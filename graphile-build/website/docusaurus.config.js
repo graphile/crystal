@@ -65,16 +65,6 @@ const config = {
         editUrl,
       },
     ],
-    [
-      "@docusaurus/plugin-content-docs",
-      {
-        id: "graphile-utils",
-        path: "graphile-utils",
-        routeBasePath: "graphile-utils",
-        sidebarPath: require.resolve("./sidebars.js"),
-        editUrl,
-      },
-    ],
 
     // Allow us to import `.mermaid` files
     () => ({
@@ -123,24 +113,26 @@ const config = {
             docId: "index",
             docsPluginId: "graphile-build-pg",
             position: "left",
-            label: "Graphile Build PG",
-          },
-          {
-            type: "doc",
-            docId: "index",
-            docsPluginId: "graphile-utils",
-            position: "left",
-            label: "Graphile Utils",
+            label: "Graphile Build pg",
           },
           {
             href: `https://github.com/${organizationName}/${projectName}`,
             label: "GitHub",
             position: "right",
           },
+          {
+            href: `https://graphile.org/sponsor/`,
+            label: "Sponsor",
+            position: "right",
+          },
+          {
+            href: `https://graphile.org/support/`,
+            label: "Support",
+            position: "right",
+          },
         ],
       },
       footer: {
-        style: "dark",
         links: [
           {
             title: "Docs",
@@ -150,16 +142,19 @@ const config = {
                 to: "/graphile-build/",
               },
               {
-                label: "Graphile Build",
+                label: "Graphile Build pg",
                 to: "/graphile-build-pg/",
               },
               {
-                label: "Graphile Utils",
-                to: "/graphile-utils/",
+                html: '<a class="footer__link-item" href="https://grafast.org">Gra<em>fast</em></a>',
               },
               {
-                label: "Grafast",
-                to: "https://grafast.org",
+                label: "PostGraphile",
+                to: "https://postgraphile.org",
+              },
+              {
+                label: "Graphile*",
+                to: "https://star.graphile.org",
               },
             ],
           },
@@ -169,6 +164,10 @@ const config = {
               {
                 label: "Discord",
                 href: "https://discord.gg/graphile",
+              },
+              {
+                label: "Mastodon",
+                href: "https://fosstodon.org/@graphile",
               },
               {
                 label: "Twitter",

@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import React from "react";
 
 import styles from "./styles.module.css";
@@ -6,7 +5,7 @@ import styles from "./styles.module.css";
 const FeatureList = [
   {
     title: "Automated",
-    Svg: require("@site/static/img/undraw_docusaurus_mountain.svg").default,
+    Svg: require("@site/static/img/automated.svg").default,
     description: (
       <>
         Don&apos;t repeat yourself, have Graphile Build do the repetative tasks
@@ -16,7 +15,7 @@ const FeatureList = [
   },
   {
     title: "Extensible",
-    Svg: require("@site/static/img/undraw_docusaurus_tree.svg").default,
+    Svg: require("@site/static/img/extensible.svg").default,
     description: (
       <>
         Extend your schemas to do whatever you need with many different
@@ -26,10 +25,10 @@ const FeatureList = [
   },
   {
     title: "Hone your API",
-    Svg: require("@site/static/img/undraw_docusaurus_react.svg").default,
+    Svg: require("@site/static/img/hone.svg").default,
     description: (
       <>
-        Graphile Build is not rigid, it&apos;s plugin based system allows you to
+        Graphile Build is not rigid, its plugin based system allows you to
         override every facet of the generated API.
       </>
     ),
@@ -38,13 +37,12 @@ const FeatureList = [
 
 function Feature({ Svg, title, description }) {
   return (
-    <div className={clsx("col col--4")}>
-      <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
+    <div className={styles.feature}>
+      <div className={styles.svgContainer}>
+        <Svg className={styles.featureSvg} role="img" alt={title} />
       </div>
-      <div className="text--center padding-horiz--md">
-        <h3>{title}</h3>
-        <p>{description}</p>
+      <div className={styles.featureDetails}>
+        <h3 className={styles.featureInfo}>{description}</h3>
       </div>
     </div>
   );

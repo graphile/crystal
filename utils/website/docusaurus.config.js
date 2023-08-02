@@ -171,6 +171,16 @@ const config = {
             label: "GitHub",
             position: "right",
           },
+          {
+            href: `https://graphile.org/sponsor/`,
+            label: "Sponsor",
+            position: "right",
+          },
+          {
+            href: `https://graphile.org/support/`,
+            label: "Support",
+            position: "right",
+          },
         ],
       },
       footer: {
@@ -198,12 +208,21 @@ const config = {
                 label: "tamedevil",
                 to: "/tamedevil/",
               },
+            ],
+          },
+          {
+            title: "The Graphile Suite",
+            items: [
               {
                 html: '<a class="footer__link-item" href="https://grafast.org">Gra<em>fast</em></a>',
               },
               {
                 label: "PostGraphile",
                 to: "https://postgraphile.org",
+              },
+              {
+                label: "Graphile Build",
+                to: "https://build.graphile.org",
               },
             ],
           },
@@ -213,6 +232,10 @@ const config = {
               {
                 label: "Discord",
                 href: "https://discord.gg/graphile",
+              },
+              {
+                label: "Mastodon",
+                href: "https://fosstodon.org/@graphile",
               },
               {
                 label: "Twitter",

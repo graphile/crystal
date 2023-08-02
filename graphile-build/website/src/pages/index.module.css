@@ -21,3 +21,24 @@
   align-items: center;
   justify-content: center;
 }
+
+.buttonHero {
+  border-radius: 7px;
+  border: 1px solid var(--ifm-color-primary);
+  letter-spacing: 0.1rem;
+}
+
+.hero {
+  color: var(--ifm-color-primary-darker);
+  font-size: 2.5rem;
+  text-align: left;
+}
+
+[data-theme="dark"] .hero {
+  color: var(--ifm-color-primary-lightest);
+}
+
+.heroImage {
+  max-width: 70%;
+  height: auto;
+}
