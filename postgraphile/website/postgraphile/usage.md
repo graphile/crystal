@@ -75,11 +75,11 @@ without the overhead of a network layer.
 
 ## Use the config, Luke!
 
-By storing most of your configuration into a `graphile.config.js` (or similar)
-file, you will be able to run PostGraphile in any of these three modes and
-still leverage a similar setup in each. This file also saves us from having to
-offer tens of CLI options as we have in previous releases, instead only
-offering the most essential options.
+By storing [your configuration](./config.mdx) into a `graphile.config.js` (or
+similar) file, you will be able to run PostGraphile in any of these three modes
+and still leverage a similar setup in each. This file also saves us from having
+to offer 72 different CLI flags like we did in V4, instead only offering the
+most essential options.
 
 ## Which one should I use?
 
