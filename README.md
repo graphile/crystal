@@ -1,4 +1,4 @@
-# Graphile GraphQL Monorepo
+# 🔮 Graphile's Crystal Monorepo
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/benjie?color=ff69b4&label=github%20sponsors)](https://github.com/sponsors/benjie)
 [![Patreon sponsor button](https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg)](https://patreon.com/benjie)
@@ -6,10 +6,11 @@
 [![Follow](https://img.shields.io/badge/twitter-@GraphileHQ-blue.svg)](https://twitter.com/GraphileHQ)
 
 At Graphile we love GraphQL so much we named ourself for our love of it! This
-repository houses many of the Graphile packages that relate to GraphQL; the two
-headline projects are **Gra*fast*** and **PostGraphile** but there's many other
-packages, a fair few of which can be used independently - see below for more
-details.
+repository houses many of the Graphile packages that relate to GraphQL (or
+relate to the packages that relate to GraphQL, or relate to those package...);
+the two headline projects are **Gra*fast*** and **PostGraphile** but there's
+many other packages, a fair few of which can be used independently - see below
+for more details.
 
 **[Grafast][grafast]**: A cutting-edge planning and execution engine for
 GraphQL.js ─ write your GraphQL schema with "plans" rather than "resolvers" and
@@ -88,6 +89,19 @@ And please give some love to our featured sponsors 🤩:
 </tr></table>
 
 <em>\* Sponsors the entire Graphile suite</em>
+
+## Why the "crystal" monorepo?
+
+Originally what is now Gra*fast* (and was previously DataPlanner) was known by
+the codename "Graphile Crystal." This lead us to use the 🔮 emoji to represent
+the project in secret before we announced it publicly, as a codeword for those
+in the know. Now that Gra*fast* is the name for our planning and execution
+engine and we needed a name for the monorepo that wasn't too GraphQL specific
+(since there are things in here that aren't strictly related to GraphQL) and we
+figured that calling it the Crystal monorepo would honour our original nickname
+for the project. Rumours that the name was inspired by the maintainers'
+[crystal wedding anniversary](https://en.wikipedia.org/wiki/Wedding_anniversary#Traditional_anniversary_gifts)
+are greatly exaggerated.
 
 <!-- SPONSORS_END -->
 
