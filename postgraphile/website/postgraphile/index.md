@@ -7,7 +7,7 @@ title: Introduction
 :::tip
 
 Coming from PostGraphile Version 4? Check out the
-[migration guide](./migrating-from-v4/)!
+[migration guide](./migrating-from-v4/index.mdx)!
 
 :::
 
