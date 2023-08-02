@@ -676,6 +676,7 @@ export interface PgRegistry<
     string,
     PgResourceOptions<
       string,
+      // TYPES: This maybe shouldn't be PgCodecWithAttributes, but PgCodec instead?
       PgCodecWithAttributes, // TCodecs[keyof TCodecs],
       ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
       readonly PgResourceParameter[] | undefined

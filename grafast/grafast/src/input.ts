@@ -154,13 +154,25 @@ export function inputStep(
   }
 }
 
-function doTypesMatch(a: GraphQLInputType, b: GraphQLInputType): boolean {
-  if (a instanceof GraphQLNonNull && b instanceof GraphQLNonNull) {
-    return doTypesMatch(a.ofType, b.ofType);
-  } else if (a instanceof GraphQLList && b instanceof GraphQLList) {
-    return doTypesMatch(a.ofType, b.ofType);
+function doTypesMatch(
+  variableType: GraphQLInputType,
+  expectedType: GraphQLInputType,
+): boolean {
+  if (
+    variableType instanceof GraphQLNonNull &&
+    expectedType instanceof GraphQLNonNull
+  ) {
+    return doTypesMatch(variableType.ofType, expectedType.ofType);
+  } else if (variableType instanceof GraphQLNonNull) {
+    // Variable is stricter than input type, that's fine
+    return doTypesMatch(variableType.ofType, expectedType);
+  } else if (
+    variableType instanceof GraphQLList &&
+    expectedType instanceof GraphQLList
+  ) {
+    return doTypesMatch(variableType.ofType, expectedType.ofType);
   } else {
-    return a === b;
+    return variableType === expectedType;
   }
 }
 
