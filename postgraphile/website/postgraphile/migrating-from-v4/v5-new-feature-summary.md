@@ -10,7 +10,7 @@ with something much more pleasant and powerful. After many iterations, we ultima
 
 Since the lookahead system underpinned everything in Version 4 of PostGraphile, replacing it
 meant rebuilding everything from the ground up, so we took the opportunity to fix a huge number
-of other niggles and suboptimal experiences in Version 4 - also adding in many capabilities which
+of other snags and suboptimal experiences in Version 4 - also adding in many capabilities which
 weren't possible, and changing some of the default behaviors.
 
 Ultimately, Version 5 brings a number of new paradigms to PostGraphile, and along with that many
@@ -159,7 +159,7 @@ Generate personalized documentation based on which plugins/presets you're using
 
 </details>
 
-- Better Relay support
+- Better Relay support via `postgraphile/presets/relay`
 - Massively enhanced TypeScript support
 - Fully implements the latest [GraphQL-over-HTTP specification draft](https://graphql.github.io/graphql-over-http/draft/)
 - Ability to perform JOINs in SQL

@@ -60,11 +60,48 @@ presets, plugins and options. You store your config into a `graphile.config.js`
 line, library mode, or even schema-only mode - they all share the same
 configuration.
 
+### makeV4Preset
+
 To make the transition to this new system easier, we've built a `makeV4Preset`
 preset factory for you that converts a number of the options that you are
 familiar with from V4 into their V5 equivalents. To use it, feed your options
 into its first argument, and combine it with `postgraphile/presets/amber` (our
 initial preset) to get a completed config:
+
+```ts title="graphile.config.js"
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
+// highlight-next-line
+import { makeV4Preset } from "postgraphile/presets/v4";
+import { makePgService } from "postgraphile/adaptors/pg";
+
+/** @type {GraphileConfig.Preset} */
+const preset = {
+  extends: [
+    PostGraphileAmberPreset,
+    // highlight-start
+    makeV4Preset({
+      /* PUT YOUR V4 OPTIONS HERE, e.g.: */
+      simpleCollections: "both",
+      jwtPgTypeIdentifier: '"b"."jwt_token"',
+    }),
+    // highlight-end
+  ],
+
+  pgServices: [
+    makePgService({
+      connectionString: process.env.DATABASE_URL,
+      schemas: ["app_public"],
+    }),
+  ],
+};
+
+export default preset;
+```
+
+
+### Larger example
+
+Here's a larger documented preset with more details:
 
 ```ts title="graphile.config.js"
 import "graphile-config";
