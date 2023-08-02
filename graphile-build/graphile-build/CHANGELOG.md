@@ -1,5 +1,13 @@
 # graphile-build
 
+## 5.0.0-alpha.18
+
+### Patch Changes
+
+- Updated dependencies
+  [[`dfefdad3c`](https://github.com/benjie/crystal/commit/dfefdad3cd5a99c36d47eb0bddd914bab4ca9a1f)]:
+  - grafast@0.0.1-alpha.16
+
 ## 5.0.0-alpha.17
 
 ### Patch Changes

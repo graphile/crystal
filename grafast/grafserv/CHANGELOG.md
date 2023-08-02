@@ -1,5 +1,13 @@
 # grafserv
 
+## 0.0.1-alpha.16
+
+### Patch Changes
+
+- Updated dependencies
+  [[`dfefdad3c`](https://github.com/benjie/crystal/commit/dfefdad3cd5a99c36d47eb0bddd914bab4ca9a1f)]:
+  - grafast@0.0.1-alpha.16
+
 ## 0.0.1-alpha.15
 
 ### Patch Changes

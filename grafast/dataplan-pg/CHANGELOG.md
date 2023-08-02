@@ -1,5 +1,19 @@
 # @dataplan/pg
 
+## 0.0.1-alpha.17
+
+### Patch Changes
+
+- [#441](https://github.com/benjie/crystal/pull/441)
+  [`dfefdad3c`](https://github.com/benjie/crystal/commit/dfefdad3cd5a99c36d47eb0bddd914bab4ca9a1f)
+  Thanks [@benjie](https://github.com/benjie)! - Change bundling techniques for
+  grafast and @dataplan/pg
+
+- Updated dependencies
+  [[`dfefdad3c`](https://github.com/benjie/crystal/commit/dfefdad3cd5a99c36d47eb0bddd914bab4ca9a1f)]:
+  - grafast@0.0.1-alpha.16
+  - @dataplan/json@0.0.1-alpha.16
+
 ## 0.0.1-alpha.16
 
 ### Patch Changes

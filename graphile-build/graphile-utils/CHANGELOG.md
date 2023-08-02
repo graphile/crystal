@@ -1,5 +1,16 @@
 # graphile-utils
 
+## 5.0.0-alpha.20
+
+### Patch Changes
+
+- Updated dependencies
+  [[`dfefdad3c`](https://github.com/benjie/crystal/commit/dfefdad3cd5a99c36d47eb0bddd914bab4ca9a1f),
+  [`6c1c1a34f`](https://github.com/benjie/crystal/commit/6c1c1a34f674bf4ef3b13dadebb4e13c422c940e)]:
+  - graphile-build-pg@5.0.0-alpha.20
+  - grafast@0.0.1-alpha.16
+  - graphile-build@5.0.0-alpha.18
+
 ## 5.0.0-alpha.19
 
 ### Patch Changes
