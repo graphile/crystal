@@ -73,25 +73,17 @@ export default function Home() {
       description="Extensible high-performance automatic GraphQL API for PostgresSQL"
     >
       <WarningSection
-        title={`PostGraphile Version 5 is in public Beta!`}
+        title={`PostGraphile Version 5 Public Beta`}
         body={
           <>
             <h3 className={styles.warningInfo}>
               This website and the associated software is still a
               work-in-progress. Whilst{" "}
-              <strong>suitable to run in production</strong>, we anticipate a
-              small number of breaking changes over the coming weeks and the
-              documentation is not yet complete.
+              <strong>suitable to run in production</strong>, we need your help
+              to get it past the finish line; please read the beta announcement{" "}
+              <strong>and get involved</strong>.
             </h3>
-            <h3 className={styles.warningInfo}>
-              If you love PostGraphile, now's your chance to get involved and
-              contribute to making the launch of PostGraphile V5 a success
-              &mdash; we need your help checking and editing the docs, trying
-              the software in your own applications, writing example projects or
-              tutorials, porting V4 plugins to V5 and much much more! Please
-              feel free to send pull requests or let us know of any gaps, and
-              most importantly, have fun!
-            </h3>
+            <h3 className={styles.warningInfo}> </h3>
           </>
         }
         primaryLink={`https://graphile.org/sponsor/`}

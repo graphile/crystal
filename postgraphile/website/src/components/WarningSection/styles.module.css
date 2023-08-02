@@ -29,6 +29,7 @@
 
 .header {
   composes: header from "@site/src/css/common.module.css";
+  font-size: 2rem;
 }
 
 .warningSection h3 {

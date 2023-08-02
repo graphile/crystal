@@ -16,7 +16,7 @@ export default function WarningContent({
       <div
         className={clsx("container margin-vert--lg", styles.warningContainer)}
       >
-        <div className={clsx("col col--6 padding-vert--md", styles.inner)}>
+        <div className={clsx("col col--6", styles.inner)}>
           <h2 className={styles.header}>{title}</h2>
           <p>{body}</p>
           <div className="buttons-container">
