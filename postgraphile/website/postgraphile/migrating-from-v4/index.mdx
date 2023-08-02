@@ -53,7 +53,7 @@ of documentation first. It also allows us to evolve the defaults over time
 without breaking existing users schemas - ultimately meaning we no longer need a
 "recommended options" section in the docs.
 
-To achieve this, we've introduced a new module: `graphile-config`. This module
+To achieve this, we've introduced a new module: [`graphile-config`](https://star.graphile.org/graphile-config/). This module
 takes care of the common concerns relating to configuration, in particular:
 presets, plugins and options. You store your config into a `graphile.config.js`
 (or `.ts`, `.mjs`, `.mts`) file and this can then be used from the command
@@ -69,7 +69,7 @@ initial preset) to get a completed config:
 ```ts title="graphile.config.js"
 import "graphile-config";
 
-import PresetAmber from "postgraphile/presets/amber";
+import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 // Use the 'pg' module to connect to the database
 import { makePgService } from "postgraphile/adaptors/pg";
@@ -78,7 +78,7 @@ import { makePgService } from "postgraphile/adaptors/pg";
 const preset = {
   extends: [
     // The initial PostGraphile V5 preset
-    PresetAmber.default ?? PresetAmber,
+    PostGraphileAmberPreset,
 
     // Change the options and add/remove plugins based on your V4 configuration:
     makeV4Preset({
@@ -144,7 +144,9 @@ const preset = {
 :::info
 
 Not all of the community's V4 plugins have been ported to V5 at time of
-writing, but with your help hopefully we can fix that!
+writing, but with your help hopefully we can fix that! See the [community
+plugins page](../community-plugins.md) for details of which plugins have been
+ported.
 
 :::
 
@@ -240,8 +242,8 @@ Other changes:
   thrown may differ slightly between V4 and V5; this will still respect the
   GraphQL schema though, of course.
 - `PgIndexBehaviorsPlugin` (the V5 equivalent of `--no-ignore-indexes`) now
-  only removes the backwards relation when a relation is unindexed, since the
-  forwards (to one) relation is always indexed
+  only removes the backwards ("has many") relation when a relation is
+  unindexed, since the forwards ("belongs to") relation is always indexed
 
 ## Smart tag changes
 
@@ -272,13 +274,19 @@ powerful.
 
 ### CLI
 
-You can run V5 with the `postgraphile` command. Now that it automatically reads
-the `graphile.config.js` file you should use that for advanced configuration of
-the PostGraphile CLI rather than sending loads of CLI flags.
+You can run V5 with the `postgraphile` (or `pgl`) command. This command
+automatically reads the `graphile.config.js` file; you should use that for
+advanced configuration of the PostGraphile CLI rather than sending loads of CLI
+flags - this enables us to keep the documentation tighter (documenting just one
+set of options rather than 4), gives you auto-complete (if your editor supports
+it) on the options, allows you to easily add comments on why the various
+options are enabled, and makes it easier to transition between CLI, library and
+schema-only modes.
 
 Currently the main options are:
 
-- `-P` - the preset to use, e.g. `-P postgraphile/presets/amber`
+- `-P` - the preset to use, e.g. `-P postgraphile/presets/amber` (or `-P
+pgl/amber` if you're using `pgl`)
 - `-p` - the port to listen on; if not set then it will try and use `5678` but
   _will fallback to a system-assigned port_ so be sure to set this in
   production!
@@ -288,40 +296,83 @@ Currently the main options are:
 - `-S postgres://...` - your superuser connection string (replaces V4's
   `-C`/`--owner-connection` flag)
 - `-s app_public` - your list of PostgreSQL schemas (same as in V4)
-- `-e` - enable "explain" - this allows PostGraphiQL (now called Ruru) to render the
-  operation plan and SQL queries that were executed
+- `-e` - enable "explain" - this allows Ruru (formerly called PostGraphiQL) to
+  render the operation plan and SQL queries that were executed
 - `-C` - the config file to load; if not set we'll try and load
-  `graphile.config.js` (or similar) but won't raise an error if it doesn't exist
+  `graphile.config.js` (or similar with different extensions) but won't raise
+  an error if it doesn't exist
 
 Example:
 
 ```bash
 postgraphile -P postgraphile/presets/amber -c postgres:///my_db_name -s public -e
+# or: pgl -P pgl/amber -c postgres:///my_db_name -s public -e
 ```
 
 ### Library mode
 
-Load your config from your `graphile.config.js` file and feed it into the
-`postgraphile` function to get a `pgl` PostGraphile instance. In V4 this would
-have been a middleware, but [Grafserv][] has much more native support for the
-various JS webservers than we had in V5, which has necessitated a different
-approach, so instead you get a collection of helper methods.
+Load your config from your `graphile.config.js` file:
 
-Load the correct [Grafserv][] adaptor for the JS server that you're using, and
-feed this into `pgl.createServ(grafserv)` to get a `serv` Grafserv instance.
+```ts
+import preset from "./graphile.config.js";
+```
+
+Then feed your preset into the
+`postgraphile` function to get a PostGraphile instance (`pgl`):
+
+```ts
+const pgl = postgraphile(preset);
+```
+
+In V4 this would have been a middleware, but in V5 we let [Grafserv][] handle
+the webserver portions (rather than PostGraphile having its own internal
+server), this allows us to provide deep integration with the various JS
+webservers (much better than we had in V4!). This has, however, necessitated a
+different approach, so instead of a middleware the result of calling
+`postgraphile()` is a PostGraphile instance which provides a collection of
+helper methods.
+
+We'll be using the `pgl.createServ()` helper in a moment, but first load the
+correct [Grafserv][] adaptor for the JS server that you're using:
+
+```ts
+import { grafserv } from "grafserv/node";
+// OR: import { grafserv } from "grafserv/express/v4";
+// OR: import { grafserv } from "grafserv/koa/v2";
+// OR: import { grafserv } from "grafserv/fastify/v4";
+// etc
+```
+
+Then feed this into `pgl.createServ` to get a `serv` Grafserv instance:
+
+```ts
+const serv = pgl.createServ(grafserv);
+```
+
 Finally mount the `serv` instance into your server of choice using the API your
-chosen Grafserv adaptor recommends (typically `serv.addTo(...)`).
+chosen Grafserv adaptor recommends (typically `serv.addTo(...)`):
 
-Here's a simple example using the Node built-in HTTP server:
+```ts
+import { createServer } from "node:http";
+const server = createServer();
+server.on("error", (e) => console.error(e));
+
+// highlight-next-line
+serv.addTo(server);
+
+server.listen(preset.grafserv?.port ?? 5678);
+```
+
+Let's pull this all together to see an example using the Node built-in HTTP
+server:
 
 ```ts title="server.js"
 import preset from "./graphile.config.js";
 import { postgraphile } from "postgraphile";
-// This is the import for 'node', there are many other adaptors for different frameworks
-import { grafserv } from "grafserv/node";
+import { grafserv } from "grafserv/node"; // Adaptor for Node's HTTP server
 import { createServer } from "node:http";
 
-// Create an HTTP server
+// Create an HTTP server (with error handler)
 const server = createServer();
 server.on("error", (e) => console.error(e));
 
@@ -336,20 +387,29 @@ serv.addTo(server);
 server.listen(preset.grafserv?.port ?? 5678);
 ```
 
-:::note
-
-Other servers will have slightly different code, please see the [Grafserv][]
-documentation for details.
-
-:::
-
 :::tip
 
 Node.js' `http.createServer()` does _not_ need to be passed a request handler -
-you can attach one later via `server.on('request', handler)` - this is exactly
+you can attach one later via `server.on('request', handler)` which is exactly
 what we do behind the scenes in the example above. The reason for this approach
 is that it gives us a chance to also add a `server.on('upgrade', ...)` handler
 for dealing with websockets if `preset.grafserv.websockets` is `true`.
+
+:::
+
+:::note
+
+The above code might differ significantly depending on which webserver
+framework you're using. In V4 we tried to support as many servers as possible
+by reducing everything to the lowest common denominator: the Node HTTP `req`
+and `res` objects. This made it easy to add the middleware, but made it
+challenging for you to deeply integrate with the various middlewares and
+capabilities in your webserver of choice. In V5, we have created an independent
+abstraction over HTTP requests which Grafserv handles, and then we provide
+different adaptors (or you can write your own!) to convert back and forth
+between your webserver framework and our internal request abstractions.
+
+Please see the [Grafserv][] documentation for details.
 
 :::
 
@@ -358,15 +418,23 @@ for dealing with websockets if `preset.grafserv.websockets` is `true`.
 `createPostGraphileSchema` is now just `makeSchema` (and can be imported from
 `postgraphile` or `graphile-build` - your choice). It only accepts one argument
 now - the preset that you'd load from your `graphile.config.js` (or similar)
-file.
+file:
+
+```ts
+import { makeSchema } from "postgraphile";
+import preset from "./graphile.config.js";
+
+// highlight-next-line
+const { schema, resolvedPreset } = await makeSchema(preset);
+```
 
 There is no need for `withPostGraphileContext` any more; the context no longer
 has a lifecycle that needs to be carefully managed. Just run the query through
 `grafast` as you normally would through `graphql`.
 
 The `context` will still need to be generated however. The easy option is to
-have this done automatically by additionally passing the `resolvedPreset` and a
-`requestContext` object to `grafast`:
+have this done automatically by passing the `resolvedPreset` and a
+`requestContext` object as part of the args to your `grafast` call:
 
 ```ts title="schema-only.mjs"
 import { grafast } from "grafast";
@@ -377,14 +445,17 @@ const { schema, resolvedPreset } = await makeSchema(preset);
 
 const args = {
   schema,
+  // highlight-next-line
+  resolvedPreset,
+  // highlight-next-line
+  requestContext: {},
   source: /* GraphQL */ `
     query MyQuery {
       __typename
     }
   `,
 };
-const requestContext = {};
-const result = await grafast(args, resolvedPreset, requestContext);
+const result = await grafast(args);
 console.dir(result);
 ```
 
@@ -408,6 +479,13 @@ GraphiQL called [Ruru][]. This still integrates into the server, but you can
 also run it directly from the command line now too! It doesn't have a plugin
 system yet, but it will :grin:
 
+You can try ruru out against any GraphQL API (not only those made by
+PostGraphile) via:
+
+```bash
+npx ruru -PSe http://localhost:5678/graphql
+```
+
 ## Plugins
 
 The plugin architecture has been transformed: whereas plugins previously were
@@ -416,8 +494,10 @@ functions, they are now declarative objects. For example a plugin that adds the
 
 ```js title="V4AddQueryFourFieldPlugin.js"
 // Version 4 example; will not work with V5!
+// highlight-start
 module.exports = (builder) => {
   builder.hook("GraphQLObjectType:fields", (fields, build, context) => {
+    // highlight-end
     const {
       graphql: { GraphQLInt },
     } = build;
@@ -428,9 +508,11 @@ module.exports = (builder) => {
       {
         four: {
           type: GraphQLInt,
+          // highlight-start
           resolve() {
             return 4;
           },
+          // highlight-end
         },
       },
       "Adding Query.four",
@@ -442,14 +524,15 @@ module.exports = (builder) => {
 In V5 the equivalent would be:
 
 ```js title="V5AddQueryFourFieldPlugin.js"
+// highlight-start
 const { constant } = require("grafast");
-
 module.exports = {
   name: "AddQueryFourFieldPlugin",
   version: "0.0.0",
   schema: {
     hooks: {
       GraphQLObjectType_fields(fields, build, context) {
+        // highlight-end
         const {
           graphql: { GraphQLInt },
         } = build;
@@ -460,9 +543,11 @@ module.exports = {
           {
             four: {
               type: GraphQLInt,
+              // highlight-start
               plan() {
                 return constant(4);
               },
+              // highlight-end
             },
           },
           "Adding Query.four",
@@ -483,9 +568,10 @@ This new structure allows the system to learn more about the plugin before
 actually running it, and can improve the debugging messages when things go
 wrong.
 
-Keep in mind that we no longer have the lookahead system (so
-`addArgDataGenerator` and its ilk no longer exist), instead we use [Gra*fast* plan
-resolvers][].
+Keep in mind that we no longer have the lookahead system so
+`addArgDataGenerator` and its ilk no longer exist, instead we declare a
+[Gra*fast* `applyPlan`](https://grafast.org/grafast/plan-resolvers/#applyplan-plan-resolvers)
+or similar plan resolver.
 
 ## Plans, not resolvers
 
