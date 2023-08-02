@@ -1,6 +1,6 @@
 {
   "name": "tamedevil",
-  "version": "0.0.0-alpha.4",
+  "version": "0.0.0-beta.0",
   "description": "Build and evaluate JavaScript strings safely via tagged template literals",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
