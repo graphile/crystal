@@ -180,12 +180,15 @@ const config = {
                 to: "https://postgraphile.org",
               },
               {
-                label: "Grafast",
-                to: "https://grafast.org",
+                html: '<a class="footer__link-item" href="/grafast">Gra<em>fast</em></a>',
               },
               {
                 label: "Graphile Build",
                 to: "https://build.graphile.org",
+              },
+              {
+                label: "Graphile*",
+                to: "https://star.graphile.org",
               },
               {
                 label: "Ruru",

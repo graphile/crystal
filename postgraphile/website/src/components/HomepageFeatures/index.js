@@ -40,7 +40,7 @@ const FeatureList = [
         Powered by Gra<em>fast</em>
       </>
     ),
-    Svg: require("@site/static/img/homepage/heart.svg").default,
+    Svg: require("@site/static/img/homepage/fast.svg").default,
     description: (
       <>
         PostGraphile Version 5 is built upon a new, powerful and pleasant
