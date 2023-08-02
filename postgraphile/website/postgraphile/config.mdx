@@ -7,8 +7,9 @@ import GraphileCLI from "@theme/GraphileCLI";
 # Configuration
 
 No matter whether you're using PostGraphile CLI, library mode or schema only,
-PostGraphile (and other elements of the stack including Graphile Build, Grafast
-and Grafserv) are configured via a `graphile-config` "preset."
+PostGraphile (and other elements of the stack including Graphile Build,
+Gra*fast* and Grafserv) are configured via a [`graphile-config`
+"preset."](https://star.graphile.org/graphile-config/preset)
 
 A preset is a simple JS object that contains a combination of: other presets,
 plugins, and options for the various scopes. Your configuration, your preset,
@@ -75,7 +76,7 @@ export default preset;
 ```
 
 Similarly you can create your config as a `.js`, `.cjs`, `.mts` or `.cts` file;
-the PostGraphile API will pick up all of these automatically assuming that you
+the PostGraphile CLI will pick up all of these automatically assuming that you
 have TypeScript installed locally.
 
 ## General structure
@@ -89,15 +90,17 @@ The value for the `extends` key, if specified, must be an array of other presets
 your preset wishes to inherit from.
 
 The value for the `plugins` key, if specified, must be an array of
-`graphile-config` plugins that your preset wishes to make use of. Plugins must
-always have unique names, and will be automatically de-duplicated by the system
-if the same plugin is referenced in multiple presets.
+[`graphile-config` plugins](https://star.graphile.org/graphile-config/plugin)
+that your preset wishes to make use of. Plugins must always have unique names,
+and will be automatically de-duplicated by the system if the same plugin is
+referenced in multiple presets.
 
 The preset also accepts keys for each supported scope. `graphile-config` has no
-native scopes, but different Graphile projects can register their own scopes,
-for example `graphile-build` registers the `inflection`, `gather` and `schema`
-scopes, `graphile-build-pg` registers the `pgServices` scope, Grafserv
-registers the `grafserv` scope and `ruru` registers the `ruru` scope.
+native scopes, but different Graphile projects can register their own scopes.
+For example: `graphile-build` registers the `inflection`, `gather` and `schema`
+scopes; `graphile-build-pg` registers the `pgServices` scope; Gra*fast*
+registers the `grafast` scope; Grafserv registers the `grafserv` scope; and
+`ruru` registers the `ruru` scope.
 
 We highly recommend using TypeScript for dealing with your preset so that you
 get auto-completion for the options available in each scope; you can also use
@@ -240,10 +243,11 @@ graphile config options
 :::info
 
 The `graphile` CLI is a development aid only, and is not needed at runtime or
-in production. This utility is sponsors-only source-available software. If
-you're not a sponsor there's a 30 day free trial that starts as soon as you run
-it for the first time. You may sponsor at any level for access to this utility.
-Read the details in the [graphile command's
+in production (or in development really, it's just a handy little helper). This
+utility is sponsors-only source-available software. If you're not a sponsor
+there's a 30 day free trial that starts as soon as you run it for the first
+time. You may sponsor at any level for access to this utility. Read the details
+in the [graphile command's
 README](https://www.npmjs.com/package/graphile/v/alpha).
 
 :::
@@ -768,6 +772,7 @@ With either of the above examples, you could write an SQL function
 
 ```sql
 create function get_x_something() returns text as $$
+  /* highlight-next-line */
   select nullif(current_setting('myapp.headers.x_something', true), '')::text;
 $$ language sql stable;
 ```
@@ -791,15 +796,18 @@ export default {
       const context = {
         pgSettings: {
           ...args.contextValue?.pgSettings,
+          // highlight-next-line
           role: "visitor",
         },
       };
 
       // Extract the current user from the Express request:
+      // highlight-next-line
       const user = requestContext.expressv4?.req.user;
 
       // If there's a user, pass additional data to Postgres:
       if (user) {
+        // highlight-next-line
         context.pgSettings["jwt.claims.user_id"] = String(user.id);
       }
 
