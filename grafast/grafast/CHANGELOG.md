@@ -1,5 +1,14 @@
 # grafast
 
+## 0.0.1-beta.2
+
+### Patch Changes
+
+- [#444](https://github.com/benjie/crystal/pull/444)
+  [`23bd3c291`](https://github.com/benjie/crystal/commit/23bd3c291246aebf27cf2784f40fc948485f43c9)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in processing variables
+  of stricter types than arguments.
+
 ## 0.0.1-beta.1
 
 ### Patch Changes
