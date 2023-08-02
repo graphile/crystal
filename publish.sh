@@ -2,7 +2,7 @@
 set -e -x
 
 BUILD_DIR=crystal/builds
-TAG=alpha
+TAG=beta
 
 cd ..
 tar tzf $BUILD_DIR/graphile__lru.tgz
