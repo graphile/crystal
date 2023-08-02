@@ -1,5 +1,26 @@
 # postgraphile
 
+## 5.0.0-beta.1
+
+### Patch Changes
+
+- [`cbd987385`](https://github.com/benjie/crystal/commit/cbd987385f99bd1248bc093ac507cc2f641ba3e8)
+  Thanks [@benjie](https://github.com/benjie)! - Bump all packages to beta
+
+- Updated dependencies
+  [[`cbd987385`](https://github.com/benjie/crystal/commit/cbd987385f99bd1248bc093ac507cc2f641ba3e8)]:
+  - @dataplan/json@0.0.1-beta.1
+  - @dataplan/pg@0.0.1-beta.1
+  - grafast@0.0.1-beta.1
+  - grafserv@0.0.1-beta.1
+  - graphile-build@5.0.0-beta.1
+  - graphile-build-pg@5.0.0-beta.1
+  - graphile-utils@5.0.0-beta.1
+  - graphile-config@0.0.1-beta.1
+  - @graphile/lru@5.0.0-beta.1
+  - pg-sql2@5.0.0-beta.1
+  - tamedevil@0.0.0-beta.1
+
 ## 5.0.0-alpha.20
 
 ### Patch Changes

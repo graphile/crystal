@@ -1,5 +1,12 @@
 # @graphile/lru
 
+## 5.0.0-beta.1
+
+### Patch Changes
+
+- [`cbd987385`](https://github.com/benjie/crystal/commit/cbd987385f99bd1248bc093ac507cc2f641ba3e8)
+  Thanks [@benjie](https://github.com/benjie)! - Bump all packages to beta
+
 ## 5.0.0-alpha.2
 
 ### Patch Changes
