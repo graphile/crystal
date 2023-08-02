@@ -142,9 +142,10 @@ in JS, you might use an SQL expression:
 
 :::note
 
-The above is _not_ an example of an SQL injection attack, the
-`pgClassExpression` helper creates a tagged template literal function which
-ensures that all parameters are correctly escaped in the generated SQL query.
+The above is _not_ an example of an SQL injection attack, the code uses the
+`sql` tagged template literal function from the [`pg-sql2`
+module](https://star.graphile.org/pg-sql2) to ensure that all parameters are
+correctly handled.
 
 :::
 
@@ -167,7 +168,9 @@ A more performant (and simpler) solution to this would have been to do it in JS:
 
 :::
 
-TODO: once `@dataplan/pg` documentation is written, add links to it here.
+Please refer to the
+[@dataplan/pg](https://grafast.org/grafast/step-library/dataplan-pg/)
+documentation for additional details.
 
 ## `selectGraphQLResultFromTable`
 
@@ -254,6 +257,7 @@ adaptor, so if you want to deal with your Postgres client of choice here (`pg`,
 
 ```js
 import { object } from "grafast";
+// highlight-next-line
 import { withPgClientTransaction } from "postgraphile/@dataplan/pg";
 import { makeExtendSchemaPlugin } from "graphile-utils";
 
@@ -301,6 +305,7 @@ export default makeExtendSchemaPlugin((build) => {
           // `withPgClientTransaction` step; if it throws an error then the
           // transaction will roll back and the error will be the result of the
           // step.
+          // highlight-start
           const $transactionResult = withPgClientTransaction(
             executor,
             $data,
@@ -327,6 +332,7 @@ export default makeExtendSchemaPlugin((build) => {
               return rows.map((row) => row.i);
             },
           );
+          // highlight-end
 
           return $transactionResult;
         },
