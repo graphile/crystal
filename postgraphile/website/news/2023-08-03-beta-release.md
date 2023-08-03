@@ -36,6 +36,8 @@ It has taken us 3.5 years to get to this point and we’re pretty happy with the
 
 **Help us to educate people about V5.** We don’t have a marketing department, we cannot afford a developer relations team or to sponsor big events. We’ll need your help to get the word out about PostGraphile V5, when the time comes; in the meantime we could really do with some help building example applications and tutorials to help people get started.
 
+<!--truncate-->
+
 ## What does “beta” mean for PostGraphile?
 
 We believe that **PostGraphile V5 is suitable to run in production** and that we’ve completed most of the significant API rewrites that we wanted to make. There’s still some expected (and maybe a couple unexpected) changes to come, but mostly the beta phase is there to gather feedback from the community about how it works for you, and to leave space to make breaking changes if they turn out to be necessary before we place the stamp on the final V5.0.0 release.
@@ -91,5 +93,3 @@ Ideally, you’d follow [the migration guide](https://postgraphile.org/postgraph
 ### Join our testing community
 
 If you use Discord, join our server at [https://discord.gg/graphile](https://discord.gg/graphile) and chat away with other V5 users — talk over the new features, discuss any issues you encounter and explore different ways of using the new projects. We look forward to welcoming you and hearing of your suggestions successes with V5!
-
-<!--truncate-->
