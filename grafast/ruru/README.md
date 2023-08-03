@@ -14,7 +14,7 @@ installing it using the `npx` command. Here's an example command to explore
 [@trevorblades](https://twitter.com/trevorblades)'s countries API:
 
 ```
-npx ruru -SPe https://countries.trevorblades.com/graphql
+npx ruru@beta -SPe https://countries.trevorblades.com/graphql
 ```
 
 (`-S` enables subscriptions, `-P` proxies GraphQL requests; neither of these are
@@ -25,7 +25,7 @@ needed for Trevor's API, but you might want them for your API.)
 Install Ruru:
 
 ```
-yarn add ruru
+yarn add ruru@beta
 ```
 
 Then you can run something like the following to automatically proxy requests

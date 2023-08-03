@@ -117,7 +117,7 @@ The easiest way to get started is with the [CLI interface](./usage-cli/); if you
 have `npx` installed you can try it out with:
 
 ```
-npx pgl -P pgl/amber -e -c 'postgres:///mydb'
+npx pgl@beta -P pgl/amber -e -c 'postgres:///mydb'
 ```
 
 _(Replace the connection string with a PostgreSQL connection string to your

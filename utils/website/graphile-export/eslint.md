@@ -12,7 +12,7 @@ with a lot of the pain.
 To install:
 
 ```
-yarn add eslint-plugin-graphile-export
+yarn add eslint-plugin-graphile-export@beta
 ```
 
 To set up, add `"graphile-export"` to your ESLint configuration's `plugins`

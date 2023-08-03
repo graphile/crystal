@@ -112,7 +112,7 @@ We've built a command into our sponsors-only `graphile` development assistant
 to help you determine all the inflectors available to you:
 
 ```bash npm2yarn
-npm install --save-dev graphile
+npm install --save-dev graphile@beta
 npx graphile inflection list
 ```
 

@@ -69,13 +69,13 @@ And please give some love to our featured sponsors 🤩:
 ## Installation
 
 ```
-yarn add tamedevil
+yarn add tamedevil@beta
 ```
 
 or
 
 ```
-npm install --save tamedevil
+npm install --save tamedevil@beta
 ```
 
 ## Importing

@@ -127,7 +127,7 @@ Use your package manager of choice to install the `postgraphile` module:
 [npm](https://docs.npmjs.com/getting-started/installing-node):
 
 ```bash npm2yarn
-npm install --save postgraphile
+npm install --save postgraphile@beta
 ```
 
 :::tip

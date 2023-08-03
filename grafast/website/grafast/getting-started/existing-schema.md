@@ -25,7 +25,7 @@ possible that this list of constraints is not complete.)
 Ensure that you have both the `graphql` and `grafast` modules installed:
 
 ```bash npm2yarn
-npm install --save grafast graphql
+npm install --save grafast@beta graphql
 ```
 
 ## Running

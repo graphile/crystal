@@ -47,10 +47,10 @@ First, add this package as a devDependency:
 
 ```bash
 # With npm
-npm install --save-dev jest-serializer-graphql-schema
+npm install --save-dev jest-serializer-graphql-schema@beta
 
 # With yarn
-yarn add --dev jest-serializer-graphql-schema
+yarn add --dev jest-serializer-graphql-schema@beta
 ```
 
 Next, update your `package.json` file to

@@ -93,13 +93,13 @@ const plugin = {
 ## Installation:
 
 ```bash
-yarn add @graphile/simplify-inflection
+yarn add @graphile/simplify-inflection@beta
 ```
 
 or
 
 ```bash
-npm install --save @graphile/simplify-inflection
+npm install --save @graphile/simplify-inflection@beta
 ```
 
 ## Usage:

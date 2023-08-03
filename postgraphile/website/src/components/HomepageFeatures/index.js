@@ -8,8 +8,8 @@ const FeatureList = [
     Svg: require("@site/static/img/homepage/clock.svg").default,
     description: (
       <>
-        <code>npx postgraphile -c postgres://...</code> and you&rsquo;re running
-        ─ try it out without investing large amounts of time!
+        <code>npx pgl -P pgl/amber -c postgres://...</code> and you&rsquo;re
+        running ─ try it out without investing large amounts of time!
       </>
     ),
   },
