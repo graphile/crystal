@@ -8,7 +8,7 @@ const FeatureList = [
     Svg: require("@site/static/img/homepage/clock.svg").default,
     description: (
       <>
-        <code>npx postgraphile -c postgres://...</code> and you&apos;re running
+        <code>npx postgraphile -c postgres://...</code> and you&rsquo;re running
         ─ try it out without investing large amounts of time!
       </>
     ),
@@ -18,17 +18,18 @@ const FeatureList = [
     Svg: require("@site/static/img/homepage/code.svg").default,
     description: (
       <>
-        Don&apos;t just take our defaults, spend a few minutes honing your API
-        so it&apos;s the shape that you&apos;ll want it to be for years to come.
+        Don&rsquo;t just take our defaults, spend a few minutes honing your API
+        so it&rsquo;s the shape that you&rsquo;ll want it to be for years to
+        come.
       </>
     ),
   },
   {
     title: "Versatile",
-    Svg: require("@site/static/img/homepage/fun-arrow.svg").default,
+    Svg: require("@site/static/img/homepage/versatile.svg").default,
     description: (
       <>
-        Whether you&apos;re building the backend API for your SaaS, build
+        Whether you&rsquo;re building the backend API for your SaaS, build
         internal tooling for your business, or anything else, PostGraphile has
         your back.
       </>
@@ -40,7 +41,7 @@ const FeatureList = [
         Powered by Gra<em>fast</em>
       </>
     ),
-    Svg: require("@site/static/img/homepage/heart.svg").default,
+    Svg: require("@site/static/img/homepage/fast.svg").default,
     description: (
       <>
         PostGraphile Version 5 is built upon a new, powerful and pleasant

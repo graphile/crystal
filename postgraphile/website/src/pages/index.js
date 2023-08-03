@@ -6,6 +6,7 @@ import HomepageTestimonials from "@site/src/components/HomepageTestimonials";
 import HomepageTools from "@site/src/components/HomepageTools";
 import SecondarySection from "@site/src/components/SecondarySection";
 import TertiarySection from "@site/src/components/TertiarySection";
+import WarningSection from "@site/src/components/WarningSection";
 import styles from "@site/src/pages/index.module.css";
 import HeroImage from "@site/static/img/homepage/coder.svg";
 import Layout from "@theme/Layout";
@@ -71,6 +72,25 @@ export default function Home() {
       title={`PostGraphile`}
       description="Extensible high-performance automatic GraphQL API for PostgresSQL"
     >
+      <WarningSection
+        title={`PostGraphile Version 5 Public Beta`}
+        body={
+          <>
+            <h3 className={styles.warningInfo}>
+              This website and the associated software is still a
+              work-in-progress. Whilst{" "}
+              <strong>suitable to run in production</strong>, we need your help
+              to get it past the finish line; please read the beta announcement{" "}
+              <strong>and get involved</strong>.
+            </h3>
+            <h3 className={styles.warningInfo}> </h3>
+          </>
+        }
+        primaryLink={`https://graphile.org/sponsor/`}
+        primaryButtonText={`Beta Announcement`}
+        secondaryLink={`/postgraphile/next/migrating-from-v4/`}
+        secondaryButtonText={`V4 Migration Guide`}
+      />
       <HomepageHeader />
       <main>
         <HomepageTestimonials />

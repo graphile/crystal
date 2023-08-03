@@ -69,3 +69,7 @@
 .githubButton {
   width: 8rem;
 }
+
+.warningInfo {
+  composes: tagline from "@site/src/css/common.module.css";
+}
