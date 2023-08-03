@@ -6,6 +6,7 @@ query {
   personSecretByPersonId(personId: 3) { nodeId personId secret }
   allPersonSecrets { nodes { nodeId personId secret } }
   personForSecret: personById(id: 1) { nodeId personSecretByPersonId { nodeId personId secret } }
+  nxPerson: personById(id: 12345678) { nodeId personSecretByPersonId { nodeId personId secret } }
 
   leftArmById(id: 42) { nodeId id personId lengthInMetres mood }
   allLeftArms { nodes { nodeId id personId lengthInMetres mood } }
