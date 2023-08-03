@@ -75,9 +75,7 @@ All the packages are published under the `@beta` tag, so you'll need to ensure y
 The fastest way to try PostGraphile V5 is with our new `pgl` command which you don’t even have to install:
 
 ```
-
 npx pgl@beta -P pgl/amber -e -c postgres:///my_db -s public
-
 ```
 
 (Replace the connection string and schema name with your database connection string and schema name(s).)
@@ -92,4 +90,4 @@ Ideally, you’d follow [the migration guide](https://postgraphile.org/postgraph
 
 ### Join our testing community
 
-If you use Discord, join our server at [https://discord.gg/graphile](https://discord.gg/graphile) and chat away with other V5 users — talk over the new features, discuss any issues you encounter and explore different ways of using the new projects. We look forward to welcoming you and hearing of your suggestions successes with V5!
+If you use Discord, join our server at [https://discord.gg/graphile](https://discord.gg/graphile) and chat away with other V5 users — talk over the new features, discuss any issues you encounter and explore different ways of using the new projects. We look forward to welcoming you and hearing of your suggestions and successes with V5!
