@@ -8,7 +8,7 @@ authors:
     url: https://github.com/Benjie
     image_url: https://github.com/Benjie.png
   - name: Jem
-    title: Community Operations
+    title: "“I wear many hats”"
     url: https://fosstodon.org/@jem
     image_url: https://github.com/jemgillam.png
 tags: [Beta]
