@@ -35,7 +35,7 @@ function constructDestructureFunction(
 ): void {
   const n = path.length;
   /** 0 - slow mode; 1 - middle mode; 2 - turbo mode */
-  let mode: 0 | 1 | 2 = n > 50 ? 0 : n > 5 ? 1 : 2;
+  let mode: 0 | 1 | 2 = n > 50 || n < 1 ? 0 : n > 5 ? 1 : 2;
 
   for (let i = 0; i < n; i++) {
     const pathItem = path[i];
@@ -110,7 +110,7 @@ function constructDestructureFunction(
     }
     te.runInBatch<Factory>(
       te`function (fallback, ${te.join(names, ", ")}) {
-return (_meta, value) => value${te.join(access, "")}${
+return (_meta, value) => value?.${te.join(access, "?.")}${
         fallback === undefined ? te.blank : te.cache` ?? fallback`
       };
 }`,
