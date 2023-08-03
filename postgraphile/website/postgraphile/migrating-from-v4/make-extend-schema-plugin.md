@@ -38,6 +38,13 @@ Here's an example from the V4 documentation converted to V5. It uses a
 [lambda step](https://grafast.org/grafast/step-library/standard-steps/lambda) to
 convert the `price_in_us_cents` to AUD via the `convertUsdToAud` function.
 
+:::info
+
+During the early access period you'll need to enter `helping2test` to get into
+the above website. You are helping to test, right?
+
+:::
+
 ```diff title="V4 -> V5 conversion"
  const { makeExtendSchemaPlugin, gql } = require("graphile-utils");
  const { convertUsdToAud } = require("ficticious-npm-library");

@@ -17,6 +17,9 @@ Under the hood, PostGraphile polymorphism is powered by
 some restrictions may apply to what PostGraphile generates for polymorphic
 types and fields based on what `@dataplan/pg` supports.
 
+During the early access period you'll need to enter `helping2test` to get into
+the above website. You are helping to test, right?
+
 :::
 
 ## @interface mode:single

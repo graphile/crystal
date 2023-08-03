@@ -41,6 +41,13 @@ leverage the Gra*fast*
 [`listen()`](https://grafast.org/grafast/step-library/standard-steps/listen)
 step to subscribe to events on a pubsub-capable entity.
 
+:::info
+
+During the early access period you'll need to enter `helping2test` to get into
+the above website. You are helping to test, right?
+
+:::
+
 ### subscribePlan() and plan()
 
 Unlike the rest of your schema where you typically use the `plan()` plan
