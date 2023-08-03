@@ -16,8 +16,6 @@ hide_table_of_contents: false
 toc_max_heading_level: 2
 ---
 
-<!-- Yay, no errors, warnings, or alerts! -->
-
 ### It’s finally here! The day has come that you can get your hands on an _early release_ of PostGraphile Version 5; but we do have an ask: please help us to get it ready for release.
 
 We need help writing automated tests, validating it works in your real-world applications, improving the documentation, keeping up with issues and community support, porting plugins, smoothing edges, and as always we need financial support so we can keep investing our time into V5 and our other projects.
