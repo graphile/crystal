@@ -86,7 +86,7 @@ export default function Home() {
             <h3 className={styles.warningInfo}> </h3>
           </>
         }
-        primaryLink={`https://graphile.org/sponsor/`}
+        primaryLink={`/news/2023-08-03-version-5-beta/`}
         primaryButtonText={`Beta Announcement`}
         secondaryLink={`/postgraphile/next/migrating-from-v4/`}
         secondaryButtonText={`V4 Migration Guide`}
