@@ -1,5 +1,14 @@
 # grafast
 
+## 0.0.1-beta.3
+
+### Patch Changes
+
+- [#448](https://github.com/benjie/crystal/pull/448)
+  [`46cd08aa1`](https://github.com/benjie/crystal/commit/46cd08aa13e3bac4d186c72c6ce24997f37658af)
+  Thanks [@benjie](https://github.com/benjie)! - Fix access step to use safe
+  access pattern even when compiled
+
 ## 0.0.1-beta.2
 
 ### Patch Changes

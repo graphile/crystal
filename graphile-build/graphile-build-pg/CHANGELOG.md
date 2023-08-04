@@ -1,5 +1,21 @@
 # graphile-build-pg
 
+## 5.0.0-beta.3
+
+### Patch Changes
+
+- [#452](https://github.com/benjie/crystal/pull/452)
+  [`d3ab4e12d`](https://github.com/benjie/crystal/commit/d3ab4e12d5bf0dc1c0364c603585175fa4d94d34)
+  Thanks [@benjie](https://github.com/benjie)! - Improve error messages with
+  links to more details.
+
+- Updated dependencies
+  [[`46cd08aa1`](https://github.com/benjie/crystal/commit/46cd08aa13e3bac4d186c72c6ce24997f37658af),
+  [`d3ab4e12d`](https://github.com/benjie/crystal/commit/d3ab4e12d5bf0dc1c0364c603585175fa4d94d34)]:
+  - grafast@0.0.1-beta.3
+  - graphile-build@5.0.0-beta.3
+  - @dataplan/pg@0.0.1-beta.3
+
 ## 5.0.0-beta.2
 
 ### Patch Changes
