@@ -1336,7 +1336,10 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
               resource.name
             }' (first represented ${printResourceFrom(
               existing,
-            )}, second represents ${printResourceFrom(resource)})`,
+            )}, second represents ${printResourceFrom(
+              resource,
+            )}):\n  Details: ${chalk.bold.blue
+              .underline`https://err.red/p2rc`}`,
           );
         }
         return builder;
