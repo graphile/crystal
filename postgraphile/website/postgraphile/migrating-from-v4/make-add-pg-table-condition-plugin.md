@@ -65,7 +65,7 @@ Here's an example:
 V4:
 
 ```js
-import { makeAddPgTableConditionPlugin } from "postgraphile/utils";
+import { makeAddPgTableConditionPlugin } from "graphile-utils";
 
 const PetsCountPlugin = makeAddPgTableConditionPlugin(
   "graphile_utils",

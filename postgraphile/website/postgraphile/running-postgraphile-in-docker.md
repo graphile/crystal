@@ -459,7 +459,7 @@ In the same folder `custom-plugin`, create a new file `index.js` with the
 following content.
 
 ```js
-const { makeWrapResolversPlugin } = require("postgraphile/utils");
+const { makeWrapResolversPlugin } = require("graphile-utils");
 
 // Create custom wrapper for resolver createUser
 const createUserResolverWrapper = () => {

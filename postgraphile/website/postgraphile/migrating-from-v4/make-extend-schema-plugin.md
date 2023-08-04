@@ -264,7 +264,7 @@ adaptor, so if you want to deal with your Postgres client of choice here (`pg`,
 `postgres`, `pg-promise`, etc) you can do so!
 
 ```js
-import { object } from "grafast";
+import { object } from "postgraphile/grafast";
 // highlight-next-line
 import { withPgClientTransaction } from "postgraphile/@dataplan/pg";
 import { makeExtendSchemaPlugin } from "postgraphile/utils";
