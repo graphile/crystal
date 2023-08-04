@@ -94,7 +94,7 @@ request executes. We also need to declare the type of the data so that it can
 be cast correctly for the database.
 
 ```ts
-import { makeAddPgTableConditionPlugin } from "graphile-utils";
+import { makeAddPgTableConditionPlugin } from "postgraphile/utils";
 import { TYPES } from "postgraphile/@dataplan/pg";
 
 const PetsCountPlugin = makeAddPgTableConditionPlugin(

@@ -46,9 +46,10 @@ the above website. You are helping to test, right?
 :::
 
 ```diff title="V4 -> V5 conversion"
- const { makeExtendSchemaPlugin, gql } = require("graphile-utils");
+- const { makeExtendSchemaPlugin, gql } = require("graphile-utils");
++ const { makeExtendSchemaPlugin, gql } = require("postgraphile/utils");
  const { convertUsdToAud } = require("ficticious-npm-library");
-+const { lambda } = require('grafast');
++const { lambda } = require('postgraphile/grafast');
 
  const MyForeignExchangePlugin = makeExtendSchemaPlugin((build) => {
    return {
@@ -263,10 +264,10 @@ adaptor, so if you want to deal with your Postgres client of choice here (`pg`,
 `postgres`, `pg-promise`, etc) you can do so!
 
 ```js
-import { object } from "grafast";
+import { object } from "postgraphile/grafast";
 // highlight-next-line
 import { withPgClientTransaction } from "postgraphile/@dataplan/pg";
-import { makeExtendSchemaPlugin } from "graphile-utils";
+import { makeExtendSchemaPlugin } from "postgraphile/utils";
 
 export default makeExtendSchemaPlugin((build) => {
   const { sql } = build;
