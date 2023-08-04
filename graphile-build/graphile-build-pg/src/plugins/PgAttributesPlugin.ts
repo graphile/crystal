@@ -100,6 +100,7 @@ function processAttribute(
 
   const {
     scope: { pgCodec: rawPgCodec },
+    Self,
   } = context;
   if (!rawPgCodec || !rawPgCodec.attributes) {
     return;
@@ -252,7 +253,7 @@ function processAttribute(
         fieldSpec,
       ),
     },
-    `Adding '${attributeName}' attribute field to PgCodec '${pgCodec.name}'`,
+    `Adding '${attributeName}' attribute field to GraphQL type '${Self.name}' (representing PgCodec '${pgCodec.name}')`,
   );
 }
 
