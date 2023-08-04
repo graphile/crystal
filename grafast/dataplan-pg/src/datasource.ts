@@ -1313,11 +1313,30 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
     },
 
     addResource(resource) {
-      const existing = registryConfig.pgResources[resource.name];
+      const existing = registryConfig.pgResources[resource.name] as
+        | PgResourceOptions
+        | undefined;
       if (existing) {
         if (existing !== resource) {
+          function printResourceFrom(resource: PgResourceOptions): string {
+            if (typeof resource.from === "function") {
+              return `function accepting ${
+                resource.parameters?.length
+              } parameters and returning SQL type '${
+                sql.compile(resource.codec.sqlType).text
+              }'`;
+            } else {
+              return `table/view/etc called '${
+                sql.compile(resource.from).text
+              }'`;
+            }
+          }
           throw new Error(
-            `Attempted to add a second resource named '${resource.name}' (existing: ${existing}, new: ${resource})`,
+            `Attempted to add a second resource named '${
+              resource.name
+            }' (first represented ${printResourceFrom(
+              existing,
+            )}, second represents ${printResourceFrom(resource)})`,
           );
         }
         return builder;
