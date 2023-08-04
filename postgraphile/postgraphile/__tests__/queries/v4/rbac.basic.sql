@@ -43,6 +43,28 @@ begin; /*fake*/
 
 select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
 
+select __person_result__.*
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
+lateral (
+  select
+    __person_secret__."person_id"::text as "0",
+    __person_secret__."sekrit" as "1",
+    __person__."id"::text as "2",
+    __person_identifiers__.idx as "3"
+  from "c"."person" as __person__
+  left outer join "c"."person_secret" as __person_secret__
+  on (__person__."id"::"int4" = __person_secret__."person_id")
+  where (
+    __person__."id" = __person_identifiers__."id0"
+  )
+) as __person_result__;
+
+commit; /*fake*/
+
+begin; /*fake*/
+
+select set_config(el->>0, el->>1, true) from json_array_elements($1::json) el
+
 select __left_arm_result__.*
 from (select 0 as idx, $1::"int4" as "id0") as __left_arm_identifiers__,
 lateral (

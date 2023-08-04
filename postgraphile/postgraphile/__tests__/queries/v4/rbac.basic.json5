@@ -32,6 +32,7 @@
     nodeId: "WyJwZW9wbGUiLDFd",
     personSecretByPersonId: null,
   },
+  nxPerson: null,
   leftArmById: {
     nodeId: "WyJsZWZ0X2FybXMiLDQyXQ==",
     id: 42,
