@@ -153,7 +153,7 @@ like this should be loaded via `--prepend-plugins` (or `prependPlugins` in the
 library mode) because otherwise the default ordering plugin dominates the order.
 
 ```js
-const { makeAddPgTableConditionPlugin } = require("graphile-utils");
+const { makeAddPgTableConditionPlugin } = require("postgraphile/utils");
 
 module.exports = makeAddPgTableConditionPlugin(
   "app_public",

@@ -46,9 +46,10 @@ the above website. You are helping to test, right?
 :::
 
 ```diff title="V4 -> V5 conversion"
- const { makeExtendSchemaPlugin, gql } = require("graphile-utils");
+- const { makeExtendSchemaPlugin, gql } = require("graphile-utils");
++ const { makeExtendSchemaPlugin, gql } = require("postgraphile/utils");
  const { convertUsdToAud } = require("ficticious-npm-library");
-+const { lambda } = require('grafast');
++const { lambda } = require('postgraphile/grafast');
 
  const MyForeignExchangePlugin = makeExtendSchemaPlugin((build) => {
    return {
