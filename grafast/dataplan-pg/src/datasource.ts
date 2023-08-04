@@ -1321,12 +1321,11 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
           throw new Error(
             `Attempted to add a second resource named '${
               resource.name
-            }' (first represented ${printResourceFrom(
+            }':\n  First represented ${printResourceFrom(
               existing,
-            )}, second represents ${printResourceFrom(
+            )}.\n  Second represents ${printResourceFrom(
               resource,
-            )}):\n  Details: ${chalk.bold.blue
-              .underline`https://err.red/p2rc`}`,
+            )}.\n  Details: ${chalk.bold.blue.underline`https://err.red/p2rc`}`,
           );
         }
         return builder;
@@ -1383,12 +1382,12 @@ exportAs("@dataplan/pg", makePgResourceOptions, "makePgResourceOptions");
 
 function printResourceFrom(resource: PgResourceOptions): string {
   if (typeof resource.from === "function") {
-    return `function accepting ${
+    return `a function accepting ${
       resource.parameters?.length
     } parameters and returning SQL type '${
       sql.compile(resource.codec.sqlType).text
     }'`;
   } else {
-    return `table/view/etc called '${sql.compile(resource.from).text}'`;
+    return `a table/view/etc called '${sql.compile(resource.from).text}'`;
   }
 }

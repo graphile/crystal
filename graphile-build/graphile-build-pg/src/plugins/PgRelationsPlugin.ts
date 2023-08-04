@@ -1388,7 +1388,7 @@ function addRelations(
             },
           ),
         },
-        `Adding '${identifier}' single relation field to ${Self.name}`,
+        `Adding field to GraphQL type '${Self.name}' for singular relation '${identifier}'`,
         "recoverable",
       );
     }

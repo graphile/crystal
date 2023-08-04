@@ -42,7 +42,7 @@ export default function extend<
           key,
         )}'.\n\n${indent(firstEntityDetails)}\n\n${indent(
           secondEntityDetails,
-        )}`,
+        )}.\n  Details: ${chalk.blue.bold.underline`https://err.red/pnc`}`,
       );
     }
     if (hintB) {
