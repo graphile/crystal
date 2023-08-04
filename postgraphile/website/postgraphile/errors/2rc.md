@@ -4,8 +4,12 @@ title: Two resources conflicted
 
 You're probably here because you just received an error like:
 
-`Error: Attempted to add a second resource named 'foo' (first represented function accepting 0 parameters and returning SQL type '"bool"', second represents table/view/etc called '"public"."foo"')
-  Details: https://err.red/p2rc`
+```
+Error: Attempted to add a second resource named 'foo':
+  First represented a function accepting 0 parameters and returning SQL type '"bool"'.
+  Second represents a table/view/etc called '"public"."foo"'.
+  Details: https://err.red/p2rc
+```
 
 This happens when PostGraphile is building the
 [resources](../registry.md#resources) for your schema, and the inflection rules
