@@ -104,7 +104,7 @@ const builder = makeRegistryBuilder()
     isUnique: true,
   })
 
-  // A forum can have many messaegs:
+  // A forum can have many messages:
   .addRelation(forumsCodec, "messages", messagesResourceOptions, {
     localAttributes: ["id"],
     remoteAttributes: ["forum_id"],
