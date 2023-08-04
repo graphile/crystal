@@ -1318,19 +1318,6 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
         | undefined;
       if (existing) {
         if (existing !== resource) {
-          function printResourceFrom(resource: PgResourceOptions): string {
-            if (typeof resource.from === "function") {
-              return `function accepting ${
-                resource.parameters?.length
-              } parameters and returning SQL type '${
-                sql.compile(resource.codec.sqlType).text
-              }'`;
-            } else {
-              return `table/view/etc called '${
-                sql.compile(resource.from).text
-              }'`;
-            }
-          }
           throw new Error(
             `Attempted to add a second resource named '${
               resource.name
@@ -1393,3 +1380,15 @@ export function makePgResourceOptions<
 }
 
 exportAs("@dataplan/pg", makePgResourceOptions, "makePgResourceOptions");
+
+function printResourceFrom(resource: PgResourceOptions): string {
+  if (typeof resource.from === "function") {
+    return `function accepting ${
+      resource.parameters?.length
+    } parameters and returning SQL type '${
+      sql.compile(resource.codec.sqlType).text
+    }'`;
+  } else {
+    return `table/view/etc called '${sql.compile(resource.from).text}'`;
+  }
+}
