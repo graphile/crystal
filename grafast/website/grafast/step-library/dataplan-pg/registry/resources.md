@@ -97,10 +97,26 @@ const forumsResourceOptions = makePgResourceOptions({
 Once a resource has been built (from the result of a call to `makeRegistry()` -
 see [registry](./index.md)), you can use the various helper methods:
 
-- `get(spec)` - call this from a plan resolver; gets a step representing a single row from this table-like resource matching the given spec
-- `find(spec)` - call this from a plan resolver; gets a step representing a list of rows from this table-like resource matching the given spec
-- `execute(args)` - call this from a plan resolver; gets a step representing the result of calling the database function this resource represents, passing the given arguments
-- `getRelations()` - gets the map of relation definitions available on this resource (by looking up its codec in the registry)
-- `getRelation(name)` - gets the named relation definition
+### `resource.get(spec)`
 
-You can also use resources as parameters to various of the @dataplan/pg steps.
+Call this from a plan resolver; gets a step representing a single row from this
+table-like resource matching the given spec
+
+### `resource.find(spec)`
+
+Call this from a plan resolver; gets a step representing a list of rows from
+this table-like resource matching the given spec
+
+### `resource.execute(args)`
+
+Call this from a plan resolver; gets a step representing the result of calling
+the database function this resource represents, passing the given arguments
+
+### `resource.getRelations()`
+
+Gets the map of relation definitions available on this resource (by looking up
+its codec in the registry)
+
+### `resource.getRelation(name)`
+
+Gets the named relation definition
