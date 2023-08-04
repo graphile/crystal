@@ -70,32 +70,6 @@ export interface GrafastTimeouts {
   // synchronous it's typically so fast that no timeout is required.
 }
 
-export interface GrafastOptions {
-  /**
-   * An object to merge into the GraphQL context. Alternatively, pass an
-   * (optionally asynchronous) function that returns an object to merge into
-   * the GraphQL context.
-   */
-  context?:
-    | Partial<Grafast.Context>
-    | ((
-        ctx: Partial<Grafast.RequestContext>,
-        args: Grafast.ExecutionArgs,
-      ) => PromiseOrValue<Partial<Grafast.Context>>);
-
-  /**
-   * A list of 'explain' types that should be included in `extensions.explain`.
-   *
-   * - `mermaid-js` will cause the mermaid plan to be included
-   * - other values are dependent on the plugins in play
-   *
-   * If set to `true` then all possible explain types will be exposed.
-   */
-  explain?: boolean | string[];
-
-  timeouts?: GrafastTimeouts;
-}
-
 export const $$queryCache = Symbol("queryCache");
 
 /**
@@ -245,12 +219,37 @@ declare global {
     }
   }
   namespace GraphileConfig {
+    interface GrafastOptions {
+      /**
+       * An object to merge into the GraphQL context. Alternatively, pass an
+       * (optionally asynchronous) function that returns an object to merge into
+       * the GraphQL context.
+       */
+      context?:
+        | Partial<Grafast.Context>
+        | ((
+            ctx: Partial<Grafast.RequestContext>,
+            args: Grafast.ExecutionArgs,
+          ) => PromiseOrValue<Partial<Grafast.Context>>);
+
+      /**
+       * A list of 'explain' types that should be included in `extensions.explain`.
+       *
+       * - `mermaid-js` will cause the mermaid plan to be included
+       * - other values are dependent on the plugins in play
+       *
+       * If set to `true` then all possible explain types will be exposed.
+       */
+      explain?: boolean | string[];
+
+      timeouts?: GrafastTimeouts;
+    }
     interface Preset {
       /**
        * Options that control how `grafast` should execute your GraphQL
        * operations.
        */
-      grafast?: GrafastOptions;
+      grafast?: GraphileConfig.GrafastOptions;
     }
     interface GrafastHooks {
       args: PluginHook<
