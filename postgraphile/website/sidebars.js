@@ -41,8 +41,9 @@ const sidebars = {
       defaultStyle: false,
     },
     "quick-start-guide",
-    "namespaces",
+    "registry",
     "inflection",
+    "namespaces",
     {
       type: "category",
       label: "Tables",
