@@ -85,7 +85,7 @@ define your enum:
 
 ```js
 import { constant } from "postgraphile/grafast";
-import { gql, makeExtendSchemaPlugin } from "graphile-utils";
+import { gql, makeExtendSchemaPlugin } from "postgraphile/utils";
 
 const myPlugin = makeExtendSchemaPlugin(() => ({
   typeDefs: gql`
