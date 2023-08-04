@@ -9,8 +9,8 @@ Error: A naming conflict has occurred - two entities have tried to define the sa
   The first entity was:
     Adding 'task' attribute field to GraphQL type 'Subtask' (representing PgCodec 'subtask')
   The second entity was:
-    Adding 'taskByMyTask' single relation field to GraphQL type 'Subtask'
-  Details: https://err.red/pnc`
+    Adding field to GraphQL type 'Subtask' for singular relation 'taskByMyTask'
+  Details: https://err.red/pnc
 ```
 
 This happens when PostGraphile tries to add an entry to an object, where that

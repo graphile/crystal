@@ -120,7 +120,7 @@ const NonNullRelationsPlugin: GraphileConfig.Plugin = {
         } = build;
         // Extract details about why this field was defined.
         const { isPgSingleRelationField, pgRelationDetails } = context.scope;
-        // See if the field was defined to be a single relation field
+        // See if the field was defined for a singular relation
         if (isPgSingleRelationField && pgRelationDetails) {
           // If so, extract details about the relation
           const { codec, relationName } = pgRelationDetails;
