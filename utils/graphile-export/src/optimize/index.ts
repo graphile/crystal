@@ -1,6 +1,24 @@
 // import generate from "@babel/generator";
-import traverse from "@babel/traverse";
+import traverse, { NodePath } from "@babel/traverse";
 import * as t from "@babel/types";
+
+/** @see {@link https://github.com/babel/babel/issues/14881} */
+const $$patched = Symbol("babel-14881-hack");
+function patch(scope: any) {
+  if (!scope[$$patched]) {
+    scope[$$patched] = true;
+    const original = scope._replaceWith;
+    scope._replaceWith = function (...args: any[]) {
+      if (!this.opts?.noScope) {
+        this._removeFromScope();
+      }
+      return original.apply(this, args);
+    };
+  }
+}
+patch(NodePath.prototype);
+
+Error.stackTraceLimit = 100;
 
 function isSimpleArg(
   arg: t.Node,
@@ -144,9 +162,6 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
     },
     Program: {
       exit(path) {
-        // Refresh the scope after all the rewriting
-        path.scope.crawl();
-
         // Replace all things that are only referenced once
         for (const [_bindingName, binding] of Object.entries(
           path.scope.bindings,
