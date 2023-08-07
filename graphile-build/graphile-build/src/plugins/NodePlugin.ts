@@ -102,6 +102,17 @@ export const NodePlugin: GraphileConfig.Plugin = {
                   `Node ID handler for type '${typeName}' already registered`,
                 );
               }
+              const details = build.getTypeMetaByName(typeName);
+              if (!details) {
+                throw new Error(
+                  `Attempted to register Node ID handler for type '${typeName}', but that type isn't registered (yet)`,
+                );
+              }
+              if (details.Constructor !== build.graphql.GraphQLObjectType) {
+                throw new Error(
+                  `Attempted to register Node ID handler for type '${typeName}', but that isn't an object type! (constructor: ${details.Constructor.name})`,
+                );
+              }
               nodeIdHandlerByTypeName[typeName] = handler;
             },
             getNodeIdHandler(typeName) {

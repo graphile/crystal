@@ -26,6 +26,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
   name: "PgTableNodePlugin",
   description: "Add the 'Node' interface to table types",
   version: version,
+  after: ["PgTablesPlugin"],
 
   schema: {
     entityBehavior: {
@@ -98,6 +99,17 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
 
         for (const [codec, resources] of resourcesByCodec.entries()) {
           const tableTypeName = build.inflection.tableType(codec);
+          const meta = build.getTypeMetaByName(tableTypeName);
+          if (!meta) {
+            console.warn(
+              `Attempted to register node handler for '${tableTypeName}' (codec=${codec.name}), but that type wasn't registered (yet)`,
+            );
+            continue;
+          }
+          if (meta.Constructor !== build.graphql.GraphQLObjectType) {
+            // Must be an interface? Skip!
+            continue;
+          }
           if (resources.length !== 1) {
             console.warn(
               `Found multiple table resources for codec '${codec.name}'; we don't currently support that but we _could_ - get in touch if you need this.`,
