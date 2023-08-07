@@ -373,7 +373,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 (pgFunctionsPreferNodeId &&
                 !resource.isMutation &&
                 param.codec.attributes &&
-                finalBuild.behavior.pgCodecMatches(param.codec, "node")
+                finalBuild.behavior.pgCodecMatches(param.codec, "type:node")
                   ? "nodeId"
                   : "input");
               if (variant === "nodeId" && !param.codec.attributes) {
