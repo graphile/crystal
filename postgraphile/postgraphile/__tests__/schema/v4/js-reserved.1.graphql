@@ -3321,11 +3321,16 @@ type Query implements Node {
   yieldById(id: Int!): Yield
 }
 
-interface RelationalItem {
+interface RelationalItem implements Node {
   """Reads a single `Building` that is related to this `RelationalItem`."""
   buildingByConstructor: Building
   constructor: String
   id: Int!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
   type: ItemType!
 }
 
