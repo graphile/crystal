@@ -52,16 +52,31 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
       pgCodecAttribute(behavior, [codec, attributeName], build) {
         const newBehavior = [behavior];
 
-        const resource = Object.values(build.input.pgRegistry.pgResources).find(
-          (r) => {
-            if (r.codec !== codec) return false;
-            if (r.parameters) return false;
-            if (r.isVirtual) return false;
-            if (r.isUnique) return false;
-            if (r.uniques.length === 0) return false;
-            return true;
-          },
-        );
+        const resource =
+          codec.polymorphism?.mode === "union"
+            ? Object.values(build.input.pgRegistry.pgResources).find((r) => {
+                if (r.parameters) return false;
+                if (r.isVirtual) return false;
+                if (r.isUnique) return false;
+                if (r.uniques.length === 0) return false;
+                const name = codec.extensions?.tags?.name ?? codec.name;
+                const impl = r.codec.extensions?.tags?.implements;
+                const implArr = impl
+                  ? Array.isArray(impl)
+                    ? impl
+                    : [impl]
+                  : [];
+                if (!implArr.includes(name)) return false;
+                return true;
+              })
+            : Object.values(build.input.pgRegistry.pgResources).find((r) => {
+                if (r.codec !== codec) return false;
+                if (r.parameters) return false;
+                if (r.isVirtual) return false;
+                if (r.isUnique) return false;
+                if (r.uniques.length === 0) return false;
+                return true;
+              });
         const pk = resource?.uniques.find((u) => u.isPrimary);
 
         // If the column is a primary key, don't include it (since it will be in the NodeID instead)
