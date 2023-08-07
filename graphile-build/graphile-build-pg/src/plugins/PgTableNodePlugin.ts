@@ -26,7 +26,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
   name: "PgTableNodePlugin",
   description: "Add the 'Node' interface to table types",
   version: version,
-  after: ["PgTablesPlugin"],
+  after: ["PgTablesPlugin", "PgPolymorphismPlugin"],
 
   schema: {
     entityBehavior: {
@@ -101,7 +101,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           const tableTypeName = build.inflection.tableType(codec);
           const meta = build.getTypeMetaByName(tableTypeName);
           if (!meta) {
-            console.warn(
+            console.trace(
               `Attempted to register node handler for '${tableTypeName}' (codec=${codec.name}), but that type wasn't registered (yet)`,
             );
             continue;
