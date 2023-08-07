@@ -6,12 +6,23 @@
   allSingleTableItems {
     nodes {
       id
+      nodeId
       type
       rootTopicId
       rootTopic {
         id
         title
       }
+    }
+  }
+  singleTableDivider(nodeId: "WyJTaW5nbGVUYWJsZURpdmlkZXIiLDNd") {
+    id
+    nodeId
+    type
+    rootTopicId
+    rootTopic {
+      id
+      title
     }
   }
 }
