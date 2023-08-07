@@ -482,8 +482,9 @@ to determine the options that they offer.
 
 :::
 
-- `defaultBehavior: string | undefined` - if set, applies a standard
-  [behavior](./behavior) to introspected objects.
+- `defaultBehavior: string | undefined` - if set, applies a default
+  [behavior](./behavior) to all entities; for example to prefer lists
+  over connections: `+list -connection`.
 - `dontSwallowErrors: boolean` - if true, errors during the schema build process
   will throw rather than the system trying to recover from them. Recommended,
   but not enabled by default as it can be a barrier to entry to new users.
