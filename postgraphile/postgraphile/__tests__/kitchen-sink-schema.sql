@@ -1530,7 +1530,7 @@ comment on table polymorphic.gcp_application_first_party_vulnerabilities is '@om
 comment on table polymorphic.gcp_application_third_party_vulnerabilities is '@omit';
 
 comment on type polymorphic.vulnerabilities is $$
-@interface mode:union plural
+@interface mode:union
 @name Vulnerability
 @behavior node
 @ref applications to:Application plural
