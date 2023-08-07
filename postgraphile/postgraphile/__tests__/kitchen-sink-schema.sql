@@ -1498,6 +1498,7 @@ create index on polymorphic.gcp_application_third_party_vulnerabilities (third_p
 comment on type polymorphic.applications is $$
 @interface mode:union
 @name Application
+@behavior node
 @ref vulnerabilities to:Vulnerability plural
 @ref owner to:PersonOrOrganization singular
 $$;
@@ -1531,6 +1532,7 @@ comment on table polymorphic.gcp_application_third_party_vulnerabilities is '@om
 comment on type polymorphic.vulnerabilities is $$
 @interface mode:union plural
 @name Vulnerability
+@behavior node
 @ref applications to:Application plural
 $$;
 
@@ -1560,6 +1562,7 @@ create type polymorphic.zero_implementation as (
 comment on type polymorphic.zero_implementation is $$
 @interface mode:union
 @name ZeroImplementation
+@behavior node
 $$;
 
 --------------------------------------------------------------------------------

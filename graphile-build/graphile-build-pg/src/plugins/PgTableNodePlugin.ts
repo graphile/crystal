@@ -21,16 +21,6 @@ declare global {
     }
   }
 }
-function canSupportNode(resource: PgResource): boolean {
-  return (
-    !resource.codec.isAnonymous &&
-    !!resource.codec.attributes &&
-    !resource.codec.polymorphism &&
-    !resource.parameters &&
-    !!resource.uniques &&
-    !!resource.uniques[0]
-  );
-}
 
 export const PgTableNodePlugin: GraphileConfig.Plugin = {
   name: "PgTableNodePlugin",
@@ -39,15 +29,43 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
 
   schema: {
     entityBehavior: {
-      pgResource: {
+      pgCodec: {
         provides: ["default"],
         before: ["inferred", "override"],
-        callback(behavior, resource) {
-          if (canSupportNode(resource)) {
-            return ["node", "select", behavior];
-          } else {
-            return behavior;
+        callback(behavior, codec, build) {
+          const newBehavior = [behavior];
+          if (
+            !codec.isAnonymous &&
+            !!codec.attributes &&
+            (!codec.polymorphism ||
+              codec.polymorphism.mode === "single" ||
+              codec.polymorphism.mode === "relational")
+          ) {
+            const resources = Object.values(
+              build.input.pgRegistry.pgResources,
+            ).filter((r) => {
+              if (r.codec !== codec) return false;
+              if (r.parameters) return false;
+              if (r.isUnique) return false;
+              if (r.isVirtual) return false;
+              if (!r.uniques || r.uniques.length < 1) return false;
+              return true;
+            });
+            if (resources.length === 1) {
+              if (codec.polymorphism) {
+                newBehavior.push("interface:node");
+              } else {
+                newBehavior.push("type:node");
+              }
+            } else if (resources.length > 1) {
+              console.warn(
+                `Found multiple table resources for codec '${codec.name}'; we don't currently support that but we _could_ - get in touch if you need this.`,
+              );
+            } else {
+              // Meh
+            }
           }
+          return newBehavior;
         },
       },
     },
@@ -59,11 +77,12 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
         const tableResources = Object.values(
           build.input.pgRegistry.pgResources,
         ).filter((resource) => {
-          if (!canSupportNode(resource)) return false;
+          // TODO: if (!resourceCanSupportNode(resource)) return false;
+
           // Needs the 'select' and 'node' behaviours for compatibility
           return (
-            !!build.behavior.pgResourceMatches(resource, "node") &&
-            !!build.behavior.pgResourceMatches(resource, "select")
+            !!build.behavior.pgCodecMatches(resource.codec, "type:node") &&
+            !!build.behavior.pgResourceMatches(resource, "resource:select")
           );
         });
 

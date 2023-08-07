@@ -589,6 +589,16 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           ];
         },
       },
+      pgResource: {
+        provides: ["default"],
+        before: ["inferred", "override"],
+        callback(behavior, resource) {
+          return [
+            ...(!resource.parameters ? ["resource:select"] : []),
+            behavior,
+          ];
+        },
+      },
     },
     hooks: {
       init(_, build, _context) {
