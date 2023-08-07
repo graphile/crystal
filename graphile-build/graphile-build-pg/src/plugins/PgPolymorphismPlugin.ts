@@ -682,6 +682,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             }
 
             const selectable = build.behavior.pgCodecMatches(codec, "select");
+            const nodeable = build.behavior.pgCodecMatches(codec, "node");
 
             if (selectable) {
               if (
@@ -695,6 +696,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     pgCodec: codec,
                     isPgPolymorphicTableType: true,
                     pgPolymorphism: polymorphism,
+                    // Since this comes from a table, if the table has the `node` interface then so should the interface
+                    supportsNodeInterface: nodeable,
                   },
                   () => ({
                     description: codec.description,
