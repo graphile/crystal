@@ -217,4 +217,15 @@
       title: "PostGraphile version 5",
     },
   },
+  node: {
+    __typename: "SingleTableDivider",
+    id: 3,
+    nodeId: "WyJTaW5nbGVUYWJsZURpdmlkZXIiLDNd",
+    type: "DIVIDER",
+    rootTopicId: 1,
+    rootTopic: {
+      id: 1,
+      title: "PostGraphile version 5",
+    },
+  },
 }

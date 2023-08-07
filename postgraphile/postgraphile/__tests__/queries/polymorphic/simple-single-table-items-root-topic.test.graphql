@@ -25,4 +25,17 @@
       title
     }
   }
+  node(nodeId: "WyJTaW5nbGVUYWJsZURpdmlkZXIiLDNd") {
+    __typename
+    ... on SingleTableDivider {
+      id
+      nodeId
+      type
+      rootTopicId
+      rootTopic {
+        id
+        title
+      }
+    }
+  }
 }
