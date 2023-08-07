@@ -482,21 +482,23 @@ to determine the options that they offer.
 
 :::
 
-- `jsonScalarAsString: boolean` - if true, JSON values will be stringified
-  rather than returned as "dynamic" objects.
+- `defaultBehavior: string | undefined` - if set, applies a standard
+  [behavior](./behavior) to introspected objects.
 - `dontSwallowErrors: boolean` - if true, errors during the schema build process
   will throw rather than the system trying to recover from them. Recommended,
   but not enabled by default as it can be a barrier to entry to new users.
-- `pgJwtSecret`
-- `pgJwtSignOptions`
-- `pgUseCustomNetworkScalars: boolean` - if not false, adds the `CidrAddress`,
-  `MacAddress` and similar types for PostgreSQL network scalars.
-- `pgOrderByNullsLast: boolean | undefined` - if true, orders such that nulls are
-  always last; if false, orders such that nulls are always first; otherwise uses
-  the default ordering
+- `jsonScalarAsString: boolean` - if true, JSON values will be stringified
+  rather than returned as "dynamic" objects.
 - `pgForbidSetofFunctionsToReturnNull: boolean` - if true, setof functions
   cannot return null, so our list and connection types can be non-nullable in
   more places.
+- `pgJwtSecret`
+- `pgJwtSignOptions`
+- `pgOrderByNullsLast: boolean | undefined` - if true, orders such that nulls are
+  always last; if false, orders such that nulls are always first; otherwise uses
+  the default ordering
+- `pgUseCustomNetworkScalars: boolean` - if not false, adds the `CidrAddress`,
+  `MacAddress` and similar types for PostgreSQL network scalars.
 
 ### `grafast` options
 
