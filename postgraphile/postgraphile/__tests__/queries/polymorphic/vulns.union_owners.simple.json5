@@ -1,0 +1,62 @@
+{
+  allVulnerabilities: {
+    nodes: [
+      {
+        id: "WyJmaXJzdF9wYXJ0eV92dWxuZXJhYmlsaXRpZXMiLDFd",
+        name: "Off-by-one",
+        owners: {
+          nodes: [
+            {
+              __typename: "Organization",
+              id: "WyJvcmdhbml6YXRpb25zIiwxXQ==",
+              name: "Acme",
+            },
+            {
+              __typename: "Organization",
+              id: "WyJvcmdhbml6YXRpb25zIiwxXQ==",
+              name: "Acme",
+            },
+            {
+              __typename: "Organization",
+              id: "WyJvcmdhbml6YXRpb25zIiw1XQ==",
+              name: "Cyberdyne Systems",
+            },
+            {
+              __typename: "Person",
+              id: "WyJwZW9wbGUiLDFd",
+              username: "Alice",
+            },
+            {
+              __typename: "Person",
+              id: "WyJwZW9wbGUiLDJd",
+              username: "Benjie",
+            },
+          ],
+        },
+      },
+      {
+        id: "WyJmaXJzdF9wYXJ0eV92dWxuZXJhYmlsaXRpZXMiLDJd",
+        name: "Index-out-of-bounds",
+        owners: {
+          nodes: [
+            {
+              __typename: "Organization",
+              id: "WyJvcmdhbml6YXRpb25zIiwxXQ==",
+              name: "Acme",
+            },
+            {
+              __typename: "Person",
+              id: "WyJwZW9wbGUiLDJd",
+              username: "Benjie",
+            },
+            {
+              __typename: "Person",
+              id: "WyJwZW9wbGUiLDNd",
+              username: "Caroline",
+            },
+          ],
+        },
+      },
+    ],
+  },
+}

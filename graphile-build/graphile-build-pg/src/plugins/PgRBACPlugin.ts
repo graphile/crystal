@@ -89,13 +89,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           parts.push("-insert");
         }
         if (!canUpdate) {
-          if (pgAttribute.attname === "site") {
-            console.log(`Site update not allowed`);
-          }
           parts.push("-update");
-        }
-        if (pgAttribute.attname === "site") {
-          console.log(`Site tags: ${parts}`);
         }
         if (parts.length > 0) {
           attribute.extensions = attribute.extensions || Object.create(null);

@@ -1198,6 +1198,9 @@ type FirstPartyVulnerability implements Vulnerability {
   cvssScore: Float!
   id: Int!
   name: String!
+
+  """Reads and enables pagination through a set of `PersonOrOrganization`."""
+  owners: PersonOrOrganizationConnection!
   teamName: String
 }
 
@@ -2214,6 +2217,29 @@ input PersonInput {
 }
 
 union PersonOrOrganization = Organization | Person
+
+"""A connection to a list of `PersonOrOrganization` values."""
+type PersonOrOrganizationConnection {
+  """
+  A list of edges which contains the `PersonOrOrganization` and cursor to aid in pagination.
+  """
+  edges: [PersonOrOrganizationEdge]!
+
+  """A list of `PersonOrOrganization` objects."""
+  nodes: [PersonOrOrganization]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""A `PersonOrOrganization` edge in the connection."""
+type PersonOrOrganizationEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PersonOrOrganization` at the end of the edge."""
+  node: PersonOrOrganization
+}
 
 """
 Represents an update to a `Person`. Fields that are set will be updated.
@@ -4599,6 +4625,9 @@ type ThirdPartyVulnerability implements Vulnerability {
   cvssScore: Float!
   id: Int!
   name: String!
+
+  """Reads and enables pagination through a set of `PersonOrOrganization`."""
+  owners: PersonOrOrganizationConnection!
   vendorName: String
 }
 
@@ -5207,6 +5236,9 @@ interface Vulnerability {
   cvssScore: Float!
   id: Int!
   name: String!
+
+  """Reads and enables pagination through a set of `PersonOrOrganization`."""
+  owners: PersonOrOrganizationConnection!
 }
 
 """

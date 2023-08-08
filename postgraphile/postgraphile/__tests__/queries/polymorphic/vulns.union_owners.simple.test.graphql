@@ -1,0 +1,30 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+#> classicIds: true
+
+{
+  allVulnerabilities(first: 2) {
+    nodes {
+      id
+      name
+      owners {
+        nodes {
+          __typename
+          ...Owner
+        }
+      }
+    }
+  }
+}
+
+fragment Owner on PersonOrOrganization {
+  ... on Organization {
+    id
+    name
+  }
+  ... on Person {
+    id
+    username
+  }
+}

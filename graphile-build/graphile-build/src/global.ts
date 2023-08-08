@@ -628,7 +628,13 @@ declare global {
       scope: ScopeObjectFieldsFieldArgsArg;
     }
 
-    interface ScopeInterface extends Scope {}
+    interface ScopeInterface extends Scope {
+      /**
+       * If true, 'AddNoteInterfaceToSuitableTypesPlugin' will add the `Node`
+       * interface and `id` field automatically to this interface
+       */
+      supportsNodeInterface?: boolean;
+    }
     interface ContextInterface extends Context {
       scope: ScopeInterface;
       type: "GraphQLInterfaceType";
@@ -669,9 +675,7 @@ declare global {
       Self: GraphQLInterfaceType;
     }
 
-    interface ScopeUnion extends Scope {
-      isPgUnionMemberUnion?: boolean;
-    }
+    interface ScopeUnion extends Scope {}
     interface ContextUnion extends Context {
       scope: ScopeUnion;
       type: "GraphQLUnionType";

@@ -20,18 +20,26 @@ import type {
   PgRegistry,
   PgResource,
   PgResourceOptions,
+  PgResourceUnique,
+  PgSelectSingleStep,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep } from "@dataplan/pg";
+import type { ListStep } from "grafast";
 import { arraysMatch } from "grafast";
 import type {
   GraphQLInterfaceType,
   GraphQLNamedType,
   GraphQLObjectType,
 } from "grafast/graphql";
-import { gatherConfig } from "graphile-build";
+import { EXPORTABLE, gatherConfig } from "graphile-build";
+import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import { getBehavior } from "../behavior.js";
-import { parseDatabaseIdentifier, parseSmartTagsOptsString } from "../utils.js";
+import {
+  parseDatabaseIdentifier,
+  parseSmartTagsOptsString,
+  tagToString,
+} from "../utils.js";
 import { version } from "../version.js";
 
 function isNotNullish<T>(v: T | null | undefined): v is T {
@@ -61,6 +69,7 @@ declare global {
         typeIdentifier: string;
         name: string;
       };
+      isPgUnionMemberUnionConnection?: boolean;
     }
     interface ScopeEnum {
       pgPolymorphicSingleTableType?: {
@@ -68,6 +77,9 @@ declare global {
         name: string;
         attributes: ReadonlyArray<PgCodecPolymorphismSingleTypeAttributeSpec>;
       };
+    }
+    interface ScopeUnion {
+      isPgUnionMemberUnion?: boolean;
     }
   }
 }
@@ -611,6 +623,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             input: {
               pgRegistry: { pgRelations },
             },
+            grafast: { arraysMatch },
           } = build;
           const { localCodec, remoteResource, isUnique, isReferencee } = entity;
           const remoteCodec = remoteResource.codec;
@@ -656,6 +669,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           inflection,
           options: { pgForbidSetofFunctionsToReturnNull },
           setGraphQLTypeForPgCodec,
+          grafast: { list, constant, access },
         } = build;
         const unionsToRegister = new Map<string, PgCodec[]>();
         for (const codec of build.pgCodecMetaLookup.keys()) {
@@ -688,6 +702,10 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 polymorphism.mode === "single" ||
                 polymorphism.mode === "relational"
               ) {
+                const nodeable = build.behavior.pgCodecMatches(
+                  codec,
+                  "interface:node",
+                );
                 const interfaceTypeName = inflection.tableType(codec);
                 build.registerInterfaceType(
                   interfaceTypeName,
@@ -695,6 +713,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     pgCodec: codec,
                     isPgPolymorphicTableType: true,
                     pgPolymorphism: polymorphism,
+                    // Since this comes from a table, if the table has the `node` interface then so should the interface
+                    supportsNodeInterface: nodeable,
                   },
                   () => ({
                     description: codec.description,
@@ -712,6 +732,27 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   },
                   nonNullNode: pgForbidSetofFunctionsToReturnNull,
                 });
+                const resources = Object.values(
+                  build.input.pgRegistry.pgResources,
+                ).filter((r) => {
+                  if (r.codec !== codec) return false;
+                  if (r.parameters) return false;
+                  if (r.isUnique) return false;
+                  if (r.isVirtual) return false;
+                  return true;
+                });
+                const resource = resources.length === 1 ? resources[0]! : null;
+                if (resources.length !== 1) {
+                  console.warn(
+                    `Found multiple table resources for codec '${codec.name}'; we don't currently support that but we _could_ - get in touch if you need this.`,
+                  );
+                }
+                const primaryKey = resource
+                  ? (resource.uniques as PgResourceUnique[]).find(
+                      (u) => u.isPrimary === true,
+                    )
+                  : undefined;
+                const pk = primaryKey?.attributes;
                 for (const [typeIdentifier, spec] of Object.entries(
                   polymorphism.types,
                 ) as Array<
@@ -724,7 +765,10 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   ]
                 >) {
                   const tableTypeName = spec.name;
-                  if (polymorphism.mode === "single") {
+                  if (
+                    polymorphism.mode === "single" &&
+                    build.behavior.pgCodecMatches(codec, "interface:node")
+                  ) {
                     build.registerObjectType(
                       tableTypeName,
                       {
@@ -761,16 +805,105 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                       },
                       nonNullNode: pgForbidSetofFunctionsToReturnNull,
                     });
+                    if (build.registerNodeIdHandler && resource && pk) {
+                      const clean =
+                        isSafeObjectPropertyName(tableTypeName) &&
+                        pk.every((attributeName) =>
+                          isSafeObjectPropertyName(attributeName),
+                        );
+                      build.registerNodeIdHandler({
+                        typeName: tableTypeName,
+                        codec: build.getNodeIdCodec!("base64JSON"),
+                        deprecationReason: tagToString(
+                          codec.extensions?.tags?.deprecation ??
+                            resource?.extensions?.tags?.deprecated,
+                        ),
+                        plan: clean
+                          ? // eslint-disable-next-line graphile-export/exhaustive-deps
+                            EXPORTABLE(
+                              te.run`\
+return function (list, constant) {
+  return $record => list([constant(${te.lit(tableTypeName)}, false), ${te.join(
+                                pk.map(
+                                  (attributeName) =>
+                                    te`$record.get(${te.lit(attributeName)})`,
+                                ),
+                                ", ",
+                              )}]);
+}` as any,
+                              [list, constant],
+                            )
+                          : EXPORTABLE(
+                              (constant, list, pk, tableTypeName) =>
+                                ($record: PgSelectSingleStep) => {
+                                  return list([
+                                    constant(tableTypeName, false),
+                                    ...pk.map((attribute) =>
+                                      $record.get(attribute),
+                                    ),
+                                  ]);
+                                },
+                              [constant, list, pk, tableTypeName],
+                            ),
+                        getSpec: clean
+                          ? // eslint-disable-next-line graphile-export/exhaustive-deps
+                            EXPORTABLE(
+                              te.run`\
+return function (access) {
+  return $list => ({ ${te.join(
+    pk.map(
+      (attributeName, index) =>
+        te`${te.safeKeyOrThrow(attributeName)}: access($list, [${te.lit(
+          index + 1,
+        )}])`,
+    ),
+    ", ",
+  )} });
+}` as any,
+                              [access],
+                            )
+                          : EXPORTABLE(
+                              (access, pk) => ($list: ListStep<any[]>) => {
+                                const spec = pk.reduce(
+                                  (memo, attribute, index) => {
+                                    memo[attribute] = access($list, [
+                                      index + 1,
+                                    ]);
+                                    return memo;
+                                  },
+                                  Object.create(null),
+                                );
+                                return spec;
+                              },
+                              [access, pk],
+                            ),
+                        get: EXPORTABLE(
+                          (resource) => (spec: any) => resource.get(spec),
+                          [resource],
+                        ),
+                        match: EXPORTABLE(
+                          (tableTypeName) => (obj) => {
+                            return obj[0] === tableTypeName;
+                          },
+                          [tableTypeName],
+                        ),
+                      });
+                    }
                   }
                 }
               } else if (polymorphism.mode === "union") {
                 const interfaceTypeName = inflection.tableType(codec);
+                const nodeable = build.behavior.pgCodecMatches(
+                  codec,
+                  "interface:node",
+                );
                 build.registerInterfaceType(
                   interfaceTypeName,
                   {
                     pgCodec: codec,
                     isPgPolymorphicTableType: true,
                     pgPolymorphism: polymorphism,
+                    supportsNodeInterface: nodeable,
                   },
                   () => ({
                     description: codec.description,
@@ -831,6 +964,10 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               }),
               "PgPolymorphismPlugin @unionMember unions",
             );
+            build.registerCursorConnection({
+              typeName: unionName,
+              scope: { isPgUnionMemberUnionConnection: true },
+            });
           });
         }
         return _;

@@ -1498,6 +1498,7 @@ create index on polymorphic.gcp_application_third_party_vulnerabilities (third_p
 comment on type polymorphic.applications is $$
 @interface mode:union
 @name Application
+@behavior node
 @ref vulnerabilities to:Vulnerability plural
 @ref owner to:PersonOrOrganization singular
 $$;
@@ -1529,9 +1530,11 @@ comment on table polymorphic.gcp_application_first_party_vulnerabilities is '@om
 comment on table polymorphic.gcp_application_third_party_vulnerabilities is '@omit';
 
 comment on type polymorphic.vulnerabilities is $$
-@interface mode:union plural
+@interface mode:union
 @name Vulnerability
+@behavior node
 @ref applications to:Application plural
+@ref owners to:PersonOrOrganization plural
 $$;
 
 comment on column polymorphic.vulnerabilities.id is '@notNull';
@@ -1543,12 +1546,22 @@ comment on table polymorphic.first_party_vulnerabilities is $$
 @ref applications to:Application plural
 @refVia applications via:aws_application_first_party_vulnerabilities;aws_applications
 @refVia applications via:gcp_application_first_party_vulnerabilities;gcp_applications
+@ref owners to:PersonOrOrganization plural
+@refVia owners via:aws_application_first_party_vulnerabilities;aws_applications;people
+@refVia owners via:aws_application_first_party_vulnerabilities;aws_applications;organizations
+@refVia owners via:gcp_application_first_party_vulnerabilities;gcp_applications;people
+@refVia owners via:gcp_application_first_party_vulnerabilities;gcp_applications;organizations
 $$;
 comment on table polymorphic.third_party_vulnerabilities is $$
 @implements Vulnerability
 @ref applications to:Application plural
 @refVia applications via:aws_application_third_party_vulnerabilities;aws_applications
 @refVia applications via:gcp_application_third_party_vulnerabilities;gcp_applications
+@ref owners to:PersonOrOrganization plural
+@refVia owners via:aws_application_third_party_vulnerabilities;aws_applications;people
+@refVia owners via:aws_application_third_party_vulnerabilities;aws_applications;organizations
+@refVia owners via:gcp_application_third_party_vulnerabilities;gcp_applications;people
+@refVia owners via:gcp_application_third_party_vulnerabilities;gcp_applications;organizations
 $$;
 
 create type polymorphic.zero_implementation as (
@@ -1560,6 +1573,7 @@ create type polymorphic.zero_implementation as (
 comment on type polymorphic.zero_implementation is $$
 @interface mode:union
 @name ZeroImplementation
+@behavior node
 $$;
 
 --------------------------------------------------------------------------------

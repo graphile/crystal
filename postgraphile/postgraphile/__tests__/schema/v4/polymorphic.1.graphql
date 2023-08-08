@@ -1,7 +1,12 @@
-interface Application {
+interface Application implements Node {
   id: Int!
   lastDeployed: Datetime
   name: String!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
 
   """
   Reads a single `PersonOrOrganization` that is related to this `Application`.
@@ -1388,6 +1393,9 @@ type FirstPartyVulnerability implements Node & Vulnerability {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
+
+  """Reads and enables pagination through a set of `PersonOrOrganization`."""
+  owners: PersonOrOrganizationConnection!
   teamName: String
 }
 
@@ -2651,6 +2659,29 @@ input PersonInput {
 
 union PersonOrOrganization = Organization | Person
 
+"""A connection to a list of `PersonOrOrganization` values."""
+type PersonOrOrganizationConnection {
+  """
+  A list of edges which contains the `PersonOrOrganization` and cursor to aid in pagination.
+  """
+  edges: [PersonOrOrganizationEdge]!
+
+  """A list of `PersonOrOrganization` objects."""
+  nodes: [PersonOrOrganization]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""A `PersonOrOrganization` edge in the connection."""
+type PersonOrOrganizationEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PersonOrOrganization` at the end of the edge."""
+  node: PersonOrOrganization
+}
+
 """
 Represents an update to a `Person`. Fields that are set will be updated.
 """
@@ -3394,6 +3425,48 @@ type Query implements Node {
   """Get a single `RelationalTopic`."""
   relationalTopicById(id: Int!): RelationalTopic
 
+  """Reads a single `SingleTableChecklist` using its globally unique `ID`."""
+  singleTableChecklist(
+    """
+    The globally unique `ID` to be used in selecting a single `SingleTableChecklist`.
+    """
+    nodeId: ID!
+  ): SingleTableChecklist
+
+  """
+  Reads a single `SingleTableChecklistItem` using its globally unique `ID`.
+  """
+  singleTableChecklistItem(
+    """
+    The globally unique `ID` to be used in selecting a single `SingleTableChecklistItem`.
+    """
+    nodeId: ID!
+  ): SingleTableChecklistItem
+
+  """Reads a single `SingleTableDivider` using its globally unique `ID`."""
+  singleTableDivider(
+    """
+    The globally unique `ID` to be used in selecting a single `SingleTableDivider`.
+    """
+    nodeId: ID!
+  ): SingleTableDivider
+
+  """Reads a single `SingleTablePost` using its globally unique `ID`."""
+  singleTablePost(
+    """
+    The globally unique `ID` to be used in selecting a single `SingleTablePost`.
+    """
+    nodeId: ID!
+  ): SingleTablePost
+
+  """Reads a single `SingleTableTopic` using its globally unique `ID`."""
+  singleTableTopic(
+    """
+    The globally unique `ID` to be used in selecting a single `SingleTableTopic`.
+    """
+    nodeId: ID!
+  ): SingleTableTopic
+
   """
   Reads a single `ThirdPartyVulnerability` using its globally unique `ID`.
   """
@@ -4068,12 +4141,17 @@ enum RelationalDividersOrderBy {
   UPDATED_AT_DESC
 }
 
-interface RelationalItem {
+interface RelationalItem implements Node {
   archivedAt: Datetime
   authorId: Int!
   createdAt: Datetime!
   id: Int!
   isExplicitlyArchived: Boolean!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
   parentId: Int
 
   """Reads a single `Person` that is related to this `RelationalItem`."""
@@ -4675,12 +4753,17 @@ enum RelationalTopicsOrderBy {
   UPDATED_AT_DESC
 }
 
-type SingleTableChecklist implements SingleTableItem {
+type SingleTableChecklist implements Node & SingleTableItem {
   archivedAt: Datetime
   authorId: Int!
   createdAt: Datetime!
   id: Int!
   isExplicitlyArchived: Boolean!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
   parentId: Int
 
   """Reads a single `Person` that is related to this `SingleTableItem`."""
@@ -4731,13 +4814,18 @@ type SingleTableChecklist implements SingleTableItem {
   updatedAt: Datetime!
 }
 
-type SingleTableChecklistItem implements SingleTableItem {
+type SingleTableChecklistItem implements Node & SingleTableItem {
   archivedAt: Datetime
   authorId: Int!
   createdAt: Datetime!
   description: String
   id: Int!
   isExplicitlyArchived: Boolean!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
   note: String
   parentId: Int
 
@@ -4792,13 +4880,18 @@ type SingleTableChecklistItem implements SingleTableItem {
   updatedAt: Datetime!
 }
 
-type SingleTableDivider implements SingleTableItem {
+type SingleTableDivider implements Node & SingleTableItem {
   archivedAt: Datetime
   authorId: Int!
   color: String
   createdAt: Datetime!
   id: Int!
   isExplicitlyArchived: Boolean!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
   parentId: Int
 
   """Reads a single `Person` that is related to this `SingleTableItem`."""
@@ -4849,12 +4942,17 @@ type SingleTableDivider implements SingleTableItem {
   updatedAt: Datetime!
 }
 
-interface SingleTableItem {
+interface SingleTableItem implements Node {
   archivedAt: Datetime
   authorId: Int!
   createdAt: Datetime!
   id: Int!
   isExplicitlyArchived: Boolean!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
   parentId: Int
 
   """Reads a single `Person` that is related to this `SingleTableItem`."""
@@ -4987,13 +5085,18 @@ enum SingleTableItemsOrderBy {
   UPDATED_AT_DESC
 }
 
-type SingleTablePost implements SingleTableItem {
+type SingleTablePost implements Node & SingleTableItem {
   archivedAt: Datetime
   authorId: Int!
   createdAt: Datetime!
   description: String
   id: Int!
   isExplicitlyArchived: Boolean!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
   note: String
   parentId: Int
 
@@ -5049,12 +5152,17 @@ type SingleTablePost implements SingleTableItem {
   updatedAt: Datetime!
 }
 
-type SingleTableTopic implements SingleTableItem {
+type SingleTableTopic implements Node & SingleTableItem {
   archivedAt: Datetime
   authorId: Int!
   createdAt: Datetime!
   id: Int!
   isExplicitlyArchived: Boolean!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
   parentId: Int
 
   """Reads a single `Person` that is related to this `SingleTableItem`."""
@@ -5185,6 +5293,9 @@ type ThirdPartyVulnerability implements Node & Vulnerability {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
+
+  """Reads and enables pagination through a set of `PersonOrOrganization`."""
+  owners: PersonOrOrganizationConnection!
   vendorName: String
 }
 
@@ -5997,7 +6108,7 @@ enum VulnerabilitiesOrderBy {
   NATURAL
 }
 
-interface Vulnerability {
+interface Vulnerability implements Node {
   """Reads and enables pagination through a set of `Application`."""
   applications(
     """Read all values in the set after (below) this cursor."""
@@ -6021,6 +6132,14 @@ interface Vulnerability {
   cvssScore: Float!
   id: Int!
   name: String!
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+
+  """Reads and enables pagination through a set of `PersonOrOrganization`."""
+  owners: PersonOrOrganizationConnection!
 }
 
 """
@@ -6038,9 +6157,14 @@ input VulnerabilityCondition {
   name: String
 }
 
-interface ZeroImplementation {
+interface ZeroImplementation implements Node {
   id: Int
   name: String
+
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
 }
 
 """

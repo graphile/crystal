@@ -6,6 +6,30 @@
   allSingleTableItems {
     nodes {
       id
+      nodeId
+      type
+      rootTopicId
+      rootTopic {
+        id
+        title
+      }
+    }
+  }
+  singleTableDivider(nodeId: "WyJTaW5nbGVUYWJsZURpdmlkZXIiLDNd") {
+    id
+    nodeId
+    type
+    rootTopicId
+    rootTopic {
+      id
+      title
+    }
+  }
+  node(nodeId: "WyJTaW5nbGVUYWJsZURpdmlkZXIiLDNd") {
+    __typename
+    ... on SingleTableDivider {
+      id
+      nodeId
       type
       rootTopicId
       rootTopic {
