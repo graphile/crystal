@@ -220,6 +220,8 @@ const config = {
         additionalLanguages: ["http"],
       },
     }),
+  trailingSlash: false,
+  clientModules: [require.resolve("./docusaurus.client.js")],
 };
 
 module.exports = config;

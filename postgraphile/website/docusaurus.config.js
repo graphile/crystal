@@ -259,6 +259,8 @@ const config = {
     mermaid: true,
   },
   themes: ["@docusaurus/theme-mermaid"],
+  trailingSlash: false,
+  clientModules: [require.resolve("./docusaurus.client.js")],
 };
 
 module.exports = config;
