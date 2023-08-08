@@ -197,7 +197,6 @@ const config = {
 
         // Public API key: it is safe to commit it
         apiKey: "460af1135480a81ded64853450606e7c",
-
         indexName: "build-graphile",
 
         // Optional: see doc section below
