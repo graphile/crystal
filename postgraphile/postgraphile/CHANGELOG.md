@@ -1,5 +1,14 @@
 # postgraphile
 
+## 5.0.0-beta.5
+
+### Patch Changes
+
+- Updated dependencies
+  [[`22ecd1e5d`](https://github.com/benjie/crystal/commit/22ecd1e5de1dcd094be3085cba56b705446413f9)]:
+  - graphile-build-pg@5.0.0-beta.5
+  - graphile-utils@5.0.0-beta.5
+
 ## 5.0.0-beta.4
 
 ### Patch Changes

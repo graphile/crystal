@@ -1,5 +1,14 @@
 # graphile-build-pg
 
+## 5.0.0-beta.5
+
+### Patch Changes
+
+- [#457](https://github.com/benjie/crystal/pull/457)
+  [`22ecd1e5d`](https://github.com/benjie/crystal/commit/22ecd1e5de1dcd094be3085cba56b705446413f9)
+  Thanks [@benjie](https://github.com/benjie)! - Hotfix: PgTableNodePlugin
+  should only deal with table resources
+
 ## 5.0.0-beta.4
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # graphile
 
+## 5.0.0-beta.5
+
+### Patch Changes
+
+- Updated dependencies []:
+  - postgraphile@5.0.0-beta.5
+
 ## 5.0.0-beta.4
 
 ### Patch Changes
