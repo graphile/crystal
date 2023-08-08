@@ -1,5 +1,28 @@
 # graphile-build-pg
 
+## 5.0.0-beta.4
+
+### Patch Changes
+
+- [#454](https://github.com/benjie/crystal/pull/454)
+  [`196e5c1aa`](https://github.com/benjie/crystal/commit/196e5c1aab52dbe2a069d0a15b9e4931523fd2dd)
+  Thanks [@benjie](https://github.com/benjie)! -
+  `@interface mode=single/relational` now get `Node` interface if the table has
+  a PK.
+
+  🚨 `@interface mode=union` no longer gets `Node` interface unless you also add
+  `@behavior node`.
+
+- [#454](https://github.com/benjie/crystal/pull/454)
+  [`e75bf57dd`](https://github.com/benjie/crystal/commit/e75bf57ddb20d20c86dba880cbb1970ec6a875af)
+  Thanks [@benjie](https://github.com/benjie)! - Automatically register
+  connection types for unionMember unions.
+
+- Updated dependencies
+  [[`196e5c1aa`](https://github.com/benjie/crystal/commit/196e5c1aab52dbe2a069d0a15b9e4931523fd2dd)]:
+  - graphile-build@5.0.0-beta.4
+  - @dataplan/pg@0.0.1-beta.3
+
 ## 5.0.0-beta.3
 
 ### Patch Changes

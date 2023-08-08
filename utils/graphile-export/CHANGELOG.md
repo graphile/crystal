@@ -1,5 +1,14 @@
 # graphile-export
 
+## 0.0.2-beta.2
+
+### Patch Changes
+
+- [#454](https://github.com/benjie/crystal/pull/454)
+  [`89400d5c2`](https://github.com/benjie/crystal/commit/89400d5c2bb44aeccbb6285c283313f4e3947847)
+  Thanks [@benjie](https://github.com/benjie)! - Apply a different patch to the
+  babel traverse issue we've been facing when optimizing.
+
 ## 0.0.2-beta.1
 
 ### Patch Changes
