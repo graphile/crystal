@@ -1845,6 +1845,9 @@ type FirstPartyVulnerability implements Vulnerability {
     orderBy: [GcpApplicationFirstPartyVulnerabilityOrderBy!] = [PRIMARY_KEY_ASC]
   ): GcpApplicationFirstPartyVulnerabilityConnection!
   name: String!
+
+  """Reads and enables pagination through a set of `PersonOrOrganization`."""
+  owners: PersonOrOrganizationConnection!
   rowId: Int!
   teamName: String
 }
@@ -3265,6 +3268,29 @@ input PersonInput {
 }
 
 union PersonOrOrganization = Organization | Person
+
+"""A connection to a list of `PersonOrOrganization` values."""
+type PersonOrOrganizationConnection {
+  """
+  A list of edges which contains the `PersonOrOrganization` and cursor to aid in pagination.
+  """
+  edges: [PersonOrOrganizationEdge]!
+
+  """A list of `PersonOrOrganization` objects."""
+  nodes: [PersonOrOrganization]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""A `PersonOrOrganization` edge in the connection."""
+type PersonOrOrganizationEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PersonOrOrganization` at the end of the edge."""
+  node: PersonOrOrganization
+}
 
 """Methods to use when ordering `Person`."""
 enum PersonOrderBy {
@@ -5872,6 +5898,9 @@ type ThirdPartyVulnerability implements Vulnerability {
     orderBy: [GcpApplicationThirdPartyVulnerabilityOrderBy!] = [PRIMARY_KEY_ASC]
   ): GcpApplicationThirdPartyVulnerabilityConnection!
   name: String!
+
+  """Reads and enables pagination through a set of `PersonOrOrganization`."""
+  owners: PersonOrOrganizationConnection!
   rowId: Int!
   vendorName: String
 }
@@ -6699,6 +6728,9 @@ interface Vulnerability {
   ): ApplicationConnection!
   cvssScore: Float!
   name: String!
+
+  """Reads and enables pagination through a set of `PersonOrOrganization`."""
+  owners: PersonOrOrganizationConnection!
   rowId: Int!
 }
 
