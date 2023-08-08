@@ -1,3 +1,4 @@
+/* global window, history */
 import ExecutionEnvironment from "@docusaurus/ExecutionEnvironment";
 
 if (ExecutionEnvironment.canUseDOM) {

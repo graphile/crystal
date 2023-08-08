@@ -82,6 +82,9 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
 
           // Needs the 'select' and 'node' behaviours for compatibility
           return (
+            !resource.parameters &&
+            !resource.isUnique &&
+            !resource.isVirtual &&
             !!build.behavior.pgCodecMatches(resource.codec, "type:node") &&
             !!build.behavior.pgResourceMatches(resource, "resource:select")
           );
