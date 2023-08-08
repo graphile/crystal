@@ -1,0 +1,262 @@
+{
+  allVulnerabilities: {
+    nodes: [
+      {
+        id: "WyJmaXJzdF9wYXJ0eV92dWxuZXJhYmlsaXRpZXMiLDFd",
+        name: "Off-by-one",
+        applications: {
+          nodes: [
+            {
+              id: "WyJhd3NfYXBwbGljYXRpb25zIiwxXQ==",
+              name: "AWS App 1",
+              owner: {
+                __typename: "Organization",
+                id: "WyJvcmdhbml6YXRpb25zIiwxXQ==",
+                name: "Acme",
+              },
+            },
+            {
+              id: "WyJhd3NfYXBwbGljYXRpb25zIiwzXQ==",
+              name: "AWS App 3",
+              owner: {
+                __typename: "Organization",
+                id: "WyJvcmdhbml6YXRpb25zIiwxXQ==",
+                name: "Acme",
+              },
+            },
+            {
+              id: "WyJhd3NfYXBwbGljYXRpb25zIiw2XQ==",
+              name: "AWS App 6",
+              owner: {
+                __typename: "Person",
+                id: "WyJwZW9wbGUiLDFd",
+                username: "Alice",
+              },
+            },
+            {
+              id: "WyJhd3NfYXBwbGljYXRpb25zIiw3XQ==",
+              name: "SAC-NORAD AI",
+              owner: {
+                __typename: "Organization",
+                id: "WyJvcmdhbml6YXRpb25zIiw1XQ==",
+                name: "Cyberdyne Systems",
+              },
+            },
+            {
+              id: "WyJnY3BfYXBwbGljYXRpb25zIiw0XQ==",
+              name: "Gargantual Crap Pile",
+              owner: {
+                __typename: "Person",
+                id: "WyJwZW9wbGUiLDJd",
+                username: "Benjie",
+              },
+            },
+          ],
+        },
+        applicationsList: [
+          {
+            id: "WyJhd3NfYXBwbGljYXRpb25zIiwxXQ==",
+            name: "AWS App 1",
+            owner: {
+              __typename: "Organization",
+              id: "WyJvcmdhbml6YXRpb25zIiwxXQ==",
+              name: "Acme",
+            },
+          },
+          {
+            id: "WyJhd3NfYXBwbGljYXRpb25zIiwzXQ==",
+            name: "AWS App 3",
+            owner: {
+              __typename: "Organization",
+              id: "WyJvcmdhbml6YXRpb25zIiwxXQ==",
+              name: "Acme",
+            },
+          },
+          {
+            id: "WyJhd3NfYXBwbGljYXRpb25zIiw2XQ==",
+            name: "AWS App 6",
+            owner: {
+              __typename: "Person",
+              id: "WyJwZW9wbGUiLDFd",
+              username: "Alice",
+            },
+          },
+          {
+            id: "WyJhd3NfYXBwbGljYXRpb25zIiw3XQ==",
+            name: "SAC-NORAD AI",
+            owner: {
+              __typename: "Organization",
+              id: "WyJvcmdhbml6YXRpb25zIiw1XQ==",
+              name: "Cyberdyne Systems",
+            },
+          },
+          {
+            id: "WyJnY3BfYXBwbGljYXRpb25zIiw0XQ==",
+            name: "Gargantual Crap Pile",
+            owner: {
+              __typename: "Person",
+              id: "WyJwZW9wbGUiLDJd",
+              username: "Benjie",
+            },
+          },
+        ],
+        owners: {
+          nodes: [
+            {
+              __typename: "Organization",
+              id: "WyJvcmdhbml6YXRpb25zIiwxXQ==",
+              name: "Acme",
+            },
+            {
+              __typename: "Organization",
+              id: "WyJvcmdhbml6YXRpb25zIiwxXQ==",
+              name: "Acme",
+            },
+            {
+              __typename: "Organization",
+              id: "WyJvcmdhbml6YXRpb25zIiw1XQ==",
+              name: "Cyberdyne Systems",
+            },
+            {
+              __typename: "Person",
+              id: "WyJwZW9wbGUiLDFd",
+              username: "Alice",
+            },
+            {
+              __typename: "Person",
+              id: "WyJwZW9wbGUiLDJd",
+              username: "Benjie",
+            },
+          ],
+        },
+        ownersList: [
+          {
+            __typename: "Organization",
+            id: "WyJvcmdhbml6YXRpb25zIiwxXQ==",
+            name: "Acme",
+          },
+          {
+            __typename: "Organization",
+            id: "WyJvcmdhbml6YXRpb25zIiwxXQ==",
+            name: "Acme",
+          },
+          {
+            __typename: "Organization",
+            id: "WyJvcmdhbml6YXRpb25zIiw1XQ==",
+            name: "Cyberdyne Systems",
+          },
+          {
+            __typename: "Person",
+            id: "WyJwZW9wbGUiLDFd",
+            username: "Alice",
+          },
+          {
+            __typename: "Person",
+            id: "WyJwZW9wbGUiLDJd",
+            username: "Benjie",
+          },
+        ],
+      },
+      {
+        id: "WyJmaXJzdF9wYXJ0eV92dWxuZXJhYmlsaXRpZXMiLDJd",
+        name: "Index-out-of-bounds",
+        applications: {
+          nodes: [
+            {
+              id: "WyJnY3BfYXBwbGljYXRpb25zIiwxXQ==",
+              name: "GCP App 1",
+              owner: {
+                __typename: "Organization",
+                id: "WyJvcmdhbml6YXRpb25zIiwxXQ==",
+                name: "Acme",
+              },
+            },
+            {
+              id: "WyJnY3BfYXBwbGljYXRpb25zIiwyXQ==",
+              name: "Grand Crayon Pasta",
+              owner: {
+                __typename: "Person",
+                id: "WyJwZW9wbGUiLDNd",
+                username: "Caroline",
+              },
+            },
+            {
+              id: "WyJnY3BfYXBwbGljYXRpb25zIiwzXQ==",
+              name: "Great Creative Project",
+              owner: {
+                __typename: "Person",
+                id: "WyJwZW9wbGUiLDJd",
+                username: "Benjie",
+              },
+            },
+          ],
+        },
+        applicationsList: [
+          {
+            id: "WyJnY3BfYXBwbGljYXRpb25zIiwxXQ==",
+            name: "GCP App 1",
+            owner: {
+              __typename: "Organization",
+              id: "WyJvcmdhbml6YXRpb25zIiwxXQ==",
+              name: "Acme",
+            },
+          },
+          {
+            id: "WyJnY3BfYXBwbGljYXRpb25zIiwyXQ==",
+            name: "Grand Crayon Pasta",
+            owner: {
+              __typename: "Person",
+              id: "WyJwZW9wbGUiLDNd",
+              username: "Caroline",
+            },
+          },
+          {
+            id: "WyJnY3BfYXBwbGljYXRpb25zIiwzXQ==",
+            name: "Great Creative Project",
+            owner: {
+              __typename: "Person",
+              id: "WyJwZW9wbGUiLDJd",
+              username: "Benjie",
+            },
+          },
+        ],
+        owners: {
+          nodes: [
+            {
+              __typename: "Organization",
+              id: "WyJvcmdhbml6YXRpb25zIiwxXQ==",
+              name: "Acme",
+            },
+            {
+              __typename: "Person",
+              id: "WyJwZW9wbGUiLDJd",
+              username: "Benjie",
+            },
+            {
+              __typename: "Person",
+              id: "WyJwZW9wbGUiLDNd",
+              username: "Caroline",
+            },
+          ],
+        },
+        ownersList: [
+          {
+            __typename: "Organization",
+            id: "WyJvcmdhbml6YXRpb25zIiwxXQ==",
+            name: "Acme",
+          },
+          {
+            __typename: "Person",
+            id: "WyJwZW9wbGUiLDJd",
+            username: "Benjie",
+          },
+          {
+            __typename: "Person",
+            id: "WyJwZW9wbGUiLDNd",
+            username: "Caroline",
+          },
+        ],
+      },
+    ],
+  },
+}
