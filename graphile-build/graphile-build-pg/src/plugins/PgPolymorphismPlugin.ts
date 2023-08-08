@@ -69,6 +69,7 @@ declare global {
         typeIdentifier: string;
         name: string;
       };
+      isPgUnionMemberUnionConnection?: boolean;
     }
     interface ScopeEnum {
       pgPolymorphicSingleTableType?: {
@@ -76,6 +77,9 @@ declare global {
         name: string;
         attributes: ReadonlyArray<PgCodecPolymorphismSingleTypeAttributeSpec>;
       };
+    }
+    interface ScopeUnion {
+      isPgUnionMemberUnion?: boolean;
     }
   }
 }
@@ -960,6 +964,10 @@ return function (access) {
               }),
               "PgPolymorphismPlugin @unionMember unions",
             );
+            build.registerCursorConnection({
+              typeName: unionName,
+              scope: { isPgUnionMemberUnionConnection: true },
+            });
           });
         }
         return _;

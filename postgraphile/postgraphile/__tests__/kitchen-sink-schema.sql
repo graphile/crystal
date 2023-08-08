@@ -1534,6 +1534,7 @@ comment on type polymorphic.vulnerabilities is $$
 @name Vulnerability
 @behavior node
 @ref applications to:Application plural
+@ref owners to:PersonOrOrganization plural
 $$;
 
 comment on column polymorphic.vulnerabilities.id is '@notNull';
@@ -1545,12 +1546,22 @@ comment on table polymorphic.first_party_vulnerabilities is $$
 @ref applications to:Application plural
 @refVia applications via:aws_application_first_party_vulnerabilities;aws_applications
 @refVia applications via:gcp_application_first_party_vulnerabilities;gcp_applications
+@ref owners to:PersonOrOrganization plural
+@refVia owners via:aws_application_first_party_vulnerabilities;aws_applications;people
+@refVia owners via:aws_application_first_party_vulnerabilities;aws_applications;organizations
+@refVia owners via:gcp_application_first_party_vulnerabilities;gcp_applications;people
+@refVia owners via:gcp_application_first_party_vulnerabilities;gcp_applications;organizations
 $$;
 comment on table polymorphic.third_party_vulnerabilities is $$
 @implements Vulnerability
 @ref applications to:Application plural
 @refVia applications via:aws_application_third_party_vulnerabilities;aws_applications
 @refVia applications via:gcp_application_third_party_vulnerabilities;gcp_applications
+@ref owners to:PersonOrOrganization plural
+@refVia owners via:aws_application_third_party_vulnerabilities;aws_applications;people
+@refVia owners via:aws_application_third_party_vulnerabilities;aws_applications;organizations
+@refVia owners via:gcp_application_third_party_vulnerabilities;gcp_applications;people
+@refVia owners via:gcp_application_third_party_vulnerabilities;gcp_applications;organizations
 $$;
 
 create type polymorphic.zero_implementation as (
