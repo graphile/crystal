@@ -211,7 +211,7 @@ const config = {
         //... other Algolia params
       },
     }),
-  trailingSlash: false,
+  trailingSlash: undefined,
   clientModules: [require.resolve("./docusaurus.client.js")],
 };
 
