@@ -499,6 +499,7 @@ import { withPgClientTransaction } from "postgraphile/@dataplan/pg";
 export const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin((build) => {
   const { sql } = build;
   const { users } = build.input.pgRegistry.pgResources;
+  const { executor } = users;
   return {
     typeDefs: gql`
       input RegisterUserInput {
