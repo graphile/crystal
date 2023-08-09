@@ -535,76 +535,6 @@ type CreateProtoPayload {
   query: Query
 }
 
-"""All input for the create `RelationalStatus` mutation."""
-input CreateRelationalStatusInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `RelationalStatus` to be created by this mutation."""
-  relationalStatus: RelationalStatusInput!
-}
-
-"""The output of our create `RelationalStatus` mutation."""
-type CreateRelationalStatusPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """The `RelationalStatus` that was created by this mutation."""
-  relationalStatus: RelationalStatus
-
-  """An edge for our `RelationalStatus`. May be used by Relay 1."""
-  relationalStatusEdge(
-    """The method to use when ordering `RelationalStatus`."""
-    orderBy: [RelationalStatusesOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): RelationalStatusesEdge
-}
-
-"""All input for the create `RelationalTopic` mutation."""
-input CreateRelationalTopicInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The `RelationalTopic` to be created by this mutation."""
-  relationalTopic: RelationalTopicInput!
-}
-
-"""The output of our create `RelationalTopic` mutation."""
-type CreateRelationalTopicPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """The `RelationalTopic` that was created by this mutation."""
-  relationalTopic: RelationalTopic
-
-  """An edge for our `RelationalTopic`. May be used by Relay 1."""
-  relationalTopicEdge(
-    """The method to use when ordering `RelationalTopic`."""
-    orderBy: [RelationalTopicsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): RelationalTopicsEdge
-}
-
 """All input for the create `Reserved` mutation."""
 input CreateReservedInput {
   """
@@ -1246,102 +1176,6 @@ type DeleteProtoPayload {
   query: Query
 }
 
-"""All input for the `deleteRelationalStatusById` mutation."""
-input DeleteRelationalStatusByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-}
-
-"""All input for the `deleteRelationalStatus` mutation."""
-input DeleteRelationalStatusInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique `ID` which will identify a single `RelationalStatus` to be deleted.
-  """
-  nodeId: ID!
-}
-
-"""The output of our delete `RelationalStatus` mutation."""
-type DeleteRelationalStatusPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  deletedRelationalStatusId: ID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """The `RelationalStatus` that was deleted by this mutation."""
-  relationalStatus: RelationalStatus
-
-  """An edge for our `RelationalStatus`. May be used by Relay 1."""
-  relationalStatusEdge(
-    """The method to use when ordering `RelationalStatus`."""
-    orderBy: [RelationalStatusesOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): RelationalStatusesEdge
-}
-
-"""All input for the `deleteRelationalTopicById` mutation."""
-input DeleteRelationalTopicByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-}
-
-"""All input for the `deleteRelationalTopic` mutation."""
-input DeleteRelationalTopicInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique `ID` which will identify a single `RelationalTopic` to be deleted.
-  """
-  nodeId: ID!
-}
-
-"""The output of our delete `RelationalTopic` mutation."""
-type DeleteRelationalTopicPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  deletedRelationalTopicId: ID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """The `RelationalTopic` that was deleted by this mutation."""
-  relationalTopic: RelationalTopic
-
-  """An edge for our `RelationalTopic`. May be used by Relay 1."""
-  relationalTopicEdge(
-    """The method to use when ordering `RelationalTopic`."""
-    orderBy: [RelationalTopicsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): RelationalTopicsEdge
-}
-
 """All input for the `deleteReservedByCase` mutation."""
 input DeleteReservedByCaseInput {
   case: String!
@@ -1715,22 +1549,6 @@ type Mutation {
     input: CreateProtoInput!
   ): CreateProtoPayload
 
-  """Creates a single `RelationalStatus`."""
-  createRelationalStatus(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateRelationalStatusInput!
-  ): CreateRelationalStatusPayload
-
-  """Creates a single `RelationalTopic`."""
-  createRelationalTopic(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateRelationalTopicInput!
-  ): CreateRelationalTopicPayload
-
   """Creates a single `Reserved`."""
   createReserved(
     """
@@ -1954,38 +1772,6 @@ type Mutation {
     """
     input: DeleteProtoInput!
   ): DeleteProtoPayload
-
-  """Deletes a single `RelationalStatus` using its globally unique id."""
-  deleteRelationalStatus(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteRelationalStatusInput!
-  ): DeleteRelationalStatusPayload
-
-  """Deletes a single `RelationalStatus` using a unique key."""
-  deleteRelationalStatusById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteRelationalStatusByIdInput!
-  ): DeleteRelationalStatusPayload
-
-  """Deletes a single `RelationalTopic` using its globally unique id."""
-  deleteRelationalTopic(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteRelationalTopicInput!
-  ): DeleteRelationalTopicPayload
-
-  """Deletes a single `RelationalTopic` using a unique key."""
-  deleteRelationalTopicById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteRelationalTopicByIdInput!
-  ): DeleteRelationalTopicPayload
 
   """Deletes a single `Reserved` using its globally unique id."""
   deleteReserved(
@@ -2260,42 +2046,6 @@ type Mutation {
     """
     input: UpdateProtoInput!
   ): UpdateProtoPayload
-
-  """
-  Updates a single `RelationalStatus` using its globally unique id and a patch.
-  """
-  updateRelationalStatus(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateRelationalStatusInput!
-  ): UpdateRelationalStatusPayload
-
-  """Updates a single `RelationalStatus` using a unique key and a patch."""
-  updateRelationalStatusById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateRelationalStatusByIdInput!
-  ): UpdateRelationalStatusPayload
-
-  """
-  Updates a single `RelationalTopic` using its globally unique id and a patch.
-  """
-  updateRelationalTopic(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateRelationalTopicInput!
-  ): UpdateRelationalTopicPayload
-
-  """Updates a single `RelationalTopic` using a unique key and a patch."""
-  updateRelationalTopicById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateRelationalTopicByIdInput!
-  ): UpdateRelationalTopicPayload
 
   """Updates a single `Reserved` using its globally unique id and a patch."""
   updateReserved(
@@ -3434,26 +3184,6 @@ input RelationalStatusCondition {
   type: ItemType
 }
 
-"""An input for mutations affecting `RelationalStatus`"""
-input RelationalStatusInput {
-  constructor: String
-  description: String
-  id: Int!
-  note: String
-  type: ItemType
-}
-
-"""
-Represents an update to a `RelationalStatus`. Fields that are set will be updated.
-"""
-input RelationalStatusPatch {
-  constructor: String
-  description: String
-  id: Int
-  note: String
-  type: ItemType
-}
-
 """A connection to a list of `RelationalStatus` values."""
 type RelationalStatusesConnection {
   """
@@ -3538,24 +3268,6 @@ input RelationalTopicCondition {
   title: String
 
   """Checks for equality with the object’s `type` field."""
-  type: ItemType
-}
-
-"""An input for mutations affecting `RelationalTopic`"""
-input RelationalTopicInput {
-  constructor: String
-  id: Int!
-  title: String!
-  type: ItemType
-}
-
-"""
-Represents an update to a `RelationalTopic`. Fields that are set will be updated.
-"""
-input RelationalTopicPatch {
-  constructor: String
-  id: Int
-  title: String
   type: ItemType
 }
 
@@ -4301,120 +4013,6 @@ type UpdateProtoPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-}
-
-"""All input for the `updateRelationalStatusById` mutation."""
-input UpdateRelationalStatusByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-
-  """
-  An object where the defined keys will be set on the `RelationalStatus` being updated.
-  """
-  relationalStatusPatch: RelationalStatusPatch!
-}
-
-"""All input for the `updateRelationalStatus` mutation."""
-input UpdateRelationalStatusInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique `ID` which will identify a single `RelationalStatus` to be updated.
-  """
-  nodeId: ID!
-
-  """
-  An object where the defined keys will be set on the `RelationalStatus` being updated.
-  """
-  relationalStatusPatch: RelationalStatusPatch!
-}
-
-"""The output of our update `RelationalStatus` mutation."""
-type UpdateRelationalStatusPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """The `RelationalStatus` that was updated by this mutation."""
-  relationalStatus: RelationalStatus
-
-  """An edge for our `RelationalStatus`. May be used by Relay 1."""
-  relationalStatusEdge(
-    """The method to use when ordering `RelationalStatus`."""
-    orderBy: [RelationalStatusesOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): RelationalStatusesEdge
-}
-
-"""All input for the `updateRelationalTopicById` mutation."""
-input UpdateRelationalTopicByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-
-  """
-  An object where the defined keys will be set on the `RelationalTopic` being updated.
-  """
-  relationalTopicPatch: RelationalTopicPatch!
-}
-
-"""All input for the `updateRelationalTopic` mutation."""
-input UpdateRelationalTopicInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique `ID` which will identify a single `RelationalTopic` to be updated.
-  """
-  nodeId: ID!
-
-  """
-  An object where the defined keys will be set on the `RelationalTopic` being updated.
-  """
-  relationalTopicPatch: RelationalTopicPatch!
-}
-
-"""The output of our update `RelationalTopic` mutation."""
-type UpdateRelationalTopicPayload {
-  """
-  The exact same `clientMutationId` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """The `RelationalTopic` that was updated by this mutation."""
-  relationalTopic: RelationalTopic
-
-  """An edge for our `RelationalTopic`. May be used by Relay 1."""
-  relationalTopicEdge(
-    """The method to use when ordering `RelationalTopic`."""
-    orderBy: [RelationalTopicsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): RelationalTopicsEdge
 }
 
 """All input for the `updateReservedByCase` mutation."""

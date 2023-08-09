@@ -662,6 +662,58 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           return behavior;
         },
       },
+      pgResource: {
+        provides: ["inferred"],
+        after: ["default"],
+        before: ["override"],
+        callback(behavior, resource, build) {
+          // Disable insert/update/delete on relational tables
+          const newBehavior = [behavior];
+          if (
+            !resource.parameters &&
+            !resource.isUnique &&
+            !resource.isVirtual
+          ) {
+            if ((resource.codec as PgCodec).polymorphism) {
+              // This is a polymorphic type
+              newBehavior.push(
+                "-resource:insert -resource:update -resource:delete",
+              );
+            } else {
+              const resourceTypeName = build.inflection.tableType(
+                resource.codec,
+              );
+              const relations: Record<string, PgCodecRelation> =
+                resource.getRelations();
+              const pk = (
+                resource.uniques as PgResourceUnique[] | undefined
+              )?.find((u) => u.isPrimary);
+              if (pk) {
+                const pkAttributes = pk.attributes;
+                const pkRelations = Object.values(relations).filter((r) =>
+                  arraysMatch(r.localAttributes, pkAttributes),
+                );
+                if (
+                  pkRelations.some(
+                    (r) =>
+                      r.remoteResource.codec.polymorphism?.mode ===
+                        "relational" &&
+                      Object.values(
+                        r.remoteResource.codec.polymorphism.types,
+                      ).some((t) => t.name === resourceTypeName),
+                  )
+                ) {
+                  // This is part of a relational polymorphic type
+                  newBehavior.push(
+                    "-resource:insert -resource:update -resource:delete",
+                  );
+                }
+              }
+            }
+          }
+          return newBehavior;
+        },
+      },
     },
     hooks: {
       init(_, build, _context) {
