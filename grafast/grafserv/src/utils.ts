@@ -107,6 +107,11 @@ export function getBodyFromRequest(
   });
 }
 
+/**
+ * Using this is a hack, it sniffs the data and tries to determine the type.
+ * Really you should ask your framework of choice what type of data it has given
+ * you.
+ */
 export function getBodyFromFrameworkBody(body: unknown): GrafservBody {
   if (typeof body === "string") {
     return {
@@ -125,7 +130,7 @@ export function getBodyFromFrameworkBody(body: unknown): GrafservBody {
     };
   } else {
     throw new Error(
-      `Grafserv Express adaptor doesn't know how to interpret this request body`,
+      `Grafserv adaptor doesn't know how to interpret this request body`,
     );
   }
 }
