@@ -1,5 +1,5 @@
 import type { GrafastResultsList, GrafastValuesList } from "grafast";
-import { ExecutableStep, constant } from "grafast";
+import { constant, ExecutableStep } from "grafast";
 
 import type { PgClient, PgExecutor, WithPgClient } from "../executor";
 
