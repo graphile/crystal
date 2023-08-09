@@ -519,11 +519,11 @@ export const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin((build) => {
     `,
     plans: {
       Mutation: {
-        registerUser() {
+        registerUser(_, fieldArgs) {
           const $user = withPgClientTransaction(
             executor,
-            null,
-            async (pgClient) => {
+            fieldArgs.getRaw(),
+            async (pgClient, args) => {
               // Our custom logic to register the user:
               const {
                 rows: [user],
