@@ -1,5 +1,5 @@
 import type { GrafastResultsList, GrafastValuesList } from "grafast";
-import { ExecutableStep } from "grafast";
+import { ExecutableStep, constant } from "grafast";
 
 import type { PgClient, PgExecutor, WithPgClient } from "../executor";
 
@@ -70,18 +70,29 @@ export class WithPgClientStep<
 
 export function withPgClient<TData, TResult>(
   executor: PgExecutor,
-  $data: ExecutableStep<TData>,
+  $data:
+    | ExecutableStep<TData>
+    | (TData extends null | undefined ? null | undefined : never),
   callback: WithPgClientStepCallback<TData, TResult>,
 ) {
-  return new WithPgClientStep(executor, $data, callback);
+  return new WithPgClientStep(
+    executor,
+    $data ?? constant($data as TData),
+    callback,
+  );
 }
 
 export function withPgClientTransaction<TData, TResult>(
   executor: PgExecutor,
-  $data: ExecutableStep<TData>,
+  $data:
+    | ExecutableStep<TData>
+    | (TData extends null | undefined ? null | undefined : never),
   callback: WithPgClientStepCallback<TData, TResult>,
 ) {
-  return withPgClient(executor, $data, (client, data) =>
-    client.withTransaction((txClient) => callback(txClient, data)),
+  return withPgClient(
+    executor,
+    $data ?? constant($data as TData),
+    (client, data) =>
+      client.withTransaction((txClient) => callback(txClient, data)),
   );
 }
