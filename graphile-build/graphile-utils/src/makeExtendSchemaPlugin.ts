@@ -158,10 +158,7 @@ declare global {
 export function makeExtendSchemaPlugin(
   generator:
     | ExtensionDefinition
-    | ((
-        build: Partial<GraphileBuild.Build> & GraphileBuild.BuildBase,
-        schemaOptions: GraphileBuild.SchemaOptions,
-      ) => ExtensionDefinition),
+    | ((build: GraphileBuild.Build) => ExtensionDefinition),
   uniquePluginName = `ExtendSchemaPlugin_${String(Math.random()).slice(2)}`,
 ): GraphileConfig.Plugin {
   let graphql: GraphileBuild.Build["graphql"];
@@ -184,12 +181,25 @@ export function makeExtendSchemaPlugin(
             GraphQLUnionType,
             GraphQLInterfaceType,
           } = graphql;
+
+          if (typeof generator === "function" && generator.length >= 2) {
+            console.error(
+              "[DEPRECATED] Your makeExtendSchemaPlugin generator callback accepts two arguments: `(build, options)`; instead you should just use the `build` argument since `options` is just `build.options`.",
+            );
+          }
+
           const {
             typeDefs,
             resolvers = Object.create(null),
             plans = Object.create(null),
           } = typeof generator === "function"
-            ? generator(build, options)
+            ? generator.length === 1
+              ? generator(build)
+              : /* TODO: DELETE THIS! */
+                ((generator as any)(
+                  build,
+                  build.options,
+                ) as ExtensionDefinition)
             : generator;
 
           const typeDefsArr = Array.isArray(typeDefs) ? typeDefs : [typeDefs];
