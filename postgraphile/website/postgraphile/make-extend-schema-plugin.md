@@ -520,10 +520,11 @@ export const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin((build) => {
     plans: {
       Mutation: {
         registerUser(_, fieldArgs) {
+          const $input = fieldArgs.getRaw("input");
           const $user = withPgClientTransaction(
             executor,
-            fieldArgs.getRaw(),
-            async (pgClient, args) => {
+            $input,
+            async (pgClient, input) => {
               // Our custom logic to register the user:
               const {
                 rows: [user],
@@ -532,14 +533,14 @@ export const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin((build) => {
                   INSERT INTO app_public.users (name, email, bio)
                   VALUES ($1, $2, $3)
                   RETURNING *`,
-                values: [args.input.name, args.input.email, args.input.bio],
+                values: [input.name, input.email, input.bio],
               });
 
               // Send the email. If this fails then the error will be caught
               // and the transaction rolled back; it will be as if the user
               // never registered
               await mockSendEmail(
-                args.input.email,
+                input.email,
                 "Welcome to my site",
                 `You're user ${user.id} - thanks for being awesome`,
               );
