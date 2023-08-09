@@ -162,6 +162,12 @@ export function makeExtendSchemaPlugin(
   uniquePluginName = `ExtendSchemaPlugin_${String(Math.random()).slice(2)}`,
 ): GraphileConfig.Plugin {
   let graphql: GraphileBuild.Build["graphql"];
+  if (typeof generator === "function" && generator.length >= 2) {
+    console.trace(
+      "[DEPRECATED] Your makeExtendSchemaPlugin generator callback accepts two arguments: `(build, options)`; instead you should just use the `build` argument since `options` is just `build.options`.",
+    );
+  }
+
   return {
     name: uniquePluginName,
     version: "0.0.0",
@@ -171,22 +177,25 @@ export function makeExtendSchemaPlugin(
           // Extract GraphQL into the scope so that our other functions can use it.
           graphql = build.graphql;
 
-          const { options } = build;
+          if (!build.makeExtendSchemaPlugin) {
+            build.makeExtendSchemaPlugin = Object.create(null);
+          }
+
+          return build;
+        },
+
+        init(_, build, _context) {
           const {
+            GraphQLDirective,
             GraphQLEnumType,
+            GraphQLError,
             GraphQLInputObjectType,
+            GraphQLInterfaceType,
             GraphQLObjectType,
             GraphQLScalarType,
-            GraphQLDirective,
             GraphQLUnionType,
-            GraphQLInterfaceType,
+            Kind,
           } = graphql;
-
-          if (typeof generator === "function" && generator.length >= 2) {
-            console.error(
-              "[DEPRECATED] Your makeExtendSchemaPlugin generator callback accepts two arguments: `(build, options)`; instead you should just use the `build` argument since `options` is just `build.options`.",
-            );
-          }
 
           const {
             typeDefs,
@@ -291,10 +300,6 @@ export function makeExtendSchemaPlugin(
               );
             }
           });
-
-          if (!build.makeExtendSchemaPlugin) {
-            build.makeExtendSchemaPlugin = Object.create(null);
-          }
           build.makeExtendSchemaPlugin![uniquePluginName] = {
             typeExtensions,
             newTypes,
@@ -302,31 +307,6 @@ export function makeExtendSchemaPlugin(
             plans,
           };
 
-          return build;
-        },
-
-        init(_, build, _context) {
-          const {
-            makeExtendSchemaPlugin: {
-              [uniquePluginName]: {
-                typeExtensions,
-                newTypes,
-                resolvers,
-                plans,
-              },
-            },
-            graphql: {
-              GraphQLEnumType,
-              GraphQLError,
-              GraphQLObjectType,
-              GraphQLInputObjectType,
-              GraphQLUnionType,
-              GraphQLInterfaceType,
-              GraphQLScalarType,
-              GraphQLDirective,
-              Kind,
-            },
-          } = build;
           newTypes.forEach((def: NewTypeDef) => {
             if (def.type === GraphQLEnumType) {
               const definition = def.definition as EnumTypeDefinitionNode;
