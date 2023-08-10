@@ -6,7 +6,6 @@
 
 import "graphile-config";
 
-import type { WithPgClient } from "@dataplan/pg";
 import {
   defaultPreset as graphileBuildPreset,
   QueryQueryPlugin,
@@ -26,17 +25,6 @@ const DATABASE_SCHEMAS: string[] = ["public", "app_public"];
 /* **         BELOW HERE IS WHERE THE CODE LIVES, ABOVE IS CONFIG          ** */
 /* **                                                                      ** */
 /* ************************************************************************** */
-
-declare global {
-  namespace Grafast {
-    interface Context {
-      pgSettings: {
-        [key: string]: string;
-      } | null;
-      withPgClient: WithPgClient;
-    }
-  }
-}
 
 export function getPool() {
   const pool = new Pool({

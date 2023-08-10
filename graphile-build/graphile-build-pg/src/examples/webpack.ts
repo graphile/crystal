@@ -1,6 +1,5 @@
 /* eslint-disable no-restricted-syntax */
 
-import type { WithPgClient } from "@dataplan/pg";
 import {
   buildInflection,
   buildSchema,
@@ -20,18 +19,6 @@ import { defaultPreset as graphileBuildPgPreset } from "../index.js";
  * Set this to 'false' for production and the bundle will be minified.
  */
 const DEBUG_MODE = true;
-
-// Our server will supply pgSettings/withPgClient on the GraphQL context
-declare global {
-  namespace Grafast {
-    interface Context {
-      pgSettings: {
-        [key: string]: string;
-      } | null;
-      withPgClient: WithPgClient;
-    }
-  }
-}
 
 // Create a pool and add the error handler
 const pool = new Pool({

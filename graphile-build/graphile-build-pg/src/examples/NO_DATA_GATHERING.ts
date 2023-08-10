@@ -37,17 +37,6 @@ import sql from "pg-sql2";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 
-declare global {
-  namespace Grafast {
-    interface Context {
-      pgSettings: {
-        [key: string]: string;
-      } | null;
-      withPgClient: WithPgClient;
-    }
-  }
-}
-
 const pool = new Pool({
   connectionString: "pggql_test",
 });

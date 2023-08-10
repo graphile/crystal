@@ -9,7 +9,6 @@
  * query.
  */
 
-import type { WithPgClient } from "@dataplan/pg";
 import { envelop, useExtendContext, useSchema } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
@@ -41,17 +40,6 @@ import * as ws from "ws";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 import { getWithPgClientFromPgService } from "../pgServices.js";
-
-declare global {
-  namespace Grafast {
-    interface Context {
-      pgSettings: {
-        [key: string]: string;
-      } | null;
-      withPgClient: WithPgClient;
-    }
-  }
-}
 
 const pool = new Pool({
   connectionString: "pggql_test",
