@@ -76,23 +76,29 @@ export interface PgClient {
   withTransaction<T>(callback: (client: PgClient) => Promise<T>): Promise<T>;
 }
 
-export interface WithPgClient {
+export interface WithPgClient<TPgClient extends PgClient = PgClient> {
   <T>(
     pgSettings: { [key: string]: string } | null,
-    callback: (client: PgClient) => T | Promise<T>,
+    callback: (client: TPgClient) => T | Promise<T>,
   ): Promise<T>;
 
   release?(): PromiseOrDirect<void>;
 }
 
-export type PgExecutorContext<TSettings = any> = {
+export type PgExecutorContext<
+  TSettings = any,
+  TPgClient extends PgClient = PgClient,
+> = {
   pgSettings: TSettings;
-  withPgClient: WithPgClient;
+  withPgClient: WithPgClient<TPgClient>;
 };
 
-export type PgExecutorContextPlans<TSettings = any> = {
+export type PgExecutorContextPlans<
+  TSettings = any,
+  TPgClient extends PgClient = PgClient,
+> = {
   pgSettings: ExecutableStep<TSettings>;
-  withPgClient: ExecutableStep<WithPgClient>;
+  withPgClient: ExecutableStep<WithPgClient<TPgClient>>;
 };
 
 export type PgExecutorInput<TInput> = {

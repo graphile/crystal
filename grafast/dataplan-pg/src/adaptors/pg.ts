@@ -60,12 +60,16 @@ const $$isSetup = Symbol("isConfiguredForDataplanPg");
  */
 const DONT_DISABLE_JIT = process.env.DATAPLAN_PG_DONT_DISABLE_JIT === "1";
 
+export interface NodePostgresPgClient extends PgClient {
+  rawClient: PoolClient;
+}
+
 function newNodePostgresPgClient(
   pgClient: pg.PoolClient,
   txLevel: number,
   alwaysQueue: boolean,
   alreadyInTransaction: boolean,
-): PgClient {
+): NodePostgresPgClient {
   let queue: Promise<void> | null = null;
   const addToQueue = <T>(callback: () => Promise<T>): Promise<T> => {
     const result = queue ? queue.then(callback) : callback();
@@ -82,6 +86,7 @@ function newNodePostgresPgClient(
     return result;
   };
   return {
+    rawClient: pgClient,
     withTransaction(callback) {
       // Transactions always queue; creating queue if need be
       return addToQueue(async () => {
@@ -191,7 +196,7 @@ declare module "pg" {
 async function makeNodePostgresWithPgClient_inner<T>(
   pgClient: pg.PoolClient,
   pgSettings: { [key: string]: string } | null,
-  callback: (client: PgClient) => T | Promise<T>,
+  callback: (client: NodePostgresPgClient) => T | Promise<T>,
   alwaysQueue: boolean,
   alreadyInTransaction: boolean,
 ) {
@@ -265,8 +270,11 @@ async function makeNodePostgresWithPgClient_inner<T>(
 export function makePgAdaptorWithPgClient(
   pool: Pool,
   release: () => PromiseOrDirect<void> = () => {},
-): WithPgClient {
-  const withPgClient: WithPgClient = async (pgSettings, callback) => {
+): WithPgClient<NodePostgresPgClient> {
+  const withPgClient: WithPgClient<NodePostgresPgClient> = async (
+    pgSettings,
+    callback,
+  ) => {
     const pgClient = await pool.connect();
     if (!pgClient[$$isSetup]) {
       pgClient[$$isSetup] = true;
@@ -315,9 +323,12 @@ export function makePgAdaptorWithPgClient(
 export function makeWithPgClientViaPgClientAlreadyInTransaction(
   pgClient: pg.PoolClient,
   alreadyInTransaction = false,
-): WithPgClient {
+): WithPgClient<NodePostgresPgClient> {
   const release = () => {};
-  const withPgClient: WithPgClient = async (pgSettings, callback) => {
+  const withPgClient: WithPgClient<NodePostgresPgClient> = async (
+    pgSettings,
+    callback,
+  ) => {
     return makeNodePostgresWithPgClient_inner(
       pgClient,
       pgSettings,
@@ -365,7 +376,7 @@ export interface PgAdaptorOptions {
 export function createWithPgClient(
   options: PgAdaptorOptions,
   variant?: "SUPERUSER" | string | null,
-): WithPgClient {
+): WithPgClient<NodePostgresPgClient> {
   if (variant === "SUPERUSER") {
     if (options.superuserPool) {
       return makePgAdaptorWithPgClient(options.superuserPool);
@@ -692,7 +703,7 @@ declare global {
       pgSettings: {
         [key: string]: string;
       } | null;
-      withPgClient: WithPgClient;
+      withPgClient: WithPgClient<NodePostgresPgClient>;
       pgSubscriber: PgSubscriber | null;
     }
   }

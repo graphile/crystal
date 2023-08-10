@@ -42,17 +42,6 @@ import * as ws from "ws";
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 import { getWithPgClientFromPgService } from "../pgServices.js";
 
-declare global {
-  namespace Grafast {
-    interface Context {
-      pgSettings: {
-        [key: string]: string;
-      } | null;
-      withPgClient: WithPgClient;
-    }
-  }
-}
-
 const pool = new Pool({
   connectionString: "pggql_test",
 });
