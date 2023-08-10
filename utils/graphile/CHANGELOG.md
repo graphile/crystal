@@ -1,5 +1,18 @@
 # graphile
 
+## 5.0.0-beta.6
+
+### Patch Changes
+
+- Updated dependencies
+  [[`53f0488b1`](https://github.com/benjie/crystal/commit/53f0488b1c060fe9f5dfcd67ad5c0bd932a4b7aa),
+  [`07883a1a5`](https://github.com/benjie/crystal/commit/07883a1a5eac63bdc0541d6a2b562fc97342c439),
+  [`22fa6230a`](https://github.com/benjie/crystal/commit/22fa6230aa7c7271e5360e619ec9e1f52c6ea49c),
+  [`d17dd1cd4`](https://github.com/benjie/crystal/commit/d17dd1cd47d6cb125fbc84c38a8c004857e1bdd2),
+  [`00d026409`](https://github.com/benjie/crystal/commit/00d0264090f90914eac881b34918fa3370782adc)]:
+  - postgraphile@5.0.0-beta.6
+  - graphile-build@5.0.0-beta.5
+
 ## 5.0.0-beta.5
 
 ### Patch Changes

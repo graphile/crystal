@@ -1,5 +1,16 @@
 # @grafserv/persisted
 
+## 0.0.0-beta.4
+
+### Patch Changes
+
+- Updated dependencies
+  [[`f9cc88dc4`](https://github.com/benjie/crystal/commit/f9cc88dc442d371aee154a28d4e63c6da39f6b2e),
+  [`22fa6230a`](https://github.com/benjie/crystal/commit/22fa6230aa7c7271e5360e619ec9e1f52c6ea49c),
+  [`fa8cfcf9b`](https://github.com/benjie/crystal/commit/fa8cfcf9b4ce0c3e12511f3f6392051924a719e5)]:
+  - grafast@0.0.1-beta.4
+  - grafserv@0.0.1-beta.4
+
 ## 0.0.0-beta.3
 
 ### Patch Changes

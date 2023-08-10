@@ -1,5 +1,13 @@
 # @localrepo/grafast-bench
 
+## 0.0.1-beta.4
+
+### Patch Changes
+
+- Updated dependencies
+  [[`f9cc88dc4`](https://github.com/benjie/crystal/commit/f9cc88dc442d371aee154a28d4e63c6da39f6b2e)]:
+  - grafast@0.0.1-beta.4
+
 ## 0.0.1-beta.3
 
 ### Patch Changes

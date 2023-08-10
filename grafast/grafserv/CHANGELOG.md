@@ -1,5 +1,23 @@
 # grafserv
 
+## 0.0.1-beta.4
+
+### Patch Changes
+
+- [#463](https://github.com/benjie/crystal/pull/463)
+  [`22fa6230a`](https://github.com/benjie/crystal/commit/22fa6230aa7c7271e5360e619ec9e1f52c6ea49c)
+  Thanks [@benjie](https://github.com/benjie)! - Add experimental support for h3
+  server to grafserv.
+
+- [#461](https://github.com/benjie/crystal/pull/461)
+  [`fa8cfcf9b`](https://github.com/benjie/crystal/commit/fa8cfcf9b4ce0c3e12511f3f6392051924a719e5)
+  Thanks [@benjie](https://github.com/benjie)! - Export
+  `getBodyFromFrameworkBody` helper, and a number of types.
+
+- Updated dependencies
+  [[`f9cc88dc4`](https://github.com/benjie/crystal/commit/f9cc88dc442d371aee154a28d4e63c6da39f6b2e)]:
+  - grafast@0.0.1-beta.4
+
 ## 0.0.1-beta.3
 
 ### Patch Changes

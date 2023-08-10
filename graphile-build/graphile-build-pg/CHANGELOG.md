@@ -1,5 +1,30 @@
 # graphile-build-pg
 
+## 5.0.0-beta.6
+
+### Patch Changes
+
+- [#459](https://github.com/benjie/crystal/pull/459)
+  [`d17dd1cd4`](https://github.com/benjie/crystal/commit/d17dd1cd47d6cb125fbc84c38a8c004857e1bdd2)
+  Thanks [@benjie](https://github.com/benjie)! - Disable mutations for
+  `@interface mode:relational` tables. (They shouldn't have been enabled, and
+  they don't work yet.)
+
+- [#464](https://github.com/benjie/crystal/pull/464)
+  [`00d026409`](https://github.com/benjie/crystal/commit/00d0264090f90914eac881b34918fa3370782adc)
+  Thanks [@benjie](https://github.com/benjie)! - `@dataplan/pg/adaptors/pg` now
+  adds `rawClient` property which is the underlying Postgres client for use with
+  `pgTyped`, `zapatos`, and other libraries that can use a raw postgres client.
+  This is exposed via `NodePostgresPgClient` interface which is a subtype of
+  `PgClient`.
+- Updated dependencies
+  [[`53f0488b1`](https://github.com/benjie/crystal/commit/53f0488b1c060fe9f5dfcd67ad5c0bd932a4b7aa),
+  [`f9cc88dc4`](https://github.com/benjie/crystal/commit/f9cc88dc442d371aee154a28d4e63c6da39f6b2e),
+  [`00d026409`](https://github.com/benjie/crystal/commit/00d0264090f90914eac881b34918fa3370782adc)]:
+  - @dataplan/pg@0.0.1-beta.4
+  - grafast@0.0.1-beta.4
+  - graphile-build@5.0.0-beta.5
+
 ## 5.0.0-beta.5
 
 ### Patch Changes

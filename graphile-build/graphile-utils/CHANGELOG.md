@@ -1,5 +1,22 @@
 # graphile-utils
 
+## 5.0.0-beta.6
+
+### Patch Changes
+
+- [#460](https://github.com/benjie/crystal/pull/460)
+  [`07883a1a5`](https://github.com/benjie/crystal/commit/07883a1a5eac63bdc0541d6a2b562fc97342c439)
+  Thanks [@benjie](https://github.com/benjie)! - Fix makeExtendSchemaPlugin: now
+  calls callback in 'init' phase, so `Build` type is used (rather than
+  `Partial<Build>`) and other types/handlers/etc should already be registered.
+- Updated dependencies
+  [[`f9cc88dc4`](https://github.com/benjie/crystal/commit/f9cc88dc442d371aee154a28d4e63c6da39f6b2e),
+  [`d17dd1cd4`](https://github.com/benjie/crystal/commit/d17dd1cd47d6cb125fbc84c38a8c004857e1bdd2),
+  [`00d026409`](https://github.com/benjie/crystal/commit/00d0264090f90914eac881b34918fa3370782adc)]:
+  - grafast@0.0.1-beta.4
+  - graphile-build-pg@5.0.0-beta.6
+  - graphile-build@5.0.0-beta.5
+
 ## 5.0.0-beta.5
 
 ### Patch Changes

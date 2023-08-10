@@ -1,5 +1,26 @@
 # @dataplan/pg
 
+## 0.0.1-beta.4
+
+### Patch Changes
+
+- [#462](https://github.com/benjie/crystal/pull/462)
+  [`53f0488b1`](https://github.com/benjie/crystal/commit/53f0488b1c060fe9f5dfcd67ad5c0bd932a4b7aa)
+  Thanks [@benjie](https://github.com/benjie)! - Allow 'null' to be passed to
+  `withPgClient`/`withPgClientTransaction`
+
+- [#464](https://github.com/benjie/crystal/pull/464)
+  [`00d026409`](https://github.com/benjie/crystal/commit/00d0264090f90914eac881b34918fa3370782adc)
+  Thanks [@benjie](https://github.com/benjie)! - `@dataplan/pg/adaptors/pg` now
+  adds `rawClient` property which is the underlying Postgres client for use with
+  `pgTyped`, `zapatos`, and other libraries that can use a raw postgres client.
+  This is exposed via `NodePostgresPgClient` interface which is a subtype of
+  `PgClient`.
+- Updated dependencies
+  [[`f9cc88dc4`](https://github.com/benjie/crystal/commit/f9cc88dc442d371aee154a28d4e63c6da39f6b2e)]:
+  - grafast@0.0.1-beta.4
+  - @dataplan/json@0.0.1-beta.4
+
 ## 0.0.1-beta.3
 
 ### Patch Changes

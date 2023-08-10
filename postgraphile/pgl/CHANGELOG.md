@@ -1,5 +1,30 @@
 # pgl
 
+## 5.0.0-beta.6
+
+### Patch Changes
+
+- [#463](https://github.com/benjie/crystal/pull/463)
+  [`22fa6230a`](https://github.com/benjie/crystal/commit/22fa6230aa7c7271e5360e619ec9e1f52c6ea49c)
+  Thanks [@benjie](https://github.com/benjie)! - Add experimental support for h3
+  server to grafserv.
+
+- Updated dependencies
+  [[`53f0488b1`](https://github.com/benjie/crystal/commit/53f0488b1c060fe9f5dfcd67ad5c0bd932a4b7aa),
+  [`f9cc88dc4`](https://github.com/benjie/crystal/commit/f9cc88dc442d371aee154a28d4e63c6da39f6b2e),
+  [`07883a1a5`](https://github.com/benjie/crystal/commit/07883a1a5eac63bdc0541d6a2b562fc97342c439),
+  [`22fa6230a`](https://github.com/benjie/crystal/commit/22fa6230aa7c7271e5360e619ec9e1f52c6ea49c),
+  [`d17dd1cd4`](https://github.com/benjie/crystal/commit/d17dd1cd47d6cb125fbc84c38a8c004857e1bdd2),
+  [`fa8cfcf9b`](https://github.com/benjie/crystal/commit/fa8cfcf9b4ce0c3e12511f3f6392051924a719e5),
+  [`00d026409`](https://github.com/benjie/crystal/commit/00d0264090f90914eac881b34918fa3370782adc)]:
+  - @dataplan/pg@0.0.1-beta.4
+  - postgraphile@5.0.0-beta.6
+  - grafast@0.0.1-beta.4
+  - grafserv@0.0.1-beta.4
+  - graphile-build-pg@5.0.0-beta.6
+  - @dataplan/json@0.0.1-beta.4
+  - graphile-build@5.0.0-beta.5
+
 ## 5.0.0-beta.5
 
 ### Patch Changes
