@@ -89,6 +89,11 @@
       "node": "./fwd/grafserv/fastify/v4/index.js",
       "default": "./fwd/grafserv/fastify/v4/index.js"
     },
+    "./grafserv/h3/v1": {
+      "types": "./fwd/grafserv/h3/v1/index.d.ts",
+      "node": "./fwd/grafserv/h3/v1/index.js",
+      "default": "./fwd/grafserv/h3/v1/index.js"
+    },
     "./grafserv/ruru": {
       "types": "./fwd/grafserv/ruru/index.d.ts",
       "node": "./fwd/grafserv/ruru/index.js",
