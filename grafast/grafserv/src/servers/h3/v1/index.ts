@@ -1,4 +1,4 @@
-import { PassThrough } from "stream";
+import { PassThrough } from "node:stream";
 import type {} from "../../node/index.js";
 import {
   H3Event,
