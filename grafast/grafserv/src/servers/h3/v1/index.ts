@@ -1,7 +1,5 @@
-import { PassThrough } from "node:stream";
-import type {} from "../../node/index.js";
+import type { H3Event } from "h3";
 import {
-  H3Event,
   getMethod,
   getQuery,
   getRequestHeaders,
@@ -12,18 +10,21 @@ import {
   setResponseHeaders,
   setResponseStatus,
 } from "h3";
+import { PassThrough } from "node:stream";
+
 import {
+  convertHandlerResultToResult,
+  GrafservBase,
+  normalizeRequest,
+  processHeaders,
+} from "../../../index.js";
+import type {
   GrafservBodyBuffer,
   GrafservConfig,
   RequestDigest,
   Result,
 } from "../../../interfaces.js";
-import {
-  GrafservBase,
-  convertHandlerResultToResult,
-  normalizeRequest,
-  processHeaders,
-} from "../../../index.js";
+import type {} from "../../node/index.js";
 
 declare global {
   namespace Grafast {
