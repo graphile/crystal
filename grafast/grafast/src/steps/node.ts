@@ -3,6 +3,7 @@ import type { GraphQLObjectType } from "graphql";
 import { isDev } from "../dev.js";
 import { inspect } from "../inspect.js";
 import type {
+  AnyInputStep,
   ExecutionExtra,
   NodeIdCodec,
   NodeIdHandler,
@@ -121,7 +122,7 @@ export function node(
 
 export function specFromNodeId(
   handler: NodeIdHandler<any>,
-  $id: ExecutableStep<string>,
+  $id: ExecutableStep<string> | AnyInputStep,
 ) {
   function decodeWithCodecAndHandler(raw: string) {
     try {
@@ -136,6 +137,9 @@ export function specFromNodeId(
   }
   decodeWithCodecAndHandler.displayName = `decode_${handler.typeName}_${handler.codec.name}`;
   decodeWithCodecAndHandler.isSyncAndSafe = true; // Optimization
-  const $decoded = lambda($id, decodeWithCodecAndHandler);
+  const $decoded = lambda(
+    $id as ExecutableStep<string>,
+    decodeWithCodecAndHandler,
+  );
   return handler.getSpec($decoded);
 }
