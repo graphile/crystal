@@ -126,11 +126,11 @@ export class H3Grafserv extends GrafservBase {
         const { statusCode, headers, lowLatency, bufferIterator } = result;
         let bufferIteratorHandled = false;
         try {
-          // if (lowLatency) {
-          //   request.raw.socket.setTimeout(0);
-          //   request.raw.socket.setNoDelay(true);
-          //   request.raw.socket.setKeepAlive(true);
-          // }
+          if (lowLatency) {
+            event.node.req.socket.setTimeout(0);
+            event.node.req.socket.setNoDelay(true);
+            event.node.req.socket.setKeepAlive(true);
+          }
           setResponseHeaders(event, headers);
           setResponseStatus(event, statusCode);
           const stream = new PassThrough();
