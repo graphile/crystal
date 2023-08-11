@@ -517,7 +517,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                 Object.create(null),
                               )),
                         },
-                        mode === "resource:update"
+                        mode === "resource:update" && TablePatch
                           ? {
                               [inflection.patchField(
                                 inflection.tableFieldName(resource),

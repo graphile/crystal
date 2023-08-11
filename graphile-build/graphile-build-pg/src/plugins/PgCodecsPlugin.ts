@@ -1368,8 +1368,9 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               } else if (codec.domainOfCodec) {
                 // We just want to be a copy of the underlying type spec, but with a different name/description
                 const copy = (underlyingTypeName: string) => (): any => {
-                  const baseType = build.getTypeByName(underlyingTypeName);
-                  const config = { ...baseType?.toConfig() };
+                  const details = build.getTypeMetaByName(underlyingTypeName);
+                  const baseConfig = details?.specGenerator();
+                  const config = { ...baseConfig };
                   delete (config as any).name;
                   delete (config as any).description;
                   return config;

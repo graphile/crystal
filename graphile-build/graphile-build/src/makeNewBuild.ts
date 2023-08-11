@@ -25,7 +25,8 @@ import extend, { indent } from "./extend.js";
 import type SchemaBuilder from "./SchemaBuilder.js";
 import { EXPORTABLE, stringTypeSpec, wrapDescription } from "./utils.js";
 import { version } from "./version.js";
-import { inspect } from "node:util";
+
+const BUILTINS = ["Int", "Float", "Boolean", "ID", "String"];
 
 /** Have we warned the user they're using the 5-arg deprecated registerObjectType call? */
 let registerObjectType5argsDeprecatedWarned = false;
@@ -309,29 +310,52 @@ export default function makeNewBuild(
             Constructor: GraphQLScalarType,
             scope: Object.freeze({}),
             origin: "GraphQL builtin",
+            specGenerator: () => {
+              switch (typeName) {
+                case "String":
+                  return GraphQLString.toConfig();
+                case "ID":
+                  return GraphQLID.toConfig();
+                case "Boolean":
+                  return GraphQLBoolean.toConfig();
+                case "Int":
+                  return GraphQLInt.toConfig();
+                case "Float":
+                  return GraphQLFloat.toConfig();
+                default: {
+                  throw new Error(`Unhandled built-in '${typeName}'`);
+                }
+              }
+            },
           });
       }
 
       const details = typeRegistry[typeName];
       if (details != null) {
-        const { klass: Constructor, scope, origin } = details;
+        const { klass: Constructor, scope, origin, specGenerator } = details;
         return Object.assign(Object.create(null), {
           Constructor,
           scope,
           origin,
+          specGenerator,
         });
       }
       return null;
     },
 
     getTypeByName(typeName) {
-      if (currentTypeDetails) {
+      if (currentTypeDetails && !BUILTINS.includes(typeName)) {
         throw new Error(
           `Error in spec callback for ${currentTypeDetails.klass.name} '${
             currentTypeDetails.typeName
           }'; the callback made a call to \`build.getTypeByName(${JSON.stringify(
             typeName,
-          )})\` (directly or indirectly) - this is the wrong time for such a call to occur since it can lead to circular dependence. Most likely you need to check the callback function, and move any calls to 'getTypeByName' (or similar) into one of the spec object's callbacks, such as \`fields()\`, \`interfaces()\` or similar.`,
+          )})\` (directly or indirectly) - this is the wrong time for such a call \
+to occur since it can lead to circular dependence. To fix this, ensure that any \
+calls to \`getTypeByName\` can only occur inside of the callbacks, such as \
+\`fields()\`, \`interfaces()\`, \`types()\` or similar. Be sure to use the callback \
+style for these configuration options (e.g. change \`interfaces: \
+[getTypeByName('Foo')]\` to \`interfaces: () => [getTypeByName('Foo')]\``,
         );
       }
       if (!this.status.isInitPhaseComplete) {

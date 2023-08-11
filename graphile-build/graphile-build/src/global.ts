@@ -422,6 +422,16 @@ declare global {
         scope: GraphileBuild.SomeScope;
         origin: string | null | undefined;
         Step?: { new (...args: any[]): ExecutableStep } | null;
+        specGenerator:
+          | (() => Omit<
+              GraphileBuild.GrafastObjectTypeConfig<any, any>,
+              "name"
+            >)
+          | (() => Omit<GrafastInterfaceTypeConfig<any, any>, "name">)
+          | (() => Omit<GrafastUnionTypeConfig<any, any>, "name">)
+          | (() => Omit<GraphQLScalarTypeConfig<any, any>, "name">)
+          | (() => Omit<GraphQLEnumTypeConfig, "name">)
+          | (() => Omit<GrafastInputObjectTypeConfig, "name">);
       } | null;
 
       /**

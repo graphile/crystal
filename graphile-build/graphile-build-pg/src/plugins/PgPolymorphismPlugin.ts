@@ -844,7 +844,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                       () => ({
                         assertStep: assertPgClassSingleStep,
                         description: codec.description,
-                        interfaces: [
+                        interfaces: () => [
                           build.getTypeByName(
                             interfaceTypeName,
                           ) as GraphQLInterfaceType,
