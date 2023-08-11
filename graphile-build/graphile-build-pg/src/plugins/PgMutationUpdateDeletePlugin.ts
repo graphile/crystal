@@ -455,94 +455,96 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                   isMutationInput: true,
                 },
                 () => {
-                  const TablePatch =
-                    mode === "resource:update"
-                      ? build.getInputTypeByName(tablePatchName!)!
-                      : null;
                   return {
                     description: build.wrapDescription(
                       `All input for the \`${fieldName}\` mutation.`,
                       "type",
                     ),
-                    fields: Object.assign(
-                      {
-                        clientMutationId: {
-                          description: build.wrapDescription(
-                            "An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.",
-                            "field",
-                          ),
-                          type: GraphQLString,
-                          applyPlan: EXPORTABLE(
-                            () =>
-                              function plan(
-                                $input: ObjectStep<any>,
-                                val: FieldArgs,
-                              ) {
-                                $input.set("clientMutationId", val.get());
-                              },
-                            [],
-                          ),
+                    fields() {
+                      const TablePatch =
+                        mode === "resource:update"
+                          ? build.getInputTypeByName(tablePatchName!)!
+                          : null;
+                      return Object.assign(
+                        {
+                          clientMutationId: {
+                            description: build.wrapDescription(
+                              "An arbitrary string value with no semantic meaning. Will be included in the payload verbatim. May be used to track mutations by the client.",
+                              "field",
+                            ),
+                            type: GraphQLString,
+                            applyPlan: EXPORTABLE(
+                              () =>
+                                function plan(
+                                  $input: ObjectStep<any>,
+                                  val: FieldArgs,
+                                ) {
+                                  $input.set("clientMutationId", val.get());
+                                },
+                              [],
+                            ),
+                          },
+                          ...(uniqueMode === "node"
+                            ? {
+                                [nodeIdFieldName!]: {
+                                  description: build.wrapDescription(
+                                    `The globally unique \`ID\` which will identify a single \`${tableTypeName}\` to be ${modeText}d.`,
+                                    "field",
+                                  ),
+                                  type: new GraphQLNonNull(GraphQLID),
+                                },
+                              }
+                            : (unique.attributes as string[]).reduce(
+                                (memo, attributeName) => {
+                                  const attribute =
+                                    resource.codec.attributes[attributeName];
+                                  memo[
+                                    inflection.attribute({
+                                      attributeName,
+                                      codec: resource.codec,
+                                    })
+                                  ] = {
+                                    description: attribute.description,
+                                    type: new GraphQLNonNull(
+                                      build.getGraphQLTypeByPgCodec(
+                                        attribute.codec,
+                                        "input",
+                                      )!,
+                                    ),
+                                  };
+                                  return memo;
+                                },
+                                Object.create(null),
+                              )),
                         },
-                        ...(uniqueMode === "node"
+                        mode === "resource:update"
                           ? {
-                              [nodeIdFieldName!]: {
+                              [inflection.patchField(
+                                inflection.tableFieldName(resource),
+                              )]: {
                                 description: build.wrapDescription(
-                                  `The globally unique \`ID\` which will identify a single \`${tableTypeName}\` to be ${modeText}d.`,
+                                  `An object where the defined keys will be set on the \`${tableTypeName}\` being ${modeText}d.`,
                                   "field",
                                 ),
-                                type: new GraphQLNonNull(GraphQLID),
+                                type: new GraphQLNonNull(TablePatch!),
+                                applyPlan: EXPORTABLE(
+                                  () =>
+                                    function plan(
+                                      $object: ObjectStep<{
+                                        result: PgUpdateSingleStep;
+                                      }>,
+                                    ) {
+                                      const $record =
+                                        $object.getStepForKey("result");
+                                      return $record.setPlan();
+                                    },
+                                  [],
+                                ),
                               },
                             }
-                          : (unique.attributes as string[]).reduce(
-                              (memo, attributeName) => {
-                                const attribute =
-                                  resource.codec.attributes[attributeName];
-                                memo[
-                                  inflection.attribute({
-                                    attributeName,
-                                    codec: resource.codec,
-                                  })
-                                ] = {
-                                  description: attribute.description,
-                                  type: new GraphQLNonNull(
-                                    build.getGraphQLTypeByPgCodec(
-                                      attribute.codec,
-                                      "input",
-                                    )!,
-                                  ),
-                                };
-                                return memo;
-                              },
-                              Object.create(null),
-                            )),
-                      },
-                      mode === "resource:update"
-                        ? {
-                            [inflection.patchField(
-                              inflection.tableFieldName(resource),
-                            )]: {
-                              description: build.wrapDescription(
-                                `An object where the defined keys will be set on the \`${tableTypeName}\` being ${modeText}d.`,
-                                "field",
-                              ),
-                              type: new GraphQLNonNull(TablePatch!),
-                              applyPlan: EXPORTABLE(
-                                () =>
-                                  function plan(
-                                    $object: ObjectStep<{
-                                      result: PgUpdateSingleStep;
-                                    }>,
-                                  ) {
-                                    const $record =
-                                      $object.getStepForKey("result");
-                                    return $record.setPlan();
-                                  },
-                                [],
-                              ),
-                            },
-                          }
-                        : null,
-                    ),
+                          : null,
+                      );
+                    },
                   };
                 },
                 `Creating ${mode} input by ${uniqueMode} for ${unique.attributes.join(
