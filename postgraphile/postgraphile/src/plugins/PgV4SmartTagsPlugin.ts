@@ -88,7 +88,7 @@ function processTags(
   processOmit(tags);
   convertBoolean(tags, "sortable", "orderBy order");
   convertBoolean(tags, "filterable", "filter filterBy");
-  convertBoolean(tags, "enum", "enum");
+  // convertBoolean(tags, "enum", "enum");
   processSimpleCollections(tags);
 }
 
