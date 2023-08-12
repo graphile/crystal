@@ -13,13 +13,23 @@ _**Instant lightning-fast GraphQL API backed primarily by your PostgreSQL databa
 
 ## Documentation: [graphile.org/postgraphile](https://graphile.org/postgraphile)
 
-## Version 5 is coming: Open now to all sponsors
+## Version 5 is in **OPEN BETA**
 
-April 2023 marked a big milestone for PostGraphile Version 5, when it entered the alpha stage. In mid-May came an even bigger milestone: **PostGraphile V5 deemed safe to run in production!** Work preparing for the final release will still be ongoing for a while (stabilizing APIs; improving types; writing documentation, tests and examples; etc), but we already have a detailed migration guide, updated docs, an enhanced developer experience and almost identical GraphQL schemas being produced with our V4 compatibility preset!
+The long awaited PostGraphile Version 5 is now available for you to try out! There's still bugs to work out, types to improve, documentation and examples that need writing; read more about what beta means in our **[Beta announcement on dev.to](https://dev.to/graphile/postgraphile-v5-public-beta-get-involved-1lg9)**.
 
-In our new blog post series we are **beginning to lift the curtain of secrecy** which has surrounded Version 5 for the past few years. Each week Benjie will dive in to a key feature of this massive new release; starting with [Intro to PostGraphile V5 (Part 1): Replacing the Foundations](https://dev.to/graphile/intro-to-postgraphile-v5-part-1-replacing-the-foundations-3lh0).
+Other useful resources:
 
-Now is the perfect time to join our sponsors and get your feet wet with V5 - even if you're not yet ready to migrate to it fully. **If you don't try V5 until after its public release then it may be too late to comment on things that could have been improved.** If you already sponsor us, send us an email with your sponsor details and we'll send you access to [postgraphile.org](https://postgraphile.org/) and [grafast.org](https://grafast.org)!
+- **[Intro to V5 series](https://dev.to/benjie/series/23459)** on dev.to
+- **[Documentation](https://postgraphile.org)** at postgraphile.org
+- **[V4 -> V5 migration guide](https://postgraphile.org/postgraphile/next/migrating-from-v4/)** at postgraphile.org
+- **[Overview of new features](https://postgraphile.org/postgraphile/next/migrating-from-v4/v5-new-feature-summary)** at postgraphile.org
+- **[💖 Sponsor us to help launch V5 sooner! 🚀](https://github.com/sponsors/benjie)**
+
+Now is the perfect time to get your feet wet with V5 — even if you're not yet ready to migrate to it fully. **If you don't try V5 until after its public release then it may be too late to comment on things that could have been improved.** Access is now open to everyone, so dive in!
+
+This release has taken a tremendous amount of work and we've forgone a significant amount of client work to build it for you. If you can afford even a couple dollars a month, please consider becoming a sponsor; we really need your support to help get V5 over the finish line!
+
+And for those of you wondering when V5.0.0 will be released, here are the [issues that need to be solved before the final release](https://github.com/benjie/crystal/milestone/3). The more support we get, the faster that day will come — please get involved, or sponsor us!
 
 <!-- SPONSORS_BEGIN -->
 
