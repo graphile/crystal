@@ -137,8 +137,8 @@ in JS, you might use an SQL expression:
 +    plans: {
 +      User: {
 +        nameWithSuffix($user, { $suffix }) {
-+          return $user.expression(
-+            sql`${$user.alias}.name || ' ' || ${$user.placeholder($suffix, TYPES.text)}`,
++          return $user.select(
++            sql`${$user.getClassStep().alias}.name || ' ' || ${$user.placeholder($suffix, TYPES.text)}`,
 +            TYPES.text,
 +          );
 +        }
