@@ -474,7 +474,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                 "An interval of time that has passed where the smallest distinct unit is a second.",
                 "type",
               ),
-              fields: makeIntervalFields(),
+              fields: () => makeIntervalFields(),
             }),
             "graphile-build-pg built-in (Interval)",
           );
@@ -488,7 +488,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
                 "An interval of time that has passed where the smallest distinct unit is a second.",
                 "type",
               ),
-              fields: makeIntervalFields(),
+              fields: () => makeIntervalFields(),
             }),
             "graphile-build-pg built-in (IntervalInput)",
           );
@@ -505,7 +505,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
               () => ({
                 assertStep: null, // TODO: does this want a plan?
                 description: build.wrapDescription(description, "type"),
-                fields: fieldGen(),
+                fields: () => fieldGen(),
               }),
               `graphile-build-pg built-in (${typeName})`,
             );
@@ -515,7 +515,7 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
               { [`isPg${typeName}InputType`]: true },
               () => ({
                 description: build.wrapDescription(description, "type"),
-                fields: inputFieldGen(),
+                fields: () => inputFieldGen(),
               }),
               `graphile-build-pg built-in (${typeName}Input)`,
             );

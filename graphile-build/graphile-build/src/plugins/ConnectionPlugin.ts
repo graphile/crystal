@@ -155,92 +155,94 @@ export const ConnectionPlugin: GraphileConfig.Plugin = {
                   isConnectionType: true,
                 },
                 () => {
-                  const NodeType = build.getOutputTypeByName(typeName);
-                  const EdgeType = build.getOutputTypeByName(edgeTypeName);
-                  const PageInfo = build.getOutputTypeByName(
-                    build.inflection.builtin("PageInfo"),
-                  );
                   return {
                     assertStep: ConnectionStep,
                     description: build.wrapDescription(
                       `A connection to a list of \`${typeName}\` values.`,
                       "type",
                     ),
-                    fields: ({ fieldWithHooks }) => ({
-                      nodes: fieldWithHooks(
-                        {
-                          fieldName: "nodes",
-                        },
-                        () => ({
-                          description: build.wrapDescription(
-                            `A list of \`${typeName}\` objects.`,
-                            "field",
-                          ),
-                          type: new build.graphql.GraphQLNonNull(
-                            new build.graphql.GraphQLList(
-                              nullableIf(!nonNullNode, NodeType),
+                    fields: ({ fieldWithHooks }) => {
+                      const NodeType = build.getOutputTypeByName(typeName);
+                      const EdgeType = build.getOutputTypeByName(edgeTypeName);
+                      const PageInfo = build.getOutputTypeByName(
+                        build.inflection.builtin("PageInfo"),
+                      );
+                      return {
+                        nodes: fieldWithHooks(
+                          {
+                            fieldName: "nodes",
+                          },
+                          () => ({
+                            description: build.wrapDescription(
+                              `A list of \`${typeName}\` objects.`,
+                              "field",
                             ),
-                          ),
-                          plan: EXPORTABLE(
-                            () =>
-                              function plan(
-                                $connection: ConnectionStep<any, any, any>,
-                              ) {
-                                return $connection.nodes();
-                              },
-                            [],
-                          ) as any,
-                        }),
-                      ),
-                      edges: fieldWithHooks(
-                        {
-                          fieldName: "edges",
-                        },
-                        () => ({
-                          description: build.wrapDescription(
-                            `A list of edges which contains the \`${typeName}\` and cursor to aid in pagination.`,
-                            "field",
-                          ),
-                          type: nullableIf(
-                            false,
-                            new build.graphql.GraphQLList(
-                              nullableIf(!nonNullNode, EdgeType),
+                            type: new build.graphql.GraphQLNonNull(
+                              new build.graphql.GraphQLList(
+                                nullableIf(!nonNullNode, NodeType),
+                              ),
                             ),
-                          ),
-                          plan: EXPORTABLE(
-                            () =>
-                              function plan(
-                                $connection: ConnectionStep<any, any, any>,
-                              ) {
-                                return $connection.edges();
-                              },
-                            [],
-                          ) as any,
-                        }),
-                      ),
-                      pageInfo: fieldWithHooks(
-                        {
-                          fieldName: "pageInfo",
-                        },
-                        () => ({
-                          description: build.wrapDescription(
-                            "Information to aid in pagination.",
-                            "field",
-                          ),
-                          type: new build.graphql.GraphQLNonNull(PageInfo),
-                          plan: EXPORTABLE(
-                            () =>
-                              function plan(
-                                $connection: ConnectionStep<any, any, any>,
-                              ) {
-                                // TYPES: why is this a TypeScript issue without the 'any'?
-                                return $connection.pageInfo() as any;
-                              },
-                            [],
-                          ),
-                        }),
-                      ),
-                    }),
+                            plan: EXPORTABLE(
+                              () =>
+                                function plan(
+                                  $connection: ConnectionStep<any, any, any>,
+                                ) {
+                                  return $connection.nodes();
+                                },
+                              [],
+                            ) as any,
+                          }),
+                        ),
+                        edges: fieldWithHooks(
+                          {
+                            fieldName: "edges",
+                          },
+                          () => ({
+                            description: build.wrapDescription(
+                              `A list of edges which contains the \`${typeName}\` and cursor to aid in pagination.`,
+                              "field",
+                            ),
+                            type: nullableIf(
+                              false,
+                              new build.graphql.GraphQLList(
+                                nullableIf(!nonNullNode, EdgeType),
+                              ),
+                            ),
+                            plan: EXPORTABLE(
+                              () =>
+                                function plan(
+                                  $connection: ConnectionStep<any, any, any>,
+                                ) {
+                                  return $connection.edges();
+                                },
+                              [],
+                            ) as any,
+                          }),
+                        ),
+                        pageInfo: fieldWithHooks(
+                          {
+                            fieldName: "pageInfo",
+                          },
+                          () => ({
+                            description: build.wrapDescription(
+                              "Information to aid in pagination.",
+                              "field",
+                            ),
+                            type: new build.graphql.GraphQLNonNull(PageInfo),
+                            plan: EXPORTABLE(
+                              () =>
+                                function plan(
+                                  $connection: ConnectionStep<any, any, any>,
+                                ) {
+                                  // TYPES: why is this a TypeScript issue without the 'any'?
+                                  return $connection.pageInfo() as any;
+                                },
+                              [],
+                            ),
+                          }),
+                        ),
+                      };
+                    },
                   };
                 },
                 `ConnectionPlugin connection type for ${typeName}`,

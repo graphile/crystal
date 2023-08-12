@@ -262,7 +262,13 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   );
                 if (!pgConstraint) {
                   throw new Error(
-                    "Could not build polymorphic reference due to missing foreign key constraint",
+                    `Could not build polymorphic reference from '${
+                      pgClass.getNamespace()?.nspname
+                    }.${pgClass.relname}' to '${
+                      referencedClass.getNamespace()?.nspname
+                    }.${
+                      referencedClass.relname
+                    }' due to missing foreign key constraint. Please create a foreign key constraint on the latter table's primary key, pointing to the former table.`,
                   );
                 }
                 const codec = await info.helpers.pgCodecs.getCodecFromClass(
@@ -838,7 +844,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                       () => ({
                         assertStep: assertPgClassSingleStep,
                         description: codec.description,
-                        interfaces: [
+                        interfaces: () => [
                           build.getTypeByName(
                             interfaceTypeName,
                           ) as GraphQLInterfaceType,

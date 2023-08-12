@@ -689,40 +689,40 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     inputTypeName,
                     { isMutationInput: true },
                     () => {
-                      const { argDetails } = pgGetArgDetailsFromParameters(
-                        resource,
-                        resource.parameters,
-                      );
-
-                      // Not used for isMutation; that's handled elsewhere
-                      const fields = argDetails.reduce(
-                        (memo, { inputType, graphqlArgName }) => {
-                          memo[graphqlArgName] = {
-                            type: inputType,
-                          };
-                          return memo;
-                        },
-                        Object.assign(Object.create(null), {
-                          clientMutationId: {
-                            type: GraphQLString,
-                            autoApplyAfterParentApplyPlan: true,
-                            applyPlan: EXPORTABLE(
-                              () =>
-                                function plan(
-                                  $input: ObjectStep<any>,
-                                  val: FieldArgs,
-                                ) {
-                                  $input.set("clientMutationId", val.get());
-                                },
-                              [],
-                            ),
-                          },
-                        }) as GrafastInputFieldConfigMap<any, any>,
-                      );
-
                       return {
                         description: `All input for the \`${fieldName}\` mutation.`,
-                        fields,
+                        fields: () => {
+                          const { argDetails } = pgGetArgDetailsFromParameters(
+                            resource,
+                            resource.parameters,
+                          );
+
+                          // Not used for isMutation; that's handled elsewhere
+                          return argDetails.reduce(
+                            (memo, { inputType, graphqlArgName }) => {
+                              memo[graphqlArgName] = {
+                                type: inputType,
+                              };
+                              return memo;
+                            },
+                            Object.assign(Object.create(null), {
+                              clientMutationId: {
+                                type: GraphQLString,
+                                autoApplyAfterParentApplyPlan: true,
+                                applyPlan: EXPORTABLE(
+                                  () =>
+                                    function plan(
+                                      $input: ObjectStep<any>,
+                                      val: FieldArgs,
+                                    ) {
+                                      $input.set("clientMutationId", val.get());
+                                    },
+                                  [],
+                                ),
+                              },
+                            }) as GrafastInputFieldConfigMap<any, any>,
+                          );
+                        },
                       };
                     },
                     "PgCustomTypeFieldPlugin mutation function input type",

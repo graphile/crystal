@@ -26,8 +26,20 @@ import type SchemaBuilder from "./SchemaBuilder.js";
 import { EXPORTABLE, stringTypeSpec, wrapDescription } from "./utils.js";
 import { version } from "./version.js";
 
+const BUILTINS = ["Int", "Float", "Boolean", "ID", "String"];
+
 /** Have we warned the user they're using the 5-arg deprecated registerObjectType call? */
 let registerObjectType5argsDeprecatedWarned = false;
+
+/** @internal */
+interface TypeDetails {
+  typeName: string;
+  // The constructor - GraphQLScalarType, GraphQLObjectType, etc
+  klass: { new (spec: any): GraphQLNamedType };
+  scope: GraphileBuild.SomeScope;
+  specGenerator: any;
+  origin: string | null | undefined;
+}
 
 /**
  * Makes a new 'Build' object suitable to be passed through the 'build' hook.
@@ -58,13 +70,7 @@ export default function makeNewBuild(
    * Where the type factories are; so we don't construct types until they're needed.
    */
   const typeRegistry: {
-    [key: string]: {
-      // The constructor - GraphQLScalarType, GraphQLObjectType, etc
-      klass: { new (spec: any): GraphQLNamedType };
-      scope: GraphileBuild.SomeScope;
-      specGenerator: any;
-      origin: string | null | undefined;
-    };
+    [key: string]: TypeDetails;
   } = Object.create(null);
 
   const scopeByType = new Map<GraphQLNamedType, GraphileBuild.SomeScope>();
@@ -106,6 +112,7 @@ export default function makeNewBuild(
     }
     allTypesSources[typeName] = newTypeSource;
     typeRegistry[typeName] = {
+      typeName,
       klass,
       scope,
       specGenerator,
@@ -303,22 +310,54 @@ export default function makeNewBuild(
             Constructor: GraphQLScalarType,
             scope: Object.freeze({}),
             origin: "GraphQL builtin",
+            specGenerator: () => {
+              switch (typeName) {
+                case "String":
+                  return GraphQLString.toConfig();
+                case "ID":
+                  return GraphQLID.toConfig();
+                case "Boolean":
+                  return GraphQLBoolean.toConfig();
+                case "Int":
+                  return GraphQLInt.toConfig();
+                case "Float":
+                  return GraphQLFloat.toConfig();
+                default: {
+                  throw new Error(`Unhandled built-in '${typeName}'`);
+                }
+              }
+            },
           });
       }
 
       const details = typeRegistry[typeName];
       if (details != null) {
-        const { klass: Constructor, scope, origin } = details;
+        const { klass: Constructor, scope, origin, specGenerator } = details;
         return Object.assign(Object.create(null), {
           Constructor,
           scope,
           origin,
+          specGenerator,
         });
       }
       return null;
     },
 
     getTypeByName(typeName) {
+      if (currentTypeDetails && !BUILTINS.includes(typeName)) {
+        throw new Error(
+          `Error in spec callback for ${currentTypeDetails.klass.name} '${
+            currentTypeDetails.typeName
+          }'; the callback made a call to \`build.getTypeByName(${JSON.stringify(
+            typeName,
+          )})\` (directly or indirectly) - this is the wrong time for such a call \
+to occur since it can lead to circular dependence. To fix this, ensure that any \
+calls to \`getTypeByName\` can only occur inside of the callbacks, such as \
+\`fields()\`, \`interfaces()\`, \`types()\` or similar. Be sure to use the callback \
+style for these configuration options (e.g. change \`interfaces: \
+[getTypeByName('Foo')]\` to \`interfaces: () => [getTypeByName('Foo')]\``,
+        );
+      }
       if (!this.status.isInitPhaseComplete) {
         throw new Error(
           "Must not call build.getTypeByName before 'init' phase is complete",
@@ -328,16 +367,20 @@ export default function makeNewBuild(
         return allTypes[typeName];
       } else if (building.has(typeName)) {
         throw new Error(
-          `Construction cycle detected: ${typeName} is already being built. Most likely this means that you forgot to use a callback for 'fields', 'interfaces', 'types', etc. when defining a type.`,
+          `Construction cycle detected: ${typeName} is already being built (build stack: ${[
+            ...building,
+          ].join(
+            ">",
+          )}). Most likely this means that you forgot to use a callback for 'fields', 'interfaces', 'types', etc. when defining a type.`,
         );
       } else {
         building.add(typeName);
         try {
           const details = typeRegistry[typeName];
           if (details != null) {
-            const { klass, scope, specGenerator } = details;
+            const { klass, scope } = details;
 
-            const spec = specGenerator();
+            const spec = generateSpecFromDetails(details);
             // No need to have the user specify name, and they're forbidden from
             // changing name (use inflection instead!) so we just set it
             // ourselves:
@@ -449,4 +492,15 @@ export default function makeNewBuild(
     _pluginMeta: Object.create(null),
   };
   return build;
+}
+
+let currentTypeDetails: TypeDetails | null = null;
+
+function generateSpecFromDetails(details: TypeDetails) {
+  currentTypeDetails = details;
+  try {
+    return details.specGenerator();
+  } finally {
+    currentTypeDetails = null;
+  }
 }
