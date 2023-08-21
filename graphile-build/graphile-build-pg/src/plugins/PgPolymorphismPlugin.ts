@@ -698,7 +698,10 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   ).find((t) => t.name === myName) &&
                   !fkey.remoteResource.codec.attributes[attributeName]
                 ) {
-                  return [behavior, "-select"];
+                  return [
+                    behavior,
+                    "-attribute:select -attribute:update -attribute:filterBy -attribute:orderBy",
+                  ];
                 }
               }
             }

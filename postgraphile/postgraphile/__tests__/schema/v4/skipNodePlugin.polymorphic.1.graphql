@@ -2508,9 +2508,6 @@ input RelationalChecklistCondition {
   """Checks for equality with the object’s `authorId` field."""
   authorId: Int
 
-  """Checks for equality with the object’s `checklistItemId` field."""
-  checklistItemId: Int
-
   """Checks for equality with the object’s `createdAt` field."""
   createdAt: Datetime
 
@@ -2634,9 +2631,6 @@ input RelationalChecklistItemCondition {
   """Checks for equality with the object’s `authorId` field."""
   authorId: Int
 
-  """Checks for equality with the object’s `checklistItemItemId` field."""
-  checklistItemItemId: Int
-
   """Checks for equality with the object’s `createdAt` field."""
   createdAt: Datetime
 
@@ -2702,8 +2696,6 @@ enum RelationalChecklistItemsOrderBy {
   ARCHIVED_AT_DESC
   AUTHOR_ID_ASC
   AUTHOR_ID_DESC
-  CHECKLIST_ITEM_ITEM_ID_ASC
-  CHECKLIST_ITEM_ITEM_ID_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   DESCRIPTION_ASC
@@ -2763,8 +2755,6 @@ enum RelationalChecklistsOrderBy {
   ARCHIVED_AT_DESC
   AUTHOR_ID_ASC
   AUTHOR_ID_DESC
-  CHECKLIST_ITEM_ID_ASC
-  CHECKLIST_ITEM_ID_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   ID_ASC
@@ -2887,9 +2877,6 @@ input RelationalDividerCondition {
   """Checks for equality with the object’s `createdAt` field."""
   createdAt: Datetime
 
-  """Checks for equality with the object’s `dividerItemId` field."""
-  dividerItemId: Int
-
   """Checks for equality with the object’s `id` field."""
   id: Int
 
@@ -2953,8 +2940,6 @@ enum RelationalDividersOrderBy {
   COLOR_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
-  DIVIDER_ITEM_ID_ASC
-  DIVIDER_ITEM_ID_DESC
   ID_ASC
   ID_DESC
   IS_EXPLICITLY_ARCHIVED_ASC
@@ -3227,9 +3212,6 @@ input RelationalPostCondition {
   """Checks for equality with the object’s `position` field."""
   position: BigInt
 
-  """Checks for equality with the object’s `postItemId` field."""
-  postItemId: Int
-
   """Checks for equality with the object’s `rootTopicId` field."""
   rootTopicId: Int
 
@@ -3290,8 +3272,6 @@ enum RelationalPostsOrderBy {
   PARENT_ID_DESC
   POSITION_ASC
   POSITION_DESC
-  POST_ITEM_ID_ASC
-  POST_ITEM_ID_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   ROOT_TOPIC_ID_ASC
@@ -3446,9 +3426,6 @@ input RelationalTopicCondition {
   """Checks for equality with the object’s `title` field."""
   title: String
 
-  """Checks for equality with the object’s `topicItemId` field."""
-  topicItemId: Int
-
   """Checks for equality with the object’s `type` field."""
   type: ItemType
 
@@ -3507,8 +3484,6 @@ enum RelationalTopicsOrderBy {
   ROOT_TOPIC_ID_DESC
   TITLE_ASC
   TITLE_DESC
-  TOPIC_ITEM_ID_ASC
-  TOPIC_ITEM_ID_DESC
   TYPE_ASC
   TYPE_DESC
   UPDATED_AT_ASC
