@@ -514,7 +514,7 @@ insert into polymorphic.relational_items
   (20, 'CHECKLIST_ITEM', 16,        2,         3,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null),
   (21, 'CHECKLIST_ITEM', 16,        1,         4,        '2020-01-28T11:01:00Z', '2021-07-30T14:24:00Z', false,                  null);
 
-insert into polymorphic.relational_topics (id, title)  values
+insert into polymorphic.relational_topics (topic_item_id, title)  values
   (1, 'PostGraphile version 5'),
   (2, 'Temporary test topic'),
   (10, 'Notes'),
@@ -539,7 +539,7 @@ update polymorphic.relational_items
   where relational_items.id = cte.id
   and cte.id != cte.rti;
 
-insert into polymorphic.relational_posts (id, title, description, note)  values
+insert into polymorphic.relational_posts (post_item_id, title, description, note)  values
   (4, 'Better planning', null, null),
   (5, 'Easier to code', null, null),
   (6, 'More features', 'E.g. interfaces and unions', 'Also things like querying from multiple databases'),
@@ -550,14 +550,14 @@ insert into polymorphic.relational_posts (id, title, description, note)  values
   (14, 'Monorepo', null, null),
   (15, 'Just a test', null, null);
 
-insert into polymorphic.relational_dividers (id, title, color)  values
+insert into polymorphic.relational_dividers (divider_item_id, title, color)  values
   (3, 'Headline features', 'green'),
   (8, 'Timescale', 'blue');
 
-insert into polymorphic.relational_checklists (id, title)  values
+insert into polymorphic.relational_checklists (checklist_item_id, title)  values
   (16, 'Planning goals');
 
-insert into polymorphic.relational_checklist_items (id, description, note)  values
+insert into polymorphic.relational_checklist_items (checklist_item_item_id, description, note)  values
   (17, 'Follows pattern of GraphQL resolver flow', null),
   (18, 'Has an optimisation phase', null),
   (19, 'Plan deduplication at the field level', null),
