@@ -331,7 +331,7 @@ declare global {
 
       /**
        * Inflection controls the naming of your fields, types, arguments, etc -
-       * use it widely!
+       * widely used for any situation where you need to name things. Use it often!
        */
       inflection: Inflection;
 
