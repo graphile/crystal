@@ -2748,7 +2748,7 @@ type Query implements Node {
   ): RelationalChecklist
 
   """Get a single `RelationalChecklist`."""
-  relationalChecklistById(id: Int!): RelationalChecklist
+  relationalChecklistByChecklistItemId(checklistItemId: Int!): RelationalChecklist
 
   """
   Reads a single `RelationalChecklistItem` using its globally unique `ID`.
@@ -2761,7 +2761,7 @@ type Query implements Node {
   ): RelationalChecklistItem
 
   """Get a single `RelationalChecklistItem`."""
-  relationalChecklistItemById(id: Int!): RelationalChecklistItem
+  relationalChecklistItemByChecklistItemItemId(checklistItemItemId: Int!): RelationalChecklistItem
 
   """Reads a single `RelationalDivider` using its globally unique `ID`."""
   relationalDivider(
@@ -2772,7 +2772,7 @@ type Query implements Node {
   ): RelationalDivider
 
   """Get a single `RelationalDivider`."""
-  relationalDividerById(id: Int!): RelationalDivider
+  relationalDividerByDividerItemId(dividerItemId: Int!): RelationalDivider
 
   """Reads a single `RelationalPost` using its globally unique `ID`."""
   relationalPost(
@@ -2783,7 +2783,7 @@ type Query implements Node {
   ): RelationalPost
 
   """Get a single `RelationalPost`."""
-  relationalPostById(id: Int!): RelationalPost
+  relationalPostByPostItemId(postItemId: Int!): RelationalPost
 
   """Reads a single `RelationalTopic` using its globally unique `ID`."""
   relationalTopic(
@@ -2794,7 +2794,7 @@ type Query implements Node {
   ): RelationalTopic
 
   """Get a single `RelationalTopic`."""
-  relationalTopicById(id: Int!): RelationalTopic
+  relationalTopicByTopicItemId(topicItemId: Int!): RelationalTopic
 
   """Reads a single `SingleTableChecklist` using its globally unique `ID`."""
   singleTableChecklist(
@@ -2872,17 +2872,17 @@ type RelationalChecklist implements Node & RelationalItem {
   """
   Reads a single `RelationalChecklist` that is related to this `RelationalChecklist`.
   """
-  relationalChecklistById: RelationalChecklist
+  relationalChecklistByChecklistItemId: RelationalChecklist
 
   """
   Reads a single `RelationalChecklistItem` that is related to this `RelationalChecklist`.
   """
-  relationalChecklistItemById: RelationalChecklistItem
+  relationalChecklistItemByChecklistItemItemId: RelationalChecklistItem
 
   """
   Reads a single `RelationalDivider` that is related to this `RelationalChecklist`.
   """
-  relationalDividerById: RelationalDivider
+  relationalDividerByDividerItemId: RelationalDivider
 
   """
   Reads a single `RelationalItem` that is related to this `RelationalChecklist`.
@@ -2921,17 +2921,17 @@ type RelationalChecklist implements Node & RelationalItem {
   """
   Reads a single `RelationalPost` that is related to this `RelationalChecklist`.
   """
-  relationalPostById: RelationalPost
-
-  """
-  Reads a single `RelationalTopic` that is related to this `RelationalChecklist`.
-  """
-  relationalTopicById: RelationalTopic
+  relationalPostByPostItemId: RelationalPost
 
   """
   Reads a single `RelationalTopic` that is related to this `RelationalChecklist`.
   """
   relationalTopicByRootTopicId: RelationalTopic
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalChecklist`.
+  """
+  relationalTopicByTopicItemId: RelationalTopic
   rootTopicId: Int
   title: String!
   type: ItemType!
@@ -2948,6 +2948,9 @@ input RelationalChecklistCondition {
 
   """Checks for equality with the object’s `authorId` field."""
   authorId: Int
+
+  """Checks for equality with the object’s `checklistItemId` field."""
+  checklistItemId: Int
 
   """Checks for equality with the object’s `createdAt` field."""
   createdAt: Datetime
@@ -3001,17 +3004,17 @@ type RelationalChecklistItem implements Node & RelationalItem {
   """
   Reads a single `RelationalChecklist` that is related to this `RelationalChecklistItem`.
   """
-  relationalChecklistById: RelationalChecklist
+  relationalChecklistByChecklistItemId: RelationalChecklist
 
   """
   Reads a single `RelationalChecklistItem` that is related to this `RelationalChecklistItem`.
   """
-  relationalChecklistItemById: RelationalChecklistItem
+  relationalChecklistItemByChecklistItemItemId: RelationalChecklistItem
 
   """
   Reads a single `RelationalDivider` that is related to this `RelationalChecklistItem`.
   """
-  relationalDividerById: RelationalDivider
+  relationalDividerByDividerItemId: RelationalDivider
 
   """
   Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
@@ -3050,17 +3053,17 @@ type RelationalChecklistItem implements Node & RelationalItem {
   """
   Reads a single `RelationalPost` that is related to this `RelationalChecklistItem`.
   """
-  relationalPostById: RelationalPost
-
-  """
-  Reads a single `RelationalTopic` that is related to this `RelationalChecklistItem`.
-  """
-  relationalTopicById: RelationalTopic
+  relationalPostByPostItemId: RelationalPost
 
   """
   Reads a single `RelationalTopic` that is related to this `RelationalChecklistItem`.
   """
   relationalTopicByRootTopicId: RelationalTopic
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalChecklistItem`.
+  """
+  relationalTopicByTopicItemId: RelationalTopic
   rootTopicId: Int
   type: ItemType!
   updatedAt: Datetime!
@@ -3076,6 +3079,9 @@ input RelationalChecklistItemCondition {
 
   """Checks for equality with the object’s `authorId` field."""
   authorId: Int
+
+  """Checks for equality with the object’s `checklistItemItemId` field."""
+  checklistItemItemId: Int
 
   """Checks for equality with the object’s `createdAt` field."""
   createdAt: Datetime
@@ -3142,6 +3148,8 @@ enum RelationalChecklistItemsOrderBy {
   ARCHIVED_AT_DESC
   AUTHOR_ID_ASC
   AUTHOR_ID_DESC
+  CHECKLIST_ITEM_ITEM_ID_ASC
+  CHECKLIST_ITEM_ITEM_ID_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   DESCRIPTION_ASC
@@ -3201,6 +3209,8 @@ enum RelationalChecklistsOrderBy {
   ARCHIVED_AT_DESC
   AUTHOR_ID_ASC
   AUTHOR_ID_DESC
+  CHECKLIST_ITEM_ID_ASC
+  CHECKLIST_ITEM_ID_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   ID_ASC
@@ -3245,17 +3255,17 @@ type RelationalDivider implements Node & RelationalItem {
   """
   Reads a single `RelationalChecklist` that is related to this `RelationalDivider`.
   """
-  relationalChecklistById: RelationalChecklist
+  relationalChecklistByChecklistItemId: RelationalChecklist
 
   """
   Reads a single `RelationalChecklistItem` that is related to this `RelationalDivider`.
   """
-  relationalChecklistItemById: RelationalChecklistItem
+  relationalChecklistItemByChecklistItemItemId: RelationalChecklistItem
 
   """
   Reads a single `RelationalDivider` that is related to this `RelationalDivider`.
   """
-  relationalDividerById: RelationalDivider
+  relationalDividerByDividerItemId: RelationalDivider
 
   """
   Reads a single `RelationalItem` that is related to this `RelationalDivider`.
@@ -3294,17 +3304,17 @@ type RelationalDivider implements Node & RelationalItem {
   """
   Reads a single `RelationalPost` that is related to this `RelationalDivider`.
   """
-  relationalPostById: RelationalPost
-
-  """
-  Reads a single `RelationalTopic` that is related to this `RelationalDivider`.
-  """
-  relationalTopicById: RelationalTopic
+  relationalPostByPostItemId: RelationalPost
 
   """
   Reads a single `RelationalTopic` that is related to this `RelationalDivider`.
   """
   relationalTopicByRootTopicId: RelationalTopic
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalDivider`.
+  """
+  relationalTopicByTopicItemId: RelationalTopic
   rootTopicId: Int
   title: String
   type: ItemType!
@@ -3327,6 +3337,9 @@ input RelationalDividerCondition {
 
   """Checks for equality with the object’s `createdAt` field."""
   createdAt: Datetime
+
+  """Checks for equality with the object’s `dividerItemId` field."""
+  dividerItemId: Int
 
   """Checks for equality with the object’s `id` field."""
   id: Int
@@ -3391,6 +3404,8 @@ enum RelationalDividersOrderBy {
   COLOR_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
+  DIVIDER_ITEM_ID_ASC
+  DIVIDER_ITEM_ID_DESC
   ID_ASC
   ID_DESC
   IS_EXPLICITLY_ARCHIVED_ASC
@@ -3575,17 +3590,17 @@ type RelationalPost implements Node & RelationalItem {
   """
   Reads a single `RelationalChecklist` that is related to this `RelationalPost`.
   """
-  relationalChecklistById: RelationalChecklist
+  relationalChecklistByChecklistItemId: RelationalChecklist
 
   """
   Reads a single `RelationalChecklistItem` that is related to this `RelationalPost`.
   """
-  relationalChecklistItemById: RelationalChecklistItem
+  relationalChecklistItemByChecklistItemItemId: RelationalChecklistItem
 
   """
   Reads a single `RelationalDivider` that is related to this `RelationalPost`.
   """
-  relationalDividerById: RelationalDivider
+  relationalDividerByDividerItemId: RelationalDivider
 
   """
   Reads a single `RelationalItem` that is related to this `RelationalPost`.
@@ -3624,17 +3639,17 @@ type RelationalPost implements Node & RelationalItem {
   """
   Reads a single `RelationalPost` that is related to this `RelationalPost`.
   """
-  relationalPostById: RelationalPost
-
-  """
-  Reads a single `RelationalTopic` that is related to this `RelationalPost`.
-  """
-  relationalTopicById: RelationalTopic
+  relationalPostByPostItemId: RelationalPost
 
   """
   Reads a single `RelationalTopic` that is related to this `RelationalPost`.
   """
   relationalTopicByRootTopicId: RelationalTopic
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalPost`.
+  """
+  relationalTopicByTopicItemId: RelationalTopic
   rootTopicId: Int
   title: String!
   type: ItemType!
@@ -3672,6 +3687,9 @@ input RelationalPostCondition {
 
   """Checks for equality with the object’s `position` field."""
   position: BigInt
+
+  """Checks for equality with the object’s `postItemId` field."""
+  postItemId: Int
 
   """Checks for equality with the object’s `rootTopicId` field."""
   rootTopicId: Int
@@ -3733,6 +3751,8 @@ enum RelationalPostsOrderBy {
   PARENT_ID_DESC
   POSITION_ASC
   POSITION_DESC
+  POST_ITEM_ID_ASC
+  POST_ITEM_ID_DESC
   PRIMARY_KEY_ASC
   PRIMARY_KEY_DESC
   ROOT_TOPIC_ID_ASC
@@ -3765,17 +3785,17 @@ type RelationalTopic implements Node & RelationalItem {
   """
   Reads a single `RelationalChecklist` that is related to this `RelationalTopic`.
   """
-  relationalChecklistById: RelationalChecklist
+  relationalChecklistByChecklistItemId: RelationalChecklist
 
   """
   Reads a single `RelationalChecklistItem` that is related to this `RelationalTopic`.
   """
-  relationalChecklistItemById: RelationalChecklistItem
+  relationalChecklistItemByChecklistItemItemId: RelationalChecklistItem
 
   """
   Reads a single `RelationalDivider` that is related to this `RelationalTopic`.
   """
-  relationalDividerById: RelationalDivider
+  relationalDividerByDividerItemId: RelationalDivider
 
   """
   Reads a single `RelationalItem` that is related to this `RelationalTopic`.
@@ -3843,17 +3863,17 @@ type RelationalTopic implements Node & RelationalItem {
   """
   Reads a single `RelationalPost` that is related to this `RelationalTopic`.
   """
-  relationalPostById: RelationalPost
-
-  """
-  Reads a single `RelationalTopic` that is related to this `RelationalTopic`.
-  """
-  relationalTopicById: RelationalTopic
+  relationalPostByPostItemId: RelationalPost
 
   """
   Reads a single `RelationalTopic` that is related to this `RelationalTopic`.
   """
   relationalTopicByRootTopicId: RelationalTopic
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalTopic`.
+  """
+  relationalTopicByTopicItemId: RelationalTopic
   rootTopicId: Int
   title: String!
   type: ItemType!
@@ -3891,6 +3911,9 @@ input RelationalTopicCondition {
 
   """Checks for equality with the object’s `title` field."""
   title: String
+
+  """Checks for equality with the object’s `topicItemId` field."""
+  topicItemId: Int
 
   """Checks for equality with the object’s `type` field."""
   type: ItemType
@@ -3950,6 +3973,8 @@ enum RelationalTopicsOrderBy {
   ROOT_TOPIC_ID_DESC
   TITLE_ASC
   TITLE_DESC
+  TOPIC_ITEM_ID_ASC
+  TOPIC_ITEM_ID_DESC
   TYPE_ASC
   TYPE_DESC
   UPDATED_AT_ASC

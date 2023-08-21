@@ -668,6 +668,45 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           return behavior;
         },
       },
+      pgCodecAttribute: {
+        provides: ["inferred"],
+        after: ["default"],
+        before: ["override"],
+        callback(behavior, [codec, attributeName], build) {
+          // If this is the primary key of a related table of a
+          // `@interface mode:relational` table, then omit it from the schema
+          const resources = Object.values(
+            build.input.pgRegistry.pgResources,
+          ).filter(
+            (r) =>
+              r.codec === codec && !r.parameters && !r.isVirtual && !r.isUnique,
+          );
+          if (resources.length === 1) {
+            const tbl = resources[0];
+            const pk = tbl.uniques.find((u) => u.isPrimary);
+            if (pk && pk.attributes.includes(attributeName)) {
+              const fkeys = Object.values(tbl.getRelations()).filter((r) =>
+                arraysMatch(r.localAttributes, pk.attributes),
+              );
+              const myName = build.inflection.tableType(codec);
+              for (const fkey of fkeys) {
+                if (
+                  fkey.remoteResource.codec.polymorphism?.mode ===
+                    "relational" &&
+                  Object.values(
+                    fkey.remoteResource.codec.polymorphism.types,
+                  ).find((t) => t.name === myName) &&
+                  !fkey.remoteResource.codec.attributes[attributeName]
+                ) {
+                  return [behavior, "-select"];
+                }
+              }
+            }
+          }
+
+          return behavior;
+        },
+      },
       pgResource: {
         provides: ["inferred"],
         after: ["default"],
