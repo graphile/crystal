@@ -508,6 +508,51 @@ type CreateRelationalItemRelationPayload {
   ): RelationalItemRelationsEdge
 }
 
+"""All input for the create `SingleTableItemRelation` mutation."""
+input CreateSingleTableItemRelationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `SingleTableItemRelation` to be created by this mutation."""
+  singleTableItemRelation: SingleTableItemRelationInput!
+}
+
+"""The output of our create `SingleTableItemRelation` mutation."""
+type CreateSingleTableItemRelationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItemRelation`.
+  """
+  singleTableItemByChildId: SingleTableItem
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItemRelation`.
+  """
+  singleTableItemByParentId: SingleTableItem
+
+  """The `SingleTableItemRelation` that was created by this mutation."""
+  singleTableItemRelation: SingleTableItemRelation
+
+  """An edge for our `SingleTableItemRelation`. May be used by Relay 1."""
+  singleTableItemRelationEdge(
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsEdge
+}
+
 """All input for the create `ThirdPartyVulnerability` mutation."""
 input CreateThirdPartyVulnerabilityInput {
   """
@@ -850,6 +895,63 @@ type DeleteRelationalItemRelationPayload {
     """The method to use when ordering `RelationalItemRelation`."""
     orderBy: [RelationalItemRelationsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationsEdge
+}
+
+"""All input for the `deleteSingleTableItemRelationById` mutation."""
+input DeleteSingleTableItemRelationByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+}
+
+"""
+All input for the `deleteSingleTableItemRelationByParentIdAndChildId` mutation.
+"""
+input DeleteSingleTableItemRelationByParentIdAndChildIdInput {
+  childId: Int!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  parentId: Int!
+}
+
+"""The output of our delete `SingleTableItemRelation` mutation."""
+type DeleteSingleTableItemRelationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItemRelation`.
+  """
+  singleTableItemByChildId: SingleTableItem
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItemRelation`.
+  """
+  singleTableItemByParentId: SingleTableItem
+
+  """The `SingleTableItemRelation` that was deleted by this mutation."""
+  singleTableItemRelation: SingleTableItemRelation
+
+  """An edge for our `SingleTableItemRelation`. May be used by Relay 1."""
+  singleTableItemRelationEdge(
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsEdge
 }
 
 """All input for the `deleteThirdPartyVulnerabilityById` mutation."""
@@ -1306,6 +1408,14 @@ type Mutation {
     input: CreateRelationalItemRelationInput!
   ): CreateRelationalItemRelationPayload
 
+  """Creates a single `SingleTableItemRelation`."""
+  createSingleTableItemRelation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateSingleTableItemRelationInput!
+  ): CreateSingleTableItemRelationPayload
+
   """Creates a single `ThirdPartyVulnerability`."""
   createThirdPartyVulnerability(
     """
@@ -1393,6 +1503,22 @@ type Mutation {
     """
     input: DeleteRelationalItemRelationByParentIdAndChildIdInput!
   ): DeleteRelationalItemRelationPayload
+
+  """Deletes a single `SingleTableItemRelation` using a unique key."""
+  deleteSingleTableItemRelationById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteSingleTableItemRelationByIdInput!
+  ): DeleteSingleTableItemRelationPayload
+
+  """Deletes a single `SingleTableItemRelation` using a unique key."""
+  deleteSingleTableItemRelationByParentIdAndChildId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteSingleTableItemRelationByParentIdAndChildIdInput!
+  ): DeleteSingleTableItemRelationPayload
 
   """Deletes a single `ThirdPartyVulnerability` using a unique key."""
   deleteThirdPartyVulnerabilityById(
@@ -1487,6 +1613,26 @@ type Mutation {
     """
     input: UpdateRelationalItemRelationByParentIdAndChildIdInput!
   ): UpdateRelationalItemRelationPayload
+
+  """
+  Updates a single `SingleTableItemRelation` using a unique key and a patch.
+  """
+  updateSingleTableItemRelationById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateSingleTableItemRelationByIdInput!
+  ): UpdateSingleTableItemRelationPayload
+
+  """
+  Updates a single `SingleTableItemRelation` using a unique key and a patch.
+  """
+  updateSingleTableItemRelationByParentIdAndChildId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateSingleTableItemRelationByParentIdAndChildIdInput!
+  ): UpdateSingleTableItemRelationPayload
 
   """
   Updates a single `ThirdPartyVulnerability` using a unique key and a patch.
@@ -2427,6 +2573,37 @@ type Query {
     orderBy: [RelationalTopicsOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalTopicsConnection
 
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  allSingleTableItemRelations(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection
+
   """Reads and enables pagination through a set of `SingleTableItem`."""
   allSingleTableItems(
     """Read all values in the set after (below) this cursor."""
@@ -2594,6 +2771,12 @@ type Query {
 
   """Get a single `RelationalTopic`."""
   relationalTopicByTopicItemId(topicItemId: Int!): RelationalTopic
+
+  """Get a single `SingleTableItemRelation`."""
+  singleTableItemRelationById(id: Int!): SingleTableItemRelation
+
+  """Get a single `SingleTableItemRelation`."""
+  singleTableItemRelationByParentIdAndChildId(childId: Int!, parentId: Int!): SingleTableItemRelation
 
   """Get a single `ThirdPartyVulnerability`."""
   thirdPartyVulnerabilityById(id: Int!): ThirdPartyVulnerability
@@ -4140,6 +4323,68 @@ type SingleTableChecklist implements SingleTableItem {
   """
   singleTableItemByParentId: SingleTableItem
 
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
   """Reads and enables pagination through a set of `SingleTableItem`."""
   singleTableItemsByParentId(
     """Read all values in the set after (below) this cursor."""
@@ -4202,6 +4447,68 @@ type SingleTableChecklistItem implements SingleTableItem {
   """
   singleTableItemByParentId: SingleTableItem
 
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
   """Reads and enables pagination through a set of `SingleTableItem`."""
   singleTableItemsByParentId(
     """Read all values in the set after (below) this cursor."""
@@ -4258,6 +4565,68 @@ type SingleTableDivider implements SingleTableItem {
   """
   singleTableItemByParentId: SingleTableItem
 
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
   """Reads and enables pagination through a set of `SingleTableItem`."""
   singleTableItemsByParentId(
     """Read all values in the set after (below) this cursor."""
@@ -4313,6 +4682,52 @@ interface SingleTableItem {
   Reads a single `SingleTableItem` that is related to this `SingleTableItem`.
   """
   singleTableItemByParentId: SingleTableItem
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTableItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTableItemRelationsConnection!
 
   """Reads and enables pagination through a set of `SingleTableItem`."""
   singleTableItemsByParentId(
@@ -4372,6 +4787,94 @@ input SingleTableItemCondition {
 
   """Checks for equality with the object’s `updatedAt` field."""
   updatedAt: Datetime
+}
+
+type SingleTableItemRelation {
+  childId: Int!
+  id: Int!
+  parentId: Int!
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItemRelation`.
+  """
+  singleTableItemByChildId: SingleTableItem
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItemRelation`.
+  """
+  singleTableItemByParentId: SingleTableItem
+}
+
+"""
+A condition to be used against `SingleTableItemRelation` object types. All
+fields are tested for equality and combined with a logical ‘and.’
+"""
+input SingleTableItemRelationCondition {
+  """Checks for equality with the object’s `childId` field."""
+  childId: Int
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+}
+
+"""An input for mutations affecting `SingleTableItemRelation`"""
+input SingleTableItemRelationInput {
+  childId: Int!
+  id: Int
+  parentId: Int!
+}
+
+"""
+Represents an update to a `SingleTableItemRelation`. Fields that are set will be updated.
+"""
+input SingleTableItemRelationPatch {
+  childId: Int
+  id: Int
+  parentId: Int
+}
+
+"""A connection to a list of `SingleTableItemRelation` values."""
+type SingleTableItemRelationsConnection {
+  """
+  A list of edges which contains the `SingleTableItemRelation` and cursor to aid in pagination.
+  """
+  edges: [SingleTableItemRelationsEdge]!
+
+  """A list of `SingleTableItemRelation` objects."""
+  nodes: [SingleTableItemRelation]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `SingleTableItemRelation` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `SingleTableItemRelation` edge in the connection."""
+type SingleTableItemRelationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `SingleTableItemRelation` at the end of the edge."""
+  node: SingleTableItemRelation
+}
+
+"""Methods to use when ordering `SingleTableItemRelation`."""
+enum SingleTableItemRelationsOrderBy {
+  CHILD_ID_ASC
+  CHILD_ID_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
 }
 
 """A connection to a list of `SingleTableItem` values."""
@@ -4458,6 +4961,68 @@ type SingleTablePost implements SingleTableItem {
   """
   singleTableItemByParentId: SingleTableItem
 
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
   """Reads and enables pagination through a set of `SingleTableItem`."""
   singleTableItemsByParentId(
     """Read all values in the set after (below) this cursor."""
@@ -4513,6 +5078,68 @@ type SingleTableTopic implements SingleTableItem {
   Reads a single `SingleTableItem` that is related to this `SingleTableItem`.
   """
   singleTableItemByParentId: SingleTableItem
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
 
   """Reads and enables pagination through a set of `SingleTableItem`."""
   singleTableItemsByParentId(
@@ -5009,6 +5636,73 @@ type UpdateRelationalItemRelationPayload {
     """The method to use when ordering `RelationalItemRelation`."""
     orderBy: [RelationalItemRelationsOrderBy!]! = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationsEdge
+}
+
+"""All input for the `updateSingleTableItemRelationById` mutation."""
+input UpdateSingleTableItemRelationByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the `SingleTableItemRelation` being updated.
+  """
+  singleTableItemRelationPatch: SingleTableItemRelationPatch!
+}
+
+"""
+All input for the `updateSingleTableItemRelationByParentIdAndChildId` mutation.
+"""
+input UpdateSingleTableItemRelationByParentIdAndChildIdInput {
+  childId: Int!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  parentId: Int!
+
+  """
+  An object where the defined keys will be set on the `SingleTableItemRelation` being updated.
+  """
+  singleTableItemRelationPatch: SingleTableItemRelationPatch!
+}
+
+"""The output of our update `SingleTableItemRelation` mutation."""
+type UpdateSingleTableItemRelationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItemRelation`.
+  """
+  singleTableItemByChildId: SingleTableItem
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItemRelation`.
+  """
+  singleTableItemByParentId: SingleTableItem
+
+  """The `SingleTableItemRelation` that was updated by this mutation."""
+  singleTableItemRelation: SingleTableItemRelation
+
+  """An edge for our `SingleTableItemRelation`. May be used by Relay 1."""
+  singleTableItemRelationEdge(
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsEdge
 }
 
 """All input for the `updateThirdPartyVulnerabilityById` mutation."""

@@ -5,8 +5,8 @@ mutation {
   createRelationalItemRelation(
     input: {
       relationalItemRelation: {
-        relationalItemByParentId: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0="
-        relationalItemByChildId: "WyJyZWxhdGlvbmFsX3Bvc3RzIiw0XQ=="
+        relationalItemByParentId: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMl0="
+        relationalItemByChildId: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0="
       }
     }
   ) {
@@ -26,7 +26,7 @@ mutation {
     input: {
       singleTableItemRelation: {
         singleTableItemByParentId: "WyJTaW5nbGVUYWJsZVRvcGljIiwyXQ=="
-        singleTableItemByChildId: "WyJTaW5nbGVUYWJsZVBvc3QiLDld"
+        singleTableItemByChildId: "WyJTaW5nbGVUYWJsZVRvcGljIiwxXQ=="
       }
     }
   ) {

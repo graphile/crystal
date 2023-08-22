@@ -29,17 +29,17 @@ lateral (
   )
 ) as __relational_items_result__;
 
-select __relational_posts_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __relational_posts_identifiers__,
+select __relational_topics_result__.*
+from (select 0 as idx, $1::"int4" as "id0") as __relational_topics_identifiers__,
 lateral (
   select
-    __relational_posts__."post_item_id"::text as "0",
-    __relational_posts_identifiers__.idx as "1"
-  from "polymorphic"."relational_posts" as __relational_posts__
+    __relational_topics__."topic_item_id"::text as "0",
+    __relational_topics_identifiers__.idx as "1"
+  from "polymorphic"."relational_topics" as __relational_topics__
   where (
-    __relational_posts__."post_item_id" = __relational_posts_identifiers__."id0"
+    __relational_topics__."topic_item_id" = __relational_topics_identifiers__."id0"
   )
-) as __relational_posts_result__;
+) as __relational_topics_result__;
 
 select __relational_topics_result__.*
 from (select 0 as idx, $1::"int4" as "id0") as __relational_topics_identifiers__,

@@ -2475,7 +2475,8 @@ ${lateralText};`;
       !this.isInliningForbidden &&
       !this.hasSideEffects &&
       !stream &&
-      !this.isNullFetch()
+      !this.isNullFetch() &&
+      !this.joins.some((j) => j.type !== "left")
     ) {
       // Inline ourself into our parent if we can.
       let t: PgSelectStep<PgResource> | null | undefined = undefined;
@@ -2614,9 +2615,13 @@ ${lateralText};`;
               parent,
             );
             const { sql: where } = this.buildWhereOrHaving(
-              sql`where`,
+              sql`/* WHERE becoming ON */`,
               this.conditions,
             );
+            if (where != sql.blank) {
+              // TODO: test this!
+              console.warn(`This method of joining is untested!`);
+            }
             const conditions = [
               ...this.identifierMatches.map((identifierMatch, i) => {
                 const { dependencyIndex, codec } = this.queryValues[i];

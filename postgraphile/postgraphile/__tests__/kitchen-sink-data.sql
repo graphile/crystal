@@ -492,8 +492,27 @@ update polymorphic.single_table_items
   where single_table_items.id = cte.id
   and cte.id != cte.rti;
 
-insert into polymorphic.single_table_item_relations (parent_id, child_id)
-  select parent_id, id from polymorphic.single_table_items where parent_id is not null;
+insert into polymorphic.single_table_item_relations
+  (id,  parent_id, child_id) values
+  (1,   1,         3),
+  (2,   1,         4),
+  (3,   1,         5),
+  (4,   1,         6),
+  (5,   1,         7),
+  (6,   1,         8),
+  (7,   1,         9),
+  (8,   1,         10),
+  (9,   10,        11),
+  (10,  11,        12),
+  (11,  11,        13),
+  (12,  11,        14),
+  (13,  2,         15),
+  (14,  4,         16),
+  (15,  16,        17),
+  (16,  16,        18),
+  (17,  16,        19),
+  (18,  16,        20),
+  (19,  16,        21);
 alter sequence polymorphic.single_table_item_relations_id_seq restart with 9999;
 
 insert into polymorphic.relational_items
@@ -570,8 +589,27 @@ insert into polymorphic.relational_checklist_items (checklist_item_item_id, desc
   (20, 'Garbage-collection of unused plans', null),
   (21, 'Supports newest GraphQL features', null);
 
-insert into polymorphic.relational_item_relations (parent_id, child_id)
-  select parent_id, id from polymorphic.relational_items where parent_id is not null;
+insert into polymorphic.relational_item_relations
+  (id,  parent_id, child_id) values
+  (1,   1,         3),
+  (2,   1,         4),
+  (3,   1,         5),
+  (4,   1,         6),
+  (5,   1,         7),
+  (6,   1,         8),
+  (7,   1,         9),
+  (8,   1,         10),
+  (9,   10,        11),
+  (10,  11,        12),
+  (11,  11,        13),
+  (12,  11,        14),
+  (13,  2,         15),
+  (14,  4,         16),
+  (15,  16,        17),
+  (16,  16,        18),
+  (17,  16,        19),
+  (18,  16,        20),
+  (19,  16,        21);
 alter sequence polymorphic.relational_item_relations_id_seq restart with 9999;
 
 

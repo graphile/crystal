@@ -1,23 +1,23 @@
 {
   createRelationalItemRelation: {
     relationalItemRelation: {
-      id: "WyJyZWxhdGlvbmFsX2l0ZW1fcmVsYXRpb25zIiwxXQ==",
+      id: "WyJyZWxhdGlvbmFsX2l0ZW1fcmVsYXRpb25zIiw5OTk5XQ==",
       relationalItemByChildId: {
-        id: "WyJyZWxhdGlvbmFsX3Bvc3RzIiw0XQ==",
-        type: "POST",
+        id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0=",
+        type: "TOPIC",
       },
       relationalItemByParentId: {
-        id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0=",
+        id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMl0=",
         type: "TOPIC",
       },
     },
   },
   createSingleTableItemRelation: {
     singleTableItemRelation: {
-      id: "WyJzaW5nbGVfdGFibGVfaXRlbV9yZWxhdGlvbnMiLDFd",
+      id: "WyJzaW5nbGVfdGFibGVfaXRlbV9yZWxhdGlvbnMiLDk5OTld",
       singleTableItemByChildId: {
-        id: "WyJTaW5nbGVUYWJsZVBvc3QiLDld",
-        type: "POST",
+        id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxXQ==",
+        type: "TOPIC",
       },
       singleTableItemByParentId: {
         id: "WyJTaW5nbGVUYWJsZVRvcGljIiwyXQ==",
