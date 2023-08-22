@@ -492,6 +492,10 @@ update polymorphic.single_table_items
   where single_table_items.id = cte.id
   and cte.id != cte.rti;
 
+insert into polymorphic.single_table_item_relations (parent_id, child_id)
+  select parent_id, id from polymorphic.single_table_items where parent_id is not null;
+alter sequence polymorphic.single_table_item_relations_id_seq restart with 9999;
+
 insert into polymorphic.relational_items
   (id, type,             parent_id, author_id, position, created_at,             updated_at,             is_explicitly_archived, archived_at) values
   (1,  'TOPIC',          null,      2,         0,        '2020-01-28T11:00:00Z', '2021-07-30T14:24:00Z', false,                  null),
@@ -565,6 +569,11 @@ insert into polymorphic.relational_checklist_items (checklist_item_item_id, desc
   (19, 'Plan deduplication at the field level', null),
   (20, 'Garbage-collection of unused plans', null),
   (21, 'Supports newest GraphQL features', null);
+
+insert into polymorphic.relational_item_relations (parent_id, child_id)
+  select parent_id, id from polymorphic.relational_items where parent_id is not null;
+alter sequence polymorphic.relational_item_relations_id_seq restart with 9999;
+
 
 insert into polymorphic.aws_applications (id, person_id, organization_id, name, last_deployed, aws_id) values
   (1, null, 1, 'AWS App 1', null, 'AWS-0001'),
@@ -784,5 +793,3 @@ insert into nested_arrays.t
   (2, '{"{\"(2,3,4,5)\"}","{\"(6,7,8,9)\"}","{}","{}","{}","{}","{}","{}"}');
 
 alter sequence nested_arrays.t_k_seq restart with 3;
-alter sequence polymorphic.relational_item_relations_id_seq restart with 1;
-alter sequence polymorphic.single_table_item_relations_id_seq restart with 1;
