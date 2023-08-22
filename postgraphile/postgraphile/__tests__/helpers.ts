@@ -172,6 +172,7 @@ export async function runTestQuery(
     subscriptions?: boolean;
     setupSql?: string;
     cleanupSql?: string;
+    extends?: string | string[];
   },
   options: {
     callback?: (
@@ -201,8 +202,28 @@ export async function runTestQuery(
     : typeof config.schema === "string"
     ? [config.schema]
     : ["a", "b", "c"];
+  const extendsRaw = Array.isArray(config.extends)
+    ? config.extends
+    : config.extends
+    ? [config.extends]
+    : [];
+  const presets = await Promise.all(
+    extendsRaw.map(async (extendRaw) => {
+      const [modulePath, name = "default"] = extendRaw.split(":");
+      const mod = await import(modulePath);
+      const imported = mod[name];
+      if (!imported) {
+        throw new Error(
+          `Invalid 'extends': '${extendRaw}' - '${name}' export doesn't exist; found: ${Object.keys(
+            mod,
+          )}`,
+        );
+      }
+      return imported;
+    }),
+  );
   const preset: GraphileConfig.Preset = {
-    extends: [AmberPreset],
+    extends: [AmberPreset, ...presets],
     plugins: [StreamDeferPlugin],
     pgServices: [
       {

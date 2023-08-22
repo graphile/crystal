@@ -1,0 +1,15 @@
+{
+  createRelationalItemRelation: {
+    relationalItemRelation: {
+      id: "WyJyZWxhdGlvbmFsX2l0ZW1fcmVsYXRpb25zIiwxXQ==",
+      relationalItemByChildId: {
+        id: "WyJyZWxhdGlvbmFsX3Bvc3RzIiw0XQ==",
+        type: "POST",
+      },
+      relationalItemByParentId: {
+        id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0=",
+        type: "TOPIC",
+      },
+    },
+  },
+}

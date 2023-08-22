@@ -1,0 +1,25 @@
+## expect(errors).toBeFalsy();
+#> schema: ["polymorphic"]
+#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+mutation {
+  createRelationalItemRelation(
+    input: {
+      relationalItemRelation: {
+        relationalItemByParentId: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0="
+        relationalItemByChildId: "WyJyZWxhdGlvbmFsX3Bvc3RzIiw0XQ=="
+      }
+    }
+  ) {
+    relationalItemRelation {
+      id
+      relationalItemByChildId {
+        id
+        type
+      }
+      relationalItemByParentId {
+        id
+        type
+      }
+    }
+  }
+}
