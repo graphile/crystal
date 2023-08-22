@@ -2398,19 +2398,19 @@ type Query {
   query: Query!
 
   """Get a single `RelationalChecklist`."""
-  relationalChecklistById(id: Int!): RelationalChecklist
+  relationalChecklistByChecklistItemId(checklistItemId: Int!): RelationalChecklist
 
   """Get a single `RelationalChecklistItem`."""
-  relationalChecklistItemById(id: Int!): RelationalChecklistItem
+  relationalChecklistItemByChecklistItemItemId(checklistItemItemId: Int!): RelationalChecklistItem
 
   """Get a single `RelationalDivider`."""
-  relationalDividerById(id: Int!): RelationalDivider
+  relationalDividerByDividerItemId(dividerItemId: Int!): RelationalDivider
 
   """Get a single `RelationalPost`."""
-  relationalPostById(id: Int!): RelationalPost
+  relationalPostByPostItemId(postItemId: Int!): RelationalPost
 
   """Get a single `RelationalTopic`."""
-  relationalTopicById(id: Int!): RelationalTopic
+  relationalTopicByTopicItemId(topicItemId: Int!): RelationalTopic
 
   """Get a single `ThirdPartyVulnerability`."""
   thirdPartyVulnerabilityById(id: Int!): ThirdPartyVulnerability
@@ -2431,17 +2431,17 @@ type RelationalChecklist implements RelationalItem {
   """
   Reads a single `RelationalChecklist` that is related to this `RelationalChecklist`.
   """
-  relationalChecklistById: RelationalChecklist
+  relationalChecklistByChecklistItemId: RelationalChecklist
 
   """
   Reads a single `RelationalChecklistItem` that is related to this `RelationalChecklist`.
   """
-  relationalChecklistItemById: RelationalChecklistItem
+  relationalChecklistItemByChecklistItemItemId: RelationalChecklistItem
 
   """
   Reads a single `RelationalDivider` that is related to this `RelationalChecklist`.
   """
-  relationalDividerById: RelationalDivider
+  relationalDividerByDividerItemId: RelationalDivider
 
   """
   Reads a single `RelationalItem` that is related to this `RelationalChecklist`.
@@ -2480,17 +2480,17 @@ type RelationalChecklist implements RelationalItem {
   """
   Reads a single `RelationalPost` that is related to this `RelationalChecklist`.
   """
-  relationalPostById: RelationalPost
-
-  """
-  Reads a single `RelationalTopic` that is related to this `RelationalChecklist`.
-  """
-  relationalTopicById: RelationalTopic
+  relationalPostByPostItemId: RelationalPost
 
   """
   Reads a single `RelationalTopic` that is related to this `RelationalChecklist`.
   """
   relationalTopicByRootTopicId: RelationalTopic
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalChecklist`.
+  """
+  relationalTopicByTopicItemId: RelationalTopic
   rootTopicId: Int
   title: String!
   type: ItemType!
@@ -2555,17 +2555,17 @@ type RelationalChecklistItem implements RelationalItem {
   """
   Reads a single `RelationalChecklist` that is related to this `RelationalChecklistItem`.
   """
-  relationalChecklistById: RelationalChecklist
+  relationalChecklistByChecklistItemId: RelationalChecklist
 
   """
   Reads a single `RelationalChecklistItem` that is related to this `RelationalChecklistItem`.
   """
-  relationalChecklistItemById: RelationalChecklistItem
+  relationalChecklistItemByChecklistItemItemId: RelationalChecklistItem
 
   """
   Reads a single `RelationalDivider` that is related to this `RelationalChecklistItem`.
   """
-  relationalDividerById: RelationalDivider
+  relationalDividerByDividerItemId: RelationalDivider
 
   """
   Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
@@ -2604,17 +2604,17 @@ type RelationalChecklistItem implements RelationalItem {
   """
   Reads a single `RelationalPost` that is related to this `RelationalChecklistItem`.
   """
-  relationalPostById: RelationalPost
-
-  """
-  Reads a single `RelationalTopic` that is related to this `RelationalChecklistItem`.
-  """
-  relationalTopicById: RelationalTopic
+  relationalPostByPostItemId: RelationalPost
 
   """
   Reads a single `RelationalTopic` that is related to this `RelationalChecklistItem`.
   """
   relationalTopicByRootTopicId: RelationalTopic
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalChecklistItem`.
+  """
+  relationalTopicByTopicItemId: RelationalTopic
   rootTopicId: Int
   type: ItemType!
   updatedAt: Datetime!
@@ -2794,17 +2794,17 @@ type RelationalDivider implements RelationalItem {
   """
   Reads a single `RelationalChecklist` that is related to this `RelationalDivider`.
   """
-  relationalChecklistById: RelationalChecklist
+  relationalChecklistByChecklistItemId: RelationalChecklist
 
   """
   Reads a single `RelationalChecklistItem` that is related to this `RelationalDivider`.
   """
-  relationalChecklistItemById: RelationalChecklistItem
+  relationalChecklistItemByChecklistItemItemId: RelationalChecklistItem
 
   """
   Reads a single `RelationalDivider` that is related to this `RelationalDivider`.
   """
-  relationalDividerById: RelationalDivider
+  relationalDividerByDividerItemId: RelationalDivider
 
   """
   Reads a single `RelationalItem` that is related to this `RelationalDivider`.
@@ -2843,17 +2843,17 @@ type RelationalDivider implements RelationalItem {
   """
   Reads a single `RelationalPost` that is related to this `RelationalDivider`.
   """
-  relationalPostById: RelationalPost
-
-  """
-  Reads a single `RelationalTopic` that is related to this `RelationalDivider`.
-  """
-  relationalTopicById: RelationalTopic
+  relationalPostByPostItemId: RelationalPost
 
   """
   Reads a single `RelationalTopic` that is related to this `RelationalDivider`.
   """
   relationalTopicByRootTopicId: RelationalTopic
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalDivider`.
+  """
+  relationalTopicByTopicItemId: RelationalTopic
   rootTopicId: Int
   title: String
   type: ItemType!
@@ -3114,17 +3114,17 @@ type RelationalPost implements RelationalItem {
   """
   Reads a single `RelationalChecklist` that is related to this `RelationalPost`.
   """
-  relationalChecklistById: RelationalChecklist
+  relationalChecklistByChecklistItemId: RelationalChecklist
 
   """
   Reads a single `RelationalChecklistItem` that is related to this `RelationalPost`.
   """
-  relationalChecklistItemById: RelationalChecklistItem
+  relationalChecklistItemByChecklistItemItemId: RelationalChecklistItem
 
   """
   Reads a single `RelationalDivider` that is related to this `RelationalPost`.
   """
-  relationalDividerById: RelationalDivider
+  relationalDividerByDividerItemId: RelationalDivider
 
   """
   Reads a single `RelationalItem` that is related to this `RelationalPost`.
@@ -3163,17 +3163,17 @@ type RelationalPost implements RelationalItem {
   """
   Reads a single `RelationalPost` that is related to this `RelationalPost`.
   """
-  relationalPostById: RelationalPost
-
-  """
-  Reads a single `RelationalTopic` that is related to this `RelationalPost`.
-  """
-  relationalTopicById: RelationalTopic
+  relationalPostByPostItemId: RelationalPost
 
   """
   Reads a single `RelationalTopic` that is related to this `RelationalPost`.
   """
   relationalTopicByRootTopicId: RelationalTopic
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalPost`.
+  """
+  relationalTopicByTopicItemId: RelationalTopic
   rootTopicId: Int
   title: String!
   type: ItemType!
@@ -3299,17 +3299,17 @@ type RelationalTopic implements RelationalItem {
   """
   Reads a single `RelationalChecklist` that is related to this `RelationalTopic`.
   """
-  relationalChecklistById: RelationalChecklist
+  relationalChecklistByChecklistItemId: RelationalChecklist
 
   """
   Reads a single `RelationalChecklistItem` that is related to this `RelationalTopic`.
   """
-  relationalChecklistItemById: RelationalChecklistItem
+  relationalChecklistItemByChecklistItemItemId: RelationalChecklistItem
 
   """
   Reads a single `RelationalDivider` that is related to this `RelationalTopic`.
   """
-  relationalDividerById: RelationalDivider
+  relationalDividerByDividerItemId: RelationalDivider
 
   """
   Reads a single `RelationalItem` that is related to this `RelationalTopic`.
@@ -3377,17 +3377,17 @@ type RelationalTopic implements RelationalItem {
   """
   Reads a single `RelationalPost` that is related to this `RelationalTopic`.
   """
-  relationalPostById: RelationalPost
-
-  """
-  Reads a single `RelationalTopic` that is related to this `RelationalTopic`.
-  """
-  relationalTopicById: RelationalTopic
+  relationalPostByPostItemId: RelationalPost
 
   """
   Reads a single `RelationalTopic` that is related to this `RelationalTopic`.
   """
   relationalTopicByRootTopicId: RelationalTopic
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalTopic`.
+  """
+  relationalTopicByTopicItemId: RelationalTopic
   rootTopicId: Int
   title: String!
   type: ItemType!

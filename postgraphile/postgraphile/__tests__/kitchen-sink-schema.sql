@@ -1389,27 +1389,27 @@ create table polymorphic.relational_items (
 );
 
 create table polymorphic.relational_topics (
-  id int primary key references polymorphic.relational_items,
+  topic_item_id int primary key references polymorphic.relational_items,
   title text not null
 );
 alter table polymorphic.relational_items add constraint relational_items_root_topic_fkey foreign key (root_topic_id) references polymorphic.relational_topics on delete cascade;
 create table polymorphic.relational_posts (
-  id int primary key references polymorphic.relational_items,
+  post_item_id int primary key references polymorphic.relational_items,
   title text not null,
   description text default '-- Enter description here --',
   note text
 );
 create table polymorphic.relational_dividers (
-  id int primary key references polymorphic.relational_items,
+  divider_item_id int primary key references polymorphic.relational_items,
   title text,
   color text
 );
 create table polymorphic.relational_checklists (
-  id int primary key references polymorphic.relational_items,
+  checklist_item_id int primary key references polymorphic.relational_items,
   title text not null
 );
 create table polymorphic.relational_checklist_items (
-  id int primary key references polymorphic.relational_items,
+  checklist_item_item_id int primary key references polymorphic.relational_items,
   description text not null,
   note text
 );
