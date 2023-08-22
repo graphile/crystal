@@ -175,6 +175,7 @@ import {
   SetterCapableStep,
   SetterStep,
   specFromNodeId,
+  makeDecodedNodeIdForHandlers,
 } from "./steps/index.js";
 import { stringifyPayload } from "./stringifyPayload.js";
 import { stripAnsi } from "./stripAnsi.js";
@@ -379,6 +380,7 @@ export {
   SetterCapableStep,
   SetterStep,
   specFromNodeId,
+  makeDecodedNodeIdForHandlers,
   stepADependsOnStepB,
   stepAMayDependOnStepB,
   StepOptimizeOptions,
@@ -441,6 +443,7 @@ exportAsMany("grafast", {
   first,
   node,
   specFromNodeId,
+  makeDecodedNodeIdForHandlers,
   proxy,
   applyTransforms,
   ApplyTransformsStep,

@@ -53,7 +53,12 @@ export {
   ListTransformOptions,
   ListTransformReduce,
 } from "./listTransform.js";
-export { node, NodeStep, specFromNodeId } from "./node.js";
+export {
+  node,
+  NodeStep,
+  specFromNodeId,
+  makeDecodedNodeIdForHandlers,
+} from "./node.js";
 export { object, ObjectPlanMeta, ObjectStep } from "./object.js";
 export { partitionByIndex } from "./partitionByIndex.js";
 export {

@@ -24,8 +24,15 @@ import type {
   PgSelectSingleStep,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep } from "@dataplan/pg";
-import type { ListStep } from "grafast";
-import { arraysMatch } from "grafast";
+import type { ExecutableStep, ListStep, NodeIdHandler } from "grafast";
+import {
+  access,
+  arraysMatch,
+  lambda,
+  list,
+  makeDecodedNodeIdForHandlers,
+  object,
+} from "grafast";
 import type {
   GraphQLInterfaceType,
   GraphQLNamedType,
@@ -53,6 +60,15 @@ declare global {
     }
   }
   namespace GraphileBuild {
+    interface Build {
+      relationalInterfaceNodeIdSpecForCodec(
+        codec: PgCodec<any, any, any, any, any, any, any>,
+      ):
+        | (($nodeId: ExecutableStep<string>) => {
+            [key: string]: ExecutableStep<any>;
+          })
+        | null;
+    }
     interface ScopeInterface {
       pgCodec?: PgCodec<any, any, any, any, any, any, any>;
       isPgPolymorphicTableType?: boolean;
@@ -80,6 +96,11 @@ declare global {
     }
     interface ScopeUnion {
       isPgUnionMemberUnion?: boolean;
+    }
+  }
+  namespace DataplanPg {
+    interface PgCodecExtensions {
+      relationalInterfaceCodecName?: string;
     }
   }
 }
@@ -271,12 +292,16 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     }' due to missing foreign key constraint. Please create a foreign key constraint on the latter table's primary key, pointing to the former table.`,
                   );
                 }
-                const codec = await info.helpers.pgCodecs.getCodecFromClass(
+                const codec = (await info.helpers.pgCodecs.getCodecFromClass(
                   serviceName,
                   referencedClass._id,
-                );
+                ))!;
+                if (!codec.extensions) {
+                  codec.extensions = Object.create(null);
+                }
+                codec.extensions!.relationalInterfaceCodecName = spec.name;
                 types[typeValue] = {
-                  name: info.inflection.tableType(codec!),
+                  name: info.inflection.tableType(codec),
                   references,
                   relationName: info.inflection.resourceRelationName({
                     serviceName,
@@ -764,6 +789,104 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
       },
     },
     hooks: {
+      build(build) {
+        return build.extend(
+          build,
+          {
+            relationalInterfaceNodeIdSpecForCodec(codec) {
+              if (codec.polymorphism?.mode !== "relational") {
+                return null;
+              }
+              const resources = Object.values(
+                build.input.pgRegistry.pgResources,
+              ).filter(
+                (r) =>
+                  r.codec === codec &&
+                  !r.parameters &&
+                  !r.isVirtual &&
+                  !r.isUnique,
+              );
+              if (resources.length !== 1) {
+                return null;
+              }
+              const details: Array<{
+                handler: NodeIdHandler;
+                pkAttributes: readonly string[];
+              }> = [];
+              const table = resources[0]!;
+              const tablePk = table.uniques.find((u) => u.isPrimary);
+              if (!tablePk) {
+                return null;
+              }
+              const tablePkAttributes = tablePk.attributes;
+              for (const [typeKey, spec] of Object.entries(
+                codec.polymorphism.types,
+              )) {
+                const relation = table.getRelation(spec.relationName);
+                const typeName = build.inflection.tableType(
+                  relation.remoteResource.codec,
+                );
+                const handler = build.getNodeIdHandler?.(typeName);
+                if (!handler) {
+                  return null;
+                }
+                const pk = (
+                  relation.remoteResource.uniques as PgResourceUnique[]
+                ).find((u) => u.isPrimary);
+                if (!pk) {
+                  return null;
+                }
+                details.push({
+                  pkAttributes: pk.attributes,
+                  handler,
+                });
+              }
+              const handlers = details.map((d) => d.handler);
+              const decodeNodeId = EXPORTABLE(
+                (handlers, makeDecodedNodeIdForHandlers) =>
+                  makeDecodedNodeIdForHandlers(handlers),
+                [handlers, makeDecodedNodeIdForHandlers],
+              );
+              return EXPORTABLE(
+                () =>
+                  (
+                    $nodeId: ExecutableStep<string>,
+                  ): { [key: string]: ExecutableStep<any> } => {
+                    const $specifier = decodeNodeId($nodeId);
+                    const $handlerMatches = list(
+                      details.map(({ handler, pkAttributes }) => {
+                        const spec = handler.getSpec(
+                          access($specifier, handler.codec.name),
+                        );
+                        return object({
+                          match: lambda($specifier, (specifier) => {
+                            const value = specifier[handler.codec.name];
+                            return value != null ? handler.match(value) : false;
+                          }),
+                          pks: list(pkAttributes.map((n) => spec[n])),
+                        });
+                      }),
+                    );
+                    const $pkValues = lambda(
+                      $handlerMatches,
+                      (handlerMatches) => {
+                        const match = handlerMatches.find((pk) => pk.match);
+                        return match?.pks;
+                      },
+                      true,
+                    );
+                    return tablePkAttributes.reduce((memo, pkAttribute, i) => {
+                      memo[pkAttribute] = access($pkValues, i);
+                      return memo;
+                    }, Object.create(null));
+                  },
+                [],
+              );
+            },
+          },
+          "Adding PgPolmorphismPlugin helpers to Build",
+        );
+      },
       init(_, build, _context) {
         const {
           inflection,

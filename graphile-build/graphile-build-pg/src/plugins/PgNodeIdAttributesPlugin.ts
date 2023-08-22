@@ -105,7 +105,25 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
               if (typeName === build.inflection.builtin("Query")) {
                 return memo;
               }
-              const fetcher = build.nodeFetcherByTypeName?.(typeName);
+              let fetcher = build.nodeFetcherByTypeName?.(typeName);
+              if (!fetcher) {
+                // If this is a `@interface mode:relational` table, we need to find the underlying fetchers.
+                if (
+                  relation.remoteResource.codec.polymorphism?.mode ===
+                  "relational"
+                ) {
+                  const getSpec = build.relationalInterfaceNodeIdSpecForCodec(
+                    relation.remoteResource.codec,
+                  );
+                  if (getSpec) {
+                    fetcher = EXPORTABLE(
+                      () => ($nodeId) =>
+                        relation.remoteResource.get(getSpec($nodeId)),
+                      [],
+                    );
+                  }
+                }
+              }
               if (!fetcher) {
                 return memo;
               }

@@ -11,13 +11,12 @@ import { lambda } from "grafast";
 import { EXPORTABLE } from "../utils.js";
 import { version } from "../version.js";
 
-type NodeFetcher = {
-  ($nodeId: ExecutableStep<string>): ExecutableStep<any>;
-  deprecationReason?: string;
-};
-
 declare global {
   namespace GraphileBuild {
+    type NodeFetcher = {
+      ($nodeId: ExecutableStep<string>): ExecutableStep<any>;
+      deprecationReason?: string;
+    };
     interface Build {
       specForHandler?(
         handler: NodeIdHandler,
@@ -91,7 +90,9 @@ export const NodeAccessorPlugin: GraphileConfig.Plugin = {
               const codec = finalBuild.getNodeIdCodec!(handler.codec.name);
               const fetcher = EXPORTABLE(
                 (codec, handler, lambda, specForHandler) => {
-                  const fn: NodeFetcher = ($nodeId: ExecutableStep<string>) => {
+                  const fn: GraphileBuild.NodeFetcher = (
+                    $nodeId: ExecutableStep<string>,
+                  ) => {
                     const $decoded = lambda(
                       $nodeId,
                       specForHandler(handler, codec),
