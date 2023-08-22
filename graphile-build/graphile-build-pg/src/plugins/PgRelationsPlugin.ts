@@ -1049,7 +1049,7 @@ function addRelations(
               finalLayer.resource.name,
             );
             const collectionIdentifier = te.identifier(
-              build.inflection.pluralize(finalLayer.resource.name),
+              `$` + build.inflection.pluralize(finalLayer.resource.name),
             );
             functionLines.push(
               te`  const ${collectionIdentifier} = ${ref_finalLayerResource}.find();`,
