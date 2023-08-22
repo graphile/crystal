@@ -7,7 +7,6 @@ import type {
   PgCodecWithAttributes,
   PgConditionStep,
   PgRegistry,
-  PgSelectSingleStep,
   PgSelectStep,
 } from "@dataplan/pg";
 import type { SetterStep } from "grafast";
