@@ -388,22 +388,45 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                       paramBaseCodec,
                       variant,
                     );
-              const typeNameForFetcher =
-                variant === "nodeId"
-                  ? finalBuild.getGraphQLTypeNameByPgCodec(
-                      paramBaseCodec,
-                      "output",
-                    )
-                  : null;
-              if (variant === "nodeId" && !finalBuild.nodeFetcherByTypeName) {
+              if (variant === "nodeId" && !finalBuild.nodeIdSpecForCodec) {
                 // ERRORS: tell them how to turn the nodeId variant off
                 throw new Error(
                   `Argument is configured to use nodeId variant, but build is not configured with Node support - there is no 'build.nodeFetcherByTypeName'. Did you skip NodePlugin?`,
                 );
               }
-              const fetcher = typeNameForFetcher
-                ? finalBuild.nodeFetcherByTypeName!(typeNameForFetcher)
-                : null;
+              const getSpec =
+                variant === "nodeId"
+                  ? finalBuild.nodeIdSpecForCodec(paramBaseCodec)
+                  : null;
+              if (variant === "nodeId" && !getSpec) {
+                // ERRORS: tell them how to turn the nodeId variant off
+                throw new Error(
+                  `Argument is configured to use nodeId variant, but we don't know how to get the spec for codec '${paramBaseCodec.name}'`,
+                );
+              }
+              const codecResource =
+                variant === "nodeId"
+                  ? Object.values(finalBuild.input.pgRegistry.pgResources).find(
+                      (r) =>
+                        r.codec === paramBaseCodec &&
+                        !r.parameters &&
+                        !r.isVirtual &&
+                        !r.isUnique,
+                    )
+                  : null;
+              if (variant === "nodeId" && !codecResource) {
+                // ERRORS: tell them how to turn the nodeId variant off
+                throw new Error(
+                  `Argument is configured to use nodeId variant, but we couldn't find a suitable resource to pull a '${paramBaseCodec.name}' record from`,
+                );
+              }
+              const fetcher =
+                getSpec && codecResource
+                  ? ($nodeId: ExecutableStep<string>) => {
+                      const spec = getSpec($nodeId);
+                      return codecResource.get(spec);
+                    }
+                  : null;
               if (!baseInputType) {
                 const hint =
                   variant === "input"
