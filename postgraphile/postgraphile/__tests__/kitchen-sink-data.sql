@@ -42,13 +42,14 @@ delete from polymorphic.third_party_vulnerabilities cascade;
 delete from polymorphic.first_party_vulnerabilities cascade;
 delete from polymorphic.gcp_applications cascade;
 delete from polymorphic.aws_applications cascade;
+delete from polymorphic.relational_item_relations cascade;
 delete from polymorphic.relational_checklist_items cascade;
 delete from polymorphic.relational_checklists cascade;
 delete from polymorphic.relational_dividers cascade;
 delete from polymorphic.relational_posts cascade;
 delete from polymorphic.relational_topics cascade;
 delete from polymorphic.relational_items cascade;
-delete from polymorphic.relational_item_relations cascade;
+delete from polymorphic.single_table_item_relations cascade;
 delete from polymorphic.single_table_items cascade;
 delete from polymorphic.priorities cascade;
 delete from polymorphic.log_entries cascade;
@@ -784,3 +785,4 @@ insert into nested_arrays.t
 
 alter sequence nested_arrays.t_k_seq restart with 3;
 alter sequence polymorphic.relational_item_relations_id_seq restart with 1;
+alter sequence polymorphic.single_table_item_relations_id_seq restart with 1;

@@ -1369,6 +1369,17 @@ comment on constraint single_table_items_root_topic_fkey on polymorphic.single_t
   @behavior -*
   $$;
 
+create table polymorphic.single_table_item_relations (
+  id serial primary key,
+  parent_id int not null references polymorphic.single_table_items on delete cascade,
+  child_id int not null references polymorphic.single_table_items on delete cascade,
+  constraint single_table_item_relations_parent_chilk_ak unique (parent_id, child_id)
+);
+
+create index on polymorphic.single_table_item_relations (parent_id);
+create index on polymorphic.single_table_item_relations (child_id);
+
+
 ----------------------------------------
 
 create table polymorphic.relational_items (

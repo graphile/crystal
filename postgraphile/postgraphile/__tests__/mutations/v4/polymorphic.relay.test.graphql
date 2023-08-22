@@ -22,4 +22,24 @@ mutation {
       }
     }
   }
+  createSingleTableItemRelation(
+    input: {
+      singleTableItemRelation: {
+        singleTableItemByParentId: "WyJTaW5nbGVUYWJsZVRvcGljIiwyXQ=="
+        singleTableItemByChildId: "WyJTaW5nbGVUYWJsZVBvc3QiLDld"
+      }
+    }
+  ) {
+    singleTableItemRelation {
+      id
+      singleTableItemByChildId {
+        id
+        type
+      }
+      singleTableItemByParentId {
+        id
+        type
+      }
+    }
+  }
 }

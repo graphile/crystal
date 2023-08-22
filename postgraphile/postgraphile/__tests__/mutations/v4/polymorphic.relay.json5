@@ -12,4 +12,17 @@
       },
     },
   },
+  createSingleTableItemRelation: {
+    singleTableItemRelation: {
+      id: "WyJzaW5nbGVfdGFibGVfaXRlbV9yZWxhdGlvbnMiLDFd",
+      singleTableItemByChildId: {
+        id: "WyJTaW5nbGVUYWJsZVBvc3QiLDld",
+        type: "POST",
+      },
+      singleTableItemByParentId: {
+        id: "WyJTaW5nbGVUYWJsZVRvcGljIiwyXQ==",
+        type: "TOPIC",
+      },
+    },
+  },
 }
