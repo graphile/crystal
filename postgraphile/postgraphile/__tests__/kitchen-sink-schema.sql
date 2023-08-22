@@ -1435,6 +1435,16 @@ comment on table polymorphic.relational_items is $$
   @type CHECKLIST_ITEM references:relational_checklist_items
   $$;
 
+CREATE FUNCTION polymorphic.custom_delete_relational_item("nodeId" polymorphic.relational_items)
+RETURNS polymorphic.relational_items
+AS $$
+  DELETE FROM polymorphic.relational_items
+  WHERE relational_items.id = "nodeId".id
+  RETURNING *;
+$$ LANGUAGE sql VOLATILE;
+
+comment on function polymorphic.custom_delete_relational_item(polymorphic.relational_items) is E'@arg0variant nodeId';
+
 ----------------------------------------
 
 create type polymorphic.applications as (
