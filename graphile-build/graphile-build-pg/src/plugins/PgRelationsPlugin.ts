@@ -1033,10 +1033,14 @@ function addRelations(
             const functionLines: TE[] = [];
             const prefixLines: TE[] = [];
             if (isMutationPayload) {
-              functionLines.push(te`return ($in) => {`);
+              functionLines.push(
+                te`return function PgRelationsPlugin_mutation_payload_relation($in) {`,
+              );
               functionLines.push(te`  const $record = $in.get("result");`);
             } else {
-              functionLines.push(te`return ($record) => {`);
+              functionLines.push(
+                te`return function PgRelationsPlugin_relation($record) {`,
+              );
             }
 
             const finalLayer = path.layers[path.layers.length - 1];
