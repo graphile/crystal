@@ -18,7 +18,7 @@ import type {
 } from "@dataplan/pg";
 import { pgUnionAll } from "@dataplan/pg";
 import type { ExecutableStep, ObjectStep } from "grafast";
-import { arraysMatch, connection, first } from "grafast";
+import { arraysMatch, connection } from "grafast";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "grafast/graphql";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
@@ -29,7 +29,6 @@ import te, { Idents, isSafeObjectPropertyName } from "tamedevil";
 import { resolveResourceRefPath, tagToString } from "../utils.js";
 import { version } from "../version.js";
 
-const ref_first = te.ref(first, "first");
 const ref_connection = te.ref(connection, "connection");
 const ref_sql = te.ref(sql, "sql");
 
@@ -1110,7 +1109,7 @@ function addRelations(
 
             if (single) {
               functionLines.push(
-                te`  return ${ref_first}(${collectionIdentifier});`,
+                te`  return ${collectionIdentifier}.single();`,
               );
             } else if (isConnection) {
               functionLines.push(
