@@ -5,7 +5,6 @@ import { inspect } from "../inspect.js";
 import type {
   AnyInputStep,
   ExecutionExtra,
-  NodeIdCodec,
   NodeIdHandler,
   PolymorphicData,
 } from "../interfaces.js";

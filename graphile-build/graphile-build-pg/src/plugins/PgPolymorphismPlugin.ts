@@ -819,9 +819,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 return null;
               }
               const tablePkAttributes = tablePk.attributes;
-              for (const [typeKey, spec] of Object.entries(
-                codec.polymorphism.types,
-              )) {
+              for (const spec of Object.values(codec.polymorphism.types)) {
                 const relation = table.getRelation(spec.relationName);
                 const typeName = build.inflection.tableType(
                   relation.remoteResource.codec,
@@ -848,7 +846,15 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 [handlers, makeDecodedNodeIdForHandlers],
               );
               return EXPORTABLE(
-                () =>
+                (
+                    access,
+                    decodeNodeId,
+                    details,
+                    lambda,
+                    list,
+                    object,
+                    tablePkAttributes,
+                  ) =>
                   (
                     $nodeId: ExecutableStep<string>,
                   ): { [key: string]: ExecutableStep<any> } => {
@@ -880,7 +886,15 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                       return memo;
                     }, Object.create(null));
                   },
-                [],
+                [
+                  access,
+                  decodeNodeId,
+                  details,
+                  lambda,
+                  list,
+                  object,
+                  tablePkAttributes,
+                ],
               );
             },
           },

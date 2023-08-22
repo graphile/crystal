@@ -54,10 +54,10 @@ export {
   ListTransformReduce,
 } from "./listTransform.js";
 export {
+  makeDecodedNodeIdForHandlers,
   node,
   NodeStep,
   specFromNodeId,
-  makeDecodedNodeIdForHandlers,
 } from "./node.js";
 export { object, ObjectPlanMeta, ObjectStep } from "./object.js";
 export { partitionByIndex } from "./partitionByIndex.js";

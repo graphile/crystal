@@ -117,9 +117,9 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                   );
                   if (getSpec) {
                     fetcher = EXPORTABLE(
-                      () => ($nodeId) =>
+                      (getSpec, relation) => ($nodeId) =>
                         relation.remoteResource.get(getSpec($nodeId)),
-                      [],
+                      [getSpec, relation],
                     );
                   }
                 }

@@ -156,6 +156,7 @@ import {
   loadOneCallback,
   LoadOptions,
   LoadStep,
+  makeDecodedNodeIdForHandlers,
   node,
   NodeStep,
   object,
@@ -175,7 +176,6 @@ import {
   SetterCapableStep,
   SetterStep,
   specFromNodeId,
-  makeDecodedNodeIdForHandlers,
 } from "./steps/index.js";
 import { stringifyPayload } from "./stringifyPayload.js";
 import { stripAnsi } from "./stripAnsi.js";
@@ -337,6 +337,7 @@ export {
   loadOneCallback,
   LoadOptions,
   LoadStep,
+  makeDecodedNodeIdForHandlers,
   makeGrafastSchema,
   ModifierStep,
   newGrafastFieldConfigBuilder,
@@ -380,7 +381,6 @@ export {
   SetterCapableStep,
   SetterStep,
   specFromNodeId,
-  makeDecodedNodeIdForHandlers,
   stepADependsOnStepB,
   stepAMayDependOnStepB,
   StepOptimizeOptions,
