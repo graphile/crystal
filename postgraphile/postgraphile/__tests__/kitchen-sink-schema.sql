@@ -1578,8 +1578,8 @@ $$;
 
 create table polymorphic.relational_item_relations (
   id serial primary key,
-  parent_id int not null references polymorphic.relational_items,
-  child_id int not null references polymorphic.relational_items,
+  parent_id int not null references polymorphic.relational_items on delete cascade,
+  child_id int not null references polymorphic.relational_items on delete cascade,
   constraint relational_item_relations_parent_chilk_ak unique (parent_id, child_id)
 );
 

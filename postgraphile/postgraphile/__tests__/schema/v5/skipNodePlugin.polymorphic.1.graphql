@@ -899,6 +899,41 @@ type CreatePriorityPayload {
   query: Query
 }
 
+"""All input for the create `RelationalItemRelation` mutation."""
+input CreateRelationalItemRelationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The `RelationalItemRelation` to be created by this mutation."""
+  relationalItemRelation: RelationalItemRelationInput!
+}
+
+"""The output of our create `RelationalItemRelation` mutation."""
+type CreateRelationalItemRelationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `RelationalItemRelation` that was created by this mutation."""
+  relationalItemRelation: RelationalItemRelation
+
+  """An edge for our `RelationalItemRelation`. May be used by Relay 1."""
+  relationalItemRelationEdge(
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationEdge
+}
+
 """All input for the create `ThirdPartyVulnerability` mutation."""
 input CreateThirdPartyVulnerabilityInput {
   """
@@ -1373,6 +1408,53 @@ type DeletePriorityPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
+}
+
+"""
+All input for the `deleteRelationalItemRelationByParentIdAndChildId` mutation.
+"""
+input DeleteRelationalItemRelationByParentIdAndChildIdInput {
+  childId: Int!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  parentId: Int!
+}
+
+"""All input for the `deleteRelationalItemRelationByRowId` mutation."""
+input DeleteRelationalItemRelationByRowIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  rowId: Int!
+}
+
+"""The output of our delete `RelationalItemRelation` mutation."""
+type DeleteRelationalItemRelationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `RelationalItemRelation` that was deleted by this mutation."""
+  relationalItemRelation: RelationalItemRelation
+
+  """An edge for our `RelationalItemRelation`. May be used by Relay 1."""
+  relationalItemRelationEdge(
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationEdge
 }
 
 """All input for the `deleteThirdPartyVulnerabilityByRowId` mutation."""
@@ -2162,6 +2244,14 @@ type Mutation {
     input: CreatePriorityInput!
   ): CreatePriorityPayload
 
+  """Creates a single `RelationalItemRelation`."""
+  createRelationalItemRelation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateRelationalItemRelationInput!
+  ): CreateRelationalItemRelationPayload
+
   """Creates a single `ThirdPartyVulnerability`."""
   createThirdPartyVulnerability(
     """
@@ -2281,6 +2371,22 @@ type Mutation {
     """
     input: DeletePriorityByRowIdInput!
   ): DeletePriorityPayload
+
+  """Deletes a single `RelationalItemRelation` using a unique key."""
+  deleteRelationalItemRelationByParentIdAndChildId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRelationalItemRelationByParentIdAndChildIdInput!
+  ): DeleteRelationalItemRelationPayload
+
+  """Deletes a single `RelationalItemRelation` using a unique key."""
+  deleteRelationalItemRelationByRowId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRelationalItemRelationByRowIdInput!
+  ): DeleteRelationalItemRelationPayload
 
   """Deletes a single `ThirdPartyVulnerability` using a unique key."""
   deleteThirdPartyVulnerabilityByRowId(
@@ -2403,6 +2509,26 @@ type Mutation {
     """
     input: UpdatePriorityByRowIdInput!
   ): UpdatePriorityPayload
+
+  """
+  Updates a single `RelationalItemRelation` using a unique key and a patch.
+  """
+  updateRelationalItemRelationByParentIdAndChildId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRelationalItemRelationByParentIdAndChildIdInput!
+  ): UpdateRelationalItemRelationPayload
+
+  """
+  Updates a single `RelationalItemRelation` using a unique key and a patch.
+  """
+  updateRelationalItemRelationByRowId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRelationalItemRelationByRowIdInput!
+  ): UpdateRelationalItemRelationPayload
 
   """
   Updates a single `ThirdPartyVulnerability` using a unique key and a patch.
@@ -3402,6 +3528,37 @@ type Query {
     orderBy: [RelationalDividerOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalDividerConnection
 
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  allRelationalItemRelations(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationConnection
+
   """Reads and enables pagination through a set of `RelationalItem`."""
   allRelationalItems(
     """Read all values in the set after (below) this cursor."""
@@ -3657,6 +3814,12 @@ type Query {
   """Get a single `RelationalDivider`."""
   relationalDividerByDividerItemId(dividerItemId: Int!): RelationalDivider
 
+  """Get a single `RelationalItemRelation`."""
+  relationalItemRelationByParentIdAndChildId(childId: Int!, parentId: Int!): RelationalItemRelation
+
+  """Get a single `RelationalItemRelation`."""
+  relationalItemRelationByRowId(rowId: Int!): RelationalItemRelation
+
   """Get a single `RelationalPost`."""
   relationalPostByPostItemId(postItemId: Int!): RelationalPost
 
@@ -3697,6 +3860,68 @@ type RelationalChecklist implements RelationalItem {
   Reads a single `RelationalItem` that is related to this `RelationalChecklist`.
   """
   relationalItemByParentId: RelationalItem
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationConnection!
 
   """Reads and enables pagination through a set of `RelationalItem`."""
   relationalItemsByParentId(
@@ -3849,6 +4074,68 @@ type RelationalChecklistItem implements RelationalItem {
   Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
   """
   relationalItemByParentId: RelationalItem
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationConnection!
 
   """Reads and enables pagination through a set of `RelationalItem`."""
   relationalItemsByParentId(
@@ -4061,6 +4348,68 @@ type RelationalDivider implements RelationalItem {
   """
   relationalItemByParentId: RelationalItem
 
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationConnection!
+
   """Reads and enables pagination through a set of `RelationalItem`."""
   relationalItemsByParentId(
     """Read all values in the set after (below) this cursor."""
@@ -4228,6 +4577,52 @@ interface RelationalItem {
   """
   relationalItemByParentId: RelationalItem
 
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): RelationalItemRelationConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): RelationalItemRelationConnection!
+
   """Reads and enables pagination through a set of `RelationalItem`."""
   relationalItemsByParentId(
     """Read all values in the set after (below) this cursor."""
@@ -4348,6 +4743,94 @@ enum RelationalItemOrderBy {
   UPDATED_AT_DESC
 }
 
+type RelationalItemRelation {
+  childId: Int!
+  parentId: Int!
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalItemRelation`.
+  """
+  relationalItemByChildId: RelationalItem
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalItemRelation`.
+  """
+  relationalItemByParentId: RelationalItem
+  rowId: Int!
+}
+
+"""
+A condition to be used against `RelationalItemRelation` object types. All fields
+are tested for equality and combined with a logical ‘and.’
+"""
+input RelationalItemRelationCondition {
+  """Checks for equality with the object’s `childId` field."""
+  childId: Int
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s `rowId` field."""
+  rowId: Int
+}
+
+"""A connection to a list of `RelationalItemRelation` values."""
+type RelationalItemRelationConnection {
+  """
+  A list of edges which contains the `RelationalItemRelation` and cursor to aid in pagination.
+  """
+  edges: [RelationalItemRelationEdge]!
+
+  """A list of `RelationalItemRelation` objects."""
+  nodes: [RelationalItemRelation]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `RelationalItemRelation` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `RelationalItemRelation` edge in the connection."""
+type RelationalItemRelationEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalItemRelation` at the end of the edge."""
+  node: RelationalItemRelation
+}
+
+"""An input for mutations affecting `RelationalItemRelation`"""
+input RelationalItemRelationInput {
+  childId: Int!
+  parentId: Int!
+  rowId: Int
+}
+
+"""Methods to use when ordering `RelationalItemRelation`."""
+enum RelationalItemRelationOrderBy {
+  CHILD_ID_ASC
+  CHILD_ID_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+Represents an update to a `RelationalItemRelation`. Fields that are set will be updated.
+"""
+input RelationalItemRelationPatch {
+  childId: Int
+  parentId: Int
+  rowId: Int
+}
+
 type RelationalPost implements RelationalItem {
   archivedAt: Datetime
   authorId: Int!
@@ -4380,6 +4863,68 @@ type RelationalPost implements RelationalItem {
   Reads a single `RelationalItem` that is related to this `RelationalPost`.
   """
   relationalItemByParentId: RelationalItem
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationConnection!
 
   """Reads and enables pagination through a set of `RelationalItem`."""
   relationalItemsByParentId(
@@ -4565,6 +5110,68 @@ type RelationalTopic implements RelationalItem {
   Reads a single `RelationalItem` that is related to this `RelationalTopic`.
   """
   relationalItemByParentId: RelationalItem
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationConnection!
 
   """Reads and enables pagination through a set of `RelationalItem`."""
   relationalItemsByParentId(
@@ -5845,6 +6452,63 @@ type UpdatePriorityPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
+}
+
+"""
+All input for the `updateRelationalItemRelationByParentIdAndChildId` mutation.
+"""
+input UpdateRelationalItemRelationByParentIdAndChildIdInput {
+  childId: Int!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  parentId: Int!
+
+  """
+  An object where the defined keys will be set on the `RelationalItemRelation` being updated.
+  """
+  relationalItemRelationPatch: RelationalItemRelationPatch!
+}
+
+"""All input for the `updateRelationalItemRelationByRowId` mutation."""
+input UpdateRelationalItemRelationByRowIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  An object where the defined keys will be set on the `RelationalItemRelation` being updated.
+  """
+  relationalItemRelationPatch: RelationalItemRelationPatch!
+  rowId: Int!
+}
+
+"""The output of our update `RelationalItemRelation` mutation."""
+type UpdateRelationalItemRelationPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """The `RelationalItemRelation` that was updated by this mutation."""
+  relationalItemRelation: RelationalItemRelation
+
+  """An edge for our `RelationalItemRelation`. May be used by Relay 1."""
+  relationalItemRelationEdge(
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationEdge
 }
 
 """All input for the `updateThirdPartyVulnerabilityByRowId` mutation."""
