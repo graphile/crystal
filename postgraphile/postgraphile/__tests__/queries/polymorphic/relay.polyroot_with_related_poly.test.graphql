@@ -1,0 +1,59 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+#> simpleCollections: "both"
+#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+
+query {
+  allSingleTableItems {
+    nodes {
+      id
+      type
+      singleTableItemByParentId {
+        id
+        type
+      }
+    }
+  }
+  allRelationalItems {
+    nodes {
+      id
+      type
+      relationalItemByParentId {
+        id
+        type
+      }
+    }
+  }
+  allSingleTableItemRelations(
+    condition: { singleTableItemByChildId: "WyJTaW5nbGVUYWJsZURpdmlkZXIiLDNd" }
+  ) {
+    nodes {
+      id
+      singleTableItemByChildId {
+        id
+        type
+      }
+      singleTableItemByParentId {
+        id
+        type
+      }
+    }
+  }
+  allRelationalItemRelations(
+    condition: {
+      relationalItemByChildId: "WyJyZWxhdGlvbmFsX2NoZWNrbGlzdF9pdGVtcyIsMjFd"
+    }
+  ) {
+    nodes {
+      id
+      relationalItemByChildId {
+        id
+        type
+      }
+      relationalItemByParentId {
+        id
+        type
+      }
+    }
+  }
+}
