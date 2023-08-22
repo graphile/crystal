@@ -61,9 +61,7 @@ declare global {
   }
   namespace GraphileBuild {
     interface Build {
-      relationalInterfaceNodeIdSpecForCodec(
-        codec: PgCodec<any, any, any, any, any, any, any>,
-      ):
+      nodeIdSpecForCodec(codec: PgCodec<any, any, any, any, any, any, any>):
         | (($nodeId: ExecutableStep<string>) => {
             [key: string]: ExecutableStep<any>;
           })
@@ -793,10 +791,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         return build.extend(
           build,
           {
-            relationalInterfaceNodeIdSpecForCodec(codec) {
-              if (codec.polymorphism?.mode !== "relational") {
-                return null;
-              }
+            nodeIdSpecForCodec(codec) {
               const resources = Object.values(
                 build.input.pgRegistry.pgResources,
               ).filter(
@@ -809,44 +804,90 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               if (resources.length !== 1) {
                 return null;
               }
-              const details: Array<{
-                handler: NodeIdHandler;
-                pkAttributes: readonly string[];
-              }> = [];
               const table = resources[0]!;
               const tablePk = table.uniques.find((u) => u.isPrimary);
               if (!tablePk) {
                 return null;
               }
               const tablePkAttributes = tablePk.attributes;
-              for (const spec of Object.values(codec.polymorphism.types)) {
-                const relation = table.getRelation(spec.relationName);
-                const typeName = build.inflection.tableType(
-                  relation.remoteResource.codec,
+              if (codec.polymorphism?.mode === "relational") {
+                const details: Array<{
+                  handler: NodeIdHandler;
+                  pkAttributes: readonly string[];
+                }> = [];
+                for (const spec of Object.values(codec.polymorphism.types)) {
+                  const relation = table.getRelation(spec.relationName);
+                  const typeName = build.inflection.tableType(
+                    relation.remoteResource.codec,
+                  );
+                  const handler = build.getNodeIdHandler?.(typeName);
+                  if (!handler) {
+                    return null;
+                  }
+                  const pk = (
+                    relation.remoteResource.uniques as PgResourceUnique[]
+                  ).find((u) => u.isPrimary);
+                  if (!pk) {
+                    return null;
+                  }
+                  details.push({
+                    pkAttributes: pk.attributes,
+                    handler,
+                  });
+                }
+                const handlers = details.map((d) => d.handler);
+                const decodeNodeId = EXPORTABLE(
+                  (handlers, makeDecodedNodeIdForHandlers) =>
+                    makeDecodedNodeIdForHandlers(handlers),
+                  [handlers, makeDecodedNodeIdForHandlers],
                 );
-                const handler = build.getNodeIdHandler?.(typeName);
-                if (!handler) {
-                  return null;
-                }
-                const pk = (
-                  relation.remoteResource.uniques as PgResourceUnique[]
-                ).find((u) => u.isPrimary);
-                if (!pk) {
-                  return null;
-                }
-                details.push({
-                  pkAttributes: pk.attributes,
-                  handler,
-                });
-              }
-              const handlers = details.map((d) => d.handler);
-              const decodeNodeId = EXPORTABLE(
-                (handlers, makeDecodedNodeIdForHandlers) =>
-                  makeDecodedNodeIdForHandlers(handlers),
-                [handlers, makeDecodedNodeIdForHandlers],
-              );
-              return EXPORTABLE(
-                (
+                return EXPORTABLE(
+                  (
+                      access,
+                      decodeNodeId,
+                      details,
+                      lambda,
+                      list,
+                      object,
+                      tablePkAttributes,
+                    ) =>
+                    (
+                      $nodeId: ExecutableStep<string>,
+                    ): { [key: string]: ExecutableStep<any> } => {
+                      const $specifier = decodeNodeId($nodeId);
+                      const $handlerMatches = list(
+                        details.map(({ handler, pkAttributes }) => {
+                          const spec = handler.getSpec(
+                            access($specifier, handler.codec.name),
+                          );
+                          return object({
+                            match: lambda($specifier, (specifier) => {
+                              const value = specifier[handler.codec.name];
+                              return value != null
+                                ? handler.match(value)
+                                : false;
+                            }),
+                            pks: list(pkAttributes.map((n) => spec[n])),
+                          });
+                        }),
+                      );
+                      const $pkValues = lambda(
+                        $handlerMatches,
+                        (handlerMatches) => {
+                          const match = handlerMatches.find((pk) => pk.match);
+                          return match?.pks;
+                        },
+                        true,
+                      );
+                      return tablePkAttributes.reduce(
+                        (memo, pkAttribute, i) => {
+                          memo[pkAttribute] = access($pkValues, i);
+                          return memo;
+                        },
+                        Object.create(null),
+                      );
+                    },
+                  [
                     access,
                     decodeNodeId,
                     details,
@@ -854,48 +895,100 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     list,
                     object,
                     tablePkAttributes,
-                  ) =>
+                  ],
+                );
+              } else if (codec.polymorphism?.mode === "single") {
+                // Lots of type names, but they all relate to the same table
+                const handlers: Array<NodeIdHandler> = [];
+                for (const spec of Object.values(codec.polymorphism.types)) {
+                  const typeName = spec.name;
+                  const handler = build.getNodeIdHandler?.(typeName);
+                  if (!handler) {
+                    return null;
+                  }
+                  handlers.push(handler);
+                }
+                const decodeNodeId = EXPORTABLE(
+                  (handlers, makeDecodedNodeIdForHandlers) =>
+                    makeDecodedNodeIdForHandlers(handlers),
+                  [handlers, makeDecodedNodeIdForHandlers],
+                );
+                return EXPORTABLE(
                   (
-                    $nodeId: ExecutableStep<string>,
-                  ): { [key: string]: ExecutableStep<any> } => {
-                    const $specifier = decodeNodeId($nodeId);
-                    const $handlerMatches = list(
-                      details.map(({ handler, pkAttributes }) => {
-                        const spec = handler.getSpec(
-                          access($specifier, handler.codec.name),
-                        );
-                        return object({
-                          match: lambda($specifier, (specifier) => {
-                            const value = specifier[handler.codec.name];
-                            return value != null ? handler.match(value) : false;
-                          }),
-                          pks: list(pkAttributes.map((n) => spec[n])),
-                        });
-                      }),
-                    );
-                    const $pkValues = lambda(
-                      $handlerMatches,
-                      (handlerMatches) => {
-                        const match = handlerMatches.find((pk) => pk.match);
-                        return match?.pks;
-                      },
-                      true,
-                    );
-                    return tablePkAttributes.reduce((memo, pkAttribute, i) => {
-                      memo[pkAttribute] = access($pkValues, i);
-                      return memo;
-                    }, Object.create(null));
-                  },
-                [
-                  access,
-                  decodeNodeId,
-                  details,
-                  lambda,
-                  list,
-                  object,
-                  tablePkAttributes,
-                ],
-              );
+                      access,
+                      decodeNodeId,
+                      handlers,
+                      lambda,
+                      list,
+                      object,
+                      tablePkAttributes,
+                    ) =>
+                    (
+                      $nodeId: ExecutableStep<string>,
+                    ): { [key: string]: ExecutableStep<any> } => {
+                      const $specifier = decodeNodeId($nodeId);
+                      const $handlerMatches = list(
+                        handlers.map((handler) => {
+                          const spec = handler.getSpec(
+                            access($specifier, handler.codec.name),
+                          );
+                          return object({
+                            match: lambda($specifier, (specifier) => {
+                              const value = specifier[handler.codec.name];
+                              return value != null
+                                ? handler.match(value)
+                                : false;
+                            }),
+                            pks: list(tablePkAttributes.map((n) => spec[n])),
+                          });
+                        }),
+                      );
+                      const $pkValues = lambda(
+                        $handlerMatches,
+                        (handlerMatches) => {
+                          const match = handlerMatches.find((pk) => pk.match);
+                          return match?.pks;
+                        },
+                        true,
+                      );
+                      return tablePkAttributes.reduce(
+                        (memo, pkAttribute, i) => {
+                          memo[pkAttribute] = access($pkValues, i);
+                          return memo;
+                        },
+                        Object.create(null),
+                      );
+                    },
+                  [
+                    access,
+                    decodeNodeId,
+                    handlers,
+                    lambda,
+                    list,
+                    object,
+                    tablePkAttributes,
+                  ],
+                );
+              } else if (codec.polymorphism) {
+                throw new Error(
+                  `Don't know how to get the spec for nodeId for codec with polymorphism mode '${codec.polymorphism.mode}'`,
+                );
+              } else {
+                const typeName = build.inflection.tableType(codec);
+                const handler = build.getNodeIdHandler?.(typeName);
+                const { specForHandler } = build;
+                if (!handler || !specForHandler) {
+                  return null;
+                }
+                return (
+                  $nodeId: ExecutableStep<string>,
+                ): { [key: string]: ExecutableStep<any> } => {
+                  // TODO: should change this to a common method like
+                  // `const $decoded = getDecodedNodeIdForHandler(handler, $nodeId)`
+                  const $decoded = lambda($nodeId, specForHandler(handler));
+                  return handler.getSpec($decoded);
+                };
+              }
             },
           },
           "Adding PgPolmorphismPlugin helpers to Build",
