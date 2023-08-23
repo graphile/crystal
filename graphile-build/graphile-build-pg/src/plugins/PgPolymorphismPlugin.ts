@@ -964,7 +964,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   return null;
                 }
                 return EXPORTABLE(
-                  (handler, lambda, specForHandler) => (
+                  (handler, lambda, specForHandler) =>
+                    (
                       $nodeId: ExecutableStep<string>,
                     ): { [key: string]: ExecutableStep<any> } => {
                       // TODO: should change this to a common method like
