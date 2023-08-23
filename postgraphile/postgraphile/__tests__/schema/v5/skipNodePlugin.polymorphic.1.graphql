@@ -899,6 +899,47 @@ type CreatePriorityPayload {
   query: Query
 }
 
+"""All input for the create `RelationalItemRelationCompositePk` mutation."""
+input CreateRelationalItemRelationCompositePkInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The `RelationalItemRelationCompositePk` to be created by this mutation.
+  """
+  relationalItemRelationCompositePk: RelationalItemRelationCompositePkInput!
+}
+
+"""The output of our create `RelationalItemRelationCompositePk` mutation."""
+type CreateRelationalItemRelationCompositePkPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  The `RelationalItemRelationCompositePk` that was created by this mutation.
+  """
+  relationalItemRelationCompositePk: RelationalItemRelationCompositePk
+
+  """
+  An edge for our `RelationalItemRelationCompositePk`. May be used by Relay 1.
+  """
+  relationalItemRelationCompositePkEdge(
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePkOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePkEdge
+}
+
 """All input for the create `RelationalItemRelation` mutation."""
 input CreateRelationalItemRelationInput {
   """
@@ -932,6 +973,51 @@ type CreateRelationalItemRelationPayload {
     """The method to use when ordering `RelationalItemRelation`."""
     orderBy: [RelationalItemRelationOrderBy!]! = [PRIMARY_KEY_ASC]
   ): RelationalItemRelationEdge
+}
+
+"""
+All input for the create `SingleTableItemRelationCompositePk` mutation.
+"""
+input CreateSingleTableItemRelationCompositePkInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The `SingleTableItemRelationCompositePk` to be created by this mutation.
+  """
+  singleTableItemRelationCompositePk: SingleTableItemRelationCompositePkInput!
+}
+
+"""
+The output of our create `SingleTableItemRelationCompositePk` mutation.
+"""
+type CreateSingleTableItemRelationCompositePkPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  The `SingleTableItemRelationCompositePk` that was created by this mutation.
+  """
+  singleTableItemRelationCompositePk: SingleTableItemRelationCompositePk
+
+  """
+  An edge for our `SingleTableItemRelationCompositePk`. May be used by Relay 1.
+  """
+  singleTableItemRelationCompositePkEdge(
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePkOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePkEdge
 }
 
 """All input for the create `SingleTableItemRelation` mutation."""
@@ -1469,6 +1555,47 @@ input DeleteRelationalItemRelationByRowIdInput {
   rowId: Int!
 }
 
+"""
+All input for the `deleteRelationalItemRelationCompositePkByParentIdAndChildId` mutation.
+"""
+input DeleteRelationalItemRelationCompositePkByParentIdAndChildIdInput {
+  childId: Int!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  parentId: Int!
+}
+
+"""The output of our delete `RelationalItemRelationCompositePk` mutation."""
+type DeleteRelationalItemRelationCompositePkPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  The `RelationalItemRelationCompositePk` that was deleted by this mutation.
+  """
+  relationalItemRelationCompositePk: RelationalItemRelationCompositePk
+
+  """
+  An edge for our `RelationalItemRelationCompositePk`. May be used by Relay 1.
+  """
+  relationalItemRelationCompositePkEdge(
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePkOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePkEdge
+}
+
 """The output of our delete `RelationalItemRelation` mutation."""
 type DeleteRelationalItemRelationPayload {
   """
@@ -1514,6 +1641,49 @@ input DeleteSingleTableItemRelationByRowIdInput {
   """
   clientMutationId: String
   rowId: Int!
+}
+
+"""
+All input for the `deleteSingleTableItemRelationCompositePkByParentIdAndChildId` mutation.
+"""
+input DeleteSingleTableItemRelationCompositePkByParentIdAndChildIdInput {
+  childId: Int!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  parentId: Int!
+}
+
+"""
+The output of our delete `SingleTableItemRelationCompositePk` mutation.
+"""
+type DeleteSingleTableItemRelationCompositePkPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  The `SingleTableItemRelationCompositePk` that was deleted by this mutation.
+  """
+  singleTableItemRelationCompositePk: SingleTableItemRelationCompositePk
+
+  """
+  An edge for our `SingleTableItemRelationCompositePk`. May be used by Relay 1.
+  """
+  singleTableItemRelationCompositePkEdge(
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePkOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePkEdge
 }
 
 """The output of our delete `SingleTableItemRelation` mutation."""
@@ -2334,6 +2504,14 @@ type Mutation {
     input: CreateRelationalItemRelationInput!
   ): CreateRelationalItemRelationPayload
 
+  """Creates a single `RelationalItemRelationCompositePk`."""
+  createRelationalItemRelationCompositePk(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateRelationalItemRelationCompositePkInput!
+  ): CreateRelationalItemRelationCompositePkPayload
+
   """Creates a single `SingleTableItemRelation`."""
   createSingleTableItemRelation(
     """
@@ -2341,6 +2519,14 @@ type Mutation {
     """
     input: CreateSingleTableItemRelationInput!
   ): CreateSingleTableItemRelationPayload
+
+  """Creates a single `SingleTableItemRelationCompositePk`."""
+  createSingleTableItemRelationCompositePk(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateSingleTableItemRelationCompositePkInput!
+  ): CreateSingleTableItemRelationCompositePkPayload
 
   """Creates a single `ThirdPartyVulnerability`."""
   createThirdPartyVulnerability(
@@ -2478,6 +2664,16 @@ type Mutation {
     input: DeleteRelationalItemRelationByRowIdInput!
   ): DeleteRelationalItemRelationPayload
 
+  """
+  Deletes a single `RelationalItemRelationCompositePk` using a unique key.
+  """
+  deleteRelationalItemRelationCompositePkByParentIdAndChildId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteRelationalItemRelationCompositePkByParentIdAndChildIdInput!
+  ): DeleteRelationalItemRelationCompositePkPayload
+
   """Deletes a single `SingleTableItemRelation` using a unique key."""
   deleteSingleTableItemRelationByParentIdAndChildId(
     """
@@ -2493,6 +2689,16 @@ type Mutation {
     """
     input: DeleteSingleTableItemRelationByRowIdInput!
   ): DeleteSingleTableItemRelationPayload
+
+  """
+  Deletes a single `SingleTableItemRelationCompositePk` using a unique key.
+  """
+  deleteSingleTableItemRelationCompositePkByParentIdAndChildId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteSingleTableItemRelationCompositePkByParentIdAndChildIdInput!
+  ): DeleteSingleTableItemRelationCompositePkPayload
 
   """Deletes a single `ThirdPartyVulnerability` using a unique key."""
   deleteThirdPartyVulnerabilityByRowId(
@@ -2637,6 +2843,16 @@ type Mutation {
   ): UpdateRelationalItemRelationPayload
 
   """
+  Updates a single `RelationalItemRelationCompositePk` using a unique key and a patch.
+  """
+  updateRelationalItemRelationCompositePkByParentIdAndChildId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateRelationalItemRelationCompositePkByParentIdAndChildIdInput!
+  ): UpdateRelationalItemRelationCompositePkPayload
+
+  """
   Updates a single `SingleTableItemRelation` using a unique key and a patch.
   """
   updateSingleTableItemRelationByParentIdAndChildId(
@@ -2655,6 +2871,16 @@ type Mutation {
     """
     input: UpdateSingleTableItemRelationByRowIdInput!
   ): UpdateSingleTableItemRelationPayload
+
+  """
+  Updates a single `SingleTableItemRelationCompositePk` using a unique key and a patch.
+  """
+  updateSingleTableItemRelationCompositePkByParentIdAndChildId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateSingleTableItemRelationCompositePkByParentIdAndChildIdInput!
+  ): UpdateSingleTableItemRelationCompositePkPayload
 
   """
   Updates a single `ThirdPartyVulnerability` using a unique key and a patch.
@@ -3655,6 +3881,37 @@ type Query {
   ): RelationalDividerConnection
 
   """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  allRelationalItemRelationCompositePks(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePkConnection
+
+  """
   Reads and enables pagination through a set of `RelationalItemRelation`.
   """
   allRelationalItemRelations(
@@ -3771,6 +4028,37 @@ type Query {
     """The method to use when ordering `RelationalTopic`."""
     orderBy: [RelationalTopicOrderBy!] = [PRIMARY_KEY_ASC]
   ): RelationalTopicConnection
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  allSingleTableItemRelationCompositePks(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePkConnection
 
   """
   Reads and enables pagination through a set of `SingleTableItemRelation`.
@@ -3977,6 +4265,9 @@ type Query {
   """Get a single `RelationalItemRelation`."""
   relationalItemRelationByRowId(rowId: Int!): RelationalItemRelation
 
+  """Get a single `RelationalItemRelationCompositePk`."""
+  relationalItemRelationCompositePkByParentIdAndChildId(childId: Int!, parentId: Int!): RelationalItemRelationCompositePk
+
   """Get a single `RelationalPost`."""
   relationalPostByPostItemId(postItemId: Int!): RelationalPost
 
@@ -3988,6 +4279,9 @@ type Query {
 
   """Get a single `SingleTableItemRelation`."""
   singleTableItemRelationByRowId(rowId: Int!): SingleTableItemRelation
+
+  """Get a single `SingleTableItemRelationCompositePk`."""
+  singleTableItemRelationCompositePkByParentIdAndChildId(childId: Int!, parentId: Int!): SingleTableItemRelationCompositePk
 
   """Get a single `ThirdPartyVulnerability`."""
   thirdPartyVulnerabilityByRowId(rowId: Int!): ThirdPartyVulnerability
@@ -4023,6 +4317,68 @@ type RelationalChecklist implements RelationalItem {
   Reads a single `RelationalItem` that is related to this `RelationalChecklist`.
   """
   relationalItemByParentId: RelationalItem
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePkConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePkConnection!
 
   """
   Reads and enables pagination through a set of `RelationalItemRelation`.
@@ -4237,6 +4593,68 @@ type RelationalChecklistItem implements RelationalItem {
   Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
   """
   relationalItemByParentId: RelationalItem
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePkConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePkConnection!
 
   """
   Reads and enables pagination through a set of `RelationalItemRelation`.
@@ -4512,6 +4930,68 @@ type RelationalDivider implements RelationalItem {
   relationalItemByParentId: RelationalItem
 
   """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePkConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePkConnection!
+
+  """
   Reads and enables pagination through a set of `RelationalItemRelation`.
   """
   relationalItemRelationsByChildId(
@@ -4741,6 +5221,52 @@ interface RelationalItem {
   relationalItemByParentId: RelationalItem
 
   """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): RelationalItemRelationCompositePkConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): RelationalItemRelationCompositePkConnection!
+
+  """
   Reads and enables pagination through a set of `RelationalItemRelation`.
   """
   relationalItemRelationsByChildId(
@@ -4922,6 +5448,86 @@ type RelationalItemRelation {
   rowId: Int!
 }
 
+type RelationalItemRelationCompositePk {
+  childId: Int!
+  parentId: Int!
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalItemRelationCompositePk`.
+  """
+  relationalItemByChildId: RelationalItem
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalItemRelationCompositePk`.
+  """
+  relationalItemByParentId: RelationalItem
+}
+
+"""
+A condition to be used against `RelationalItemRelationCompositePk` object types.
+All fields are tested for equality and combined with a logical ‘and.’
+"""
+input RelationalItemRelationCompositePkCondition {
+  """Checks for equality with the object’s `childId` field."""
+  childId: Int
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+}
+
+"""A connection to a list of `RelationalItemRelationCompositePk` values."""
+type RelationalItemRelationCompositePkConnection {
+  """
+  A list of edges which contains the `RelationalItemRelationCompositePk` and cursor to aid in pagination.
+  """
+  edges: [RelationalItemRelationCompositePkEdge]!
+
+  """A list of `RelationalItemRelationCompositePk` objects."""
+  nodes: [RelationalItemRelationCompositePk]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `RelationalItemRelationCompositePk` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `RelationalItemRelationCompositePk` edge in the connection."""
+type RelationalItemRelationCompositePkEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalItemRelationCompositePk` at the end of the edge."""
+  node: RelationalItemRelationCompositePk
+}
+
+"""An input for mutations affecting `RelationalItemRelationCompositePk`"""
+input RelationalItemRelationCompositePkInput {
+  childId: Int!
+  parentId: Int!
+}
+
+"""Methods to use when ordering `RelationalItemRelationCompositePk`."""
+enum RelationalItemRelationCompositePkOrderBy {
+  CHILD_ID_ASC
+  CHILD_ID_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+Represents an update to a `RelationalItemRelationCompositePk`. Fields that are set will be updated.
+"""
+input RelationalItemRelationCompositePkPatch {
+  childId: Int
+  parentId: Int
+}
+
 """
 A condition to be used against `RelationalItemRelation` object types. All fields
 are tested for equality and combined with a logical ‘and.’
@@ -5026,6 +5632,68 @@ type RelationalPost implements RelationalItem {
   Reads a single `RelationalItem` that is related to this `RelationalPost`.
   """
   relationalItemByParentId: RelationalItem
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePkConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePkConnection!
 
   """
   Reads and enables pagination through a set of `RelationalItemRelation`.
@@ -5273,6 +5941,68 @@ type RelationalTopic implements RelationalItem {
   Reads a single `RelationalItem` that is related to this `RelationalTopic`.
   """
   relationalItemByParentId: RelationalItem
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePkConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePkConnection!
 
   """
   Reads and enables pagination through a set of `RelationalItemRelation`.
@@ -5535,6 +6265,68 @@ type SingleTableChecklist implements SingleTableItem {
   singleTableItemByParentId: SingleTableItem
 
   """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePkConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePkConnection!
+
+  """
   Reads and enables pagination through a set of `SingleTableItemRelation`.
   """
   singleTableItemRelationsByChildId(
@@ -5659,6 +6451,68 @@ type SingleTableChecklistItem implements SingleTableItem {
   singleTableItemByParentId: SingleTableItem
 
   """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePkConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePkConnection!
+
+  """
   Reads and enables pagination through a set of `SingleTableItemRelation`.
   """
   singleTableItemRelationsByChildId(
@@ -5777,6 +6631,68 @@ type SingleTableDivider implements SingleTableItem {
   singleTableItemByParentId: SingleTableItem
 
   """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePkConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePkConnection!
+
+  """
   Reads and enables pagination through a set of `SingleTableItemRelation`.
   """
   singleTableItemRelationsByChildId(
@@ -5893,6 +6809,52 @@ interface SingleTableItem {
   Reads a single `SingleTableItem` that is related to this `SingleTableItem`.
   """
   singleTableItemByParentId: SingleTableItem
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTableItemRelationCompositePkConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTableItemRelationCompositePkConnection!
 
   """
   Reads and enables pagination through a set of `SingleTableItemRelation`.
@@ -6071,6 +7033,86 @@ type SingleTableItemRelation {
   singleTableItemByParentId: SingleTableItem
 }
 
+type SingleTableItemRelationCompositePk {
+  childId: Int!
+  parentId: Int!
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemByChildId: SingleTableItem
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemByParentId: SingleTableItem
+}
+
+"""
+A condition to be used against `SingleTableItemRelationCompositePk` object
+types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input SingleTableItemRelationCompositePkCondition {
+  """Checks for equality with the object’s `childId` field."""
+  childId: Int
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+}
+
+"""A connection to a list of `SingleTableItemRelationCompositePk` values."""
+type SingleTableItemRelationCompositePkConnection {
+  """
+  A list of edges which contains the `SingleTableItemRelationCompositePk` and cursor to aid in pagination.
+  """
+  edges: [SingleTableItemRelationCompositePkEdge]!
+
+  """A list of `SingleTableItemRelationCompositePk` objects."""
+  nodes: [SingleTableItemRelationCompositePk]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `SingleTableItemRelationCompositePk` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `SingleTableItemRelationCompositePk` edge in the connection."""
+type SingleTableItemRelationCompositePkEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `SingleTableItemRelationCompositePk` at the end of the edge."""
+  node: SingleTableItemRelationCompositePk
+}
+
+"""An input for mutations affecting `SingleTableItemRelationCompositePk`"""
+input SingleTableItemRelationCompositePkInput {
+  childId: Int!
+  parentId: Int!
+}
+
+"""Methods to use when ordering `SingleTableItemRelationCompositePk`."""
+enum SingleTableItemRelationCompositePkOrderBy {
+  CHILD_ID_ASC
+  CHILD_ID_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+Represents an update to a `SingleTableItemRelationCompositePk`. Fields that are set will be updated.
+"""
+input SingleTableItemRelationCompositePkPatch {
+  childId: Int
+  parentId: Int
+}
+
 """
 A condition to be used against `SingleTableItemRelation` object types. All
 fields are tested for equality and combined with a logical ‘and.’
@@ -6171,6 +7213,68 @@ type SingleTablePost implements SingleTableItem {
   Reads a single `SingleTableItem` that is related to this `SingleTableItem`.
   """
   singleTableItemByParentId: SingleTableItem
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePkConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePkConnection!
 
   """
   Reads and enables pagination through a set of `SingleTableItemRelation`.
@@ -6289,6 +7393,68 @@ type SingleTableTopic implements SingleTableItem {
   Reads a single `SingleTableItem` that is related to this `SingleTableItem`.
   """
   singleTableItemByParentId: SingleTableItem
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePkConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePkOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePkConnection!
 
   """
   Reads and enables pagination through a set of `SingleTableItemRelation`.
@@ -7095,6 +8261,52 @@ input UpdateRelationalItemRelationByRowIdInput {
   rowId: Int!
 }
 
+"""
+All input for the `updateRelationalItemRelationCompositePkByParentIdAndChildId` mutation.
+"""
+input UpdateRelationalItemRelationCompositePkByParentIdAndChildIdInput {
+  childId: Int!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  parentId: Int!
+
+  """
+  An object where the defined keys will be set on the `RelationalItemRelationCompositePk` being updated.
+  """
+  relationalItemRelationCompositePkPatch: RelationalItemRelationCompositePkPatch!
+}
+
+"""The output of our update `RelationalItemRelationCompositePk` mutation."""
+type UpdateRelationalItemRelationCompositePkPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  The `RelationalItemRelationCompositePk` that was updated by this mutation.
+  """
+  relationalItemRelationCompositePk: RelationalItemRelationCompositePk
+
+  """
+  An edge for our `RelationalItemRelationCompositePk`. May be used by Relay 1.
+  """
+  relationalItemRelationCompositePkEdge(
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePkOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePkEdge
+}
+
 """The output of our update `RelationalItemRelation` mutation."""
 type UpdateRelationalItemRelationPayload {
   """
@@ -7150,6 +8362,54 @@ input UpdateSingleTableItemRelationByRowIdInput {
   An object where the defined keys will be set on the `SingleTableItemRelation` being updated.
   """
   singleTableItemRelationPatch: SingleTableItemRelationPatch!
+}
+
+"""
+All input for the `updateSingleTableItemRelationCompositePkByParentIdAndChildId` mutation.
+"""
+input UpdateSingleTableItemRelationCompositePkByParentIdAndChildIdInput {
+  childId: Int!
+
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  parentId: Int!
+
+  """
+  An object where the defined keys will be set on the `SingleTableItemRelationCompositePk` being updated.
+  """
+  singleTableItemRelationCompositePkPatch: SingleTableItemRelationCompositePkPatch!
+}
+
+"""
+The output of our update `SingleTableItemRelationCompositePk` mutation.
+"""
+type UpdateSingleTableItemRelationCompositePkPayload {
+  """
+  The exact same `clientMutationId` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """
+  The `SingleTableItemRelationCompositePk` that was updated by this mutation.
+  """
+  singleTableItemRelationCompositePk: SingleTableItemRelationCompositePk
+
+  """
+  An edge for our `SingleTableItemRelationCompositePk`. May be used by Relay 1.
+  """
+  singleTableItemRelationCompositePkEdge(
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePkOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePkEdge
 }
 
 """The output of our update `SingleTableItemRelation` mutation."""
