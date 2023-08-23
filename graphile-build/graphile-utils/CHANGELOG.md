@@ -1,5 +1,18 @@
 # graphile-utils
 
+## 5.0.0-beta.7
+
+### Patch Changes
+
+- Updated dependencies
+  [[`53186213a`](https://github.com/benjie/crystal/commit/53186213ade962f4b66cb0d5ea8b57b5ce7ea85f),
+  [`e916b7412`](https://github.com/benjie/crystal/commit/e916b7412fc1fbbcb1578dbe07684189c2a720ad),
+  [`73f1b5218`](https://github.com/benjie/crystal/commit/73f1b52187b2e009d502afa1db8a4e8f702e2958),
+  [`109c8ec67`](https://github.com/benjie/crystal/commit/109c8ec6784dc74f4c4c4c43cc61516cc12401c8)]:
+  - grafast@0.0.1-beta.5
+  - graphile-build-pg@5.0.0-beta.7
+  - graphile-build@5.0.0-beta.6
+
 ## 5.0.0-beta.6
 
 ### Patch Changes

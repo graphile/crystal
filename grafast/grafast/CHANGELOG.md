@@ -1,5 +1,14 @@
 # grafast
 
+## 0.0.1-beta.5
+
+### Patch Changes
+
+- [#488](https://github.com/benjie/crystal/pull/488)
+  [`53186213a`](https://github.com/benjie/crystal/commit/53186213ade962f4b66cb0d5ea8b57b5ce7ea85f)
+  Thanks [@benjie](https://github.com/benjie)! - Expose new `makeDecodeNodeId`
+  helper
+
 ## 0.0.1-beta.4
 
 ### Patch Changes

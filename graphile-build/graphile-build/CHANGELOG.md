@@ -1,5 +1,18 @@
 # graphile-build
 
+## 5.0.0-beta.6
+
+### Patch Changes
+
+- [#488](https://github.com/benjie/crystal/pull/488)
+  [`73f1b5218`](https://github.com/benjie/crystal/commit/73f1b52187b2e009d502afa1db8a4e8f702e2958)
+  Thanks [@benjie](https://github.com/benjie)! - specForHandler now only
+  requires handler - no need to pass codec.
+
+- Updated dependencies
+  [[`53186213a`](https://github.com/benjie/crystal/commit/53186213ade962f4b66cb0d5ea8b57b5ce7ea85f)]:
+  - grafast@0.0.1-beta.5
+
 ## 5.0.0-beta.5
 
 ### Patch Changes

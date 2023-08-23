@@ -1,5 +1,19 @@
 # @dataplan/pg
 
+## 0.0.1-beta.5
+
+### Patch Changes
+
+- [#488](https://github.com/benjie/crystal/pull/488)
+  [`95e902f54`](https://github.com/benjie/crystal/commit/95e902f5403c16895e874692f7650293d77590dd)
+  Thanks [@benjie](https://github.com/benjie)! - Don't try and inline a query
+  when it includes an inner join (unsafe).
+
+- Updated dependencies
+  [[`53186213a`](https://github.com/benjie/crystal/commit/53186213ade962f4b66cb0d5ea8b57b5ce7ea85f)]:
+  - grafast@0.0.1-beta.5
+  - @dataplan/json@0.0.1-beta.5
+
 ## 0.0.1-beta.4
 
 ### Patch Changes

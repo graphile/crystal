@@ -1,5 +1,13 @@
 # ruru
 
+## 2.0.0-beta.2
+
+### Patch Changes
+
+- [#488](https://github.com/benjie/crystal/pull/488)
+  [`9f82b8612`](https://github.com/benjie/crystal/commit/9f82b861206fdd2b8a7c50ba5184112dfb57b54a)
+  Thanks [@benjie](https://github.com/benjie)! - Fix detection of SQL aliases
+
 ## 2.0.0-beta.1
 
 ### Patch Changes

@@ -1,5 +1,27 @@
 # postgraphile
 
+## 5.0.0-beta.7
+
+### Patch Changes
+
+- [#488](https://github.com/benjie/crystal/pull/488)
+  [`e916b7412`](https://github.com/benjie/crystal/commit/e916b7412fc1fbbcb1578dbe07684189c2a720ad)
+  Thanks [@benjie](https://github.com/benjie)! - Fix issues with polymorphism
+  when interacting with nodeIds, particularly in mutations and SQL functions.
+- Updated dependencies
+  [[`95e902f54`](https://github.com/benjie/crystal/commit/95e902f5403c16895e874692f7650293d77590dd),
+  [`53186213a`](https://github.com/benjie/crystal/commit/53186213ade962f4b66cb0d5ea8b57b5ce7ea85f),
+  [`e916b7412`](https://github.com/benjie/crystal/commit/e916b7412fc1fbbcb1578dbe07684189c2a720ad),
+  [`73f1b5218`](https://github.com/benjie/crystal/commit/73f1b52187b2e009d502afa1db8a4e8f702e2958),
+  [`109c8ec67`](https://github.com/benjie/crystal/commit/109c8ec6784dc74f4c4c4c43cc61516cc12401c8)]:
+  - @dataplan/pg@0.0.1-beta.5
+  - grafast@0.0.1-beta.5
+  - graphile-build-pg@5.0.0-beta.7
+  - graphile-build@5.0.0-beta.6
+  - grafserv@0.0.1-beta.5
+  - @dataplan/json@0.0.1-beta.5
+  - graphile-utils@5.0.0-beta.7
+
 ## 5.0.0-beta.6
 
 ### Patch Changes
