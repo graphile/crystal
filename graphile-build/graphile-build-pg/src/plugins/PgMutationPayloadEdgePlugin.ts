@@ -3,7 +3,6 @@ import "graphile-config";
 import type {
   PgClassSingleStep,
   PgCodecWithAttributes,
-  PgResource,
   PgResourceUnique,
 } from "@dataplan/pg";
 import { PgDeleteSingleStep, pgSelectFromRecord } from "@dataplan/pg";

@@ -1,11 +1,7 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type {
-  PgCodecAttribute,
-  PgCodecWithAttributes,
-  PgResourceUnique,
-} from "@dataplan/pg";
+import type { PgCodecAttribute, PgCodecWithAttributes } from "@dataplan/pg";
 import { PgSelectStep, PgUnionAllStep } from "@dataplan/pg";
 import type { ExecutableStep, ModifierStep } from "grafast";
 import type { GraphQLEnumValueConfigMap } from "grafast/graphql";

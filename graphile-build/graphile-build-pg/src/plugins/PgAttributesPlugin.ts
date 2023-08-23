@@ -92,11 +92,7 @@ function processAttribute(
   attributeName: string,
   overrideName?: string,
 ): void {
-  const {
-    extend,
-    inflection,
-    input: { pgRegistry: registry },
-  } = build;
+  const { extend, inflection } = build;
 
   const {
     scope: { pgCodec: rawPgCodec },
