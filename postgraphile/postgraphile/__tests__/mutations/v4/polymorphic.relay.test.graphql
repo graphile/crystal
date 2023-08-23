@@ -22,6 +22,26 @@ mutation {
       }
     }
   }
+  createRelationalItemRelationCompositePk(
+    input: {
+      relationalItemRelationCompositePk: {
+        relationalItemByParentId: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMl0="
+        relationalItemByChildId: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0="
+      }
+    }
+  ) {
+    relationalItemRelationCompositePk {
+      id
+      relationalItemByChildId {
+        id
+        type
+      }
+      relationalItemByParentId {
+        id
+        type
+      }
+    }
+  }
   createSingleTableItemRelation(
     input: {
       singleTableItemRelation: {
@@ -31,6 +51,26 @@ mutation {
     }
   ) {
     singleTableItemRelation {
+      id
+      singleTableItemByChildId {
+        id
+        type
+      }
+      singleTableItemByParentId {
+        id
+        type
+      }
+    }
+  }
+  createSingleTableItemRelationCompositePk(
+    input: {
+      singleTableItemRelationCompositePk: {
+        singleTableItemByParentId: "WyJTaW5nbGVUYWJsZVRvcGljIiwyXQ=="
+        singleTableItemByChildId: "WyJTaW5nbGVUYWJsZVRvcGljIiwxXQ=="
+      }
+    }
+  ) {
+    singleTableItemRelationCompositePk {
       id
       singleTableItemByChildId {
         id

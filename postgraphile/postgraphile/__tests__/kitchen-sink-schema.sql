@@ -1379,6 +1379,13 @@ create table polymorphic.single_table_item_relations (
 create index on polymorphic.single_table_item_relations (parent_id);
 create index on polymorphic.single_table_item_relations (child_id);
 
+create table polymorphic.single_table_item_relation_composite_pks (
+  parent_id int not null references polymorphic.single_table_items on delete cascade,
+  child_id int not null references polymorphic.single_table_items on delete cascade,
+  primary key (parent_id, child_id)
+);
+
+create index on polymorphic.single_table_item_relation_composite_pks (child_id);
 
 ----------------------------------------
 
@@ -1606,6 +1613,15 @@ create table polymorphic.relational_item_relations (
 
 create index on polymorphic.relational_item_relations (parent_id);
 create index on polymorphic.relational_item_relations (child_id);
+
+create table polymorphic.relational_item_relation_composite_pks (
+  parent_id int not null references polymorphic.relational_items on delete cascade,
+  child_id int not null references polymorphic.relational_items on delete cascade,
+  primary key (parent_id, child_id)
+);
+
+create index on polymorphic.relational_item_relation_composite_pks (child_id);
+
 
 --------------------------------------------------------------------------------
 
