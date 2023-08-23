@@ -41,7 +41,7 @@ export class NodeStep
     $id: ExecutableStep<string>,
   ) {
     super();
-    const decodeNodeId = makeDecodedNodeIdForHandlers(
+    const decodeNodeId = makeDecodeNodeId(
       Object.values(possibleTypes),
     );
     this.specPlanDep = this.addDependency(decodeNodeId($id));
@@ -125,7 +125,7 @@ export function specFromNodeId(
   return handler.getSpec($decoded);
 }
 
-export function makeDecodedNodeIdForHandlers(handlers: NodeIdHandler[]) {
+export function makeDecodeNodeId(handlers: NodeIdHandler[]) {
   const codecs = [...new Set(handlers.map((h) => h.codec))];
 
   function decodeNodeIdWithCodecs(raw: string) {

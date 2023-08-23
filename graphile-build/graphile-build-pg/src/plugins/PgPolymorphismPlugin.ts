@@ -30,7 +30,7 @@ import {
   arraysMatch,
   lambda,
   list,
-  makeDecodedNodeIdForHandlers,
+  makeDecodeNodeId,
   object,
 } from "grafast";
 import type {
@@ -837,9 +837,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 }
                 const handlers = details.map((d) => d.handler);
                 const decodeNodeId = EXPORTABLE(
-                  (handlers, makeDecodedNodeIdForHandlers) =>
-                    makeDecodedNodeIdForHandlers(handlers),
-                  [handlers, makeDecodedNodeIdForHandlers],
+                  (handlers, makeDecodeNodeId) =>
+                    makeDecodeNodeId(handlers),
+                  [handlers, makeDecodeNodeId],
                 );
                 return EXPORTABLE(
                   (
@@ -909,9 +909,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   handlers.push(handler);
                 }
                 const decodeNodeId = EXPORTABLE(
-                  (handlers, makeDecodedNodeIdForHandlers) =>
-                    makeDecodedNodeIdForHandlers(handlers),
-                  [handlers, makeDecodedNodeIdForHandlers],
+                  (handlers, makeDecodeNodeId) =>
+                    makeDecodeNodeId(handlers),
+                  [handlers, makeDecodeNodeId],
                 );
                 return EXPORTABLE(
                   (

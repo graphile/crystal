@@ -54,7 +54,7 @@ export {
   ListTransformReduce,
 } from "./listTransform.js";
 export {
-  makeDecodedNodeIdForHandlers,
+  makeDecodeNodeId,
   node,
   NodeStep,
   specFromNodeId,
