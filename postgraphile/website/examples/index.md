@@ -1,5 +1,6 @@
 ---
 title: PostGraphile Example Gallery
+sidebar_position: 1
 ---
 
 # Example queries and mutations
