@@ -422,10 +422,12 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               }
               const fetcher =
                 getSpec && codecResource
-                  ? ($nodeId: ExecutableStep<string>) => {
-                      const spec = getSpec($nodeId);
-                      return codecResource.get(spec);
-                    }
+                  ? EXPORTABLE(
+                      (codecResource, getSpec) =>
+                        ($nodeId: ExecutableStep<string>) =>
+                          codecResource.get(getSpec($nodeId)),
+                      [codecResource, getSpec],
+                    )
                   : null;
               if (!baseInputType) {
                 const hint =

@@ -837,8 +837,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 }
                 const handlers = details.map((d) => d.handler);
                 const decodeNodeId = EXPORTABLE(
-                  (handlers, makeDecodeNodeId) =>
-                    makeDecodeNodeId(handlers),
+                  (handlers, makeDecodeNodeId) => makeDecodeNodeId(handlers),
                   [handlers, makeDecodeNodeId],
                 );
                 return EXPORTABLE(
@@ -909,8 +908,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   handlers.push(handler);
                 }
                 const decodeNodeId = EXPORTABLE(
-                  (handlers, makeDecodeNodeId) =>
-                    makeDecodeNodeId(handlers),
+                  (handlers, makeDecodeNodeId) => makeDecodeNodeId(handlers),
                   [handlers, makeDecodeNodeId],
                 );
                 return EXPORTABLE(

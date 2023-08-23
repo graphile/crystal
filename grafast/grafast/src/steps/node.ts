@@ -41,9 +41,7 @@ export class NodeStep
     $id: ExecutableStep<string>,
   ) {
     super();
-    const decodeNodeId = makeDecodeNodeId(
-      Object.values(possibleTypes),
-    );
+    const decodeNodeId = makeDecodeNodeId(Object.values(possibleTypes));
     this.specPlanDep = this.addDependency(decodeNodeId($id));
   }
 
