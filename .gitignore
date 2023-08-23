@@ -34,6 +34,8 @@ grafast/dataplan-pg/__tests__/**/*.mermaid.png
 /graphile-build/graphile-build-pg/schema-export-output.mjs
 /postgraphile/postgraphile/latestSchema.graphql
 /postgraphile/postgraphile/latestSchema.json
+/postgraphile/postgraphile/exported-schema.mjs
+/postgraphile/postgraphile/exported-schema.webpacked.js
 /grafast/ruru/bundle/ruru.min.js
 /grafast/ruru/bundle/ruru.min.js.LICENSE.txt
 
