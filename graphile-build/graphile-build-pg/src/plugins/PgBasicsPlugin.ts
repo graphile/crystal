@@ -93,6 +93,7 @@ declare global {
        */
       pgTableResource<TCodec extends PgCodecWithAttributes>(
         codec: TCodec,
+        strict?: boolean,
       ): PgResource<
         string,
         TCodec,
@@ -284,18 +285,26 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
               meta.typeNameBySituation[situation] = typeName;
             }
           };
-        const resourceByCodecCache = new Map<
+        const resourceByCodecCacheUnstrict = new Map<
+          PgCodecWithAttributes,
+          PgResource<any, any, any, any, any> | null
+        >();
+        const resourceByCodecCacheStrict = new Map<
           PgCodecWithAttributes,
           PgResource<any, any, any, any, any> | null
         >();
         const pgTableResource = <TCodec extends PgCodecWithAttributes>(
           codec: TCodec,
+          strict = true,
         ): PgResource<
           string,
           TCodec,
           ReadonlyArray<PgResourceUnique>,
           undefined
         > | null => {
+          const resourceByCodecCache = strict
+            ? resourceByCodecCacheStrict
+            : resourceByCodecCacheUnstrict;
           if (resourceByCodecCache.has(codec)) {
             return resourceByCodecCache.get(codec)!;
           }
@@ -307,9 +316,8 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
             ): r is PgResource<string, TCodec, any, undefined> =>
               r.codec === codec &&
               !r.parameters &&
-              !r.isVirtual &&
-              !r.isUnique &&
-              r.executor === codec.executor,
+              r.executor === codec.executor &&
+              (!strict || (!r.isVirtual && !r.isUnique)),
           );
           if (resources.length < 1) {
             resourceByCodecCache.set(codec, null);

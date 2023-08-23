@@ -151,7 +151,7 @@ function processAttribute(
   };
 
   const resource = baseCodec.attributes
-    ? build.pgTableResource(baseCodec as PgCodecWithAttributes)
+    ? build.pgTableResource(baseCodec as PgCodecWithAttributes, false)
     : null;
   if (baseCodec.attributes && !resource) {
     // We can't load codecs with attributes unless we know the executor.
