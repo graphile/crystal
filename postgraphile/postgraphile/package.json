@@ -153,7 +153,7 @@
   },
   "bin": "./dist/cli-run.js",
   "scripts": {
-    "test": "jest -i __tests__/queries && jest -i __tests__/mutations && jest -i __tests__/schema",
+    "test": "jest -i __tests__/queries/v4 && jest -i __tests__/queries/polymorphic && jest -i __tests__/mutations && jest -i __tests__/schema",
     "prepack": "tsc -b tsconfig.build.json"
   },
   "repository": {
