@@ -43,15 +43,13 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
 
         const pgCodec = rawPgCodec as PgCodecWithAttributes;
 
-        const resources = Object.values(
-          build.input.pgRegistry.pgResources,
-        ).filter((s) => s.codec === pgCodec && !s.parameters);
-        if (resources.length < 1) {
+        const resource = build.pgTableResource(pgCodec);
+        if (!resource) {
           return values;
         }
 
-        const primaryKey = (resources[0].uniques as PgResourceUnique[]).find(
-          (resource) => resource.isPrimary,
+        const primaryKey = (resource.uniques as PgResourceUnique[]).find(
+          (unique) => unique.isPrimary,
         );
         if (!primaryKey) {
           return values;

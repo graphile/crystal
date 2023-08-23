@@ -126,7 +126,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
   name: "PgPolymorphismPlugin",
   description: "Adds polymorphism",
   version,
-  after: ["smart-tags", "PgTablesPlugin", "PgCodecsPlugin"],
+  after: ["smart-tags", "PgTablesPlugin", "PgCodecsPlugin", "PgBasicsPlugin"],
   gather: gatherConfig({
     namespace: "pgPolymorphism",
     initialCache() {
@@ -698,14 +698,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         callback(behavior, [codec, attributeName], build) {
           // If this is the primary key of a related table of a
           // `@interface mode:relational` table, then omit it from the schema
-          const resources = Object.values(
-            build.input.pgRegistry.pgResources,
-          ).filter(
-            (r) =>
-              r.codec === codec && !r.parameters && !r.isVirtual && !r.isUnique,
-          );
-          if (resources.length === 1) {
-            const tbl = resources[0];
+          const tbl = build.pgTableResource(codec);
+          if (tbl) {
             const pk = tbl.uniques.find((u) => u.isPrimary);
             if (pk && pk.attributes.includes(attributeName)) {
               const fkeys = Object.values(tbl.getRelations()).filter((r) =>
@@ -719,7 +713,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   Object.values(
                     fkey.remoteResource.codec.polymorphism.types,
                   ).find((t) => t.name === myName) &&
-                  !fkey.remoteResource.codec.attributes[attributeName]
+                  !fkey.remoteResource.codec.attributes![attributeName]
                 ) {
                   return [
                     behavior,
@@ -792,19 +786,10 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           build,
           {
             nodeIdSpecForCodec(codec) {
-              const resources = Object.values(
-                build.input.pgRegistry.pgResources,
-              ).filter(
-                (r) =>
-                  r.codec === codec &&
-                  !r.parameters &&
-                  !r.isVirtual &&
-                  !r.isUnique,
-              );
-              if (resources.length !== 1) {
+              const table = build.pgTableResource!(codec);
+              if (!table) {
                 return null;
               }
-              const table = resources[0]!;
               const tablePk = table.uniques.find((u) => u.isPrimary);
               if (!tablePk) {
                 return null;
@@ -1060,21 +1045,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   },
                   nonNullNode: pgForbidSetofFunctionsToReturnNull,
                 });
-                const resources = Object.values(
-                  build.input.pgRegistry.pgResources,
-                ).filter((r) => {
-                  if (r.codec !== codec) return false;
-                  if (r.parameters) return false;
-                  if (r.isUnique) return false;
-                  if (r.isVirtual) return false;
-                  return true;
-                });
-                const resource = resources.length === 1 ? resources[0]! : null;
-                if (resources.length !== 1) {
-                  console.warn(
-                    `Found multiple table resources for codec '${codec.name}'; we don't currently support that but we _could_ - get in touch if you need this.`,
-                  );
-                }
+                const resource = build.pgTableResource(
+                  codec as PgCodecWithAttributes,
+                );
                 const primaryKey = resource
                   ? (resource.uniques as PgResourceUnique[]).find(
                       (u) => u.isPrimary === true,

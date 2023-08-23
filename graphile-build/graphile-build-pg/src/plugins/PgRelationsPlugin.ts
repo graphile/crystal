@@ -731,11 +731,7 @@ function addRelations(
   ) {
     return fields;
   }
-  const allPgResources = Object.values(build.input.pgRegistry.pgResources);
-  const resource = (pgTypeResource ??
-    allPgResources.find((s) => s.codec === codec && !s.parameters)) as
-    | PgResource<any, PgCodecWithAttributes, any, any, any>
-    | undefined;
+  const resource = pgTypeResource ?? build.pgTableResource(codec);
   const relations: Record<string, PgCodecRelation> = (build.input.pgRegistry
     .pgRelations[codec.name] ?? Object.create(null)) as Record<
     string,

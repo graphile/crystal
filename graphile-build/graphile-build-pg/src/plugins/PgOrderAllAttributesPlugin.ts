@@ -87,10 +87,10 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
               ),
             )
           : allAttributes;
-        const sources = Object.values(
-          build.input.pgRegistry.pgResources,
-        ).filter((s) => s.codec === pgCodec && !s.parameters);
-        const uniques = sources.flatMap((s) => s.uniques as PgResourceUnique[]);
+        const resource = build.pgTableResource(pgCodec);
+        if (!resource) {
+          return values;
+        }
         return extend(
           values,
           Object.entries(attributes).reduce(
@@ -104,7 +104,7 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
               ) {
                 return memo;
               }
-              const isUnique = uniques.some(
+              const isUnique = resource.uniques.some(
                 (list) => list.attributes[0] === attributeName,
               );
 

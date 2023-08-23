@@ -406,13 +406,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               }
               const codecResource =
                 variant === "nodeId"
-                  ? Object.values(finalBuild.input.pgRegistry.pgResources).find(
-                      (r) =>
-                        r.codec === paramBaseCodec &&
-                        !r.parameters &&
-                        !r.isVirtual &&
-                        !r.isUnique,
-                    )
+                  ? finalBuild.pgTableResource(paramBaseCodec)
                   : null;
               if (variant === "nodeId" && !codecResource) {
                 // ERRORS: tell them how to turn the nodeId variant off
