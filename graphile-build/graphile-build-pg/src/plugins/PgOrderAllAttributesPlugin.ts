@@ -84,9 +84,7 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
             )
           : allAttributes;
         const resource = build.pgTableResource(pgCodec);
-        if (!resource) {
-          return values;
-        }
+        const uniques = resource?.uniques ?? [];
         return extend(
           values,
           Object.entries(attributes).reduce(
@@ -100,7 +98,7 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
               ) {
                 return memo;
               }
-              const isUnique = resource.uniques.some(
+              const isUnique = uniques.some(
                 (list) => list.attributes[0] === attributeName,
               );
 
