@@ -613,36 +613,18 @@ input CustomDeleteRelationalItemInput {
 
 """The output of our `customDeleteRelationalItem` mutation."""
 type CustomDeleteRelationalItemPayload {
+  boolean: Boolean
+
   """
   The exact same `clientMutationId` that was provided in the mutation input,
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
 
-  """Reads a single `Person` that is related to this `RelationalItem`."""
-  personByAuthorId: Person
-
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  relationalItem: RelationalItem
-
-  """
-  Reads a single `RelationalItem` that is related to this `RelationalItem`.
-  """
-  relationalItemByParentId: RelationalItem
-
-  """An edge for our `RelationalItem`. May be used by Relay 1."""
-  relationalItemEdge(
-    """The method to use when ordering `RelationalItem`."""
-    orderBy: [RelationalItemsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): RelationalItemsEdge
-
-  """
-  Reads a single `RelationalTopic` that is related to this `RelationalItem`.
-  """
-  relationalTopicByRootTopicId: RelationalTopic
 }
 
 """

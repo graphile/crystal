@@ -1,0 +1,19 @@
+## expect(errors).toBeFalsy();
+## expect(data.customDeleteRelationalItem.query.allRelationalItems.nodes[0].id).not.toEqual("WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0=")
+#> schema: ["polymorphic"]
+#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+mutation {
+  customDeleteRelationalItem(
+    input: { nodeId: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0=" }
+  ) {
+    boolean
+    query {
+      allRelationalItems(first: 1) {
+        nodes {
+          id
+          type
+        }
+      }
+    }
+  }
+}
