@@ -36,8 +36,7 @@ language sql stable
 as $$
   select case
     when length(t.body) > max_length
-    then left(t.body, max_length - 3)
-           || '...'
+    then left(t.body, max_length - 3) || '...'
     else t.body
     end;
 $$;
