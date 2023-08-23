@@ -963,14 +963,17 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 if (!handler || !specForHandler) {
                   return null;
                 }
-                return (
-                  $nodeId: ExecutableStep<string>,
-                ): { [key: string]: ExecutableStep<any> } => {
-                  // TODO: should change this to a common method like
-                  // `const $decoded = getDecodedNodeIdForHandler(handler, $nodeId)`
-                  const $decoded = lambda($nodeId, specForHandler(handler));
-                  return handler.getSpec($decoded);
-                };
+                return EXPORTABLE(
+                  (handler, lambda, specForHandler) => (
+                      $nodeId: ExecutableStep<string>,
+                    ): { [key: string]: ExecutableStep<any> } => {
+                      // TODO: should change this to a common method like
+                      // `const $decoded = getDecodedNodeIdForHandler(handler, $nodeId)`
+                      const $decoded = lambda($nodeId, specForHandler(handler));
+                      return handler.getSpec($decoded);
+                    },
+                  [handler, lambda, specForHandler],
+                );
               }
             },
           },
