@@ -3,7 +3,6 @@ import "graphile-config";
 import type {
   PgClassSingleStep,
   PgCodecWithAttributes,
-  PgResource,
   PgResourceUnique,
 } from "@dataplan/pg";
 import { PgDeleteSingleStep, pgSelectFromRecord } from "@dataplan/pg";
@@ -80,25 +79,10 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const resources = Object.values(
-          build.input.pgRegistry.pgResources,
-        ).filter((resource) => {
-          if (resource.codec !== pgCodec) return false;
-          if (resource.parameters) return false;
-          return true;
-        });
-
-        if (resources.length !== 1) {
+        const resource = build.pgTableResource(pgCodec);
+        if (!resource) {
           return fields;
         }
-
-        const resource = resources[0] as PgResource<
-          any,
-          PgCodecWithAttributes,
-          any,
-          any,
-          any
-        >;
 
         const pk = (resource.uniques as PgResourceUnique[])?.find(
           (u) => u.isPrimary,

@@ -1,0 +1,54 @@
+{
+  createRelationalItemRelation: {
+    relationalItemRelation: {
+      id: "WyJyZWxhdGlvbmFsX2l0ZW1fcmVsYXRpb25zIiw5OTk5XQ==",
+      relationalItemByChildId: {
+        id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0=",
+        type: "TOPIC",
+      },
+      relationalItemByParentId: {
+        id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMl0=",
+        type: "TOPIC",
+      },
+    },
+  },
+  createRelationalItemRelationCompositePk: {
+    relationalItemRelationCompositePk: {
+      id: "WyJyZWxhdGlvbmFsX2l0ZW1fcmVsYXRpb25fY29tcG9zaXRlX3BrcyIsMiwxXQ==",
+      relationalItemByChildId: {
+        id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0=",
+        type: "TOPIC",
+      },
+      relationalItemByParentId: {
+        id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMl0=",
+        type: "TOPIC",
+      },
+    },
+  },
+  createSingleTableItemRelation: {
+    singleTableItemRelation: {
+      id: "WyJzaW5nbGVfdGFibGVfaXRlbV9yZWxhdGlvbnMiLDk5OTld",
+      singleTableItemByChildId: {
+        id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxXQ==",
+        type: "TOPIC",
+      },
+      singleTableItemByParentId: {
+        id: "WyJTaW5nbGVUYWJsZVRvcGljIiwyXQ==",
+        type: "TOPIC",
+      },
+    },
+  },
+  createSingleTableItemRelationCompositePk: {
+    singleTableItemRelationCompositePk: {
+      id: "WyJzaW5nbGVfdGFibGVfaXRlbV9yZWxhdGlvbl9jb21wb3NpdGVfcGtzIiwyLDFd",
+      singleTableItemByChildId: {
+        id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxXQ==",
+        type: "TOPIC",
+      },
+      singleTableItemByParentId: {
+        id: "WyJTaW5nbGVUYWJsZVRvcGljIiwyXQ==",
+        type: "TOPIC",
+      },
+    },
+  },
+}

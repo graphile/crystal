@@ -1,0 +1,15 @@
+{
+  customDeleteRelationalItem: {
+    boolean: true,
+    query: {
+      allRelationalItems: {
+        nodes: [
+          {
+            id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMl0=",
+            type: "TOPIC",
+          },
+        ],
+      },
+    },
+  },
+}

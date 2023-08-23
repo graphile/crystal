@@ -87,6 +87,19 @@ declare global {
       sql: typeof sql;
 
       pgGetBehavior: typeof getBehavior;
+
+      /**
+       * Get a table-like resource for the given codec, assuming exactly one exists.
+       */
+      pgTableResource<TCodec extends PgCodecWithAttributes>(
+        codec: TCodec,
+        strict?: boolean,
+      ): PgResource<
+        string,
+        TCodec,
+        ReadonlyArray<PgResourceUnique>,
+        undefined
+      > | null;
     }
 
     interface BehaviorEntities {
@@ -272,6 +285,54 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
               meta.typeNameBySituation[situation] = typeName;
             }
           };
+        const resourceByCodecCacheUnstrict = new Map<
+          PgCodecWithAttributes,
+          PgResource<any, any, any, any, any> | null
+        >();
+        const resourceByCodecCacheStrict = new Map<
+          PgCodecWithAttributes,
+          PgResource<any, any, any, any, any> | null
+        >();
+        const pgTableResource = <TCodec extends PgCodecWithAttributes>(
+          codec: TCodec,
+          strict = true,
+        ): PgResource<
+          string,
+          TCodec,
+          ReadonlyArray<PgResourceUnique>,
+          undefined
+        > | null => {
+          const resourceByCodecCache = strict
+            ? resourceByCodecCacheStrict
+            : resourceByCodecCacheUnstrict;
+          if (resourceByCodecCache.has(codec)) {
+            return resourceByCodecCache.get(codec)!;
+          }
+          const resources = Object.values(
+            build.input.pgRegistry.pgResources,
+          ).filter(
+            (
+              r: PgResource<any, any, any, any>,
+            ): r is PgResource<string, TCodec, any, undefined> =>
+              r.codec === codec &&
+              !r.parameters &&
+              r.executor === codec.executor &&
+              (!strict || (!r.isVirtual && !r.isUnique)),
+          );
+          if (resources.length < 1) {
+            resourceByCodecCache.set(codec, null);
+            return null;
+          } else if (resources.length > 1) {
+            console.warn(
+              `[WARNING]: detected more than one table-like resource for codec '${codec.name}'; returning nothing to avoid ambiguity.`,
+            );
+            resourceByCodecCache.set(codec, null);
+            return null;
+          } else {
+            resourceByCodecCache.set(codec, resources[0]);
+            return resources[0] as any;
+          }
+        };
 
         return build.extend(
           build,
@@ -294,6 +355,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
             pgGetBehavior: getBehavior,
             // For slightly better backwards compatibility with v4.
             pgSql: sql,
+            pgTableResource,
           },
           "Adding helpers from PgBasicsPlugin",
         );

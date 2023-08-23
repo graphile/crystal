@@ -42,12 +42,14 @@ delete from polymorphic.third_party_vulnerabilities cascade;
 delete from polymorphic.first_party_vulnerabilities cascade;
 delete from polymorphic.gcp_applications cascade;
 delete from polymorphic.aws_applications cascade;
+delete from polymorphic.relational_item_relations cascade;
 delete from polymorphic.relational_checklist_items cascade;
 delete from polymorphic.relational_checklists cascade;
 delete from polymorphic.relational_dividers cascade;
 delete from polymorphic.relational_posts cascade;
 delete from polymorphic.relational_topics cascade;
 delete from polymorphic.relational_items cascade;
+delete from polymorphic.single_table_item_relations cascade;
 delete from polymorphic.single_table_items cascade;
 delete from polymorphic.priorities cascade;
 delete from polymorphic.log_entries cascade;
@@ -490,6 +492,29 @@ update polymorphic.single_table_items
   where single_table_items.id = cte.id
   and cte.id != cte.rti;
 
+insert into polymorphic.single_table_item_relations
+  (id,  parent_id, child_id) values
+  (1,   1,         3),
+  (2,   1,         4),
+  (3,   1,         5),
+  (4,   1,         6),
+  (5,   1,         7),
+  (6,   1,         8),
+  (7,   1,         9),
+  (8,   1,         10),
+  (9,   10,        11),
+  (10,  11,        12),
+  (11,  11,        13),
+  (12,  11,        14),
+  (13,  2,         15),
+  (14,  4,         16),
+  (15,  16,        17),
+  (16,  16,        18),
+  (17,  16,        19),
+  (18,  16,        20),
+  (19,  16,        21);
+alter sequence polymorphic.single_table_item_relations_id_seq restart with 9999;
+
 insert into polymorphic.relational_items
   (id, type,             parent_id, author_id, position, created_at,             updated_at,             is_explicitly_archived, archived_at) values
   (1,  'TOPIC',          null,      2,         0,        '2020-01-28T11:00:00Z', '2021-07-30T14:24:00Z', false,                  null),
@@ -563,6 +588,30 @@ insert into polymorphic.relational_checklist_items (checklist_item_item_id, desc
   (19, 'Plan deduplication at the field level', null),
   (20, 'Garbage-collection of unused plans', null),
   (21, 'Supports newest GraphQL features', null);
+
+insert into polymorphic.relational_item_relations
+  (id,  parent_id, child_id) values
+  (1,   1,         3),
+  (2,   1,         4),
+  (3,   1,         5),
+  (4,   1,         6),
+  (5,   1,         7),
+  (6,   1,         8),
+  (7,   1,         9),
+  (8,   1,         10),
+  (9,   10,        11),
+  (10,  11,        12),
+  (11,  11,        13),
+  (12,  11,        14),
+  (13,  2,         15),
+  (14,  4,         16),
+  (15,  16,        17),
+  (16,  16,        18),
+  (17,  16,        19),
+  (18,  16,        20),
+  (19,  16,        21);
+alter sequence polymorphic.relational_item_relations_id_seq restart with 9999;
+
 
 insert into polymorphic.aws_applications (id, person_id, organization_id, name, last_deployed, aws_id) values
   (1, null, 1, 'AWS App 1', null, 'AWS-0001'),

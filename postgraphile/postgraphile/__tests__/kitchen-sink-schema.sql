@@ -1369,6 +1369,24 @@ comment on constraint single_table_items_root_topic_fkey on polymorphic.single_t
   @behavior -*
   $$;
 
+create table polymorphic.single_table_item_relations (
+  id serial primary key,
+  parent_id int not null references polymorphic.single_table_items on delete cascade,
+  child_id int not null references polymorphic.single_table_items on delete cascade,
+  constraint single_table_item_relations_parent_chilk_ak unique (parent_id, child_id)
+);
+
+create index on polymorphic.single_table_item_relations (parent_id);
+create index on polymorphic.single_table_item_relations (child_id);
+
+create table polymorphic.single_table_item_relation_composite_pks (
+  parent_id int not null references polymorphic.single_table_items on delete cascade,
+  child_id int not null references polymorphic.single_table_items on delete cascade,
+  primary key (parent_id, child_id)
+);
+
+create index on polymorphic.single_table_item_relation_composite_pks (child_id);
+
 ----------------------------------------
 
 create table polymorphic.relational_items (
@@ -1389,27 +1407,27 @@ create table polymorphic.relational_items (
 );
 
 create table polymorphic.relational_topics (
-  topic_item_id int primary key references polymorphic.relational_items,
+  topic_item_id int primary key references polymorphic.relational_items on delete cascade,
   title text not null
 );
 alter table polymorphic.relational_items add constraint relational_items_root_topic_fkey foreign key (root_topic_id) references polymorphic.relational_topics on delete cascade;
 create table polymorphic.relational_posts (
-  post_item_id int primary key references polymorphic.relational_items,
+  post_item_id int primary key references polymorphic.relational_items on delete cascade,
   title text not null,
   description text default '-- Enter description here --',
   note text
 );
 create table polymorphic.relational_dividers (
-  divider_item_id int primary key references polymorphic.relational_items,
+  divider_item_id int primary key references polymorphic.relational_items on delete cascade,
   title text,
   color text
 );
 create table polymorphic.relational_checklists (
-  checklist_item_id int primary key references polymorphic.relational_items,
+  checklist_item_id int primary key references polymorphic.relational_items on delete cascade,
   title text not null
 );
 create table polymorphic.relational_checklist_items (
-  checklist_item_item_id int primary key references polymorphic.relational_items,
+  checklist_item_item_id int primary key references polymorphic.relational_items on delete cascade,
   description text not null,
   note text
 );
@@ -1423,6 +1441,16 @@ comment on table polymorphic.relational_items is $$
   @type CHECKLIST references:relational_checklists
   @type CHECKLIST_ITEM references:relational_checklist_items
   $$;
+
+CREATE FUNCTION polymorphic.custom_delete_relational_item("nodeId" polymorphic.relational_items)
+RETURNS boolean
+AS $$
+  DELETE FROM polymorphic.relational_items
+  WHERE relational_items.id = "nodeId".id
+  RETURNING true;
+$$ LANGUAGE sql VOLATILE;
+
+comment on function polymorphic.custom_delete_relational_item(polymorphic.relational_items) is E'@arg0variant nodeId';
 
 ----------------------------------------
 
@@ -1575,6 +1603,25 @@ comment on type polymorphic.zero_implementation is $$
 @name ZeroImplementation
 @behavior node
 $$;
+
+create table polymorphic.relational_item_relations (
+  id serial primary key,
+  parent_id int not null references polymorphic.relational_items on delete cascade,
+  child_id int not null references polymorphic.relational_items on delete cascade,
+  constraint relational_item_relations_parent_chilk_ak unique (parent_id, child_id)
+);
+
+create index on polymorphic.relational_item_relations (parent_id);
+create index on polymorphic.relational_item_relations (child_id);
+
+create table polymorphic.relational_item_relation_composite_pks (
+  parent_id int not null references polymorphic.relational_items on delete cascade,
+  child_id int not null references polymorphic.relational_items on delete cascade,
+  primary key (parent_id, child_id)
+);
+
+create index on polymorphic.relational_item_relation_composite_pks (child_id);
+
 
 --------------------------------------------------------------------------------
 

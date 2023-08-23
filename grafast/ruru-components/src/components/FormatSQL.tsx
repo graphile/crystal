@@ -11,7 +11,7 @@ export const FormatSQL: FC<{ sql: string }> = ({ sql }) => {
     const makeParts = (line: string) => {
       const parts: JSX.Element[] = [];
       let idx = 0;
-      const re = /__([a-zA-Z0-9](_?[a-zA-Z0-9])*)__/g;
+      const re = /__([a-zA-Z0-9](_?[a-zA-Z0-9])*)(__|_[0-9]+(?![a-zA-Z0-9_]))/g;
       let matches;
       while ((matches = re.exec(line))) {
         const start = matches.index;

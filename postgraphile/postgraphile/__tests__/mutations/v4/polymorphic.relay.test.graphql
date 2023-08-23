@@ -1,0 +1,85 @@
+## expect(errors).toBeFalsy();
+#> schema: ["polymorphic"]
+#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+mutation {
+  createRelationalItemRelation(
+    input: {
+      relationalItemRelation: {
+        relationalItemByParentId: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMl0="
+        relationalItemByChildId: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0="
+      }
+    }
+  ) {
+    relationalItemRelation {
+      id
+      relationalItemByChildId {
+        id
+        type
+      }
+      relationalItemByParentId {
+        id
+        type
+      }
+    }
+  }
+  createRelationalItemRelationCompositePk(
+    input: {
+      relationalItemRelationCompositePk: {
+        relationalItemByParentId: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMl0="
+        relationalItemByChildId: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0="
+      }
+    }
+  ) {
+    relationalItemRelationCompositePk {
+      id
+      relationalItemByChildId {
+        id
+        type
+      }
+      relationalItemByParentId {
+        id
+        type
+      }
+    }
+  }
+  createSingleTableItemRelation(
+    input: {
+      singleTableItemRelation: {
+        singleTableItemByParentId: "WyJTaW5nbGVUYWJsZVRvcGljIiwyXQ=="
+        singleTableItemByChildId: "WyJTaW5nbGVUYWJsZVRvcGljIiwxXQ=="
+      }
+    }
+  ) {
+    singleTableItemRelation {
+      id
+      singleTableItemByChildId {
+        id
+        type
+      }
+      singleTableItemByParentId {
+        id
+        type
+      }
+    }
+  }
+  createSingleTableItemRelationCompositePk(
+    input: {
+      singleTableItemRelationCompositePk: {
+        singleTableItemByParentId: "WyJTaW5nbGVUYWJsZVRvcGljIiwyXQ=="
+        singleTableItemByChildId: "WyJTaW5nbGVUYWJsZVRvcGljIiwxXQ=="
+      }
+    }
+  ) {
+    singleTableItemRelationCompositePk {
+      id
+      singleTableItemByChildId {
+        id
+        type
+      }
+      singleTableItemByParentId {
+        id
+        type
+      }
+    }
+  }
+}

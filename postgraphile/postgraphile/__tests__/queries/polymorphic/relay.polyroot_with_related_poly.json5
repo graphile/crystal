@@ -1,0 +1,364 @@
+{
+  allSingleTableItems: {
+    nodes: [
+      {
+        id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxXQ==",
+        type: "TOPIC",
+        singleTableItemByParentId: null,
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZVRvcGljIiwyXQ==",
+        type: "TOPIC",
+        singleTableItemByParentId: null,
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZURpdmlkZXIiLDNd",
+        type: "DIVIDER",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxXQ==",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZVBvc3QiLDRd",
+        type: "POST",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxXQ==",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZVBvc3QiLDVd",
+        type: "POST",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxXQ==",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZVBvc3QiLDZd",
+        type: "POST",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxXQ==",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZVBvc3QiLDdd",
+        type: "POST",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxXQ==",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZURpdmlkZXIiLDhd",
+        type: "DIVIDER",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxXQ==",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZVBvc3QiLDld",
+        type: "POST",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxXQ==",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxMF0=",
+        type: "TOPIC",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxXQ==",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxMV0=",
+        type: "TOPIC",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxMF0=",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZVBvc3QiLDEyXQ==",
+        type: "POST",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxMV0=",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZVBvc3QiLDEzXQ==",
+        type: "POST",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxMV0=",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZVBvc3QiLDE0XQ==",
+        type: "POST",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxMV0=",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZVBvc3QiLDE1XQ==",
+        type: "POST",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZVRvcGljIiwyXQ==",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZUNoZWNrbGlzdCIsMTZd",
+        type: "CHECKLIST",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZVBvc3QiLDRd",
+          type: "POST",
+        },
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZUNoZWNrbGlzdEl0ZW0iLDE3XQ==",
+        type: "CHECKLIST_ITEM",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZUNoZWNrbGlzdCIsMTZd",
+          type: "CHECKLIST",
+        },
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZUNoZWNrbGlzdEl0ZW0iLDE4XQ==",
+        type: "CHECKLIST_ITEM",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZUNoZWNrbGlzdCIsMTZd",
+          type: "CHECKLIST",
+        },
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZUNoZWNrbGlzdEl0ZW0iLDE5XQ==",
+        type: "CHECKLIST_ITEM",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZUNoZWNrbGlzdCIsMTZd",
+          type: "CHECKLIST",
+        },
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZUNoZWNrbGlzdEl0ZW0iLDIwXQ==",
+        type: "CHECKLIST_ITEM",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZUNoZWNrbGlzdCIsMTZd",
+          type: "CHECKLIST",
+        },
+      },
+      {
+        id: "WyJTaW5nbGVUYWJsZUNoZWNrbGlzdEl0ZW0iLDIxXQ==",
+        type: "CHECKLIST_ITEM",
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZUNoZWNrbGlzdCIsMTZd",
+          type: "CHECKLIST",
+        },
+      },
+    ],
+  },
+  allRelationalItems: {
+    nodes: [
+      {
+        id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0=",
+        type: "TOPIC",
+        relationalItemByParentId: null,
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMl0=",
+        type: "TOPIC",
+        relationalItemByParentId: null,
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX2RpdmlkZXJzIiwzXQ==",
+        type: "DIVIDER",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0=",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX3Bvc3RzIiw0XQ==",
+        type: "POST",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0=",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX3Bvc3RzIiw1XQ==",
+        type: "POST",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0=",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX3Bvc3RzIiw2XQ==",
+        type: "POST",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0=",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX3Bvc3RzIiw3XQ==",
+        type: "POST",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0=",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX2RpdmlkZXJzIiw4XQ==",
+        type: "DIVIDER",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0=",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX3Bvc3RzIiw5XQ==",
+        type: "POST",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0=",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMTBd",
+        type: "TOPIC",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0=",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMTFd",
+        type: "TOPIC",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMTBd",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX3Bvc3RzIiwxMl0=",
+        type: "POST",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMTFd",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX3Bvc3RzIiwxM10=",
+        type: "POST",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMTFd",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX3Bvc3RzIiwxNF0=",
+        type: "POST",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMTFd",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX3Bvc3RzIiwxNV0=",
+        type: "POST",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX3RvcGljcyIsMl0=",
+          type: "TOPIC",
+        },
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX2NoZWNrbGlzdHMiLDE2XQ==",
+        type: "CHECKLIST",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX3Bvc3RzIiw0XQ==",
+          type: "POST",
+        },
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX2NoZWNrbGlzdF9pdGVtcyIsMTdd",
+        type: "CHECKLIST_ITEM",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX2NoZWNrbGlzdHMiLDE2XQ==",
+          type: "CHECKLIST",
+        },
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX2NoZWNrbGlzdF9pdGVtcyIsMThd",
+        type: "CHECKLIST_ITEM",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX2NoZWNrbGlzdHMiLDE2XQ==",
+          type: "CHECKLIST",
+        },
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX2NoZWNrbGlzdF9pdGVtcyIsMTld",
+        type: "CHECKLIST_ITEM",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX2NoZWNrbGlzdHMiLDE2XQ==",
+          type: "CHECKLIST",
+        },
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX2NoZWNrbGlzdF9pdGVtcyIsMjBd",
+        type: "CHECKLIST_ITEM",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX2NoZWNrbGlzdHMiLDE2XQ==",
+          type: "CHECKLIST",
+        },
+      },
+      {
+        id: "WyJyZWxhdGlvbmFsX2NoZWNrbGlzdF9pdGVtcyIsMjFd",
+        type: "CHECKLIST_ITEM",
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX2NoZWNrbGlzdHMiLDE2XQ==",
+          type: "CHECKLIST",
+        },
+      },
+    ],
+  },
+  allSingleTableItemRelations: {
+    nodes: [
+      {
+        id: "WyJzaW5nbGVfdGFibGVfaXRlbV9yZWxhdGlvbnMiLDFd",
+        singleTableItemByChildId: {
+          id: "WyJTaW5nbGVUYWJsZURpdmlkZXIiLDNd",
+          type: "DIVIDER",
+        },
+        singleTableItemByParentId: {
+          id: "WyJTaW5nbGVUYWJsZVRvcGljIiwxXQ==",
+          type: "TOPIC",
+        },
+      },
+    ],
+  },
+  allRelationalItemRelations: {
+    nodes: [
+      {
+        id: "WyJyZWxhdGlvbmFsX2l0ZW1fcmVsYXRpb25zIiwxOV0=",
+        relationalItemByChildId: {
+          id: "WyJyZWxhdGlvbmFsX2NoZWNrbGlzdF9pdGVtcyIsMjFd",
+          type: "CHECKLIST_ITEM",
+        },
+        relationalItemByParentId: {
+          id: "WyJyZWxhdGlvbmFsX2NoZWNrbGlzdHMiLDE2XQ==",
+          type: "CHECKLIST",
+        },
+      },
+    ],
+  },
+}

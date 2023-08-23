@@ -1,0 +1,12 @@
+{
+  createLeftArm: {
+    leftArm: {
+      id: "WyJsZWZ0X2FybXMiLDEwMF0=",
+      personByPersonId: {
+        id: "WyJwZW9wbGUiLDZd",
+      },
+      lengthInMetres: 0.69,
+      mood: "neutral",
+    },
+  },
+}

@@ -18,7 +18,7 @@ import type {
 } from "@dataplan/pg";
 import { pgUnionAll } from "@dataplan/pg";
 import type { ExecutableStep, ObjectStep } from "grafast";
-import { arraysMatch, connection, first } from "grafast";
+import { arraysMatch, connection } from "grafast";
 import type { GraphQLFieldConfigMap, GraphQLObjectType } from "grafast/graphql";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { PgAttribute, PgClass, PgConstraint } from "pg-introspection";
@@ -29,7 +29,6 @@ import te, { Idents, isSafeObjectPropertyName } from "tamedevil";
 import { resolveResourceRefPath, tagToString } from "../utils.js";
 import { version } from "../version.js";
 
-const ref_first = te.ref(first, "first");
 const ref_connection = te.ref(connection, "connection");
 const ref_sql = te.ref(sql, "sql");
 
@@ -732,11 +731,7 @@ function addRelations(
   ) {
     return fields;
   }
-  const allPgResources = Object.values(build.input.pgRegistry.pgResources);
-  const resource = (pgTypeResource ??
-    allPgResources.find((s) => s.codec === codec && !s.parameters)) as
-    | PgResource<any, PgCodecWithAttributes, any, any, any>
-    | undefined;
+  const resource = pgTypeResource ?? build.pgTableResource(codec);
   const relations: Record<string, PgCodecRelation> = (build.input.pgRegistry
     .pgRelations[codec.name] ?? Object.create(null)) as Record<
     string,
@@ -1033,10 +1028,14 @@ function addRelations(
             const functionLines: TE[] = [];
             const prefixLines: TE[] = [];
             if (isMutationPayload) {
-              functionLines.push(te`return ($in) => {`);
+              functionLines.push(
+                te`return function PgRelationsPlugin_mutation_payload_relation($in) {`,
+              );
               functionLines.push(te`  const $record = $in.get("result");`);
             } else {
-              functionLines.push(te`return ($record) => {`);
+              functionLines.push(
+                te`return function PgRelationsPlugin_relation($record) {`,
+              );
             }
 
             const finalLayer = path.layers[path.layers.length - 1];
@@ -1045,7 +1044,7 @@ function addRelations(
               finalLayer.resource.name,
             );
             const collectionIdentifier = te.identifier(
-              build.inflection.pluralize(finalLayer.resource.name),
+              `$` + build.inflection.pluralize(finalLayer.resource.name),
             );
             functionLines.push(
               te`  const ${collectionIdentifier} = ${ref_finalLayerResource}.find();`,
@@ -1106,7 +1105,7 @@ function addRelations(
 
             if (single) {
               functionLines.push(
-                te`  return ${ref_first}(${collectionIdentifier});`,
+                te`  return ${collectionIdentifier}.single();`,
               );
             } else if (isConnection) {
               functionLines.push(

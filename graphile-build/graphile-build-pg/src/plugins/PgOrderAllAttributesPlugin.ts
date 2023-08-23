@@ -1,11 +1,7 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type {
-  PgCodecAttribute,
-  PgCodecWithAttributes,
-  PgResourceUnique,
-} from "@dataplan/pg";
+import type { PgCodecAttribute, PgCodecWithAttributes } from "@dataplan/pg";
 import { PgSelectStep, PgUnionAllStep } from "@dataplan/pg";
 import type { ExecutableStep, ModifierStep } from "grafast";
 import type { GraphQLEnumValueConfigMap } from "grafast/graphql";
@@ -87,10 +83,8 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
               ),
             )
           : allAttributes;
-        const sources = Object.values(
-          build.input.pgRegistry.pgResources,
-        ).filter((s) => s.codec === pgCodec && !s.parameters);
-        const uniques = sources.flatMap((s) => s.uniques as PgResourceUnique[]);
+        const resource = build.pgTableResource(pgCodec);
+        const uniques = resource?.uniques ?? [];
         return extend(
           values,
           Object.entries(attributes).reduce(

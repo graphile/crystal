@@ -5,7 +5,6 @@ import { inspect } from "../inspect.js";
 import type {
   AnyInputStep,
   ExecutionExtra,
-  NodeIdCodec,
   NodeIdHandler,
   PolymorphicData,
 } from "../interfaces.js";
@@ -42,28 +41,8 @@ export class NodeStep
     $id: ExecutableStep<string>,
   ) {
     super();
-    const codecSet = new Set<NodeIdCodec>();
-    for (const handler of Object.values(possibleTypes)) {
-      codecSet.add(handler.codec);
-    }
-    const codecs = [...codecSet];
-    function decodeNodeIdWithCodecs(raw: string) {
-      return codecs.reduce(
-        (memo, codec) => {
-          try {
-            memo[codec.name] = codec.decode(raw);
-          } catch (e) {
-            memo[codec.name] = null;
-          }
-          return memo;
-        },
-        { raw } as {
-          [codecName: string]: any | null;
-        },
-      );
-    }
-    decodeNodeIdWithCodecs.isSyncAndSafe = true; // Optimization
-    this.specPlanDep = this.addDependency(lambda($id, decodeNodeIdWithCodecs));
+    const decodeNodeId = makeDecodeNodeId(Object.values(possibleTypes));
+    this.specPlanDep = this.addDependency(decodeNodeId($id));
   }
 
   planForType(type: GraphQLObjectType): ExecutableStep {
@@ -142,4 +121,26 @@ export function specFromNodeId(
     decodeWithCodecAndHandler,
   );
   return handler.getSpec($decoded);
+}
+
+export function makeDecodeNodeId(handlers: NodeIdHandler[]) {
+  const codecs = [...new Set(handlers.map((h) => h.codec))];
+
+  function decodeNodeIdWithCodecs(raw: string) {
+    return codecs.reduce(
+      (memo, codec) => {
+        try {
+          memo[codec.name] = codec.decode(raw);
+        } catch (e) {
+          memo[codec.name] = null;
+        }
+        return memo;
+      },
+      { raw } as {
+        [codecName: string]: any | null;
+      },
+    );
+  }
+  decodeNodeIdWithCodecs.isSyncAndSafe = true; // Optimization
+  return ($id: ExecutableStep<string>) => lambda($id, decodeNodeIdWithCodecs);
 }

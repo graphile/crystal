@@ -7,7 +7,6 @@ import type {
   PgCodecWithAttributes,
   PgConditionStep,
   PgRegistry,
-  PgSelectSingleStep,
   PgSelectStep,
 } from "@dataplan/pg";
 import type { SetterStep } from "grafast";
@@ -105,8 +104,10 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
               if (typeName === build.inflection.builtin("Query")) {
                 return memo;
               }
-              const fetcher = build.nodeFetcherByTypeName?.(typeName);
-              if (!fetcher) {
+              const getSpec = build.nodeIdSpecForCodec?.(
+                relation.remoteResource.codec,
+              );
+              if (!getSpec) {
                 return memo;
               }
               const action = isPgBaseInput
@@ -159,7 +160,6 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                           !anAttributeIsNotNull,
                         GraphQLID,
                       ),
-                      deprecationReason: fetcher.deprecationReason,
                       autoApplyAfterParentInputPlan: true,
                       autoApplyAfterParentApplyPlan: true,
                       // ENHANCE: if the remote columns are the primary keys
@@ -168,7 +168,7 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                       applyPlan: isPgCondition
                         ? EXPORTABLE(
                             (
-                              fetcher,
+                              getSpec,
                               localAttributeCodecs,
                               localAttributes,
                               remoteAttributes,
@@ -193,9 +193,7 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                     });
                                   }
                                 } else {
-                                  const $record = fetcher(
-                                    val.get(),
-                                  ) as PgSelectSingleStep;
+                                  const spec = getSpec(val.get());
                                   for (
                                     let i = 0, l = localAttributes.length;
                                     i < l;
@@ -209,7 +207,7 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                       attribute: localName,
                                       callback: (expression) =>
                                         sql`${expression} = ${$condition.placeholder(
-                                          $record.get(remoteName),
+                                          spec[remoteName],
                                           codec,
                                         )}`,
                                     });
@@ -217,7 +215,7 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                 }
                               },
                             [
-                              fetcher,
+                              getSpec,
                               localAttributeCodecs,
                               localAttributes,
                               remoteAttributes,
@@ -225,14 +223,12 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                             ],
                           )
                         : EXPORTABLE(
-                            (fetcher, localAttributes, remoteAttributes) =>
+                            (getSpec, localAttributes, remoteAttributes) =>
                               function plan(
                                 $insert: SetterStep<any, any>,
                                 val,
                               ) {
-                                const $record = fetcher(
-                                  val.get(),
-                                ) as PgSelectSingleStep;
+                                const spec = getSpec(val.get());
                                 for (
                                   let i = 0, l = localAttributes.length;
                                   i < l;
@@ -240,11 +236,11 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                 ) {
                                   const localName = localAttributes[i];
                                   const remoteName = remoteAttributes[i];
-                                  const $val = $record.get(remoteName);
+                                  const $val = spec[remoteName];
                                   $insert.set(localName, $val);
                                 }
                               },
-                            [fetcher, localAttributes, remoteAttributes],
+                            [getSpec, localAttributes, remoteAttributes],
                           ),
                     },
                   ),

@@ -92,11 +92,7 @@ function processAttribute(
   attributeName: string,
   overrideName?: string,
 ): void {
-  const {
-    extend,
-    inflection,
-    input: { pgRegistry: registry },
-  } = build;
+  const { extend, inflection } = build;
 
   const {
     scope: { pgCodec: rawPgCodec },
@@ -150,14 +146,8 @@ function processAttribute(
     type: type as GraphQLOutputType,
   };
 
-  const executor = pgCodec.executor;
   const resource = baseCodec.attributes
-    ? Object.values(registry.pgResources).find(
-        (potentialSource) =>
-          potentialSource.codec === baseCodec &&
-          !potentialSource.parameters &&
-          potentialSource.executor === executor,
-      )
+    ? build.pgTableResource(baseCodec as PgCodecWithAttributes, false)
     : null;
   if (baseCodec.attributes && !resource) {
     // We can't load codecs with attributes unless we know the executor.

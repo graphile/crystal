@@ -1,0 +1,19 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "b", "c"]
+#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+mutation {
+  createLeftArm(
+    input: {
+      leftArm: { personByPersonId: "WyJwZW9wbGUiLDZd", lengthInMetres: 0.69 }
+    }
+  ) {
+    leftArm {
+      id
+      personByPersonId {
+        id
+      }
+      lengthInMetres
+      mood
+    }
+  }
+}
