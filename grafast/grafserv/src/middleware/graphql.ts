@@ -437,16 +437,44 @@ export const makeGraphQLHandler = (
           ? parseGraphQLBody(resolvedPreset, request, await request.getBody())
           : parseGraphQLQueryParams(await request.getQueryParams());
 
-      // Apply our hooks (if any) to the body (they will mutate the body in place)
-      const hookResult =
-        hooks.callbacks.processGraphQLRequestBody != null
-          ? hooks.process("processGraphQLRequestBody", {
-              body: parsedBody,
-              request,
-            })
-          : undefined;
-      if (hookResult != null) {
-        await hookResult;
+      try {
+        // Apply our hooks (if any) to the body (they will mutate the body in place)
+        const hookResult =
+          hooks.callbacks.processGraphQLRequestBody != null
+            ? hooks.process("processGraphQLRequestBody", {
+                body: parsedBody,
+                request,
+              })
+            : undefined;
+        if (hookResult != null) {
+          await hookResult;
+        }
+      } catch (e) {
+        if (e instanceof SafeError) {
+          const payload = {
+            errors: [
+              new GraphQLError(
+                e.message,
+                null,
+                undefined,
+                undefined,
+                undefined,
+                e,
+                undefined,
+              ),
+            ],
+          };
+          return {
+            type: "graphql",
+            request,
+            dynamicOptions,
+            statusCode: e.extensions.statusCode,
+            contentType: chosenContentType,
+            payload,
+          };
+        } else {
+          throw e;
+        }
       }
 
       // Validate that the body is of the right shape

@@ -229,10 +229,30 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
       const parseAndValidate = latestParseAndValidate;
 
       const parsedBody = parseGraphQLJSONBody(message.payload);
-      await hooks.process("processGraphQLRequestBody", {
-        body: parsedBody,
-        graphqlWsContext: ctx,
-      });
+      try {
+        await hooks.process("processGraphQLRequestBody", {
+          body: parsedBody,
+          graphqlWsContext: ctx,
+        });
+      } catch (e) {
+        if (e instanceof SafeError) {
+          return {
+            errors: [
+              new GraphQLError(
+                e.message,
+                null,
+                undefined,
+                undefined,
+                undefined,
+                e,
+                undefined,
+              ),
+            ],
+          };
+        } else {
+          throw e;
+        }
+      }
 
       const { query, operationName, variableValues } =
         validateGraphQLBody(parsedBody);
