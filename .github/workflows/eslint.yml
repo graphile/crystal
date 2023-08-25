@@ -27,6 +27,3 @@ jobs:
 
       - name: "Lint Code"
         run: yarn eslint .
-
-
-git remote add upstream https://github.com/ORIGINAL_OWNER/ORIGINAL_REPOSITORY.git
