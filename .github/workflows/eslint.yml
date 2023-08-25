@@ -24,7 +24,8 @@ jobs:
           cache: 'yarn'
 
       - run: yarn --immutable
-      - run: yarn workspaces foreach -ptR --from eslint-plugin-graphile-export run prepack
+      - name: Compile eslint-plugin-graphile-export
+        run: yarn workspaces foreach -ptR --from eslint-plugin-graphile-export run prepack
 
       - name: "Lint Code"
         run: yarn eslint .

@@ -1,6 +1,6 @@
-const fs = require("fs");
-const os = require("os");
-const { exec } = require("child_process");
+const fs = require("node:fs");
+const os = require("node:os");
+const { exec } = require("node:child_process");
 const { isPropertyAccessOrQualifiedName } = require("typescript");
 
 exec("yarn workspaces list -v --json", (err, stdout, stderr) => {
@@ -18,7 +18,7 @@ exec("yarn workspaces list -v --json", (err, stdout, stderr) => {
   const locationToName = workspaces.reduce((mapping, next) => {
     mapping[next.location] = next.name;
     return mapping;
-  }, {});
+  }, Object.create(null));
 
   const packages = workspaces.map((workspace) => {
     const package = JSON.parse(
@@ -45,7 +45,8 @@ exec("yarn workspaces list -v --json", (err, stdout, stderr) => {
     const prePackPackages = [...new Set([...preTestPackages, package.name])];
     fs.writeFileSync(
       `.github/workflows/generated__${fileName}-${command}.yml`,
-      `name: ${command} ${package.name}
+      `\
+name: ${command} ${package.name}
 
 on: [push]
 
@@ -57,8 +58,7 @@ jobs:
       prepackPackages: "{${prePackPackages.join(",")}}"
       package: "${package.name}"
       testcommand: "${command}"
-      ${command == "test" ? 'args: "--ci"' : ""}
-    `,
+${command == "test" ? '      args: "--ci"\n' : ""}`,
     );
   };
 
