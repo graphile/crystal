@@ -1,9 +1,10 @@
-name: ESLint
+name: Check prettier formatting
 
 on: [push]
 
 jobs:
-  build:
+  check-prettier:
+    name: Check if all files are formatted correctly by prettier
     runs-on: ubuntu-latest
 
     env:

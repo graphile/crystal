@@ -3,7 +3,8 @@ name: ESLint
 on: [push]
 
 jobs:
-  build:
+  ESLint:
+    name: Run ESLint on the whole codebase
     runs-on: ubuntu-latest
 
     env:
