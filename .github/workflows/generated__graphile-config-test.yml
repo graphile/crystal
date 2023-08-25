@@ -3,7 +3,8 @@ name: Test graphile-config
 on: [push]
 
 jobs:
-  Run Test:
+  runtest:
+    name: Run test
     uses: ./.github/workflows/test-base.yml
     with:
       prepackPackages: "{graphile-config,pg-sql2,tamedevil}"
