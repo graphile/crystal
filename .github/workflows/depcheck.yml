@@ -1,10 +1,10 @@
-name: Run depcheck script
+name: Depcheck
 
 on: [push]
 
 jobs:
   depcheck:
-    name: Check if all files are formatted correctly by prettier
+    name: Run depcheck script
     runs-on: ubuntu-latest
 
     env:
