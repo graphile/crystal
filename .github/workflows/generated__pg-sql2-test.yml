@@ -10,5 +10,5 @@ jobs:
       prepackPackages: "{pg-sql2,tamedevil}"
       package: "pg-sql2"
       testcommand: "test"
-      args: "ci"
+      args: "--ci"
     
