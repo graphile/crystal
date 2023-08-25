@@ -21,6 +21,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - run: yarn --immutable
+      - run: yarn workspaces foreach -ptR --from eslint-plugin-graphile-export run prepack
 
       - name: "Lint Code"
         run: yarn eslint .
