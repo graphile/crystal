@@ -1,0 +1,14 @@
+name: posttest @dataplan/pg
+
+on: [push]
+
+jobs:
+  runtest:
+    name: Run posttest
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{pg-sql2,tamedevil,@dataplan/pg}"
+      package: "@dataplan/pg"
+      testcommand: "posttest"
+      
+    

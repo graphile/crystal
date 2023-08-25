@@ -1,0 +1,14 @@
+name: posttest @localrepo/postgraphile-website
+
+on: [push]
+
+jobs:
+  runtest:
+    name: Run posttest
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{pg-sql2,tamedevil,@localrepo/postgraphile-website}"
+      package: "@localrepo/postgraphile-website"
+      testcommand: "posttest"
+      
+    

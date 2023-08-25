@@ -1,0 +1,14 @@
+name: test grafserv
+
+on: [push]
+
+jobs:
+  runtest:
+    name: Run test
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{pg-sql2,tamedevil,grafserv}"
+      package: "grafserv"
+      testcommand: "test"
+      args: "--ci"
+    

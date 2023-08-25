@@ -1,0 +1,14 @@
+name: test @graphile/lru
+
+on: [push]
+
+jobs:
+  runtest:
+    name: Run test
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{pg-sql2,tamedevil,@graphile/lru}"
+      package: "@graphile/lru"
+      testcommand: "test"
+      args: "--ci"
+    

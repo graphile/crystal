@@ -1,0 +1,14 @@
+name: test @graphile/simplify-inflection
+
+on: [push]
+
+jobs:
+  runtest:
+    name: Run test
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{pg-sql2,tamedevil,@graphile/simplify-inflection}"
+      package: "@graphile/simplify-inflection"
+      testcommand: "test"
+      args: "--ci"
+    

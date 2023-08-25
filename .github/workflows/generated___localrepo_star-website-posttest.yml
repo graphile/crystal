@@ -1,0 +1,14 @@
+name: posttest @localrepo/star-website
+
+on: [push]
+
+jobs:
+  runtest:
+    name: Run posttest
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{pg-sql2,tamedevil,@localrepo/star-website}"
+      package: "@localrepo/star-website"
+      testcommand: "posttest"
+      
+    
