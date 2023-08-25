@@ -89,4 +89,4 @@ jobs:
         run: yarn workspaces foreach -vptR --from '${{ inputs.prepackPackages }}' run prepack
 
       - name: "Test Project"
-        run: yarn run pretest && yarn workspaces foreach -vptR --from ${{ inputs.package }} run ${{ inputs.testcommand }} --ci
+        run: yarn run pretest && yarn workspaces foreach -v --from '${{ inputs.package }}' run ${{ inputs.testcommand }} --ci
