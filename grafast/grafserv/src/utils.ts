@@ -236,8 +236,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
         });
       } catch (e) {
         if (e instanceof SafeError) {
-          return {
-            errors: [
+          return  [
               new GraphQLError(
                 e.message,
                 null,
@@ -247,8 +246,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
                 e,
                 undefined,
               ),
-            ],
-          };
+            ]
         } else {
           throw e;
         }
