@@ -12,6 +12,7 @@ jobs:
       TERM: xterm
       FORCE_COLOR: 1
       NODE_VERSION: 16.14 # Should be moved to repository env variable
+      NODE_OPTIONS: "--max-old-space-size=4096" # Give eslint more space?
 
     steps:
       - name: Checkout
