@@ -1,7 +1,6 @@
 name: Node CI
 
-on:
-  workflow_call:
+on: [push]
 
 jobs:
   build:
@@ -41,7 +40,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
@@ -69,8 +68,11 @@ jobs:
       - name: "Docker logs postgres"
         run: docker logs "${{ job.services.postgres.id }}"
 
-      - name: "Build Code"
-        run: yarn prepack:all
+      - name: "Typescript Build"
+        run: tsc -b
+
+      - name: "Prepack"
+        run: yarn workspaces foreach -vptR --from '{graphile-config,pg-sql2,tamedevil}' run prepack
 
       - name: "Test Project"
-        run: yarn run pretest && yarn test --ci && yarn run posttest
+        run: yarn run pretest && yarn workspaces foreach -vptR --from '{graphile-config,}' run test --ci
