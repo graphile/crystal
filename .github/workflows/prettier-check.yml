@@ -1,0 +1,26 @@
+name: ESLint
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    env:
+      CI: true # Should already be set to TRUE by Github?
+      TERM: xterm
+      FORCE_COLOR: 1
+      NODE_VERSION: 16.14 # Should be moved to repository env variable
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - run: yarn --immutable
+
+      - name: "Check Code Format"
+        run: yarn prettier:check

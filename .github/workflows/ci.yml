@@ -72,9 +72,3 @@ jobs:
 
       - name: "Test Project"
         run: yarn run pretest && yarn test --ci && yarn run posttest
-
-      - name: "Check Code Format"
-        run: yarn prettier:check
-
-      - name: "Lint Code"
-        run: yarn eslint .
