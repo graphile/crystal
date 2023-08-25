@@ -1,0 +1,30 @@
+name: Run depcheck script
+
+on: [push]
+
+jobs:
+  depcheck:
+    name: Check if all files are formatted correctly by prettier
+    runs-on: ubuntu-latest
+
+    env:
+      TERM: xterm
+      FORCE_COLOR: 1
+      NODE_VERSION: 16.14 # Should be moved to repository env variable
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
+
+      - run: yarn --immutable
+
+      - name: "Build Code"
+        run: yarn prepack:all
+
+      - name: "Run depcheck script"
+        run: node scripts/benjies-depcheck.mjs
