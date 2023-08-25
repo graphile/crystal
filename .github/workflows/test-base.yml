@@ -69,7 +69,7 @@ jobs:
         run: docker logs "${{ job.services.postgres.id }}"
 
       - name: "Typescript Build"
-        run: tsc -b
+        run: yarn tsc -b
 
       - name: "Prepack"
         run: yarn workspaces foreach -vptR --from '{graphile-config,pg-sql2,tamedevil}' run prepack
