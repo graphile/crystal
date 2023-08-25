@@ -20,9 +20,13 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ env.NODE_VERSION }}
+          cache: 'yarn'
 
       - run: yarn --immutable
       - run: yarn workspaces foreach -ptR --from eslint-plugin-graphile-export run prepack
 
       - name: "Lint Code"
         run: yarn eslint .
+
+
+git remote add upstream https://github.com/ORIGINAL_OWNER/ORIGINAL_REPOSITORY.git
