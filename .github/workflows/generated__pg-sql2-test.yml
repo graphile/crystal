@@ -1,4 +1,4 @@
-name: Test pg-sql2
+name: test pg-sql2
 
 on: [push]
 
@@ -10,4 +10,5 @@ jobs:
       prepackPackages: "{pg-sql2,tamedevil}"
       package: "pg-sql2"
       testcommand: "test"
+      args: "ci"
     

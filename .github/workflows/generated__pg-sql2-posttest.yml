@@ -1,13 +1,14 @@
-name: Test pg-sql2
+name: posttest pg-sql2
 
 on: [push]
 
 jobs:
   runtest:
-    name: Run test
+    name: Run posttest
     uses: ./.github/workflows/test-base.yml
     with:
       prepackPackages: "{pg-sql2,tamedevil}"
       package: "pg-sql2"
       testcommand: "posttest"
+      
     

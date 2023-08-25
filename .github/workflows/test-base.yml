@@ -15,6 +15,11 @@ on:
         description: Command to execute, usually test or posttest
         type: string
         required: true
+      args:
+        description: Optional command arguments
+        type: string
+        default: ''
+        required: false
 
 jobs:
   build:
@@ -89,4 +94,4 @@ jobs:
         run: yarn workspaces foreach -vptR --from '${{ inputs.prepackPackages }}' run prepack
 
       - name: "Test Project"
-        run: yarn run pretest && yarn workspaces foreach -v --from '${{ inputs.package }}' run ${{ inputs.testcommand }} --ci
+        run: yarn run pretest && yarn workspaces foreach -v --from '${{ inputs.package }}' run ${{ inputs.testcommand }} ${{ inputs.args}}
