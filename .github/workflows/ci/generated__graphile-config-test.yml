@@ -1,0 +1,11 @@
+name: Test graphile-config
+
+on: [push]
+
+jobs:
+  Run Test:
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{graphile-config,pg-sql2,tamedevil}"
+      package: "graphile-config"
+      testcommand: "test"

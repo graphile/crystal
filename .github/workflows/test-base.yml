@@ -1,6 +1,20 @@
-name: Node CI
+name: Base Test Workflow
 
-on: [push]
+on:
+  workflow_call:
+    inputs:
+      prepackPackages:
+        description: List of packages to be prepacked given as {package-a,} the extra , is important! or {package-A,package-B}
+        required: true
+        type: string
+      package:
+        description: Name of the package that should be tested
+        type: string
+        required: true
+      testcommand:
+        description: Command to execute, usually test or posttest
+        type: string
+        required: true
 
 jobs:
   build:
@@ -72,7 +86,7 @@ jobs:
         run: yarn tsc -b
 
       - name: "Prepack"
-        run: yarn workspaces foreach -vptR --from '{graphile-config,pg-sql2,tamedevil}' run prepack
+        run: yarn workspaces foreach -vptR --from '${{ inputs.prepackPackages }}' run prepack
 
       - name: "Test Project"
-        run: yarn run pretest && yarn workspaces foreach -vptR --from '{graphile-config,}' run test --ci
+        run: yarn run pretest && yarn workspaces foreach -vptR --from ${{ inputs.package }} run ${{ inputs.testcommand }} --ci
