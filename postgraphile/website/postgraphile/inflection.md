@@ -88,7 +88,7 @@ conflicts, and can make your schema somewhat verbose, e.g. `userByAuthorId`,
 
 Some people like this verbosity; however if you, like us, prefer shorter names
 then we encourage you use
-[the `@graphile/simplify-inflection` plugin](https://github.com/graphile/simplify-inflection).
+[the `@graphile/simplify-inflection` plugin](https://www.npmjs.com/package/@graphile/simplify-inflection).
 This would automatically change those fields to be named `author`, `editor` and
 `publisher` respectively.
 
