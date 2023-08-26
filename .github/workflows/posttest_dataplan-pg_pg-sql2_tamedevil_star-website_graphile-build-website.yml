@@ -1,0 +1,14 @@
+name: Posttest @dataplan/pg,pg-sql2,tamedevil,star-website,graphile-build-website
+
+on: [push]
+
+jobs:
+  runtest:
+    name: Run posttest
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{pg-sql2,tamedevil,@dataplan/pg,@localrepo/star-website,@localrepo/graphile-build-website}"
+      package: "{@dataplan/pg,pg-sql2,tamedevil,@localrepo/star-website,@localrepo/graphile-build-website}"
+      testcommand: "posttest"
+      
+    
