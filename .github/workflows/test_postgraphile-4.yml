@@ -1,4 +1,4 @@
-name: Test postgraphile schmea
+name: Test postgraphile schema
 
 on: [push]
 
