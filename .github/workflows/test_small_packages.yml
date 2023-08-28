@@ -1,0 +1,13 @@
+name: Test @grafserv/persisted, @graphile/lru, @graphile/simplify-inflection,@localrepo/grafast-bench,@localrepo/grafast-website,grafast,graphile,graphile-config,graphile-utils,jest-serializer-graphql-schema,pg-introspection,pg-sql2,tamedevil,grafserv
+
+on: [push]
+
+jobs:
+  runtest:
+    name: Run test
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{pg-sql2,tamedevil,@grafserv/persisted,@graphile/lru,@graphile/simplify-inflection,@localrepo/grafast-bench,@localrepo/grafast-website,grafast,graphile,graphile-config,graphile-utils,jest-serializer-graphql-schema,pg-introspection,pg-sql2,tamedevil,grafserv}"
+      package: "{@grafserv/persisted,@graphile/lru,@graphile/simplify-inflection,@localrepo/grafast-bench,@localrepo/grafast-website,grafast,graphile,graphile-config,graphile-utils,jest-serializer-graphql-schema,pg-introspection,pg-sql2,tamedevil,grafserv}"
+      testcommand: "test"
+      args: "--ci"
