@@ -1,10 +1,10 @@
-name: ESLint
+name: ESLint + Prettier
 
 on: [push]
 
 jobs:
   ESLint:
-    name: Run ESLint on the whole codebase
+    name: Run ESLint and Prettier
     runs-on: ubuntu-latest
 
     env:
@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Use Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v3
         with:
@@ -29,3 +29,6 @@ jobs:
 
       - name: "Lint Code"
         run: yarn eslint .
+
+      - name: "Check Code Format"
+        run: yarn prettier:check
