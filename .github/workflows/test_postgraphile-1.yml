@@ -1,4 +1,4 @@
-name: test postgraphile
+name: Test postgraphile v4
 
 on: [push]
 
