@@ -40,11 +40,11 @@
   },
   "homepage": "https://graphile.org/",
   "dependencies": {
-    "@babel/generator": "^7.21.3",
-    "@babel/parser": "^7.21.3",
-    "@babel/template": "^7.20.7",
-    "@babel/traverse": "^7.21.3",
-    "@babel/types": "^7.21.3",
+    "@babel/generator": "^7.22.10",
+    "@babel/parser": "^7.22.14",
+    "@babel/template": "^7.22.5",
+    "@babel/traverse": "^7.22.11",
+    "@babel/types": "^7.22.11",
     "@types/node": "^18.15.5",
     "prettier": "^2.8.7",
     "tslib": "^2.5.0"
