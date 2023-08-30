@@ -1,6 +1,6 @@
 name: Test postgraphile v4
 
-on: [push]
+on: [push, pr]
 
 jobs:
   runtest:

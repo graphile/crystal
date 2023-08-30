@@ -1,6 +1,6 @@
 name: Depcheck
 
-on: [push]
+on: [push, pr]
 
 jobs:
   depcheck:

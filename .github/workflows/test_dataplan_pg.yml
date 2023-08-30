@@ -1,6 +1,6 @@
 name: Test @dataplan/pg
 
-on: [push]
+on: [push, pr]
 
 jobs:
   runtest:

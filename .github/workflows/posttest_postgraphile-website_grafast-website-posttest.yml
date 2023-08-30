@@ -1,6 +1,6 @@
 name: Posttest grafast-website, postgraphile-website
 
-on: [push]
+on: [push, pr]
 
 jobs:
   runtest:

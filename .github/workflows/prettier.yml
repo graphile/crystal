@@ -1,6 +1,6 @@
 name: Prettier
 
-on: [push]
+on: [push, pr]
 
 jobs:
   ESLint:

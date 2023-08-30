@@ -1,6 +1,6 @@
 name: ESLint
 
-on: [push]
+on: [push, pr]
 
 jobs:
   ESLint:

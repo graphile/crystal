@@ -1,6 +1,6 @@
 name: Test postgraphile polymorphic
 
-on: [push]
+on: [push, pr]
 
 jobs:
   runtest:

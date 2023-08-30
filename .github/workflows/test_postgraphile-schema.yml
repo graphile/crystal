@@ -1,6 +1,6 @@
 name: Test postgraphile schema
 
-on: [push]
+on: [push, pr]
 
 jobs:
   runtest:
