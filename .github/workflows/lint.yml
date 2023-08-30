@@ -1,4 +1,4 @@
-name: ESLint + Prettier
+name: Linting
 
 on: [push, pull_request]
 
