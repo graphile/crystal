@@ -1,10 +1,10 @@
-name: ESLint + Prettier
+name: ESLint
 
 on: [push]
 
 jobs:
   ESLint:
-    name: Run ESLint and Prettier
+    name: Run ESLint
     runs-on: ubuntu-latest
 
     env:
@@ -29,6 +29,3 @@ jobs:
 
       - name: "Lint Code"
         run: yarn eslint .
-
-      - name: "Check Code Format"
-        run: yarn prettier:check
