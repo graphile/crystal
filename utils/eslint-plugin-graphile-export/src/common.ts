@@ -5,7 +5,7 @@ import type { Expression as ESTreeExpression } from "estree";
 declare module "eslint" {
   namespace Rule {
     interface RuleMetaData {
-      hasSuggestions: boolean;
+      hasSuggestions?: boolean | undefined;
     }
     interface RuleContext {
       getSource(node: Expression | ESTreeExpression): string;

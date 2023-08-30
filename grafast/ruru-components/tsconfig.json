@@ -9,8 +9,8 @@
     "lib": ["dom", "es2021"],
 
     "noUncheckedIndexedAccess": false,
-    "moduleResolution": "Nodenext",
-    "module": "commonjs"
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext"
   },
   "include": ["src"],
   "references": []
