@@ -1,10 +1,10 @@
-name: Prettier
+name: ESLint + Prettier
 
 on: [push, pull_request]
 
 jobs:
   ESLint:
-    name: Run Prettier
+    name: Run ESLint
     runs-on: ubuntu-latest
 
     env:
@@ -13,6 +13,28 @@ jobs:
       FORCE_COLOR: 1
       NODE_VERSION: 16.14 # Should be moved to repository env variable
       NODE_OPTIONS: "--max-old-space-size=4096" # Give eslint more space?
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Use Node.js ${{ env.NODE_VERSION }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "yarn"
+
+      - run: yarn --immutable
+      - name: Compile eslint-plugin-graphile-export
+        run:
+          yarn workspaces foreach -ptR --from eslint-plugin-graphile-export run
+          prepack
+
+      - name: "Lint Code"
+        run: yarn eslint .
+
+  Prettier:
+    name: Run ESLint
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
