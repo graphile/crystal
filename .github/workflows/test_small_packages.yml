@@ -2,7 +2,7 @@ name:
   Test pg-sql2,tamedevil,@grafserv/persisted,@graphile/lru,
   @graphile/simplify-inflection,@localrepo/grafast-bench,@localrepo/grafast-website,grafast,graphile,graphile-config,graphile-utils,jest-serializer-graphql-schema,pg-introspection,grafserv
 
-on: [push, pr]
+on: [push, pull_request]
 
 jobs:
   runtest:

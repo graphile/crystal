@@ -1,6 +1,6 @@
 name: ESLint
 
-on: [push, pr]
+on: [push, pull_request]
 
 jobs:
   ESLint:

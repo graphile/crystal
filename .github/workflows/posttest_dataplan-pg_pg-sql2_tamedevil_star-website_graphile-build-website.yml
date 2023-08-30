@@ -1,7 +1,7 @@
 name:
   Posttest @dataplan/pg,pg-sql2,tamedevil,star-website,graphile-build-website
 
-on: [push, pr]
+on: [push, pull_request]
 
 jobs:
   runtest:

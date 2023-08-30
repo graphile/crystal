@@ -1,6 +1,6 @@
 name: Depcheck
 
-on: [push, pr]
+on: [push, pull_request]
 
 jobs:
   depcheck:

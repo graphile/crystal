@@ -1,6 +1,6 @@
 name: Test postgraphile mutations
 
-on: [push, pr]
+on: [push, pull_request]
 
 jobs:
   runtest:
