@@ -5,6 +5,10 @@
  * registry (hence the "no data gathering" - we skip the gather phase).
  */
 
+import { readFile } from "node:fs/promises";
+import { pathToFileURL } from "node:url";
+import { inspect } from "node:util";
+
 import type {
   PgExecutorContextPlans,
   PgRegistry,
@@ -29,9 +33,6 @@ import {
 } from "graphile-build";
 import { resolvePresets } from "graphile-config";
 import { EXPORTABLE, exportSchema } from "graphile-export";
-import { readFile } from "node:fs/promises";
-import { pathToFileURL } from "node:url";
-import { inspect } from "node:util";
 import { Pool } from "pg";
 import sql from "pg-sql2";
 

@@ -11,8 +11,6 @@ import { resolvePresets } from "graphile-config";
 
 export { makeSchema, watchSchema };
 
-export { GraphileBuild, GraphileConfig };
-
 export interface PostGraphileInstance {
   createServ<TGrafserv extends GrafservBase>(
     grafserv: (config: GrafservConfig) => TGrafserv,

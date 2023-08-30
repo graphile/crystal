@@ -1,5 +1,5 @@
 import crypto from "crypto";
-// eslint-disable-next-line @typescript-eslint/no-duplicate-imports
+// eslint-disable-next-line import/no-duplicates
 import * as _crypto from "crypto";
 import * as grafastStar from "grafast";
 import * as graphqlStar from "grafast/graphql";

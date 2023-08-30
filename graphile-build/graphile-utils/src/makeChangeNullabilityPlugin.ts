@@ -1,12 +1,12 @@
+import { inspect } from "node:util";
+
 import type { GrafastArgumentConfig, GrafastFieldConfig } from "grafast";
 import type * as AllGraphQL from "grafast/graphql";
-import type {
-  GraphQLInputType,
-  GraphQLOutputType,
-  GraphQLType,
-} from "grafast/graphql";
 import type {} from "graphile-build";
-import { inspect } from "node:util";
+
+type GraphQLInputType = AllGraphQL.GraphQLInputType;
+type GraphQLOutputType = AllGraphQL.GraphQLOutputType;
+type GraphQLType = AllGraphQL.GraphQLType;
 
 export type NullabilitySpecString =
   | ""

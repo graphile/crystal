@@ -1,6 +1,7 @@
+import { pathToFileURL } from "node:url";
+
 import type { PgClient, WithPgClient } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
-import { pathToFileURL } from "node:url";
 
 /**
  * Is "thenable".

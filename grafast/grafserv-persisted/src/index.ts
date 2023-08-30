@@ -1,3 +1,5 @@
+import fsp from "node:fs/promises";
+
 import type { PromiseOrDirect } from "grafast";
 import { SafeError } from "grafast";
 import type {
@@ -5,7 +7,6 @@ import type {
   ProcessGraphQLRequestBodyEvent,
 } from "grafserv";
 import type {} from "graphile-config";
-import fsp from "node:fs/promises";
 
 export type { PersistedOperationGetter } from "./interfaces.js";
 import LRU from "@graphile/lru";

@@ -1,9 +1,10 @@
-import type { Context } from "koa";
-import type Koa from "koa";
 import type { IncomingMessage, Server as HTTPServer } from "node:http";
 import type { Server as HTTPSServer } from "node:https";
 import type { Duplex } from "node:stream";
 import { PassThrough } from "node:stream";
+
+import type { Context } from "koa";
+import type Koa from "koa";
 
 import { GrafservBase } from "../../../core/base.js";
 import type { GrafservConfig, RequestDigest } from "../../../interfaces.js";

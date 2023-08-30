@@ -1,4 +1,3 @@
-import "@uiw/react-codemirror";
 import "codemirror/keymap/sublime";
 import "codemirror/theme/monokai.css";
 import "codemirror/mode/javascript/javascript";
@@ -9,7 +8,6 @@ import "graphiql/graphiql.css";
 import "@graphiql/plugin-explorer/dist/style.css";
 import "ruru-components/ruru.css";
 
-// eslint-disable-next-line @typescript-eslint/no-duplicate-imports
 import CodeMirror from "@uiw/react-codemirror";
 import * as Grafast from "grafast";
 import { grafast, makeGrafastSchema } from "grafast";

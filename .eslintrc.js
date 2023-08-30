@@ -92,8 +92,7 @@ module.exports = {
 
     // note you must disable the base rule as it can report incorrect errors
     "no-duplicate-imports": "off",
-    "import/no-duplicates": "off",
-    "@typescript-eslint/no-duplicate-imports": ["error"],
+    "import/no-duplicates": "error",
   },
   overrides: [
     // Rules for core plugins

@@ -1,6 +1,7 @@
+import { PassThrough } from "node:stream";
+
 import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { makeHandler } from "graphql-ws/lib/use/@fastify/websocket";
-import { PassThrough } from "node:stream";
 
 import {
   convertHandlerResultToResult,

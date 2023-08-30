@@ -1,7 +1,8 @@
-import type { Express, Request, Response } from "express";
 import type { IncomingMessage, Server as HTTPServer } from "node:http";
 import type { Server as HTTPSServer } from "node:https";
 import type { Duplex } from "node:stream";
+
+import type { Express, Request, Response } from "express";
 
 import type { GrafservConfig, RequestDigest } from "../../../interfaces.js";
 import type { OptionsFromConfig } from "../../../options.js";

@@ -1,8 +1,9 @@
+import { createServer } from "node:http";
+
 import { resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { loadConfig } from "graphile-config/load";
 import type { createProxyServer } from "http-proxy";
-import { createServer } from "node:http";
 
 import type { RuruConfig } from "./server.js";
 import { makeHTMLParts, ruruHTML } from "./server.js";

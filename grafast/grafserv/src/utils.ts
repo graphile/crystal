@@ -1,3 +1,5 @@
+import type { Readable } from "node:stream";
+
 import type { PromiseOrDirect } from "grafast";
 import { execute, hookArgs, SafeError, stripAnsi, subscribe } from "grafast";
 import type {
@@ -9,7 +11,6 @@ import type {
 import * as graphql from "grafast/graphql";
 import type { ServerOptions, SubscribePayload } from "graphql-ws";
 import type { Extra } from "graphql-ws/lib/use/ws";
-import type { Readable } from "node:stream";
 
 import { getGrafservHooks } from "./hooks.js";
 import type { GrafservBase } from "./index.js";

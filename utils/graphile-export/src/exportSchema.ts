@@ -1,3 +1,7 @@
+import { writeFile } from "node:fs/promises";
+import type { URL } from "node:url";
+import { inspect } from "node:util";
+
 import generate from "@babel/generator";
 import { parseExpression } from "@babel/parser";
 import type { TemplateBuilderOptions } from "@babel/template";
@@ -39,9 +43,6 @@ import {
   printSchema,
 } from "grafast/graphql";
 import type { GraphQLSchemaNormalizedConfig } from "graphql/type/schema";
-import { writeFile } from "node:fs/promises";
-import type { URL } from "node:url";
-import { inspect } from "node:util";
 import type { PgSQL, SQL } from "pg-sql2";
 
 import type { ExportOptions } from "./interfaces.js";

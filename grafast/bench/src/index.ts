@@ -1,3 +1,5 @@
+import { EventEmitter } from "node:stream";
+
 import { execute, isAsyncIterable } from "grafast";
 import type {
   ExecutionPatchResult,
@@ -5,7 +7,6 @@ import type {
   GraphQLSchema,
 } from "grafast/graphql";
 import { parse, validate } from "grafast/graphql";
-import { EventEmitter } from "node:stream";
 
 import type { BenchOperation, GrafastBenchSetupResult } from "./interfaces.js";
 export { GrafastBenchConfig } from "./interfaces.js";
