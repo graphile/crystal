@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   ESLint:
-    name: Run ESLint
+    name: ESLint
     runs-on: ubuntu-latest
 
     env:
@@ -33,7 +33,7 @@ jobs:
         run: yarn eslint .
 
   Prettier:
-    name: Run ESLint
+    name: Prettier
     runs-on: ubuntu-latest
 
     steps:

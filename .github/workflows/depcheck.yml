@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   depcheck:
-    name: Run depcheck script
+    name: Benjie's depcheck script
     runs-on: ubuntu-latest
 
     env:

@@ -49,7 +49,7 @@ jobs:
       args: "--ci"
 
   small_packages:
-    name: Run small package tests
+    name: Small package tests
     uses: ./.github/workflows/test-base.yml
     with:
       prepackPackages: "{pg-sql2,tamedevil,@grafserv/persisted,@graphile/lru,@graphile/simplify-inflection,@localrepo/grafast-bench,@localrepo/grafast-website,grafast,graphile,graphile-config,graphile-utils,jest-serializer-graphql-schema,pg-introspection,grafserv}"
