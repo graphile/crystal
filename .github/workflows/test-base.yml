@@ -1,6 +1,27 @@
-name: Node CI
+name: Base Test Workflow
 
-on: [push]
+on:
+  workflow_call:
+    inputs:
+      prepackPackages:
+        description:
+          List of packages to be prepacked given as {package-a,} the extra , is
+          important! or {package-A,package-B}
+        required: true
+        type: string
+      package:
+        description: Name of the package that should be tested
+        type: string
+        required: true
+      testcommand:
+        description: Command to execute, usually test or posttest
+        type: string
+        required: true
+      args:
+        description: Optional command arguments
+        type: string
+        default: ""
+        required: false
 
 jobs:
   build:
@@ -40,11 +61,12 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
+          cache: "yarn"
       - name: Configure PostgreSQL
         run: |
           cat .github/workflows/ci/docker-entrypoint-initdb.d/010-enable_wal.sh | docker exec -i postgres bash
@@ -67,14 +89,15 @@ jobs:
       - name: "Docker logs postgres"
         run: docker logs "${{ job.services.postgres.id }}"
 
-      - name: "Build Code"
-        run: yarn prepack:all
+      - name: "Typescript Build"
+        run: yarn tsc -b
+
+      - name: "Prepack"
+        run:
+          yarn workspaces foreach -vptR --from '${{ inputs.prepackPackages }}'
+          run prepack
 
       - name: "Test Project"
-        run: yarn run pretest && yarn test --ci && yarn run posttest
-
-      - name: "Check Code Format"
-        run: yarn prettier:check
-
-      - name: "Lint Code"
-        run: yarn eslint .
+        run:
+          yarn run pretest && yarn workspaces foreach -vp --jobs 2 --from '${{
+          inputs.package }}' run ${{ inputs.testcommand }} ${{ inputs.args }}

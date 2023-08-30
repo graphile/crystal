@@ -1,0 +1,58 @@
+name: Test
+
+on: [push, pull_request]
+
+jobs:
+  dataplan_pg:
+    name: "@dataplan/pg tests"
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{pg-sql2,tamedevil,@dataplan/pg}"
+      package: "@dataplan/pg"
+      testcommand: "test"
+      args: "--ci"
+
+  postgraphile_queries_v4:
+    name: PostGraphile v4 queries tests
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
+      package: "postgraphile"
+      testcommand: "test:v4"
+      args: "--ci"
+
+  postgraphile_queries_polymorphic:
+    name: PostGraphile polymorphic query tests
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
+      package: "postgraphile"
+      testcommand: "test:polymorphic"
+      args: "--ci"
+
+  postgraphile_mutations:
+    name: PostGraphile mutation tests
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
+      package: "postgraphile"
+      testcommand: "test:mutations"
+      args: "--ci"
+
+  postgraphile_schemas:
+    name: PostGraphile schema tests
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
+      package: "postgraphile"
+      testcommand: "test:schema"
+      args: "--ci"
+
+  small_packages:
+    name: Small package tests
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{pg-sql2,tamedevil,@grafserv/persisted,@graphile/lru,@graphile/simplify-inflection,@localrepo/grafast-bench,@localrepo/grafast-website,grafast,graphile,graphile-config,graphile-utils,jest-serializer-graphql-schema,pg-introspection,grafserv}"
+      package: "{pg-sql2,tamedevil,@grafserv/persisted,@graphile/lru,@graphile/simplify-inflection,@localrepo/grafast-bench,@localrepo/grafast-website,grafast,graphile,graphile-config,graphile-utils,jest-serializer-graphql-schema,pg-introspection,grafserv}"
+      testcommand: "test"
+      args: "--ci"

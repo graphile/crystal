@@ -1,0 +1,26 @@
+name: Posttest
+
+on: [push, pull_request]
+
+jobs:
+  star_and_build_websites:
+    name: star/build website posttests
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{@dataplan/pg,pg-sql2,tamedevil,@localrepo/star-website,@localrepo/graphile-build-website}"
+      package: "{@localrepo/star-website,@localrepo/graphile-build-website}"
+      testcommand: "posttest"
+  grafast_and_postgraphile_websites:
+    name: Grafast/PostGraphile website posttests
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{pg-sql2,tamedevil,@localrepo/grafast-website,@localrepo/postgraphile-website}"
+      package: "{@localrepo/grafast-website,@localrepo/postgraphile-website}"
+      testcommand: "posttest"
+  small_packages:
+    name: Small package posttests
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{@dataplan/pg,pg-sql2,tamedevil,@localrepo/star-website,@localrepo/graphile-build-website}"
+      package: "{@dataplan/pg,pg-sql2,tamedevil}"
+      testcommand: "posttest"

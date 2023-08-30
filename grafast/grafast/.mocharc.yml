@@ -4,4 +4,4 @@ check-leaks: true
 extension:
   - ts
 node-option:
-  - 'loader=ts-node/esm/transpile-only'
+  - "loader=ts-node/esm/transpile-only"

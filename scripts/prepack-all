@@ -1,9 +1,6 @@
 #!/bin/bash
 set -e
 
-# Make sure any generated assets are built
-yarn workspaces foreach --parallel --topological run preprepack
-
 # Build everything in the relevant order according to TypeScript project references
 tsc -b
 

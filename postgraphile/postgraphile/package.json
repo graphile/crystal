@@ -153,7 +153,11 @@
   },
   "bin": "./dist/cli-run.js",
   "scripts": {
-    "test": "jest -i __tests__/queries/v4 && jest -i __tests__/queries/polymorphic && jest -i __tests__/mutations && jest -i __tests__/schema",
+    "test": "yarn test:v4 && yarn test:polymorphic && yarn test:mutations && yarn test:schema",
+    "test:v4": "jest -i __tests__/queries/v4",
+    "test:polymorphic": "jest -i __tests__/queries/polymorphic",
+    "test:mutations": "jest -i __tests__/mutations",
+    "test:schema": "jest -i __tests__/schema",
     "prepack": "tsc -b tsconfig.build.json"
   },
   "repository": {
