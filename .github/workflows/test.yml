@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 jobs:
   dataplan_pg:
-    name: @dataplan/pg tests
+    name: "@dataplan/pg tests"
     uses: ./.github/workflows/test-base.yml
     with:
       prepackPackages: "{pg-sql2,tamedevil,@dataplan/pg}"
