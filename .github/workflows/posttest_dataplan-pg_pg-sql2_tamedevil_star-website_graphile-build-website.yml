@@ -1,4 +1,5 @@
-name: Posttest @dataplan/pg,pg-sql2,tamedevil,star-website,graphile-build-website
+name:
+  Posttest @dataplan/pg,pg-sql2,tamedevil,star-website,graphile-build-website
 
 on: [push]
 
@@ -10,5 +11,3 @@ jobs:
       prepackPackages: "{@dataplan/pg,pg-sql2,tamedevil,@localrepo/star-website,@localrepo/graphile-build-website}"
       package: "{@dataplan/pg,pg-sql2,tamedevil,@localrepo/star-website,@localrepo/graphile-build-website}"
       testcommand: "posttest"
-      
-    

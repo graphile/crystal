@@ -21,10 +21,9 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'yarn'
+          cache: "yarn"
 
       - run: yarn --immutable
 
       - name: "Check Code Format"
         run: yarn prettier:check
-

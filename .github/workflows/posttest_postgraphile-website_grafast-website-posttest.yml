@@ -10,5 +10,3 @@ jobs:
       prepackPackages: "{pg-sql2,tamedevil,@localrepo/grafast-website,@localrepo/postgraphile-website}"
       package: "{@localrepo/grafast-website,@localrepo/postgraphile-website}"
       testcommand: "posttest"
-      
-    

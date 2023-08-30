@@ -1,4 +1,6 @@
-name: Test @grafserv/persisted, @graphile/lru, @graphile/simplify-inflection,@localrepo/grafast-bench,@localrepo/grafast-website,grafast,graphile,graphile-config,graphile-utils,jest-serializer-graphql-schema,pg-introspection,pg-sql2,tamedevil,grafserv
+name:
+  Test @grafserv/persisted, @graphile/lru,
+  @graphile/simplify-inflection,@localrepo/grafast-bench,@localrepo/grafast-website,grafast,graphile,graphile-config,graphile-utils,jest-serializer-graphql-schema,pg-introspection,pg-sql2,tamedevil,grafserv
 
 on: [push]
 

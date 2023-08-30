@@ -4,7 +4,9 @@ on:
   workflow_call:
     inputs:
       prepackPackages:
-        description: List of packages to be prepacked given as {package-a,} the extra , is important! or {package-A,package-B}
+        description:
+          List of packages to be prepacked given as {package-a,} the extra , is
+          important! or {package-A,package-B}
         required: true
         type: string
       package:
@@ -18,7 +20,7 @@ on:
       args:
         description: Optional command arguments
         type: string
-        default: ''
+        default: ""
         required: false
 
 jobs:
@@ -64,7 +66,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'yarn'
+          cache: "yarn"
       - name: Configure PostgreSQL
         run: |
           cat .github/workflows/ci/docker-entrypoint-initdb.d/010-enable_wal.sh | docker exec -i postgres bash
@@ -91,7 +93,11 @@ jobs:
         run: yarn tsc -b
 
       - name: "Prepack"
-        run: yarn workspaces foreach -vptR --from '${{ inputs.prepackPackages }}' run prepack
+        run:
+          yarn workspaces foreach -vptR --from '${{ inputs.prepackPackages }}'
+          run prepack
 
       - name: "Test Project"
-        run: yarn run pretest && yarn workspaces foreach -vp --jobs 2 --from '${{ inputs.package }}' run ${{ inputs.testcommand }} ${{ inputs.args }}
+        run:
+          yarn run pretest && yarn workspaces foreach -vp --jobs 2 --from '${{
+          inputs.package }}' run ${{ inputs.testcommand }} ${{ inputs.args }}

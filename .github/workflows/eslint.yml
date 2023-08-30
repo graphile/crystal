@@ -21,11 +21,13 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'yarn'
+          cache: "yarn"
 
       - run: yarn --immutable
       - name: Compile eslint-plugin-graphile-export
-        run: yarn workspaces foreach -ptR --from eslint-plugin-graphile-export run prepack
+        run:
+          yarn workspaces foreach -ptR --from eslint-plugin-graphile-export run
+          prepack
 
       - name: "Lint Code"
         run: yarn eslint .
