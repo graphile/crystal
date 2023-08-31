@@ -34,6 +34,7 @@
     "@babel/preset-typescript": "^7.22.11",
     "@knodes/typedoc-plugin-monorepo-readmes": "^0.23.1",
     "@knodes/typedoc-plugin-pages": "^0.23.4",
+    "@localrepo/prettier2-for-jest": "npm:prettier@^2",
     "@tsconfig/node16": "^16.1.1",
     "@types/jest": "^29.5.4",
     "@types/mock-fs": "4.13.1",

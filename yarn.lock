@@ -3741,6 +3741,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@localrepo/prettier2-for-jest@npm:prettier@^2, prettier@npm:^2.7.1":
+  version: 2.8.8
+  resolution: "prettier@npm:2.8.8"
+  bin:
+    prettier: bin-prettier.js
+  checksum: 38b0a43ea17e83f54b904f8808f7d0fd1d9705ef9627bb40017ee276cbd6f5e7d15bcf816c4467b64cfe14ef109369a981ce61fad9c6022749d041f74a672188
+  languageName: node
+  linkType: hard
+
 "@localrepo/star-website@workspace:utils/website":
   version: 0.0.0-use.local
   resolution: "@localrepo/star-website@workspace:utils/website"
@@ -17001,15 +17010,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:^2.7.1":
-  version: 2.8.8
-  resolution: "prettier@npm:2.8.8"
-  bin:
-    prettier: bin-prettier.js
-  checksum: 38b0a43ea17e83f54b904f8808f7d0fd1d9705ef9627bb40017ee276cbd6f5e7d15bcf816c4467b64cfe14ef109369a981ce61fad9c6022749d041f74a672188
-  languageName: node
-  linkType: hard
-
 "pretty-error@npm:^4.0.0":
   version: 4.0.0
   resolution: "pretty-error@npm:4.0.0"
@@ -18246,6 +18246,7 @@ __metadata:
     "@changesets/cli": "npm:^2.26.2"
     "@knodes/typedoc-plugin-monorepo-readmes": "npm:^0.23.1"
     "@knodes/typedoc-plugin-pages": "npm:^0.23.4"
+    "@localrepo/prettier2-for-jest": "npm:prettier@^2"
     "@tsconfig/node16": "npm:^16.1.1"
     "@types/jest": "npm:^29.5.4"
     "@types/mock-fs": "npm:4.13.1"
