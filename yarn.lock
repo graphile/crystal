@@ -3653,42 +3653,43 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@knodes/typedoc-plugin-monorepo-readmes@npm:^0.22.5":
-  version: 0.22.7
-  resolution: "@knodes/typedoc-plugin-monorepo-readmes@npm:0.22.7"
+"@knodes/typedoc-plugin-monorepo-readmes@npm:^0.23.1":
+  version: 0.23.1
+  resolution: "@knodes/typedoc-plugin-monorepo-readmes@npm:0.23.1"
   dependencies:
-    "@knodes/typedoc-pluginutils": "npm:~0.22.7"
+    "@knodes/typedoc-pluginutils": "npm:~0.23.1"
     find-up: "npm:^4.1.0"
     lodash: "npm:^4.17.21"
   peerDependencies:
-    typedoc: ^0.22.0
-  checksum: 445c170e54fe56a71874900645e2f866e153d3364d1164df76531a7a44625de13296187f449618889e66b5a09000d28618bfeaed1ec71785ec6709d159b4777c
+    typedoc: ^0.23.0
+  checksum: a723226b82d60cc70120583f51809404de7328993b13dbb7714db997ec537d6009b64770a60887768194ee09f631643155673f8e8179ff1e2612d49b3416250f
   languageName: node
   linkType: hard
 
-"@knodes/typedoc-plugin-pages@npm:^0.22.5":
-  version: 0.22.7
-  resolution: "@knodes/typedoc-plugin-pages@npm:0.22.7"
+"@knodes/typedoc-plugin-pages@npm:^0.23.4":
+  version: 0.23.4
+  resolution: "@knodes/typedoc-plugin-pages@npm:0.23.4"
   dependencies:
-    "@knodes/typedoc-pluginutils": "npm:~0.22.7"
+    "@knodes/typedoc-pluginutils": "npm:~0.23.4"
     lodash: "npm:^4.17.21"
   peerDependencies:
     lunr: ^2.3.0
-    typedoc: ^0.22.0
-  checksum: 8f2700da53c5c689baab4d3e72c2e1be18e40a192a40dcc556ebaee0cdd8905c96c0da869da91e19b8a1465f15c91bc53193c3c5a3f3ba177142f92ce07431e2
+    typedoc: ^0.23.0
+  checksum: 1cb1599be715bcc07b719158174ddf5942f0b2e8eb9b8f9546a67374abd0074c20146cb4501c980fae48c1c397fd08429de4f44f191e41f9100bb3bfe22ebf96
   languageName: node
   linkType: hard
 
-"@knodes/typedoc-pluginutils@npm:~0.22.7":
-  version: 0.22.7
-  resolution: "@knodes/typedoc-pluginutils@npm:0.22.7"
+"@knodes/typedoc-pluginutils@npm:~0.23.1, @knodes/typedoc-pluginutils@npm:~0.23.4":
+  version: 0.23.4
+  resolution: "@knodes/typedoc-pluginutils@npm:0.23.4"
   dependencies:
+    fastest-levenshtein: "npm:^1.0.16"
     lodash: "npm:^4.17.21"
     pkg-up: "npm:^3.1.0"
     semver: "npm:^7.3.5"
   peerDependencies:
-    typedoc: ^0.22.0
-  checksum: 291c26693743c7c3a6ccc5f88e081f436ea487d16195f8d1645c3cbaeda1140eaead269bd3e9021ab17f1f0d018aefc719d5e7725be211787c8f5c17762a0f64
+    typedoc: ^0.23.0
+  checksum: d0e83b85057fb15195aa6b9e4c1f830217ae1ea97e771d1d551ae9b82fa1468d2f8c6394ffb40c077d0d75f6a46a7d1d52723633010bff33b4e037076e50136e
   languageName: node
   linkType: hard
 
@@ -6135,6 +6136,13 @@ __metadata:
   version: 6.0.1
   resolution: "ansi-regex@npm:6.0.1"
   checksum: 53669c3634190ead828055bcae5f0feff485fd8d7d05538d4f753ad56ffedb7aa5bcc93efaa8e99e4907ad970682413f2407cf4acac8deb1d408bc564bca9027
+  languageName: node
+  linkType: hard
+
+"ansi-sequence-parser@npm:^1.1.0":
+  version: 1.1.1
+  resolution: "ansi-sequence-parser@npm:1.1.1"
+  checksum: 1d7e5fb3b95111a2016d113771ce4688db3b5e4a56781682f029a0fcd11f907152186a0aae99fc3782831ea8d01857747dbc96fccd65731cf126193e14e38a0c
   languageName: node
   linkType: hard
 
@@ -10692,7 +10700,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fastest-levenshtein@npm:^1.0.12":
+"fastest-levenshtein@npm:^1.0.12, fastest-levenshtein@npm:^1.0.16":
   version: 1.0.16
   resolution: "fastest-levenshtein@npm:1.0.16"
   checksum: 40ae402f492ac925db4f954af221cc4c99e2ba931eaea6d724601f81cf1b7be9d211e01685a3ef77ff32073e0f19be5993e383fb33328c06f122065c2e853d39
@@ -11572,19 +11580,6 @@ __metadata:
     once: "npm:^1.3.0"
     path-is-absolute: "npm:^1.0.0"
   checksum: c55966a5db7ed2f30976a1490f3165f9d4e20ac7cabf01b55da4cc4f8f53a4c506e6f427e469c2fbf68636200871f3acf07e159ba6d9b65e7386216b98474a34
-  languageName: node
-  linkType: hard
-
-"glob@npm:^8.0.3":
-  version: 8.1.0
-  resolution: "glob@npm:8.1.0"
-  dependencies:
-    fs.realpath: "npm:^1.0.0"
-    inflight: "npm:^1.0.4"
-    inherits: "npm:2"
-    minimatch: "npm:^5.0.1"
-    once: "npm:^1.3.0"
-  checksum: b2d53aa8d54a3e5b3998f52e72140deea385d292a68719144cda70148c335aa956bd03a643f50f6e4f685ee40ae538ee62a96278cc7b797f731a50a3babfcf63
   languageName: node
   linkType: hard
 
@@ -14254,7 +14249,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jsonc-parser@npm:^3.0.0":
+"jsonc-parser@npm:^3.2.0":
   version: 3.2.0
   resolution: "jsonc-parser@npm:3.2.0"
   checksum: dffa53dd8b8aa897575bcd31b767f1a5c90a0229902e4fcf7aaae73d11a2a343eee6f852d432f7f9328b14520f487805014c2284fbe358e904c41f004964b54a
@@ -15139,7 +15134,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"marked@npm:^4.0.16":
+"marked@npm:^4.3.0":
   version: 4.3.0
   resolution: "marked@npm:4.3.0"
   bin:
@@ -15476,16 +15471,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"minimatch@npm:^5.0.1, minimatch@npm:^5.1.0":
-  version: 5.1.6
-  resolution: "minimatch@npm:5.1.6"
-  dependencies:
-    brace-expansion: "npm:^2.0.1"
-  checksum: 0c0446ede579b1736bfea4efb288c2dea17ce80fd0339d00547625ed97a60ed403c7c2fb141211119937a811bc635b3f0f44debeb9d7870b3f58cf0fe78ddccc
-  languageName: node
-  linkType: hard
-
-"minimatch@npm:^9.0.1":
+"minimatch@npm:^9.0.1, minimatch@npm:^9.0.3":
   version: 9.0.3
   resolution: "minimatch@npm:9.0.3"
   dependencies:
@@ -18851,8 +18837,8 @@ __metadata:
     "@babel/preset-typescript": "npm:^7.22.11"
     "@changesets/changelog-github": "npm:^0.4.8"
     "@changesets/cli": "npm:^2.26.2"
-    "@knodes/typedoc-plugin-monorepo-readmes": "npm:^0.22.5"
-    "@knodes/typedoc-plugin-pages": "npm:^0.22.5"
+    "@knodes/typedoc-plugin-monorepo-readmes": "npm:^0.23.1"
+    "@knodes/typedoc-plugin-pages": "npm:^0.23.4"
     "@tsconfig/node16": "npm:^1.0.2"
     "@types/jest": "npm:^27.5.1"
     "@types/mock-fs": "npm:4.13.1"
@@ -18883,8 +18869,8 @@ __metadata:
     pg: "npm:^8.7.1"
     prettier: "npm:^2.8.7"
     rimraf: "npm:^5.0.1"
-    typedoc: "npm:^0.22.15"
-    typedoc-monorepo-link-types: "npm:^0.0.2"
+    typedoc: "npm:^0.25.0"
+    typedoc-monorepo-link-types: "npm:^0.0.4"
     typescript: "npm:^5.0.4"
     webpack: "npm:^5.65.0"
     zx: "npm:^7.2.3"
@@ -19428,14 +19414,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"shiki@npm:^0.10.1":
-  version: 0.10.1
-  resolution: "shiki@npm:0.10.1"
+"shiki@npm:^0.14.1":
+  version: 0.14.3
+  resolution: "shiki@npm:0.14.3"
   dependencies:
-    jsonc-parser: "npm:^3.0.0"
-    vscode-oniguruma: "npm:^1.6.1"
-    vscode-textmate: "npm:5.2.0"
-  checksum: 2c5f47c6c52cd5bfdaa97205866363248a145ac6c749b656858fe06ef55889adf31ca6aab4c360659a2b142c2000874c11dad8607394f5f5cb7c4e8af52c5314
+    ansi-sequence-parser: "npm:^1.1.0"
+    jsonc-parser: "npm:^3.2.0"
+    vscode-oniguruma: "npm:^1.7.0"
+    vscode-textmate: "npm:^8.0.0"
+  checksum: a62ecd31462a9206302fec40bd16185774d824a8fde68f919ea91b017345015448f24d60153cba64fb662b74cd5c67fe5a0f88a56d82cbd375b90958483d4833
   languageName: node
   linkType: hard
 
@@ -20990,29 +20977,28 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typedoc-monorepo-link-types@npm:^0.0.2":
-  version: 0.0.2
-  resolution: "typedoc-monorepo-link-types@npm:0.0.2"
+"typedoc-monorepo-link-types@npm:^0.0.4":
+  version: 0.0.4
+  resolution: "typedoc-monorepo-link-types@npm:0.0.4"
   peerDependencies:
-    typedoc: 0.22.x
-  checksum: f37f44a118dedcc52c162374c4f8865264db71b8cea8fed73fa1a3e9d208668a03f12497c5e0f16147ff85b5bbe112baf9010135850cbf4a32546ce32319d5f8
+    typedoc: 0.23.x
+  checksum: a75beb8150cd0319098ceaf42f8d3f4813b24df9e966d6e6a1aa13d8c11e75d1ef981342b7c2cb1a52d239d70fcebe4d29432a8d51b47505fb4339aca7a48967
   languageName: node
   linkType: hard
 
-"typedoc@npm:^0.22.15":
-  version: 0.22.18
-  resolution: "typedoc@npm:0.22.18"
+"typedoc@npm:^0.25.0":
+  version: 0.25.0
+  resolution: "typedoc@npm:0.25.0"
   dependencies:
-    glob: "npm:^8.0.3"
     lunr: "npm:^2.3.9"
-    marked: "npm:^4.0.16"
-    minimatch: "npm:^5.1.0"
-    shiki: "npm:^0.10.1"
+    marked: "npm:^4.3.0"
+    minimatch: "npm:^9.0.3"
+    shiki: "npm:^0.14.1"
   peerDependencies:
-    typescript: 4.0.x || 4.1.x || 4.2.x || 4.3.x || 4.4.x || 4.5.x || 4.6.x || 4.7.x
+    typescript: 4.6.x || 4.7.x || 4.8.x || 4.9.x || 5.0.x || 5.1.x || 5.2.x
   bin:
     typedoc: bin/typedoc
-  checksum: 30697e7112d7192a6f57601d202199dc8bd8572a5e2f5f10738dc814984f6d221ac747b118ed78db5ce6d1f9355463fb407c7f6534bab8bbbc937756e8b0290d
+  checksum: f7365ad125eb429ab5c3e87182997e52009b4a8c0b2956966b564c97304ba99e38f8d2576367fa95246087f198b223fe40c2f3533b49260e32791861bc140c35
   languageName: node
   linkType: hard
 
@@ -21642,17 +21628,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vscode-oniguruma@npm:^1.6.1":
+"vscode-oniguruma@npm:^1.7.0":
   version: 1.7.0
   resolution: "vscode-oniguruma@npm:1.7.0"
   checksum: be926f3eda5c37574ac42f9630969576e1035b3eb78a724921de367e76c84888847864bc2d9779e73ca61789fb27e5a0cda207c3a0aeb55dbb6b2f84449ab807
   languageName: node
   linkType: hard
 
-"vscode-textmate@npm:5.2.0":
-  version: 5.2.0
-  resolution: "vscode-textmate@npm:5.2.0"
-  checksum: adfe4dacaa689351eea44ef97d797dab87dd2c546f51e7c9e61b4b1cd9c2a47f2cc02e0023436f832e9525bd180c82a27f87355b4587816676cd4caca25eaf0f
+"vscode-textmate@npm:^8.0.0":
+  version: 8.0.0
+  resolution: "vscode-textmate@npm:8.0.0"
+  checksum: 19efb37dda3a3090aec8b97267b5ac71fedbf155140ab560b5f5aced5c8d4ca565060748eabe85e820735415cc64f970b47126cfa1ee00c29d25b9f322b42eb0
   languageName: node
   linkType: hard
 
