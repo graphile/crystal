@@ -27,7 +27,7 @@
   "homepage": "https://github.com/graphile/heart/tree/main/utils/jest-serializer-simple",
   "dependencies": {
     "@types/json5": "^2.2.0",
-    "json5": "^2.2.0",
+    "json5": "^2.2.3",
     "prettier": "^3.0.3",
     "tslib": "^2.6.2"
   },

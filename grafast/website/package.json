@@ -30,9 +30,9 @@
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "2.4.1",
-    "dataloader": "^2.1.0",
+    "dataloader": "^2.2.2",
     "mermaid": "^9.1.7",
-    "sqlite3": "^5.1.1"
+    "sqlite3": "^5.1.6"
   },
   "browserslist": {
     "production": [

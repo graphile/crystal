@@ -200,11 +200,11 @@
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "iterall": "^1.3.0",
     "jsonwebtoken": "^8.5.1",
-    "pg": "^8.7.1",
+    "pg": "^8.11.3",
     "pg-sql2": "workspace:^",
     "tamedevil": "workspace:^",
     "tslib": "^2.6.2",
-    "ws": "^8.12.1"
+    "ws": "^8.13.0"
   },
   "peerDependencies": {
     "@dataplan/json": "workspace:*",
@@ -242,7 +242,7 @@
     "graphile": "workspace:^",
     "graphile-export": "workspace:^",
     "jest": "^29.6.4",
-    "nodemon": "^2.0.15",
+    "nodemon": "^3.0.1",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
   }

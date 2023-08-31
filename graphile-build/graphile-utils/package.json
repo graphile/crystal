@@ -63,7 +63,7 @@
     "graphile-build-pg": "workspace:^",
     "jest": "^29.6.4",
     "jest-serializer-graphql-schema": "workspace:^",
-    "nodemon": "^2.0.15",
+    "nodemon": "^3.0.1",
     "postgraphile": "workspace:^",
     "ts-node": "^10.9.1",
     "typescript": "^5.2.2"
