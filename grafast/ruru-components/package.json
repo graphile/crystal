@@ -43,7 +43,7 @@
     "@types/node": "^20.5.7",
     "graphiql": "^2.4.0",
     "graphql-ws": "^5.14.0",
-    "mermaid": "^8.14.0",
+    "mermaid": "^10.4.0",
     "react": ">=16 <17",
     "react-dom": ">=16 <17",
     "tslib": "^2.6.2"
