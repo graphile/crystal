@@ -47,7 +47,7 @@
     "@types/node": "^20.5.7",
     "debug": "^4.3.4",
     "graphile-config": "workspace:^",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.2",
     "pg-introspection": "workspace:^",
     "tslib": "^2.6.2"
   },
