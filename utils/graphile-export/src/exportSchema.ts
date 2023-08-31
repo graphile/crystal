@@ -1797,7 +1797,7 @@ export async function exportSchema(
   if (options.prettier) {
     const prettier = await import("prettier");
     const config = await prettier.resolveConfig(toPath.toString());
-    const formatted = prettier.format(toFormat, {
+    const formatted = await prettier.format(toFormat, {
       parser: "babel",
       ...(config ?? {}),
     });
