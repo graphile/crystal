@@ -2,8 +2,8 @@ import te from "../dist/index.js";
 
 it("basic", () => {
   expect(te.compile(te`return 1`)).toMatchInlineSnapshot(`
-    Object {
-      "refs": Object {},
+    {
+      "refs": {},
       "string": "return 1",
     }
   `);
@@ -26,19 +26,19 @@ it("a few refs", () => {
   ${te.ref(COMPLEX_OBJECT)}
 ]`;
   expect(te.compile(frag)).toMatchInlineSnapshot(`
-    Object {
-      "refs": Object {
+    {
+      "refs": {
         "_$$_ref_1": -9007199254740991,
-        "_$$_ref_10": Object {
+        "_$$_ref_10": {
           "a": 1,
-          "b": Object {
+          "b": {
             "c": 3,
           },
         },
         "_$$_ref_2": -1.7976931348623157e+308,
         "_$$_ref_3": 5e-324,
         "_$$_ref_4": "",
-        "_$$_ref_5": "string\\"'\`$\\\\",
+        "_$$_ref_5": "string"'\`$\\",
         "_$$_ref_6": true,
         "_$$_ref_7": false,
         "_$$_ref_8": null,
@@ -62,19 +62,19 @@ it("a few refs", () => {
   expect(val[4]).toStrictEqual(AWKWARD_STRING);
   expect(val[9]).toStrictEqual(COMPLEX_OBJECT);
   expect(val).toMatchInlineSnapshot(`
-    Array [
+    [
       -9007199254740991,
       -1.7976931348623157e+308,
       5e-324,
       "",
-      "string\\"'\`$\\\\",
+      "string"'\`$\\",
       true,
       false,
       null,
       undefined,
-      Object {
+      {
         "a": 1,
-        "b": Object {
+        "b": {
           "c": 3,
         },
       },
@@ -96,11 +96,11 @@ it("a few lits", () => {
   ${te.lit(COMPLEX_OBJECT)}
 ]`;
   expect(te.compile(frag)).toMatchInlineSnapshot(`
-    Object {
-      "refs": Object {
-        "_$$_ref_1": Object {
+    {
+      "refs": {
+        "_$$_ref_1": {
           "a": 1,
-          "b": Object {
+          "b": {
             "c": 3,
           },
         },
@@ -109,8 +109,8 @@ it("a few lits", () => {
       -9007199254740991,
       -1.7976931348623157e+308,
       5e-324,
-      \\"\\",
-      \\"string\\\\\\"'\`$\\\\\\\\\\",
+      "",
+      "string\\"'\`$\\\\",
       true,
       false,
       null,
@@ -123,19 +123,19 @@ it("a few lits", () => {
   expect(val[4]).toStrictEqual(AWKWARD_STRING);
   expect(val[9]).toStrictEqual(COMPLEX_OBJECT);
   expect(val).toMatchInlineSnapshot(`
-    Array [
+    [
       -9007199254740991,
       -1.7976931348623157e+308,
       5e-324,
       "",
-      "string\\"'\`$\\\\",
+      "string"'\`$\\",
       true,
       false,
       null,
       undefined,
-      Object {
+      {
         "a": 1,
-        "b": Object {
+        "b": {
           "c": 3,
         },
       },
@@ -159,12 +159,12 @@ it("mixture", () => {
   const key = te.lit(9);
   const frag = te`return ${inner}[${key}];`;
   expect(te.compile(frag)).toMatchInlineSnapshot(`
-    Object {
-      "refs": Object {
+    {
+      "refs": {
         "_$$_ref_1": undefined,
-        "_$$_ref_2": Object {
+        "_$$_ref_2": {
           "a": 1,
-          "b": Object {
+          "b": {
             "c": 3,
           },
         },
@@ -173,8 +173,8 @@ it("mixture", () => {
       -9007199254740991,
       -1.7976931348623157e+308,
       5e-324,
-      \\"\\",
-      \\"string\\\\\\"'\`$\\\\\\\\\\",
+      "",
+      "string\\"'\`$\\\\",
       true,
       false,
       null,
@@ -242,12 +242,12 @@ it("named refs", () => {
   ${te.ref(COMPLEX_OBJECT, "complex")}
 ]`;
   expect(te.compile(frag)).toMatchInlineSnapshot(`
-    Object {
-      "refs": Object {
-        "awkward": "string\\"'\`$\\\\",
-        "complex": Object {
+    {
+      "refs": {
+        "awkward": "string"'\`$\\",
+        "complex": {
           "a": 1,
-          "b": Object {
+          "b": {
             "c": 3,
           },
         },
@@ -278,19 +278,19 @@ it("named refs", () => {
   expect(val[4]).toStrictEqual(AWKWARD_STRING);
   expect(val[9]).toStrictEqual(COMPLEX_OBJECT);
   expect(val).toMatchInlineSnapshot(`
-    Array [
+    [
       -9007199254740991,
       -1.7976931348623157e+308,
       5e-324,
       "",
-      "string\\"'\`$\\\\",
+      "string"'\`$\\",
       true,
       false,
       null,
       undefined,
-      Object {
+      {
         "a": 1,
-        "b": Object {
+        "b": {
           "c": 3,
         },
       },

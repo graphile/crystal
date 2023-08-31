@@ -31,7 +31,7 @@ it("gives bracketed access to simple symbol prop", () => {
   const untrustedInput = Symbol("some_symbol");
   const result = te.compile(te`return (obj) => obj${te.get(untrustedInput)}`);
   expect(result.refs).toMatchInlineSnapshot(`
-    Object {
+    {
       "_$$_ref_1": Symbol(some_symbol),
     }
   `);

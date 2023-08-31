@@ -19,7 +19,7 @@ it("allows awkward keys", () => {
     "_1frog",
   )}: 2 }`;
   expect(te.compile(frag).string).toMatchInlineSnapshot(
-    `"return { \\"1\\": 1, _1frog: 2 }"`,
+    `"return { "1": 1, _1frog: 2 }"`,
   );
   const val = te.run(frag);
   expect(val).toEqual({
@@ -32,6 +32,6 @@ it("forbids __proto__", () => {
   expect(() => {
     te`return { ${te.safeKeyOrThrow("__proto__")}: {a: 1} }`;
   }).toThrowErrorMatchingInlineSnapshot(
-    `"Forbidden object key: \\"__proto__\\"; consider using 'Object.create(null)' and assigning properties using te.lit."`,
+    `"Forbidden object key: "__proto__"; consider using 'Object.create(null)' and assigning properties using te.lit."`,
   );
 });
