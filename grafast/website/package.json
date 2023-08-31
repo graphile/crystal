@@ -16,9 +16,9 @@
     "test": "cd examples/users-and-friends && node index.js"
   },
   "dependencies": {
-    "@docusaurus/core": "2.4.0",
-    "@docusaurus/preset-classic": "2.4.0",
-    "@docusaurus/remark-plugin-npm2yarn": "^2.4.0",
+    "@docusaurus/core": "2.4.1",
+    "@docusaurus/preset-classic": "2.4.1",
+    "@docusaurus/remark-plugin-npm2yarn": "^2.4.1",
     "@mdx-js/react": "^1.6.22",
     "@uiw/react-codemirror": "^3.0.0",
     "clsx": "^1.2.1",
@@ -29,7 +29,7 @@
     "react-dom": "^16.8.0"
   },
   "devDependencies": {
-    "@docusaurus/module-type-aliases": "2.4.0",
+    "@docusaurus/module-type-aliases": "2.4.1",
     "dataloader": "^2.1.0",
     "mermaid": "^9.1.7",
     "sqlite3": "^5.1.1"
