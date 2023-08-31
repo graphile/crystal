@@ -30,13 +30,13 @@
     "graphql": ">=15 <17"
   },
   "devDependencies": {
-    "@types/jest": "^27.5.1",
+    "@types/jest": "^27.5.2",
     "graphql": "16.1.0-experimental-stream-defer.6",
     "jest": "^28.1.3",
     "pretty-format": "^27.5.1",
     "ts-node": "^10.9.1",
-    "tslib": "^2.5.0",
-    "typescript": "^5.0.4"
+    "tslib": "^2.6.2",
+    "typescript": "^5.2.2"
   },
   "files": [
     "dist"
