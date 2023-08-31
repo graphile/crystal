@@ -32,7 +32,7 @@
     "dist"
   ],
   "devDependencies": {
-    "@types/node": "^18.17.12",
+    "@types/node": "^20.5.7",
     "postgraphile": "workspace:^",
     "typescript": "^5.2.2"
   },
