@@ -237,7 +237,7 @@
     "@types/debug": "^4.1.8",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.4",
-    "@types/jsonwebtoken": "^8.5.9",
+    "@types/jsonwebtoken": "^9.0.2",
     "@types/nodemon": "1.19.2",
     "graphile": "workspace:^",
     "graphile-export": "workspace:^",
