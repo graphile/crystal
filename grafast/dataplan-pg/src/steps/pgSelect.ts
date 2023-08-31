@@ -1606,7 +1606,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
             ({
               ...o,
               direction: o.direction === "ASC" ? "DESC" : "ASC",
-            } as PgOrderSpec),
+            }) as PgOrderSpec,
         )
       : this.orders;
     return {

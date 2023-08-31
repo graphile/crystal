@@ -146,12 +146,9 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
                   te.run`\
 return function (list, constant) {
   return $record => list([constant(${te.lit(identifier)}, false), ${te.join(
-                    pk.map(
-                      (attributeName) =>
-                        te`$record.get(${te.lit(attributeName)})`,
-                    ),
-                    ", ",
-                  )}]);
+    pk.map((attributeName) => te`$record.get(${te.lit(attributeName)})`),
+    ", ",
+  )}]);
 }` as any,
                   [list, constant],
                 )

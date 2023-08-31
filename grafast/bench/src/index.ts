@@ -38,7 +38,7 @@ export async function bench(
   },
 ) {
   const {
-    setup = () => ({} as any),
+    setup = () => ({}) as any,
     teardown = () => {},
     contextFactory = () => ({}),
   } = options;

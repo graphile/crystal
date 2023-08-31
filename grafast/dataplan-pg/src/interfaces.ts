@@ -418,7 +418,8 @@ export type KeysOfType<TObject, TValueType> = {
 declare global {
   namespace GraphileConfig {
     interface PgServiceConfiguration<
-      TAdaptor extends keyof GraphileConfig.PgDatabaseAdaptorOptions = keyof GraphileConfig.PgDatabaseAdaptorOptions,
+      TAdaptor extends
+        keyof GraphileConfig.PgDatabaseAdaptorOptions = keyof GraphileConfig.PgDatabaseAdaptorOptions,
     > {
       name: string;
       schemas?: string[];

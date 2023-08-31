@@ -3280,9 +3280,9 @@ export function makeExampleSchema(
       updatedAt: attrField("updated_at", GraphQLString),
       isExplicitlyArchived: attrField("is_explicitly_archived", GraphQLBoolean),
       archivedAt: attrField("archived_at", GraphQLString),
-    } satisfies {
+    }) satisfies {
       [fieldName: string]: GrafastFieldConfig<any, any, TStep, any, any>;
-    });
+    };
 
   const RelationalTopic = newObjectTypeBuilder<
     OurGraphQLContext,

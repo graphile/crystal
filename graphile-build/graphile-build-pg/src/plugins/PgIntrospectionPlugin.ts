@@ -703,9 +703,8 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
           }
         }
         try {
-          const eventStream = await pgService.pgSubscriber.subscribe(
-            "postgraphile_watch",
-          );
+          const eventStream =
+            await pgService.pgSubscriber.subscribe("postgraphile_watch");
           const $$stop = Symbol("stop");
           const abort = defer<typeof $$stop>();
           unlistens.push(() => abort.resolve($$stop));

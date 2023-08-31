@@ -42,10 +42,13 @@ function makeMapper(
       if (obj == null) {
         return obj;
       }
-      return Object.keys(actualKeyByDesiredKey).reduce((memo, desiredKey) => {
-        memo[desiredKey] = obj[actualKeyByDesiredKey[desiredKey]];
-        return memo;
-      }, Object.create(null) as Record<string, any>);
+      return Object.keys(actualKeyByDesiredKey).reduce(
+        (memo, desiredKey) => {
+          memo[desiredKey] = obj[actualKeyByDesiredKey[desiredKey]];
+          return memo;
+        },
+        Object.create(null) as Record<string, any>,
+      );
     },
   );
 }

@@ -219,7 +219,8 @@ export interface PgFunctionResourceOptions<
   TUniques extends ReadonlyArray<
     PgResourceUnique<GetPgCodecAttributes<TCodec>>
   > = ReadonlyArray<PgResourceUnique<GetPgCodecAttributes<TCodec>>>,
-  TNewParameters extends readonly PgResourceParameter[] = readonly PgResourceParameter[],
+  TNewParameters extends
+    readonly PgResourceParameter[] = readonly PgResourceParameter[],
 > {
   name: TNewName;
   identifier?: string;
@@ -1382,9 +1383,8 @@ exportAs("@dataplan/pg", makePgResourceOptions, "makePgResourceOptions");
 
 function printResourceFrom(resource: PgResourceOptions): string {
   if (typeof resource.from === "function") {
-    return `a function accepting ${
-      resource.parameters?.length
-    } parameters and returning SQL type '${
+    return `a function accepting ${resource.parameters
+      ?.length} parameters and returning SQL type '${
       sql.compile(resource.codec.sqlType).text
     }'`;
   } else {

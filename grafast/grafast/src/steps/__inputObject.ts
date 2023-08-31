@@ -87,8 +87,8 @@ export class __InputObjectStep<
         }
         return te`\
   resultValues${te.set(inputFieldName, true)} = ${te.identifier(
-          `val${dependencyIndex}`,
-        )};`;
+    `val${dependencyIndex}`,
+  )};`;
       },
     ),
     "\n",

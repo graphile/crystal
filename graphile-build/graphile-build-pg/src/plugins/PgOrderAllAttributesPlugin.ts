@@ -122,12 +122,12 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
                       grafast: {
                         applyPlan: EXPORTABLE(
                           (
-                              PgSelectStep,
-                              PgUnionAllStep,
-                              attributeName,
-                              isUnique,
-                              pgOrderByNullsLast,
-                            ) =>
+                            PgSelectStep,
+                            PgUnionAllStep,
+                            attributeName,
+                            isUnique,
+                            pgOrderByNullsLast,
+                          ) =>
                             (plan: ExecutableStep | ModifierStep): void => {
                               if (
                                 !(plan instanceof PgSelectStep) &&
@@ -181,12 +181,12 @@ export const PgOrderAllAttributesPlugin: GraphileConfig.Plugin = {
                       grafast: {
                         applyPlan: EXPORTABLE(
                           (
-                              PgSelectStep,
-                              PgUnionAllStep,
-                              attributeName,
-                              isUnique,
-                              pgOrderByNullsLast,
-                            ) =>
+                            PgSelectStep,
+                            PgUnionAllStep,
+                            attributeName,
+                            isUnique,
+                            pgOrderByNullsLast,
+                          ) =>
                             (plan: ExecutableStep | ModifierStep): void => {
                               if (
                                 !(plan instanceof PgSelectStep) &&

@@ -17,7 +17,10 @@ export class ToPgStep extends UnbatchedExecutableStep<any> {
     exportName: "ToPgStep",
   };
   isSyncAndSafe = true;
-  constructor($value: ExecutableStep, private codec: PgCodec) {
+  constructor(
+    $value: ExecutableStep,
+    private codec: PgCodec,
+  ) {
     super();
     this.addDependency($value);
   }

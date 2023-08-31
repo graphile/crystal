@@ -24,7 +24,8 @@ import type { PgSelectSingleStep } from "./pgSelectSingle.js";
 export interface PgPolymorphicTypeMap<
   TItemStep extends PgSelectSingleStep<any> | PgClassExpressionStep<any, any>,
   TTypeSpecifier,
-  TTypeSpecifierStep extends ExecutableStep<TTypeSpecifier> = ExecutableStep<TTypeSpecifier>,
+  TTypeSpecifierStep extends
+    ExecutableStep<TTypeSpecifier> = ExecutableStep<TTypeSpecifier>,
 > {
   [typeName: string]: {
     match(specifier: TTypeSpecifier): boolean;
@@ -41,7 +42,8 @@ export interface PgPolymorphicTypeMap<
 export class PgPolymorphicStep<
     TItemStep extends PgSelectSingleStep<any> | PgClassExpressionStep<any, any>,
     TTypeSpecifier,
-    TTypeSpecifierStep extends ExecutableStep<TTypeSpecifier> = ExecutableStep<TTypeSpecifier>,
+    TTypeSpecifierStep extends
+      ExecutableStep<TTypeSpecifier> = ExecutableStep<TTypeSpecifier>,
   >
   extends UnbatchedExecutableStep<any>
   implements PolymorphicStep
@@ -143,7 +145,8 @@ export class PgPolymorphicStep<
 export function pgPolymorphic<
   TItemStep extends PgSelectSingleStep<any> | PgClassExpressionStep<any, any>,
   TTypeSpecifier = any,
-  TTypeSpecifierStep extends ExecutableStep<TTypeSpecifier> = ExecutableStep<TTypeSpecifier>,
+  TTypeSpecifierStep extends
+    ExecutableStep<TTypeSpecifier> = ExecutableStep<TTypeSpecifier>,
 >(
   $item: TItemStep,
   $typeSpecifier: TTypeSpecifierStep,

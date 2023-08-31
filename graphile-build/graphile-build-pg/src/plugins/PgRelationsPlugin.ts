@@ -1159,17 +1159,17 @@ function addRelations(
             }
             return EXPORTABLE(
               (
-                  attributes,
-                  connection,
-                  identifier,
-                  isConnection,
-                  isMutationPayload,
-                  members,
-                  paths,
-                  pgUnionAll,
-                  resourceByTypeName,
-                  single,
-                ) =>
+                attributes,
+                connection,
+                identifier,
+                isConnection,
+                isMutationPayload,
+                members,
+                paths,
+                pgUnionAll,
+                resourceByTypeName,
+                single,
+              ) =>
                 ($parent: ExecutableStep) => {
                   const $record = isMutationPayload
                     ? (

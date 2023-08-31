@@ -908,10 +908,12 @@ function makeExecuteChildPlanCode(
     const queueCount = root.queue.length;
     try {
       ${setTargetOrReturn} ${
-      childBucket === te_bucket
-        ? te.blank
-        : te`${childBucket} == null ? ${asString ? te_nullString : te_null} : `
-    }${te_childOutputPlanExecute};
+        childBucket === te_bucket
+          ? te.blank
+          : te`${childBucket} == null ? ${
+              asString ? te_nullString : te_null
+            } : `
+      }${te_childOutputPlanExecute};
     } catch (e) {
       ${te_commonErrorHandler}(e, ${locationDetails}, mutablePath, mutablePathIndex, root, streamCount, queueCount);
       ${setTargetOrReturn} ${asString ? te_nullString : te_null};
