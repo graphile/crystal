@@ -20,18 +20,18 @@
     "@docusaurus/preset-classic": "2.4.1",
     "@docusaurus/remark-plugin-npm2yarn": "^2.4.1",
     "@mdx-js/react": "^2.3.0",
-    "@uiw/react-codemirror": "^3.0.0",
+    "@uiw/react-codemirror": "^4.21.12",
     "clsx": "^2.0.0",
-    "codemirror": "^5.0.0",
-    "codemirror-graphql": "^2.0.0",
+    "codemirror": "^5.65.15",
+    "codemirror-graphql": "^2.0.9",
     "prism-react-renderer": "^2.0.6",
-    "react": "^16.8.0",
-    "react-dom": "^16.8.0"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "2.4.1",
     "dataloader": "^2.2.2",
-    "mermaid": "^10.4.0",
+    "mermaid": "^9.0.0",
     "sqlite3": "^5.1.6"
   },
   "browserslist": {

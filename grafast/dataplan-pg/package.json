@@ -82,7 +82,7 @@
     "dist"
   ],
   "devDependencies": {
-    "@mermaid-js/mermaid-cli": "^10.4.0",
+    "@mermaid-js/mermaid-cli": "^9.0.0",
     "@types/jest": "^29.5.4",
     "@types/json5": "^2.2.0",
     "@types/license-checker-webpack-plugin": "^0.2.2",
