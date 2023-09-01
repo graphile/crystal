@@ -15,7 +15,6 @@ import {
   stringifyPayload,
   subscribe as grafastSubscribe,
 } from "grafast";
-import { planToMermaid } from "grafast/mermaid";
 import type {
   AsyncExecutionResult,
   ExecutionPatchResult,
@@ -28,6 +27,7 @@ import {
   validate,
   validateSchema,
 } from "grafast/graphql";
+import { planToMermaid } from "grafast/mermaid";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 import { relative } from "path";

@@ -55,6 +55,7 @@ import {
   GrafastFieldConfig,
   GrafastFieldConfigArgumentMap,
   GrafastInputFieldConfig,
+  GrafastPlanJSON,
   GrafastResultsList,
   GrafastResultStreamList,
   GrafastSubscriber,
@@ -75,7 +76,6 @@ import {
   StepOptimizeOptions,
   StepStreamOptions,
   TypedEventEmitter,
-  GrafastPlanJSON,
 } from "./interfaces.js";
 import { polymorphicWrap } from "./polymorphic.js";
 import {

@@ -1,4 +1,3 @@
-import mermaid from "mermaid";
 import type { FC } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -7,7 +6,6 @@ import type { ExplainHelpers } from "../hooks/useExplain.js";
 import type { ExplainResults } from "../hooks/useFetcher.js";
 import { Copy } from "./Copy.js";
 import { FormatSQL } from "./FormatSQL.js";
-import { Mermaid } from "./Mermaid.js";
 
 export const Explain: FC<{
   explain: boolean;

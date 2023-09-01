@@ -42,7 +42,6 @@ import type {
   ConstantStep,
 } from "./steps/index.js";
 import type { GrafastInputObjectType, GrafastObjectType } from "./utils.js";
-import { LayerPlanReason } from "./engine/LayerPlan.js";
 
 type PromiseOrValue<T> = T | Promise<T>;
 

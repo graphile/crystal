@@ -23,7 +23,6 @@ import {
   hookArgs,
   subscribe as grafastSubscribe,
 } from "grafast";
-import { planToMermaid } from "grafast/mermaid";
 import type {
   AsyncExecutionResult,
   ExecutionArgs,
@@ -40,6 +39,7 @@ import {
   validate,
   validateSchema,
 } from "grafast/graphql";
+import { planToMermaid } from "grafast/mermaid";
 import { StreamDeferPlugin } from "graphile-build";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";

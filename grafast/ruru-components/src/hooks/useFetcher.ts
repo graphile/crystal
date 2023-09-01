@@ -9,9 +9,9 @@ import {
   isAsyncIterable,
   isPromise,
 } from "@graphiql/toolkit";
+import type { GrafastPlanJSON } from "grafast";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { getOperationAST, parse } from "graphql";
-import type { GrafastPlanJSON } from "grafast";
 import { createClient } from "graphql-ws";
 import { useEffect, useMemo, useState } from "react";
 

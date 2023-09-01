@@ -27,7 +27,6 @@ import { isGrafastError } from "./error.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { GrafastPlanJSON, OperationPlan } from "./index.js";
 import type {
-  GrafastPlanJSONv1,
   GrafastTimeouts,
   JSONValue,
   PromiseOrDirect,
@@ -40,8 +39,6 @@ import { isPromiseLike } from "./utils.js";
 
 const { GraphQLError } = graphql;
 
-const isTest =
-  typeof process !== "undefined" && process.env.NODE_ENV === "test";
 const $$contextPlanCache = Symbol("contextPlanCache");
 const $$bypassGraphQL = Symbol("bypassGraphQL");
 

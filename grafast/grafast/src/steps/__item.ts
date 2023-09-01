@@ -1,8 +1,8 @@
 import chalk from "chalk";
 
+import type { JSONValue } from "../index.js";
 import type { ExecutableStep } from "../step.js";
 import { $$deepDepSkip, $$noExec, UnbatchedExecutableStep } from "../step.js";
-import { JSONValue } from "../index.js";
 
 /**
  * An __ItemStep is an internal plan (users must never construct it

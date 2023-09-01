@@ -2,7 +2,7 @@
  * This file contains all our utilities for dealing with Mermaid-js
  */
 
-import {
+import type {
   GrafastPlanBucketJSONv1,
   GrafastPlanJSON,
   GrafastPlanJSONv1,
