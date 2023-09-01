@@ -2,25 +2,21 @@ import { useMemo, useState } from "react";
 
 export interface StoredKeys {
   saveHeaders: "true" | "";
-  headers: string;
   explain: "true" | "";
   explorerIsOpen: "true" | "";
   explainIsOpen: "true" | "";
   explainAtBottom: "true" | "";
   explainSize: string;
-  query: string;
   verbose: "true" | "";
 }
 
 const KEYS: { [key in keyof StoredKeys]: string } = {
   saveHeaders: "Ruru:saveHeadersText",
-  headers: "Ruru:headersText",
   explain: "Ruru:explain",
   explainSize: "Ruru:explainSize",
   explainIsOpen: "Ruru:explainIsOpen",
   explainAtBottom: "Ruru:explainAtBottom",
   explorerIsOpen: "graphiql:explorerIsOpen",
-  query: "graphiql:query",
   verbose: "Ruru:verbose",
 };
 
