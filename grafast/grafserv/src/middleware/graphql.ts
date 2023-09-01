@@ -437,65 +437,49 @@ export const makeGraphQLHandler = (
           ? parseGraphQLBody(resolvedPreset, request, await request.getBody())
           : parseGraphQLQueryParams(await request.getQueryParams());
 
-      try {
-        // Apply our hooks (if any) to the body (they will mutate the body in place)
-        const hookResult =
-          hooks.callbacks.processGraphQLRequestBody != null
-            ? hooks.process("processGraphQLRequestBody", {
-                body: parsedBody,
-                request,
-              })
-            : undefined;
-        if (hookResult != null) {
-          await hookResult;
-        }
-      } catch (e) {
-        if (e instanceof SafeError) {
-          const payload = {
-            errors: [
-              new GraphQLError(
-                e.message,
-                null,
-                undefined,
-                undefined,
-                undefined,
-                e,
-                undefined,
-              ),
-            ],
-          };
-          return {
-            type: "graphql",
-            request,
-            dynamicOptions,
-            statusCode: e.extensions.statusCode,
-            contentType: chosenContentType,
-            payload,
-          };
-        } else {
-          throw e;
-        }
+      // Apply our hooks (if any) to the body (they will mutate the body in place)
+      const hookResult =
+        hooks.callbacks.processGraphQLRequestBody != null
+          ? hooks.process("processGraphQLRequestBody", {
+              body: parsedBody,
+              request,
+            })
+          : undefined;
+      if (hookResult != null) {
+        await hookResult;
       }
 
       // Validate that the body is of the right shape
       body = validateGraphQLBody(parsedBody);
     } catch (e) {
-      if (e instanceof SafeError) {
-        throw e;
-      } else if (
-        typeof e.statusCode === "number" &&
-        e.statusCode >= 400 &&
-        e.statusCode < 600
-      ) {
-        throw e;
-      } else {
-        // ENHANCE: should maybe handle more specific issues here. See examples:
-        // https://graphql.github.io/graphql-over-http/draft/#sec-application-json.Examples
-        throw httpError(
-          400,
-          `Parsing failed, please check that the data you're sending to the server is correct`,
-        );
-      }
+      return {
+        type: "graphql",
+        request,
+        dynamicOptions,
+        statusCode:
+          e instanceof SafeError
+            ? e.extensions.statusCode
+            : typeof e.statusCode === "number" &&
+              e.statusCode >= 400 &&
+              e.statusCode < 600
+            ? e.statusCode
+            : 400,
+        contentType: chosenContentType,
+        payload: maskPayload({
+          errors: [
+            new GraphQLError(
+              e.message ??
+                `Parsing failed, please check that the data you're sending to the server is correct`,
+              null,
+              undefined,
+              undefined,
+              undefined,
+              e,
+              undefined,
+            ),
+          ],
+        }),
+      };
     }
 
     const { query, operationName, variableValues } = body;
