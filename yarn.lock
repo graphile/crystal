@@ -18931,6 +18931,10 @@ __metadata:
     typescript: "npm:^5.2.2"
   peerDependencies:
     graphql: ^16.1.0-experimental-stream-defer.6
+    tamedevil: "workspace:^"
+  peerDependenciesMeta:
+    tamedevil:
+      optional: true
   languageName: unknown
   linkType: soft
 
