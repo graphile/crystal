@@ -55,10 +55,7 @@ export const Ruru: FC<RuruProps> = (props) => {
   const explainHelpers = useExplain(storage);
   const { schema } = useSchema(props, fetcher, setError, streamEndpoint);
   const defaultQuery = props.defaultQuery ?? DEFAULT_QUERY;
-  const [query, setQuery] = useState(storage.get("query") ?? defaultQuery);
   const explorerPlugin = makeExplorerPlugin({
-    // query,
-    // onEdit: setQuery,
     showAttribution: false,
   });
   const plugins = useMemo<GraphiQLPlugin[]>(() => {
@@ -78,7 +75,6 @@ export const Ruru: FC<RuruProps> = (props) => {
         fetcher={fetcher}
         schema={schema}
         defaultQuery={defaultQuery}
-        query={query}
         plugins={plugins}
         shouldPersistHeaders={saveHeaders}
       >
@@ -87,7 +83,6 @@ export const Ruru: FC<RuruProps> = (props) => {
           editorTheme={props.editorTheme}
           error={error}
           setError={setError}
-          onEditQuery={setQuery}
         />
       </GraphiQLProvider>
     </ExplainContext.Provider>
@@ -99,7 +94,7 @@ export const RuruInner: FC<{
   storage: RuruStorage;
   error: Error | null;
   setError: React.Dispatch<React.SetStateAction<Error | null>>;
-  onEditQuery: GraphiQLProps["onEditQuery"];
+  onEditQuery?: GraphiQLProps["onEditQuery"];
 }> = (props) => {
   const { storage, editorTheme, error, setError, onEditQuery } = props;
   const prettify = usePrettify();
