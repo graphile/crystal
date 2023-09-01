@@ -3301,6 +3301,8 @@ export class OperationPlan {
           ? [...step.polymorphicPaths]
           : undefined,
         isSyncAndSafe: step.isSyncAndSafe || undefined,
+        supportsUnbatched:
+          typeof (step as any).unbatchedExecute === "function" || undefined,
         hasSideEffects: step.hasSideEffects || undefined,
         extra: step.planJSONExtra(),
       };

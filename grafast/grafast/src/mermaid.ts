@@ -170,7 +170,7 @@ export function planToMermaid(
       const strippedMeta = rawMeta != null ? stripAnsi(rawMeta) : null;
       const meta =
         concise && strippedMeta ? squish(strippedMeta) : strippedMeta;
-      const isUnbatched = typeof (plan as any).unbatchedExecute === "function";
+      const isUnbatched = plan.supportsUnbatched;
 
       const polyPaths = pp(plan.polymorphicPaths);
       const polyPathsIfDifferent =
@@ -265,6 +265,12 @@ export function planToMermaid(
     planId(step);
   });
 
+  const stepToString = (step: GrafastPlanStepJSONv1): string => {
+    return `${step.stepClass.replace(/Step$/, "")}${
+      step.bucketId === 0 ? "" : `{${step.bucketId}}`
+    }${step.metaString ? `<${step.metaString}>` : ""}[${step.id}]`;
+  };
+
   graph.push("");
   if (!concise) graph.push("    subgraph Buckets");
   const layerPlans = Object.values(layerPlanById);
@@ -298,7 +304,7 @@ export function planToMermaid(
               : ""
           }${
             layerPlan.rootStepId != null && layerPlan.reason.type !== "root"
-              ? `\nROOT ${stepById[layerPlan.rootStepId]}`
+              ? `\nROOT ${stepToString(stepById[layerPlan.rootStepId])}`
               : ""
           }${startSteps(layerPlan)}\n${outputMapStuff.join("\n")}`,
         )}):::bucket`,

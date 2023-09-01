@@ -1029,6 +1029,7 @@ export interface GrafastPlanStepJSONv1 {
   dependencyIds: ReadonlyArray<string | number>;
   polymorphicPaths: readonly string[] | undefined;
   isSyncAndSafe: boolean | undefined;
+  supportsUnbatched: boolean | undefined;
   hasSideEffects: boolean | undefined;
   extra?: Record<string, JSONValue | undefined>;
 }
