@@ -3862,7 +3862,7 @@ __metadata:
     codemirror: "npm:^5.65.15"
     codemirror-graphql: "npm:^2.0.9"
     dataloader: "npm:^2.2.2"
-    mermaid: "npm:^9.0.0"
+    mermaid: "npm:^9.4.3"
     prism-react-renderer: "npm:^2.0.6"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
@@ -5946,7 +5946,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/webpack-bundle-analyzer@npm:^4":
+"@types/webpack-bundle-analyzer@npm:^4.6.0":
   version: 4.6.0
   resolution: "@types/webpack-bundle-analyzer@npm:4.6.0"
   dependencies:
@@ -10901,9 +10901,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fastify@npm:^4.22.0":
-  version: 4.22.0
-  resolution: "fastify@npm:4.22.0"
+"fastify@npm:^4.22.1":
+  version: 4.22.1
+  resolution: "fastify@npm:4.22.1"
   dependencies:
     "@fastify/ajv-compiler": "npm:^3.5.0"
     "@fastify/error": "npm:^3.2.0"
@@ -10921,7 +10921,7 @@ __metadata:
     secure-json-parse: "npm:^2.5.0"
     semver: "npm:^7.5.0"
     tiny-lru: "npm:^11.0.1"
-  checksum: 4b0482a8247e672a47ebace2581b151b541ef27730837f78eef2bb4797b84430dfd8645cf55ef430e55de1d840b02266442aa0dc64a17d14b2dc1aec5c886933
+  checksum: 80662d8e7cae6563e0ae212c1c69f316e4c93d9258dfb410e0296db32bb9e9c2f385d3c6a8ef8fcf2f1733d1089743127e1214d4bd6d88e87ef5cd6c3aaf22e4
   languageName: node
   linkType: hard
 
@@ -11806,7 +11806,7 @@ __metadata:
     jest: "npm:^29.6.4"
     license-checker-webpack-plugin: "npm:^0.2.1"
     lodash: "npm:^4.17.21"
-    mermaid: "npm:^9.0.0"
+    mermaid: "npm:^9.4.3"
     mocha: "npm:^10.2.0"
     nodemon: "npm:^3.0.1"
     pg-sql2: "workspace:^"
@@ -11845,7 +11845,7 @@ __metadata:
     debug: "npm:^4.3.4"
     eventemitter3: "npm:^5.0.1"
     express: "npm:^4.18.2"
-    fastify: "npm:^4.22.0"
+    fastify: "npm:^4.22.1"
     grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphql-http: "npm:^1.22.0"
@@ -11904,7 +11904,7 @@ __metadata:
     debug: "npm:^4.3.4"
     express: "npm:^4.18.2"
     express-graphql: "npm:^0.12.0"
-    fastify: "npm:^4.22.0"
+    fastify: "npm:^4.22.1"
     fastify-static: "npm:^4.7.0"
     graphile-config: "workspace:^"
     graphile-export: "workspace:^"
@@ -15217,7 +15217,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mermaid@npm:*, mermaid@npm:^10.0.0":
+"mermaid@npm:*":
   version: 10.4.0
   resolution: "mermaid@npm:10.4.0"
   dependencies:
@@ -15245,7 +15245,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mermaid@npm:^9.0.0, mermaid@npm:^9.2.2":
+"mermaid@npm:^9.2.2, mermaid@npm:^9.4.3":
   version: 9.4.3
   resolution: "mermaid@npm:9.4.3"
   dependencies:
@@ -18989,7 +18989,6 @@ __metadata:
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     graphql-ws: "npm:^5.14.0"
     jest: "npm:^29.6.4"
-    mermaid: "npm:^10.0.0"
     nodemon: "npm:^3.0.1"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
@@ -19005,7 +19004,7 @@ __metadata:
   resolution: "ruru@workspace:grafast/ruru"
   dependencies:
     "@types/http-proxy": "npm:^1.17.11"
-    "@types/webpack-bundle-analyzer": "npm:^4"
+    "@types/webpack-bundle-analyzer": "npm:^4.6.0"
     "@types/yargs": "npm:^17.0.24"
     css-loader: "npm:^6.8.1"
     file-loader: "npm:^6.2.0"

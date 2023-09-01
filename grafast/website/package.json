@@ -31,7 +31,7 @@
   "devDependencies": {
     "@docusaurus/module-type-aliases": "2.4.1",
     "dataloader": "^2.2.2",
-    "mermaid": "^9.0.0",
+    "mermaid": "^9.4.3",
     "sqlite3": "^5.1.6"
   },
   "browserslist": {
