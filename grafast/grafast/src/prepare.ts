@@ -591,13 +591,6 @@ export function grafastPrepare(
   ) {
     // Only build the plan once
     if (operationPlan[$$contextPlanCache] == null) {
-      /*
-      operationPlan[$$contextPlanCache] = operationPlan.printPlanGraph({
-        includePaths: isTest,
-        printPathRelations: false,
-        concise: !isTest,
-      });
-      */
       operationPlan[$$contextPlanCache] = operationPlan.generatePlanJSON();
     }
     rootValue[$$extensions]?.explain?.operations.push({
