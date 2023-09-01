@@ -99,7 +99,7 @@
     "@types/express": "^4.17.17",
     "@types/koa": "^2.13.8",
     "@types/koa-bodyparser": "^4.3.10",
-    "@whatwg-node/fetch": "^0.8.8",
+    "@whatwg-node/fetch": "^0.9.10",
     "express": "^4.18.2",
     "fastify": "^4.22.1",
     "grafast": "workspace:^",

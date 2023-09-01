@@ -4225,39 +4225,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@peculiar/asn1-schema@npm:^2.3.6":
-  version: 2.3.6
-  resolution: "@peculiar/asn1-schema@npm:2.3.6"
-  dependencies:
-    asn1js: "npm:^3.0.5"
-    pvtsutils: "npm:^1.3.2"
-    tslib: "npm:^2.4.0"
-  checksum: 4076214ab488be21806c961747049b2ee548b952318f0a28e3facab1699dfdac67ba2ace2684151fcfe87f904812ded8971752b0352ee3476a2358e607c41e05
-  languageName: node
-  linkType: hard
-
-"@peculiar/json-schema@npm:^1.1.12":
-  version: 1.1.12
-  resolution: "@peculiar/json-schema@npm:1.1.12"
-  dependencies:
-    tslib: "npm:^2.0.0"
-  checksum: 968c0856e97e17541e781a9a8c32bca9e915798ce0e449cd1aa5747af84802b45188cc1e2cffa773063331b61b398100eb96ccacb971b4460ea5315fb1cf260c
-  languageName: node
-  linkType: hard
-
-"@peculiar/webcrypto@npm:^1.4.0":
-  version: 1.4.3
-  resolution: "@peculiar/webcrypto@npm:1.4.3"
-  dependencies:
-    "@peculiar/asn1-schema": "npm:^2.3.6"
-    "@peculiar/json-schema": "npm:^1.1.12"
-    pvtsutils: "npm:^1.3.2"
-    tslib: "npm:^2.5.0"
-    webcrypto-core: "npm:^1.7.7"
-  checksum: 357fb9c9408aa776c01c9eec5ac2bb3b10de328cc56cc23a9420adf976d126eccd38a8886b02372913cff883195d59527732f5eee7c9a7a6c23e687139e54ca8
-  languageName: node
-  linkType: hard
-
 "@pkgjs/parseargs@npm:^0.11.0":
   version: 0.11.0
   resolution: "@pkgjs/parseargs@npm:0.11.0"
@@ -6471,36 +6438,33 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@whatwg-node/events@npm:^0.0.3":
-  version: 0.0.3
-  resolution: "@whatwg-node/events@npm:0.0.3"
-  checksum: 6c9a1a72da638a1dfeb72ccacadc8a443de37ba931af76b0afd06ddfedfcebd531b4feb2466a0336da349112593c27f0aad0bafc16a2a24f0242c6335a47e950
+"@whatwg-node/events@npm:^0.1.0":
+  version: 0.1.1
+  resolution: "@whatwg-node/events@npm:0.1.1"
+  checksum: 89a2a79091d025b709559402e6606d1f7e9528d9a0fa00b69024fa6b31f0ba15eae0c24a08605558bd3469468a8e123839a5691d5bad55bf4c6407fcf0248673
   languageName: node
   linkType: hard
 
-"@whatwg-node/fetch@npm:^0.8.8":
-  version: 0.8.8
-  resolution: "@whatwg-node/fetch@npm:0.8.8"
+"@whatwg-node/fetch@npm:^0.9.10":
+  version: 0.9.10
+  resolution: "@whatwg-node/fetch@npm:0.9.10"
   dependencies:
-    "@peculiar/webcrypto": "npm:^1.4.0"
-    "@whatwg-node/node-fetch": "npm:^0.3.6"
-    busboy: "npm:^1.6.0"
-    urlpattern-polyfill: "npm:^8.0.0"
-    web-streams-polyfill: "npm:^3.2.1"
-  checksum: b126e32f1a515e228ef65d103199ae9d3f3299d7d10dd8676672775101a5de9269c02864349dd97e8389a428149ea10db97d2d36e016e0bbe941f526e12c1d33
+    "@whatwg-node/node-fetch": "npm:^0.4.15"
+    urlpattern-polyfill: "npm:^9.0.0"
+  checksum: eb3b2a6dadd4e9cef94b0a85186ea5d5990e52a0e49a989bdc938af36e2357bf10b0f801df475d5f393e8f0241e13d00735767741eb725776a69529bf7d320fe
   languageName: node
   linkType: hard
 
-"@whatwg-node/node-fetch@npm:^0.3.6":
-  version: 0.3.6
-  resolution: "@whatwg-node/node-fetch@npm:0.3.6"
+"@whatwg-node/node-fetch@npm:^0.4.15":
+  version: 0.4.15
+  resolution: "@whatwg-node/node-fetch@npm:0.4.15"
   dependencies:
-    "@whatwg-node/events": "npm:^0.0.3"
+    "@whatwg-node/events": "npm:^0.1.0"
     busboy: "npm:^1.6.0"
     fast-querystring: "npm:^1.1.1"
     fast-url-parser: "npm:^1.1.3"
     tslib: "npm:^2.3.1"
-  checksum: 51cce86de7ae1992a20dbe64fbecab030cbae9b6bb3852a9647f36ffc3c0a5d6f6959d489960bdcaa7884216b217d6dfd38ffa84e1319d632c2431808c11cbe6
+  checksum: e9c27ca93e25f9b6a8971b2a4b1ebcccfef3f2422bfe131cb30785516d5feef105db9cdf4ec1c261dc0919a3aa2080be80c9ab45918b25467324e6db4e58911a
   languageName: node
   linkType: hard
 
@@ -7023,17 +6987,6 @@ __metadata:
   version: 2.0.6
   resolution: "asap@npm:2.0.6"
   checksum: 081b91072d2826810a8a48f4514b7b151b4771984a079005297bb9ebfa15bb4ff6ce065492933902fb12b4ab46bde204e22144d29ceca3a820f81748225cb684
-  languageName: node
-  linkType: hard
-
-"asn1js@npm:^3.0.1, asn1js@npm:^3.0.5":
-  version: 3.0.5
-  resolution: "asn1js@npm:3.0.5"
-  dependencies:
-    pvtsutils: "npm:^1.3.2"
-    pvutils: "npm:^1.1.3"
-    tslib: "npm:^2.4.0"
-  checksum: d0bc57da97696cbf161ad24cb35f9442b59a9e59a30f30e13ba6e2fb9e69f417666d952cb436a9f309a3c88d4d89404493dcc277a5fdb4d0cdbeb03da0303bb1
   languageName: node
   linkType: hard
 
@@ -11857,7 +11810,7 @@ __metadata:
     "@types/express": "npm:^4.17.17"
     "@types/koa": "npm:^2.13.8"
     "@types/koa-bodyparser": "npm:^4.3.10"
-    "@whatwg-node/fetch": "npm:^0.8.8"
+    "@whatwg-node/fetch": "npm:^0.9.10"
     debug: "npm:^4.3.4"
     eventemitter3: "npm:^5.0.1"
     express: "npm:^4.18.2"
@@ -17962,22 +17915,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pvtsutils@npm:^1.3.2":
-  version: 1.3.5
-  resolution: "pvtsutils@npm:1.3.5"
-  dependencies:
-    tslib: "npm:^2.6.1"
-  checksum: 4d092bb03ee046e0d059e15c69b6abbc8ee8f69217490658ef631b3ae622d94553ccd1ae7befda0bc213653bd48b8a4cbc83e6b519f9f9f7794cac35b20741cb
-  languageName: node
-  linkType: hard
-
-"pvutils@npm:^1.1.3":
-  version: 1.1.3
-  resolution: "pvutils@npm:1.1.3"
-  checksum: 0cb4f4878f535b07ad409df26b4e724582a50cc9ddd71375cc8d79dc79b9d712dcc0cbe52f4385c27abe6887aa88a94c98377746d95f35a88f96ebb8a585814c
-  languageName: node
-  linkType: hard
-
 "qs@npm:6.11.0":
   version: 6.11.0
   resolution: "qs@npm:6.11.0"
@@ -20740,7 +20677,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2, tslib@npm:^2.0.0, tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.3.1, tslib@npm:^2.4.0, tslib@npm:^2.4.1, tslib@npm:^2.5.0, tslib@npm:^2.6.1, tslib@npm:^2.6.2":
+"tslib@npm:^2, tslib@npm:^2.0.0, tslib@npm:^2.0.3, tslib@npm:^2.1.0, tslib@npm:^2.3.1, tslib@npm:^2.4.0, tslib@npm:^2.4.1, tslib@npm:^2.5.0, tslib@npm:^2.6.2":
   version: 2.6.2
   resolution: "tslib@npm:2.6.2"
   checksum: e5654691294dfbc49d7f37c8476b11a90ab8a0af4ad8cc968af1d013600e84ecfcd9a68e1cb89f5dcfe5c88872e3fbacea830d237cfa063498115a88f4bd2de6
@@ -21349,10 +21286,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"urlpattern-polyfill@npm:^8.0.0":
-  version: 8.0.2
-  resolution: "urlpattern-polyfill@npm:8.0.2"
-  checksum: 60db8072f11b8a456295e815afce83a4a0783d1a632f223dc61882f67cadb1e2042d8249a451aa2e494bd0d1cde75cf2ac938634a74fcd4bfbcbdbff1bea7f6b
+"urlpattern-polyfill@npm:^9.0.0":
+  version: 9.0.0
+  resolution: "urlpattern-polyfill@npm:9.0.0"
+  checksum: 9c86e08fa693219127edf42276b72fac5591b01e3b1093acba34f6add0a783a985555761761a93f539b2c7f452ea4b28e63d036c05225e1618d0ca2f2b052779
   languageName: node
   linkType: hard
 
@@ -21670,7 +21607,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web-streams-polyfill@npm:^3.0.3, web-streams-polyfill@npm:^3.2.1":
+"web-streams-polyfill@npm:^3.0.3":
   version: 3.2.1
   resolution: "web-streams-polyfill@npm:3.2.1"
   checksum: d0b6246240d181d6e2d8de6ded04938581bc5807da33ccd6f6b4a431c1f3fa3c04ffe0dfb739c7172d1208141717b4c80e8df7b300998fa9287ddb69bbaa0c68
@@ -21681,19 +21618,6 @@ __metadata:
   version: 1.2.0
   resolution: "web-worker@npm:1.2.0"
   checksum: 6b884b6c28f8664148ab2e3ff4a84bc40c035243e6467d3fefe90ea9c8c037a234eaaee2079ce47975f8ec6ec685c6ca8e3f2b98856687dfa4f7d683ba8ac344
-  languageName: node
-  linkType: hard
-
-"webcrypto-core@npm:^1.7.7":
-  version: 1.7.7
-  resolution: "webcrypto-core@npm:1.7.7"
-  dependencies:
-    "@peculiar/asn1-schema": "npm:^2.3.6"
-    "@peculiar/json-schema": "npm:^1.1.12"
-    asn1js: "npm:^3.0.1"
-    pvtsutils: "npm:^1.3.2"
-    tslib: "npm:^2.4.0"
-  checksum: 5765cb899f9bc2fd50ed89e6130b4f2dca875644b6a248a83cd955a11e4f1986765508ceb4ba55f8b295da26395cccf4e461bffaeeef365e2342a7ab06caa419
   languageName: node
   linkType: hard
 
