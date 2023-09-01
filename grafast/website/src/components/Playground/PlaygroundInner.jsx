@@ -30,9 +30,7 @@ type Query {
 const INITIAL_CODE = `\
 const plans = {
   Query: {
-    addTwoNumbers(_, args) {
-      const $a = args.get("a");
-      const $b = args.get("b");
+    addTwoNumbers(_, { $a, $b }) {
       return lambda([$a, $b], ([a, b]) => a + b, true);
     },
   },
@@ -111,10 +109,6 @@ with (Grafast) {
 }
 
 const Editor = ({ value, onValueChange, lang }) => {
-  const onChange = useCallback(
-    (e) => onValueChange(e.getValue()),
-    [onValueChange],
-  );
   const options = useMemo(() => {
     return {
       theme: "monokai",
@@ -126,7 +120,7 @@ const Editor = ({ value, onValueChange, lang }) => {
     <CodeMirror
       lazyLoadMode={false}
       value={value}
-      onChange={onChange}
+      onChange={onValueChange}
       options={options}
     />
   );
