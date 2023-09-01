@@ -82,7 +82,8 @@ import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
 import { OutputPlan } from "./OutputPlan.js";
 import { StepTracker } from "./StepTracker.js";
 
-const atpe = process.env.ALWAYS_THROW_PLANNING_ERRORS;
+const atpe =
+  typeof process !== "undefined" && process.env.ALWAYS_THROW_PLANNING_ERRORS;
 const ALWAYS_THROW_PLANNING_ERRORS = atpe === "1";
 const THROW_PLANNING_ERRORS_ON_SIDE_EFFECTS = atpe === "2";
 
