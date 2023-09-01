@@ -5946,6 +5946,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/webpack-bundle-analyzer@npm:^4":
+  version: 4.6.0
+  resolution: "@types/webpack-bundle-analyzer@npm:4.6.0"
+  dependencies:
+    "@types/node": "npm:*"
+    tapable: "npm:^2.2.0"
+    webpack: "npm:^5"
+  checksum: ed00dd0237340c4f491709642ad7b952653b843ec9aaca3ff3af3fc0ee62ffecca433e686237863bef6a9c2587c08c3435d9b64c27ee5316d3fbe0fc90f68eab
+  languageName: node
+  linkType: hard
+
 "@types/webpack-sources@npm:*":
   version: 3.2.0
   resolution: "@types/webpack-sources@npm:3.2.0"
@@ -15206,7 +15217,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mermaid@npm:*":
+"mermaid@npm:*, mermaid@npm:^10.0.0":
   version: 10.4.0
   resolution: "mermaid@npm:10.4.0"
   dependencies:
@@ -18978,7 +18989,7 @@ __metadata:
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     graphql-ws: "npm:^5.14.0"
     jest: "npm:^29.6.4"
-    mermaid: "npm:^9.0.0"
+    mermaid: "npm:^10.0.0"
     nodemon: "npm:^3.0.1"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
@@ -18994,6 +19005,7 @@ __metadata:
   resolution: "ruru@workspace:grafast/ruru"
   dependencies:
     "@types/http-proxy": "npm:^1.17.11"
+    "@types/webpack-bundle-analyzer": "npm:^4"
     "@types/yargs": "npm:^17.0.24"
     css-loader: "npm:^6.8.1"
     file-loader: "npm:^6.2.0"
@@ -19007,6 +19019,7 @@ __metadata:
     tslib: "npm:^2.6.2"
     typescript: "npm:^5.2.2"
     webpack: "npm:^5.88.2"
+    webpack-bundle-analyzer: "npm:^4.9.1"
     webpack-cli: "npm:^5.1.4"
     yargs: "npm:^17.7.2"
   peerDependencies:
@@ -21674,7 +21687,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack-bundle-analyzer@npm:^4.5.0":
+"webpack-bundle-analyzer@npm:^4.5.0, webpack-bundle-analyzer@npm:^4.9.1":
   version: 4.9.1
   resolution: "webpack-bundle-analyzer@npm:4.9.1"
   dependencies:
@@ -21829,7 +21842,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webpack@npm:^5.73.0, webpack@npm:^5.88.2":
+"webpack@npm:^5, webpack@npm:^5.73.0, webpack@npm:^5.88.2":
   version: 5.88.2
   resolution: "webpack@npm:5.88.2"
   dependencies:

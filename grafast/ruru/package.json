@@ -64,6 +64,7 @@
   ],
   "devDependencies": {
     "@types/http-proxy": "^1.17.11",
+    "@types/webpack-bundle-analyzer": "^4",
     "@types/yargs": "^17.0.24",
     "css-loader": "^6.8.1",
     "file-loader": "^6.2.0",
@@ -74,6 +75,7 @@
     "ts-loader": "^9.4.4",
     "typescript": "^5.2.2",
     "webpack": "^5.88.2",
+    "webpack-bundle-analyzer": "^4.9.1",
     "webpack-cli": "^5.1.4"
   }
 }

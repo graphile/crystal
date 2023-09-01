@@ -76,22 +76,24 @@ export const ExplainMain: FC<{
     if (!selectedResult || selectedResult.type !== "mermaid-js") return;
     setSaving(true);
     setTimeout(() => {
-      mermaid.mermaidAPI.render("id1", selectedResult.diagram, (svg) => {
-        const file = new File([svg], "grafast-plan.svg");
+      mermaid.mermaidAPI
+        .render("id1", selectedResult.diagram)
+        .then(({ svg }) => {
+          const file = new File([svg], "grafast-plan.svg");
 
-        const a = document.createElement("a");
-        a.href = URL.createObjectURL(file);
-        a.download = file.name;
-        a.style.display = "none";
-        document.body.appendChild(a);
-        a.click();
-        setSaving(false);
+          const a = document.createElement("a");
+          a.href = URL.createObjectURL(file);
+          a.download = file.name;
+          a.style.display = "none";
+          document.body.appendChild(a);
+          a.click();
+          setSaving(false);
 
-        setTimeout(() => {
-          URL.revokeObjectURL(a.href);
-          a.parentNode!.removeChild(a);
-        }, 0);
-      });
+          setTimeout(() => {
+            URL.revokeObjectURL(a.href);
+            a.parentNode!.removeChild(a);
+          }, 0);
+        });
     }, 0);
   }, [selectedResult]);
 
