@@ -1,7 +1,7 @@
+import { planToMermaid } from "grafast/mermaid";
 import type { FC } from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { planToMermaid } from "grafast/mermaid";
 
 import type { ExplainHelpers } from "../hooks/useExplain.js";
 import type { ExplainResults } from "../hooks/useFetcher.js";

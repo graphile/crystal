@@ -1,4 +1,5 @@
-import { planToMermaid, GrafastPlanJSON } from "grafast/mermaid";
+import type { GrafastPlanJSON } from "grafast/mermaid";
+import { planToMermaid } from "grafast/mermaid";
 import type { FC } from "react";
 import { useEffect, useMemo } from "react";
 
