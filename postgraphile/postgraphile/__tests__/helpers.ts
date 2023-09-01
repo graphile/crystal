@@ -22,7 +22,7 @@ import {
   execute as grafastExecute,
   hookArgs,
   subscribe as grafastSubscribe,
-  planToMermaidDiagram,
+  planToMermaid,
 } from "grafast";
 import type {
   AsyncExecutionResult,
@@ -696,7 +696,7 @@ export const assertSnapshotsMatch = async (
       (op) => op.type === "plan",
     );
 
-    const graphString = planOp ? planToMermaidDiagram(planOp.plan) : undefined;
+    const graphString = planOp ? planToMermaid(planOp.plan) : undefined;
     const mermaidFileName = basePath + (ext || "") + ".mermaid";
     if (!graphString) {
       throw new Error("No plan was emitted for this test!");

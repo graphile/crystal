@@ -1030,6 +1030,7 @@ export interface GrafastPlanStepJSONv1 {
   polymorphicPaths: readonly string[] | undefined;
   isSyncAndSafe: boolean | undefined;
   hasSideEffects: boolean | undefined;
+  extra?: Record<string, JSONValue | undefined>;
 }
 
 export interface GrafastPlanBucketPhaseJSONv1 {

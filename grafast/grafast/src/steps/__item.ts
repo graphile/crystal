@@ -2,6 +2,7 @@ import chalk from "chalk";
 
 import type { ExecutableStep } from "../step.js";
 import { $$deepDepSkip, $$noExec, UnbatchedExecutableStep } from "../step.js";
+import { JSONValue } from "../index.js";
 
 /**
  * An __ItemStep is an internal plan (users must never construct it
@@ -31,6 +32,12 @@ export class __ItemStep<TData> extends UnbatchedExecutableStep<TData> {
 
   toStringMeta(): string {
     return chalk.bold.yellow(String(this.dependencies[0].id));
+  }
+
+  public planJSONExtra(): Record<string, JSONValue | undefined> | undefined {
+    return {
+      transformStepId: this.transformStepId,
+    };
   }
 
   [$$deepDepSkip](): ExecutableStep {

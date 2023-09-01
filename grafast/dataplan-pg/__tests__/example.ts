@@ -19,7 +19,7 @@ import {
   __ValueStep,
   grafastGraphql,
   isAsyncIterable,
-  planToMermaidDiagram,
+  planToMermaid,
   stripAnsi,
 } from "grafast";
 import type { AsyncExecutionResult, ExecutionResult } from "grafast/graphql";
@@ -71,7 +71,7 @@ async function main() {
     if (ops) {
       for (const op of ops) {
         if (op.type === "plan") {
-          console.log(planToMermaidDiagram(op.plan));
+          console.log(planToMermaid(op.plan));
         } else {
           console.log(`UNKNOWN: ${op.type}`);
         }

@@ -163,7 +163,7 @@ export function planToMermaid(
   const planIdMap = Object.create(null);
   const planId = (plan: GrafastPlanStepJSONv1): string => {
     if (!planIdMap[plan.id]) {
-      const planName = plan.constructor.name.replace(/Step$/, "");
+      const planName = plan.stepClass.replace(/Step$/, "");
       const planNode = `${planName}${plan.id}`;
       planIdMap[plan.id] = planNode;
       const rawMeta = plan.metaString;
@@ -183,7 +183,7 @@ export function planToMermaid(
         meta ? `\n<${meta}>` : ""
       }${polyPathsIfDifferent}`;
       const [lBrace, rBrace] =
-        plan instanceof __ItemStep
+        plan.stepClass === "__ItemStep"
           ? ["[/", "\\]"]
           : plan.isSyncAndSafe
           ? isUnbatched
@@ -192,7 +192,7 @@ export function planToMermaid(
           : ["[[", "]]"];
       const planClass = plan.hasSideEffects
         ? "sideeffectplan"
-        : plan instanceof __ItemStep
+        : plan.stepClass === "__ItemStep"
         ? "itemplan"
         : isUnbatched && !plan.isSyncAndSafe
         ? "unbatchedplan"
@@ -219,16 +219,16 @@ export function planToMermaid(
       });
       const transformItemPlanNode = null;
       /*
-      plan instanceof __ListTransformStep
+      plan.stepClass === '__ListTransformStep'
         ? planId(
             steps[operationPlan.transformDependencyPlanIdByTransformStepId[plan.id]],
           )
         : null;
         */
       if (depNodes.length > 0) {
-        if (plan instanceof __ItemStep) {
+        if (plan.stepClass === "__ItemStep") {
           const [firstDep, ...rest] = depNodes;
-          const arrow = plan.transformStepId == null ? "==>" : "-.->";
+          const arrow = plan.extra?.transformStepId == null ? "==>" : "-.->";
           graph.push(`    ${firstDep} ${arrow} ${planNode}`);
           if (rest.length > 0) {
             graph.push(`    ${rest.join(" & ")} --> ${planNode}`);

@@ -77,7 +77,7 @@ export const ExplainMain: FC<{
     setSaving(true);
     setTimeout(() => {
       /*
-      const diagram = planToMermaidDiagram(selectedResult.plan);
+      const diagram = planToMermaid(selectedResult.plan);
       mermaid.mermaidAPI.render("id1", diagram).then(({ svg }) => {
         const file = new File([svg], "grafast-plan.svg");
 

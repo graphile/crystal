@@ -3302,6 +3302,7 @@ export class OperationPlan {
           : undefined,
         isSyncAndSafe: step.isSyncAndSafe || undefined,
         hasSideEffects: step.hasSideEffects || undefined,
+        extra: step.planJSONExtra(),
       };
     }
     function printPhase(phase: LayerPlanPhase): GrafastPlanBucketPhaseJSONv1 {
