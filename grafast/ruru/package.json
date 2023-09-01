@@ -44,6 +44,7 @@
   },
   "homepage": "https://grafast.org/ruru/",
   "dependencies": {
+    "@emotion/is-prop-valid": "^1.2.1",
     "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "http-proxy": "^1.18.1",

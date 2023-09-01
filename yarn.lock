@@ -2810,10 +2810,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@emotion/is-prop-valid@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "@emotion/is-prop-valid@npm:1.2.1"
+  dependencies:
+    "@emotion/memoize": "npm:^0.8.1"
+  checksum: 04624e1cd72287c2f1143890605507f18cb22fb2f9111d89af56d88bea316c0a819040df9aeafa1b5f02facff31ada510e0d4efc1111ae0f4f8979f0da9b3966
+  languageName: node
+  linkType: hard
+
 "@emotion/memoize@npm:0.7.4":
   version: 0.7.4
   resolution: "@emotion/memoize@npm:0.7.4"
   checksum: 6ea6add503898a3ffa90d549c7d841ba31652a37fd12c1517574d7aebcfa7735583489ff0678e28626e33c34f701cb1e9ced71dd4684cb8d43efc054f11bcaff
+  languageName: node
+  linkType: hard
+
+"@emotion/memoize@npm:^0.8.1":
+  version: 0.8.1
+  resolution: "@emotion/memoize@npm:0.8.1"
+  checksum: f9129e5c6d0fe36572c60eaa58fa7ca882f538440d9332d5f12a15aec8348095cdfd25092ee1af16b4bc55767aca56728411c26e2b0b3725e663039b842d3533
   languageName: node
   linkType: hard
 
@@ -18985,6 +19001,7 @@ __metadata:
     "@types/nodemon": "npm:1.19.2"
     "@types/react": "npm:^18.2.21"
     "@types/react-dom": "npm:^18.2.7"
+    grafast: "workspace:^"
     graphiql: "npm:^3.0.5"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     graphql-ws: "npm:^5.14.0"
@@ -19003,6 +19020,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ruru@workspace:grafast/ruru"
   dependencies:
+    "@emotion/is-prop-valid": "npm:^1.2.1"
     "@types/http-proxy": "npm:^1.17.11"
     "@types/webpack-bundle-analyzer": "npm:^4.6.0"
     "@types/yargs": "npm:^17.0.24"

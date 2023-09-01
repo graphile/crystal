@@ -42,6 +42,7 @@
     "@graphiql/react": "^0.19.3",
     "@graphiql/toolkit": "^0.9.1",
     "@types/node": "^20.5.7",
+    "grafast": "workspace:^",
     "graphiql": "^3.0.5",
     "graphql-ws": "^5.14.0",
     "react": "^18.2.0",
