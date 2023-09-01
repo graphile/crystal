@@ -13,9 +13,15 @@ export const Mermaid: FC<{ diagram: string }> = ({ diagram }) => {
       mermaid.contentLoaded();
     }
   }, [diagram]);
-  return (
-    <div className="mermaid" key={diagram}>
-      {diagram}
-    </div>
-  );
+  if (window.mermaid) {
+    return (
+      <div className="mermaid" key={diagram}>
+        {diagram}
+      </div>
+    );
+  } else {
+    return (
+      <div>Mermaid hasn't (yet) loaded, so we cannot render plan diagrams</div>
+    );
+  }
 };

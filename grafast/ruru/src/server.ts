@@ -41,6 +41,7 @@ const baseHeaderScripts = `\
 const baseElements = `\
 <div id="ruru-root"></div>`;
 const baseBodyScripts = `\
+<script src="https://cdn.jsdelivr.net/npm/mermaid@9.4.3"></script>
 <script>/*! For license information, see https://unpkg.com/ruru@${version}/bundle/ruru.min.js.LICENSE.txt */
 ${escapeJS(graphiQLContent)}</script>`;
 const baseBodyInitScript = `\
