@@ -49,8 +49,7 @@ import type {
   TrackedArguments,
 } from "../interfaces.js";
 import { $$proxy, $$subroutine, $$timeout, $$ts } from "../interfaces.js";
-import type { PrintPlanGraphOptions } from "../mermaid.js";
-import { planToMermaid, printPlanGraph } from "../mermaid.js";
+import { planToMermaid } from "../mermaid.js";
 import type { ApplyAfterModeArg } from "../operationPlan-input.js";
 import { withFieldArgsForArguments } from "../operationPlan-input.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
@@ -3298,6 +3297,11 @@ export class OperationPlan {
         metaString: metaString ? stripAnsi(metaString) : metaString,
         bucketId: step.layerPlan.id,
         dependencyIds: step.dependencies.map((d) => d.id),
+        polymorphicPaths: step.polymorphicPaths
+          ? [...step.polymorphicPaths]
+          : undefined,
+        isSyncAndSafe: step.isSyncAndSafe || undefined,
+        hasSideEffects: step.hasSideEffects || undefined,
       };
     }
     function printPhase(phase: LayerPlanPhase): GrafastPlanBucketPhaseJSONv1 {
@@ -3366,6 +3370,7 @@ export class OperationPlan {
         phases: lp.phases.map(printPhase),
         steps: lp.steps.map(printStep),
         children: lp.children.map(printBucket),
+        rootStepId: lp.rootStep ? lp.rootStep.id : null,
       };
     }
     return {

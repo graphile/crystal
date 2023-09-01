@@ -1027,6 +1027,9 @@ export interface GrafastPlanStepJSONv1 {
   metaString: string | null;
   bucketId: string | number;
   dependencyIds: ReadonlyArray<string | number>;
+  polymorphicPaths: readonly string[] | undefined;
+  isSyncAndSafe: boolean | undefined;
+  hasSideEffects: boolean | undefined;
 }
 
 export interface GrafastPlanBucketPhaseJSONv1 {
@@ -1095,6 +1098,7 @@ export interface GrafastPlanBucketJSONv1 {
   reason: GrafastPlanBucketReasonJSONv1;
   copyStepIds: ReadonlyArray<string | number>;
   steps: ReadonlyArray<GrafastPlanStepJSONv1>;
+  rootStepId: string | number | null;
   phases: ReadonlyArray<GrafastPlanBucketPhaseJSONv1>;
   children: ReadonlyArray<GrafastPlanBucketJSONv1>;
 }
