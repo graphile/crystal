@@ -3872,7 +3872,7 @@ __metadata:
     "@docusaurus/module-type-aliases": "npm:2.4.1"
     "@docusaurus/preset-classic": "npm:2.4.1"
     "@docusaurus/remark-plugin-npm2yarn": "npm:^2.4.1"
-    "@mdx-js/react": "npm:^2.3.0"
+    "@mdx-js/react": "npm:^1.6.22"
     "@uiw/react-codemirror": "npm:^4.21.12"
     clsx: "npm:^2.0.0"
     codemirror: "npm:^5.65.15"
@@ -3893,7 +3893,7 @@ __metadata:
     "@docusaurus/core": "npm:2.4.1"
     "@docusaurus/module-type-aliases": "npm:2.4.1"
     "@docusaurus/preset-classic": "npm:2.4.1"
-    "@mdx-js/react": "npm:^2.3.0"
+    "@mdx-js/react": "npm:^1.6.22"
     clsx: "npm:^2.0.0"
     prism-react-renderer: "npm:^2.0.6"
     react: "npm:^18.2.0"
@@ -3910,7 +3910,7 @@ __metadata:
     "@docusaurus/preset-classic": "npm:2.4.1"
     "@docusaurus/remark-plugin-npm2yarn": "npm:^2.4.1"
     "@docusaurus/theme-mermaid": "npm:^2.4.1"
-    "@mdx-js/react": "npm:^2.3.0"
+    "@mdx-js/react": "npm:^1.6.22"
     clsx: "npm:^2.0.0"
     prism-react-renderer: "npm:^2.0.6"
     react: "npm:^18.2.0"
@@ -3934,7 +3934,7 @@ __metadata:
     "@docusaurus/core": "npm:2.4.1"
     "@docusaurus/module-type-aliases": "npm:2.4.1"
     "@docusaurus/preset-classic": "npm:2.4.1"
-    "@mdx-js/react": "npm:^2.3.0"
+    "@mdx-js/react": "npm:^1.6.22"
     clsx: "npm:^2.0.0"
     prism-react-renderer: "npm:^2.0.6"
     react: "npm:^18.2.0"
@@ -4020,18 +4020,6 @@ __metadata:
   peerDependencies:
     react: ^16.13.1 || ^17.0.0
   checksum: 97aba18d5a0a95630520ae5a0f8b09f0b37503889f8992234f14014d695c5496ca4615df7f2ed14a5b6ed973305e860efd290352ad75095c33c96a104ed94a64
-  languageName: node
-  linkType: hard
-
-"@mdx-js/react@npm:^2.3.0":
-  version: 2.3.0
-  resolution: "@mdx-js/react@npm:2.3.0"
-  dependencies:
-    "@types/mdx": "npm:^2.0.0"
-    "@types/react": "npm:>=16"
-  peerDependencies:
-    react: ">=16"
-  checksum: c72aef2fbddf66a8e627dee8bf90cb1475cedb060db28519978d6bb847b8a9c35fb3e5ef86e64d0df25762798ab5d96173ab63caf1731045829ed9e9e6800dc2
   languageName: node
   linkType: hard
 
@@ -5557,13 +5545,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/mdx@npm:^2.0.0":
-  version: 2.0.7
-  resolution: "@types/mdx@npm:2.0.7"
-  checksum: 0990a16e9776c42f82782bfc950aa06c2f72918524f2ae441b2ad88606c8b789cc108e485650c11b2a73209ca9534a070848be6e9b8a5f02b8adead225d6ddf6
-  languageName: node
-  linkType: hard
-
 "@types/mermaid@npm:^9.2.0":
   version: 9.2.0
   resolution: "@types/mermaid@npm:9.2.0"
@@ -5785,7 +5766,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*, @types/react@npm:>=16, @types/react@npm:^18.2.21":
+"@types/react@npm:*, @types/react@npm:^18.2.21":
   version: 18.2.21
   resolution: "@types/react@npm:18.2.21"
   dependencies:
