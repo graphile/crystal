@@ -62,7 +62,7 @@ export const Ruru: FC<RuruProps> = (props) => {
     showAttribution: false,
   });
   const plugins = useMemo<GraphiQLPlugin[]>(() => {
-    return [] || [explorerPlugin, EXPLAIN_PLUGIN];
+    return [explorerPlugin, EXPLAIN_PLUGIN];
   }, [explorerPlugin]);
   return (
     //EditorContextProvider
