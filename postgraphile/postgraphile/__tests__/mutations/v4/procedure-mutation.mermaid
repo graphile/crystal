@@ -27,8 +27,8 @@ graph TD
     Constant680{{"Constant[680∈0]<br />ᐸ1ᐳ"}}:::plan
     Constant681{{"Constant[681∈0]<br />ᐸ2ᐳ"}}:::plan
     Constant682{{"Constant[682∈0]<br />ᐸ'hello'ᐳ"}}:::plan
-    Constant686{{"Constant[686∈0]<br />ᐸ5ᐳ"}}:::plan
     Constant685{{"Constant[685∈0]<br />ᐸ'world'ᐳ"}}:::plan
+    Constant686{{"Constant[686∈0]<br />ᐸ5ᐳ"}}:::plan
     Constant688{{"Constant[688∈0]<br />ᐸ3ᐳ"}}:::plan
     Constant691{{"Constant[691∈0]<br />ᐸ0ᐳ"}}:::plan
     Constant699{{"Constant[699∈0]<br />ᐸ'50'ᐳ"}}:::plan
@@ -41,259 +41,258 @@ graph TD
     Constant736{{"Constant[736∈0]<br />ᐸnullᐳ"}}:::plan
     Constant737{{"Constant[737∈0]<br />ᐸ'0123456789abcde'ᐳ"}}:::plan
     Constant762{{"Constant[762∈0]<br />ᐸ'test'ᐳ"}}:::plan
-    Object663{{"Object[663∈104]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access661{{"Access[661∈104]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access662{{"Access[662∈104]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access661 & Access662 --> Object663
-    __Value3 --> Access661
-    __Value3 --> Access662
-    PgSelect660[["PgSelect[660∈104]<br />ᐸmutation_interval_set(mutation)ᐳ"]]:::sideeffectplan
-    Object663 --> PgSelect660
-    Object664{{"Object[664∈104]<br />ᐸ{result}ᐳ"}}:::plan
-    PgSelect660 --> Object664
-    Object646{{"Object[646∈100]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access644{{"Access[644∈100]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access645{{"Access[645∈100]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access644 & Access645 --> Object646
-    __Value3 --> Access644
-    __Value3 --> Access645
-    PgSelect643[["PgSelect[643∈100]<br />ᐸmutation_interval_array(mutation)ᐳ"]]:::sideeffectplan
-    Object646 --> PgSelect643
-    First647{{"First[647∈100]"}}:::plan
-    PgSelect643 --> First647
-    PgSelectSingle648{{"PgSelectSingle[648∈100]<br />ᐸmutation_interval_arrayᐳ"}}:::plan
-    First647 --> PgSelectSingle648
-    PgClassExpression649{{"PgClassExpression[649∈100]<br />ᐸ__mutation..._array__.vᐳ"}}:::plan
-    PgSelectSingle648 --> PgClassExpression649
-    Object650{{"Object[650∈100]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression649 --> Object650
-    Object635{{"Object[635∈97]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access633{{"Access[633∈97]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access634{{"Access[634∈97]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access633 & Access634 --> Object635
-    __Value3 --> Access633
-    __Value3 --> Access634
-    PgSelect632[["PgSelect[632∈97]<br />ᐸmutation_text_array(mutation)ᐳ"]]:::sideeffectplan
-    Object635 --> PgSelect632
-    First636{{"First[636∈97]"}}:::plan
-    PgSelect632 --> First636
-    PgSelectSingle637{{"PgSelectSingle[637∈97]<br />ᐸmutation_text_arrayᐳ"}}:::plan
-    First636 --> PgSelectSingle637
-    PgClassExpression638{{"PgClassExpression[638∈97]<br />ᐸ__mutation..._array__.vᐳ"}}:::plan
-    PgSelectSingle637 --> PgClassExpression638
-    Object639{{"Object[639∈97]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression638 --> Object639
-    Object615{{"Object[615∈92]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access613{{"Access[613∈92]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access614{{"Access[614∈92]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access613 & Access614 --> Object615
-    PgSelect612[["PgSelect[612∈92]<br />ᐸmutation_compound_type_array(mutation)ᐳ"]]:::sideeffectplan
-    Constant789{{"Constant[789∈92]<br />ᐸ[Object: null prototype] {   a: 419,   b: 'easy cheesy bakedᐳ"}}:::plan
-    Object615 & Constant789 --> PgSelect612
-    __Value3 --> Access613
-    __Value3 --> Access614
-    Object616{{"Object[616∈92]<br />ᐸ{result}ᐳ"}}:::plan
-    PgSelect612 --> Object616
-    Object587{{"Object[587∈88]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access585{{"Access[585∈88]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access586{{"Access[586∈88]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access585 & Access586 --> Object587
-    __Value3 --> Access585
-    __Value3 --> Access586
-    PgSelect584[["PgSelect[584∈88]<br />ᐸissue756_set_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object587 --> PgSelect584
-    Object588{{"Object[588∈88]<br />ᐸ{result}ᐳ"}}:::plan
-    PgSelect584 --> Object588
-    Object576{{"Object[576∈85]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access574{{"Access[574∈85]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access575{{"Access[575∈85]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access574 & Access575 --> Object576
-    __Value3 --> Access574
-    __Value3 --> Access575
-    PgSelect573[["PgSelect[573∈85]<br />ᐸissue756_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object576 --> PgSelect573
-    First577{{"First[577∈85]"}}:::plan
-    PgSelect573 --> First577
-    PgSelectSingle578{{"PgSelectSingle[578∈85]<br />ᐸissue756_mutationᐳ"}}:::plan
-    First577 --> PgSelectSingle578
-    Object579{{"Object[579∈85]<br />ᐸ{result}ᐳ"}}:::plan
-    PgSelectSingle578 --> Object579
-    PgSelect562[["PgSelect[562∈82]<br />ᐸpost_with_suffix(mutation)ᐳ"]]:::sideeffectplan
-    Object565{{"Object[565∈82]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant781{{"Constant[781∈82]<br />ᐸ[Object: null prototype] {   id: 15,   headline: 'headline_'ᐳ"}}:::plan
-    Object565 & Constant781 & Constant762 --> PgSelect562
-    Access563{{"Access[563∈82]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access564{{"Access[564∈82]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access563 & Access564 --> Object565
-    __Value3 --> Access563
-    __Value3 --> Access564
-    First566{{"First[566∈82]"}}:::plan
-    PgSelect562 --> First566
-    PgSelectSingle567{{"PgSelectSingle[567∈82]<br />ᐸpost_with_suffixᐳ"}}:::plan
-    First566 --> PgSelectSingle567
-    Object568{{"Object[568∈82]<br />ᐸ{result}ᐳ"}}:::plan
-    PgSelectSingle567 --> Object568
-    Object536{{"Object[536∈76]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access534{{"Access[534∈76]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access535{{"Access[535∈76]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access534 & Access535 --> Object536
-    PgSelect533[["PgSelect[533∈76]<br />ᐸpost_many(mutation)ᐳ"]]:::sideeffectplan
-    Constant793{{"Constant[793∈76]<br />ᐸ[   [Object: null prototype] {     id: 7,     headline: 'heaᐳ"}}:::plan
-    Object536 & Constant793 --> PgSelect533
-    __Value3 --> Access534
-    __Value3 --> Access535
-    Object537{{"Object[537∈76]<br />ᐸ{result}ᐳ"}}:::plan
-    PgSelect533 --> Object537
-    Object479{{"Object[479∈74]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access477{{"Access[477∈74]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access478{{"Access[478∈74]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access477 & Access478 --> Object479
-    PgSelect476[["PgSelect[476∈74]<br />ᐸguid_fn(mutation)ᐳ"]]:::sideeffectplan
-    Object479 & Constant737 --> PgSelect476
-    __Value3 --> Access477
-    __Value3 --> Access478
-    First480{{"First[480∈74]"}}:::plan
-    PgSelect476 --> First480
-    PgSelectSingle481{{"PgSelectSingle[481∈74]<br />ᐸguid_fnᐳ"}}:::plan
-    First480 --> PgSelectSingle481
-    PgClassExpression482{{"PgClassExpression[482∈74]<br />ᐸ__guid_fn__.vᐳ"}}:::plan
-    PgSelectSingle481 --> PgClassExpression482
-    Object483{{"Object[483∈74]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression482 --> Object483
-    Object468{{"Object[468∈72]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access466{{"Access[466∈72]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access467{{"Access[467∈72]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access466 & Access467 --> Object468
-    PgSelect465[["PgSelect[465∈72]<br />ᐸguid_fn(mutation)ᐳ"]]:::sideeffectplan
-    Object468 & Constant736 --> PgSelect465
-    __Value3 --> Access466
-    __Value3 --> Access467
-    First469{{"First[469∈72]"}}:::plan
-    PgSelect465 --> First469
-    PgSelectSingle470{{"PgSelectSingle[470∈72]<br />ᐸguid_fnᐳ"}}:::plan
-    First469 --> PgSelectSingle470
-    PgClassExpression471{{"PgClassExpression[471∈72]<br />ᐸ__guid_fn__.vᐳ"}}:::plan
-    PgSelectSingle470 --> PgClassExpression471
-    Object472{{"Object[472∈72]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression471 --> Object472
-    Object457{{"Object[457∈70]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access455{{"Access[455∈70]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access456{{"Access[456∈70]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access455 & Access456 --> Object457
-    __Value3 --> Access455
-    __Value3 --> Access456
-    PgSelect454[["PgSelect[454∈70]<br />ᐸreturn_void_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object457 --> PgSelect454
-    First458{{"First[458∈70]"}}:::plan
-    PgSelect454 --> First458
-    PgSelectSingle459{{"PgSelectSingle[459∈70]<br />ᐸreturn_void_mutationᐳ"}}:::plan
-    First458 --> PgSelectSingle459
-    PgClassExpression460{{"PgClassExpression[460∈70]<br />ᐸ__return_v...tation__.vᐳ"}}:::plan
-    PgSelectSingle459 --> PgClassExpression460
-    Object461{{"Object[461∈70]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression460 --> Object461
-    Object447{{"Object[447∈68]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access445{{"Access[445∈68]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access446{{"Access[446∈68]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access445 & Access446 --> Object447
-    Object451{{"Object[451∈68]<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
-    PgClassExpression450{{"PgClassExpression[450∈68]<br />ᐸ__no_args_mutation__.vᐳ"}}:::plan
-    PgClassExpression450 & Constant735 --> Object451
-    __Value3 --> Access445
-    __Value3 --> Access446
-    PgSelect444[["PgSelect[444∈68]<br />ᐸno_args_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object447 --> PgSelect444
-    First448{{"First[448∈68]"}}:::plan
-    PgSelect444 --> First448
-    PgSelectSingle449{{"PgSelectSingle[449∈68]<br />ᐸno_args_mutationᐳ"}}:::plan
-    First448 --> PgSelectSingle449
-    PgSelectSingle449 --> PgClassExpression450
-    PgSelect434[["PgSelect[434∈65]<br />ᐸint_set_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object437{{"Object[437∈65]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant433{{"Constant[433∈65]<br />ᐸnullᐳ"}}:::plan
-    Object437 & Constant686 & Constant433 & Constant734 --> PgSelect434
-    Access435{{"Access[435∈65]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access436{{"Access[436∈65]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access435 & Access436 --> Object437
-    __Value3 --> Access435
-    __Value3 --> Access436
-    Object438{{"Object[438∈65]<br />ᐸ{result}ᐳ"}}:::plan
-    PgSelect434 --> Object438
-    Object423{{"Object[423∈61]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access421{{"Access[421∈61]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access422{{"Access[422∈61]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access421 & Access422 --> Object423
-    __Value3 --> Access421
-    __Value3 --> Access422
-    PgSelect420[["PgSelect[420∈61]<br />ᐸtable_set_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object423 --> PgSelect420
-    Object424{{"Object[424∈61]<br />ᐸ{result}ᐳ"}}:::plan
-    PgSelect420 --> Object424
-    Object382{{"Object[382∈55]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access380{{"Access[380∈55]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access381{{"Access[381∈55]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access380 & Access381 --> Object382
-    PgSelect379[["PgSelect[379∈55]<br />ᐸtable_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object382 & Constant732 --> PgSelect379
-    __Value3 --> Access380
-    __Value3 --> Access381
-    First383{{"First[383∈55]"}}:::plan
-    PgSelect379 --> First383
-    PgSelectSingle384{{"PgSelectSingle[384∈55]<br />ᐸtable_mutationᐳ"}}:::plan
-    First383 --> PgSelectSingle384
-    Object385{{"Object[385∈55]<br />ᐸ{result}ᐳ"}}:::plan
-    PgSelectSingle384 --> Object385
-    Object340{{"Object[340∈49]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access338{{"Access[338∈49]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access339{{"Access[339∈49]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access338 & Access339 --> Object340
-    PgSelect337[["PgSelect[337∈49]<br />ᐸtable_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object340 & Constant686 --> PgSelect337
-    __Value3 --> Access338
-    __Value3 --> Access339
-    First341{{"First[341∈49]"}}:::plan
-    PgSelect337 --> First341
-    PgSelectSingle342{{"PgSelectSingle[342∈49]<br />ᐸtable_mutationᐳ"}}:::plan
-    First341 --> PgSelectSingle342
-    Object343{{"Object[343∈49]<br />ᐸ{result}ᐳ"}}:::plan
-    PgSelectSingle342 --> Object343
-    Object319{{"Object[319∈44]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access317{{"Access[317∈44]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access318{{"Access[318∈44]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access317 & Access318 --> Object319
-    PgSelect316[["PgSelect[316∈44]<br />ᐸcompound_type_array_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Constant785{{"Constant[785∈44]<br />ᐸ[Object: null prototype] {   a: 419,   b: 'easy cheesy bakedᐳ"}}:::plan
-    Object319 & Constant785 --> PgSelect316
-    __Value3 --> Access317
-    __Value3 --> Access318
-    Object320{{"Object[320∈44]<br />ᐸ{result}ᐳ"}}:::plan
-    PgSelect316 --> Object320
-    Object282{{"Object[282∈39]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access280{{"Access[280∈39]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access281{{"Access[281∈39]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access280 & Access281 --> Object282
-    PgSelect279[["PgSelect[279∈39]<br />ᐸcompound_type_set_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Constant784{{"Constant[784∈39]<br />ᐸ[Object: null prototype] {   a: 419,   b: 'easy cheesy bakedᐳ"}}:::plan
-    Object282 & Constant784 --> PgSelect279
-    __Value3 --> Access280
-    __Value3 --> Access281
-    Object283{{"Object[283∈39]<br />ᐸ{result}ᐳ"}}:::plan
-    PgSelect279 --> Object283
-    Object245{{"Object[245∈35]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access243{{"Access[243∈35]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access244{{"Access[244∈35]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access243 & Access244 --> Object245
-    PgSelect242[["PgSelect[242∈35]<br />ᐸcompound_type_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Constant783{{"Constant[783∈35]<br />ᐸ[Object: null prototype] {   a: 419,   b: 'easy cheesy bakedᐳ"}}:::plan
-    Object245 & Constant783 --> PgSelect242
-    __Value3 --> Access243
-    __Value3 --> Access244
-    First246{{"First[246∈35]"}}:::plan
-    PgSelect242 --> First246
-    PgSelectSingle247{{"PgSelectSingle[247∈35]<br />ᐸcompound_type_mutationᐳ"}}:::plan
-    First246 --> PgSelectSingle247
-    Object248{{"Object[248∈35]<br />ᐸ{result}ᐳ"}}:::plan
-    PgSelectSingle247 --> Object248
+    PgSelect10[["PgSelect[10∈1]<br />ᐸjson_identity_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object13 & Constant674 --> PgSelect10
+    First14{{"First[14∈1]"}}:::plan
+    PgSelect10 --> First14
+    PgSelectSingle15{{"PgSelectSingle[15∈1]<br />ᐸjson_identity_mutationᐳ"}}:::plan
+    First14 --> PgSelectSingle15
+    PgClassExpression16{{"PgClassExpression[16∈1]<br />ᐸ__json_ide...tation__.vᐳ"}}:::plan
+    PgSelectSingle15 --> PgClassExpression16
+    Object17{{"Object[17∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression16 --> Object17
+    PgSelect21[["PgSelect[21∈3]<br />ᐸjsonb_identity_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object24{{"Object[24∈3]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object24 & Constant675 --> PgSelect21
+    Access22{{"Access[22∈3]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access23{{"Access[23∈3]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access22 & Access23 --> Object24
+    __Value3 --> Access22
+    __Value3 --> Access23
+    First25{{"First[25∈3]"}}:::plan
+    PgSelect21 --> First25
+    PgSelectSingle26{{"PgSelectSingle[26∈3]<br />ᐸjsonb_identity_mutationᐳ"}}:::plan
+    First25 --> PgSelectSingle26
+    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__jsonb_id...tation__.vᐳ"}}:::plan
+    PgSelectSingle26 --> PgClassExpression27
+    Object28{{"Object[28∈3]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression27 --> Object28
+    PgSelect32[["PgSelect[32∈5]<br />ᐸjson_identity_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object35{{"Object[35∈5]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object35 & Constant676 --> PgSelect32
+    Access33{{"Access[33∈5]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access34{{"Access[34∈5]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access33 & Access34 --> Object35
+    __Value3 --> Access33
+    __Value3 --> Access34
+    First36{{"First[36∈5]"}}:::plan
+    PgSelect32 --> First36
+    PgSelectSingle37{{"PgSelectSingle[37∈5]<br />ᐸjson_identity_mutationᐳ"}}:::plan
+    First36 --> PgSelectSingle37
+    PgClassExpression38{{"PgClassExpression[38∈5]<br />ᐸ__json_ide...tation__.vᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression38
+    Object39{{"Object[39∈5]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression38 --> Object39
+    PgSelect43[["PgSelect[43∈7]<br />ᐸjsonb_identity_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object46{{"Object[46∈7]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object46 & Constant677 --> PgSelect43
+    Access44{{"Access[44∈7]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access45{{"Access[45∈7]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access44 & Access45 --> Object46
+    __Value3 --> Access44
+    __Value3 --> Access45
+    First47{{"First[47∈7]"}}:::plan
+    PgSelect43 --> First47
+    PgSelectSingle48{{"PgSelectSingle[48∈7]<br />ᐸjsonb_identity_mutationᐳ"}}:::plan
+    First47 --> PgSelectSingle48
+    PgClassExpression49{{"PgClassExpression[49∈7]<br />ᐸ__jsonb_id...tation__.vᐳ"}}:::plan
+    PgSelectSingle48 --> PgClassExpression49
+    Object50{{"Object[50∈7]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression49 --> Object50
+    PgSelect54[["PgSelect[54∈9]<br />ᐸjsonb_identity_mutation_plpgsql(mutation)ᐳ"]]:::sideeffectplan
+    Object57{{"Object[57∈9]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object57 & Constant678 --> PgSelect54
+    Access55{{"Access[55∈9]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access56{{"Access[56∈9]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access55 & Access56 --> Object57
+    __Value3 --> Access55
+    __Value3 --> Access56
+    First58{{"First[58∈9]"}}:::plan
+    PgSelect54 --> First58
+    PgSelectSingle59{{"PgSelectSingle[59∈9]<br />ᐸjsonb_identity_mutation_plpgsqlᐳ"}}:::plan
+    First58 --> PgSelectSingle59
+    PgClassExpression60{{"PgClassExpression[60∈9]<br />ᐸ__jsonb_id...lpgsql__.vᐳ"}}:::plan
+    PgSelectSingle59 --> PgClassExpression60
+    Object61{{"Object[61∈9]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression60 --> Object61
+    Object68{{"Object[68∈11]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access66{{"Access[66∈11]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access67{{"Access[67∈11]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access66 & Access67 --> Object68
+    PgSelect65[["PgSelect[65∈11]<br />ᐸjsonb_identity_mutation_plpgsql_with_default(mutation)ᐳ"]]:::sideeffectplan
+    Object68 --> PgSelect65
+    __Value3 --> Access66
+    __Value3 --> Access67
+    First69{{"First[69∈11]"}}:::plan
+    PgSelect65 --> First69
+    PgSelectSingle70{{"PgSelectSingle[70∈11]<br />ᐸjsonb_identity_mutation_plpgsql_with_defaultᐳ"}}:::plan
+    First69 --> PgSelectSingle70
+    PgClassExpression71{{"PgClassExpression[71∈11]<br />ᐸ__jsonb_id...efault__.vᐳ"}}:::plan
+    PgSelectSingle70 --> PgClassExpression71
+    Object72{{"Object[72∈11]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression71 --> Object72
+    PgSelect76[["PgSelect[76∈13]<br />ᐸjsonb_identity_mutation_plpgsql_with_default(mutation)ᐳ"]]:::sideeffectplan
+    Object79{{"Object[79∈13]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object79 & Constant679 --> PgSelect76
+    Access77{{"Access[77∈13]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access78{{"Access[78∈13]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access77 & Access78 --> Object79
+    __Value3 --> Access77
+    __Value3 --> Access78
+    First80{{"First[80∈13]"}}:::plan
+    PgSelect76 --> First80
+    PgSelectSingle81{{"PgSelectSingle[81∈13]<br />ᐸjsonb_identity_mutation_plpgsql_with_defaultᐳ"}}:::plan
+    First80 --> PgSelectSingle81
+    PgClassExpression82{{"PgClassExpression[82∈13]<br />ᐸ__jsonb_id...efault__.vᐳ"}}:::plan
+    PgSelectSingle81 --> PgClassExpression82
+    Object83{{"Object[83∈13]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression82 --> Object83
+    PgSelect88[["PgSelect[88∈15]<br />ᐸadd_1_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object91{{"Object[91∈15]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object91 & Constant680 & Constant681 --> PgSelect88
+    Access89{{"Access[89∈15]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access90{{"Access[90∈15]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access89 & Access90 --> Object91
+    __Value3 --> Access89
+    __Value3 --> Access90
+    First92{{"First[92∈15]"}}:::plan
+    PgSelect88 --> First92
+    PgSelectSingle93{{"PgSelectSingle[93∈15]<br />ᐸadd_1_mutationᐳ"}}:::plan
+    First92 --> PgSelectSingle93
+    PgClassExpression94{{"PgClassExpression[94∈15]<br />ᐸ__add_1_mutation__.vᐳ"}}:::plan
+    PgSelectSingle93 --> PgClassExpression94
+    Object95{{"Object[95∈15]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression94 --> Object95
+    Constant96{{"Constant[96∈16]<br />ᐸundefinedᐳ"}}:::plan
+    PgSelect101[["PgSelect[101∈17]<br />ᐸadd_2_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object104{{"Object[104∈17]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object104 & Constant681 & Constant681 --> PgSelect101
+    Access102{{"Access[102∈17]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access103{{"Access[103∈17]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access102 & Access103 --> Object104
+    Object108{{"Object[108∈17]<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
+    PgClassExpression107{{"PgClassExpression[107∈17]<br />ᐸ__add_2_mutation__.vᐳ"}}:::plan
+    PgClassExpression107 & Constant682 --> Object108
+    __Value3 --> Access102
+    __Value3 --> Access103
+    First105{{"First[105∈17]"}}:::plan
+    PgSelect101 --> First105
+    PgSelectSingle106{{"PgSelectSingle[106∈17]<br />ᐸadd_2_mutationᐳ"}}:::plan
+    First105 --> PgSelectSingle106
+    PgSelectSingle106 --> PgClassExpression107
+    PgSelect114[["PgSelect[114∈19]<br />ᐸadd_3_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object117{{"Object[117∈19]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant113{{"Constant[113∈19]<br />ᐸnullᐳ"}}:::plan
+    Object117 & Constant113 & Constant686 --> PgSelect114
+    Access115{{"Access[115∈19]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access116{{"Access[116∈19]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access115 & Access116 --> Object117
+    Object121{{"Object[121∈19]<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
+    PgClassExpression120{{"PgClassExpression[120∈19]<br />ᐸ__add_3_mutation__.vᐳ"}}:::plan
+    PgClassExpression120 & Constant685 --> Object121
+    __Value3 --> Access115
+    __Value3 --> Access116
+    First118{{"First[118∈19]"}}:::plan
+    PgSelect114 --> First118
+    PgSelectSingle119{{"PgSelectSingle[119∈19]<br />ᐸadd_3_mutationᐳ"}}:::plan
+    First118 --> PgSelectSingle119
+    PgSelectSingle119 --> PgClassExpression120
+    PgSelect126[["PgSelect[126∈21]<br />ᐸadd_4_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object129{{"Object[129∈21]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object129 & Constant680 & Constant688 --> PgSelect126
+    Access127{{"Access[127∈21]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access128{{"Access[128∈21]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access127 & Access128 --> Object129
+    __Value3 --> Access127
+    __Value3 --> Access128
+    First130{{"First[130∈21]"}}:::plan
+    PgSelect126 --> First130
+    PgSelectSingle131{{"PgSelectSingle[131∈21]<br />ᐸadd_4_mutationᐳ"}}:::plan
+    First130 --> PgSelectSingle131
+    PgClassExpression132{{"PgClassExpression[132∈21]<br />ᐸ__add_4_mutation__.vᐳ"}}:::plan
+    PgSelectSingle131 --> PgClassExpression132
+    Object133{{"Object[133∈21]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression132 --> Object133
+    PgSelect138[["PgSelect[138∈23]<br />ᐸadd_4_mutation_error(mutation)ᐳ"]]:::sideeffectplan
+    Object141{{"Object[141∈23]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object141 & Constant680 & Constant688 --> PgSelect138
+    Access139{{"Access[139∈23]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access140{{"Access[140∈23]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access139 & Access140 --> Object141
+    __Value3 --> Access139
+    __Value3 --> Access140
+    First142{{"First[142∈23]"}}:::plan
+    PgSelect138 --> First142
+    PgSelectSingle143{{"PgSelectSingle[143∈23]<br />ᐸadd_4_mutation_errorᐳ"}}:::plan
+    First142 --> PgSelectSingle143
+    PgClassExpression144{{"PgClassExpression[144∈23]<br />ᐸ__add_4_mu..._error__.vᐳ"}}:::plan
+    PgSelectSingle143 --> PgClassExpression144
+    Object145{{"Object[145∈23]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression144 --> Object145
+    PgSelect150[["PgSelect[150∈25]<br />ᐸmult_1(mutation)ᐳ"]]:::sideeffectplan
+    Object153{{"Object[153∈25]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object153 & Constant691 & Constant680 --> PgSelect150
+    Access151{{"Access[151∈25]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access152{{"Access[152∈25]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access151 & Access152 --> Object153
+    __Value3 --> Access151
+    __Value3 --> Access152
+    First154{{"First[154∈25]"}}:::plan
+    PgSelect150 --> First154
+    PgSelectSingle155{{"PgSelectSingle[155∈25]<br />ᐸmult_1ᐳ"}}:::plan
+    First154 --> PgSelectSingle155
+    PgClassExpression156{{"PgClassExpression[156∈25]<br />ᐸ__mult_1__.vᐳ"}}:::plan
+    PgSelectSingle155 --> PgClassExpression156
+    Object157{{"Object[157∈25]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression156 --> Object157
+    PgSelect162[["PgSelect[162∈27]<br />ᐸmult_2(mutation)ᐳ"]]:::sideeffectplan
+    Object165{{"Object[165∈27]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object165 & Constant680 & Constant680 --> PgSelect162
+    Access163{{"Access[163∈27]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access164{{"Access[164∈27]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access163 & Access164 --> Object165
+    __Value3 --> Access163
+    __Value3 --> Access164
+    First166{{"First[166∈27]"}}:::plan
+    PgSelect162 --> First166
+    PgSelectSingle167{{"PgSelectSingle[167∈27]<br />ᐸmult_2ᐳ"}}:::plan
+    First166 --> PgSelectSingle167
+    PgClassExpression168{{"PgClassExpression[168∈27]<br />ᐸ__mult_2__.vᐳ"}}:::plan
+    PgSelectSingle167 --> PgClassExpression168
+    Object169{{"Object[169∈27]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression168 --> Object169
+    PgSelect174[["PgSelect[174∈29]<br />ᐸmult_3(mutation)ᐳ"]]:::sideeffectplan
+    Object177{{"Object[177∈29]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object177 & Constant680 & Constant681 --> PgSelect174
+    Access175{{"Access[175∈29]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access176{{"Access[176∈29]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access175 & Access176 --> Object177
+    __Value3 --> Access175
+    __Value3 --> Access176
+    First178{{"First[178∈29]"}}:::plan
+    PgSelect174 --> First178
+    PgSelectSingle179{{"PgSelectSingle[179∈29]<br />ᐸmult_3ᐳ"}}:::plan
+    First178 --> PgSelectSingle179
+    PgClassExpression180{{"PgClassExpression[180∈29]<br />ᐸ__mult_3__.vᐳ"}}:::plan
+    PgSelectSingle179 --> PgClassExpression180
+    Object181{{"Object[181∈29]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression180 --> Object181
+    PgSelect186[["PgSelect[186∈31]<br />ᐸmult_4(mutation)ᐳ"]]:::sideeffectplan
+    Object189{{"Object[189∈31]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object189 & Constant686 & Constant681 --> PgSelect186
+    Access187{{"Access[187∈31]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access188{{"Access[188∈31]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access187 & Access188 --> Object189
+    __Value3 --> Access187
+    __Value3 --> Access188
+    First190{{"First[190∈31]"}}:::plan
+    PgSelect186 --> First190
+    PgSelectSingle191{{"PgSelectSingle[191∈31]<br />ᐸmult_4ᐳ"}}:::plan
+    First190 --> PgSelectSingle191
+    PgClassExpression192{{"PgClassExpression[192∈31]<br />ᐸ__mult_4__.vᐳ"}}:::plan
+    PgSelectSingle191 --> PgClassExpression192
+    Object193{{"Object[193∈31]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression192 --> Object193
     PgSelect215[["PgSelect[215∈33]<br />ᐸtypes_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object218{{"Object[218∈33]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Constant774{{"Constant[774∈33]<br />ᐸ[ 1, 2, 3 ]ᐳ"}}:::plan
@@ -312,322 +311,21 @@ graph TD
     PgSelectSingle220 --> PgClassExpression221
     Object222{{"Object[222∈33]<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression221 --> Object222
-    PgSelect186[["PgSelect[186∈31]<br />ᐸmult_4(mutation)ᐳ"]]:::sideeffectplan
-    Object189{{"Object[189∈31]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object189 & Constant686 & Constant681 --> PgSelect186
-    Access187{{"Access[187∈31]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access188{{"Access[188∈31]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access187 & Access188 --> Object189
-    __Value3 --> Access187
-    __Value3 --> Access188
-    First190{{"First[190∈31]"}}:::plan
-    PgSelect186 --> First190
-    PgSelectSingle191{{"PgSelectSingle[191∈31]<br />ᐸmult_4ᐳ"}}:::plan
-    First190 --> PgSelectSingle191
-    PgClassExpression192{{"PgClassExpression[192∈31]<br />ᐸ__mult_4__.vᐳ"}}:::plan
-    PgSelectSingle191 --> PgClassExpression192
-    Object193{{"Object[193∈31]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression192 --> Object193
-    PgSelect174[["PgSelect[174∈29]<br />ᐸmult_3(mutation)ᐳ"]]:::sideeffectplan
-    Object177{{"Object[177∈29]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object177 & Constant680 & Constant681 --> PgSelect174
-    Access175{{"Access[175∈29]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access176{{"Access[176∈29]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access175 & Access176 --> Object177
-    __Value3 --> Access175
-    __Value3 --> Access176
-    First178{{"First[178∈29]"}}:::plan
-    PgSelect174 --> First178
-    PgSelectSingle179{{"PgSelectSingle[179∈29]<br />ᐸmult_3ᐳ"}}:::plan
-    First178 --> PgSelectSingle179
-    PgClassExpression180{{"PgClassExpression[180∈29]<br />ᐸ__mult_3__.vᐳ"}}:::plan
-    PgSelectSingle179 --> PgClassExpression180
-    Object181{{"Object[181∈29]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression180 --> Object181
-    PgSelect162[["PgSelect[162∈27]<br />ᐸmult_2(mutation)ᐳ"]]:::sideeffectplan
-    Object165{{"Object[165∈27]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object165 & Constant680 & Constant680 --> PgSelect162
-    Access163{{"Access[163∈27]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access164{{"Access[164∈27]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access163 & Access164 --> Object165
-    __Value3 --> Access163
-    __Value3 --> Access164
-    First166{{"First[166∈27]"}}:::plan
-    PgSelect162 --> First166
-    PgSelectSingle167{{"PgSelectSingle[167∈27]<br />ᐸmult_2ᐳ"}}:::plan
-    First166 --> PgSelectSingle167
-    PgClassExpression168{{"PgClassExpression[168∈27]<br />ᐸ__mult_2__.vᐳ"}}:::plan
-    PgSelectSingle167 --> PgClassExpression168
-    Object169{{"Object[169∈27]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression168 --> Object169
-    PgSelect150[["PgSelect[150∈25]<br />ᐸmult_1(mutation)ᐳ"]]:::sideeffectplan
-    Object153{{"Object[153∈25]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object153 & Constant691 & Constant680 --> PgSelect150
-    Access151{{"Access[151∈25]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access152{{"Access[152∈25]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access151 & Access152 --> Object153
-    __Value3 --> Access151
-    __Value3 --> Access152
-    First154{{"First[154∈25]"}}:::plan
-    PgSelect150 --> First154
-    PgSelectSingle155{{"PgSelectSingle[155∈25]<br />ᐸmult_1ᐳ"}}:::plan
-    First154 --> PgSelectSingle155
-    PgClassExpression156{{"PgClassExpression[156∈25]<br />ᐸ__mult_1__.vᐳ"}}:::plan
-    PgSelectSingle155 --> PgClassExpression156
-    Object157{{"Object[157∈25]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression156 --> Object157
-    PgSelect138[["PgSelect[138∈23]<br />ᐸadd_4_mutation_error(mutation)ᐳ"]]:::sideeffectplan
-    Object141{{"Object[141∈23]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object141 & Constant680 & Constant688 --> PgSelect138
-    Access139{{"Access[139∈23]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access140{{"Access[140∈23]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access139 & Access140 --> Object141
-    __Value3 --> Access139
-    __Value3 --> Access140
-    First142{{"First[142∈23]"}}:::plan
-    PgSelect138 --> First142
-    PgSelectSingle143{{"PgSelectSingle[143∈23]<br />ᐸadd_4_mutation_errorᐳ"}}:::plan
-    First142 --> PgSelectSingle143
-    PgClassExpression144{{"PgClassExpression[144∈23]<br />ᐸ__add_4_mu..._error__.vᐳ"}}:::plan
-    PgSelectSingle143 --> PgClassExpression144
-    Object145{{"Object[145∈23]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression144 --> Object145
-    PgSelect126[["PgSelect[126∈21]<br />ᐸadd_4_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object129{{"Object[129∈21]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object129 & Constant680 & Constant688 --> PgSelect126
-    Access127{{"Access[127∈21]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access128{{"Access[128∈21]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access127 & Access128 --> Object129
-    __Value3 --> Access127
-    __Value3 --> Access128
-    First130{{"First[130∈21]"}}:::plan
-    PgSelect126 --> First130
-    PgSelectSingle131{{"PgSelectSingle[131∈21]<br />ᐸadd_4_mutationᐳ"}}:::plan
-    First130 --> PgSelectSingle131
-    PgClassExpression132{{"PgClassExpression[132∈21]<br />ᐸ__add_4_mutation__.vᐳ"}}:::plan
-    PgSelectSingle131 --> PgClassExpression132
-    Object133{{"Object[133∈21]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression132 --> Object133
-    PgSelect114[["PgSelect[114∈19]<br />ᐸadd_3_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object117{{"Object[117∈19]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant113{{"Constant[113∈19]<br />ᐸnullᐳ"}}:::plan
-    Object117 & Constant113 & Constant686 --> PgSelect114
-    Access115{{"Access[115∈19]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access116{{"Access[116∈19]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access115 & Access116 --> Object117
-    Object121{{"Object[121∈19]<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
-    PgClassExpression120{{"PgClassExpression[120∈19]<br />ᐸ__add_3_mutation__.vᐳ"}}:::plan
-    PgClassExpression120 & Constant685 --> Object121
-    __Value3 --> Access115
-    __Value3 --> Access116
-    First118{{"First[118∈19]"}}:::plan
-    PgSelect114 --> First118
-    PgSelectSingle119{{"PgSelectSingle[119∈19]<br />ᐸadd_3_mutationᐳ"}}:::plan
-    First118 --> PgSelectSingle119
-    PgSelectSingle119 --> PgClassExpression120
-    PgSelect101[["PgSelect[101∈17]<br />ᐸadd_2_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object104{{"Object[104∈17]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object104 & Constant681 & Constant681 --> PgSelect101
-    Access102{{"Access[102∈17]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access103{{"Access[103∈17]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access102 & Access103 --> Object104
-    Object108{{"Object[108∈17]<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
-    PgClassExpression107{{"PgClassExpression[107∈17]<br />ᐸ__add_2_mutation__.vᐳ"}}:::plan
-    PgClassExpression107 & Constant682 --> Object108
-    __Value3 --> Access102
-    __Value3 --> Access103
-    First105{{"First[105∈17]"}}:::plan
-    PgSelect101 --> First105
-    PgSelectSingle106{{"PgSelectSingle[106∈17]<br />ᐸadd_2_mutationᐳ"}}:::plan
-    First105 --> PgSelectSingle106
-    PgSelectSingle106 --> PgClassExpression107
-    PgSelect88[["PgSelect[88∈15]<br />ᐸadd_1_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object91{{"Object[91∈15]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object91 & Constant680 & Constant681 --> PgSelect88
-    Access89{{"Access[89∈15]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access90{{"Access[90∈15]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access89 & Access90 --> Object91
-    __Value3 --> Access89
-    __Value3 --> Access90
-    First92{{"First[92∈15]"}}:::plan
-    PgSelect88 --> First92
-    PgSelectSingle93{{"PgSelectSingle[93∈15]<br />ᐸadd_1_mutationᐳ"}}:::plan
-    First92 --> PgSelectSingle93
-    PgClassExpression94{{"PgClassExpression[94∈15]<br />ᐸ__add_1_mutation__.vᐳ"}}:::plan
-    PgSelectSingle93 --> PgClassExpression94
-    Object95{{"Object[95∈15]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression94 --> Object95
-    Object79{{"Object[79∈13]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access77{{"Access[77∈13]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access78{{"Access[78∈13]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access77 & Access78 --> Object79
-    PgSelect76[["PgSelect[76∈13]<br />ᐸjsonb_identity_mutation_plpgsql_with_default(mutation)ᐳ"]]:::sideeffectplan
-    Object79 & Constant679 --> PgSelect76
-    __Value3 --> Access77
-    __Value3 --> Access78
-    First80{{"First[80∈13]"}}:::plan
-    PgSelect76 --> First80
-    PgSelectSingle81{{"PgSelectSingle[81∈13]<br />ᐸjsonb_identity_mutation_plpgsql_with_defaultᐳ"}}:::plan
-    First80 --> PgSelectSingle81
-    PgClassExpression82{{"PgClassExpression[82∈13]<br />ᐸ__jsonb_id...efault__.vᐳ"}}:::plan
-    PgSelectSingle81 --> PgClassExpression82
-    Object83{{"Object[83∈13]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression82 --> Object83
-    Object68{{"Object[68∈11]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access66{{"Access[66∈11]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access67{{"Access[67∈11]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access66 & Access67 --> Object68
-    __Value3 --> Access66
-    __Value3 --> Access67
-    PgSelect65[["PgSelect[65∈11]<br />ᐸjsonb_identity_mutation_plpgsql_with_default(mutation)ᐳ"]]:::sideeffectplan
-    Object68 --> PgSelect65
-    First69{{"First[69∈11]"}}:::plan
-    PgSelect65 --> First69
-    PgSelectSingle70{{"PgSelectSingle[70∈11]<br />ᐸjsonb_identity_mutation_plpgsql_with_defaultᐳ"}}:::plan
-    First69 --> PgSelectSingle70
-    PgClassExpression71{{"PgClassExpression[71∈11]<br />ᐸ__jsonb_id...efault__.vᐳ"}}:::plan
-    PgSelectSingle70 --> PgClassExpression71
-    Object72{{"Object[72∈11]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression71 --> Object72
-    Object57{{"Object[57∈9]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access55{{"Access[55∈9]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access56{{"Access[56∈9]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access55 & Access56 --> Object57
-    PgSelect54[["PgSelect[54∈9]<br />ᐸjsonb_identity_mutation_plpgsql(mutation)ᐳ"]]:::sideeffectplan
-    Object57 & Constant678 --> PgSelect54
-    __Value3 --> Access55
-    __Value3 --> Access56
-    First58{{"First[58∈9]"}}:::plan
-    PgSelect54 --> First58
-    PgSelectSingle59{{"PgSelectSingle[59∈9]<br />ᐸjsonb_identity_mutation_plpgsqlᐳ"}}:::plan
-    First58 --> PgSelectSingle59
-    PgClassExpression60{{"PgClassExpression[60∈9]<br />ᐸ__jsonb_id...lpgsql__.vᐳ"}}:::plan
-    PgSelectSingle59 --> PgClassExpression60
-    Object61{{"Object[61∈9]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression60 --> Object61
-    Object46{{"Object[46∈7]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access44{{"Access[44∈7]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access45{{"Access[45∈7]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access44 & Access45 --> Object46
-    PgSelect43[["PgSelect[43∈7]<br />ᐸjsonb_identity_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object46 & Constant677 --> PgSelect43
-    __Value3 --> Access44
-    __Value3 --> Access45
-    First47{{"First[47∈7]"}}:::plan
-    PgSelect43 --> First47
-    PgSelectSingle48{{"PgSelectSingle[48∈7]<br />ᐸjsonb_identity_mutationᐳ"}}:::plan
-    First47 --> PgSelectSingle48
-    PgClassExpression49{{"PgClassExpression[49∈7]<br />ᐸ__jsonb_id...tation__.vᐳ"}}:::plan
-    PgSelectSingle48 --> PgClassExpression49
-    Object50{{"Object[50∈7]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression49 --> Object50
-    Object35{{"Object[35∈5]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access33{{"Access[33∈5]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access34{{"Access[34∈5]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access33 & Access34 --> Object35
-    PgSelect32[["PgSelect[32∈5]<br />ᐸjson_identity_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object35 & Constant676 --> PgSelect32
-    __Value3 --> Access33
-    __Value3 --> Access34
-    First36{{"First[36∈5]"}}:::plan
-    PgSelect32 --> First36
-    PgSelectSingle37{{"PgSelectSingle[37∈5]<br />ᐸjson_identity_mutationᐳ"}}:::plan
-    First36 --> PgSelectSingle37
-    PgClassExpression38{{"PgClassExpression[38∈5]<br />ᐸ__json_ide...tation__.vᐳ"}}:::plan
-    PgSelectSingle37 --> PgClassExpression38
-    Object39{{"Object[39∈5]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression38 --> Object39
-    Object24{{"Object[24∈3]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access22{{"Access[22∈3]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access23{{"Access[23∈3]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access22 & Access23 --> Object24
-    PgSelect21[["PgSelect[21∈3]<br />ᐸjsonb_identity_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object24 & Constant675 --> PgSelect21
-    __Value3 --> Access22
-    __Value3 --> Access23
-    First25{{"First[25∈3]"}}:::plan
-    PgSelect21 --> First25
-    PgSelectSingle26{{"PgSelectSingle[26∈3]<br />ᐸjsonb_identity_mutationᐳ"}}:::plan
-    First25 --> PgSelectSingle26
-    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__jsonb_id...tation__.vᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression27
-    Object28{{"Object[28∈3]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression27 --> Object28
-    PgSelect10[["PgSelect[10∈1]<br />ᐸjson_identity_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object13 & Constant674 --> PgSelect10
-    First14{{"First[14∈1]"}}:::plan
-    PgSelect10 --> First14
-    PgSelectSingle15{{"PgSelectSingle[15∈1]<br />ᐸjson_identity_mutationᐳ"}}:::plan
-    First14 --> PgSelectSingle15
-    PgClassExpression16{{"PgClassExpression[16∈1]<br />ᐸ__json_ide...tation__.vᐳ"}}:::plan
-    PgSelectSingle15 --> PgClassExpression16
-    Object17{{"Object[17∈1]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression16 --> Object17
-    Edge370{{"Edge[370∈50]"}}:::plan
-    PgSelectSingle369{{"PgSelectSingle[369∈50]<br />ᐸpostᐳ"}}:::plan
-    PgCursor371{{"PgCursor[371∈50]"}}:::plan
-    Connection367{{"Connection[367∈50]<br />ᐸ363ᐳ"}}:::plan
-    PgSelectSingle369 & PgCursor371 & Connection367 --> Edge370
-    Edge412{{"Edge[412∈56]"}}:::plan
-    PgSelectSingle411{{"PgSelectSingle[411∈56]<br />ᐸpostᐳ"}}:::plan
-    PgCursor413{{"PgCursor[413∈56]"}}:::plan
-    Connection409{{"Connection[409∈56]<br />ᐸ405ᐳ"}}:::plan
-    PgSelectSingle411 & PgCursor413 & Connection409 --> Edge412
-    PgSelect352[["PgSelect[352∈50]<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression351{{"PgClassExpression[351∈50]<br />ᐸ__table_mu...author_id”ᐳ"}}:::plan
-    Object340 & PgClassExpression351 --> PgSelect352
-    PgSelect363[["PgSelect[363∈50]<br />ᐸpostᐳ"]]:::plan
-    PgClassExpression362{{"PgClassExpression[362∈50]<br />ᐸ__table_mutation__.”id”ᐳ"}}:::plan
-    Object340 & PgClassExpression362 --> PgSelect363
-    PgSelect394[["PgSelect[394∈56]<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression393{{"PgClassExpression[393∈56]<br />ᐸ__table_mu...author_id”ᐳ"}}:::plan
-    Object382 & PgClassExpression393 --> PgSelect394
-    PgSelect405[["PgSelect[405∈56]<br />ᐸpostᐳ"]]:::plan
-    PgClassExpression404{{"PgClassExpression[404∈56]<br />ᐸ__table_mutation__.”id”ᐳ"}}:::plan
-    Object382 & PgClassExpression404 --> PgSelect405
-    PgSelectSingle342 --> PgClassExpression362
-    PgSelectSingle342 --> PgClassExpression351
-    First356{{"First[356∈50]"}}:::plan
-    PgSelect352 --> First356
-    PgSelectSingle357{{"PgSelectSingle[357∈50]<br />ᐸpersonᐳ"}}:::plan
-    First356 --> PgSelectSingle357
-    First368{{"First[368∈50]"}}:::plan
-    PgSelect363 --> First368
-    First368 --> PgSelectSingle369
-    PgClassExpression372{{"PgClassExpression[372∈50]<br />ᐸ__post__.”id”ᐳ"}}:::plan
-    PgSelectSingle369 --> PgClassExpression372
-    List373{{"List[373∈50]<br />ᐸ372ᐳ"}}:::plan
-    PgClassExpression372 --> List373
-    List373 --> PgCursor371
-    PgSelectSingle384 --> PgClassExpression404
-    PgSelectSingle384 --> PgClassExpression393
-    First398{{"First[398∈56]"}}:::plan
-    PgSelect394 --> First398
-    PgSelectSingle399{{"PgSelectSingle[399∈56]<br />ᐸpersonᐳ"}}:::plan
-    First398 --> PgSelectSingle399
-    First410{{"First[410∈56]"}}:::plan
-    PgSelect405 --> First410
-    First410 --> PgSelectSingle411
-    PgClassExpression414{{"PgClassExpression[414∈56]<br />ᐸ__post__.”id”ᐳ"}}:::plan
-    PgSelectSingle411 --> PgClassExpression414
-    List415{{"List[415∈56]<br />ᐸ414ᐳ"}}:::plan
-    PgClassExpression414 --> List415
-    List415 --> PgCursor413
-    Constant96{{"Constant[96∈16]<br />ᐸundefinedᐳ"}}:::plan
-    PgClassExpression358{{"PgClassExpression[358∈52]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle357 --> PgClassExpression358
-    PgClassExpression359{{"PgClassExpression[359∈52]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle357 --> PgClassExpression359
-    PgClassExpression400{{"PgClassExpression[400∈58]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle399 --> PgClassExpression400
-    PgClassExpression401{{"PgClassExpression[401∈58]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle399 --> PgClassExpression401
-    List346{{"List[346∈51]<br />ᐸ344,362ᐳ"}}:::plan
-    Constant344{{"Constant[344∈51]<br />ᐸ'posts'ᐳ"}}:::plan
-    Constant344 & PgClassExpression362 --> List346
-    List388{{"List[388∈57]<br />ᐸ386,404ᐳ"}}:::plan
-    Constant386{{"Constant[386∈57]<br />ᐸ'posts'ᐳ"}}:::plan
-    Constant386 & PgClassExpression404 --> List388
+    PgSelect242[["PgSelect[242∈35]<br />ᐸcompound_type_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object245{{"Object[245∈35]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant783{{"Constant[783∈35]<br />ᐸ[Object: null prototype] {   a: 419,   b: 'easy cheesy bakedᐳ"}}:::plan
+    Object245 & Constant783 --> PgSelect242
+    Access243{{"Access[243∈35]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access244{{"Access[244∈35]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access243 & Access244 --> Object245
+    __Value3 --> Access243
+    __Value3 --> Access244
+    First246{{"First[246∈35]"}}:::plan
+    PgSelect242 --> First246
+    PgSelectSingle247{{"PgSelectSingle[247∈35]<br />ᐸcompound_type_mutationᐳ"}}:::plan
+    First246 --> PgSelectSingle247
+    Object248{{"Object[248∈35]<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelectSingle247 --> Object248
     PgClassExpression249{{"PgClassExpression[249∈37]<br />ᐸ__compound...tion__.”a”ᐳ"}}:::plan
     PgSelectSingle247 --> PgClassExpression249
     PgClassExpression250{{"PgClassExpression[250∈37]<br />ᐸ__compound...tion__.”b”ᐳ"}}:::plan
@@ -644,65 +342,21 @@ graph TD
     PgSelectSingle247 --> PgClassExpression255
     PgClassExpression259{{"PgClassExpression[259∈37]<br />ᐸ__compound....”foo_bar”ᐳ"}}:::plan
     PgSelectSingle247 --> PgClassExpression259
+    PgSelect279[["PgSelect[279∈39]<br />ᐸcompound_type_set_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object282{{"Object[282∈39]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant784{{"Constant[784∈39]<br />ᐸ[Object: null prototype] {   a: 419,   b: 'easy cheesy bakedᐳ"}}:::plan
+    Object282 & Constant784 --> PgSelect279
+    Access280{{"Access[280∈39]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access281{{"Access[281∈39]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access280 & Access281 --> Object282
+    __Value3 --> Access280
+    __Value3 --> Access281
+    Object283{{"Object[283∈39]<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelect279 --> Object283
     __Item284[/"__Item[284∈41]<br />ᐸ279ᐳ"\]:::itemplan
     PgSelect279 ==> __Item284
     PgSelectSingle285{{"PgSelectSingle[285∈41]<br />ᐸcompound_type_set_mutationᐳ"}}:::plan
     __Item284 --> PgSelectSingle285
-    __Item321[/"__Item[321∈46]<br />ᐸ316ᐳ"\]:::itemplan
-    PgSelect316 ==> __Item321
-    PgSelectSingle322{{"PgSelectSingle[322∈46]<br />ᐸcompound_type_array_mutationᐳ"}}:::plan
-    __Item321 --> PgSelectSingle322
-    Lambda347{{"Lambda[347∈51]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List346 --> Lambda347
-    PgClassExpression349{{"PgClassExpression[349∈51]<br />ᐸ__table_mu...”headline”ᐳ"}}:::plan
-    PgSelectSingle342 --> PgClassExpression349
-    Lambda389{{"Lambda[389∈57]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List388 --> Lambda389
-    PgClassExpression391{{"PgClassExpression[391∈57]<br />ᐸ__table_mu...”headline”ᐳ"}}:::plan
-    PgSelectSingle384 --> PgClassExpression391
-    __Item425[/"__Item[425∈63]<br />ᐸ420ᐳ"\]:::itemplan
-    PgSelect420 ==> __Item425
-    PgSelectSingle426{{"PgSelectSingle[426∈63]<br />ᐸtable_set_mutationᐳ"}}:::plan
-    __Item425 --> PgSelectSingle426
-    __Item439[/"__Item[439∈67]<br />ᐸ434ᐳ"\]:::itemplan
-    PgSelect434 ==> __Item439
-    PgSelectSingle440{{"PgSelectSingle[440∈67]<br />ᐸint_set_mutationᐳ"}}:::plan
-    __Item439 --> PgSelectSingle440
-    PgClassExpression441{{"PgClassExpression[441∈67]<br />ᐸ__int_set_mutation__.vᐳ"}}:::plan
-    PgSelectSingle440 --> PgClassExpression441
-    __Item538[/"__Item[538∈78]<br />ᐸ533ᐳ"\]:::itemplan
-    PgSelect533 ==> __Item538
-    PgSelectSingle539{{"PgSelectSingle[539∈78]<br />ᐸpost_manyᐳ"}}:::plan
-    __Item538 --> PgSelectSingle539
-    PgClassExpression569{{"PgClassExpression[569∈84]<br />ᐸ__post_wit...fix__.”id”ᐳ"}}:::plan
-    PgSelectSingle567 --> PgClassExpression569
-    PgClassExpression570{{"PgClassExpression[570∈84]<br />ᐸ__post_wit...”headline”ᐳ"}}:::plan
-    PgSelectSingle567 --> PgClassExpression570
-    PgClassExpression580{{"PgClassExpression[580∈87]<br />ᐸ__issue756...ion__.”id”ᐳ"}}:::plan
-    PgSelectSingle578 --> PgClassExpression580
-    PgClassExpression581{{"PgClassExpression[581∈87]<br />ᐸ__issue756...ion__.”ts”ᐳ"}}:::plan
-    PgSelectSingle578 --> PgClassExpression581
-    __Item589[/"__Item[589∈90]<br />ᐸ584ᐳ"\]:::itemplan
-    PgSelect584 ==> __Item589
-    PgSelectSingle590{{"PgSelectSingle[590∈90]<br />ᐸissue756_set_mutationᐳ"}}:::plan
-    __Item589 --> PgSelectSingle590
-    __Item617[/"__Item[617∈94]<br />ᐸ612ᐳ"\]:::itemplan
-    PgSelect612 ==> __Item617
-    PgSelectSingle618{{"PgSelectSingle[618∈94]<br />ᐸmutation_compound_type_arrayᐳ"}}:::plan
-    __Item617 --> PgSelectSingle618
-    __Item640[/"__Item[640∈99]<br />ᐸ638ᐳ"\]:::itemplan
-    PgClassExpression638 ==> __Item640
-    __Item651[/"__Item[651∈102]<br />ᐸ649ᐳ"\]:::itemplan
-    PgClassExpression649 ==> __Item651
-    __Item665[/"__Item[665∈106]<br />ᐸ660ᐳ"\]:::itemplan
-    PgSelect660 ==> __Item665
-    PgSelectSingle666{{"PgSelectSingle[666∈106]<br />ᐸmutation_interval_setᐳ"}}:::plan
-    __Item665 --> PgSelectSingle666
-    PgClassExpression667{{"PgClassExpression[667∈106]<br />ᐸ__mutation...al_set__.vᐳ"}}:::plan
-    PgSelectSingle666 --> PgClassExpression667
-    PgSelect543[["PgSelect[543∈79]<br />ᐸfrmcdc_comptypeᐳ"]]:::plan
-    PgClassExpression542{{"PgClassExpression[542∈79]<br />ᐸ__post_man...comptypes”ᐳ"}}:::plan
-    Object536 & PgClassExpression542 --> PgSelect543
     PgClassExpression286{{"PgClassExpression[286∈42]<br />ᐸ__compound...tion__.”a”ᐳ"}}:::plan
     PgSelectSingle285 --> PgClassExpression286
     PgClassExpression287{{"PgClassExpression[287∈42]<br />ᐸ__compound...tion__.”b”ᐳ"}}:::plan
@@ -719,6 +373,21 @@ graph TD
     PgSelectSingle285 --> PgClassExpression292
     PgClassExpression296{{"PgClassExpression[296∈42]<br />ᐸ__compound....”foo_bar”ᐳ"}}:::plan
     PgSelectSingle285 --> PgClassExpression296
+    PgSelect316[["PgSelect[316∈44]<br />ᐸcompound_type_array_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object319{{"Object[319∈44]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant785{{"Constant[785∈44]<br />ᐸ[Object: null prototype] {   a: 419,   b: 'easy cheesy bakedᐳ"}}:::plan
+    Object319 & Constant785 --> PgSelect316
+    Access317{{"Access[317∈44]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access318{{"Access[318∈44]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access317 & Access318 --> Object319
+    __Value3 --> Access317
+    __Value3 --> Access318
+    Object320{{"Object[320∈44]<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelect316 --> Object320
+    __Item321[/"__Item[321∈46]<br />ᐸ316ᐳ"\]:::itemplan
+    PgSelect316 ==> __Item321
+    PgSelectSingle322{{"PgSelectSingle[322∈46]<br />ᐸcompound_type_array_mutationᐳ"}}:::plan
+    __Item321 --> PgSelectSingle322
     PgClassExpression323{{"PgClassExpression[323∈47]<br />ᐸ__compound...tion__.”a”ᐳ"}}:::plan
     PgSelectSingle322 --> PgClassExpression323
     PgClassExpression324{{"PgClassExpression[324∈47]<br />ᐸ__compound...tion__.”b”ᐳ"}}:::plan
@@ -735,21 +404,308 @@ graph TD
     PgSelectSingle322 --> PgClassExpression329
     PgClassExpression333{{"PgClassExpression[333∈47]<br />ᐸ__compound....”foo_bar”ᐳ"}}:::plan
     PgSelectSingle322 --> PgClassExpression333
+    PgSelect337[["PgSelect[337∈49]<br />ᐸtable_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object340{{"Object[340∈49]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object340 & Constant686 --> PgSelect337
+    Access338{{"Access[338∈49]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access339{{"Access[339∈49]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access338 & Access339 --> Object340
+    __Value3 --> Access338
+    __Value3 --> Access339
+    First341{{"First[341∈49]"}}:::plan
+    PgSelect337 --> First341
+    PgSelectSingle342{{"PgSelectSingle[342∈49]<br />ᐸtable_mutationᐳ"}}:::plan
+    First341 --> PgSelectSingle342
+    Object343{{"Object[343∈49]<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelectSingle342 --> Object343
+    Edge370{{"Edge[370∈50]"}}:::plan
+    PgSelectSingle369{{"PgSelectSingle[369∈50]<br />ᐸpostᐳ"}}:::plan
+    PgCursor371{{"PgCursor[371∈50]"}}:::plan
+    Connection367{{"Connection[367∈50]<br />ᐸ363ᐳ"}}:::plan
+    PgSelectSingle369 & PgCursor371 & Connection367 --> Edge370
+    PgSelect352[["PgSelect[352∈50]<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression351{{"PgClassExpression[351∈50]<br />ᐸ__table_mu...author_id”ᐳ"}}:::plan
+    Object340 & PgClassExpression351 --> PgSelect352
+    PgSelect363[["PgSelect[363∈50]<br />ᐸpostᐳ"]]:::plan
+    PgClassExpression362{{"PgClassExpression[362∈50]<br />ᐸ__table_mutation__.”id”ᐳ"}}:::plan
+    Object340 & PgClassExpression362 --> PgSelect363
+    PgSelectSingle342 --> PgClassExpression351
+    First356{{"First[356∈50]"}}:::plan
+    PgSelect352 --> First356
+    PgSelectSingle357{{"PgSelectSingle[357∈50]<br />ᐸpersonᐳ"}}:::plan
+    First356 --> PgSelectSingle357
+    PgSelectSingle342 --> PgClassExpression362
+    First368{{"First[368∈50]"}}:::plan
+    PgSelect363 --> First368
+    First368 --> PgSelectSingle369
+    List373{{"List[373∈50]<br />ᐸ372ᐳ"}}:::plan
+    List373 --> PgCursor371
+    PgClassExpression372{{"PgClassExpression[372∈50]<br />ᐸ__post__.”id”ᐳ"}}:::plan
+    PgSelectSingle369 --> PgClassExpression372
+    PgClassExpression372 --> List373
+    List346{{"List[346∈51]<br />ᐸ344,362ᐳ"}}:::plan
+    Constant344{{"Constant[344∈51]<br />ᐸ'posts'ᐳ"}}:::plan
+    Constant344 & PgClassExpression362 --> List346
+    Lambda347{{"Lambda[347∈51]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List346 --> Lambda347
+    PgClassExpression349{{"PgClassExpression[349∈51]<br />ᐸ__table_mu...”headline”ᐳ"}}:::plan
+    PgSelectSingle342 --> PgClassExpression349
+    PgClassExpression358{{"PgClassExpression[358∈52]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle357 --> PgClassExpression358
+    PgClassExpression359{{"PgClassExpression[359∈52]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle357 --> PgClassExpression359
     PgClassExpression375{{"PgClassExpression[375∈54]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgSelectSingle369 --> PgClassExpression375
+    PgSelect379[["PgSelect[379∈55]<br />ᐸtable_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object382{{"Object[382∈55]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object382 & Constant732 --> PgSelect379
+    Access380{{"Access[380∈55]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access381{{"Access[381∈55]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access380 & Access381 --> Object382
+    __Value3 --> Access380
+    __Value3 --> Access381
+    First383{{"First[383∈55]"}}:::plan
+    PgSelect379 --> First383
+    PgSelectSingle384{{"PgSelectSingle[384∈55]<br />ᐸtable_mutationᐳ"}}:::plan
+    First383 --> PgSelectSingle384
+    Object385{{"Object[385∈55]<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelectSingle384 --> Object385
+    Edge412{{"Edge[412∈56]"}}:::plan
+    PgSelectSingle411{{"PgSelectSingle[411∈56]<br />ᐸpostᐳ"}}:::plan
+    PgCursor413{{"PgCursor[413∈56]"}}:::plan
+    Connection409{{"Connection[409∈56]<br />ᐸ405ᐳ"}}:::plan
+    PgSelectSingle411 & PgCursor413 & Connection409 --> Edge412
+    PgSelect394[["PgSelect[394∈56]<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression393{{"PgClassExpression[393∈56]<br />ᐸ__table_mu...author_id”ᐳ"}}:::plan
+    Object382 & PgClassExpression393 --> PgSelect394
+    PgSelect405[["PgSelect[405∈56]<br />ᐸpostᐳ"]]:::plan
+    PgClassExpression404{{"PgClassExpression[404∈56]<br />ᐸ__table_mutation__.”id”ᐳ"}}:::plan
+    Object382 & PgClassExpression404 --> PgSelect405
+    PgSelectSingle384 --> PgClassExpression393
+    First398{{"First[398∈56]"}}:::plan
+    PgSelect394 --> First398
+    PgSelectSingle399{{"PgSelectSingle[399∈56]<br />ᐸpersonᐳ"}}:::plan
+    First398 --> PgSelectSingle399
+    PgSelectSingle384 --> PgClassExpression404
+    First410{{"First[410∈56]"}}:::plan
+    PgSelect405 --> First410
+    First410 --> PgSelectSingle411
+    List415{{"List[415∈56]<br />ᐸ414ᐳ"}}:::plan
+    List415 --> PgCursor413
+    PgClassExpression414{{"PgClassExpression[414∈56]<br />ᐸ__post__.”id”ᐳ"}}:::plan
+    PgSelectSingle411 --> PgClassExpression414
+    PgClassExpression414 --> List415
+    List388{{"List[388∈57]<br />ᐸ386,404ᐳ"}}:::plan
+    Constant386{{"Constant[386∈57]<br />ᐸ'posts'ᐳ"}}:::plan
+    Constant386 & PgClassExpression404 --> List388
+    Lambda389{{"Lambda[389∈57]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List388 --> Lambda389
+    PgClassExpression391{{"PgClassExpression[391∈57]<br />ᐸ__table_mu...”headline”ᐳ"}}:::plan
+    PgSelectSingle384 --> PgClassExpression391
+    PgClassExpression400{{"PgClassExpression[400∈58]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle399 --> PgClassExpression400
+    PgClassExpression401{{"PgClassExpression[401∈58]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle399 --> PgClassExpression401
     PgClassExpression417{{"PgClassExpression[417∈60]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgSelectSingle411 --> PgClassExpression417
+    Object423{{"Object[423∈61]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access421{{"Access[421∈61]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access422{{"Access[422∈61]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access421 & Access422 --> Object423
+    PgSelect420[["PgSelect[420∈61]<br />ᐸtable_set_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object423 --> PgSelect420
+    __Value3 --> Access421
+    __Value3 --> Access422
+    Object424{{"Object[424∈61]<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelect420 --> Object424
+    __Item425[/"__Item[425∈63]<br />ᐸ420ᐳ"\]:::itemplan
+    PgSelect420 ==> __Item425
+    PgSelectSingle426{{"PgSelectSingle[426∈63]<br />ᐸtable_set_mutationᐳ"}}:::plan
+    __Item425 --> PgSelectSingle426
     PgClassExpression427{{"PgClassExpression[427∈64]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
     PgSelectSingle426 --> PgClassExpression427
+    PgSelect434[["PgSelect[434∈65]<br />ᐸint_set_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object437{{"Object[437∈65]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant433{{"Constant[433∈65]<br />ᐸnullᐳ"}}:::plan
+    Object437 & Constant686 & Constant433 & Constant734 --> PgSelect434
+    Access435{{"Access[435∈65]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access436{{"Access[436∈65]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access435 & Access436 --> Object437
+    __Value3 --> Access435
+    __Value3 --> Access436
+    Object438{{"Object[438∈65]<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelect434 --> Object438
+    __Item439[/"__Item[439∈67]<br />ᐸ434ᐳ"\]:::itemplan
+    PgSelect434 ==> __Item439
+    PgSelectSingle440{{"PgSelectSingle[440∈67]<br />ᐸint_set_mutationᐳ"}}:::plan
+    __Item439 --> PgSelectSingle440
+    PgClassExpression441{{"PgClassExpression[441∈67]<br />ᐸ__int_set_mutation__.vᐳ"}}:::plan
+    PgSelectSingle440 --> PgClassExpression441
+    Object447{{"Object[447∈68]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access445{{"Access[445∈68]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access446{{"Access[446∈68]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access445 & Access446 --> Object447
+    Object451{{"Object[451∈68]<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
+    PgClassExpression450{{"PgClassExpression[450∈68]<br />ᐸ__no_args_mutation__.vᐳ"}}:::plan
+    PgClassExpression450 & Constant735 --> Object451
+    PgSelect444[["PgSelect[444∈68]<br />ᐸno_args_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object447 --> PgSelect444
+    __Value3 --> Access445
+    __Value3 --> Access446
+    First448{{"First[448∈68]"}}:::plan
+    PgSelect444 --> First448
+    PgSelectSingle449{{"PgSelectSingle[449∈68]<br />ᐸno_args_mutationᐳ"}}:::plan
+    First448 --> PgSelectSingle449
+    PgSelectSingle449 --> PgClassExpression450
+    Object457{{"Object[457∈70]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access455{{"Access[455∈70]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access456{{"Access[456∈70]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access455 & Access456 --> Object457
+    PgSelect454[["PgSelect[454∈70]<br />ᐸreturn_void_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object457 --> PgSelect454
+    __Value3 --> Access455
+    __Value3 --> Access456
+    First458{{"First[458∈70]"}}:::plan
+    PgSelect454 --> First458
+    PgSelectSingle459{{"PgSelectSingle[459∈70]<br />ᐸreturn_void_mutationᐳ"}}:::plan
+    First458 --> PgSelectSingle459
+    PgClassExpression460{{"PgClassExpression[460∈70]<br />ᐸ__return_v...tation__.vᐳ"}}:::plan
+    PgSelectSingle459 --> PgClassExpression460
+    Object461{{"Object[461∈70]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression460 --> Object461
+    PgSelect465[["PgSelect[465∈72]<br />ᐸguid_fn(mutation)ᐳ"]]:::sideeffectplan
+    Object468{{"Object[468∈72]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object468 & Constant736 --> PgSelect465
+    Access466{{"Access[466∈72]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access467{{"Access[467∈72]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access466 & Access467 --> Object468
+    __Value3 --> Access466
+    __Value3 --> Access467
+    First469{{"First[469∈72]"}}:::plan
+    PgSelect465 --> First469
+    PgSelectSingle470{{"PgSelectSingle[470∈72]<br />ᐸguid_fnᐳ"}}:::plan
+    First469 --> PgSelectSingle470
+    PgClassExpression471{{"PgClassExpression[471∈72]<br />ᐸ__guid_fn__.vᐳ"}}:::plan
+    PgSelectSingle470 --> PgClassExpression471
+    Object472{{"Object[472∈72]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression471 --> Object472
+    PgSelect476[["PgSelect[476∈74]<br />ᐸguid_fn(mutation)ᐳ"]]:::sideeffectplan
+    Object479{{"Object[479∈74]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object479 & Constant737 --> PgSelect476
+    Access477{{"Access[477∈74]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access478{{"Access[478∈74]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access477 & Access478 --> Object479
+    __Value3 --> Access477
+    __Value3 --> Access478
+    First480{{"First[480∈74]"}}:::plan
+    PgSelect476 --> First480
+    PgSelectSingle481{{"PgSelectSingle[481∈74]<br />ᐸguid_fnᐳ"}}:::plan
+    First480 --> PgSelectSingle481
+    PgClassExpression482{{"PgClassExpression[482∈74]<br />ᐸ__guid_fn__.vᐳ"}}:::plan
+    PgSelectSingle481 --> PgClassExpression482
+    Object483{{"Object[483∈74]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression482 --> Object483
+    PgSelect533[["PgSelect[533∈76]<br />ᐸpost_many(mutation)ᐳ"]]:::sideeffectplan
+    Object536{{"Object[536∈76]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant793{{"Constant[793∈76]<br />ᐸ[   [Object: null prototype] {     id: 7,     headline: 'heaᐳ"}}:::plan
+    Object536 & Constant793 --> PgSelect533
+    Access534{{"Access[534∈76]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access535{{"Access[535∈76]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access534 & Access535 --> Object536
+    __Value3 --> Access534
+    __Value3 --> Access535
+    Object537{{"Object[537∈76]<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelect533 --> Object537
+    __Item538[/"__Item[538∈78]<br />ᐸ533ᐳ"\]:::itemplan
+    PgSelect533 ==> __Item538
+    PgSelectSingle539{{"PgSelectSingle[539∈78]<br />ᐸpost_manyᐳ"}}:::plan
+    __Item538 --> PgSelectSingle539
+    PgSelect543[["PgSelect[543∈79]<br />ᐸfrmcdc_comptypeᐳ"]]:::plan
+    PgClassExpression542{{"PgClassExpression[542∈79]<br />ᐸ__post_man...comptypes”ᐳ"}}:::plan
+    Object536 & PgClassExpression542 --> PgSelect543
     PgClassExpression540{{"PgClassExpression[540∈79]<br />ᐸ__post_many__.”id”ᐳ"}}:::plan
     PgSelectSingle539 --> PgClassExpression540
     PgClassExpression541{{"PgClassExpression[541∈79]<br />ᐸ__post_man...”headline”ᐳ"}}:::plan
     PgSelectSingle539 --> PgClassExpression541
     PgSelectSingle539 --> PgClassExpression542
+    __Item547[/"__Item[547∈80]<br />ᐸ543ᐳ"\]:::itemplan
+    PgSelect543 ==> __Item547
+    PgSelectSingle548{{"PgSelectSingle[548∈80]<br />ᐸfrmcdc_comptypeᐳ"}}:::plan
+    __Item547 --> PgSelectSingle548
+    PgClassExpression549{{"PgClassExpression[549∈81]<br />ᐸ__frmcdc_c...”schedule”ᐳ"}}:::plan
+    PgSelectSingle548 --> PgClassExpression549
+    PgClassExpression550{{"PgClassExpression[550∈81]<br />ᐸ__frmcdc_c...optimised”ᐳ"}}:::plan
+    PgSelectSingle548 --> PgClassExpression550
+    PgSelect562[["PgSelect[562∈82]<br />ᐸpost_with_suffix(mutation)ᐳ"]]:::sideeffectplan
+    Object565{{"Object[565∈82]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant781{{"Constant[781∈82]<br />ᐸ[Object: null prototype] {   id: 15,   headline: 'headline_'ᐳ"}}:::plan
+    Object565 & Constant781 & Constant762 --> PgSelect562
+    Access563{{"Access[563∈82]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access564{{"Access[564∈82]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access563 & Access564 --> Object565
+    __Value3 --> Access563
+    __Value3 --> Access564
+    First566{{"First[566∈82]"}}:::plan
+    PgSelect562 --> First566
+    PgSelectSingle567{{"PgSelectSingle[567∈82]<br />ᐸpost_with_suffixᐳ"}}:::plan
+    First566 --> PgSelectSingle567
+    Object568{{"Object[568∈82]<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelectSingle567 --> Object568
+    PgClassExpression569{{"PgClassExpression[569∈84]<br />ᐸ__post_wit...fix__.”id”ᐳ"}}:::plan
+    PgSelectSingle567 --> PgClassExpression569
+    PgClassExpression570{{"PgClassExpression[570∈84]<br />ᐸ__post_wit...”headline”ᐳ"}}:::plan
+    PgSelectSingle567 --> PgClassExpression570
+    Object576{{"Object[576∈85]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access574{{"Access[574∈85]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access575{{"Access[575∈85]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access574 & Access575 --> Object576
+    PgSelect573[["PgSelect[573∈85]<br />ᐸissue756_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object576 --> PgSelect573
+    __Value3 --> Access574
+    __Value3 --> Access575
+    First577{{"First[577∈85]"}}:::plan
+    PgSelect573 --> First577
+    PgSelectSingle578{{"PgSelectSingle[578∈85]<br />ᐸissue756_mutationᐳ"}}:::plan
+    First577 --> PgSelectSingle578
+    Object579{{"Object[579∈85]<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelectSingle578 --> Object579
+    PgClassExpression580{{"PgClassExpression[580∈87]<br />ᐸ__issue756...ion__.”id”ᐳ"}}:::plan
+    PgSelectSingle578 --> PgClassExpression580
+    PgClassExpression581{{"PgClassExpression[581∈87]<br />ᐸ__issue756...ion__.”ts”ᐳ"}}:::plan
+    PgSelectSingle578 --> PgClassExpression581
+    Object587{{"Object[587∈88]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access585{{"Access[585∈88]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access586{{"Access[586∈88]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access585 & Access586 --> Object587
+    PgSelect584[["PgSelect[584∈88]<br />ᐸissue756_set_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object587 --> PgSelect584
+    __Value3 --> Access585
+    __Value3 --> Access586
+    Object588{{"Object[588∈88]<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelect584 --> Object588
+    __Item589[/"__Item[589∈90]<br />ᐸ584ᐳ"\]:::itemplan
+    PgSelect584 ==> __Item589
+    PgSelectSingle590{{"PgSelectSingle[590∈90]<br />ᐸissue756_set_mutationᐳ"}}:::plan
+    __Item589 --> PgSelectSingle590
     PgClassExpression591{{"PgClassExpression[591∈91]<br />ᐸ__issue756...ion__.”id”ᐳ"}}:::plan
     PgSelectSingle590 --> PgClassExpression591
     PgClassExpression592{{"PgClassExpression[592∈91]<br />ᐸ__issue756...ion__.”ts”ᐳ"}}:::plan
     PgSelectSingle590 --> PgClassExpression592
+    PgSelect612[["PgSelect[612∈92]<br />ᐸmutation_compound_type_array(mutation)ᐳ"]]:::sideeffectplan
+    Object615{{"Object[615∈92]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant789{{"Constant[789∈92]<br />ᐸ[Object: null prototype] {   a: 419,   b: 'easy cheesy bakedᐳ"}}:::plan
+    Object615 & Constant789 --> PgSelect612
+    Access613{{"Access[613∈92]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access614{{"Access[614∈92]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access613 & Access614 --> Object615
+    __Value3 --> Access613
+    __Value3 --> Access614
+    Object616{{"Object[616∈92]<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelect612 --> Object616
+    __Item617[/"__Item[617∈94]<br />ᐸ612ᐳ"\]:::itemplan
+    PgSelect612 ==> __Item617
+    PgSelectSingle618{{"PgSelectSingle[618∈94]<br />ᐸmutation_compound_type_arrayᐳ"}}:::plan
+    __Item617 --> PgSelectSingle618
     PgClassExpression619{{"PgClassExpression[619∈95]<br />ᐸ__mutation...rray__.”a”ᐳ"}}:::plan
     PgSelectSingle618 --> PgClassExpression619
     PgClassExpression620{{"PgClassExpression[620∈95]<br />ᐸ__mutation...rray__.”b”ᐳ"}}:::plan
@@ -766,14 +722,58 @@ graph TD
     PgSelectSingle618 --> PgClassExpression625
     PgClassExpression629{{"PgClassExpression[629∈95]<br />ᐸ__mutation....”foo_bar”ᐳ"}}:::plan
     PgSelectSingle618 --> PgClassExpression629
-    __Item547[/"__Item[547∈80]<br />ᐸ543ᐳ"\]:::itemplan
-    PgSelect543 ==> __Item547
-    PgSelectSingle548{{"PgSelectSingle[548∈80]<br />ᐸfrmcdc_comptypeᐳ"}}:::plan
-    __Item547 --> PgSelectSingle548
-    PgClassExpression549{{"PgClassExpression[549∈81]<br />ᐸ__frmcdc_c...”schedule”ᐳ"}}:::plan
-    PgSelectSingle548 --> PgClassExpression549
-    PgClassExpression550{{"PgClassExpression[550∈81]<br />ᐸ__frmcdc_c...optimised”ᐳ"}}:::plan
-    PgSelectSingle548 --> PgClassExpression550
+    Object635{{"Object[635∈97]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access633{{"Access[633∈97]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access634{{"Access[634∈97]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access633 & Access634 --> Object635
+    PgSelect632[["PgSelect[632∈97]<br />ᐸmutation_text_array(mutation)ᐳ"]]:::sideeffectplan
+    Object635 --> PgSelect632
+    __Value3 --> Access633
+    __Value3 --> Access634
+    First636{{"First[636∈97]"}}:::plan
+    PgSelect632 --> First636
+    PgSelectSingle637{{"PgSelectSingle[637∈97]<br />ᐸmutation_text_arrayᐳ"}}:::plan
+    First636 --> PgSelectSingle637
+    PgClassExpression638{{"PgClassExpression[638∈97]<br />ᐸ__mutation..._array__.vᐳ"}}:::plan
+    PgSelectSingle637 --> PgClassExpression638
+    Object639{{"Object[639∈97]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression638 --> Object639
+    __Item640[/"__Item[640∈99]<br />ᐸ638ᐳ"\]:::itemplan
+    PgClassExpression638 ==> __Item640
+    Object646{{"Object[646∈100]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access644{{"Access[644∈100]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access645{{"Access[645∈100]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access644 & Access645 --> Object646
+    PgSelect643[["PgSelect[643∈100]<br />ᐸmutation_interval_array(mutation)ᐳ"]]:::sideeffectplan
+    Object646 --> PgSelect643
+    __Value3 --> Access644
+    __Value3 --> Access645
+    First647{{"First[647∈100]"}}:::plan
+    PgSelect643 --> First647
+    PgSelectSingle648{{"PgSelectSingle[648∈100]<br />ᐸmutation_interval_arrayᐳ"}}:::plan
+    First647 --> PgSelectSingle648
+    PgClassExpression649{{"PgClassExpression[649∈100]<br />ᐸ__mutation..._array__.vᐳ"}}:::plan
+    PgSelectSingle648 --> PgClassExpression649
+    Object650{{"Object[650∈100]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression649 --> Object650
+    __Item651[/"__Item[651∈102]<br />ᐸ649ᐳ"\]:::itemplan
+    PgClassExpression649 ==> __Item651
+    Object663{{"Object[663∈104]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access661{{"Access[661∈104]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access662{{"Access[662∈104]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access661 & Access662 --> Object663
+    PgSelect660[["PgSelect[660∈104]<br />ᐸmutation_interval_set(mutation)ᐳ"]]:::sideeffectplan
+    Object663 --> PgSelect660
+    __Value3 --> Access661
+    __Value3 --> Access662
+    Object664{{"Object[664∈104]<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelect660 --> Object664
+    __Item665[/"__Item[665∈106]<br />ᐸ660ᐳ"\]:::itemplan
+    PgSelect660 ==> __Item665
+    PgSelectSingle666{{"PgSelectSingle[666∈106]<br />ᐸmutation_interval_setᐳ"}}:::plan
+    __Item665 --> PgSelectSingle666
+    PgClassExpression667{{"PgClassExpression[667∈106]<br />ᐸ__mutation...al_set__.vᐳ"}}:::plan
+    PgSelectSingle666 --> PgClassExpression667
 
     %% define steps
 

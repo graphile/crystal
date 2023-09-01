@@ -9,13 +9,13 @@ graph TD
 
 
     %% plan dependencies
+    PgSelect8[["PgSelect[8∈0]<br />ᐸpeopleᐳ"]]:::plan
     Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant95{{"Constant[95∈0]<br />ᐸ2ᐳ"}}:::plan
+    Object11 & Constant95 --> PgSelect8
     Access9{{"Access[9∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
-    PgSelect8[["PgSelect[8∈0]<br />ᐸpeopleᐳ"]]:::plan
-    Constant95{{"Constant[95∈0]<br />ᐸ2ᐳ"}}:::plan
-    Object11 & Constant95 --> PgSelect8
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access9
     __Value3 --> Access10
@@ -45,14 +45,16 @@ graph TD
     PgClassExpression32 & List36 --> PgPolymorphic37
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__person_b...rks__.”id”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression23
-    RemapKeys86{{"RemapKeys[86∈3]<br />ᐸ22:{”0”:1}ᐳ"}}:::plan
-    PgSelectSingle22 --> RemapKeys86
     PgSelectSingle30{{"PgSelectSingle[30∈3]<br />ᐸpeopleᐳ"}}:::plan
+    RemapKeys86{{"RemapKeys[86∈3]<br />ᐸ22:{”0”:1}ᐳ"}}:::plan
     RemapKeys86 --> PgSelectSingle30
     PgSelectSingle22 --> PgClassExpression32
     PgSelectSingle22 --> PgClassExpression33
     PgSelectSingle22 --> PgClassExpression34
     PgSelectSingle22 --> PgClassExpression35
+    PgSelectSingle22 --> RemapKeys86
+    PgClassExpression31{{"PgClassExpression[31∈4]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgSelectSingle30 --> PgClassExpression31
     PgSelect38[["PgSelect[38∈5]<br />ᐸpeopleᐳ<br />ᐳPerson"]]:::plan
     Object11 & PgClassExpression33 --> PgSelect38
     PgSelect46[["PgSelect[46∈5]<br />ᐸpostsᐳ<br />ᐳPost"]]:::plan
@@ -73,9 +75,8 @@ graph TD
     First50 --> PgSelectSingle51
     PgClassExpression52{{"PgClassExpression[52∈5]<br />ᐸ__posts__.”post_id”ᐳ"}}:::plan
     PgSelectSingle51 --> PgClassExpression52
-    RemapKeys88{{"RemapKeys[88∈5]<br />ᐸ51:{”0”:1}ᐳ"}}:::plan
-    PgSelectSingle51 --> RemapKeys88
     PgSelectSingle59{{"PgSelectSingle[59∈5]<br />ᐸpeopleᐳ"}}:::plan
+    RemapKeys88{{"RemapKeys[88∈5]<br />ᐸ51:{”0”:1}ᐳ"}}:::plan
     RemapKeys88 --> PgSelectSingle59
     PgClassExpression61{{"PgClassExpression[61∈5]<br />ᐸ__posts__.”body”ᐳ"}}:::plan
     PgSelectSingle51 --> PgClassExpression61
@@ -85,24 +86,23 @@ graph TD
     First66 --> PgSelectSingle67
     PgClassExpression68{{"PgClassExpression[68∈5]<br />ᐸ__comments...omment_id”ᐳ"}}:::plan
     PgSelectSingle67 --> PgClassExpression68
-    RemapKeys90{{"RemapKeys[90∈5]<br />ᐸ67:{”0”:1}ᐳ"}}:::plan
-    PgSelectSingle67 --> RemapKeys90
     PgSelectSingle75{{"PgSelectSingle[75∈5]<br />ᐸpeopleᐳ"}}:::plan
+    RemapKeys90{{"RemapKeys[90∈5]<br />ᐸ67:{”0”:1}ᐳ"}}:::plan
     RemapKeys90 --> PgSelectSingle75
-    RemapKeys92{{"RemapKeys[92∈5]<br />ᐸ67:{”0”:2}ᐳ"}}:::plan
-    PgSelectSingle67 --> RemapKeys92
     PgSelectSingle83{{"PgSelectSingle[83∈5]<br />ᐸpostsᐳ"}}:::plan
+    RemapKeys92{{"RemapKeys[92∈5]<br />ᐸ67:{”0”:2}ᐳ"}}:::plan
     RemapKeys92 --> PgSelectSingle83
     PgClassExpression85{{"PgClassExpression[85∈5]<br />ᐸ__comments__.”body”ᐳ"}}:::plan
     PgSelectSingle67 --> PgClassExpression85
-    PgClassExpression31{{"PgClassExpression[31∈4]<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle30 --> PgClassExpression31
-    PgClassExpression84{{"PgClassExpression[84∈8]<br />ᐸ__posts__.”body”ᐳ"}}:::plan
-    PgSelectSingle83 --> PgClassExpression84
-    PgClassExpression76{{"PgClassExpression[76∈7]<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle75 --> PgClassExpression76
+    PgSelectSingle51 --> RemapKeys88
+    PgSelectSingle67 --> RemapKeys90
+    PgSelectSingle67 --> RemapKeys92
     PgClassExpression60{{"PgClassExpression[60∈6]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle59 --> PgClassExpression60
+    PgClassExpression76{{"PgClassExpression[76∈7]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgSelectSingle75 --> PgClassExpression76
+    PgClassExpression84{{"PgClassExpression[84∈8]<br />ᐸ__posts__.”body”ᐳ"}}:::plan
+    PgSelectSingle83 --> PgClassExpression84
 
     %% define steps
 

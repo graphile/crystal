@@ -34,44 +34,6 @@ graph TD
     __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Constant45{{"Constant[45∈0]<br />ᐸfalseᐳ"}}:::plan
-    PgSelect79[["PgSelect[79∈4]<br />ᐸperson+1ᐳ"]]:::plan
-    ToPg85{{"ToPg[85∈4]"}}:::plan
-    Object18 & Connection76 & Lambda77 & ToPg85 --> PgSelect79
-    PgSelect103[["PgSelect[103∈4]<br />ᐸperson(aggregate)ᐳ"]]:::plan
-    Object18 & Connection76 --> PgSelect103
-    PgPageInfo78{{"PgPageInfo[78∈4]"}}:::plan
-    Connection76 --> PgPageInfo78
-    Access84{{"Access[84∈4]<br />ᐸ77.1ᐳ"}}:::plan
-    Lambda77 --> Access84
-    Access84 --> ToPg85
-    First80{{"First[80∈4]"}}:::plan
-    PgSelect79 --> First80
-    PgSelectSingle81{{"PgSelectSingle[81∈4]<br />ᐸpersonᐳ"}}:::plan
-    First80 --> PgSelectSingle81
-    PgClassExpression86{{"PgClassExpression[86∈4]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle81 --> PgClassExpression86
-    List87{{"List[87∈4]<br />ᐸ86ᐳ"}}:::plan
-    PgClassExpression86 --> List87
-    PgCursor82{{"PgCursor[82∈4]"}}:::plan
-    List87 --> PgCursor82
-    Last89{{"Last[89∈4]"}}:::plan
-    PgSelect79 --> Last89
-    PgSelectSingle90{{"PgSelectSingle[90∈4]<br />ᐸpersonᐳ"}}:::plan
-    Last89 --> PgSelectSingle90
-    PgClassExpression95{{"PgClassExpression[95∈4]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle90 --> PgClassExpression95
-    List96{{"List[96∈4]<br />ᐸ95ᐳ"}}:::plan
-    PgClassExpression95 --> List96
-    PgCursor91{{"PgCursor[91∈4]"}}:::plan
-    List96 --> PgCursor91
-    Access98{{"Access[98∈4]<br />ᐸ79.hasMoreᐳ"}}:::plan
-    PgSelect79 --> Access98
-    First104{{"First[104∈4]"}}:::plan
-    PgSelect103 --> First104
-    PgSelectSingle105{{"PgSelectSingle[105∈4]<br />ᐸpersonᐳ"}}:::plan
-    First104 --> PgSelectSingle105
-    PgClassExpression106{{"PgClassExpression[106∈4]<br />ᐸcount(*)ᐳ"}}:::plan
-    PgSelectSingle105 --> PgClassExpression106
     PgSelect22[["PgSelect[22∈1]<br />ᐸperson+1ᐳ"]]:::plan
     ToPg28{{"ToPg[28∈1]"}}:::plan
     Object18 & Connection19 & Lambda20 & ToPg28 --> PgSelect22
@@ -79,29 +41,29 @@ graph TD
     Object18 & Connection19 --> PgSelect46
     PgPageInfo21{{"PgPageInfo[21∈1]"}}:::plan
     Connection19 --> PgPageInfo21
-    Access27{{"Access[27∈1]<br />ᐸ20.1ᐳ"}}:::plan
-    Lambda20 --> Access27
-    Access27 --> ToPg28
     First23{{"First[23∈1]"}}:::plan
     PgSelect22 --> First23
     PgSelectSingle24{{"PgSelectSingle[24∈1]<br />ᐸpersonᐳ"}}:::plan
     First23 --> PgSelectSingle24
+    PgCursor25{{"PgCursor[25∈1]"}}:::plan
+    List30{{"List[30∈1]<br />ᐸ29ᐳ"}}:::plan
+    List30 --> PgCursor25
+    Access27{{"Access[27∈1]<br />ᐸ20.1ᐳ"}}:::plan
+    Lambda20 --> Access27
+    Access27 --> ToPg28
     PgClassExpression29{{"PgClassExpression[29∈1]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression29
-    List30{{"List[30∈1]<br />ᐸ29ᐳ"}}:::plan
     PgClassExpression29 --> List30
-    PgCursor25{{"PgCursor[25∈1]"}}:::plan
-    List30 --> PgCursor25
     Last32{{"Last[32∈1]"}}:::plan
     PgSelect22 --> Last32
     PgSelectSingle33{{"PgSelectSingle[33∈1]<br />ᐸpersonᐳ"}}:::plan
     Last32 --> PgSelectSingle33
+    PgCursor34{{"PgCursor[34∈1]"}}:::plan
+    List39{{"List[39∈1]<br />ᐸ38ᐳ"}}:::plan
+    List39 --> PgCursor34
     PgClassExpression38{{"PgClassExpression[38∈1]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle33 --> PgClassExpression38
-    List39{{"List[39∈1]<br />ᐸ38ᐳ"}}:::plan
     PgClassExpression38 --> List39
-    PgCursor34{{"PgCursor[34∈1]"}}:::plan
-    List39 --> PgCursor34
     Access41{{"Access[41∈1]<br />ᐸ22.hasMoreᐳ"}}:::plan
     PgSelect22 --> Access41
     First47{{"First[47∈1]"}}:::plan
@@ -114,16 +76,12 @@ graph TD
     PgSelect22 ==> __Item54
     PgSelectSingle55{{"PgSelectSingle[55∈2]<br />ᐸpersonᐳ"}}:::plan
     __Item54 --> PgSelectSingle55
-    __Item111[/"__Item[111∈5]<br />ᐸ79ᐳ"\]:::itemplan
-    PgSelect79 ==> __Item111
-    PgSelectSingle112{{"PgSelectSingle[112∈5]<br />ᐸpersonᐳ"}}:::plan
-    __Item111 --> PgSelectSingle112
+    PgCursor56{{"PgCursor[56∈3]"}}:::plan
+    List58{{"List[58∈3]<br />ᐸ57ᐳ"}}:::plan
+    List58 --> PgCursor56
     PgClassExpression57{{"PgClassExpression[57∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle55 --> PgClassExpression57
-    List58{{"List[58∈3]<br />ᐸ57ᐳ"}}:::plan
     PgClassExpression57 --> List58
-    PgCursor56{{"PgCursor[56∈3]"}}:::plan
-    List58 --> PgCursor56
     PgClassExpression60{{"PgClassExpression[60∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle55 --> PgClassExpression60
     PgClassExpression61{{"PgClassExpression[61∈3]<br />ᐸ__person__.”email”ᐳ"}}:::plan
@@ -132,12 +90,54 @@ graph TD
     PgSelectSingle55 --> PgClassExpression62
     PgClassExpression63{{"PgClassExpression[63∈3]<br />ᐸ__person__...n_from_ip”ᐳ"}}:::plan
     PgSelectSingle55 --> PgClassExpression63
+    PgSelect79[["PgSelect[79∈4]<br />ᐸperson+1ᐳ"]]:::plan
+    ToPg85{{"ToPg[85∈4]"}}:::plan
+    Object18 & Connection76 & Lambda77 & ToPg85 --> PgSelect79
+    PgSelect103[["PgSelect[103∈4]<br />ᐸperson(aggregate)ᐳ"]]:::plan
+    Object18 & Connection76 --> PgSelect103
+    PgPageInfo78{{"PgPageInfo[78∈4]"}}:::plan
+    Connection76 --> PgPageInfo78
+    First80{{"First[80∈4]"}}:::plan
+    PgSelect79 --> First80
+    PgSelectSingle81{{"PgSelectSingle[81∈4]<br />ᐸpersonᐳ"}}:::plan
+    First80 --> PgSelectSingle81
+    PgCursor82{{"PgCursor[82∈4]"}}:::plan
+    List87{{"List[87∈4]<br />ᐸ86ᐳ"}}:::plan
+    List87 --> PgCursor82
+    Access84{{"Access[84∈4]<br />ᐸ77.1ᐳ"}}:::plan
+    Lambda77 --> Access84
+    Access84 --> ToPg85
+    PgClassExpression86{{"PgClassExpression[86∈4]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle81 --> PgClassExpression86
+    PgClassExpression86 --> List87
+    Last89{{"Last[89∈4]"}}:::plan
+    PgSelect79 --> Last89
+    PgSelectSingle90{{"PgSelectSingle[90∈4]<br />ᐸpersonᐳ"}}:::plan
+    Last89 --> PgSelectSingle90
+    PgCursor91{{"PgCursor[91∈4]"}}:::plan
+    List96{{"List[96∈4]<br />ᐸ95ᐳ"}}:::plan
+    List96 --> PgCursor91
+    PgClassExpression95{{"PgClassExpression[95∈4]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle90 --> PgClassExpression95
+    PgClassExpression95 --> List96
+    Access98{{"Access[98∈4]<br />ᐸ79.hasMoreᐳ"}}:::plan
+    PgSelect79 --> Access98
+    First104{{"First[104∈4]"}}:::plan
+    PgSelect103 --> First104
+    PgSelectSingle105{{"PgSelectSingle[105∈4]<br />ᐸpersonᐳ"}}:::plan
+    First104 --> PgSelectSingle105
+    PgClassExpression106{{"PgClassExpression[106∈4]<br />ᐸcount(*)ᐳ"}}:::plan
+    PgSelectSingle105 --> PgClassExpression106
+    __Item111[/"__Item[111∈5]<br />ᐸ79ᐳ"\]:::itemplan
+    PgSelect79 ==> __Item111
+    PgSelectSingle112{{"PgSelectSingle[112∈5]<br />ᐸpersonᐳ"}}:::plan
+    __Item111 --> PgSelectSingle112
+    PgCursor113{{"PgCursor[113∈6]"}}:::plan
+    List115{{"List[115∈6]<br />ᐸ114ᐳ"}}:::plan
+    List115 --> PgCursor113
     PgClassExpression114{{"PgClassExpression[114∈6]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle112 --> PgClassExpression114
-    List115{{"List[115∈6]<br />ᐸ114ᐳ"}}:::plan
     PgClassExpression114 --> List115
-    PgCursor113{{"PgCursor[113∈6]"}}:::plan
-    List115 --> PgCursor113
     PgClassExpression117{{"PgClassExpression[117∈6]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle112 --> PgClassExpression117
     PgClassExpression118{{"PgClassExpression[118∈6]<br />ᐸ__person__.”email”ᐳ"}}:::plan

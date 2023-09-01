@@ -9,13 +9,13 @@ graph TD
 
 
     %% plan dependencies
+    PgSelect8[["PgSelect[8∈0]<br />ᐸmessagesᐳ"]]:::plan
     Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant26{{"Constant[26∈0]<br />ᐸ'ca70ca70-0000-0000-0000-cec111a0ca70'ᐳ"}}:::plan
+    Object11 & Constant26 --> PgSelect8
     Access9{{"Access[9∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
-    PgSelect8[["PgSelect[8∈0]<br />ᐸmessagesᐳ"]]:::plan
-    Constant26{{"Constant[26∈0]<br />ᐸ'ca70ca70-0000-0000-0000-cec111a0ca70'ᐳ"}}:::plan
-    Object11 & Constant26 --> PgSelect8
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access9
     __Value3 --> Access10
@@ -29,10 +29,10 @@ graph TD
     PgSelectSingle13 --> PgClassExpression14
     PgClassExpression15{{"PgClassExpression[15∈1]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression15
-    RemapKeys24{{"RemapKeys[24∈1]<br />ᐸ13:{”0”:2}ᐳ"}}:::plan
-    PgSelectSingle13 --> RemapKeys24
     PgSelectSingle22{{"PgSelectSingle[22∈1]<br />ᐸforumsᐳ"}}:::plan
+    RemapKeys24{{"RemapKeys[24∈1]<br />ᐸ13:{”0”:2}ᐳ"}}:::plan
     RemapKeys24 --> PgSelectSingle22
+    PgSelectSingle13 --> RemapKeys24
     PgClassExpression16{{"PgClassExpression[16∈2]<br />ᐸ__messages__.”forum_id”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression16
 

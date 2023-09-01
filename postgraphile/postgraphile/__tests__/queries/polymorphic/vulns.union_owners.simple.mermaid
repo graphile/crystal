@@ -73,12 +73,6 @@ graph TD
     List87 --> Lambda88
     PgClassExpression89{{"PgClassExpression[89∈3]<br />ᐸ__third_pa...s__.”name”ᐳ"}}:::plan
     PgSelectSingle84 --> PgClassExpression89
-    __Item100[/"__Item[100∈6]<br />ᐸ99ᐳ"\]:::itemplan
-    PgUnionAll99 ==> __Item100
-    PgUnionAllSingle101["PgUnionAllSingle[101∈6]"]:::plan
-    __Item100 --> PgUnionAllSingle101
-    Access102{{"Access[102∈6]<br />ᐸ101.1ᐳ"}}:::plan
-    PgUnionAllSingle101 --> Access102
     __Item46[/"__Item[46∈4]<br />ᐸ45ᐳ"\]:::itemplan
     PgUnionAll45 ==> __Item46
     PgUnionAllSingle47["PgUnionAllSingle[47∈4]"]:::plan
@@ -99,20 +93,6 @@ graph TD
     Constant71{{"Constant[71∈5]<br />ᐸ'people'ᐳ<br />ᐳFirstPartyVulnerabilityᐳPerson"}}:::plan
     PgClassExpression72{{"PgClassExpression[72∈5]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     Constant71 & PgClassExpression72 --> List73
-    PgSelect105[["PgSelect[105∈7]<br />ᐸorganizationsᐳ<br />ᐳThirdPartyVulnerabilityᐳOrganization"]]:::plan
-    Access104{{"Access[104∈7]<br />ᐸ103.0ᐳ"}}:::plan
-    Object17 & Access104 --> PgSelect105
-    List113{{"List[113∈7]<br />ᐸ111,112ᐳ<br />ᐳThirdPartyVulnerabilityᐳOrganization"}}:::plan
-    Constant111{{"Constant[111∈7]<br />ᐸ'organizations'ᐳ<br />ᐳThirdPartyVulnerabilityᐳOrganization"}}:::plan
-    PgClassExpression112{{"PgClassExpression[112∈7]<br />ᐸ__organiza...zation_id”ᐳ"}}:::plan
-    Constant111 & PgClassExpression112 --> List113
-    PgSelect119[["PgSelect[119∈7]<br />ᐸpeopleᐳ<br />ᐳThirdPartyVulnerabilityᐳPerson"]]:::plan
-    Access118{{"Access[118∈7]<br />ᐸ117.0ᐳ"}}:::plan
-    Object17 & Access118 --> PgSelect119
-    List127{{"List[127∈7]<br />ᐸ125,126ᐳ<br />ᐳThirdPartyVulnerabilityᐳPerson"}}:::plan
-    Constant125{{"Constant[125∈7]<br />ᐸ'people'ᐳ<br />ᐳThirdPartyVulnerabilityᐳPerson"}}:::plan
-    PgClassExpression126{{"PgClassExpression[126∈7]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    Constant125 & PgClassExpression126 --> List127
     JSONParse49[["JSONParse[49∈5]<br />ᐸ48ᐳ<br />ᐳFirstPartyVulnerabilityᐳOrganization"]]:::plan
     Access48 --> JSONParse49
     JSONParse49 --> Access50
@@ -137,6 +117,26 @@ graph TD
     List73 --> Lambda74
     PgClassExpression75{{"PgClassExpression[75∈5]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle70 --> PgClassExpression75
+    __Item100[/"__Item[100∈6]<br />ᐸ99ᐳ"\]:::itemplan
+    PgUnionAll99 ==> __Item100
+    PgUnionAllSingle101["PgUnionAllSingle[101∈6]"]:::plan
+    __Item100 --> PgUnionAllSingle101
+    Access102{{"Access[102∈6]<br />ᐸ101.1ᐳ"}}:::plan
+    PgUnionAllSingle101 --> Access102
+    PgSelect105[["PgSelect[105∈7]<br />ᐸorganizationsᐳ<br />ᐳThirdPartyVulnerabilityᐳOrganization"]]:::plan
+    Access104{{"Access[104∈7]<br />ᐸ103.0ᐳ"}}:::plan
+    Object17 & Access104 --> PgSelect105
+    List113{{"List[113∈7]<br />ᐸ111,112ᐳ<br />ᐳThirdPartyVulnerabilityᐳOrganization"}}:::plan
+    Constant111{{"Constant[111∈7]<br />ᐸ'organizations'ᐳ<br />ᐳThirdPartyVulnerabilityᐳOrganization"}}:::plan
+    PgClassExpression112{{"PgClassExpression[112∈7]<br />ᐸ__organiza...zation_id”ᐳ"}}:::plan
+    Constant111 & PgClassExpression112 --> List113
+    PgSelect119[["PgSelect[119∈7]<br />ᐸpeopleᐳ<br />ᐳThirdPartyVulnerabilityᐳPerson"]]:::plan
+    Access118{{"Access[118∈7]<br />ᐸ117.0ᐳ"}}:::plan
+    Object17 & Access118 --> PgSelect119
+    List127{{"List[127∈7]<br />ᐸ125,126ᐳ<br />ᐳThirdPartyVulnerabilityᐳPerson"}}:::plan
+    Constant125{{"Constant[125∈7]<br />ᐸ'people'ᐳ<br />ᐳThirdPartyVulnerabilityᐳPerson"}}:::plan
+    PgClassExpression126{{"PgClassExpression[126∈7]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
+    Constant125 & PgClassExpression126 --> List127
     JSONParse103[["JSONParse[103∈7]<br />ᐸ102ᐳ<br />ᐳThirdPartyVulnerabilityᐳOrganization"]]:::plan
     Access102 --> JSONParse103
     JSONParse103 --> Access104

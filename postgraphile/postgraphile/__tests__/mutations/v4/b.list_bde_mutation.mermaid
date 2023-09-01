@@ -18,48 +18,26 @@ graph TD
     __Value3 --> Access15
     __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant71{{"Constant[71∈0]<br />ᐸ[]ᐳ"}}:::plan
     Constant69{{"Constant[69∈0]<br />ᐸ'bar'ᐳ"}}:::plan
     Constant70{{"Constant[70∈0]<br />ᐸ'q0'ᐳ"}}:::plan
+    Constant71{{"Constant[71∈0]<br />ᐸ[]ᐳ"}}:::plan
     Constant73{{"Constant[73∈0]<br />ᐸ''ᐳ"}}:::plan
     Constant74{{"Constant[74∈0]<br />ᐸ'q1'ᐳ"}}:::plan
     Constant75{{"Constant[75∈0]<br />ᐸ'foo'ᐳ"}}:::plan
     Constant76{{"Constant[76∈0]<br />ᐸ'q2'ᐳ"}}:::plan
     Constant80{{"Constant[80∈0]<br />ᐸ'q3'ᐳ"}}:::plan
-    PgSelect60[["PgSelect[60∈10]<br />ᐸlist_bde_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object63{{"Object[63∈10]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant82{{"Constant[82∈10]<br />ᐸ[ 'option-2' ]ᐳ"}}:::plan
-    Object63 & Constant82 & Constant73 & Constant80 --> PgSelect60
-    Access61{{"Access[61∈10]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access62{{"Access[62∈10]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access61 & Access62 --> Object63
-    __Value3 --> Access61
-    __Value3 --> Access62
-    First64{{"First[64∈10]"}}:::plan
-    PgSelect60 --> First64
-    PgSelectSingle65{{"PgSelectSingle[65∈10]<br />ᐸlist_bde_mutationᐳ"}}:::plan
-    First64 --> PgSelectSingle65
-    PgClassExpression66{{"PgClassExpression[66∈10]<br />ᐸ__list_bde_mutation__.vᐳ"}}:::plan
-    PgSelectSingle65 --> PgClassExpression66
-    Object67{{"Object[67∈10]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression66 --> Object67
-    PgSelect44[["PgSelect[44∈7]<br />ᐸlist_bde_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object47{{"Object[47∈7]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant77{{"Constant[77∈7]<br />ᐸ[]ᐳ"}}:::plan
-    Object47 & Constant77 & Constant75 & Constant76 --> PgSelect44
-    Access45{{"Access[45∈7]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access46{{"Access[46∈7]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access45 & Access46 --> Object47
-    __Value3 --> Access45
-    __Value3 --> Access46
-    First48{{"First[48∈7]"}}:::plan
-    PgSelect44 --> First48
-    PgSelectSingle49{{"PgSelectSingle[49∈7]<br />ᐸlist_bde_mutationᐳ"}}:::plan
-    First48 --> PgSelectSingle49
-    PgClassExpression50{{"PgClassExpression[50∈7]<br />ᐸ__list_bde_mutation__.vᐳ"}}:::plan
-    PgSelectSingle49 --> PgClassExpression50
-    Object51{{"Object[51∈7]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression50 --> Object51
+    PgSelect13[["PgSelect[13∈1]<br />ᐸlist_bde_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object16 & Constant71 & Constant69 & Constant70 --> PgSelect13
+    First17{{"First[17∈1]"}}:::plan
+    PgSelect13 --> First17
+    PgSelectSingle18{{"PgSelectSingle[18∈1]<br />ᐸlist_bde_mutationᐳ"}}:::plan
+    First17 --> PgSelectSingle18
+    PgClassExpression19{{"PgClassExpression[19∈1]<br />ᐸ__list_bde_mutation__.vᐳ"}}:::plan
+    PgSelectSingle18 --> PgClassExpression19
+    Object20{{"Object[20∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression19 --> Object20
+    __Item21[/"__Item[21∈3]<br />ᐸ19ᐳ"\]:::itemplan
+    PgClassExpression19 ==> __Item21
     PgSelect29[["PgSelect[29∈4]<br />ᐸlist_bde_mutation(mutation)ᐳ"]]:::sideeffectplan
     Object32{{"Object[32∈4]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Constant81{{"Constant[81∈4]<br />ᐸ[ 'option-1' ]ᐳ"}}:::plan
@@ -77,22 +55,44 @@ graph TD
     PgSelectSingle34 --> PgClassExpression35
     Object36{{"Object[36∈4]<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression35 --> Object36
-    PgSelect13[["PgSelect[13∈1]<br />ᐸlist_bde_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object16 & Constant71 & Constant69 & Constant70 --> PgSelect13
-    First17{{"First[17∈1]"}}:::plan
-    PgSelect13 --> First17
-    PgSelectSingle18{{"PgSelectSingle[18∈1]<br />ᐸlist_bde_mutationᐳ"}}:::plan
-    First17 --> PgSelectSingle18
-    PgClassExpression19{{"PgClassExpression[19∈1]<br />ᐸ__list_bde_mutation__.vᐳ"}}:::plan
-    PgSelectSingle18 --> PgClassExpression19
-    Object20{{"Object[20∈1]<br />ᐸ{result}ᐳ"}}:::plan
-    PgClassExpression19 --> Object20
-    __Item21[/"__Item[21∈3]<br />ᐸ19ᐳ"\]:::itemplan
-    PgClassExpression19 ==> __Item21
     __Item37[/"__Item[37∈6]<br />ᐸ35ᐳ"\]:::itemplan
     PgClassExpression35 ==> __Item37
+    PgSelect44[["PgSelect[44∈7]<br />ᐸlist_bde_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object47{{"Object[47∈7]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant77{{"Constant[77∈7]<br />ᐸ[]ᐳ"}}:::plan
+    Object47 & Constant77 & Constant75 & Constant76 --> PgSelect44
+    Access45{{"Access[45∈7]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access46{{"Access[46∈7]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access45 & Access46 --> Object47
+    __Value3 --> Access45
+    __Value3 --> Access46
+    First48{{"First[48∈7]"}}:::plan
+    PgSelect44 --> First48
+    PgSelectSingle49{{"PgSelectSingle[49∈7]<br />ᐸlist_bde_mutationᐳ"}}:::plan
+    First48 --> PgSelectSingle49
+    PgClassExpression50{{"PgClassExpression[50∈7]<br />ᐸ__list_bde_mutation__.vᐳ"}}:::plan
+    PgSelectSingle49 --> PgClassExpression50
+    Object51{{"Object[51∈7]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression50 --> Object51
     __Item52[/"__Item[52∈9]<br />ᐸ50ᐳ"\]:::itemplan
     PgClassExpression50 ==> __Item52
+    PgSelect60[["PgSelect[60∈10]<br />ᐸlist_bde_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object63{{"Object[63∈10]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant82{{"Constant[82∈10]<br />ᐸ[ 'option-2' ]ᐳ"}}:::plan
+    Object63 & Constant82 & Constant73 & Constant80 --> PgSelect60
+    Access61{{"Access[61∈10]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access62{{"Access[62∈10]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access61 & Access62 --> Object63
+    __Value3 --> Access61
+    __Value3 --> Access62
+    First64{{"First[64∈10]"}}:::plan
+    PgSelect60 --> First64
+    PgSelectSingle65{{"PgSelectSingle[65∈10]<br />ᐸlist_bde_mutationᐳ"}}:::plan
+    First64 --> PgSelectSingle65
+    PgClassExpression66{{"PgClassExpression[66∈10]<br />ᐸ__list_bde_mutation__.vᐳ"}}:::plan
+    PgSelectSingle65 --> PgClassExpression66
+    Object67{{"Object[67∈10]<br />ᐸ{result}ᐳ"}}:::plan
+    PgClassExpression66 --> Object67
     __Item68[/"__Item[68∈12]<br />ᐸ66ᐳ"\]:::itemplan
     PgClassExpression66 ==> __Item68
 

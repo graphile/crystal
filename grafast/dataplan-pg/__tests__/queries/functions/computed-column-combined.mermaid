@@ -32,10 +32,10 @@ graph TD
     PgSelectSingle20 --> PgClassExpression21
     PgClassExpression22{{"PgClassExpression[22∈2]<br />ᐸ__forums_r...vatar_url”ᐳ"}}:::plan
     PgSelectSingle20 --> PgClassExpression22
-    RemapKeys50{{"RemapKeys[50∈2]<br />ᐸ20:{”0”:2,”1”:3,”2”:4}ᐳ"}}:::plan
-    PgSelectSingle20 --> RemapKeys50
     PgSelectSingle29{{"PgSelectSingle[29∈2]<br />ᐸusers_most_recent_forumᐳ"}}:::plan
+    RemapKeys50{{"RemapKeys[50∈2]<br />ᐸ20:{”0”:2,”1”:3,”2”:4}ᐳ"}}:::plan
     RemapKeys50 --> PgSelectSingle29
+    PgSelectSingle20 --> RemapKeys50
     PgSelectSingle37{{"PgSelectSingle[37∈3]<br />ᐸforums_unique_author_countᐳ"}}:::plan
     PgSelectSingle29 --> PgSelectSingle37
     PgClassExpression38{{"PgClassExpression[38∈3]<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan

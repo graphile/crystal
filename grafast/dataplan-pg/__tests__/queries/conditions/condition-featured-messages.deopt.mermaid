@@ -13,11 +13,11 @@ graph TD
     Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
+    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
+    Object14 --> PgSelect11
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access12
     __Value3 --> Access13
-    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
-    Object14 --> PgSelect11
     Connection29{{"Connection[29∈0]<br />ᐸ25ᐳ"}}:::plan
     Constant79{{"Constant[79∈0]<br />ᐸ5ᐳ"}}:::plan
     Constant79 --> Connection29
@@ -27,8 +27,8 @@ graph TD
     PgSelect11 ==> __Item15
     PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
     __Item15 --> PgSelectSingle16
-    Constant80{{"Constant[80∈1]<br />ᐸtrueᐳ"}}:::plan
     Constant62{{"Constant[62∈1]<br />ᐸfalseᐳ"}}:::plan
+    Constant80{{"Constant[80∈1]<br />ᐸtrueᐳ"}}:::plan
     PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression17
     PgSelect31[["PgSelect[31∈3]<br />ᐸmessages+1ᐳ"]]:::plan
@@ -47,22 +47,22 @@ graph TD
     PgSelect31 --> First64
     PgSelectSingle65{{"PgSelectSingle[65∈3]<br />ᐸmessagesᐳ"}}:::plan
     First64 --> PgSelectSingle65
+    PgCursor66{{"PgCursor[66∈3]"}}:::plan
+    List68{{"List[68∈3]<br />ᐸ67ᐳ"}}:::plan
+    List68 --> PgCursor66
     PgClassExpression67{{"PgClassExpression[67∈3]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
     PgSelectSingle65 --> PgClassExpression67
-    List68{{"List[68∈3]<br />ᐸ67ᐳ"}}:::plan
     PgClassExpression67 --> List68
-    PgCursor66{{"PgCursor[66∈3]"}}:::plan
-    List68 --> PgCursor66
     Last70{{"Last[70∈3]"}}:::plan
     PgSelect31 --> Last70
     PgSelectSingle71{{"PgSelectSingle[71∈3]<br />ᐸmessagesᐳ"}}:::plan
     Last70 --> PgSelectSingle71
+    PgCursor72{{"PgCursor[72∈3]"}}:::plan
+    List74{{"List[74∈3]<br />ᐸ73ᐳ"}}:::plan
+    List74 --> PgCursor72
     PgClassExpression73{{"PgClassExpression[73∈3]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
     PgSelectSingle71 --> PgClassExpression73
-    List74{{"List[74∈3]<br />ᐸ73ᐳ"}}:::plan
     PgClassExpression73 --> List74
-    PgCursor72{{"PgCursor[72∈3]"}}:::plan
-    List74 --> PgCursor72
     First76{{"First[76∈3]"}}:::plan
     PgSelect75 --> First76
     PgSelectSingle77{{"PgSelectSingle[77∈3]<br />ᐸmessagesᐳ"}}:::plan
@@ -73,22 +73,6 @@ graph TD
     PgSelect31 ==> __Item32
     PgSelectSingle33{{"PgSelectSingle[33∈4]<br />ᐸmessagesᐳ"}}:::plan
     __Item32 --> PgSelectSingle33
-    PgSelect51[["PgSelect[51∈7]<br />ᐸusersᐳ"]]:::plan
-    PgClassExpression50{{"PgClassExpression[50∈7]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
-    Object14 & PgClassExpression50 --> PgSelect51
-    PgClassExpression47{{"PgClassExpression[47∈7]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
-    PgSelectSingle33 --> PgClassExpression47
-    List48{{"List[48∈7]<br />ᐸ47ᐳ"}}:::plan
-    PgClassExpression47 --> List48
-    PgCursor46{{"PgCursor[46∈7]"}}:::plan
-    List48 --> PgCursor46
-    PgClassExpression49{{"PgClassExpression[49∈7]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
-    PgSelectSingle33 --> PgClassExpression49
-    PgSelectSingle33 --> PgClassExpression50
-    First55{{"First[55∈7]"}}:::plan
-    PgSelect51 --> First55
-    PgSelectSingle56{{"PgSelectSingle[56∈7]<br />ᐸusersᐳ"}}:::plan
-    First55 --> PgSelectSingle56
     PgSelect36[["PgSelect[36∈5]<br />ᐸusersᐳ"]]:::plan
     PgClassExpression35{{"PgClassExpression[35∈5]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
     Object14 & PgClassExpression35 --> PgSelect36
@@ -103,6 +87,22 @@ graph TD
     PgSelectSingle41 --> PgClassExpression42
     PgClassExpression43{{"PgClassExpression[43∈6]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
     PgSelectSingle41 --> PgClassExpression43
+    PgSelect51[["PgSelect[51∈7]<br />ᐸusersᐳ"]]:::plan
+    PgClassExpression50{{"PgClassExpression[50∈7]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
+    Object14 & PgClassExpression50 --> PgSelect51
+    PgCursor46{{"PgCursor[46∈7]"}}:::plan
+    List48{{"List[48∈7]<br />ᐸ47ᐳ"}}:::plan
+    List48 --> PgCursor46
+    PgClassExpression47{{"PgClassExpression[47∈7]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
+    PgSelectSingle33 --> PgClassExpression47
+    PgClassExpression47 --> List48
+    PgClassExpression49{{"PgClassExpression[49∈7]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
+    PgSelectSingle33 --> PgClassExpression49
+    PgSelectSingle33 --> PgClassExpression50
+    First55{{"First[55∈7]"}}:::plan
+    PgSelect51 --> First55
+    PgSelectSingle56{{"PgSelectSingle[56∈7]<br />ᐸusersᐳ"}}:::plan
+    First55 --> PgSelectSingle56
     PgClassExpression57{{"PgClassExpression[57∈8]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle56 --> PgClassExpression57
     PgClassExpression58{{"PgClassExpression[58∈8]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan

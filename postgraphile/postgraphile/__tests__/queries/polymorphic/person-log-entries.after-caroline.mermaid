@@ -38,14 +38,14 @@ graph TD
     __Item25 --> PgSelectSingle26
     PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle26 --> PgClassExpression31
-    Access45{{"Access[45∈3]<br />ᐸ25.0ᐳ"}}:::plan
-    __Item25 --> Access45
     PgClassExpression41{{"PgClassExpression[41∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle26 --> PgClassExpression41
-    List44{{"List[44∈3]<br />ᐸ31ᐳ"}}:::plan
-    PgClassExpression31 --> List44
     PgCursor42{{"PgCursor[42∈3]"}}:::plan
+    List44{{"List[44∈3]<br />ᐸ31ᐳ"}}:::plan
     List44 --> PgCursor42
+    PgClassExpression31 --> List44
+    Access45{{"Access[45∈3]<br />ᐸ25.0ᐳ"}}:::plan
+    __Item25 --> Access45
     __Item36[/"__Item[36∈4]<br />ᐸ45ᐳ"\]:::itemplan
     Access45 ==> __Item36
     PgSelectSingle37{{"PgSelectSingle[37∈4]<br />ᐸlog_entriesᐳ"}}:::plan

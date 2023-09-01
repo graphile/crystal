@@ -47,9 +47,8 @@ graph TD
     PgSelectSingle30 --> PgClassExpression33
     PgClassExpression34{{"PgClassExpression[34∈3]<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
     PgSelectSingle30 --> PgClassExpression34
-    RemapKeys71{{"RemapKeys[71∈3]<br />ᐸ30:{”0”:7}ᐳ"}}:::plan
-    PgSelectSingle30 --> RemapKeys71
     PgSelectSingle41{{"PgSelectSingle[41∈3]<br />ᐸtextᐳ"}}:::plan
+    RemapKeys71{{"RemapKeys[71∈3]<br />ᐸ30:{”0”:7}ᐳ"}}:::plan
     RemapKeys71 --> PgSelectSingle41
     PgClassExpression42{{"PgClassExpression[42∈3]<br />ᐸ__relation..._lower__.vᐳ"}}:::plan
     PgSelectSingle41 --> PgClassExpression42
@@ -57,10 +56,11 @@ graph TD
     PgSelectSingle30 --> PgSelectSingle49
     PgClassExpression50{{"PgClassExpression[50∈3]<br />ᐸ__relation..._archived”ᐳ"}}:::plan
     PgSelectSingle49 --> PgClassExpression50
-    RemapKeys67{{"RemapKeys[67∈3]<br />ᐸ49:{”0”:1,”1”:2}ᐳ"}}:::plan
-    PgSelectSingle49 --> RemapKeys67
     PgSelectSingle64{{"PgSelectSingle[64∈3]<br />ᐸpeopleᐳ"}}:::plan
+    RemapKeys67{{"RemapKeys[67∈3]<br />ᐸ49:{”0”:1,”1”:2}ᐳ"}}:::plan
     RemapKeys67 --> PgSelectSingle64
+    PgSelectSingle49 --> RemapKeys67
+    PgSelectSingle30 --> RemapKeys71
     PgClassExpression65{{"PgClassExpression[65∈4]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle64 --> PgClassExpression65
     PgClassExpression66{{"PgClassExpression[66∈4]<br />ᐸ__people__.”username”ᐳ"}}:::plan

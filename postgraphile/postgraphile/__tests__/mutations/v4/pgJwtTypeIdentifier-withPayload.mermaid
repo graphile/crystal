@@ -32,15 +32,11 @@ graph TD
     PgSelect30[["PgSelect[30∈2]<br />ᐸpersonᐳ"]]:::plan
     PgClassExpression38{{"PgClassExpression[38∈2]<br />ᐸ__authenti...oad__.”id”ᐳ"}}:::plan
     Object15 & PgClassExpression38 --> PgSelect30
-    PgSelectSingle17 --> PgClassExpression38
     First34{{"First[34∈2]"}}:::plan
     PgSelect30 --> First34
     PgSelectSingle35{{"PgSelectSingle[35∈2]<br />ᐸpersonᐳ"}}:::plan
     First34 --> PgSelectSingle35
-    PgClassExpression45{{"PgClassExpression[45∈5]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle35 --> PgClassExpression45
-    PgClassExpression46{{"PgClassExpression[46∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle35 --> PgClassExpression46
+    PgSelectSingle17 --> PgClassExpression38
     PgSelect20[["PgSelect[20∈3]<br />ᐸfrmcdc_jwtTokenᐳ"]]:::plan
     PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__authenti...ad__.”jwt”ᐳ"}}:::plan
     Object15 & PgClassExpression19 --> PgSelect20
@@ -57,6 +53,10 @@ graph TD
     PgSelectSingle35 --> PgClassExpression36
     PgClassExpression37{{"PgClassExpression[37∈4]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle35 --> PgClassExpression37
+    PgClassExpression45{{"PgClassExpression[45∈5]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle35 --> PgClassExpression45
+    PgClassExpression46{{"PgClassExpression[46∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle35 --> PgClassExpression46
 
     %% define steps
 

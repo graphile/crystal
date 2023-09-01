@@ -9,11 +9,11 @@ graph TD
 
 
     %% plan dependencies
+    Node8{{"Node[8∈0]"}}:::plan
     Lambda9{{"Lambda[9∈0]<br />ᐸdecodeNodeIdWithCodecsᐳ"}}:::plan
+    Lambda9 --> Node8
     Constant159{{"Constant[159∈0]<br />ᐸ'WyJ0eXBlcyIsMTFd'ᐳ"}}:::plan
     Constant159 --> Lambda9
-    Node8{{"Node[8∈0]"}}:::plan
-    Lambda9 --> Node8
     __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
@@ -22,11 +22,11 @@ graph TD
     Access157{{"Access[157∈1]<br />ᐸ9.base64JSON.1ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
     Access158{{"Access[158∈1]<br />ᐸ9.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
     Object16 & Access157 & Access158 --> PgSelect62
+    PgSelect13[["PgSelect[13∈1]<br />ᐸinputsᐳ<br />ᐳInput"]]:::plan
+    Object16 & Access157 --> PgSelect13
     Access14{{"Access[14∈1]<br />ᐸ3.pgSettingsᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
     Access15{{"Access[15∈1]<br />ᐸ3.withPgClientᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
     Access14 & Access15 --> Object16
-    PgSelect13[["PgSelect[13∈1]<br />ᐸinputsᐳ<br />ᐳInput"]]:::plan
-    Object16 & Access157 --> PgSelect13
     PgSelect21[["PgSelect[21∈1]<br />ᐸpatchsᐳ<br />ᐳPatch"]]:::plan
     Object16 & Access157 --> PgSelect21
     PgSelect29[["PgSelect[29∈1]<br />ᐸreservedᐳ<br />ᐳReserved"]]:::plan
@@ -61,7 +61,6 @@ graph TD
     Object16 & Access157 --> PgSelect151
     __Value3 --> Access14
     __Value3 --> Access15
-    Lambda9 --> Access157
     First17{{"First[17∈1]"}}:::plan
     PgSelect13 --> First17
     PgSelectSingle18{{"PgSelectSingle[18∈1]<br />ᐸinputsᐳ"}}:::plan
@@ -86,7 +85,6 @@ graph TD
     PgSelect53 --> First57
     PgSelectSingle58{{"PgSelectSingle[58∈1]<br />ᐸdefault_valueᐳ"}}:::plan
     First57 --> PgSelectSingle58
-    Lambda9 --> Access158
     First66{{"First[66∈1]"}}:::plan
     PgSelect62 --> First66
     PgSelectSingle67{{"PgSelectSingle[67∈1]<br />ᐸcompound_keyᐳ"}}:::plan
@@ -137,6 +135,8 @@ graph TD
     PgSelect151 --> First155
     PgSelectSingle156{{"PgSelectSingle[156∈1]<br />ᐸissue756ᐳ"}}:::plan
     First155 --> PgSelectSingle156
+    Lambda9 --> Access157
+    Lambda9 --> Access158
 
     %% define steps
 

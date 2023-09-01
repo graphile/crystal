@@ -32,18 +32,18 @@ graph TD
     PgSelectSingle13 --> PgSelectSingle21
     PgClassExpression22{{"PgClassExpression[22∈1]<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression22
-    RemapKeys43{{"RemapKeys[43∈1]<br />ᐸ13:{”0”:1}ᐳ"}}:::plan
-    PgSelectSingle13 --> RemapKeys43
     PgSelectSingle30{{"PgSelectSingle[30∈1]<br />ᐸforums_unique_author_countᐳ"}}:::plan
+    RemapKeys43{{"RemapKeys[43∈1]<br />ᐸ13:{”0”:1}ᐳ"}}:::plan
     RemapKeys43 --> PgSelectSingle30
     PgClassExpression31{{"PgClassExpression[31∈1]<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
     PgSelectSingle30 --> PgClassExpression31
-    RemapKeys45{{"RemapKeys[45∈1]<br />ᐸ13:{”0”:2}ᐳ"}}:::plan
-    PgSelectSingle13 --> RemapKeys45
     PgSelectSingle39{{"PgSelectSingle[39∈1]<br />ᐸforums_unique_author_countᐳ"}}:::plan
+    RemapKeys45{{"RemapKeys[45∈1]<br />ᐸ13:{”0”:2}ᐳ"}}:::plan
     RemapKeys45 --> PgSelectSingle39
     PgClassExpression40{{"PgClassExpression[40∈1]<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
     PgSelectSingle39 --> PgClassExpression40
+    PgSelectSingle13 --> RemapKeys43
+    PgSelectSingle13 --> RemapKeys45
 
     %% define steps
 

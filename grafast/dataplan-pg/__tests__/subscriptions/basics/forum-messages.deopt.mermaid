@@ -64,14 +64,14 @@ graph TD
     PgSelect39 --> First43
     PgSelectSingle44{{"PgSelectSingle[44∈3]<br />ᐸusersᐳ"}}:::plan
     First43 --> PgSelectSingle44
-    PgClassExpression45{{"PgClassExpression[45∈5]<br />ᐸ__users__.”username”ᐳ"}}:::plan
-    PgSelectSingle44 --> PgClassExpression45
-    PgClassExpression46{{"PgClassExpression[46∈5]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
-    PgSelectSingle44 --> PgClassExpression46
     PgClassExpression35{{"PgClassExpression[35∈4]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle33 --> PgClassExpression35
     PgClassExpression36{{"PgClassExpression[36∈4]<br />ᐸ(__forums_... not null)ᐳ"}}:::plan
     PgSelectSingle33 --> PgClassExpression36
+    PgClassExpression45{{"PgClassExpression[45∈5]<br />ᐸ__users__.”username”ᐳ"}}:::plan
+    PgSelectSingle44 --> PgClassExpression45
+    PgClassExpression46{{"PgClassExpression[46∈5]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
+    PgSelectSingle44 --> PgClassExpression46
 
     %% define steps
 

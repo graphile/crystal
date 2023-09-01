@@ -13,31 +13,15 @@ graph TD
     Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
+    PgSelect11[["PgSelect[11∈0]<br />ᐸcompound_keyᐳ"]]:::plan
+    Object14 --> PgSelect11
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access12
     __Value3 --> Access13
-    PgSelect11[["PgSelect[11∈0]<br />ᐸcompound_keyᐳ"]]:::plan
-    Object14 --> PgSelect11
     PgSelect45[["PgSelect[45∈0]<br />ᐸforeign_keyᐳ"]]:::plan
     Object14 --> PgSelect45
     __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __Item49[/"__Item[49∈4]<br />ᐸ45ᐳ"\]:::itemplan
-    PgSelect45 ==> __Item49
-    PgSelectSingle50{{"PgSelectSingle[50∈4]<br />ᐸforeign_keyᐳ"}}:::plan
-    __Item49 --> PgSelectSingle50
-    PgClassExpression51{{"PgClassExpression[51∈4]<br />ᐸ__foreign_...person_id”ᐳ"}}:::plan
-    PgSelectSingle50 --> PgClassExpression51
-    PgClassExpression52{{"PgClassExpression[52∈4]<br />ᐸ__foreign_...und_key_1”ᐳ"}}:::plan
-    PgSelectSingle50 --> PgClassExpression52
-    PgClassExpression53{{"PgClassExpression[53∈4]<br />ᐸ__foreign_...und_key_2”ᐳ"}}:::plan
-    PgSelectSingle50 --> PgClassExpression53
-    PgSelectSingle60{{"PgSelectSingle[60∈4]<br />ᐸpersonᐳ"}}:::plan
-    PgSelectSingle50 --> PgSelectSingle60
-    RemapKeys80{{"RemapKeys[80∈4]<br />ᐸ50:{”0”:3,”1”:4,”2”:5}ᐳ"}}:::plan
-    PgSelectSingle50 --> RemapKeys80
-    PgSelectSingle70{{"PgSelectSingle[70∈4]<br />ᐸcompound_keyᐳ"}}:::plan
-    RemapKeys80 --> PgSelectSingle70
     __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
     PgSelect11 ==> __Item15
     PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸcompound_keyᐳ"}}:::plan
@@ -50,28 +34,44 @@ graph TD
     PgSelectSingle16 --> PgClassExpression19
     PgSelectSingle26{{"PgSelectSingle[26∈1]<br />ᐸpersonᐳ"}}:::plan
     PgSelectSingle16 --> PgSelectSingle26
-    RemapKeys76{{"RemapKeys[76∈1]<br />ᐸ16:{”0”:3,”1”:4}ᐳ"}}:::plan
-    PgSelectSingle16 --> RemapKeys76
     PgSelectSingle35{{"PgSelectSingle[35∈1]<br />ᐸpersonᐳ"}}:::plan
+    RemapKeys76{{"RemapKeys[76∈1]<br />ᐸ16:{”0”:3,”1”:4}ᐳ"}}:::plan
     RemapKeys76 --> PgSelectSingle35
+    PgSelectSingle16 --> RemapKeys76
+    PgClassExpression27{{"PgClassExpression[27∈2]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle26 --> PgClassExpression27
+    PgClassExpression28{{"PgClassExpression[28∈2]<br />ᐸ__person__.”email”ᐳ"}}:::plan
+    PgSelectSingle26 --> PgClassExpression28
     PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle35 --> PgClassExpression36
     PgClassExpression37{{"PgClassExpression[37∈3]<br />ᐸ__person__.”email”ᐳ"}}:::plan
     PgSelectSingle35 --> PgClassExpression37
+    __Item49[/"__Item[49∈4]<br />ᐸ45ᐳ"\]:::itemplan
+    PgSelect45 ==> __Item49
+    PgSelectSingle50{{"PgSelectSingle[50∈4]<br />ᐸforeign_keyᐳ"}}:::plan
+    __Item49 --> PgSelectSingle50
+    PgClassExpression51{{"PgClassExpression[51∈4]<br />ᐸ__foreign_...person_id”ᐳ"}}:::plan
+    PgSelectSingle50 --> PgClassExpression51
+    PgClassExpression52{{"PgClassExpression[52∈4]<br />ᐸ__foreign_...und_key_1”ᐳ"}}:::plan
+    PgSelectSingle50 --> PgClassExpression52
+    PgClassExpression53{{"PgClassExpression[53∈4]<br />ᐸ__foreign_...und_key_2”ᐳ"}}:::plan
+    PgSelectSingle50 --> PgClassExpression53
+    PgSelectSingle60{{"PgSelectSingle[60∈4]<br />ᐸpersonᐳ"}}:::plan
+    PgSelectSingle50 --> PgSelectSingle60
+    PgSelectSingle70{{"PgSelectSingle[70∈4]<br />ᐸcompound_keyᐳ"}}:::plan
+    RemapKeys80{{"RemapKeys[80∈4]<br />ᐸ50:{”0”:3,”1”:4,”2”:5}ᐳ"}}:::plan
+    RemapKeys80 --> PgSelectSingle70
+    PgSelectSingle50 --> RemapKeys80
+    PgClassExpression61{{"PgClassExpression[61∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle60 --> PgClassExpression61
+    PgClassExpression62{{"PgClassExpression[62∈5]<br />ᐸ__person__.”email”ᐳ"}}:::plan
+    PgSelectSingle60 --> PgClassExpression62
     PgClassExpression71{{"PgClassExpression[71∈6]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgSelectSingle70 --> PgClassExpression71
     PgClassExpression72{{"PgClassExpression[72∈6]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
     PgSelectSingle70 --> PgClassExpression72
     PgClassExpression73{{"PgClassExpression[73∈6]<br />ᐸ__compound...__.”extra”ᐳ"}}:::plan
     PgSelectSingle70 --> PgClassExpression73
-    PgClassExpression27{{"PgClassExpression[27∈2]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression27
-    PgClassExpression28{{"PgClassExpression[28∈2]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression28
-    PgClassExpression61{{"PgClassExpression[61∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle60 --> PgClassExpression61
-    PgClassExpression62{{"PgClassExpression[62∈5]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    PgSelectSingle60 --> PgClassExpression62
 
     %% define steps
 

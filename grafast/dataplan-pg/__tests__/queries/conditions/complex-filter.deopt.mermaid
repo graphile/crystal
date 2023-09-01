@@ -9,13 +9,13 @@ graph TD
 
 
     %% plan dependencies
+    PgSelect16[["PgSelect[16∈0]<br />ᐸforumsᐳ"]]:::plan
     Object19{{"Object[19∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant40{{"Constant[40∈0]<br />ᐸtrueᐳ"}}:::plan
+    Object19 & Constant40 --> PgSelect16
     Access17{{"Access[17∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access18{{"Access[18∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access17 & Access18 --> Object19
-    PgSelect16[["PgSelect[16∈0]<br />ᐸforumsᐳ"]]:::plan
-    Constant40{{"Constant[40∈0]<br />ᐸtrueᐳ"}}:::plan
-    Object19 & Constant40 --> PgSelect16
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access17
     __Value3 --> Access18

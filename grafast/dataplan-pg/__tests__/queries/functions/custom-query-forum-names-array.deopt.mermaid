@@ -13,11 +13,11 @@ graph TD
     Access8{{"Access[8∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access9{{"Access[9∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
+    PgSelect7[["PgSelect[7∈0]<br />ᐸforum_names_arrayᐳ"]]:::plan
+    Object10 --> PgSelect7
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access8
     __Value3 --> Access9
-    PgSelect7[["PgSelect[7∈0]<br />ᐸforum_names_arrayᐳ"]]:::plan
-    Object10 --> PgSelect7
     First11{{"First[11∈0]"}}:::plan
     PgSelect7 --> First11
     PgSelectSingle12{{"PgSelectSingle[12∈0]<br />ᐸforum_names_arrayᐳ"}}:::plan

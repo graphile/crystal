@@ -42,11 +42,11 @@ graph TD
     PgSelect141[["PgSelect[141∈0]<br />ᐸnullᐳ"]]:::plan
     Constant158{{"Constant[158∈0]<br />ᐸ3ᐳ"}}:::plan
     Object14 & Constant158 --> PgSelect141
+    PgSelect11[["PgSelect[11∈0]<br />ᐸconstructorᐳ"]]:::plan
+    Object14 --> PgSelect11
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access12
     __Value3 --> Access13
-    PgSelect11[["PgSelect[11∈0]<br />ᐸconstructorᐳ"]]:::plan
-    Object14 --> PgSelect11
     First25{{"First[25∈0]"}}:::plan
     PgSelect21 --> First25
     PgSelectSingle26{{"PgSelectSingle[26∈0]<br />ᐸconstructorᐳ"}}:::plan
@@ -95,76 +95,6 @@ graph TD
     First145 --> PgSelectSingle146
     __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    PgClassExpression147{{"PgClassExpression[147∈14]<br />ᐸ__null__.”break”ᐳ"}}:::plan
-    PgSelectSingle146 --> PgClassExpression147
-    PgClassExpression148{{"PgClassExpression[148∈14]<br />ᐸ__null__.”...nProperty”ᐳ"}}:::plan
-    PgSelectSingle146 --> PgClassExpression148
-    PgClassExpression138{{"PgClassExpression[138∈13]<br />ᐸ__null__.”break”ᐳ"}}:::plan
-    PgSelectSingle137 --> PgClassExpression138
-    PgClassExpression139{{"PgClassExpression[139∈13]<br />ᐸ__null__.”id”ᐳ"}}:::plan
-    PgSelectSingle137 --> PgClassExpression139
-    PgClassExpression129{{"PgClassExpression[129∈12]<br />ᐸ__null__.”...nProperty”ᐳ"}}:::plan
-    PgSelectSingle128 --> PgClassExpression129
-    PgClassExpression130{{"PgClassExpression[130∈12]<br />ᐸ__null__.”id”ᐳ"}}:::plan
-    PgSelectSingle128 --> PgClassExpression130
-    __Item117[/"__Item[117∈11]<br />ᐸ113ᐳ"\]:::itemplan
-    PgSelect113 ==> __Item117
-    PgSelectSingle118{{"PgSelectSingle[118∈11]<br />ᐸnullᐳ"}}:::plan
-    __Item117 --> PgSelectSingle118
-    PgClassExpression119{{"PgClassExpression[119∈11]<br />ᐸ__null__.”break”ᐳ"}}:::plan
-    PgSelectSingle118 --> PgClassExpression119
-    PgClassExpression120{{"PgClassExpression[120∈11]<br />ᐸ__null__.”...nProperty”ᐳ"}}:::plan
-    PgSelectSingle118 --> PgClassExpression120
-    PgClassExpression121{{"PgClassExpression[121∈11]<br />ᐸ__null__.”id”ᐳ"}}:::plan
-    PgSelectSingle118 --> PgClassExpression121
-    PgClassExpression107{{"PgClassExpression[107∈10]<br />ᐸ__proto__.”brand”ᐳ"}}:::plan
-    PgSelectSingle106 --> PgClassExpression107
-    PgClassExpression108{{"PgClassExpression[108∈10]<br />ᐸ__proto__.”id”ᐳ"}}:::plan
-    PgSelectSingle106 --> PgClassExpression108
-    PgClassExpression98{{"PgClassExpression[98∈9]<br />ᐸ__proto__.”brand”ᐳ"}}:::plan
-    PgSelectSingle97 --> PgClassExpression98
-    PgClassExpression99{{"PgClassExpression[99∈9]<br />ᐸ__proto__.”name”ᐳ"}}:::plan
-    PgSelectSingle97 --> PgClassExpression99
-    __Item86[/"__Item[86∈8]<br />ᐸ82ᐳ"\]:::itemplan
-    PgSelect82 ==> __Item86
-    PgSelectSingle87{{"PgSelectSingle[87∈8]<br />ᐸ__proto__ᐳ"}}:::plan
-    __Item86 --> PgSelectSingle87
-    PgClassExpression88{{"PgClassExpression[88∈8]<br />ᐸ__proto__.”id”ᐳ"}}:::plan
-    PgSelectSingle87 --> PgClassExpression88
-    PgClassExpression89{{"PgClassExpression[89∈8]<br />ᐸ__proto__.”name”ᐳ"}}:::plan
-    PgSelectSingle87 --> PgClassExpression89
-    PgClassExpression90{{"PgClassExpression[90∈8]<br />ᐸ__proto__.”brand”ᐳ"}}:::plan
-    PgSelectSingle87 --> PgClassExpression90
-    PgClassExpression76{{"PgClassExpression[76∈7]<br />ᐸ__yield__.”crop”ᐳ"}}:::plan
-    PgSelectSingle75 --> PgClassExpression76
-    PgClassExpression77{{"PgClassExpression[77∈7]<br />ᐸ__yield__.”export”ᐳ"}}:::plan
-    PgSelectSingle75 --> PgClassExpression77
-    PgClassExpression67{{"PgClassExpression[67∈6]<br />ᐸ__yield__.”crop”ᐳ"}}:::plan
-    PgSelectSingle66 --> PgClassExpression67
-    PgClassExpression68{{"PgClassExpression[68∈6]<br />ᐸ__yield__.”id”ᐳ"}}:::plan
-    PgSelectSingle66 --> PgClassExpression68
-    __Item55[/"__Item[55∈5]<br />ᐸ51ᐳ"\]:::itemplan
-    PgSelect51 ==> __Item55
-    PgSelectSingle56{{"PgSelectSingle[56∈5]<br />ᐸyieldᐳ"}}:::plan
-    __Item55 --> PgSelectSingle56
-    PgClassExpression57{{"PgClassExpression[57∈5]<br />ᐸ__yield__.”crop”ᐳ"}}:::plan
-    PgSelectSingle56 --> PgClassExpression57
-    PgClassExpression58{{"PgClassExpression[58∈5]<br />ᐸ__yield__.”export”ᐳ"}}:::plan
-    PgSelectSingle56 --> PgClassExpression58
-    PgClassExpression59{{"PgClassExpression[59∈5]<br />ᐸ__yield__.”id”ᐳ"}}:::plan
-    PgSelectSingle56 --> PgClassExpression59
-    PgClassExpression45{{"PgClassExpression[45∈4]<br />ᐸ__construc..._.”export”ᐳ"}}:::plan
-    PgSelectSingle44 --> PgClassExpression45
-    PgClassExpression46{{"PgClassExpression[46∈4]<br />ᐸ__constructor__.”id”ᐳ"}}:::plan
-    PgSelectSingle44 --> PgClassExpression46
-    PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸ__construc..._.”export”ᐳ"}}:::plan
-    PgSelectSingle35 --> PgClassExpression36
-    PgClassExpression37{{"PgClassExpression[37∈3]<br />ᐸ__constructor__.”name”ᐳ"}}:::plan
-    PgSelectSingle35 --> PgClassExpression37
-    PgClassExpression27{{"PgClassExpression[27∈2]<br />ᐸ__constructor__.”name”ᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression27
-    PgClassExpression28{{"PgClassExpression[28∈2]<br />ᐸ__constructor__.”id”ᐳ"}}:::plan
-    PgSelectSingle26 --> PgClassExpression28
     __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
     PgSelect11 ==> __Item15
     PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸconstructorᐳ"}}:::plan
@@ -175,6 +105,76 @@ graph TD
     PgSelectSingle16 --> PgClassExpression18
     PgClassExpression19{{"PgClassExpression[19∈1]<br />ᐸ__constructor__.”id”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression19
+    PgClassExpression27{{"PgClassExpression[27∈2]<br />ᐸ__constructor__.”name”ᐳ"}}:::plan
+    PgSelectSingle26 --> PgClassExpression27
+    PgClassExpression28{{"PgClassExpression[28∈2]<br />ᐸ__constructor__.”id”ᐳ"}}:::plan
+    PgSelectSingle26 --> PgClassExpression28
+    PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸ__construc..._.”export”ᐳ"}}:::plan
+    PgSelectSingle35 --> PgClassExpression36
+    PgClassExpression37{{"PgClassExpression[37∈3]<br />ᐸ__constructor__.”name”ᐳ"}}:::plan
+    PgSelectSingle35 --> PgClassExpression37
+    PgClassExpression45{{"PgClassExpression[45∈4]<br />ᐸ__construc..._.”export”ᐳ"}}:::plan
+    PgSelectSingle44 --> PgClassExpression45
+    PgClassExpression46{{"PgClassExpression[46∈4]<br />ᐸ__constructor__.”id”ᐳ"}}:::plan
+    PgSelectSingle44 --> PgClassExpression46
+    __Item55[/"__Item[55∈5]<br />ᐸ51ᐳ"\]:::itemplan
+    PgSelect51 ==> __Item55
+    PgSelectSingle56{{"PgSelectSingle[56∈5]<br />ᐸyieldᐳ"}}:::plan
+    __Item55 --> PgSelectSingle56
+    PgClassExpression57{{"PgClassExpression[57∈5]<br />ᐸ__yield__.”crop”ᐳ"}}:::plan
+    PgSelectSingle56 --> PgClassExpression57
+    PgClassExpression58{{"PgClassExpression[58∈5]<br />ᐸ__yield__.”export”ᐳ"}}:::plan
+    PgSelectSingle56 --> PgClassExpression58
+    PgClassExpression59{{"PgClassExpression[59∈5]<br />ᐸ__yield__.”id”ᐳ"}}:::plan
+    PgSelectSingle56 --> PgClassExpression59
+    PgClassExpression67{{"PgClassExpression[67∈6]<br />ᐸ__yield__.”crop”ᐳ"}}:::plan
+    PgSelectSingle66 --> PgClassExpression67
+    PgClassExpression68{{"PgClassExpression[68∈6]<br />ᐸ__yield__.”id”ᐳ"}}:::plan
+    PgSelectSingle66 --> PgClassExpression68
+    PgClassExpression76{{"PgClassExpression[76∈7]<br />ᐸ__yield__.”crop”ᐳ"}}:::plan
+    PgSelectSingle75 --> PgClassExpression76
+    PgClassExpression77{{"PgClassExpression[77∈7]<br />ᐸ__yield__.”export”ᐳ"}}:::plan
+    PgSelectSingle75 --> PgClassExpression77
+    __Item86[/"__Item[86∈8]<br />ᐸ82ᐳ"\]:::itemplan
+    PgSelect82 ==> __Item86
+    PgSelectSingle87{{"PgSelectSingle[87∈8]<br />ᐸ__proto__ᐳ"}}:::plan
+    __Item86 --> PgSelectSingle87
+    PgClassExpression88{{"PgClassExpression[88∈8]<br />ᐸ__proto__.”id”ᐳ"}}:::plan
+    PgSelectSingle87 --> PgClassExpression88
+    PgClassExpression89{{"PgClassExpression[89∈8]<br />ᐸ__proto__.”name”ᐳ"}}:::plan
+    PgSelectSingle87 --> PgClassExpression89
+    PgClassExpression90{{"PgClassExpression[90∈8]<br />ᐸ__proto__.”brand”ᐳ"}}:::plan
+    PgSelectSingle87 --> PgClassExpression90
+    PgClassExpression98{{"PgClassExpression[98∈9]<br />ᐸ__proto__.”brand”ᐳ"}}:::plan
+    PgSelectSingle97 --> PgClassExpression98
+    PgClassExpression99{{"PgClassExpression[99∈9]<br />ᐸ__proto__.”name”ᐳ"}}:::plan
+    PgSelectSingle97 --> PgClassExpression99
+    PgClassExpression107{{"PgClassExpression[107∈10]<br />ᐸ__proto__.”brand”ᐳ"}}:::plan
+    PgSelectSingle106 --> PgClassExpression107
+    PgClassExpression108{{"PgClassExpression[108∈10]<br />ᐸ__proto__.”id”ᐳ"}}:::plan
+    PgSelectSingle106 --> PgClassExpression108
+    __Item117[/"__Item[117∈11]<br />ᐸ113ᐳ"\]:::itemplan
+    PgSelect113 ==> __Item117
+    PgSelectSingle118{{"PgSelectSingle[118∈11]<br />ᐸnullᐳ"}}:::plan
+    __Item117 --> PgSelectSingle118
+    PgClassExpression119{{"PgClassExpression[119∈11]<br />ᐸ__null__.”break”ᐳ"}}:::plan
+    PgSelectSingle118 --> PgClassExpression119
+    PgClassExpression120{{"PgClassExpression[120∈11]<br />ᐸ__null__.”...nProperty”ᐳ"}}:::plan
+    PgSelectSingle118 --> PgClassExpression120
+    PgClassExpression121{{"PgClassExpression[121∈11]<br />ᐸ__null__.”id”ᐳ"}}:::plan
+    PgSelectSingle118 --> PgClassExpression121
+    PgClassExpression129{{"PgClassExpression[129∈12]<br />ᐸ__null__.”...nProperty”ᐳ"}}:::plan
+    PgSelectSingle128 --> PgClassExpression129
+    PgClassExpression130{{"PgClassExpression[130∈12]<br />ᐸ__null__.”id”ᐳ"}}:::plan
+    PgSelectSingle128 --> PgClassExpression130
+    PgClassExpression138{{"PgClassExpression[138∈13]<br />ᐸ__null__.”break”ᐳ"}}:::plan
+    PgSelectSingle137 --> PgClassExpression138
+    PgClassExpression139{{"PgClassExpression[139∈13]<br />ᐸ__null__.”id”ᐳ"}}:::plan
+    PgSelectSingle137 --> PgClassExpression139
+    PgClassExpression147{{"PgClassExpression[147∈14]<br />ᐸ__null__.”break”ᐳ"}}:::plan
+    PgSelectSingle146 --> PgClassExpression147
+    PgClassExpression148{{"PgClassExpression[148∈14]<br />ᐸ__null__.”...nProperty”ᐳ"}}:::plan
+    PgSelectSingle146 --> PgClassExpression148
 
     %% define steps
 

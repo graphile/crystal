@@ -42,22 +42,22 @@ graph TD
     PgSelect21 --> First48
     PgSelectSingle49{{"PgSelectSingle[49∈1]<br />ᐸmessagesᐳ"}}:::plan
     First48 --> PgSelectSingle49
+    PgCursor50{{"PgCursor[50∈1]"}}:::plan
+    List55{{"List[55∈1]<br />ᐸ54ᐳ"}}:::plan
+    List55 --> PgCursor50
     PgClassExpression54{{"PgClassExpression[54∈1]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
     PgSelectSingle49 --> PgClassExpression54
-    List55{{"List[55∈1]<br />ᐸ54ᐳ"}}:::plan
     PgClassExpression54 --> List55
-    PgCursor50{{"PgCursor[50∈1]"}}:::plan
-    List55 --> PgCursor50
     Last57{{"Last[57∈1]"}}:::plan
     PgSelect21 --> Last57
     PgSelectSingle58{{"PgSelectSingle[58∈1]<br />ᐸmessagesᐳ"}}:::plan
     Last57 --> PgSelectSingle58
+    PgCursor59{{"PgCursor[59∈1]"}}:::plan
+    List64{{"List[64∈1]<br />ᐸ63ᐳ"}}:::plan
+    List64 --> PgCursor59
     PgClassExpression63{{"PgClassExpression[63∈1]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
     PgSelectSingle58 --> PgClassExpression63
-    List64{{"List[64∈1]<br />ᐸ63ᐳ"}}:::plan
     PgClassExpression63 --> List64
-    PgCursor59{{"PgCursor[59∈1]"}}:::plan
-    List64 --> PgCursor59
     First66{{"First[66∈1]"}}:::plan
     PgSelect65 --> First66
     PgSelectSingle67{{"PgSelectSingle[67∈1]<br />ᐸmessagesᐳ"}}:::plan
@@ -72,12 +72,12 @@ graph TD
     PgSelect32[["PgSelect[32∈3]<br />ᐸusersᐳ"]]:::plan
     PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
     Object18 & PgClassExpression31 --> PgSelect32
+    PgCursor27{{"PgCursor[27∈3]"}}:::plan
+    List29{{"List[29∈3]<br />ᐸ28ᐳ"}}:::plan
+    List29 --> PgCursor27
     PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
     PgSelectSingle26 --> PgClassExpression28
-    List29{{"List[29∈3]<br />ᐸ28ᐳ"}}:::plan
     PgClassExpression28 --> List29
-    PgCursor27{{"PgCursor[27∈3]"}}:::plan
-    List29 --> PgCursor27
     PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle26 --> PgClassExpression30
     PgSelectSingle26 --> PgClassExpression31

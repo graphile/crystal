@@ -43,20 +43,20 @@ graph TD
     PgSelect22 --> First45
     PgSelectSingle46{{"PgSelectSingle[46∈1]<br />ᐸmessagesᐳ"}}:::plan
     First45 --> PgSelectSingle46
+    PgCursor47{{"PgCursor[47∈1]"}}:::plan
+    List51 --> PgCursor47
     PgSelectSingle46 --> PgClassExpression48
     PgSelectSingle46 --> PgClassExpression49
     PgSelectSingle46 --> PgClassExpression50
-    PgCursor47{{"PgCursor[47∈1]"}}:::plan
-    List51 --> PgCursor47
     Last53{{"Last[53∈1]"}}:::plan
     PgSelect22 --> Last53
     PgSelectSingle54{{"PgSelectSingle[54∈1]<br />ᐸmessagesᐳ"}}:::plan
     Last53 --> PgSelectSingle54
+    PgCursor55{{"PgCursor[55∈1]"}}:::plan
+    List59 --> PgCursor55
     PgSelectSingle54 --> PgClassExpression56
     PgSelectSingle54 --> PgClassExpression57
     PgSelectSingle54 --> PgClassExpression58
-    PgCursor55{{"PgCursor[55∈1]"}}:::plan
-    List59 --> PgCursor55
     First61{{"First[61∈1]"}}:::plan
     PgSelect60 --> First61
     PgSelectSingle62{{"PgSelectSingle[62∈1]<br />ᐸmessagesᐳ"}}:::plan
@@ -76,11 +76,11 @@ graph TD
     PgSelect32[["PgSelect[32∈3]<br />ᐸusersᐳ"]]:::plan
     PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
     Object20 & PgClassExpression31 --> PgSelect32
+    PgCursor25{{"PgCursor[25∈3]"}}:::plan
+    List29 --> PgCursor25
     PgSelectSingle24 --> PgClassExpression26
     PgSelectSingle24 --> PgClassExpression27
     PgSelectSingle24 --> PgClassExpression28
-    PgCursor25{{"PgCursor[25∈3]"}}:::plan
-    List29 --> PgCursor25
     PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression30
     PgSelectSingle24 --> PgClassExpression31
