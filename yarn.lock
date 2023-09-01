@@ -9892,9 +9892,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.4.477":
-  version: 1.4.506
-  resolution: "electron-to-chromium@npm:1.4.506"
-  checksum: 7013792e7428fc5e089db1073fa912f0e0bf8bacd875d7491a425e16789e855e4a7e9d63c50d02fc7a9e207d2fe41e147db9bcb16c5ec78f653a6d119ab6d6ee
+  version: 1.4.508
+  resolution: "electron-to-chromium@npm:1.4.508"
+  checksum: 4909eda744e23e1124ee6b7e4de7f9cb359b947822f2b26e2d54a2ee64dcbad33f60fcd42e4f029a707645e07c6ece770d8983724b5e91fcd11df54c7f3020bc
   languageName: node
   linkType: hard
 
@@ -11251,9 +11251,9 @@ __metadata:
   linkType: hard
 
 "fraction.js@npm:^4.2.0":
-  version: 4.3.4
-  resolution: "fraction.js@npm:4.3.4"
-  checksum: 74d757116301dfdd0c81eefa0be4076d652c5ac9681f6a4c7d3a07d82d4f36de5e61e29a60d0bc69dd29b00f266fcc52a9b88df2fe7c67e10d89594b67e0f3ec
+  version: 4.3.5
+  resolution: "fraction.js@npm:4.3.5"
+  checksum: e2ea86b68183707df72a389587130171189b3eee91e45ddbc29a3cd858d8a52f97e8a2a37717d6739f15f82c7bcd360e32e14b6ad83ffe34875032842cd789e6
   languageName: node
   linkType: hard
 
@@ -11449,11 +11449,11 @@ __metadata:
   linkType: hard
 
 "fx@npm:*":
-  version: 28.0.0
-  resolution: "fx@npm:28.0.0"
+  version: 28.0.1
+  resolution: "fx@npm:28.0.1"
   bin:
     fx: index.js
-  checksum: 2ba8e4eba76802fe253057479caced00360488f6cd45c00cc054776cb88eb48ef1466f51439ddfb31a3e29dcb4960785ee6852cb945a93eb0cda5933a8e332e0
+  checksum: 0579686887ba0e9ec84506ca4a46c28fa10dccfcf2866f8c9327908c249fa0b2ae11c7f51b41347fd68c349ecad2ce55f7fcfa376fced9aeb4f2940373a9bcf6
   languageName: node
   linkType: hard
 
