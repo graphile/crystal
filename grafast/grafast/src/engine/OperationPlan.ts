@@ -24,7 +24,7 @@ import {
   graphqlCollectFields,
 } from "../graphqlCollectFields.js";
 import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
-import type { ModifierStep } from "../index.js";
+import type { GrafastPlanJSON, ModifierStep } from "../index.js";
 import {
   __ItemStep,
   __TrackedValueStep,
@@ -33,18 +33,24 @@ import {
   ExecutableStep,
   object,
   SafeError,
+  stripAnsi,
 } from "../index.js";
 import { inputStep } from "../input.js";
 import { inspect } from "../inspect.js";
 import type {
   FieldPlanResolver,
+  GrafastPlanBucketJSONv1,
+  GrafastPlanBucketPhaseJSONv1,
+  GrafastPlanBucketReasonJSONv1,
+  GrafastPlanJSONv1,
+  GrafastPlanStepJSONv1,
   LocationDetails,
   StepOptions,
   TrackedArguments,
 } from "../interfaces.js";
 import { $$proxy, $$subroutine, $$timeout, $$ts } from "../interfaces.js";
 import type { PrintPlanGraphOptions } from "../mermaid.js";
-import { printPlanGraph } from "../mermaid.js";
+import { planToMermaid, printPlanGraph } from "../mermaid.js";
 import type { ApplyAfterModeArg } from "../operationPlan-input.js";
 import { withFieldArgsForArguments } from "../operationPlan-input.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
@@ -69,6 +75,7 @@ import {
 } from "../utils.js";
 import type {
   LayerPlanPhase,
+  LayerPlanReason,
   LayerPlanReasonPolymorphic,
   LayerPlanReasonSubroutine,
 } from "./LayerPlan.js";
@@ -3129,7 +3136,7 @@ export class OperationPlan {
           }
         }
         if (nextSteps.length === 0) {
-          console.log(this.printPlanGraph());
+          console.log(planToMermaid(this.generatePlanJSON()));
           throw new Error(
             `GrafastInternalError<2904ebbf-6344-4f2b-9305-8db9c1ff29c5>: Could not compute execution order?! Remaining: ${[
               ...pending,
@@ -3282,13 +3289,89 @@ export class OperationPlan {
     }
   }
 
-  /**
-   * Convert an OpPlan into a plan graph in mermaid-js format.
-   */
-  printPlanGraph(options: PrintPlanGraphOptions = {}): string {
-    return printPlanGraph(this, options, {
-      steps: this.stepTracker.stepById,
-    });
+  generatePlanJSON(): GrafastPlanJSON {
+    function printStep(step: ExecutableStep): GrafastPlanStepJSONv1 {
+      const metaString = step.toStringMeta();
+      return {
+        id: step.id,
+        stepClass: step.constructor.name,
+        metaString: metaString ? stripAnsi(metaString) : metaString,
+        bucketId: step.layerPlan.id,
+        dependencyIds: step.dependencies.map((d) => d.id),
+      };
+    }
+    function printPhase(phase: LayerPlanPhase): GrafastPlanBucketPhaseJSONv1 {
+      return {
+        normalStepIds: phase.normalSteps?.map((s) => s.step.id),
+        unbatchedStepIds: phase.unbatchedSyncAndSafeSteps?.map(
+          (s) => s.step.id,
+        ),
+      };
+    }
+    function printBucketReason(
+      reason: LayerPlanReason,
+    ): GrafastPlanBucketReasonJSONv1 {
+      switch (reason.type) {
+        case "root": {
+          const { type } = reason;
+          return { type };
+        }
+        case "nullableBoundary": {
+          const { type, parentStep } = reason;
+          return { type, parentStepId: parentStep.id };
+        }
+        case "listItem": {
+          const { type, parentStep, stream } = reason;
+          return { type, parentStepId: parentStep.id, stream };
+        }
+        case "subscription": {
+          const { type } = reason;
+          return { type };
+        }
+        case "mutationField": {
+          const { type, mutationIndex } = reason;
+          return { type, mutationIndex };
+        }
+        case "defer": {
+          const { type, label } = reason;
+          return { type, label };
+        }
+        case "polymorphic": {
+          const { type, typeNames, parentStep, polymorphicPaths } = reason;
+          return {
+            type,
+            typeNames,
+            parentStepId: parentStep.id,
+            polymorphicPaths: [...polymorphicPaths],
+          };
+        }
+        case "subroutine": {
+          const { type, parentStep } = reason;
+          return { type, parentStepId: parentStep.id };
+        }
+        default: {
+          const never: never = reason;
+          throw new Error(
+            `Failed to process layer plan reason ${inspect(never)}`,
+          );
+        }
+      }
+    }
+    function printBucket(lp: LayerPlan): GrafastPlanBucketJSONv1 {
+      lp.reason;
+      return {
+        id: lp.id,
+        reason: printBucketReason(lp.reason),
+        copyStepIds: lp.copyStepIds,
+        phases: lp.phases.map(printPhase),
+        steps: lp.steps.map(printStep),
+        children: lp.children.map(printBucket),
+      };
+    }
+    return {
+      version: "v1",
+      rootBucket: printBucket(this.rootLayerPlan),
+    } as GrafastPlanJSONv1;
   }
 
   finishSubroutine(

@@ -4,6 +4,7 @@
 
 import type { OperationPlan } from ".";
 import type { LayerPlan } from "./engine/LayerPlan";
+import { GrafastPlanJSON } from "./interfaces";
 import type { ExecutableStep } from "./step.js";
 import { __ItemStep, __ListTransformStep } from "./steps/index.js";
 import { stripAnsi } from "./stripAnsi.js";
@@ -388,4 +389,16 @@ function startSteps(layerPlan: LayerPlan) {
             }`,
         )
         .join("\n")}`;
+}
+
+export function planToMermaid(
+  plan: GrafastPlanJSON,
+  {
+    // printPathRelations = false,
+    concise = false,
+    skipBuckets = (global as any).grafastExplainMermaidSkipBuckets ?? false,
+  }: PrintPlanGraphOptions = {},
+) {
+  return `flowchart TD
+  To -> Do`;
 }

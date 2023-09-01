@@ -22,6 +22,7 @@ import {
   execute as grafastExecute,
   hookArgs,
   subscribe as grafastSubscribe,
+  planToMermaidDiagram,
 } from "grafast";
 import type {
   AsyncExecutionResult,
@@ -256,7 +257,7 @@ export async function runTestQuery(
       ...graphileBuildOptions,
     },
     grafast: {
-      explain: ["mermaid-js"],
+      explain: ["plan"],
     },
   };
 
@@ -691,9 +692,11 @@ export const assertSnapshotsMatch = async (
       .join("\n\n");
     await snapshot(formattedQueries, sqlFileName);
   } else if (only === "mermaid") {
-    const graphString = extensions?.explain?.operations?.find(
-      (op) => op.type === "mermaid-js",
-    )?.diagram;
+    const planOp = extensions?.explain?.operations?.find(
+      (op) => op.type === "plan",
+    );
+
+    const graphString = planOp ? planToMermaidDiagram(planOp.plan) : undefined;
     const mermaidFileName = basePath + (ext || "") + ".mermaid";
     if (!graphString) {
       throw new Error("No plan was emitted for this test!");

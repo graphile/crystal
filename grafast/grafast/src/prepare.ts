@@ -25,8 +25,9 @@ import type { OutputPlan } from "./engine/OutputPlan.js";
 import { coerceError, getChildBucketAndIndex } from "./engine/OutputPlan.js";
 import { isGrafastError } from "./error.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
-import type { OperationPlan } from "./index.js";
+import type { GrafastPlanJSON, OperationPlan } from "./index.js";
 import type {
+  GrafastPlanJSONv1,
   GrafastTimeouts,
   JSONValue,
   PromiseOrDirect,
@@ -48,7 +49,7 @@ export interface GrafastPrepareOptions {
   /**
    * A list of 'explain' types that should be included in `extensions.explain`.
    *
-   * - `mermaid-js` will cause the mermaid plan to be included
+   * - `plan` will cause the plan JSON to be included
    * - other values are dependent on the plugins in play
    *
    * If set to `true` then all possible explain types will be exposed.
@@ -528,7 +529,7 @@ function executePreemptive(
 
 declare module "./engine/OperationPlan.js" {
   interface OperationPlan {
-    [$$contextPlanCache]?: string;
+    [$$contextPlanCache]?: GrafastPlanJSON;
   }
 }
 
@@ -589,20 +590,23 @@ export function grafastPrepare(
 
   if (
     options.explain === true ||
-    (options.explain && options.explain.includes("mermaid-js"))
+    (options.explain && options.explain.includes("plan"))
   ) {
     // Only build the plan once
     if (operationPlan[$$contextPlanCache] == null) {
+      /*
       operationPlan[$$contextPlanCache] = operationPlan.printPlanGraph({
         includePaths: isTest,
         printPathRelations: false,
         concise: !isTest,
       });
+      */
+      operationPlan[$$contextPlanCache] = operationPlan.generatePlanJSON();
     }
     rootValue[$$extensions]?.explain?.operations.push({
-      type: "mermaid-js",
-      title: "Step",
-      diagram: operationPlan[$$contextPlanCache],
+      type: "plan",
+      title: "Plan",
+      plan: operationPlan[$$contextPlanCache],
     });
   }
 

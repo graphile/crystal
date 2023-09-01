@@ -76,7 +76,7 @@ with (Grafast) {
           operationName,
           variableValues: variables,
         },
-        { grafast: { explain: ["mermaid-js"] } },
+        { grafast: { explain: ["plan"] } },
       );
       if (result.extensions) {
         // Hide 'extensions' so it doesn't overwhelm people

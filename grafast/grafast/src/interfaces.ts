@@ -42,6 +42,7 @@ import type {
   ConstantStep,
 } from "./steps/index.js";
 import type { GrafastInputObjectType, GrafastObjectType } from "./utils.js";
+import { LayerPlanReason } from "./engine/LayerPlan.js";
 
 type PromiseOrValue<T> = T | Promise<T>;
 
@@ -235,7 +236,7 @@ declare global {
       /**
        * A list of 'explain' types that should be included in `extensions.explain`.
        *
-       * - `mermaid-js` will cause the mermaid plan to be included
+       * - `plan` will cause the plan JSON to be included
        * - other values are dependent on the plugins in play
        *
        * If set to `true` then all possible explain types will be exposed.
@@ -1014,4 +1015,91 @@ export type StreamMoreableArray<T = any> = Array<T> & {
 export interface GrafastArgs extends GraphQLArgs {
   resolvedPreset?: GraphileConfig.ResolvedPreset;
   requestContext?: Partial<Grafast.RequestContext>;
+}
+
+export interface GrafastPlanJSON {
+  version: "v1" | "v2";
+}
+
+export interface GrafastPlanStepJSONv1 {
+  id: string | number;
+  stepClass: string;
+  metaString: string | null;
+  bucketId: string | number;
+  dependencyIds: ReadonlyArray<string | number>;
+}
+
+export interface GrafastPlanBucketPhaseJSONv1 {
+  normalStepIds?: ReadonlyArray<string | number>;
+  unbatchedStepIds?: ReadonlyArray<string | number>;
+}
+
+export type GrafastPlanBucketReasonJSONv1 =
+  | GrafastPlanBucketReasonRootJSONv1
+  | GrafastPlanBucketReasonNullableFieldJSONv1
+  | GrafastPlanBucketReasonListItemJSONv1
+  | GrafastPlanBucketReasonSubscriptionJSONv1
+  | GrafastPlanBucketReasonMutationFieldJSONv1
+  | GrafastPlanBucketReasonDeferJSONv1
+  | GrafastPlanBucketReasonPolymorphicJSONv1
+  | GrafastPlanBucketReasonSubroutineJSONv1;
+
+export interface GrafastPlanBucketReasonRootJSONv1 {
+  type: "root";
+}
+/** Non-branching, non-deferred */
+export interface GrafastPlanBucketReasonNullableFieldJSONv1 {
+  type: "nullableBoundary";
+  parentStepId: string | number;
+}
+/** Non-branching, non-deferred */
+export interface GrafastPlanBucketReasonListItemJSONv1 {
+  type: "listItem";
+  parentStepId: string | number;
+
+  /** If this listItem is to be streamed, the configuration for that streaming */
+  stream?: {
+    initialCount: number;
+    label?: string;
+  };
+}
+/** Non-branching, deferred */
+export interface GrafastPlanBucketReasonSubscriptionJSONv1 {
+  type: "subscription";
+}
+/** Non-branching, deferred */
+export interface GrafastPlanBucketReasonMutationFieldJSONv1 {
+  type: "mutationField";
+  mutationIndex: number;
+}
+/** Non-branching, deferred */
+export interface GrafastPlanBucketReasonDeferJSONv1 {
+  type: "defer";
+  label?: string;
+}
+/** Branching, non-deferred */
+export interface GrafastPlanBucketReasonPolymorphicJSONv1 {
+  type: "polymorphic";
+  typeNames: readonly string[];
+  parentStepId: string | number;
+  polymorphicPaths: ReadonlyArray<string>;
+}
+/** Non-branching, non-deferred */
+export interface GrafastPlanBucketReasonSubroutineJSONv1 {
+  type: "subroutine";
+  parentStepId: string | number;
+}
+
+export interface GrafastPlanBucketJSONv1 {
+  id: string | number;
+  reason: GrafastPlanBucketReasonJSONv1;
+  copyStepIds: ReadonlyArray<string | number>;
+  steps: ReadonlyArray<GrafastPlanStepJSONv1>;
+  phases: ReadonlyArray<GrafastPlanBucketPhaseJSONv1>;
+  children: ReadonlyArray<GrafastPlanBucketJSONv1>;
+}
+
+export interface GrafastPlanJSONv1 extends GrafastPlanJSON {
+  version: "v1";
+  rootBucket: GrafastPlanBucketJSONv1;
 }

@@ -73,27 +73,29 @@ export const ExplainMain: FC<{
 
   const [saving, setSaving] = useState(false);
   const saveSVG = useCallback(() => {
-    if (!selectedResult || selectedResult.type !== "mermaid-js") return;
+    if (!selectedResult || selectedResult.type !== "plan") return;
     setSaving(true);
     setTimeout(() => {
-      mermaid.mermaidAPI
-        .render("id1", selectedResult.diagram)
-        .then(({ svg }) => {
-          const file = new File([svg], "grafast-plan.svg");
+      /*
+      const diagram = planToMermaidDiagram(selectedResult.plan);
+      mermaid.mermaidAPI.render("id1", diagram).then(({ svg }) => {
+        const file = new File([svg], "grafast-plan.svg");
 
-          const a = document.createElement("a");
-          a.href = URL.createObjectURL(file);
-          a.download = file.name;
-          a.style.display = "none";
-          document.body.appendChild(a);
-          a.click();
-          setSaving(false);
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(file);
+        a.download = file.name;
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        setSaving(false);
 
-          setTimeout(() => {
-            URL.revokeObjectURL(a.href);
-            a.parentNode!.removeChild(a);
-          }, 0);
-        });
+        setTimeout(() => {
+          URL.revokeObjectURL(a.href);
+          a.parentNode!.removeChild(a);
+        }, 0);
+      });
+      */
+      alert("TODO: trigger SVG download for the plan diagram");
     }, 0);
   }, [selectedResult]);
 
@@ -123,17 +125,17 @@ export const ExplainMain: FC<{
           </div>
         );
       }
-      case "mermaid-js": {
+      case "plan": {
         return (
           <>
-            <Copy text={selectedResult.diagram}>
-              Copy Mermaid.js Definition
+            <Copy text={JSON.stringify(selectedResult.plan)}>
+              Copy plan JSON
             </Copy>
             <button onClick={saveSVG} disabled={saving}>
-              Save Mermaid Diagram
+              Save Mermaid Diagram (TODO!)
             </button>
             <div onClick={expand}>
-              <Mermaid diagram={selectedResult.diagram} />
+              {/*<Mermaid diagram={selectedResult.diagram} />*/ "TODO"}
             </div>
             {expanded
               ? createPortal(
@@ -148,7 +150,7 @@ export const ExplainMain: FC<{
                       </button>
                     </div>
                     <div className="explainExpandedMain">
-                      <Mermaid diagram={selectedResult.diagram} />
+                      {/*<Mermaid diagram={selectedResult.diagram} />*/ "TODO"}
                     </div>
                   </div>,
 
