@@ -378,3 +378,5 @@ function pp(polymorphicPaths: ReadonlyArray<string> | null | undefined) {
   }
   return polymorphicPaths.map((p) => `${p}`).join("\n");
 }
+
+export * from "./planJSONInterfaces.js";

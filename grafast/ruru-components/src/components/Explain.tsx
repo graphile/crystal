@@ -137,14 +137,12 @@ export const ExplainMain: FC<{
       case "plan": {
         return (
           <>
-            <Copy text={JSON.stringify(selectedResult.plan)}>
-              Copy plan JSON
-            </Copy>
+            <Copy json={selectedResult.plan}>Copy plan JSON</Copy>
             <button onClick={saveSVG} disabled={saving}>
-              Save Mermaid Diagram (TODO!)
+              Save Mermaid Diagram
             </button>
             <div onClick={expand}>
-              <Mermaid diagram={planToMermaid(selectedResult.plan)} />
+              <Mermaid plan={selectedResult.plan} />
             </div>
             {expanded
               ? createPortal(
@@ -159,7 +157,7 @@ export const ExplainMain: FC<{
                       </button>
                     </div>
                     <div className="explainExpandedMain">
-                      <Mermaid diagram={planToMermaid(selectedResult.plan)} />
+                      <Mermaid plan={selectedResult.plan} />
                     </div>
                   </div>,
 

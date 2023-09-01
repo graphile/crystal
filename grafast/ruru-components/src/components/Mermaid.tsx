@@ -1,13 +1,15 @@
+import { planToMermaid, GrafastPlanJSON } from "grafast/mermaid";
 import mermaid from "mermaid";
 import type { FC } from "react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 mermaid.initialize({
   startOnLoad: true,
   maxTextSize: 1000000,
 });
 
-export const Mermaid: FC<{ diagram: string }> = ({ diagram }) => {
+export const Mermaid: FC<{ plan: GrafastPlanJSON }> = ({ plan }) => {
+  const diagram = useMemo(() => planToMermaid(plan), [plan]);
   useEffect(() => {
     if (diagram) {
       mermaid.contentLoaded();
