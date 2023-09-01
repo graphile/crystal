@@ -14,8 +14,8 @@ import {
   execute as grafastExecute,
   stringifyPayload,
   subscribe as grafastSubscribe,
-  planToMermaid,
 } from "grafast";
+import { planToMermaid } from "grafast/mermaid";
 import type {
   AsyncExecutionResult,
   ExecutionPatchResult,

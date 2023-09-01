@@ -49,7 +49,6 @@ import type {
   TrackedArguments,
 } from "../interfaces.js";
 import { $$proxy, $$subroutine, $$timeout, $$ts } from "../interfaces.js";
-import { planToMermaid } from "../mermaid.js";
 import type { ApplyAfterModeArg } from "../operationPlan-input.js";
 import { withFieldArgsForArguments } from "../operationPlan-input.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
@@ -3135,7 +3134,6 @@ export class OperationPlan {
           }
         }
         if (nextSteps.length === 0) {
-          console.log(planToMermaid(this.generatePlanJSON()));
           throw new Error(
             `GrafastInternalError<2904ebbf-6344-4f2b-9305-8db9c1ff29c5>: Could not compute execution order?! Remaining: ${[
               ...pending,

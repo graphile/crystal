@@ -15,6 +15,11 @@
       "node": "./dist/envelop.js",
       "default": "./dist/envelop.js"
     },
+    "./mermaid": {
+      "types": "./dist/mermaid.d.ts",
+      "node": "./dist/mermaid.js",
+      "default": "./dist/mermaid.js"
+    },
     "./graphql": {
       "types": "./fwd/graphql/index.d.ts",
       "node": "./fwd/graphql/index.js",

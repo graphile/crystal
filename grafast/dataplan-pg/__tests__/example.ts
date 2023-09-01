@@ -19,9 +19,9 @@ import {
   __ValueStep,
   grafastGraphql,
   isAsyncIterable,
-  planToMermaid,
   stripAnsi,
 } from "grafast";
+import { planToMermaid } from "grafast/mermaid";
 import type { AsyncExecutionResult, ExecutionResult } from "grafast/graphql";
 import { resolve } from "path";
 import { Pool } from "pg";

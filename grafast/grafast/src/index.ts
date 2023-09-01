@@ -14,7 +14,6 @@ import {
   ObjectPlans,
   ScalarPlans,
 } from "./makeGrafastSchema.js";
-import { PrintPlanGraphOptions, planToMermaid } from "./mermaid.js";
 
 // HACK: doing this here feels "naughty".
 debugFactory.formatters.c = grafastPrint;
@@ -367,7 +366,6 @@ export {
   PolymorphicData,
   PolymorphicStep,
   polymorphicWrap,
-  PrintPlanGraphOptions,
   PromiseOrDirect,
   proxy,
   ProxyStep,
@@ -394,7 +392,6 @@ export {
   subscribe,
   TypedEventEmitter,
   UnbatchedExecutableStep,
-  planToMermaid,
 };
 
 exportAsMany("grafast", {
@@ -497,7 +494,6 @@ exportAsMany("grafast", {
   loadManyCallback,
   LoadedRecordStep,
   LoadStep,
-  planToMermaid,
 });
 
 export { hookArgs } from "./args.js";

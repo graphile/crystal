@@ -22,8 +22,8 @@ import {
   execute as grafastExecute,
   hookArgs,
   subscribe as grafastSubscribe,
-  planToMermaid,
 } from "grafast";
+import { planToMermaid } from "grafast/mermaid";
 import type {
   AsyncExecutionResult,
   ExecutionArgs,
