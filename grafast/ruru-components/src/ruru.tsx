@@ -1,7 +1,8 @@
-import { useExplorerPlugin } from "@graphiql/plugin-explorer";
+import { explorerPlugin as makeExplorerPlugin } from "@graphiql/plugin-explorer";
+import type { GraphiQLPlugin } from "@graphiql/react";
 import {
   CopyIcon,
-  GraphiQLProvider,
+  GraphiQLProvider as GP2,
   MergeIcon,
   PrettifyIcon,
   SettingsIcon,
@@ -11,7 +12,7 @@ import {
   useMergeQuery,
 } from "@graphiql/react";
 import type { GraphiQLProps } from "graphiql";
-import { GraphiQL, GraphiQLInterface } from "graphiql";
+import { GraphiQL, GraphiQLInterface, GraphiQLProvider } from "graphiql";
 import type { FC } from "react";
 import { useCallback, useMemo, useState } from "react";
 
@@ -26,6 +27,10 @@ import type { RuruStorage } from "./hooks/useStorage.js";
 import { useStorage } from "./hooks/useStorage.js";
 import type { RuruProps } from "./interfaces.js";
 import { EXPLAIN_PLUGIN } from "./plugins/explain.js";
+
+if (GP2 !== GraphiQLProvider) {
+  throw new Error("PACKAGE MANAGEMENT ERROR! The providers don't match up!");
+}
 
 const checkCss = { width: "1.5rem", display: "inline-block" };
 const check = <span style={checkCss}>✔</span>;
@@ -50,16 +55,14 @@ export const Ruru: FC<RuruProps> = (props) => {
   const explainHelpers = useExplain(storage);
   const { schema } = useSchema(props, fetcher, setError, streamEndpoint);
   const defaultQuery = props.defaultQuery ?? DEFAULT_QUERY;
-  const [query, setQuery] = useState(storage.get("query") ?? defaultQuery);
-  const explorerPlugin = useExplorerPlugin({
-    query,
-    onEdit: setQuery,
+  const explorerPlugin = makeExplorerPlugin({
     showAttribution: false,
   });
-  const plugins = useMemo(() => {
+  const plugins = useMemo<GraphiQLPlugin[]>(() => {
     return [explorerPlugin, EXPLAIN_PLUGIN];
   }, [explorerPlugin]);
   return (
+    //EditorContextProvider
     <ExplainContext.Provider
       value={{
         explainHelpers,
@@ -72,7 +75,6 @@ export const Ruru: FC<RuruProps> = (props) => {
         fetcher={fetcher}
         schema={schema}
         defaultQuery={defaultQuery}
-        query={query}
         plugins={plugins}
         shouldPersistHeaders={saveHeaders}
       >
@@ -81,7 +83,6 @@ export const Ruru: FC<RuruProps> = (props) => {
           editorTheme={props.editorTheme}
           error={error}
           setError={setError}
-          onEditQuery={setQuery}
         />
       </GraphiQLProvider>
     </ExplainContext.Provider>
@@ -93,7 +94,7 @@ export const RuruInner: FC<{
   storage: RuruStorage;
   error: Error | null;
   setError: React.Dispatch<React.SetStateAction<Error | null>>;
-  onEditQuery: GraphiQLProps["onEditQuery"];
+  onEditQuery?: GraphiQLProps["onEditQuery"];
 }> = (props) => {
   const { storage, editorTheme, error, setError, onEditQuery } = props;
   const prettify = usePrettify();

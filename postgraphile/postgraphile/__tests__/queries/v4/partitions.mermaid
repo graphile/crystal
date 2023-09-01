@@ -43,18 +43,18 @@ graph TD
     PgSelect20 --> First45
     PgSelectSingle46{{"PgSelectSingle[46∈1]<br />ᐸmeasurementsᐳ"}}:::plan
     First45 --> PgSelectSingle46
-    PgSelectSingle46 --> PgClassExpression48
-    PgSelectSingle46 --> PgClassExpression49
     PgCursor47{{"PgCursor[47∈1]"}}:::plan
     List50 --> PgCursor47
+    PgSelectSingle46 --> PgClassExpression48
+    PgSelectSingle46 --> PgClassExpression49
     Last52{{"Last[52∈1]"}}:::plan
     PgSelect20 --> Last52
     PgSelectSingle53{{"PgSelectSingle[53∈1]<br />ᐸmeasurementsᐳ"}}:::plan
     Last52 --> PgSelectSingle53
-    PgSelectSingle53 --> PgClassExpression55
-    PgSelectSingle53 --> PgClassExpression56
     PgCursor54{{"PgCursor[54∈1]"}}:::plan
     List57 --> PgCursor54
+    PgSelectSingle53 --> PgClassExpression55
+    PgSelectSingle53 --> PgClassExpression56
     Constant58{{"Constant[58∈1]<br />ᐸfalseᐳ"}}:::plan
     __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
     PgSelect20 ==> __Item21
@@ -64,16 +64,16 @@ graph TD
     PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__measurem...timestamp”ᐳ"}}:::plan
     PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__measurements__.”key”ᐳ"}}:::plan
     PgClassExpression24 & PgClassExpression25 --> List26
-    PgSelectSingle22 --> PgClassExpression24
-    PgSelectSingle22 --> PgClassExpression25
     PgCursor23{{"PgCursor[23∈3]"}}:::plan
     List26 --> PgCursor23
+    PgSelectSingle22 --> PgClassExpression24
+    PgSelectSingle22 --> PgClassExpression25
     PgClassExpression29{{"PgClassExpression[29∈3]<br />ᐸ__measurem...__.”value”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression29
-    RemapKeys60{{"RemapKeys[60∈3]<br />ᐸ22:{”0”:3,”1”:4}ᐳ"}}:::plan
-    PgSelectSingle22 --> RemapKeys60
     PgSelectSingle36{{"PgSelectSingle[36∈3]<br />ᐸusersᐳ"}}:::plan
+    RemapKeys60{{"RemapKeys[60∈3]<br />ᐸ22:{”0”:3,”1”:4}ᐳ"}}:::plan
     RemapKeys60 --> PgSelectSingle36
+    PgSelectSingle22 --> RemapKeys60
     PgClassExpression37{{"PgClassExpression[37∈4]<br />ᐸ__users__.”id”ᐳ"}}:::plan
     PgSelectSingle36 --> PgClassExpression37
     PgClassExpression38{{"PgClassExpression[38∈4]<br />ᐸ__users__.”name”ᐳ"}}:::plan

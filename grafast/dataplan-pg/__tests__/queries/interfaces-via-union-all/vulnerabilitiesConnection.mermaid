@@ -30,11 +30,11 @@ graph TD
     Access25{{"Access[25∈3]<br />ᐸ22.1ᐳ"}}:::plan
     Access26{{"Access[26∈3]<br />ᐸ22.2ᐳ"}}:::plan
     Access24 & Access25 & Access26 --> List27
+    PgCursor23{{"PgCursor[23∈3]"}}:::plan
+    List27 --> PgCursor23
     PgUnionAllSingle22 --> Access24
     PgUnionAllSingle22 --> Access25
     PgUnionAllSingle22 --> Access26
-    PgCursor23{{"PgCursor[23∈3]"}}:::plan
-    List27 --> PgCursor23
     PgSelect31[["PgSelect[31∈4]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
     Access30{{"Access[30∈4]<br />ᐸ29.0ᐳ"}}:::plan
     Object18 & Access30 --> PgSelect31

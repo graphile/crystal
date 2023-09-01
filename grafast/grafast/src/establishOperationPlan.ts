@@ -19,7 +19,8 @@ const debug = debugFactory("grafast:establishOperationPlan");
 
 // How long is a timeout valid for? Here I've set it to 60 seconds.
 const TIMEOUT_TIMEOUT =
-  (typeof process.env.GRAFAST_TIMEOUT_VALIDITY_MS === "string"
+  (typeof process !== "undefined" &&
+  typeof process.env.GRAFAST_TIMEOUT_VALIDITY_MS === "string"
     ? parseInt(process.env.GRAFAST_TIMEOUT_VALIDITY_MS, 10)
     : null) || 60_000;
 // OPTIMIZE: we should consider increasing the timeout once the process has been

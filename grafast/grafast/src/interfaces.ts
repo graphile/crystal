@@ -235,7 +235,7 @@ declare global {
       /**
        * A list of 'explain' types that should be included in `extensions.explain`.
        *
-       * - `mermaid-js` will cause the mermaid plan to be included
+       * - `plan` will cause the plan JSON to be included
        * - other values are dependent on the plugins in play
        *
        * If set to `true` then all possible explain types will be exposed.
@@ -983,18 +983,6 @@ export interface LocationDetails {
   fieldName: string | null;
 }
 
-export type JSONValue =
-  | boolean
-  | number
-  | string
-  | null
-  | JSONObject
-  | JSONArray;
-export interface JSONObject {
-  [key: string]: JSONValue;
-}
-export interface JSONArray extends Array<JSONValue> {}
-
 export type UnwrapPlanTuple</* const */ TIn extends readonly ExecutableStep[]> =
   {
     [Index in keyof TIn]: TIn[Index] extends ExecutableStep<infer U>
@@ -1015,3 +1003,5 @@ export interface GrafastArgs extends GraphQLArgs {
   resolvedPreset?: GraphileConfig.ResolvedPreset;
   requestContext?: Partial<Grafast.RequestContext>;
 }
+
+export * from "./planJSONInterfaces.js";

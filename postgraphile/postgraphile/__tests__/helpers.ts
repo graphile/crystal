@@ -39,6 +39,7 @@ import {
   validate,
   validateSchema,
 } from "grafast/graphql";
+import { planToMermaid } from "grafast/mermaid";
 import { StreamDeferPlugin } from "graphile-build";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
@@ -49,7 +50,7 @@ import type { PoolClient } from "pg";
 import { Pool } from "pg";
 
 import { withTestWithPgClient } from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.js";
-import { makeSchema } from "..";
+import { makeSchema } from "../src/index.js";
 import AmberPreset from "../src/presets/amber.js";
 import { makeV4Preset } from "../src/presets/v4.js";
 
@@ -256,7 +257,7 @@ export async function runTestQuery(
       ...graphileBuildOptions,
     },
     grafast: {
-      explain: ["mermaid-js"],
+      explain: ["plan"],
     },
   };
 
@@ -691,9 +692,11 @@ export const assertSnapshotsMatch = async (
       .join("\n\n");
     await snapshot(formattedQueries, sqlFileName);
   } else if (only === "mermaid") {
-    const graphString = extensions?.explain?.operations?.find(
-      (op) => op.type === "mermaid-js",
-    )?.diagram;
+    const planOp = extensions?.explain?.operations?.find(
+      (op) => op.type === "plan",
+    );
+
+    const graphString = planOp ? planToMermaid(planOp.plan) : undefined;
     const mermaidFileName = basePath + (ext || "") + ".mermaid";
     if (!graphString) {
       throw new Error("No plan was emitted for this test!");

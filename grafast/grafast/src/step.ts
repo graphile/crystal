@@ -21,6 +21,7 @@ import type {
   GrafastResultsList,
   GrafastResultStreamList,
   GrafastValuesList,
+  JSONValue,
   PromiseOrDirect,
   StepOptimizeOptions,
   StepOptions,
@@ -153,6 +154,10 @@ export abstract class BaseStep {
    */
   public toStringMeta(): string | null {
     return null;
+  }
+
+  public planJSONExtra(): Record<string, JSONValue | undefined> | undefined {
+    return undefined;
   }
 
   public finalize(): void {

@@ -174,8 +174,8 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
           }"."${pgClass.relname}", perhaps you need to grant access:
   GRANT USAGE ON SCHEMA "${pgClass.getNamespace()!.nspname}" TO "${role}";
   GRANT SELECT ON "${pgClass.getNamespace()!.nspname}"."${
-            pgClass.relname
-          }" TO "${role}";
+    pgClass.relname
+  }" TO "${role}";
 Original error: ${e.message}
 `);
         }

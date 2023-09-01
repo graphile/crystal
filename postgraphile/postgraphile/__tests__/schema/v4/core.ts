@@ -64,9 +64,8 @@ export const test =
           ...graphileBuildOptions,
         },
       };
-      const { schema, resolvedPreset: _resolvedPreset } = await makeSchema(
-        preset,
-      );
+      const { schema, resolvedPreset: _resolvedPreset } =
+        await makeSchema(preset);
       const i = testPath in countByPath ? countByPath[testPath] + 1 : 1;
       countByPath[testPath] = i;
       const sorted = sort ? lexicographicSortSchema(schema) : schema;

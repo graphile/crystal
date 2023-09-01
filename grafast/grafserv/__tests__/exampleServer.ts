@@ -1,6 +1,7 @@
-import { constant, makeGrafastSchema } from "grafast";
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
+
+import { constant, makeGrafastSchema } from "grafast";
 
 import { grafserv } from "../src/servers/node/index.js";
 

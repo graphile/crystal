@@ -9,13 +9,13 @@ graph TD
 
 
     %% plan dependencies
+    PgSelect8[["PgSelect[8∈0]<br />ᐸunion_itemsᐳ"]]:::plan
     Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant65{{"Constant[65∈0]<br />ᐸ1ᐳ"}}:::plan
+    Object11 & Constant65 --> PgSelect8
     Access9{{"Access[9∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
-    PgSelect8[["PgSelect[8∈0]<br />ᐸunion_itemsᐳ"]]:::plan
-    Constant65{{"Constant[65∈0]<br />ᐸ1ᐳ"}}:::plan
-    Object11 & Constant65 --> PgSelect8
     PgPolymorphic15{{"PgPolymorphic[15∈0]"}}:::plan
     PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸunion_itemsᐳ"}}:::plan
     PgClassExpression14{{"PgClassExpression[14∈0]<br />ᐸ__union_items__.”type”ᐳ"}}:::plan

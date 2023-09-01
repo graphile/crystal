@@ -13,11 +13,11 @@ graph TD
     Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
+    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
+    Object14 --> PgSelect11
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access12
     __Value3 --> Access13
-    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
-    Object14 --> PgSelect11
     __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
@@ -30,14 +30,14 @@ graph TD
     PgSelectSingle16 --> PgClassExpression17
     __ListTransform22[["__ListTransform[22∈2]<br />ᐸpartitionByIndex1:18ᐳ"]]:::plan
     PgSelect18 --> __ListTransform22
-    __Item26[/"__Item[26∈4]<br />ᐸ22ᐳ"\]:::itemplan
-    __ListTransform22 ==> __Item26
     __Item23[/"__Item[23∈3]<br />ᐸ18ᐳ"\]:::itemplan
     PgSelect18 -.-> __Item23
     PgSelectSingle24{{"PgSelectSingle[24∈3]<br />ᐸforums_messages_list_setᐳ"}}:::plan
     __Item23 --> PgSelectSingle24
     PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__forums_m..._set_idx__ᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression25
+    __Item26[/"__Item[26∈4]<br />ᐸ22ᐳ"\]:::itemplan
+    __ListTransform22 ==> __Item26
     __Item29[/"__Item[29∈6]<br />ᐸ26ᐳ"\]:::itemplan
     __Item26 ==> __Item29
     PgSelectSingle30{{"PgSelectSingle[30∈6]<br />ᐸforums_messages_list_setᐳ"}}:::plan
@@ -65,15 +65,8 @@ graph TD
     Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ22ᐳ[26]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item26 bucket4
-    Bucket6("Bucket 6 (listItem)<br />ROOT __Item{6}ᐸ26ᐳ[29]"):::bucket
-    classDef bucket6 stroke:#ff1493
-    class Bucket6,__Item29,PgSelectSingle30 bucket6
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 30<br /><br />ROOT PgSelectSingle{6}ᐸforums_messages_list_setᐳ[30]"):::bucket
-    classDef bucket7 stroke:#808000
-    class Bucket7,PgClassExpression31,PgClassExpression32 bucket7
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3 & Bucket4
     Bucket4 --> Bucket6
-    Bucket6 --> Bucket7
     end

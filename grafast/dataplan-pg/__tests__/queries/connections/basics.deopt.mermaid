@@ -29,22 +29,22 @@ graph TD
     PgSelect20 --> First40
     PgSelectSingle41{{"PgSelectSingle[41∈1]<br />ᐸmessagesᐳ"}}:::plan
     First40 --> PgSelectSingle41
+    PgCursor42{{"PgCursor[42∈1]"}}:::plan
+    List44{{"List[44∈1]<br />ᐸ43ᐳ"}}:::plan
+    List44 --> PgCursor42
     PgClassExpression43{{"PgClassExpression[43∈1]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
     PgSelectSingle41 --> PgClassExpression43
-    List44{{"List[44∈1]<br />ᐸ43ᐳ"}}:::plan
     PgClassExpression43 --> List44
-    PgCursor42{{"PgCursor[42∈1]"}}:::plan
-    List44 --> PgCursor42
     Last46{{"Last[46∈1]"}}:::plan
     PgSelect20 --> Last46
     PgSelectSingle47{{"PgSelectSingle[47∈1]<br />ᐸmessagesᐳ"}}:::plan
     Last46 --> PgSelectSingle47
+    PgCursor48{{"PgCursor[48∈1]"}}:::plan
+    List50{{"List[50∈1]<br />ᐸ49ᐳ"}}:::plan
+    List50 --> PgCursor48
     PgClassExpression49{{"PgClassExpression[49∈1]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
     PgSelectSingle47 --> PgClassExpression49
-    List50{{"List[50∈1]<br />ᐸ49ᐳ"}}:::plan
     PgClassExpression49 --> List50
-    PgCursor48{{"PgCursor[48∈1]"}}:::plan
-    List50 --> PgCursor48
     First52{{"First[52∈1]"}}:::plan
     PgSelect51 --> First52
     PgSelectSingle53{{"PgSelectSingle[53∈1]<br />ᐸmessagesᐳ"}}:::plan
@@ -59,12 +59,12 @@ graph TD
     PgSelect28[["PgSelect[28∈3]<br />ᐸusersᐳ"]]:::plan
     PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__messages...author_id”ᐳ"}}:::plan
     Object18 & PgClassExpression27 --> PgSelect28
+    PgCursor23{{"PgCursor[23∈3]"}}:::plan
+    List25{{"List[25∈3]<br />ᐸ24ᐳ"}}:::plan
+    List25 --> PgCursor23
     PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression24
-    List25{{"List[25∈3]<br />ᐸ24ᐳ"}}:::plan
     PgClassExpression24 --> List25
-    PgCursor23{{"PgCursor[23∈3]"}}:::plan
-    List25 --> PgCursor23
     PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression26
     PgSelectSingle22 --> PgClassExpression27

@@ -10,7 +10,7 @@
 
     "noUncheckedIndexedAccess": false,
     "moduleResolution": "nodenext",
-    "module": "commonjs"
+    "module": "nodenext"
   },
   "include": ["."],
   "exclude": ["__tests__", "dist"]

@@ -26,30 +26,14 @@ graph TD
     PgSelect17 --> __ListTransform18
     __ListTransform31[["__ListTransform[31∈1]<br />ᐸeach:30ᐳ"]]:::plan
     PgSelect17 --> __ListTransform31
-    Edge36{{"Edge[36∈6]"}}:::plan
-    PgSelectSingle35{{"PgSelectSingle[35∈6]<br />ᐸbadly_behaved_functionᐳ"}}:::plan
-    PgCursor37{{"PgCursor[37∈6]"}}:::plan
-    PgSelectSingle35 & PgCursor37 & Connection16 --> Edge36
-    __Item34[/"__Item[34∈6]<br />ᐸ31ᐳ"\]:::itemplan
-    __ListTransform31 ==> __Item34
-    __Item34 --> PgSelectSingle35
-    PgClassExpression38{{"PgClassExpression[38∈6]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle35 --> PgClassExpression38
-    List39{{"List[39∈6]<br />ᐸ38ᐳ"}}:::plan
-    PgClassExpression38 --> List39
-    List39 --> PgCursor37
-    __Item32[/"__Item[32∈5]<br />ᐸ17ᐳ"\]:::itemplan
-    PgSelect17 -.-> __Item32
-    PgSelectSingle33{{"PgSelectSingle[33∈5]<br />ᐸbadly_behaved_functionᐳ"}}:::plan
-    __Item32 --> PgSelectSingle33
-    __Item21[/"__Item[21∈3]<br />ᐸ18ᐳ"\]:::itemplan
-    __ListTransform18 ==> __Item21
-    PgSelectSingle22{{"PgSelectSingle[22∈3]<br />ᐸbadly_behaved_functionᐳ"}}:::plan
-    __Item21 --> PgSelectSingle22
     __Item19[/"__Item[19∈2]<br />ᐸ17ᐳ"\]:::itemplan
     PgSelect17 -.-> __Item19
     PgSelectSingle20{{"PgSelectSingle[20∈2]<br />ᐸbadly_behaved_functionᐳ"}}:::plan
     __Item19 --> PgSelectSingle20
+    __Item21[/"__Item[21∈3]<br />ᐸ18ᐳ"\]:::itemplan
+    __ListTransform18 ==> __Item21
+    PgSelectSingle22{{"PgSelectSingle[22∈3]<br />ᐸbadly_behaved_functionᐳ"}}:::plan
+    __Item21 --> PgSelectSingle22
     List25{{"List[25∈4]<br />ᐸ23,24ᐳ"}}:::plan
     PgClassExpression24{{"PgClassExpression[24∈4]<br />ᐸ__badly_be...ion__.”id”ᐳ"}}:::plan
     Constant23 & PgClassExpression24 --> List25
@@ -58,6 +42,22 @@ graph TD
     List25 --> Lambda26
     PgClassExpression29{{"PgClassExpression[29∈4]<br />ᐸ”c”.”perso...unction__)ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression29
+    __Item32[/"__Item[32∈5]<br />ᐸ17ᐳ"\]:::itemplan
+    PgSelect17 -.-> __Item32
+    PgSelectSingle33{{"PgSelectSingle[33∈5]<br />ᐸbadly_behaved_functionᐳ"}}:::plan
+    __Item32 --> PgSelectSingle33
+    Edge36{{"Edge[36∈6]"}}:::plan
+    PgSelectSingle35{{"PgSelectSingle[35∈6]<br />ᐸbadly_behaved_functionᐳ"}}:::plan
+    PgCursor37{{"PgCursor[37∈6]"}}:::plan
+    PgSelectSingle35 & PgCursor37 & Connection16 --> Edge36
+    __Item34[/"__Item[34∈6]<br />ᐸ31ᐳ"\]:::itemplan
+    __ListTransform31 ==> __Item34
+    __Item34 --> PgSelectSingle35
+    List39{{"List[39∈6]<br />ᐸ38ᐳ"}}:::plan
+    List39 --> PgCursor37
+    PgClassExpression38{{"PgClassExpression[38∈6]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle35 --> PgClassExpression38
+    PgClassExpression38 --> List39
     List42{{"List[42∈8]<br />ᐸ23,41ᐳ"}}:::plan
     PgClassExpression41{{"PgClassExpression[41∈8]<br />ᐸ__badly_be...ion__.”id”ᐳ"}}:::plan
     Constant23 & PgClassExpression41 --> List42

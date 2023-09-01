@@ -9,6 +9,7 @@ import {
   isAsyncIterable,
   isPromise,
 } from "@graphiql/toolkit";
+import type { GrafastPlanJSON } from "grafast";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { getOperationAST, parse } from "graphql";
 import { createClient } from "graphql-ws";
@@ -27,14 +28,12 @@ export interface ExplainedSQLOperation extends IExplainedOperation {
   explain?: string;
 }
 
-export interface ExplainedMermaidJsOperation extends IExplainedOperation {
-  type: "mermaid-js";
-  diagram: string;
+export interface ExplainedPlanOperation extends IExplainedOperation {
+  type: "plan";
+  plan: GrafastPlanJSON;
 }
 
-export type ExplainedOperation =
-  | ExplainedSQLOperation
-  | ExplainedMermaidJsOperation;
+export type ExplainedOperation = ExplainedSQLOperation | ExplainedPlanOperation;
 
 export interface ExplainResults {
   operations: Array<ExplainedOperation>;
@@ -151,7 +150,7 @@ export const useFetcher = (
         ...(explain
           ? {
               "X-PostGraphile-Explain": "on",
-              "X-GraphQL-Explain": "mermaid-js,sql",
+              "X-GraphQL-Explain": "plan,sql",
             }
           : null),
       },

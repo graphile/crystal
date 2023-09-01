@@ -42,22 +42,6 @@ graph TD
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
     Constant23{{"Constant[23∈0]<br />ᐸ'large_node_ids'ᐳ"}}:::plan
-    List55{{"List[55∈5]<br />ᐸ23,54ᐳ"}}:::plan
-    PgClassExpression54{{"PgClassExpression[54∈5]<br />ᐸ__large_node_id__.”id”ᐳ"}}:::plan
-    Constant23 & PgClassExpression54 --> List55
-    PgSelectSingle52 --> PgClassExpression54
-    Lambda56{{"Lambda[56∈5]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List55 --> Lambda56
-    PgClassExpression58{{"PgClassExpression[58∈5]<br />ᐸ__large_no...d__.”text”ᐳ"}}:::plan
-    PgSelectSingle52 --> PgClassExpression58
-    List40{{"List[40∈4]<br />ᐸ23,39ᐳ"}}:::plan
-    PgClassExpression39{{"PgClassExpression[39∈4]<br />ᐸ__large_node_id__.”id”ᐳ"}}:::plan
-    Constant23 & PgClassExpression39 --> List40
-    PgSelectSingle37 --> PgClassExpression39
-    Lambda41{{"Lambda[41∈4]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List40 --> Lambda41
-    PgClassExpression43{{"PgClassExpression[43∈4]<br />ᐸ__large_no...d__.”text”ᐳ"}}:::plan
-    PgSelectSingle37 --> PgClassExpression43
     PgSelect20[["PgSelect[20∈1]<br />ᐸlarge_node_idᐳ"]]:::plan
     Object18 & Connection19 --> PgSelect20
     __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
@@ -72,6 +56,22 @@ graph TD
     List25 --> Lambda26
     PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__large_no...d__.”text”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression28
+    List40{{"List[40∈4]<br />ᐸ23,39ᐳ"}}:::plan
+    PgClassExpression39{{"PgClassExpression[39∈4]<br />ᐸ__large_node_id__.”id”ᐳ"}}:::plan
+    Constant23 & PgClassExpression39 --> List40
+    PgSelectSingle37 --> PgClassExpression39
+    Lambda41{{"Lambda[41∈4]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List40 --> Lambda41
+    PgClassExpression43{{"PgClassExpression[43∈4]<br />ᐸ__large_no...d__.”text”ᐳ"}}:::plan
+    PgSelectSingle37 --> PgClassExpression43
+    List55{{"List[55∈5]<br />ᐸ23,54ᐳ"}}:::plan
+    PgClassExpression54{{"PgClassExpression[54∈5]<br />ᐸ__large_node_id__.”id”ᐳ"}}:::plan
+    Constant23 & PgClassExpression54 --> List55
+    PgSelectSingle52 --> PgClassExpression54
+    Lambda56{{"Lambda[56∈5]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List55 --> Lambda56
+    PgClassExpression58{{"PgClassExpression[58∈5]<br />ᐸ__large_no...d__.”text”ᐳ"}}:::plan
+    PgSelectSingle52 --> PgClassExpression58
 
     %% define steps
 

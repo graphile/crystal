@@ -27,6 +27,7 @@ import {
   validate,
   validateSchema,
 } from "grafast/graphql";
+import { planToMermaid } from "grafast/mermaid";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 import { relative } from "path";
@@ -190,7 +191,7 @@ export async function runTestQuery(
         const subscribe = grafastSubscribe;
         const preset: GraphileConfig.ResolvedPreset = {
           grafast: {
-            explain: ["mermaid-js"],
+            explain: ["plan"],
           },
         };
         const result =
@@ -528,9 +529,10 @@ export const assertSnapshotsMatch = async (
     // Consistently end in a newline
     await snapshot(formattedQueries + "\n", sqlFileName);
   } else if (only === "mermaid") {
-    const graphString = extensions?.explain?.operations?.find(
-      (op) => op.type === "mermaid-js",
-    )?.diagram;
+    const planOp = extensions?.explain?.operations?.find(
+      (op) => op.type === "plan",
+    );
+    const graphString = planToMermaid(planOp.plan);
     const mermaidFileName = basePath + (ext || "") + ".mermaid";
     if (!graphString) {
       throw new Error("No plan was emitted for this test!");

@@ -28,10 +28,10 @@ graph TD
     __Item23 --> PgSelectSingle24
     PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression30
-    Access41{{"Access[41∈3]<br />ᐸ23.0ᐳ"}}:::plan
-    __Item23 --> Access41
     PgClassExpression40{{"PgClassExpression[40∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression40
+    Access41{{"Access[41∈3]<br />ᐸ23.0ᐳ"}}:::plan
+    __Item23 --> Access41
     __Item35[/"__Item[35∈4]<br />ᐸ41ᐳ"\]:::itemplan
     Access41 ==> __Item35
     PgSelectSingle36{{"PgSelectSingle[36∈4]<br />ᐸlog_entriesᐳ"}}:::plan

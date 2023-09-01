@@ -13,15 +13,19 @@ graph TD
     Access9{{"Access[9∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
+    PgSelect8[["PgSelect[8∈0]<br />ᐸrelational_commentablesᐳ"]]:::plan
+    Object11 --> PgSelect8
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access9
     __Value3 --> Access10
-    PgSelect8[["PgSelect[8∈0]<br />ᐸrelational_commentablesᐳ"]]:::plan
-    Object11 --> PgSelect8
     __ListTransform12[["__ListTransform[12∈0]<br />ᐸeach:8ᐳ"]]:::plan
     PgSelect8 --> __ListTransform12
     __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    __Item13[/"__Item[13∈1]<br />ᐸ8ᐳ"\]:::itemplan
+    PgSelect8 -.-> __Item13
+    PgSelectSingle14{{"PgSelectSingle[14∈1]<br />ᐸrelational_commentablesᐳ"}}:::plan
+    __Item13 --> PgSelectSingle14
     PgPolymorphic18{{"PgPolymorphic[18∈2]"}}:::plan
     PgSelectSingle16{{"PgSelectSingle[16∈2]<br />ᐸrelational_commentablesᐳ"}}:::plan
     PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__relation...s__.”type”ᐳ"}}:::plan
@@ -32,10 +36,6 @@ graph TD
     PgSelectSingle16 --> PgClassExpression17
     PgClassExpression19{{"PgClassExpression[19∈2]<br />ᐸ__relation...les__.”id”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression19
-    __Item13[/"__Item[13∈1]<br />ᐸ8ᐳ"\]:::itemplan
-    PgSelect8 -.-> __Item13
-    PgSelectSingle14{{"PgSelectSingle[14∈1]<br />ᐸrelational_commentablesᐳ"}}:::plan
-    __Item13 --> PgSelectSingle14
     PgSelect20[["PgSelect[20∈3]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
     Object11 & PgClassExpression19 --> PgSelect20
     PgSelect55[["PgSelect[55∈3]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalChecklist"]]:::plan

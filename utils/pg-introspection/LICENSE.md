@@ -26,7 +26,8 @@ license applies to those excerpts:
 
 PostgreSQL is Copyright © 1996–2022 by the PostgreSQL Global Development Group.
 
-Postgres95 is Copyright © 1994–5 by the Regents of the University of California.
+Postgres95 is Copyright © 1994–5 by the Regents of the University of
+California.
 
 Permission to use, copy, modify, and distribute this software and its
 documentation for any purpose, without fee, and without a written agreement is

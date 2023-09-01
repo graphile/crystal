@@ -1,5 +1,6 @@
 import type { Configuration, Resolver } from "webpack";
 import webpack from "webpack";
+// import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 
 const JSX_REGEXP = /\.jsx?$/;
 const NODE_MODULES_REGEXP = /[/\\]node_modules(?:[/\\]|$)/;
@@ -48,7 +49,7 @@ class TsResolvePlugin {
 }
 
 const config: Configuration = {
-  entry: "./src/bundle.tsx",
+  entry: "./src/bundle.mtsx",
   output: {
     // @ts-ignore
     path: `${__dirname}/bundle`,
@@ -81,13 +82,15 @@ const config: Configuration = {
     ],
   },
   resolve: {
-    extensions: [".tsx", ".ts", ".js"],
+    extensions: [".tsx", ".ts", ".js", ".json", ".jsx", ".css", ".mjs"],
   },
   plugins: [
+    // new BundleAnalyzerPlugin(),
     new webpack.optimize.LimitChunkCountPlugin({
       maxChunks: 1,
     }),
   ],
+  //stats: "detailed",
 };
 
 export default config;

@@ -21,17 +21,6 @@ graph TD
     Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
     Connection36{{"Connection[36∈0]<br />ᐸ32ᐳ"}}:::plan
     Connection67{{"Connection[67∈0]<br />ᐸ63ᐳ"}}:::plan
-    PgSelect68[["PgSelect[68∈5]<br />ᐸtable_set_query(aggregate)ᐳ"]]:::plan
-    Object18 & Connection67 --> PgSelect68
-    First69{{"First[69∈5]"}}:::plan
-    PgSelect68 --> First69
-    PgSelectSingle70{{"PgSelectSingle[70∈5]<br />ᐸtable_set_queryᐳ"}}:::plan
-    First69 --> PgSelectSingle70
-    PgClassExpression71{{"PgClassExpression[71∈5]<br />ᐸcount(*)ᐳ"}}:::plan
-    PgSelectSingle70 --> PgClassExpression71
-    PgSelect37[["PgSelect[37∈2]<br />ᐸpersonᐳ"]]:::plan
-    Object18 & Connection36 --> PgSelect37
-    Connection51{{"Connection[51∈2]<br />ᐸ47ᐳ"}}:::plan
     PgSelect20[["PgSelect[20∈1]<br />ᐸperson(aggregate)ᐳ"]]:::plan
     Object18 & Connection19 --> PgSelect20
     First21{{"First[21∈1]"}}:::plan
@@ -40,18 +29,29 @@ graph TD
     First21 --> PgSelectSingle22
     PgClassExpression23{{"PgClassExpression[23∈1]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression23
+    PgSelect37[["PgSelect[37∈2]<br />ᐸpersonᐳ"]]:::plan
+    Object18 & Connection36 --> PgSelect37
+    Connection51{{"Connection[51∈2]<br />ᐸ47ᐳ"}}:::plan
     __Item38[/"__Item[38∈3]<br />ᐸ37ᐳ"\]:::itemplan
     PgSelect37 ==> __Item38
     PgSelectSingle39{{"PgSelectSingle[39∈3]<br />ᐸpersonᐳ"}}:::plan
     __Item38 --> PgSelectSingle39
-    Access72{{"Access[72∈4]<br />ᐸ38.0ᐳ"}}:::plan
-    __Item38 --> Access72
     First53{{"First[53∈4]"}}:::plan
+    Access72{{"Access[72∈4]<br />ᐸ38.0ᐳ"}}:::plan
     Access72 --> First53
     PgSelectSingle54{{"PgSelectSingle[54∈4]<br />ᐸperson_friendsᐳ"}}:::plan
     First53 --> PgSelectSingle54
     PgClassExpression55{{"PgClassExpression[55∈4]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle54 --> PgClassExpression55
+    __Item38 --> Access72
+    PgSelect68[["PgSelect[68∈5]<br />ᐸtable_set_query(aggregate)ᐳ"]]:::plan
+    Object18 & Connection67 --> PgSelect68
+    First69{{"First[69∈5]"}}:::plan
+    PgSelect68 --> First69
+    PgSelectSingle70{{"PgSelectSingle[70∈5]<br />ᐸtable_set_queryᐳ"}}:::plan
+    First69 --> PgSelectSingle70
+    PgClassExpression71{{"PgClassExpression[71∈5]<br />ᐸcount(*)ᐳ"}}:::plan
+    PgSelectSingle70 --> PgClassExpression71
 
     %% define steps
 

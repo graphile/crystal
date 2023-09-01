@@ -9,8 +9,8 @@
     "declarationMap": true,
     "allowJs": false,
 
-    "module": "commonjs",
-    "moduleResolution": "nodenext",
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext",
     "target": "ES2022",
     "lib": ["ES2022"],
     // This has runtime performance overhead! Specifically it means a lot of

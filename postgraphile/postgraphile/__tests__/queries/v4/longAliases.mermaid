@@ -9,13 +9,13 @@ graph TD
 
 
     %% plan dependencies
+    PgSelect8[["PgSelect[8∈0]<br />ᐸpersonᐳ"]]:::plan
     Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant53{{"Constant[53∈0]<br />ᐸ'sara.smith@email.com'ᐳ"}}:::plan
+    Object11 & Constant53 --> PgSelect8
     Access9{{"Access[9∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
-    PgSelect8[["PgSelect[8∈0]<br />ᐸpersonᐳ"]]:::plan
-    Constant53{{"Constant[53∈0]<br />ᐸ'sara.smith@email.com'ᐳ"}}:::plan
-    Object11 & Constant53 --> PgSelect8
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access9
     __Value3 --> Access10
@@ -34,22 +34,22 @@ graph TD
     List16 --> Lambda17
     PgClassExpression18{{"PgClassExpression[18∈1]<br />ᐸ__person__.”email”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression18
-    Access51{{"Access[51∈1]<br />ᐸ12.2ᐳ"}}:::plan
-    First12 --> Access51
     First32{{"First[32∈1]"}}:::plan
+    Access51{{"Access[51∈1]<br />ᐸ12.2ᐳ"}}:::plan
     Access51 --> First32
     PgSelectSingle33{{"PgSelectSingle[33∈1]<br />ᐸperson_friendsᐳ"}}:::plan
     First32 --> PgSelectSingle33
     PgClassExpression34{{"PgClassExpression[34∈1]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle33 --> PgClassExpression34
-    Access52{{"Access[52∈1]<br />ᐸ12.3ᐳ"}}:::plan
-    First12 --> Access52
     First48{{"First[48∈1]"}}:::plan
+    Access52{{"Access[52∈1]<br />ᐸ12.3ᐳ"}}:::plan
     Access52 --> First48
     PgSelectSingle49{{"PgSelectSingle[49∈1]<br />ᐸperson_friendsᐳ"}}:::plan
     First48 --> PgSelectSingle49
     PgClassExpression50{{"PgClassExpression[50∈1]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle49 --> PgClassExpression50
+    First12 --> Access51
+    First12 --> Access52
     Connection30{{"Connection[30∈1]<br />ᐸ26ᐳ"}}:::plan
     Connection46{{"Connection[46∈1]<br />ᐸ42ᐳ"}}:::plan
 

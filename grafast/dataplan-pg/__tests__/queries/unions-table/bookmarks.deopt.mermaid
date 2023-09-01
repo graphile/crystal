@@ -9,13 +9,13 @@ graph TD
 
 
     %% plan dependencies
+    PgSelect8[["PgSelect[8∈0]<br />ᐸpeopleᐳ"]]:::plan
     Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant87{{"Constant[87∈0]<br />ᐸ2ᐳ"}}:::plan
+    Object11 & Constant87 --> PgSelect8
     Access9{{"Access[9∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access10{{"Access[10∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
-    PgSelect8[["PgSelect[8∈0]<br />ᐸpeopleᐳ"]]:::plan
-    Constant87{{"Constant[87∈0]<br />ᐸ2ᐳ"}}:::plan
-    Object11 & Constant87 --> PgSelect8
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access9
     __Value3 --> Access10
@@ -57,6 +57,8 @@ graph TD
     PgSelectSingle22 --> PgClassExpression33
     PgSelectSingle22 --> PgClassExpression34
     PgSelectSingle22 --> PgClassExpression35
+    PgClassExpression31{{"PgClassExpression[31∈4]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgSelectSingle30 --> PgClassExpression31
     PgSelect38[["PgSelect[38∈5]<br />ᐸpeopleᐳ<br />ᐳPerson"]]:::plan
     Object11 & PgClassExpression33 --> PgSelect38
     PgSelect46[["PgSelect[46∈5]<br />ᐸpostsᐳ<br />ᐳPost"]]:::plan
@@ -111,14 +113,12 @@ graph TD
     First82 --> PgSelectSingle83
     PgClassExpression85{{"PgClassExpression[85∈5]<br />ᐸ__comments__.”body”ᐳ"}}:::plan
     PgSelectSingle67 --> PgClassExpression85
-    PgClassExpression31{{"PgClassExpression[31∈4]<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle30 --> PgClassExpression31
-    PgClassExpression84{{"PgClassExpression[84∈8]<br />ᐸ__posts__.”body”ᐳ"}}:::plan
-    PgSelectSingle83 --> PgClassExpression84
-    PgClassExpression76{{"PgClassExpression[76∈7]<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle75 --> PgClassExpression76
     PgClassExpression60{{"PgClassExpression[60∈6]<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle59 --> PgClassExpression60
+    PgClassExpression76{{"PgClassExpression[76∈7]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgSelectSingle75 --> PgClassExpression76
+    PgClassExpression84{{"PgClassExpression[84∈8]<br />ᐸ__posts__.”body”ᐳ"}}:::plan
+    PgSelectSingle83 --> PgClassExpression84
 
     %% define steps
 

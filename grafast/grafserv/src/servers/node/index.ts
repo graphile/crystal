@@ -1,5 +1,3 @@
-import { SafeError } from "grafast";
-import { CloseCode, makeServer } from "graphql-ws";
 import type {
   IncomingMessage,
   Server as HTTPServer,
@@ -8,6 +6,9 @@ import type {
 import type { Server as HTTPSServer } from "node:https";
 import { parse as parseQueryString } from "node:querystring";
 import type { Duplex } from "node:stream";
+
+import { SafeError } from "grafast";
+import { CloseCode, makeServer } from "graphql-ws";
 import type WebSocket from "ws";
 
 import { GrafservBase } from "../../core/base.js";

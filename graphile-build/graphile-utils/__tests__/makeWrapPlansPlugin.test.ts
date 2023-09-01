@@ -400,34 +400,34 @@ describe("wrapping plans matching a filter", () => {
     expect(before.length).toEqual(2);
     expect(after.length).toEqual(2);
     expect(before).toMatchInlineSnapshot(`
-Array [
-  Array [
-    "Mutation 'a' starting with arguments:",
-    Object {
-      "arg1": 1,
-      "arg2": 7,
-    },
-  ],
-  Array [
-    "Mutation 'b' starting with arguments:",
-    Object {
-      "arg1": "1",
-      "arg2": "ARG2",
-    },
-  ],
-]
-`);
+      [
+        [
+          "Mutation 'a' starting with arguments:",
+          {
+            "arg1": 1,
+            "arg2": 7,
+          },
+        ],
+        [
+          "Mutation 'b' starting with arguments:",
+          {
+            "arg1": "1",
+            "arg2": "ARG2",
+          },
+        ],
+      ]
+    `);
     expect(after).toMatchInlineSnapshot(`
-Array [
-  Array [
-    "Mutation 'a' result:",
-    8,
-  ],
-  Array [
-    "Mutation 'b' result:",
-    "1ARG2",
-  ],
-]
-`);
+      [
+        [
+          "Mutation 'a' result:",
+          8,
+        ],
+        [
+          "Mutation 'b' result:",
+          "1ARG2",
+        ],
+      ]
+    `);
   });
 });

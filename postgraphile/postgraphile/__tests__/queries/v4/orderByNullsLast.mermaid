@@ -21,29 +21,29 @@ graph TD
     Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
     Constant23{{"Constant[23∈0]<br />ᐸ'similar_table_1S'ᐳ"}}:::plan
     Connection40{{"Connection[40∈0]<br />ᐸ36ᐳ"}}:::plan
-    PgSelect41[["PgSelect[41∈4]<br />ᐸsimilar_table_1ᐳ"]]:::plan
-    Object18 & Connection40 --> PgSelect41
     PgSelect20[["PgSelect[20∈1]<br />ᐸsimilar_table_1ᐳ"]]:::plan
     Object18 & Connection19 --> PgSelect20
     __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
     PgSelect20 ==> __Item21
     PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸsimilar_table_1ᐳ"}}:::plan
     __Item21 --> PgSelectSingle22
-    __Item42[/"__Item[42∈5]<br />ᐸ41ᐳ"\]:::itemplan
-    PgSelect41 ==> __Item42
-    PgSelectSingle43{{"PgSelectSingle[43∈5]<br />ᐸsimilar_table_1ᐳ"}}:::plan
-    __Item42 --> PgSelectSingle43
     List25{{"List[25∈3]<br />ᐸ23,24ᐳ"}}:::plan
     PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
     Constant23 & PgClassExpression24 --> List25
-    List46{{"List[46∈6]<br />ᐸ23,45ᐳ"}}:::plan
-    PgClassExpression45{{"PgClassExpression[45∈6]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
-    Constant23 & PgClassExpression45 --> List46
     PgSelectSingle22 --> PgClassExpression24
     Lambda26{{"Lambda[26∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List25 --> Lambda26
     PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__similar_...1__.”col2”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression27
+    PgSelect41[["PgSelect[41∈4]<br />ᐸsimilar_table_1ᐳ"]]:::plan
+    Object18 & Connection40 --> PgSelect41
+    __Item42[/"__Item[42∈5]<br />ᐸ41ᐳ"\]:::itemplan
+    PgSelect41 ==> __Item42
+    PgSelectSingle43{{"PgSelectSingle[43∈5]<br />ᐸsimilar_table_1ᐳ"}}:::plan
+    __Item42 --> PgSelectSingle43
+    List46{{"List[46∈6]<br />ᐸ23,45ᐳ"}}:::plan
+    PgClassExpression45{{"PgClassExpression[45∈6]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
+    Constant23 & PgClassExpression45 --> List46
     PgSelectSingle43 --> PgClassExpression45
     Lambda47{{"Lambda[47∈6]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List46 --> Lambda47

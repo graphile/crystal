@@ -1,5 +1,6 @@
 import chalk from "chalk";
 
+import type { JSONValue } from "../index.js";
 import type { ExecutableStep } from "../step.js";
 import { $$deepDepSkip, $$noExec, UnbatchedExecutableStep } from "../step.js";
 
@@ -31,6 +32,12 @@ export class __ItemStep<TData> extends UnbatchedExecutableStep<TData> {
 
   toStringMeta(): string {
     return chalk.bold.yellow(String(this.dependencies[0].id));
+  }
+
+  public planJSONExtra(): Record<string, JSONValue | undefined> | undefined {
+    return {
+      transformStepId: this.transformStepId,
+    };
   }
 
   [$$deepDepSkip](): ExecutableStep {

@@ -9,6 +9,9 @@
  * query.
  */
 
+import { pathToFileURL } from "node:url";
+import { inspect } from "node:util";
+
 import { envelop, useExtendContext, useSchema } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
@@ -33,8 +36,6 @@ import {
 } from "graphql-helix";
 import { useServer } from "graphql-ws/lib/use/ws";
 import * as jsonwebtoken from "jsonwebtoken";
-import { pathToFileURL } from "node:url";
-import { inspect } from "node:util";
 import { Pool } from "pg";
 import * as ws from "ws";
 

@@ -33,11 +33,11 @@ graph TD
     __Value3 --> Access17
     PgPageInfo21{{"PgPageInfo[21∈1]"}}:::plan
     Connection19 --> PgPageInfo21
+    Access24{{"Access[24∈1]<br />ᐸ23.hasMoreᐳ"}}:::plan
+    PgSelect23 --> Access24
     Access26{{"Access[26∈1]<br />ᐸ20.1ᐳ"}}:::plan
     Lambda20 --> Access26
     Access26 --> ToPg27
-    Access24{{"Access[24∈1]<br />ᐸ23.hasMoreᐳ"}}:::plan
-    PgSelect23 --> Access24
     First29{{"First[29∈1]"}}:::plan
     PgSelect28 --> First29
     PgSelectSingle30{{"PgSelectSingle[30∈1]<br />ᐸmessagesᐳ"}}:::plan

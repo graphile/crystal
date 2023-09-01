@@ -21,6 +21,19 @@ graph TD
     Constant45{{"Constant[45∈0]<br />ᐸ1ᐳ"}}:::plan
     Constant46{{"Constant[46∈0]<br />ᐸ'Bobby Tables'ᐳ"}}:::plan
     Constant47{{"Constant[47∈0]<br />ᐸ'foo.txt'ᐳ"}}:::plan
+    PgInsertSingle12[["PgInsertSingle[12∈1]<br />ᐸuser(id,name)ᐳ"]]:::sideeffectplan
+    Object15 & Constant45 & Constant46 --> PgInsertSingle12
+    Object16{{"Object[16∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    PgInsertSingle12 --> Object16
+    List19{{"List[19∈3]<br />ᐸ17,18ᐳ"}}:::plan
+    Constant17{{"Constant[17∈3]<br />ᐸ'users'ᐳ"}}:::plan
+    PgClassExpression18{{"PgClassExpression[18∈3]<br />ᐸ__user__.”id”ᐳ"}}:::plan
+    Constant17 & PgClassExpression18 --> List19
+    PgInsertSingle12 --> PgClassExpression18
+    Lambda20{{"Lambda[20∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List19 --> Lambda20
+    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__user__.”name”ᐳ"}}:::plan
+    PgInsertSingle12 --> PgClassExpression22
     PgInsertSingle29[["PgInsertSingle[29∈4]<br />ᐸuser_file(filename,user_id)ᐳ"]]:::sideeffectplan
     Object32{{"Object[32∈4]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object32 & Constant47 & Constant45 --> PgInsertSingle29
@@ -31,22 +44,9 @@ graph TD
     __Value3 --> Access31
     Object33{{"Object[33∈4]<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle29 --> Object33
-    PgInsertSingle12[["PgInsertSingle[12∈1]<br />ᐸuser(id,name)ᐳ"]]:::sideeffectplan
-    Object15 & Constant45 & Constant46 --> PgInsertSingle12
-    Object16{{"Object[16∈1]<br />ᐸ{result}ᐳ"}}:::plan
-    PgInsertSingle12 --> Object16
-    List19{{"List[19∈3]<br />ᐸ17,18ᐳ"}}:::plan
-    Constant17{{"Constant[17∈3]<br />ᐸ'users'ᐳ"}}:::plan
-    PgClassExpression18{{"PgClassExpression[18∈3]<br />ᐸ__user__.”id”ᐳ"}}:::plan
-    Constant17 & PgClassExpression18 --> List19
     PgSelect37[["PgSelect[37∈6]<br />ᐸuserᐳ"]]:::plan
     PgClassExpression36{{"PgClassExpression[36∈6]<br />ᐸ__user_file__.”user_id”ᐳ"}}:::plan
     Object32 & PgClassExpression36 --> PgSelect37
-    PgInsertSingle12 --> PgClassExpression18
-    Lambda20{{"Lambda[20∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List19 --> Lambda20
-    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__user__.”name”ᐳ"}}:::plan
-    PgInsertSingle12 --> PgClassExpression22
     PgClassExpression34{{"PgClassExpression[34∈6]<br />ᐸ__user_file__.”id”ᐳ"}}:::plan
     PgInsertSingle29 --> PgClassExpression34
     PgClassExpression35{{"PgClassExpression[35∈6]<br />ᐸ__user_fil...”filename”ᐳ"}}:::plan

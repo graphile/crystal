@@ -189,7 +189,7 @@ const sqlTypeToGraphQLType = (type) =>
     DIVIDER: "Divider",
     CHECKLIST: "Checklist",
     CHECKLIST_ITEM: "ChecklistItem",
-  }[type] ?? null);
+  })[type] ?? null;
 // Or: `const sqlTypeToGraphQLType = pascalCase;`
 
 /******/

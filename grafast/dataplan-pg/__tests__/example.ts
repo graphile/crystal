@@ -22,6 +22,7 @@ import {
   stripAnsi,
 } from "grafast";
 import type { AsyncExecutionResult, ExecutionResult } from "grafast/graphql";
+import { planToMermaid } from "grafast/mermaid";
 import { resolve } from "path";
 import { Pool } from "pg";
 import prettier from "prettier";
@@ -69,8 +70,8 @@ async function main() {
     const ops = (extensions?.explain as any)?.operations;
     if (ops) {
       for (const op of ops) {
-        if (op.type === "mermaid-js") {
-          console.log(op.diagram);
+        if (op.type === "plan") {
+          console.log(planToMermaid(op.plan));
         } else {
           console.log(`UNKNOWN: ${op.type}`);
         }
@@ -135,7 +136,7 @@ async function main() {
         rootValue: null,
       },
       {
-        // explain: ["mermaid-js"],
+        // explain: ["plan"],
       },
     );
 

@@ -1,11 +1,12 @@
+import { createServer } from "node:http";
+import { pathToFileURL } from "node:url";
+import { inspect } from "node:util";
+
 import type { MakePgServiceOptions } from "@dataplan/pg";
 import { grafserv } from "grafserv/node";
 import { resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { loadConfig } from "graphile-config/load";
-import { createServer } from "node:http";
-import { pathToFileURL } from "node:url";
-import { inspect } from "node:util";
 
 import { postgraphile } from "./index.js";
 

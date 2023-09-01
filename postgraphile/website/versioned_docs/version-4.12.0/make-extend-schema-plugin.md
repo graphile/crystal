@@ -37,7 +37,7 @@ module.exports = MyPlugin;
 
 And would be added to your PostGraphile instance via
 
-- CLI: `` --append-plugins `pwd`/MySchemaExtensionPlugin.js ``
+- CLI: ``--append-plugins `pwd`/MySchemaExtensionPlugin.js``
 - Library: `appendPlugins: [require('./MySchemaExtensionPlugin')]`
 
 The `build` argument to the makeExtendSchemaPlugin callback contains lots of
@@ -299,13 +299,13 @@ attacks. The `queryBuilder` has a number of methods which affect the query which
 will be generated. The main ones you're likely to want are:
 
 - `where(sqlFragment)`; e.g.
-  `` queryBuilder.where(build.pgSql.fragment`is_admin is true`) ``
+  ``queryBuilder.where(build.pgSql.fragment`is_admin is true`)``
 - `orderBy(() => sqlFragment, ascending)`; e.g.
-  `` queryBuilder.orderBy(() => build.pgSql.fragment`created_at`, false) ``
+  ``queryBuilder.orderBy(() => build.pgSql.fragment`created_at`, false)``
 - `limit(number)`; e.g. `queryBuilder.limit(1)`
 - `offset(number)`; e.g. `queryBuilder.offset(1)`
 - `select(() => sqlFragment, alias)`; e.g.
-  `` queryBuilder.select(() => build.pgSql.fragment`gen_random_uuid()`, '__my_random_uuid') `` -
+  ``queryBuilder.select(() => build.pgSql.fragment`gen_random_uuid()`, '__my_random_uuid')`` -
   it's advised to start your alias with two underscores to prevent it clashing
   with any potential columns exposed as GraphQL fields.
 

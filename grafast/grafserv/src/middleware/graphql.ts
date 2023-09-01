@@ -1,3 +1,5 @@
+import { parse as parseGraphQLQueryString } from "node:querystring";
+
 import { LRU } from "@graphile/lru";
 import { createHash } from "crypto";
 import type { PromiseOrDirect } from "grafast";
@@ -15,7 +17,6 @@ import type {
   GraphQLSchema,
 } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
-import { parse as parseGraphQLQueryString } from "node:querystring";
 
 import { makeAcceptMatcher } from "../accept.js";
 import { getGrafservHooks } from "../hooks.js";

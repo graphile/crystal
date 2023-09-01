@@ -13,11 +13,11 @@ graph TD
     Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
+    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
+    Object14 --> PgSelect11
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access12
     __Value3 --> Access13
-    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
-    Object14 --> PgSelect11
     __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Connection28{{"Connection[28∈0]<br />ᐸ24ᐳ"}}:::plan
@@ -28,48 +28,48 @@ graph TD
     Constant59{{"Constant[59∈1]<br />ᐸfalseᐳ"}}:::plan
     PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression17
-    Access69{{"Access[69∈3]<br />ᐸ15.1ᐳ"}}:::plan
-    __Item15 --> Access69
     PgPageInfo58{{"PgPageInfo[58∈3]"}}:::plan
     Connection28 --> PgPageInfo58
-    Access70{{"Access[70∈3]<br />ᐸ15.2ᐳ"}}:::plan
-    __Item15 --> Access70
     First62{{"First[62∈3]"}}:::plan
+    Access70{{"Access[70∈3]<br />ᐸ15.2ᐳ"}}:::plan
     Access70 --> First62
     PgSelectSingle63{{"PgSelectSingle[63∈3]<br />ᐸmessagesᐳ"}}:::plan
     First62 --> PgSelectSingle63
     PgClassExpression64{{"PgClassExpression[64∈3]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle63 --> PgClassExpression64
+    Access69{{"Access[69∈3]<br />ᐸ15.1ᐳ"}}:::plan
+    __Item15 --> Access69
+    __Item15 --> Access70
     __Item31[/"__Item[31∈4]<br />ᐸ69ᐳ"\]:::itemplan
     Access69 ==> __Item31
     PgSelectSingle32{{"PgSelectSingle[32∈4]<br />ᐸmessagesᐳ"}}:::plan
     __Item31 --> PgSelectSingle32
-    PgClassExpression45{{"PgClassExpression[45∈7]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
-    PgSelectSingle32 --> PgClassExpression45
-    RemapKeys67{{"RemapKeys[67∈7]<br />ᐸ32:{”0”:3,”1”:4}ᐳ"}}:::plan
-    PgSelectSingle32 --> RemapKeys67
-    PgSelectSingle52{{"PgSelectSingle[52∈7]<br />ᐸusersᐳ"}}:::plan
-    RemapKeys67 --> PgSelectSingle52
     PgClassExpression33{{"PgClassExpression[33∈5]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle32 --> PgClassExpression33
-    RemapKeys65{{"RemapKeys[65∈5]<br />ᐸ32:{”0”:1,”1”:2}ᐳ"}}:::plan
-    PgSelectSingle32 --> RemapKeys65
     PgSelectSingle40{{"PgSelectSingle[40∈5]<br />ᐸusersᐳ"}}:::plan
+    RemapKeys65{{"RemapKeys[65∈5]<br />ᐸ32:{”0”:1,”1”:2}ᐳ"}}:::plan
     RemapKeys65 --> PgSelectSingle40
-    PgClassExpression56{{"PgClassExpression[56∈9]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
-    PgSelectSingle32 --> PgClassExpression56
-    List57{{"List[57∈9]<br />ᐸ56ᐳ"}}:::plan
-    PgClassExpression56 --> List57
-    PgCursor55{{"PgCursor[55∈9]"}}:::plan
-    List57 --> PgCursor55
+    PgSelectSingle32 --> RemapKeys65
     PgClassExpression41{{"PgClassExpression[41∈6]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle40 --> PgClassExpression41
     PgClassExpression42{{"PgClassExpression[42∈6]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
     PgSelectSingle40 --> PgClassExpression42
+    PgClassExpression45{{"PgClassExpression[45∈7]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression45
+    PgSelectSingle52{{"PgSelectSingle[52∈7]<br />ᐸusersᐳ"}}:::plan
+    RemapKeys67{{"RemapKeys[67∈7]<br />ᐸ32:{”0”:3,”1”:4}ᐳ"}}:::plan
+    RemapKeys67 --> PgSelectSingle52
+    PgSelectSingle32 --> RemapKeys67
     PgClassExpression53{{"PgClassExpression[53∈8]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle52 --> PgClassExpression53
     PgClassExpression54{{"PgClassExpression[54∈8]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan
     PgSelectSingle52 --> PgClassExpression54
+    PgCursor55{{"PgCursor[55∈9]"}}:::plan
+    List57{{"List[57∈9]<br />ᐸ56ᐳ"}}:::plan
+    List57 --> PgCursor55
+    PgClassExpression56{{"PgClassExpression[56∈9]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression56
+    PgClassExpression56 --> List57
 
     %% define steps
 

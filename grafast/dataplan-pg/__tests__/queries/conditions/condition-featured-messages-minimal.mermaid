@@ -9,13 +9,13 @@ graph TD
 
 
     %% plan dependencies
+    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
     Object14{{"Object[14∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant41{{"Constant[41∈0]<br />ᐸtrueᐳ"}}:::plan
+    Object14 & Constant41 --> PgSelect11
     Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
-    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
-    Constant41{{"Constant[41∈0]<br />ᐸtrueᐳ"}}:::plan
-    Object14 & Constant41 --> PgSelect11
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access12
     __Value3 --> Access13
@@ -30,20 +30,20 @@ graph TD
     __Item15 --> PgSelectSingle16
     PgPageInfo30{{"PgPageInfo[30∈3]"}}:::plan
     Connection28 --> PgPageInfo30
-    Access37{{"Access[37∈3]<br />ᐸ15.0ᐳ"}}:::plan
-    __Item15 --> Access37
-    Lambda38{{"Lambda[38∈3]"}}:::plan
-    Access37 --> Lambda38
     Access32{{"Access[32∈3]<br />ᐸ38.hasMoreᐳ"}}:::plan
+    Lambda38{{"Lambda[38∈3]"}}:::plan
     Lambda38 --> Access32
-    Access39{{"Access[39∈3]<br />ᐸ15.1ᐳ"}}:::plan
-    __Item15 --> Access39
     First34{{"First[34∈3]"}}:::plan
+    Access39{{"Access[39∈3]<br />ᐸ15.1ᐳ"}}:::plan
     Access39 --> First34
     PgSelectSingle35{{"PgSelectSingle[35∈3]<br />ᐸmessagesᐳ"}}:::plan
     First34 --> PgSelectSingle35
     PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle35 --> PgClassExpression36
+    Access37{{"Access[37∈3]<br />ᐸ15.0ᐳ"}}:::plan
+    __Item15 --> Access37
+    Access37 --> Lambda38
+    __Item15 --> Access39
 
     %% define steps
 

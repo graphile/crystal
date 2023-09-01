@@ -387,13 +387,16 @@ export function objectSpec<
     fields: () => {
       const fields =
         typeof spec.fields === "function" ? spec.fields() : spec.fields;
-      const modifiedFields = Object.keys(fields).reduce((o, key) => {
-        o[key] = objectFieldSpec<TContext, TParentStep>(
-          fields[key],
-          `${spec.name}.${key}`,
-        );
-        return o;
-      }, {} as GraphQLFieldConfigMap<any, TContext>);
+      const modifiedFields = Object.keys(fields).reduce(
+        (o, key) => {
+          o[key] = objectFieldSpec<TContext, TParentStep>(
+            fields[key],
+            `${spec.name}.${key}`,
+          );
+          return o;
+        },
+        {} as GraphQLFieldConfigMap<any, TContext>,
+      );
       return modifiedFields;
     },
   };

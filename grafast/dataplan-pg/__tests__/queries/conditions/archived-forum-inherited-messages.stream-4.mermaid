@@ -13,11 +13,11 @@ graph TD
     Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
+    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
+    Object14 --> PgSelect11
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access12
     __Value3 --> Access13
-    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
-    Object14 --> PgSelect11
     __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Connection28{{"Connection[28∈0]<br />ᐸ24ᐳ"}}:::plan
@@ -39,10 +39,10 @@ graph TD
     __Item31 --> PgSelectSingle32
     PgClassExpression33{{"PgClassExpression[33∈5]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle32 --> PgClassExpression33
-    RemapKeys43{{"RemapKeys[43∈5]<br />ᐸ32:{”0”:1,”1”:2}ᐳ"}}:::plan
-    PgSelectSingle32 --> RemapKeys43
     PgSelectSingle40{{"PgSelectSingle[40∈5]<br />ᐸusersᐳ"}}:::plan
+    RemapKeys43{{"RemapKeys[43∈5]<br />ᐸ32:{”0”:1,”1”:2}ᐳ"}}:::plan
     RemapKeys43 --> PgSelectSingle40
+    PgSelectSingle32 --> RemapKeys43
     PgClassExpression41{{"PgClassExpression[41∈6]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle40 --> PgClassExpression41
     PgClassExpression42{{"PgClassExpression[42∈6]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan

@@ -13,11 +13,11 @@ graph TD
     Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access13{{"Access[13∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
+    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
+    Object14 --> PgSelect11
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access12
     __Value3 --> Access13
-    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
-    Object14 --> PgSelect11
     Connection28{{"Connection[28∈0]<br />ᐸ24ᐳ"}}:::plan
     Constant67{{"Constant[67∈0]<br />ᐸ2ᐳ"}}:::plan
     Constant67 --> Connection28
@@ -30,52 +30,52 @@ graph TD
     Constant43{{"Constant[43∈1]<br />ᐸfalseᐳ"}}:::plan
     PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression17
-    Access64{{"Access[64∈3]<br />ᐸ15.1ᐳ"}}:::plan
-    __Item15 --> Access64
-    Lambda65{{"Lambda[65∈3]"}}:::plan
-    Access64 --> Lambda65
     PgPageInfo42{{"PgPageInfo[42∈3]"}}:::plan
     Connection28 --> PgPageInfo42
     Access45{{"Access[45∈3]<br />ᐸ65.hasMoreᐳ"}}:::plan
+    Lambda65{{"Lambda[65∈3]"}}:::plan
     Lambda65 --> Access45
     First47{{"First[47∈3]"}}:::plan
     Lambda65 --> First47
     PgSelectSingle48{{"PgSelectSingle[48∈3]<br />ᐸmessagesᐳ"}}:::plan
     First47 --> PgSelectSingle48
+    PgCursor49{{"PgCursor[49∈3]"}}:::plan
+    List51{{"List[51∈3]<br />ᐸ50ᐳ"}}:::plan
+    List51 --> PgCursor49
     PgClassExpression50{{"PgClassExpression[50∈3]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
     PgSelectSingle48 --> PgClassExpression50
-    List51{{"List[51∈3]<br />ᐸ50ᐳ"}}:::plan
     PgClassExpression50 --> List51
-    PgCursor49{{"PgCursor[49∈3]"}}:::plan
-    List51 --> PgCursor49
     Last53{{"Last[53∈3]"}}:::plan
     Lambda65 --> Last53
     PgSelectSingle54{{"PgSelectSingle[54∈3]<br />ᐸmessagesᐳ"}}:::plan
     Last53 --> PgSelectSingle54
+    PgCursor55{{"PgCursor[55∈3]"}}:::plan
+    List57{{"List[57∈3]<br />ᐸ56ᐳ"}}:::plan
+    List57 --> PgCursor55
     PgClassExpression56{{"PgClassExpression[56∈3]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
     PgSelectSingle54 --> PgClassExpression56
-    List57{{"List[57∈3]<br />ᐸ56ᐳ"}}:::plan
     PgClassExpression56 --> List57
-    PgCursor55{{"PgCursor[55∈3]"}}:::plan
-    List57 --> PgCursor55
-    Access66{{"Access[66∈3]<br />ᐸ15.2ᐳ"}}:::plan
-    __Item15 --> Access66
     First59{{"First[59∈3]"}}:::plan
+    Access66{{"Access[66∈3]<br />ᐸ15.2ᐳ"}}:::plan
     Access66 --> First59
     PgSelectSingle60{{"PgSelectSingle[60∈3]<br />ᐸmessagesᐳ"}}:::plan
     First59 --> PgSelectSingle60
     PgClassExpression61{{"PgClassExpression[61∈3]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle60 --> PgClassExpression61
+    Access64{{"Access[64∈3]<br />ᐸ15.1ᐳ"}}:::plan
+    __Item15 --> Access64
+    Access64 --> Lambda65
+    __Item15 --> Access66
     __Item30[/"__Item[30∈4]<br />ᐸ65ᐳ"\]:::itemplan
     Lambda65 ==> __Item30
     PgSelectSingle31{{"PgSelectSingle[31∈4]<br />ᐸmessagesᐳ"}}:::plan
     __Item30 --> PgSelectSingle31
     PgClassExpression32{{"PgClassExpression[32∈5]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
     PgSelectSingle31 --> PgClassExpression32
-    RemapKeys62{{"RemapKeys[62∈5]<br />ᐸ31:{”0”:1,”1”:2}ᐳ"}}:::plan
-    PgSelectSingle31 --> RemapKeys62
     PgSelectSingle39{{"PgSelectSingle[39∈5]<br />ᐸusersᐳ"}}:::plan
+    RemapKeys62{{"RemapKeys[62∈5]<br />ᐸ31:{”0”:1,”1”:2}ᐳ"}}:::plan
     RemapKeys62 --> PgSelectSingle39
+    PgSelectSingle31 --> RemapKeys62
     PgClassExpression40{{"PgClassExpression[40∈6]<br />ᐸ__users__.”username”ᐳ"}}:::plan
     PgSelectSingle39 --> PgClassExpression40
     PgClassExpression41{{"PgClassExpression[41∈6]<br />ᐸ__users__....vatar_url”ᐳ"}}:::plan

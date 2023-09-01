@@ -1,3 +1,5 @@
+import { PassThrough } from "node:stream";
+
 import type { H3Event } from "h3";
 import {
   getMethod,
@@ -10,7 +12,6 @@ import {
   setResponseHeaders,
   setResponseStatus,
 } from "h3";
-import { PassThrough } from "node:stream";
 
 import {
   convertHandlerResultToResult,

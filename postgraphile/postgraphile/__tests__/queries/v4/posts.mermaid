@@ -28,37 +28,34 @@ graph TD
     PgSelect20 ==> __Item21
     PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸpostᐳ"}}:::plan
     __Item21 --> PgSelectSingle22
+    PgCursor23{{"PgCursor[23∈3]"}}:::plan
+    List25{{"List[25∈3]<br />ᐸ24ᐳ"}}:::plan
+    List25 --> PgCursor23
     PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__post__.”id”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression24
-    List25{{"List[25∈3]<br />ᐸ24ᐳ"}}:::plan
     PgClassExpression24 --> List25
-    PgCursor23{{"PgCursor[23∈3]"}}:::plan
-    List25 --> PgCursor23
     PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression27
     PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ”a”.”post_...(__post__)ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression31
-    RemapKeys106{{"RemapKeys[106∈3]<br />ᐸ22:{”0”:3,”1”:4,”2”:5,”3”:6,”4”:7,”5”:8,”6”:9,”7”:10,”8”:11,”9”:12,”10”:13}ᐳ"}}:::plan
-    PgSelectSingle22 --> RemapKeys106
     PgSelectSingle38{{"PgSelectSingle[38∈3]<br />ᐸpersonᐳ"}}:::plan
+    RemapKeys106{{"RemapKeys[106∈3]<br />ᐸ22:{”0”:3,”1”:4,”2”:5,”3”:6,”4”:7,”5”:8,”6”:9,”7”:10,”8”:11,”9”:12,”10”:13}ᐳ"}}:::plan
     RemapKeys106 --> PgSelectSingle38
+    PgSelectSingle22 --> RemapKeys106
     PgClassExpression39{{"PgClassExpression[39∈4]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle38 --> PgClassExpression39
     PgClassExpression40{{"PgClassExpression[40∈4]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle38 --> PgClassExpression40
     PgClassExpression42{{"PgClassExpression[42∈4]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
     PgSelectSingle38 --> PgClassExpression42
-    RemapKeys102{{"RemapKeys[102∈4]<br />ᐸ38:{”0”:2,”1”:3,”2”:4,”3”:5,”4”:6,”5”:7}ᐳ"}}:::plan
-    PgSelectSingle38 --> RemapKeys102
     PgSelectSingle49{{"PgSelectSingle[49∈4]<br />ᐸperson_first_postᐳ"}}:::plan
+    RemapKeys102{{"RemapKeys[102∈4]<br />ᐸ38:{”0”:2,”1”:3,”2”:4,”3”:5,”4”:6,”5”:7}ᐳ"}}:::plan
     RemapKeys102 --> PgSelectSingle49
-    Access104{{"Access[104∈4]<br />ᐸ106.8ᐳ"}}:::plan
-    RemapKeys106 --> Access104
     __ListTransform80[["__ListTransform[80∈4]<br />ᐸeach:79ᐳ"]]:::plan
+    Access104{{"Access[104∈4]<br />ᐸ106.8ᐳ"}}:::plan
     Access104 --> __ListTransform80
-    Access105{{"Access[105∈4]<br />ᐸ106.9ᐳ"}}:::plan
-    RemapKeys106 --> Access105
     First90{{"First[90∈4]"}}:::plan
+    Access105{{"Access[105∈4]<br />ᐸ106.9ᐳ"}}:::plan
     Access105 --> First90
     PgSelectSingle91{{"PgSelectSingle[91∈4]<br />ᐸperson_friendsᐳ"}}:::plan
     First90 --> PgSelectSingle91
@@ -68,36 +65,39 @@ graph TD
     Access104 --> First95
     PgSelectSingle96{{"PgSelectSingle[96∈4]<br />ᐸperson_friendsᐳ"}}:::plan
     First95 --> PgSelectSingle96
+    PgCursor97{{"PgCursor[97∈4]"}}:::plan
+    List99{{"List[99∈4]<br />ᐸ98ᐳ"}}:::plan
+    List99 --> PgCursor97
     PgClassExpression98{{"PgClassExpression[98∈4]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
     PgSelectSingle96 --> PgClassExpression98
-    List99{{"List[99∈4]<br />ᐸ98ᐳ"}}:::plan
     PgClassExpression98 --> List99
-    PgCursor97{{"PgCursor[97∈4]"}}:::plan
-    List99 --> PgCursor97
-    __Item83[/"__Item[83∈8]<br />ᐸ80ᐳ"\]:::itemplan
-    __ListTransform80 ==> __Item83
-    PgSelectSingle84{{"PgSelectSingle[84∈8]<br />ᐸperson_friendsᐳ"}}:::plan
-    __Item83 --> PgSelectSingle84
-    __Item81[/"__Item[81∈7]<br />ᐸ104ᐳ"\]:::itemplan
-    Access104 -.-> __Item81
-    PgSelectSingle82{{"PgSelectSingle[82∈7]<br />ᐸperson_friendsᐳ"}}:::plan
-    __Item81 --> PgSelectSingle82
+    PgSelectSingle38 --> RemapKeys102
+    RemapKeys106 --> Access104
+    RemapKeys106 --> Access105
     PgClassExpression50{{"PgClassExpression[50∈5]<br />ᐸ__person_f...ost__.”id”ᐳ"}}:::plan
     PgSelectSingle49 --> PgClassExpression50
     PgClassExpression51{{"PgClassExpression[51∈5]<br />ᐸ__person_f...”headline”ᐳ"}}:::plan
     PgSelectSingle49 --> PgClassExpression51
     PgClassExpression55{{"PgClassExpression[55∈5]<br />ᐸ”a”.”post_...st_post__)ᐳ"}}:::plan
     PgSelectSingle49 --> PgClassExpression55
-    RemapKeys100{{"RemapKeys[100∈5]<br />ᐸ49:{”0”:3,”1”:4,”2”:5}ᐳ"}}:::plan
-    PgSelectSingle49 --> RemapKeys100
     PgSelectSingle62{{"PgSelectSingle[62∈5]<br />ᐸpersonᐳ"}}:::plan
+    RemapKeys100{{"RemapKeys[100∈5]<br />ᐸ49:{”0”:3,”1”:4,”2”:5}ᐳ"}}:::plan
     RemapKeys100 --> PgSelectSingle62
+    PgSelectSingle49 --> RemapKeys100
     PgClassExpression63{{"PgClassExpression[63∈6]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle62 --> PgClassExpression63
     PgClassExpression64{{"PgClassExpression[64∈6]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle62 --> PgClassExpression64
     PgClassExpression66{{"PgClassExpression[66∈6]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
     PgSelectSingle62 --> PgClassExpression66
+    __Item81[/"__Item[81∈7]<br />ᐸ104ᐳ"\]:::itemplan
+    Access104 -.-> __Item81
+    PgSelectSingle82{{"PgSelectSingle[82∈7]<br />ᐸperson_friendsᐳ"}}:::plan
+    __Item81 --> PgSelectSingle82
+    __Item83[/"__Item[83∈8]<br />ᐸ80ᐳ"\]:::itemplan
+    __ListTransform80 ==> __Item83
+    PgSelectSingle84{{"PgSelectSingle[84∈8]<br />ᐸperson_friendsᐳ"}}:::plan
+    __Item83 --> PgSelectSingle84
     PgClassExpression85{{"PgClassExpression[85∈9]<br />ᐸ__person_friends__.”id”ᐳ"}}:::plan
     PgSelectSingle84 --> PgClassExpression85
     PgClassExpression86{{"PgClassExpression[86∈9]<br />ᐸ__person_f...full_name”ᐳ"}}:::plan

@@ -30,12 +30,12 @@ test(
       expect(fields.nodeId).toBeTruthy();
       expect(fields.postsByPostId).toBeFalsy();
       expect(Object.keys(fields)).toMatchInlineSnapshot(`
-Array [
-  "nodeId",
-  "id",
-  "postId",
-]
-`);
+        [
+          "nodeId",
+          "id",
+          "postId",
+        ]
+      `);
     },
   ),
 );

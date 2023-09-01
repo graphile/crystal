@@ -282,7 +282,7 @@ async function main() {
           source,
           contextValue: baseContext,
         },
-        { grafast: { explain: ["mermaid-js"] } },
+        { grafast: { explain: ["plan"] } },
       );
       await fsp.writeFile(
         `${__dirname}/plan.mermaid`,
@@ -297,8 +297,7 @@ async function main() {
           source: source + " ", // Force re-planning
           contextValue: baseContext,
         },
-        // TODO: something like { grafast: { explain: [{ "mermaid-js": { skipBuckets: true } }] } },
-        { grafast: { explain: ["mermaid-js"] } },
+        { grafast: { explain: ["plan"] } },
       );
       await fsp.writeFile(
         `${__dirname}/plan-simplified.mermaid`,

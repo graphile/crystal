@@ -22,39 +22,39 @@ graph TD
     Connection23{{"Connection[23∈0]<br />ᐸ19ᐳ"}}:::plan
     Connection43{{"Connection[43∈0]<br />ᐸ39ᐳ"}}:::plan
     Connection64{{"Connection[64∈0]<br />ᐸ60ᐳ"}}:::plan
-    PgSelect65[["PgSelect[65∈7]<br />ᐸmy_tableᐳ"]]:::plan
-    Access58{{"Access[58∈7]<br />ᐸ1.myVal2ᐳ"}}:::plan
-    Object22 & Access58 & Connection64 --> PgSelect65
-    __Value1 --> Access58
-    PgSelect44[["PgSelect[44∈4]<br />ᐸmy_tableᐳ"]]:::plan
-    __InputDynamicScalar38{{"__InputDynamicScalar[38∈4]"}}:::plan
-    Object22 & __InputDynamicScalar38 & Connection43 --> PgSelect44
     PgSelect24[["PgSelect[24∈1]<br />ᐸmy_tableᐳ"]]:::plan
     __InputDynamicScalar16{{"__InputDynamicScalar[16∈1]"}}:::plan
     Object22 & __InputDynamicScalar16 & Connection23 --> PgSelect24
     Access17{{"Access[17∈1]<br />ᐸ1.myValᐳ"}}:::plan
-    __Value1 --> Access17
     Access17 --> __InputDynamicScalar16
+    __Value1 --> Access17
     __Item25[/"__Item[25∈2]<br />ᐸ24ᐳ"\]:::itemplan
     PgSelect24 ==> __Item25
     PgSelectSingle26{{"PgSelectSingle[26∈2]<br />ᐸmy_tableᐳ"}}:::plan
     __Item25 --> PgSelectSingle26
-    __Item45[/"__Item[45∈5]<br />ᐸ44ᐳ"\]:::itemplan
-    PgSelect44 ==> __Item45
-    PgSelectSingle46{{"PgSelectSingle[46∈5]<br />ᐸmy_tableᐳ"}}:::plan
-    __Item45 --> PgSelectSingle46
-    __Item66[/"__Item[66∈8]<br />ᐸ65ᐳ"\]:::itemplan
-    PgSelect65 ==> __Item66
-    PgSelectSingle67{{"PgSelectSingle[67∈8]<br />ᐸmy_tableᐳ"}}:::plan
-    __Item66 --> PgSelectSingle67
     PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
     PgSelectSingle26 --> PgClassExpression27
     PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan
     PgSelectSingle26 --> PgClassExpression28
+    PgSelect44[["PgSelect[44∈4]<br />ᐸmy_tableᐳ"]]:::plan
+    __InputDynamicScalar38{{"__InputDynamicScalar[38∈4]"}}:::plan
+    Object22 & __InputDynamicScalar38 & Connection43 --> PgSelect44
+    __Item45[/"__Item[45∈5]<br />ᐸ44ᐳ"\]:::itemplan
+    PgSelect44 ==> __Item45
+    PgSelectSingle46{{"PgSelectSingle[46∈5]<br />ᐸmy_tableᐳ"}}:::plan
+    __Item45 --> PgSelectSingle46
     PgClassExpression47{{"PgClassExpression[47∈6]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
     PgSelectSingle46 --> PgClassExpression47
     PgClassExpression48{{"PgClassExpression[48∈6]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan
     PgSelectSingle46 --> PgClassExpression48
+    PgSelect65[["PgSelect[65∈7]<br />ᐸmy_tableᐳ"]]:::plan
+    Access58{{"Access[58∈7]<br />ᐸ1.myVal2ᐳ"}}:::plan
+    Object22 & Access58 & Connection64 --> PgSelect65
+    __Value1 --> Access58
+    __Item66[/"__Item[66∈8]<br />ᐸ65ᐳ"\]:::itemplan
+    PgSelect65 ==> __Item66
+    PgSelectSingle67{{"PgSelectSingle[67∈8]<br />ᐸmy_tableᐳ"}}:::plan
+    __Item66 --> PgSelectSingle67
     PgClassExpression68{{"PgClassExpression[68∈9]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
     PgSelectSingle67 --> PgClassExpression68
     PgClassExpression69{{"PgClassExpression[69∈9]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan

@@ -464,12 +464,17 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
             // This is a factory because we don't want mutations to one set
             // of args to affect the others!
             const makeFieldArgs = () =>
-              argDetails.reduce((memo, { inputType, graphqlArgName }) => {
-                memo[graphqlArgName] = {
-                  type: inputType,
-                };
-                return memo;
-              }, Object.create(null) as { [graphqlArgName: string]: { type: GraphQLInputType } });
+              argDetails.reduce(
+                (memo, { inputType, graphqlArgName }) => {
+                  memo[graphqlArgName] = {
+                    type: inputType,
+                  };
+                  return memo;
+                },
+                Object.create(null) as {
+                  [graphqlArgName: string]: { type: GraphQLInputType };
+                },
+              );
 
             const argDetailsSimple = argDetails.map(
               ({
@@ -496,11 +501,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
             const makeArgs = EXPORTABLE(
               (
-                  argDetailsLength,
-                  argDetailsSimple,
-                  constant,
-                  indexAfterWhichAllArgsAreNamed,
-                ) =>
+                argDetailsLength,
+                argDetailsSimple,
+                constant,
+                indexAfterWhichAllArgsAreNamed,
+              ) =>
                 (args: FieldArgs, path: string[] = []) => {
                   const selectArgs: PgSelectArgumentSpec[] = [];
 
@@ -947,14 +952,14 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 : // Otherwise computed:
                   EXPORTABLE(
                     (
-                        PgSelectSingleStep,
-                        hasRecord,
-                        makeArgs,
-                        pgClassExpression,
-                        pgSelectSingleFromRecord,
-                        resource,
-                        stepAMayDependOnStepB,
-                      ) =>
+                      PgSelectSingleStep,
+                      hasRecord,
+                      makeArgs,
+                      pgClassExpression,
+                      pgSelectSingleFromRecord,
+                      resource,
+                      stepAMayDependOnStepB,
+                    ) =>
                       ($in, args, _info) => {
                         if (!hasRecord($in)) {
                           throw new Error(

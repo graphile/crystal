@@ -1,3 +1,7 @@
+import { writeFile } from "node:fs/promises";
+import type { URL } from "node:url";
+import { inspect } from "node:util";
+
 import generate from "@babel/generator";
 import { parseExpression } from "@babel/parser";
 import type { TemplateBuilderOptions } from "@babel/template";
@@ -39,9 +43,6 @@ import {
   printSchema,
 } from "grafast/graphql";
 import type { GraphQLSchemaNormalizedConfig } from "graphql/type/schema";
-import { writeFile } from "node:fs/promises";
-import type { URL } from "node:url";
-import { inspect } from "node:util";
 import type { PgSQL, SQL } from "pg-sql2";
 
 import type { ExportOptions } from "./interfaces.js";
@@ -483,53 +484,56 @@ class CodegenFile {
     fields: GraphQLFieldConfigMap<any, any>,
     typeName: string,
   ): t.Expression {
-    const obj = Object.entries(fields).reduce((memo, [fieldName, config]) => {
-      if (!fieldName.startsWith("__")) {
-        const locationHint = `${typeName}.fields[${fieldName}]`;
-        const mappedConfig: {
-          [key in keyof GraphQLFieldConfig<any, any> as Exclude<
-            keyof GraphQLFieldConfig<any, any>,
-            "astNode"
-          >]-?: t.Expression | null;
-        } = {
-          description: desc(config.description),
-          type: this.typeExpression(config.type),
-          args:
-            config.args && Object.keys(config.args).length > 0
-              ? this.makeFieldArgs(
-                  config.args,
-                  `${typeName}.fields[${fieldName}].args`,
-                  `${typeName}.${fieldName}`,
+    const obj = Object.entries(fields).reduce(
+      (memo, [fieldName, config]) => {
+        if (!fieldName.startsWith("__")) {
+          const locationHint = `${typeName}.fields[${fieldName}]`;
+          const mappedConfig: {
+            [key in keyof GraphQLFieldConfig<any, any> as Exclude<
+              keyof GraphQLFieldConfig<any, any>,
+              "astNode"
+            >]-?: t.Expression | null;
+          } = {
+            description: desc(config.description),
+            type: this.typeExpression(config.type),
+            args:
+              config.args && Object.keys(config.args).length > 0
+                ? this.makeFieldArgs(
+                    config.args,
+                    `${typeName}.fields[${fieldName}].args`,
+                    `${typeName}.${fieldName}`,
+                  )
+                : null,
+            resolve: config.resolve
+              ? func(
+                  this,
+                  config.resolve,
+                  `${locationHint}.resolve`,
+                  `${typeName}.${fieldName}.resolve`,
                 )
               : null,
-          resolve: config.resolve
-            ? func(
-                this,
-                config.resolve,
-                `${locationHint}.resolve`,
-                `${typeName}.${fieldName}.resolve`,
-              )
-            : null,
-          subscribe: config.subscribe
-            ? func(
-                this,
-                config.subscribe,
-                `${locationHint}.subscribe`,
-                `${typeName}.${fieldName}.subscribe`,
-              )
-            : null,
-          deprecationReason: desc(config.deprecationReason),
-          extensions: extensions(
-            this,
-            config.extensions,
-            `${locationHint}.extensions`,
-            `${typeName}.${fieldName}.extensions`,
-          ),
-        };
-        memo[fieldName] = configToAST(mappedConfig);
-      }
-      return memo;
-    }, {} as { [key: string]: t.Expression | null });
+            subscribe: config.subscribe
+              ? func(
+                  this,
+                  config.subscribe,
+                  `${locationHint}.subscribe`,
+                  `${typeName}.${fieldName}.subscribe`,
+                )
+              : null,
+            deprecationReason: desc(config.deprecationReason),
+            extensions: extensions(
+              this,
+              config.extensions,
+              `${locationHint}.extensions`,
+              `${typeName}.${fieldName}.extensions`,
+            ),
+          };
+          memo[fieldName] = configToAST(mappedConfig);
+        }
+        return memo;
+      },
+      {} as { [key: string]: t.Expression | null },
+    );
     return t.objectExpression(objectToObjectProperties(obj));
   }
 
@@ -537,38 +541,41 @@ class CodegenFile {
     fields: GraphQLInputFieldConfigMap,
     typeName: string,
   ): t.Expression {
-    const obj = Object.entries(fields).reduce((memo, [fieldName, config]) => {
-      if (!fieldName.startsWith("__")) {
-        const locationHint = `${typeName}.fields[${fieldName}]`;
-        const mappedConfig: {
-          [key in keyof GraphQLInputFieldConfig as Exclude<
-            keyof GraphQLInputFieldConfig,
-            "astNode"
-          >]-?: t.Expression | null;
-        } = {
-          description: desc(config.description),
-          type: this.typeExpression(config.type),
-          defaultValue:
-            config.defaultValue !== undefined
-              ? convertToIdentifierViaAST(
-                  this,
-                  config.defaultValue,
-                  `${typeName}.${fieldName}.defaultValue`,
-                  `${locationHint}.defaultValue`,
-                )
-              : null,
-          deprecationReason: desc(config.deprecationReason),
-          extensions: extensions(
-            this,
-            config.extensions,
-            `${locationHint}.extensions`,
-            `${typeName}.${fieldName}.extensions`,
-          ),
-        };
-        memo[fieldName] = configToAST(mappedConfig);
-      }
-      return memo;
-    }, {} as { [key: string]: t.Expression | null });
+    const obj = Object.entries(fields).reduce(
+      (memo, [fieldName, config]) => {
+        if (!fieldName.startsWith("__")) {
+          const locationHint = `${typeName}.fields[${fieldName}]`;
+          const mappedConfig: {
+            [key in keyof GraphQLInputFieldConfig as Exclude<
+              keyof GraphQLInputFieldConfig,
+              "astNode"
+            >]-?: t.Expression | null;
+          } = {
+            description: desc(config.description),
+            type: this.typeExpression(config.type),
+            defaultValue:
+              config.defaultValue !== undefined
+                ? convertToIdentifierViaAST(
+                    this,
+                    config.defaultValue,
+                    `${typeName}.${fieldName}.defaultValue`,
+                    `${locationHint}.defaultValue`,
+                  )
+                : null,
+            deprecationReason: desc(config.deprecationReason),
+            extensions: extensions(
+              this,
+              config.extensions,
+              `${locationHint}.extensions`,
+              `${typeName}.${fieldName}.extensions`,
+            ),
+          };
+          memo[fieldName] = configToAST(mappedConfig);
+        }
+        return memo;
+      },
+      {} as { [key: string]: t.Expression | null },
+    );
     return t.objectExpression(objectToObjectProperties(obj));
   }
 
@@ -577,38 +584,41 @@ class CodegenFile {
     baseLocationHint: string,
     nameHint: string,
   ): t.Expression {
-    const obj = Object.entries(args).reduce((memo, [argName, config]) => {
-      if (!argName.startsWith("__")) {
-        const locationHint = `${baseLocationHint}[${argName}]`;
-        const mappedConfig: {
-          [key in keyof GraphQLArgumentConfig as Exclude<
-            keyof GraphQLArgumentConfig,
-            "astNode"
-          >]-?: t.Expression | null;
-        } = {
-          description: desc(config.description),
-          type: this.typeExpression(config.type),
-          defaultValue:
-            config.defaultValue !== undefined
-              ? convertToIdentifierViaAST(
-                  this,
-                  config.defaultValue,
-                  `${nameHint}.${argName}.defaultValue`,
-                  `${locationHint}.defaultValue`,
-                )
-              : null,
-          deprecationReason: desc(config.deprecationReason),
-          extensions: extensions(
-            this,
-            config.extensions,
-            `${locationHint}.extensions`,
-            `${nameHint}.${argName}.extensions`,
-          ),
-        };
-        memo[argName] = configToAST(mappedConfig);
-      }
-      return memo;
-    }, {} as { [key: string]: t.Expression | null });
+    const obj = Object.entries(args).reduce(
+      (memo, [argName, config]) => {
+        if (!argName.startsWith("__")) {
+          const locationHint = `${baseLocationHint}[${argName}]`;
+          const mappedConfig: {
+            [key in keyof GraphQLArgumentConfig as Exclude<
+              keyof GraphQLArgumentConfig,
+              "astNode"
+            >]-?: t.Expression | null;
+          } = {
+            description: desc(config.description),
+            type: this.typeExpression(config.type),
+            defaultValue:
+              config.defaultValue !== undefined
+                ? convertToIdentifierViaAST(
+                    this,
+                    config.defaultValue,
+                    `${nameHint}.${argName}.defaultValue`,
+                    `${locationHint}.defaultValue`,
+                  )
+                : null,
+            deprecationReason: desc(config.deprecationReason),
+            extensions: extensions(
+              this,
+              config.extensions,
+              `${locationHint}.extensions`,
+              `${nameHint}.${argName}.extensions`,
+            ),
+          };
+          memo[argName] = configToAST(mappedConfig);
+        }
+        return memo;
+      },
+      {} as { [key: string]: t.Expression | null },
+    );
     return t.objectExpression(objectToObjectProperties(obj));
   }
 
@@ -1787,7 +1797,7 @@ export async function exportSchema(
   if (options.prettier) {
     const prettier = await import("prettier");
     const config = await prettier.resolveConfig(toPath.toString());
-    const formatted = prettier.format(toFormat, {
+    const formatted = await prettier.format(toFormat, {
       parser: "babel",
       ...(config ?? {}),
     });

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { readFile } from "fs/promises";
-import glob from "glob";
+import { sync as globSync } from "glob";
 import { grafast } from "grafast";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
@@ -150,7 +150,7 @@ try {
   const matches =
     process.argv.length > 2
       ? process.argv.slice(2)
-      : glob.sync("__tests__/queries/*/*.test.graphql");
+      : globSync("__tests__/queries/*/*.test.graphql");
 
   for (const match of matches) {
     const basePath = match.replace(/\.test\.graphql$/, "");

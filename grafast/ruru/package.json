@@ -44,11 +44,12 @@
   },
   "homepage": "https://grafast.org/ruru/",
   "dependencies": {
+    "@emotion/is-prop-valid": "^1.2.1",
     "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "http-proxy": "^1.18.1",
-    "tslib": "^2.5.0",
-    "yargs": "^17.6.2"
+    "tslib": "^2.6.2",
+    "yargs": "^17.7.2"
   },
   "engines": {
     "node": ">=16"
@@ -63,17 +64,19 @@
     "index.js"
   ],
   "devDependencies": {
-    "@types/http-proxy": "^1",
-    "@types/yargs": "^17.0.21",
-    "css-loader": "^6.7.1",
+    "@types/http-proxy": "^1.17.11",
+    "@types/webpack-bundle-analyzer": "^4.6.0",
+    "@types/yargs": "^17.0.24",
+    "css-loader": "^6.8.1",
     "file-loader": "^6.2.0",
     "graphql": "16.1.0-experimental-stream-defer.6",
     "ruru-components": "workspace:^",
-    "style-loader": "^3.3.1",
+    "style-loader": "^3.3.3",
     "svg-inline-loader": "^0.8.2",
-    "ts-loader": "^9.4.2",
-    "typescript": "^5.0.4",
-    "webpack": "^5.72.0",
-    "webpack-cli": "^4.9.2"
+    "ts-loader": "^9.4.4",
+    "typescript": "^5.2.2",
+    "webpack": "^5.88.2",
+    "webpack-bundle-analyzer": "^4.9.1",
+    "webpack-cli": "^5.1.4"
   }
 }

@@ -1,4 +1,3 @@
-import "@uiw/react-codemirror";
 import "codemirror/keymap/sublime";
 import "codemirror/theme/monokai.css";
 import "codemirror/mode/javascript/javascript";
@@ -9,7 +8,6 @@ import "graphiql/graphiql.css";
 import "@graphiql/plugin-explorer/dist/style.css";
 import "ruru-components/ruru.css";
 
-// eslint-disable-next-line @typescript-eslint/no-duplicate-imports
 import CodeMirror from "@uiw/react-codemirror";
 import * as Grafast from "grafast";
 import { grafast, makeGrafastSchema } from "grafast";
@@ -32,9 +30,7 @@ type Query {
 const INITIAL_CODE = `\
 const plans = {
   Query: {
-    addTwoNumbers(_, args) {
-      const $a = args.get("a");
-      const $b = args.get("b");
+    addTwoNumbers(_, { $a, $b }) {
       return lambda([$a, $b], ([a, b]) => a + b, true);
     },
   },
@@ -78,7 +74,7 @@ with (Grafast) {
           operationName,
           variableValues: variables,
         },
-        { grafast: { explain: ["mermaid-js"] } },
+        { grafast: { explain: ["plan"] } },
       );
       if (result.extensions) {
         // Hide 'extensions' so it doesn't overwhelm people
@@ -113,10 +109,6 @@ with (Grafast) {
 }
 
 const Editor = ({ value, onValueChange, lang }) => {
-  const onChange = useCallback(
-    (e) => onValueChange(e.getValue()),
-    [onValueChange],
-  );
   const options = useMemo(() => {
     return {
       theme: "monokai",
@@ -128,7 +120,7 @@ const Editor = ({ value, onValueChange, lang }) => {
     <CodeMirror
       lazyLoadMode={false}
       value={value}
-      onChange={onChange}
+      onChange={onValueChange}
       options={options}
     />
   );

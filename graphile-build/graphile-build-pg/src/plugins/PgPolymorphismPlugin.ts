@@ -281,11 +281,10 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   );
                 if (!pgConstraint) {
                   throw new Error(
-                    `Could not build polymorphic reference from '${
-                      pgClass.getNamespace()?.nspname
-                    }.${pgClass.relname}' to '${
-                      referencedClass.getNamespace()?.nspname
-                    }.${
+                    `Could not build polymorphic reference from '${pgClass.getNamespace()
+                      ?.nspname}.${
+                      pgClass.relname
+                    }' to '${referencedClass.getNamespace()?.nspname}.${
                       referencedClass.relname
                     }' due to missing foreign key constraint. Please create a foreign key constraint on the latter table's primary key, pointing to the former table.`,
                   );
@@ -827,14 +826,14 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 );
                 return EXPORTABLE(
                   (
-                      access,
-                      decodeNodeId,
-                      details,
-                      lambda,
-                      list,
-                      object,
-                      tablePkAttributes,
-                    ) =>
+                    access,
+                    decodeNodeId,
+                    details,
+                    lambda,
+                    list,
+                    object,
+                    tablePkAttributes,
+                  ) =>
                     (
                       $nodeId: ExecutableStep<string>,
                     ): { [key: string]: ExecutableStep<any> } => {
@@ -898,14 +897,14 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 );
                 return EXPORTABLE(
                   (
-                      access,
-                      decodeNodeId,
-                      handlers,
-                      lambda,
-                      list,
-                      object,
-                      tablePkAttributes,
-                    ) =>
+                    access,
+                    decodeNodeId,
+                    handlers,
+                    lambda,
+                    list,
+                    object,
+                    tablePkAttributes,
+                  ) =>
                     (
                       $nodeId: ExecutableStep<string>,
                     ): { [key: string]: ExecutableStep<any> } => {
@@ -1129,12 +1128,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                               te.run`\
 return function (list, constant) {
   return $record => list([constant(${te.lit(tableTypeName)}, false), ${te.join(
-                                pk.map(
-                                  (attributeName) =>
-                                    te`$record.get(${te.lit(attributeName)})`,
-                                ),
-                                ", ",
-                              )}]);
+    pk.map((attributeName) => te`$record.get(${te.lit(attributeName)})`),
+    ", ",
+  )}]);
 }` as any,
                               [list, constant],
                             )

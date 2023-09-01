@@ -1,6 +1,6 @@
 import assert from "assert";
 
-import LRU from "..";
+import LRU from "../src/index.js";
 
 function testLinkedList(cache: LRU, expectedList: string[] | null = null) {
   if (expectedList) {

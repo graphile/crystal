@@ -485,7 +485,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 isVirtual,
                 description,
                 extensions,
-              } as const),
+              }) as const,
             [
               codec,
               description,

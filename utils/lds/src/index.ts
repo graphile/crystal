@@ -91,7 +91,7 @@ export default async function subscribeToLogicalDecoding(
     }
   }
 
-  let loopTimeout: NodeJS.Timer;
+  let loopTimeout: NodeJS.Timeout;
 
   let finished = false;
   const ldSubscription = {

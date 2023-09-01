@@ -18,7 +18,8 @@ const assert = require("assert");
  */
 const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === "1";
 
-const ROOT_CONNECTION_STRING = process.env.ROOT_DATABASE_URL || "postgres";
+const ROOT_CONNECTION_STRING =
+  process.env.ROOT_DATABASE_URL || "postgres:///postgres";
 const CONNECTION_STRING =
   process.env.TEST_SIMPLIFY_DATABASE_URL ||
   "postgres:///pg_simplify_inflectors";

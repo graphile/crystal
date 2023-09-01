@@ -9,8 +9,8 @@
     "noEmit": true,
 
     "noUncheckedIndexedAccess": false,
-    "moduleResolution": "nodenext",
-    "module": "commonjs"
+    "moduleResolution": "NodeNext",
+    "module": "NodeNext"
   },
   "include": ["."],
   "exclude": ["__tests__", "dist"]

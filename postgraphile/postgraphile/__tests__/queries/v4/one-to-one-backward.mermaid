@@ -27,22 +27,42 @@ graph TD
     PgSelect20 ==> __Item21
     PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸpersonᐳ"}}:::plan
     __Item21 --> PgSelectSingle22
+    PgCursor23{{"PgCursor[23∈3]"}}:::plan
+    List25{{"List[25∈3]<br />ᐸ24ᐳ"}}:::plan
+    List25 --> PgCursor23
     PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression24
-    List25{{"List[25∈3]<br />ᐸ24ᐳ"}}:::plan
     PgClassExpression24 --> List25
-    PgCursor23{{"PgCursor[23∈3]"}}:::plan
-    List25 --> PgCursor23
     PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression27
     PgClassExpression29{{"PgClassExpression[29∈3]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression29
     PgSelectSingle36{{"PgSelectSingle[36∈3]<br />ᐸleft_armᐳ"}}:::plan
     PgSelectSingle22 --> PgSelectSingle36
-    RemapKeys85{{"RemapKeys[85∈3]<br />ᐸ22:{”0”:6,”1”:7,”2”:8,”3”:9,”4”:10}ᐳ"}}:::plan
-    PgSelectSingle22 --> RemapKeys85
     PgSelectSingle61{{"PgSelectSingle[61∈3]<br />ᐸperson_secretᐳ"}}:::plan
+    RemapKeys85{{"RemapKeys[85∈3]<br />ᐸ22:{”0”:6,”1”:7,”2”:8,”3”:9,”4”:10}ᐳ"}}:::plan
     RemapKeys85 --> PgSelectSingle61
+    PgSelectSingle22 --> RemapKeys85
+    List39{{"List[39∈4]<br />ᐸ37,38ᐳ"}}:::plan
+    PgClassExpression38{{"PgClassExpression[38∈4]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
+    Constant37 & PgClassExpression38 --> List39
+    PgSelectSingle36 --> PgClassExpression38
+    Lambda40{{"Lambda[40∈4]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List39 --> Lambda40
+    PgClassExpression42{{"PgClassExpression[42∈4]<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
+    PgSelectSingle36 --> PgClassExpression42
+    PgSelectSingle49{{"PgSelectSingle[49∈4]<br />ᐸpersonᐳ"}}:::plan
+    RemapKeys79{{"RemapKeys[79∈4]<br />ᐸ36:{”0”:1,”1”:2,”2”:3}ᐳ"}}:::plan
+    RemapKeys79 --> PgSelectSingle49
+    PgClassExpression54{{"PgClassExpression[54∈4]<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
+    PgSelectSingle36 --> PgClassExpression54
+    PgSelectSingle36 --> RemapKeys79
+    PgClassExpression50{{"PgClassExpression[50∈5]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle49 --> PgClassExpression50
+    PgClassExpression51{{"PgClassExpression[51∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle49 --> PgClassExpression51
+    PgClassExpression53{{"PgClassExpression[53∈5]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
+    PgSelectSingle49 --> PgClassExpression53
     List64{{"List[64∈6]<br />ᐸ62,63ᐳ"}}:::plan
     PgClassExpression63{{"PgClassExpression[63∈6]<br />ᐸ__person_s...person_id”ᐳ"}}:::plan
     Constant62 & PgClassExpression63 --> List64
@@ -53,26 +73,6 @@ graph TD
     PgSelectSingle61 --> PgSelectSingle73
     PgClassExpression78{{"PgClassExpression[78∈6]<br />ᐸ__person_s..._.”sekrit”ᐳ"}}:::plan
     PgSelectSingle61 --> PgClassExpression78
-    List39{{"List[39∈4]<br />ᐸ37,38ᐳ"}}:::plan
-    PgClassExpression38{{"PgClassExpression[38∈4]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
-    Constant37 & PgClassExpression38 --> List39
-    PgSelectSingle36 --> PgClassExpression38
-    Lambda40{{"Lambda[40∈4]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List39 --> Lambda40
-    PgClassExpression42{{"PgClassExpression[42∈4]<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
-    PgSelectSingle36 --> PgClassExpression42
-    RemapKeys79{{"RemapKeys[79∈4]<br />ᐸ36:{”0”:1,”1”:2,”2”:3}ᐳ"}}:::plan
-    PgSelectSingle36 --> RemapKeys79
-    PgSelectSingle49{{"PgSelectSingle[49∈4]<br />ᐸpersonᐳ"}}:::plan
-    RemapKeys79 --> PgSelectSingle49
-    PgClassExpression54{{"PgClassExpression[54∈4]<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
-    PgSelectSingle36 --> PgClassExpression54
-    PgClassExpression50{{"PgClassExpression[50∈5]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle49 --> PgClassExpression50
-    PgClassExpression51{{"PgClassExpression[51∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle49 --> PgClassExpression51
-    PgClassExpression53{{"PgClassExpression[53∈5]<br />ᐸ”c”.”perso..._person__)ᐳ"}}:::plan
-    PgSelectSingle49 --> PgClassExpression53
     PgClassExpression74{{"PgClassExpression[74∈7]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle73 --> PgClassExpression74
     PgClassExpression75{{"PgClassExpression[75∈7]<br />ᐸ__person__...full_name”ᐳ"}}:::plan

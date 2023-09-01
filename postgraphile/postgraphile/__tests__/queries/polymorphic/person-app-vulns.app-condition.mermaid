@@ -56,10 +56,10 @@ graph TD
     Access51{{"Access[51∈5]<br />ᐸ45.0ᐳ"}}:::plan
     Access52{{"Access[52∈5]<br />ᐸ45.1ᐳ"}}:::plan
     Access51 & Access52 --> List53
-    PgUnionAllSingle45 --> Access51
-    PgUnionAllSingle45 --> Access52
     PgCursor46{{"PgCursor[46∈5]"}}:::plan
     List53 --> PgCursor46
+    PgUnionAllSingle45 --> Access51
+    PgUnionAllSingle45 --> Access52
     PgSelect57[["PgSelect[57∈6]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication"]]:::plan
     Access56{{"Access[56∈6]<br />ᐸ55.0ᐳ"}}:::plan
     Object18 & Access56 --> PgSelect57

@@ -14,8 +14,8 @@ import { PgLazyJWTPreset } from "postgraphile/presets/lazy-jwt";
 import { PgRelayPreset } from "postgraphile/presets/relay";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
-import { PgManyToManyPreset } from "../../contrib/pg-many-to-many/dist/index.js";
-import { PostGraphileConnectionFilterPreset } from "../../contrib/postgraphile-plugin-connection-filter/dist/index.js";
+// import { PgManyToManyPreset } from "../../contrib/pg-many-to-many/dist/index.js";
+// import { PostGraphileConnectionFilterPreset } from "../../contrib/postgraphile-plugin-connection-filter/dist/index.js";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -206,8 +206,8 @@ const preset: GraphileConfig.Preset = {
       graphiql: true,
       graphiqlRoute: "/",
     }),
-    PgManyToManyPreset,
-    PostGraphileConnectionFilterPreset,
+    // PgManyToManyPreset,
+    // PostGraphileConnectionFilterPreset,
     PgRelayPreset,
     PgLazyJWTPreset,
   ],

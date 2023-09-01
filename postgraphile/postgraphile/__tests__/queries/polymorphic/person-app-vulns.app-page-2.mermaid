@@ -55,10 +55,10 @@ graph TD
     Access48{{"Access[48∈5]<br />ᐸ42.0ᐳ"}}:::plan
     Access49{{"Access[49∈5]<br />ᐸ42.1ᐳ"}}:::plan
     Access48 & Access49 --> List50
-    PgUnionAllSingle42 --> Access48
-    PgUnionAllSingle42 --> Access49
     PgCursor43{{"PgCursor[43∈5]"}}:::plan
     List50 --> PgCursor43
+    PgUnionAllSingle42 --> Access48
+    PgUnionAllSingle42 --> Access49
     PgUnionAll75[["PgUnionAll[75∈6]<br />ᐳAwsApplication"]]:::plan
     PgClassExpression60{{"PgClassExpression[60∈6]<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
     Connection74{{"Connection[74∈6]<br />ᐸ70ᐳ<br />ᐳAwsApplication"}}:::plan
@@ -91,10 +91,6 @@ graph TD
     First109 --> PgSelectSingle110
     PgSelectSingle110 --> PgClassExpression111
     Constant154 --> Connection125
-    __Item127[/"__Item[127∈10]<br />ᐸ126ᐳ"\]:::itemplan
-    PgUnionAll126 ==> __Item127
-    PgUnionAllSingle128["PgUnionAllSingle[128∈10]"]:::plan
-    __Item127 --> PgUnionAllSingle128
     __Item76[/"__Item[76∈7]<br />ᐸ75ᐳ"\]:::itemplan
     PgUnionAll75 ==> __Item76
     PgUnionAllSingle77["PgUnionAllSingle[77∈7]"]:::plan
@@ -103,30 +99,16 @@ graph TD
     Access79{{"Access[79∈8]<br />ᐸ77.0ᐳ"}}:::plan
     Access80{{"Access[80∈8]<br />ᐸ77.1ᐳ"}}:::plan
     Access79 & Access80 --> List81
-    List132{{"List[132∈11]<br />ᐸ130,131ᐳ<br />ᐳGcpApplication"}}:::plan
-    Access130{{"Access[130∈11]<br />ᐸ128.0ᐳ"}}:::plan
-    Access131{{"Access[131∈11]<br />ᐸ128.1ᐳ"}}:::plan
-    Access130 & Access131 --> List132
-    PgUnionAllSingle77 --> Access79
-    PgUnionAllSingle77 --> Access80
     PgCursor78{{"PgCursor[78∈8]"}}:::plan
     List81 --> PgCursor78
-    PgUnionAllSingle128 --> Access130
-    PgUnionAllSingle128 --> Access131
-    PgCursor129{{"PgCursor[129∈11]"}}:::plan
-    List132 --> PgCursor129
+    PgUnionAllSingle77 --> Access79
+    PgUnionAllSingle77 --> Access80
     PgSelect85[["PgSelect[85∈9]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳAwsApplicationᐳFirstPartyVulnerability"]]:::plan
     Access84{{"Access[84∈9]<br />ᐸ83.0ᐳ"}}:::plan
     Object18 & Access84 --> PgSelect85
     PgSelect95[["PgSelect[95∈9]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳAwsApplicationᐳThirdPartyVulnerability"]]:::plan
     Access94{{"Access[94∈9]<br />ᐸ93.0ᐳ"}}:::plan
     Object18 & Access94 --> PgSelect95
-    PgSelect136[["PgSelect[136∈12]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳGcpApplicationᐳFirstPartyVulnerability"]]:::plan
-    Access135{{"Access[135∈12]<br />ᐸ134.0ᐳ"}}:::plan
-    Object18 & Access135 --> PgSelect136
-    PgSelect146[["PgSelect[146∈12]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳGcpApplicationᐳThirdPartyVulnerability"]]:::plan
-    Access145{{"Access[145∈12]<br />ᐸ144.0ᐳ"}}:::plan
-    Object18 & Access145 --> PgSelect146
     JSONParse83[["JSONParse[83∈9]<br />ᐸ80ᐳ<br />ᐳAwsApplicationᐳFirstPartyVulnerability"]]:::plan
     Access80 --> JSONParse83
     JSONParse83 --> Access84
@@ -145,6 +127,24 @@ graph TD
     First99 --> PgSelectSingle100
     PgClassExpression101{{"PgClassExpression[101∈9]<br />ᐸ__third_pa...ies__.”id”ᐳ"}}:::plan
     PgSelectSingle100 --> PgClassExpression101
+    __Item127[/"__Item[127∈10]<br />ᐸ126ᐳ"\]:::itemplan
+    PgUnionAll126 ==> __Item127
+    PgUnionAllSingle128["PgUnionAllSingle[128∈10]"]:::plan
+    __Item127 --> PgUnionAllSingle128
+    List132{{"List[132∈11]<br />ᐸ130,131ᐳ<br />ᐳGcpApplication"}}:::plan
+    Access130{{"Access[130∈11]<br />ᐸ128.0ᐳ"}}:::plan
+    Access131{{"Access[131∈11]<br />ᐸ128.1ᐳ"}}:::plan
+    Access130 & Access131 --> List132
+    PgCursor129{{"PgCursor[129∈11]"}}:::plan
+    List132 --> PgCursor129
+    PgUnionAllSingle128 --> Access130
+    PgUnionAllSingle128 --> Access131
+    PgSelect136[["PgSelect[136∈12]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳGcpApplicationᐳFirstPartyVulnerability"]]:::plan
+    Access135{{"Access[135∈12]<br />ᐸ134.0ᐳ"}}:::plan
+    Object18 & Access135 --> PgSelect136
+    PgSelect146[["PgSelect[146∈12]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳGcpApplicationᐳThirdPartyVulnerability"]]:::plan
+    Access145{{"Access[145∈12]<br />ᐸ144.0ᐳ"}}:::plan
+    Object18 & Access145 --> PgSelect146
     JSONParse134[["JSONParse[134∈12]<br />ᐸ131ᐳ<br />ᐳGcpApplicationᐳFirstPartyVulnerability"]]:::plan
     Access131 --> JSONParse134
     JSONParse134 --> Access135

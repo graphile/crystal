@@ -1,14 +1,15 @@
+import * as fsp from "node:fs/promises";
+import * as path from "node:path";
+import { pathToFileURL } from "node:url";
+
 import { glob } from "glob";
 import { isSchema } from "grafast/graphql";
 import { resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
 import { loadConfig } from "graphile-config/load";
-import * as fsp from "node:fs/promises";
-import * as path from "node:path";
-import { pathToFileURL } from "node:url";
 
-import type { GrafastBenchConfig } from ".";
-import { bench } from ".";
+import type { GrafastBenchConfig } from "./index.js";
+import { bench } from "./index.js";
 
 export function options(yargs: Argv) {
   return yargs

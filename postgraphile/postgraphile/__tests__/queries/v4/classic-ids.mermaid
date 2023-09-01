@@ -20,9 +20,6 @@ graph TD
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Connection26{{"Connection[26∈0]<br />ᐸ22ᐳ"}}:::plan
     Connection51{{"Connection[51∈0]<br />ᐸ47ᐳ"}}:::plan
-    PgSelect52[["PgSelect[52∈4]<br />ᐸedge_caseᐳ"]]:::plan
-    Constant57{{"Constant[57∈4]<br />ᐸ2ᐳ"}}:::plan
-    Object25 & Constant57 & Connection51 --> PgSelect52
     PgSelect27[["PgSelect[27∈1]<br />ᐸpostᐳ"]]:::plan
     Constant56{{"Constant[56∈1]<br />ᐸ1ᐳ"}}:::plan
     Object25 & Constant56 & Connection26 --> PgSelect27
@@ -31,10 +28,6 @@ graph TD
     PgSelect27 ==> __Item28
     PgSelectSingle29{{"PgSelectSingle[29∈2]<br />ᐸpostᐳ"}}:::plan
     __Item28 --> PgSelectSingle29
-    __Item53[/"__Item[53∈5]<br />ᐸ52ᐳ"\]:::itemplan
-    PgSelect52 ==> __Item53
-    PgSelectSingle54{{"PgSelectSingle[54∈5]<br />ᐸedge_caseᐳ"}}:::plan
-    __Item53 --> PgSelectSingle54
     List32{{"List[32∈3]<br />ᐸ30,31ᐳ"}}:::plan
     PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__post__.”id”ᐳ"}}:::plan
     Constant30 & PgClassExpression31 --> List32
@@ -43,6 +36,13 @@ graph TD
     List32 --> Lambda33
     PgClassExpression35{{"PgClassExpression[35∈3]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgSelectSingle29 --> PgClassExpression35
+    PgSelect52[["PgSelect[52∈4]<br />ᐸedge_caseᐳ"]]:::plan
+    Constant57{{"Constant[57∈4]<br />ᐸ2ᐳ"}}:::plan
+    Object25 & Constant57 & Connection51 --> PgSelect52
+    __Item53[/"__Item[53∈5]<br />ᐸ52ᐳ"\]:::itemplan
+    PgSelect52 ==> __Item53
+    PgSelectSingle54{{"PgSelectSingle[54∈5]<br />ᐸedge_caseᐳ"}}:::plan
+    __Item53 --> PgSelectSingle54
     PgClassExpression55{{"PgClassExpression[55∈6]<br />ᐸ__edge_case__.”row_id”ᐳ"}}:::plan
     PgSelectSingle54 --> PgClassExpression55
 

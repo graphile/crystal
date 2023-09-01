@@ -38,5 +38,7 @@ module.exports = (dir) => {
     },
 
     setupFiles: [`${__dirname}/__tests__/setup-mock-fs.ts`],
+    // Jest doesn't currently support prettier v3; see https://github.com/jestjs/jest/issues/14305
+    prettierPath: require.resolve("@localrepo/prettier2-for-jest"),
   };
 };

@@ -1,10 +1,15 @@
 import type { FC } from "react";
-import { useCallback, useRef } from "react";
+import { useCallback, useMemo, useRef } from "react";
 
 export const Copy: FC<{
-  text: string;
+  text?: string;
+  json?: any;
   children: string | JSX.Element | JSX.Element[];
-}> = ({ text, children }) => {
+}> = ({ text: rawText, json, children }) => {
+  const text = useMemo(
+    () => rawText ?? (json !== undefined ? JSON.stringify(json) : undefined),
+    [rawText, json],
+  );
   const ref = useRef<HTMLTextAreaElement | null>(null);
   const copy = useCallback(() => {
     const el = ref.current;

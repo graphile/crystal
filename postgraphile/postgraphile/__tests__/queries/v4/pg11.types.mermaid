@@ -35,39 +35,27 @@ graph TD
     PgSelect20 --> First71
     PgSelectSingle72{{"PgSelectSingle[72∈1]<br />ᐸtypesᐳ"}}:::plan
     First71 --> PgSelectSingle72
+    PgCursor73{{"PgCursor[73∈1]"}}:::plan
+    List75{{"List[75∈1]<br />ᐸ74ᐳ"}}:::plan
+    List75 --> PgCursor73
     PgClassExpression74{{"PgClassExpression[74∈1]<br />ᐸ__types__.”id”ᐳ"}}:::plan
     PgSelectSingle72 --> PgClassExpression74
-    List75{{"List[75∈1]<br />ᐸ74ᐳ"}}:::plan
     PgClassExpression74 --> List75
-    PgCursor73{{"PgCursor[73∈1]"}}:::plan
-    List75 --> PgCursor73
     Last77{{"Last[77∈1]"}}:::plan
     PgSelect20 --> Last77
     PgSelectSingle78{{"PgSelectSingle[78∈1]<br />ᐸtypesᐳ"}}:::plan
     Last77 --> PgSelectSingle78
+    PgCursor79{{"PgCursor[79∈1]"}}:::plan
+    List81{{"List[81∈1]<br />ᐸ80ᐳ"}}:::plan
+    List81 --> PgCursor79
     PgClassExpression80{{"PgClassExpression[80∈1]<br />ᐸ__types__.”id”ᐳ"}}:::plan
     PgSelectSingle78 --> PgClassExpression80
-    List81{{"List[81∈1]<br />ᐸ80ᐳ"}}:::plan
     PgClassExpression80 --> List81
-    PgCursor79{{"PgCursor[79∈1]"}}:::plan
-    List81 --> PgCursor79
     Constant68{{"Constant[68∈1]<br />ᐸfalseᐳ"}}:::plan
     __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
     PgSelect20 ==> __Item21
     PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸtypesᐳ"}}:::plan
     __Item21 --> PgSelectSingle22
-    PgClassExpression44{{"PgClassExpression[44∈6]<br />ᐸ__types__.”id”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression44
-    PgClassExpression45{{"PgClassExpression[45∈6]<br />ᐸ__types__.”regrole”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression45
-    PgClassExpression46{{"PgClassExpression[46∈6]<br />ᐸ__types__....namespace”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression46
-    PgClassExpression47{{"PgClassExpression[47∈6]<br />ᐸ__types__....ay_domain”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression47
-    RemapKeys84{{"RemapKeys[84∈6]<br />ᐸ22:{”0”:12,”1”:13,”2”:14,”3”:15,”4”:16,”5”:17,”6”:18,”7”:19}ᐳ"}}:::plan
-    PgSelectSingle22 --> RemapKeys84
-    PgSelectSingle55{{"PgSelectSingle[55∈6]<br />ᐸfrmcdc_domainConstrainedCompoundTypeᐳ"}}:::plan
-    RemapKeys84 --> PgSelectSingle55
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__types__.”id”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression23
     PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__types__.”regrole”ᐳ"}}:::plan
@@ -76,10 +64,12 @@ graph TD
     PgSelectSingle22 --> PgClassExpression25
     PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__types__....ay_domain”ᐳ"}}:::plan
     PgSelectSingle22 --> PgClassExpression26
-    RemapKeys82{{"RemapKeys[82∈3]<br />ᐸ22:{”0”:4,”1”:5,”2”:6,”3”:7,”4”:8,”5”:9,”6”:10,”7”:11}ᐳ"}}:::plan
-    PgSelectSingle22 --> RemapKeys82
     PgSelectSingle34{{"PgSelectSingle[34∈3]<br />ᐸfrmcdc_domainConstrainedCompoundTypeᐳ"}}:::plan
+    RemapKeys82{{"RemapKeys[82∈3]<br />ᐸ22:{”0”:4,”1”:5,”2”:6,”3”:7,”4”:8,”5”:9,”6”:10,”7”:11}ᐳ"}}:::plan
     RemapKeys82 --> PgSelectSingle34
+    PgSelectSingle22 --> RemapKeys82
+    __Item27[/"__Item[27∈4]<br />ᐸ26ᐳ"\]:::itemplan
+    PgClassExpression26 ==> __Item27
     PgClassExpression35{{"PgClassExpression[35∈5]<br />ᐸ__frmcdc_d...type__.”a”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression35
     PgClassExpression36{{"PgClassExpression[36∈5]<br />ᐸ__frmcdc_d...type__.”b”ᐳ"}}:::plan
@@ -94,6 +84,20 @@ graph TD
     PgSelectSingle34 --> PgClassExpression40
     PgClassExpression41{{"PgClassExpression[41∈5]<br />ᐸ__frmcdc_d....”foo_bar”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression41
+    PgClassExpression44{{"PgClassExpression[44∈6]<br />ᐸ__types__.”id”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression44
+    PgClassExpression45{{"PgClassExpression[45∈6]<br />ᐸ__types__.”regrole”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression45
+    PgClassExpression46{{"PgClassExpression[46∈6]<br />ᐸ__types__....namespace”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression46
+    PgClassExpression47{{"PgClassExpression[47∈6]<br />ᐸ__types__....ay_domain”ᐳ"}}:::plan
+    PgSelectSingle22 --> PgClassExpression47
+    PgSelectSingle55{{"PgSelectSingle[55∈6]<br />ᐸfrmcdc_domainConstrainedCompoundTypeᐳ"}}:::plan
+    RemapKeys84{{"RemapKeys[84∈6]<br />ᐸ22:{”0”:12,”1”:13,”2”:14,”3”:15,”4”:16,”5”:17,”6”:18,”7”:19}ᐳ"}}:::plan
+    RemapKeys84 --> PgSelectSingle55
+    PgSelectSingle22 --> RemapKeys84
+    __Item48[/"__Item[48∈7]<br />ᐸ47ᐳ"\]:::itemplan
+    PgClassExpression47 ==> __Item48
     PgClassExpression56{{"PgClassExpression[56∈8]<br />ᐸ__frmcdc_d...type__.”a”ᐳ"}}:::plan
     PgSelectSingle55 --> PgClassExpression56
     PgClassExpression57{{"PgClassExpression[57∈8]<br />ᐸ__frmcdc_d...type__.”b”ᐳ"}}:::plan
@@ -108,10 +112,6 @@ graph TD
     PgSelectSingle55 --> PgClassExpression61
     PgClassExpression62{{"PgClassExpression[62∈8]<br />ᐸ__frmcdc_d....”foo_bar”ᐳ"}}:::plan
     PgSelectSingle55 --> PgClassExpression62
-    __Item27[/"__Item[27∈4]<br />ᐸ26ᐳ"\]:::itemplan
-    PgClassExpression26 ==> __Item27
-    __Item48[/"__Item[48∈7]<br />ᐸ47ᐳ"\]:::itemplan
-    PgClassExpression47 ==> __Item48
 
     %% define steps
 

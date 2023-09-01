@@ -15,7 +15,8 @@ const { GraphQLList, Kind } = graphql;
  * Implements `__InputListStep`.
  */
 export class __InputListStep<
-  TInputType extends graphql.GraphQLList<GraphQLInputType> = graphql.GraphQLList<GraphQLInputType>,
+  TInputType extends
+    graphql.GraphQLList<GraphQLInputType> = graphql.GraphQLList<GraphQLInputType>,
 > extends ExecutableStep {
   static $$export = {
     moduleName: "grafast",

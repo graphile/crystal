@@ -9,7 +9,8 @@ import type {
 } from "../steps/pgCondition.js";
 
 export class PgClassFilterStep<
-  TParentStep extends PgConditionCapableParentStep = PgConditionCapableParentStep,
+  TParentStep extends
+    PgConditionCapableParentStep = PgConditionCapableParentStep,
 > extends ModifierStep<PgConditionStep<TParentStep>> {
   static $$export = {
     moduleName: "@dataplan/pg",

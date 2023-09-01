@@ -14,7 +14,6 @@ import {
   ObjectPlans,
   ScalarPlans,
 } from "./makeGrafastSchema.js";
-import { PrintPlanGraphOptions } from "./mermaid.js";
 
 // HACK: doing this here feels "naughty".
 debugFactory.formatters.c = grafastPrint;
@@ -56,6 +55,7 @@ import {
   GrafastFieldConfig,
   GrafastFieldConfigArgumentMap,
   GrafastInputFieldConfig,
+  GrafastPlanJSON,
   GrafastResultsList,
   GrafastResultStreamList,
   GrafastSubscriber,
@@ -282,6 +282,7 @@ export {
   GrafastInputFieldConfigMap,
   GrafastInputObjectType,
   GrafastObjectType,
+  GrafastPlanJSON,
   GrafastPlans,
   grafastPrint,
   GrafastResultsList,
@@ -365,7 +366,6 @@ export {
   PolymorphicData,
   PolymorphicStep,
   polymorphicWrap,
-  PrintPlanGraphOptions,
   PromiseOrDirect,
   proxy,
   ProxyStep,

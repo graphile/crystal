@@ -2,9 +2,12 @@
  * This file contains all our utilities for dealing with Mermaid-js
  */
 
-import type { OperationPlan } from ".";
-import type { LayerPlan } from "./engine/LayerPlan";
-import type { ExecutableStep } from "./step.js";
+import type {
+  GrafastPlanBucketJSONv1,
+  GrafastPlanJSON,
+  GrafastPlanJSONv1,
+  GrafastPlanStepJSONv1,
+} from "./interfaces";
 import { __ItemStep, __ListTransformStep } from "./steps/index.js";
 import { stripAnsi } from "./stripAnsi.js";
 
@@ -63,9 +66,9 @@ export const mermaidEscape = (str: string): string => {
     .replace(
       /[#"<>]/g,
       (l) =>
-        ({ "#": "ꖛ", '"': "”", "<": "ᐸ", ">": "ᐳ" }[
+        ({ "#": "ꖛ", '"': "”", "<": "ᐸ", ">": "ᐳ" })[
           l as "#" | '"' | "<" | ">"
-        ]),
+        ],
     )
     .replace(/\r?\n/g, "<br />")}"`;
 };
@@ -77,25 +80,59 @@ export interface PrintPlanGraphOptions {
   skipBuckets?: boolean;
 }
 
-/**
- * Convert an OpPlan into a plan graph; call this via `operationPlan.printPlanGraph()`
- * rather than calling this function directly.
- *
- * @internal
- */
-export function printPlanGraph(
-  operationPlan: OperationPlan,
+function isGrafastPlanJSONv1(json: GrafastPlanJSON): json is GrafastPlanJSONv1 {
+  return json.version === "v1";
+}
+
+export function planToMermaid(
+  planJSON: GrafastPlanJSON,
   {
     // printPathRelations = false,
     concise = false,
     skipBuckets = (global as any).grafastExplainMermaidSkipBuckets ?? false,
-  }: PrintPlanGraphOptions,
-  {
-    steps,
-  }: {
-    steps: { [stepId: number]: ExecutableStep | null };
-  },
+  }: PrintPlanGraphOptions = {},
 ): string {
+  if (!isGrafastPlanJSONv1(planJSON)) {
+    throw new Error("planToMermaid only supports v1 plan JSON");
+  }
+
+  const stepById: { [stepId: number | string]: GrafastPlanStepJSONv1 } =
+    Object.create(null);
+  const layerPlanById: {
+    [layerPlanId: number | string]: GrafastPlanBucketJSONv1;
+  } = Object.create(null);
+  const dependentsByStepId: {
+    [stepId: string | number]: GrafastPlanStepJSONv1[] | undefined;
+  } = Object.create(null);
+  const sortedSteps: GrafastPlanStepJSONv1[] = [];
+  const extractSteps = (bucket: GrafastPlanBucketJSONv1): void => {
+    layerPlanById[bucket.id] = bucket;
+    // Shallowest bucket first, then most dependencies
+    const sorted = [...bucket.steps].sort(
+      (a, z) => z.dependencyIds.length - a.dependencyIds.length,
+    );
+    for (const step of sorted) {
+      if (stepById[step.id]) {
+        throw new Error(
+          `Step ${step.id} (${step.stepClass}/${step.metaString}) duplicated in plan?!`,
+        );
+      }
+      stepById[step.id] = step;
+      sortedSteps.push(step);
+      for (const depId of step.dependencyIds) {
+        if (!dependentsByStepId[depId]) {
+          dependentsByStepId[depId] = [step];
+        } else {
+          dependentsByStepId[depId]!.push(step);
+        }
+      }
+    }
+    for (const child of bucket.children) {
+      extractSteps(child);
+    }
+  };
+  extractSteps(planJSON.rootBucket);
+
   const color = (i: number) => {
     return COLORS[i % COLORS.length];
   };
@@ -124,29 +161,29 @@ export function printPlanGraph(
   };
 
   const planIdMap = Object.create(null);
-  const planId = (plan: ExecutableStep): string => {
+  const planId = (plan: GrafastPlanStepJSONv1): string => {
     if (!planIdMap[plan.id]) {
-      const planName = plan.constructor.name.replace(/Step$/, "");
+      const planName = plan.stepClass.replace(/Step$/, "");
       const planNode = `${planName}${plan.id}`;
       planIdMap[plan.id] = planNode;
-      const rawMeta = plan.toStringMeta();
+      const rawMeta = plan.metaString;
       const strippedMeta = rawMeta != null ? stripAnsi(rawMeta) : null;
       const meta =
         concise && strippedMeta ? squish(strippedMeta) : strippedMeta;
-      const isUnbatched = typeof (plan as any).unbatchedExecute === "function";
+      const isUnbatched = plan.supportsUnbatched;
 
       const polyPaths = pp(plan.polymorphicPaths);
       const polyPathsIfDifferent =
-        plan.dependencies.length === 1 &&
-        pp(plan.dependencies[0].polymorphicPaths) === polyPaths
+        plan.dependencyIds.length === 1 &&
+        pp(stepById[plan.dependencyIds[0]].polymorphicPaths) === polyPaths
           ? ""
           : `\n${polyPaths}`;
 
-      const planString = `${planName}[${plan.id}${`∈${plan.layerPlan.id}`}]${
+      const planString = `${planName}[${plan.id}${`∈${plan.bucketId}`}]${
         meta ? `\n<${meta}>` : ""
       }${polyPathsIfDifferent}`;
       const [lBrace, rBrace] =
-        plan instanceof __ItemStep
+        plan.stepClass === "__ItemStep"
           ? ["[/", "\\]"]
           : plan.isSyncAndSafe
           ? isUnbatched
@@ -155,7 +192,7 @@ export function printPlanGraph(
           : ["[[", "]]"];
       const planClass = plan.hasSideEffects
         ? "sideeffectplan"
-        : plan instanceof __ItemStep
+        : plan.stepClass === "__ItemStep"
         ? "itemplan"
         : isUnbatched && !plan.isSyncAndSafe
         ? "unbatchedplan"
@@ -173,73 +210,25 @@ export function printPlanGraph(
   graph.push("    %% plan dependencies");
   const chainByDep: { [depNode: string]: string } = Object.create(null);
 
-  const sortedSteps: ExecutableStep[] = [];
-  operationPlan.processSteps(
-    "printingPlanDeps",
-    "dependencies-first",
-    true,
-    (plan) => {
-      sortedSteps.push(plan);
-      return plan;
-    },
-  );
-
-  const layerPlanDepth = (step: ExecutableStep) => {
-    let depth = 0;
-    let lp: LayerPlan | null = step.layerPlan;
-    if (lp.parentLayerPlan !== null) {
-      depth -= lp.parentLayerPlan.children.indexOf(lp);
-    }
-    while ((lp = lp.parentLayerPlan)) {
-      depth += 100;
-    }
-    return depth;
-  };
-  type Strategy =
-    | "dependencies-first"
-    | "most-dependencies-first"
-    | "deepest-bucket-first"
-    | "deepest-bucket-first-then-most-dependencies"
-    | "shallowest-bucket-first-then-most-dependencies"
-    | "most-dependencies-first-then-deepest-bucket";
-  const strategy = "shallowest-bucket-first-then-most-dependencies" as Strategy;
-  if (strategy === "most-dependencies-first") {
-    sortedSteps.sort((a, z) => z.dependencies.length - a.dependencies.length);
-  } else if (strategy === "deepest-bucket-first") {
-    sortedSteps.sort((a, z) => layerPlanDepth(z) - layerPlanDepth(a));
-  } else if (strategy === "deepest-bucket-first-then-most-dependencies") {
-    const weight = (step: ExecutableStep) =>
-      layerPlanDepth(step) * 1000 + step.dependencies.length;
-    sortedSteps.sort((a, z) => weight(z) - weight(a));
-  } else if (strategy === "shallowest-bucket-first-then-most-dependencies") {
-    const weight = (step: ExecutableStep) =>
-      layerPlanDepth(step) * 1000 - step.dependencies.length;
-    sortedSteps.sort((a, z) => weight(a) - weight(z));
-  } else if (strategy === "most-dependencies-first-then-deepest-bucket") {
-    const weight = (step: ExecutableStep) =>
-      step.dependencies.length * 1000000 + layerPlanDepth(step);
-    sortedSteps.sort((a, z) => weight(z) - weight(a));
-  }
-
   sortedSteps.forEach(
     // This comment is here purely to maintain the previous formatting to reduce a git diff.
     (plan) => {
       const planNode = planId(plan);
-      const depNodes = plan.dependencies.map(($dep) => {
-        return planId($dep);
+      const depNodes = plan.dependencyIds.map((depId) => {
+        return planId(stepById[depId]);
       });
       const transformItemPlanNode = null;
       /*
-      plan instanceof __ListTransformStep
+      plan.stepClass === '__ListTransformStep'
         ? planId(
             steps[operationPlan.transformDependencyPlanIdByTransformStepId[plan.id]],
           )
         : null;
         */
       if (depNodes.length > 0) {
-        if (plan instanceof __ItemStep) {
+        if (plan.stepClass === "__ItemStep") {
           const [firstDep, ...rest] = depNodes;
-          const arrow = plan.transformStepId == null ? "==>" : "-.->";
+          const arrow = plan.extra?.transformStepId == null ? "==>" : "-.->";
           graph.push(`    ${firstDep} ${arrow} ${planNode}`);
           if (rest.length > 0) {
             graph.push(`    ${rest.join(" & ")} --> ${planNode}`);
@@ -247,7 +236,7 @@ export function printPlanGraph(
         } else {
           if (
             concise &&
-            plan.dependents.length === 0 &&
+            !dependentsByStepId[plan.id] &&
             depNodes.length === 1
           ) {
             // Try alternating the nodes so they render closer together
@@ -272,26 +261,27 @@ export function printPlanGraph(
 
   graph.push("");
   graph.push("    %% define steps");
-  operationPlan.processSteps(
-    "printingPlans",
-    "dependents-first",
-    true,
-    (plan) => {
-      planId(plan);
-      return plan;
-    },
-  );
+  sortedSteps.forEach((step) => {
+    planId(step);
+  });
+
+  const stepToString = (step: GrafastPlanStepJSONv1): string => {
+    return `${step.stepClass.replace(/Step$/, "")}${
+      step.bucketId === 0 ? "" : `{${step.bucketId}}`
+    }${step.metaString ? `<${step.metaString}>` : ""}[${step.id}]`;
+  };
 
   graph.push("");
   if (!concise) graph.push("    subgraph Buckets");
-  for (let i = 0, l = operationPlan.stepTracker.layerPlans.length; i < l; i++) {
-    const layerPlan = operationPlan.stepTracker.layerPlans[i];
+  const layerPlans = Object.values(layerPlanById);
+  for (let i = 0, l = layerPlans.length; i < l; i++) {
+    const layerPlan = layerPlans[i];
     if (!layerPlan || layerPlan.id !== i) {
       continue;
     }
-    const plansAndIds = Object.entries(steps).filter(
+    const plansAndIds = Object.entries(stepById).filter(
       ([id, plan]) =>
-        plan && plan.id === Number(id) && plan.layerPlan === layerPlan,
+        plan && plan.id === Number(id) && plan.bucketId === layerPlan.id,
     );
     const raisonDEtre =
       ` (${layerPlan.reason.type})` +
@@ -305,7 +295,7 @@ export function printPlanGraph(
           `Bucket ${layerPlan.id}${raisonDEtre}${
             layerPlan.copyStepIds.length > 0
               ? `\nDeps: ${layerPlan.copyStepIds
-                  .map((pId) => steps[pId]!.id)
+                  .map((pId) => stepById[pId]!.id)
                   .join(", ")}\n`
               : ""
           }${
@@ -313,10 +303,8 @@ export function printPlanGraph(
               ? pp(layerPlan.reason.polymorphicPaths)
               : ""
           }${
-            layerPlan.rootStep != null && layerPlan.reason.type !== "root"
-              ? `\nROOT ${operationPlan.dangerouslyGetStep(
-                  layerPlan.rootStep.id,
-                )}`
+            layerPlan.rootStepId != null && layerPlan.reason.type !== "root"
+              ? `\nROOT ${stepToString(stepById[layerPlan.rootStepId])}`
               : ""
           }${startSteps(layerPlan)}\n${outputMapStuff.join("\n")}`,
         )}):::bucket`,
@@ -333,12 +321,8 @@ export function printPlanGraph(
     );
   }
   if (!skipBuckets) {
-    for (
-      let i = 0, l = operationPlan.stepTracker.layerPlans.length;
-      i < l;
-      i++
-    ) {
-      const layerPlan = operationPlan.stepTracker.layerPlans[i];
+    for (let i = 0, l = layerPlans.length; i < l; i++) {
+      const layerPlan = layerPlans[i];
       if (!layerPlan || layerPlan.id !== i) {
         continue;
       }
@@ -352,40 +336,47 @@ export function printPlanGraph(
 
   const graphString = graph.join("\n");
   return graphString;
+  function startSteps(layerPlan: GrafastPlanBucketJSONv1) {
+    function shortStep(step: GrafastPlanStepJSONv1) {
+      return `${step.stepClass.replace(/Step$/, "") ?? ""}[${step.id}]`;
+    }
+    function shortSteps(
+      steps: ReadonlyArray<GrafastPlanStepJSONv1> | undefined,
+    ) {
+      if (!steps) {
+        return "";
+      }
+      const str = steps.map(shortStep).join(", ");
+      if (str.length < 40) {
+        return str;
+      } else {
+        return steps.map((s) => s.id).join(", ");
+      }
+    }
+    return layerPlan.phases.length === 1
+      ? ``
+      : `\n${layerPlan.phases
+          .map(
+            (phase, i) =>
+              `${i + 1}: ${shortSteps(
+                phase.normalStepIds?.map((id) => stepById[id]),
+              )}${
+                phase.unbatchedStepIds
+                  ? `\n>: ${shortSteps(
+                      phase.unbatchedStepIds.map((id) => stepById[id]),
+                    )}`
+                  : ""
+              }`,
+          )
+          .join("\n")}`;
+  }
 }
 
-function pp(polymorphicPaths: ReadonlySet<string> | null) {
+function pp(polymorphicPaths: ReadonlyArray<string> | null | undefined) {
   if (!polymorphicPaths) {
     return "";
   }
-  return [...polymorphicPaths].map((p) => `${p}`).join("\n");
+  return polymorphicPaths.map((p) => `${p}`).join("\n");
 }
 
-function startSteps(layerPlan: LayerPlan) {
-  function shortStep({ step }: { step: ExecutableStep }) {
-    return `${step.constructor.name?.replace(/Step$/, "") ?? ""}[${step.id}]`;
-  }
-  function shortSteps(steps: Array<{ step: ExecutableStep }> | undefined) {
-    if (!steps) {
-      return "";
-    }
-    const str = steps.map(shortStep).join(", ");
-    if (str.length < 40) {
-      return str;
-    } else {
-      return steps.map((s) => s.step.id).join(", ");
-    }
-  }
-  return layerPlan.phases.length === 1
-    ? ``
-    : `\n${layerPlan.phases
-        .map(
-          (phase, i) =>
-            `${i + 1}: ${shortSteps(phase.normalSteps)}${
-              phase.unbatchedSyncAndSafeSteps
-                ? `\n>: ${shortSteps(phase.unbatchedSyncAndSafeSteps)}`
-                : ""
-            }`,
-        )
-        .join("\n")}`;
-}
+export * from "./planJSONInterfaces.js";

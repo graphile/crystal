@@ -1,10 +1,11 @@
+import { inspect } from "node:util";
+
 import type {
   FieldArgs,
   FieldInfo,
   FieldPlanResolver,
   GrafastFieldConfig,
 } from "grafast";
-import { inspect } from "node:util";
 
 type ToOptional<T> = { [K in keyof T]+?: T[K] };
 

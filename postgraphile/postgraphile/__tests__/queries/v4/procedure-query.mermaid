@@ -81,12 +81,12 @@ graph TD
     Object11 & Constant1231 & Constant1240 --> PgSelect99
     PgSelect109[["PgSelect[109∈0]<br />ᐸoptional_missing_middle_3ᐳ"]]:::plan
     Object11 & Constant1231 & Constant1240 --> PgSelect109
-    Access9{{"Access[9∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access10{{"Access[10∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access9 & Access10 --> Object11
     PgSelect8[["PgSelect[8∈0]<br />ᐸjson_identityᐳ"]]:::plan
     Constant1227{{"Constant[1227∈0]<br />ᐸ{ a: 1, b: 2, c: 3 }ᐳ"}}:::plan
     Object11 & Constant1227 --> PgSelect8
+    Access9{{"Access[9∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access10{{"Access[10∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access9 & Access10 --> Object11
     PgSelect16[["PgSelect[16∈0]<br />ᐸjsonb_identityᐳ"]]:::plan
     Constant1228{{"Constant[1228∈0]<br />ᐸ{ a: 1, b: 2, c: 3 }ᐳ"}}:::plan
     Object11 & Constant1228 --> PgSelect16
@@ -231,9 +231,9 @@ graph TD
     Constant1290{{"Constant[1290∈0]<br />ᐸ'WyJuYXR1cmFsIiwzXQ=='ᐳ"}}:::plan
     Constant1290 --> Lambda456
     Lambda455 --> PgValidateParsedCursor461
-    Lambda456 --> PgValidateParsedCursor463
     Access462{{"Access[462∈0]<br />ᐸ455.1ᐳ"}}:::plan
     Lambda455 --> Access462
+    Lambda456 --> PgValidateParsedCursor463
     Access464{{"Access[464∈0]<br />ᐸ456.1ᐳ"}}:::plan
     Lambda456 --> Access464
     Lambda455 --> PgValidateParsedCursor513
@@ -285,606 +285,6 @@ graph TD
     Connection1039{{"Connection[1039∈0]<br />ᐸ1035ᐳ"}}:::plan
     Connection1072{{"Connection[1072∈0]<br />ᐸ1068ᐳ"}}:::plan
     Connection1154{{"Connection[1154∈0]<br />ᐸ1150ᐳ"}}:::plan
-    PgSelect1155[["PgSelect[1155∈107]<br />ᐸquery_interval_setᐳ"]]:::plan
-    Object11 & Connection1154 --> PgSelect1155
-    PgSelect1184[["PgSelect[1184∈107]<br />ᐸquery_interval_set(aggregate)ᐳ"]]:::plan
-    Object11 & Connection1154 --> PgSelect1184
-    __ListTransform1156[["__ListTransform[1156∈107]<br />ᐸeach:1155ᐳ"]]:::plan
-    PgSelect1155 --> __ListTransform1156
-    __ListTransform1170[["__ListTransform[1170∈107]<br />ᐸeach:1169ᐳ"]]:::plan
-    PgSelect1155 --> __ListTransform1170
-    First1185{{"First[1185∈107]"}}:::plan
-    PgSelect1184 --> First1185
-    PgSelectSingle1186{{"PgSelectSingle[1186∈107]<br />ᐸquery_interval_setᐳ"}}:::plan
-    First1185 --> PgSelectSingle1186
-    PgClassExpression1187{{"PgClassExpression[1187∈107]<br />ᐸcount(*)ᐳ"}}:::plan
-    PgSelectSingle1186 --> PgClassExpression1187
-    __Item1138[/"__Item[1138∈105]<br />ᐸ1137ᐳ"\]:::itemplan
-    PgClassExpression1137 ==> __Item1138
-    __Item1130[/"__Item[1130∈104]<br />ᐸ1129ᐳ"\]:::itemplan
-    PgClassExpression1129 ==> __Item1130
-    __Item1110[/"__Item[1110∈101]<br />ᐸ1106ᐳ"\]:::itemplan
-    PgSelect1106 ==> __Item1110
-    PgSelectSingle1111{{"PgSelectSingle[1111∈101]<br />ᐸquery_compound_type_arrayᐳ"}}:::plan
-    __Item1110 --> PgSelectSingle1111
-    PgSelect1073[["PgSelect[1073∈97]<br />ᐸstatic_big_integerᐳ"]]:::plan
-    Object11 & Connection1072 --> PgSelect1073
-    PgSelect1085[["PgSelect[1085∈97]<br />ᐸstatic_big_integer(aggregate)ᐳ"]]:::plan
-    Object11 & Connection1072 --> PgSelect1085
-    __ListTransform1074[["__ListTransform[1074∈97]<br />ᐸeach:1073ᐳ"]]:::plan
-    PgSelect1073 --> __ListTransform1074
-    First1086{{"First[1086∈97]"}}:::plan
-    PgSelect1085 --> First1086
-    PgSelectSingle1087{{"PgSelectSingle[1087∈97]<br />ᐸstatic_big_integerᐳ"}}:::plan
-    First1086 --> PgSelectSingle1087
-    PgClassExpression1088{{"PgClassExpression[1088∈97]<br />ᐸcount(*)ᐳ"}}:::plan
-    PgSelectSingle1087 --> PgClassExpression1088
-    PgSelect1040[["PgSelect[1040∈93]<br />ᐸint_set_queryᐳ"]]:::plan
-    Object11 & Constant1236 & Constant59 & Constant1305 & Connection1039 --> PgSelect1040
-    PgSelect1052[["PgSelect[1052∈93]<br />ᐸint_set_query(aggregate)ᐳ"]]:::plan
-    Object11 & Constant1236 & Constant59 & Constant1305 & Connection1039 --> PgSelect1052
-    __ListTransform1041[["__ListTransform[1041∈93]<br />ᐸeach:1040ᐳ"]]:::plan
-    PgSelect1040 --> __ListTransform1041
-    First1053{{"First[1053∈93]"}}:::plan
-    PgSelect1052 --> First1053
-    PgSelectSingle1054{{"PgSelectSingle[1054∈93]<br />ᐸint_set_queryᐳ"}}:::plan
-    First1053 --> PgSelectSingle1054
-    PgClassExpression1055{{"PgClassExpression[1055∈93]<br />ᐸcount(*)ᐳ"}}:::plan
-    PgSelectSingle1054 --> PgClassExpression1055
-    PgSelect991[["PgSelect[991∈88]<br />ᐸtable_set_query_plpgsql+1ᐳ"]]:::plan
-    Access996{{"Access[996∈88]<br />ᐸ990.1ᐳ"}}:::plan
-    Lambda1223{{"Lambda[1223∈88]"}}:::plan
-    Access1224{{"Access[1224∈88]<br />ᐸ1223.0ᐳ"}}:::plan
-    Access1225{{"Access[1225∈88]<br />ᐸ1223.1ᐳ"}}:::plan
-    Object11 & Connection989 & Lambda990 & Access996 & Lambda1223 & Access1224 & Access1225 --> PgSelect991
-    List1222{{"List[1222∈88]<br />ᐸ996,1221ᐳ"}}:::plan
-    Constant1221{{"Constant[1221∈88]<br />ᐸnullᐳ"}}:::plan
-    Access996 & Constant1221 --> List1222
-    Lambda990 --> Access996
-    List1222 --> Lambda1223
-    Lambda1223 --> Access1224
-    Lambda1223 --> Access1225
-    __ListTransform992[["__ListTransform[992∈88]<br />ᐸeach:991ᐳ"]]:::plan
-    PgSelect991 --> __ListTransform992
-    PgPageInfo1004{{"PgPageInfo[1004∈88]"}}:::plan
-    Connection989 --> PgPageInfo1004
-    First1006{{"First[1006∈88]"}}:::plan
-    PgSelect991 --> First1006
-    PgSelectSingle1007{{"PgSelectSingle[1007∈88]<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
-    First1006 --> PgSelectSingle1007
-    PgClassExpression1011{{"PgClassExpression[1011∈88]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle1007 --> PgClassExpression1011
-    List1012{{"List[1012∈88]<br />ᐸ1011ᐳ"}}:::plan
-    PgClassExpression1011 --> List1012
-    PgCursor1008{{"PgCursor[1008∈88]"}}:::plan
-    List1012 --> PgCursor1008
-    Last1014{{"Last[1014∈88]"}}:::plan
-    PgSelect991 --> Last1014
-    PgSelectSingle1015{{"PgSelectSingle[1015∈88]<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
-    Last1014 --> PgSelectSingle1015
-    PgClassExpression1019{{"PgClassExpression[1019∈88]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle1015 --> PgClassExpression1019
-    List1020{{"List[1020∈88]<br />ᐸ1019ᐳ"}}:::plan
-    PgClassExpression1019 --> List1020
-    PgCursor1016{{"PgCursor[1016∈88]"}}:::plan
-    List1020 --> PgCursor1016
-    Access1022{{"Access[1022∈88]<br />ᐸ991.hasMoreᐳ"}}:::plan
-    PgSelect991 --> Access1022
-    PgSelect953[["PgSelect[953∈83]<br />ᐸtable_set_query_plpgsql+1ᐳ"]]:::plan
-    Object11 & Connection952 --> PgSelect953
-    __ListTransform954[["__ListTransform[954∈83]<br />ᐸeach:953ᐳ"]]:::plan
-    PgSelect953 --> __ListTransform954
-    PgPageInfo964{{"PgPageInfo[964∈83]"}}:::plan
-    Connection952 --> PgPageInfo964
-    First966{{"First[966∈83]"}}:::plan
-    PgSelect953 --> First966
-    PgSelectSingle967{{"PgSelectSingle[967∈83]<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
-    First966 --> PgSelectSingle967
-    PgClassExpression969{{"PgClassExpression[969∈83]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle967 --> PgClassExpression969
-    List970{{"List[970∈83]<br />ᐸ969ᐳ"}}:::plan
-    PgClassExpression969 --> List970
-    PgCursor968{{"PgCursor[968∈83]"}}:::plan
-    List970 --> PgCursor968
-    Last972{{"Last[972∈83]"}}:::plan
-    PgSelect953 --> Last972
-    PgSelectSingle973{{"PgSelectSingle[973∈83]<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
-    Last972 --> PgSelectSingle973
-    PgClassExpression975{{"PgClassExpression[975∈83]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle973 --> PgClassExpression975
-    List976{{"List[976∈83]<br />ᐸ975ᐳ"}}:::plan
-    PgClassExpression975 --> List976
-    PgCursor974{{"PgCursor[974∈83]"}}:::plan
-    List976 --> PgCursor974
-    Access978{{"Access[978∈83]<br />ᐸ953.hasMoreᐳ"}}:::plan
-    PgSelect953 --> Access978
-    PgSelect908[["PgSelect[908∈78]<br />ᐸtable_set_query+1ᐳ"]]:::plan
-    Lambda1218{{"Lambda[1218∈78]"}}:::plan
-    Access1219{{"Access[1219∈78]<br />ᐸ1218.0ᐳ"}}:::plan
-    Access1220{{"Access[1220∈78]<br />ᐸ1218.1ᐳ"}}:::plan
-    Object11 & Connection906 & Lambda859 & Access865 & Lambda1218 & Access1219 & Access1220 --> PgSelect908
-    List1217{{"List[1217∈78]<br />ᐸ865,1216ᐳ"}}:::plan
-    Constant1216{{"Constant[1216∈78]<br />ᐸnullᐳ"}}:::plan
-    Access865 & Constant1216 --> List1217
-    List1217 --> Lambda1218
-    Lambda1218 --> Access1219
-    Lambda1218 --> Access1220
-    __ListTransform909[["__ListTransform[909∈78]<br />ᐸeach:908ᐳ"]]:::plan
-    PgSelect908 --> __ListTransform909
-    PgPageInfo921{{"PgPageInfo[921∈78]"}}:::plan
-    Connection906 --> PgPageInfo921
-    First923{{"First[923∈78]"}}:::plan
-    PgSelect908 --> First923
-    PgSelectSingle924{{"PgSelectSingle[924∈78]<br />ᐸtable_set_queryᐳ"}}:::plan
-    First923 --> PgSelectSingle924
-    PgClassExpression928{{"PgClassExpression[928∈78]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle924 --> PgClassExpression928
-    List929{{"List[929∈78]<br />ᐸ928ᐳ"}}:::plan
-    PgClassExpression928 --> List929
-    PgCursor925{{"PgCursor[925∈78]"}}:::plan
-    List929 --> PgCursor925
-    Last931{{"Last[931∈78]"}}:::plan
-    PgSelect908 --> Last931
-    PgSelectSingle932{{"PgSelectSingle[932∈78]<br />ᐸtable_set_queryᐳ"}}:::plan
-    Last931 --> PgSelectSingle932
-    PgClassExpression936{{"PgClassExpression[936∈78]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle932 --> PgClassExpression936
-    List937{{"List[937∈78]<br />ᐸ936ᐳ"}}:::plan
-    PgClassExpression936 --> List937
-    PgCursor933{{"PgCursor[933∈78]"}}:::plan
-    List937 --> PgCursor933
-    Access939{{"Access[939∈78]<br />ᐸ908.hasMoreᐳ"}}:::plan
-    PgSelect908 --> Access939
-    PgSelect860[["PgSelect[860∈73]<br />ᐸtable_set_query+1ᐳ"]]:::plan
-    Lambda1213{{"Lambda[1213∈73]"}}:::plan
-    Access1214{{"Access[1214∈73]<br />ᐸ1213.0ᐳ"}}:::plan
-    Access1215{{"Access[1215∈73]<br />ᐸ1213.1ᐳ"}}:::plan
-    Object11 & Connection858 & Lambda859 & Access865 & Lambda1213 & Access1214 & Access1215 --> PgSelect860
-    List1212{{"List[1212∈73]<br />ᐸ1211,865ᐳ"}}:::plan
-    Constant1211{{"Constant[1211∈73]<br />ᐸnullᐳ"}}:::plan
-    Constant1211 & Access865 --> List1212
-    List1212 --> Lambda1213
-    Lambda1213 --> Access1214
-    Lambda1213 --> Access1215
-    __ListTransform861[["__ListTransform[861∈73]<br />ᐸeach:860ᐳ"]]:::plan
-    PgSelect860 --> __ListTransform861
-    PgPageInfo873{{"PgPageInfo[873∈73]"}}:::plan
-    Connection858 --> PgPageInfo873
-    First875{{"First[875∈73]"}}:::plan
-    PgSelect860 --> First875
-    PgSelectSingle876{{"PgSelectSingle[876∈73]<br />ᐸtable_set_queryᐳ"}}:::plan
-    First875 --> PgSelectSingle876
-    PgClassExpression880{{"PgClassExpression[880∈73]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle876 --> PgClassExpression880
-    List881{{"List[881∈73]<br />ᐸ880ᐳ"}}:::plan
-    PgClassExpression880 --> List881
-    PgCursor877{{"PgCursor[877∈73]"}}:::plan
-    List881 --> PgCursor877
-    Last883{{"Last[883∈73]"}}:::plan
-    PgSelect860 --> Last883
-    PgSelectSingle884{{"PgSelectSingle[884∈73]<br />ᐸtable_set_queryᐳ"}}:::plan
-    Last883 --> PgSelectSingle884
-    PgClassExpression888{{"PgClassExpression[888∈73]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle884 --> PgClassExpression888
-    List889{{"List[889∈73]<br />ᐸ888ᐳ"}}:::plan
-    PgClassExpression888 --> List889
-    PgCursor885{{"PgCursor[885∈73]"}}:::plan
-    List889 --> PgCursor885
-    Access892{{"Access[892∈73]<br />ᐸ860.hasMoreᐳ"}}:::plan
-    PgSelect860 --> Access892
-    PgSelect820[["PgSelect[820∈68]<br />ᐸtable_set_query+1ᐳ"]]:::plan
-    Object11 & Connection819 --> PgSelect820
-    __ListTransform821[["__ListTransform[821∈68]<br />ᐸeach:820ᐳ"]]:::plan
-    PgSelect820 --> __ListTransform821
-    PgPageInfo831{{"PgPageInfo[831∈68]"}}:::plan
-    Connection819 --> PgPageInfo831
-    First833{{"First[833∈68]"}}:::plan
-    PgSelect820 --> First833
-    PgSelectSingle834{{"PgSelectSingle[834∈68]<br />ᐸtable_set_queryᐳ"}}:::plan
-    First833 --> PgSelectSingle834
-    PgClassExpression836{{"PgClassExpression[836∈68]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle834 --> PgClassExpression836
-    List837{{"List[837∈68]<br />ᐸ836ᐳ"}}:::plan
-    PgClassExpression836 --> List837
-    PgCursor835{{"PgCursor[835∈68]"}}:::plan
-    List837 --> PgCursor835
-    Last839{{"Last[839∈68]"}}:::plan
-    PgSelect820 --> Last839
-    PgSelectSingle840{{"PgSelectSingle[840∈68]<br />ᐸtable_set_queryᐳ"}}:::plan
-    Last839 --> PgSelectSingle840
-    PgClassExpression842{{"PgClassExpression[842∈68]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle840 --> PgClassExpression842
-    List843{{"List[843∈68]<br />ᐸ842ᐳ"}}:::plan
-    PgClassExpression842 --> List843
-    PgCursor841{{"PgCursor[841∈68]"}}:::plan
-    List843 --> PgCursor841
-    Access845{{"Access[845∈68]<br />ᐸ820.hasMoreᐳ"}}:::plan
-    PgSelect820 --> Access845
-    PgSelect781[["PgSelect[781∈63]<br />ᐸtable_set_query+1ᐳ"]]:::plan
-    Object11 & Connection780 --> PgSelect781
-    __ListTransform782[["__ListTransform[782∈63]<br />ᐸeach:781ᐳ"]]:::plan
-    PgSelect781 --> __ListTransform782
-    PgPageInfo792{{"PgPageInfo[792∈63]"}}:::plan
-    Connection780 --> PgPageInfo792
-    First794{{"First[794∈63]"}}:::plan
-    PgSelect781 --> First794
-    PgSelectSingle795{{"PgSelectSingle[795∈63]<br />ᐸtable_set_queryᐳ"}}:::plan
-    First794 --> PgSelectSingle795
-    PgClassExpression797{{"PgClassExpression[797∈63]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle795 --> PgClassExpression797
-    List798{{"List[798∈63]<br />ᐸ797ᐳ"}}:::plan
-    PgClassExpression797 --> List798
-    PgCursor796{{"PgCursor[796∈63]"}}:::plan
-    List798 --> PgCursor796
-    Last800{{"Last[800∈63]"}}:::plan
-    PgSelect781 --> Last800
-    PgSelectSingle801{{"PgSelectSingle[801∈63]<br />ᐸtable_set_queryᐳ"}}:::plan
-    Last800 --> PgSelectSingle801
-    PgClassExpression803{{"PgClassExpression[803∈63]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle801 --> PgClassExpression803
-    List804{{"List[804∈63]<br />ᐸ803ᐳ"}}:::plan
-    PgClassExpression803 --> List804
-    PgCursor802{{"PgCursor[802∈63]"}}:::plan
-    List804 --> PgCursor802
-    Access806{{"Access[806∈63]<br />ᐸ781.hasMoreᐳ"}}:::plan
-    PgSelect781 --> Access806
-    PgSelect742[["PgSelect[742∈58]<br />ᐸtable_set_query+1ᐳ"]]:::plan
-    Object11 & Connection741 --> PgSelect742
-    __ListTransform743[["__ListTransform[743∈58]<br />ᐸeach:742ᐳ"]]:::plan
-    PgSelect742 --> __ListTransform743
-    PgPageInfo753{{"PgPageInfo[753∈58]"}}:::plan
-    Connection741 --> PgPageInfo753
-    First755{{"First[755∈58]"}}:::plan
-    PgSelect742 --> First755
-    PgSelectSingle756{{"PgSelectSingle[756∈58]<br />ᐸtable_set_queryᐳ"}}:::plan
-    First755 --> PgSelectSingle756
-    PgClassExpression758{{"PgClassExpression[758∈58]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle756 --> PgClassExpression758
-    List759{{"List[759∈58]<br />ᐸ758ᐳ"}}:::plan
-    PgClassExpression758 --> List759
-    PgCursor757{{"PgCursor[757∈58]"}}:::plan
-    List759 --> PgCursor757
-    Last761{{"Last[761∈58]"}}:::plan
-    PgSelect742 --> Last761
-    PgSelectSingle762{{"PgSelectSingle[762∈58]<br />ᐸtable_set_queryᐳ"}}:::plan
-    Last761 --> PgSelectSingle762
-    PgClassExpression764{{"PgClassExpression[764∈58]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle762 --> PgClassExpression764
-    List765{{"List[765∈58]<br />ᐸ764ᐳ"}}:::plan
-    PgClassExpression764 --> List765
-    PgCursor763{{"PgCursor[763∈58]"}}:::plan
-    List765 --> PgCursor763
-    Access767{{"Access[767∈58]<br />ᐸ742.hasMoreᐳ"}}:::plan
-    PgSelect742 --> Access767
-    PgSelect703[["PgSelect[703∈53]<br />ᐸtable_set_query+1ᐳ"]]:::plan
-    Object11 & Connection702 --> PgSelect703
-    __ListTransform704[["__ListTransform[704∈53]<br />ᐸeach:703ᐳ"]]:::plan
-    PgSelect703 --> __ListTransform704
-    PgPageInfo714{{"PgPageInfo[714∈53]"}}:::plan
-    Connection702 --> PgPageInfo714
-    First716{{"First[716∈53]"}}:::plan
-    PgSelect703 --> First716
-    PgSelectSingle717{{"PgSelectSingle[717∈53]<br />ᐸtable_set_queryᐳ"}}:::plan
-    First716 --> PgSelectSingle717
-    PgClassExpression719{{"PgClassExpression[719∈53]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle717 --> PgClassExpression719
-    List720{{"List[720∈53]<br />ᐸ719ᐳ"}}:::plan
-    PgClassExpression719 --> List720
-    PgCursor718{{"PgCursor[718∈53]"}}:::plan
-    List720 --> PgCursor718
-    Last722{{"Last[722∈53]"}}:::plan
-    PgSelect703 --> Last722
-    PgSelectSingle723{{"PgSelectSingle[723∈53]<br />ᐸtable_set_queryᐳ"}}:::plan
-    Last722 --> PgSelectSingle723
-    PgClassExpression725{{"PgClassExpression[725∈53]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle723 --> PgClassExpression725
-    List726{{"List[726∈53]<br />ᐸ725ᐳ"}}:::plan
-    PgClassExpression725 --> List726
-    PgCursor724{{"PgCursor[724∈53]"}}:::plan
-    List726 --> PgCursor724
-    Access728{{"Access[728∈53]<br />ᐸ703.hasMoreᐳ"}}:::plan
-    PgSelect703 --> Access728
-    PgSelect656[["PgSelect[656∈48]<br />ᐸtable_set_query+1ᐳ"]]:::plan
-    Lambda1208{{"Lambda[1208∈48]"}}:::plan
-    Access1209{{"Access[1209∈48]<br />ᐸ1208.0ᐳ"}}:::plan
-    Access1210{{"Access[1210∈48]<br />ᐸ1208.1ᐳ"}}:::plan
-    Object11 & Connection654 & Lambda456 & Access464 & Lambda1208 & Access1209 & Access1210 --> PgSelect656
-    List1207{{"List[1207∈48]<br />ᐸ464,1206ᐳ"}}:::plan
-    Constant1206{{"Constant[1206∈48]<br />ᐸnullᐳ"}}:::plan
-    Access464 & Constant1206 --> List1207
-    List1207 --> Lambda1208
-    Lambda1208 --> Access1209
-    Lambda1208 --> Access1210
-    __ListTransform657[["__ListTransform[657∈48]<br />ᐸeach:656ᐳ"]]:::plan
-    PgSelect656 --> __ListTransform657
-    PgPageInfo669{{"PgPageInfo[669∈48]"}}:::plan
-    Connection654 --> PgPageInfo669
-    First671{{"First[671∈48]"}}:::plan
-    PgSelect656 --> First671
-    PgSelectSingle672{{"PgSelectSingle[672∈48]<br />ᐸtable_set_queryᐳ"}}:::plan
-    First671 --> PgSelectSingle672
-    PgClassExpression676{{"PgClassExpression[676∈48]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle672 --> PgClassExpression676
-    List677{{"List[677∈48]<br />ᐸ676ᐳ"}}:::plan
-    PgClassExpression676 --> List677
-    PgCursor673{{"PgCursor[673∈48]"}}:::plan
-    List677 --> PgCursor673
-    Last679{{"Last[679∈48]"}}:::plan
-    PgSelect656 --> Last679
-    PgSelectSingle680{{"PgSelectSingle[680∈48]<br />ᐸtable_set_queryᐳ"}}:::plan
-    Last679 --> PgSelectSingle680
-    PgClassExpression684{{"PgClassExpression[684∈48]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle680 --> PgClassExpression684
-    List685{{"List[685∈48]<br />ᐸ684ᐳ"}}:::plan
-    PgClassExpression684 --> List685
-    PgCursor681{{"PgCursor[681∈48]"}}:::plan
-    List685 --> PgCursor681
-    Access687{{"Access[687∈48]<br />ᐸ656.hasMoreᐳ"}}:::plan
-    PgSelect656 --> Access687
-    PgSelect608[["PgSelect[608∈43]<br />ᐸtable_set_query+1ᐳ"]]:::plan
-    Lambda1203{{"Lambda[1203∈43]"}}:::plan
-    Access1204{{"Access[1204∈43]<br />ᐸ1203.0ᐳ"}}:::plan
-    Access1205{{"Access[1205∈43]<br />ᐸ1203.1ᐳ"}}:::plan
-    Object11 & Connection606 & Lambda455 & Access462 & Lambda1203 & Access1204 & Access1205 --> PgSelect608
-    List1202{{"List[1202∈43]<br />ᐸ1201,462ᐳ"}}:::plan
-    Constant1201{{"Constant[1201∈43]<br />ᐸnullᐳ"}}:::plan
-    Constant1201 & Access462 --> List1202
-    List1202 --> Lambda1203
-    Lambda1203 --> Access1204
-    Lambda1203 --> Access1205
-    __ListTransform609[["__ListTransform[609∈43]<br />ᐸeach:608ᐳ"]]:::plan
-    PgSelect608 --> __ListTransform609
-    PgPageInfo621{{"PgPageInfo[621∈43]"}}:::plan
-    Connection606 --> PgPageInfo621
-    First623{{"First[623∈43]"}}:::plan
-    PgSelect608 --> First623
-    PgSelectSingle624{{"PgSelectSingle[624∈43]<br />ᐸtable_set_queryᐳ"}}:::plan
-    First623 --> PgSelectSingle624
-    PgClassExpression628{{"PgClassExpression[628∈43]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle624 --> PgClassExpression628
-    List629{{"List[629∈43]<br />ᐸ628ᐳ"}}:::plan
-    PgClassExpression628 --> List629
-    PgCursor625{{"PgCursor[625∈43]"}}:::plan
-    List629 --> PgCursor625
-    Last631{{"Last[631∈43]"}}:::plan
-    PgSelect608 --> Last631
-    PgSelectSingle632{{"PgSelectSingle[632∈43]<br />ᐸtable_set_queryᐳ"}}:::plan
-    Last631 --> PgSelectSingle632
-    PgClassExpression636{{"PgClassExpression[636∈43]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle632 --> PgClassExpression636
-    List637{{"List[637∈43]<br />ᐸ636ᐳ"}}:::plan
-    PgClassExpression636 --> List637
-    PgCursor633{{"PgCursor[633∈43]"}}:::plan
-    List637 --> PgCursor633
-    Access639{{"Access[639∈43]<br />ᐸ608.hasMoreᐳ"}}:::plan
-    PgSelect608 --> Access639
-    PgSelect560[["PgSelect[560∈38]<br />ᐸtable_set_query+1ᐳ"]]:::plan
-    Lambda1198{{"Lambda[1198∈38]"}}:::plan
-    Access1199{{"Access[1199∈38]<br />ᐸ1198.0ᐳ"}}:::plan
-    Access1200{{"Access[1200∈38]<br />ᐸ1198.1ᐳ"}}:::plan
-    Object11 & Connection558 & Lambda455 & Access462 & Lambda1198 & Access1199 & Access1200 --> PgSelect560
-    List1197{{"List[1197∈38]<br />ᐸ1196,462ᐳ"}}:::plan
-    Constant1196{{"Constant[1196∈38]<br />ᐸnullᐳ"}}:::plan
-    Constant1196 & Access462 --> List1197
-    List1197 --> Lambda1198
-    Lambda1198 --> Access1199
-    Lambda1198 --> Access1200
-    __ListTransform561[["__ListTransform[561∈38]<br />ᐸeach:560ᐳ"]]:::plan
-    PgSelect560 --> __ListTransform561
-    PgPageInfo573{{"PgPageInfo[573∈38]"}}:::plan
-    Connection558 --> PgPageInfo573
-    First575{{"First[575∈38]"}}:::plan
-    PgSelect560 --> First575
-    PgSelectSingle576{{"PgSelectSingle[576∈38]<br />ᐸtable_set_queryᐳ"}}:::plan
-    First575 --> PgSelectSingle576
-    PgClassExpression580{{"PgClassExpression[580∈38]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle576 --> PgClassExpression580
-    List581{{"List[581∈38]<br />ᐸ580ᐳ"}}:::plan
-    PgClassExpression580 --> List581
-    PgCursor577{{"PgCursor[577∈38]"}}:::plan
-    List581 --> PgCursor577
-    Last583{{"Last[583∈38]"}}:::plan
-    PgSelect560 --> Last583
-    PgSelectSingle584{{"PgSelectSingle[584∈38]<br />ᐸtable_set_queryᐳ"}}:::plan
-    Last583 --> PgSelectSingle584
-    PgClassExpression588{{"PgClassExpression[588∈38]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle584 --> PgClassExpression588
-    List589{{"List[589∈38]<br />ᐸ588ᐳ"}}:::plan
-    PgClassExpression588 --> List589
-    PgCursor585{{"PgCursor[585∈38]"}}:::plan
-    List589 --> PgCursor585
-    Access592{{"Access[592∈38]<br />ᐸ560.hasMoreᐳ"}}:::plan
-    PgSelect560 --> Access592
-    PgSelect509[["PgSelect[509∈33]<br />ᐸtable_set_queryᐳ"]]:::plan
-    Lambda1193{{"Lambda[1193∈33]"}}:::plan
-    Access1194{{"Access[1194∈33]<br />ᐸ1193.0ᐳ"}}:::plan
-    Access1195{{"Access[1195∈33]<br />ᐸ1193.1ᐳ"}}:::plan
-    Object11 & Connection506 & Lambda455 & Lambda456 & Access462 & Access464 & Lambda1193 & Access1194 & Access1195 --> PgSelect509
-    List1192{{"List[1192∈33]<br />ᐸ464,462ᐳ"}}:::plan
-    Access464 & Access462 --> List1192
-    List1192 --> Lambda1193
-    Lambda1193 --> Access1194
-    Lambda1193 --> Access1195
-    __ListTransform510[["__ListTransform[510∈33]<br />ᐸeach:509ᐳ"]]:::plan
-    PgSelect509 --> __ListTransform510
-    PgPageInfo524{{"PgPageInfo[524∈33]"}}:::plan
-    Connection506 --> PgPageInfo524
-    First526{{"First[526∈33]"}}:::plan
-    PgSelect509 --> First526
-    PgSelectSingle527{{"PgSelectSingle[527∈33]<br />ᐸtable_set_queryᐳ"}}:::plan
-    First526 --> PgSelectSingle527
-    PgClassExpression533{{"PgClassExpression[533∈33]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle527 --> PgClassExpression533
-    List534{{"List[534∈33]<br />ᐸ533ᐳ"}}:::plan
-    PgClassExpression533 --> List534
-    PgCursor528{{"PgCursor[528∈33]"}}:::plan
-    List534 --> PgCursor528
-    Last536{{"Last[536∈33]"}}:::plan
-    PgSelect509 --> Last536
-    PgSelectSingle537{{"PgSelectSingle[537∈33]<br />ᐸtable_set_queryᐳ"}}:::plan
-    Last536 --> PgSelectSingle537
-    PgClassExpression543{{"PgClassExpression[543∈33]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle537 --> PgClassExpression543
-    List544{{"List[544∈33]<br />ᐸ543ᐳ"}}:::plan
-    PgClassExpression543 --> List544
-    PgCursor538{{"PgCursor[538∈33]"}}:::plan
-    List544 --> PgCursor538
-    PgSelect457[["PgSelect[457∈28]<br />ᐸtable_set_queryᐳ"]]:::plan
-    Lambda1189{{"Lambda[1189∈28]"}}:::plan
-    Access1190{{"Access[1190∈28]<br />ᐸ1189.0ᐳ"}}:::plan
-    Access1191{{"Access[1191∈28]<br />ᐸ1189.1ᐳ"}}:::plan
-    Object11 & Connection454 & Lambda455 & Lambda456 & Access462 & Access464 & Lambda1189 & Access1190 & Access1191 --> PgSelect457
-    List1188{{"List[1188∈28]<br />ᐸ464,462ᐳ"}}:::plan
-    Access464 & Access462 --> List1188
-    List1188 --> Lambda1189
-    Lambda1189 --> Access1190
-    Lambda1189 --> Access1191
-    __ListTransform458[["__ListTransform[458∈28]<br />ᐸeach:457ᐳ"]]:::plan
-    PgSelect457 --> __ListTransform458
-    PgPageInfo472{{"PgPageInfo[472∈28]"}}:::plan
-    Connection454 --> PgPageInfo472
-    First474{{"First[474∈28]"}}:::plan
-    PgSelect457 --> First474
-    PgSelectSingle475{{"PgSelectSingle[475∈28]<br />ᐸtable_set_queryᐳ"}}:::plan
-    First474 --> PgSelectSingle475
-    PgClassExpression481{{"PgClassExpression[481∈28]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle475 --> PgClassExpression481
-    List482{{"List[482∈28]<br />ᐸ481ᐳ"}}:::plan
-    PgClassExpression481 --> List482
-    PgCursor476{{"PgCursor[476∈28]"}}:::plan
-    List482 --> PgCursor476
-    Last484{{"Last[484∈28]"}}:::plan
-    PgSelect457 --> Last484
-    PgSelectSingle485{{"PgSelectSingle[485∈28]<br />ᐸtable_set_queryᐳ"}}:::plan
-    Last484 --> PgSelectSingle485
-    PgClassExpression491{{"PgClassExpression[491∈28]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle485 --> PgClassExpression491
-    List492{{"List[492∈28]<br />ᐸ491ᐳ"}}:::plan
-    PgClassExpression491 --> List492
-    PgCursor486{{"PgCursor[486∈28]"}}:::plan
-    List492 --> PgCursor486
-    PgSelect417[["PgSelect[417∈23]<br />ᐸtable_set_queryᐳ"]]:::plan
-    Constant1288{{"Constant[1288∈23]<br />ᐸ'Budd Deey'ᐳ"}}:::plan
-    Object11 & Constant1288 & Connection416 --> PgSelect417
-    __ListTransform418[["__ListTransform[418∈23]<br />ᐸeach:417ᐳ"]]:::plan
-    PgSelect417 --> __ListTransform418
-    PgPageInfo428{{"PgPageInfo[428∈23]"}}:::plan
-    Connection416 --> PgPageInfo428
-    First430{{"First[430∈23]"}}:::plan
-    PgSelect417 --> First430
-    PgSelectSingle431{{"PgSelectSingle[431∈23]<br />ᐸtable_set_queryᐳ"}}:::plan
-    First430 --> PgSelectSingle431
-    PgClassExpression433{{"PgClassExpression[433∈23]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle431 --> PgClassExpression433
-    List434{{"List[434∈23]<br />ᐸ433ᐳ"}}:::plan
-    PgClassExpression433 --> List434
-    PgCursor432{{"PgCursor[432∈23]"}}:::plan
-    List434 --> PgCursor432
-    Last436{{"Last[436∈23]"}}:::plan
-    PgSelect417 --> Last436
-    PgSelectSingle437{{"PgSelectSingle[437∈23]<br />ᐸtable_set_queryᐳ"}}:::plan
-    Last436 --> PgSelectSingle437
-    PgClassExpression439{{"PgClassExpression[439∈23]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle437 --> PgClassExpression439
-    List440{{"List[440∈23]<br />ᐸ439ᐳ"}}:::plan
-    PgClassExpression439 --> List440
-    PgCursor438{{"PgCursor[438∈23]"}}:::plan
-    List440 --> PgCursor438
-    PgSelect367[["PgSelect[367∈18]<br />ᐸtable_set_queryᐳ"]]:::plan
-    Object11 & Connection366 --> PgSelect367
-    __ListTransform368[["__ListTransform[368∈18]<br />ᐸeach:367ᐳ"]]:::plan
-    PgSelect367 --> __ListTransform368
-    PgPageInfo378{{"PgPageInfo[378∈18]"}}:::plan
-    Connection366 --> PgPageInfo378
-    First380{{"First[380∈18]"}}:::plan
-    PgSelect367 --> First380
-    PgSelectSingle381{{"PgSelectSingle[381∈18]<br />ᐸtable_set_queryᐳ"}}:::plan
-    First380 --> PgSelectSingle381
-    PgClassExpression383{{"PgClassExpression[383∈18]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
-    PgSelectSingle381 --> PgClassExpression383
-    List384{{"List[384∈18]<br />ᐸ383ᐳ"}}:::plan
-    PgClassExpression383 --> List384
-    PgCursor382{{"PgCursor[382∈18]"}}:::plan
-    List384 --> PgCursor382
-    Last386{{"Last[386∈18]"}}:::plan
-    PgSelect367 --> Last386
-    PgSelectSingle387{{"PgSelectSingle[387∈18]<br />ᐸtable_set_queryᐳ"}}:::plan
-    Last386 --> PgSelectSingle387
-    PgClassExpression389{{"PgClassExpression[389∈18]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
-    PgSelectSingle387 --> PgClassExpression389
-    List390{{"List[390∈18]<br />ᐸ389ᐳ"}}:::plan
-    PgClassExpression389 --> List390
-    PgCursor388{{"PgCursor[388∈18]"}}:::plan
-    List390 --> PgCursor388
-    PgSelect328[["PgSelect[328∈13]<br />ᐸtable_set_queryᐳ"]]:::plan
-    Object11 & Connection327 --> PgSelect328
-    __ListTransform329[["__ListTransform[329∈13]<br />ᐸeach:328ᐳ"]]:::plan
-    PgSelect328 --> __ListTransform329
-    PgPageInfo339{{"PgPageInfo[339∈13]"}}:::plan
-    Connection327 --> PgPageInfo339
-    First341{{"First[341∈13]"}}:::plan
-    PgSelect328 --> First341
-    PgSelectSingle342{{"PgSelectSingle[342∈13]<br />ᐸtable_set_queryᐳ"}}:::plan
-    First341 --> PgSelectSingle342
-    PgClassExpression344{{"PgClassExpression[344∈13]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle342 --> PgClassExpression344
-    List345{{"List[345∈13]<br />ᐸ344ᐳ"}}:::plan
-    PgClassExpression344 --> List345
-    PgCursor343{{"PgCursor[343∈13]"}}:::plan
-    List345 --> PgCursor343
-    Last347{{"Last[347∈13]"}}:::plan
-    PgSelect328 --> Last347
-    PgSelectSingle348{{"PgSelectSingle[348∈13]<br />ᐸtable_set_queryᐳ"}}:::plan
-    Last347 --> PgSelectSingle348
-    PgClassExpression350{{"PgClassExpression[350∈13]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle348 --> PgClassExpression350
-    List351{{"List[351∈13]<br />ᐸ350ᐳ"}}:::plan
-    PgClassExpression350 --> List351
-    PgCursor349{{"PgCursor[349∈13]"}}:::plan
-    List351 --> PgCursor349
-    List311{{"List[311∈12]<br />ᐸ309,310ᐳ"}}:::plan
-    Constant309{{"Constant[309∈12]<br />ᐸ'posts'ᐳ"}}:::plan
-    PgClassExpression310{{"PgClassExpression[310∈12]<br />ᐸ__table_query__.”id”ᐳ"}}:::plan
-    Constant309 & PgClassExpression310 --> List311
-    PgSelectSingle308 --> PgClassExpression310
-    Lambda312{{"Lambda[312∈12]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List311 --> Lambda312
-    PgClassExpression314{{"PgClassExpression[314∈12]<br />ᐸ__table_qu...”headline”ᐳ"}}:::plan
-    PgSelectSingle308 --> PgClassExpression314
-    PgClassExpression315{{"PgClassExpression[315∈12]<br />ᐸ__table_qu...author_id”ᐳ"}}:::plan
-    PgSelectSingle308 --> PgClassExpression315
-    __Item289[/"__Item[289∈9]<br />ᐸ285ᐳ"\]:::itemplan
-    PgSelect285 ==> __Item289
-    PgSelectSingle290{{"PgSelectSingle[290∈9]<br />ᐸcompound_type_array_queryᐳ"}}:::plan
-    __Item289 --> PgSelectSingle290
-    PgSelect231[["PgSelect[231∈3]<br />ᐸcompound_type_set_query+1ᐳ"]]:::plan
-    Object11 & Connection230 --> PgSelect231
-    __ListTransform232[["__ListTransform[232∈3]<br />ᐸeach:231ᐳ"]]:::plan
-    PgSelect231 --> __ListTransform232
-    PgPageInfo252{{"PgPageInfo[252∈3]"}}:::plan
-    Connection230 --> PgPageInfo252
-    First254{{"First[254∈3]"}}:::plan
-    PgSelect231 --> First254
-    PgSelectSingle255{{"PgSelectSingle[255∈3]<br />ᐸcompound_type_set_queryᐳ"}}:::plan
-    First254 --> PgSelectSingle255
-    PgClassExpression257{{"PgClassExpression[257∈3]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle255 --> PgClassExpression257
-    List258{{"List[258∈3]<br />ᐸ257ᐳ"}}:::plan
-    PgClassExpression257 --> List258
-    PgCursor256{{"PgCursor[256∈3]"}}:::plan
-    List258 --> PgCursor256
-    Last260{{"Last[260∈3]"}}:::plan
-    PgSelect231 --> Last260
-    PgSelectSingle261{{"PgSelectSingle[261∈3]<br />ᐸcompound_type_set_queryᐳ"}}:::plan
-    Last260 --> PgSelectSingle261
-    PgClassExpression263{{"PgClassExpression[263∈3]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle261 --> PgClassExpression263
-    List264{{"List[264∈3]<br />ᐸ263ᐳ"}}:::plan
-    PgClassExpression263 --> List264
-    PgCursor262{{"PgCursor[262∈3]"}}:::plan
-    List264 --> PgCursor262
-    Access266{{"Access[266∈3]<br />ᐸ231.hasMoreᐳ"}}:::plan
-    PgSelect231 --> Access266
     PgClassExpression210{{"PgClassExpression[210∈1]<br />ᐸ__compound...uery__.”a”ᐳ"}}:::plan
     PgSelectSingle209 --> PgClassExpression210
     PgClassExpression211{{"PgClassExpression[211∈1]<br />ᐸ__compound...uery__.”b”ᐳ"}}:::plan
@@ -901,376 +301,50 @@ graph TD
     PgSelectSingle209 --> PgClassExpression216
     PgClassExpression220{{"PgClassExpression[220∈1]<br />ᐸ__compound....”foo_bar”ᐳ"}}:::plan
     PgSelectSingle209 --> PgClassExpression220
-    Edge1177{{"Edge[1177∈112]"}}:::plan
-    PgClassExpression1176{{"PgClassExpression[1176∈112]<br />ᐸ__query_in...al_set__.vᐳ"}}:::plan
-    PgCursor1178{{"PgCursor[1178∈112]"}}:::plan
-    PgClassExpression1176 & PgCursor1178 & Connection1154 --> Edge1177
-    __Item1174[/"__Item[1174∈112]<br />ᐸ1170ᐳ"\]:::itemplan
-    __ListTransform1170 ==> __Item1174
-    PgSelectSingle1175{{"PgSelectSingle[1175∈112]<br />ᐸquery_interval_setᐳ"}}:::plan
-    __Item1174 --> PgSelectSingle1175
-    PgSelectSingle1175 --> PgClassExpression1176
-    PgClassExpression1179{{"PgClassExpression[1179∈112]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle1175 --> PgClassExpression1179
-    List1180{{"List[1180∈112]<br />ᐸ1179ᐳ"}}:::plan
-    PgClassExpression1179 --> List1180
-    List1180 --> PgCursor1178
-    __Item1171[/"__Item[1171∈111]<br />ᐸ1155ᐳ"\]:::itemplan
-    PgSelect1155 -.-> __Item1171
-    PgSelectSingle1172{{"PgSelectSingle[1172∈111]<br />ᐸquery_interval_setᐳ"}}:::plan
-    __Item1171 --> PgSelectSingle1172
-    PgClassExpression1173{{"PgClassExpression[1173∈111]<br />ᐸ__query_in...al_set__.vᐳ"}}:::plan
-    PgSelectSingle1172 --> PgClassExpression1173
-    Edge237{{"Edge[237∈5]"}}:::plan
-    PgSelectSingle236{{"PgSelectSingle[236∈5]<br />ᐸcompound_type_set_queryᐳ"}}:::plan
-    PgCursor238{{"PgCursor[238∈5]"}}:::plan
-    PgSelectSingle236 & PgCursor238 & Connection230 --> Edge237
-    Edge334{{"Edge[334∈15]"}}:::plan
-    PgSelectSingle333{{"PgSelectSingle[333∈15]<br />ᐸtable_set_queryᐳ"}}:::plan
-    PgCursor335{{"PgCursor[335∈15]"}}:::plan
-    PgSelectSingle333 & PgCursor335 & Connection327 --> Edge334
-    Edge373{{"Edge[373∈20]"}}:::plan
-    PgSelectSingle372{{"PgSelectSingle[372∈20]<br />ᐸtable_set_queryᐳ"}}:::plan
-    PgCursor374{{"PgCursor[374∈20]"}}:::plan
-    PgSelectSingle372 & PgCursor374 & Connection366 --> Edge373
-    Edge423{{"Edge[423∈25]"}}:::plan
-    PgSelectSingle422{{"PgSelectSingle[422∈25]<br />ᐸtable_set_queryᐳ"}}:::plan
-    PgCursor424{{"PgCursor[424∈25]"}}:::plan
-    PgSelectSingle422 & PgCursor424 & Connection416 --> Edge423
-    Edge467{{"Edge[467∈30]"}}:::plan
-    PgSelectSingle466{{"PgSelectSingle[466∈30]<br />ᐸtable_set_queryᐳ"}}:::plan
-    PgCursor468{{"PgCursor[468∈30]"}}:::plan
-    PgSelectSingle466 & PgCursor468 & Connection454 --> Edge467
-    Edge519{{"Edge[519∈35]"}}:::plan
-    PgSelectSingle518{{"PgSelectSingle[518∈35]<br />ᐸtable_set_queryᐳ"}}:::plan
-    PgCursor520{{"PgCursor[520∈35]"}}:::plan
-    PgSelectSingle518 & PgCursor520 & Connection506 --> Edge519
-    Edge568{{"Edge[568∈40]"}}:::plan
-    PgSelectSingle567{{"PgSelectSingle[567∈40]<br />ᐸtable_set_queryᐳ"}}:::plan
-    PgCursor569{{"PgCursor[569∈40]"}}:::plan
-    PgSelectSingle567 & PgCursor569 & Connection558 --> Edge568
-    Edge616{{"Edge[616∈45]"}}:::plan
-    PgSelectSingle615{{"PgSelectSingle[615∈45]<br />ᐸtable_set_queryᐳ"}}:::plan
-    PgCursor617{{"PgCursor[617∈45]"}}:::plan
-    PgSelectSingle615 & PgCursor617 & Connection606 --> Edge616
-    Edge664{{"Edge[664∈50]"}}:::plan
-    PgSelectSingle663{{"PgSelectSingle[663∈50]<br />ᐸtable_set_queryᐳ"}}:::plan
-    PgCursor665{{"PgCursor[665∈50]"}}:::plan
-    PgSelectSingle663 & PgCursor665 & Connection654 --> Edge664
-    Edge709{{"Edge[709∈55]"}}:::plan
-    PgSelectSingle708{{"PgSelectSingle[708∈55]<br />ᐸtable_set_queryᐳ"}}:::plan
-    PgCursor710{{"PgCursor[710∈55]"}}:::plan
-    PgSelectSingle708 & PgCursor710 & Connection702 --> Edge709
-    Edge748{{"Edge[748∈60]"}}:::plan
-    PgSelectSingle747{{"PgSelectSingle[747∈60]<br />ᐸtable_set_queryᐳ"}}:::plan
-    PgCursor749{{"PgCursor[749∈60]"}}:::plan
-    PgSelectSingle747 & PgCursor749 & Connection741 --> Edge748
-    Edge787{{"Edge[787∈65]"}}:::plan
-    PgSelectSingle786{{"PgSelectSingle[786∈65]<br />ᐸtable_set_queryᐳ"}}:::plan
-    PgCursor788{{"PgCursor[788∈65]"}}:::plan
-    PgSelectSingle786 & PgCursor788 & Connection780 --> Edge787
-    Edge826{{"Edge[826∈70]"}}:::plan
-    PgSelectSingle825{{"PgSelectSingle[825∈70]<br />ᐸtable_set_queryᐳ"}}:::plan
-    PgCursor827{{"PgCursor[827∈70]"}}:::plan
-    PgSelectSingle825 & PgCursor827 & Connection819 --> Edge826
-    Edge868{{"Edge[868∈75]"}}:::plan
-    PgSelectSingle867{{"PgSelectSingle[867∈75]<br />ᐸtable_set_queryᐳ"}}:::plan
-    PgCursor869{{"PgCursor[869∈75]"}}:::plan
-    PgSelectSingle867 & PgCursor869 & Connection858 --> Edge868
-    Edge916{{"Edge[916∈80]"}}:::plan
-    PgSelectSingle915{{"PgSelectSingle[915∈80]<br />ᐸtable_set_queryᐳ"}}:::plan
-    PgCursor917{{"PgCursor[917∈80]"}}:::plan
-    PgSelectSingle915 & PgCursor917 & Connection906 --> Edge916
-    Edge959{{"Edge[959∈85]"}}:::plan
-    PgSelectSingle958{{"PgSelectSingle[958∈85]<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
-    PgCursor960{{"PgCursor[960∈85]"}}:::plan
-    PgSelectSingle958 & PgCursor960 & Connection952 --> Edge959
-    Edge999{{"Edge[999∈90]"}}:::plan
-    PgSelectSingle998{{"PgSelectSingle[998∈90]<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
-    PgCursor1000{{"PgCursor[1000∈90]"}}:::plan
-    PgSelectSingle998 & PgCursor1000 & Connection989 --> Edge999
-    Edge1048{{"Edge[1048∈95]"}}:::plan
-    PgClassExpression1047{{"PgClassExpression[1047∈95]<br />ᐸ__int_set_query__.vᐳ"}}:::plan
-    PgCursor1049{{"PgCursor[1049∈95]"}}:::plan
-    PgClassExpression1047 & PgCursor1049 & Connection1039 --> Edge1048
-    Edge1226{{"Edge[1226∈99]"}}:::plan
-    PgClassExpression1080{{"PgClassExpression[1080∈99]<br />ᐸ__static_b...nteger__.vᐳ"}}:::plan
-    PgClassExpression1080 & Connection1072 --> Edge1226
-    __Item235[/"__Item[235∈5]<br />ᐸ232ᐳ"\]:::itemplan
-    __ListTransform232 ==> __Item235
-    __Item235 --> PgSelectSingle236
-    PgClassExpression239{{"PgClassExpression[239∈5]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle236 --> PgClassExpression239
-    List240{{"List[240∈5]<br />ᐸ239ᐳ"}}:::plan
-    PgClassExpression239 --> List240
-    List240 --> PgCursor238
-    __Item332[/"__Item[332∈15]<br />ᐸ329ᐳ"\]:::itemplan
-    __ListTransform329 ==> __Item332
-    __Item332 --> PgSelectSingle333
-    PgClassExpression336{{"PgClassExpression[336∈15]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle333 --> PgClassExpression336
-    List337{{"List[337∈15]<br />ᐸ336ᐳ"}}:::plan
-    PgClassExpression336 --> List337
-    List337 --> PgCursor335
-    __Item371[/"__Item[371∈20]<br />ᐸ368ᐳ"\]:::itemplan
-    __ListTransform368 ==> __Item371
-    __Item371 --> PgSelectSingle372
-    PgClassExpression375{{"PgClassExpression[375∈20]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
-    PgSelectSingle372 --> PgClassExpression375
-    List376{{"List[376∈20]<br />ᐸ375ᐳ"}}:::plan
-    PgClassExpression375 --> List376
-    List376 --> PgCursor374
-    __Item421[/"__Item[421∈25]<br />ᐸ418ᐳ"\]:::itemplan
-    __ListTransform418 ==> __Item421
-    __Item421 --> PgSelectSingle422
-    PgClassExpression425{{"PgClassExpression[425∈25]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle422 --> PgClassExpression425
-    List426{{"List[426∈25]<br />ᐸ425ᐳ"}}:::plan
-    PgClassExpression425 --> List426
-    List426 --> PgCursor424
-    __Item465[/"__Item[465∈30]<br />ᐸ458ᐳ"\]:::itemplan
-    __ListTransform458 ==> __Item465
-    __Item465 --> PgSelectSingle466
-    PgClassExpression469{{"PgClassExpression[469∈30]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle466 --> PgClassExpression469
-    List470{{"List[470∈30]<br />ᐸ469ᐳ"}}:::plan
-    PgClassExpression469 --> List470
-    List470 --> PgCursor468
-    __Item517[/"__Item[517∈35]<br />ᐸ510ᐳ"\]:::itemplan
-    __ListTransform510 ==> __Item517
-    __Item517 --> PgSelectSingle518
-    PgClassExpression521{{"PgClassExpression[521∈35]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle518 --> PgClassExpression521
-    List522{{"List[522∈35]<br />ᐸ521ᐳ"}}:::plan
-    PgClassExpression521 --> List522
-    List522 --> PgCursor520
-    __Item566[/"__Item[566∈40]<br />ᐸ561ᐳ"\]:::itemplan
-    __ListTransform561 ==> __Item566
-    __Item566 --> PgSelectSingle567
-    PgClassExpression570{{"PgClassExpression[570∈40]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle567 --> PgClassExpression570
-    List571{{"List[571∈40]<br />ᐸ570ᐳ"}}:::plan
-    PgClassExpression570 --> List571
-    List571 --> PgCursor569
-    __Item614[/"__Item[614∈45]<br />ᐸ609ᐳ"\]:::itemplan
-    __ListTransform609 ==> __Item614
-    __Item614 --> PgSelectSingle615
-    PgClassExpression618{{"PgClassExpression[618∈45]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle615 --> PgClassExpression618
-    List619{{"List[619∈45]<br />ᐸ618ᐳ"}}:::plan
-    PgClassExpression618 --> List619
-    List619 --> PgCursor617
-    __Item662[/"__Item[662∈50]<br />ᐸ657ᐳ"\]:::itemplan
-    __ListTransform657 ==> __Item662
-    __Item662 --> PgSelectSingle663
-    PgClassExpression666{{"PgClassExpression[666∈50]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle663 --> PgClassExpression666
-    List667{{"List[667∈50]<br />ᐸ666ᐳ"}}:::plan
-    PgClassExpression666 --> List667
-    List667 --> PgCursor665
-    __Item707[/"__Item[707∈55]<br />ᐸ704ᐳ"\]:::itemplan
-    __ListTransform704 ==> __Item707
-    __Item707 --> PgSelectSingle708
-    PgClassExpression711{{"PgClassExpression[711∈55]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle708 --> PgClassExpression711
-    List712{{"List[712∈55]<br />ᐸ711ᐳ"}}:::plan
-    PgClassExpression711 --> List712
-    List712 --> PgCursor710
-    __Item746[/"__Item[746∈60]<br />ᐸ743ᐳ"\]:::itemplan
-    __ListTransform743 ==> __Item746
-    __Item746 --> PgSelectSingle747
-    PgClassExpression750{{"PgClassExpression[750∈60]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle747 --> PgClassExpression750
-    List751{{"List[751∈60]<br />ᐸ750ᐳ"}}:::plan
-    PgClassExpression750 --> List751
-    List751 --> PgCursor749
-    __Item785[/"__Item[785∈65]<br />ᐸ782ᐳ"\]:::itemplan
-    __ListTransform782 ==> __Item785
-    __Item785 --> PgSelectSingle786
-    PgClassExpression789{{"PgClassExpression[789∈65]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle786 --> PgClassExpression789
-    List790{{"List[790∈65]<br />ᐸ789ᐳ"}}:::plan
-    PgClassExpression789 --> List790
-    List790 --> PgCursor788
-    __Item824[/"__Item[824∈70]<br />ᐸ821ᐳ"\]:::itemplan
-    __ListTransform821 ==> __Item824
-    __Item824 --> PgSelectSingle825
-    PgClassExpression828{{"PgClassExpression[828∈70]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle825 --> PgClassExpression828
-    List829{{"List[829∈70]<br />ᐸ828ᐳ"}}:::plan
-    PgClassExpression828 --> List829
-    List829 --> PgCursor827
-    __Item866[/"__Item[866∈75]<br />ᐸ861ᐳ"\]:::itemplan
-    __ListTransform861 ==> __Item866
-    __Item866 --> PgSelectSingle867
-    PgClassExpression870{{"PgClassExpression[870∈75]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle867 --> PgClassExpression870
-    List871{{"List[871∈75]<br />ᐸ870ᐳ"}}:::plan
-    PgClassExpression870 --> List871
-    List871 --> PgCursor869
-    __Item914[/"__Item[914∈80]<br />ᐸ909ᐳ"\]:::itemplan
-    __ListTransform909 ==> __Item914
-    __Item914 --> PgSelectSingle915
-    PgClassExpression918{{"PgClassExpression[918∈80]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle915 --> PgClassExpression918
-    List919{{"List[919∈80]<br />ᐸ918ᐳ"}}:::plan
-    PgClassExpression918 --> List919
-    List919 --> PgCursor917
-    __Item957[/"__Item[957∈85]<br />ᐸ954ᐳ"\]:::itemplan
-    __ListTransform954 ==> __Item957
-    __Item957 --> PgSelectSingle958
-    PgClassExpression961{{"PgClassExpression[961∈85]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle958 --> PgClassExpression961
-    List962{{"List[962∈85]<br />ᐸ961ᐳ"}}:::plan
-    PgClassExpression961 --> List962
-    List962 --> PgCursor960
-    __Item997[/"__Item[997∈90]<br />ᐸ992ᐳ"\]:::itemplan
-    __ListTransform992 ==> __Item997
-    __Item997 --> PgSelectSingle998
-    PgClassExpression1001{{"PgClassExpression[1001∈90]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle998 --> PgClassExpression1001
-    List1002{{"List[1002∈90]<br />ᐸ1001ᐳ"}}:::plan
-    PgClassExpression1001 --> List1002
-    List1002 --> PgCursor1000
-    __Item1045[/"__Item[1045∈95]<br />ᐸ1041ᐳ"\]:::itemplan
-    __ListTransform1041 ==> __Item1045
-    PgSelectSingle1046{{"PgSelectSingle[1046∈95]<br />ᐸint_set_queryᐳ"}}:::plan
-    __Item1045 --> PgSelectSingle1046
-    PgSelectSingle1046 --> PgClassExpression1047
-    PgClassExpression1050{{"PgClassExpression[1050∈95]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
-    PgSelectSingle1046 --> PgClassExpression1050
-    List1051{{"List[1051∈95]<br />ᐸ1050ᐳ"}}:::plan
-    PgClassExpression1050 --> List1051
-    List1051 --> PgCursor1049
-    __Item1078[/"__Item[1078∈99]<br />ᐸ1074ᐳ"\]:::itemplan
-    __ListTransform1074 ==> __Item1078
-    PgSelectSingle1079{{"PgSelectSingle[1079∈99]<br />ᐸstatic_big_integerᐳ"}}:::plan
-    __Item1078 --> PgSelectSingle1079
-    PgSelectSingle1079 --> PgClassExpression1080
-    __Item1160[/"__Item[1160∈109]<br />ᐸ1156ᐳ"\]:::itemplan
-    __ListTransform1156 ==> __Item1160
-    PgSelectSingle1161{{"PgSelectSingle[1161∈109]<br />ᐸquery_interval_setᐳ"}}:::plan
-    __Item1160 --> PgSelectSingle1161
-    PgClassExpression1162{{"PgClassExpression[1162∈109]<br />ᐸ__query_in...al_set__.vᐳ"}}:::plan
-    PgSelectSingle1161 --> PgClassExpression1162
+    PgSelect231[["PgSelect[231∈3]<br />ᐸcompound_type_set_query+1ᐳ"]]:::plan
+    Object11 & Connection230 --> PgSelect231
+    __ListTransform232[["__ListTransform[232∈3]<br />ᐸeach:231ᐳ"]]:::plan
+    PgSelect231 --> __ListTransform232
+    PgPageInfo252{{"PgPageInfo[252∈3]"}}:::plan
+    Connection230 --> PgPageInfo252
+    First254{{"First[254∈3]"}}:::plan
+    PgSelect231 --> First254
+    PgSelectSingle255{{"PgSelectSingle[255∈3]<br />ᐸcompound_type_set_queryᐳ"}}:::plan
+    First254 --> PgSelectSingle255
+    PgCursor256{{"PgCursor[256∈3]"}}:::plan
+    List258{{"List[258∈3]<br />ᐸ257ᐳ"}}:::plan
+    List258 --> PgCursor256
+    PgClassExpression257{{"PgClassExpression[257∈3]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle255 --> PgClassExpression257
+    PgClassExpression257 --> List258
+    Last260{{"Last[260∈3]"}}:::plan
+    PgSelect231 --> Last260
+    PgSelectSingle261{{"PgSelectSingle[261∈3]<br />ᐸcompound_type_set_queryᐳ"}}:::plan
+    Last260 --> PgSelectSingle261
+    PgCursor262{{"PgCursor[262∈3]"}}:::plan
+    List264{{"List[264∈3]<br />ᐸ263ᐳ"}}:::plan
+    List264 --> PgCursor262
+    PgClassExpression263{{"PgClassExpression[263∈3]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle261 --> PgClassExpression263
+    PgClassExpression263 --> List264
+    Access266{{"Access[266∈3]<br />ᐸ231.hasMoreᐳ"}}:::plan
+    PgSelect231 --> Access266
     __Item233[/"__Item[233∈4]<br />ᐸ231ᐳ"\]:::itemplan
     PgSelect231 -.-> __Item233
     PgSelectSingle234{{"PgSelectSingle[234∈4]<br />ᐸcompound_type_set_queryᐳ"}}:::plan
     __Item233 --> PgSelectSingle234
-    PgClassExpression291{{"PgClassExpression[291∈10]<br />ᐸ__compound...uery__.”a”ᐳ"}}:::plan
-    PgSelectSingle290 --> PgClassExpression291
-    PgClassExpression292{{"PgClassExpression[292∈10]<br />ᐸ__compound...uery__.”b”ᐳ"}}:::plan
-    PgSelectSingle290 --> PgClassExpression292
-    PgClassExpression293{{"PgClassExpression[293∈10]<br />ᐸ__compound...uery__.”c”ᐳ"}}:::plan
-    PgSelectSingle290 --> PgClassExpression293
-    PgClassExpression294{{"PgClassExpression[294∈10]<br />ᐸ__compound...uery__.”d”ᐳ"}}:::plan
-    PgSelectSingle290 --> PgClassExpression294
-    PgClassExpression295{{"PgClassExpression[295∈10]<br />ᐸ__compound...uery__.”e”ᐳ"}}:::plan
-    PgSelectSingle290 --> PgClassExpression295
-    PgClassExpression296{{"PgClassExpression[296∈10]<br />ᐸ__compound...uery__.”f”ᐳ"}}:::plan
-    PgSelectSingle290 --> PgClassExpression296
-    PgClassExpression297{{"PgClassExpression[297∈10]<br />ᐸ__compound...uery__.”g”ᐳ"}}:::plan
-    PgSelectSingle290 --> PgClassExpression297
-    PgClassExpression301{{"PgClassExpression[301∈10]<br />ᐸ__compound....”foo_bar”ᐳ"}}:::plan
-    PgSelectSingle290 --> PgClassExpression301
-    __Item330[/"__Item[330∈14]<br />ᐸ328ᐳ"\]:::itemplan
-    PgSelect328 -.-> __Item330
-    PgSelectSingle331{{"PgSelectSingle[331∈14]<br />ᐸtable_set_queryᐳ"}}:::plan
-    __Item330 --> PgSelectSingle331
-    __Item369[/"__Item[369∈19]<br />ᐸ367ᐳ"\]:::itemplan
-    PgSelect367 -.-> __Item369
-    PgSelectSingle370{{"PgSelectSingle[370∈19]<br />ᐸtable_set_queryᐳ"}}:::plan
-    __Item369 --> PgSelectSingle370
-    __Item419[/"__Item[419∈24]<br />ᐸ417ᐳ"\]:::itemplan
-    PgSelect417 -.-> __Item419
-    PgSelectSingle420{{"PgSelectSingle[420∈24]<br />ᐸtable_set_queryᐳ"}}:::plan
-    __Item419 --> PgSelectSingle420
-    __Item459[/"__Item[459∈29]<br />ᐸ457ᐳ"\]:::itemplan
-    PgSelect457 -.-> __Item459
-    PgSelectSingle460{{"PgSelectSingle[460∈29]<br />ᐸtable_set_queryᐳ"}}:::plan
-    __Item459 --> PgSelectSingle460
-    __Item511[/"__Item[511∈34]<br />ᐸ509ᐳ"\]:::itemplan
-    PgSelect509 -.-> __Item511
-    PgSelectSingle512{{"PgSelectSingle[512∈34]<br />ᐸtable_set_queryᐳ"}}:::plan
-    __Item511 --> PgSelectSingle512
-    __Item562[/"__Item[562∈39]<br />ᐸ560ᐳ"\]:::itemplan
-    PgSelect560 -.-> __Item562
-    PgSelectSingle563{{"PgSelectSingle[563∈39]<br />ᐸtable_set_queryᐳ"}}:::plan
-    __Item562 --> PgSelectSingle563
-    __Item610[/"__Item[610∈44]<br />ᐸ608ᐳ"\]:::itemplan
-    PgSelect608 -.-> __Item610
-    PgSelectSingle611{{"PgSelectSingle[611∈44]<br />ᐸtable_set_queryᐳ"}}:::plan
-    __Item610 --> PgSelectSingle611
-    __Item658[/"__Item[658∈49]<br />ᐸ656ᐳ"\]:::itemplan
-    PgSelect656 -.-> __Item658
-    PgSelectSingle659{{"PgSelectSingle[659∈49]<br />ᐸtable_set_queryᐳ"}}:::plan
-    __Item658 --> PgSelectSingle659
-    __Item705[/"__Item[705∈54]<br />ᐸ703ᐳ"\]:::itemplan
-    PgSelect703 -.-> __Item705
-    PgSelectSingle706{{"PgSelectSingle[706∈54]<br />ᐸtable_set_queryᐳ"}}:::plan
-    __Item705 --> PgSelectSingle706
-    __Item744[/"__Item[744∈59]<br />ᐸ742ᐳ"\]:::itemplan
-    PgSelect742 -.-> __Item744
-    PgSelectSingle745{{"PgSelectSingle[745∈59]<br />ᐸtable_set_queryᐳ"}}:::plan
-    __Item744 --> PgSelectSingle745
-    __Item783[/"__Item[783∈64]<br />ᐸ781ᐳ"\]:::itemplan
-    PgSelect781 -.-> __Item783
-    PgSelectSingle784{{"PgSelectSingle[784∈64]<br />ᐸtable_set_queryᐳ"}}:::plan
-    __Item783 --> PgSelectSingle784
-    __Item822[/"__Item[822∈69]<br />ᐸ820ᐳ"\]:::itemplan
-    PgSelect820 -.-> __Item822
-    PgSelectSingle823{{"PgSelectSingle[823∈69]<br />ᐸtable_set_queryᐳ"}}:::plan
-    __Item822 --> PgSelectSingle823
-    __Item862[/"__Item[862∈74]<br />ᐸ860ᐳ"\]:::itemplan
-    PgSelect860 -.-> __Item862
-    PgSelectSingle863{{"PgSelectSingle[863∈74]<br />ᐸtable_set_queryᐳ"}}:::plan
-    __Item862 --> PgSelectSingle863
-    __Item910[/"__Item[910∈79]<br />ᐸ908ᐳ"\]:::itemplan
-    PgSelect908 -.-> __Item910
-    PgSelectSingle911{{"PgSelectSingle[911∈79]<br />ᐸtable_set_queryᐳ"}}:::plan
-    __Item910 --> PgSelectSingle911
-    __Item955[/"__Item[955∈84]<br />ᐸ953ᐳ"\]:::itemplan
-    PgSelect953 -.-> __Item955
-    PgSelectSingle956{{"PgSelectSingle[956∈84]<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
-    __Item955 --> PgSelectSingle956
-    __Item993[/"__Item[993∈89]<br />ᐸ991ᐳ"\]:::itemplan
-    PgSelect991 -.-> __Item993
-    PgSelectSingle994{{"PgSelectSingle[994∈89]<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
-    __Item993 --> PgSelectSingle994
-    __Item1042[/"__Item[1042∈94]<br />ᐸ1040ᐳ"\]:::itemplan
-    PgSelect1040 -.-> __Item1042
-    PgSelectSingle1043{{"PgSelectSingle[1043∈94]<br />ᐸint_set_queryᐳ"}}:::plan
-    __Item1042 --> PgSelectSingle1043
-    PgClassExpression1044{{"PgClassExpression[1044∈94]<br />ᐸ__int_set_query__.vᐳ"}}:::plan
-    PgSelectSingle1043 --> PgClassExpression1044
-    __Item1075[/"__Item[1075∈98]<br />ᐸ1073ᐳ"\]:::itemplan
-    PgSelect1073 -.-> __Item1075
-    PgSelectSingle1076{{"PgSelectSingle[1076∈98]<br />ᐸstatic_big_integerᐳ"}}:::plan
-    __Item1075 --> PgSelectSingle1076
-    PgClassExpression1077{{"PgClassExpression[1077∈98]<br />ᐸ__static_b...nteger__.vᐳ"}}:::plan
-    PgSelectSingle1076 --> PgClassExpression1077
-    PgClassExpression1112{{"PgClassExpression[1112∈102]<br />ᐸ__query_co...rray__.”a”ᐳ"}}:::plan
-    PgSelectSingle1111 --> PgClassExpression1112
-    PgClassExpression1113{{"PgClassExpression[1113∈102]<br />ᐸ__query_co...rray__.”b”ᐳ"}}:::plan
-    PgSelectSingle1111 --> PgClassExpression1113
-    PgClassExpression1114{{"PgClassExpression[1114∈102]<br />ᐸ__query_co...rray__.”c”ᐳ"}}:::plan
-    PgSelectSingle1111 --> PgClassExpression1114
-    PgClassExpression1115{{"PgClassExpression[1115∈102]<br />ᐸ__query_co...rray__.”d”ᐳ"}}:::plan
-    PgSelectSingle1111 --> PgClassExpression1115
-    PgClassExpression1116{{"PgClassExpression[1116∈102]<br />ᐸ__query_co...rray__.”e”ᐳ"}}:::plan
-    PgSelectSingle1111 --> PgClassExpression1116
-    PgClassExpression1117{{"PgClassExpression[1117∈102]<br />ᐸ__query_co...rray__.”f”ᐳ"}}:::plan
-    PgSelectSingle1111 --> PgClassExpression1117
-    PgClassExpression1118{{"PgClassExpression[1118∈102]<br />ᐸ__query_co...rray__.”g”ᐳ"}}:::plan
-    PgSelectSingle1111 --> PgClassExpression1118
-    PgClassExpression1122{{"PgClassExpression[1122∈102]<br />ᐸ__query_co....”foo_bar”ᐳ"}}:::plan
-    PgSelectSingle1111 --> PgClassExpression1122
-    __Item1157[/"__Item[1157∈108]<br />ᐸ1155ᐳ"\]:::itemplan
-    PgSelect1155 -.-> __Item1157
-    PgSelectSingle1158{{"PgSelectSingle[1158∈108]<br />ᐸquery_interval_setᐳ"}}:::plan
-    __Item1157 --> PgSelectSingle1158
-    PgClassExpression1159{{"PgClassExpression[1159∈108]<br />ᐸ__query_in...al_set__.vᐳ"}}:::plan
-    PgSelectSingle1158 --> PgClassExpression1159
+    Edge237{{"Edge[237∈5]"}}:::plan
+    PgSelectSingle236{{"PgSelectSingle[236∈5]<br />ᐸcompound_type_set_queryᐳ"}}:::plan
+    PgCursor238{{"PgCursor[238∈5]"}}:::plan
+    PgSelectSingle236 & PgCursor238 & Connection230 --> Edge237
+    __Item235[/"__Item[235∈5]<br />ᐸ232ᐳ"\]:::itemplan
+    __ListTransform232 ==> __Item235
+    __Item235 --> PgSelectSingle236
+    List240{{"List[240∈5]<br />ᐸ239ᐳ"}}:::plan
+    List240 --> PgCursor238
+    PgClassExpression239{{"PgClassExpression[239∈5]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle236 --> PgClassExpression239
+    PgClassExpression239 --> List240
     PgClassExpression241{{"PgClassExpression[241∈7]<br />ᐸ__compound...uery__.”a”ᐳ"}}:::plan
     PgSelectSingle236 --> PgClassExpression241
     PgClassExpression242{{"PgClassExpression[242∈7]<br />ᐸ__compound...uery__.”b”ᐳ"}}:::plan
@@ -1287,36 +361,962 @@ graph TD
     PgSelectSingle236 --> PgClassExpression247
     PgClassExpression251{{"PgClassExpression[251∈7]<br />ᐸ__compound....”foo_bar”ᐳ"}}:::plan
     PgSelectSingle236 --> PgClassExpression251
+    __Item289[/"__Item[289∈9]<br />ᐸ285ᐳ"\]:::itemplan
+    PgSelect285 ==> __Item289
+    PgSelectSingle290{{"PgSelectSingle[290∈9]<br />ᐸcompound_type_array_queryᐳ"}}:::plan
+    __Item289 --> PgSelectSingle290
+    PgClassExpression291{{"PgClassExpression[291∈10]<br />ᐸ__compound...uery__.”a”ᐳ"}}:::plan
+    PgSelectSingle290 --> PgClassExpression291
+    PgClassExpression292{{"PgClassExpression[292∈10]<br />ᐸ__compound...uery__.”b”ᐳ"}}:::plan
+    PgSelectSingle290 --> PgClassExpression292
+    PgClassExpression293{{"PgClassExpression[293∈10]<br />ᐸ__compound...uery__.”c”ᐳ"}}:::plan
+    PgSelectSingle290 --> PgClassExpression293
+    PgClassExpression294{{"PgClassExpression[294∈10]<br />ᐸ__compound...uery__.”d”ᐳ"}}:::plan
+    PgSelectSingle290 --> PgClassExpression294
+    PgClassExpression295{{"PgClassExpression[295∈10]<br />ᐸ__compound...uery__.”e”ᐳ"}}:::plan
+    PgSelectSingle290 --> PgClassExpression295
+    PgClassExpression296{{"PgClassExpression[296∈10]<br />ᐸ__compound...uery__.”f”ᐳ"}}:::plan
+    PgSelectSingle290 --> PgClassExpression296
+    PgClassExpression297{{"PgClassExpression[297∈10]<br />ᐸ__compound...uery__.”g”ᐳ"}}:::plan
+    PgSelectSingle290 --> PgClassExpression297
+    PgClassExpression301{{"PgClassExpression[301∈10]<br />ᐸ__compound....”foo_bar”ᐳ"}}:::plan
+    PgSelectSingle290 --> PgClassExpression301
+    List311{{"List[311∈12]<br />ᐸ309,310ᐳ"}}:::plan
+    Constant309{{"Constant[309∈12]<br />ᐸ'posts'ᐳ"}}:::plan
+    PgClassExpression310{{"PgClassExpression[310∈12]<br />ᐸ__table_query__.”id”ᐳ"}}:::plan
+    Constant309 & PgClassExpression310 --> List311
+    PgSelectSingle308 --> PgClassExpression310
+    Lambda312{{"Lambda[312∈12]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List311 --> Lambda312
+    PgClassExpression314{{"PgClassExpression[314∈12]<br />ᐸ__table_qu...”headline”ᐳ"}}:::plan
+    PgSelectSingle308 --> PgClassExpression314
+    PgClassExpression315{{"PgClassExpression[315∈12]<br />ᐸ__table_qu...author_id”ᐳ"}}:::plan
+    PgSelectSingle308 --> PgClassExpression315
+    PgSelect328[["PgSelect[328∈13]<br />ᐸtable_set_queryᐳ"]]:::plan
+    Object11 & Connection327 --> PgSelect328
+    __ListTransform329[["__ListTransform[329∈13]<br />ᐸeach:328ᐳ"]]:::plan
+    PgSelect328 --> __ListTransform329
+    PgPageInfo339{{"PgPageInfo[339∈13]"}}:::plan
+    Connection327 --> PgPageInfo339
+    First341{{"First[341∈13]"}}:::plan
+    PgSelect328 --> First341
+    PgSelectSingle342{{"PgSelectSingle[342∈13]<br />ᐸtable_set_queryᐳ"}}:::plan
+    First341 --> PgSelectSingle342
+    PgCursor343{{"PgCursor[343∈13]"}}:::plan
+    List345{{"List[345∈13]<br />ᐸ344ᐳ"}}:::plan
+    List345 --> PgCursor343
+    PgClassExpression344{{"PgClassExpression[344∈13]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle342 --> PgClassExpression344
+    PgClassExpression344 --> List345
+    Last347{{"Last[347∈13]"}}:::plan
+    PgSelect328 --> Last347
+    PgSelectSingle348{{"PgSelectSingle[348∈13]<br />ᐸtable_set_queryᐳ"}}:::plan
+    Last347 --> PgSelectSingle348
+    PgCursor349{{"PgCursor[349∈13]"}}:::plan
+    List351{{"List[351∈13]<br />ᐸ350ᐳ"}}:::plan
+    List351 --> PgCursor349
+    PgClassExpression350{{"PgClassExpression[350∈13]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle348 --> PgClassExpression350
+    PgClassExpression350 --> List351
+    __Item330[/"__Item[330∈14]<br />ᐸ328ᐳ"\]:::itemplan
+    PgSelect328 -.-> __Item330
+    PgSelectSingle331{{"PgSelectSingle[331∈14]<br />ᐸtable_set_queryᐳ"}}:::plan
+    __Item330 --> PgSelectSingle331
+    Edge334{{"Edge[334∈15]"}}:::plan
+    PgSelectSingle333{{"PgSelectSingle[333∈15]<br />ᐸtable_set_queryᐳ"}}:::plan
+    PgCursor335{{"PgCursor[335∈15]"}}:::plan
+    PgSelectSingle333 & PgCursor335 & Connection327 --> Edge334
+    __Item332[/"__Item[332∈15]<br />ᐸ329ᐳ"\]:::itemplan
+    __ListTransform329 ==> __Item332
+    __Item332 --> PgSelectSingle333
+    List337{{"List[337∈15]<br />ᐸ336ᐳ"}}:::plan
+    List337 --> PgCursor335
+    PgClassExpression336{{"PgClassExpression[336∈15]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle333 --> PgClassExpression336
+    PgClassExpression336 --> List337
     PgClassExpression338{{"PgClassExpression[338∈17]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
     PgSelectSingle333 --> PgClassExpression338
+    PgSelect367[["PgSelect[367∈18]<br />ᐸtable_set_queryᐳ"]]:::plan
+    Object11 & Connection366 --> PgSelect367
+    __ListTransform368[["__ListTransform[368∈18]<br />ᐸeach:367ᐳ"]]:::plan
+    PgSelect367 --> __ListTransform368
+    PgPageInfo378{{"PgPageInfo[378∈18]"}}:::plan
+    Connection366 --> PgPageInfo378
+    First380{{"First[380∈18]"}}:::plan
+    PgSelect367 --> First380
+    PgSelectSingle381{{"PgSelectSingle[381∈18]<br />ᐸtable_set_queryᐳ"}}:::plan
+    First380 --> PgSelectSingle381
+    PgCursor382{{"PgCursor[382∈18]"}}:::plan
+    List384{{"List[384∈18]<br />ᐸ383ᐳ"}}:::plan
+    List384 --> PgCursor382
+    PgClassExpression383{{"PgClassExpression[383∈18]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
+    PgSelectSingle381 --> PgClassExpression383
+    PgClassExpression383 --> List384
+    Last386{{"Last[386∈18]"}}:::plan
+    PgSelect367 --> Last386
+    PgSelectSingle387{{"PgSelectSingle[387∈18]<br />ᐸtable_set_queryᐳ"}}:::plan
+    Last386 --> PgSelectSingle387
+    PgCursor388{{"PgCursor[388∈18]"}}:::plan
+    List390{{"List[390∈18]<br />ᐸ389ᐳ"}}:::plan
+    List390 --> PgCursor388
+    PgClassExpression389{{"PgClassExpression[389∈18]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
+    PgSelectSingle387 --> PgClassExpression389
+    PgClassExpression389 --> List390
+    __Item369[/"__Item[369∈19]<br />ᐸ367ᐳ"\]:::itemplan
+    PgSelect367 -.-> __Item369
+    PgSelectSingle370{{"PgSelectSingle[370∈19]<br />ᐸtable_set_queryᐳ"}}:::plan
+    __Item369 --> PgSelectSingle370
+    Edge373{{"Edge[373∈20]"}}:::plan
+    PgSelectSingle372{{"PgSelectSingle[372∈20]<br />ᐸtable_set_queryᐳ"}}:::plan
+    PgCursor374{{"PgCursor[374∈20]"}}:::plan
+    PgSelectSingle372 & PgCursor374 & Connection366 --> Edge373
+    __Item371[/"__Item[371∈20]<br />ᐸ368ᐳ"\]:::itemplan
+    __ListTransform368 ==> __Item371
+    __Item371 --> PgSelectSingle372
+    List376{{"List[376∈20]<br />ᐸ375ᐳ"}}:::plan
+    List376 --> PgCursor374
+    PgClassExpression375{{"PgClassExpression[375∈20]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
+    PgSelectSingle372 --> PgClassExpression375
+    PgClassExpression375 --> List376
+    PgSelect417[["PgSelect[417∈23]<br />ᐸtable_set_queryᐳ"]]:::plan
+    Constant1288{{"Constant[1288∈23]<br />ᐸ'Budd Deey'ᐳ"}}:::plan
+    Object11 & Constant1288 & Connection416 --> PgSelect417
+    __ListTransform418[["__ListTransform[418∈23]<br />ᐸeach:417ᐳ"]]:::plan
+    PgSelect417 --> __ListTransform418
+    PgPageInfo428{{"PgPageInfo[428∈23]"}}:::plan
+    Connection416 --> PgPageInfo428
+    First430{{"First[430∈23]"}}:::plan
+    PgSelect417 --> First430
+    PgSelectSingle431{{"PgSelectSingle[431∈23]<br />ᐸtable_set_queryᐳ"}}:::plan
+    First430 --> PgSelectSingle431
+    PgCursor432{{"PgCursor[432∈23]"}}:::plan
+    List434{{"List[434∈23]<br />ᐸ433ᐳ"}}:::plan
+    List434 --> PgCursor432
+    PgClassExpression433{{"PgClassExpression[433∈23]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle431 --> PgClassExpression433
+    PgClassExpression433 --> List434
+    Last436{{"Last[436∈23]"}}:::plan
+    PgSelect417 --> Last436
+    PgSelectSingle437{{"PgSelectSingle[437∈23]<br />ᐸtable_set_queryᐳ"}}:::plan
+    Last436 --> PgSelectSingle437
+    PgCursor438{{"PgCursor[438∈23]"}}:::plan
+    List440{{"List[440∈23]<br />ᐸ439ᐳ"}}:::plan
+    List440 --> PgCursor438
+    PgClassExpression439{{"PgClassExpression[439∈23]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle437 --> PgClassExpression439
+    PgClassExpression439 --> List440
+    __Item419[/"__Item[419∈24]<br />ᐸ417ᐳ"\]:::itemplan
+    PgSelect417 -.-> __Item419
+    PgSelectSingle420{{"PgSelectSingle[420∈24]<br />ᐸtable_set_queryᐳ"}}:::plan
+    __Item419 --> PgSelectSingle420
+    Edge423{{"Edge[423∈25]"}}:::plan
+    PgSelectSingle422{{"PgSelectSingle[422∈25]<br />ᐸtable_set_queryᐳ"}}:::plan
+    PgCursor424{{"PgCursor[424∈25]"}}:::plan
+    PgSelectSingle422 & PgCursor424 & Connection416 --> Edge423
+    __Item421[/"__Item[421∈25]<br />ᐸ418ᐳ"\]:::itemplan
+    __ListTransform418 ==> __Item421
+    __Item421 --> PgSelectSingle422
+    List426{{"List[426∈25]<br />ᐸ425ᐳ"}}:::plan
+    List426 --> PgCursor424
+    PgClassExpression425{{"PgClassExpression[425∈25]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle422 --> PgClassExpression425
+    PgClassExpression425 --> List426
     PgClassExpression427{{"PgClassExpression[427∈27]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
     PgSelectSingle422 --> PgClassExpression427
+    PgSelect457[["PgSelect[457∈28]<br />ᐸtable_set_queryᐳ"]]:::plan
+    Lambda1189{{"Lambda[1189∈28]"}}:::plan
+    Access1190{{"Access[1190∈28]<br />ᐸ1189.0ᐳ"}}:::plan
+    Access1191{{"Access[1191∈28]<br />ᐸ1189.1ᐳ"}}:::plan
+    Object11 & Connection454 & Lambda455 & Lambda456 & Access462 & Access464 & Lambda1189 & Access1190 & Access1191 --> PgSelect457
+    List1188{{"List[1188∈28]<br />ᐸ464,462ᐳ"}}:::plan
+    Access464 & Access462 --> List1188
+    __ListTransform458[["__ListTransform[458∈28]<br />ᐸeach:457ᐳ"]]:::plan
+    PgSelect457 --> __ListTransform458
+    PgPageInfo472{{"PgPageInfo[472∈28]"}}:::plan
+    Connection454 --> PgPageInfo472
+    First474{{"First[474∈28]"}}:::plan
+    PgSelect457 --> First474
+    PgSelectSingle475{{"PgSelectSingle[475∈28]<br />ᐸtable_set_queryᐳ"}}:::plan
+    First474 --> PgSelectSingle475
+    PgCursor476{{"PgCursor[476∈28]"}}:::plan
+    List482{{"List[482∈28]<br />ᐸ481ᐳ"}}:::plan
+    List482 --> PgCursor476
+    PgClassExpression481{{"PgClassExpression[481∈28]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle475 --> PgClassExpression481
+    PgClassExpression481 --> List482
+    Last484{{"Last[484∈28]"}}:::plan
+    PgSelect457 --> Last484
+    PgSelectSingle485{{"PgSelectSingle[485∈28]<br />ᐸtable_set_queryᐳ"}}:::plan
+    Last484 --> PgSelectSingle485
+    PgCursor486{{"PgCursor[486∈28]"}}:::plan
+    List492{{"List[492∈28]<br />ᐸ491ᐳ"}}:::plan
+    List492 --> PgCursor486
+    PgClassExpression491{{"PgClassExpression[491∈28]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle485 --> PgClassExpression491
+    PgClassExpression491 --> List492
+    List1188 --> Lambda1189
+    Lambda1189 --> Access1190
+    Lambda1189 --> Access1191
+    __Item459[/"__Item[459∈29]<br />ᐸ457ᐳ"\]:::itemplan
+    PgSelect457 -.-> __Item459
+    PgSelectSingle460{{"PgSelectSingle[460∈29]<br />ᐸtable_set_queryᐳ"}}:::plan
+    __Item459 --> PgSelectSingle460
+    Edge467{{"Edge[467∈30]"}}:::plan
+    PgSelectSingle466{{"PgSelectSingle[466∈30]<br />ᐸtable_set_queryᐳ"}}:::plan
+    PgCursor468{{"PgCursor[468∈30]"}}:::plan
+    PgSelectSingle466 & PgCursor468 & Connection454 --> Edge467
+    __Item465[/"__Item[465∈30]<br />ᐸ458ᐳ"\]:::itemplan
+    __ListTransform458 ==> __Item465
+    __Item465 --> PgSelectSingle466
+    List470{{"List[470∈30]<br />ᐸ469ᐳ"}}:::plan
+    List470 --> PgCursor468
+    PgClassExpression469{{"PgClassExpression[469∈30]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle466 --> PgClassExpression469
+    PgClassExpression469 --> List470
     PgClassExpression471{{"PgClassExpression[471∈32]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
     PgSelectSingle466 --> PgClassExpression471
+    PgSelect509[["PgSelect[509∈33]<br />ᐸtable_set_queryᐳ"]]:::plan
+    Lambda1193{{"Lambda[1193∈33]"}}:::plan
+    Access1194{{"Access[1194∈33]<br />ᐸ1193.0ᐳ"}}:::plan
+    Access1195{{"Access[1195∈33]<br />ᐸ1193.1ᐳ"}}:::plan
+    Object11 & Connection506 & Lambda455 & Lambda456 & Access462 & Access464 & Lambda1193 & Access1194 & Access1195 --> PgSelect509
+    List1192{{"List[1192∈33]<br />ᐸ464,462ᐳ"}}:::plan
+    Access464 & Access462 --> List1192
+    __ListTransform510[["__ListTransform[510∈33]<br />ᐸeach:509ᐳ"]]:::plan
+    PgSelect509 --> __ListTransform510
+    PgPageInfo524{{"PgPageInfo[524∈33]"}}:::plan
+    Connection506 --> PgPageInfo524
+    First526{{"First[526∈33]"}}:::plan
+    PgSelect509 --> First526
+    PgSelectSingle527{{"PgSelectSingle[527∈33]<br />ᐸtable_set_queryᐳ"}}:::plan
+    First526 --> PgSelectSingle527
+    PgCursor528{{"PgCursor[528∈33]"}}:::plan
+    List534{{"List[534∈33]<br />ᐸ533ᐳ"}}:::plan
+    List534 --> PgCursor528
+    PgClassExpression533{{"PgClassExpression[533∈33]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle527 --> PgClassExpression533
+    PgClassExpression533 --> List534
+    Last536{{"Last[536∈33]"}}:::plan
+    PgSelect509 --> Last536
+    PgSelectSingle537{{"PgSelectSingle[537∈33]<br />ᐸtable_set_queryᐳ"}}:::plan
+    Last536 --> PgSelectSingle537
+    PgCursor538{{"PgCursor[538∈33]"}}:::plan
+    List544{{"List[544∈33]<br />ᐸ543ᐳ"}}:::plan
+    List544 --> PgCursor538
+    PgClassExpression543{{"PgClassExpression[543∈33]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle537 --> PgClassExpression543
+    PgClassExpression543 --> List544
+    List1192 --> Lambda1193
+    Lambda1193 --> Access1194
+    Lambda1193 --> Access1195
+    __Item511[/"__Item[511∈34]<br />ᐸ509ᐳ"\]:::itemplan
+    PgSelect509 -.-> __Item511
+    PgSelectSingle512{{"PgSelectSingle[512∈34]<br />ᐸtable_set_queryᐳ"}}:::plan
+    __Item511 --> PgSelectSingle512
+    Edge519{{"Edge[519∈35]"}}:::plan
+    PgSelectSingle518{{"PgSelectSingle[518∈35]<br />ᐸtable_set_queryᐳ"}}:::plan
+    PgCursor520{{"PgCursor[520∈35]"}}:::plan
+    PgSelectSingle518 & PgCursor520 & Connection506 --> Edge519
+    __Item517[/"__Item[517∈35]<br />ᐸ510ᐳ"\]:::itemplan
+    __ListTransform510 ==> __Item517
+    __Item517 --> PgSelectSingle518
+    List522{{"List[522∈35]<br />ᐸ521ᐳ"}}:::plan
+    List522 --> PgCursor520
+    PgClassExpression521{{"PgClassExpression[521∈35]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle518 --> PgClassExpression521
+    PgClassExpression521 --> List522
     PgClassExpression523{{"PgClassExpression[523∈37]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
     PgSelectSingle518 --> PgClassExpression523
+    PgSelect560[["PgSelect[560∈38]<br />ᐸtable_set_query+1ᐳ"]]:::plan
+    Lambda1198{{"Lambda[1198∈38]"}}:::plan
+    Access1199{{"Access[1199∈38]<br />ᐸ1198.0ᐳ"}}:::plan
+    Access1200{{"Access[1200∈38]<br />ᐸ1198.1ᐳ"}}:::plan
+    Object11 & Connection558 & Lambda455 & Access462 & Lambda1198 & Access1199 & Access1200 --> PgSelect560
+    List1197{{"List[1197∈38]<br />ᐸ1196,462ᐳ"}}:::plan
+    Constant1196{{"Constant[1196∈38]<br />ᐸnullᐳ"}}:::plan
+    Constant1196 & Access462 --> List1197
+    __ListTransform561[["__ListTransform[561∈38]<br />ᐸeach:560ᐳ"]]:::plan
+    PgSelect560 --> __ListTransform561
+    PgPageInfo573{{"PgPageInfo[573∈38]"}}:::plan
+    Connection558 --> PgPageInfo573
+    First575{{"First[575∈38]"}}:::plan
+    PgSelect560 --> First575
+    PgSelectSingle576{{"PgSelectSingle[576∈38]<br />ᐸtable_set_queryᐳ"}}:::plan
+    First575 --> PgSelectSingle576
+    PgCursor577{{"PgCursor[577∈38]"}}:::plan
+    List581{{"List[581∈38]<br />ᐸ580ᐳ"}}:::plan
+    List581 --> PgCursor577
+    PgClassExpression580{{"PgClassExpression[580∈38]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle576 --> PgClassExpression580
+    PgClassExpression580 --> List581
+    Last583{{"Last[583∈38]"}}:::plan
+    PgSelect560 --> Last583
+    PgSelectSingle584{{"PgSelectSingle[584∈38]<br />ᐸtable_set_queryᐳ"}}:::plan
+    Last583 --> PgSelectSingle584
+    PgCursor585{{"PgCursor[585∈38]"}}:::plan
+    List589{{"List[589∈38]<br />ᐸ588ᐳ"}}:::plan
+    List589 --> PgCursor585
+    PgClassExpression588{{"PgClassExpression[588∈38]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle584 --> PgClassExpression588
+    PgClassExpression588 --> List589
+    Access592{{"Access[592∈38]<br />ᐸ560.hasMoreᐳ"}}:::plan
+    PgSelect560 --> Access592
+    List1197 --> Lambda1198
+    Lambda1198 --> Access1199
+    Lambda1198 --> Access1200
+    __Item562[/"__Item[562∈39]<br />ᐸ560ᐳ"\]:::itemplan
+    PgSelect560 -.-> __Item562
+    PgSelectSingle563{{"PgSelectSingle[563∈39]<br />ᐸtable_set_queryᐳ"}}:::plan
+    __Item562 --> PgSelectSingle563
+    Edge568{{"Edge[568∈40]"}}:::plan
+    PgSelectSingle567{{"PgSelectSingle[567∈40]<br />ᐸtable_set_queryᐳ"}}:::plan
+    PgCursor569{{"PgCursor[569∈40]"}}:::plan
+    PgSelectSingle567 & PgCursor569 & Connection558 --> Edge568
+    __Item566[/"__Item[566∈40]<br />ᐸ561ᐳ"\]:::itemplan
+    __ListTransform561 ==> __Item566
+    __Item566 --> PgSelectSingle567
+    List571{{"List[571∈40]<br />ᐸ570ᐳ"}}:::plan
+    List571 --> PgCursor569
+    PgClassExpression570{{"PgClassExpression[570∈40]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle567 --> PgClassExpression570
+    PgClassExpression570 --> List571
     PgClassExpression572{{"PgClassExpression[572∈42]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
     PgSelectSingle567 --> PgClassExpression572
+    PgSelect608[["PgSelect[608∈43]<br />ᐸtable_set_query+1ᐳ"]]:::plan
+    Lambda1203{{"Lambda[1203∈43]"}}:::plan
+    Access1204{{"Access[1204∈43]<br />ᐸ1203.0ᐳ"}}:::plan
+    Access1205{{"Access[1205∈43]<br />ᐸ1203.1ᐳ"}}:::plan
+    Object11 & Connection606 & Lambda455 & Access462 & Lambda1203 & Access1204 & Access1205 --> PgSelect608
+    List1202{{"List[1202∈43]<br />ᐸ1201,462ᐳ"}}:::plan
+    Constant1201{{"Constant[1201∈43]<br />ᐸnullᐳ"}}:::plan
+    Constant1201 & Access462 --> List1202
+    __ListTransform609[["__ListTransform[609∈43]<br />ᐸeach:608ᐳ"]]:::plan
+    PgSelect608 --> __ListTransform609
+    PgPageInfo621{{"PgPageInfo[621∈43]"}}:::plan
+    Connection606 --> PgPageInfo621
+    First623{{"First[623∈43]"}}:::plan
+    PgSelect608 --> First623
+    PgSelectSingle624{{"PgSelectSingle[624∈43]<br />ᐸtable_set_queryᐳ"}}:::plan
+    First623 --> PgSelectSingle624
+    PgCursor625{{"PgCursor[625∈43]"}}:::plan
+    List629{{"List[629∈43]<br />ᐸ628ᐳ"}}:::plan
+    List629 --> PgCursor625
+    PgClassExpression628{{"PgClassExpression[628∈43]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle624 --> PgClassExpression628
+    PgClassExpression628 --> List629
+    Last631{{"Last[631∈43]"}}:::plan
+    PgSelect608 --> Last631
+    PgSelectSingle632{{"PgSelectSingle[632∈43]<br />ᐸtable_set_queryᐳ"}}:::plan
+    Last631 --> PgSelectSingle632
+    PgCursor633{{"PgCursor[633∈43]"}}:::plan
+    List637{{"List[637∈43]<br />ᐸ636ᐳ"}}:::plan
+    List637 --> PgCursor633
+    PgClassExpression636{{"PgClassExpression[636∈43]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle632 --> PgClassExpression636
+    PgClassExpression636 --> List637
+    Access639{{"Access[639∈43]<br />ᐸ608.hasMoreᐳ"}}:::plan
+    PgSelect608 --> Access639
+    List1202 --> Lambda1203
+    Lambda1203 --> Access1204
+    Lambda1203 --> Access1205
+    __Item610[/"__Item[610∈44]<br />ᐸ608ᐳ"\]:::itemplan
+    PgSelect608 -.-> __Item610
+    PgSelectSingle611{{"PgSelectSingle[611∈44]<br />ᐸtable_set_queryᐳ"}}:::plan
+    __Item610 --> PgSelectSingle611
+    Edge616{{"Edge[616∈45]"}}:::plan
+    PgSelectSingle615{{"PgSelectSingle[615∈45]<br />ᐸtable_set_queryᐳ"}}:::plan
+    PgCursor617{{"PgCursor[617∈45]"}}:::plan
+    PgSelectSingle615 & PgCursor617 & Connection606 --> Edge616
+    __Item614[/"__Item[614∈45]<br />ᐸ609ᐳ"\]:::itemplan
+    __ListTransform609 ==> __Item614
+    __Item614 --> PgSelectSingle615
+    List619{{"List[619∈45]<br />ᐸ618ᐳ"}}:::plan
+    List619 --> PgCursor617
+    PgClassExpression618{{"PgClassExpression[618∈45]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle615 --> PgClassExpression618
+    PgClassExpression618 --> List619
     PgClassExpression620{{"PgClassExpression[620∈47]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
     PgSelectSingle615 --> PgClassExpression620
+    PgSelect656[["PgSelect[656∈48]<br />ᐸtable_set_query+1ᐳ"]]:::plan
+    Lambda1208{{"Lambda[1208∈48]"}}:::plan
+    Access1209{{"Access[1209∈48]<br />ᐸ1208.0ᐳ"}}:::plan
+    Access1210{{"Access[1210∈48]<br />ᐸ1208.1ᐳ"}}:::plan
+    Object11 & Connection654 & Lambda456 & Access464 & Lambda1208 & Access1209 & Access1210 --> PgSelect656
+    List1207{{"List[1207∈48]<br />ᐸ464,1206ᐳ"}}:::plan
+    Constant1206{{"Constant[1206∈48]<br />ᐸnullᐳ"}}:::plan
+    Access464 & Constant1206 --> List1207
+    __ListTransform657[["__ListTransform[657∈48]<br />ᐸeach:656ᐳ"]]:::plan
+    PgSelect656 --> __ListTransform657
+    PgPageInfo669{{"PgPageInfo[669∈48]"}}:::plan
+    Connection654 --> PgPageInfo669
+    First671{{"First[671∈48]"}}:::plan
+    PgSelect656 --> First671
+    PgSelectSingle672{{"PgSelectSingle[672∈48]<br />ᐸtable_set_queryᐳ"}}:::plan
+    First671 --> PgSelectSingle672
+    PgCursor673{{"PgCursor[673∈48]"}}:::plan
+    List677{{"List[677∈48]<br />ᐸ676ᐳ"}}:::plan
+    List677 --> PgCursor673
+    PgClassExpression676{{"PgClassExpression[676∈48]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle672 --> PgClassExpression676
+    PgClassExpression676 --> List677
+    Last679{{"Last[679∈48]"}}:::plan
+    PgSelect656 --> Last679
+    PgSelectSingle680{{"PgSelectSingle[680∈48]<br />ᐸtable_set_queryᐳ"}}:::plan
+    Last679 --> PgSelectSingle680
+    PgCursor681{{"PgCursor[681∈48]"}}:::plan
+    List685{{"List[685∈48]<br />ᐸ684ᐳ"}}:::plan
+    List685 --> PgCursor681
+    PgClassExpression684{{"PgClassExpression[684∈48]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle680 --> PgClassExpression684
+    PgClassExpression684 --> List685
+    Access687{{"Access[687∈48]<br />ᐸ656.hasMoreᐳ"}}:::plan
+    PgSelect656 --> Access687
+    List1207 --> Lambda1208
+    Lambda1208 --> Access1209
+    Lambda1208 --> Access1210
+    __Item658[/"__Item[658∈49]<br />ᐸ656ᐳ"\]:::itemplan
+    PgSelect656 -.-> __Item658
+    PgSelectSingle659{{"PgSelectSingle[659∈49]<br />ᐸtable_set_queryᐳ"}}:::plan
+    __Item658 --> PgSelectSingle659
+    Edge664{{"Edge[664∈50]"}}:::plan
+    PgSelectSingle663{{"PgSelectSingle[663∈50]<br />ᐸtable_set_queryᐳ"}}:::plan
+    PgCursor665{{"PgCursor[665∈50]"}}:::plan
+    PgSelectSingle663 & PgCursor665 & Connection654 --> Edge664
+    __Item662[/"__Item[662∈50]<br />ᐸ657ᐳ"\]:::itemplan
+    __ListTransform657 ==> __Item662
+    __Item662 --> PgSelectSingle663
+    List667{{"List[667∈50]<br />ᐸ666ᐳ"}}:::plan
+    List667 --> PgCursor665
+    PgClassExpression666{{"PgClassExpression[666∈50]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle663 --> PgClassExpression666
+    PgClassExpression666 --> List667
     PgClassExpression668{{"PgClassExpression[668∈52]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
     PgSelectSingle663 --> PgClassExpression668
+    PgSelect703[["PgSelect[703∈53]<br />ᐸtable_set_query+1ᐳ"]]:::plan
+    Object11 & Connection702 --> PgSelect703
+    __ListTransform704[["__ListTransform[704∈53]<br />ᐸeach:703ᐳ"]]:::plan
+    PgSelect703 --> __ListTransform704
+    PgPageInfo714{{"PgPageInfo[714∈53]"}}:::plan
+    Connection702 --> PgPageInfo714
+    First716{{"First[716∈53]"}}:::plan
+    PgSelect703 --> First716
+    PgSelectSingle717{{"PgSelectSingle[717∈53]<br />ᐸtable_set_queryᐳ"}}:::plan
+    First716 --> PgSelectSingle717
+    PgCursor718{{"PgCursor[718∈53]"}}:::plan
+    List720{{"List[720∈53]<br />ᐸ719ᐳ"}}:::plan
+    List720 --> PgCursor718
+    PgClassExpression719{{"PgClassExpression[719∈53]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle717 --> PgClassExpression719
+    PgClassExpression719 --> List720
+    Last722{{"Last[722∈53]"}}:::plan
+    PgSelect703 --> Last722
+    PgSelectSingle723{{"PgSelectSingle[723∈53]<br />ᐸtable_set_queryᐳ"}}:::plan
+    Last722 --> PgSelectSingle723
+    PgCursor724{{"PgCursor[724∈53]"}}:::plan
+    List726{{"List[726∈53]<br />ᐸ725ᐳ"}}:::plan
+    List726 --> PgCursor724
+    PgClassExpression725{{"PgClassExpression[725∈53]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle723 --> PgClassExpression725
+    PgClassExpression725 --> List726
+    Access728{{"Access[728∈53]<br />ᐸ703.hasMoreᐳ"}}:::plan
+    PgSelect703 --> Access728
+    __Item705[/"__Item[705∈54]<br />ᐸ703ᐳ"\]:::itemplan
+    PgSelect703 -.-> __Item705
+    PgSelectSingle706{{"PgSelectSingle[706∈54]<br />ᐸtable_set_queryᐳ"}}:::plan
+    __Item705 --> PgSelectSingle706
+    Edge709{{"Edge[709∈55]"}}:::plan
+    PgSelectSingle708{{"PgSelectSingle[708∈55]<br />ᐸtable_set_queryᐳ"}}:::plan
+    PgCursor710{{"PgCursor[710∈55]"}}:::plan
+    PgSelectSingle708 & PgCursor710 & Connection702 --> Edge709
+    __Item707[/"__Item[707∈55]<br />ᐸ704ᐳ"\]:::itemplan
+    __ListTransform704 ==> __Item707
+    __Item707 --> PgSelectSingle708
+    List712{{"List[712∈55]<br />ᐸ711ᐳ"}}:::plan
+    List712 --> PgCursor710
+    PgClassExpression711{{"PgClassExpression[711∈55]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle708 --> PgClassExpression711
+    PgClassExpression711 --> List712
     PgClassExpression713{{"PgClassExpression[713∈57]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
     PgSelectSingle708 --> PgClassExpression713
+    PgSelect742[["PgSelect[742∈58]<br />ᐸtable_set_query+1ᐳ"]]:::plan
+    Object11 & Connection741 --> PgSelect742
+    __ListTransform743[["__ListTransform[743∈58]<br />ᐸeach:742ᐳ"]]:::plan
+    PgSelect742 --> __ListTransform743
+    PgPageInfo753{{"PgPageInfo[753∈58]"}}:::plan
+    Connection741 --> PgPageInfo753
+    First755{{"First[755∈58]"}}:::plan
+    PgSelect742 --> First755
+    PgSelectSingle756{{"PgSelectSingle[756∈58]<br />ᐸtable_set_queryᐳ"}}:::plan
+    First755 --> PgSelectSingle756
+    PgCursor757{{"PgCursor[757∈58]"}}:::plan
+    List759{{"List[759∈58]<br />ᐸ758ᐳ"}}:::plan
+    List759 --> PgCursor757
+    PgClassExpression758{{"PgClassExpression[758∈58]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle756 --> PgClassExpression758
+    PgClassExpression758 --> List759
+    Last761{{"Last[761∈58]"}}:::plan
+    PgSelect742 --> Last761
+    PgSelectSingle762{{"PgSelectSingle[762∈58]<br />ᐸtable_set_queryᐳ"}}:::plan
+    Last761 --> PgSelectSingle762
+    PgCursor763{{"PgCursor[763∈58]"}}:::plan
+    List765{{"List[765∈58]<br />ᐸ764ᐳ"}}:::plan
+    List765 --> PgCursor763
+    PgClassExpression764{{"PgClassExpression[764∈58]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle762 --> PgClassExpression764
+    PgClassExpression764 --> List765
+    Access767{{"Access[767∈58]<br />ᐸ742.hasMoreᐳ"}}:::plan
+    PgSelect742 --> Access767
+    __Item744[/"__Item[744∈59]<br />ᐸ742ᐳ"\]:::itemplan
+    PgSelect742 -.-> __Item744
+    PgSelectSingle745{{"PgSelectSingle[745∈59]<br />ᐸtable_set_queryᐳ"}}:::plan
+    __Item744 --> PgSelectSingle745
+    Edge748{{"Edge[748∈60]"}}:::plan
+    PgSelectSingle747{{"PgSelectSingle[747∈60]<br />ᐸtable_set_queryᐳ"}}:::plan
+    PgCursor749{{"PgCursor[749∈60]"}}:::plan
+    PgSelectSingle747 & PgCursor749 & Connection741 --> Edge748
+    __Item746[/"__Item[746∈60]<br />ᐸ743ᐳ"\]:::itemplan
+    __ListTransform743 ==> __Item746
+    __Item746 --> PgSelectSingle747
+    List751{{"List[751∈60]<br />ᐸ750ᐳ"}}:::plan
+    List751 --> PgCursor749
+    PgClassExpression750{{"PgClassExpression[750∈60]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle747 --> PgClassExpression750
+    PgClassExpression750 --> List751
     PgClassExpression752{{"PgClassExpression[752∈62]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
     PgSelectSingle747 --> PgClassExpression752
+    PgSelect781[["PgSelect[781∈63]<br />ᐸtable_set_query+1ᐳ"]]:::plan
+    Object11 & Connection780 --> PgSelect781
+    __ListTransform782[["__ListTransform[782∈63]<br />ᐸeach:781ᐳ"]]:::plan
+    PgSelect781 --> __ListTransform782
+    PgPageInfo792{{"PgPageInfo[792∈63]"}}:::plan
+    Connection780 --> PgPageInfo792
+    First794{{"First[794∈63]"}}:::plan
+    PgSelect781 --> First794
+    PgSelectSingle795{{"PgSelectSingle[795∈63]<br />ᐸtable_set_queryᐳ"}}:::plan
+    First794 --> PgSelectSingle795
+    PgCursor796{{"PgCursor[796∈63]"}}:::plan
+    List798{{"List[798∈63]<br />ᐸ797ᐳ"}}:::plan
+    List798 --> PgCursor796
+    PgClassExpression797{{"PgClassExpression[797∈63]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle795 --> PgClassExpression797
+    PgClassExpression797 --> List798
+    Last800{{"Last[800∈63]"}}:::plan
+    PgSelect781 --> Last800
+    PgSelectSingle801{{"PgSelectSingle[801∈63]<br />ᐸtable_set_queryᐳ"}}:::plan
+    Last800 --> PgSelectSingle801
+    PgCursor802{{"PgCursor[802∈63]"}}:::plan
+    List804{{"List[804∈63]<br />ᐸ803ᐳ"}}:::plan
+    List804 --> PgCursor802
+    PgClassExpression803{{"PgClassExpression[803∈63]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle801 --> PgClassExpression803
+    PgClassExpression803 --> List804
+    Access806{{"Access[806∈63]<br />ᐸ781.hasMoreᐳ"}}:::plan
+    PgSelect781 --> Access806
+    __Item783[/"__Item[783∈64]<br />ᐸ781ᐳ"\]:::itemplan
+    PgSelect781 -.-> __Item783
+    PgSelectSingle784{{"PgSelectSingle[784∈64]<br />ᐸtable_set_queryᐳ"}}:::plan
+    __Item783 --> PgSelectSingle784
+    Edge787{{"Edge[787∈65]"}}:::plan
+    PgSelectSingle786{{"PgSelectSingle[786∈65]<br />ᐸtable_set_queryᐳ"}}:::plan
+    PgCursor788{{"PgCursor[788∈65]"}}:::plan
+    PgSelectSingle786 & PgCursor788 & Connection780 --> Edge787
+    __Item785[/"__Item[785∈65]<br />ᐸ782ᐳ"\]:::itemplan
+    __ListTransform782 ==> __Item785
+    __Item785 --> PgSelectSingle786
+    List790{{"List[790∈65]<br />ᐸ789ᐳ"}}:::plan
+    List790 --> PgCursor788
+    PgClassExpression789{{"PgClassExpression[789∈65]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle786 --> PgClassExpression789
+    PgClassExpression789 --> List790
     PgClassExpression791{{"PgClassExpression[791∈67]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
     PgSelectSingle786 --> PgClassExpression791
+    PgSelect820[["PgSelect[820∈68]<br />ᐸtable_set_query+1ᐳ"]]:::plan
+    Object11 & Connection819 --> PgSelect820
+    __ListTransform821[["__ListTransform[821∈68]<br />ᐸeach:820ᐳ"]]:::plan
+    PgSelect820 --> __ListTransform821
+    PgPageInfo831{{"PgPageInfo[831∈68]"}}:::plan
+    Connection819 --> PgPageInfo831
+    First833{{"First[833∈68]"}}:::plan
+    PgSelect820 --> First833
+    PgSelectSingle834{{"PgSelectSingle[834∈68]<br />ᐸtable_set_queryᐳ"}}:::plan
+    First833 --> PgSelectSingle834
+    PgCursor835{{"PgCursor[835∈68]"}}:::plan
+    List837{{"List[837∈68]<br />ᐸ836ᐳ"}}:::plan
+    List837 --> PgCursor835
+    PgClassExpression836{{"PgClassExpression[836∈68]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle834 --> PgClassExpression836
+    PgClassExpression836 --> List837
+    Last839{{"Last[839∈68]"}}:::plan
+    PgSelect820 --> Last839
+    PgSelectSingle840{{"PgSelectSingle[840∈68]<br />ᐸtable_set_queryᐳ"}}:::plan
+    Last839 --> PgSelectSingle840
+    PgCursor841{{"PgCursor[841∈68]"}}:::plan
+    List843{{"List[843∈68]<br />ᐸ842ᐳ"}}:::plan
+    List843 --> PgCursor841
+    PgClassExpression842{{"PgClassExpression[842∈68]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle840 --> PgClassExpression842
+    PgClassExpression842 --> List843
+    Access845{{"Access[845∈68]<br />ᐸ820.hasMoreᐳ"}}:::plan
+    PgSelect820 --> Access845
+    __Item822[/"__Item[822∈69]<br />ᐸ820ᐳ"\]:::itemplan
+    PgSelect820 -.-> __Item822
+    PgSelectSingle823{{"PgSelectSingle[823∈69]<br />ᐸtable_set_queryᐳ"}}:::plan
+    __Item822 --> PgSelectSingle823
+    Edge826{{"Edge[826∈70]"}}:::plan
+    PgSelectSingle825{{"PgSelectSingle[825∈70]<br />ᐸtable_set_queryᐳ"}}:::plan
+    PgCursor827{{"PgCursor[827∈70]"}}:::plan
+    PgSelectSingle825 & PgCursor827 & Connection819 --> Edge826
+    __Item824[/"__Item[824∈70]<br />ᐸ821ᐳ"\]:::itemplan
+    __ListTransform821 ==> __Item824
+    __Item824 --> PgSelectSingle825
+    List829{{"List[829∈70]<br />ᐸ828ᐳ"}}:::plan
+    List829 --> PgCursor827
+    PgClassExpression828{{"PgClassExpression[828∈70]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle825 --> PgClassExpression828
+    PgClassExpression828 --> List829
     PgClassExpression830{{"PgClassExpression[830∈72]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
     PgSelectSingle825 --> PgClassExpression830
+    PgSelect860[["PgSelect[860∈73]<br />ᐸtable_set_query+1ᐳ"]]:::plan
+    Lambda1213{{"Lambda[1213∈73]"}}:::plan
+    Access1214{{"Access[1214∈73]<br />ᐸ1213.0ᐳ"}}:::plan
+    Access1215{{"Access[1215∈73]<br />ᐸ1213.1ᐳ"}}:::plan
+    Object11 & Connection858 & Lambda859 & Access865 & Lambda1213 & Access1214 & Access1215 --> PgSelect860
+    List1212{{"List[1212∈73]<br />ᐸ1211,865ᐳ"}}:::plan
+    Constant1211{{"Constant[1211∈73]<br />ᐸnullᐳ"}}:::plan
+    Constant1211 & Access865 --> List1212
+    __ListTransform861[["__ListTransform[861∈73]<br />ᐸeach:860ᐳ"]]:::plan
+    PgSelect860 --> __ListTransform861
+    PgPageInfo873{{"PgPageInfo[873∈73]"}}:::plan
+    Connection858 --> PgPageInfo873
+    First875{{"First[875∈73]"}}:::plan
+    PgSelect860 --> First875
+    PgSelectSingle876{{"PgSelectSingle[876∈73]<br />ᐸtable_set_queryᐳ"}}:::plan
+    First875 --> PgSelectSingle876
+    PgCursor877{{"PgCursor[877∈73]"}}:::plan
+    List881{{"List[881∈73]<br />ᐸ880ᐳ"}}:::plan
+    List881 --> PgCursor877
+    PgClassExpression880{{"PgClassExpression[880∈73]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle876 --> PgClassExpression880
+    PgClassExpression880 --> List881
+    Last883{{"Last[883∈73]"}}:::plan
+    PgSelect860 --> Last883
+    PgSelectSingle884{{"PgSelectSingle[884∈73]<br />ᐸtable_set_queryᐳ"}}:::plan
+    Last883 --> PgSelectSingle884
+    PgCursor885{{"PgCursor[885∈73]"}}:::plan
+    List889{{"List[889∈73]<br />ᐸ888ᐳ"}}:::plan
+    List889 --> PgCursor885
+    PgClassExpression888{{"PgClassExpression[888∈73]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle884 --> PgClassExpression888
+    PgClassExpression888 --> List889
+    Access892{{"Access[892∈73]<br />ᐸ860.hasMoreᐳ"}}:::plan
+    PgSelect860 --> Access892
+    List1212 --> Lambda1213
+    Lambda1213 --> Access1214
+    Lambda1213 --> Access1215
+    __Item862[/"__Item[862∈74]<br />ᐸ860ᐳ"\]:::itemplan
+    PgSelect860 -.-> __Item862
+    PgSelectSingle863{{"PgSelectSingle[863∈74]<br />ᐸtable_set_queryᐳ"}}:::plan
+    __Item862 --> PgSelectSingle863
+    Edge868{{"Edge[868∈75]"}}:::plan
+    PgSelectSingle867{{"PgSelectSingle[867∈75]<br />ᐸtable_set_queryᐳ"}}:::plan
+    PgCursor869{{"PgCursor[869∈75]"}}:::plan
+    PgSelectSingle867 & PgCursor869 & Connection858 --> Edge868
+    __Item866[/"__Item[866∈75]<br />ᐸ861ᐳ"\]:::itemplan
+    __ListTransform861 ==> __Item866
+    __Item866 --> PgSelectSingle867
+    List871{{"List[871∈75]<br />ᐸ870ᐳ"}}:::plan
+    List871 --> PgCursor869
+    PgClassExpression870{{"PgClassExpression[870∈75]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle867 --> PgClassExpression870
+    PgClassExpression870 --> List871
     PgClassExpression872{{"PgClassExpression[872∈77]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
     PgSelectSingle867 --> PgClassExpression872
+    PgSelect908[["PgSelect[908∈78]<br />ᐸtable_set_query+1ᐳ"]]:::plan
+    Lambda1218{{"Lambda[1218∈78]"}}:::plan
+    Access1219{{"Access[1219∈78]<br />ᐸ1218.0ᐳ"}}:::plan
+    Access1220{{"Access[1220∈78]<br />ᐸ1218.1ᐳ"}}:::plan
+    Object11 & Connection906 & Lambda859 & Access865 & Lambda1218 & Access1219 & Access1220 --> PgSelect908
+    List1217{{"List[1217∈78]<br />ᐸ865,1216ᐳ"}}:::plan
+    Constant1216{{"Constant[1216∈78]<br />ᐸnullᐳ"}}:::plan
+    Access865 & Constant1216 --> List1217
+    __ListTransform909[["__ListTransform[909∈78]<br />ᐸeach:908ᐳ"]]:::plan
+    PgSelect908 --> __ListTransform909
+    PgPageInfo921{{"PgPageInfo[921∈78]"}}:::plan
+    Connection906 --> PgPageInfo921
+    First923{{"First[923∈78]"}}:::plan
+    PgSelect908 --> First923
+    PgSelectSingle924{{"PgSelectSingle[924∈78]<br />ᐸtable_set_queryᐳ"}}:::plan
+    First923 --> PgSelectSingle924
+    PgCursor925{{"PgCursor[925∈78]"}}:::plan
+    List929{{"List[929∈78]<br />ᐸ928ᐳ"}}:::plan
+    List929 --> PgCursor925
+    PgClassExpression928{{"PgClassExpression[928∈78]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle924 --> PgClassExpression928
+    PgClassExpression928 --> List929
+    Last931{{"Last[931∈78]"}}:::plan
+    PgSelect908 --> Last931
+    PgSelectSingle932{{"PgSelectSingle[932∈78]<br />ᐸtable_set_queryᐳ"}}:::plan
+    Last931 --> PgSelectSingle932
+    PgCursor933{{"PgCursor[933∈78]"}}:::plan
+    List937{{"List[937∈78]<br />ᐸ936ᐳ"}}:::plan
+    List937 --> PgCursor933
+    PgClassExpression936{{"PgClassExpression[936∈78]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle932 --> PgClassExpression936
+    PgClassExpression936 --> List937
+    Access939{{"Access[939∈78]<br />ᐸ908.hasMoreᐳ"}}:::plan
+    PgSelect908 --> Access939
+    List1217 --> Lambda1218
+    Lambda1218 --> Access1219
+    Lambda1218 --> Access1220
+    __Item910[/"__Item[910∈79]<br />ᐸ908ᐳ"\]:::itemplan
+    PgSelect908 -.-> __Item910
+    PgSelectSingle911{{"PgSelectSingle[911∈79]<br />ᐸtable_set_queryᐳ"}}:::plan
+    __Item910 --> PgSelectSingle911
+    Edge916{{"Edge[916∈80]"}}:::plan
+    PgSelectSingle915{{"PgSelectSingle[915∈80]<br />ᐸtable_set_queryᐳ"}}:::plan
+    PgCursor917{{"PgCursor[917∈80]"}}:::plan
+    PgSelectSingle915 & PgCursor917 & Connection906 --> Edge916
+    __Item914[/"__Item[914∈80]<br />ᐸ909ᐳ"\]:::itemplan
+    __ListTransform909 ==> __Item914
+    __Item914 --> PgSelectSingle915
+    List919{{"List[919∈80]<br />ᐸ918ᐳ"}}:::plan
+    List919 --> PgCursor917
+    PgClassExpression918{{"PgClassExpression[918∈80]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle915 --> PgClassExpression918
+    PgClassExpression918 --> List919
     PgClassExpression920{{"PgClassExpression[920∈82]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
     PgSelectSingle915 --> PgClassExpression920
+    PgSelect953[["PgSelect[953∈83]<br />ᐸtable_set_query_plpgsql+1ᐳ"]]:::plan
+    Object11 & Connection952 --> PgSelect953
+    __ListTransform954[["__ListTransform[954∈83]<br />ᐸeach:953ᐳ"]]:::plan
+    PgSelect953 --> __ListTransform954
+    PgPageInfo964{{"PgPageInfo[964∈83]"}}:::plan
+    Connection952 --> PgPageInfo964
+    First966{{"First[966∈83]"}}:::plan
+    PgSelect953 --> First966
+    PgSelectSingle967{{"PgSelectSingle[967∈83]<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
+    First966 --> PgSelectSingle967
+    PgCursor968{{"PgCursor[968∈83]"}}:::plan
+    List970{{"List[970∈83]<br />ᐸ969ᐳ"}}:::plan
+    List970 --> PgCursor968
+    PgClassExpression969{{"PgClassExpression[969∈83]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle967 --> PgClassExpression969
+    PgClassExpression969 --> List970
+    Last972{{"Last[972∈83]"}}:::plan
+    PgSelect953 --> Last972
+    PgSelectSingle973{{"PgSelectSingle[973∈83]<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
+    Last972 --> PgSelectSingle973
+    PgCursor974{{"PgCursor[974∈83]"}}:::plan
+    List976{{"List[976∈83]<br />ᐸ975ᐳ"}}:::plan
+    List976 --> PgCursor974
+    PgClassExpression975{{"PgClassExpression[975∈83]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle973 --> PgClassExpression975
+    PgClassExpression975 --> List976
+    Access978{{"Access[978∈83]<br />ᐸ953.hasMoreᐳ"}}:::plan
+    PgSelect953 --> Access978
+    __Item955[/"__Item[955∈84]<br />ᐸ953ᐳ"\]:::itemplan
+    PgSelect953 -.-> __Item955
+    PgSelectSingle956{{"PgSelectSingle[956∈84]<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
+    __Item955 --> PgSelectSingle956
+    Edge959{{"Edge[959∈85]"}}:::plan
+    PgSelectSingle958{{"PgSelectSingle[958∈85]<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
+    PgCursor960{{"PgCursor[960∈85]"}}:::plan
+    PgSelectSingle958 & PgCursor960 & Connection952 --> Edge959
+    __Item957[/"__Item[957∈85]<br />ᐸ954ᐳ"\]:::itemplan
+    __ListTransform954 ==> __Item957
+    __Item957 --> PgSelectSingle958
+    List962{{"List[962∈85]<br />ᐸ961ᐳ"}}:::plan
+    List962 --> PgCursor960
+    PgClassExpression961{{"PgClassExpression[961∈85]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle958 --> PgClassExpression961
+    PgClassExpression961 --> List962
     PgClassExpression963{{"PgClassExpression[963∈87]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
     PgSelectSingle958 --> PgClassExpression963
+    PgSelect991[["PgSelect[991∈88]<br />ᐸtable_set_query_plpgsql+1ᐳ"]]:::plan
+    Access996{{"Access[996∈88]<br />ᐸ990.1ᐳ"}}:::plan
+    Lambda1223{{"Lambda[1223∈88]"}}:::plan
+    Access1224{{"Access[1224∈88]<br />ᐸ1223.0ᐳ"}}:::plan
+    Access1225{{"Access[1225∈88]<br />ᐸ1223.1ᐳ"}}:::plan
+    Object11 & Connection989 & Lambda990 & Access996 & Lambda1223 & Access1224 & Access1225 --> PgSelect991
+    List1222{{"List[1222∈88]<br />ᐸ996,1221ᐳ"}}:::plan
+    Constant1221{{"Constant[1221∈88]<br />ᐸnullᐳ"}}:::plan
+    Access996 & Constant1221 --> List1222
+    __ListTransform992[["__ListTransform[992∈88]<br />ᐸeach:991ᐳ"]]:::plan
+    PgSelect991 --> __ListTransform992
+    Lambda990 --> Access996
+    PgPageInfo1004{{"PgPageInfo[1004∈88]"}}:::plan
+    Connection989 --> PgPageInfo1004
+    First1006{{"First[1006∈88]"}}:::plan
+    PgSelect991 --> First1006
+    PgSelectSingle1007{{"PgSelectSingle[1007∈88]<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
+    First1006 --> PgSelectSingle1007
+    PgCursor1008{{"PgCursor[1008∈88]"}}:::plan
+    List1012{{"List[1012∈88]<br />ᐸ1011ᐳ"}}:::plan
+    List1012 --> PgCursor1008
+    PgClassExpression1011{{"PgClassExpression[1011∈88]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle1007 --> PgClassExpression1011
+    PgClassExpression1011 --> List1012
+    Last1014{{"Last[1014∈88]"}}:::plan
+    PgSelect991 --> Last1014
+    PgSelectSingle1015{{"PgSelectSingle[1015∈88]<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
+    Last1014 --> PgSelectSingle1015
+    PgCursor1016{{"PgCursor[1016∈88]"}}:::plan
+    List1020{{"List[1020∈88]<br />ᐸ1019ᐳ"}}:::plan
+    List1020 --> PgCursor1016
+    PgClassExpression1019{{"PgClassExpression[1019∈88]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle1015 --> PgClassExpression1019
+    PgClassExpression1019 --> List1020
+    Access1022{{"Access[1022∈88]<br />ᐸ991.hasMoreᐳ"}}:::plan
+    PgSelect991 --> Access1022
+    List1222 --> Lambda1223
+    Lambda1223 --> Access1224
+    Lambda1223 --> Access1225
+    __Item993[/"__Item[993∈89]<br />ᐸ991ᐳ"\]:::itemplan
+    PgSelect991 -.-> __Item993
+    PgSelectSingle994{{"PgSelectSingle[994∈89]<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
+    __Item993 --> PgSelectSingle994
+    Edge999{{"Edge[999∈90]"}}:::plan
+    PgSelectSingle998{{"PgSelectSingle[998∈90]<br />ᐸtable_set_query_plpgsqlᐳ"}}:::plan
+    PgCursor1000{{"PgCursor[1000∈90]"}}:::plan
+    PgSelectSingle998 & PgCursor1000 & Connection989 --> Edge999
+    __Item997[/"__Item[997∈90]<br />ᐸ992ᐳ"\]:::itemplan
+    __ListTransform992 ==> __Item997
+    __Item997 --> PgSelectSingle998
+    List1002{{"List[1002∈90]<br />ᐸ1001ᐳ"}}:::plan
+    List1002 --> PgCursor1000
+    PgClassExpression1001{{"PgClassExpression[1001∈90]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle998 --> PgClassExpression1001
+    PgClassExpression1001 --> List1002
     PgClassExpression1003{{"PgClassExpression[1003∈92]<br />ᐸ__table_se...full_name”ᐳ"}}:::plan
     PgSelectSingle998 --> PgClassExpression1003
+    PgSelect1040[["PgSelect[1040∈93]<br />ᐸint_set_queryᐳ"]]:::plan
+    Object11 & Constant1236 & Constant59 & Constant1305 & Connection1039 --> PgSelect1040
+    PgSelect1052[["PgSelect[1052∈93]<br />ᐸint_set_query(aggregate)ᐳ"]]:::plan
+    Object11 & Constant1236 & Constant59 & Constant1305 & Connection1039 --> PgSelect1052
+    __ListTransform1041[["__ListTransform[1041∈93]<br />ᐸeach:1040ᐳ"]]:::plan
+    PgSelect1040 --> __ListTransform1041
+    First1053{{"First[1053∈93]"}}:::plan
+    PgSelect1052 --> First1053
+    PgSelectSingle1054{{"PgSelectSingle[1054∈93]<br />ᐸint_set_queryᐳ"}}:::plan
+    First1053 --> PgSelectSingle1054
+    PgClassExpression1055{{"PgClassExpression[1055∈93]<br />ᐸcount(*)ᐳ"}}:::plan
+    PgSelectSingle1054 --> PgClassExpression1055
+    __Item1042[/"__Item[1042∈94]<br />ᐸ1040ᐳ"\]:::itemplan
+    PgSelect1040 -.-> __Item1042
+    PgSelectSingle1043{{"PgSelectSingle[1043∈94]<br />ᐸint_set_queryᐳ"}}:::plan
+    __Item1042 --> PgSelectSingle1043
+    PgClassExpression1044{{"PgClassExpression[1044∈94]<br />ᐸ__int_set_query__.vᐳ"}}:::plan
+    PgSelectSingle1043 --> PgClassExpression1044
+    Edge1048{{"Edge[1048∈95]"}}:::plan
+    PgClassExpression1047{{"PgClassExpression[1047∈95]<br />ᐸ__int_set_query__.vᐳ"}}:::plan
+    PgCursor1049{{"PgCursor[1049∈95]"}}:::plan
+    PgClassExpression1047 & PgCursor1049 & Connection1039 --> Edge1048
+    __Item1045[/"__Item[1045∈95]<br />ᐸ1041ᐳ"\]:::itemplan
+    __ListTransform1041 ==> __Item1045
+    PgSelectSingle1046{{"PgSelectSingle[1046∈95]<br />ᐸint_set_queryᐳ"}}:::plan
+    __Item1045 --> PgSelectSingle1046
+    PgSelectSingle1046 --> PgClassExpression1047
+    List1051{{"List[1051∈95]<br />ᐸ1050ᐳ"}}:::plan
+    List1051 --> PgCursor1049
+    PgClassExpression1050{{"PgClassExpression[1050∈95]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle1046 --> PgClassExpression1050
+    PgClassExpression1050 --> List1051
+    PgSelect1073[["PgSelect[1073∈97]<br />ᐸstatic_big_integerᐳ"]]:::plan
+    Object11 & Connection1072 --> PgSelect1073
+    PgSelect1085[["PgSelect[1085∈97]<br />ᐸstatic_big_integer(aggregate)ᐳ"]]:::plan
+    Object11 & Connection1072 --> PgSelect1085
+    __ListTransform1074[["__ListTransform[1074∈97]<br />ᐸeach:1073ᐳ"]]:::plan
+    PgSelect1073 --> __ListTransform1074
+    First1086{{"First[1086∈97]"}}:::plan
+    PgSelect1085 --> First1086
+    PgSelectSingle1087{{"PgSelectSingle[1087∈97]<br />ᐸstatic_big_integerᐳ"}}:::plan
+    First1086 --> PgSelectSingle1087
+    PgClassExpression1088{{"PgClassExpression[1088∈97]<br />ᐸcount(*)ᐳ"}}:::plan
+    PgSelectSingle1087 --> PgClassExpression1088
+    __Item1075[/"__Item[1075∈98]<br />ᐸ1073ᐳ"\]:::itemplan
+    PgSelect1073 -.-> __Item1075
+    PgSelectSingle1076{{"PgSelectSingle[1076∈98]<br />ᐸstatic_big_integerᐳ"}}:::plan
+    __Item1075 --> PgSelectSingle1076
+    PgClassExpression1077{{"PgClassExpression[1077∈98]<br />ᐸ__static_b...nteger__.vᐳ"}}:::plan
+    PgSelectSingle1076 --> PgClassExpression1077
+    Edge1226{{"Edge[1226∈99]"}}:::plan
+    PgClassExpression1080{{"PgClassExpression[1080∈99]<br />ᐸ__static_b...nteger__.vᐳ"}}:::plan
+    PgClassExpression1080 & Connection1072 --> Edge1226
+    __Item1078[/"__Item[1078∈99]<br />ᐸ1074ᐳ"\]:::itemplan
+    __ListTransform1074 ==> __Item1078
+    PgSelectSingle1079{{"PgSelectSingle[1079∈99]<br />ᐸstatic_big_integerᐳ"}}:::plan
+    __Item1078 --> PgSelectSingle1079
+    PgSelectSingle1079 --> PgClassExpression1080
+    __Item1110[/"__Item[1110∈101]<br />ᐸ1106ᐳ"\]:::itemplan
+    PgSelect1106 ==> __Item1110
+    PgSelectSingle1111{{"PgSelectSingle[1111∈101]<br />ᐸquery_compound_type_arrayᐳ"}}:::plan
+    __Item1110 --> PgSelectSingle1111
+    PgClassExpression1112{{"PgClassExpression[1112∈102]<br />ᐸ__query_co...rray__.”a”ᐳ"}}:::plan
+    PgSelectSingle1111 --> PgClassExpression1112
+    PgClassExpression1113{{"PgClassExpression[1113∈102]<br />ᐸ__query_co...rray__.”b”ᐳ"}}:::plan
+    PgSelectSingle1111 --> PgClassExpression1113
+    PgClassExpression1114{{"PgClassExpression[1114∈102]<br />ᐸ__query_co...rray__.”c”ᐳ"}}:::plan
+    PgSelectSingle1111 --> PgClassExpression1114
+    PgClassExpression1115{{"PgClassExpression[1115∈102]<br />ᐸ__query_co...rray__.”d”ᐳ"}}:::plan
+    PgSelectSingle1111 --> PgClassExpression1115
+    PgClassExpression1116{{"PgClassExpression[1116∈102]<br />ᐸ__query_co...rray__.”e”ᐳ"}}:::plan
+    PgSelectSingle1111 --> PgClassExpression1116
+    PgClassExpression1117{{"PgClassExpression[1117∈102]<br />ᐸ__query_co...rray__.”f”ᐳ"}}:::plan
+    PgSelectSingle1111 --> PgClassExpression1117
+    PgClassExpression1118{{"PgClassExpression[1118∈102]<br />ᐸ__query_co...rray__.”g”ᐳ"}}:::plan
+    PgSelectSingle1111 --> PgClassExpression1118
+    PgClassExpression1122{{"PgClassExpression[1122∈102]<br />ᐸ__query_co....”foo_bar”ᐳ"}}:::plan
+    PgSelectSingle1111 --> PgClassExpression1122
+    __Item1130[/"__Item[1130∈104]<br />ᐸ1129ᐳ"\]:::itemplan
+    PgClassExpression1129 ==> __Item1130
+    __Item1138[/"__Item[1138∈105]<br />ᐸ1137ᐳ"\]:::itemplan
+    PgClassExpression1137 ==> __Item1138
+    PgSelect1155[["PgSelect[1155∈107]<br />ᐸquery_interval_setᐳ"]]:::plan
+    Object11 & Connection1154 --> PgSelect1155
+    PgSelect1184[["PgSelect[1184∈107]<br />ᐸquery_interval_set(aggregate)ᐳ"]]:::plan
+    Object11 & Connection1154 --> PgSelect1184
+    __ListTransform1156[["__ListTransform[1156∈107]<br />ᐸeach:1155ᐳ"]]:::plan
+    PgSelect1155 --> __ListTransform1156
+    __ListTransform1170[["__ListTransform[1170∈107]<br />ᐸeach:1169ᐳ"]]:::plan
+    PgSelect1155 --> __ListTransform1170
+    First1185{{"First[1185∈107]"}}:::plan
+    PgSelect1184 --> First1185
+    PgSelectSingle1186{{"PgSelectSingle[1186∈107]<br />ᐸquery_interval_setᐳ"}}:::plan
+    First1185 --> PgSelectSingle1186
+    PgClassExpression1187{{"PgClassExpression[1187∈107]<br />ᐸcount(*)ᐳ"}}:::plan
+    PgSelectSingle1186 --> PgClassExpression1187
+    __Item1157[/"__Item[1157∈108]<br />ᐸ1155ᐳ"\]:::itemplan
+    PgSelect1155 -.-> __Item1157
+    PgSelectSingle1158{{"PgSelectSingle[1158∈108]<br />ᐸquery_interval_setᐳ"}}:::plan
+    __Item1157 --> PgSelectSingle1158
+    PgClassExpression1159{{"PgClassExpression[1159∈108]<br />ᐸ__query_in...al_set__.vᐳ"}}:::plan
+    PgSelectSingle1158 --> PgClassExpression1159
+    __Item1160[/"__Item[1160∈109]<br />ᐸ1156ᐳ"\]:::itemplan
+    __ListTransform1156 ==> __Item1160
+    PgSelectSingle1161{{"PgSelectSingle[1161∈109]<br />ᐸquery_interval_setᐳ"}}:::plan
+    __Item1160 --> PgSelectSingle1161
+    PgClassExpression1162{{"PgClassExpression[1162∈109]<br />ᐸ__query_in...al_set__.vᐳ"}}:::plan
+    PgSelectSingle1161 --> PgClassExpression1162
+    __Item1171[/"__Item[1171∈111]<br />ᐸ1155ᐳ"\]:::itemplan
+    PgSelect1155 -.-> __Item1171
+    PgSelectSingle1172{{"PgSelectSingle[1172∈111]<br />ᐸquery_interval_setᐳ"}}:::plan
+    __Item1171 --> PgSelectSingle1172
+    PgClassExpression1173{{"PgClassExpression[1173∈111]<br />ᐸ__query_in...al_set__.vᐳ"}}:::plan
+    PgSelectSingle1172 --> PgClassExpression1173
+    Edge1177{{"Edge[1177∈112]"}}:::plan
+    PgClassExpression1176{{"PgClassExpression[1176∈112]<br />ᐸ__query_in...al_set__.vᐳ"}}:::plan
+    PgCursor1178{{"PgCursor[1178∈112]"}}:::plan
+    PgClassExpression1176 & PgCursor1178 & Connection1154 --> Edge1177
+    __Item1174[/"__Item[1174∈112]<br />ᐸ1170ᐳ"\]:::itemplan
+    __ListTransform1170 ==> __Item1174
+    PgSelectSingle1175{{"PgSelectSingle[1175∈112]<br />ᐸquery_interval_setᐳ"}}:::plan
+    __Item1174 --> PgSelectSingle1175
+    PgSelectSingle1175 --> PgClassExpression1176
+    List1180{{"List[1180∈112]<br />ᐸ1179ᐳ"}}:::plan
+    List1180 --> PgCursor1178
+    PgClassExpression1179{{"PgClassExpression[1179∈112]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
+    PgSelectSingle1175 --> PgClassExpression1179
+    PgClassExpression1179 --> List1180
 
     %% define steps
 

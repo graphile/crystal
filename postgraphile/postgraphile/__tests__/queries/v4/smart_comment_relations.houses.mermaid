@@ -44,34 +44,6 @@ graph TD
     Constant41{{"Constant[41∈0]<br />ᐸ'streets'ᐳ"}}:::plan
     Constant64{{"Constant[64∈0]<br />ᐸ'buildings'ᐳ"}}:::plan
     Constant128{{"Constant[128∈0]<br />ᐸ'properties'ᐳ"}}:::plan
-    List350{{"List[350∈28]<br />ᐸ23,348,349ᐳ"}}:::plan
-    PgClassExpression348{{"PgClassExpression[348∈28]<br />ᐸ__houses__.”street_id”ᐳ"}}:::plan
-    PgClassExpression349{{"PgClassExpression[349∈28]<br />ᐸ__houses__...operty_id”ᐳ"}}:::plan
-    Constant23 & PgClassExpression348 & PgClassExpression349 --> List350
-    PgClassExpression344{{"PgClassExpression[344∈28]<br />ᐸ__houses__...ding_name”ᐳ"}}:::plan
-    PgSelectSingle343 --> PgClassExpression344
-    PgClassExpression345{{"PgClassExpression[345∈28]<br />ᐸ__houses__...or_number”ᐳ"}}:::plan
-    PgSelectSingle343 --> PgClassExpression345
-    PgClassExpression346{{"PgClassExpression[346∈28]<br />ᐸ__houses__...reet_name”ᐳ"}}:::plan
-    PgSelectSingle343 --> PgClassExpression346
-    PgSelectSingle343 --> PgClassExpression348
-    PgSelectSingle343 --> PgClassExpression349
-    Lambda351{{"Lambda[351∈28]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List350 --> Lambda351
-    List332{{"List[332∈27]<br />ᐸ23,330,331ᐳ"}}:::plan
-    PgClassExpression330{{"PgClassExpression[330∈27]<br />ᐸ__houses__.”street_id”ᐳ"}}:::plan
-    PgClassExpression331{{"PgClassExpression[331∈27]<br />ᐸ__houses__...operty_id”ᐳ"}}:::plan
-    Constant23 & PgClassExpression330 & PgClassExpression331 --> List332
-    PgClassExpression326{{"PgClassExpression[326∈27]<br />ᐸ__houses__...ding_name”ᐳ"}}:::plan
-    PgSelectSingle325 --> PgClassExpression326
-    PgClassExpression327{{"PgClassExpression[327∈27]<br />ᐸ__houses__...or_number”ᐳ"}}:::plan
-    PgSelectSingle325 --> PgClassExpression327
-    PgClassExpression328{{"PgClassExpression[328∈27]<br />ᐸ__houses__...reet_name”ᐳ"}}:::plan
-    PgSelectSingle325 --> PgClassExpression328
-    PgSelectSingle325 --> PgClassExpression330
-    PgSelectSingle325 --> PgClassExpression331
-    Lambda333{{"Lambda[333∈27]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List332 --> Lambda333
     PgSelect20[["PgSelect[20∈1]<br />ᐸhousesᐳ"]]:::plan
     Object18 & Connection19 --> PgSelect20
     Connection60{{"Connection[60∈1]<br />ᐸ56ᐳ"}}:::plan
@@ -102,44 +74,40 @@ graph TD
     PgSelectSingle22 --> PgClassExpression32
     PgSelectSingle40{{"PgSelectSingle[40∈3]<br />ᐸstreetsᐳ"}}:::plan
     PgSelectSingle22 --> PgSelectSingle40
-    RemapKeys378{{"RemapKeys[378∈3]<br />ᐸ22:{”0”:26,”1”:27,”2”:28,”3”:29,”4”:30,”5”:31,”6”:32,”7”:33,”8”:34,”9”:35,”10”:36,”11”:37,”12”:38}ᐳ"}}:::plan
-    PgSelectSingle22 --> RemapKeys378
     PgSelectSingle76{{"PgSelectSingle[76∈3]<br />ᐸbuildingsᐳ"}}:::plan
+    RemapKeys378{{"RemapKeys[378∈3]<br />ᐸ22:{”0”:26,”1”:27,”2”:28,”3”:29,”4”:30,”5”:31,”6”:32,”7”:33,”8”:34,”9”:35,”10”:36,”11”:37,”12”:38}ᐳ"}}:::plan
     RemapKeys378 --> PgSelectSingle76
-    RemapKeys368{{"RemapKeys[368∈3]<br />ᐸ22:{”0”:16,”1”:17,”2”:18,”3”:19,”4”:20,”5”:21}ᐳ"}}:::plan
-    PgSelectSingle22 --> RemapKeys368
     PgSelectSingle177{{"PgSelectSingle[177∈3]<br />ᐸpropertiesᐳ"}}:::plan
+    RemapKeys368{{"RemapKeys[368∈3]<br />ᐸ22:{”0”:16,”1”:17,”2”:18,”3”:19,”4”:20,”5”:21}ᐳ"}}:::plan
     RemapKeys368 --> PgSelectSingle177
-    RemapKeys363{{"RemapKeys[363∈3]<br />ᐸ22:{”0”:3,”1”:4,”2”:5,”3”:6,”4”:7,”5”:8,”6”:9,”7”:10,”8”:11,”9”:12,”10”:13,”11”:14}ᐳ"}}:::plan
-    PgSelectSingle22 --> RemapKeys363
     PgSelectSingle228{{"PgSelectSingle[228∈3]<br />ᐸstreet_propertyᐳ"}}:::plan
+    RemapKeys363{{"RemapKeys[363∈3]<br />ᐸ22:{”0”:3,”1”:4,”2”:5,”3”:6,”4”:7,”5”:8,”6”:9,”7”:10,”8”:11,”9”:12,”10”:13,”11”:14}ᐳ"}}:::plan
     RemapKeys363 --> PgSelectSingle228
-    PgClassExpression229{{"PgClassExpression[229∈19]<br />ᐸ__street_p..._.”str_id”ᐳ"}}:::plan
-    PgSelectSingle228 --> PgClassExpression229
-    PgClassExpression230{{"PgClassExpression[230∈19]<br />ᐸ__street_p....”prop_id”ᐳ"}}:::plan
-    PgSelectSingle228 --> PgClassExpression230
-    PgClassExpression231{{"PgClassExpression[231∈19]<br />ᐸ__street_p...ent_owner”ᐳ"}}:::plan
-    PgSelectSingle228 --> PgClassExpression231
-    PgSelectSingle238{{"PgSelectSingle[238∈19]<br />ᐸstreetsᐳ"}}:::plan
-    PgSelectSingle228 --> PgSelectSingle238
-    RemapKeys361{{"RemapKeys[361∈19]<br />ᐸ228:{”0”:4,”1”:5,”2”:6,”3”:7,”4”:8,”5”:9}ᐳ"}}:::plan
-    PgSelectSingle228 --> RemapKeys361
-    PgSelectSingle274{{"PgSelectSingle[274∈19]<br />ᐸpropertiesᐳ"}}:::plan
-    RemapKeys361 --> PgSelectSingle274
-    List180{{"List[180∈15]<br />ᐸ128,179ᐳ"}}:::plan
-    PgClassExpression179{{"PgClassExpression[179∈15]<br />ᐸ__properties__.”id”ᐳ"}}:::plan
-    Constant128 & PgClassExpression179 --> List180
-    PgSelectSingle177 --> PgClassExpression179
-    Lambda181{{"Lambda[181∈15]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List180 --> Lambda181
-    PgClassExpression183{{"PgClassExpression[183∈15]<br />ᐸ__properti...street_id”ᐳ"}}:::plan
-    PgSelectSingle177 --> PgClassExpression183
-    PgClassExpression184{{"PgClassExpression[184∈15]<br />ᐸ__properti...or_number”ᐳ"}}:::plan
-    PgSelectSingle177 --> PgClassExpression184
-    RemapKeys366{{"RemapKeys[366∈15]<br />ᐸ177:{”0”:1,”1”:2,”2”:3}ᐳ"}}:::plan
-    PgSelectSingle177 --> RemapKeys366
-    PgSelectSingle191{{"PgSelectSingle[191∈15]<br />ᐸstreetsᐳ"}}:::plan
-    RemapKeys366 --> PgSelectSingle191
+    PgSelectSingle22 --> RemapKeys363
+    PgSelectSingle22 --> RemapKeys368
+    PgSelectSingle22 --> RemapKeys378
+    List43{{"List[43∈4]<br />ᐸ41,42ᐳ"}}:::plan
+    PgClassExpression42{{"PgClassExpression[42∈4]<br />ᐸ__streets__.”id”ᐳ"}}:::plan
+    Constant41 & PgClassExpression42 --> List43
+    PgSelectSingle40 --> PgClassExpression42
+    Lambda44{{"Lambda[44∈4]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List43 --> Lambda44
+    PgClassExpression46{{"PgClassExpression[46∈4]<br />ᐸ__streets__.”name”ᐳ"}}:::plan
+    PgSelectSingle40 --> PgClassExpression46
+    Access352{{"Access[352∈4]<br />ᐸ22.1ᐳ"}}:::plan
+    PgSelectSingle22 --> Access352
+    __Item62[/"__Item[62∈5]<br />ᐸ352ᐳ"\]:::itemplan
+    Access352 ==> __Item62
+    PgSelectSingle63{{"PgSelectSingle[63∈5]<br />ᐸbuildingsᐳ"}}:::plan
+    __Item62 --> PgSelectSingle63
+    List66{{"List[66∈6]<br />ᐸ64,65ᐳ"}}:::plan
+    PgClassExpression65{{"PgClassExpression[65∈6]<br />ᐸ__buildings__.”id”ᐳ"}}:::plan
+    Constant64 & PgClassExpression65 --> List66
+    PgSelectSingle63 --> PgClassExpression65
+    Lambda67{{"Lambda[67∈6]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List66 --> Lambda67
+    PgClassExpression69{{"PgClassExpression[69∈6]<br />ᐸ__buildings__.”name”ᐳ"}}:::plan
+    PgSelectSingle63 --> PgClassExpression69
     List79{{"List[79∈7]<br />ᐸ64,78ᐳ"}}:::plan
     PgClassExpression78{{"PgClassExpression[78∈7]<br />ᐸ__buildings__.”id”ᐳ"}}:::plan
     Constant64 & PgClassExpression78 --> List79
@@ -152,65 +120,17 @@ graph TD
     PgSelectSingle76 --> PgClassExpression83
     PgClassExpression84{{"PgClassExpression[84∈7]<br />ᐸ__building...s_primary”ᐳ"}}:::plan
     PgSelectSingle76 --> PgClassExpression84
-    RemapKeys371{{"RemapKeys[371∈7]<br />ᐸ76:{”0”:1,”1”:2,”2”:3}ᐳ"}}:::plan
-    PgSelectSingle76 --> RemapKeys371
     PgSelectSingle91{{"PgSelectSingle[91∈7]<br />ᐸstreetsᐳ"}}:::plan
+    RemapKeys371{{"RemapKeys[371∈7]<br />ᐸ76:{”0”:1,”1”:2,”2”:3}ᐳ"}}:::plan
     RemapKeys371 --> PgSelectSingle91
-    RemapKeys376{{"RemapKeys[376∈7]<br />ᐸ76:{”0”:7,”1”:8,”2”:9,”3”:10,”4”:11,”5”:12}ᐳ"}}:::plan
-    PgSelectSingle76 --> RemapKeys376
     PgSelectSingle127{{"PgSelectSingle[127∈7]<br />ᐸpropertiesᐳ"}}:::plan
+    RemapKeys376{{"RemapKeys[376∈7]<br />ᐸ76:{”0”:7,”1”:8,”2”:9,”3”:10,”4”:11,”5”:12}ᐳ"}}:::plan
     RemapKeys376 --> PgSelectSingle127
-    List43{{"List[43∈4]<br />ᐸ41,42ᐳ"}}:::plan
-    PgClassExpression42{{"PgClassExpression[42∈4]<br />ᐸ__streets__.”id”ᐳ"}}:::plan
-    Constant41 & PgClassExpression42 --> List43
-    PgSelectSingle40 --> PgClassExpression42
-    Lambda44{{"Lambda[44∈4]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List43 --> Lambda44
-    PgClassExpression46{{"PgClassExpression[46∈4]<br />ᐸ__streets__.”name”ᐳ"}}:::plan
-    PgSelectSingle40 --> PgClassExpression46
-    Access352{{"Access[352∈4]<br />ᐸ22.1ᐳ"}}:::plan
-    PgSelectSingle22 --> Access352
-    List130{{"List[130∈11]<br />ᐸ128,129ᐳ"}}:::plan
-    PgClassExpression129{{"PgClassExpression[129∈11]<br />ᐸ__properties__.”id”ᐳ"}}:::plan
-    Constant128 & PgClassExpression129 --> List130
-    List277{{"List[277∈23]<br />ᐸ128,276ᐳ"}}:::plan
-    PgClassExpression276{{"PgClassExpression[276∈23]<br />ᐸ__properties__.”id”ᐳ"}}:::plan
-    Constant128 & PgClassExpression276 --> List277
-    PgSelectSingle127 --> PgClassExpression129
-    Lambda131{{"Lambda[131∈11]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List130 --> Lambda131
-    PgClassExpression133{{"PgClassExpression[133∈11]<br />ᐸ__properti...street_id”ᐳ"}}:::plan
-    PgSelectSingle127 --> PgClassExpression133
-    PgClassExpression134{{"PgClassExpression[134∈11]<br />ᐸ__properti...or_number”ᐳ"}}:::plan
-    PgSelectSingle127 --> PgClassExpression134
-    RemapKeys374{{"RemapKeys[374∈11]<br />ᐸ127:{”0”:1,”1”:2,”2”:3}ᐳ"}}:::plan
-    PgSelectSingle127 --> RemapKeys374
-    PgSelectSingle141{{"PgSelectSingle[141∈11]<br />ᐸstreetsᐳ"}}:::plan
-    RemapKeys374 --> PgSelectSingle141
-    PgSelectSingle274 --> PgClassExpression276
-    Lambda278{{"Lambda[278∈23]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List277 --> Lambda278
-    PgClassExpression280{{"PgClassExpression[280∈23]<br />ᐸ__properti...street_id”ᐳ"}}:::plan
-    PgSelectSingle274 --> PgClassExpression280
-    PgClassExpression281{{"PgClassExpression[281∈23]<br />ᐸ__properti...or_number”ᐳ"}}:::plan
-    PgSelectSingle274 --> PgClassExpression281
-    RemapKeys359{{"RemapKeys[359∈23]<br />ᐸ274:{”0”:1,”1”:2,”2”:3}ᐳ"}}:::plan
-    PgSelectSingle274 --> RemapKeys359
-    PgSelectSingle288{{"PgSelectSingle[288∈23]<br />ᐸstreetsᐳ"}}:::plan
-    RemapKeys359 --> PgSelectSingle288
+    PgSelectSingle76 --> RemapKeys371
+    PgSelectSingle76 --> RemapKeys376
     List94{{"List[94∈8]<br />ᐸ41,93ᐳ"}}:::plan
     PgClassExpression93{{"PgClassExpression[93∈8]<br />ᐸ__streets__.”id”ᐳ"}}:::plan
     Constant41 & PgClassExpression93 --> List94
-    List194{{"List[194∈16]<br />ᐸ41,193ᐳ"}}:::plan
-    PgClassExpression193{{"PgClassExpression[193∈16]<br />ᐸ__streets__.”id”ᐳ"}}:::plan
-    Constant41 & PgClassExpression193 --> List194
-    List241{{"List[241∈20]<br />ᐸ41,240ᐳ"}}:::plan
-    PgClassExpression240{{"PgClassExpression[240∈20]<br />ᐸ__streets__.”id”ᐳ"}}:::plan
-    Constant41 & PgClassExpression240 --> List241
-    __Item62[/"__Item[62∈5]<br />ᐸ352ᐳ"\]:::itemplan
-    Access352 ==> __Item62
-    PgSelectSingle63{{"PgSelectSingle[63∈5]<br />ᐸbuildingsᐳ"}}:::plan
-    __Item62 --> PgSelectSingle63
     PgSelectSingle91 --> PgClassExpression93
     Lambda95{{"Lambda[95∈8]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List94 --> Lambda95
@@ -218,38 +138,35 @@ graph TD
     PgSelectSingle91 --> PgClassExpression97
     Access370{{"Access[370∈8]<br />ᐸ371.1ᐳ"}}:::plan
     RemapKeys371 --> Access370
-    PgSelectSingle191 --> PgClassExpression193
-    Lambda195{{"Lambda[195∈16]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List194 --> Lambda195
-    PgClassExpression197{{"PgClassExpression[197∈16]<br />ᐸ__streets__.”name”ᐳ"}}:::plan
-    PgSelectSingle191 --> PgClassExpression197
-    Access365{{"Access[365∈16]<br />ᐸ366.1ᐳ"}}:::plan
-    RemapKeys366 --> Access365
-    PgSelectSingle238 --> PgClassExpression240
-    Lambda242{{"Lambda[242∈20]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List241 --> Lambda242
-    PgClassExpression244{{"PgClassExpression[244∈20]<br />ᐸ__streets__.”name”ᐳ"}}:::plan
-    PgSelectSingle238 --> PgClassExpression244
-    Access355{{"Access[355∈20]<br />ᐸ228.1ᐳ"}}:::plan
-    PgSelectSingle228 --> Access355
-    List66{{"List[66∈6]<br />ᐸ64,65ᐳ"}}:::plan
-    PgClassExpression65{{"PgClassExpression[65∈6]<br />ᐸ__buildings__.”id”ᐳ"}}:::plan
-    Constant64 & PgClassExpression65 --> List66
-    List144{{"List[144∈12]<br />ᐸ41,143ᐳ"}}:::plan
-    PgClassExpression143{{"PgClassExpression[143∈12]<br />ᐸ__streets__.”id”ᐳ"}}:::plan
-    Constant41 & PgClassExpression143 --> List144
-    List291{{"List[291∈24]<br />ᐸ41,290ᐳ"}}:::plan
-    PgClassExpression290{{"PgClassExpression[290∈24]<br />ᐸ__streets__.”id”ᐳ"}}:::plan
-    Constant41 & PgClassExpression290 --> List291
-    PgSelectSingle63 --> PgClassExpression65
-    Lambda67{{"Lambda[67∈6]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List66 --> Lambda67
-    PgClassExpression69{{"PgClassExpression[69∈6]<br />ᐸ__buildings__.”name”ᐳ"}}:::plan
-    PgSelectSingle63 --> PgClassExpression69
     __Item113[/"__Item[113∈9]<br />ᐸ370ᐳ"\]:::itemplan
     Access370 ==> __Item113
     PgSelectSingle114{{"PgSelectSingle[114∈9]<br />ᐸbuildingsᐳ"}}:::plan
     __Item113 --> PgSelectSingle114
+    List117{{"List[117∈10]<br />ᐸ64,116ᐳ"}}:::plan
+    PgClassExpression116{{"PgClassExpression[116∈10]<br />ᐸ__buildings__.”id”ᐳ"}}:::plan
+    Constant64 & PgClassExpression116 --> List117
+    PgSelectSingle114 --> PgClassExpression116
+    Lambda118{{"Lambda[118∈10]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List117 --> Lambda118
+    PgClassExpression120{{"PgClassExpression[120∈10]<br />ᐸ__buildings__.”name”ᐳ"}}:::plan
+    PgSelectSingle114 --> PgClassExpression120
+    List130{{"List[130∈11]<br />ᐸ128,129ᐳ"}}:::plan
+    PgClassExpression129{{"PgClassExpression[129∈11]<br />ᐸ__properties__.”id”ᐳ"}}:::plan
+    Constant128 & PgClassExpression129 --> List130
+    PgSelectSingle127 --> PgClassExpression129
+    Lambda131{{"Lambda[131∈11]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List130 --> Lambda131
+    PgClassExpression133{{"PgClassExpression[133∈11]<br />ᐸ__properti...street_id”ᐳ"}}:::plan
+    PgSelectSingle127 --> PgClassExpression133
+    PgClassExpression134{{"PgClassExpression[134∈11]<br />ᐸ__properti...or_number”ᐳ"}}:::plan
+    PgSelectSingle127 --> PgClassExpression134
+    PgSelectSingle141{{"PgSelectSingle[141∈11]<br />ᐸstreetsᐳ"}}:::plan
+    RemapKeys374{{"RemapKeys[374∈11]<br />ᐸ127:{”0”:1,”1”:2,”2”:3}ᐳ"}}:::plan
+    RemapKeys374 --> PgSelectSingle141
+    PgSelectSingle127 --> RemapKeys374
+    List144{{"List[144∈12]<br />ᐸ41,143ᐳ"}}:::plan
+    PgClassExpression143{{"PgClassExpression[143∈12]<br />ᐸ__streets__.”id”ᐳ"}}:::plan
+    Constant41 & PgClassExpression143 --> List144
     PgSelectSingle141 --> PgClassExpression143
     Lambda145{{"Lambda[145∈12]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List144 --> Lambda145
@@ -257,14 +174,105 @@ graph TD
     PgSelectSingle141 --> PgClassExpression147
     Access373{{"Access[373∈12]<br />ᐸ374.1ᐳ"}}:::plan
     RemapKeys374 --> Access373
+    __Item163[/"__Item[163∈13]<br />ᐸ373ᐳ"\]:::itemplan
+    Access373 ==> __Item163
+    PgSelectSingle164{{"PgSelectSingle[164∈13]<br />ᐸbuildingsᐳ"}}:::plan
+    __Item163 --> PgSelectSingle164
+    List167{{"List[167∈14]<br />ᐸ64,166ᐳ"}}:::plan
+    PgClassExpression166{{"PgClassExpression[166∈14]<br />ᐸ__buildings__.”id”ᐳ"}}:::plan
+    Constant64 & PgClassExpression166 --> List167
+    PgSelectSingle164 --> PgClassExpression166
+    Lambda168{{"Lambda[168∈14]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List167 --> Lambda168
+    PgClassExpression170{{"PgClassExpression[170∈14]<br />ᐸ__buildings__.”name”ᐳ"}}:::plan
+    PgSelectSingle164 --> PgClassExpression170
+    List180{{"List[180∈15]<br />ᐸ128,179ᐳ"}}:::plan
+    PgClassExpression179{{"PgClassExpression[179∈15]<br />ᐸ__properties__.”id”ᐳ"}}:::plan
+    Constant128 & PgClassExpression179 --> List180
+    PgSelectSingle177 --> PgClassExpression179
+    Lambda181{{"Lambda[181∈15]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List180 --> Lambda181
+    PgClassExpression183{{"PgClassExpression[183∈15]<br />ᐸ__properti...street_id”ᐳ"}}:::plan
+    PgSelectSingle177 --> PgClassExpression183
+    PgClassExpression184{{"PgClassExpression[184∈15]<br />ᐸ__properti...or_number”ᐳ"}}:::plan
+    PgSelectSingle177 --> PgClassExpression184
+    PgSelectSingle191{{"PgSelectSingle[191∈15]<br />ᐸstreetsᐳ"}}:::plan
+    RemapKeys366{{"RemapKeys[366∈15]<br />ᐸ177:{”0”:1,”1”:2,”2”:3}ᐳ"}}:::plan
+    RemapKeys366 --> PgSelectSingle191
+    PgSelectSingle177 --> RemapKeys366
+    List194{{"List[194∈16]<br />ᐸ41,193ᐳ"}}:::plan
+    PgClassExpression193{{"PgClassExpression[193∈16]<br />ᐸ__streets__.”id”ᐳ"}}:::plan
+    Constant41 & PgClassExpression193 --> List194
+    PgSelectSingle191 --> PgClassExpression193
+    Lambda195{{"Lambda[195∈16]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List194 --> Lambda195
+    PgClassExpression197{{"PgClassExpression[197∈16]<br />ᐸ__streets__.”name”ᐳ"}}:::plan
+    PgSelectSingle191 --> PgClassExpression197
+    Access365{{"Access[365∈16]<br />ᐸ366.1ᐳ"}}:::plan
+    RemapKeys366 --> Access365
     __Item213[/"__Item[213∈17]<br />ᐸ365ᐳ"\]:::itemplan
     Access365 ==> __Item213
     PgSelectSingle214{{"PgSelectSingle[214∈17]<br />ᐸbuildingsᐳ"}}:::plan
     __Item213 --> PgSelectSingle214
+    List217{{"List[217∈18]<br />ᐸ64,216ᐳ"}}:::plan
+    PgClassExpression216{{"PgClassExpression[216∈18]<br />ᐸ__buildings__.”id”ᐳ"}}:::plan
+    Constant64 & PgClassExpression216 --> List217
+    PgSelectSingle214 --> PgClassExpression216
+    Lambda218{{"Lambda[218∈18]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List217 --> Lambda218
+    PgClassExpression220{{"PgClassExpression[220∈18]<br />ᐸ__buildings__.”name”ᐳ"}}:::plan
+    PgSelectSingle214 --> PgClassExpression220
+    PgClassExpression229{{"PgClassExpression[229∈19]<br />ᐸ__street_p..._.”str_id”ᐳ"}}:::plan
+    PgSelectSingle228 --> PgClassExpression229
+    PgClassExpression230{{"PgClassExpression[230∈19]<br />ᐸ__street_p....”prop_id”ᐳ"}}:::plan
+    PgSelectSingle228 --> PgClassExpression230
+    PgClassExpression231{{"PgClassExpression[231∈19]<br />ᐸ__street_p...ent_owner”ᐳ"}}:::plan
+    PgSelectSingle228 --> PgClassExpression231
+    PgSelectSingle238{{"PgSelectSingle[238∈19]<br />ᐸstreetsᐳ"}}:::plan
+    PgSelectSingle228 --> PgSelectSingle238
+    PgSelectSingle274{{"PgSelectSingle[274∈19]<br />ᐸpropertiesᐳ"}}:::plan
+    RemapKeys361{{"RemapKeys[361∈19]<br />ᐸ228:{”0”:4,”1”:5,”2”:6,”3”:7,”4”:8,”5”:9}ᐳ"}}:::plan
+    RemapKeys361 --> PgSelectSingle274
+    PgSelectSingle228 --> RemapKeys361
+    List241{{"List[241∈20]<br />ᐸ41,240ᐳ"}}:::plan
+    PgClassExpression240{{"PgClassExpression[240∈20]<br />ᐸ__streets__.”id”ᐳ"}}:::plan
+    Constant41 & PgClassExpression240 --> List241
+    PgSelectSingle238 --> PgClassExpression240
+    Lambda242{{"Lambda[242∈20]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List241 --> Lambda242
+    PgClassExpression244{{"PgClassExpression[244∈20]<br />ᐸ__streets__.”name”ᐳ"}}:::plan
+    PgSelectSingle238 --> PgClassExpression244
+    Access355{{"Access[355∈20]<br />ᐸ228.1ᐳ"}}:::plan
+    PgSelectSingle228 --> Access355
     __Item260[/"__Item[260∈21]<br />ᐸ355ᐳ"\]:::itemplan
     Access355 ==> __Item260
     PgSelectSingle261{{"PgSelectSingle[261∈21]<br />ᐸbuildingsᐳ"}}:::plan
     __Item260 --> PgSelectSingle261
+    List264{{"List[264∈22]<br />ᐸ64,263ᐳ"}}:::plan
+    PgClassExpression263{{"PgClassExpression[263∈22]<br />ᐸ__buildings__.”id”ᐳ"}}:::plan
+    Constant64 & PgClassExpression263 --> List264
+    PgSelectSingle261 --> PgClassExpression263
+    Lambda265{{"Lambda[265∈22]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List264 --> Lambda265
+    PgClassExpression267{{"PgClassExpression[267∈22]<br />ᐸ__buildings__.”name”ᐳ"}}:::plan
+    PgSelectSingle261 --> PgClassExpression267
+    List277{{"List[277∈23]<br />ᐸ128,276ᐳ"}}:::plan
+    PgClassExpression276{{"PgClassExpression[276∈23]<br />ᐸ__properties__.”id”ᐳ"}}:::plan
+    Constant128 & PgClassExpression276 --> List277
+    PgSelectSingle274 --> PgClassExpression276
+    Lambda278{{"Lambda[278∈23]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List277 --> Lambda278
+    PgClassExpression280{{"PgClassExpression[280∈23]<br />ᐸ__properti...street_id”ᐳ"}}:::plan
+    PgSelectSingle274 --> PgClassExpression280
+    PgClassExpression281{{"PgClassExpression[281∈23]<br />ᐸ__properti...or_number”ᐳ"}}:::plan
+    PgSelectSingle274 --> PgClassExpression281
+    PgSelectSingle288{{"PgSelectSingle[288∈23]<br />ᐸstreetsᐳ"}}:::plan
+    RemapKeys359{{"RemapKeys[359∈23]<br />ᐸ274:{”0”:1,”1”:2,”2”:3}ᐳ"}}:::plan
+    RemapKeys359 --> PgSelectSingle288
+    PgSelectSingle274 --> RemapKeys359
+    List291{{"List[291∈24]<br />ᐸ41,290ᐳ"}}:::plan
+    PgClassExpression290{{"PgClassExpression[290∈24]<br />ᐸ__streets__.”id”ᐳ"}}:::plan
+    Constant41 & PgClassExpression290 --> List291
     PgSelectSingle288 --> PgClassExpression290
     Lambda292{{"Lambda[292∈24]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List291 --> Lambda292
@@ -272,54 +280,46 @@ graph TD
     PgSelectSingle288 --> PgClassExpression294
     Access358{{"Access[358∈24]<br />ᐸ359.1ᐳ"}}:::plan
     RemapKeys359 --> Access358
-    List117{{"List[117∈10]<br />ᐸ64,116ᐳ"}}:::plan
-    PgClassExpression116{{"PgClassExpression[116∈10]<br />ᐸ__buildings__.”id”ᐳ"}}:::plan
-    Constant64 & PgClassExpression116 --> List117
-    List217{{"List[217∈18]<br />ᐸ64,216ᐳ"}}:::plan
-    PgClassExpression216{{"PgClassExpression[216∈18]<br />ᐸ__buildings__.”id”ᐳ"}}:::plan
-    Constant64 & PgClassExpression216 --> List217
-    List264{{"List[264∈22]<br />ᐸ64,263ᐳ"}}:::plan
-    PgClassExpression263{{"PgClassExpression[263∈22]<br />ᐸ__buildings__.”id”ᐳ"}}:::plan
-    Constant64 & PgClassExpression263 --> List264
-    PgSelectSingle114 --> PgClassExpression116
-    Lambda118{{"Lambda[118∈10]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List117 --> Lambda118
-    PgClassExpression120{{"PgClassExpression[120∈10]<br />ᐸ__buildings__.”name”ᐳ"}}:::plan
-    PgSelectSingle114 --> PgClassExpression120
-    __Item163[/"__Item[163∈13]<br />ᐸ373ᐳ"\]:::itemplan
-    Access373 ==> __Item163
-    PgSelectSingle164{{"PgSelectSingle[164∈13]<br />ᐸbuildingsᐳ"}}:::plan
-    __Item163 --> PgSelectSingle164
-    PgSelectSingle214 --> PgClassExpression216
-    Lambda218{{"Lambda[218∈18]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List217 --> Lambda218
-    PgClassExpression220{{"PgClassExpression[220∈18]<br />ᐸ__buildings__.”name”ᐳ"}}:::plan
-    PgSelectSingle214 --> PgClassExpression220
-    PgSelectSingle261 --> PgClassExpression263
-    Lambda265{{"Lambda[265∈22]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List264 --> Lambda265
-    PgClassExpression267{{"PgClassExpression[267∈22]<br />ᐸ__buildings__.”name”ᐳ"}}:::plan
-    PgSelectSingle261 --> PgClassExpression267
     __Item310[/"__Item[310∈25]<br />ᐸ358ᐳ"\]:::itemplan
     Access358 ==> __Item310
     PgSelectSingle311{{"PgSelectSingle[311∈25]<br />ᐸbuildingsᐳ"}}:::plan
     __Item310 --> PgSelectSingle311
-    List167{{"List[167∈14]<br />ᐸ64,166ᐳ"}}:::plan
-    PgClassExpression166{{"PgClassExpression[166∈14]<br />ᐸ__buildings__.”id”ᐳ"}}:::plan
-    Constant64 & PgClassExpression166 --> List167
     List314{{"List[314∈26]<br />ᐸ64,313ᐳ"}}:::plan
     PgClassExpression313{{"PgClassExpression[313∈26]<br />ᐸ__buildings__.”id”ᐳ"}}:::plan
     Constant64 & PgClassExpression313 --> List314
-    PgSelectSingle164 --> PgClassExpression166
-    Lambda168{{"Lambda[168∈14]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List167 --> Lambda168
-    PgClassExpression170{{"PgClassExpression[170∈14]<br />ᐸ__buildings__.”name”ᐳ"}}:::plan
-    PgSelectSingle164 --> PgClassExpression170
     PgSelectSingle311 --> PgClassExpression313
     Lambda315{{"Lambda[315∈26]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List314 --> Lambda315
     PgClassExpression317{{"PgClassExpression[317∈26]<br />ᐸ__buildings__.”name”ᐳ"}}:::plan
     PgSelectSingle311 --> PgClassExpression317
+    List332{{"List[332∈27]<br />ᐸ23,330,331ᐳ"}}:::plan
+    PgClassExpression330{{"PgClassExpression[330∈27]<br />ᐸ__houses__.”street_id”ᐳ"}}:::plan
+    PgClassExpression331{{"PgClassExpression[331∈27]<br />ᐸ__houses__...operty_id”ᐳ"}}:::plan
+    Constant23 & PgClassExpression330 & PgClassExpression331 --> List332
+    PgClassExpression326{{"PgClassExpression[326∈27]<br />ᐸ__houses__...ding_name”ᐳ"}}:::plan
+    PgSelectSingle325 --> PgClassExpression326
+    PgClassExpression327{{"PgClassExpression[327∈27]<br />ᐸ__houses__...or_number”ᐳ"}}:::plan
+    PgSelectSingle325 --> PgClassExpression327
+    PgClassExpression328{{"PgClassExpression[328∈27]<br />ᐸ__houses__...reet_name”ᐳ"}}:::plan
+    PgSelectSingle325 --> PgClassExpression328
+    PgSelectSingle325 --> PgClassExpression330
+    PgSelectSingle325 --> PgClassExpression331
+    Lambda333{{"Lambda[333∈27]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List332 --> Lambda333
+    List350{{"List[350∈28]<br />ᐸ23,348,349ᐳ"}}:::plan
+    PgClassExpression348{{"PgClassExpression[348∈28]<br />ᐸ__houses__.”street_id”ᐳ"}}:::plan
+    PgClassExpression349{{"PgClassExpression[349∈28]<br />ᐸ__houses__...operty_id”ᐳ"}}:::plan
+    Constant23 & PgClassExpression348 & PgClassExpression349 --> List350
+    PgClassExpression344{{"PgClassExpression[344∈28]<br />ᐸ__houses__...ding_name”ᐳ"}}:::plan
+    PgSelectSingle343 --> PgClassExpression344
+    PgClassExpression345{{"PgClassExpression[345∈28]<br />ᐸ__houses__...or_number”ᐳ"}}:::plan
+    PgSelectSingle343 --> PgClassExpression345
+    PgClassExpression346{{"PgClassExpression[346∈28]<br />ᐸ__houses__...reet_name”ᐳ"}}:::plan
+    PgSelectSingle343 --> PgClassExpression346
+    PgSelectSingle343 --> PgClassExpression348
+    PgSelectSingle343 --> PgClassExpression349
+    Lambda351{{"Lambda[351∈28]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List350 --> Lambda351
 
     %% define steps
 
