@@ -275,13 +275,7 @@ export function planToMermaid(
   const layerPlans = Object.values(layerPlanById);
   for (let i = 0, l = layerPlans.length; i < l; i++) {
     const layerPlan = layerPlans[i];
-    if (!layerPlan) {
-      continue;
-    }
-    const plansAndIds = Object.entries(stepById).filter(
-      ([id, plan]) =>
-        plan && plan.id === Number(id) && plan.bucketId === layerPlan.id,
-    );
+    const steps = layerPlan.steps;
     const raisonDEtre =
       ` (${layerPlan.reason.type})` +
       (layerPlan.reason.type === "polymorphic"
@@ -313,18 +307,14 @@ export function planToMermaid(
       `    classDef bucket${layerPlan.id} stroke:${color(layerPlan.id)}`,
     );
     graph.push(
-      `    class ${[
-        `Bucket${layerPlan.id}`,
-        ...plansAndIds.map(([, plan]) => planId(plan!)),
-      ].join(",")} bucket${layerPlan.id}`,
+      `    class ${[`Bucket${layerPlan.id}`, ...steps.map(planId)].join(
+        ",",
+      )} bucket${layerPlan.id}`,
     );
   }
   if (!skipBuckets) {
     for (let i = 0, l = layerPlans.length; i < l; i++) {
       const layerPlan = layerPlans[i];
-      if (!layerPlan || layerPlan.id !== i) {
-        continue;
-      }
       const childNodes = layerPlan.children.map((c) => `Bucket${c.id}`);
       if (childNodes.length > 0) {
         graph.push(`    Bucket${layerPlan.id} --> ${childNodes.join(" & ")}`);
