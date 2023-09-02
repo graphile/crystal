@@ -95,7 +95,7 @@ export class LoadedRecordStep<
     private isSingle: boolean,
     private sourceDescription: string,
     // Only safe to reference this during planning phase
-    private specEquivalent: Record<string, ExecutableStep>,
+    private ioEquivalence: Record<string, ExecutableStep>,
   ) {
     super();
     this.addDependency($data);
@@ -109,9 +109,9 @@ export class LoadedRecordStep<
     // Allow auto-collapsing of the waterfall by knowing keys are equivalent
     if (
       this.operationPlan.phase === "plan" &&
-      this.specEquivalent[attr as any]
+      this.ioEquivalence[attr as any]
     ) {
-      return this.specEquivalent[attr as any];
+      return this.ioEquivalence[attr as any];
     }
 
     return access(this, attr);
@@ -172,7 +172,7 @@ export class LoadStep<
   constructor(
     $spec: ExecutableStep<TSpec>,
     private load: LoadCallback<TSpec, TItem, TData, TParams>,
-    private specEquivalent?:
+    private ioEquivalence?:
       | null
       | string
       | { [key in keyof TSpec]?: string | null },
@@ -186,19 +186,19 @@ export class LoadStep<
   private makeAccessMap(): Record<string, ExecutableStep> {
     const map = Object.create(null);
     const $spec = this.getDep(0);
-    if (this.specEquivalent == null) {
+    if (this.ioEquivalence == null) {
       return map;
-    } else if (typeof this.specEquivalent === "string") {
-      map[this.specEquivalent] = $spec;
+    } else if (typeof this.ioEquivalence === "string") {
+      map[this.ioEquivalence] = $spec;
       return map;
-    } else if (Array.isArray(this.specEquivalent)) {
-      for (let i = 0, l = this.specEquivalent.length; i < l; i++) {
-        const key = this.specEquivalent[i];
+    } else if (Array.isArray(this.ioEquivalence)) {
+      for (let i = 0, l = this.ioEquivalence.length; i < l; i++) {
+        const key = this.ioEquivalence[i];
         map[key] = isListLikeStep($spec) ? $spec.at(i) : access($spec, [i]);
       }
       return map;
-    } else if (typeof this.specEquivalent === "object") {
-      for (const key of Object.keys(this.specEquivalent)) {
+    } else if (typeof this.ioEquivalence === "object") {
+      for (const key of Object.keys(this.ioEquivalence)) {
         map[key] = isObjectLikeStep($spec)
           ? $spec.get(key)
           : access($spec, [key]);
@@ -206,7 +206,7 @@ export class LoadStep<
       return map;
     } else {
       throw new Error(
-        `specEquivalent passed to loadOne() or loadMany() call not understood`,
+        `ioEquivalence passed to loadOne() or loadMany() call not understood`,
       );
     }
   }
@@ -335,10 +335,10 @@ function load<
   TParams extends Record<string, any>,
 >(
   $spec: ExecutableStep<TSpec>,
-  specEquivalent: null | string | { [key in keyof TSpec]?: string | null },
+  ioEquivalence: null | string | { [key in keyof TSpec]?: string | null },
   loadCallback: LoadCallback<TSpec, TItem, TData, TParams>,
 ) {
-  return new LoadStep($spec, loadCallback, specEquivalent);
+  return new LoadStep($spec, loadCallback, ioEquivalence);
 }
 
 export function loadMany<
@@ -355,7 +355,7 @@ export function loadMany<
   TParams extends Record<string, any> = Record<string, any>,
 >(
   $spec: ExecutableStep<TSpec>,
-  specEquivalent:
+  ioEquivalence:
     | null
     | string
     | (TSpec extends [...any[]]
@@ -371,7 +371,7 @@ export function loadMany<
   TParams extends Record<string, any> = Record<string, any>,
 >(
   $spec: ExecutableStep<TSpec>,
-  loadCallbackOrSpecEquivalent:
+  loadCallbackOrIoEquivalence:
     | LoadManyCallback<TSpec, TItem, TParams>
     | null
     | string
@@ -381,7 +381,7 @@ export function loadMany<
   if (loadCallbackOnly) {
     return load(
       $spec,
-      loadCallbackOrSpecEquivalent as
+      loadCallbackOrIoEquivalence as
         | null
         | string
         | { [key in keyof TSpec]?: string | null },
@@ -391,7 +391,7 @@ export function loadMany<
     return load(
       $spec,
       null,
-      loadCallbackOrSpecEquivalent as LoadManyCallback<TSpec, TItem, TParams>,
+      loadCallbackOrIoEquivalence as LoadManyCallback<TSpec, TItem, TParams>,
     ) as LoadStep<TSpec, TItem, ReadonlyArray<TItem>, TParams>;
   }
 }
@@ -410,7 +410,7 @@ export function loadOne<
   TParams extends Record<string, any> = Record<string, any>,
 >(
   $spec: ExecutableStep<TSpec>,
-  specEquivalent: null | string | { [key in keyof TSpec]?: string | null },
+  ioEquivalence: null | string | { [key in keyof TSpec]?: string | null },
   loadCallback: LoadOneCallback<TSpec, TItem, TParams>,
 ): LoadedRecordStep<TItem, TParams>;
 export function loadOne<
@@ -419,7 +419,7 @@ export function loadOne<
   TParams extends Record<string, any> = Record<string, any>,
 >(
   $spec: ExecutableStep<TSpec>,
-  loadCallbackOrSpecEquivalent:
+  loadCallbackOrIoEquivalence:
     | LoadOneCallback<TSpec, TItem, TParams>
     | null
     | string
@@ -429,7 +429,7 @@ export function loadOne<
   if (loadCallbackOnly) {
     return load(
       $spec,
-      loadCallbackOrSpecEquivalent as
+      loadCallbackOrIoEquivalence as
         | null
         | string
         | { [key in keyof TSpec]?: string | null },
@@ -439,7 +439,7 @@ export function loadOne<
     return load(
       $spec,
       null,
-      loadCallbackOrSpecEquivalent as LoadOneCallback<TSpec, TItem, TParams>,
+      loadCallbackOrIoEquivalence as LoadOneCallback<TSpec, TItem, TParams>,
     ).single();
   }
 }
