@@ -181,7 +181,7 @@ export function httpError(statusCode: number, message: string): SafeError {
 export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
   const {
     resolvedPreset,
-    dynamicOptions: { maskExecutionResult },
+    dynamicOptions: { maskError, maskExecutionResult },
   } = instance;
 
   const hooks = getGrafservHooks(resolvedPreset);
@@ -263,14 +263,16 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
         return args;
       } catch (e) {
         return [
-          new GraphQLError(
-            e.message,
-            null,
-            undefined,
-            undefined,
-            undefined,
-            e,
-            undefined,
+          maskError(
+            new GraphQLError(
+              e.message,
+              null,
+              undefined,
+              undefined,
+              undefined,
+              e,
+              undefined,
+            ),
           ),
         ];
       }
