@@ -96,8 +96,15 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 9, 12<br /><br />ROOT PgInsertSingle{1}ᐸt(v)ᐳ[9]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression230,PgClassExpression231 bucket3
+    Bucket5("Bucket 5 (listItem)<br />Deps: 12<br /><br />ROOT __Item{5}ᐸ231ᐳ[234]"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,__Item234,PgSelect235 bucket5
+    Bucket6("Bucket 6 (listItem)<br />ROOT __Item{6}ᐸ235ᐳ[239]"):::bucket
+    classDef bucket6 stroke:#ff1493
+    class Bucket6,__Item239,PgSelectSingle240,PgClassExpression241,PgClassExpression242,PgClassExpression243,PgClassExpression244 bucket6
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     Bucket3 --> Bucket5
+    Bucket5 --> Bucket6
     end

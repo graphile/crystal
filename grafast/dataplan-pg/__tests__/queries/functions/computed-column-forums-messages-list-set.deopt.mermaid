@@ -65,8 +65,15 @@ graph TD
     Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ22ᐳ[26]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item26 bucket4
+    Bucket6("Bucket 6 (listItem)<br />ROOT __Item{6}ᐸ26ᐳ[29]"):::bucket
+    classDef bucket6 stroke:#ff1493
+    class Bucket6,__Item29,PgSelectSingle30 bucket6
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 30<br /><br />ROOT PgSelectSingle{6}ᐸforums_messages_list_setᐳ[30]"):::bucket
+    classDef bucket7 stroke:#808000
+    class Bucket7,PgClassExpression31,PgClassExpression32 bucket7
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3 & Bucket4
     Bucket4 --> Bucket6
+    Bucket6 --> Bucket7
     end
