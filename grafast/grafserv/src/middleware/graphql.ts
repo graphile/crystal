@@ -452,34 +452,22 @@ export const makeGraphQLHandler = (
       // Validate that the body is of the right shape
       body = validateGraphQLBody(parsedBody);
     } catch (e) {
-      return {
-        type: "graphql",
-        request,
-        dynamicOptions,
-        statusCode:
-          e instanceof SafeError
-            ? e.extensions.statusCode
-            : typeof e.statusCode === "number" &&
-              e.statusCode >= 400 &&
-              e.statusCode < 600
-            ? e.statusCode
-            : 400,
-        contentType: chosenContentType,
-        payload: maskPayload({
-          errors: [
-            new GraphQLError(
-              e.message ??
-                `Parsing failed, please check that the data you're sending to the server is correct`,
-              null,
-              undefined,
-              undefined,
-              undefined,
-              e,
-              undefined,
-            ),
-          ],
-        }),
-      };
+      if (e instanceof SafeError) {
+        throw e;
+      } else if (
+        typeof e.statusCode === "number" &&
+        e.statusCode >= 400 &&
+        e.statusCode < 600
+      ) {
+        throw e;
+      } else {
+        // ENHANCE: should maybe handle more specific issues here. See examples:
+        // https://graphql.github.io/graphql-over-http/draft/#sec-application-json.Examples
+        throw httpError(
+          400,
+          `Parsing failed, please check that the data you're sending to the server is correct`,
+        );
+      }
     }
 
     const { query, operationName, variableValues } = body;
