@@ -275,7 +275,7 @@ export function planToMermaid(
   const layerPlans = Object.values(layerPlanById);
   for (let i = 0, l = layerPlans.length; i < l; i++) {
     const layerPlan = layerPlans[i];
-    if (!layerPlan || layerPlan.id !== i) {
+    if (!layerPlan) {
       continue;
     }
     const plansAndIds = Object.entries(stepById).filter(

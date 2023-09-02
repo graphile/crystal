@@ -77,7 +77,7 @@ export interface GrafastPlanBucketReasonSubroutineJSONv1 {
 }
 
 export interface GrafastPlanBucketJSONv1 {
-  id: string | number;
+  id: number;
   reason: GrafastPlanBucketReasonJSONv1;
   copyStepIds: ReadonlyArray<string | number>;
   steps: ReadonlyArray<GrafastPlanStepJSONv1>;
