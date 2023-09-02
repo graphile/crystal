@@ -288,14 +288,14 @@ async function main() {
         `${__dirname}/plan.mermaid`,
         planToMermaid(
           grafastResultWithPlan.extensions.explain.operations[0].plan,
-          { skipBuckets: false },
+          { skipBuckets: false, concise: true },
         ),
       );
       await fsp.writeFile(
         `${__dirname}/plan-simplified.mermaid`,
         planToMermaid(
           grafastResultWithPlan.extensions.explain.operations[0].plan,
-          { skipBuckets: true },
+          { skipBuckets: true, concise: true },
         ),
       );
 
