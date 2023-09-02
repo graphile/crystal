@@ -637,6 +637,20 @@ export function isObjectLikeStep<
   return "get" in plan && typeof (plan as any).get === "function";
 }
 
+export type ListLikeStep<
+  TData extends [...ExecutableStep[]] = [...ExecutableStep[]],
+> = ExecutableStep<{
+  [key in keyof TData]: TData[key] extends ExecutableStep<infer U> ? U : never;
+}> & {
+  at<TKey extends keyof TData>(key: TKey): ExecutableStep<TData[TKey]>;
+};
+
+export function isListLikeStep<
+  TData extends [...ExecutableStep[]] = [...ExecutableStep[]],
+>(plan: ExecutableStep): plan is ListLikeStep<TData> {
+  return "at" in plan && typeof (plan as any).at === "function";
+}
+
 export type StreamableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
   /**
    * If this plan supports streaming then it should implement this method. It's
