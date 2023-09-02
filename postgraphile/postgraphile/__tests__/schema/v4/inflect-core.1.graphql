@@ -509,6 +509,7 @@ enum CompoundKeysOrderBy {
 """Awesome feature!"""
 type CompoundType {
   a: Int
+  arrayQuery: [CompoundType]
   b: String
   c: Color
   computedField: Int
@@ -517,6 +518,8 @@ type CompoundType {
   f: EnumWithEmptyString
   fooBar: Int
   g: I
+  query: CompoundType
+  queryCompoundTypeArray: [CompoundType]
 }
 
 """All input for the `compoundTypeArrayMutation` mutation."""
@@ -7148,6 +7151,7 @@ type Q implements N {
   """Get a single `CompoundKey`."""
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
   compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
+  compoundTypeComputedField(compoundType: CompoundTypeInput): Int
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
 
   """Reads and enables pagination through a set of `CompoundType`."""

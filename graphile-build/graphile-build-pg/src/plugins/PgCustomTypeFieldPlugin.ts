@@ -376,9 +376,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                 finalBuild.behavior.pgCodecMatches(param.codec, "type:node")
                   ? "nodeId"
                   : "input");
+              const thing = `Argument ${index} (name: ${param.name}, type: ${param.codec.name}) of function '${resource.name}' (${resource.extensions?.pg?.schemaName}.${resource.extensions?.pg?.name})`;
               if (variant === "nodeId" && !param.codec.attributes) {
                 throw new Error(
-                  `Argument is marked as nodeId, but it doesn't seem to be a record type. Lists of nodeIds are not yet supported.`,
+                  `${thing} is marked as nodeId, but it doesn't seem to be a record type. Lists of nodeIds are not yet supported.`,
                 );
               }
               const baseInputType =
@@ -391,7 +392,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               if (variant === "nodeId" && !finalBuild.nodeIdSpecForCodec) {
                 // ERRORS: tell them how to turn the nodeId variant off
                 throw new Error(
-                  `Argument is configured to use nodeId variant, but build is not configured with Node support - there is no 'build.nodeFetcherByTypeName'. Did you skip NodePlugin?`,
+                  `${thing} is configured to use nodeId variant, but build is not configured with Node support - there is no 'build.nodeFetcherByTypeName'. Did you skip NodePlugin?`,
                 );
               }
               const getSpec =
@@ -399,9 +400,19 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   ? finalBuild.nodeIdSpecForCodec(paramBaseCodec)
                   : null;
               if (variant === "nodeId" && !getSpec) {
+                console.log({
+                  variant: param.extensions?.variant,
+                  pgFunctionsPreferNodeId,
+                  isMutation: resource.isMutation,
+                  hasAttributes: !!param.codec.attributes,
+                  behavior: finalBuild.behavior.pgCodecMatches(
+                    param.codec,
+                    "type:node",
+                  ),
+                });
                 // ERRORS: tell them how to turn the nodeId variant off
                 throw new Error(
-                  `Argument is configured to use nodeId variant, but we don't know how to get the spec for codec '${paramBaseCodec.name}'`,
+                  `${thing} is configured to use nodeId variant, but we don't know how to get the spec for codec '${paramBaseCodec.name}'`,
                 );
               }
               const codecResource =
@@ -411,7 +422,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               if (variant === "nodeId" && !codecResource) {
                 // ERRORS: tell them how to turn the nodeId variant off
                 throw new Error(
-                  `Argument is configured to use nodeId variant, but we couldn't find a suitable resource to pull a '${paramBaseCodec.name}' record from`,
+                  `${thing} is configured to use nodeId variant, but we couldn't find a suitable resource to pull a '${paramBaseCodec.name}' record from`,
                 );
               }
               const fetcher =
@@ -1222,6 +1233,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   }
                 }
 
+                // console.log(`${resource.name} ${listFieldBehaviorScope}`);
                 if (
                   build.behavior.pgResourceMatches(
                     resource,
@@ -1237,6 +1249,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     : inflection.computedAttributeListField({
                         resource,
                       });
+                  // console.log(
+                  //   `${resource.name} ${listFieldBehaviorScope} ${fieldName}`,
+                  // );
                   memo = build.recoverable(memo, () =>
                     build.extend(
                       memo,

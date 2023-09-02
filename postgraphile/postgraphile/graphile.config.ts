@@ -15,7 +15,9 @@ import { PgRelayPreset } from "postgraphile/presets/relay";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
 // import { PgManyToManyPreset } from "../../contrib/pg-many-to-many/dist/index.js";
+// import { PgOmitArchivedPlugin } from "../../contrib/pg-omit-archived/dist/index.js";
 // import { PostGraphileConnectionFilterPreset } from "../../contrib/postgraphile-plugin-connection-filter/dist/index.js";
+// import { PgAggregatesPreset } from "../../contrib/postgraphile-plugin-connection-filter/contrib/pg-aggregates/dist/index.js";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -196,11 +198,12 @@ const preset: GraphileConfig.Preset = {
     makeRuruTitlePlugin("<New title text here!>"),
     ExportSchemaPlugin,
     NonNullRelationsPlugin,
+    // PgOmitArchivedPlugin,
   ],
   extends: [
     PostGraphileAmberPreset,
     makeV4Preset({
-      simpleCollections: "both",
+      //simpleCollections: "both",
       jwtPgTypeIdentifier: '"b"."jwt_token"',
       dynamicJson: true,
       graphiql: true,
@@ -208,6 +211,7 @@ const preset: GraphileConfig.Preset = {
     }),
     // PgManyToManyPreset,
     // PostGraphileConnectionFilterPreset,
+    // PgAggregatesPreset,
     PgRelayPreset,
     PgLazyJWTPreset,
   ],
@@ -226,6 +230,7 @@ const preset: GraphileConfig.Preset = {
     exportSchemaIntrospectionResultPath: `${__dirname}/latestSchema.json`,
     sortExport: true,
     pgJwtSecret: "FROGS",
+    // defaultBehavior: "-query:*:* -queryField:*:* -queryField -*",
   },
   grafserv: {
     port: 5678,

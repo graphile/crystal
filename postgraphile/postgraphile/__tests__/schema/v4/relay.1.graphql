@@ -841,7 +841,6 @@ type Person implements Node {
   """
   id: ID!
   lastName: String
-  name: String
 
   """Reads and enables pagination through a set of `Post`."""
   posts(

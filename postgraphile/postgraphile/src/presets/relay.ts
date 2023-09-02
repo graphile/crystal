@@ -38,7 +38,6 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
 
   schema: {
     globalBehavior: `\
-+node \
 +connection -list \
 -query:resource:single \
 +nodeId:filterBy \

@@ -76,7 +76,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
         provides: ["default"],
         before: ["inferred", "override"],
         callback(behavior, resource) {
-          const newBehavior = [behavior, "+insert:resource:select"];
+          const newBehavior = ["+insert:resource:select"];
           if (
             !resource.parameters &&
             !!resource.codec.attributes &&
@@ -86,6 +86,7 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
             newBehavior.unshift("insert");
             newBehavior.unshift("record");
           }
+          newBehavior.push(behavior);
           return newBehavior;
         },
       },

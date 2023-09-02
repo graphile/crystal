@@ -35,7 +35,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
         provides: ["default"],
         before: ["inferred", "override"],
         callback(behavior, codec, build) {
-          const newBehavior = [behavior];
+          const newBehavior = [];
           if (
             !codec.isAnonymous &&
             !!codec.attributes &&
@@ -50,12 +50,14 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
               if (codec.polymorphism) {
                 newBehavior.push("interface:node");
               } else {
+                console.log(`${resource.name} is type:node`);
                 newBehavior.push("type:node");
               }
             } else {
               // Meh
             }
           }
+          newBehavior.push(behavior);
           return newBehavior;
         },
       },

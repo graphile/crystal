@@ -999,7 +999,6 @@ type Person implements Node {
   firstName: String
   id: Int!
   lastName: String
-  name: String
 
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.

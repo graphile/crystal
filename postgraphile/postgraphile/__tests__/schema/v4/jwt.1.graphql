@@ -221,6 +221,7 @@ enum Color {
 """Awesome feature!"""
 type CompoundType {
   a: Int
+  arrayQuery: [CompoundType]
   b: String
   c: Color
   d: UUID
@@ -228,6 +229,7 @@ type CompoundType {
   f: EnumWithEmptyString
   fooBar: Int
   g: Interval
+  query: CompoundType
 }
 
 """All input for the `compoundTypeArrayMutation` mutation."""

@@ -278,6 +278,7 @@ type Query implements Node {
   queryTextArray: [String]
   returnTableWithoutGrants: CompoundKey
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
+  compoundTypeComputedField(compoundType: CompoundTypeInput): Int
   funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
 
   """Reads and enables pagination through a set of `CompoundType`."""
@@ -1628,6 +1629,9 @@ type PersonComputedComplexRecord {
 """Awesome feature!"""
 type CompoundType {
   computedField: Int
+  query: CompoundType
+  queryCompoundTypeArray: [CompoundType]
+  arrayQuery: [CompoundType]
   a: Int
   b: String
   c: Color
