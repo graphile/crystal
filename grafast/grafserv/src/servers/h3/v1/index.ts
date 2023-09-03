@@ -220,7 +220,7 @@ export class H3Grafserv extends GrafservBase {
 
     router.use(
       this.dynamicOptions.graphqlPath,
-      eventHandler(this.handleEvent),
+      eventHandler((event) => this.handleGraphqlEvent(event)),
       this.dynamicOptions.graphqlOverGET ||
         this.dynamicOptions.graphiqlOnGraphQLGET
         ? ["get", "post"]
@@ -230,14 +230,14 @@ export class H3Grafserv extends GrafservBase {
     if (dynamicOptions.graphiql) {
       router.get(
         this.dynamicOptions.graphiqlPath,
-        eventHandler(this.handleGraphiqlEvent),
+        eventHandler((event) => this.handleGraphiqlEvent(event)),
       );
     }
 
     if (dynamicOptions.watch) {
       router.get(
         this.dynamicOptions.eventStreamPath,
-        eventHandler(this.handleEventStreamEvent),
+        eventHandler((event) => this.handleEventStreamEvent(event)),
       );
     }
   }
