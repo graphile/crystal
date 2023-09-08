@@ -1,5 +1,29 @@
 # ruru-components
 
+## 2.0.0-beta.3
+
+### Patch Changes
+
+- [#496](https://github.com/benjie/crystal/pull/496)
+  [`c9bfd9892`](https://github.com/benjie/crystal/commit/c9bfd989247f9433fb5b18c5175c9d8d64cd21a1)
+  Thanks [@benjie](https://github.com/benjie)! - Update dependencies (sometimes
+  through major versions).
+
+- [#496](https://github.com/benjie/crystal/pull/496)
+  [`1867d365f`](https://github.com/benjie/crystal/commit/1867d365f360ac8411f622b0813ca76a19ab4013)
+  Thanks [@benjie](https://github.com/benjie)! - Ruru now runs on React 18
+
+- [#496](https://github.com/benjie/crystal/pull/496)
+  [`c747d91e9`](https://github.com/benjie/crystal/commit/c747d91e9646409c66e73c12195dbf6cbd97b211)
+  Thanks [@benjie](https://github.com/benjie)! - Modules converted to ESM to fix
+  compatibility with GraphiQL.
+
+- Updated dependencies
+  [[`c9bfd9892`](https://github.com/benjie/crystal/commit/c9bfd989247f9433fb5b18c5175c9d8d64cd21a1),
+  [`e613b476d`](https://github.com/benjie/crystal/commit/e613b476d6ee867d1f7509c895dabee40e7f9a31)]:
+  - grafast@0.0.1-beta.6
+  - tamedevil@0.0.0-beta.2
+
 ## 2.0.0-beta.2
 
 ### Patch Changes

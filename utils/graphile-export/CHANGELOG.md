@@ -1,5 +1,20 @@
 # graphile-export
 
+## 0.0.2-beta.3
+
+### Patch Changes
+
+- [#496](https://github.com/benjie/crystal/pull/496)
+  [`c9bfd9892`](https://github.com/benjie/crystal/commit/c9bfd989247f9433fb5b18c5175c9d8d64cd21a1)
+  Thanks [@benjie](https://github.com/benjie)! - Update dependencies (sometimes
+  through major versions).
+
+- Updated dependencies
+  [[`c9bfd9892`](https://github.com/benjie/crystal/commit/c9bfd989247f9433fb5b18c5175c9d8d64cd21a1),
+  [`e613b476d`](https://github.com/benjie/crystal/commit/e613b476d6ee867d1f7509c895dabee40e7f9a31)]:
+  - grafast@0.0.1-beta.6
+  - pg-sql2@5.0.0-beta.2
+
 ## 0.0.2-beta.2
 
 ### Patch Changes

@@ -1,5 +1,31 @@
 # pgl
 
+## 5.0.0-beta.8
+
+### Patch Changes
+
+- [#496](https://github.com/benjie/crystal/pull/496)
+  [`c9bfd9892`](https://github.com/benjie/crystal/commit/c9bfd989247f9433fb5b18c5175c9d8d64cd21a1)
+  Thanks [@benjie](https://github.com/benjie)! - Update dependencies (sometimes
+  through major versions).
+
+- Updated dependencies
+  [[`ac092e021`](https://github.com/benjie/crystal/commit/ac092e0217d1385967dcdf39c9c1a390ebf6add8),
+  [`c9bfd9892`](https://github.com/benjie/crystal/commit/c9bfd989247f9433fb5b18c5175c9d8d64cd21a1),
+  [`e613b476d`](https://github.com/benjie/crystal/commit/e613b476d6ee867d1f7509c895dabee40e7f9a31)]:
+  - postgraphile@5.0.0-beta.8
+  - graphile-build-pg@5.0.0-beta.8
+  - graphile-build@5.0.0-beta.7
+  - pg-introspection@0.0.1-beta.2
+  - @dataplan/json@0.0.1-beta.6
+  - graphile-config@0.0.1-beta.2
+  - @dataplan/pg@0.0.1-beta.6
+  - grafserv@0.0.1-beta.6
+  - grafast@0.0.1-beta.6
+  - tamedevil@0.0.0-beta.2
+  - pg-sql2@5.0.0-beta.2
+  - @graphile/lru@5.0.0-beta.2
+
 ## 5.0.0-beta.7
 
 ### Patch Changes

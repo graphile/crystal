@@ -1,5 +1,14 @@
 # graphile-config
 
+## 0.0.1-beta.2
+
+### Patch Changes
+
+- [#496](https://github.com/benjie/crystal/pull/496)
+  [`c9bfd9892`](https://github.com/benjie/crystal/commit/c9bfd989247f9433fb5b18c5175c9d8d64cd21a1)
+  Thanks [@benjie](https://github.com/benjie)! - Update dependencies (sometimes
+  through major versions).
+
 ## 0.0.1-beta.1
 
 ### Patch Changes

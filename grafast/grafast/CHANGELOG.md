@@ -1,5 +1,26 @@
 # grafast
 
+## 0.0.1-beta.6
+
+### Patch Changes
+
+- [#496](https://github.com/benjie/crystal/pull/496)
+  [`c9bfd9892`](https://github.com/benjie/crystal/commit/c9bfd989247f9433fb5b18c5175c9d8d64cd21a1)
+  Thanks [@benjie](https://github.com/benjie)! - Update dependencies (sometimes
+  through major versions).
+
+- [#496](https://github.com/benjie/crystal/pull/496)
+  [`e613b476d`](https://github.com/benjie/crystal/commit/e613b476d6ee867d1f7509c895dabee40e7f9a31)
+  Thanks [@benjie](https://github.com/benjie)! - `mermaid-js` explain type no
+  longer supported, instead use `plan` which produces a JSON object. You can use
+  the new `import { planToMermaid } from 'grafast/mermaid'` to convert this
+  object back into a mermaid definition.
+- Updated dependencies
+  [[`c9bfd9892`](https://github.com/benjie/crystal/commit/c9bfd989247f9433fb5b18c5175c9d8d64cd21a1)]:
+  - graphile-config@0.0.1-beta.2
+  - tamedevil@0.0.0-beta.2
+  - @graphile/lru@5.0.0-beta.2
+
 ## 0.0.1-beta.5
 
 ### Patch Changes

@@ -1,5 +1,24 @@
 # grafserv
 
+## 0.0.1-beta.6
+
+### Patch Changes
+
+- [#496](https://github.com/benjie/crystal/pull/496)
+  [`c9bfd9892`](https://github.com/benjie/crystal/commit/c9bfd989247f9433fb5b18c5175c9d8d64cd21a1)
+  Thanks [@benjie](https://github.com/benjie)! - Update dependencies (sometimes
+  through major versions).
+
+- Updated dependencies
+  [[`c9bfd9892`](https://github.com/benjie/crystal/commit/c9bfd989247f9433fb5b18c5175c9d8d64cd21a1),
+  [`1867d365f`](https://github.com/benjie/crystal/commit/1867d365f360ac8411f622b0813ca76a19ab4013),
+  [`e613b476d`](https://github.com/benjie/crystal/commit/e613b476d6ee867d1f7509c895dabee40e7f9a31),
+  [`c747d91e9`](https://github.com/benjie/crystal/commit/c747d91e9646409c66e73c12195dbf6cbd97b211)]:
+  - graphile-config@0.0.1-beta.2
+  - grafast@0.0.1-beta.6
+  - ruru@2.0.0-beta.3
+  - @graphile/lru@5.0.0-beta.2
+
 ## 0.0.1-beta.5
 
 ### Patch Changes
