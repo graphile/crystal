@@ -271,7 +271,7 @@ export function planToMermaid(
   };
 
   graph.push("");
-  if (!concise) graph.push("    subgraph Buckets");
+  if (!concise && !skipBuckets) graph.push("    subgraph Buckets");
   const layerPlans = Object.values(layerPlanById);
   for (let i = 0, l = layerPlans.length; i < l; i++) {
     const layerPlan = layerPlans[i];
@@ -331,7 +331,7 @@ export function planToMermaid(
       }
     }
   }
-  if (!concise) graph.push("    end");
+  if (!concise && !skipBuckets) graph.push("    end");
 
   const graphString = graph.join("\n");
   return graphString;
