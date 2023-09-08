@@ -1,5 +1,12 @@
 # grafast
 
+## 0.0.1-beta.7
+
+### Patch Changes
+
+- [`3700e204f`](https://github.com/benjie/crystal/commit/3700e204f430db182c92ca7abc82017c81fa1f9b)
+  Thanks [@benjie](https://github.com/benjie)! - Fix grafast mermaid export
+
 ## 0.0.1-beta.6
 
 ### Patch Changes

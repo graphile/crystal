@@ -1,5 +1,13 @@
 # graphile-build
 
+## 5.0.0-beta.8
+
+### Patch Changes
+
+- Updated dependencies
+  [[`3700e204f`](https://github.com/benjie/crystal/commit/3700e204f430db182c92ca7abc82017c81fa1f9b)]:
+  - grafast@0.0.1-beta.7
+
 ## 5.0.0-beta.7
 
 ### Patch Changes

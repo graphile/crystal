@@ -1,6 +1,6 @@
 {
   "name": "grafast",
-  "version": "0.0.1-beta.6",
+  "version": "0.0.1-beta.7",
   "description": "Cutting edge GraphQL planning and execution engine",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
