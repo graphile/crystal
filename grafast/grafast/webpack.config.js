@@ -12,7 +12,6 @@ module.exports = {
       import: "./dist/envelop.js",
     },
     mermaid: {
-      dependOn: "index",
       import: "./dist/mermaid.js",
     },
   },

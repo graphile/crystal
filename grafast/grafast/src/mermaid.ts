@@ -8,7 +8,6 @@ import type {
   GrafastPlanJSONv1,
   GrafastPlanStepJSONv1,
 } from "./interfaces";
-import { __ItemStep, __ListTransformStep } from "./steps/index.js";
 import { stripAnsi } from "./stripAnsi.js";
 
 /**
