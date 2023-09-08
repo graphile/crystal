@@ -11,6 +11,10 @@ module.exports = {
       dependOn: "index",
       import: "./dist/envelop.js",
     },
+    mermaid: {
+      dependOn: "index",
+      import: "./dist/mermaid.js",
+    },
   },
   output: {
     path: path.resolve(__dirname, "release/dist"),

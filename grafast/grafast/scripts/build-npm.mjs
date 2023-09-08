@@ -23,3 +23,4 @@ await transformPackageJson(
 );
 await esmHack(__dirname + "/../release/dist/index.js");
 await esmHack(__dirname + "/../release/dist/envelop.js");
+await esmHack(__dirname + "/../release/dist/mermaid.js");
