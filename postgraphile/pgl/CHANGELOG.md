@@ -1,5 +1,15 @@
 # pgl
 
+## 5.0.0-beta.10
+
+### Patch Changes
+
+- Updated dependencies []:
+  - grafserv@0.0.1-beta.8
+  - graphile-build-pg@5.0.0-beta.9
+  - @dataplan/pg@0.0.1-beta.7
+  - postgraphile@5.0.0-beta.10
+
 ## 5.0.0-beta.9
 
 ### Patch Changes

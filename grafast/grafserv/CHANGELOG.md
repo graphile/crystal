@@ -1,5 +1,13 @@
 # grafserv
 
+## 0.0.1-beta.8
+
+### Patch Changes
+
+- Updated dependencies
+  [[`4c39d7c0b`](https://github.com/benjie/crystal/commit/4c39d7c0bae5acb6ae79cc1fec0a1eabdd40a234)]:
+  - ruru@2.0.0-beta.4
+
 ## 0.0.1-beta.7
 
 ### Patch Changes

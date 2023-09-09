@@ -1,5 +1,12 @@
 # ruru
 
+## 2.0.0-beta.4
+
+### Patch Changes
+
+- [`4c39d7c0b`](https://github.com/benjie/crystal/commit/4c39d7c0bae5acb6ae79cc1fec0a1eabdd40a234)
+  Thanks [@benjie](https://github.com/benjie)! - Bump - npm broke the publish?
+
 ## 2.0.0-beta.3
 
 ### Patch Changes
