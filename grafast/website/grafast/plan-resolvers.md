@@ -68,7 +68,7 @@ function plan_resolver(
 
 :::note
 
-By convention, when a variable represents a step we start the variables name
+By convention, when a variable represents a step we start the variable's name
 with a `$`.
 
 :::
@@ -161,7 +161,7 @@ TODO: expand this section with examples of why you might do these things.
 FieldArgs keeps track of the arguments/input fields that you `.get()`,
 `.getRaw()` or `.apply()`, and should there be any left unaccessed that have an
 `applyPlan` method, these will automatically be called passing the field plan
-resolvers resulting step as the argument.
+resolver's resulting step as the argument.
 
 This, for example, allows you to associate the "first" behavior with the
 argument rather than the plan resolver, such that you could share the
