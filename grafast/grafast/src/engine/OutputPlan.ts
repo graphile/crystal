@@ -1589,7 +1589,7 @@ function withFastExpression(
 
   for (let i = 0, l = path.length; i < l; i++) {
     const part = path[i];
-    jitParts.push(te.get(part));
+    jitParts.push(te.optionalGet(part));
   }
   const expression = te.join(jitParts, "");
   te.runInBatch<(value: any) => any>(
