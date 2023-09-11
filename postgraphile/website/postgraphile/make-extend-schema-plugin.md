@@ -65,6 +65,8 @@ should use `plans` rather than `resolvers`.
 
 ```ts
 import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
+import { constant } from "postgraphile/grafast";
+
 
 export const MyPlugin = makeExtendSchemaPlugin((build) => {
   // Get any helpers we need from `build`
@@ -558,7 +560,8 @@ export const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin((build) => {
 
       // The payload also needs plans detailing how to resolve its fields:
       RegisterUserPayload: {
-        user($user) {
+        user($data) {
+          const $user = $data.get("user");
           // It would be tempting to return $user here, but the step class
           // is not compatible with the auto-generated `User` type, so
           // errors will occur. We must ensure that we return a compatible
