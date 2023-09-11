@@ -67,7 +67,6 @@ should use `plans` rather than `resolvers`.
 import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
 import { constant } from "postgraphile/grafast";
 
-
 export const MyPlugin = makeExtendSchemaPlugin((build) => {
   // Get any helpers we need from `build`
   const { sql, inflection } = build;
