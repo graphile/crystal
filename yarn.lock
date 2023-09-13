@@ -5105,6 +5105,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/aws-lambda@npm:^8.10.123":
+  version: 8.10.123
+  resolution: "@types/aws-lambda@npm:8.10.123"
+  checksum: 3336788a2b0fbdca0ce1b643ab5c35219e939ef0e0fa474029efe7cd618e5e8c3dc68180bd8ac3eaeb73b234d4cd01c2a30b7601e6eb0ecfc863b5142966c0b0
+  languageName: node
+  linkType: hard
+
 "@types/babel__core@npm:^7.1.14":
   version: 7.20.1
   resolution: "@types/babel__core@npm:7.20.1"
@@ -11789,6 +11796,7 @@ __metadata:
   resolution: "grafserv@workspace:grafast/grafserv"
   dependencies:
     "@graphile/lru": "workspace:^"
+    "@types/aws-lambda": "npm:^8.10.123"
     "@types/express": "npm:^4.17.17"
     "@types/koa": "npm:^2.13.8"
     "@types/koa-bodyparser": "npm:^4.3.10"

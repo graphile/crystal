@@ -96,6 +96,7 @@
     }
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.123",
     "@types/express": "^4.17.17",
     "@types/koa": "^2.13.8",
     "@types/koa-bodyparser": "^4.3.10",
