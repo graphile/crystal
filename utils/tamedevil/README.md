@@ -43,9 +43,9 @@ hood.
 
 ## Crowd-funded open-source software
 
-To help us develop this software sustainably under the MIT license, we ask all
-individuals and businesses that use it to help support its ongoing maintenance
-and development via sponsorship.
+To help us develop this software sustainably, we ask all individuals and
+businesses that use it to help support its ongoing maintenance and development
+via sponsorship.
 
 ### [Click here to find out more about sponsors and sponsorship.](https://www.graphile.org/sponsor/)
 
@@ -54,12 +54,12 @@ And please give some love to our featured sponsors 🤩:
 <table><tr>
 <td align="center"><a href="https://www.the-guild.dev/"><img src="https://graphile.org/images/sponsors/theguild.png" width="90" height="90" alt="The Guild" /><br />The Guild</a> *</td>
 <td align="center"><a href="https://dovetailapp.com/"><img src="https://graphile.org/images/sponsors/dovetail.png" width="90" height="90" alt="Dovetail" /><br />Dovetail</a> *</td>
-<td align="center"><a href="https://qwick.com/"><img src="https://graphile.org/images/sponsors/qwick.png" width="90" height="90" alt="Qwick" /><br />Qwick</a> *</td>
 <td align="center"><a href="https://www.netflix.com/"><img src="https://graphile.org/images/sponsors/Netflix.png" width="90" height="90" alt="Netflix" /><br />Netflix</a> *</td>
-</tr><tr>
 <td align="center"><a href=""><img src="https://graphile.org/images/sponsors/chadf.png" width="90" height="90" alt="Chad Furman" /><br />Chad Furman</a> *</td>
+</tr><tr>
 <td align="center"><a href="https://stellate.co/"><img src="https://graphile.org/images/sponsors/Stellate.png" width="90" height="90" alt="Stellate" /><br />Stellate</a> *</td>
 <td align="center"><a href="https://www.accenture.com/"><img src="https://graphile.org/images/sponsors/accenture.svg" width="90" height="90" alt="Accenture" /><br />Accenture</a> *</td>
+<td align="center"><a href="https://microteam.io/"><img src="https://graphile.org/images/sponsors/micro.png" width="90" height="90" alt="We Love Micro" /><br />We Love Micro</a> *</td>
 </tr></table>
 
 <em>\* Sponsors the entire Graphile suite</em>
@@ -322,7 +322,7 @@ If `obj` is potentially expensive code and you need to reference it multiple
 times (e.g. `` te`(${obj}.foo === 3 ? ${obj}.bar : ${obj}.baz)` ``) then you can
 use `tmp` to create a temporary variable that stores reference to it and return
 the result of calling `callback` passing this temporary reference. E.g.
-``te.tmp(obj, tmp => te`(${tmp}.foo === 3 ? ${tmp}.bar : ${tmp}.baz)`)`` means
+`` te.tmp(obj, tmp => te`(${tmp}.foo === 3 ? ${tmp}.bar : ${tmp}.baz)`) `` means
 that the potentially expensive expression in the original `obj` variable only
 need to be evaluated once, not 3 times.
 
