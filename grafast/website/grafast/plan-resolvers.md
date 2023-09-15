@@ -156,15 +156,25 @@ field will be applied to the given step.
 
 TODO: expand this section with examples of why you might do these things.
 
-## Automatic application of `applyPlan` plan resolvers
+## ~~Automatic application of `applyPlan` plan resolvers~~
 
-FieldArgs keeps track of the arguments/input fields that you `.get()`,
+:::warning
+
+This section is now _wrong_. We changed this behavior, and now you need to add
+`autoApplyAfterParentApplyPlan` or similar in order to trigger your field to
+auto-apply (or `autoApplyAfterParentPlan` for an argument).
+
+TODO: fix this documentation.
+
+:::
+
+~~FieldArgs keeps track of the arguments/input fields that you `.get()`,
 `.getRaw()` or `.apply()`, and should there be any left unaccessed that have an
 `applyPlan` method, these will automatically be called passing the field plan
-resolver's resulting step as the argument.
+resolver's resulting step as the argument.~~
 
-This, for example, allows you to associate the "first" behavior with the
+~~This, for example, allows you to associate the "first" behavior with the
 argument rather than the plan resolver, such that you could share the
 first/last/before/after behavior via a common object that you spread into each
 of your arguments on connections, rather than having to rewrite the logic in
-each of your plan resolver functions.
+each of your plan resolver functions.~~
