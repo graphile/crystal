@@ -1,6 +1,7 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
+const TerserPlugin = require("terser-webpack-plugin");
 const lightCodeTheme = require("prism-react-renderer").themes.github;
 const darkCodeTheme = require("prism-react-renderer").themes.dracula;
 
@@ -113,6 +114,15 @@ const config = {
               crypto: false,
               util: false,
             },
+          },
+          optimization: {
+            minimizer: [
+              new TerserPlugin({
+                terserOptions: {
+                  keep_classnames: true,
+                },
+              }),
+            ],
           },
         };
       },
