@@ -3878,6 +3878,7 @@ __metadata:
     codemirror: "npm:^5.65.15"
     codemirror-graphql: "npm:^2.0.9"
     dataloader: "npm:^2.2.2"
+    grafast: "workspace:^"
     mermaid: "npm:^9.4.3"
     prism-react-renderer: "npm:^2.0.6"
     react: "npm:^18.2.0"

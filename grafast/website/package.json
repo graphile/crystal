@@ -24,6 +24,7 @@
     "clsx": "^2.0.0",
     "codemirror": "^5.65.15",
     "codemirror-graphql": "^2.0.9",
+    "grafast": "workspace:^",
     "prism-react-renderer": "^2.0.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
