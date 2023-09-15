@@ -86,10 +86,13 @@ const config = {
       },
     ],
 
-    // Allow us to import `.mermaid` files
     () => ({
+      name: "webpack-customization-plugin",
       configureWebpack() {
         return {
+          mergeStrategy: { "optimization.minimizer": "replace" },
+
+          // Allow us to import `.mermaid` files
           module: {
             rules: [
               // This rule enables Ruru to work even though it's a type:module
@@ -115,6 +118,8 @@ const config = {
               util: false,
             },
           },
+
+          // Don't minify class names
           optimization: {
             minimizer: [
               new TerserPlugin({
