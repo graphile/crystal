@@ -90,6 +90,8 @@ And please give some love to our featured sponsors 🤩:
 
 <em>\* Sponsors the entire Graphile suite</em>
 
+<!-- SPONSORS_END -->
+
 ## Why the "crystal" monorepo?
 
 Originally what is now Gra*fast* (and was previously DataPlanner) was known by
@@ -102,8 +104,6 @@ figured that calling it the Crystal monorepo would honour our original nickname
 for the project. Rumours that the name was inspired by the maintainers'
 [crystal wedding anniversary](https://en.wikipedia.org/wiki/Wedding_anniversary#Traditional_anniversary_gifts)
 are greatly exaggerated.
-
-<!-- SPONSORS_END -->
 
 [grafast]: grafast/grafast/
 [@dataplan/pg]: grafast/dataplan-pg/
