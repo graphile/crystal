@@ -8,15 +8,16 @@ sponsor](https://graphile.org/sponsor/).
 
 - The Guild
 - Dovetail
-- Qwick
 - Netflix
 - Chad Furman
 - Stellate
 - Accenture
+- We Love Micro
 - Politics Rewired
 
 ## Leaders
 
+- Qwick
 - Joe Dennis
 - Robert Claypool
 - DocIQ
@@ -30,7 +31,9 @@ sponsor](https://graphile.org/sponsor/).
 - Notably
 - Taiste
 - latch.bio
-- Severin Ibarluzea
+- Cintra
+- Trigger.dev
+- Giovanny Gutiérrez
 - BairesDev
 - FOLX Health
 - Two Bit Solutions
@@ -66,8 +69,10 @@ sponsor](https://graphile.org/sponsor/).
 - Boo
 - JYC
 - Ben Periton
+- Spear AI
 - SpaceFill
 - Vizcom
+- garpulon
 - Nate Smith
 - The Outbound Collective
 - Charlie Hadden
@@ -76,4 +81,5 @@ sponsor](https://graphile.org/sponsor/).
 - urtho
 - Andrew Joseph
 - Old Grammar
-- Spear AI
+- SIED 70
+- Peter C. Romano
