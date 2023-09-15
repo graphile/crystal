@@ -8,15 +8,16 @@ Graphile ecosystem. Find out
 
 - The Guild
 - Dovetail
-- Qwick
 - Netflix
 - Chad Furman
 - Stellate
 - Accenture
+- We Love Micro
 - Politics Rewired
 
 ## Leaders
 
+- Qwick
 - Joe Dennis
 - Robert Claypool
 - DocIQ
@@ -30,7 +31,9 @@ Graphile ecosystem. Find out
 - Notably
 - Taiste
 - latch.bio
-- Severin Ibarluzea
+- Cintra
+- Trigger.dev
+- Giovanny Gutiérrez
 - BairesDev
 - FOLX Health
 - Two Bit Solutions
@@ -66,8 +69,10 @@ Graphile ecosystem. Find out
 - Boo
 - JYC
 - Ben Periton
+- Spear AI
 - SpaceFill
 - Vizcom
+- garpulon
 - Nate Smith
 - The Outbound Collective
 - Charlie Hadden
@@ -76,4 +81,5 @@ Graphile ecosystem. Find out
 - urtho
 - Andrew Joseph
 - Old Grammar
-- Spear AI
+- SIED 70
+- Peter C. Romano
