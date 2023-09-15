@@ -1,3 +1,23 @@
+:root {
+  --black-ish: #1b1c3e;
+  --access-text-size: 3.5rem;
+  --access-text-width: 30rem;
+  --access-text-offset: 0.2rem;
+  --board-width: 25rem;
+  --board-font-size: 1.5rem;
+  --text-stroke: 0.2rem;
+}
+@media only screen and (max-width: 40rem) {
+  :root {
+    --access-text-size: 2.5rem;
+    --access-text-width: 20rem;
+    --access-text-offset: 0.125rem;
+    --board-width: 17rem;
+    --board-font-size: 1.1rem;
+    --text-stroke: 0.12rem;
+  }
+}
+
 /**
  * CSS files with the .module.css suffix will be treated as CSS modules
  * and scoped locally.
@@ -100,7 +120,22 @@
 .featureSvg {
   height: 12em;
   width: 31em;
+  max-width: 100%;
 }
 .alignSelfCenter {
   align-self: center;
+}
+@media only screen and (max-width: 40rem) {
+  .boardContainer {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .hero,
+  .subscribeSection {
+    padding: 1rem;
+  }
+  .featureSvg {
+    height: 8em;
+    width: 21em;
+  }
 }

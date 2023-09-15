@@ -1,6 +1,6 @@
 .boardContainer {
   flex: 1 0 var(--board-width);
-  margin: 3rem 5rem 2rem;
+  margin: 0;
 }
 .board {
   border-radius: 0.25rem;
@@ -87,4 +87,10 @@
   border-radius: 100rem;
   left: calc(50% - 0.25rem - 0.5rem);
   top: calc(0.25rem + -0.46613 * 0.5 * (var(--board-width) - 1.4rem));
+}
+@media only screen and (max-width: 40rem) {
+  .boardContainer {
+    margin-left: 0;
+    margin-right: 0;
+  }
 }

@@ -1,13 +1,3 @@
-:root {
-  --black-ish: #1b1c3e;
-  --access-text-size: 3.5rem;
-  --access-text-width: 30rem;
-  --access-text-offset: 0.2rem;
-  --board-width: 25rem;
-  --board-font-size: 1.5rem;
-  --text-stroke: 0.2rem;
-}
-
 .features {
   display: flex;
   align-items: center;
