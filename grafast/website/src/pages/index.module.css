@@ -4,10 +4,30 @@
  */
 
 .heroBanner {
+  /* composes: comicFont from "../components/HomepageFeatures/styles.module.css"; */
   padding: 4rem 0;
   text-align: center;
   position: relative;
   overflow: hidden;
+
+  background: rgb(149, 109, 190);
+  background: radial-gradient(#855bb1 3px, transparent 0, transparent 100%),
+    linear-gradient(
+      133deg,
+      rgba(149, 109, 190, 1) 0%,
+      rgba(149, 109, 190, 1) 20%,
+      rgba(108, 68, 149, 1) 80%,
+      rgba(108, 68, 149, 1) 100%
+    );
+  background-blend-mode: darken;
+  background-size:
+    10px 10px,
+    100% 100%;
+  padding: 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: right;
 }
 
 @media screen and (max-width: 996px) {
@@ -20,4 +40,67 @@
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.divider {
+  height: calc(0.5rem + 2 * 5px);
+  border: 5px solid var(--black-ish);
+  border-left: 0;
+  border-right: 0;
+  background-color: white;
+}
+
+.subscribeSection {
+  padding: 2rem;
+  background-color: #ffb600;
+  background: radial-gradient(#ffb600 3px, transparent 0, transparent 100%),
+    linear-gradient(170deg, #ffc83f 0%, #ffc83f 20%, #ffb600 80%, #ffb600 100%);
+  background-blend-mode: darken;
+  background-size:
+    10px 10px,
+    100% 100%;
+}
+
+.subscribe {
+  border: 5px solid var(--black-ish);
+  background: white;
+  display: flex;
+  flex-wrap: wrap;
+  box-shadow: 0.5rem 0.5rem 0px var(--black-ish);
+  margin: 1rem 0;
+}
+.subscribe input[type="email"] {
+  outline: 0;
+  border: 0;
+  margin: 0;
+  padding: 0.25rem;
+  font-size: 1.5rem;
+  flex: 1000 0 10rem;
+}
+.subscribe input[type="submit"] {
+  text-transform: uppercase;
+  border: 0;
+  font-family: "Sriracha", "Comic Sans MS", "Comic Sans", sans;
+  font-style: italic;
+  font-size: 1.25rem;
+  color: white;
+  background-color: #00b600;
+  /* Accessibility: */
+  background-color: #008a00;
+  margin: 0.25rem 0.5rem;
+  flex: 1 0 9rem;
+  padding: 0.25rem 0.75rem 0.25rem 0.5rem;
+}
+.instruction {
+  composes: instruction from "../components/HomepageFeatures/styles.module.css";
+}
+.heroSubtitle {
+  font-size: 1.3em;
+}
+.featureSvg {
+  height: 12em;
+  width: 31em;
+}
+.alignSelfCenter {
+  align-self: center;
 }

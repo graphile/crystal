@@ -1,13 +1,25 @@
+:root {
+  --black-ish: #1b1c3e;
+  --access-text-size: 3.5rem;
+  --access-text-width: 30rem;
+  --access-text-offset: 0.2rem;
+  --board-width: 25rem;
+  --board-font-size: 1.5rem;
+  --text-stroke: 0.2rem;
+}
+
 .features {
   display: flex;
   align-items: center;
-  padding: 2rem 0;
+  padding: 0rem 0;
   width: 100%;
+  max-width: 60rem;
+  margin: 0 auto;
 }
 
 .featureSvg {
   height: 200px;
-  width: 200px;
+  width: 300px;
 }
 
 .lead p {
@@ -15,4 +27,30 @@
   margin: 2rem auto 0;
   text-align: center;
   font-size: 1.5em;
+}
+
+.mainSectionInstructionContainer {
+  padding: 1rem;
+}
+
+.comicFont {
+  font-family: "Sriracha", "Comic Sans MS", "Comic Sans", sans;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-style: italic;
+}
+
+.instruction {
+  composes: comicFont;
+  display: inline-block;
+  border: 5px solid var(--black-ish);
+  background: #a3f9a8;
+  box-shadow: 0.5rem 0.5rem 0px var(--black-ish);
+  margin: 1rem 0;
+  padding: 0.25rem 0.75rem 0.25rem 0.5rem;
+}
+
+.instruction {
+  font-size: 1.5rem;
+  line-height: 100%;
 }

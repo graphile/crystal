@@ -1,0 +1,90 @@
+.boardContainer {
+  flex: 1 0 var(--board-width);
+  margin: 3rem 5rem 2rem;
+}
+.board {
+  border-radius: 0.25rem;
+  background-color: #ffec00;
+  padding: 0.4rem;
+  color: black;
+
+  margin: 0 auto;
+  width: var(--board-width);
+  font-size: var(--board-font-size);
+  font-family: "Sriracha", "Comic Sans MS", "Comic Sans", sans;
+  line-height: 100%;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-style: italic;
+  text-align: center;
+  box-shadow: 0.5rem 0.5rem 0 var(--black-ish);
+
+  transform: rotate(-6deg);
+}
+.b1 {
+  border-radius: 9px;
+  background-color: #ffb600;
+  padding: 0.34rem;
+}
+.b2 {
+  border-radius: 3px;
+  background-color: #000;
+  padding: 0.25rem;
+}
+.b3 {
+  border-radius: 3px;
+  border: 0.25rem solid #e3c883;
+  background-color: #fffec8;
+  padding: 1rem;
+  position: relative;
+}
+.pin .dot1,
+.pin .dot2,
+.pin .line1,
+.pin .line2 {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.4rem;
+}
+.pin .dot1,
+.pin .dot2 {
+  border-radius: 100rem;
+  border: 0.25rem solid black;
+}
+.pin .dot2,
+.pin .line2 {
+  left: auto;
+  right: 0.4rem;
+}
+
+.pin .dot1 {
+  transform: translate(-0.125rem, -0.125rem);
+}
+.pin .dot2 {
+  transform: translate(0.125rem, -0.125rem);
+}
+
+.pin .line1,
+.pin .line2 {
+  width: 54%;
+  height: 0.2rem;
+  background-color: black;
+}
+.pin .line1 {
+  transform-origin: 0 0;
+  transform: translate(-0.1rem, 0.1rem) rotate(-25deg);
+}
+.pin .line2 {
+  transform-origin: 100% 0;
+  transform: translate(0.1rem, 0.1rem) rotate(25deg);
+}
+.pin .dot3 {
+  background-color: white;
+  border: 0.25rem solid black;
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 100rem;
+  left: calc(50% - 0.25rem - 0.5rem);
+  top: calc(0.25rem + -0.46613 * 0.5 * (var(--board-width) - 1.4rem));
+}

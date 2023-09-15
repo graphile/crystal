@@ -7,7 +7,7 @@ import styles from "./styles.module.css";
 const FeatureList = [
   {
     title: "General purpose",
-    Svg: require("@site/static/img/generalpurpose.svg").default,
+    Svg: require("@site/static/img/generalpurpose2.svg").default,
     description: (
       <>
         <Grafast /> can implement any shape of GraphQL schema and is designed to
@@ -17,7 +17,7 @@ const FeatureList = [
   },
   {
     title: "Holistic approach",
-    Svg: require("@site/static/img/holistic.svg").default,
+    Svg: require("@site/static/img/holistic2.svg").default,
     description: (
       <>
         Fine-tune your plans to only fetch the data you need from your business
@@ -26,6 +26,7 @@ const FeatureList = [
       </>
     ),
   },
+  /*
   {
     title: "Everything is batched",
     Svg: require("@site/static/img/batched.svg").default,
@@ -36,6 +37,8 @@ const FeatureList = [
       </>
     ),
   },
+  */
+  /*
   {
     title: "Spec compliant",
     Svg: require("@site/static/img/speccompliant.svg").default,
@@ -47,9 +50,10 @@ const FeatureList = [
       </>
     ),
   },
+  */
   {
     title: "Ludicrous speed",
-    Svg: require("@site/static/img/ludicrousspeed.svg").default,
+    Svg: require("@site/static/img/ludicrousspeed2.svg").default,
     description: (
       <>
         <Grafast /> was designed to maximize performance throughout the entire
@@ -58,6 +62,17 @@ const FeatureList = [
       </>
     ),
   },
+  {
+    title: "And so much more!",
+    Svg: require("@site/static/img/andmore2.svg").default,
+    description: (
+      <>
+        Eliminating over-fetching, under-fetching, and the N+1 problem are just
+        the first step in your <Grafast /> "journey to efficiency".
+      </>
+    ),
+  },
+  /*
   {
     title: "Compatible with GraphQL.js",
     Svg: require("@site/static/img/graphqljscompatability.svg").default,
@@ -74,16 +89,16 @@ const FeatureList = [
       </>
     ),
   },
+  */
 ];
 
 function Feature({ Svg, title, description }) {
   return (
-    <div className={clsx("col col--4")}>
+    <div className={clsx("col col--6")}>
       <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
+        <Svg className={styles.featureSvg} role="img" alt={title} />
       </div>
       <div className="text--center padding-horiz--md">
-        <h3>{title}</h3>
         <p>{description}</p>
       </div>
     </div>
@@ -96,15 +111,12 @@ export default function HomepageFeatures() {
       <section className={styles.lead}>
         <div className="container">
           <div className="row">
-            <p>
-              <strong>
-                <Grafast />
-              </strong>{" "}
-              is an alternative execution engine for GraphQL; its plan-based
-              approach helps developers avoid common pitfalls and achieve better
-              backend efficiency, leading to increased scalability and
-              incredible performance your customers will love.
-            </p>
+            <div className={styles.mainSectionInstructionContainer}>
+              <div className={styles.instruction}>
+                Introducing Gra<em>fast</em>: a next-generation planning and
+                execution engine for GraphQL!
+              </div>
+            </div>
           </div>
         </div>
       </section>
