@@ -49,7 +49,6 @@ Nitro and h3 does not yet support WebSocket.
 An unofficial and experimental workaround consists to create a nuxt module:
 
 ```ts title="modules/grafserv/index.ts"
-
 // nuxt auto-register modules located in `modules/*.ts` or `modules/*/index.ts`
 
 import { defineNuxtModule, addServerPlugin } from "@nuxt/kit";
