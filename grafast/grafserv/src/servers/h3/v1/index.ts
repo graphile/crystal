@@ -83,13 +83,13 @@ export class H3Grafserv extends GrafservBase {
   }
 
   /**
-   * @deprecated use handleGraphqlEvent instead
+   * @deprecated use handleGraphQLEvent instead
    */
   public async handleEvent(event: H3Event) {
-    return this.handleGraphqlEvent(event);
+    return this.handleGraphQLEvent(event);
   }
 
-  public async handleGraphqlEvent(event: H3Event) {
+  public async handleGraphQLEvent(event: H3Event) {
     const digest = getDigest(event);
 
     const handlerResult = await this.graphqlHandler(
