@@ -70,6 +70,7 @@ const config = {
   plugins: [
     // Allow us to import `.mermaid` files
     () => ({
+      name: "webpack-customization-plugin",
       configureWebpack() {
         return {
           module: {
