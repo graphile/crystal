@@ -6,10 +6,9 @@ with those used in the Graphile config, otherwise the assets will not correctly
 be served/referenced, this may cause issues when communicating between Ruru
 and GraphQL.
 
-Creating grafserv :
+Creating `grafserv`:
 
-```ts
-// server/grafserv/serv.ts
+```ts title="server/grafserv/serv.ts"
 import { grafserv } from "grafserv/h3/v1";
 import preset from "./graphile.config";
 import schema from "./schema.mjs";
@@ -20,24 +19,21 @@ export const serv = grafserv({ schema, preset });
 
 and the API routes :
 
-```ts
-// server/api/graphql.ts
+```ts title="server/api/graphql.ts"
 import { serv } from "@/server/grafserv/serv";
 
 // Create and export the `/api/graphql` route handler
-export default eventHandler((event) => serv.handleGraphqlEvent(event));
+export default eventHandler((event) => serv.handleGraphQLEvent(event));
 ```
 
-```ts
-// pages/routes/ruru.ts
+```ts title="pages/routes/ruru.ts"
 import { serv } from "@/server/grafserv/serv";
 
 // Create and export the `/ruru` route handler
 export default eventHandler((event) => serv.handleGraphiqlEvent(event));
 ```
 
-```ts
-// pages/api/graphql/stream.ts
+```ts title="pages/api/graphql/stream.ts"
 import { serv } from "@/server/grafserv/serv";
 
 // Create and export the `/api/graphql/stream` route handler
@@ -50,10 +46,9 @@ export default eventHandler((event) => serv.handleEventStreamEvent(event));
 
 Nitro and h3 does not yet support WebSocket.
 
-An unofficial and experimental workaround consists to create a nuxt module :
+An unofficial and experimental workaround consists to create a nuxt module:
 
-```ts
-// modules/grafserv/index.ts
+```ts title="modules/grafserv/index.ts"
 
 // nuxt auto-register modules located in `modules/*.ts` or `modules/*/index.ts`
 
@@ -105,8 +100,7 @@ export default defineNuxtModule({
 
 and two Nitro plugins (one for dev, and one for prod)
 
-```ts
-// modules/grafserv/ws-dev.ts
+```ts title="modules/grafserv/ws-dev.ts"
 import { Server } from "http";
 import { serv } from "@/server/grafserv/serv";
 
@@ -130,8 +124,7 @@ export default defineNitroPlugin(async (nitroApp) => {
 });
 ```
 
-```ts
-// modules/grafserv/ws.ts
+```ts title="modules/grafserv/ws.ts"
 import { serv } from "@/server/grafserv/serv";
 
 // plugin running in PRODUCTION (runtime)
