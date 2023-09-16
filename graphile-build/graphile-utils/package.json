@@ -18,7 +18,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/heart.git"
+    "url": "git+https://github.com/graphile/crystal.git"
   },
   "keywords": [
     "graphile",
@@ -34,9 +34,9 @@
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/graphile/heart/issues"
+    "url": "https://github.com/graphile/crystal/issues"
   },
-  "homepage": "https://github.com/graphile/heart/tree/main/graphile-build/graphile-utils",
+  "homepage": "https://github.com/graphile/crystal/tree/main/graphile-build/graphile-utils",
   "dependencies": {
     "debug": "^4.3.4",
     "json5": "^2.2.3",

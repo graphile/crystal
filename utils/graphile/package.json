@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/heart.git"
+    "url": "git+https://github.com/graphile/crystal.git"
   },
   "keywords": [
     "lru",
@@ -21,9 +21,9 @@
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "SEE LICENSE IN LICENSE.md",
   "bugs": {
-    "url": "https://github.com/graphile/heart/issues"
+    "url": "https://github.com/graphile/crystal/issues"
   },
-  "homepage": "https://github.com/graphile/heart/tree/main/utils/graphile",
+  "homepage": "https://github.com/graphile/crystal/tree/main/utils/graphile",
   "engines": {
     "node": ">=14.17"
   },

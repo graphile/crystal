@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/heart.git"
+    "url": "git+https://github.com/graphile/crystal.git"
   },
   "keywords": [
     "jest",
@@ -23,9 +23,9 @@
   "author": "David Baumgold <david@davidbaumgold.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/graphile/heart/issues"
+    "url": "https://github.com/graphile/crystal/issues"
   },
-  "homepage": "https://github.com/graphile/heart/tree/main/utils/jest-serializer-graphql-schema",
+  "homepage": "https://github.com/graphile/crystal/tree/main/utils/jest-serializer-graphql-schema",
   "peerDependencies": {
     "graphql": ">=15 <17"
   },

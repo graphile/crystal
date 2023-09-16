@@ -6,7 +6,7 @@
  * with bundling/etc we've made it a TS file in V5.
  */
 export const watchFixtures = /* SQL */ `\
--- @see https://github.com/graphile/heart/blob/main/graphile-build/graphile-build-pg/src/watchFixtures.ts
+-- @see https://github.com/graphile/crystal/blob/main/graphile-build/graphile-build-pg/src/watchFixtures.ts
 
 -- Adds the functionality for PostGraphile to watch the database for schema
 -- changes. This script is idempotent, you can run it as many times as you
