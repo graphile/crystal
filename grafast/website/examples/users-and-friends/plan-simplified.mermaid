@@ -8,26 +8,26 @@ flowchart TD
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
 
 
-    %% define steps
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Access7{{"Access[7∈0]<br />ᐸ3.currentUserIdᐳ"}}:::plan
-    Load8[["Load[8∈0]<br />ᐸuserByIdᐳ"]]:::plan
-    Access11{{"Access[11∈1]<br />ᐸ8.idᐳ"}}:::plan
-    Load12[["Load[12∈1]<br />ᐸfriendshipsByUserIdᐳ"]]:::plan
-    __Item16[/"__Item[16∈3]<br />ᐸ12ᐳ"\]:::itemplan
-    Access18{{"Access[18∈3]<br />ᐸ16.friend_idᐳ"}}:::plan
-    Load19[["Load[19∈3]<br />ᐸuserByIdᐳ"]]:::plan
-
     %% plan dependencies
+    Access7{{"Access[7∈0]<br />ᐸ3.currentUserIdᐳ"}}:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access7
+    Load8[["Load[8∈0]<br />ᐸuserByIdᐳ"]]:::plan
     Access7 --> Load8
+    __Value0["__Value[0∈0]"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Access11{{"Access[11∈1]<br />ᐸ8.idᐳ"}}:::plan
     Load8 --> Access11
+    Load12[["Load[12∈1]<br />ᐸfriendshipsByUserIdᐳ"]]:::plan
     Access11 --> Load12
+    __Item16[/"__Item[16∈3]<br />ᐸ12ᐳ"\]:::itemplan
     Load12 ==> __Item16
+    Access18{{"Access[18∈3]<br />ᐸ16.friend_idᐳ"}}:::plan
     __Item16 --> Access18
+    Load19[["Load[19∈3]<br />ᐸuserByIdᐳ"]]:::plan
     Access18 --> Load19
+
+    %% define steps
 
     classDef bucket0 stroke:#696969
     class Bucket0,__Value0,__Value3,__Value5,Access7,Load8 bucket0

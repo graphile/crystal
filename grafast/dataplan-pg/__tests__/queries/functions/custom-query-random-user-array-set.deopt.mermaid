@@ -51,6 +51,13 @@ graph TD
     Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ11ᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item15 bucket2
+    Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ15ᐳ[18]"):::bucket
+    classDef bucket4 stroke:#0000ff
+    class Bucket4,__Item18,PgSelectSingle19 bucket4
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 19<br /><br />ROOT PgSelectSingle{4}ᐸrandom_user_array_setᐳ[19]"):::bucket
+    classDef bucket5 stroke:#7fff00
+    class Bucket5,PgClassExpression20,PgClassExpression21 bucket5
     Bucket0 --> Bucket1 & Bucket2
     Bucket2 --> Bucket4
+    Bucket4 --> Bucket5
     end

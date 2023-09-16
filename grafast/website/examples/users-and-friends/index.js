@@ -14,6 +14,7 @@ const {
   stringifyPayload,
   execute: grafastExecute,
 } = require("grafast");
+const { planToMermaid } = require("grafast/mermaid");
 const { makeDataLoaders } = require("./dataloaders");
 const { userById, friendshipsByUserId } = require("./plans");
 const fsp = require("node:fs/promises");
@@ -276,33 +277,26 @@ async function main() {
         }
       `;
 
-      const grafastResultWithPlan = await grafast(
-        {
-          schema: schemaGF,
-          source,
-          contextValue: baseContext,
-        },
-        { grafast: { explain: ["plan"] } },
-      );
+      const grafastResultWithPlan = await grafast({
+        schema: schemaGF,
+        source,
+        contextValue: baseContext,
+        resolvedPreset: { grafast: { explain: ["plan"] } },
+      });
+
       await fsp.writeFile(
         `${__dirname}/plan.mermaid`,
-        grafastResultWithPlan.extensions.explain.operations[0].diagram,
-      );
-
-      // TODO: remove this, replace with explain options
-      global.grafastExplainMermaidSkipBuckets = true;
-      const grafastResultWithSimplifiedPlan = await grafast(
-        {
-          schema: schemaGF,
-          source: source + " ", // Force re-planning
-          contextValue: baseContext,
-        },
-        { grafast: { explain: ["plan"] } },
+        planToMermaid(
+          grafastResultWithPlan.extensions.explain.operations[0].plan,
+          { skipBuckets: false, concise: true },
+        ),
       );
       await fsp.writeFile(
         `${__dirname}/plan-simplified.mermaid`,
-        grafastResultWithSimplifiedPlan.extensions.explain.operations[0]
-          .diagram,
+        planToMermaid(
+          grafastResultWithPlan.extensions.explain.operations[0].plan,
+          { skipBuckets: true, concise: true },
+        ),
       );
 
       console.log("... query plans written successfully");
