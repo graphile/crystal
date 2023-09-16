@@ -1,18 +1,17 @@
+import Head from "@docusaurus/Head";
 import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import HomepageFeatures from "@site/src/components/HomepageFeatures";
+import GrafastLogo from "@site/static/img/grafast-wordmark.svg";
 import Layout from "@theme/Layout";
 import clsx from "clsx";
 import React from "react";
-import Head from "@docusaurus/Head";
 
-import styles from "./index.module.css";
 import boardStyles from "./board.module.css";
-import GrafastLogo from "@site/static/img/grafast-wordmark.svg";
-import Grafast from "../components/Grafast";
+import styles from "./index.module.css";
 
 function HomepageHeader() {
-  const { siteConfig } = useDocusaurusContext();
+  // const { siteConfig } = useDocusaurusContext();
   return (
     <header className={clsx("hero hero--primary", styles.heroBanner)}>
       <div className="container">
@@ -111,7 +110,7 @@ export default function Home() {
               <input
                 type="text"
                 name="b_d103f710cf00a9273b55e8e9b_c3a9eb5c4e"
-                tabindex="-1"
+                tabIndex="-1"
                 value=""
               />
             </div>

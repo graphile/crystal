@@ -68,7 +68,7 @@ const FeatureList = [
     description: (
       <>
         Eliminating over-fetching, under-fetching, and the N+1 problem are just
-        the first step in your <Grafast /> "journey to efficiency".
+        the first step in your <Grafast /> &ldquo;journey to efficiency&rdquo;.
       </>
     ),
   },
