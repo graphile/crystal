@@ -18,14 +18,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/heart.git"
+    "url": "git+https://github.com/graphile/crystal.git"
   },
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/graphile/heart/issues"
+    "url": "https://github.com/graphile/crystal/issues"
   },
-  "homepage": "https://github.com/graphile/heart/tree/main/grafast/bench",
+  "homepage": "https://github.com/graphile/crystal/tree/main/grafast/bench",
   "dependencies": {
     "grafast": "workspace:^",
     "graphile-config": "workspace:^",

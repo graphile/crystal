@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/heart.git"
+    "url": "git+https://github.com/graphile/crystal.git"
   },
   "keywords": [
     "graphile",
@@ -25,9 +25,9 @@
   "author": "Benjie Gillam <code@benjiegillam.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/graphile/heart/issues"
+    "url": "https://github.com/graphile/crystal/issues"
   },
-  "homepage": "https://github.com/graphile/heart#readme",
+  "homepage": "https://github.com/graphile/crystal#readme",
   "files": [
     "dist"
   ],

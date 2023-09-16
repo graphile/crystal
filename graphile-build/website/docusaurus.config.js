@@ -4,8 +4,7 @@
 const lightCodeTheme = require("prism-react-renderer").themes.github;
 const darkCodeTheme = require("prism-react-renderer").themes.dracula;
 
-// TODO: change this to "graphile"?
-const organizationName = "benjie";
+const organizationName = "graphile";
 const projectName = "crystal";
 const mainBranch = "main";
 

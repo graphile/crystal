@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/graphile/heart.git"
+    "url": "git+https://github.com/graphile/crystal.git"
   },
   "keywords": [
     "pg",
@@ -27,9 +27,9 @@
   "author": "Benjie Gillam <benjie@jemjie.com>",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/graphile/heart/issues"
+    "url": "https://github.com/graphile/crystal/issues"
   },
-  "homepage": "https://github.com/graphile/heart/tree/main/utils/pg-introspection",
+  "homepage": "https://github.com/graphile/crystal/tree/main/utils/pg-introspection",
   "devDependencies": {
     "@types/debug": "4.1.8",
     "@types/jest": "^29.5.4",
