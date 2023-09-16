@@ -13,11 +13,13 @@ many other packages, a fair few of which can be used independently - see below
 for more details.
 
 **[Grafast][grafast]**: A cutting-edge planning and execution engine for
-GraphQL.js ─ write your GraphQL schema with "plans" rather than "resolvers" and
-our intelligent engine can optimize execution for incredible performance and
-efficiency gains despite very attractive developer ergonomics. With batching
-hard wired into the design, use this if you like to build your own GraphQL
-schemas and want the best performance with minimal developer effort.
+GraphQL.js ─ use this as a drop-in replacement for the `execute` method from
+GraphQL.js and by moving from traditional resolvers to Gra*fast* "plan
+resolvers" you'll be able to leverage the declarative nature of GraphQL requests
+to execute your business logic in the most efficient way, leading to reduced
+server load and happier customers. Use this if you're building your own GraphQL
+schemas and want the best performance and efficiency without having to put much
+extra effort in.
 
 **[PostGraphile][postgraphile]**: An incredibly low-effort way to build a well
 structured and high-performance GraphQL API backed primarily by a PostgreSQL
@@ -27,6 +29,9 @@ you want to use it as the "source of truth" for an auto-generated GraphQL API
 (which you can still make significant changes to). **NOTE**: thanks to
 [graphile-export][] you can also use this as a starting point for an API that
 you then manage yourself.
+
+| For **PostGraphile V4** see [the `legacy` branch](https://github.com/graphile/crystal/tree/legacy) |
+| -------------------------------------------------------------------------------------------------- |
 
 ## Project summaries
 
