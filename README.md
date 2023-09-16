@@ -30,8 +30,8 @@ you want to use it as the "source of truth" for an auto-generated GraphQL API
 [graphile-export][] you can also use this as a starting point for an API that
 you then manage yourself.
 
-| For **PostGraphile V4** see [the `legacy` branch](https://github.com/graphile/crystal/tree/legacy) |
-| -------------------------------------------------------------------------------------------------- |
+| ➡️ For **PostGraphile V4** see [the `legacy` branch](https://github.com/graphile/crystal/tree/legacy) |
+| ----------------------------------------------------------------------------------------------------- |
 
 ## Project summaries
 
