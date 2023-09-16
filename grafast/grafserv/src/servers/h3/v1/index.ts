@@ -220,7 +220,7 @@ export class H3Grafserv extends GrafservBase {
 
     router.use(
       this.dynamicOptions.graphqlPath,
-      eventHandler((event) => this.handleGraphqlEvent(event)),
+      eventHandler((event) => this.handleGraphQLEvent(event)),
       this.dynamicOptions.graphqlOverGET ||
         this.dynamicOptions.graphiqlOnGraphQLGET
         ? ["get", "post"]
