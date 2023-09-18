@@ -2817,6 +2817,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@dataplan/graphql@workspace:grafast/dataplan-graphql":
+  version: 0.0.0-use.local
+  resolution: "@dataplan/graphql@workspace:grafast/dataplan-graphql"
+  dependencies:
+    "@types/jest": "npm:^30.0.0"
+    chalk: "npm:^4.1.2"
+    jest: "npm:^30.2.0"
+    jest-serializer-simple: "workspace:^"
+    tslib: "npm:^2.8.1"
+    typescript: "npm:^5.9.3"
+  peerDependencies:
+    grafast: "workspace:^"
+  languageName: unknown
+  linkType: soft
+
 "@dataplan/json@workspace:^, @dataplan/json@workspace:grafast/dataplan-json":
   version: 0.0.0-use.local
   resolution: "@dataplan/json@workspace:grafast/dataplan-json"
