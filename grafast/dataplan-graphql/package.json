@@ -1,0 +1,47 @@
+{
+  "name": "@dataplan/graphql",
+  "version": "0.0.1-beta.0",
+  "description": "Grafast step classes for querying GraphQL APIs",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "prepack": "tsc -b"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/graphile/crystal.git"
+  },
+  "keywords": [
+    "graphile",
+    "graphql",
+    "grafast",
+    "json",
+    "dataplan",
+    "graphite"
+  ],
+  "author": "Benjie Gillam <code@benjiegillam.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/graphile/crystal/issues"
+  },
+  "homepage": "https://github.com/graphile/crystal/tree/main/grafast/dataplan-graphql",
+  "dependencies": {
+    "chalk": "^4.1.2",
+    "tslib": "^2.6.2"
+  },
+  "engines": {
+    "node": ">=14.17"
+  },
+  "peerDependencies": {
+    "grafast": "workspace:^"
+  },
+  "files": [
+    "dist"
+  ],
+  "devDependencies": {
+    "@types/jest": "^29.5.4",
+    "jest": "^29.6.4",
+    "jest-serializer-simple": "workspace:^",
+    "typescript": "^5.2.2"
+  }
+}
