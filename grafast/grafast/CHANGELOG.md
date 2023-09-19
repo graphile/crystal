@@ -1,5 +1,36 @@
 # grafast
 
+## 0.0.1-beta.8
+
+### Patch Changes
+
+- [#514](https://github.com/graphile/crystal-pre-merge/pull/514)
+  [`c9848f693`](https://github.com/graphile/crystal-pre-merge/commit/c9848f6936a5abd7740c0638bfb458fb5551f03b)
+  Thanks [@benjie](https://github.com/benjie)! - Update package.json repository
+  information
+
+- [#513](https://github.com/graphile/crystal-pre-merge/pull/513)
+  [`ede1092fe`](https://github.com/graphile/crystal-pre-merge/commit/ede1092fe197719b6fa786f4cfa75f6a1f4c56c1)
+  Thanks [@benjie](https://github.com/benjie)! - A couple minor follow-up fixes
+  to plan diagrams
+
+- [#498](https://github.com/graphile/crystal-pre-merge/pull/498)
+  [`566983fbd`](https://github.com/graphile/crystal-pre-merge/commit/566983fbd99c4b2df8c4ebd6260521670a2b7dfc)
+  Thanks [@benjie](https://github.com/benjie)! - loadOne and loadMany now
+  support "input/output equivalence" feature to enable collapsing of request
+  waterfalls.
+
+- [#502](https://github.com/graphile/crystal-pre-merge/pull/502)
+  [`409bf6071`](https://github.com/graphile/crystal-pre-merge/commit/409bf607180d4d8faec658c803e5ec4d1a00c451)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug when merging AccessStep
+  into OutputPlan relation to optionalGet
+
+- Updated dependencies
+  [[`c9848f693`](https://github.com/graphile/crystal-pre-merge/commit/c9848f6936a5abd7740c0638bfb458fb5551f03b)]:
+  - graphile-config@0.0.1-beta.3
+  - tamedevil@0.0.0-beta.3
+  - @graphile/lru@5.0.0-beta.3
+
 ## 0.0.1-beta.7
 
 ### Patch Changes

@@ -1,5 +1,18 @@
 # tamedevil
 
+## 0.0.0-beta.3
+
+### Patch Changes
+
+- [#514](https://github.com/graphile/crystal-pre-merge/pull/514)
+  [`c9848f693`](https://github.com/graphile/crystal-pre-merge/commit/c9848f6936a5abd7740c0638bfb458fb5551f03b)
+  Thanks [@benjie](https://github.com/benjie)! - Update package.json repository
+  information
+
+- Updated dependencies
+  [[`c9848f693`](https://github.com/graphile/crystal-pre-merge/commit/c9848f6936a5abd7740c0638bfb458fb5551f03b)]:
+  - @graphile/lru@5.0.0-beta.3
+
 ## 0.0.0-beta.2
 
 ### Patch Changes
