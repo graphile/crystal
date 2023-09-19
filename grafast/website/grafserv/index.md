@@ -20,8 +20,25 @@ const serv = grafserv({ schema, preset });
 ```
 
 `grafserv` is passed the GraphQL schema to use (if it's available, otherwise
-passing either null or a promise is also acceptable) and a `graphql-config`
-preset - i.e. your configuration.
+passing either null or a promise is also acceptable) and a `graphile-config`
+preset - i.e. your configuration. The preset can be an empty object, but here's
+a bigger (but not exhaustive) example:
+
+```js
+const preset = {
+  grafserv: {
+    port: 5678,
+    host: "0.0.0.0",
+    dangerouslyAllowAllCORSRequests: false,
+    graphqlPath: "/graphql",
+    eventStreamPath: "/graphql/stream",
+    graphqlOverGET: true,
+    graphiql: true,
+    graphiqlPath: "/",
+    websockets: true,
+  },
+};
+```
 
 Calling `grafserv` will return an instance; this instance will have a number of
 helpers on it, including helpers specific to integrating it with your framework
