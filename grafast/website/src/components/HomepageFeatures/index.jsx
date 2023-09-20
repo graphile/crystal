@@ -107,7 +107,7 @@ function Feature({ Svg, title, description }) {
 
 export default function HomepageFeatures() {
   return (
-    <>
+    <div className={styles.featuresContainer}>
       <section className={styles.lead}>
         <div className="container">
           <div className="row">
@@ -129,6 +129,6 @@ export default function HomepageFeatures() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }
