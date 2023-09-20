@@ -1,6 +1,7 @@
 import Head from "@docusaurus/Head";
 import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
+import Grafast from "@site/src/components/Grafast";
 import HomepageFeatures from "@site/src/components/HomepageFeatures";
 import GrafastLogo from "@site/static/img/grafast-wordmark.svg";
 import Layout from "@theme/Layout";
@@ -51,8 +52,8 @@ function HomepageHeader() {
               GraphQL.
             </p>
             <p className={styles.heroSubtitle}>
-              <strong>v0.1 is here!</strong> Fully open sourced under the MIT
-              License.
+              🆕 <strong>v0.1 is here!</strong> <Grafast /> is now MIT Licensed
+              Open Source Software!
             </p>
             <div className={styles.buttons}>
               <Link
