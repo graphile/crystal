@@ -148,7 +148,7 @@ const config = {
         title: "Home",
         logo: {
           alt: "Grafast Logo",
-          src: "img/green-graphile-logo.png",
+          src: "img/grafast-exclamation.svg",
         },
         items: [
           {
