@@ -178,7 +178,7 @@ const config = {
             position: "left",
           },
           {
-            href: `https://github.com/${organizationName}/${projectName}`,
+            href: `https://github.com/graphile/crystal/tree/main/grafast/grafast/`,
             label: "GitHub",
             position: "right",
           },
