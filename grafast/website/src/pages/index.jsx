@@ -50,6 +50,10 @@ function HomepageHeader() {
               your entire backend stack by leveraging the declarative nature of
               GraphQL.
             </p>
+            <p className={styles.heroSubtitle}>
+              <strong>v0.1 is here!</strong> Fully open sourced under the MIT
+              License.
+            </p>
             <div className={styles.buttons}>
               <Link
                 className="button button--secondary button--lg"

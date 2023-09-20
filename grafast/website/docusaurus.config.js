@@ -148,7 +148,7 @@ const config = {
         title: "Home",
         logo: {
           alt: "Grafast Logo",
-          src: "img/green-graphile-logo.png",
+          src: "img/grafast-exclamation.svg",
         },
         items: [
           {
@@ -178,7 +178,12 @@ const config = {
             position: "left",
           },
           {
-            href: `https://github.com/${organizationName}/${projectName}`,
+            href: "https://github.com/grafast/wg",
+            label: "Working Group",
+            position: "right",
+          },
+          {
+            href: `https://github.com/graphile/crystal/tree/main/grafast/grafast/`,
             label: "GitHub",
             position: "right",
           },
