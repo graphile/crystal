@@ -89,6 +89,12 @@
   box-shadow: 0.5rem 0.5rem 0px var(--black-ish);
   margin: 1rem 0;
 }
+
+[data-theme="dark"] .subscribe {
+  box-shadow: 0.5rem 0.5rem 0px white;
+  background: var(--black-ish);
+}
+
 .subscribe input[type="email"] {
   outline: 0;
   border: 0;
@@ -97,6 +103,11 @@
   font-size: 1.5rem;
   flex: 1000 0 10rem;
 }
+
+[data-theme="dark"] .subscribe input[type="email"] {
+  background: var(--black-ish);
+}
+
 .subscribe input[type="submit"] {
   text-transform: uppercase;
   border: 0;

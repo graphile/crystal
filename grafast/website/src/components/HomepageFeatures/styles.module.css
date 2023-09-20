@@ -47,6 +47,7 @@
 
 [data-theme="dark"] .instruction {
   background: #008a00;
+  color: white;
   box-shadow: 0.5rem 0.5rem 0px white;
 }
 
