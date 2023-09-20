@@ -178,6 +178,11 @@ const config = {
             position: "left",
           },
           {
+            href: "https://github.com/grafast/wg",
+            label: "Working Group",
+            position: "right",
+          },
+          {
             href: `https://github.com/graphile/crystal/tree/main/grafast/grafast/`,
             label: "GitHub",
             position: "right",
