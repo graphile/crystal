@@ -760,41 +760,85 @@ export interface PgRegistry<
   };
 }
 
-export type GetPgRegistryCodecs<TRegistry extends PgRegistry<any, any, any>> =
-  TRegistry["pgCodecs"];
-
-export type GetPgRegistrySources<TRegistry extends PgRegistry<any, any, any>> =
-  TRegistry["pgResources"];
-
+export type GetPgRegistryCodecs<U> = U extends PgRegistry<infer C, any, any>
+  ? C
+  : never;
+export type GetPgRegistrySources<U> = U extends PgRegistry<any, infer R, any>
+  ? R
+  : never;
+export type GetPgRegistryRelations<U> = U extends PgRegistry<any, any, infer R>
+  ? R
+  : never;
+export type GetPgCodecName<U> = U extends PgCodec<
+  infer N,
+  any,
+  any,
+  any,
+  any,
+  any,
+  any
+>
+  ? N
+  : never
 export type GetPgRegistryCodecRelations<
   TRegistry extends PgRegistry<any, any, any>,
   TCodec extends PgCodec<any, any, any, any, any, any, any>,
-> = TRegistry["pgRelations"][TCodec["name"]];
-
-export type GetPgCodecAttributes<
-  TCodec extends PgCodec<any, any, any, any, any, any, any>,
-> = TCodec extends PgCodec<any, infer UAttributes, any, any, any, any, any>
-  ? UAttributes extends undefined
-    ? never
-    : UAttributes
-  : PgCodecAttributes;
-
-export type GetPgResourceRegistry<
-  TResource extends PgResource<any, any, any, any, any>,
-> = TResource["registry"];
-
-export type GetPgResourceCodec<
-  TResource extends PgResource<any, any, any, any, any>,
-> = TResource["codec"];
-
-export type GetPgResourceAttributes<
-  TResource extends PgResource<any, any, any, any, any>,
-> = GetPgCodecAttributes<TResource["codec"]>;
-
-export type GetPgResourceRelations<
-  TResource extends PgResource<any, any, any, any, any>,
-> = TResource["registry"]["pgRelations"][TResource["codec"]["name"]];
-
-export type GetPgResourceUniques<
-  TResource extends PgResource<any, any, any, any, any>,
-> = TResource["uniques"];
+> = GetPgRegistryRelations<TRegistry>[GetPgCodecName<TCodec>]
+export type GetPgCodecAttributes<U> = U extends PgCodec<
+  any,
+  infer A,
+  any,
+  any,
+  any,
+  any,
+  any
+>
+  ? A
+  : never;
+export type GetPgResourceRegistry<U> = U extends PgResource<
+  any,
+  any,
+  any,
+  any,
+  infer R
+>
+  ? R
+  : never;
+export type GetPgResourceCodec<U> = U extends PgResource<
+  any,
+  infer C,
+  any,
+  any,
+  any
+>
+  ? C
+  : never;
+export type GetPgResourceAttributes<U> = U extends PgResource<
+  any,
+  infer C,
+  any,
+  any,
+  any
+>
+  ? GetPgCodecAttributes<GetPgResourceCodec<U>>
+  : never;
+export type GetPgResourceRelations<U> = U extends PgResource<
+  any,
+  any,
+  any,
+  any,
+  any
+>
+  ? GetPgRegistryRelations<GetPgResourceRegistry<U>>[GetPgCodecName<
+      GetPgResourceCodec<U>
+    >]
+  : never
+export type GetPgResourceUniques<T> = T extends PgResource<
+  any,
+  any,
+  infer U,
+  any,
+  any
+>
+  ? U
+  : never;
