@@ -24,26 +24,50 @@ const ExtendPlugin = makeExtendSchemaPlugin({
     },
     Scalar1: new GraphQLScalarType({
       name: "SomethingElse",
-      serialize() {
-        return 1;
-      },
-      parseLiteral() {
-        return 1;
-      },
-      parseValue() {
-        return 1;
-      },
+      serialize: EXPORTABLE(
+        () =>
+          function serialize() {
+            return 1;
+          },
+        [],
+      ),
+      parseLiteral: EXPORTABLE(
+        () =>
+          function parseLiteral() {
+            return 1;
+          },
+        [],
+      ),
+      parseValue: EXPORTABLE(
+        () =>
+          function parseValue() {
+            return 1;
+          },
+        [],
+      ),
     }),
     Scalar2: {
-      serialize() {
-        return 2;
-      },
-      parseLiteral() {
-        return 2;
-      },
-      parseValue() {
-        return 2;
-      },
+      serialize: EXPORTABLE(
+        () =>
+          function serialize() {
+            return 2;
+          },
+        [],
+      ),
+      parseLiteral: EXPORTABLE(
+        () =>
+          function parseLiteral() {
+            return 2;
+          },
+        [],
+      ),
+      parseValue: EXPORTABLE(
+        () =>
+          function parseValue() {
+            return 2;
+          },
+        [],
+      ),
     },
   },
 });
