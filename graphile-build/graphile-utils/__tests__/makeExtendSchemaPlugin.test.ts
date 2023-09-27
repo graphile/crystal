@@ -1,7 +1,8 @@
 import { constant, grafast } from "grafast";
 import { GraphQLScalarType } from "grafast/graphql";
 import { buildSchema, QueryPlugin } from "graphile-build";
-import { makeExtendSchemaPlugin, gql } from "../src";
+
+import { gql, makeExtendSchemaPlugin } from "../src/index.js";
 
 const ExtendPlugin = makeExtendSchemaPlugin({
   typeDefs: gql`
