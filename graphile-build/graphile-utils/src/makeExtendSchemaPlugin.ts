@@ -387,7 +387,6 @@ export function makeExtendSchemaPlugin(
               // https://graphql.org/graphql-js/type/#graphqlobjecttype
               const name = getName(definition.name);
               const description = getDescription(definition.description);
-              const interfaces = getInterfaces(definition.interfaces, build);
               const directives = getDirectives(definition.directives);
               const scope = {
                 __origin: `makeExtendSchemaPlugin`,
@@ -398,7 +397,7 @@ export function makeExtendSchemaPlugin(
                 name,
                 scope,
                 () => ({
-                  interfaces,
+                  interfaces: () => getInterfaces(definition.interfaces, build),
                   fields: (fieldsContext) =>
                     getFields(
                       fieldsContext.Self,
