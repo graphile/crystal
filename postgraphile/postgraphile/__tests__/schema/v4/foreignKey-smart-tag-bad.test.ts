@@ -25,6 +25,6 @@ test("raises an error when a foreignKey tries to reference a non-unique combinat
       ADD UNIQUE ("about");
 
     or use a '@unique about' smart tag to emulate this. (Original spec: "(sekrit) references c.person (about)").
-    To temporarily fix this you can set 'preset.gather.pgFaceConstraintsAutofixForeignKeyUniqueness' to 'true', but we strongly recommend against using this long term.'"
+    To temporarily fix this you can set 'preset.gather.pgFakeConstraintsAutofixForeignKeyUniqueness' to 'true', but we strongly recommend against using this long term.'"
   `);
 });
