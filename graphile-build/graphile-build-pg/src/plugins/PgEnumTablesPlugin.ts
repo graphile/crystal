@@ -17,6 +17,7 @@ declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
       pgEnumTables: {
+        isEnumConstraint(pgConstraint: PgConstraint): boolean;
         getIntrospectionData(
           serviceName: string,
           pgClass: PgClass,
@@ -26,6 +27,9 @@ declare global {
           serviceName: string;
           introspection: Introspection;
         }): Promise<void>;
+        enumCodecForConstraint(
+          pgConstraint: PgConstraint,
+        ): PgEnumCodec<string, string> | undefined;
       };
     }
   }
@@ -127,6 +131,40 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
       codecByPgAttribute: new Map(),
     }),
     helpers: {
+      isEnumConstraint(info, pgConstraint) {
+        const pgClass = pgConstraint.getClass();
+        if (!pgClass) return false;
+        const { tags, description: _description } =
+          pgClass.getTagsAndDescription();
+        const isEnumTable = tags.enum === true || typeof tags.enum === "string";
+        if (pgConstraint.conrelid === pgClass._id) {
+          const isPrimaryKey = pgConstraint.contype === "p";
+          const isUniqueConstraint = pgConstraint.contype === "u";
+          if (isPrimaryKey || isUniqueConstraint) {
+            const conTags = pgConstraint.getTags();
+            const isExplicitEnumConstraint =
+              conTags.enum === true || typeof conTags.enum === "string";
+            const isPrimaryKeyOfEnumTableConstraint =
+              pgConstraint.contype === "p" && isEnumTable;
+            if (isExplicitEnumConstraint || isPrimaryKeyOfEnumTableConstraint) {
+              const hasExactlyOneAttribute = pgConstraint.conkey!.length === 1;
+              if (!hasExactlyOneAttribute) {
+                throw new Error(
+                  `Enum table "${pgClass.getNamespace()!.nspname}"."${
+                    pgClass.relname
+                  }" enum constraint '${
+                    pgConstraint.conname
+                  }' is composite; it should have exactly one attribute (found: ${
+                    pgConstraint.conkey!.length
+                  })`,
+                );
+              }
+              return true;
+            }
+          }
+        }
+        return false;
+      },
       async getIntrospectionData(info, serviceName, pgClass, attributes) {
         // Load data from the table/view.
         const query = sql.compile(
@@ -199,10 +237,14 @@ Original error: ${e.message}
 
           // By this point, even views should have "fake" constraints we can use
           // (e.g. `@primaryKey`)
-          const enumConstraints = introspection.constraints.filter(
-            (pgConstraint) =>
-              isEnumConstraint(pgClass, pgConstraint, isEnumTable),
-          );
+          const enumConstraints = pgClass
+            .getConstraints()
+            .filter((pgConstraint) =>
+              info.helpers.pgEnumTables.isEnumConstraint(pgConstraint),
+            );
+          if (enumConstraints.length === 0) {
+            continue;
+          }
 
           // Get all the attributes
           const enumTableAttributes = pgClass.getAttributes();
@@ -327,6 +369,9 @@ Original error: ${e.message}
           }
         }
       },
+      enumCodecForConstraint(info, constraint) {
+        return info.state.codecByPgConstraint.get(constraint);
+      },
     },
     hooks: {
       // Run in the 'introspection' phase before anything uses the tags
@@ -337,43 +382,14 @@ Original error: ${e.message}
         const { attribute, pgAttribute } = event;
         const replacementCodec = info.state.codecByPgAttribute.get(pgAttribute);
         if (replacementCodec) {
+          console.log(
+            `${pgAttribute.getClass()!.relname}.${pgAttribute.attname} : ${
+              replacementCodec.name
+            }`,
+          );
           attribute.codec = replacementCodec;
         }
       },
     },
   }),
 };
-
-function isEnumConstraint(
-  pgClass: PgClass,
-  pgConstraint: PgConstraint,
-  isEnumTable: boolean,
-) {
-  if (pgConstraint.conrelid === pgClass._id) {
-    const isPrimaryKey = pgConstraint.contype === "p";
-    const isUniqueConstraint = pgConstraint.contype === "u";
-    if (isPrimaryKey || isUniqueConstraint) {
-      const conTags = pgConstraint.getTags();
-      const isExplicitEnumConstraint =
-        conTags.enum === true || typeof conTags.enum === "string";
-      const isPrimaryKeyOfEnumTableConstraint =
-        pgConstraint.contype === "p" && isEnumTable;
-      if (isExplicitEnumConstraint || isPrimaryKeyOfEnumTableConstraint) {
-        const hasExactlyOneAttribute = pgConstraint.conkey!.length === 1;
-        if (!hasExactlyOneAttribute) {
-          throw new Error(
-            `Enum table "${pgClass.getNamespace()!.nspname}"."${
-              pgClass.relname
-            }" enum constraint '${
-              pgConstraint.conname
-            }' is composite; it should have exactly one attribute (found: ${
-              pgConstraint.conkey!.length
-            })`,
-          );
-        }
-        return true;
-      }
-    }
-  }
-  return false;
-}
