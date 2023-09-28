@@ -476,6 +476,7 @@ declare global {
         name: string;
       };
       listItemNonNull?: boolean;
+      isEnumTableEnum?: boolean;
     }
 
     /**

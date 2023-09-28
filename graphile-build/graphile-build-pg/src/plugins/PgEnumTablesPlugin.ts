@@ -320,6 +320,7 @@ Original error: ${e.message}
 
               const extensions: PgCodecExtensions = {
                 // ENHANCE: more extensions/tags?
+                isEnumTableEnum: true,
                 tags: {
                   name: info.inflection.enumTableEnum({
                     serviceName,
