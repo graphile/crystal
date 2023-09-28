@@ -258,9 +258,11 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                 string,
                 PgCodecRelationConfig<PgCodecWithAttributes, PgResourceOptions>,
               ];
-              const relationEntries = Object.entries(
-                registryConfig.pgRelations[currentResourceOptions.codec.name],
-              ) as Array<RelationEntry>;
+              const relations =
+                registryConfig.pgRelations[currentResourceOptions.codec.name];
+              const relationEntries = relations
+                ? (Object.entries(relations) as Array<RelationEntry>)
+                : [];
               const part = rawPart.trim();
               // ENHANCE: allow whitespace
               const matches = part.match(
@@ -335,7 +337,13 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                 currentResourceOptions = nextSource;
               } else {
                 console.warn(
-                  `Could not find matching relation for '${via}' / ${currentResourceOptions.name} -> '${rawPart}'`,
+                  `When processing ref for resource '${
+                    resourceOptions.name
+                  }', could not find matching relation for via:'${via}' ${
+                    rawPart === via
+                      ? ""
+                      : ` (from: '${currentResourceOptions.name}', path: '${rawPart}')`
+                  }`,
                 );
                 continue outerLoop;
               }
