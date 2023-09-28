@@ -53,7 +53,6 @@ create table polymorphic.single_table_items (
   -- Shared attributes:
   parent_id int references polymorphic.single_table_items on delete cascade,
   root_topic_id int constraint single_table_items_root_topic_fkey references polymorphic.single_table_items on delete cascade,
-  author_id int not null references polymorphic.people on delete cascade,
   position bigint not null default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
@@ -116,7 +115,6 @@ create table polymorphic.relational_items (
   -- Shared attributes (also 'id'):
   parent_id int references polymorphic.relational_items on delete cascade,
   root_topic_id int, -- constraint being created below
-  author_id int not null references polymorphic.people on delete cascade,
   position bigint not null default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
