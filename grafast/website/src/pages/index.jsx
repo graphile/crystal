@@ -116,14 +116,14 @@ export default function Home() {
                 type="text"
                 name="b_d103f710cf00a9273b55e8e9b_c3a9eb5c4e"
                 tabIndex="-1"
-                value=""
+                defaultValue=""
               />
             </div>
             <div className={styles.subscribe}>
               <input
                 placeholder="email@example.com"
                 type="email"
-                value=""
+                defaultValue=""
                 name="EMAIL"
                 className="required email"
                 id="mce-EMAIL"
