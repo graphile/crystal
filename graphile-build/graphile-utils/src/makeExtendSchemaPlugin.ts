@@ -26,6 +26,7 @@ import type {
   GraphQLObjectType,
   GraphQLOutputType,
   GraphQLScalarType,
+  GraphQLScalarTypeConfig,
   // Union types:
   GraphQLType,
   GraphQLTypeResolver,
@@ -48,6 +49,8 @@ import type {
 import type { GraphileBuild } from "graphile-build";
 
 import { EXPORTABLE } from "./exportable.js";
+
+type Maybe<T> = T | null | undefined;
 
 export interface ObjectFieldConfig<TSource = any, TContext = any> {
   plan?: FieldPlanResolver<any, any, any>;
@@ -76,13 +79,26 @@ export interface EnumResolver {
   [key: string]: string | number | Array<any> | Record<string, any> | symbol;
 }
 
+export interface TypeResolver {
+  __resolveType?: GraphQLTypeResolver<any, any>;
+}
+
 /** @deprecated Use Plans instead */
 export interface Resolvers<TSource = any, TContext = any> {
-  [key: string]: ObjectResolver<TSource, TContext> | EnumResolver;
+  [key: string]:
+    | ObjectResolver<TSource, TContext>
+    | EnumResolver
+    | TypeResolver
+    | GraphQLScalarType
+    | GraphQLScalarTypeConfig<any, any>;
 }
 
 export interface Plans<TSource = any, TContext = any> {
-  [key: string]: ObjectPlan<TSource, TContext> | EnumResolver;
+  [key: string]:
+    | ObjectPlan<TSource, TContext>
+    | EnumResolver
+    | GraphQLScalarType
+    | GraphQLScalarTypeConfig<any, any>;
 }
 
 export interface ExtensionDefinition {
@@ -314,7 +330,9 @@ export function makeExtendSchemaPlugin(
               const name = getName(definition.name);
               const description = getDescription(definition.description);
               const directives = getDirectives(definition.directives);
-              const relevantResolver = plans[name] || resolvers[name] || {};
+              const relevantResolver = (plans[name] ??
+                resolvers[name] ??
+                {}) as EnumResolver;
               const values: GraphQLEnumValueConfigMap = (
                 definition.values ?? []
               ).reduce(
@@ -435,9 +453,8 @@ export function makeExtendSchemaPlugin(
                 directives,
                 ...scopeFromDirectives(directives),
               };
-              const resolveType = resolvers[name]?.__resolveType as
-                | GraphQLTypeResolver<any, any>
-                | undefined;
+              const resolveType = (resolvers[name] as Maybe<TypeResolver>)
+                ?.__resolveType;
               build.registerUnionType(
                 name,
                 scope,
@@ -470,9 +487,8 @@ export function makeExtendSchemaPlugin(
                 directives,
                 ...scopeFromDirectives(directives),
               };
-              const resolveType = resolvers[name]?.__resolveType as
-                | GraphQLTypeResolver<any, any>
-                | undefined;
+              const resolveType = (resolvers[name] as Maybe<TypeResolver>)
+                ?.__resolveType;
               build.registerInterfaceType(
                 name,
                 scope,
@@ -506,30 +522,48 @@ export function makeExtendSchemaPlugin(
                 directives,
                 ...scopeFromDirectives(directives),
               };
+              const possiblePlan = plans[name];
+              const possibleResolver = resolvers[name] as Maybe<
+                GraphQLScalarType | GraphQLScalarTypeConfig<any, any>
+              >;
+              if (possiblePlan && possibleResolver) {
+                throw new Error(
+                  `You must set only plans.${name} or resolvers.${name} - not both!`,
+                );
+              }
+              const rawConfig = possiblePlan ?? possibleResolver;
+              const config = rawConfig
+                ? rawConfig instanceof GraphQLScalarType
+                  ? EXPORTABLE((rawConfig) => rawConfig.toConfig(), [rawConfig])
+                  : (rawConfig as GraphQLScalarTypeConfig<any, any>)
+                : null;
               build.registerScalarType(
                 name,
                 scope,
                 () => ({
                   description,
-                  serialize: EXPORTABLE(
-                    () => (value: any) => String(value),
-                    [],
-                  ),
-                  parseValue: EXPORTABLE(
-                    () => (value: any) => String(value),
-                    [],
-                  ),
-                  parseLiteral: EXPORTABLE(
-                    (GraphQLError, Kind, name) => (ast: any) => {
-                      if (ast.kind !== Kind.STRING) {
-                        throw new GraphQLError(
-                          `${name} can only parse string values`,
-                        );
-                      }
-                      return ast.value;
-                    },
-                    [GraphQLError, Kind, name],
-                  ),
+                  astNode: definition,
+                  extensions: config?.extensions,
+                  specifiedByURL: config?.specifiedByURL,
+                  serialize: config?.serialize
+                    ? EXPORTABLE((config) => config.serialize, [config])
+                    : EXPORTABLE(() => (value: any) => String(value), []),
+                  parseValue: config?.parseValue
+                    ? EXPORTABLE((config) => config.parseValue, [config])
+                    : EXPORTABLE(() => (value: any) => String(value), []),
+                  parseLiteral: config?.parseLiteral
+                    ? EXPORTABLE((config) => config.parseLiteral, [config])
+                    : EXPORTABLE(
+                        (GraphQLError, Kind, name) => (ast: any) => {
+                          if (ast.kind !== Kind.STRING) {
+                            throw new GraphQLError(
+                              `${name} can only parse string values`,
+                            );
+                          }
+                          return ast.value;
+                        },
+                        [GraphQLError, Kind, name],
+                      ),
                 }),
                 uniquePluginName,
               );
@@ -1001,8 +1035,12 @@ export function makeExtendSchemaPlugin(
            * can define 'plan', 'subscribePlan', 'resolve', 'subscribe' and
            * other relevant methods.
            */
-          const possiblePlan = plans[Self.name]?.[fieldName];
-          const possibleResolver = resolvers[Self.name]?.[fieldName];
+          const possiblePlan = (
+            plans[Self.name] as Maybe<ObjectPlan<any, any>>
+          )?.[fieldName];
+          const possibleResolver = (
+            resolvers[Self.name] as Maybe<ObjectResolver>
+          )?.[fieldName];
           if (possiblePlan && possibleResolver) {
             throw new Error(
               `You must set only plans.${Self.name}.${fieldName} or resolvers.${Self.name}.${fieldName} - not both!`,
