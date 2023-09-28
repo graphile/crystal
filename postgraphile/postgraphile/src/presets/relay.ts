@@ -51,6 +51,7 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
     entityBehavior: {
       pgCodecAttribute(behavior, [codec, attributeName], build) {
         const newBehavior = [behavior];
+        const attr = codec.attributes[attributeName];
 
         const resource =
           codec.polymorphism?.mode === "union"
@@ -101,20 +102,22 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
             if (!r.localAttributes.includes(attributeName)) return false;
             return true;
           });
-          if (singularRelationsUsingThisColumn.length > 0) {
+          if (
+            singularRelationsUsingThisColumn.length > 0 &&
+            !attr.codec.extensions?.isEnumTableEnum
+          ) {
             // Do not include this column in the schema (other than for create)
             newBehavior.push(...RELAY_HIDDEN_COLUMN_BEHAVIORS);
           }
         }
-
         const relations = (
           Object.values(
             build.input.pgRegistry.pgRelations[codec.name] ?? {},
           ) as PgCodecRelation[]
         ).filter((r) => !r.isReferencee && r.isUnique);
-        const isPartOfRelation = relations.some((r) =>
-          r.localAttributes.includes(attributeName),
-        );
+        const isPartOfRelation =
+          !attr.codec.extensions?.isEnumTableEnum &&
+          relations.some((r) => r.localAttributes.includes(attributeName));
         if (isPartOfRelation) {
           // `nodeId:filterBy` handles this
           newBehavior.push(`-attribute:filterBy`);
