@@ -378,7 +378,7 @@ or use a '@unique ${foreignKeyAttibutes
             ",",
           )}' smart tag to emulate this. (Original spec: ${JSON.stringify(
           rawSpec,
-        )}).\nTo temporarily fix this you can set 'preset.gather.pgFaceConstraintsAutofixForeignKeyUniqueness' to 'true', but we strongly recommend against using this long term.'`,
+        )}).\nTo temporarily fix this you can set 'preset.gather.pgFakeConstraintsAutofixForeignKeyUniqueness' to 'true', but we strongly recommend against using this long term.'`,
       );
     }
   }
