@@ -1,0 +1,27 @@
+## expect(errors).toBeFalsy();
+#> schema: ["composite_domains"]
+#> subscriptions: true
+#> simpleCollections: "both"
+{
+  allPosts {
+    nodes {
+      id
+      userId
+      content {
+        imgUrl
+        lines {
+          lineNodeType
+          lineNodeText
+        }
+      }
+      threadContent {
+        imgUrl
+        lines {
+          lineNodeType
+          lineNodeText
+        }
+      }
+      createdAt
+    }
+  }
+}

@@ -1,0 +1,88 @@
+{
+  allPosts: {
+    nodes: [
+      {
+        id: 1,
+        userId: 1,
+        content: {
+          imgUrl: "https://placekitten.com/200/300",
+          lines: [
+            [
+              {
+                lineNodeType: "TEXT",
+                lineNodeText: "blah1",
+              },
+              {
+                lineNodeType: "MENTION",
+                lineNodeText: "blah2",
+              },
+            ],
+            [
+              {
+                lineNodeType: "TEXT",
+                lineNodeText: "blah3",
+              },
+              {
+                lineNodeType: "MENTION",
+                lineNodeText: "blah4",
+              },
+            ],
+          ],
+        },
+        threadContent: [
+          {
+            imgUrl: "https://placekitten.com/200/300",
+            lines: [
+              [
+                {
+                  lineNodeType: "TEXT",
+                  lineNodeText: "blah5",
+                },
+                {
+                  lineNodeType: "MENTION",
+                  lineNodeText: "blah6",
+                },
+              ],
+              [
+                {
+                  lineNodeType: "TEXT",
+                  lineNodeText: "blah7",
+                },
+                {
+                  lineNodeType: "MENTION",
+                  lineNodeText: "blah8",
+                },
+              ],
+            ],
+          },
+          {
+            imgUrl: "https://placekitten.com/200/300",
+            lines: [
+              [
+                {
+                  lineNodeType: "TEXT",
+                  lineNodeText: "blah9",
+                },
+                {
+                  lineNodeType: "MENTION",
+                  lineNodeText: "blah10",
+                },
+              ],
+              [
+                {
+                  lineNodeType: "TEXT",
+                  lineNodeText: "blah11",
+                },
+                {
+                  lineNodeType: "MENTION",
+                  lineNodeText: "blah12",
+                },
+              ],
+            ],
+          },
+        ],
+        createdAt: "2023-09-29T09:13:28.571996-04:00",
+      },
+    ],
+  },
+}
