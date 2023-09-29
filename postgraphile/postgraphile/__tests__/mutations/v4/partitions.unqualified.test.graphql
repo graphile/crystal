@@ -2,6 +2,7 @@
 #> schema: ["partitions"]
 #> search_path: "partitions"
 #> pgIdentifiers: 'unqualified'
+## expect(queries.map(q => q.text).join("\n")).not.toMatch(/"partitions"/);
 #> subscriptions: true
 mutation {
   createMeasurement(
