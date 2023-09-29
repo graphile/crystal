@@ -409,7 +409,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const fromCallback = EXPORTABLE(
             (namespaceName, procName, sql, sqlFromArgDigests) =>
               (...args: PgSelectArgumentDigest[]) =>
-                sql`${sql.identifier(
+                sql`${info.helpers.pgBasics.identifier(
                   namespaceName,
                   procName,
                 )}(${sqlFromArgDigests(args)})`,

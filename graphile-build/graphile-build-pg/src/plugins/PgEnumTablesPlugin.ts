@@ -171,10 +171,11 @@ export const PgEnumTablesPlugin: GraphileConfig.Plugin = {
           sql.fragment`select ${sql.join(
             attributes.map((col) => sql.identifier(col.attname)),
             ", ",
-          )} from ${sql.identifier(
-            pgClass.getNamespace()!.nspname,
-            pgClass.relname,
-          )};`,
+          )} from ${
+            // NOTE: Even in the case of unqualified pgIdentifiers, we still want
+            // to read _this_ enums values from _this_ schema.
+            sql.identifier(pgClass.getNamespace()!.nspname, pgClass.relname)
+          };`,
         );
 
         const pgService = info.resolvedPreset.pgServices!.find(

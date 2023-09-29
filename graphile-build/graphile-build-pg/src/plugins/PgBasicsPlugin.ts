@@ -14,12 +14,13 @@ import type {
 } from "@dataplan/pg";
 import * as dataplanPg from "@dataplan/pg";
 import type { GraphQLType } from "grafast/graphql";
-import sql from "pg-sql2";
+import sql, { SQL } from "pg-sql2";
 
 import { getBehavior } from "../behavior.js";
 import type { PgCodecMetaLookup } from "../inputUtils.js";
 import { getCodecMetaLookupFromInput, makePgCodecMeta } from "../inputUtils.js";
 import { version } from "../version.js";
+import { gatherConfig } from "graphile-build";
 
 declare global {
   namespace GraphileBuild {
@@ -114,6 +115,22 @@ declare global {
       pgCodecRef: PgCodecRef;
       pgRefDefinition: PgRefDefinition;
     }
+    interface GatherOptions {
+      /** Set to 'unqualified' to omit the schema name from table, function, and type identifiers */
+      pgIdentifiers?: "qualified" | "unqualified";
+    }
+  }
+
+  namespace GraphileConfig {
+    interface GatherHelpers {
+      pgBasics: {
+        /**
+         * Create an SQL identifier from the given parts; skipping the very
+         * first part (schema) if pgIdentifiers is set to 'unqualified'
+         */
+        identifier(...parts: string[]): SQL;
+      };
+    }
   }
 }
 
@@ -122,6 +139,30 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
   description:
     "Basic utilities required by many other graphile-build-pg plugins.",
   version: version,
+
+  gather: gatherConfig({
+    namespace: "pgBasics",
+    helpers: {
+      identifier(info, ...parts) {
+        switch (info.options.pgIdentifiers) {
+          case "unqualified": {
+            // strip the schema
+            const [, ...partsWithoutSchema] = parts;
+            return sql.identifier(...partsWithoutSchema);
+          }
+          case "qualified":
+          case undefined: {
+            return sql.identifier(...parts);
+          }
+          default: {
+            throw new Error(
+              `Setting preset.gather.pgIdentifiers had unsupported value '${info.options.pgIdentifiers}'; please use a supported value: 'qualified' or 'unqualified'.`,
+            );
+          }
+        }
+      },
+    },
+  }),
 
   schema: {
     globalBehavior: "connection -list",

@@ -418,7 +418,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               sql,
             ) => ({
               name: codecName,
-              identifier: sql.identifier(nspName, className),
+              identifier: info.helpers.pgBasics.identifier(nspName, className),
               attributes,
               description,
               extensions,
@@ -576,7 +576,10 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 ) =>
                   enumCodec({
                     name: codecName,
-                    identifier: sql.identifier(namespaceName, typeName),
+                    identifier: info.helpers.pgBasics.identifier(
+                      namespaceName,
+                      typeName,
+                    ),
                     values: enumLabels,
                     extensions,
                   }),
@@ -654,7 +657,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   rangeOfCodec(
                     innerCodec,
                     codecName,
-                    sql.identifier(namespaceName, typeName),
+                    info.helpers.pgBasics.identifier(namespaceName, typeName),
                     {
                       description,
                       extensions,
@@ -728,7 +731,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     domainOfCodec(
                       innerCodec,
                       codecName,
-                      sql.identifier(namespaceName, typeName),
+                      info.helpers.pgBasics.identifier(namespaceName, typeName),
                       {
                         description,
                         extensions,
