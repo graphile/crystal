@@ -915,5 +915,5 @@ insert into composite_domains.posts (user_id, content, thread_content, created_a
     )::composite_domains.user_update_content
 
     ]::composite_domains.user_update_content[],
-    now()
+  '2023-09-29T09:13:28.571996-04:00'
   );
