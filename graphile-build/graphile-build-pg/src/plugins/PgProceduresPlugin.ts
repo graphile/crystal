@@ -406,14 +406,15 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const namespaceName = namespace.nspname;
           const procName = pgProc.proname;
 
+          const sqlIdent = info.helpers.pgBasics.identifier(
+            namespaceName,
+            procName,
+          );
           const fromCallback = EXPORTABLE(
-            (namespaceName, procName, sql, sqlFromArgDigests) =>
+            (sql, sqlFromArgDigests, sqlIdent) =>
               (...args: PgSelectArgumentDigest[]) =>
-                sql`${info.helpers.pgBasics.identifier(
-                  namespaceName,
-                  procName,
-                )}(${sqlFromArgDigests(args)})`,
-            [namespaceName, procName, sql, sqlFromArgDigests],
+                sql`${sqlIdent}(${sqlFromArgDigests(args)})`,
+            [sql, sqlFromArgDigests, sqlIdent],
           );
 
           addBehaviorToTags(tags, "-filter -order", true);

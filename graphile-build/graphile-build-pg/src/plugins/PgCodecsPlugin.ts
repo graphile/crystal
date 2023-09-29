@@ -20,7 +20,6 @@ import {
 } from "@dataplan/pg";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { PgAttribute, PgClass, PgType } from "pg-introspection";
-import sql from "pg-sql2";
 
 import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";
@@ -406,19 +405,18 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           };
           const executor =
             info.helpers.pgIntrospection.getExecutorForService(serviceName);
+          const sqlIdent = info.helpers.pgBasics.identifier(nspName, className);
           const spec: PgRecordTypeCodecSpec<any, any> = EXPORTABLE(
             (
               attributes,
-              className,
               codecName,
               description,
               executor,
               extensions,
-              nspName,
-              sql,
+              sqlIdent,
             ) => ({
               name: codecName,
-              identifier: info.helpers.pgBasics.identifier(nspName, className),
+              identifier: sqlIdent,
               attributes,
               description,
               extensions,
@@ -426,13 +424,11 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             }),
             [
               attributes,
-              className,
               codecName,
               description,
               executor,
               extensions,
-              nspName,
-              sql,
+              sqlIdent,
             ],
           );
           await info.process("pgCodecs_recordType_spec", {
@@ -564,34 +560,19 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 pgType: type,
                 extensions,
               });
+              const sqlIdent = info.helpers.pgBasics.identifier(
+                namespaceName,
+                typeName,
+              );
               return EXPORTABLE(
-                (
-                  codecName,
-                  enumCodec,
-                  enumLabels,
-                  extensions,
-                  namespaceName,
-                  sql,
-                  typeName,
-                ) =>
+                (codecName, enumCodec, enumLabels, extensions, sqlIdent) =>
                   enumCodec({
                     name: codecName,
-                    identifier: info.helpers.pgBasics.identifier(
-                      namespaceName,
-                      typeName,
-                    ),
+                    identifier: sqlIdent,
                     values: enumLabels,
                     extensions,
                   }),
-                [
-                  codecName,
-                  enumCodec,
-                  enumLabels,
-                  extensions,
-                  namespaceName,
-                  sql,
-                  typeName,
-                ],
+                [codecName, enumCodec, enumLabels, extensions, sqlIdent],
               );
             }
 
@@ -643,35 +624,30 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 extensions,
               });
 
+              const sqlIdent = info.helpers.pgBasics.identifier(
+                namespaceName,
+                typeName,
+              );
               return EXPORTABLE(
                 (
                   codecName,
                   description,
                   extensions,
                   innerCodec,
-                  namespaceName,
                   rangeOfCodec,
-                  sql,
-                  typeName,
+                  sqlIdent,
                 ) =>
-                  rangeOfCodec(
-                    innerCodec,
-                    codecName,
-                    info.helpers.pgBasics.identifier(namespaceName, typeName),
-                    {
-                      description,
-                      extensions,
-                    },
-                  ),
+                  rangeOfCodec(innerCodec, codecName, sqlIdent, {
+                    description,
+                    extensions,
+                  }),
                 [
                   codecName,
                   description,
                   extensions,
                   innerCodec,
-                  namespaceName,
                   rangeOfCodec,
-                  sql,
-                  typeName,
+                  sqlIdent,
                 ],
               );
             }
@@ -716,6 +692,10 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   pgType: type,
                   serviceName,
                 });
+                const sqlIdent = info.helpers.pgBasics.identifier(
+                  namespaceName,
+                  typeName,
+                );
                 return EXPORTABLE(
                   (
                     codecName,
@@ -723,31 +703,22 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     domainOfCodec,
                     extensions,
                     innerCodec,
-                    namespaceName,
                     notNull,
-                    sql,
-                    typeName,
+                    sqlIdent,
                   ) =>
-                    domainOfCodec(
-                      innerCodec,
-                      codecName,
-                      info.helpers.pgBasics.identifier(namespaceName, typeName),
-                      {
-                        description,
-                        extensions,
-                        notNull,
-                      },
-                    ) as PgCodec,
+                    domainOfCodec(innerCodec, codecName, sqlIdent, {
+                      description,
+                      extensions,
+                      notNull,
+                    }) as PgCodec,
                   [
                     codecName,
                     description,
                     domainOfCodec,
                     extensions,
                     innerCodec,
-                    namespaceName,
                     notNull,
-                    sql,
-                    typeName,
+                    sqlIdent,
                   ],
                 );
               }

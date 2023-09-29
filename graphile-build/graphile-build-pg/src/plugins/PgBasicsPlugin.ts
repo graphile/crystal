@@ -1,4 +1,3 @@
-import "graphile-build";
 import "./PgTablesPlugin.js";
 import "../interfaces.js";
 import "graphile-config";
@@ -14,13 +13,14 @@ import type {
 } from "@dataplan/pg";
 import * as dataplanPg from "@dataplan/pg";
 import type { GraphQLType } from "grafast/graphql";
-import sql, { SQL } from "pg-sql2";
+import { EXPORTABLE, gatherConfig } from "graphile-build";
+import type { SQL } from "pg-sql2";
+import sql from "pg-sql2";
 
 import { getBehavior } from "../behavior.js";
 import type { PgCodecMetaLookup } from "../inputUtils.js";
 import { getCodecMetaLookupFromInput, makePgCodecMeta } from "../inputUtils.js";
 import { version } from "../version.js";
-import { gatherConfig } from "graphile-build";
 
 declare global {
   namespace GraphileBuild {
@@ -148,11 +148,18 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           case "unqualified": {
             // strip the schema
             const [, ...partsWithoutSchema] = parts;
-            return sql.identifier(...partsWithoutSchema);
+            return EXPORTABLE(
+              (partsWithoutSchema, sql) =>
+                sql.identifier(...partsWithoutSchema),
+              [partsWithoutSchema, sql],
+            );
           }
           case "qualified":
           case undefined: {
-            return sql.identifier(...parts);
+            return EXPORTABLE(
+              (parts, sql) => sql.identifier(...parts),
+              [parts, sql],
+            );
           }
           default: {
             throw new Error(
