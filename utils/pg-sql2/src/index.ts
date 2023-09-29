@@ -201,7 +201,8 @@ function makeRawNode(text: string, exportName?: string): SQLRawNode {
   if (exportName) {
     exportAs(newNode, exportName);
   }
-  Object.freeze(newNode);
+  // Cannot freeze here, otherwise the SQL node cannot be marked EXPORTABLE later. Maybe wait a tick?
+  // Object.freeze(newNode);
   CACHE_RAW_NODES.set(text, newNode);
   return newNode;
 }

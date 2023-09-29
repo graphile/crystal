@@ -1,4 +1,3 @@
-import "graphile-build";
 import "./PgTablesPlugin.js";
 import "../interfaces.js";
 import "graphile-config";
@@ -14,6 +13,8 @@ import type {
 } from "@dataplan/pg";
 import * as dataplanPg from "@dataplan/pg";
 import type { GraphQLType } from "grafast/graphql";
+import { EXPORTABLE, gatherConfig } from "graphile-build";
+import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import { getBehavior } from "../behavior.js";
@@ -114,6 +115,22 @@ declare global {
       pgCodecRef: PgCodecRef;
       pgRefDefinition: PgRefDefinition;
     }
+    interface GatherOptions {
+      /** Set to 'unqualified' to omit the schema name from table, function, and type identifiers */
+      pgIdentifiers?: "qualified" | "unqualified";
+    }
+  }
+
+  namespace GraphileConfig {
+    interface GatherHelpers {
+      pgBasics: {
+        /**
+         * Create an SQL identifier from the given parts; skipping the very
+         * first part (schema) if pgIdentifiers is set to 'unqualified'
+         */
+        identifier(...parts: string[]): SQL;
+      };
+    }
   }
 }
 
@@ -122,6 +139,37 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
   description:
     "Basic utilities required by many other graphile-build-pg plugins.",
   version: version,
+
+  gather: gatherConfig({
+    namespace: "pgBasics",
+    helpers: {
+      identifier(info, ...parts) {
+        switch (info.options.pgIdentifiers) {
+          case "unqualified": {
+            // strip the schema
+            const [, ...partsWithoutSchema] = parts;
+            return EXPORTABLE(
+              (partsWithoutSchema, sql) =>
+                sql.identifier(...partsWithoutSchema),
+              [partsWithoutSchema, sql],
+            );
+          }
+          case "qualified":
+          case undefined: {
+            return EXPORTABLE(
+              (parts, sql) => sql.identifier(...parts),
+              [parts, sql],
+            );
+          }
+          default: {
+            throw new Error(
+              `Setting preset.gather.pgIdentifiers had unsupported value '${info.options.pgIdentifiers}'; please use a supported value: 'qualified' or 'unqualified'.`,
+            );
+          }
+        }
+      },
+    },
+  }),
 
   schema: {
     globalBehavior: "connection -list",
