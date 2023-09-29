@@ -831,3 +831,89 @@ insert into nested_arrays.t
   (2, '{"{\"(2,3,4,5)\"}","{\"(6,7,8,9)\"}","{}","{}","{}","{}","{}","{}"}');
 
 alter sequence nested_arrays.t_k_seq restart with 3;
+
+truncate composite_domains.posts restart identity;
+
+insert into composite_domains.posts (user_id, content, thread_content, created_at)
+  values (
+    1,
+    (
+      ARRAY[
+        ARRAY[
+          (
+            'TEXT'::composite_domains.user_update_line_node_type,
+            'blah1'::composite_domains.line_node_text
+          )::composite_domains.user_update_content_line_node,
+          (
+            'MENTION'::composite_domains.user_update_line_node_type,
+            'blah2'::composite_domains.line_node_text
+          )::composite_domains.user_update_content_line_node
+        ]::composite_domains.user_update_content_line,
+        ARRAY[
+          (
+            'TEXT'::composite_domains.user_update_line_node_type,
+            'blah3'::composite_domains.line_node_text
+          )::composite_domains.user_update_content_line_node,
+          (
+            'MENTION'::composite_domains.user_update_line_node_type,
+            'blah4'::composite_domains.line_node_text
+          )::composite_domains.user_update_content_line_node
+        ]::composite_domains.user_update_content_line
+      ]::composite_domains.user_update_content_line[],
+      'https://placekitten.com/200/300'
+    )::composite_domains.user_update_content,
+    ARRAY[
+    (
+      ARRAY[
+        ARRAY[
+          (
+            'TEXT'::composite_domains.user_update_line_node_type,
+            'blah5'::composite_domains.line_node_text
+          )::composite_domains.user_update_content_line_node,
+          (
+            'MENTION'::composite_domains.user_update_line_node_type,
+            'blah6'::composite_domains.line_node_text
+          )::composite_domains.user_update_content_line_node
+        ]::composite_domains.user_update_content_line,
+        ARRAY[
+          (
+            'TEXT'::composite_domains.user_update_line_node_type,
+            'blah7'::composite_domains.line_node_text
+          )::composite_domains.user_update_content_line_node,
+          (
+            'MENTION'::composite_domains.user_update_line_node_type,
+            'blah8'::composite_domains.line_node_text
+          )::composite_domains.user_update_content_line_node
+        ]::composite_domains.user_update_content_line
+      ]::composite_domains.user_update_content_line[],
+      'https://placekitten.com/200/300'
+    )::composite_domains.user_update_content,
+    (
+      ARRAY[
+        ARRAY[
+          (
+            'TEXT'::composite_domains.user_update_line_node_type,
+            'blah9'::composite_domains.line_node_text
+          )::composite_domains.user_update_content_line_node,
+          (
+            'MENTION'::composite_domains.user_update_line_node_type,
+            'blah10'::composite_domains.line_node_text
+          )::composite_domains.user_update_content_line_node
+        ]::composite_domains.user_update_content_line,
+        ARRAY[
+          (
+            'TEXT'::composite_domains.user_update_line_node_type,
+            'blah11'::composite_domains.line_node_text
+          )::composite_domains.user_update_content_line_node,
+          (
+            'MENTION'::composite_domains.user_update_line_node_type,
+            'blah12'::composite_domains.line_node_text
+          )::composite_domains.user_update_content_line_node
+        ]::composite_domains.user_update_content_line
+      ]::composite_domains.user_update_content_line[],
+      'https://placekitten.com/200/300'
+    )::composite_domains.user_update_content
+
+    ]::composite_domains.user_update_content[],
+    now()
+  );
