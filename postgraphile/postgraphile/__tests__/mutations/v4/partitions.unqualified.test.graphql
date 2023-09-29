@@ -1,5 +1,7 @@
 ## expect(errors).toBeFalsy();
 #> schema: ["partitions"]
+#> search_path: "partitions"
+#> pgIdentifiers: 'unqualified'
 #> subscriptions: true
 mutation {
   createMeasurement(

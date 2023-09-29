@@ -174,6 +174,8 @@ export async function runTestQuery(
     setupSql?: string;
     cleanupSql?: string;
     extends?: string | string[];
+    pgIdentifiers?: "qualified" | "unqualified";
+    search_path?: string;
   },
   options: {
     callback?: (
@@ -194,7 +196,14 @@ export async function runTestQuery(
   queries: PgClientQuery[];
   extensions?: any;
 }> {
-  const { variableValues, graphileBuildOptions, setupSql, cleanupSql } = config;
+  const {
+    variableValues,
+    graphileBuildOptions,
+    setupSql,
+    cleanupSql,
+    pgIdentifiers,
+    search_path,
+  } = config;
   const { path } = options;
 
   const queries: PgClientQuery[] = [];
@@ -243,7 +252,12 @@ export async function runTestQuery(
             ? () => ({
                 role: "postgraphile_test_visitor",
                 "jwt.claims.user_id": "3",
+                search_path,
               })
+            : search_path
+            ? {
+                search_path,
+              }
             : undefined,
         schemas: schemas,
         adaptorSettings: {
@@ -255,6 +269,9 @@ export async function runTestQuery(
       pgForbidSetofFunctionsToReturnNull:
         config.setofFunctionsContainNulls === false,
       ...graphileBuildOptions,
+    },
+    gather: {
+      pgIdentifiers,
     },
     grafast: {
       explain: ["plan"],
