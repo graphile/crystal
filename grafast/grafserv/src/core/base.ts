@@ -1,6 +1,6 @@
 import EventEmitter from "eventemitter3";
 import type { PromiseOrDirect, TypedEventEmitter } from "grafast";
-import { isPromiseLike, SafeError, stringifyPayload } from "grafast";
+import { isPromiseLike, stringifyPayload } from "grafast";
 import type { GraphQLSchema } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
 import { resolvePresets } from "graphile-config";
@@ -20,55 +20,12 @@ import type {
 } from "../interfaces.js";
 import { mapIterator } from "../mapIterator.js";
 import { makeGraphiQLHandler } from "../middleware/graphiql.js";
-import { APPLICATION_JSON, makeGraphQLHandler } from "../middleware/graphql.js";
+import { makeGraphQLHandler } from "../middleware/graphql.js";
 import type { OptionsFromConfig } from "../options.js";
 import { optionsFromConfig } from "../options.js";
 import { handleErrors, normalizeRequest } from "../utils.js";
 
-const { GraphQLError, isSchema, validateSchema } = graphql;
-
-function handleGraphQLHandlerError(
-  request: NormalizedRequestDigest,
-  dynamicOptions: OptionsFromConfig,
-  e: Error | SafeError,
-) {
-  if (e instanceof SafeError) {
-    return {
-      type: "graphql",
-      request,
-      dynamicOptions,
-      payload: {
-        errors: [
-          new GraphQLError(e.message, null, null, null, null, e, e.extensions),
-        ],
-      },
-      statusCode: e.extensions?.statusCode ?? 500,
-      // FIXME: we should respect the `accept` header here if we can.
-      contentType: APPLICATION_JSON,
-    } as HandlerResult;
-  }
-  // TODO: if a GraphQLError is thrown... WTF?
-  const graphqlError =
-    e instanceof GraphQLError
-      ? e
-      : new GraphQLError("Unknown error occurred", null, null, null, null, e);
-  // Special error handling for GraphQL route
-  console.error(
-    "An error occurred whilst attempting to handle the GraphQL request:",
-  );
-  console.dir(e);
-  return {
-    type: "graphql",
-    request,
-    dynamicOptions,
-    payload: { errors: [graphqlError] },
-    statusCode:
-      (graphqlError.extensions?.statusCode as number | undefined) ?? 500,
-    // Fall back to application/json; this is when an unexpected error happens
-    // so it shouldn't be hit.
-    contentType: APPLICATION_JSON,
-  } as HandlerResult;
-}
+const { isSchema, validateSchema } = graphql;
 
 export class GrafservBase {
   private releaseHandlers: Array<() => PromiseOrDirect<void>> = [];
@@ -121,9 +78,7 @@ export class GrafservBase {
     try {
       if (request.path === dynamicOptions.graphqlPath) {
         if (forceCORS) return optionsResponse(request, this.dynamicOptions);
-        return this.graphqlHandler(request, this.graphiqlHandler).catch((e) =>
-          handleGraphQLHandlerError(request, dynamicOptions, e),
-        );
+        return this.graphqlHandler(request, this.graphiqlHandler);
       }
 
       if (

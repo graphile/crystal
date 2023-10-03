@@ -181,7 +181,7 @@ export function httpError(statusCode: number, message: string): SafeError {
 export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
   const {
     resolvedPreset,
-    dynamicOptions: { maskExecutionResult },
+    dynamicOptions: { maskError },
   } = instance;
 
   const hooks = getGrafservHooks(resolvedPreset);
@@ -193,77 +193,97 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
 
   return {
     async onSubscribe(ctx, message) {
-      // Get up to date schema, in case we're in watch mode
-      const schemaOrPromise = instance.getSchema();
-      if (schemaOrPromise !== latestSchemaOrPromise) {
-        if ("then" in schemaOrPromise) {
-          latestSchemaOrPromise = schemaOrPromise;
-          schemaPrepare = (async () => {
-            latestSchema = await schemaOrPromise;
+      try {
+        // Get up to date schema, in case we're in watch mode
+        const schemaOrPromise = instance.getSchema();
+        if (schemaOrPromise !== latestSchemaOrPromise) {
+          if ("then" in schemaOrPromise) {
             latestSchemaOrPromise = schemaOrPromise;
-            latestParseAndValidate = makeParseAndValidateFunction(latestSchema);
-            schemaPrepare = null;
-            return true;
-          })();
-        } else {
-          latestSchemaOrPromise = schemaOrPromise;
-          if (latestSchema === schemaOrPromise) {
-            // No action necessary
+            schemaPrepare = (async () => {
+              latestSchema = await schemaOrPromise;
+              latestSchemaOrPromise = schemaOrPromise;
+              latestParseAndValidate =
+                makeParseAndValidateFunction(latestSchema);
+              schemaPrepare = null;
+              return true;
+            })();
           } else {
-            latestSchema = schemaOrPromise;
-            latestParseAndValidate = makeParseAndValidateFunction(latestSchema);
+            latestSchemaOrPromise = schemaOrPromise;
+            if (latestSchema === schemaOrPromise) {
+              // No action necessary
+            } else {
+              latestSchema = schemaOrPromise;
+              latestParseAndValidate =
+                makeParseAndValidateFunction(latestSchema);
+            }
           }
         }
-      }
-      if (schemaPrepare !== null) {
-        const schemaReady = await Promise.race([
-          schemaPrepare,
-          sleep(instance.dynamicOptions.schemaWaitTime),
-        ]);
-        if (schemaReady !== true) {
-          // Handle missing schema
-          throw new Error(`Schema isn't ready`);
+        if (schemaPrepare !== null) {
+          const schemaReady = await Promise.race([
+            schemaPrepare,
+            sleep(instance.dynamicOptions.schemaWaitTime),
+          ]);
+          if (schemaReady !== true) {
+            // Handle missing schema
+            throw new Error(`Schema isn't ready`);
+          }
         }
+        const schema = latestSchema;
+        const parseAndValidate = latestParseAndValidate;
+
+        const parsedBody = parseGraphQLJSONBody(message.payload);
+        await hooks.process("processGraphQLRequestBody", {
+          body: parsedBody,
+          graphqlWsContext: ctx,
+        });
+
+        const { query, operationName, variableValues } =
+          validateGraphQLBody(parsedBody);
+        const { errors, document } = parseAndValidate(query);
+        if (errors !== undefined) {
+          return errors;
+        }
+        const args: ExecutionArgs = {
+          schema,
+          document,
+          rootValue: null,
+          contextValue: Object.create(null),
+          variableValues,
+          operationName,
+        };
+
+        await hookArgs(args, resolvedPreset, {
+          ws: {
+            request: (ctx.extra as Extra).request,
+            socket: (ctx.extra as Extra).socket,
+            connectionParams: ctx.connectionParams,
+          },
+        });
+
+        return args;
+      } catch (e) {
+        return [
+          new GraphQLError(
+            e.message,
+            null,
+            undefined,
+            undefined,
+            undefined,
+            e,
+            undefined,
+          ),
+        ];
       }
-      const schema = latestSchema;
-      const parseAndValidate = latestParseAndValidate;
-
-      const parsedBody = parseGraphQLJSONBody(message.payload);
-      await hooks.process("processGraphQLRequestBody", {
-        body: parsedBody,
-        graphqlWsContext: ctx,
-      });
-
-      const { query, operationName, variableValues } =
-        validateGraphQLBody(parsedBody);
-      const { errors, document } = parseAndValidate(query);
-      if (errors !== undefined) {
-        return errors;
-      }
-      const args: ExecutionArgs = {
-        schema,
-        document,
-        rootValue: null,
-        contextValue: Object.create(null),
-        variableValues,
-        operationName,
-      };
-
-      await hookArgs(args, resolvedPreset, {
-        ws: {
-          request: (ctx.extra as Extra).request,
-          socket: (ctx.extra as Extra).socket,
-          connectionParams: ctx.connectionParams,
-        },
-      });
-
-      return args;
+    },
+    // TODO: validate that this actually does mask every error
+    onError(ctx, message, errors) {
+      return errors.map(maskError);
     },
     async execute(args: ExecutionArgs) {
-      return maskExecutionResult(await execute(args, resolvedPreset));
+      return execute(args, resolvedPreset);
     },
     async subscribe(args: ExecutionArgs) {
-      return maskExecutionResult(await subscribe(args, resolvedPreset));
+      return subscribe(args, resolvedPreset);
     },
   };
 }
