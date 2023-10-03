@@ -170,6 +170,15 @@ export class StepTracker {
    * @internal
    */
   public addOutputPlan(outputPlan: OutputPlan): void {
+    if (isDev && !this.activeSteps.has(outputPlan.rootStep)) {
+      throw new Error(
+        `GrafastInternalError<84485250-c4f3-4175-ab0c-360e073fa69f>: Root step '${
+          outputPlan.rootStep
+        }' is not active; perhaps it was replaced (replacement: ${this.getStepById(
+          outputPlan.rootStep.id,
+        )})`,
+      );
+    }
     this.allOutputPlans.push(outputPlan);
     const store = this.outputPlansByRootStep.get(outputPlan.rootStep);
     if (store !== undefined) {
