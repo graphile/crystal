@@ -11956,7 +11956,7 @@ __metadata:
     tslib: "npm:^2.6.2"
     typescript: "npm:^5.2.2"
   peerDependencies:
-    grafast: "workspace:^0.0.1-beta.8"
+    grafast: "workspace:^"
     pg-sql2: "workspace:^5.0.0-beta.3"
   peerDependenciesMeta:
     pg-sql2:
