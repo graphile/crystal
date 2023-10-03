@@ -30,10 +30,10 @@ export const pgl = postgraphile(preset);
 should import the `grafserv` function from the relevant grafserv subpath:
 
 ```js
-import { grafserv } from "grafserv/express/v4";
-// OR: import { grafserv } from "grafserv/node";
-// OR: import { grafserv } from "grafserv/koa/v2";
-// OR: import { grafserv } from "grafserv/fastify/v4";
+import { grafserv } from "postgraphile/grafserv/express/v4";
+// OR: import { grafserv } from "postgraphile/grafserv/node";
+// OR: import { grafserv } from "postgraphile/grafserv/koa/v2";
+// OR: import { grafserv } from "postgraphile/grafserv/fastify/v4";
 ```
 
 Then create your `serv` instance by passing this to the `pgl.createServ()`
@@ -60,7 +60,7 @@ Here's an example with Node's HTTP server:
 
 ```js title="example-node.js"
 import { createServer } from "node:http";
-import { grafserv } from "grafserv/node";
+import { grafserv } from "postgraphile/grafserv/node";
 import { pgl } from "./pgl.js";
 
 const serv = pgl.createServ(grafserv);
@@ -85,7 +85,7 @@ And an example for Express:
 ```js title="example-express.js"
 import { createServer } from "node:http";
 import express from "express";
-import { grafserv } from "grafserv/express/v4";
+import { grafserv } from "postgraphile/grafserv/express/v4";
 import { pgl } from "./pgl.js";
 
 const serv = pgl.createServ(grafserv);
