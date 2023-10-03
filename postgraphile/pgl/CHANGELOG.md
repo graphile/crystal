@@ -1,5 +1,17 @@
 # pgl
 
+## 5.0.0-beta.13
+
+### Patch Changes
+
+- Updated dependencies
+  [[`2805edc68`](https://github.com/graphile/crystal/commit/2805edc68b90546bf71ffd293af4d87a79345825)]:
+  - pg-sql2@5.0.0-beta.4
+  - @dataplan/pg@0.0.1-beta.10
+  - grafast@0.1.1-beta.0
+  - graphile-build-pg@5.0.0-beta.12
+  - postgraphile@5.0.0-beta.13
+
 ## 5.0.0-beta.12
 
 ### Patch Changes

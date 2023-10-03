@@ -1,5 +1,13 @@
 # pg-sql2
 
+## 5.0.0-beta.4
+
+### Patch Changes
+
+- [`2805edc68`](https://github.com/graphile/crystal/commit/2805edc68b90546bf71ffd293af4d87a79345825)
+  Thanks [@benjie](https://github.com/benjie)! - Don't freeze object, so that it
+  can be annotated as exportable.
+
 ## 5.0.0-beta.3
 
 ### Patch Changes
