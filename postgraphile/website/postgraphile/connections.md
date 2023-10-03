@@ -42,7 +42,7 @@ like this to your preset:
 ```js title="graphile.config.mjs"
 const preset = {
   schema: {
-    globalBehavior: "-connection +list",
+    defaultBehavior: "-connection +list",
   },
 };
 ```
@@ -55,7 +55,7 @@ on a per-entity basis with [smart tags](./smart-tags.md#behavior) if you like!
 If you're comparing the performance of two GraphQL servers be sure to make sure
 the comparison is fair by using either lists on both or connections on both.
 You can have PostGraphile generate lists rather than connections by using the
-`globalBehavior` setting detailed in the advice above.
+`defaultBehavior` setting detailed in the advice above.
 
 If you read a research paper comparing performance of different GraphQL servers
 and they don't ensure basic equivalence by using either lists on both or
