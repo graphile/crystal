@@ -1625,7 +1625,33 @@ export class OperationPlan {
          * Now we need to loop through each type and plan it.
          */
         const polyBase = polymorphicPath ?? "";
+        const $oldStep = $step;
         for (const type of allPossibleObjectTypes) {
+          /* TODO: this $oldStep / $step dance turned out to be necessary
+           * because `$step` was being replaced in the following query against
+           * the pggql_test `polymorpic` schema; but I'm not sure this is the
+           * right behavior - shouldn't deduplication have been temporarily
+           * disabled during this?
+           *
+           * ```graphql
+           * {
+           *   allSingleTableItems {
+           *     nodes {
+           *       id
+           *       type
+           *       singleTableItemsByParentIdList {
+           *         id
+           *         position
+           *       }
+           *     }
+           *   }
+           * }
+           * ```
+           */
+          const $step = this.stepTracker.getStepById(
+            $oldStep.id,
+          ) as typeof $oldStep;
+
           // Bit of a hack, but saves passing it around through all the arguments
           const newPolymorphicPath = `${polyBase}>${type.name}`;
           polymorphicLayerPlan.reason.polymorphicPaths.add(newPolymorphicPath);
@@ -3038,7 +3064,9 @@ export class OperationPlan {
         }
         if (isDev && this.stepTracker.getStepById(dep.id) !== dep) {
           throw new Error(
-            `Plan mismatch - ${dep} != ${this.stepTracker.getStepById(dep.id)}`,
+            `GrafastInternalError<b291b110-396a-4c9c-814a-5466af3c50e8>: Plan mismatch; are we using a replaced step? Step ID: ${
+              dep.id
+            }; step: ${dep}; stepById: ${this.stepTracker.getStepById(dep.id)}`,
           );
         }
         currentLayerPlan.copyStepIds.push(dep.id);
