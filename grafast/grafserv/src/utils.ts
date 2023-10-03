@@ -263,25 +263,27 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
         return args;
       } catch (e) {
         return [
-          maskError(
-            new GraphQLError(
-              e.message,
-              null,
-              undefined,
-              undefined,
-              undefined,
-              e,
-              undefined,
-            ),
+          new GraphQLError(
+            e.message,
+            null,
+            undefined,
+            undefined,
+            undefined,
+            e,
+            undefined,
           ),
         ];
       }
     },
+    // TODO: validate that this actually does mask every error
+    onError(ctx, message, errors) {
+      return errors.map(maskError);
+    },
     async execute(args: ExecutionArgs) {
-      return maskExecutionResult(await execute(args, resolvedPreset));
+      return execute(args, resolvedPreset);
     },
     async subscribe(args: ExecutionArgs) {
-      return maskExecutionResult(await subscribe(args, resolvedPreset));
+      return subscribe(args, resolvedPreset);
     },
   };
 }
