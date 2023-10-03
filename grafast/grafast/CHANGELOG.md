@@ -1,5 +1,24 @@
 # grafast
 
+## 0.1.1-beta.0
+
+### Patch Changes
+
+- [#1779](https://github.com/graphile/crystal/pull/1779)
+  [`4a4d26d87`](https://github.com/graphile/crystal/commit/4a4d26d87ce74589429b8ca5126a7bfdf30351b8)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a polymorphic planning
+  issue.
+
+- [#1778](https://github.com/graphile/crystal/pull/1778)
+  [`b2bce88da`](https://github.com/graphile/crystal/commit/b2bce88da26c7a8965468be16fc2d935eadd3434)
+  Thanks [@benjie](https://github.com/benjie)! - Enable source maps in modules
+  where it was disabled.
+
+- [#1780](https://github.com/graphile/crystal/pull/1780)
+  [`861a8a306`](https://github.com/graphile/crystal/commit/861a8a306ef42a821da19e77903ddd7e8130bfb3)
+  Thanks [@benjie](https://github.com/benjie)! - Fix an issue with side effect
+  plans and polymorphism
+
 ## 0.0.1-beta.8
 
 ### Patch Changes

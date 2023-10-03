@@ -1,5 +1,27 @@
 # @dataplan/pg
 
+## 0.0.1-beta.9
+
+### Patch Changes
+
+- [#1778](https://github.com/graphile/crystal/pull/1778)
+  [`b2bce88da`](https://github.com/graphile/crystal/commit/b2bce88da26c7a8965468be16fc2d935eadd3434)
+  Thanks [@benjie](https://github.com/benjie)! - Enable source maps in modules
+  where it was disabled.
+
+- [#1770](https://github.com/graphile/crystal/pull/1770)
+  [`9a84bc6dd`](https://github.com/graphile/crystal/commit/9a84bc6dd5b33c1919f75f867df1f61c78686695)
+  Thanks [@benjie](https://github.com/benjie)! - Fix issues around enum tables:
+  indicate when an enum table codec replaces a regular attribute codec, expose
+  helpers for working with enum tables, and don't exclude enum table references
+  when using the Relay preset.
+- Updated dependencies
+  [[`4a4d26d87`](https://github.com/graphile/crystal/commit/4a4d26d87ce74589429b8ca5126a7bfdf30351b8),
+  [`b2bce88da`](https://github.com/graphile/crystal/commit/b2bce88da26c7a8965468be16fc2d935eadd3434),
+  [`861a8a306`](https://github.com/graphile/crystal/commit/861a8a306ef42a821da19e77903ddd7e8130bfb3)]:
+  - grafast@0.1.1-beta.0
+  - @dataplan/json@0.0.1-beta.9
+
 ## 0.0.1-beta.8
 
 ### Patch Changes

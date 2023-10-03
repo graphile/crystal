@@ -1,5 +1,56 @@
 # postgraphile
 
+## 5.0.0-beta.12
+
+### Patch Changes
+
+- [#1779](https://github.com/graphile/crystal/pull/1779)
+  [`4a4d26d87`](https://github.com/graphile/crystal/commit/4a4d26d87ce74589429b8ca5126a7bfdf30351b8)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a polymorphic planning
+  issue.
+
+- [#1778](https://github.com/graphile/crystal/pull/1778)
+  [`b2bce88da`](https://github.com/graphile/crystal/commit/b2bce88da26c7a8965468be16fc2d935eadd3434)
+  Thanks [@benjie](https://github.com/benjie)! - Enable source maps in modules
+  where it was disabled.
+
+- [#1780](https://github.com/graphile/crystal/pull/1780)
+  [`861a8a306`](https://github.com/graphile/crystal/commit/861a8a306ef42a821da19e77903ddd7e8130bfb3)
+  Thanks [@benjie](https://github.com/benjie)! - Fix an issue with side effect
+  plans and polymorphism
+
+- [#1770](https://github.com/graphile/crystal/pull/1770)
+  [`9a84bc6dd`](https://github.com/graphile/crystal/commit/9a84bc6dd5b33c1919f75f867df1f61c78686695)
+  Thanks [@benjie](https://github.com/benjie)! - Fix issues around enum tables:
+  indicate when an enum table codec replaces a regular attribute codec, expose
+  helpers for working with enum tables, and don't exclude enum table references
+  when using the Relay preset.
+
+- [#1774](https://github.com/graphile/crystal/pull/1774)
+  [`7d55d2c34`](https://github.com/graphile/crystal/commit/7d55d2c343880d7e665f9743f6ae7e39343c22cc)
+  Thanks [@benjie](https://github.com/benjie)! - Add
+  `preset.gather.pgIdentifiers` setting (values: 'qualified' or 'unqualified');
+  if set to 'unqualified' then we will not add the schema name to table or
+  function identifiers - it's up to you to ensure they're present in the
+  `search_path` (which you can set via `pgSettings` on a per-request basis).
+- Updated dependencies
+  [[`eeccfd675`](https://github.com/graphile/crystal/commit/eeccfd67585a79330197886fdc98335562e08c0a),
+  [`4a4d26d87`](https://github.com/graphile/crystal/commit/4a4d26d87ce74589429b8ca5126a7bfdf30351b8),
+  [`b2bce88da`](https://github.com/graphile/crystal/commit/b2bce88da26c7a8965468be16fc2d935eadd3434),
+  [`861a8a306`](https://github.com/graphile/crystal/commit/861a8a306ef42a821da19e77903ddd7e8130bfb3),
+  [`9a84bc6dd`](https://github.com/graphile/crystal/commit/9a84bc6dd5b33c1919f75f867df1f61c78686695),
+  [`b728d7fb9`](https://github.com/graphile/crystal/commit/b728d7fb91eb29fbb21d955af5fd9cb4278f6222),
+  [`264158f03`](https://github.com/graphile/crystal/commit/264158f034e7b6ebc1a9a94d92b7e4fb746c5fac),
+  [`2d31f058b`](https://github.com/graphile/crystal/commit/2d31f058b34d3f5ef11699582b9a4960a4ebc471),
+  [`7d55d2c34`](https://github.com/graphile/crystal/commit/7d55d2c343880d7e665f9743f6ae7e39343c22cc)]:
+  - graphile-utils@5.0.0-beta.11
+  - grafast@0.1.1-beta.0
+  - @dataplan/json@0.0.1-beta.9
+  - @dataplan/pg@0.0.1-beta.9
+  - graphile-build-pg@5.0.0-beta.11
+  - graphile-build@5.0.0-beta.10
+  - grafserv@0.1.1-beta.0
+
 ## 5.0.0-beta.11
 
 ### Patch Changes

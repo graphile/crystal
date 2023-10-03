@@ -1,5 +1,38 @@
 # graphile-build-pg
 
+## 5.0.0-beta.11
+
+### Patch Changes
+
+- [#1770](https://github.com/graphile/crystal/pull/1770)
+  [`9a84bc6dd`](https://github.com/graphile/crystal/commit/9a84bc6dd5b33c1919f75f867df1f61c78686695)
+  Thanks [@benjie](https://github.com/benjie)! - Fix issues around enum tables:
+  indicate when an enum table codec replaces a regular attribute codec, expose
+  helpers for working with enum tables, and don't exclude enum table references
+  when using the Relay preset.
+
+- [#1769](https://github.com/graphile/crystal/pull/1769)
+  [`b728d7fb9`](https://github.com/graphile/crystal/commit/b728d7fb91eb29fbb21d955af5fd9cb4278f6222)
+  Thanks [@benjie](https://github.com/benjie)! - Fix error message when ref is
+  used with no foreign key.
+
+- [#1774](https://github.com/graphile/crystal/pull/1774)
+  [`7d55d2c34`](https://github.com/graphile/crystal/commit/7d55d2c343880d7e665f9743f6ae7e39343c22cc)
+  Thanks [@benjie](https://github.com/benjie)! - Add
+  `preset.gather.pgIdentifiers` setting (values: 'qualified' or 'unqualified');
+  if set to 'unqualified' then we will not add the schema name to table or
+  function identifiers - it's up to you to ensure they're present in the
+  `search_path` (which you can set via `pgSettings` on a per-request basis).
+- Updated dependencies
+  [[`4a4d26d87`](https://github.com/graphile/crystal/commit/4a4d26d87ce74589429b8ca5126a7bfdf30351b8),
+  [`b2bce88da`](https://github.com/graphile/crystal/commit/b2bce88da26c7a8965468be16fc2d935eadd3434),
+  [`861a8a306`](https://github.com/graphile/crystal/commit/861a8a306ef42a821da19e77903ddd7e8130bfb3),
+  [`9a84bc6dd`](https://github.com/graphile/crystal/commit/9a84bc6dd5b33c1919f75f867df1f61c78686695),
+  [`b728d7fb9`](https://github.com/graphile/crystal/commit/b728d7fb91eb29fbb21d955af5fd9cb4278f6222)]:
+  - grafast@0.1.1-beta.0
+  - @dataplan/pg@0.0.1-beta.9
+  - graphile-build@5.0.0-beta.10
+
 ## 5.0.0-beta.10
 
 ### Patch Changes

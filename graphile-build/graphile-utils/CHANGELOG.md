@@ -1,5 +1,30 @@
 # graphile-utils
 
+## 5.0.0-beta.11
+
+### Patch Changes
+
+- [#1760](https://github.com/graphile/crystal/pull/1760)
+  [`eeccfd675`](https://github.com/graphile/crystal/commit/eeccfd67585a79330197886fdc98335562e08c0a)
+  Thanks [@benjie](https://github.com/benjie)! - makeExtendSchemaPlugin now
+  support specifying scalar details via resolvers/plans
+
+- [#1768](https://github.com/graphile/crystal/pull/1768)
+  [`264158f03`](https://github.com/graphile/crystal/commit/264158f034e7b6ebc1a9a94d92b7e4fb746c5fac)
+  Thanks [@benjie](https://github.com/benjie)! - Fix `type Foo extends Bar`
+  syntax in makeExtendSchemaPlugin - no longer throws
+  `getTypeByName before 'init' phase` error.
+- Updated dependencies
+  [[`4a4d26d87`](https://github.com/graphile/crystal/commit/4a4d26d87ce74589429b8ca5126a7bfdf30351b8),
+  [`b2bce88da`](https://github.com/graphile/crystal/commit/b2bce88da26c7a8965468be16fc2d935eadd3434),
+  [`861a8a306`](https://github.com/graphile/crystal/commit/861a8a306ef42a821da19e77903ddd7e8130bfb3),
+  [`9a84bc6dd`](https://github.com/graphile/crystal/commit/9a84bc6dd5b33c1919f75f867df1f61c78686695),
+  [`b728d7fb9`](https://github.com/graphile/crystal/commit/b728d7fb91eb29fbb21d955af5fd9cb4278f6222),
+  [`7d55d2c34`](https://github.com/graphile/crystal/commit/7d55d2c343880d7e665f9743f6ae7e39343c22cc)]:
+  - grafast@0.1.1-beta.0
+  - graphile-build-pg@5.0.0-beta.11
+  - graphile-build@5.0.0-beta.10
+
 ## 5.0.0-beta.10
 
 ### Patch Changes
