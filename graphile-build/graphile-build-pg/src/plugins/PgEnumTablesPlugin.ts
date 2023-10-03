@@ -384,11 +384,6 @@ Original error: ${e.message}
         const { attribute, pgAttribute } = event;
         const replacementCodec = info.state.codecByPgAttribute.get(pgAttribute);
         if (replacementCodec) {
-          console.log(
-            `${pgAttribute.getClass()!.relname}.${pgAttribute.attname} : ${
-              replacementCodec.name
-            }`,
-          );
           attribute.codec = replacementCodec;
         }
       },
