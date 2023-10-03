@@ -3,7 +3,7 @@
   "changelog": [
     "@changesets/changelog-github",
     {
-      "repo": "benjie/crystal"
+      "repo": "graphile/crystal"
     }
   ],
   "//": {
