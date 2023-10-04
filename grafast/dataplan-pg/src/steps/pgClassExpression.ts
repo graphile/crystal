@@ -3,11 +3,11 @@ import { access, exportAs, UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgResource } from "../datasource.js";
+import type { AnyPgResource, PgResource } from "../datasource.js";
 import type {
-  GetPgCodecAttributes,
+  AnyPgCodec,
   PgClassSingleStep,
-  PgCodec,
+  PgCodecAttributes,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import { PgDeleteSingleStep } from "./pgDeleteSingle.js";
@@ -15,6 +15,7 @@ import { PgInsertSingleStep } from "./pgInsertSingle.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
 import { PgUnionAllSingleStep } from "./pgUnionAll.js";
 import { PgUpdateSingleStep } from "./pgUpdateSingle.js";
+import { PgCodecAttributeCodec, PgCodecAttributeName } from "../codecs.js";
 
 // const debugPlan = debugFactory("@dataplan/pg:PgClassExpressionStep:plan");
 // const debugExecute = debugFactory( "@dataplan/pg:PgClassExpressionStep:execute",);
@@ -28,8 +29,8 @@ import { PgUpdateSingleStep } from "./pgUpdateSingle.js";
  * of another layer of plan.
  */
 export class PgClassExpressionStep<
-    TExpressionCodec extends PgCodec,
-    TResource extends PgResource<any, any, any, any, any>,
+    TExpressionCodec extends AnyPgCodec,
+    TResource extends AnyPgResource,
   >
   extends UnbatchedExecutableStep<any>
   implements PgTypedExecutableStep<TExpressionCodec>
@@ -160,10 +161,14 @@ export class PgClassExpressionStep<
 
     Instead, we'll lie and ignore the `AccessStep` case
   */
-  public get<TAttr extends keyof GetPgCodecAttributes<TExpressionCodec>>(
+  public get<
+    TAttr extends PgCodecAttributeName<PgCodecAttributes<TExpressionCodec>>,
+  >(
     attributeName: TAttr,
   ): PgClassExpressionStep<
-    GetPgCodecAttributes<TExpressionCodec>[TAttr]["codec"],
+    PgCodecAttributeCodec<
+      Extract<PgCodecAttributes<TExpressionCodec>, { name: TAttr }>
+    >,
     TResource
   > {
     const attributes = this.pgCodec.attributes;
@@ -171,7 +176,7 @@ export class PgClassExpressionStep<
       // Fall back to access, since this could be a 'point' or similar type that doesn't have attributes in Postgres but does in JS.
       return access(this, attributeName) as any;
     }
-    const attribute = attributes[attributeName as string];
+    const attribute = attributes[attributeName];
     if (!attribute) {
       throw new Error(
         `Cannot call ${this}.get('${String(
@@ -197,8 +202,8 @@ export class PgClassExpressionStep<
     }
     const sqlExpr = pgClassExpression(this.getParentStep(), attribute.codec);
     return sqlExpr`${sql.parens(this.expression, true)}.${sql.identifier(
-      attributeName as string,
-    )}` as any;
+      attributeName,
+    )}`;
   }
 
   public getParentStep(): PgClassSingleStep<TResource> | PgUnionAllSingleStep {
@@ -265,8 +270,8 @@ export class PgClassExpressionStep<
  * that will be selected.
  */
 function pgClassExpression<
-  TExpressionCodec extends PgCodec,
-  TResource extends PgResource<any, any, any, any, any>,
+  TExpressionCodec extends AnyPgCodec,
+  TResource extends AnyPgResource,
 >(
   table: PgClassSingleStep<TResource> | PgUnionAllSingleStep,
   codec: TExpressionCodec,

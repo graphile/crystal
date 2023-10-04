@@ -1,6 +1,6 @@
 import "graphile-build";
 
-import type { PgCodec, PgCodecRelation, PgResource } from "@dataplan/pg";
+import type { DefaultPgCodec, DefaultPgResource } from "@dataplan/pg";
 
 /**
  * Metadata for a specific PgCodec
@@ -18,12 +18,12 @@ export interface PgCodecMeta {
 /**
  * A map from PgCodec to its associated metadata.
  */
-export type PgCodecMetaLookup = Map<PgCodec, PgCodecMeta>;
+export type PgCodecMetaLookup = Map<DefaultPgCodec, PgCodecMeta>;
 
 /**
  * Creates an empty meta object for the given codec.
  */
-export function makePgCodecMeta(_codec: PgCodec): PgCodecMeta {
+export function makePgCodecMeta(_codec: DefaultPgCodec): PgCodecMeta {
   return {
     typeNameBySituation: Object.create(null),
   };
@@ -40,8 +40,8 @@ export function getCodecMetaLookupFromInput(
   input: GraphileBuild.BuildInput,
 ): PgCodecMetaLookup {
   const metaLookup: PgCodecMetaLookup = new Map();
-  const seenResources = new Set<PgResource>();
-  for (const codec of Object.values(input.pgRegistry.pgCodecs) as PgCodec[]) {
+  const seenResources = new Set<DefaultPgResource>();
+  for (const codec of Object.values(input.pgRegistry.pgCodecs)) {
     walkCodec(codec, metaLookup);
   }
   for (const resource of Object.values(input.pgRegistry.pgResources)) {
@@ -57,9 +57,9 @@ export function getCodecMetaLookupFromInput(
  * @internal
  */
 function walkResource(
-  resource: PgResource,
+  resource: DefaultPgResource,
   metaLookup: PgCodecMetaLookup,
-  seenResources: Set<PgResource>,
+  seenResources: Set<DefaultPgResource>,
 ): void {
   if (seenResources.has(resource)) {
     return;
@@ -68,7 +68,7 @@ function walkResource(
   if (!metaLookup.has(resource.codec)) {
     walkCodec(resource.codec, metaLookup);
   }
-  const relations = resource.getRelations() as Record<string, PgCodecRelation>;
+  const relations = resource.getRelations();
   if (relations) {
     for (const relationshipName in relations) {
       walkResource(
@@ -86,7 +86,7 @@ function walkResource(
  *
  * @internal
  */
-function walkCodec(codec: PgCodec, metaLookup: PgCodecMetaLookup): void {
+function walkCodec(codec: DefaultPgCodec, metaLookup: PgCodecMetaLookup): void {
   if (metaLookup.has(codec)) {
     return;
   }

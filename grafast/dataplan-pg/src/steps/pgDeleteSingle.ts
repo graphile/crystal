@@ -7,18 +7,22 @@ import { ExecutableStep, exportAs, isDev, SafeError } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgCodecAttribute } from "../codecs.js";
-import type { PgResource, PgResourceUnique } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
+  AnyPgCodec,
   GetPgResourceAttributes,
   GetPgResourceCodec,
   GetPgResourceUniques,
-  PgCodec,
   PlanByUniques,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
+import {
+  AnyPgResource,
+  DefaultPgResource,
+  PgResourceUnique,
+} from "../datasource.js";
+import { PgCodecAttributeCodec, PgCodecAttributeName } from "../codecs.js";
 
 type QueryValueDetailsBySymbol = Map<
   symbol,
@@ -36,11 +40,14 @@ interface PgDeletePlanFinalizeResults {
   queryValueDetailsBySymbol: QueryValueDetailsBySymbol;
 }
 
+export interface AnyPgDeleteSingleStep extends PgDeleteSingleStep<any> {}
+export interface DefaultPgDeleteSingleStep
+  extends PgDeleteSingleStep<DefaultPgResource> {}
 /**
  * Deletes a row in the database, can return columns from the deleted row.
  */
 export class PgDeleteSingleStep<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends AnyPgResource,
 > extends ExecutableStep<unknown[]> {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -75,9 +82,9 @@ export class PgDeleteSingleStep<
    * The attributes and their dependency ids for us to find the record by.
    */
   private getBys: Array<{
-    name: keyof GetPgResourceAttributes<TResource>;
+    name: PgCodecAttributeName<GetPgResourceAttributes<TResource>>;
     depId: number;
-    pgCodec: PgCodec;
+    pgCodec: AnyPgCodec;
   }> = [];
 
   /**
@@ -117,14 +124,18 @@ export class PgDeleteSingleStep<
     this.alias = sql.identifier(this.symbol);
     this.contextId = this.addDependency(this.resource.executor.context());
 
-    const keys: ReadonlyArray<keyof GetPgResourceAttributes<TResource>> = getBy
-      ? (Object.keys(getBy) as Array<keyof GetPgResourceAttributes<TResource>>)
+    const keys = getBy
+      ? (Object.keys(getBy) as Array<
+          PgCodecAttributeName<GetPgResourceAttributes<TResource>>
+        >)
       : [];
 
     if (
-      !(this.resource.uniques as PgResourceUnique[]).some((uniq) =>
-        uniq.attributes.every((key) => keys.includes(key as any)),
-      )
+      !(
+        this.resource.uniques as Array<
+          PgResourceUnique<GetPgResourceAttributes<TResource>>
+        >
+      ).some((uniq) => uniq.attributes.every((key) => keys.includes(key)))
     ) {
       throw new Error(
         `Attempted to build 'PgDeleteSingleStep' with a non-unique getBy keys ('${keys.join(
@@ -145,13 +156,13 @@ export class PgDeleteSingleStep<
           );
         }
       }
-      const value = (getBy as any)![name as any];
+      const value = getBy[name];
       const depId = this.addDependency(value);
-      const attribute = (
-        this.resource.codec.attributes as GetPgResourceAttributes<TResource>
-      )[name];
-      const pgCodec = attribute.codec;
-      this.getBys.push({ name, depId, pgCodec });
+      const attribute = this.resource.codec.attributes?.[name];
+      if (attribute) {
+        const pgCodec = attribute.codec;
+        this.getBys.push({ name, depId, pgCodec });
+      }
     });
   }
 
@@ -163,14 +174,15 @@ export class PgDeleteSingleStep<
    * Returns a plan representing a named attribute (e.g. column) from the newly
    * deleteed row.
    */
-  get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
+  get<TAttr extends PgCodecAttributeName<GetPgResourceAttributes<TResource>>>(
     attr: TAttr,
   ): PgClassExpressionStep<
-    GetPgResourceAttributes<TResource>[TAttr]["codec"],
+    PgCodecAttributeCodec<
+      Extract<GetPgResourceAttributes<TResource>, { name: TAttr }>
+    >,
     TResource
   > {
-    const resourceAttribute: PgCodecAttribute =
-      this.resource.codec.attributes![attr as string];
+    const resourceAttribute = this.resource.codec.attributes![attr];
     if (!resourceAttribute) {
       throw new Error(
         `${this.resource} does not define an attribute named '${String(attr)}'`,
@@ -381,9 +393,7 @@ export class PgDeleteSingleStep<
 /**
  * Delete a row in `resource` identified by the `getBy` unique condition.
  */
-export function pgDeleteSingle<
-  TResource extends PgResource<any, any, any, any>,
->(
+export function pgDeleteSingle<TResource extends AnyPgResource>(
   resource: TResource,
   getBy: PlanByUniques<
     GetPgResourceAttributes<TResource>,

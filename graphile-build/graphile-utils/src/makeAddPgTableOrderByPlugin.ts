@@ -1,17 +1,17 @@
-import type { PgOrderSpec, PgSelectStep } from "@dataplan/pg";
+import type { DefaultPgSelectStep, PgOrderSpec, PgSelectStep } from "@dataplan/pg";
 
 import { EXPORTABLE } from "./exportable.js";
 
 type OrderBySpecIdentity =
   | string // Attribute name
   | Omit<PgOrderSpec, "direction"> // Expression
-  | (($select: PgSelectStep) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
+  | (($select: DefaultPgSelectStep) => Omit<PgOrderSpec, "direction">); // Callback, allows for joins/etc
 
 export interface MakeAddPgTableOrderByPluginOrders {
   [orderByEnumValue: string]: {
     extensions: {
       grafast: {
-        applyPlan($select: PgSelectStep): void;
+        applyPlan($select: DefaultPgSelectStep): void;
       };
     };
   };
@@ -127,7 +127,7 @@ export function orderByAscDesc(
       ? "FIRST"
       : "LAST";
 
-  type Plan = ($select: PgSelectStep) => void;
+  type Plan = ($select: DefaultPgSelectStep) => void;
 
   let spec: PgOrderSpec;
   const ascendingPlan: Plan =

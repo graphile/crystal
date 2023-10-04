@@ -185,7 +185,7 @@ function getEntities(
   build: GraphileBuild.Build,
   entityType: keyof GraphileBuild.BehaviorEntities,
 ) {
-  const registry = build.input.pgRegistry as PgRegistry;
+  const registry = build.input.pgRegistry;
   switch (entityType) {
     case "pgCodec": {
       return registry.pgCodecs;

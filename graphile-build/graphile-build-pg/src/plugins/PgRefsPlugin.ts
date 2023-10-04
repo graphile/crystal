@@ -1,4 +1,8 @@
 import type {
+  AnyPgCodec,
+  AnyPgCodecRelationConfig,
+  AnyPgResourceOptions,
+  DefaultPgCodecRelationConfig,
   PgCodec,
   PgCodecExtensions,
   PgCodecRefPath,
@@ -202,7 +206,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           ? [tags.refVia]
           : null;
 
-        const refDefinitions = (resourceOptions.codec as PgCodec).extensions
+        const refDefinitions = resourceOptions.codec.extensions
           ?.refDefinitions;
         if (!refDefinitions) {
           if (rawRefVias) {
@@ -252,16 +256,13 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           outerLoop: for (const via of vias) {
             const path: PgCodecRefPath = [];
             const parts = via.split(";");
-            let currentResourceOptions: PgResourceOptions = resourceOptions;
+            let currentResourceOptions = resourceOptions;
             for (const rawPart of parts) {
-              type RelationEntry = [
-                string,
-                PgCodecRelationConfig<PgCodecWithAttributes, PgResourceOptions>,
-              ];
+              type RelationEntry = [string, DefaultPgCodecRelationConfig];
               const relations =
                 registryConfig.pgRelations[currentResourceOptions.codec.name];
               const relationEntries = relations
-                ? (Object.entries(relations) as Array<RelationEntry>)
+                ? Object.entries(relations)
                 : [];
               const part = rawPart.trim();
               // ENHANCE: allow whitespace

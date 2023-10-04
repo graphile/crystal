@@ -38,8 +38,14 @@ import {
 import type { PgExecutor } from "./executor.js";
 import { inspect } from "./inspect.js";
 import type {
+  AnyPgCodec,
+  DefaultPgCodec,
   PgCodec,
+  PgCodecAttributeMap,
+  PgCodecAttributes,
+  PgCodecAttributesRecord,
   PgCodecExtensions,
+  PgCodecFromPostgres,
   PgCodecPolymorphism,
   PgDecode,
   PgEncode,
@@ -50,19 +56,59 @@ import type {
 // PERF: `identity` can be shortcut
 const identity = <T>(value: T): T => value;
 
-export type PgCodecAttributeViaExplicit = {
-  relation: string;
-  attribute: string;
+export type PgCodecAttributeViaExplicit<
+  TRelationName extends string,
+  TAttribute extends string,
+> = {
+  relation: TRelationName;
+  attribute: TAttribute;
 };
-export type PgCodecAttributeVia = string | PgCodecAttributeViaExplicit;
+export interface AnyPgCodecAttributeVia extends PgCodecAttributeVia<any, any> {}
+export type DefaultPgCodecAttributeVia = PgCodecAttributeVia<string, string>;
+export type AnyPgCodecAttributeViaRelationName<U> =
+  U extends PgCodecAttributeVia<infer TRelationName, any>
+    ? TRelationName
+    : never;
+export type AnyPgCodecAttributeViaAttribute<U> = U extends PgCodecAttributeVia<
+  any,
+  infer TAttributeName
+>
+  ? TAttributeName
+  : never;
+export type PgCodecAttributeVia<
+  TRelationName extends string,
+  TAttribute extends string,
+> = TRelationName | PgCodecAttributeViaExplicit<TRelationName, TAttribute>;
 
 /** @deprecated Use DataplanPg.PgCodecAttributeExtensions instead */
 export type PgCodecAttributeExtensions = DataplanPg.PgCodecAttributeExtensions;
 
+export type PgCodecAttributeName<U> = U extends PgCodecAttribute<
+  infer TName,
+  any,
+  any
+>
+  ? TName
+  : never;
+
+export type PgCodecAttributeCodec<U> = U extends PgCodecAttribute<
+  any,
+  infer TCodec,
+  any
+>
+  ? TCodec
+  : never;
+
+export interface DefaultPgCodecAttribute
+  extends PgCodecAttribute<string, DefaultPgCodec, boolean> {}
+export interface AnyPgCodecAttribute extends PgCodecAttribute<any, any, any> {}
+
 export interface PgCodecAttribute<
-  TCodec extends PgCodec = PgCodec,
-  TNotNull extends boolean = boolean,
+  TName extends string,
+  TCodec extends AnyPgCodec,
+  TNotNull extends boolean,
 > {
+  name: TName;
   /**
    * How to translate to/from PG and how to cast.
    */
@@ -87,7 +133,7 @@ export interface PgCodecAttribute<
    * If this attribute actually exists on a relation rather than locally, the name
    * of the (unique) relation this attribute belongs to.
    */
-  via?: PgCodecAttributeVia;
+  via?: AnyPgCodecAttributeVia;
 
   /**
    * If the attribute exists identically on a relation and locally (e.g.
@@ -112,7 +158,7 @@ export interface PgCodecAttribute<
    * these are all plural relationships. So identicalVia is generally one-way
    * (except in 1-to-1 relationships).
    */
-  identicalVia?: PgCodecAttributeVia;
+  identicalVia?: AnyPgCodecAttributeVia;
   // ENHANCE: can identicalVia be plural? Is that useful? Maybe a attribute that has
   // multiple foreign key references?
 
@@ -128,14 +174,6 @@ export interface PgCodecAttribute<
 
   extensions?: Partial<PgCodecAttributeExtensions>;
 }
-
-export type PgCodecAttributes<
-  TCodecMap extends {
-    [attributeName in string]: PgCodecAttribute;
-  } = {
-    [attributeName in string]: PgCodecAttribute;
-  },
-> = TCodecMap;
 
 /**
  * Returns a PgCodec for the given builtin Postgres scalar type, optionally
@@ -160,12 +198,12 @@ function t<TFromJavaScript = any, TFromPostgres = string>(): <
   options?: Cast<TFromJavaScript, TFromPostgres>,
 ) => PgCodec<
   TName,
-  undefined,
+  never,
   TFromPostgres,
   TFromJavaScript,
-  undefined,
-  undefined,
-  undefined
+  never,
+  never,
+  never
 > {
   return (oid, type, options = {}) => {
     const { castFromPg, listCastFromPg, fromPg, toPg, isBinary } = options;
@@ -174,7 +212,6 @@ function t<TFromJavaScript = any, TFromPostgres = string>(): <
       sqlType: sql.identifier(...type.split(".")),
       fromPg: fromPg ?? (identity as any),
       toPg: toPg ?? (identity as any),
-      attributes: undefined,
       extensions: { oid: oid },
       castFromPg,
       listCastFromPg,
@@ -318,11 +355,21 @@ function recordStringToTuple(value: string): Array<string | null> {
   return tuple;
 }
 
-function realAttributeDefs<TAttributes extends PgCodecAttributes>(
+function realAttributeDefs<
+  TAttributes extends Record<string, AnyPgCodecAttribute>,
+>(
   attributes: TAttributes,
-): Array<[string, TAttributes[keyof TAttributes]]> {
+): Array<
+  [
+    PgCodecAttributeName<TAttributes[keyof TAttributes]>,
+    TAttributes[keyof TAttributes],
+  ]
+> {
   const attributeDefs = Object.entries(attributes) as Array<
-    [string, TAttributes extends infer U ? U[keyof U] : never]
+    [
+      PgCodecAttributeName<TAttributes[keyof TAttributes]>,
+      TAttributes[keyof TAttributes],
+    ]
   >;
   return attributeDefs.filter(
     ([_attributeName, spec]) => !spec.expression && !spec.via,
@@ -336,9 +383,9 @@ function realAttributeDefs<TAttributes extends PgCodecAttributes>(
  *
  * @see {@link https://www.postgresql.org/docs/current/rowtypes.html#id-1.5.7.24.6}
  */
-function makeRecordToSQLRawValue<TAttributes extends PgCodecAttributes>(
-  attributes: TAttributes,
-): PgEncode<ObjectFromPgCodecAttributes<TAttributes>> {
+function makeRecordToSQLRawValue<
+  TAttributes extends Record<string, AnyPgCodecAttribute>,
+>(attributes: TAttributes): PgEncode<ObjectFromPgCodecAttributes<TAttributes>> {
   const attributeDefs = realAttributeDefs(attributes);
   return (value) => {
     const values = attributeDefs.map(([attributeName, spec]) => {
@@ -350,19 +397,23 @@ function makeRecordToSQLRawValue<TAttributes extends PgCodecAttributes>(
   };
 }
 
-export type ObjectFromPgCodecAttributes<TAttributes extends PgCodecAttributes> =
-  {
-    [attributeName in keyof TAttributes]: TAttributes[attributeName] extends PgCodecAttribute<
-      infer UCodec,
-      infer UNonNull
-    >
-      ? UCodec extends PgCodec<any, any, any, infer UFromJs, any, any, any>
-        ? UNonNull extends true
-          ? Exclude<UFromJs, null | undefined>
-          : UFromJs | null
-        : never
-      : never;
-  };
+export type ObjectFromPgCodecAttributes<
+  TAttributes extends Record<string, AnyPgCodecAttribute>,
+> = {
+  [TCodecAttribute in keyof TAttributes as PgCodecAttributeName<
+    TAttributes[TCodecAttribute]
+  >]: TAttributes[TCodecAttribute] extends PgCodecAttribute<
+    any,
+    infer UCodec,
+    infer UNonNull
+  >
+    ? UCodec extends PgCodec<any, any, any, infer UFromJs, any, any, any>
+      ? UNonNull extends true
+        ? Exclude<UFromJs, null | undefined>
+        : UFromJs | null
+      : never
+    : never;
+};
 
 /**
  * Takes a list of attributes and returns a mapping function that takes a
@@ -371,7 +422,9 @@ export type ObjectFromPgCodecAttributes<TAttributes extends PgCodecAttributes> =
  *
  * @see {@link https://www.postgresql.org/docs/current/rowtypes.html#id-1.5.7.24.6}
  */
-function makeSQLValueToRecord<TAttributes extends PgCodecAttributes>(
+function makeSQLValueToRecord<
+  TAttributes extends Record<string, AnyPgCodecAttribute>,
+>(
   attributes: TAttributes,
 ): (value: string) => ObjectFromPgCodecAttributes<TAttributes> {
   const attributeDefs = realAttributeDefs(attributes);
@@ -390,7 +443,9 @@ function makeSQLValueToRecord<TAttributes extends PgCodecAttributes>(
 
 export type PgRecordTypeCodecSpec<
   TName extends string,
-  TAttributes extends PgCodecAttributes,
+  TAttributes extends {
+    [TAttribute in keyof TAttributes]: Omit<AnyPgCodecAttribute, "name">;
+  },
 > = {
   name: TName;
   executor: PgExecutor;
@@ -414,17 +469,28 @@ export type PgRecordTypeCodecSpec<
  */
 export function recordCodec<
   const TName extends string,
-  const TAttributes extends PgCodecAttributes,
+  const TAttributes extends {
+    [TAttribute in keyof TAttributes]: Omit<AnyPgCodecAttribute, "name">;
+  },
+  const TCodecAttributes extends {
+    [TAttribute in keyof TAttributes]: PgCodecAttribute<
+      TAttribute extends string ? TAttribute : never,
+      TAttributes[TAttribute]["codec"],
+      TAttributes[TAttribute]["notNull"] extends boolean
+        ? TAttributes[TAttribute]["notNull"]
+        : never
+    >;
+  },
 >(
   config: PgRecordTypeCodecSpec<TName, TAttributes>,
 ): PgCodec<
   TName,
-  TAttributes,
+  TCodecAttributes,
   string,
-  ObjectFromPgCodecAttributes<TAttributes>,
-  undefined,
-  undefined,
-  undefined
+  ObjectFromPgCodecAttributes<TCodecAttributes>,
+  never,
+  never,
+  never
 > {
   const {
     name,
@@ -436,13 +502,26 @@ export function recordCodec<
     isAnonymous = false,
     executor,
   } = config;
+
+  (
+    Object.entries(attributes) as Array<
+      [keyof TAttributes, TAttributes[keyof TAttributes]]
+    >
+  ).forEach(
+    ([name, value]) =>
+      (attributes[name] = {
+        ...value,
+        name,
+      }),
+  );
+
   return {
     name,
     sqlType: identifier,
     isAnonymous,
-    fromPg: makeSQLValueToRecord(attributes),
-    toPg: makeRecordToSQLRawValue(attributes),
-    attributes,
+    fromPg: makeSQLValueToRecord(attributes as unknown as TCodecAttributes),
+    toPg: makeRecordToSQLRawValue(attributes as unknown as TCodecAttributes),
+    attributes: attributes as unknown as TCodecAttributes,
     polymorphism,
     description,
     extensions,
@@ -506,14 +585,14 @@ type CodecWithListCodec<
     `${TCodec extends PgCodec<infer UName, any, any, any, any, any, any>
       ? UName
       : never}[]`,
-    undefined,
+    never,
     string,
-    TCodec extends PgCodec<any, any, any, infer UFromJs, undefined, any, any>
+    TCodec extends PgCodec<any, any, any, infer UFromJs, never, any, any>
       ? UFromJs[]
       : any[],
     TCodec,
-    undefined,
-    undefined
+    never,
+    never
   >;
 };
 
@@ -530,9 +609,7 @@ type CodecWithListCodec<
  * @param typeDelim - the delimeter used to separate entries in this list when Postgres stringifies it
  * @param identifier - a pg-sql2 fragment that represents the name of this type
  */
-export function listOfCodec<
-  TInnerCodec extends PgCodec<string, any, any, any, undefined, any, any>,
->(
+export function listOfCodec<TInnerCodec extends AnyPgCodec = AnyPgCodec>(
   listedCodec: TInnerCodec,
   config?: {
     description?: string;
@@ -544,14 +621,14 @@ export function listOfCodec<
   `${TInnerCodec extends PgCodec<infer UName, any, any, any, any, any, any>
     ? UName
     : never}[]`,
-  undefined, // Array has no attributes
+  never, // Array has no attributes
   string,
-  TInnerCodec extends PgCodec<any, any, any, infer UFromJs, undefined, any, any>
+  TInnerCodec extends PgCodec<any, any, any, infer UFromJs, never, any, any>
     ? UFromJs[]
     : any[],
   TInnerCodec,
-  undefined,
-  undefined
+  never,
+  never
 > {
   const innerCodec: CodecWithListCodec<TInnerCodec> = listedCodec;
 
@@ -570,22 +647,14 @@ export function listOfCodec<
     `${TInnerCodec extends PgCodec<infer UName, any, any, any, any, any, any>
       ? UName
       : never}[]`,
-    undefined, // Array has no attributes
+    never, // Array has no attributes
     string,
-    TInnerCodec extends PgCodec<
-      any,
-      any,
-      any,
-      infer UFromJs,
-      undefined,
-      any,
-      any
-    >
+    TInnerCodec extends PgCodec<any, any, any, infer UFromJs, never, any, any>
       ? UFromJs[]
       : any[],
     TInnerCodec,
-    undefined,
-    undefined
+    never,
+    never
   > = {
     name: `${
       innerCodec.name as TInnerCodec extends PgCodec<
@@ -663,7 +732,7 @@ exportAs("@dataplan/pg", listOfCodec, "listOfCodec");
  */
 export function domainOfCodec<
   TName extends string,
-  TInnerCodec extends PgCodec<any, any, any, any, any, any>,
+  TInnerCodec extends AnyPgCodec,
 >(
   innerCodec: TInnerCodec,
   name: TName,
@@ -675,13 +744,15 @@ export function domainOfCodec<
   } = {},
 ): PgCodec<
   TName,
-  TInnerCodec extends PgCodec<any, infer U, any, any, any, any> ? U : any,
-  TInnerCodec extends PgCodec<any, any, infer U, any, any, any> ? U : any,
-  undefined,
+  PgCodecAttributeMap<TInnerCodec>,
+  PgCodecFromPostgres<TInnerCodec>,
+  any,
+  AnyPgCodec,
   TInnerCodec,
-  undefined
+  any
 > {
   const { description, extensions, notNull } = config;
+
   return {
     // Generally same as underlying type:
     ...innerCodec,
@@ -691,7 +762,7 @@ export function domainOfCodec<
     sqlType: identifier,
     description,
     extensions,
-    domainOfCodec: innerCodec.arrayOfCodec ? undefined : innerCodec,
+    ...(innerCodec.arrayOfCodec ? {} : { domainOfCodec: innerCodec }),
     notNull: Boolean(notNull),
   };
 }
@@ -702,9 +773,10 @@ exportAs("@dataplan/pg", domainOfCodec, "domainOfCodec");
  *
  * @internal
  */
-function escapeRangeValue<
-  TInnerCodec extends PgCodec<any, undefined, any, any, undefined, any, any>,
->(value: null | any, innerCodec: TInnerCodec): string {
+function escapeRangeValue<TInnerCodec extends AnyPgCodec>(
+  value: null | any,
+  innerCodec: TInnerCodec,
+): string {
   if (value == null) {
     return "";
   }
@@ -729,15 +801,7 @@ interface PgRange<T> {
  */
 export function rangeOfCodec<
   TName extends string,
-  TInnerCodec extends PgCodec<
-    any,
-    undefined,
-    any,
-    any,
-    undefined,
-    any,
-    undefined
-  >,
+  TInnerCodec extends AnyPgCodec,
 >(
   innerCodec: TInnerCodec,
   name: TName,
@@ -746,15 +810,7 @@ export function rangeOfCodec<
     description?: string;
     extensions?: Partial<PgCodecExtensions>;
   } = {},
-): PgCodec<
-  TName,
-  undefined,
-  string,
-  PgRange<unknown>,
-  undefined,
-  undefined,
-  TInnerCodec
-> {
+): PgCodec<TName, never, string, PgRange<unknown>, never, never, TInnerCodec> {
   const { description, extensions } = config;
   const needsCast = innerCodec.castFromPg;
 
@@ -1171,9 +1227,7 @@ export function getCodecByPgCatalogTypeName(pgCatalogTypeName: string) {
   return null;
 }
 
-export function getInnerCodec<
-  TCodec extends PgCodec<any, any, any, any, any, any>,
->(
+export function getInnerCodec<TCodec extends AnyPgCodec>(
   codec: TCodec,
 ): TCodec extends PgCodec<
   any,
@@ -1181,7 +1235,8 @@ export function getInnerCodec<
   any,
   infer UArray,
   infer UDomain,
-  infer URange
+  infer URange,
+  any
 >
   ? Exclude<UDomain | UArray | URange, undefined>
   : TCodec {

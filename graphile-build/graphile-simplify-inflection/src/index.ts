@@ -320,9 +320,9 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         if (baseName) {
           return this.camelCase(baseName);
         }
-        const foreignPk = (
-          relation.remoteResource.uniques as PgResourceUnique[]
-        ).find((u) => u.isPrimary);
+        const foreignPk = relation.remoteResource.uniques.find(
+          (u) => u.isPrimary,
+        );
         if (
           foreignPk &&
           arraysMatch(foreignPk.attributes, relation.remoteAttributes)
@@ -375,8 +375,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             `singleRelationBackwards inflector check failed: multiple table-like resources for codec '${codec.name}', so we cannot determine the primary key - please override this inflector for this table.`,
           );
         }
-        const uniques = (possibleResources[0]?.uniques ??
-          []) as PgResourceUnique[];
+        const uniques = possibleResources[0]?.uniques ?? [];
         const pk = uniques.find((u) => u.isPrimary);
         if (pk && arraysMatch(pk.attributes, relation.localAttributes)) {
           return this.camelCase(
@@ -417,9 +416,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             );
           }
         }
-        const pk = (relation.remoteResource.uniques as PgResourceUnique[]).find(
-          (u) => u.isPrimary,
-        );
+        const pk = relation.remoteResource.uniques.find((u) => u.isPrimary);
         if (pk && arraysMatch(pk.attributes, relation.remoteAttributes)) {
           return this.camelCase(
             `${this.distinctPluralize(

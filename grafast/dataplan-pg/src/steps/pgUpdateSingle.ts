@@ -7,18 +7,19 @@ import { ExecutableStep, exportAs, isDev, SafeError, setter } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgCodecAttribute } from "../codecs.js";
-import type { PgResource, PgResourceUnique } from "../index.js";
+import type { AnyPgCodecAttribute, PgCodecAttributeName } from "../codecs.js";
+import type { DefaultPgResource, PgResourceUnique } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
+  AnyPgCodec,
   GetPgResourceAttributes,
   GetPgResourceCodec,
   GetPgResourceUniques,
-  PgCodec,
   PlanByUniques,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
+import { AnyPgResource, PgResourceUniques } from "../datasource.js";
 
 type QueryValueDetailsBySymbol = Map<
   symbol,
@@ -35,12 +36,14 @@ interface PgUpdatePlanFinalizeResults {
   /** When we see the given symbol in the SQL values, what dependency do we replace it with? */
   queryValueDetailsBySymbol: QueryValueDetailsBySymbol;
 }
-
+export interface AnyPgUpdateSingleStep extends PgUpdateSingleStep<any> {}
+export interface DefaultPgUpdateSingleStep
+  extends PgUpdateSingleStep<DefaultPgResource> {}
 /**
  * Update a single row identified by the 'getBy' argument.
  */
 export class PgUpdateSingleStep<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
+  TResource extends AnyPgResource,
 > extends ExecutableStep<unknown[]> {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -75,18 +78,18 @@ export class PgUpdateSingleStep<
    * The attributes and their dependency ids for us to find the record by.
    */
   private getBys: Array<{
-    name: keyof GetPgResourceAttributes<TResource>;
+    name: PgCodecAttributeName<GetPgResourceAttributes<TResource>>;
     depId: number;
-    pgCodec: PgCodec;
+    pgCodec: AnyPgCodec;
   }> = [];
 
   /**
    * The attributes and their dependency ids for us to update.
    */
   private attributes: Array<{
-    name: keyof GetPgResourceAttributes<TResource>;
+    name: PgCodecAttributeName<GetPgResourceAttributes<TResource>>;
     depId: number;
-    pgCodec: PgCodec;
+    pgCodec: AnyPgCodec;
   }> = [];
 
   /**
@@ -114,10 +117,10 @@ export class PgUpdateSingleStep<
     resource: TResource,
     getBy: PlanByUniques<
       GetPgResourceAttributes<TResource>,
-      GetPgResourceUniques<TResource>
+      PgResourceUniques<TResource>
     >,
     attributes?: {
-      [key in keyof GetPgResourceAttributes<TResource>]?: ExecutableStep; // | PgTypedExecutableStep<TAttributes[key]["codec"]>
+      [attribute in GetPgResourceAttributes<TResource> as PgCodecAttributeName<attribute>]?: ExecutableStep; // | PgTypedExecutableStep<TAttributes[key]["codec"]>
     },
   ) {
     super();
@@ -127,14 +130,18 @@ export class PgUpdateSingleStep<
     this.alias = sql.identifier(this.symbol);
     this.contextId = this.addDependency(this.resource.executor.context());
 
-    const keys: ReadonlyArray<keyof GetPgResourceAttributes<TResource>> = getBy
-      ? (Object.keys(getBy) as Array<keyof GetPgResourceAttributes<TResource>>)
+    const keys = getBy
+      ? (Object.keys(getBy) as Array<
+          PgCodecAttributeName<GetPgResourceAttributes<TResource>>
+        >)
       : [];
 
     if (
-      !(this.resource.uniques as PgResourceUnique[]).some((uniq) =>
-        uniq.attributes.every((key) => keys.includes(key as any)),
-      )
+      !(
+        this.resource.uniques as Array<
+          PgResourceUnique<GetPgResourceAttributes<TResource>>
+        >
+      ).some((uniq) => uniq.attributes.every((key) => keys.includes(key)))
     ) {
       throw new Error(
         `Attempted to build 'PgUpdateSingleStep' with a non-unique getBy keys ('${keys.join(
@@ -155,22 +162,26 @@ export class PgUpdateSingleStep<
           );
         }
       }
-      const value = (getBy as any)![name as any];
+      const value = getBy[name];
       const depId = this.addDependency(value);
-      const attribute = (
-        this.resource.codec.attributes as GetPgResourceAttributes<TResource>
-      )[name];
-      const pgCodec = attribute.codec;
-      this.getBys.push({ name, depId, pgCodec });
+      const attribute = this.resource.codec.attributes?.[name];
+      if (attribute) {
+        const pgCodec = attribute.codec;
+        this.getBys.push({ name, depId, pgCodec });
+      }
     });
 
     if (attributes) {
-      Object.entries(attributes).forEach(([key, value]) => {
+      (
+        Object.entries(attributes) as Array<
+          [
+            PgCodecAttributeName<GetPgResourceAttributes<TResource>>,
+            ExecutableStep,
+          ]
+        >
+      ).forEach(([key, value]) => {
         if (value) {
-          this.set(
-            key as keyof GetPgResourceAttributes<TResource>,
-            value as ExecutableStep,
-          );
+          this.set(key, value as ExecutableStep);
         }
       });
     }
@@ -182,9 +193,9 @@ export class PgUpdateSingleStep<
     )};${this.attributes.map((a) => a.name)})`;
   }
 
-  set<TKey extends keyof GetPgResourceAttributes<TResource>>(
+  set<TKey extends PgCodecAttributeName<GetPgResourceAttributes<TResource>>>(
     name: TKey,
-    value: ExecutableStep, // | PgTypedExecutableStep<TAttributes[TKey]["codec"]>
+    value: ExecutableStep, // PgTypedExecutableStep<GetPgResourceAttributes<TResource>[number]["codec"]>,
   ): void {
     if (this.locked) {
       throw new Error("Cannot set after plan is locked.");
@@ -196,17 +207,16 @@ export class PgUpdateSingleStep<
         );
       }
     }
-    const { codec: pgCodec } = (
-      this.resource.codec.attributes as GetPgResourceAttributes<TResource>
-    )[name];
-    const depId = this.addDependency(value);
-    this.attributes.push({ name, depId, pgCodec });
+    const attribute = this.resource.codec.attributes?.[name];
+    if (attribute) {
+      const depId = this.addDependency(value);
+      this.attributes.push({ name, depId, pgCodec: attribute.codec });
+    }
   }
 
   setPlan(): SetterStep<
     {
-      [key in keyof GetPgResourceAttributes<TResource> &
-        string]: ExecutableStep;
+      [attribute in GetPgResourceAttributes<TResource> as PgCodecAttributeName<attribute>]: ExecutableStep;
     },
     this
   > {
@@ -222,13 +232,13 @@ export class PgUpdateSingleStep<
    * Returns a plan representing a named attribute (e.g. column) from the newly
    * updateed row.
    */
-  get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
+  get<TAttr extends PgCodecAttributeName<GetPgResourceAttributes<TResource>>>(
     attr: TAttr,
   ): PgClassExpressionStep<
-    GetPgResourceAttributes<TResource>[TAttr]["codec"],
+    Extract<GetPgResourceAttributes<TResource>, { name: TAttr }>["codec"],
     TResource
   > {
-    const resourceAttribute: PgCodecAttribute =
+    const resourceAttribute: AnyPgCodecAttribute =
       this.resource.codec.attributes![attr as string];
     if (!resourceAttribute) {
       throw new Error(
@@ -450,16 +460,14 @@ export class PgUpdateSingleStep<
 /**
  * Update a single row identified by the 'getBy' argument.
  */
-export function pgUpdateSingle<
-  TResource extends PgResource<any, any, any, any>,
->(
+export function pgUpdateSingle<TResource extends AnyPgResource>(
   resource: TResource,
   getBy: PlanByUniques<
     GetPgResourceAttributes<TResource>,
     GetPgResourceUniques<TResource>
   >,
   attributes?: {
-    [key in keyof GetPgResourceAttributes<TResource>]?: ExecutableStep; // | PgTypedExecutableStep<TAttributes[key]["codec"]>
+    [attribute in GetPgResourceAttributes<TResource> as PgCodecAttributeName<attribute>]?: ExecutableStep; // | PgTypedExecutableStep<TAttributes[key]["codec"]>
   },
 ): PgUpdateSingleStep<TResource> {
   return new PgUpdateSingleStep(resource, getBy, attributes);

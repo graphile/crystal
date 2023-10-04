@@ -3,10 +3,9 @@ import "../interfaces.js";
 import "graphile-config";
 
 import type {
-  PgCodecRelation,
-  PgCodecWithAttributes,
+  DefaultPgCodec,
+  DefaultPgRegistry,
   PgConditionStep,
-  PgRegistry,
   PgSelectStep,
 } from "@dataplan/pg";
 import type { SetterStep } from "grafast";
@@ -24,8 +23,8 @@ declare global {
       nodeIdAttribute(
         this: Inflection,
         details: {
-          registry: PgRegistry;
-          codec: PgCodecWithAttributes;
+          registry: DefaultPgRegistry;
+          codec: DefaultPgCodec;
           relationName: string;
         },
       ): string;
@@ -82,13 +81,10 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
         ) {
           return fields;
         }
-        const pgCodec = rawPgCodec as PgCodecWithAttributes;
+        const pgCodec = rawPgCodec;
 
-        const relationEntries = (
-          Object.entries(pgRegistry.pgRelations[pgCodec.name] ?? {}) as [
-            string,
-            PgCodecRelation,
-          ][]
+        const relationEntries = Object.entries(
+          pgRegistry.pgRelations[pgCodec.name] ?? {},
         ).filter(
           ([_name, relation]) => !relation.isReferencee && relation.isUnique,
         );
@@ -134,14 +130,14 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                 relationName,
               });
               const attributes = relation.localAttributes.map(
-                (name) => pgCodec.attributes[name],
+                (name) => pgCodec.attributes![name],
               );
               const anAttributeIsNotNull = attributes.some(
                 (attr) => attr.notNull || attr.extensions?.tags?.notNull,
               );
               const { localAttributes, remoteAttributes } = relation;
               const localAttributeCodecs = localAttributes.map(
-                (name) => pgCodec.attributes[name].codec,
+                (name) => pgCodec.attributes![name].codec,
               );
               return extend(
                 memo,

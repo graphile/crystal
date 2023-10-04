@@ -1,4 +1,8 @@
-import type { PgConditionStep, PgSelectStep } from "@dataplan/pg";
+import type {
+  DefaultPgSelectStep,
+  PgConditionStep,
+  PgSelectStep,
+} from "@dataplan/pg";
 import type { FieldArgs, GrafastInputFieldConfig } from "grafast";
 import type { SQL, sql } from "pg-sql2";
 
@@ -13,7 +17,7 @@ export function makeAddPgTableConditionPlugin(
   conditionGenerator?: (
     value: FieldArgs,
     helpers: {
-      $condition: PgConditionStep<PgSelectStep>;
+      $condition: PgConditionStep<DefaultPgSelectStep>;
       sql: typeof sql;
       sqlTableAlias: SQL;
       build: GraphileBuild.Build;
@@ -85,7 +89,7 @@ export function makeAddPgTableConditionPlugin(
             conditionFieldSpec.applyPlan = EXPORTABLE(
               (build, conditionGenerator, sql) =>
                 function applyPlan(
-                  $condition: PgConditionStep<PgSelectStep>,
+                  $condition: PgConditionStep<DefaultPgSelectStep>,
                   val,
                 ) {
                   const expression = conditionGenerator!(val, {

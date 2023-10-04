@@ -3,12 +3,11 @@ import "../interfaces.js";
 import "graphile-config";
 
 import type {
+  DefaultPgCodec,
+  DefaultPgCodecAttribute,
+  DefaultPgSelectSingleStep,
   PgClassExpressionStep,
-  PgCodec,
-  PgCodecAttribute,
-  PgCodecAttributes,
   PgCodecList,
-  PgCodecWithAttributes,
   PgConditionStep,
   PgSelectSingleStep,
   PgSelectStep,
@@ -25,9 +24,9 @@ declare global {
   namespace GraphileBuild {
     interface Build {
       pgResolveOutputType(
-        codec: PgCodec,
+        codec: DefaultPgCodec,
         notNull?: boolean,
-      ): [baseCodec: PgCodec, resolvedType: GraphQLOutputType] | null;
+      ): [baseCodec: DefaultPgCodec, resolvedType: GraphQLOutputType] | null;
     }
 
     interface Inflection {
@@ -42,7 +41,7 @@ declare global {
       _attributeName(
         this: GraphileBuild.Inflection,
         details: {
-          codec: PgCodecWithAttributes;
+          codec: DefaultPgCodec;
           attributeName: string;
           skipRowId?: boolean;
         },
@@ -54,7 +53,7 @@ declare global {
        */
       _joinAttributeNames(
         this: GraphileBuild.Inflection,
-        codec: PgCodecWithAttributes,
+        codec: DefaultPgCodec,
         names: readonly string[],
       ): string;
 
@@ -67,7 +66,7 @@ declare global {
         this: GraphileBuild.Inflection,
         details: {
           attributeName: string;
-          codec: PgCodecWithAttributes;
+          codec: DefaultPgCodec;
         },
       ): string;
     }
@@ -78,7 +77,7 @@ declare global {
       isPgBaseInput?: boolean;
       isPgRowType?: boolean;
       isPgCompoundType?: boolean;
-      pgAttribute?: PgCodecAttribute;
+      pgAttribute?: DefaultPgCodecAttribute;
     }
   }
 }
@@ -102,11 +101,11 @@ function processAttribute(
     return;
   }
 
-  const pgCodec = rawPgCodec as PgCodecWithAttributes;
+  const pgCodec = rawPgCodec;
 
   const isInterface = context.type === "GraphQLInterfaceType";
 
-  const attribute = pgCodec.attributes[attributeName];
+  const attribute = pgCodec.attributes![attributeName];
 
   if (
     !build.behavior.pgCodecAttributeMatches(
@@ -147,7 +146,7 @@ function processAttribute(
   };
 
   const resource = baseCodec.attributes
-    ? build.pgTableResource(baseCodec as PgCodecWithAttributes, false)
+    ? build.pgTableResource(baseCodec, false)
     : null;
   if (baseCodec.attributes && !resource) {
     // We can't load codecs with attributes unless we know the executor.
@@ -160,7 +159,7 @@ function processAttribute(
       if (!baseCodec.attributes) {
         // Simply get the value
         return EXPORTABLE(
-          (attributeName) => ($record: PgSelectSingleStep) => {
+          (attributeName) => ($record: DefaultPgSelectSingleStep) => {
             return $record.get(attributeName);
           },
           [attributeName],
@@ -257,7 +256,7 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
   inflection: {
     add: {
       _attributeName(options, { attributeName, codec }) {
-        const attribute = codec.attributes[attributeName];
+        const attribute = codec.attributes![attributeName];
         return this.coerceToGraphQLName(
           attribute.extensions?.tags?.name || attributeName,
         );
@@ -290,8 +289,8 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
           const behaviors = new Set([
             "select base update insert filterBy orderBy",
           ]);
-          const attribute = codec.attributes[attributeName];
-          function walk(codec: PgCodec) {
+          const attribute = codec.attributes![attributeName];
+          function walk(codec: DefaultPgCodec) {
             if (codec.arrayOfCodec) {
               behaviors.add("-condition:attribute:filterBy");
               behaviors.add(`-attribute:orderBy`);
@@ -443,8 +442,8 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
         ) {
           return fields;
         }
-        const pgCodec = rawPgCodec as PgCodecWithAttributes;
-        const allAttributes = pgCodec.attributes;
+        const pgCodec = rawPgCodec;
+        const allAttributes = pgCodec.attributes!;
         const allowedAttributes =
           pgCodec.polymorphism?.mode === "single"
             ? [
@@ -463,12 +462,12 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                   */
               ]
             : null;
-        const attributes = allowedAttributes
-          ? (Object.fromEntries(
+        const attributes = allowedAttributes!
+          ? Object.fromEntries(
               Object.entries(allAttributes).filter(([attrName, _attr]) =>
                 allowedAttributes.includes(attrName),
               ),
-            ) as PgCodecAttributes)
+            )
           : allAttributes;
 
         return Object.entries(attributes).reduce(
@@ -597,9 +596,9 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
 
 function resolveOutputType(
   build: GraphileBuild.Build,
-  codec: PgCodec,
+  codec: DefaultPgCodec,
   notNull?: boolean,
-): [baseCodec: PgCodec, resolvedType: GraphQLOutputType] | null {
+): [baseCodec: DefaultPgCodec, resolvedType: GraphQLOutputType] | null {
   const {
     getGraphQLTypeByPgCodec,
     graphql: { GraphQLList, GraphQLNonNull, getNullableType, isOutputType },

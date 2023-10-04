@@ -1,7 +1,7 @@
 import "graphile-config";
 import "graphile-build-pg";
 
-import type { PgResourceOptions } from "@dataplan/pg";
+import type { DefaultPgResourceOptions, PgResourceOptions } from "@dataplan/pg";
 import type { PgProc } from "graphile-build-pg/pg-introspection";
 import { inspect } from "util";
 
@@ -14,7 +14,7 @@ declare global {
 }
 
 const v4ComputedAttributeChecks = (
-  _s: PgResourceOptions,
+  _s: DefaultPgResourceOptions,
   pgProc: PgProc,
 ): boolean => {
   const args = pgProc.getArguments();

@@ -385,9 +385,7 @@ export const resolveResourceRefPath = (
     layers: [] as Layer[],
   };
   for (const pathEntry of path) {
-    const relation = result.resource.getRelation(
-      pathEntry.relationName,
-    ) as PgCodecRelation;
+    const relation = result.resource.getRelation(pathEntry.relationName);
     const {
       isReferencee,
       localAttributes,

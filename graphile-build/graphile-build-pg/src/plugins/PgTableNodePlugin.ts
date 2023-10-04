@@ -1,11 +1,9 @@
 import "graphile-config";
 
 import type {
-  PgCodec,
-  PgCodecWithAttributes,
-  PgResource,
-  PgResourceUnique,
-  PgSelectSingleStep,
+  AnyPgSelectSingleStep,
+  DefaultPgCodec,
+  DefaultPgResource,
 } from "@dataplan/pg";
 import type { ListStep } from "grafast";
 import { access, constant, list } from "grafast";
@@ -43,9 +41,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
               codec.polymorphism.mode === "single" ||
               codec.polymorphism.mode === "relational")
           ) {
-            const resource = build.pgTableResource(
-              codec as PgCodecWithAttributes,
-            );
+            const resource = build.pgTableResource(codec);
             if (resource && resource.uniques?.length >= 1) {
               if (codec.polymorphism) {
                 newBehavior.push("interface:node");
@@ -80,7 +76,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           );
         });
 
-        const resourcesByCodec = new Map<PgCodec, PgResource[]>();
+        const resourcesByCodec = new Map<DefaultPgCodec, DefaultPgResource[]>();
         for (const resource of tableResources) {
           let list = resourcesByCodec.get(resource.codec);
           if (!list) {
@@ -110,7 +106,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
             continue;
           }
           const pgResource = resources[0];
-          const primaryKey = (pgResource.uniques as PgResourceUnique[]).find(
+          const primaryKey = pgResource.uniques.find(
             (u) => u.isPrimary === true,
           );
           if (!primaryKey) {
@@ -154,7 +150,7 @@ return function (list, constant) {
                 )
               : EXPORTABLE(
                   (constant, identifier, list, pk) =>
-                    ($record: PgSelectSingleStep) => {
+                    ($record: AnyPgSelectSingleStep) => {
                       return list([
                         constant(identifier, false),
                         ...pk.map((attribute) => $record.get(attribute)),

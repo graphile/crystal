@@ -1,6 +1,7 @@
 import { isDev } from "grafast";
 
-import type { PgSelectStep, PgUnionAllStep } from "./index";
+import { AnyPgSelectStep } from "./steps/pgSelect";
+import { AnyPgUnionAllStep } from "./steps/pgUnionAll";
 
 export type PgLockableParameter =
   | "orderBy"
@@ -8,13 +9,13 @@ export type PgLockableParameter =
   | "last"
   | "offset"
   | "groupBy";
-export type PgLockCallback<
-  TStep extends PgSelectStep<any> | PgUnionAllStep<any, any>,
-> = (step: TStep) => void;
+export type PgLockCallback<TStep extends AnyPgStep> = (step: TStep) => void;
 
-export class PgLocker<
-  TStep extends PgSelectStep<any> | PgUnionAllStep<any, any>,
-> {
+export type AnyPgStep = AnyPgSelectStep | AnyPgUnionAllStep;
+
+export interface AnyPgLocker extends PgLocker<any> {}
+
+export class PgLocker<TStep extends AnyPgStep> {
   /**
    * Determines if the PgSelectStep is "locked" - i.e. its
    * FROM,JOINs,WHERE,ORDER BY,LIMIT,OFFSET cannot be changed. Note this does

@@ -69,7 +69,6 @@ import sql from "pg-sql2";
 import { inspect } from "util";
 
 import type {
-  GetPgResourceRelations,
   PgCodecAttribute,
   PgCodecAttributeVia,
   PgConditionStep,
@@ -79,11 +78,15 @@ import type {
   WithPgClient,
 } from "../";
 import type { NodePostgresPgClient, PgSubscriber } from "../adaptors/pg.js";
-import { listOfCodec } from "../codecs.js";
+import { listOfCodec, PgCodecAttributeName } from "../codecs.js";
 import {
+  AnyPgResource,
   makePgResourceOptions,
   makeRegistry,
   makeRegistryBuilder,
+  PgResourceCodec,
+  PgResourceName,
+  PgResourceUniques,
 } from "../datasource.js";
 import {
   enumCodec,
@@ -107,7 +110,16 @@ import {
   recordCodec,
   TYPES,
 } from "../index.js";
-import type { GetPgResourceAttributes, PgCodec } from "../interfaces";
+import type {
+  AnyPgCodec,
+  GetPgResourceAttributeMap,
+  GetPgResourceAttributes,
+  GetPgResourceRelationConfigs,
+  PgCodec,
+  PgCodecAttributeMap,
+  PgCodecAttributes,
+  PgCodecRelationConfigName,
+} from "../interfaces";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
@@ -118,6 +130,10 @@ import {
   WithPgClientStep,
   withPgClientTransaction,
 } from "../steps/withPgClient.js";
+import {
+  AnyPgSelectSingleStep,
+  PgSelectSingleStepResource,
+} from "../steps/pgSelectSingle";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -197,19 +213,28 @@ export function makeExampleSchema(
     ) => {
       const col = <
         TOptions extends {
-          codec: PgCodec;
+          codec: AnyPgCodec;
           notNull?: boolean;
-          expression?: PgCodecAttribute<any>["expression"];
-          via?: PgCodecAttributeVia;
-          identicalVia?: PgCodecAttributeVia;
+          expression?: PgCodecAttribute<any, any, any>["expression"];
+          via?: PgCodecAttributeVia<any, any>;
+          identicalVia?: PgCodecAttributeVia<any, any>;
         },
       >(
         options: TOptions,
-      ): PgCodecAttribute<TOptions extends { codec: infer U } ? U : never> => {
+      ): PgCodecAttribute<
+        any,
+        TOptions extends { codec: infer U } ? U : never,
+        TOptions extends { notNull: infer U }
+          ? U extends boolean
+            ? U
+            : false
+          : false
+      > => {
         const { notNull, codec, expression, via, identicalVia } = options;
         return {
+          name: undefined,
           codec: codec as TOptions extends { codec: infer U } ? U : never,
-          notNull: !!notNull,
+          notNull: !!notNull as any,
           expression,
           via,
           identicalVia,
@@ -294,7 +319,6 @@ export function makeExampleSchema(
         from: (...args) =>
           sql`app_public.forum_names_array(${sqlFromArgDigests(args)})`,
         name: "forum_names_array",
-        parameters: [],
         isUnique: true, // No setof
       });
 
@@ -305,7 +329,6 @@ export function makeExampleSchema(
         from: (...args) =>
           sql`app_public.forum_names_cases(${sqlFromArgDigests(args)})`,
         name: "forum_names_cases",
-        parameters: [],
       });
 
       const forumsUniqueAuthorCountResourceOptions = makePgResourceOptions({
@@ -394,7 +417,6 @@ export function makeExampleSchema(
             sql`app_public.featured_messages(${sqlFromArgDigests(args)})`,
           returnsSetof: true,
           returnsArray: false,
-          parameters: [],
         });
 
       const forumsFeaturedMessagesResourceOptions =
@@ -423,7 +445,6 @@ export function makeExampleSchema(
             sql`app_public.random_user_array(${sqlFromArgDigests(args)})`,
           returnsArray: true,
           returnsSetof: false,
-          parameters: [],
         },
       );
 
@@ -434,7 +455,6 @@ export function makeExampleSchema(
             sql`app_public.random_user_array_set(${sqlFromArgDigests(args)})`,
           returnsSetof: true,
           returnsArray: true,
-          parameters: [],
         });
 
       const forumsMessagesListSetResourceOptions =
@@ -444,7 +464,6 @@ export function makeExampleSchema(
             sql`app_public.forums_messages_list_set(${sqlFromArgDigests(
               args,
             )})`,
-          parameters: [],
           returnsArray: true,
           returnsSetof: true,
           extensions: {
@@ -726,7 +745,7 @@ export function makeExampleSchema(
 
       const itemAttributes = {
         id: col({ codec: TYPES.int, notNull: true, identicalVia: "item" }),
-        type: col({ codec: TYPES.text, notNull: true, via: "item" }),
+        type: col({ codec: itemTypeEnumCodec, notNull: true, via: "item" }),
         type2: col({
           codec: enumTableItemTypeEnumCodec,
           notNull: true,
@@ -1291,8 +1310,8 @@ export function makeExampleSchema(
           "item",
           relationalItemsResourceOptions,
           {
-            localAttributes: [`id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`id`],
+            remoteAttributes: [`id`],
             isUnique: true,
           },
         )
@@ -1301,14 +1320,14 @@ export function makeExampleSchema(
           "parent",
           relationalItemsResourceOptions,
           {
-            localAttributes: [`parent_id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`parent_id`],
+            remoteAttributes: [`id`],
             isUnique: true,
           },
         )
         .addRelation(relationalTopicsCodec, "author", personResourceOptions, {
-          localAttributes: [`author_id`] as const,
-          remoteAttributes: [`person_id`] as const,
+          localAttributes: [`author_id`],
+          remoteAttributes: [`person_id`],
           isUnique: true,
         })
 
@@ -1317,8 +1336,8 @@ export function makeExampleSchema(
           "item",
           relationalItemsResourceOptions,
           {
-            localAttributes: [`id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`id`],
+            remoteAttributes: [`id`],
             isUnique: true,
           },
         )
@@ -1327,14 +1346,14 @@ export function makeExampleSchema(
           "parent",
           relationalItemsResourceOptions,
           {
-            localAttributes: [`parent_id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`parent_id`],
+            remoteAttributes: [`id`],
             isUnique: true,
           },
         )
         .addRelation(relationalPostsCodec, "author", personResourceOptions, {
-          localAttributes: [`author_id`] as const,
-          remoteAttributes: [`person_id`] as const,
+          localAttributes: [`author_id`],
+          remoteAttributes: [`person_id`],
           isUnique: true,
         })
         .addRelation(
@@ -1342,8 +1361,8 @@ export function makeExampleSchema(
           "commentable",
           relationalCommentableResourceOptions,
           {
-            localAttributes: [`id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`id`],
+            remoteAttributes: [`id`],
             isUnique: true,
           },
         )
@@ -1353,8 +1372,8 @@ export function makeExampleSchema(
           "item",
           relationalItemsResourceOptions,
           {
-            localAttributes: [`id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`id`],
+            remoteAttributes: [`id`],
             isUnique: true,
           },
         )
@@ -1363,14 +1382,14 @@ export function makeExampleSchema(
           "parent",
           relationalItemsResourceOptions,
           {
-            localAttributes: [`parent_id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`parent_id`],
+            remoteAttributes: [`id`],
             isUnique: true,
           },
         )
         .addRelation(relationalDividersCodec, "author", personResourceOptions, {
-          localAttributes: [`author_id`] as const,
-          remoteAttributes: [`person_id`] as const,
+          localAttributes: [`author_id`],
+          remoteAttributes: [`person_id`],
           isUnique: true,
         })
         .addRelation(
@@ -1378,8 +1397,8 @@ export function makeExampleSchema(
           "item",
           relationalItemsResourceOptions,
           {
-            localAttributes: [`id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`id`],
+            remoteAttributes: [`id`],
             isUnique: true,
           },
         )
@@ -1388,8 +1407,8 @@ export function makeExampleSchema(
           "parent",
           relationalItemsResourceOptions,
           {
-            localAttributes: [`parent_id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`parent_id`],
+            remoteAttributes: [`id`],
             isUnique: true,
           },
         )
@@ -1398,8 +1417,8 @@ export function makeExampleSchema(
           "author",
           personResourceOptions,
           {
-            localAttributes: [`author_id`] as const,
-            remoteAttributes: [`person_id`] as const,
+            localAttributes: [`author_id`],
+            remoteAttributes: [`person_id`],
             isUnique: true,
           },
         )
@@ -1408,8 +1427,8 @@ export function makeExampleSchema(
           "commentable",
           relationalCommentableResourceOptions,
           {
-            localAttributes: [`id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`id`],
+            remoteAttributes: [`id`],
             isUnique: true,
           },
         )
@@ -1418,8 +1437,8 @@ export function makeExampleSchema(
           "item",
           relationalItemsResourceOptions,
           {
-            localAttributes: [`id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`id`],
+            remoteAttributes: [`id`],
             isUnique: true,
           },
         )
@@ -1428,8 +1447,8 @@ export function makeExampleSchema(
           "parent",
           relationalItemsResourceOptions,
           {
-            localAttributes: [`parent_id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`parent_id`],
+            remoteAttributes: [`id`],
             isUnique: true,
           },
         )
@@ -1438,8 +1457,8 @@ export function makeExampleSchema(
           "author",
           personResourceOptions,
           {
-            localAttributes: [`author_id`] as const,
-            remoteAttributes: [`person_id`] as const,
+            localAttributes: [`author_id`],
+            remoteAttributes: [`person_id`],
             isUnique: true,
           },
         )
@@ -1448,8 +1467,8 @@ export function makeExampleSchema(
           "commentable",
           relationalCommentableResourceOptions,
           {
-            localAttributes: [`id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`id`],
+            remoteAttributes: [`id`],
             isUnique: true,
           },
         )
@@ -1460,8 +1479,8 @@ export function makeExampleSchema(
           relationalItemsResourceOptions,
           {
             isUnique: true,
-            localAttributes: ["parent_id"] as const,
-            remoteAttributes: ["id"] as const,
+            localAttributes: ["parent_id"],
+            remoteAttributes: ["id"],
           },
         )
         .addRelation(
@@ -1470,22 +1489,22 @@ export function makeExampleSchema(
           relationalItemsResourceOptions,
           {
             isUnique: false,
-            localAttributes: ["id"] as const,
-            remoteAttributes: ["parent_id"] as const,
+            localAttributes: ["id"],
+            remoteAttributes: ["parent_id"],
           },
         )
         .addRelation(relationalItemsCodec, "author", personResourceOptions, {
           isUnique: true,
-          localAttributes: ["author_id"] as const,
-          remoteAttributes: ["person_id"] as const,
+          localAttributes: ["author_id"],
+          remoteAttributes: ["person_id"],
         })
         .addRelation(
           relationalItemsCodec,
           "topic",
           relationalTopicsResourceOptions,
           {
-            localAttributes: [`id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`id`],
+            remoteAttributes: [`id`],
             isUnique: true,
             // reciprocal: 'item',
           },
@@ -1495,8 +1514,8 @@ export function makeExampleSchema(
           "post",
           relationalPostsResourceOptions,
           {
-            localAttributes: [`id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`id`],
+            remoteAttributes: [`id`],
             isUnique: true,
             // reciprocal: 'item',
           },
@@ -1506,8 +1525,8 @@ export function makeExampleSchema(
           "divider",
           relationalDividersResourceOptions,
           {
-            localAttributes: [`id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`id`],
+            remoteAttributes: [`id`],
             isUnique: true,
             // reciprocal: 'item',
           },
@@ -1517,8 +1536,8 @@ export function makeExampleSchema(
           "checklist",
           relationalChecklistsResourceOptions,
           {
-            localAttributes: [`id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`id`],
+            remoteAttributes: [`id`],
             isUnique: true,
             // reciprocal: 'item',
           },
@@ -1528,8 +1547,8 @@ export function makeExampleSchema(
           "checklistItem",
           relationalChecklistItemsResourceOptions,
           {
-            localAttributes: [`id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`id`],
+            remoteAttributes: [`id`],
             isUnique: true,
             // reciprocal: 'item',
           },
@@ -1540,8 +1559,8 @@ export function makeExampleSchema(
           "post",
           relationalPostsResourceOptions,
           {
-            localAttributes: [`id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`id`],
+            remoteAttributes: [`id`],
             isUnique: true,
             // reciprocal: 'item',
           },
@@ -1551,8 +1570,8 @@ export function makeExampleSchema(
           "checklist",
           relationalChecklistsResourceOptions,
           {
-            localAttributes: [`id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`id`],
+            remoteAttributes: [`id`],
             isUnique: true,
             // reciprocal: 'item',
           },
@@ -1562,26 +1581,26 @@ export function makeExampleSchema(
           "checklistItem",
           relationalChecklistItemsResourceOptions,
           {
-            localAttributes: [`id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`id`],
+            remoteAttributes: [`id`],
             isUnique: true,
             // reciprocal: 'item',
           },
         )
 
         .addRelation(unionItemsCodec, "topic", unionTopicsResourceOptions, {
-          localAttributes: [`id`] as const,
-          remoteAttributes: [`id`] as const,
+          localAttributes: [`id`],
+          remoteAttributes: [`id`],
           isUnique: true,
         })
         .addRelation(unionItemsCodec, "post", unionPostsResource, {
-          localAttributes: [`id`] as const,
-          remoteAttributes: [`id`] as const,
+          localAttributes: [`id`],
+          remoteAttributes: [`id`],
           isUnique: true,
         })
         .addRelation(unionItemsCodec, "divider", unionDividersResourceOptions, {
-          localAttributes: [`id`] as const,
-          remoteAttributes: [`id`] as const,
+          localAttributes: [`id`],
+          remoteAttributes: [`id`],
           isUnique: true,
         })
         .addRelation(
@@ -1589,8 +1608,8 @@ export function makeExampleSchema(
           "checklist",
           unionChecklistsResourceOptions,
           {
-            localAttributes: [`id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`id`],
+            remoteAttributes: [`id`],
             isUnique: true,
           },
         )
@@ -1599,8 +1618,8 @@ export function makeExampleSchema(
           "checklistItem",
           unionChecklistItemsResourceOptions,
           {
-            localAttributes: [`id`] as const,
-            remoteAttributes: [`id`] as const,
+            localAttributes: [`id`],
+            remoteAttributes: [`id`],
             isUnique: true,
           },
         )
@@ -1621,10 +1640,16 @@ export function makeExampleSchema(
     ],
   );
 
-  const registry = EXPORTABLE(
+  const rawRegistry = EXPORTABLE(
     (makeRegistry, registryConfig) => makeRegistry(registryConfig),
     [makeRegistry, registryConfig],
   );
+
+  type RawRegistry = typeof rawRegistry;
+
+  interface Registry extends RawRegistry {}
+
+  const registry: Registry = rawRegistry;
 
   if (Math.random() > 2) {
     /*
@@ -1665,7 +1690,7 @@ export function makeExampleSchema(
           const innerPlan =
             step instanceof __ListTransformStep
               ? step.getListStep()
-              : (step as PgSelectStep | PgSelectSingleStep);
+              : (step as PgSelectStep<any> | PgSelectSingleStep<any>);
           if ("getClassStep" in innerPlan) {
             innerPlan.getClassStep().setInliningForbidden();
           } else if ("setInliningForbidden" in innerPlan) {
@@ -1677,9 +1702,7 @@ export function makeExampleSchema(
     [__ListTransformStep, options],
   );
 
-  type ResourceConnectionPlan<
-    TResource extends PgResource<any, any, any, any, any>,
-  > = ConnectionStep<
+  type ResourceConnectionPlan<TResource extends AnyPgResource> = ConnectionStep<
     PgSelectSingleStep<TResource>,
     PgSelectParsedCursorStep,
     PgSelectStep<TResource>,
@@ -1727,48 +1750,103 @@ export function makeExampleSchema(
     },
   } = registry;
 
-  type MessageConnectionStep = ResourceConnectionPlan<typeof messageResource>;
-  type MessageStep = PgSelectSingleStep<typeof messageResource>;
-  type UserStep = PgSelectSingleStep<typeof userResource>;
-  type ForumStep = PgSelectSingleStep<typeof forumResource>;
-  type PersonStep = PgSelectSingleStep<typeof personResource>;
-  type PersonBookmarkStep = PgSelectSingleStep<typeof personBookmarksResource>;
-  type PostStep = PgSelectSingleStep<typeof postResource>;
-  type CommentStep = PgSelectSingleStep<typeof commentResource>;
-  type SingleTableItemsStep = PgSelectStep<typeof singleTableItemsResource>;
-  type SingleTableItemStep = PgSelectSingleStep<
-    typeof singleTableItemsResource
-  >;
-  type RelationalItemsStep = PgSelectStep<typeof relationalItemsResource>;
-  type RelationalItemStep = PgSelectSingleStep<typeof relationalItemsResource>;
-  type RelationalTopicStep = PgSelectSingleStep<
-    typeof relationalTopicsResource
-  >;
-  type RelationalPostStep = PgSelectSingleStep<typeof relationalPostsResource>;
-  type RelationalDividerStep = PgSelectSingleStep<
-    typeof relationalDividersResource
-  >;
-  type RelationalChecklistStep = PgSelectSingleStep<
-    typeof relationalChecklistsResource
-  >;
-  type RelationalChecklistItemStep = PgSelectSingleStep<
-    typeof relationalChecklistItemsResource
-  >;
-  type UnionItemsStep = PgSelectStep<typeof unionItemsResource>;
-  type UnionItemStep = PgSelectSingleStep<typeof unionItemsResource>;
-  type UnionTopicStep = PgSelectSingleStep<typeof unionTopicsResource>;
-  type UnionPostStep = PgSelectSingleStep<typeof unionPostsResource>;
-  type UnionDividerStep = PgSelectSingleStep<typeof unionDividersResource>;
-  type UnionChecklistStep = PgSelectSingleStep<typeof unionChecklistsResource>;
-  type UnionChecklistItemStep = PgSelectSingleStep<
-    typeof unionChecklistItemsResource
-  >;
-  type RelationalCommentablesStep = PgSelectStep<
-    typeof relationalCommentableResource
-  >;
-  type RelationalCommentableStep = PgSelectSingleStep<
-    typeof relationalCommentableResource
-  >;
+  type unionEntityCodec = typeof unionEntityCodec;
+  interface UnionEntityCodec extends unionEntityCodec {}
+
+  type messages = typeof messageResource;
+  interface MessageResource extends messages {}
+
+  type MessageConnectionStep = ResourceConnectionPlan<MessageResource>;
+
+  type users = typeof userResource;
+  interface UserResource extends users {}
+
+  type forums = typeof forumResource;
+  interface ForumResource extends forums {}
+
+  type people = typeof personResource;
+  interface PersonResource extends people {}
+
+  type person_bookmarks = typeof personBookmarksResource;
+  interface PersonBookmarkResource extends person_bookmarks {}
+
+  type posts = typeof postResource;
+  interface PostResource extends posts {}
+
+  type comments = typeof commentResource;
+  interface CommentResource extends comments {}
+
+  type single_table_items = typeof singleTableItemsResource;
+  interface SingleTableItemResource extends single_table_items {}
+
+  type relational_items = typeof relationalItemsResource;
+  interface RelationalItemResource extends relational_items {}
+
+  type relational_topics = typeof relationalTopicsResource;
+  interface RelationalTopicResource extends relational_topics {}
+
+  type relational_posts = typeof relationalPostsResource;
+  interface RelationalPostResource extends relational_posts {}
+
+  type relational_dividers = typeof relationalDividersResource;
+  interface RelationalDividerResource extends relational_dividers {}
+
+  type relational_checklists = typeof relationalChecklistsResource;
+  interface RelationalChecklistResource extends relational_checklists {}
+
+  type relational_checklist_items = typeof relationalChecklistItemsResource;
+  interface RelationalChecklistItemResource
+    extends relational_checklist_items {}
+
+  type union_items = typeof unionItemsResource;
+  interface UnionItemResource extends union_items {}
+
+  type union_topics = typeof unionTopicsResource;
+  interface UnionTopicResource extends union_topics {}
+
+  type union_posts = typeof unionPostsResource;
+  interface UnionPostResource extends union_posts {}
+
+  type union_dividers = typeof unionDividersResource;
+  interface UnionDividerResource extends union_dividers {}
+
+  type union_checklists = typeof unionChecklistsResource;
+  interface UnionChecklistResource extends union_checklists {}
+
+  type union_checklist_items = typeof unionChecklistItemsResource;
+  interface UnionChecklistItemResource extends union_checklist_items {}
+
+  type relational_commentables = typeof relationalCommentableResource;
+  interface RelationalCommentableResource extends relational_commentables {}
+
+  type MessageStep = PgSelectSingleStep<MessageResource>;
+  type UserStep = PgSelectSingleStep<UserResource>;
+  type ForumStep = PgSelectSingleStep<ForumResource>;
+  type PersonStep = PgSelectSingleStep<PersonResource>;
+  type PersonBookmarkStep = PgSelectSingleStep<PersonBookmarkResource>;
+  type PostStep = PgSelectSingleStep<PostResource>;
+  type CommentStep = PgSelectSingleStep<CommentResource>;
+  type SingleTableItemsStep = PgSelectStep<SingleTableItemResource>;
+  type SingleTableItemStep = PgSelectSingleStep<SingleTableItemResource>;
+  type RelationalItemsStep = PgSelectStep<RelationalItemResource>;
+  type RelationalItemStep = PgSelectSingleStep<RelationalItemResource>;
+  type RelationalTopicStep = PgSelectSingleStep<RelationalTopicResource>;
+  type RelationalPostStep = PgSelectSingleStep<RelationalPostResource>;
+  type RelationalDividerStep = PgSelectSingleStep<RelationalDividerResource>;
+  type RelationalChecklistStep =
+    PgSelectSingleStep<RelationalChecklistResource>;
+  type RelationalChecklistItemStep =
+    PgSelectSingleStep<RelationalChecklistItemResource>;
+  type UnionItemsStep = PgSelectStep<UnionItemResource>;
+  type UnionItemStep = PgSelectSingleStep<UnionItemResource>;
+  type UnionTopicStep = PgSelectSingleStep<UnionTopicResource>;
+  type UnionPostStep = PgSelectSingleStep<UnionPostResource>;
+  type UnionDividerStep = PgSelectSingleStep<UnionDividerResource>;
+  type UnionChecklistStep = PgSelectSingleStep<UnionChecklistResource>;
+  type UnionChecklistItemStep = PgSelectSingleStep<UnionChecklistItemResource>;
+  type RelationalCommentablesStep = PgSelectStep<RelationalCommentableResource>;
+  type RelationalCommentableStep =
+    PgSelectSingleStep<RelationalCommentableResource>;
 
   ////////////////////////////////////////
 
@@ -1784,8 +1862,10 @@ export function makeExampleSchema(
   });
 
   function attrField<
-    TMyResource extends PgResource<any, any, any, any, any>,
-    TAttrName extends keyof GetPgResourceAttributes<TMyResource>,
+    TMyResource extends AnyPgResource,
+    TAttrName extends PgCodecAttributeName<
+      GetPgResourceAttributes<TMyResource>
+    >,
   >(attrName: TAttrName, type: GraphQLOutputType) {
     return {
       type,
@@ -1800,8 +1880,10 @@ export function makeExampleSchema(
   }
 
   function singleRelationField<
-    TMyResource extends PgResource<any, any, any, any, any>,
-    TRelationName extends keyof GetPgResourceRelations<TMyResource>,
+    TMyResource extends AnyPgResource,
+    TRelationName extends PgCodecRelationConfigName<
+      GetPgResourceRelationConfigs<TMyResource>
+    >,
   >(relation: TRelationName, type: GraphQLOutputType) {
     return {
       type,
@@ -2827,7 +2909,7 @@ export function makeExampleSchema(
   const relationalItemPolymorphicTypeMap = EXPORTABLE(
     (
       deoptimizeIfAppropriate,
-    ): PgPolymorphicTypeMap<RelationalItemStep, string> => ({
+    ): PgPolymorphicTypeMap<RelationalItemsLikeStep, string> => ({
       RelationalTopic: {
         match: (t) => t === "TOPIC",
         plan: (_, $item) =>
@@ -2859,7 +2941,7 @@ export function makeExampleSchema(
 
   const relationalItemInterface = EXPORTABLE(
     (pgPolymorphic, relationalItemPolymorphicTypeMap) =>
-      ($item: RelationalItemStep) =>
+      <TStep extends RelationalItemsLikeStep>($item: TStep) =>
         pgPolymorphic(
           $item,
           $item.get("type"),
@@ -2945,7 +3027,8 @@ export function makeExampleSchema(
       personResource,
       postResource,
     ): PgPolymorphicTypeMap<
-      PgSelectSingleStep<any> | PgClassExpressionStep<PgCodec, any>,
+      | PgSelectSingleStep<any>
+      | PgClassExpressionStep<PgCodec<any, any, any, any, any, any, any>, any>,
       readonly number[],
       ListStep<readonly ExecutableStep[]>
     > => ({
@@ -2977,10 +3060,10 @@ export function makeExampleSchema(
    */
   const entityUnion = EXPORTABLE(
     (entityPolymorphicTypeMap, list, pgPolymorphic) =>
-      <TCodec extends typeof unionEntityCodec>(
+      (
         $item:
-          | PgSelectSingleStep<PgResource<any, TCodec, any, any, any>>
-          | PgClassExpressionStep<TCodec, PgResource<any, any, any, any, any>>,
+          | PgSelectSingleStep<PgResource<any, UnionEntityCodec, any, any, any>>
+          | PgClassExpressionStep<UnionEntityCodec, any>,
       ) =>
         pgPolymorphic(
           $item,
@@ -3033,10 +3116,9 @@ export function makeExampleSchema(
             ) =>
               function plan($person) {
                 const $personId = $person.get("person_id");
-                const $items: SingleTableItemsStep =
-                  singleTableItemsResource.find({
-                    author_id: $personId,
-                  });
+                const $items = singleTableItemsResource.find({
+                  author_id: $personId,
+                });
                 deoptimizeIfAppropriate($items);
                 return each($items, singleTableItemInterface);
               },
@@ -3156,9 +3238,7 @@ export function makeExampleSchema(
     [fieldName: string]: GrafastFieldConfig<
       any,
       any,
-      PgSelectSingleStep<
-        PgResource<any, typeof singleTableItemsResource.codec, any, any, any>
-      >,
+      SingleTableItemStep,
       any,
       any
     >;
@@ -3255,8 +3335,27 @@ export function makeExampleSchema(
     }),
   });
 
+  interface RelationalItemsLikeStep
+    extends PgSelectSingleStep<
+      PgResource<
+        any,
+        PgCodec<
+          any,
+          PgCodecAttributeMap<PgResourceCodec<RelationalItemResource>>,
+          any,
+          any,
+          any,
+          any,
+          any
+        >,
+        any,
+        any,
+        any
+      >
+    > {}
+
   const commonRelationalItemFields = <
-    TStep extends PgSelectSingleStep<any>,
+    TStep extends RelationalItemsLikeStep,
   >() =>
     ({
       id: attrField("id", GraphQLInt),
@@ -3638,7 +3737,7 @@ export function makeExampleSchema(
         extensions: {
           grafast: {
             applyPlan: EXPORTABLE(
-              () => (step: PgUnionAllStep) => {
+              () => (step: PgUnionAllStep<any, any>) => {
                 step.orderBy({
                   attribute: "cvss_score",
                   direction: "ASC",
@@ -3653,7 +3752,7 @@ export function makeExampleSchema(
         extensions: {
           grafast: {
             applyPlan: EXPORTABLE(
-              () => (step: PgUnionAllStep) => {
+              () => (step: PgUnionAllStep<any, any>) => {
                 step.orderBy({
                   attribute: "cvss_score",
                   direction: "DESC",
@@ -4310,7 +4409,7 @@ export function makeExampleSchema(
                   pgCodec: TYPES.text,
                   name: "query",
                 },
-              ]) as PgSelectStep;
+              ]) as PgSelectStep<any>;
               deoptimizeIfAppropriate($step);
               return each($step, ($item) => entityUnion($item as any));
             },
@@ -4708,7 +4807,15 @@ export function makeExampleSchema(
 
   type PgRecord<TResource extends PgResource<any, any, any, any, any>> =
     PgClassExpressionStep<
-      PgCodec<any, GetPgResourceAttributes<TResource>, any, any, any, any, any>,
+      PgCodec<
+        any,
+        GetPgResourceAttributeMap<TResource>,
+        any,
+        any,
+        any,
+        any,
+        any
+      >,
       TResource
     >;
 

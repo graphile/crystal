@@ -1,10 +1,9 @@
 import "graphile-config";
 
 import type {
-  PgCodec,
-  PgCodecWithAttributes,
-  PgResource,
-  PgResourceUnique,
+  DefaultPgCodec,
+  DefaultPgResource,
+  DefaultPgResourceUnique,
 } from "@dataplan/pg";
 import type { FieldArgs } from "grafast";
 import { EXPORTABLE } from "graphile-build";
@@ -19,8 +18,8 @@ declare global {
       rowByUnique(
         this: Inflection,
         details: {
-          unique: PgResourceUnique;
-          resource: PgResource<any, any, any, any, any>;
+          unique: DefaultPgResourceUnique;
+          resource: DefaultPgResource;
         },
       ): string;
     }
@@ -84,65 +83,58 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
         return resources.reduce(
           (outerMemo, rawResource) =>
             build.recoverable(outerMemo, () =>
-              (rawResource.uniques as PgResourceUnique[]).reduce(
-                (memo, unique) => {
-                  const resource = rawResource as PgResource<
-                    any,
-                    PgCodecWithAttributes,
-                    any,
-                    any,
-                    any
-                  >;
-                  const uniqueKeys = unique.attributes as string[];
-                  const fieldName = build.inflection.rowByUnique({
-                    unique,
-                    resource,
+              rawResource.uniques.reduce((memo, unique) => {
+                const resource = rawResource;
+                const uniqueKeys = unique.attributes;
+                const fieldName = build.inflection.rowByUnique({
+                  unique,
+                  resource,
+                });
+
+                const type = build.getTypeByName(
+                  build.inflection.tableType(resource.codec),
+                );
+                if (!type || !(type instanceof GraphQLObjectType)) {
+                  return memo;
+                }
+
+                const detailsByAttributeName: {
+                  [attributeName: string]: {
+                    graphqlName: string;
+                    codec: DefaultPgCodec;
+                  };
+                } = Object.create(null);
+                uniqueKeys.forEach((attributeName) => {
+                  const attribute = resource.codec.attributes![attributeName];
+                  const attributeArgName = build.inflection.attribute({
+                    attributeName,
+                    codec: resource.codec,
                   });
+                  detailsByAttributeName[attributeName] = {
+                    graphqlName: attributeArgName,
+                    codec: attribute.codec,
+                  };
+                });
 
-                  const type = build.getTypeByName(
-                    build.inflection.tableType(resource.codec),
-                  );
-                  if (!type || !(type instanceof GraphQLObjectType)) {
-                    return memo;
-                  }
-
-                  const detailsByAttributeName: {
-                    [attributeName: string]: {
-                      graphqlName: string;
-                      codec: PgCodec;
-                    };
-                  } = Object.create(null);
-                  uniqueKeys.forEach((attributeName) => {
-                    const attribute = resource.codec.attributes![attributeName];
-                    const attributeArgName = build.inflection.attribute({
-                      attributeName,
-                      codec: resource.codec,
-                    });
-                    detailsByAttributeName[attributeName] = {
-                      graphqlName: attributeArgName,
-                      codec: attribute.codec,
-                    };
-                  });
-
-                  const attributeNames = Object.keys(detailsByAttributeName);
-                  const clean = attributeNames.every(
-                    (key) =>
-                      isSafeObjectPropertyName(key) &&
-                      isSafeObjectPropertyName(
-                        detailsByAttributeName[key].graphqlName,
-                      ),
-                  );
-                  const plan = clean
-                    ? /*
-                       * Since all the identifiers are nice and clean we can use
-                       * an optimized function that doesn't loop over the
-                       * attributes and just builds the object directly.  This is
-                       * more performant, but it also makes the code nicer to
-                       * read in the exported code.
-                       */
-                      // eslint-disable-next-line graphile-export/exhaustive-deps
-                      EXPORTABLE(
-                        te.run`\
+                const attributeNames = Object.keys(detailsByAttributeName);
+                const clean = attributeNames.every(
+                  (key) =>
+                    isSafeObjectPropertyName(key) &&
+                    isSafeObjectPropertyName(
+                      detailsByAttributeName[key].graphqlName,
+                    ),
+                );
+                const plan = clean
+                  ? /*
+                     * Since all the identifiers are nice and clean we can use
+                     * an optimized function that doesn't loop over the
+                     * attributes and just builds the object directly.  This is
+                     * more performant, but it also makes the code nicer to
+                     * read in the exported code.
+                     */
+                    // eslint-disable-next-line graphile-export/exhaustive-deps
+                    EXPORTABLE(
+                      te.run`\
 return function (resource) {
   return (_$root, args) => resource.get({ ${te.join(
     attributeNames.map(
@@ -154,76 +146,72 @@ return function (resource) {
     ", ",
   )} });
 }` as any,
-                        [resource],
-                      )
-                    : EXPORTABLE(
-                        (detailsByAttributeName, resource) =>
-                          function plan(_$root: any, args: FieldArgs) {
-                            const spec = Object.create(null);
-                            for (const attributeName in detailsByAttributeName) {
-                              spec[attributeName] = args.get(
-                                detailsByAttributeName[attributeName]
-                                  .graphqlName,
-                              );
-                            }
-                            return resource.get(spec);
-                          },
-                        [detailsByAttributeName, resource],
-                      );
-
-                  const fieldBehaviorScope = "query:resource:single";
-                  if (
-                    !build.behavior.pgResourceUniqueMatches(
-                      [resource, unique],
-                      fieldBehaviorScope,
+                      [resource],
                     )
-                  ) {
-                    return memo;
-                  }
-
-                  return build.extend(
-                    memo,
-                    {
-                      [fieldName]: fieldWithHooks(
-                        {
-                          fieldName,
-                          fieldBehaviorScope,
-                        },
-                        () => ({
-                          description: `Get a single \`${type.name}\`.`,
-                          deprecationReason: tagToString(
-                            resource.extensions?.tags?.deprecated,
-                          ),
-                          type,
-                          args: uniqueKeys.reduce((args, attributeName) => {
-                            const details =
-                              detailsByAttributeName[attributeName];
-                            const attributeType = build.getGraphQLTypeByPgCodec(
-                              details.codec,
-                              "input",
+                  : EXPORTABLE(
+                      (detailsByAttributeName, resource) =>
+                        function plan(_$root: any, args: FieldArgs) {
+                          const spec = Object.create(null);
+                          for (const attributeName in detailsByAttributeName) {
+                            spec[attributeName] = args.get(
+                              detailsByAttributeName[attributeName].graphqlName,
                             );
-                            if (!attributeType) {
-                              throw new Error(
-                                `Could not determine type for attribute`,
-                              );
-                            }
-                            args[details.graphqlName] = {
-                              type: new GraphQLNonNull(attributeType),
-                            };
-                            return args;
-                          }, Object.create(null)),
+                          }
+                          return resource.get(spec);
+                        },
+                      [detailsByAttributeName, resource],
+                    );
 
-                          plan: plan as any,
-                        }),
-                      ),
-                    },
-                    `Adding row accessor for ${resource} by unique attributes ${uniqueKeys.join(
-                      ",",
-                    )}`,
-                  );
-                },
-                outerMemo,
-              ),
+                const fieldBehaviorScope = "query:resource:single";
+                if (
+                  !build.behavior.pgResourceUniqueMatches(
+                    [resource, unique],
+                    fieldBehaviorScope,
+                  )
+                ) {
+                  return memo;
+                }
+
+                return build.extend(
+                  memo,
+                  {
+                    [fieldName]: fieldWithHooks(
+                      {
+                        fieldName,
+                        fieldBehaviorScope,
+                      },
+                      () => ({
+                        description: `Get a single \`${type.name}\`.`,
+                        deprecationReason: tagToString(
+                          resource.extensions?.tags?.deprecated,
+                        ),
+                        type,
+                        args: uniqueKeys.reduce((args, attributeName) => {
+                          const details = detailsByAttributeName[attributeName];
+                          const attributeType = build.getGraphQLTypeByPgCodec(
+                            details.codec,
+                            "input",
+                          );
+                          if (!attributeType) {
+                            throw new Error(
+                              `Could not determine type for attribute`,
+                            );
+                          }
+                          args[details.graphqlName] = {
+                            type: new GraphQLNonNull(attributeType),
+                          };
+                          return args;
+                        }, Object.create(null)),
+
+                        plan: plan as any,
+                      }),
+                    ),
+                  },
+                  `Adding row accessor for ${resource} by unique attributes ${uniqueKeys.join(
+                    ",",
+                  )}`,
+                );
+              }, outerMemo),
             ),
           fields,
         );

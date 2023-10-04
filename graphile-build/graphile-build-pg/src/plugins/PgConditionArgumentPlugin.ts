@@ -2,6 +2,8 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
+  DefaultPgSelectSingleStep,
+  DefaultPgSelectStep,
   PgCodecWithAttributes,
   PgSelectParsedCursorStep,
   PgSelectSingleStep,
@@ -59,7 +61,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
             if (!rawCodec.attributes || rawCodec.isAnonymous) {
               return;
             }
-            const codec = rawCodec as PgCodecWithAttributes;
+            const codec = rawCodec;
 
             const tableTypeName = inflection.tableType(codec);
             const conditionName = inflection.conditionType(tableTypeName);
@@ -156,15 +158,15 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                 ? (
                     _condition,
                     $connection: ConnectionStep<
-                      PgSelectSingleStep,
+                      DefaultPgSelectSingleStep,
                       PgSelectParsedCursorStep,
-                      PgSelectStep
+                      DefaultPgSelectStep
                     >,
                   ) => {
                     const $select = $connection.getSubplan();
                     return $select.wherePlan();
                   }
-                : (_condition, $select: PgSelectStep) => {
+                : (_condition, $select: DefaultPgSelectStep) => {
                     return $select.wherePlan();
                   },
             },

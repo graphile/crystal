@@ -51,7 +51,7 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
     entityBehavior: {
       pgCodecAttribute(behavior, [codec, attributeName], build) {
         const newBehavior = [behavior];
-        const attr = codec.attributes[attributeName];
+        const attr = codec.attributes![attributeName];
 
         const resource =
           codec.polymorphism?.mode === "union"
@@ -88,9 +88,9 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
           // If the column is available via a singular relation, don't include the column itself
           const relationsMap = build.input.pgRegistry.pgRelations[codec.name];
           const relations = relationsMap
-            ? (Object.values(
+            ? Object.values(
                 build.input.pgRegistry.pgRelations[codec.name] ?? {},
-              ) as PgCodecRelation[])
+              )
             : [];
           const singularRelationsUsingThisColumn = relations.filter((r) => {
             // NOTE: We do this even if the end table is not visible, because
@@ -110,10 +110,8 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
             newBehavior.push(...RELAY_HIDDEN_COLUMN_BEHAVIORS);
           }
         }
-        const relations = (
-          Object.values(
-            build.input.pgRegistry.pgRelations[codec.name] ?? {},
-          ) as PgCodecRelation[]
+        const relations = Object.values(
+          build.input.pgRegistry.pgRelations[codec.name] ?? {},
         ).filter((r) => !r.isReferencee && r.isUnique);
         const isPartOfRelation =
           !attr.codec.extensions?.isEnumTableEnum &&
