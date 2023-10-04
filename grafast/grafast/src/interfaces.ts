@@ -127,7 +127,7 @@ declare global {
      * HTTP request, the request itself so headers can be interrogated.
      *
      * It's anticipated this will be expanded via declaration merging, e.g. if
-     * your server is Koa then `RequestContext.koa` might be added.
+     * your server is Koa v2 then `RequestContext.koav2` might be added.
      */
     interface RequestContext {}
 
