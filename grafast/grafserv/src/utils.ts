@@ -312,3 +312,13 @@ export function parseGraphQLJSONBody(
     extensions,
   };
 }
+
+export async function concatBufferIterator(
+  bufferIterator: AsyncGenerator<Buffer>,
+) {
+  const buffers = [];
+  for await (const buffer of bufferIterator) {
+    buffers.push(buffer);
+  }
+  return Buffer.concat(buffers);
+}
