@@ -22,6 +22,7 @@ declare global {
   }
 }
 
+/** @experimental */
 export class LambdaGrafserv extends GrafservBase {
   protected lambdaRequestToGrafserv(
     event: APIGatewayEvent,
@@ -78,7 +79,7 @@ export class LambdaGrafserv extends GrafservBase {
 
       case "buffer": {
         const { statusCode, headers, buffer } = response;
-        return { statusCode, headers, body: buffer.toString() };
+        return { statusCode, headers, body: buffer.toString("utf8") };
       }
 
       case "json": {
@@ -90,7 +91,7 @@ export class LambdaGrafserv extends GrafservBase {
         console.log("Unhandled:");
         console.dir(response);
         return {
-          statusCode: 503,
+          statusCode: 501,
           headers: { "Content-Type": "text/plain" },
           body: "Server hasn't implemented this yet",
         };
@@ -123,6 +124,7 @@ export class LambdaGrafserv extends GrafservBase {
   }
 }
 
+/** @experimental */
 export function grafserv(config: GrafservConfig) {
   return new LambdaGrafserv(config);
 }

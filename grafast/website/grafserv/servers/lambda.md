@@ -1,5 +1,7 @@
 # Lambda
 
+**THIS INTEGRATION IS EXPERIMENTAL**. PRs improving it are welcome.
+
 Grafserv supports the following AWS lambda configurations:
 
 ## AWS API Gateway v2
