@@ -17,7 +17,7 @@
     "postgraphile": "cd postgraphile/postgraphile && node dist/cli-run.js",
     "-----": "-----",
     "eslint": "eslint --ext .js,.jsx,.ts,.tsx",
-    "prettier": "prettier --ignore-path ./.eslintignore",
+    "prettier": "prettier --cache --ignore-path ./.eslintignore",
     "prettier:all": "yarn prettier '**/*.{json,md,mdx,html,js,jsx,ts,tsx,yml}'",
     "prettier:fix": "yarn prettier:all --write",
     "prettier:check": "yarn prettier:all --list-different"
