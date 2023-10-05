@@ -191,8 +191,7 @@ program
   .option(
     '--use-partitioned-parent',
     'by default, partitioned table partitions are exposed and their parents are hidden; use this flag to hide partitions and expose their parents',
-  )
-;
+  );
 
 pluginHook('cli:flags:add:schema', addFlag);
 
