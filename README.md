@@ -1,6 +1,6 @@
 <img width="120" height="120" title="PostGraphile logo" src="https://cdn.rawgit.com/graphile/graphile.github.io/a6225f8c3052df5c276ecef28aeb0cade1aec16a/logos/postgraphile.optimized.svg" />
 
-# PostGraphile
+# PostGraphile V4
 
 [![GitHub Sponsors](https://img.shields.io/github/sponsors/benjie?label=GitHub%20sponsors)](https://github.com/sponsors/benjie)
 [![Patreon sponsor button](https://img.shields.io/badge/sponsor-via%20Patreon-orange.svg)](https://patreon.com/benjie)
@@ -11,16 +11,16 @@
 
 _**Instant lightning-fast GraphQL API backed primarily by your PostgreSQL database. Highly customisable and extensible thanks to incredibly powerful plugin system.**_ _Formerly "PostGraphQL"._
 
-## Documentation: [graphile.org/postgraphile](https://graphile.org/postgraphile)
+## V4 Documentation: [graphile.org/postgraphile](https://graphile.org/postgraphile)
 
-## Version 5 is in **OPEN BETA**
+## ANNOUNCEMENT: Version 5 is in **OPEN BETA**
 
 The long awaited PostGraphile Version 5 is now available for you to try out! There's still bugs to work out, types to improve, documentation and examples that need writing; read more about what beta means in our **[Beta announcement on dev.to](https://dev.to/graphile/postgraphile-v5-public-beta-get-involved-1lg9)**.
 
 Other useful resources:
 
 - **[Intro to V5 series](https://dev.to/benjie/series/23459)** on dev.to
-- **[Documentation](https://postgraphile.org)** at postgraphile.org
+- **[V5 Documentation](https://postgraphile.org)** at postgraphile.org
 - **[V4 -> V5 migration guide](https://postgraphile.org/postgraphile/next/migrating-from-v4/)** at postgraphile.org
 - **[Overview of new features](https://postgraphile.org/postgraphile/next/migrating-from-v4/v5-new-feature-summary)** at postgraphile.org
 - **[💖 Sponsor us to help launch V5 sooner! 🚀](https://github.com/sponsors/benjie)**
@@ -29,7 +29,7 @@ Now is the perfect time to get your feet wet with V5 — even if you're not yet 
 
 This release has taken a tremendous amount of work and we've forgone a significant amount of client work to build it for you. If you can afford even a couple dollars a month, please consider becoming a sponsor; we really need your support to help get V5 over the finish line!
 
-And for those of you wondering when V5.0.0 will be released, here are the [issues that need to be solved before the final release](https://github.com/benjie/crystal/milestone/3). The more support we get, the faster that day will come — please get involved, or sponsor us!
+And for those of you wondering when V5.0.0 will be released, here are the [issues that need to be solved before the final release](https://github.com/orgs/graphile/projects/3). The more support we get, the faster that day will come — please get involved, or sponsor us!
 
 <!-- SPONSORS_BEGIN -->
 
