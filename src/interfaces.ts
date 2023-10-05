@@ -319,6 +319,10 @@ export interface PostGraphileOptions<
   // disable.
   /* @middlewareOnly */
   queryCacheMaxSize?: number;
+  // By default, partitioned tables' partitions are exposed and parents
+  // are hidden in the generated GraphQL schema. You can use this flag to
+  // expose parents and hide partitions, instead.
+  usePartitionedParent?: boolean;
 }
 
 export interface CreateRequestHandlerOptions extends PostGraphileOptions {
