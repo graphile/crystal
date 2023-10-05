@@ -32,6 +32,7 @@ export {
   withPostGraphileContext,
   enhanceHttpServerWithWebSockets,
   debugPgClient,
+  extendedFormatError,
   // Backwards compatibility
   postgraphile as postgraphql,
   createPostGraphileSchema as createPostGraphQLSchema,
