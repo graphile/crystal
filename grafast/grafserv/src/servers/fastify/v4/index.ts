@@ -154,7 +154,7 @@ export class FastifyGrafserv extends GrafservBase {
         console.log("Unhandled:");
         console.dir(never);
         reply.type("text/plain");
-        reply.statusCode = 503;
+        reply.statusCode = 501;
         return "Server hasn't implemented this yet";
       }
     }

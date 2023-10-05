@@ -236,7 +236,7 @@ export class NodeGrafservBase extends GrafservBase {
               "Server hasn't implemented this yet",
               "utf8",
             );
-            res.writeHead(503, { "Content-Length": payload.length });
+            res.writeHead(501, { "Content-Length": payload.length });
             res.end(payload);
             return;
           }

@@ -134,7 +134,7 @@ export class KoaGrafserv extends GrafservBase {
           console.log("Unhandled:");
           console.dir(never);
           ctx.response.type = "text/plain";
-          ctx.response.status = 503;
+          ctx.response.status = 501;
           ctx.response.body = "Server hasn't implemented this yet";
           return;
         }
