@@ -1,3 +1,5 @@
+src/assets/favicon.ico.ts
+src/assets/graphiql.html.ts
 /assets
 /postgraphiql/public
 node_modules

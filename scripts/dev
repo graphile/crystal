@@ -5,7 +5,6 @@ set -e
 echo "Running dev (don't forget to 'yarn make-assets' if you've changed GraphiQL / favicon / etc)..."
 cd $(dirname $0)/..
 
-npm_bin=$(npm bin)
 
 export POSTGRAPHILE_ENV=development
 export BROWSER=none
@@ -18,10 +17,10 @@ if [ "$1" = "--" ]; then
     echo '  export DEBUG="postgraphile*,graphile-build:warn,-postgraphile:graphql,-postgraphile:postgres:explain"'
   fi
   shift
-  $npm_bin/ts-node --transpile-only src/postgraphile/cli.ts "$@" &
+  npx --no-install ts-node --transpile-only src/postgraphile/cli.ts "$@" &
 else
   export DEBUG=${DEBUG-postgraphile*,graphile-build:warn,-postgraphile:graphql,-postgraphile:postgres:explain}
-  $npm_bin/nodemon \
+  npx --no-install nodemon \
     --watch ../packages/postgraphile-core/node8plus \
     --watch ../packages/graphile-build-pg/node8plus \
     --watch ../packages/graphile-build/node8plus \
@@ -31,7 +30,7 @@ else
     --ignore __mocks__ \
     --ignore src/postgraphile/graphiql \
     --ext js,ts \
-    --exec "$npm_bin/ts-node --transpile-only src/postgraphile/cli.ts $* --show-error-stack json --extended-errors hint,detail,errcode" &
+    --exec "npx --no-install ts-node --transpile-only src/postgraphile/cli.ts $* --show-error-stack json --extended-errors hint,detail,errcode" &
 fi;
 
 # Ensure forked process is killed even if we die unexpectedly

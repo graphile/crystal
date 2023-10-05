@@ -869,7 +869,7 @@ if (noServer) {
     // some instructions and other interesting information.
     server.listen(port, hostname, () => {
       const address = server.address();
-      const actualPort = typeof address === 'string' ? port : address.port;
+      const actualPort = typeof address === 'string' || address == null ? port : address.port;
       const self = cluster.isMaster
         ? isDev
           ? `server (pid=${process.pid})`

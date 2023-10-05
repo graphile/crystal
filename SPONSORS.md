@@ -6,68 +6,80 @@ sponsor](https://graphile.org/sponsor/).
 
 ## Featured
 
-- Surge
-- Story.ai
-- Chad Furman
 - The Guild
-- Qwick
-- Fanatics
-- Stellate
 - Dovetail
-- Enzuzo
+- Netflix
+- Chad Furman
+- Stellate
+- Accenture
+- We Love Micro
 - Politics Rewired
-- IaSQL
 
 ## Leaders
 
-- Robert Claypool
+- Qwick
 - Joe Dennis
-- domonda
-- nigelrmtaylor
-- Jack Dinker
+- Robert Claypool
 - DocIQ
+- nigelrmtaylor
 - Principia Mentis
-- Ian Stewart
-- HR-ON
 - Luxor Labs
-- PostHog
+- Ian Stewart
 - Axinom
-- Taiste
-- Notably
+- PostHog
 - Nathanael Beisiegel
-- SuperRare Labs
-- William Baxter
+- Notably
+- Taiste
 - latch.bio
+- Cintra
+- Trigger.dev
+- Giovanny Gutiérrez
+- BairesDev
+- FOLX Health
+- Two Bit Solutions
+- Beacon
+- Ndustrial
+- dimply
 
 ## Supporters
 
-- Postlight
-- nick
-- Philipp Litzenberger
+- HR-ON
+- stlbucket
 - Sam Levin
-- Chris Watland
 - Matt Bretl
+- Chris Watland
 - svarmony
 - James Rascoe
 - Simon Elliott
-- Mark
 - CJ Lazell
+- Daniel Einspanjer
 - Mansoor Razzaq
-- Keith Layne
-- Olli Selamaa
-- Jimmy Liu
-- Paul Melnikow
 - Alvin Ali Khaled
-- Stéphane Klein
+- Keith Layne
+- Paul Melnikow
+- Jimmy Liu
 - Splitgraph
 - Kadi Kraman
-- OnThisSpot
 - Benjamin Berman
 - Zymego
-- ARK
-- Sen Palanisami
-- IFCHOR GROUP
 - CartoLab
-- Zentered
+- IFCHOR GROUP
 - Nicolas Penot
 - Gamma Peak
+- Boo
+- JYC
+- Ben Periton
+- Spear AI
+- SpaceFill
+- Vizcom
+- garpulon
+- Nate Smith
+- The Outbound Collective
+- Charlie Hadden
+- Kiron Open Higher Education
+- Antonio Angelino
+- urtho
+- Andrew Joseph
+- Old Grammar
+- SIED 70
+- Peter C. Romano
