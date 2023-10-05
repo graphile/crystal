@@ -206,7 +206,7 @@ export class H3Grafserv extends GrafservBase {
         console.log("Unhandled:");
         console.dir(never);
         setResponseHeader(event, "Content-Type", "text/plain");
-        setResponseStatus(event, 503);
+        setResponseStatus(event, 501);
         return "Server hasn't implemented this yet";
       }
     }
