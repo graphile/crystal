@@ -8,6 +8,19 @@ to you also.
 Graphile Engine, so you should also reference [those
 changes](https://github.com/graphile/graphile-engine/blob/master/CHANGELOG.md).
 
+# [4.13.0](https://github.com/graphile/postgraphile/compare/v4.12.12...v4.13.0) (2023-01-12)
+
+### Bug Fixes
+
+- upgrade Graphile Engine ([#1702](https://github.com/graphile/postgraphile/issues/1702)) ([df19851](https://github.com/graphile/postgraphile/commit/df1985190c908f0f5f1255fb4558f74c46cae533))
+- **deps:** upgrade to jsonwebtoken@9
+
+## [4.12.12](https://github.com/graphile/postgraphile/compare/v4.12.11...v4.12.12) (2022-12-01)
+
+### Features
+
+- **ci:** build arm64 ([#1681](https://github.com/graphile/postgraphile/issues/1681)) ([6627fcb](https://github.com/graphile/postgraphile/commit/6627fcb185cc9e869bb6495a9fed6b00c02515f6))
+
 ## [4.12.11](https://github.com/graphile/postgraphile/compare/v4.12.10...v4.12.11) (2022-05-25)
 
 ### Bug Fixes

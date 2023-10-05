@@ -1,5 +1,3 @@
 #!/usr/bin/env bash
 
-npm_bin=$(npm bin)
-
-$npm_bin/jest --maxWorkers 3 $@
+npx --no-install jest --maxWorkers 3 "$@"

@@ -1,4 +1,4 @@
-FROM node:12-alpine as builder
+FROM node:16-alpine as builder
 
 WORKDIR /postgraphile/
 
@@ -26,7 +26,7 @@ RUN ./scripts/build
 
 ########################################
 
-FROM node:12-alpine as clean
+FROM node:16-alpine as clean
 
 # Again, install yarn ASAP because it's the slowest
 COPY package.json yarn.lock /postgraphile/
@@ -40,7 +40,7 @@ COPY --from=builder /postgraphile/sponsors.json /postgraphile/
 
 ########################################
 
-FROM node:12-alpine
+FROM node:16-alpine
 LABEL description="Instant extensible high-performance GraphQL API for your PostgreSQL database https://graphile.org/postgraphile"
 
 EXPOSE 5000

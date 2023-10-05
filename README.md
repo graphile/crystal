@@ -13,32 +13,46 @@ _**Instant lightning-fast GraphQL API backed primarily by your PostgreSQL databa
 
 ## Documentation: [graphile.org/postgraphile](https://graphile.org/postgraphile)
 
+## Version 5 is in **OPEN BETA**
+
+The long awaited PostGraphile Version 5 is now available for you to try out! There's still bugs to work out, types to improve, documentation and examples that need writing; read more about what beta means in our **[Beta announcement on dev.to](https://dev.to/graphile/postgraphile-v5-public-beta-get-involved-1lg9)**.
+
+Other useful resources:
+
+- **[Intro to V5 series](https://dev.to/benjie/series/23459)** on dev.to
+- **[Documentation](https://postgraphile.org)** at postgraphile.org
+- **[V4 -> V5 migration guide](https://postgraphile.org/postgraphile/next/migrating-from-v4/)** at postgraphile.org
+- **[Overview of new features](https://postgraphile.org/postgraphile/next/migrating-from-v4/v5-new-feature-summary)** at postgraphile.org
+- **[💖 Sponsor us to help launch V5 sooner! 🚀](https://github.com/sponsors/benjie)**
+
+Now is the perfect time to get your feet wet with V5 — even if you're not yet ready to migrate to it fully. **If you don't try V5 until after its public release then it may be too late to comment on things that could have been improved.** Access is now open to everyone, so dive in!
+
+This release has taken a tremendous amount of work and we've forgone a significant amount of client work to build it for you. If you can afford even a couple dollars a month, please consider becoming a sponsor; we really need your support to help get V5 over the finish line!
+
+And for those of you wondering when V5.0.0 will be released, here are the [issues that need to be solved before the final release](https://github.com/benjie/crystal/milestone/3). The more support we get, the faster that day will come — please get involved, or sponsor us!
+
 <!-- SPONSORS_BEGIN -->
 
 ## Crowd-funded open-source software
 
-To help us develop this software sustainably under the MIT license, we ask
-all individuals and businesses that use it to help support its ongoing
-maintenance and development via sponsorship.
+To help us develop this software sustainably, we ask all individuals and
+businesses that use it to help support its ongoing maintenance and development
+via sponsorship.
 
 ### [Click here to find out more about sponsors and sponsorship.](https://www.graphile.org/sponsor/)
 
 And please give some love to our featured sponsors 🤩:
 
 <table><tr>
-<td align="center"><a href="https://surge.io/"><img src="https://graphile.org/images/sponsors/surge.png" width="90" height="90" alt="Surge" /><br />Surge</a> *</td>
-<td align="center"><a href="https://storyscript.com/?utm_source=postgraphile"><img src="https://graphile.org/images/sponsors/storyscript.png" width="90" height="90" alt="Story.ai" /><br />Story.ai</a> *</td>
-<td align="center"><a href="http://chads.website"><img src="https://graphile.org/images/sponsors/chadf.png" width="90" height="90" alt="Chad Furman" /><br />Chad Furman</a> *</td>
-<td align="center"><a href="https://www.fanatics.com/"><img src="https://graphile.org/images/sponsors/fanatics.png" width="90" height="90" alt="Fanatics" /><br />Fanatics</a> *</td>
-</tr><tr>
-<td align="center"><a href="https://qwick.com/"><img src="https://graphile.org/images/sponsors/qwick.png" width="90" height="90" alt="Qwick" /><br />Qwick</a> *</td>
 <td align="center"><a href="https://www.the-guild.dev/"><img src="https://graphile.org/images/sponsors/theguild.png" width="90" height="90" alt="The Guild" /><br />The Guild</a> *</td>
 <td align="center"><a href="https://dovetailapp.com/"><img src="https://graphile.org/images/sponsors/dovetail.png" width="90" height="90" alt="Dovetail" /><br />Dovetail</a> *</td>
-<td align="center"><a href="https://www.enzuzo.com/"><img src="https://graphile.org/images/sponsors/enzuzo.png" width="90" height="90" alt="Enzuzo" /><br />Enzuzo</a> *</td>
+<td align="center"><a href="https://www.netflix.com/"><img src="https://graphile.org/images/sponsors/Netflix.png" width="90" height="90" alt="Netflix" /><br />Netflix</a> *</td>
+<td align="center"><a href=""><img src="https://graphile.org/images/sponsors/chadf.png" width="90" height="90" alt="Chad Furman" /><br />Chad Furman</a> *</td>
 </tr><tr>
 <td align="center"><a href="https://stellate.co/"><img src="https://graphile.org/images/sponsors/Stellate.png" width="90" height="90" alt="Stellate" /><br />Stellate</a> *</td>
+<td align="center"><a href="https://www.accenture.com/"><img src="https://graphile.org/images/sponsors/accenture.svg" width="90" height="90" alt="Accenture" /><br />Accenture</a> *</td>
+<td align="center"><a href="https://microteam.io/"><img src="https://graphile.org/images/sponsors/micro.png" width="90" height="90" alt="We Love Micro" /><br />We Love Micro</a> *</td>
 <td align="center"><a href="https://politicsrewired.com/"><img src="https://graphile.org/images/sponsors/politics-rewired.png" width="90" height="90" alt="Politics Rewired" /><br />Politics Rewired</a></td>
-<td align="center"><a href="https://iasql.com/"><img src="https://graphile.org/images/sponsors/IaSQL.png" width="90" height="90" alt="IaSQL" /><br />IaSQL</a></td>
 </tr></table>
 
 <em>\* Sponsors the entire Graphile suite</em>
@@ -49,7 +63,7 @@ And please give some love to our featured sponsors 🤩:
 
 **GraphQL** is a new way of communicating with your server. It eliminates the problems of over- and under-fetching, incorporates strong data types, has built-in introspection, documentation and deprecation capabilities, and is implemented in many programming languages. This all leads to gloriously low-latency user experiences, better developer experiences, and much increased productivity. Because of all this, GraphQL is typically used as a replacement for (or companion to) RESTful API services.
 
-**PostgreSQL** is the self-proclaimed “world’s most advanced open source database,” with each new release bring more amazing features and performance gains. Thinking of your database as a plain CRUD store is now an archaic viewpoint as modern PostgreSQL can do so much for you &mdash; from authorization with Row-Level Security (RLS, introduced in PG9.5), through Foreign Data Wrappers (FDW), to real time notifications with `LISTEN`/`NOTIFY`.
+**PostgreSQL** is the self-proclaimed “world’s most advanced open source database,” with each new release bringing more amazing features and performance gains. Thinking of your database as a plain CRUD store is now an archaic viewpoint as modern PostgreSQL can do so much for you &mdash; from authorization with Row-Level Security (RLS, introduced in PG9.5), through Foreign Data Wrappers (FDW), to real time notifications with `LISTEN`/`NOTIFY`.
 
 **PostGraphile** pairs these two incredible technologies together, helping you not only build applications more rapidly, but to build lightning-fast applications. PostGraphile allows you to access the power of PostgreSQL through a well designed, extensible, customisable and incredibly performant GraphQL server. It automatically detects tables, columns, indexes, relationships, views, types, functions, comments, and more - providing a GraphQL server that is highly intelligent about your data, and that automatically updates itself without restarting when you change your database schema.
 
