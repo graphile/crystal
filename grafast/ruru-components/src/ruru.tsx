@@ -101,7 +101,14 @@ export const RuruInner: FC<{
   onEditQuery?: GraphiQLProps["onEditQuery"];
   onEditVariables?: GraphiQLProps["onEditVariables"];
 }> = (props) => {
-  const { storage, editorTheme, error, setError, onEditQuery, onEditVariables } = props;
+  const {
+    storage,
+    editorTheme,
+    error,
+    setError,
+    onEditQuery,
+    onEditVariables,
+  } = props;
   const prettify = usePrettify();
   const mergeQuery = useMergeQuery();
   const copyQuery = useCopyQuery();

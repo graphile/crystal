@@ -44,7 +44,6 @@ export interface RuruProps {
    */
   initialVariables?: string;
 
-
   /**
    * The query to prepopulate the editor with.
    */
@@ -59,7 +58,6 @@ export interface RuruProps {
    * Callback executed when the current query changes.
    */
   onEditQuery?: GraphiQLProps["onEditQuery"];
-
 
   /**
    * Callback executed when the variables change.
