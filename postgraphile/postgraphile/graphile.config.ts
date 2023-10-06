@@ -99,8 +99,37 @@ const currentUrl = new URL(document.URL);
 const query = currentUrl.searchParams.get("query");
 const variables = currentUrl.searchParams.get("variables");
 if (query) {
-  RURU_CONFIG.initialQuery = query;
-  RURU_CONFIG.initialVariables = variables;
+  RURU_CONFIG.query = query;
+  RURU_CONFIG.variables = variables;
+}
+</script>
+`;
+      },
+    },
+  },
+};
+
+/**
+ * Update the URL search params with the current query and variables
+ */
+const RuruQueryParamsUpdatePlugin: GraphileConfig.Plugin = {
+  name: "RuruQueryParamsUpdatePlugin",
+  version: "0.0.0",
+
+  grafserv: {
+    hooks: {
+      ruruHTMLParts(_info, parts, _extra) {
+        parts.headerScripts += `
+<script>
+const ruruQueryParamsUpdateUrl = new URL(document.URL);
+const search = ruruQueryParamsUpdateUrl.searchParams;
+RURU_CONFIG.onEditQuery = (query) => {
+  search.set("query", query);
+  window.history.replaceState(null, "", ruruQueryParamsUpdateUrl);
+}
+RURU_CONFIG.onEditVariables = (variables) => {
+  search.set("variables", variables);
+  window.history.replaceState(null, "", ruruQueryParamsUpdateUrl);
 }
 </script>
 `;
@@ -220,6 +249,7 @@ const preset: GraphileConfig.Preset = {
     ExportSchemaPlugin,
     NonNullRelationsPlugin,
     RuruQueryParamsPlugin,
+    RuruQueryParamsUpdatePlugin,
   ],
   extends: [
     PostGraphileAmberPreset,

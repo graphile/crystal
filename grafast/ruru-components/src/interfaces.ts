@@ -35,12 +35,34 @@ export interface RuruProps {
   defaultQuery?: string;
 
   /**
-   * The query to prepopulate the editor with.
+   * DEPRECATED: use `query` instead
    */
   initialQuery?: string;
 
   /**
-   * The variables to prepopulate the editor with.
+   * DEPRECATED: use `variables` instead
    */
   initialVariables?: string;
+
+
+  /**
+   * The query to prepopulate the editor with.
+   */
+  query?: string;
+
+  /**
+   * The variables to prepopulate the editor with.
+   */
+  variables?: string;
+
+  /**
+   * Callback executed when the current query changes.
+   */
+  onEditQuery?: GraphiQLProps["onEditQuery"];
+
+
+  /**
+   * Callback executed when the variables change.
+   */
+  onEditVariables?: GraphiQLProps["onEditVariables"];
 }
