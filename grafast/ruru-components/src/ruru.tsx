@@ -75,6 +75,8 @@ export const Ruru: FC<RuruProps> = (props) => {
         fetcher={fetcher}
         schema={schema}
         defaultQuery={defaultQuery}
+        query={props.initialQuery}
+        variables={props.initialVariables}
         plugins={plugins}
         shouldPersistHeaders={saveHeaders}
       >

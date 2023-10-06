@@ -29,5 +29,18 @@ export interface RuruProps {
    */
   debugTools?: Array<"explain" | "plan">;
 
+  /**
+   * The query to use when the user has never visited the page before (unless `initialQuery` is set).
+   */
   defaultQuery?: string;
+
+  /**
+   * The query to prepopulate the editor with.
+   */
+  initialQuery?: string;
+
+  /**
+   * The variables to prepopulate the editor with.
+   */
+  initialVariables?: string;
 }

@@ -86,6 +86,29 @@ function makeRuruTitlePlugin(title: string): GraphileConfig.Plugin {
   };
 }
 
+const RuruQueryParamsPlugin: GraphileConfig.Plugin = {
+  name: "RuruQueryParamsPlugin",
+  version: "0.0.0",
+
+  grafserv: {
+    hooks: {
+      ruruHTMLParts(_info, parts, _extra) {
+        parts.headerScripts += `
+<script>
+const currentUrl = new URL(document.URL);
+const query = currentUrl.searchParams.get("query");
+const variables = currentUrl.searchParams.get("variables");
+if (query) {
+  RURU_CONFIG.initialQuery = query;
+  RURU_CONFIG.initialVariables = variables;
+}
+</script>
+`;
+      },
+    },
+  },
+};
+
 const ExportSchemaPlugin: GraphileConfig.Plugin = {
   name: "ExportSchemaPlugin",
   version: "0.0.0",
@@ -196,6 +219,7 @@ const preset: GraphileConfig.Preset = {
     makeRuruTitlePlugin("<New title text here!>"),
     ExportSchemaPlugin,
     NonNullRelationsPlugin,
+    RuruQueryParamsPlugin,
   ],
   extends: [
     PostGraphileAmberPreset,
