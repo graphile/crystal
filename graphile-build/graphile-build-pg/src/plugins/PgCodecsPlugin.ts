@@ -566,7 +566,14 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 typeName,
               );
               return EXPORTABLE(
-                (codecName, enumCodec, enumLabels, extensions, sqlIdent) =>
+                (
+                  codecName,
+                  description,
+                  enumCodec,
+                  enumLabels,
+                  extensions,
+                  sqlIdent,
+                ) =>
                   enumCodec({
                     name: codecName,
                     identifier: sqlIdent,
@@ -574,7 +581,14 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     description,
                     extensions,
                   }),
-                [codecName, enumCodec, enumLabels, extensions, sqlIdent],
+                [
+                  codecName,
+                  description,
+                  enumCodec,
+                  enumLabels,
+                  extensions,
+                  sqlIdent,
+                ],
               );
             }
 
