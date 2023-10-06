@@ -546,6 +546,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 serviceName,
               });
               const enumLabels = enumValues.map((e) => e.enumlabel);
+              const { tags, description } = type.getTagsAndDescription();
               const extensions = {
                 oid: type._id,
                 pg: {
@@ -553,7 +554,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   schemaName: type.getNamespace()!.nspname,
                   name: type.typname,
                 },
-                tags: Object.create(null),
+                tags,
               };
               await info.process("pgCodecs_enumType_extensions", {
                 serviceName,
@@ -570,6 +571,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     name: codecName,
                     identifier: sqlIdent,
                     values: enumLabels,
+                    description,
                     extensions,
                   }),
                 [codecName, enumCodec, enumLabels, extensions, sqlIdent],
