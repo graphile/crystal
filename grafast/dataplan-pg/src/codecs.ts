@@ -455,6 +455,7 @@ export type PgEnumCodecSpec<TName extends string, TValue extends string> = {
   name: TName;
   identifier: SQL;
   values: Array<PgEnumValue<TValue> | TValue>;
+  description?: string;
   extensions?: Partial<PgCodecExtensions>;
 };
 
@@ -470,7 +471,7 @@ export function enumCodec<
   const TName extends string,
   const TValue extends string,
 >(config: PgEnumCodecSpec<TName, TValue>): PgEnumCodec<TName, TValue> {
-  const { name, identifier, values, extensions } = config;
+  const { name, identifier, values, description, extensions } = config;
   return {
     name,
     sqlType: identifier,
@@ -480,6 +481,7 @@ export function enumCodec<
       typeof value === "string" ? { value } : value,
     ),
     attributes: undefined,
+    description,
     extensions,
     executor: null,
   };
