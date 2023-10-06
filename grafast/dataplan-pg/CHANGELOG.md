@@ -1,5 +1,14 @@
 # @dataplan/pg
 
+## 0.0.1-beta.11
+
+### Patch Changes
+
+- [#1797](https://github.com/graphile/crystal/pull/1797)
+  [`26e0bc726`](https://github.com/graphile/crystal/commit/26e0bc72653cd8dcef4b6cfb3c76876a5e620a12)
+  Thanks [@benjie](https://github.com/benjie)! - Fix that smart tags were not
+  copied onto enum codecs.
+
 ## 0.0.1-beta.10
 
 ### Patch Changes

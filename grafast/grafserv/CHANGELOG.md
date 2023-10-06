@@ -1,5 +1,22 @@
 # grafserv
 
+## 0.1.1-beta.1
+
+### Patch Changes
+
+- [`781a89758`](https://github.com/graphile/crystal/commit/781a89758fff2712f0080d8fafb4048da189b782)
+  Thanks [@benjie](https://github.com/benjie)! - Change the unimplemented status
+  code from 503 to 501.
+
+- [#1777](https://github.com/graphile/crystal/pull/1777)
+  [`a38e650d6`](https://github.com/graphile/crystal/commit/a38e650d67d6c7ff0cf5b853377622090ede3a50)
+  Thanks [@innermatrix](https://github.com/innermatrix)! - Added AWS lambda
+  adapter for grafserv
+
+- Updated dependencies
+  [[`ebb0b817e`](https://github.com/graphile/crystal/commit/ebb0b817e3efe210445d3f3396ff4bc53ebab3e7)]:
+  - ruru@2.0.0-beta.6
+
 ## 0.1.1-beta.0
 
 ### Patch Changes

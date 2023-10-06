@@ -1,5 +1,29 @@
 # postgraphile
 
+## 5.0.0-beta.14
+
+### Patch Changes
+
+- [#1796](https://github.com/graphile/crystal/pull/1796)
+  [`ebb0b817e`](https://github.com/graphile/crystal/commit/ebb0b817e3efe210445d3f3396ff4bc53ebab3e7)
+  Thanks [@benjie](https://github.com/benjie)! - Can now set initial query and
+  variables in Ruru via the plugin system; e.g. to set query/variables based on
+  query string.
+
+- [#1797](https://github.com/graphile/crystal/pull/1797)
+  [`26e0bc726`](https://github.com/graphile/crystal/commit/26e0bc72653cd8dcef4b6cfb3c76876a5e620a12)
+  Thanks [@benjie](https://github.com/benjie)! - Fix that smart tags were not
+  copied onto enum codecs.
+
+- Updated dependencies
+  [[`781a89758`](https://github.com/graphile/crystal/commit/781a89758fff2712f0080d8fafb4048da189b782),
+  [`a38e650d6`](https://github.com/graphile/crystal/commit/a38e650d67d6c7ff0cf5b853377622090ede3a50),
+  [`26e0bc726`](https://github.com/graphile/crystal/commit/26e0bc72653cd8dcef4b6cfb3c76876a5e620a12)]:
+  - grafserv@0.1.1-beta.1
+  - graphile-build-pg@5.0.0-beta.13
+  - @dataplan/pg@0.0.1-beta.11
+  - graphile-utils@5.0.0-beta.13
+
 ## 5.0.0-beta.13
 
 ### Patch Changes

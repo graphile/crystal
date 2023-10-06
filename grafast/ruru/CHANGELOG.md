@@ -1,5 +1,15 @@
 # ruru
 
+## 2.0.0-beta.6
+
+### Patch Changes
+
+- [#1796](https://github.com/graphile/crystal/pull/1796)
+  [`ebb0b817e`](https://github.com/graphile/crystal/commit/ebb0b817e3efe210445d3f3396ff4bc53ebab3e7)
+  Thanks [@benjie](https://github.com/benjie)! - Can now set initial query and
+  variables in Ruru via the plugin system; e.g. to set query/variables based on
+  query string.
+
 ## 2.0.0-beta.5
 
 ### Patch Changes

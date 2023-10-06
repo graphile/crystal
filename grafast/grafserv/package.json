@@ -1,6 +1,6 @@
 {
   "name": "grafserv",
-  "version": "0.1.1-beta.0",
+  "version": "0.1.1-beta.1",
   "description": "A highly optimized server for GraphQL, powered by Grafast",
   "type": "commonjs",
   "main": "dist/index.js",

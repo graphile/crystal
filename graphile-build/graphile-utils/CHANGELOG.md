@@ -1,5 +1,13 @@
 # graphile-utils
 
+## 5.0.0-beta.13
+
+### Patch Changes
+
+- Updated dependencies
+  [[`26e0bc726`](https://github.com/graphile/crystal/commit/26e0bc72653cd8dcef4b6cfb3c76876a5e620a12)]:
+  - graphile-build-pg@5.0.0-beta.13
+
 ## 5.0.0-beta.12
 
 ### Patch Changes
