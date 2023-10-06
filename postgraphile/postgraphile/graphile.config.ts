@@ -92,7 +92,7 @@ const RuruQueryParamsPlugin: GraphileConfig.Plugin = {
 
   grafserv: {
     hooks: {
-      ruruHTMLParts(_info, parts, extra) {
+      ruruHTMLParts(_info, parts, _extra) {
         parts.headerScripts += `
 <script>
 const currentUrl = new URL(document.URL);
