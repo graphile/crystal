@@ -264,7 +264,7 @@ const preset: GraphileConfig.Preset = {
     context(requestContext, args) {
       return {
         pgSettings: {
-          role: "postgres",
+          // role: "postgres",
           ...args.contextValue?.pgSettings,
         },
         mol: 42,
