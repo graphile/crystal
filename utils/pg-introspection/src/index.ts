@@ -21,7 +21,12 @@ import type {
 } from "./introspection.js";
 export { makeIntrospectionQuery } from "./introspection.js";
 import type { AclObject } from "./acl.js";
-import { aclContainsRole, expandRoles, resolvePermissions } from "./acl.js";
+import {
+  aclContainsRole,
+  entityPermissions,
+  expandRoles,
+  resolvePermissions,
+} from "./acl.js";
 import { augmentIntrospection } from "./augmentIntrospection.js";
 import type {
   PgSmartTagsAndDescription,
@@ -52,7 +57,13 @@ export {
   PgType,
 };
 
-export { aclContainsRole, AclObject, expandRoles, resolvePermissions };
+export {
+  aclContainsRole,
+  AclObject,
+  entityPermissions,
+  expandRoles,
+  resolvePermissions,
+};
 
 export function parseIntrospectionResults(
   introspectionResults: string,
@@ -91,10 +102,14 @@ declare module "./introspection" {
   }
 
   interface PgDatabase {
+    _type: "PgDatabase";
+    /** @deprecated Use getOwner instead */
     getDba(): PgRoles | undefined;
+    getOwner(): PgRoles | undefined;
     getACL(): AclObject[];
   }
   interface PgNamespace {
+    _type: "PgNamespace";
     getOwner(): PgRoles | undefined;
     getDescription(): string | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
@@ -107,6 +122,7 @@ declare module "./introspection" {
     getProcs(by: { name: string }): PgProc[] | undefined;
   }
   interface PgClass {
+    _type: "PgClass";
     getNamespace(): PgNamespace | undefined;
     getType(): PgType | undefined;
     getOfType(): PgType | undefined;
@@ -126,6 +142,7 @@ declare module "./introspection" {
     getInherited(): PgInherits[];
   }
   interface PgIndex {
+    _type: "PgIndex";
     /**
      * Get the class that represents this index.
      */
@@ -141,6 +158,7 @@ declare module "./introspection" {
     getKeys(): Array<PgAttribute | null>;
   }
   interface PgAttribute {
+    _type: "PgAttribute";
     getClass(): PgClass | undefined;
     getType(): PgType | undefined;
     getDescription(): string | undefined;
@@ -150,6 +168,7 @@ declare module "./introspection" {
     getACL(): AclObject[];
   }
   interface PgConstraint {
+    _type: "PgConstraint";
     getNamespace(): PgNamespace | undefined;
     getClass(): PgClass | undefined;
     getAttributes(): PgAttribute[] | undefined;
@@ -162,6 +181,7 @@ declare module "./introspection" {
     getTags(): PgSmartTagsDict;
   }
   interface PgProc {
+    _type: "PgProc";
     getNamespace(): PgNamespace | undefined;
     getOwner(): PgRoles | undefined;
     getReturnType(): PgType | undefined;
@@ -173,6 +193,7 @@ declare module "./introspection" {
     getACL(): AclObject[];
   }
   interface PgType {
+    _type: "PgType";
     getNamespace(): PgNamespace | undefined;
     getOwner(): PgRoles | undefined;
     getClass(): PgClass | undefined;
@@ -186,12 +207,14 @@ declare module "./introspection" {
     getTags(): PgSmartTagsDict;
   }
   interface PgEnum {
+    _type: "PgEnum";
     getType(): PgType | undefined;
     getTagsAndDescription(): PgSmartTagsAndDescription;
     /** Convenience method for getTagsAndDescription().tags */
     getTags(): PgSmartTagsDict;
   }
   interface PgRange {
+    _type: "PgRange";
     getType(): PgType | undefined;
     getSubType(): PgType | undefined;
   }

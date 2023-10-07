@@ -208,9 +208,11 @@ export function augmentIntrospection(
   introspection.getLanguage = (by) =>
     introspection.languages.find((c) => c._id === by.id);
 
-  introspection.database.getDba = memo(() =>
+  introspection.database._type = "PgDatabase";
+  introspection.database.getOwner = memo(() =>
     getRole(introspection.database.datdba),
   );
+  introspection.database.getDba = introspection.database.getOwner;
   introspection.database.getACL = memo(() =>
     parseAcls(
       introspection,
@@ -221,6 +223,7 @@ export function augmentIntrospection(
   );
 
   introspection.namespaces.forEach((entity) => {
+    entity._type = "PgNamespace";
     entity.getOwner = memo(() => getRole(entity.nspowner));
     entity.getDescription = memo(() =>
       getDescription(PG_NAMESPACE, entity._id),
@@ -252,6 +255,7 @@ export function augmentIntrospection(
   });
 
   introspection.classes.forEach((entity) => {
+    entity._type = "PgClass";
     entity.getNamespace = memo(() => getNamespace(entity.relnamespace));
     entity.getType = memo(() => getType(entity.reltype));
     entity.getOfType = memo(() => getType(entity.reloftype));
@@ -287,6 +291,7 @@ export function augmentIntrospection(
     );
   });
   introspection.indexes.forEach((entity) => {
+    entity._type = "PgIndex";
     entity.getIndexClass = memo(() => getClass(entity.indexrelid));
     entity.getClass = memo(() => getClass(entity.indrelid));
     entity.getKeys = memo(() => {
@@ -299,6 +304,7 @@ export function augmentIntrospection(
     });
   });
   introspection.attributes.forEach((entity) => {
+    entity._type = "PgAttribute";
     entity.getClass = memo(() => getClass(entity.attrelid));
     entity.getType = memo(() => getType(entity.atttypid));
     entity.getDescription = memo(() =>
@@ -318,6 +324,7 @@ export function augmentIntrospection(
     );
   });
   introspection.constraints.forEach((entity) => {
+    entity._type = "PgConstraint";
     entity.getNamespace = memo(() => getNamespace(entity.connamespace));
     entity.getClass = memo(() => getClass(entity.conrelid));
     entity.getAttributes = memo(() => {
@@ -387,6 +394,7 @@ export function augmentIntrospection(
     entity.getTags = memo(() => entity.getTagsAndDescription().tags);
   });
   introspection.procs.forEach((entity) => {
+    entity._type = "PgProc";
     entity.getNamespace = memo(() => getNamespace(entity.pronamespace));
     entity.getOwner = memo(() => getRole(entity.proowner));
     entity.getReturnType = memo(() => getType(entity.prorettype));
@@ -468,6 +476,7 @@ export function augmentIntrospection(
     );
   });
   introspection.types.forEach((entity) => {
+    entity._type = "PgType";
     entity.getNamespace = memo(() => getNamespace(entity.typnamespace));
     entity.getOwner = memo(() => getRole(entity.typowner));
     entity.getClass = memo(() => getClass(entity.typrelid));
@@ -482,6 +491,7 @@ export function augmentIntrospection(
     entity.getTags = memo(() => entity.getTagsAndDescription().tags);
   });
   introspection.enums.forEach((entity) => {
+    entity._type = "PgEnum";
     entity.getType = memo(() => getType(entity.enumtypid));
     // Postgres doesn't support comments on enum values right now, but we still
     // want to be able to add tags/description so we fake it.
@@ -492,6 +502,7 @@ export function augmentIntrospection(
     entity.getTags = memo(() => entity.getTagsAndDescription().tags);
   });
   introspection.ranges.forEach((entity) => {
+    entity._type = "PgRange";
     entity.getType = memo(() => getType(entity.rngtypid));
     entity.getSubType = memo(() => getType(entity.rngsubtype));
   });

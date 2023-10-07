@@ -1,7 +1,7 @@
 import "graphile-config";
 
 import { gatherConfig } from "graphile-build";
-import { resolvePermissions } from "pg-introspection";
+import { entityPermissions } from "pg-introspection";
 
 import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";
@@ -45,15 +45,15 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           // https://youtu.be/3kx7tgkJbjo?t=11
           throw new Error("WHO AM I?");
         }
-        const attributePermissions = resolvePermissions(
+        const attributePermissions = entityPermissions(
           introspection,
-          pgAttribute.getACL(),
+          pgAttribute,
           introspectionRole,
           true,
         );
-        const tablePermissions = resolvePermissions(
+        const tablePermissions = entityPermissions(
           introspection,
-          pgClass.getACL(),
+          pgClass,
           introspectionRole,
           true,
         );
@@ -74,12 +74,8 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
             .some(
               (att) =>
                 att.attnum > 0 &&
-                resolvePermissions(
-                  introspection,
-                  att.getACL(),
-                  introspectionRole,
-                  true,
-                ).select,
+                entityPermissions(introspection, att, introspectionRole, true)
+                  .select,
             );
           if (hasSiblingWithSelect) {
             parts.push("-select -filterBy -orderBy");
@@ -108,9 +104,9 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           // https://youtu.be/3kx7tgkJbjo?t=11
           throw new Error("WHO AM I?");
         }
-        const permissions = resolvePermissions(
+        const permissions = entityPermissions(
           introspection,
-          pgProc.getACL(),
+          pgProc,
           introspectionRole,
           true,
         );
@@ -142,9 +138,9 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           // https://youtu.be/3kx7tgkJbjo?t=11
           throw new Error("WHO AM I?");
         }
-        const tablePermissions = resolvePermissions(
+        const tablePermissions = entityPermissions(
           introspection,
-          pgClass.getACL(),
+          pgClass,
           introspectionRole,
           true,
         );
@@ -160,12 +156,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
             .getAttributes()
             .filter((att) => att.attnum > 0)
             .map((att) =>
-              resolvePermissions(
-                introspection,
-                att.getACL(),
-                introspectionRole,
-                true,
-              ),
+              entityPermissions(introspection, att, introspectionRole, true),
             );
           for (const attributePermission of attributePermissions) {
             canSelect = canSelect || attributePermission.select;

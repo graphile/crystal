@@ -229,6 +229,7 @@ const preset: GraphileConfig.Preset = {
       dynamicJson: true,
       graphiql: true,
       graphiqlRoute: "/",
+      ignoreRBAC: false,
     }),
     // PgManyToManyPreset,
     // PostGraphileConnectionFilterPreset,
@@ -263,7 +264,7 @@ const preset: GraphileConfig.Preset = {
     context(requestContext, args) {
       return {
         pgSettings: {
-          role: "postgres",
+          // role: "postgres",
           ...args.contextValue?.pgSettings,
         },
         mol: 42,

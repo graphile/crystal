@@ -1,4 +1,9 @@
-import type { Introspection, PgClass, PgRoles } from "./introspection.js";
+import type {
+  Introspection,
+  PgClass,
+  PgEntity,
+  PgRoles,
+} from "./introspection.js";
 
 /**
  * A fake 'pg_roles' record representing the 'public' meta-role.
@@ -456,38 +461,43 @@ export function resolvePermissions(
   acls: AclObject[],
   role: PgRoles,
   includeNoInherit = false,
+  isOwnerAndHasNoExplicitACLs = false,
 ): ResolvedPermissions {
   const expandedRoles = expandRoles(introspection, [role], includeNoInherit);
   const isSuperuser = expandedRoles.some((role) => role.rolsuper);
-  // Just as in life, you start with nothing...
+
+  // Superusers have all permissions. An owner of an object has all permissions
+  // _unless_ there's a specific ACL for that owner. In all other cases, just as
+  // in life, you start with nothing...
+  const grantAll = isSuperuser || isOwnerAndHasNoExplicitACLs;
   const permissions: ResolvedPermissions = {
-    select: isSuperuser,
-    selectGrant: isSuperuser,
-    update: isSuperuser,
-    updateGrant: isSuperuser,
-    insert: isSuperuser,
-    insertGrant: isSuperuser,
-    delete: isSuperuser,
-    deleteGrant: isSuperuser,
-    truncate: isSuperuser,
-    truncateGrant: isSuperuser,
-    references: isSuperuser,
-    referencesGrant: isSuperuser,
-    trigger: isSuperuser,
-    triggerGrant: isSuperuser,
-    execute: isSuperuser,
-    executeGrant: isSuperuser,
-    usage: isSuperuser,
-    usageGrant: isSuperuser,
-    create: isSuperuser,
-    createGrant: isSuperuser,
-    connect: isSuperuser,
-    connectGrant: isSuperuser,
-    temporary: isSuperuser,
-    temporaryGrant: isSuperuser,
+    select: grantAll,
+    selectGrant: grantAll,
+    update: grantAll,
+    updateGrant: grantAll,
+    insert: grantAll,
+    insertGrant: grantAll,
+    delete: grantAll,
+    deleteGrant: grantAll,
+    truncate: grantAll,
+    truncateGrant: grantAll,
+    references: grantAll,
+    referencesGrant: grantAll,
+    trigger: grantAll,
+    triggerGrant: grantAll,
+    execute: grantAll,
+    executeGrant: grantAll,
+    usage: grantAll,
+    usageGrant: grantAll,
+    create: grantAll,
+    createGrant: grantAll,
+    connect: grantAll,
+    connectGrant: grantAll,
+    temporary: grantAll,
+    temporaryGrant: grantAll,
   };
 
-  if (isSuperuser) {
+  if (grantAll) {
     return permissions;
   }
 
@@ -530,4 +540,33 @@ export function resolvePermissions(
   }
 
   return permissions;
+}
+export function entityPermissions(
+  introspection: Introspection,
+  entity: Extract<PgEntity, { getACL(): readonly AclObject[] }>,
+  role: PgRoles,
+  includeNoInherit = false,
+) {
+  const acls = entity.getACL();
+  const owner =
+    entity._type === "PgAttribute"
+      ? entity.getClass()?.getOwner()
+      : entity.getOwner();
+  // If the role is the owner, and no explicit ACLs have been granted to this role, then the owner has all privileges.
+  const isOwnerAndHasNoExplicitACLs =
+    owner &&
+    owner === role &&
+    !acls.some((acl) => acl.role === owner.rolname) &&
+    (entity._type !== "PgAttribute" ||
+      !entity
+        .getClass()
+        ?.getACL()
+        .some((acl) => acl.role === owner.rolname));
+  return resolvePermissions(
+    introspection,
+    acls,
+    role,
+    includeNoInherit,
+    isOwnerAndHasNoExplicitACLs,
+  );
 }
