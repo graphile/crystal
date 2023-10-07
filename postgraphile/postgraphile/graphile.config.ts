@@ -229,6 +229,7 @@ const preset: GraphileConfig.Preset = {
       dynamicJson: true,
       graphiql: true,
       graphiqlRoute: "/",
+      ignoreRBAC: false,
     }),
     // PgManyToManyPreset,
     // PostGraphileConnectionFilterPreset,
