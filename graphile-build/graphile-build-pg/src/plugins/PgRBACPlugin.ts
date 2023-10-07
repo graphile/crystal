@@ -50,12 +50,14 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           pgAttribute.getACL(),
           introspectionRole,
           true,
+          introspectionRole === pgClass.getOwner(),
         );
         const tablePermissions = resolvePermissions(
           introspection,
           pgClass.getACL(),
           introspectionRole,
           true,
+          introspectionRole === pgClass.getOwner(),
         );
         const canSelect =
           attributePermissions.select || tablePermissions.select;
@@ -113,6 +115,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           pgProc.getACL(),
           introspectionRole,
           true,
+          introspectionRole === pgProc.getOwner(),
         );
         if (!permissions.execute) {
           resourceOptions.extensions =
@@ -147,6 +150,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           pgClass.getACL(),
           introspectionRole,
           true,
+          introspectionRole === pgClass.getOwner(),
         );
 
         let canSelect = tablePermissions.select;
@@ -165,6 +169,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
                 att.getACL(),
                 introspectionRole,
                 true,
+                introspectionRole === pgClass.getOwner(),
               ),
             );
           for (const attributePermission of attributePermissions) {
