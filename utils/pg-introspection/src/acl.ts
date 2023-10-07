@@ -469,9 +469,20 @@ export function resolvePermissions(
   const isOwner = owner === role;
   const expandedRoles = expandRoles(introspection, [role], includeNoInherit);
   const isSuperuser = expandedRoles.some((role) => role.rolsuper);
-  const grantAll = isSuperuser || isOwner;
-  // Superusers and owners of objects have all permissions over them, otherwise
-  // just as in life, you start with nothing...
+  /** Is there an ACL for the owner role, either for the thing directly or if it's an attribute then directly or its parent table */
+  const hasOwnerAcl =
+    owner &&
+    (acls.some((acl) => acl.role === owner.rolname) ||
+      (entity._type === "PgAttribute" &&
+        entity
+          .getClass()
+          ?.getACL()
+          .some((acl) => acl.role === owner.rolname)));
+
+  // Superusers have all permissions. An owner of an object has all permissions
+  // _unless_ there's a specific ACL for that owner. In all other cases, just as
+  // in life, you start with nothing...
+  const grantAll = isSuperuser || (isOwner && !hasOwnerAcl);
   const permissions: ResolvedPermissions = {
     select: grantAll,
     selectGrant: grantAll,
