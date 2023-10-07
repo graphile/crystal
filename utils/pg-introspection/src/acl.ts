@@ -2,6 +2,7 @@ import type {
   Introspection,
   PgAttribute,
   PgClass,
+  PgEntity,
   PgProc,
   PgRoles,
 } from "./introspection.js";
@@ -459,30 +460,18 @@ export function aclContainsRole(
  */
 export function resolvePermissions(
   introspection: Introspection,
-  entity: PgClass | PgAttribute | PgProc,
+  acls: AclObject[],
   role: PgRoles,
   includeNoInherit = false,
+  isOwnerAndHasNoExplicitACLs = false,
 ): ResolvedPermissions {
-  const acls: AclObject[] = entity.getACL();
-  const owner =
-    "getOwner" in entity ? entity.getOwner() : entity.getClass()?.getOwner();
-  const isOwner = owner === role;
   const expandedRoles = expandRoles(introspection, [role], includeNoInherit);
   const isSuperuser = expandedRoles.some((role) => role.rolsuper);
-  /** Is there an ACL for the owner role, either for the thing directly or if it's an attribute then directly or its parent table */
-  const hasOwnerAcl =
-    owner &&
-    (acls.some((acl) => acl.role === owner.rolname) ||
-      (entity._type === "PgAttribute" &&
-        entity
-          .getClass()
-          ?.getACL()
-          .some((acl) => acl.role === owner.rolname)));
 
   // Superusers have all permissions. An owner of an object has all permissions
   // _unless_ there's a specific ACL for that owner. In all other cases, just as
   // in life, you start with nothing...
-  const grantAll = isSuperuser || (isOwner && !hasOwnerAcl);
+  const grantAll = isSuperuser || isOwnerAndHasNoExplicitACLs;
   const permissions: ResolvedPermissions = {
     select: grantAll,
     selectGrant: grantAll,
@@ -553,4 +542,33 @@ export function resolvePermissions(
   }
 
   return permissions;
+}
+export function entityPermissions(
+  introspection: Introspection,
+  entity: Extract<PgEntity, { getACL(): readonly AclObject[] }>,
+  role: PgRoles,
+  includeNoInherit = false,
+) {
+  const acls = entity.getACL();
+  const owner =
+    entity._type === "PgAttribute"
+      ? entity.getClass()?.getOwner()
+      : entity.getOwner();
+  // If the role is the owner, and no explicit ACLs have been granted to this role, then the owner has all privileges.
+  const isOwnerAndHasNoExplicitACLs =
+    owner &&
+    owner === role &&
+    !acls.some((acl) => acl.role === owner.rolname) &&
+    (entity._type !== "PgAttribute" ||
+      !entity
+        .getClass()
+        ?.getACL()
+        .some((acl) => acl.role === owner.rolname));
+  return resolvePermissions(
+    introspection,
+    acls,
+    role,
+    includeNoInherit,
+    isOwnerAndHasNoExplicitACLs,
+  );
 }

@@ -208,9 +208,11 @@ export function augmentIntrospection(
   introspection.getLanguage = (by) =>
     introspection.languages.find((c) => c._id === by.id);
 
-  introspection.database.getDba = memo(() =>
+  introspection.database._type = "PgDatabase";
+  introspection.database.getOwner = memo(() =>
     getRole(introspection.database.datdba),
   );
+  introspection.database.getDba = introspection.database.getOwner;
   introspection.database.getACL = memo(() =>
     parseAcls(
       introspection,

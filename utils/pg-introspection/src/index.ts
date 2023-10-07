@@ -21,7 +21,12 @@ import type {
 } from "./introspection.js";
 export { makeIntrospectionQuery } from "./introspection.js";
 import type { AclObject } from "./acl.js";
-import { aclContainsRole, expandRoles, resolvePermissions } from "./acl.js";
+import {
+  aclContainsRole,
+  entityPermissions,
+  expandRoles,
+  resolvePermissions,
+} from "./acl.js";
 import { augmentIntrospection } from "./augmentIntrospection.js";
 import type {
   PgSmartTagsAndDescription,
@@ -52,7 +57,13 @@ export {
   PgType,
 };
 
-export { aclContainsRole, AclObject, expandRoles, resolvePermissions };
+export {
+  aclContainsRole,
+  AclObject,
+  entityPermissions,
+  expandRoles,
+  resolvePermissions,
+};
 
 export function parseIntrospectionResults(
   introspectionResults: string,
@@ -91,7 +102,10 @@ declare module "./introspection" {
   }
 
   interface PgDatabase {
+    _type: "PgDatabase";
+    /** @deprecated Use getOwner instead */
     getDba(): PgRoles | undefined;
+    getOwner(): PgRoles | undefined;
     getACL(): AclObject[];
   }
   interface PgNamespace {
