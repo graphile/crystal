@@ -1,9 +1,7 @@
 import type {
   Introspection,
-  PgAttribute,
   PgClass,
   PgEntity,
-  PgProc,
   PgRoles,
 } from "./introspection.js";
 
