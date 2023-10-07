@@ -1,4 +1,10 @@
-import type { Introspection, PgClass, PgRoles } from "./introspection.js";
+import type {
+  Introspection,
+  PgAttribute,
+  PgClass,
+  PgProc,
+  PgRoles,
+} from "./introspection.js";
 
 /**
  * A fake 'pg_roles' record representing the 'public' meta-role.
@@ -453,42 +459,47 @@ export function aclContainsRole(
  */
 export function resolvePermissions(
   introspection: Introspection,
-  acls: AclObject[],
+  entity: PgClass | PgAttribute | PgProc,
   role: PgRoles,
   includeNoInherit = false,
-  isOwner = false,
 ): ResolvedPermissions {
+  const acls: AclObject[] = entity.getACL();
+  const owner =
+    "getOwner" in entity ? entity.getOwner() : entity.getClass()?.getOwner();
+  const isOwner = owner === role;
   const expandedRoles = expandRoles(introspection, [role], includeNoInherit);
   const isSuperuser = expandedRoles.some((role) => role.rolsuper);
-  // Just as in life, you start with nothing...
+  const grantAll = isSuperuser || isOwner;
+  // Superusers and owners of objects have all permissions over them, otherwise
+  // just as in life, you start with nothing...
   const permissions: ResolvedPermissions = {
-    select: isSuperuser || isOwner,
-    selectGrant: isSuperuser || isOwner,
-    update: isSuperuser || isOwner,
-    updateGrant: isSuperuser || isOwner,
-    insert: isSuperuser || isOwner,
-    insertGrant: isSuperuser || isOwner,
-    delete: isSuperuser || isOwner,
-    deleteGrant: isSuperuser || isOwner,
-    truncate: isSuperuser || isOwner,
-    truncateGrant: isSuperuser || isOwner,
-    references: isSuperuser || isOwner,
-    referencesGrant: isSuperuser || isOwner,
-    trigger: isSuperuser || isOwner,
-    triggerGrant: isSuperuser || isOwner,
-    execute: isSuperuser || isOwner,
-    executeGrant: isSuperuser || isOwner,
-    usage: isSuperuser || isOwner,
-    usageGrant: isSuperuser || isOwner,
-    create: isSuperuser || isOwner,
-    createGrant: isSuperuser || isOwner,
-    connect: isSuperuser || isOwner,
-    connectGrant: isSuperuser || isOwner,
-    temporary: isSuperuser || isOwner,
-    temporaryGrant: isSuperuser || isOwner,
+    select: grantAll,
+    selectGrant: grantAll,
+    update: grantAll,
+    updateGrant: grantAll,
+    insert: grantAll,
+    insertGrant: grantAll,
+    delete: grantAll,
+    deleteGrant: grantAll,
+    truncate: grantAll,
+    truncateGrant: grantAll,
+    references: grantAll,
+    referencesGrant: grantAll,
+    trigger: grantAll,
+    triggerGrant: grantAll,
+    execute: grantAll,
+    executeGrant: grantAll,
+    usage: grantAll,
+    usageGrant: grantAll,
+    create: grantAll,
+    createGrant: grantAll,
+    connect: grantAll,
+    connectGrant: grantAll,
+    temporary: grantAll,
+    temporaryGrant: grantAll,
   };
 
-  if (isSuperuser) {
+  if (grantAll) {
     return permissions;
   }
 

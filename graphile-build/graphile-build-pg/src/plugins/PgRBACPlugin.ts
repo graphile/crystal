@@ -47,17 +47,15 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
         }
         const attributePermissions = resolvePermissions(
           introspection,
-          pgAttribute.getACL(),
+          pgAttribute,
           introspectionRole,
           true,
-          introspectionRole === pgClass.getOwner(),
         );
         const tablePermissions = resolvePermissions(
           introspection,
-          pgClass.getACL(),
+          pgClass,
           introspectionRole,
           true,
-          introspectionRole === pgClass.getOwner(),
         );
         const canSelect =
           attributePermissions.select || tablePermissions.select;
@@ -76,12 +74,8 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
             .some(
               (att) =>
                 att.attnum > 0 &&
-                resolvePermissions(
-                  introspection,
-                  att.getACL(),
-                  introspectionRole,
-                  true,
-                ).select,
+                resolvePermissions(introspection, att, introspectionRole, true)
+                  .select,
             );
           if (hasSiblingWithSelect) {
             parts.push("-select -filterBy -orderBy");
@@ -112,10 +106,9 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
         }
         const permissions = resolvePermissions(
           introspection,
-          pgProc.getACL(),
+          pgProc,
           introspectionRole,
           true,
-          introspectionRole === pgProc.getOwner(),
         );
         if (!permissions.execute) {
           resourceOptions.extensions =
@@ -147,10 +140,9 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
         }
         const tablePermissions = resolvePermissions(
           introspection,
-          pgClass.getACL(),
+          pgClass,
           introspectionRole,
           true,
-          introspectionRole === pgClass.getOwner(),
         );
 
         let canSelect = tablePermissions.select;
@@ -164,13 +156,7 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
             .getAttributes()
             .filter((att) => att.attnum > 0)
             .map((att) =>
-              resolvePermissions(
-                introspection,
-                att.getACL(),
-                introspectionRole,
-                true,
-                introspectionRole === pgClass.getOwner(),
-              ),
+              resolvePermissions(introspection, att, introspectionRole, true),
             );
           for (const attributePermission of attributePermissions) {
             canSelect = canSelect || attributePermission.select;
