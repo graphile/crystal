@@ -75,8 +75,8 @@ export const Ruru: FC<RuruProps> = (props) => {
         fetcher={fetcher}
         schema={schema}
         defaultQuery={defaultQuery}
-        query={props.initialQuery}
-        variables={props.initialVariables}
+        query={props.query ?? props.initialQuery}
+        variables={props.variables ?? props.initialVariables}
         plugins={plugins}
         shouldPersistHeaders={saveHeaders}
       >
@@ -85,6 +85,8 @@ export const Ruru: FC<RuruProps> = (props) => {
           editorTheme={props.editorTheme}
           error={error}
           setError={setError}
+          onEditQuery={props.onEditQuery}
+          onEditVariables={props.onEditVariables}
         />
       </GraphiQLProvider>
     </ExplainContext.Provider>
@@ -97,8 +99,16 @@ export const RuruInner: FC<{
   error: Error | null;
   setError: React.Dispatch<React.SetStateAction<Error | null>>;
   onEditQuery?: GraphiQLProps["onEditQuery"];
+  onEditVariables?: GraphiQLProps["onEditVariables"];
 }> = (props) => {
-  const { storage, editorTheme, error, setError, onEditQuery } = props;
+  const {
+    storage,
+    editorTheme,
+    error,
+    setError,
+    onEditQuery,
+    onEditVariables,
+  } = props;
   const prettify = usePrettify();
   const mergeQuery = useMergeQuery();
   const copyQuery = useCopyQuery();
@@ -126,6 +136,7 @@ export const RuruInner: FC<{
         <GraphiQLInterface
           editorTheme={editorTheme ?? "graphiql"}
           onEditQuery={onEditQuery}
+          onEditVariables={onEditVariables}
         >
           <GraphiQL.Logo>
             <a
