@@ -128,11 +128,11 @@ const RuruQueryParamsUpdatePlugin: GraphileConfig.Plugin = {
   RURU_CONFIG.onEditQuery = (query) => {
     currentUrl.searchParams.set("query", query);
     window.history.replaceState(null, "", currentUrl);
-  }
+  };
   RURU_CONFIG.onEditVariables = (variables) => {
     currentUrl.searchParams.set("variables", variables);
     window.history.replaceState(null, "", currentUrl);
-  }
+  };
 }
 </script>
 `;
