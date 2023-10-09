@@ -95,12 +95,14 @@ const RuruQueryParamsPlugin: GraphileConfig.Plugin = {
       ruruHTMLParts(_info, parts, _extra) {
         parts.headerScripts += `
 <script>
-const ruruQueryParamsUrl = new URL(document.URL);
-const ruruQueryParamsQuery = ruruQueryParamsUrl.searchParams.get("query");
-const ruruQueryParamsVariables = ruruQueryParamsUrl.searchParams.get("variables");
-if (ruruQueryParamsQuery) {
-  RURU_CONFIG.query = ruruQueryParamsQuery;
-  RURU_CONFIG.variables = ruruQueryParamsVariables;
+{
+  const currentUrl = new URL(document.URL);
+  const query = currentUrl.searchParams.get("query");
+  const variables = currentUrl.searchParams.get("variables");
+  if (query) {
+    RURU_CONFIG.query = query;
+    RURU_CONFIG.variables = variables;
+  }
 }
 </script>
 `;
@@ -121,15 +123,16 @@ const RuruQueryParamsUpdatePlugin: GraphileConfig.Plugin = {
       ruruHTMLParts(_info, parts, _extra) {
         parts.headerScripts += `
 <script>
-const ruruQueryParamsUpdateUrl = new URL(document.URL);
-const ruruQueryParamsUpdateSearch = ruruQueryParamsUpdateUrl.searchParams;
-RURU_CONFIG.onEditQuery = (query) => {
-  ruruQueryParamsUpdateSearch.set("query", query);
-  window.history.replaceState(null, "", ruruQueryParamsUpdateUrl);
-}
-RURU_CONFIG.onEditVariables = (variables) => {
-  ruruQueryParamsUpdateSearch.set("variables", variables);
-  window.history.replaceState(null, "", ruruQueryParamsUpdateUrl);
+{
+  const currentUrl = new URL(document.URL);
+  RURU_CONFIG.onEditQuery = (query) => {
+    currentUrl.searchParams.set("query", query);
+    window.history.replaceState(null, "", currentUrl);
+  }
+  RURU_CONFIG.onEditVariables = (variables) => {
+    currentUrl.searchParams.set("variables", variables);
+    window.history.replaceState(null, "", currentUrl);
+  }
 }
 </script>
 `;

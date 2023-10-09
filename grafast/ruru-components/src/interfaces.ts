@@ -35,12 +35,12 @@ export interface RuruProps {
   defaultQuery?: string;
 
   /**
-   * DEPRECATED: use `query` instead
+   * @deprecated Use `query` instead
    */
   initialQuery?: string;
 
   /**
-   * DEPRECATED: use `variables` instead
+   * @deprecated Use `variables` instead
    */
   initialVariables?: string;
 
