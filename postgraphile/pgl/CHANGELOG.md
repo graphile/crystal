@@ -1,5 +1,18 @@
 # pgl
 
+## 5.0.0-beta.15
+
+### Patch Changes
+
+- Updated dependencies
+  [[`3dd5d86d6`](https://github.com/graphile/crystal/commit/3dd5d86d6c1ea7ba106c08e8a315ec47ed6cfa2d),
+  [`2d447a6b4`](https://github.com/graphile/crystal/commit/2d447a6b45d7db2813bd957f412cd959e2185759)]:
+  - postgraphile@5.0.0-beta.15
+  - graphile-build-pg@5.0.0-beta.14
+  - pg-introspection@0.0.1-beta.4
+  - grafserv@0.1.1-beta.2
+  - @dataplan/pg@0.0.1-beta.11
+
 ## 5.0.0-beta.14
 
 ### Patch Changes

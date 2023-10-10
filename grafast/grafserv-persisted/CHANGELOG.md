@@ -1,5 +1,12 @@
 # @grafserv/persisted
 
+## 0.0.0-beta.12
+
+### Patch Changes
+
+- Updated dependencies []:
+  - grafserv@0.1.1-beta.2
+
 ## 0.0.0-beta.11
 
 ### Patch Changes

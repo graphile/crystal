@@ -1,5 +1,18 @@
 # graphile-build-pg
 
+## 5.0.0-beta.14
+
+### Patch Changes
+
+- [#1801](https://github.com/graphile/crystal/pull/1801)
+  [`2d447a6b4`](https://github.com/graphile/crystal/commit/2d447a6b45d7db2813bd957f412cd959e2185759)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug where the owner of a
+  database object wasn't seen as having any privileges.
+- Updated dependencies
+  [[`2d447a6b4`](https://github.com/graphile/crystal/commit/2d447a6b45d7db2813bd957f412cd959e2185759)]:
+  - pg-introspection@0.0.1-beta.4
+  - @dataplan/pg@0.0.1-beta.11
+
 ## 5.0.0-beta.13
 
 ### Patch Changes
