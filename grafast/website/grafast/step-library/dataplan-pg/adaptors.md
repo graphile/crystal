@@ -5,7 +5,7 @@ sidebar_position: 2
 # Adaptors
 
 `@dataplan/pg` can use any client to communicate with your database, so long as
-their is a suitable adaptor. Each adaptor provides a baseline of capabilities
+there is a suitable adaptor. Each adaptor provides a baseline of capabilities
 for `@dataplan/pg` to use. You may use multiple adaptors with the same schema.
 
 At planning time, when a step determines a PgExecutor will be needed to
