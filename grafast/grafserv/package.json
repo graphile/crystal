@@ -18,6 +18,10 @@
       "types": "./dist/servers/express/v4/index.d.ts",
       "default": "./dist/servers/express/v4/index.js"
     },
+    "./lambda/v1": {
+      "types": "./dist/servers/lambda/v1/index.d.ts",
+      "default": "./dist/servers/lambda/v1/index.js"
+    },
     "./koa/v2": {
       "types": "./dist/servers/koa/v2/index.d.ts",
       "default": "./dist/servers/koa/v2/index.js"
