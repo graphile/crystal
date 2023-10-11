@@ -13,7 +13,7 @@ are not possible in DataLoader.
 
 ### Attribute and parameter tracking
 
-A `loadOne` step (techincally a `LoadedRecordStep`) keeps track of the
+A `loadOne` step (technically a `LoadedRecordStep`) keeps track of the
 attribute names accessed via `.get(attrName)` and any parameters set via
 `.setParam(key, value)`. This information will be passed through to your
 callback function such that you may make more optimal calls to your backend
@@ -75,7 +75,7 @@ stateDiagram
 `} />
 
 However, we can indicate that the output of the `loadOne` step's `id` property
-(`$user.get("id")`) is equivalent to it's input (`context().get("userId")`):
+(`$user.get("id")`) is equivalent to its input (`context().get("userId")`):
 
 ```diff {5-6}
  const plans = {

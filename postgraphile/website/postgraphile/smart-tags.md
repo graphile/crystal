@@ -117,7 +117,7 @@ So now the query needs to use the new name for the table:
 
 :::info
 
-These screenshots were take in an early PostGraphile V4 GraphiQL. Though Ruru
+These screenshots were taken in an early PostGraphile V4 GraphiQL. Though Ruru
 in PostGraphile V5 will look different, the results are the same.
 
 :::
