@@ -41,3 +41,9 @@ div[class^="announcementBar_"] {
   );
   font-weight: bold;
 }
+
+figure figcaption {
+  font-size: 0.9em;
+  font-style: italic;
+  text-align: center;
+}
