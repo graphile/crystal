@@ -47,3 +47,10 @@ figure figcaption {
   font-style: italic;
   text-align: center;
 }
+
+figure {
+  text-align: center;
+}
+figure iframe {
+  display: inline-block;
+}
