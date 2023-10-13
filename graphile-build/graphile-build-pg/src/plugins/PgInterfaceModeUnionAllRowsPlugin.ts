@@ -175,6 +175,7 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
                                 ),
                                 description:
                                   "Filter results to only those of the given types",
+                                deprecationReason: "EXPERIMENTAL",
                               },
                             }
                           : null),
