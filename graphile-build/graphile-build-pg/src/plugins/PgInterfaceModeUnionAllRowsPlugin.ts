@@ -77,6 +77,7 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
     hooks: {
       GraphQLObjectType_fields(fields, build, context) {
         const {
+          getTypeByName,
           inflection,
           graphql: { GraphQLList, GraphQLNonNull },
           pgResourcesByPolymorphicTypeName,
@@ -116,14 +117,14 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
             const makeField = (useConnection: boolean): void => {
               if (!interfaceCodec.polymorphism) return;
 
-              const type = build.getTypeByName(
-                build.inflection.tableType(interfaceCodec),
+              const type = getTypeByName(
+                inflection.tableType(interfaceCodec),
               ) as GraphQLInterfaceType | undefined;
               if (!type) return;
 
               const fieldType = useConnection
-                ? (build.getTypeByName(
-                    build.inflection.tableConnectionType(interfaceCodec),
+                ? (getTypeByName(
+                    inflection.tableConnectionType(interfaceCodec),
                   ) as GraphQLObjectType | undefined)
                 : // TODO: nullability.
                   new GraphQLList(new GraphQLNonNull(type));
