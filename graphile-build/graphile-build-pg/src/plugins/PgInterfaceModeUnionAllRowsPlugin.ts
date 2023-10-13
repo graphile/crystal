@@ -7,7 +7,7 @@ import type {
   PgUnionAllStepMember,
 } from "@dataplan/pg";
 import { pgUnionAll } from "@dataplan/pg";
-import { connection } from "grafast";
+import { FieldArgs, connection } from "grafast";
 import type { GraphQLInterfaceType, GraphQLObjectType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 
@@ -149,6 +149,11 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
                 });
               }
               const interfaceCodecName = interfaceCodec.name;
+              const onlyArgName =
+                inflection.pgPolymorphismOnlyArgument(interfaceCodec);
+              const enumTypeName =
+                inflection.pgPolymorphismEnumType(interfaceCodec);
+              const enumType = getTypeByName(enumTypeName);
               build.extend(
                 fields,
                 {
@@ -161,36 +166,103 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
                     },
                     {
                       type: fieldType,
-                      plan: EXPORTABLE(
-                        (
-                          attributes,
-                          connection,
-                          interfaceCodecName,
-                          members,
-                          pgUnionAll,
-                          resourceByTypeName,
-                          useConnection,
-                        ) => {
-                          return function plan() {
-                            const $list = pgUnionAll({
+                      args: {
+                        ...(enumType
+                          ? {
+                              [onlyArgName]: {
+                                type: new GraphQLList(
+                                  new GraphQLNonNull(enumType),
+                                ),
+                                description:
+                                  "Filter results to only those of the given types",
+                              },
+                            }
+                          : null),
+                      },
+                      plan: enumType
+                        ? EXPORTABLE(
+                            (
                               attributes,
-                              resourceByTypeName,
+                              connection,
+                              interfaceCodecName,
                               members,
-                              name: interfaceCodecName,
-                            });
-                            return useConnection ? connection($list) : $list;
-                          };
-                        },
-                        [
-                          attributes,
-                          connection,
-                          interfaceCodecName,
-                          members,
-                          pgUnionAll,
-                          resourceByTypeName,
-                          useConnection,
-                        ],
-                      ),
+                              pgUnionAll,
+                              resourceByTypeName,
+                              useConnection,
+                            ) => {
+                              return function plan(
+                                _: any,
+                                fieldArgs: FieldArgs,
+                              ) {
+                                const $typeNames =
+                                  fieldArgs.getRaw(onlyArgName);
+                                const typeNames = $typeNames.eval();
+                                const filteredResources = typeNames
+                                  ? Object.fromEntries(
+                                      Object.entries(resourceByTypeName).filter(
+                                        ([typeName, _]) =>
+                                          typeNames.includes(typeName),
+                                      ),
+                                    )
+                                  : resourceByTypeName;
+                                const filteredMembers = typeNames
+                                  ? members.filter((m) =>
+                                      typeNames.includes(m.typeName),
+                                    )
+                                  : members;
+                                const $list = pgUnionAll({
+                                  attributes,
+                                  resourceByTypeName: filteredResources,
+                                  members: filteredMembers,
+                                  name: interfaceCodecName,
+                                });
+                                return useConnection
+                                  ? connection($list)
+                                  : $list;
+                              };
+                            },
+                            [
+                              attributes,
+                              connection,
+                              interfaceCodecName,
+                              members,
+                              pgUnionAll,
+                              resourceByTypeName,
+                              useConnection,
+                            ],
+                          )
+                        : EXPORTABLE(
+                            (
+                              attributes,
+                              connection,
+                              interfaceCodecName,
+                              members,
+                              pgUnionAll,
+                              resourceByTypeName,
+                              useConnection,
+                            ) => {
+                              return function plan() {
+                                const $list = pgUnionAll({
+                                  attributes,
+                                  resourceByTypeName,
+                                  members,
+                                  name: interfaceCodecName,
+                                });
+                                return useConnection
+                                  ? connection($list)
+                                  : $list;
+                              };
+                            },
+                            [
+                              attributes,
+                              connection,
+                              interfaceCodecName,
+                              members,
+                              pgUnionAll,
+                              resourceByTypeName,
+                              useConnection,
+                            ],
+                          ),
                     },
                   ),
                 },
