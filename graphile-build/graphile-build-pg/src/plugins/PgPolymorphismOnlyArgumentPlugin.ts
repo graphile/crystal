@@ -1,7 +1,20 @@
-import { GraphileConfig } from "graphile-config";
+import { GraphileConfig, PluginHook } from "graphile-config";
 import { version } from "../version.js";
-import { PgCodec, PgCodecPolymorphismRelationalTypeSpec } from "@dataplan/pg";
-import { GraphQLEnumValueConfigMap } from "graphql";
+import {
+  PgCodec,
+  PgCodecPolymorphismRelationalTypeSpec,
+  PgUnionAllStep,
+} from "@dataplan/pg";
+import {
+  GraphQLEnumValueConfigMap,
+  GraphQLFieldConfigArgumentMap,
+} from "graphql";
+import { EXPORTABLE } from "graphile-build";
+import {
+  ConnectionStep,
+  FieldArgs,
+  GrafastFieldConfigArgumentMap,
+} from "grafast";
 
 declare global {
   namespace GraphileBuild {
@@ -133,6 +146,97 @@ export const PgPolymorphismOnlyArgumentPlugin: GraphileConfig.Plugin = {
         }
         return values;
       },
+
+      GraphQLObjectType_fields_field_args: makeFieldsHook(false),
+      GraphQLInterfaceType_fields_field_args: makeFieldsHook(true),
     },
   },
 };
+function makeFieldsHook(isInterface: boolean) {
+  return (
+    args:
+      | GrafastFieldConfigArgumentMap<any, any, any, any>
+      | GraphQLFieldConfigArgumentMap,
+
+    build: GraphileBuild.Build,
+    context:
+      | GraphileBuild.ContextObjectFieldsFieldArgs
+      | GraphileBuild.ContextInterfaceFieldsFieldArgs,
+  ) => {
+    const {
+      getTypeByName,
+      graphql: { GraphQLList, GraphQLNonNull },
+      inflection,
+    } = build;
+    const {
+      scope: {
+        pgFieldResource,
+        pgFieldCodec,
+        isPgFieldConnection,
+        isPgFieldSimpleCollection,
+      },
+    } = context;
+    if (!(isPgFieldConnection || isPgFieldSimpleCollection)) {
+      return args;
+    }
+    const codec: PgCodec | undefined = pgFieldCodec ?? pgFieldResource?.codec;
+    if (!codec || !codec.polymorphism) {
+      return args;
+    }
+    const enumTypeName = inflection.pgPolymorphismEnumType(codec);
+    const enumType = getTypeByName(enumTypeName);
+    if (!enumType) {
+      return args;
+    }
+    const argName = inflection.pgPolymorphismOnlyArgument(codec);
+    if (codec.polymorphism.mode === "union") {
+      args = build.extend(
+        args,
+        {
+          [argName]: {
+            type: new GraphQLList(new GraphQLNonNull(enumType)),
+            description: "Filter results to only those of the given types",
+            deprecationReason: "EXPERIMENTAL",
+            ...(isInterface
+              ? null
+              : {
+                  autoApplyAfterParentPlan: true,
+                  applyPlan: isPgFieldConnection
+                    ? EXPORTABLE(
+                        () =>
+                          (
+                            $parent: any,
+                            $connection: ConnectionStep<
+                              any,
+                              any,
+                              PgUnionAllStep,
+                              any
+                            >,
+                            fieldArgs: FieldArgs,
+                          ) => {
+                            const $union = $connection.getSubplan();
+                            $union.limitToTypes(fieldArgs.getRaw().eval());
+                          },
+                        [],
+                      )
+                    : EXPORTABLE(
+                        () =>
+                          (
+                            $parent: any,
+                            $union: PgUnionAllStep,
+                            fieldArgs: FieldArgs,
+                          ) => {
+                            $union.limitToTypes(fieldArgs.getRaw().eval());
+                          },
+                        [],
+                      ),
+                }),
+          },
+        },
+        `Adding "only" argument to union interface polymorphic connection/list field ${context.Self.name}.${context.scope.fieldName}`,
+      );
+    }
+
+    return args;
+  };
+}

@@ -512,6 +512,7 @@ export class PgUnionAllStep<
   private locker: PgLocker<this> = new PgLocker(this);
 
   private memberDigests: MemberDigest<TTypeNames>[];
+  private _limitToTypes: string[] | undefined;
 
   constructor(
     cloneFrom: PgUnionAllStep<TAttributes, TTypeNames>,
@@ -534,6 +535,9 @@ export class PgUnionAllStep<
         cloneFrom.mode === this.mode ? cloneFrom : null;
       this.spec = cloneFrom.spec;
       this.memberDigests = cloneDigests(cloneFrom.memberDigests);
+      this._limitToTypes = cloneFrom._limitToTypes
+        ? [...cloneFrom._limitToTypes]
+        : undefined;
 
       cloneFrom.dependencies.forEach((planId, idx) => {
         const myIdx = this.addDependency(cloneFrom.getDep(idx), true);
@@ -1516,7 +1520,21 @@ and ${condition(i + 1)}`}
     return this.orders;
   }
 
+  /** @experimental */
+  limitToTypes(types: readonly string[]): void {
+    if (!this._limitToTypes) {
+      this._limitToTypes = [...types];
+    } else {
+      this._limitToTypes = this._limitToTypes.filter((t) => types.includes(t));
+    }
+  }
+
   optimize() {
+    if (this._limitToTypes) {
+      this.memberDigests = this.memberDigests.filter((d) =>
+        this._limitToTypes!.includes(d.member.typeName),
+      );
+    }
     if (this.memberDigests.length === 0) {
       // We have no implementations, we'll never return anything
       return constant([], false);
