@@ -61,6 +61,16 @@ declare global {
   }
   namespace GraphileBuild {
     interface Build {
+      pgResourcesByPolymorphicTypeName: {
+        [polymorphicTypeName: string]: {
+          resources: PgResource[];
+          type: "union" | "interface";
+        };
+      };
+      pgCodecByPolymorphicUnionModeTypeName: {
+        [polymorphicTypeName: string]: PgCodec;
+      };
+
       nodeIdSpecForCodec(codec: PgCodec<any, any, any, any, any, any, any>):
         | (($nodeId: ExecutableStep<string>) => {
             [key: string]: ExecutableStep<any>;
@@ -781,9 +791,89 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
     },
     hooks: {
       build(build) {
+        const { input, inflection } = build;
+        const pgRegistry = input.pgRegistry as PgRegistry;
+        const pgResourcesByPolymorphicTypeName: GraphileBuild.Build["pgResourcesByPolymorphicTypeName"] =
+          Object.create(null);
+
+        const allResources = Object.values(pgRegistry.pgResources);
+        for (const resource of allResources) {
+          if (resource.parameters) continue;
+          if (typeof resource.from === "function") continue;
+          if (!resource.codec.extensions?.tags) continue;
+          const { implements: implementsTag } = resource.codec.extensions.tags;
+          /*
+          const { unionMember } = resource.codec.extensions.tags;
+          if (unionMember) {
+            const unions = Array.isArray(unionMember)
+              ? unionMember
+              : [unionMember];
+            for (const union of unions) {
+              if (!resourcesByPolymorphicTypeName[union]) {
+                resourcesByPolymorphicTypeName[union] = {
+                  resources: [resource as PgResource],
+                  type: "union",
+                };
+              } else {
+                if (resourcesByPolymorphicTypeName[union].type !== "union") {
+                  throw new Error(`Inconsistent polymorphism`);
+                }
+                resourcesByPolymorphicTypeName[union].resources.push(
+                  resource as PgResource,
+                );
+              }
+            }
+          }
+          */
+          if (implementsTag) {
+            const interfaces = Array.isArray(implementsTag)
+              ? implementsTag
+              : [implementsTag];
+            for (const interfaceName of interfaces) {
+              if (!pgResourcesByPolymorphicTypeName[interfaceName]) {
+                pgResourcesByPolymorphicTypeName[interfaceName] = {
+                  resources: [resource as PgResource],
+                  type: "interface",
+                };
+              } else {
+                if (
+                  pgResourcesByPolymorphicTypeName[interfaceName].type !==
+                  "interface"
+                ) {
+                  throw new Error(`Inconsistent polymorphism`);
+                }
+                pgResourcesByPolymorphicTypeName[interfaceName].resources.push(
+                  resource as PgResource,
+                );
+              }
+            }
+          }
+        }
+
+        const pgCodecByPolymorphicUnionModeTypeName: {
+          [polymorphicTypeName: string]: PgCodec;
+        } = Object.create(null);
+        for (const codec of Object.values(pgRegistry.pgCodecs)) {
+          if (!codec.polymorphism) continue;
+          if (codec.polymorphism.mode !== "union") continue;
+
+          const interfaceTypeName = inflection.tableType(codec);
+          pgCodecByPolymorphicUnionModeTypeName[interfaceTypeName] = codec;
+
+          // Explicitly allow zero implementations.
+          if (!pgResourcesByPolymorphicTypeName[interfaceTypeName]) {
+            pgResourcesByPolymorphicTypeName[interfaceTypeName] = {
+              resources: [],
+              type: "interface",
+            };
+          }
+        }
+
         return build.extend(
           build,
           {
+            pgResourcesByPolymorphicTypeName,
+            pgCodecByPolymorphicUnionModeTypeName,
             nodeIdSpecForCodec(codec) {
               const table = build.pgTableResource!(codec);
               if (!table) {
