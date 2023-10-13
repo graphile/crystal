@@ -84,6 +84,24 @@ const config = {
         editUrl,
       },
     ],
+    [
+      "@docusaurus/plugin-content-blog",
+      {
+        /**
+         * Required for any multi-instance plugin
+         */
+        id: "news",
+        /**
+         * URL route for the blog section of your site.
+         * *DO NOT* include a trailing slash.
+         */
+        routeBasePath: "news",
+        /**
+         * Path to data on filesystem relative to site dir.
+         */
+        path: "./news",
+      },
+    ],
 
     () => ({
       name: "webpack-customization-plugin",
@@ -176,6 +194,11 @@ const config = {
             href: "/playground",
             label: "Playground",
             position: "left",
+          },
+          {
+            to: "news",
+            label: "News",
+            position: "right",
           },
           {
             href: "https://github.com/grafast/wg",
