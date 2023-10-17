@@ -261,6 +261,25 @@ const config = {
         darkTheme: darkCodeTheme,
         additionalLanguages: ["http"],
       },
+      algolia: {
+        // The application ID provided by Algolia
+        appId: "G81R3UYS9Q",
+
+        // Public API key: it is safe to commit it
+        apiKey: "9fd53308d86655a5995d171b5414d88a",
+        indexName: "grafast",
+
+        // Optional: see doc section below
+        contextualSearch: true,
+
+        // Optional: Algolia search parameters
+        searchParameters: {},
+
+        // Optional: path for search page that enabled by default (`false` to disable it)
+        searchPagePath: "search",
+
+        //... other Algolia params
+      },
     }),
   trailingSlash: undefined,
   clientModules: [require.resolve("./docusaurus.client.js")],
