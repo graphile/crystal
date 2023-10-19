@@ -18,7 +18,7 @@ CRUD mutations can easily be disabled by disabling the `create`,
 export default {
   // ...
   schema: {
-    defaultBehavior: "-create -update -delete",
+    defaultBehavior: "-insert -update -delete",
   },
 };
 ```
