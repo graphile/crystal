@@ -270,6 +270,12 @@ export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
 
 :::info
 
+Notice `Channel` type used in the `typeDefs` for `channels` table, this is automatically created by `postgraphile` while introspecting the database. [Read more on the artifacts that are created for each database table here.](https://postgraphile.org/postgraphile/next/tables)
+
+:::
+
+:::info
+
 Though you might be thinking that this would result in multiple requests being
 issued to the database, thanks to the magic of Gra*fast* and `@dataplan/pg`,
 this is not the case. During the optimization phase for the operation plan,
