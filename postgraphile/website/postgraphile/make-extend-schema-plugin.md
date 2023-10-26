@@ -268,6 +268,15 @@ export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
 });
 ```
 
+:::note
+
+The `Channel` type used in the `typeDefs` above is the type that PostGraphile
+generated automatically for the `channels` table. See
+[Tables](/postgraphile/next/tables) for more on the artifacts generated for each
+database table.
+
+:::
+
 :::info
 
 Though you might be thinking that this would result in multiple requests being
