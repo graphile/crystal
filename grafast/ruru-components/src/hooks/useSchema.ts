@@ -13,11 +13,24 @@ import type { RuruProps } from "../interfaces.js";
 // import { updateGraphiQLDocExplorerNavStack } from "../updateGraphiQLDocExplorerNavStack.js";
 import { useGraphQLChangeStream } from "./useGraphQLChangeStream.js";
 
+function tryParseJson(text: string | undefined): Record<string, unknown> | null {
+  if (text) {
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      return null
+    }
+  } else {
+    return null
+  }
+}
+
 export const useSchema = (
   props: RuruProps,
   fetcher: GraphiQLProps["fetcher"],
   setError: Dispatch<SetStateAction<Error | null>>,
   streamEndpoint: string | null,
+  headers: string | undefined
 ) => {
   const [schema, setSchema] = useState<GraphQLSchema | null>(null);
   const refetchStatusRef = useRef({
@@ -37,7 +50,7 @@ export const useSchema = (
       const result = await fetcher({
         query: getIntrospectionQuery(),
         operationName: null,
-      });
+      }, { headers: tryParseJson(headers) || {} });
       let payload;
       if (isAsyncIterable(result)) {
         // Handle async iterator; we're only expecting a single payload.
@@ -91,7 +104,7 @@ export const useSchema = (
           refetchStatusRef.current.fetchAgain();
         }
       });
-  }, [fetcher, setError]);
+  }, [fetcher, setError, headers]);
   useGraphQLChangeStream(props, refetch, streamEndpoint);
 
   useEffect(() => {

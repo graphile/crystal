@@ -9,12 +9,13 @@ import {
   ToolbarButton,
   ToolbarMenu,
   useCopyQuery,
+  useEditorContext,
   useMergeQuery,
 } from "@graphiql/react";
 import type { GraphiQLProps } from "graphiql";
 import { GraphiQL, GraphiQLInterface, GraphiQLProvider } from "graphiql";
 import type { FC } from "react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useEffect, useRef } from "react";
 
 import { ErrorPopup } from "./components/ErrorPopup.js";
 import { RuruFooter } from "./components/Footer.js";
@@ -27,6 +28,7 @@ import type { RuruStorage } from "./hooks/useStorage.js";
 import { useStorage } from "./hooks/useStorage.js";
 import type { RuruProps } from "./interfaces.js";
 import { EXPLAIN_PLUGIN } from "./plugins/explain.js";
+import { GraphQLSchema } from "graphql";
 
 if (GP2 !== GraphiQLProvider) {
   throw new Error("PACKAGE MANAGEMENT ERROR! The providers don't match up!");
@@ -37,6 +39,7 @@ const check = <span style={checkCss}>✔</span>;
 const nocheck = <span style={checkCss}></span>;
 
 export const Ruru: FC<RuruProps> = (props) => {
+  const [schema, setSchema] = useState<GraphQLSchema | null>(null);
   const storage = useStorage();
   const explain = storage.get("explain") === "true";
   const verbose = storage.get("verbose") === "true";
@@ -53,7 +56,6 @@ export const Ruru: FC<RuruProps> = (props) => {
   });
   const [error, setError] = useState<Error | null>(null);
   const explainHelpers = useExplain(storage);
-  const { schema } = useSchema(props, fetcher, setError, streamEndpoint);
   const defaultQuery = props.defaultQuery ?? DEFAULT_QUERY;
   const explorerPlugin = makeExplorerPlugin({
     showAttribution: false,
@@ -80,6 +82,7 @@ export const Ruru: FC<RuruProps> = (props) => {
         plugins={plugins}
         shouldPersistHeaders={saveHeaders}
       >
+        <SchemaSync {...props} setError={setError} setSchema={setSchema} />
         <RuruInner
           storage={storage}
           editorTheme={props.editorTheme}
@@ -92,6 +95,37 @@ export const Ruru: FC<RuruProps> = (props) => {
     </ExplainContext.Provider>
   );
 };
+
+type SchemaSyncProps = RuruProps & {
+  setError: React.Dispatch<React.SetStateAction<Error | null>>;
+  setSchema: (schema: GraphQLSchema | null) => void
+}
+
+const SchemaSync: FC<SchemaSyncProps> = (props) => {
+  const editorContext = useEditorContext();
+
+  const storage = useStorage();
+  const explain = storage.get("explain") === "true";
+  const verbose = storage.get("verbose") === "true";
+
+  const { fetcher, streamEndpoint } = useFetcher(props, {
+    explain,
+    verbose,
+  });
+
+  const headersRef = useRef<string | undefined>(editorContext?.initialHeaders);
+  useEffect(() => {
+    headersRef.current = editorContext?.headerEditor?.getValue()
+  });
+
+  const { schema } = useSchema(props, fetcher, props.setError, streamEndpoint, headersRef.current);
+
+  useEffect(() => {
+    props.setSchema(schema)
+  }, [schema])
+
+  return null;
+}
 
 export const RuruInner: FC<{
   editorTheme?: string;
