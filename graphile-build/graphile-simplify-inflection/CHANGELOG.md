@@ -1,5 +1,12 @@
 # v8.0.0
 
+## 8.0.0-beta.4
+
+### Patch Changes
+
+- [`1d3c54ecd`](https://github.com/graphile/crystal/commit/1d3c54ecd9c8f3a0ccf825d3a48153a1e429f235)
+  Thanks [@benjie](https://github.com/benjie)! - Update README.
+
 ## 8.0.0-beta.3
 
 ### Patch Changes
