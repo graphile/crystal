@@ -22,12 +22,12 @@ import { RuruFooter } from "./components/Footer.js";
 import { defaultQuery as DEFAULT_QUERY } from "./defaultQuery.js";
 import { ExplainContext, useExplain } from "./hooks/useExplain.js";
 import { useFetcher } from "./hooks/useFetcher.js";
+import { useGraphQLChangeStream } from "./hooks/useGraphQLChangeStream.js";
 import { usePrettify } from "./hooks/usePrettify.js";
 import type { RuruStorage } from "./hooks/useStorage.js";
 import { useStorage } from "./hooks/useStorage.js";
 import type { RuruProps } from "./interfaces.js";
 import { EXPLAIN_PLUGIN } from "./plugins/explain.js";
-import { useGraphQLChangeStream } from "./hooks/useGraphQLChangeStream.js";
 
 if (GP2 !== GraphiQLProvider) {
   throw new Error("PACKAGE MANAGEMENT ERROR! The providers don't match up!");
