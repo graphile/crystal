@@ -4,6 +4,8 @@ set -e -x
 rm -rf builds/
 mkdir builds/
 
+yarn clean
+
 # @graphile/lru
 cd utils/lru
 rm -f *.tgz
