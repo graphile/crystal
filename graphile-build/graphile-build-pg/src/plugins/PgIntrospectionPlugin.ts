@@ -235,10 +235,11 @@ type IntrospectionResults = Array<{
 
 interface Cache {
   introspectionResultsPromise: null | Promise<IntrospectionResults>;
+  dirty: boolean;
 }
 
 interface State {
-  introspectionResultsPromise: null | PromiseOrDirect<IntrospectionResults>;
+  getIntrospectionPromise: null | PromiseOrDirect<IntrospectionResults>;
   executors: {
     [key: string]: PgExecutor;
   };
@@ -320,9 +321,10 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
     namespace: "pgIntrospection",
     initialCache: (): Cache => ({
       introspectionResultsPromise: null,
+      dirty: false,
     }),
     initialState: (): State => ({
-      introspectionResultsPromise: null,
+      getIntrospectionPromise: null,
       executors: Object.create(null),
     }),
     helpers: {
@@ -493,92 +495,21 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
       getIntrospection(info) {
         // IMPORTANT: introspection shouldn't change within a single run (even
         // if the cache does), thus we add it to state.
-
-        if (info.state.introspectionResultsPromise) {
-          return info.state.introspectionResultsPromise;
-        }
-
-        info.state.introspectionResultsPromise =
-          info.cache.introspectionResultsPromise ??
-          (async () => {
-            if (info.cache.introspectionResultsPromise) {
-              return info.cache.introspectionResultsPromise;
+        return (
+          info.state.getIntrospectionPromise ??
+          (info.state.getIntrospectionPromise = (async () => {
+            // If the cache is dirty, clear it now we're about to replace it.
+            if (info.cache.dirty) {
+              info.cache.introspectionResultsPromise = null;
+              info.cache.dirty = false;
             }
-            if (!info.resolvedPreset.pgServices) {
-              return [];
-            }
-            const seenNames = new Map<string, number>();
-            const seenPgSettingsKeys = new Map<string, number>();
-            const seenWithPgClientKeys = new Map<string, number>();
-            // Resolve the promise ASAP so dependents can `getIntrospection()` and then `getClass` or whatever from the result.
-            const introspectionPromise = Promise.all(
-              info.resolvedPreset.pgServices.map(async (pgService, i) => {
-                // Validate there's no conflicts between pgServices
-                const { name, pgSettingsKey, withPgClientKey } = pgService;
-                if (!name) {
-                  throw new Error(`pgServices[${i}] has no name`);
-                }
-                if (!withPgClientKey) {
-                  throw new Error(`pgServices[${i}] has no withPgClientKey`);
-                }
-                {
-                  const existingIndex = seenNames.get(name);
-                  if (existingIndex != null) {
-                    throw new Error(
-                      `pgServices[${i}] has the same name as pgServices[${existingIndex}] (${JSON.stringify(
-                        name,
-                      )})`,
-                    );
-                  }
-                  seenNames.set(name, i);
-                }
-                {
-                  const existingIndex =
-                    seenWithPgClientKeys.get(withPgClientKey);
-                  if (existingIndex != null) {
-                    throw new Error(
-                      `pgServices[${i}] has the same withPgClientKey as pgServices[${existingIndex}] (${JSON.stringify(
-                        withPgClientKey,
-                      )})`,
-                    );
-                  }
-                  seenWithPgClientKeys.set(withPgClientKey, i);
-                }
-                if (pgSettingsKey) {
-                  const existingIndex = seenPgSettingsKeys.get(pgSettingsKey);
-                  if (existingIndex != null) {
-                    throw new Error(
-                      `pgServices[${i}] has the same pgSettingsKey as pgServices[${existingIndex}] (${JSON.stringify(
-                        pgSettingsKey,
-                      )})`,
-                    );
-                  }
-                  seenPgSettingsKeys.set(pgSettingsKey, i);
-                }
+            // Introspect the database (or read it from CLEAN cache)
+            const introspectionPromise =
+              info.cache.introspectionResultsPromise ??
+              (info.cache.introspectionResultsPromise = introspectPgServices(
+                info.resolvedPreset.pgServices,
+              ));
 
-                // Do the introspection
-                const introspectionQuery = makeIntrospectionQuery();
-                const {
-                  rows: [row],
-                } = await withPgClientFromPgService(
-                  pgService,
-                  pgService.pgSettingsForIntrospection ?? null,
-                  (client) =>
-                    client.query<{ introspection: string }>({
-                      text: introspectionQuery,
-                    }),
-                );
-                if (!row) {
-                  throw new Error("Introspection failed");
-                }
-                const introspection = parseIntrospectionResults(
-                  row.introspection,
-                );
-                return { pgService, introspection };
-              }),
-            );
-
-            info.cache.introspectionResultsPromise = introspectionPromise;
             // Don't cache errors
             introspectionPromise.then(null, () => {
               info.cache.introspectionResultsPromise = null;
@@ -587,9 +518,12 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             const introspections = await introspectionPromise;
 
             // Store the resolved state, so access during announcements doesn't cause the system to hang
-            info.state.introspectionResultsPromise = introspections;
+            info.state.getIntrospectionPromise = introspections;
 
-            // Announce it
+            // Announce the introspection results.
+            // NOTE: we must not *cache* this, because it needs to run on every
+            // gather. We only do it once per gather though, so writing to state
+            // is fine.
             await Promise.all(
               introspections.map(async (result) => {
                 const { introspection, pgService } = result;
@@ -657,9 +591,8 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             );
 
             return introspections;
-          })();
-
-        return info.state.introspectionResultsPromise;
+          })())
+        );
       },
       async getService(info, serviceName) {
         const all = await info.helpers.pgIntrospection.getIntrospection();
@@ -725,6 +658,8 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                   try {
                     // Delete the introspection results
                     info.cache.introspectionResultsPromise = null;
+                    // Deleting the introspection results is not sufficient since they might be replaced before gather runs again
+                    info.cache.dirty = true;
                     // Trigger re-gather
                     callback();
                   } finally {
@@ -759,3 +694,79 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
     },
   }),
 };
+
+async function introspectPgServices(
+  pgServices: ReadonlyArray<GraphileConfig.PgServiceConfiguration> | undefined,
+): Promise<IntrospectionResults> {
+  if (!pgServices) {
+    return [];
+  }
+  const seenNames = new Map<string, number>();
+  const seenPgSettingsKeys = new Map<string, number>();
+  const seenWithPgClientKeys = new Map<string, number>();
+  // Resolve the promise ASAP so dependents can `getIntrospection()` and then `getClass` or whatever from the result.
+  const introspectionPromise = Promise.all(
+    pgServices.map(async (pgService, i) => {
+      // Validate there's no conflicts between pgServices
+      const { name, pgSettingsKey, withPgClientKey } = pgService;
+      if (!name) {
+        throw new Error(`pgServices[${i}] has no name`);
+      }
+      if (!withPgClientKey) {
+        throw new Error(`pgServices[${i}] has no withPgClientKey`);
+      }
+      {
+        const existingIndex = seenNames.get(name);
+        if (existingIndex != null) {
+          throw new Error(
+            `pgServices[${i}] has the same name as pgServices[${existingIndex}] (${JSON.stringify(
+              name,
+            )})`,
+          );
+        }
+        seenNames.set(name, i);
+      }
+      {
+        const existingIndex = seenWithPgClientKeys.get(withPgClientKey);
+        if (existingIndex != null) {
+          throw new Error(
+            `pgServices[${i}] has the same withPgClientKey as pgServices[${existingIndex}] (${JSON.stringify(
+              withPgClientKey,
+            )})`,
+          );
+        }
+        seenWithPgClientKeys.set(withPgClientKey, i);
+      }
+      if (pgSettingsKey) {
+        const existingIndex = seenPgSettingsKeys.get(pgSettingsKey);
+        if (existingIndex != null) {
+          throw new Error(
+            `pgServices[${i}] has the same pgSettingsKey as pgServices[${existingIndex}] (${JSON.stringify(
+              pgSettingsKey,
+            )})`,
+          );
+        }
+        seenPgSettingsKeys.set(pgSettingsKey, i);
+      }
+
+      // Do the introspection
+      const introspectionQuery = makeIntrospectionQuery();
+      const {
+        rows: [row],
+      } = await withPgClientFromPgService(
+        pgService,
+        pgService.pgSettingsForIntrospection ?? null,
+        (client) =>
+          client.query<{ introspection: string }>({
+            text: introspectionQuery,
+          }),
+      );
+      if (!row) {
+        throw new Error("Introspection failed");
+      }
+      const introspection = parseIntrospectionResults(row.introspection);
+      return { pgService, introspection };
+    }),
+  );
+  return introspectionPromise;
+}
