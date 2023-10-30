@@ -695,17 +695,20 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
   }),
 };
 
-async function introspectPgServices(
+function introspectPgServices(
   pgServices: ReadonlyArray<GraphileConfig.PgServiceConfiguration> | undefined,
 ): Promise<IntrospectionResults> {
   if (!pgServices) {
-    return [];
+    return Promise.resolve([]);
   }
+
   const seenNames = new Map<string, number>();
   const seenPgSettingsKeys = new Map<string, number>();
   const seenWithPgClientKeys = new Map<string, number>();
-  // Resolve the promise ASAP so dependents can `getIntrospection()` and then `getClass` or whatever from the result.
-  const introspectionPromise = Promise.all(
+
+  // Resolve the promise ASAP so dependents can `getIntrospection()` and then
+  // `getClass` or whatever from the result.
+  return Promise.all(
     pgServices.map(async (pgService, i) => {
       // Validate there's no conflicts between pgServices
       const { name, pgSettingsKey, withPgClientKey } = pgService;
@@ -768,5 +771,4 @@ async function introspectPgServices(
       return { pgService, introspection };
     }),
   );
-  return introspectionPromise;
 }
