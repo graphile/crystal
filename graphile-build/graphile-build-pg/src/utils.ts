@@ -74,7 +74,11 @@ export function parseSmartTagsOptsString<TParamName extends string = string>(
       throw new Error(`Empty parameter name not allowed`);
     }
     if (!SAFE_PARAMETER_NAME.test(name)) {
-      throw new Error(`Invalid parameter name`);
+      throw new Error(
+        `Invalid parameter name '${name}' - please carefully check your syntax, especially the placement of spaces and quotes. (Opts string: ${JSON.stringify(
+          optsString,
+        )})`,
+      );
     }
     return name as TParamName;
   }
