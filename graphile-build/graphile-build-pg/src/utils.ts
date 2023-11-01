@@ -43,6 +43,10 @@ enum MODE {
   PARAM_VALUE = 5,
 }
 
+// NOTE: Do **NOT** add `<>` as parens; it will break arrows `->`
+const OPEN_PARENS = ["(", "{", "["];
+const CLOSE_PARENS = [")", "}", "]"];
+
 const IGNORED = /\s/;
 const SPECIAL = /[\\":]/;
 const SAFE_PARAMETER_NAME = /^[a-zA-Z_][a-zA-Z_0-9]*$/;
@@ -65,6 +69,7 @@ export function parseSmartTagsOptsString<TParamName extends string = string>(
   let inQuotes = false;
   let str = "";
   let name = "";
+  let stack: number[] = [];
 
   function validateParameterName(name: string): TParamName {
     if (name in result.params) {
@@ -132,6 +137,24 @@ export function parseSmartTagsOptsString<TParamName extends string = string>(
       } else {
         str += char;
       }
+    } else if (stack.length > 0) {
+      str += char;
+      if (char === CLOSE_PARENS[stack[stack.length - 1]]) {
+        stack.pop();
+      } else {
+        const parenIdx = OPEN_PARENS.indexOf(char);
+        if (parenIdx >= 0) {
+          stack.push(parenIdx);
+        } else if (CLOSE_PARENS.includes(char)) {
+          throw new Error(
+            `Found mismatched '${char}' at position ${i} (closing parenthesis; expecting '${
+              CLOSE_PARENS[stack[stack.length - 1]]
+            }'); if this is deliberate, be sure to escape your parameter value with quotes. (Opt string = ${JSON.stringify(
+              optsString,
+            )})`,
+          );
+        }
+      }
     } else {
       switch (mode) {
         case MODE.EXPECT_ARG: {
@@ -147,6 +170,14 @@ export function parseSmartTagsOptsString<TParamName extends string = string>(
                 throw new Error("Invalid position for special char");
               }
               str = char;
+              let openIdx = OPEN_PARENS.indexOf(char);
+              if (openIdx >= 0) {
+                stack.push(openIdx);
+              } else if (CLOSE_PARENS.includes(char)) {
+                throw new Error(
+                  `Argument value started with '${char}' which is a close parenthesis character; if this is intentional, please escape the argument value with double quotes.`,
+                );
+              }
             }
           }
           break;
@@ -160,6 +191,14 @@ export function parseSmartTagsOptsString<TParamName extends string = string>(
               throw new Error("Invalid position for special char");
             }
             str = char;
+            let openIdx = OPEN_PARENS.indexOf(char);
+            if (openIdx >= 0) {
+              stack.push(openIdx);
+            } else if (CLOSE_PARENS.includes(char)) {
+              throw new Error(
+                `Param name started with '${char}' which is not permitted.`,
+              );
+            }
           }
           break;
         }
@@ -176,6 +215,14 @@ export function parseSmartTagsOptsString<TParamName extends string = string>(
                 throw new Error("Invalid position for special char");
               }
               str = char;
+              let openIdx = OPEN_PARENS.indexOf(char);
+              if (openIdx >= 0) {
+                stack.push(openIdx);
+              } else if (CLOSE_PARENS.includes(char)) {
+                throw new Error(
+                  `Parameter value started with '${char}' which is a close parenthesis character; if this is intentional, please escape the Parameter value with double quotes.`,
+                );
+              }
             }
           }
           break;
@@ -203,6 +250,16 @@ export function parseSmartTagsOptsString<TParamName extends string = string>(
             throw new Error("Invalid position for special char");
           } else {
             str += char;
+            const parenIdx = OPEN_PARENS.indexOf(char);
+            if (parenIdx >= 0) {
+              stack.push(parenIdx);
+            } else if (CLOSE_PARENS.includes(char)) {
+              throw new Error(
+                `Found unexpected '${char}' at position ${i} (closing parenthesis; but no parenthesis is open); if this is deliberate, be sure to escape your parameter value with quotes. (Opt string: ${JSON.stringify(
+                  optsString,
+                )})`,
+              );
+            }
           }
           break;
         }

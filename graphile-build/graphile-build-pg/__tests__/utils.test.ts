@@ -7,7 +7,6 @@ const EXPECTED_VALUE_1 = {
     attributes: "title>subject!",
   },
 };
-
 const EXPECTED_VALUE_2 = {
   args: ["typeA"],
   params: {
@@ -34,6 +33,7 @@ test.each([
   ],
 
   ['typeA via:"(id_1,id_2)->types_a.a(id_1, id_2)" singular', EXPECTED_VALUE_2],
+  ["typeA via:(id_1,id_2)->types_a.a(id_1, id_2) singular", EXPECTED_VALUE_2],
 ])("%s", (str, expected) => {
   const result = parseSmartTagsOptsString(str, 1);
   expect(result).toEqual(expected);
