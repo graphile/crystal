@@ -45,7 +45,9 @@ test.each([
   ['typeA via:"(id_1,id_2)->types_a.a(id_1, id_2)" singular', EXPECTED_VALUE_2],
   ["typeA via:(id_1,id_2)->types_a.a(id_1, id_2) singular", EXPECTED_VALUE_2],
   ["( { [ 1, {2} ], }, )(){}[]({[]})", EXPECTED_VALUE_3],
+  ['"( { [ 1, {2} ], }, )(){}[]({[]})"', EXPECTED_VALUE_3],
   ["blah stuff:( { [ 1, {2} ], }, )(){}[]({[]})", EXPECTED_VALUE_4],
+  ['blah stuff:"( { [ 1, {2} ], }, )(){}[]({[]})"', EXPECTED_VALUE_4],
 ])("%s", (str, expected) => {
   const result = parseSmartTagsOptsString(str, 1);
   expect(result).toEqual(expected);
