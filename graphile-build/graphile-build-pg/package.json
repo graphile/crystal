@@ -17,6 +17,7 @@
     }
   },
   "scripts": {
+    "test": "jest -i",
     "prepack": "tsc -b && cp src/.npmignore dist/.npmignore"
   },
   "repository": {

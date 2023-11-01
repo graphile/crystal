@@ -8,6 +8,14 @@ const EXPECTED_VALUE_1 = {
   },
 };
 
+const EXPECTED_VALUE_2 = {
+  args: ["typeA"],
+  params: {
+    via: "(id_1,id_2)->types_a.a(id_1, id_2)",
+    singular: "",
+  },
+};
+
 test.each([
   ["TOPIC name:SingleTableTopic attributes:title>subject!", EXPECTED_VALUE_1],
   ["TOPIC name:SingleTableTopic attributes:title>subject!", EXPECTED_VALUE_1],
@@ -24,6 +32,8 @@ test.each([
     ' \t   TOPIC name:\t"SingleTableTopic" attributes:t"i""tle>subj"ect!',
     EXPECTED_VALUE_1,
   ],
+
+  ['typeA via:"(id_1,id_2)->types_a.a(id_1, id_2)" singular', EXPECTED_VALUE_2],
 ])("%s", (str, expected) => {
   const result = parseSmartTagsOptsString(str, 1);
   expect(result).toEqual(expected);
