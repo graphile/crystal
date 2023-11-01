@@ -69,7 +69,7 @@ export function parseSmartTagsOptsString<TParamName extends string = string>(
   let inQuotes = false;
   let str = "";
   let name = "";
-  let stack: number[] = [];
+  const stack: number[] = [];
 
   function validateParameterName(name: string): TParamName {
     if (name in result.params) {
@@ -170,7 +170,7 @@ export function parseSmartTagsOptsString<TParamName extends string = string>(
                 throw new Error("Invalid position for special char");
               }
               str = char;
-              let openIdx = OPEN_PARENS.indexOf(char);
+              const openIdx = OPEN_PARENS.indexOf(char);
               if (openIdx >= 0) {
                 stack.push(openIdx);
               } else if (CLOSE_PARENS.includes(char)) {
@@ -191,7 +191,7 @@ export function parseSmartTagsOptsString<TParamName extends string = string>(
               throw new Error("Invalid position for special char");
             }
             str = char;
-            let openIdx = OPEN_PARENS.indexOf(char);
+            const openIdx = OPEN_PARENS.indexOf(char);
             if (openIdx >= 0) {
               stack.push(openIdx);
             } else if (CLOSE_PARENS.includes(char)) {
@@ -215,7 +215,7 @@ export function parseSmartTagsOptsString<TParamName extends string = string>(
                 throw new Error("Invalid position for special char");
               }
               str = char;
-              let openIdx = OPEN_PARENS.indexOf(char);
+              const openIdx = OPEN_PARENS.indexOf(char);
               if (openIdx >= 0) {
                 stack.push(openIdx);
               } else if (CLOSE_PARENS.includes(char)) {
