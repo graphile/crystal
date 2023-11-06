@@ -174,11 +174,7 @@ export class FastifyGrafserv extends GrafservBase {
     const dynamicOptions = this.dynamicOptions;
 
     app.route({
-      method:
-        this.dynamicOptions.graphqlOverGET ||
-        this.dynamicOptions.graphiqlOnGraphQLGET
-          ? ["GET", "POST"]
-          : ["POST"],
+      method: "POST",
       url: this.dynamicOptions.graphqlPath,
       exposeHeadRoute: true,
       bodyLimit: this.dynamicOptions.maxRequestLength,
@@ -191,12 +187,48 @@ export class FastifyGrafserv extends GrafservBase {
         const result = await convertHandlerResultToResult(handlerResult);
         return this.send(request, reply, result);
       },
-      ...(this.resolvedPreset.grafserv?.websockets
-        ? {
-            wsHandler: makeHandler(makeGraphQLWSConfig(this)),
-          }
-        : null),
     });
+
+    const graphqlOverGet =
+      (dynamicOptions.graphqlOverGET || dynamicOptions.graphiqlOnGraphQLGET) ??
+      false;
+
+    const websockets = this.resolvedPreset.grafserv?.websockets ?? false;
+
+    if (graphqlOverGet || websockets) {
+      app.route({
+        method: "GET",
+        url: this.dynamicOptions.graphqlPath,
+        exposeHeadRoute: true,
+        ...(graphqlOverGet
+          ? {
+              handler: async (request, reply) => {
+                const digest = getDigest(request, reply);
+                const handlerResult = await this.graphqlHandler(
+                  normalizeRequest(digest),
+                  this.graphiqlHandler,
+                );
+                const result =
+                  await convertHandlerResultToResult(handlerResult);
+                return this.send(request, reply, result);
+              },
+            }
+          : {
+              handler: async (request, reply) => {
+                return reply.status(405).send({
+                  error: "Method not allowed.",
+                  detail:
+                    "Can be enabled with { grafserv: { graphqlOverGET: true } }",
+                });
+              },
+            }),
+        ...(websockets
+          ? {
+              wsHandler: makeHandler(makeGraphQLWSConfig(this)),
+            }
+          : null),
+      });
+    }
 
     if (dynamicOptions.graphiql) {
       app.route({
