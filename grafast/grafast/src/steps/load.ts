@@ -1,8 +1,10 @@
-import type { __ItemStep } from "../index.js";
+import type { __ItemStep, Deferred } from "../index.js";
+import { defer } from "../index.js";
 import type {
   ExecutionExtra,
   GrafastResultsList,
   GrafastValuesList,
+  Maybe,
   PromiseOrDirect,
 } from "../interfaces.js";
 import { ExecutableStep, isListLikeStep, isObjectLikeStep } from "../step.js";
@@ -23,7 +25,7 @@ type LoadCallback<
   (
     specs: ReadonlyArray<TSpec>,
     options: LoadOptions<TItem, TParams>,
-  ): PromiseOrDirect<ReadonlyArray<TData>>;
+  ): PromiseOrDirect<ReadonlyArray<Maybe<TData>>>;
   displayName?: string;
 };
 
@@ -65,8 +67,16 @@ export function loadManyCallback<
   return callback;
 }
 
+interface LoadBatch {
+  deferred: Deferred<any>;
+  batchSpecs: readonly any[];
+}
+
 interface LoadMeta {
   cache?: Map<any, any>;
+  loadBatchesByLoad?:
+    | Map<LoadCallback<any, any, any, any>, LoadBatch[]>
+    | undefined;
 }
 
 const idByLoad = new WeakMap<LoadCallback<any, any, any, any>, string>();
@@ -277,7 +287,7 @@ export class LoadStep<
     count: number,
     [specs]: [GrafastValuesList<TSpec>],
     extra: ExecutionExtra,
-  ): PromiseOrDirect<GrafastResultsList<TData>> {
+  ): PromiseOrDirect<GrafastResultsList<Maybe<TData>>> {
     const loadOptions = this.loadOptions!;
     const meta = extra.meta as LoadMeta;
     let cache = meta.cache;
@@ -287,7 +297,7 @@ export class LoadStep<
     }
     const batch = new Map<TSpec, number[]>();
 
-    const results: Array<PromiseOrDirect<TData> | null> = [];
+    const results: Array<PromiseOrDirect<Maybe<TData>>> = [];
     for (let i = 0; i < count; i++) {
       const spec = specs[i];
       if (cache.has(spec)) {
@@ -305,9 +315,30 @@ export class LoadStep<
     }
     const pendingCount = batch.size;
     if (pendingCount > 0) {
+      const deferred = defer<ReadonlyArray<Maybe<TData>>>();
+      const batchSpecs = [...batch.keys()];
+      const loadBatch: LoadBatch = { deferred, batchSpecs };
+      if (!meta.loadBatchesByLoad) {
+        meta.loadBatchesByLoad = new Map();
+      }
+      let loadBatches = meta.loadBatchesByLoad.get(this.load);
+      if (loadBatches) {
+        // Add to existing batch load
+        loadBatches.push(loadBatch);
+      } else {
+        // Create new batch load
+        loadBatches = [loadBatch];
+        meta.loadBatchesByLoad.set(this.load, loadBatches);
+        // Guaranteed by the metaKey to be equivalent for all entries sharing the same `meta`. Note equivalent is not identical; key order may change.
+        const loadOptions = this.loadOptions!;
+        setTimeout(() => {
+          // Don't allow adding anything else to the batch
+          meta.loadBatchesByLoad!.delete(this.load);
+          executeBatches(loadBatches!, this.load, loadOptions);
+        }, 0);
+      }
       return (async () => {
-        const batchSpecs = [...batch.keys()];
-        const loadResults = await this.load(batchSpecs, loadOptions);
+        const loadResults = await deferred;
         for (
           let pendingIndex = 0;
           pendingIndex < pendingCount;
@@ -321,10 +352,48 @@ export class LoadStep<
             results[targetIndex] = loadResult;
           }
         }
-        return results as Array<PromiseOrDirect<TData>>;
+        return results;
       })();
     }
-    return results as Array<PromiseOrDirect<TData>>;
+    return results;
+  }
+}
+
+async function executeBatches(
+  loadBatches: readonly LoadBatch[],
+  load: LoadCallback<any, any, any, any>,
+  loadOptions: LoadOptions<any, any>,
+) {
+  try {
+    const numberOfBatches = loadBatches.length;
+    if (numberOfBatches === 1) {
+      const [loadBatch] = loadBatches;
+      loadBatch.deferred.resolve(load(loadBatch.batchSpecs, loadOptions));
+      return;
+    } else {
+      // Do some tick-batching!
+      const indexStarts: number[] = [];
+      const allBatchSpecs: any[] = [];
+      for (let i = 0; i < numberOfBatches; i++) {
+        const loadBatch = loadBatches[i];
+        indexStarts[i] = allBatchSpecs.length;
+        for (const batchSpec of loadBatch.batchSpecs) {
+          allBatchSpecs.push(batchSpec);
+        }
+      }
+      const results = await load(allBatchSpecs, loadOptions);
+      for (let i = 0; i < numberOfBatches; i++) {
+        const loadBatch = loadBatches[i];
+        const start = indexStarts[i];
+        const stop = indexStarts[i + 1] ?? allBatchSpecs.length;
+        const entries = results.slice(start, stop);
+        loadBatch.deferred.resolve(entries);
+      }
+    }
+  } catch (e) {
+    for (const loadBatch of loadBatches) {
+      loadBatch.deferred.reject(e);
+    }
   }
 }
 

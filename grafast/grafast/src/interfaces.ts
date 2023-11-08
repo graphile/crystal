@@ -1004,4 +1004,6 @@ export interface GrafastArgs extends GraphQLArgs {
   requestContext?: Partial<Grafast.RequestContext>;
 }
 
+export type Maybe<T> = T | null | undefined;
+
 export * from "./planJSONInterfaces.js";
