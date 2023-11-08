@@ -179,7 +179,8 @@ export class FastifyGrafserv extends GrafservBase {
     const {
       graphiql,
       graphiqlOnGraphQLGET,
-      graphiqlPath: url,
+      graphqlPath,
+      graphiqlPath,
       graphqlOverGET,
       maxRequestLength: bodyLimit,
       watch,
