@@ -1,6 +1,11 @@
 import { PassThrough } from "node:stream";
 
-import type { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import type {
+  FastifyInstance,
+  FastifyReply,
+  FastifyRequest,
+  RouteHandlerMethod,
+} from "fastify";
 import { makeHandler } from "graphql-ws/lib/use/@fastify/websocket";
 
 import {
@@ -171,71 +176,48 @@ export class FastifyGrafserv extends GrafservBase {
     );
     */
 
-    const dynamicOptions = this.dynamicOptions;
-
-    app.route({
-      method: "POST",
-      url: this.dynamicOptions.graphqlPath,
-      exposeHeadRoute: true,
-      bodyLimit: this.dynamicOptions.maxRequestLength,
-      handler: async (request, reply) => {
-        const digest = getDigest(request, reply);
-        const handlerResult = await this.graphqlHandler(
-          normalizeRequest(digest),
-          this.graphiqlHandler,
-        );
-        const result = await convertHandlerResultToResult(handlerResult);
-        return this.send(request, reply, result);
-      },
-    });
-
-    const graphqlOverGet =
-      (dynamicOptions.graphqlOverGET || dynamicOptions.graphiqlOnGraphQLGET) ??
-      false;
-
+    const {
+      graphiql,
+      graphiqlOnGraphQLGET,
+      graphiqlPath: url,
+      graphqlOverGET,
+      maxRequestLength: bodyLimit,
+      watch,
+    } = this.dynamicOptions;
+    const graphqlOverGet = (graphqlOverGET || graphiqlOnGraphQLGET) ?? false;
     const websockets = this.resolvedPreset.grafserv?.websockets ?? false;
+    const exposeHeadRoute = true;
 
-    if (graphqlOverGet || websockets) {
-      app.route({
-        method: "GET",
-        url: this.dynamicOptions.graphqlPath,
-        exposeHeadRoute: true,
-        ...(graphqlOverGet
-          ? {
-              handler: async (request, reply) => {
-                const digest = getDigest(request, reply);
-                const handlerResult = await this.graphqlHandler(
-                  normalizeRequest(digest),
-                  this.graphiqlHandler,
-                );
-                const result =
-                  await convertHandlerResultToResult(handlerResult);
-                return this.send(request, reply, result);
-              },
-            }
-          : {
-              handler: async (request, reply) => {
-                return reply.status(405).send({
-                  error: "Method not allowed.",
-                  detail:
-                    "Can be enabled with { grafserv: { graphqlOverGET: true } }",
-                });
-              },
-            }),
-        ...(websockets
-          ? {
-              wsHandler: makeHandler(makeGraphQLWSConfig(this)),
-            }
-          : null),
-      });
+    // Build HTTP handler.
+    const handler: RouteHandlerMethod = async (request, reply) => {
+      const digest = getDigest(request, reply);
+      const handlerResult = await this.graphqlHandler(
+        normalizeRequest(digest),
+        this.graphiqlHandler,
+      );
+      const result = await convertHandlerResultToResult(handlerResult);
+      return this.send(request, reply, result);
+    };
+
+    // Build websocket handler.
+    const wsHandler = websockets
+      ? makeHandler(makeGraphQLWSConfig(this))
+      : undefined;
+
+    // Attach HTTP handler for POST requests.
+    app.route({ url, method: "POST", handler, bodyLimit });
+
+    // Attach websocket and HTTP handler for GET requests, if desired.
+    if (websockets || graphqlOverGet) {
+      app.route({ method: "GET", url, exposeHeadRoute, handler, wsHandler });
     }
 
-    if (dynamicOptions.graphiql) {
+    if (graphiql) {
       app.route({
         method: "GET",
-        url: this.dynamicOptions.graphiqlPath,
-        exposeHeadRoute: true,
-        bodyLimit: this.dynamicOptions.maxRequestLength,
+        url,
+        exposeHeadRoute,
+        bodyLimit,
         handler: async (request, reply) => {
           const digest = getDigest(request, reply);
           const handlerResult = await this.graphiqlHandler(
@@ -247,7 +229,7 @@ export class FastifyGrafserv extends GrafservBase {
       });
     }
 
-    if (dynamicOptions.watch) {
+    if (watch) {
       app.route({
         method: "GET",
         url: this.dynamicOptions.eventStreamPath,
@@ -259,7 +241,7 @@ export class FastifyGrafserv extends GrafservBase {
           const handlerResult: EventStreamHeandlerResult = {
             type: "event-stream",
             request: normalizeRequest(digest),
-            dynamicOptions,
+            dynamicOptions: this.dynamicOptions,
             payload: this.makeStream(),
             statusCode: 200,
           };
