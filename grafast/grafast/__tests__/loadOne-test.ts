@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { ExecutionResult } from "graphql";
+import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 
 import type { LoadOneCallback } from "../dist/index.js";
@@ -39,7 +39,7 @@ let CALLS: {
   params: object;
 }[] = [];
 
-const loadThingByIds: LoadOneCallback<number, Thing, {}> = (
+const loadThingByIds: LoadOneCallback<number, Thing, Record<string, never>> = (
   ids,
   { attributes, params },
 ) => {

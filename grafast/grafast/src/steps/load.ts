@@ -288,7 +288,6 @@ export class LoadStep<
     [specs]: [GrafastValuesList<TSpec>],
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<Maybe<TData>>> {
-    const loadOptions = this.loadOptions!;
     const meta = extra.meta as LoadMeta;
     let cache = meta.cache;
     if (!cache) {
