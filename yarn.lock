@@ -3054,6 +3054,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fastify/websocket@npm:^8.2.0":
+  version: 8.2.0
+  resolution: "@fastify/websocket@npm:8.2.0"
+  dependencies:
+    fastify-plugin: "npm:^4.0.0"
+    ws: "npm:^8.0.0"
+  checksum: dc72fe86884d40f81a42ad96db8fe9c18268872a26e8247b4b151567fcbc060641a6953bd8c99a72bd74dd08da852fa537a4548be0256e4e7515042d1786f804
+  languageName: node
+  linkType: hard
+
 "@floating-ui/core@npm:^1.4.1":
   version: 1.4.1
   resolution: "@floating-ui/core@npm:1.4.1"
@@ -10271,7 +10281,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-graphile-export@workspace:utils/eslint-plugin-graphile-export":
+"eslint-plugin-graphile-export@workspace:^, eslint-plugin-graphile-export@workspace:utils/eslint-plugin-graphile-export":
   version: 0.0.0-use.local
   resolution: "eslint-plugin-graphile-export@workspace:utils/eslint-plugin-graphile-export"
   dependencies:
@@ -10916,6 +10926,13 @@ __metadata:
   version: 3.0.1
   resolution: "fastify-plugin@npm:3.0.1"
   checksum: 804e7b52287599449950d4ddaa778ea47e507fe00df631659131540ba194d6612485d0b4731cd65fda37796d6f143374c0a643579d5bce31d766b2eb0ee5a144
+  languageName: node
+  linkType: hard
+
+"fastify-plugin@npm:^4.0.0":
+  version: 4.5.1
+  resolution: "fastify-plugin@npm:4.5.1"
+  checksum: 10e475e337615aa56c80794b4868393d09ea6b26565002f43c64c30b212032dfd0ec75d6a80719619a7edd93b21d1f0e208a20910d19278e861a94d3cdf6cccc
   languageName: node
   linkType: hard
 
@@ -11880,6 +11897,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "grafserv@workspace:grafast/grafserv"
   dependencies:
+    "@fastify/websocket": "npm:^8.2.0"
     "@graphile/lru": "workspace:^"
     "@types/aws-lambda": "npm:^8.10.123"
     "@types/express": "npm:^4.17.17"
@@ -18945,6 +18963,7 @@ __metadata:
     concurrently: "npm:^8.2.1"
     eslint: "npm:^8.48.0"
     eslint-config-prettier: "npm:^9.0.0"
+    eslint-plugin-graphile-export: "workspace:^"
     eslint-plugin-graphql: "npm:^4.0.0"
     eslint-plugin-import: "npm:^2.28.1"
     eslint-plugin-jest: "npm:^27.2.3"
@@ -22203,6 +22222,21 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 5a4f52060e2a65194c324e5506021c998444ef5740365f7f04a59da38d2da5229221f5ab6e7ceee0d5999d03c2c1c73164a5ebdafa481043edeae4c5c42f988c
+  languageName: node
+  linkType: hard
+
+"ws@npm:^8.0.0":
+  version: 8.14.2
+  resolution: "ws@npm:8.14.2"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 471d62cd5ebc7457fdea4a753d8a53860554ef45d8a7298ba02c5aad275a55e97613988e238410ba62f61f8c62075ce5a0011dbe66e19809725095af79e9aa3e
   languageName: node
   linkType: hard
 
