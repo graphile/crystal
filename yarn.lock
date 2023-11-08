@@ -10281,7 +10281,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-graphile-export@workspace:^, eslint-plugin-graphile-export@workspace:utils/eslint-plugin-graphile-export":
+"eslint-plugin-graphile-export@workspace:utils/eslint-plugin-graphile-export":
   version: 0.0.0-use.local
   resolution: "eslint-plugin-graphile-export@workspace:utils/eslint-plugin-graphile-export"
   dependencies:
@@ -18963,7 +18963,6 @@ __metadata:
     concurrently: "npm:^8.2.1"
     eslint: "npm:^8.48.0"
     eslint-config-prettier: "npm:^9.0.0"
-    eslint-plugin-graphile-export: "workspace:^"
     eslint-plugin-graphql: "npm:^4.0.0"
     eslint-plugin-import: "npm:^2.28.1"
     eslint-plugin-jest: "npm:^27.2.3"
