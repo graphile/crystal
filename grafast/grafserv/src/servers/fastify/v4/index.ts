@@ -216,7 +216,7 @@ export class FastifyGrafserv extends GrafservBase {
     if (graphiql) {
       app.route({
         method: "GET",
-        url,
+        url: graphiqlPath,
         exposeHeadRoute,
         bodyLimit,
         handler: async (request, reply) => {
