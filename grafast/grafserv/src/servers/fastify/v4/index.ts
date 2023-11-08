@@ -185,8 +185,8 @@ export class FastifyGrafserv extends GrafservBase {
       maxRequestLength: bodyLimit,
       watch,
     } = this.dynamicOptions;
-    const graphqlOverGet = (graphqlOverGET || graphiqlOnGraphQLGET) ?? false;
     const websockets = this.resolvedPreset.grafserv?.websockets ?? false;
+    const exposeGetRoute = graphqlOverGET || graphiqlOnGraphQLGET || websockets;
     const exposeHeadRoute = true;
 
     // Build HTTP handler.
