@@ -209,7 +209,7 @@ export class FastifyGrafserv extends GrafservBase {
     app.route({ url, method: "POST", handler, bodyLimit });
 
     // Attach websocket and HTTP handler for GET requests, if desired.
-    if (websockets || graphqlOverGet) {
+    if (exposeGetRoute) {
       app.route({ method: "GET", url, exposeHeadRoute, handler, wsHandler });
     }
 
