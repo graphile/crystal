@@ -36,7 +36,10 @@ of their latest post (posts are stored in `app_public.posts`) you might create a
 plugin like this:
 
 ```ts
-import { makeAddPgTableOrderByPlugin } from "postgraphile/utils";
+import {
+  makeAddPgTableOrderByPlugin,
+  orderByAscDesc,
+} from "postgraphile/utils";
 import { TYPES } from "postgraphile/@dataplan/pg";
 
 /* TODO: test this plugin works! */
