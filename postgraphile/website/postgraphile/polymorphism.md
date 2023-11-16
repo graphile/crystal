@@ -95,6 +95,16 @@ tags!
 
 :::
 
+:::tip
+
+For polymorphism to work, your table must have a primary key; we
+currently do not automatically detect the lack of primary key, so
+you may receive unexpected results (typically `null`s) without one.
+If you have a `view` instead of a `table`, make sure to define a
+primary key using the `@primaryKey` smart tag.
+
+:::
+
 ## @interface mode:relational
 
 A slightly more complex case is having a table that defines the common fields
