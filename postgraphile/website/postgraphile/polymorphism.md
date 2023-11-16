@@ -95,6 +95,14 @@ tags!
 
 :::
 
+:::tip
+
+If you have a `view` instead of a `table`, make sure to define a
+primary key using `@primaryKey` smart tag. Otherwise, it may
+produce un-predictable results.
+
+:::
+
 ## @interface mode:relational
 
 A slightly more complex case is having a table that defines the common fields
