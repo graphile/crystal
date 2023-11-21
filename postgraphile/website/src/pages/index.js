@@ -70,7 +70,7 @@ export default function Home() {
   return (
     <Layout
       title={`PostGraphile`}
-      description="Extensible high-performance automatic GraphQL API for PostgresSQL"
+      description="Extensible high-performance automatic GraphQL API for PostgreSQL"
     >
       <WarningSection
         title={`PostGraphile Version 5 Public Beta`}
