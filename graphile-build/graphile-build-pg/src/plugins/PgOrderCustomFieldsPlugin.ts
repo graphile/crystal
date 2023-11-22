@@ -2,8 +2,8 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
-  DefaultPgResource,
-  DefaultPgSelectStep,
+  GenericPgResource,
+  GenericPgSelectStep,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
 
@@ -16,7 +16,7 @@ declare global {
       computedAttributeOrder(
         this: Inflection,
         details: {
-          resource: DefaultPgResource;
+          resource: GenericPgResource;
           variant: "asc" | "desc" | "asc_nulls_last" | "desc_nulls_last";
         },
       ): string;
@@ -95,7 +95,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
                       grafast: {
                         applyPlan: EXPORTABLE(
                           (ascDesc, pgFieldSource, sql) =>
-                            (step: DefaultPgSelectStep) => {
+                            (step: GenericPgSelectStep) => {
                               if (typeof pgFieldSource.from !== "function") {
                                 throw new Error(
                                   "Invalid computed attribute 'from'",

@@ -5,9 +5,9 @@ import "./PgRelationsPlugin.js";
 import "./PgTablesPlugin.js";
 
 import type {
-  DefaultPgCodec,
-  DefaultPgRelation,
-  DefaultPgSelectSingleStep,
+  GenericPgCodec,
+  GenericPgRelation,
+  GenericPgSelectSingleStep,
   PgCodecExtensions,
   PgCodecPolymorphism,
   PgCodecPolymorphismRelational,
@@ -56,14 +56,14 @@ declare global {
   }
   namespace GraphileBuild {
     interface Build {
-      nodeIdSpecForCodec(codec: DefaultPgCodec):
+      nodeIdSpecForCodec(codec: GenericPgCodec):
         | (($nodeId: ExecutableStep<string>) => {
             [key: string]: ExecutableStep<any>;
           })
         | null;
     }
     interface ScopeInterface {
-      pgCodec?: DefaultPgCodec;
+      pgCodec?: GenericPgCodec;
       isPgPolymorphicTableType?: boolean;
       pgPolymorphism?: PgCodecPolymorphism<string>;
     }
@@ -732,7 +732,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               const resourceTypeName = build.inflection.tableType(
                 resource.codec,
               );
-              const relations: Record<string, DefaultPgRelation> =
+              const relations: Record<string, GenericPgRelation> =
                 resource.getRelations();
               const pk = resource.uniques?.find((u) => u.isPrimary);
               if (pk) {
@@ -970,7 +970,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           setGraphQLTypeForPgCodec,
           grafast: { list, constant, access },
         } = build;
-        const unionsToRegister = new Map<string, DefaultPgCodec[]>();
+        const unionsToRegister = new Map<string, GenericPgCodec[]>();
         for (const codec of build.pgCodecMetaLookup.keys()) {
           if (!codec.attributes) {
             // Only apply to codecs that define attributes
@@ -1115,7 +1115,7 @@ return function (list, constant) {
                             )
                           : EXPORTABLE(
                               (constant, list, pk, tableTypeName) =>
-                                ($record: DefaultPgSelectSingleStep) => {
+                                ($record: GenericPgSelectSingleStep) => {
                                   return list([
                                     constant(tableTypeName, false),
                                     ...pk.map((attribute) =>

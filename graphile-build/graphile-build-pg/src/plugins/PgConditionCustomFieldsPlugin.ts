@@ -1,7 +1,7 @@
 import "graphile-config";
 
 import type {
-  DefaultPgResource,
+  GenericPgResource,
   PgConditionStep,
   PgResource,
   PgResourceParameter,
@@ -25,7 +25,7 @@ declare global {
  * arguments except the first are nullable, the first argument is a composite
  * type, and the result is a simple scalar type.
  */
-export function isSimpleScalarComputedColumnLike(resource: DefaultPgResource) {
+export function isSimpleScalarComputedColumnLike(resource: GenericPgResource) {
   if (resource.codec.attributes) return false;
   if (resource.codec.arrayOfCodec) return false;
   if (resource.codec.rangeOfCodec) return false;
@@ -86,7 +86,7 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
         return build.extend(
           fields,
           functionSources.reduce(
-            (memo, rawPgFieldSource: DefaultPgResource) => {
+            (memo, rawPgFieldSource: GenericPgResource) => {
               const pgFieldSource = rawPgFieldSource;
               const fieldName = inflection.computedAttributeField({
                 resource: pgFieldSource,

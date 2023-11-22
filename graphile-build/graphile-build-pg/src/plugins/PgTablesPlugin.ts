@@ -1,12 +1,12 @@
 import type {
   _AnyPgCodecAttribute,
   _AnyPgResource,
-  DefaultPgResourceOptions,
+  GenericPgResourceOptions,
   _AnyPgResourceUnique,
   PgCodec,
   PgResource,
   _AnyPgResourceOptions,
-  DefaultPgCodec,
+  GenericPgCodec,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
 import { object } from "grafast";
@@ -90,7 +90,7 @@ declare global {
        */
       _codecName(
         this: Inflection,
-        codec: DefaultPgCodec,
+        codec: GenericPgCodec,
       ): string;
 
       /**
@@ -106,7 +106,7 @@ declare global {
        */
       _singularizedCodecName(
         this: Inflection,
-        codec: DefaultPgCodec,
+        codec: GenericPgCodec,
       ): string;
 
       /**
@@ -122,17 +122,17 @@ declare global {
        */
       tableType(
         this: GraphileBuild.Inflection,
-        codec: DefaultPgCodec,
+        codec: GenericPgCodec,
       ): string;
 
       tableConnectionType(
         this: GraphileBuild.Inflection,
-        codec: DefaultPgCodec,
+        codec: GenericPgCodec,
       ): string;
 
       tableEdgeType(
         this: GraphileBuild.Inflection,
-        codec: DefaultPgCodec,
+        codec: GenericPgCodec,
       ): string;
 
       patchType(this: GraphileBuild.Inflection, typeName: string): string;
@@ -140,20 +140,20 @@ declare global {
     }
 
     interface ScopeObject {
-      pgCodec?: DefaultPgCodec;
+      pgCodec?: GenericPgCodec;
       isPgClassType?: boolean;
       isPgConnectionRelated?: true;
     }
     interface ScopeObjectFieldsField {
       pgFieldResource?: PgResource<any, any, any, any, any>;
-      pgFieldCodec?: DefaultPgCodec;
+      pgFieldCodec?: GenericPgCodec;
       pgFieldAttribute?: _AnyPgCodecAttribute;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
     interface ScopeInterfaceFieldsField {
       pgFieldResource?: PgResource<any, any, any, any, any>;
-      pgFieldCodec?: DefaultPgCodec;
+      pgFieldCodec?: GenericPgCodec;
       pgFieldAttribute?: _AnyPgCodecAttribute;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
@@ -168,7 +168,7 @@ declare global {
         getResourceOptions(
           serviceName: string,
           pgClass: PgClass,
-        ): Promise<DefaultPgResourceOptions | null>;
+        ): Promise<GenericPgResourceOptions | null>;
       };
     }
 
@@ -188,17 +188,17 @@ declare global {
       pgTables_PgResourceOptions(event: {
         serviceName: string;
         pgClass: PgClass;
-        resourceOptions: DefaultPgResourceOptions;
+        resourceOptions: GenericPgResourceOptions;
       }): void | Promise<void>;
       pgTables_PgResourceOptions_relations(event: {
         serviceName: string;
         pgClass: PgClass;
-        resourceOptions: DefaultPgResourceOptions;
+        resourceOptions: GenericPgResourceOptions;
       }): Promise<void> | void;
       pgTables_PgResourceOptions_relations_post(event: {
         serviceName: string;
         pgClass: PgClass;
-        resourceOptions: DefaultPgResourceOptions;
+        resourceOptions: GenericPgResourceOptions;
       }): Promise<void> | void;
     }
   }
@@ -207,11 +207,11 @@ declare global {
 interface State {
   resourceOptionsByPgClassByService: Map<
     string,
-    Map<PgClass, Promise<DefaultPgResourceOptions | null>>
+    Map<PgClass, Promise<GenericPgResourceOptions | null>>
   >;
-  resourceByResourceOptions: Map<DefaultPgResourceOptions, Promise<_AnyPgResource | null>>;
+  resourceByResourceOptions: Map<GenericPgResourceOptions, Promise<_AnyPgResource | null>>;
   detailsByResourceOptions: Map<
-  DefaultPgResourceOptions,
+  GenericPgResourceOptions,
     { serviceName: string; pgClass: PgClass }
   >;
 }

@@ -1,9 +1,9 @@
 import "graphile-config";
 
 import type {
-  DefaultPgCodec,
-  DefaultPgResource,
-  DefaultPgResourceUnique,
+  GenericPgCodec,
+  GenericPgResource,
+  GenericPgResourceUnique,
 } from "@dataplan/pg";
 import type { FieldArgs } from "grafast";
 import { EXPORTABLE } from "graphile-build";
@@ -18,8 +18,8 @@ declare global {
       rowByUnique(
         this: Inflection,
         details: {
-          unique: DefaultPgResourceUnique;
-          resource: DefaultPgResource;
+          unique: GenericPgResourceUnique;
+          resource: GenericPgResource;
         },
       ): string;
     }
@@ -101,7 +101,7 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                 const detailsByAttributeName: {
                   [attributeName: string]: {
                     graphqlName: string;
-                    codec: DefaultPgCodec;
+                    codec: GenericPgCodec;
                   };
                 } = Object.create(null);
                 uniqueKeys.forEach((attributeName) => {

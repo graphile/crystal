@@ -1,7 +1,7 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type { DefaultPgCodec, DefaultPgCodecAttribute } from "@dataplan/pg";
+import type { GenericPgCodec, GenericPgCodecAttribute } from "@dataplan/pg";
 import { PgSelectStep, PgUnionAllStep } from "@dataplan/pg";
 import type { ExecutableStep, ModifierStep } from "grafast";
 import type { GraphQLEnumValueConfigMap } from "grafast/graphql";
@@ -15,9 +15,9 @@ declare global {
       orderByAttributeEnum(
         this: Inflection,
         details: {
-          codec: DefaultPgCodec;
+          codec: GenericPgCodec;
           attributeName: string;
-          attribute: DefaultPgCodecAttribute;
+          attribute: GenericPgCodecAttribute;
           variant: "asc" | "desc" | "asc_nulls_last" | "desc_nulls_last";
         },
       ): string;

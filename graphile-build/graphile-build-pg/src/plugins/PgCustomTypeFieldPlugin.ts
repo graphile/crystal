@@ -6,13 +6,13 @@ import "./PgProceduresPlugin.js";
 import "graphile-config";
 
 import type {
-  DefaultPgCodec,
-  DefaultPgDeleteSingleStep,
-  DefaultPgResource,
-  DefaultPgResourceParameter,
-  DefaultPgSelectSingleStep,
-  DefaultPgSelectStep,
-  DefaultPgUpdateSingleStep,
+  GenericPgCodec,
+  GenericPgDeleteSingleStep,
+  GenericPgResource,
+  GenericPgResourceParameter,
+  GenericPgSelectSingleStep,
+  GenericPgSelectStep,
+  GenericPgUpdateSingleStep,
   PgClassSingleStep,
   PgCodec,
   PgDeleteSingleStep,
@@ -64,8 +64,8 @@ declare global {
   namespace GraphileBuild {
     interface Build {
       pgGetArgDetailsFromParameters(
-        resource: DefaultPgResource,
-        parameters?: readonly DefaultPgResourceParameter[],
+        resource: GenericPgResource,
+        parameters?: readonly GenericPgResourceParameter[],
       ): {
         makeFieldArgs(): {
           [graphqlArgName: string]: {
@@ -77,13 +77,13 @@ declare global {
         argDetails: Array<{
           graphqlArgName: string;
           postgresArgName: string | null;
-          pgCodec: DefaultPgCodec;
+          pgCodec: GenericPgCodec;
           inputType: GraphQLInputType;
           required: boolean;
         }>;
         makeExpression(opts: {
           $placeholderable: {
-            placeholder($step: ExecutableStep, codec: DefaultPgCodec): SQL;
+            placeholder($step: ExecutableStep, codec: GenericPgCodec): SQL;
           };
           resource: PgResource<any, any, any, any, any>;
           fieldArgs: FieldArgs;
@@ -94,15 +94,15 @@ declare global {
     }
 
     interface InflectionCustomFieldProcedureDetails {
-      resource: DefaultPgResource;
+      resource: GenericPgResource;
     }
     interface InflectionCustomFieldArgumentDetails {
-      resource: DefaultPgResource;
-      param: DefaultPgResourceParameter;
+      resource: GenericPgResource;
+      param: GenericPgResourceParameter;
       index: number;
     }
     interface InflectionCustomFieldMutationResult {
-      resource: DefaultPgResource;
+      resource: GenericPgResource;
       returnGraphQLTypeName: string;
     }
 
@@ -179,7 +179,7 @@ declare global {
 }
 
 function shouldUseCustomConnection(
-  pgResource: DefaultPgResource,
+  pgResource: GenericPgResource,
 ): boolean {
   const { codec } = pgResource;
   // 'setof <scalar>' functions should use a connection based on the function name, not a generic connection
@@ -188,7 +188,7 @@ function shouldUseCustomConnection(
   return setOrArray && scalarOrAnonymous;
 }
 
-function defaultProcSourceBehavior(s: DefaultPgResource): string {
+function defaultProcSourceBehavior(s: GenericPgResource): string {
   const behavior = [];
   const firstParameter = s.parameters[0];
   if (
@@ -235,19 +235,19 @@ function defaultProcSourceBehavior(s: DefaultPgResource): string {
 function hasRecord(
   $row: ExecutableStep,
 ): $row is
-  | DefaultPgSelectSingleStep
+  | GenericPgSelectSingleStep
   | PgInsertSingleStep
-  | DefaultPgUpdateSingleStep
-  | DefaultPgDeleteSingleStep {
+  | GenericPgUpdateSingleStep
+  | GenericPgDeleteSingleStep {
   return "record" in $row && typeof ($row as any).record === "function";
 }
 
 declare global {
   namespace GraphileBuild {
     interface Build {
-      [$$rootQuery]: Array<DefaultPgResource>;
-      [$$rootMutation]: Array<DefaultPgResource>;
-      [$$computed]: Map<DefaultPgCodec, Array<DefaultPgResource>>;
+      [$$rootQuery]: Array<GenericPgResource>;
+      [$$rootMutation]: Array<GenericPgResource>;
+      [$$computed]: Map<GenericPgCodec, Array<GenericPgResource>>;
     }
   }
 }
@@ -1186,7 +1186,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                                         $parent,
                                         args,
                                         info,
-                                      ) as DefaultPgSelectStep;
+                                      ) as GenericPgSelectStep;
                                     return connection(
                                       $select,
                                       ($item) => $item,
@@ -1272,7 +1272,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
 function getFunctionSourceReturnGraphQLType(
   build: GraphileBuild.Build,
-  resource: DefaultPgResource,
+  resource: GenericPgResource,
 ): GraphQLOutputType | null {
   const resourceInnerCodec = resource.codec.arrayOfCodec ?? resource.codec;
   if (!resourceInnerCodec) {

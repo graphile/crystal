@@ -1,6 +1,6 @@
 /* eslint-disable graphile-export/export-instances */
 import type {
-  DefaultPgRegistry,
+  GenericPgRegistry,
   PgRegistry,
   PgRegistryBuilder,
   DefaultRegistryBuilder,
@@ -17,7 +17,7 @@ declare global {
     interface GatherHelpers {
       pgRegistry: {
         getRegistryBuilder(): PromiseOrDirect<DefaultRegistryBuilder>;
-        getRegistry(): PromiseOrDirect<DefaultPgRegistry>;
+        getRegistry(): PromiseOrDirect<GenericPgRegistry>;
       };
     }
 
@@ -38,7 +38,7 @@ declare global {
         registryBuilder: DefaultRegistryBuilder;
       }): PromiseOrDirect<void>;
       pgRegistry_PgRegistry(event: {
-        registry: DefaultPgRegistry;
+        registry: GenericPgRegistry;
       }): PromiseOrDirect<void>;
     }
   }

@@ -3,9 +3,9 @@ import "../interfaces.js";
 import "graphile-config";
 
 import type {
-  DefaultPgCodec,
-  DefaultPgCodecAttribute,
-  DefaultPgSelectSingleStep,
+  GenericPgCodec,
+  GenericPgCodecAttribute,
+  GenericPgSelectSingleStep,
   PgClassExpressionStep,
   PgCodecList,
   PgConditionStep,
@@ -24,9 +24,9 @@ declare global {
   namespace GraphileBuild {
     interface Build {
       pgResolveOutputType(
-        codec: DefaultPgCodec,
+        codec: GenericPgCodec,
         notNull?: boolean,
-      ): [baseCodec: DefaultPgCodec, resolvedType: GraphQLOutputType] | null;
+      ): [baseCodec: GenericPgCodec, resolvedType: GraphQLOutputType] | null;
     }
 
     interface Inflection {
@@ -41,7 +41,7 @@ declare global {
       _attributeName(
         this: GraphileBuild.Inflection,
         details: {
-          codec: DefaultPgCodec;
+          codec: GenericPgCodec;
           attributeName: string;
           skipRowId?: boolean;
         },
@@ -53,7 +53,7 @@ declare global {
        */
       _joinAttributeNames(
         this: GraphileBuild.Inflection,
-        codec: DefaultPgCodec,
+        codec: GenericPgCodec,
         names: readonly string[],
       ): string;
 
@@ -66,7 +66,7 @@ declare global {
         this: GraphileBuild.Inflection,
         details: {
           attributeName: string;
-          codec: DefaultPgCodec;
+          codec: GenericPgCodec;
         },
       ): string;
     }
@@ -77,7 +77,7 @@ declare global {
       isPgBaseInput?: boolean;
       isPgRowType?: boolean;
       isPgCompoundType?: boolean;
-      pgAttribute?: DefaultPgCodecAttribute;
+      pgAttribute?: GenericPgCodecAttribute;
     }
   }
 }
@@ -159,7 +159,7 @@ function processAttribute(
       if (!baseCodec.attributes) {
         // Simply get the value
         return EXPORTABLE(
-          (attributeName) => ($record: DefaultPgSelectSingleStep) => {
+          (attributeName) => ($record: GenericPgSelectSingleStep) => {
             return $record.get(attributeName);
           },
           [attributeName],
@@ -290,7 +290,7 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
             "select base update insert filterBy orderBy",
           ]);
           const attribute = codec.attributes![attributeName];
-          function walk(codec: DefaultPgCodec) {
+          function walk(codec: GenericPgCodec) {
             if (codec.arrayOfCodec) {
               behaviors.add("-condition:attribute:filterBy");
               behaviors.add(`-attribute:orderBy`);
@@ -596,9 +596,9 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
 
 function resolveOutputType(
   build: GraphileBuild.Build,
-  codec: DefaultPgCodec,
+  codec: GenericPgCodec,
   notNull?: boolean,
-): [baseCodec: DefaultPgCodec, resolvedType: GraphQLOutputType] | null {
+): [baseCodec: GenericPgCodec, resolvedType: GraphQLOutputType] | null {
   const {
     getGraphQLTypeByPgCodec,
     graphql: { GraphQLList, GraphQLNonNull, getNullableType, isOutputType },

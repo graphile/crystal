@@ -1,8 +1,8 @@
 import "graphile-config";
 
 import type {
-  DefaultPgCodec,
-  DefaultPgSelectSingleStep,
+  GenericPgCodec,
+  GenericPgSelectSingleStep,
   PgCodec,
   PgSelectSingleStep,
 } from "@dataplan/pg";
@@ -40,7 +40,7 @@ declare global {
 
     interface ScopeScalar {
       isPgJwtType?: boolean;
-      pgCodec?: DefaultPgCodec;
+      pgCodec?: GenericPgCodec;
     }
   }
 }
@@ -190,7 +190,7 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
                 plan: EXPORTABLE(
                   () =>
                     function plan($in) {
-                      const $record = $in as DefaultPgSelectSingleStep;
+                      const $record = $in as GenericPgSelectSingleStep;
                       return $record.record();
                     },
                   [],

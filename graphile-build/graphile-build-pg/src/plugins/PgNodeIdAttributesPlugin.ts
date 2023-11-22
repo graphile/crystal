@@ -3,8 +3,8 @@ import "../interfaces.js";
 import "graphile-config";
 
 import type {
-  DefaultPgCodec,
-  DefaultPgRegistry,
+  GenericPgCodec,
+  GenericPgRegistry,
   PgConditionStep,
   PgSelectStep,
 } from "@dataplan/pg";
@@ -23,8 +23,8 @@ declare global {
       nodeIdAttribute(
         this: Inflection,
         details: {
-          registry: DefaultPgRegistry;
-          codec: DefaultPgCodec;
+          registry: GenericPgRegistry;
+          codec: GenericPgCodec;
           relationName: string;
         },
       ): string;

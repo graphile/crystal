@@ -1,4 +1,4 @@
-import type { DefaultPgRegistry, PgRegistry, WithPgClient } from "@dataplan/pg";
+import type { GenericPgRegistry, PgRegistry, WithPgClient } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
 declare global {
   namespace GraphileBuild {
@@ -107,7 +107,7 @@ declare global {
 
   namespace GraphileBuild {
     interface BuildInput {
-      pgRegistry: DefaultPgRegistry;
+      pgRegistry: GenericPgRegistry;
     }
   }
 }

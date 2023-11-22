@@ -12,7 +12,7 @@ import sql from "pg-sql2";
 
 import type {
   _AnyPgCodecAttribute,
-  DefaultPgCodecAttribute,
+  GenericPgCodecAttribute,
   PgCodecAttributeName,
   PgCodecAttributeVia,
   PgCodecAttributeViaExplicit,
@@ -49,8 +49,8 @@ import type {
   PgRegistryConfigRelationConfigs,
   PgRegistryConfigResourceOptions,
   Expand,
-  DefaultPgCodec,
-  DefaultPgCodecRelationConfig,
+  GenericPgCodec,
+  GenericPgCodecRelationConfig,
 } from "./interfaces.js";
 import type { PgClassExpressionStep } from "./steps/pgClassExpression.js";
 import type {
@@ -96,8 +96,8 @@ export type PgResourceParameterExtensions =
 
 /** @internal */
 export interface _AnyPgResourceParameter extends PgResourceParameter<any, any> {}
-export interface DefaultPgResourceParameter
-  extends PgResourceParameter<string | null, DefaultPgCodec> {}
+export interface GenericPgResourceParameter
+  extends PgResourceParameter<string | null, GenericPgCodec> {}
 
 /**
  * If this is a functional (rather than static) resource, this describes one of
@@ -130,8 +130,8 @@ export interface PgResourceParameter<
 
 /** @internal */
 export interface _AnyPgResourceUnique extends PgResourceUnique<any> {}
-export interface DefaultPgResourceUnique
-  extends PgResourceUnique<DefaultPgCodecAttribute> {}
+export interface GenericPgResourceUnique
+  extends PgResourceUnique<GenericPgCodecAttribute> {}
 /**
  * Description of a unique constraint on a PgResource.
  */
@@ -170,13 +170,13 @@ export interface PgCodecRef {
 export interface PgCodecRefs {
   [refName: string]: PgCodecRef;
 }
-export interface DefaultPgResourceOptions<
-  TCodec extends DefaultPgCodec = DefaultPgCodec,
+export interface GenericPgResourceOptions<
+  TCodec extends GenericPgCodec = GenericPgCodec,
 > extends PgResourceOptions<
     string,
     TCodec,
-    DefaultPgResourceUnique,
-    DefaultPgResourceParameter
+    GenericPgResourceUnique,
+    GenericPgResourceParameter
   > {}
 
 /** @internal */
@@ -275,12 +275,12 @@ export interface PgResourceOptions<
 /** @internal */
 export interface _AnyPgFunctionResourceOptions
   extends PgFunctionResourceOptions<any, any, any, any> {}
-export interface DefaultPgFunctionResourceOptions
+export interface GenericPgFunctionResourceOptions
   extends PgFunctionResourceOptions<
     string,
-    DefaultPgCodec,
-    DefaultPgResourceUnique,
-    DefaultPgResourceParameter
+    GenericPgCodec,
+    GenericPgResourceUnique,
+    GenericPgResourceParameter
   > {}
 
 export interface PgFunctionResourceOptions<
@@ -349,12 +349,12 @@ export type PgResourceRegistry<U> = U extends PgResource<
 >
   ? TRegistry
   : never;
-export interface DefaultPgResource
+export interface GenericPgResource
   extends PgResource<
     string,
-    DefaultPgCodec,
-    DefaultPgResourceUnique,
-    DefaultPgResourceParameter,
+    GenericPgCodec,
+    GenericPgResourceUnique,
+    GenericPgResourceParameter,
     any
   > {}
 /** @internal */
@@ -972,9 +972,9 @@ export interface EmptyRegistryBuilder
   extends PgRegistryBuilder<never, never, never> {}
 export interface DefaultRegistryBuilder
   extends PgRegistryBuilder<
-    DefaultPgCodec,
-    DefaultPgResourceOptions,
-    DefaultPgCodecRelationConfig
+    GenericPgCodec,
+    GenericPgResourceOptions,
+    GenericPgCodecRelationConfig
   > {}
 
 export interface PgRegistryBuilder<

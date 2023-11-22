@@ -1,10 +1,10 @@
 import "graphile-config";
 
 import type {
-  DefaultPgDeleteSingleStep,
-  DefaultPgResource,
-  DefaultPgResourceUnique,
-  DefaultPgUpdateSingleStep,
+  GenericPgDeleteSingleStep,
+  GenericPgResource,
+  GenericPgResourceUnique,
+  GenericPgUpdateSingleStep,
   PgClassSingleStep,
   PgCodecWithAttributes,
   PgDeleteSingleStep,
@@ -35,7 +35,7 @@ declare global {
     interface ScopeObject {
       isPgUpdatePayloadType?: boolean;
       isPgDeletePayloadType?: boolean;
-      pgTypeResource?: DefaultPgResource;
+      pgTypeResource?: GenericPgResource;
     }
 
     interface ScopeObjectFieldsField {
@@ -49,88 +49,88 @@ declare global {
       isPgDeleteInputType?: boolean;
       isPgDeleteByKeysInputType?: boolean;
       isPgDeleteNodeInputType?: boolean;
-      pgResource?: DefaultPgResource;
-      pgResourceUnique?: DefaultPgResourceUnique;
+      pgResource?: GenericPgResource;
+      pgResourceUnique?: GenericPgResourceUnique;
     }
 
     interface Inflection {
       updatePayloadType(
         this: Inflection,
         details: {
-          resource: DefaultPgResource;
+          resource: GenericPgResource;
         },
       ): string;
       deletePayloadType(
         this: Inflection,
         details: {
-          resource: DefaultPgResource;
+          resource: GenericPgResource;
         },
       ): string;
 
       updateNodeField(
         this: Inflection,
         details: {
-          resource: DefaultPgResource;
-          unique: DefaultPgResourceUnique;
+          resource: GenericPgResource;
+          unique: GenericPgResourceUnique;
         },
       ): string;
       updateNodeInputType(
         this: Inflection,
         details: {
-          resource: DefaultPgResource;
-          unique: DefaultPgResourceUnique;
+          resource: GenericPgResource;
+          unique: GenericPgResourceUnique;
         },
       ): string;
 
       deletedNodeId(
         this: Inflection,
         details: {
-          resource: DefaultPgResource;
+          resource: GenericPgResource;
         },
       ): string;
 
       deleteNodeField(
         this: Inflection,
         details: {
-          resource: DefaultPgResource;
-          unique: DefaultPgResourceUnique;
+          resource: GenericPgResource;
+          unique: GenericPgResourceUnique;
         },
       ): string;
       deleteNodeInputType(
         this: Inflection,
         details: {
-          resource: DefaultPgResource;
-          unique: DefaultPgResourceUnique;
+          resource: GenericPgResource;
+          unique: GenericPgResourceUnique;
         },
       ): string;
 
       updateByKeysField(
         this: Inflection,
         details: {
-          resource: DefaultPgResource;
-          unique: DefaultPgResourceUnique;
+          resource: GenericPgResource;
+          unique: GenericPgResourceUnique;
         },
       ): string;
       updateByKeysInputType(
         this: Inflection,
         details: {
-          resource: DefaultPgResource;
-          unique: DefaultPgResourceUnique;
+          resource: GenericPgResource;
+          unique: GenericPgResourceUnique;
         },
       ): string;
 
       deleteByKeysField(
         this: Inflection,
         details: {
-          resource: DefaultPgResource;
-          unique: DefaultPgResourceUnique;
+          resource: GenericPgResource;
+          unique: GenericPgResourceUnique;
         },
       ): string;
       deleteByKeysInputType(
         this: Inflection,
         details: {
-          resource: DefaultPgResource;
-          unique: DefaultPgResourceUnique;
+          resource: GenericPgResource;
+          unique: GenericPgResourceUnique;
         },
       ): string;
 
@@ -251,7 +251,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
         } = build;
 
         const process = (
-          resource: DefaultPgResource,
+          resource: GenericPgResource,
           mode: "resource:update" | "resource:delete",
         ) => {
           const modeText = mode === "resource:update" ? "update" : "delete";
@@ -341,8 +341,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                   function plan(
                                     $object: ObjectStep<{
                                       result:
-                                        | DefaultPgUpdateSingleStep
-                                        | DefaultPgDeleteSingleStep;
+                                        | GenericPgUpdateSingleStep
+                                        | GenericPgDeleteSingleStep;
                                     }>,
                                   ) {
                                     return $object.get("result");
@@ -535,7 +535,7 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                   () =>
                                     function plan(
                                       $object: ObjectStep<{
-                                        result: DefaultPgUpdateSingleStep;
+                                        result: GenericPgUpdateSingleStep;
                                       }>,
                                     ) {
                                       const $record =
@@ -750,8 +750,8 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
                                   _: any,
                                   $object: ObjectStep<{
                                     result:
-                                      | DefaultPgUpdateSingleStep
-                                      | DefaultPgDeleteSingleStep;
+                                      | GenericPgUpdateSingleStep
+                                      | GenericPgDeleteSingleStep;
                                   }>,
                                 ) {
                                   return $object;
@@ -878,11 +878,11 @@ return (_$root, args) => {
 
 function getSpecs(
   build: GraphileBuild.Build,
-  resource: DefaultPgResource,
+  resource: GenericPgResource,
   mode: "resource:update" | "resource:delete",
 ) {
   const primaryUnique = resource.uniques.find(
-    (u: DefaultPgResourceUnique) => u.isPrimary,
+    (u: GenericPgResourceUnique) => u.isPrimary,
   );
   const constraintMode = `constraint:${mode}`;
   const specs = [
@@ -892,13 +892,13 @@ function getSpecs(
       ? [{ unique: primaryUnique, uniqueMode: "node" }]
       : []),
     ...resource.uniques
-      .filter((unique: DefaultPgResourceUnique) => {
+      .filter((unique: GenericPgResourceUnique) => {
         return build.behavior.pgResourceUniqueMatches(
           [resource, unique],
           constraintMode,
         );
       })
-      .map((unique: DefaultPgResourceUnique) => ({
+      .map((unique: GenericPgResourceUnique) => ({
         unique,
         uniqueMode: "keys",
       })),

@@ -4,7 +4,7 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import type { PgAdaptorOptions } from "./adaptors/pg.js";
 import type {
   _AnyPgCodecAttribute,
-  DefaultPgCodecAttribute,
+  GenericPgCodecAttribute,
   PgCodecAttribute,
   PgCodecAttributeCodec,
   PgCodecAttributeName,
@@ -14,8 +14,8 @@ import type {
   _AnyPgResourceOptions,
   _AnyPgResourceParameter,
   _AnyPgResourceUnique,
-  DefaultPgResource,
-  DefaultPgResourceOptions,
+  GenericPgResource,
+  GenericPgResourceOptions,
   PgCodecRefs,
   PgResource,
   PgResourceCodec,
@@ -130,8 +130,8 @@ export type PgCodecPolymorphism<TAttributeName extends string> =
   | PgCodecPolymorphismRelational<TAttributeName>
   | PgCodecPolymorphismUnion;
 
-export interface DefaultPgRangeItemCodec
-  extends PgCodec<string, never, any, any, never, DefaultPgCodec, never> {}
+export interface GenericPgRangeItemCodec
+  extends PgCodec<string, never, any, any, never, GenericPgCodec, never> {}
 /** @internal */
 export interface _AnyPgRangeItemCodec
   extends PgCodec<string, never, any, any, never, any, never> {}
@@ -196,8 +196,8 @@ export type PgCodecFromPg<U> = PgDecode<
   PgCodecFromJavaScript<U>,
   PgCodecFromPostgres<U>
 >;
-export interface DefaultPgCodecAttributesRecord
-  extends PgCodecAttributesRecord<DefaultPgCodecAttribute> {}
+export interface GenericPgCodecAttributesRecord
+  extends PgCodecAttributesRecord<GenericPgCodecAttribute> {}
 /** @internal */
 export interface _AnyPgCodecAttributesRecord
   extends PgCodecAttributesRecord<any> {}
@@ -207,15 +207,15 @@ export type PgCodecAttributesRecord<
 > = {
   [TCodecAttribute in TCodecAttributes as PgCodecAttributeName<TCodecAttribute>]: TCodecAttribute;
 };
-export interface DefaultPgCodec
+export interface GenericPgCodec
   extends PgCodec<
     string,
-    PgCodecAttributesRecord<DefaultPgCodecAttribute>,
+    PgCodecAttributesRecord<GenericPgCodecAttribute>,
     any,
     any,
-    DefaultPgCodec,
-    DefaultPgCodec,
-    DefaultPgCodec
+    GenericPgCodec,
+    GenericPgCodec,
+    GenericPgCodec
   > {}
 export interface DefaultScalarPgCodec
   extends PgCodec<
@@ -223,9 +223,9 @@ export interface DefaultScalarPgCodec
     never,
     any,
     any,
-    DefaultPgCodec,
-    DefaultPgCodec,
-    DefaultPgCodec
+    GenericPgCodec,
+    GenericPgCodec,
+    GenericPgCodec
   > {}
 /** @internal */
 export interface _AnyScalarPgCodec
@@ -370,10 +370,10 @@ export interface PgCodec<
    */
   executor: PgExecutor | null;
 }
-export interface DefaultPgCodecWithAttributes
+export interface GenericPgCodecWithAttributes
   extends PgCodec<
     any,
-    Record<string, DefaultPgCodecAttribute>,
+    Record<string, GenericPgCodecAttribute>,
     any,
     any,
     never,
@@ -672,11 +672,11 @@ export interface PgCodecRelationBase<
 
   description?: string;
 }
-export interface DefaultPgCodecRelationConfig
+export interface GenericPgCodecRelationConfig
   extends PgCodecRelationConfig<
     string,
-    DefaultPgCodec,
-    DefaultPgResourceOptions
+    GenericPgCodec,
+    GenericPgResourceOptions
   > {}
 /** @internal */
 export interface _AnyPgCodecRelationConfig
@@ -709,11 +709,11 @@ export interface PgCodecRelationConfig<
   remoteResourceOptions: TRemoteResourceOptions;
 }
 
-export interface DefaultPgRegistryConfig
+export interface GenericPgRegistryConfig
   extends PgRegistryConfig<
-    DefaultPgCodec,
-    DefaultPgResourceOptions,
-    DefaultPgCodecRelationConfig
+    GenericPgCodec,
+    GenericPgResourceOptions,
+    GenericPgCodecRelationConfig
   > {}
 /** @internal */
 export interface _AnyPgRegistryConfig extends PgRegistryConfig<any, any, any> {}
@@ -786,12 +786,12 @@ export type PgRegistryRelationConfigs<
 
 /** @internal */
 export interface _AnyPgRelation extends PgRelation<any, any, any, any> {}
-export interface DefaultPgRelation
+export interface GenericPgRelation
   extends PgRelation<
     string,
-    DefaultPgCodec,
-    DefaultPgResourceOptions,
-    DefaultPgRegistry
+    GenericPgCodec,
+    GenericPgResourceOptions,
+    GenericPgRegistry
   > {}
 
 export interface PgRelation<
@@ -835,11 +835,11 @@ export type PgRegistryCodecRelations<
 };
 /** @internal */
 export interface _AnyPgRegistry extends PgRegistry<any, any, any> {}
-export interface DefaultPgRegistry
+export interface GenericPgRegistry
   extends PgRegistry<
-    DefaultPgCodec,
-    DefaultPgResourceOptions,
-    DefaultPgCodecRelationConfig
+    GenericPgCodec,
+    GenericPgResourceOptions,
+    GenericPgCodecRelationConfig
   > {}
 export interface EmptyPgRegistry extends PgRegistry<never, never, never> {}
 

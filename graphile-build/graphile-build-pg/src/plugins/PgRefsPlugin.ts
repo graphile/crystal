@@ -2,7 +2,7 @@ import type {
   _AnyPgCodec,
   _AnyPgCodecRelationConfig,
   _AnyPgResourceOptions,
-  DefaultPgCodecRelationConfig,
+  GenericPgCodecRelationConfig,
   PgCodec,
   PgCodecExtensions,
   PgCodecRefPath,
@@ -258,7 +258,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
             const parts = via.split(";");
             let currentResourceOptions = resourceOptions;
             for (const rawPart of parts) {
-              type RelationEntry = [string, DefaultPgCodecRelationConfig];
+              type RelationEntry = [string, GenericPgCodecRelationConfig];
               const relations =
                 registryConfig.pgRelations[currentResourceOptions.codec.name];
               const relationEntries = relations

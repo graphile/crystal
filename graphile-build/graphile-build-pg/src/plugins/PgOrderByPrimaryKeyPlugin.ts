@@ -1,7 +1,7 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type { DefaultPgSelectStep } from "@dataplan/pg";
+import type { GenericPgSelectStep } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
 
 import { version } from "../version.js";
@@ -58,7 +58,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                 grafast: {
                   applyPlan: EXPORTABLE(
                     (pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql) =>
-                      (step: DefaultPgSelectStep) => {
+                      (step: GenericPgSelectStep) => {
                         primaryKeyAttributes.forEach((attributeName) => {
                           const attribute = pgCodec.attributes![attributeName];
                           step.orderBy({
@@ -86,7 +86,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                 grafast: {
                   applyPlan: EXPORTABLE(
                     (pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql) =>
-                      (step: DefaultPgSelectStep) => {
+                      (step: GenericPgSelectStep) => {
                         primaryKeyAttributes.forEach((attributeName) => {
                           const attribute = pgCodec.attributes![attributeName];
                           step.orderBy({

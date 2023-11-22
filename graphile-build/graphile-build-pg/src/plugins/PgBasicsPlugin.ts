@@ -21,19 +21,19 @@ declare global {
       "@dataplan/pg": string;
     }
     type HasGraphQLTypeForPgCodec = (
-      codec: dataplanPg.DefaultPgCodec,
+      codec: dataplanPg.GenericPgCodec,
       situation?: string,
     ) => boolean;
     type GetGraphQLTypeByPgCodec = (
-      codec: dataplanPg.DefaultPgCodec,
+      codec: dataplanPg.GenericPgCodec,
       situation: string,
     ) => GraphQLType | null;
     type GetGraphQLTypeNameByPgCodec = (
-      codec: dataplanPg.DefaultPgCodec,
+      codec: dataplanPg.GenericPgCodec,
       situation: string,
     ) => string | null;
     type SetGraphQLTypeForPgCodec = (
-      codec: dataplanPg.DefaultPgCodec,
+      codec: dataplanPg.GenericPgCodec,
       situations: string | string[],
       typeName: string,
     ) => void;
@@ -84,30 +84,30 @@ declare global {
       /**
        * Get a table-like resource for the given codec, assuming exactly one exists.
        */
-      pgTableResource<TCodec extends dataplanPg.DefaultPgCodec>(
+      pgTableResource<TCodec extends dataplanPg.GenericPgCodec>(
         codec: TCodec,
         strict?: boolean,
       ): PgResource<
         string,
         TCodec,
-        dataplanPg.DefaultPgResourceUnique,
+        dataplanPg.GenericPgResourceUnique,
         never,
-        dataplanPg.DefaultPgRegistry
+        dataplanPg.GenericPgRegistry
       > | null;
     }
 
     interface BehaviorEntities {
-      pgCodec: dataplanPg.DefaultPgCodec;
+      pgCodec: dataplanPg.GenericPgCodec;
       pgCodecAttribute: [
-        codec: dataplanPg.DefaultPgCodec,
+        codec: dataplanPg.GenericPgCodec,
         attributeName: string,
       ];
-      pgResource: dataplanPg.DefaultPgResource;
+      pgResource: dataplanPg.GenericPgResource;
       pgResourceUnique: [
-        resource: dataplanPg.DefaultPgResource,
-        unique: dataplanPg.DefaultPgResourceUnique,
+        resource: dataplanPg.GenericPgResource,
+        unique: dataplanPg.GenericPgResourceUnique,
       ];
-      pgCodecRelation: dataplanPg.DefaultPgRelation;
+      pgCodecRelation: dataplanPg.GenericPgRelation;
       pgCodecRef: PgCodecRef;
       pgRefDefinition: PgRefDefinition;
     }
@@ -330,22 +330,22 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
             }
           };
         const resourceByCodecCacheUnstrict = new Map<
-          dataplanPg.DefaultPgCodec,
-          dataplanPg.DefaultPgResource | null
+          dataplanPg.GenericPgCodec,
+          dataplanPg.GenericPgResource | null
         >();
         const resourceByCodecCacheStrict = new Map<
-          dataplanPg.DefaultPgCodec,
-          dataplanPg.DefaultPgResource | null
+          dataplanPg.GenericPgCodec,
+          dataplanPg.GenericPgResource | null
         >();
-        const pgTableResource = <TCodec extends dataplanPg.DefaultPgCodec>(
+        const pgTableResource = <TCodec extends dataplanPg.GenericPgCodec>(
           codec: TCodec,
           strict = true,
         ): PgResource<
           string,
           TCodec,
-          dataplanPg.DefaultPgResourceUnique,
+          dataplanPg.GenericPgResourceUnique,
           never,
-          dataplanPg.DefaultPgRegistry
+          dataplanPg.GenericPgRegistry
         > | null => {
           const resourceByCodecCache = strict
             ? resourceByCodecCacheStrict
@@ -363,7 +363,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
               TCodec,
               any,
               never,
-              dataplanPg.DefaultPgRegistry
+              dataplanPg.GenericPgRegistry
             > =>
               r.codec === codec &&
               !r.parameters &&

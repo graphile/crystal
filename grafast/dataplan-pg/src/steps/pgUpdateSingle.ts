@@ -8,7 +8,7 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { _AnyPgCodecAttribute, PgCodecAttributeName } from "../codecs.js";
-import type { DefaultPgResource, PgResourceUnique } from "../index.js";
+import type { GenericPgResource, PgResourceUnique } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
   _AnyPgCodec,
@@ -38,8 +38,8 @@ interface PgUpdatePlanFinalizeResults {
 }
 /** @internal */
 export interface _AnyPgUpdateSingleStep extends PgUpdateSingleStep<any> {}
-export interface DefaultPgUpdateSingleStep
-  extends PgUpdateSingleStep<DefaultPgResource> {}
+export interface GenericPgUpdateSingleStep
+  extends PgUpdateSingleStep<GenericPgResource> {}
 /**
  * Update a single row identified by the 'getBy' argument.
  */

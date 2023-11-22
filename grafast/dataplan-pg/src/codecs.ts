@@ -39,7 +39,7 @@ import type { PgExecutor } from "./executor.js";
 import { inspect } from "./inspect.js";
 import type {
   _AnyPgCodec,
-  DefaultPgCodec,
+  GenericPgCodec,
   PgCodec,
   PgCodecAttributeMap,
   PgCodecAttributes,
@@ -65,7 +65,7 @@ export type PgCodecAttributeViaExplicit<
 };
 /** @internal */
 export interface _AnyPgCodecAttributeVia extends PgCodecAttributeVia<any, any> {}
-export type DefaultPgCodecAttributeVia = PgCodecAttributeVia<string, string>;
+export type GenericPgCodecAttributeVia = PgCodecAttributeVia<string, string>;
 /** @internal */
 export type _AnyPgCodecAttributeViaRelationName<U> =
   U extends PgCodecAttributeVia<infer TRelationName, any>
@@ -102,8 +102,8 @@ export type PgCodecAttributeCodec<U> = U extends PgCodecAttribute<
   ? TCodec
   : never;
 
-export interface DefaultPgCodecAttribute
-  extends PgCodecAttribute<string, DefaultPgCodec, boolean> {}
+export interface GenericPgCodecAttribute
+  extends PgCodecAttribute<string, GenericPgCodec, boolean> {}
 /** @internal */
 export interface _AnyPgCodecAttribute extends PgCodecAttribute<any, any, any> {}
 

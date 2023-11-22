@@ -47,7 +47,7 @@ import type {
   _AnyPgResource,
   _AnyPgResourceUnique,
   _AnyScalarPgResource,
-  DefaultPgResource,
+  GenericPgResource,
   PgResource,
   PgResourceCodec,
 } from "../datasource.js";
@@ -265,7 +265,7 @@ export interface PgSelectOptions<TResource extends _AnyPgResource> {
   joinAsLateral?: boolean;
 }
 
-export interface DefaultPgSelectStep extends PgSelectStep<DefaultPgResource> {}
+export interface GenericPgSelectStep extends PgSelectStep<GenericPgResource> {}
 /** @internal */
 export interface _AnyPgSelectStep extends PgSelectStep<any> {}
 

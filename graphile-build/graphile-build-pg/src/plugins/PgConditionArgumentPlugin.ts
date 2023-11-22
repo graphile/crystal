@@ -2,8 +2,8 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
-  DefaultPgSelectSingleStep,
-  DefaultPgSelectStep,
+  GenericPgSelectSingleStep,
+  GenericPgSelectStep,
   PgCodecWithAttributes,
   PgSelectParsedCursorStep,
   PgSelectSingleStep,
@@ -158,15 +158,15 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
                 ? (
                     _condition,
                     $connection: ConnectionStep<
-                      DefaultPgSelectSingleStep,
+                      GenericPgSelectSingleStep,
                       PgSelectParsedCursorStep,
-                      DefaultPgSelectStep
+                      GenericPgSelectStep
                     >,
                   ) => {
                     const $select = $connection.getSubplan();
                     return $select.wherePlan();
                   }
-                : (_condition, $select: DefaultPgSelectStep) => {
+                : (_condition, $select: GenericPgSelectStep) => {
                     return $select.wherePlan();
                   },
             },

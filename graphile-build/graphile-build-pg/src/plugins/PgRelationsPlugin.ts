@@ -2,12 +2,12 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
-  DefaultPgCodec,
-  DefaultPgCodecRelationConfig,
-  DefaultPgRegistry,
-  DefaultPgResource,
-  DefaultPgResourceOptions,
-  DefaultPgSelectSingleStep,
+  GenericPgCodec,
+  GenericPgCodecRelationConfig,
+  GenericPgRegistry,
+  GenericPgResource,
+  GenericPgResourceOptions,
+  GenericPgSelectSingleStep,
   PgCodecRef,
   PgCodecRefPath,
   PgCodecRelationConfig,
@@ -39,8 +39,8 @@ declare global {
       pgMutationPayloadRelations?: boolean;
     }
     interface PgRelationsPluginRelationDetails {
-      registry: DefaultPgRegistry;
-      codec: DefaultPgCodec;
+      registry: GenericPgRegistry;
+      codec: GenericPgCodec;
       relationName: string;
     }
 
@@ -107,7 +107,7 @@ declare global {
           event: {
             pgClass: PgClass;
             serviceName: string;
-            resourceOptions: DefaultPgResourceOptions;
+            resourceOptions: GenericPgResourceOptions;
           },
           pgConstraint: PgConstraint,
           isReferencee?: boolean,
@@ -119,7 +119,7 @@ declare global {
         serviceName: string;
         pgClass: PgClass;
         pgConstraint: PgConstraint;
-        relation: DefaultPgCodecRelationConfig;
+        relation: GenericPgCodecRelationConfig;
       }): Promise<void> | void;
     }
   }
@@ -567,7 +567,7 @@ function makeSpecString(
 function makeRelationPlans(
   localAttributes: readonly string[],
   remoteAttributes: readonly string[],
-  otherSource: DefaultPgResource,
+  otherSource: GenericPgResource,
   isMutationPayload: boolean,
 ) {
   const recordOrResult = isMutationPayload
@@ -591,7 +591,7 @@ function makeRelationPlans(
 
   const specFromRecord = EXPORTABLE(
     (localAttributes, remoteAttributes) =>
-      ($record: DefaultPgSelectSingleStep) => {
+      ($record: GenericPgSelectSingleStep) => {
         return remoteAttributes.reduce((memo, remoteAttributeName, i) => {
           memo[remoteAttributeName] = $record.get(localAttributes[i] as string);
           return memo;
@@ -600,7 +600,7 @@ function makeRelationPlans(
     [localAttributes, remoteAttributes],
   );
   type MutationPayload = ObjectStep<{
-    result: DefaultPgSelectSingleStep;
+    result: GenericPgSelectSingleStep;
   }>;
 
   const singleRecordPlan =
@@ -625,7 +625,7 @@ return function (otherSource) {
         )
       : EXPORTABLE(
           (otherSource, specFromRecord) =>
-            function plan($record: DefaultPgSelectSingleStep) {
+            function plan($record: GenericPgSelectSingleStep) {
               return otherSource.get(specFromRecord($record));
             },
           [otherSource, specFromRecord],
@@ -652,7 +652,7 @@ return function (otherSource) {
         )
       : EXPORTABLE(
           (otherSource, specFromRecord) =>
-            function plan($record: DefaultPgSelectSingleStep) {
+            function plan($record: GenericPgSelectSingleStep) {
               return otherSource.find(specFromRecord($record));
             },
           [otherSource, specFromRecord],
@@ -682,7 +682,7 @@ return function (otherSource, connection) {
         )
       : EXPORTABLE(
           (connection, otherSource, specFromRecord) =>
-            function plan($record: DefaultPgSelectSingleStep) {
+            function plan($record: GenericPgSelectSingleStep) {
               return connection(otherSource.find(specFromRecord($record)));
             },
           [connection, otherSource, specFromRecord],
@@ -747,7 +747,7 @@ function addRelations(
     refName: string;
     refDefinition: PgRefDefinition;
     ref?: PgCodecRef;
-    codec?: DefaultPgCodec;
+    codec?: GenericPgCodec;
   }> = isMutationPayload
     ? []
     : codec.refs
@@ -783,8 +783,8 @@ function addRelations(
     listFieldName: string;
     connectionFieldName: string;
     description?: string;
-    pgResource?: DefaultPgResource;
-    pgCodec: DefaultPgCodec | undefined;
+    pgResource?: GenericPgResource;
+    pgCodec: GenericPgCodec | undefined;
     pgRelationDetails?: GraphileBuild.PgRelationsPluginRelationDetails;
     relatedTypeName: string;
     isNonNull: boolean | undefined;
@@ -909,8 +909,8 @@ function addRelations(
   } of refDefinitionList) {
     const isUnique = !!refSpec.singular;
     let hasReferencee;
-    let sharedCodec: DefaultPgCodec | undefined = undefined;
-    let sharedSource: DefaultPgResource | undefined = undefined;
+    let sharedCodec: GenericPgCodec | undefined = undefined;
+    let sharedSource: GenericPgResource | undefined = undefined;
     let behavior: string;
     let typeName: string | null | undefined;
     let singleRecordPlan;
@@ -1132,7 +1132,7 @@ function addRelations(
             const isConnection = mode === "connection";
             const attributes: PgUnionAllStepConfigAttributes<string> =
               unionAttributes ?? {};
-            const resourceByTypeName: Record<string, DefaultPgResource> =
+            const resourceByTypeName: Record<string, GenericPgResource> =
               Object.create(null);
             const members: PgUnionAllStepMember<string>[] = [];
             for (const path of paths) {
@@ -1172,10 +1172,10 @@ function addRelations(
                   const $record = isMutationPayload
                     ? (
                         $parent as ObjectStep<{
-                          result: DefaultPgSelectSingleStep;
+                          result: GenericPgSelectSingleStep;
                         }>
                       ).get("result")
-                    : ($parent as DefaultPgSelectSingleStep);
+                    : ($parent as GenericPgSelectSingleStep);
                   for (let i = 0, l = paths.length; i < l; i++) {
                     const path = paths[i];
                     const firstLayer = path.layers[0];

@@ -2,8 +2,8 @@ import "graphile-config";
 
 import type {
   _AnyPgSelectSingleStep,
-  DefaultPgCodec,
-  DefaultPgResource,
+  GenericPgCodec,
+  GenericPgResource,
 } from "@dataplan/pg";
 import type { ListStep } from "grafast";
 import { access, constant, list } from "grafast";
@@ -76,7 +76,7 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           );
         });
 
-        const resourcesByCodec = new Map<DefaultPgCodec, DefaultPgResource[]>();
+        const resourcesByCodec = new Map<GenericPgCodec, GenericPgResource[]>();
         for (const resource of tableResources) {
           let list = resourcesByCodec.get(resource.codec);
           if (!list) {

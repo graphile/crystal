@@ -3,11 +3,11 @@
 // (e.g. they can be relations to other tables), so we've renamed them.
 
 import type {
-  DefaultPgCodec,
-  DefaultPgCodecAttributesRecord,
-  DefaultPgFunctionResourceOptions,
-  DefaultPgResourceOptions,
-  DefaultPgResourceParameter,
+  GenericPgCodec,
+  GenericPgCodecAttributesRecord,
+  GenericPgFunctionResourceOptions,
+  GenericPgResourceOptions,
+  GenericPgResourceParameter,
   PgResourceExtensions,
   PgSelectArgumentDigest,
 } from "@dataplan/pg";
@@ -64,7 +64,7 @@ declare global {
         getResourceOptions(
           serviceName: string,
           pgProc: PgProc,
-        ): Promise<DefaultPgResourceOptions | null>;
+        ): Promise<GenericPgResourceOptions | null>;
       };
     }
 
@@ -73,17 +73,17 @@ declare global {
         serviceName: string;
         pgProc: PgProc;
         baseResourceOptions: Pick<
-          DefaultPgResourceOptions,
+          GenericPgResourceOptions,
           "codec" | "executor"
         > &
-          Partial<Omit<DefaultPgResourceOptions, "codec" | "executor">>;
-        functionResourceOptions: DefaultPgFunctionResourceOptions;
+          Partial<Omit<GenericPgResourceOptions, "codec" | "executor">>;
+        functionResourceOptions: GenericPgFunctionResourceOptions;
       }): void | Promise<void>;
 
       pgProcedures_PgResourceOptions(event: {
         serviceName: string;
         pgProc: PgProc;
-        resourceOptions: DefaultPgResourceOptions;
+        resourceOptions: GenericPgResourceOptions;
       }): void | Promise<void>;
     }
   }
@@ -92,7 +92,7 @@ declare global {
 interface State {
   resourceOptionsByPgProcByService: Map<
     string,
-    Map<PgProc, Promise<DefaultPgResourceOptions | null>>
+    Map<PgProc, Promise<GenericPgResourceOptions | null>>
   >;
 }
 const EMPTY_OBJECT = Object.freeze({});
@@ -217,12 +217,12 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const tags = JSON.parse(JSON.stringify(rawTags));
 
           const makeCodecFromReturn =
-            async (): Promise<DefaultPgCodec | null> => {
+            async (): Promise<GenericPgCodec | null> => {
               // We're building a PgCodec to represent specifically the
               // return type of this function.
 
               const numberOfArguments = allArgTypes.length ?? 0;
-              const attributes: DefaultPgCodecAttributesRecord =
+              const attributes: GenericPgCodecAttributesRecord =
                 Object.create(null);
               for (let i = 0, l = numberOfArguments; i < l; i++) {
                 // i for IN arguments, o for OUT arguments, b for INOUT arguments,
@@ -317,7 +317,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             return null;
           }
 
-          const parameters: DefaultPgResourceParameter[] = [];
+          const parameters: GenericPgResourceParameter[] = [];
 
           // const processedFirstInputArg = false;
 
@@ -504,7 +504,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               return null;
             }
 
-            const options: DefaultPgFunctionResourceOptions = {
+            const options: GenericPgFunctionResourceOptions = {
               name,
               identifier,
               from: fromCallback,
@@ -541,7 +541,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               [finalResourceOptions, makePgResourceOptions],
             );
           } else {
-            const options: DefaultPgResourceOptions = EXPORTABLE(
+            const options: GenericPgResourceOptions = EXPORTABLE(
               (
                 description,
                 executor,

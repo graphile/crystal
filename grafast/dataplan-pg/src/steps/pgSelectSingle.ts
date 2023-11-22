@@ -18,7 +18,7 @@ import type {
 import { TYPES } from "../codecs.js";
 import type {
   _AnyPgResource,
-  DefaultPgResource,
+  GenericPgResource,
   PgResource,
   PgResourceCodec,
   PgResourceRegistry,
@@ -82,7 +82,7 @@ const CHEAP_ATTRIBUTE_TYPES = new Set<_AnyPgCodec>([
 
 /** @internal */
 export interface _AnyPgSelectSingleStep extends PgSelectSingleStep<any> {}
-export interface DefaultPgSelectSingleStep extends PgSelectSingleStep<DefaultPgResource> {}
+export interface GenericPgSelectSingleStep extends PgSelectSingleStep<GenericPgResource> {}
 export type PgSelectSingleStepResource<U> = U extends PgSelectSingleStep<
   infer TResource
 >

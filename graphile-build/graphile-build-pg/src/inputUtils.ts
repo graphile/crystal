@@ -1,6 +1,6 @@
 import "graphile-build";
 
-import type { DefaultPgCodec, DefaultPgResource } from "@dataplan/pg";
+import type { GenericPgCodec, GenericPgResource } from "@dataplan/pg";
 
 /**
  * Metadata for a specific PgCodec
@@ -18,12 +18,12 @@ export interface PgCodecMeta {
 /**
  * A map from PgCodec to its associated metadata.
  */
-export type PgCodecMetaLookup = Map<DefaultPgCodec, PgCodecMeta>;
+export type PgCodecMetaLookup = Map<GenericPgCodec, PgCodecMeta>;
 
 /**
  * Creates an empty meta object for the given codec.
  */
-export function makePgCodecMeta(_codec: DefaultPgCodec): PgCodecMeta {
+export function makePgCodecMeta(_codec: GenericPgCodec): PgCodecMeta {
   return {
     typeNameBySituation: Object.create(null),
   };
@@ -40,7 +40,7 @@ export function getCodecMetaLookupFromInput(
   input: GraphileBuild.BuildInput,
 ): PgCodecMetaLookup {
   const metaLookup: PgCodecMetaLookup = new Map();
-  const seenResources = new Set<DefaultPgResource>();
+  const seenResources = new Set<GenericPgResource>();
   for (const codec of Object.values(input.pgRegistry.pgCodecs)) {
     walkCodec(codec, metaLookup);
   }
@@ -57,9 +57,9 @@ export function getCodecMetaLookupFromInput(
  * @internal
  */
 function walkResource(
-  resource: DefaultPgResource,
+  resource: GenericPgResource,
   metaLookup: PgCodecMetaLookup,
-  seenResources: Set<DefaultPgResource>,
+  seenResources: Set<GenericPgResource>,
 ): void {
   if (seenResources.has(resource)) {
     return;
@@ -86,7 +86,7 @@ function walkResource(
  *
  * @internal
  */
-function walkCodec(codec: DefaultPgCodec, metaLookup: PgCodecMetaLookup): void {
+function walkCodec(codec: GenericPgCodec, metaLookup: PgCodecMetaLookup): void {
   if (metaLookup.has(codec)) {
     return;
   }

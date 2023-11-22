@@ -19,7 +19,7 @@ import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import {
   _AnyPgResource,
-  DefaultPgResource,
+  GenericPgResource,
   PgResourceUnique,
 } from "../datasource.js";
 import { PgCodecAttributeCodec, PgCodecAttributeName } from "../codecs.js";
@@ -42,8 +42,8 @@ interface PgDeletePlanFinalizeResults {
 
 /** @internal */
 export interface _AnyPgDeleteSingleStep extends PgDeleteSingleStep<any> {}
-export interface DefaultPgDeleteSingleStep
-  extends PgDeleteSingleStep<DefaultPgResource> {}
+export interface GenericPgDeleteSingleStep
+  extends PgDeleteSingleStep<GenericPgResource> {}
 /**
  * Deletes a row in the database, can return columns from the deleted row.
  */

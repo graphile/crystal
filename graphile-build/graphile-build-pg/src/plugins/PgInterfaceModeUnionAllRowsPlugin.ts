@@ -1,8 +1,8 @@
 import "graphile-config";
 
 import type {
-  DefaultPgCodec,
-  DefaultPgResource,
+  GenericPgCodec,
+  GenericPgResource,
   PgCodec,
   PgUnionAllStepConfigAttributes,
   PgUnionAllStepMember,
@@ -21,7 +21,7 @@ declare global {
        * The base inflector used by allInterfaceModeUnionRowsConnection and
        * allInterfaceModeUnionRowsList.
        */
-      _allInterfaceModeUnionRows(this: Inflection, codec: DefaultPgCodec): string;
+      _allInterfaceModeUnionRows(this: Inflection, codec: GenericPgCodec): string;
 
       /**
        * The field name for a Cursor Connection field that returns all rows
@@ -29,14 +29,14 @@ declare global {
        */
       allInterfaceModeUnionRowsConnection(
         this: Inflection,
-        codec: DefaultPgCodec,
+        codec: GenericPgCodec,
       ): string;
 
       /**
        * The field name for a List field that returns all rows from the given
        * `@interface mode:union` codec.
        */
-      allInterfaceModeUnionRowsList(this: Inflection, codec: DefaultPgCodec): string;
+      allInterfaceModeUnionRowsList(this: Inflection, codec: GenericPgCodec): string;
     }
   }
 }
@@ -94,7 +94,7 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
 
         const resourcesByPolymorphicTypeName: {
           [polymorphicTypeName: string]: {
-            resources: DefaultPgResource[];
+            resources: GenericPgResource[];
             type: "union" | "interface";
           };
         } = Object.create(null);
@@ -154,7 +154,7 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
         }
 
         const interfaceCodecs: {
-          [polymorphicTypeName: string]: DefaultPgCodec;
+          [polymorphicTypeName: string]: GenericPgCodec;
         } = Object.create(null);
         for (const codec of Object.values(pgRegistry.pgCodecs)) {
           if (!codec.polymorphism) continue;
@@ -217,7 +217,7 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
               if (!interfaceCodec.attributes) return;
               const attributes: PgUnionAllStepConfigAttributes<string> =
                 interfaceCodec.attributes;
-              const resourceByTypeName: Record<string, DefaultPgResource> =
+              const resourceByTypeName: Record<string, GenericPgResource> =
                 Object.create(null);
               const members: PgUnionAllStepMember<string>[] = [];
               for (const resource of spec.resources) {
