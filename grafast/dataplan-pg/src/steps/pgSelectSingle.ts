@@ -10,21 +10,21 @@ import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type {
-  AnyPgCodecAttribute,
+  _AnyPgCodecAttribute,
   ObjectFromPgCodecAttributes,
   PgCodecAttributeCodec,
   PgCodecAttributeName,
 } from "../codecs.js";
 import { TYPES } from "../codecs.js";
 import type {
-  AnyPgResource,
+  _AnyPgResource,
   DefaultPgResource,
   PgResource,
   PgResourceCodec,
   PgResourceRegistry,
 } from "../datasource.js";
 import type {
-  AnyPgCodec,
+  _AnyPgCodec,
   GetPgRegistryCodecRelationConfigs,
   GetPgResourceAttributeMap,
   GetPgResourceAttributes,
@@ -50,9 +50,9 @@ import { getFragmentAndCodecFromOrder, PgSelectStep } from "./pgSelect.js";
 // const debugPlanVerbose = debugPlan.extend("verbose");
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
-export interface AnyPgSelectSinglePlanOptions
+export interface _AnyPgSelectSinglePlanOptions
   extends PgSelectSinglePlanOptions<any> {}
-export interface PgSelectSinglePlanOptions<TResource extends AnyPgResource> {
+export interface PgSelectSinglePlanOptions<TResource extends _AnyPgResource> {
   fromRelation?: readonly [
     PgSelectSingleStep<TResource>,
     PgCodecRelationConfigName<
@@ -66,7 +66,7 @@ export interface PgSelectSinglePlanOptions<TResource extends AnyPgResource> {
 
 // Types that only take a few bytes so adding them to the selection would be
 // cheap to do.
-const CHEAP_ATTRIBUTE_TYPES = new Set<AnyPgCodec>([
+const CHEAP_ATTRIBUTE_TYPES = new Set<_AnyPgCodec>([
   TYPES.int2,
   TYPES.int,
   TYPES.bigint,
@@ -79,7 +79,7 @@ const CHEAP_ATTRIBUTE_TYPES = new Set<AnyPgCodec>([
   TYPES.timestamptz,
 ]);
 
-export interface AnyPgSelectSingleStep extends PgSelectSingleStep<any> {}
+export interface _AnyPgSelectSingleStep extends PgSelectSingleStep<any> {}
 export interface DefaultPgSelectSingleStep extends PgSelectSingleStep<DefaultPgResource> {}
 export type PgSelectSingleStepResource<U> = U extends PgSelectSingleStep<
   infer TResource
@@ -95,7 +95,7 @@ export type PgSelectSingleStepResource<U> = U extends PgSelectSingleStep<
  * such as `.get` and `.cursor` which can receive specific properties by
  * telling the PgSelectStep to select the relevant expressions.
  */
-export class PgSelectSingleStep<TResource extends AnyPgResource>
+export class PgSelectSingleStep<TResource extends _AnyPgResource>
   extends UnbatchedExecutableStep<
     unknown[] /* What we return will be a tuple based on the values selected */
   >
@@ -234,7 +234,7 @@ export class PgSelectSingleStep<TResource extends AnyPgResource>
         Object.entries($fromPlan.resource.codec.attributes!) as Array<
           [
             PgCodecAttributeName<GetPgResourceAttributes<TResource>>,
-            AnyPgCodecAttribute,
+            _AnyPgCodecAttribute,
           ]
         >
       ).find(([name, col]) => {
@@ -295,7 +295,7 @@ export class PgSelectSingleStep<TResource extends AnyPgResource>
   /**
    * Returns a plan representing the result of an expression.
    */
-  public select<TExpressionCodec extends AnyPgCodec>(
+  public select<TExpressionCodec extends _AnyPgCodec>(
     fragment: SQL,
     codec: TExpressionCodec,
   ): PgClassExpressionStep<TExpressionCodec, TResource> {
@@ -314,11 +314,11 @@ export class PgSelectSingleStep<TResource extends AnyPgResource>
   }
 
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
-  public placeholder<TCodec extends AnyPgCodec>(
+  public placeholder<TCodec extends _AnyPgCodec>(
     $step: ExecutableStep,
     codec: TCodec,
   ): SQL;
-  public placeholder<TCodec extends AnyPgCodec>(
+  public placeholder<TCodec extends _AnyPgCodec>(
     $step: ExecutableStep | PgTypedExecutableStep<any>,
     overrideCodec?: TCodec,
   ): SQL {
@@ -503,7 +503,7 @@ export class PgSelectSingleStep<TResource extends AnyPgResource>
   }
 
   private nonNullAttribute: {
-    attribute: AnyPgCodecAttribute;
+    attribute: _AnyPgCodecAttribute;
     attr: string;
   } | null = null;
   private nullCheckAttributeIndex: number | null = null;
@@ -645,7 +645,7 @@ export function pgSelectFromRecord<
  * Given a plan that represents a single record (via
  * PgSelectSingleStep.record()) this turns it back into a PgSelectSingleStep
  */
-export function pgSelectSingleFromRecord<TResource extends AnyPgResource>(
+export function pgSelectSingleFromRecord<TResource extends _AnyPgResource>(
   resource: TResource,
   $record: PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>,
 ): PgSelectSingleStep<TResource> {

@@ -1,7 +1,7 @@
 import "graphile-config";
 
 import type {
-  AnyPgSelectSingleStep,
+  _AnyPgSelectSingleStep,
   DefaultPgCodec,
   DefaultPgResource,
 } from "@dataplan/pg";
@@ -150,7 +150,7 @@ return function (list, constant) {
                 )
               : EXPORTABLE(
                   (constant, identifier, list, pk) =>
-                    ($record: AnyPgSelectSingleStep) => {
+                    ($record: _AnyPgSelectSingleStep) => {
                       return list([
                         constant(identifier, false),
                         ...pk.map((attribute) => $record.get(attribute)),

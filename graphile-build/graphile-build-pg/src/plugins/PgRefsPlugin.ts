@@ -1,7 +1,7 @@
 import type {
-  AnyPgCodec,
-  AnyPgCodecRelationConfig,
-  AnyPgResourceOptions,
+  _AnyPgCodec,
+  _AnyPgCodecRelationConfig,
+  _AnyPgResourceOptions,
   DefaultPgCodecRelationConfig,
   PgCodec,
   PgCodecExtensions,

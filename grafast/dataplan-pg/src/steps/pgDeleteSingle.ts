@@ -9,7 +9,7 @@ import sql from "pg-sql2";
 
 import { inspect } from "../inspect.js";
 import type {
-  AnyPgCodec,
+  _AnyPgCodec,
   GetPgResourceAttributes,
   GetPgResourceCodec,
   GetPgResourceUniques,
@@ -18,7 +18,7 @@ import type {
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
 import {
-  AnyPgResource,
+  _AnyPgResource,
   DefaultPgResource,
   PgResourceUnique,
 } from "../datasource.js";
@@ -40,14 +40,14 @@ interface PgDeletePlanFinalizeResults {
   queryValueDetailsBySymbol: QueryValueDetailsBySymbol;
 }
 
-export interface AnyPgDeleteSingleStep extends PgDeleteSingleStep<any> {}
+export interface _AnyPgDeleteSingleStep extends PgDeleteSingleStep<any> {}
 export interface DefaultPgDeleteSingleStep
   extends PgDeleteSingleStep<DefaultPgResource> {}
 /**
  * Deletes a row in the database, can return columns from the deleted row.
  */
 export class PgDeleteSingleStep<
-  TResource extends AnyPgResource,
+  TResource extends _AnyPgResource,
 > extends ExecutableStep<unknown[]> {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -84,7 +84,7 @@ export class PgDeleteSingleStep<
   private getBys: Array<{
     name: PgCodecAttributeName<GetPgResourceAttributes<TResource>>;
     depId: number;
-    pgCodec: AnyPgCodec;
+    pgCodec: _AnyPgCodec;
   }> = [];
 
   /**
@@ -393,7 +393,7 @@ export class PgDeleteSingleStep<
 /**
  * Delete a row in `resource` identified by the `getBy` unique condition.
  */
-export function pgDeleteSingle<TResource extends AnyPgResource>(
+export function pgDeleteSingle<TResource extends _AnyPgResource>(
   resource: TResource,
   getBy: PlanByUniques<
     GetPgResourceAttributes<TResource>,

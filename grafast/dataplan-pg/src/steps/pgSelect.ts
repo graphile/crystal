@@ -44,15 +44,15 @@ import sql, { $$symbolToIdentifier, arraysMatch } from "pg-sql2";
 
 import { listOfCodec, TYPES } from "../codecs.js";
 import type {
-  AnyPgResource,
-  AnyPgResourceUnique,
-  AnyScalarPgResource,
+  _AnyPgResource,
+  _AnyPgResourceUnique,
+  _AnyScalarPgResource,
   DefaultPgResource,
   PgResource,
   PgResourceCodec,
 } from "../datasource.js";
 import type {
-  AnyPgCodec,
+  _AnyPgCodec,
   GetPgResourceAttributes,
   GetPgResourceCodec,
   GetPgResourceRelationConfigs,
@@ -164,26 +164,26 @@ type PgSelectPlanJoin =
  */
 type PgSelectPlaceholder = {
   dependencyIndex: number;
-  codec: AnyPgCodec;
+  codec: _AnyPgCodec;
   symbol: symbol;
 };
 
 export type PgSelectIdentifierSpec =
   | {
       step: ExecutableStep;
-      codec: AnyPgCodec;
+      codec: _AnyPgCodec;
       matches: (alias: SQL) => SQL;
     }
   | {
       step: PgTypedExecutableStep<any>;
-      codec?: AnyPgCodec;
+      codec?: _AnyPgCodec;
       matches: (alias: SQL) => SQL;
     };
 
 export type PgSelectArgumentSpec =
   | {
       step: ExecutableStep;
-      pgCodec: AnyPgCodec;
+      pgCodec: _AnyPgCodec;
       name?: string;
     }
   | {
@@ -199,7 +199,7 @@ export interface PgSelectArgumentDigest {
 
 interface QueryValue {
   dependencyIndex: number;
-  codec: AnyPgCodec;
+  codec: _AnyPgCodec;
 }
 
 function assertSensible(step: ExecutableStep): void {
@@ -217,7 +217,7 @@ function assertSensible(step: ExecutableStep): void {
 
 export type PgSelectMode = "normal" | "aggregate" | "mutation";
 
-export interface PgSelectOptions<TResource extends AnyPgResource> {
+export interface PgSelectOptions<TResource extends _AnyPgResource> {
   /**
    * Tells us what we're dealing with - data type, columns, where to get it
    * from, what it's called, etc. Many of these details can be overridden
@@ -266,7 +266,7 @@ export interface PgSelectOptions<TResource extends AnyPgResource> {
 }
 
 export interface DefaultPgSelectStep extends PgSelectStep<DefaultPgResource> {}
-export interface AnyPgSelectStep extends PgSelectStep<any> {}
+export interface _AnyPgSelectStep extends PgSelectStep<any> {}
 
 /**
  * This represents selecting from a class-like entity (table, view, etc); i.e.
@@ -277,7 +277,7 @@ export interface AnyPgSelectStep extends PgSelectStep<any> {}
  * don't allow `UNION`/`INTERSECT`/`EXCEPT`/`FOR UPDATE`/etc at this time,
  * purely because it hasn't been sufficiently considered.
  */
-export class PgSelectStep<TResource extends AnyPgResource>
+export class PgSelectStep<TResource extends _AnyPgResource>
   extends ExecutableStep<
     ReadonlyArray<unknown[] /* a tuple based on what is selected at runtime */>
   >
@@ -773,11 +773,11 @@ export class PgSelectStep<TResource extends AnyPgResource>
     return this.isUnique;
   }
 
-  public placeholder($step: PgTypedExecutableStep<AnyPgCodec>): SQL;
-  public placeholder($step: ExecutableStep, codec: AnyPgCodec): SQL;
+  public placeholder($step: PgTypedExecutableStep<_AnyPgCodec>): SQL;
+  public placeholder($step: ExecutableStep, codec: _AnyPgCodec): SQL;
   public placeholder(
-    $step: ExecutableStep | PgTypedExecutableStep<AnyPgCodec>,
-    overrideCodec?: AnyPgCodec,
+    $step: ExecutableStep | PgTypedExecutableStep<_AnyPgCodec>,
+    overrideCodec?: _AnyPgCodec,
   ): SQL {
     if (this.locker.locked) {
       throw new Error(`${this}: cannot add placeholders once plan is locked`);
@@ -2204,7 +2204,7 @@ ${lateralText};`;
       if ($p === this) {
         return true;
       }
-      const p = $p as PgSelectStep<AnyPgResource>;
+      const p = $p as PgSelectStep<_AnyPgResource>;
       // If SELECT, FROM, JOIN, WHERE, ORDER, GROUP BY, HAVING, LIMIT, OFFSET
       // all match with one of our peers then we can replace ourself with one
       // of our peers. NOTE: we do _not_ merge SELECTs at this stage because
@@ -2384,7 +2384,7 @@ ${lateralText};`;
     }
   }
 
-  private mergeSelectsWith<TOtherStep extends PgSelectStep<AnyPgResource>>(
+  private mergeSelectsWith<TOtherStep extends PgSelectStep<_AnyPgResource>>(
     otherPlan: TOtherStep,
   ): {
     [desiredIndex: string]: string;
@@ -2408,7 +2408,7 @@ ${lateralText};`;
     return actualKeyByDesiredKey;
   }
 
-  private mergePlaceholdersInto<TOtherStep extends PgSelectStep<AnyPgResource>>(
+  private mergePlaceholdersInto<TOtherStep extends PgSelectStep<_AnyPgResource>>(
     otherPlan: TOtherStep,
   ): void {
     for (const placeholder of this.placeholders) {
@@ -2487,7 +2487,7 @@ ${lateralText};`;
       !this.joins.some((j) => j.type !== "left")
     ) {
       // Inline ourself into our parent if we can.
-      let t: PgSelectStep<AnyPgResource> | null | undefined = undefined;
+      let t: PgSelectStep<_AnyPgResource> | null | undefined = undefined;
       let p: ExecutableStep | undefined = undefined;
       for (
         let dependencyIndex = 0, l = this.dependencies.length;
@@ -2844,7 +2844,7 @@ ${lateralText};`;
    */
   listItem(
     itemPlan: ExecutableStep,
-  ): TResource extends AnyScalarPgResource
+  ): TResource extends _AnyScalarPgResource
     ? PgClassExpressionStep<PgResourceCodec<TResource>, TResource>
     : PgSelectSingleStep<TResource>;
   listItem(
@@ -2898,7 +2898,7 @@ function joinMatches(
  * Apply a default order in case our default is not unique.
  */
 function ensureOrderIsUnique<
-  TResource extends PgResource<any, any, AnyPgResourceUnique, any, any>,
+  TResource extends PgResource<any, any, _AnyPgResourceUnique, any, any>,
 >(step: PgSelectStep<TResource>) {
   // No need to order a unique record
   if (step.unique()) return;
@@ -2918,7 +2918,7 @@ function ensureOrderIsUnique<
   }
 }
 
-export function pgSelect<TResource extends AnyPgResource>(
+export function pgSelect<TResource extends _AnyPgResource>(
   options: PgSelectOptions<TResource>,
 ): PgSelectStep<TResource> {
   return new PgSelectStep(options);
@@ -2928,7 +2928,7 @@ exportAs("@dataplan/pg", pgSelect, "pgSelect");
 /**
  * Turns a list of records (e.g. from PgSelectSingleStep.record()) back into a PgSelect.
  */
-export function pgSelectFromRecords<TResource extends AnyPgResource>(
+export function pgSelectFromRecords<TResource extends _AnyPgResource>(
   resource: TResource,
   records:
     | PgClassExpressionStep<
@@ -2965,7 +2965,7 @@ exportAs("@dataplan/pg", sqlFromArgDigests, "sqlFromArgDigests");
 
 export function digestsFromArgumentSpecs(
   $placeholderable: {
-    placeholder(step: ExecutableStep, codec: AnyPgCodec): SQL;
+    placeholder(step: ExecutableStep, codec: _AnyPgCodec): SQL;
   },
   specs: PgSelectArgumentSpec[],
   digests: PgSelectArgumentDigest[] = [],
@@ -3003,8 +3003,8 @@ exportAs("@dataplan/pg", digestsFromArgumentSpecs, "digestsFromArgumentSpecs");
 export function getFragmentAndCodecFromOrder(
   alias: SQL,
   order: PgOrderSpec,
-  codecOrCodecs: AnyPgCodec | AnyPgCodec[],
-): [fragment: SQL, codec: AnyPgCodec, isNullable?: boolean] {
+  codecOrCodecs: _AnyPgCodec | _AnyPgCodec[],
+): [fragment: SQL, codec: _AnyPgCodec, isNullable?: boolean] {
   if (order.attribute != null) {
     const colFrag = sql`${alias}.${sql.identifier(order.attribute)}`;
     const isArray = Array.isArray(codecOrCodecs);

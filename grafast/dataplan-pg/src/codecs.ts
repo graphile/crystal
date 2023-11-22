@@ -38,7 +38,7 @@ import {
 import type { PgExecutor } from "./executor.js";
 import { inspect } from "./inspect.js";
 import type {
-  AnyPgCodec,
+  _AnyPgCodec,
   DefaultPgCodec,
   PgCodec,
   PgCodecAttributeMap,
@@ -63,13 +63,13 @@ export type PgCodecAttributeViaExplicit<
   relation: TRelationName;
   attribute: TAttribute;
 };
-export interface AnyPgCodecAttributeVia extends PgCodecAttributeVia<any, any> {}
+export interface _AnyPgCodecAttributeVia extends PgCodecAttributeVia<any, any> {}
 export type DefaultPgCodecAttributeVia = PgCodecAttributeVia<string, string>;
-export type AnyPgCodecAttributeViaRelationName<U> =
+export type _AnyPgCodecAttributeViaRelationName<U> =
   U extends PgCodecAttributeVia<infer TRelationName, any>
     ? TRelationName
     : never;
-export type AnyPgCodecAttributeViaAttribute<U> = U extends PgCodecAttributeVia<
+export type _AnyPgCodecAttributeViaAttribute<U> = U extends PgCodecAttributeVia<
   any,
   infer TAttributeName
 >
@@ -101,11 +101,11 @@ export type PgCodecAttributeCodec<U> = U extends PgCodecAttribute<
 
 export interface DefaultPgCodecAttribute
   extends PgCodecAttribute<string, DefaultPgCodec, boolean> {}
-export interface AnyPgCodecAttribute extends PgCodecAttribute<any, any, any> {}
+export interface _AnyPgCodecAttribute extends PgCodecAttribute<any, any, any> {}
 
 export interface PgCodecAttribute<
   TName extends string,
-  TCodec extends AnyPgCodec,
+  TCodec extends _AnyPgCodec,
   TNotNull extends boolean,
 > {
   name: TName;
@@ -133,7 +133,7 @@ export interface PgCodecAttribute<
    * If this attribute actually exists on a relation rather than locally, the name
    * of the (unique) relation this attribute belongs to.
    */
-  via?: AnyPgCodecAttributeVia;
+  via?: _AnyPgCodecAttributeVia;
 
   /**
    * If the attribute exists identically on a relation and locally (e.g.
@@ -158,7 +158,7 @@ export interface PgCodecAttribute<
    * these are all plural relationships. So identicalVia is generally one-way
    * (except in 1-to-1 relationships).
    */
-  identicalVia?: AnyPgCodecAttributeVia;
+  identicalVia?: _AnyPgCodecAttributeVia;
   // ENHANCE: can identicalVia be plural? Is that useful? Maybe a attribute that has
   // multiple foreign key references?
 
@@ -356,7 +356,7 @@ function recordStringToTuple(value: string): Array<string | null> {
 }
 
 function realAttributeDefs<
-  TAttributes extends Record<string, AnyPgCodecAttribute>,
+  TAttributes extends Record<string, _AnyPgCodecAttribute>,
 >(
   attributes: TAttributes,
 ): Array<
@@ -384,7 +384,7 @@ function realAttributeDefs<
  * @see {@link https://www.postgresql.org/docs/current/rowtypes.html#id-1.5.7.24.6}
  */
 function makeRecordToSQLRawValue<
-  TAttributes extends Record<string, AnyPgCodecAttribute>,
+  TAttributes extends Record<string, _AnyPgCodecAttribute>,
 >(attributes: TAttributes): PgEncode<ObjectFromPgCodecAttributes<TAttributes>> {
   const attributeDefs = realAttributeDefs(attributes);
   return (value) => {
@@ -398,7 +398,7 @@ function makeRecordToSQLRawValue<
 }
 
 export type ObjectFromPgCodecAttributes<
-  TAttributes extends Record<string, AnyPgCodecAttribute>,
+  TAttributes extends Record<string, _AnyPgCodecAttribute>,
 > = {
   [TCodecAttribute in keyof TAttributes as PgCodecAttributeName<
     TAttributes[TCodecAttribute]
@@ -423,7 +423,7 @@ export type ObjectFromPgCodecAttributes<
  * @see {@link https://www.postgresql.org/docs/current/rowtypes.html#id-1.5.7.24.6}
  */
 function makeSQLValueToRecord<
-  TAttributes extends Record<string, AnyPgCodecAttribute>,
+  TAttributes extends Record<string, _AnyPgCodecAttribute>,
 >(
   attributes: TAttributes,
 ): (value: string) => ObjectFromPgCodecAttributes<TAttributes> {
@@ -444,7 +444,7 @@ function makeSQLValueToRecord<
 export type PgRecordTypeCodecSpec<
   TName extends string,
   TAttributes extends {
-    [TAttribute in keyof TAttributes]: Omit<AnyPgCodecAttribute, "name">;
+    [TAttribute in keyof TAttributes]: Omit<_AnyPgCodecAttribute, "name">;
   },
 > = {
   name: TName;
@@ -470,7 +470,7 @@ export type PgRecordTypeCodecSpec<
 export function recordCodec<
   const TName extends string,
   const TAttributes extends {
-    [TAttribute in keyof TAttributes]: Omit<AnyPgCodecAttribute, "name">;
+    [TAttribute in keyof TAttributes]: Omit<_AnyPgCodecAttribute, "name">;
   },
   const TCodecAttributes extends {
     [TAttribute in keyof TAttributes]: PgCodecAttribute<
@@ -609,7 +609,7 @@ type CodecWithListCodec<
  * @param typeDelim - the delimeter used to separate entries in this list when Postgres stringifies it
  * @param identifier - a pg-sql2 fragment that represents the name of this type
  */
-export function listOfCodec<TInnerCodec extends AnyPgCodec = AnyPgCodec>(
+export function listOfCodec<TInnerCodec extends _AnyPgCodec = _AnyPgCodec>(
   listedCodec: TInnerCodec,
   config?: {
     description?: string;
@@ -732,7 +732,7 @@ exportAs("@dataplan/pg", listOfCodec, "listOfCodec");
  */
 export function domainOfCodec<
   TName extends string,
-  TInnerCodec extends AnyPgCodec,
+  TInnerCodec extends _AnyPgCodec,
 >(
   innerCodec: TInnerCodec,
   name: TName,
@@ -747,7 +747,7 @@ export function domainOfCodec<
   PgCodecAttributeMap<TInnerCodec>,
   PgCodecFromPostgres<TInnerCodec>,
   any,
-  AnyPgCodec,
+  _AnyPgCodec,
   TInnerCodec,
   any
 > {
@@ -773,7 +773,7 @@ exportAs("@dataplan/pg", domainOfCodec, "domainOfCodec");
  *
  * @internal
  */
-function escapeRangeValue<TInnerCodec extends AnyPgCodec>(
+function escapeRangeValue<TInnerCodec extends _AnyPgCodec>(
   value: null | any,
   innerCodec: TInnerCodec,
 ): string {
@@ -801,7 +801,7 @@ interface PgRange<T> {
  */
 export function rangeOfCodec<
   TName extends string,
-  TInnerCodec extends AnyPgCodec,
+  TInnerCodec extends _AnyPgCodec,
 >(
   innerCodec: TInnerCodec,
   name: TName,
@@ -1227,7 +1227,7 @@ export function getCodecByPgCatalogTypeName(pgCatalogTypeName: string) {
   return null;
 }
 
-export function getInnerCodec<TCodec extends AnyPgCodec>(
+export function getInnerCodec<TCodec extends _AnyPgCodec>(
   codec: TCodec,
 ): TCodec extends PgCodec<
   any,

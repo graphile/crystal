@@ -3,9 +3,9 @@ import { access, exportAs, UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { AnyPgResource, PgResource } from "../datasource.js";
+import type { _AnyPgResource, PgResource } from "../datasource.js";
 import type {
-  AnyPgCodec,
+  _AnyPgCodec,
   PgClassSingleStep,
   PgCodecAttributes,
   PgTypedExecutableStep,
@@ -29,8 +29,8 @@ import { PgCodecAttributeCodec, PgCodecAttributeName } from "../codecs.js";
  * of another layer of plan.
  */
 export class PgClassExpressionStep<
-    TExpressionCodec extends AnyPgCodec,
-    TResource extends AnyPgResource,
+    TExpressionCodec extends _AnyPgCodec,
+    TResource extends _AnyPgResource,
   >
   extends UnbatchedExecutableStep<any>
   implements PgTypedExecutableStep<TExpressionCodec>
@@ -270,8 +270,8 @@ export class PgClassExpressionStep<
  * that will be selected.
  */
 function pgClassExpression<
-  TExpressionCodec extends AnyPgCodec,
-  TResource extends AnyPgResource,
+  TExpressionCodec extends _AnyPgCodec,
+  TResource extends _AnyPgResource,
 >(
   table: PgClassSingleStep<TResource> | PgUnionAllSingleStep,
   codec: TExpressionCodec,

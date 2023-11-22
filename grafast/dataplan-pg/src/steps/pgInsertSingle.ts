@@ -10,21 +10,21 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type {
-  AnyPgCodecAttribute,
+  _AnyPgCodecAttribute,
   PgCodecAttribute,
   PgCodecAttributeCodec,
   PgCodecAttributeName,
 } from "../codecs.js";
 import { inspect } from "../inspect.js";
 import type {
-  AnyPgCodec,
+  _AnyPgCodec,
   GetPgResourceAttributes,
   GetPgResourceCodec,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
-import { AnyPgResource } from "../datasource.js";
+import { _AnyPgResource } from "../datasource.js";
 
 const EMPTY_MAP = new Map<never, never>();
 
@@ -47,7 +47,7 @@ interface PgInsertSinglePlanFinalizeResults {
 /**
  * Inserts a row into resource with the given specified attribute values.
  */
-export class PgInsertSingleStep<TResource extends AnyPgResource = AnyPgResource>
+export class PgInsertSingleStep<TResource extends _AnyPgResource = _AnyPgResource>
   extends ExecutableStep<
     unknown[] // tuple depending on what's selected
   >
@@ -92,7 +92,7 @@ export class PgInsertSingleStep<TResource extends AnyPgResource = AnyPgResource>
     name: PgCodecAttributeName<GetPgResourceAttributes<TResource>>;
     depId: number;
     // This isn't really needed, we can look it up in the codec, but it acts as a quick reference.
-    pgCodec: AnyPgCodec;
+    pgCodec: _AnyPgCodec;
   }> = [];
 
   /**
@@ -214,7 +214,7 @@ export class PgInsertSingleStep<TResource extends AnyPgResource = AnyPgResource>
     if (!this.resource.codec.attributes) {
       throw new Error(`Cannot call .get() when there's no attributes.`);
     }
-    const resourceAttribute: AnyPgCodecAttribute =
+    const resourceAttribute: _AnyPgCodecAttribute =
       this.resource.codec.attributes[attr as string];
     if (!resourceAttribute) {
       throw new Error(
@@ -420,7 +420,7 @@ export class PgInsertSingleStep<TResource extends AnyPgResource = AnyPgResource>
 /**
  * Inserts a row into resource with the given specified attribute values.
  */
-export function pgInsertSingle<TResource extends AnyPgResource>(
+export function pgInsertSingle<TResource extends _AnyPgResource>(
   resource: TResource,
   attributes?: {
     [attribute in GetPgResourceAttributes<TResource> as PgCodecAttributeName<attribute>]?:

@@ -1,5 +1,5 @@
 import type {
-  AnyPgCodecAttributesRecord,
+  _AnyPgCodecAttributesRecord,
   DefaultPgCodec,
   DefaultPgCodecAttribute,
   PgCodec,
@@ -310,7 +310,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             );
           }
 
-          const attributes: AnyPgCodecAttributesRecord = Object.create(null);
+          const attributes: _AnyPgCodecAttributesRecord = Object.create(null);
           const allAttributes =
             await info.helpers.pgIntrospection.getAttributesForClass(
               serviceName,

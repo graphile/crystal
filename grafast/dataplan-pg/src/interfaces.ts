@@ -3,17 +3,17 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 
 import type { PgAdaptorOptions } from "./adaptors/pg.js";
 import type {
-  AnyPgCodecAttribute,
+  _AnyPgCodecAttribute,
   DefaultPgCodecAttribute,
   PgCodecAttribute,
   PgCodecAttributeCodec,
   PgCodecAttributeName,
 } from "./codecs.js";
 import type {
-  AnyPgResource,
-  AnyPgResourceOptions,
-  AnyPgResourceParameter,
-  AnyPgResourceUnique,
+  _AnyPgResource,
+  _AnyPgResourceOptions,
+  _AnyPgResourceParameter,
+  _AnyPgResourceUnique,
   DefaultPgResource,
   DefaultPgResourceOptions,
   PgCodecRefs,
@@ -35,7 +35,7 @@ import type { PgUpdateSingleStep } from "./steps/pgUpdateSingle.js";
  * A class-like source of information - could be from `SELECT`-ing a row, or
  * `INSERT...RETURNING` or similar. *ALWAYS* represents a single row (or null).
  */
-export type PgClassSingleStep<TResource extends AnyPgResource = AnyPgResource> =
+export type PgClassSingleStep<TResource extends _AnyPgResource = _AnyPgResource> =
 
     | PgSelectSingleStep<TResource>
     | PgInsertSingleStep<TResource>
@@ -132,7 +132,7 @@ export type PgCodecPolymorphism<TAttributeName extends string> =
 
 export interface DefaultPgRangeItemCodec
   extends PgCodec<string, never, any, any, never, DefaultPgCodec, never> {}
-export interface AnyPgRangeItemCodec
+export interface _AnyPgRangeItemCodec
   extends PgCodec<string, never, any, any, never, any, never> {}
 
 export type PgCodecName<U> = U extends PgCodec<
@@ -197,11 +197,11 @@ export type PgCodecFromPg<U> = PgDecode<
 >;
 export interface DefaultPgCodecAttributesRecord
   extends PgCodecAttributesRecord<DefaultPgCodecAttribute> {}
-export interface AnyPgCodecAttributesRecord
+export interface _AnyPgCodecAttributesRecord
   extends PgCodecAttributesRecord<any> {}
 
 export type PgCodecAttributesRecord<
-  TCodecAttributes extends AnyPgCodecAttribute,
+  TCodecAttributes extends _AnyPgCodecAttribute,
 > = {
   [TCodecAttribute in TCodecAttributes as PgCodecAttributeName<TCodecAttribute>]: TCodecAttribute;
 };
@@ -225,9 +225,9 @@ export interface DefaultScalarPgCodec
     DefaultPgCodec,
     DefaultPgCodec
   > {}
-export interface AnyScalarPgCodec
+export interface _AnyScalarPgCodec
   extends PgCodec<any, never, any, any, any, any, any> {}
-export interface AnyPgCodec
+export interface _AnyPgCodec
   extends PgCodec<any, any, any, any, any, any, any> {}
 
 /**
@@ -237,12 +237,12 @@ export interface AnyPgCodec
  */
 export interface PgCodec<
   TName extends string,
-  TCodecAttributes extends Record<string, AnyPgCodecAttribute>,
+  TCodecAttributes extends Record<string, _AnyPgCodecAttribute>,
   TFromPostgres,
   TFromJavaScript,
-  TArrayItemCodec extends AnyPgCodec,
-  TDomainItemCodec extends AnyPgCodec,
-  TRangeItemCodec extends AnyPgCodec,
+  TArrayItemCodec extends _AnyPgCodec,
+  TDomainItemCodec extends _AnyPgCodec,
+  TRangeItemCodec extends _AnyPgCodec,
 > {
   /**
    * Unique name to identify this codec.
@@ -377,7 +377,7 @@ export interface DefaultPgCodecWithAttributes
     never
   > {}
 export interface PgCodecWithAttributes<
-  TAttributes extends Record<string, AnyPgCodecAttribute>,
+  TAttributes extends Record<string, _AnyPgCodecAttribute>,
 > extends PgCodec<any, TAttributes, any, any, never, any, never> {}
 
 export interface PgCodecAnyScalar
@@ -421,7 +421,7 @@ export interface PgEnumCodec<
  * A PgTypedExecutableStep has a 'pgCodec' property which means we don't need
  * to also state the pgCodec to use, this can be an added convenience.
  */
-export interface PgTypedExecutableStep<TCodec extends AnyPgCodec>
+export interface PgTypedExecutableStep<TCodec extends _AnyPgCodec>
   extends ExecutableStep {
   pgCodec: TCodec;
 }
@@ -436,7 +436,7 @@ export type PgOrderFragmentSpec = {
   /** The expression we're ordering by. */
   fragment: SQL;
   /** The codec of the expression that we're ordering by, this is useful when constructing a cursor for it. */
-  codec: AnyPgCodec;
+  codec: _AnyPgCodec;
 
   attribute?: never;
   callback?: never;
@@ -450,9 +450,9 @@ export type PgOrderAttributeSpec = {
   /** An optional expression to wrap this attribute with, and the type that expression returns */
   callback?: (
     attributeExpression: SQL,
-    attributeCodec: AnyPgCodec,
+    attributeCodec: _AnyPgCodec,
     nullable: boolean,
-  ) => [fragment: SQL, codec: AnyPgCodec, nullable?: boolean];
+  ) => [fragment: SQL, codec: _AnyPgCodec, nullable?: boolean];
 
   fragment?: never;
   codec?: never;
@@ -474,7 +474,7 @@ export interface PgGroupSpec {
 }
 
 export type TuplePlanMap<
-  TAttributes extends AnyPgCodecAttribute,
+  TAttributes extends _AnyPgCodecAttribute,
   TTuple extends ReadonlyArray<PgCodecAttributeName<TAttributes>>,
 > = {
   [Index in keyof TTuple]: {
@@ -506,13 +506,13 @@ export type TuplePlanMap<
  * to.
  */
 export type PlanByUniques<
-  TAttributes extends AnyPgCodecAttribute,
+  TAttributes extends _AnyPgCodecAttribute,
   TUniqueAttributes extends PgResourceUnique<TAttributes>,
 > = TuplePlanMap<TAttributes, TUniqueAttributes["attributes"]>[number];
 
 export type PgConditionLikeStep = (ModifierStep<any> | ExecutableStep) & {
   alias: SQL;
-  placeholder($step: ExecutableStep, codec: AnyPgCodec): SQL;
+  placeholder($step: ExecutableStep, codec: _AnyPgCodec): SQL;
   where(condition: SQL): void;
   having(condition: SQL): void;
 };
@@ -630,7 +630,7 @@ export type PgCodecRelationExtensions = DataplanPg.PgCodecRelationExtensions;
 
 export interface PgCodecRelationBase<
   TName extends string = string,
-  TLocalCodec extends AnyPgCodec = AnyPgCodec,
+  TLocalCodec extends _AnyPgCodec = _AnyPgCodec,
   TRemoteAttributes extends string = string,
 > {
   name: TName;
@@ -674,7 +674,7 @@ export interface DefaultPgCodecRelationConfig
     DefaultPgCodec,
     DefaultPgResourceOptions
   > {}
-export interface AnyPgCodecRelationConfig
+export interface _AnyPgCodecRelationConfig
   extends PgCodecRelationConfig<any, any, any> {}
 
 export type PgCodecRelationConfigName<U> = U extends PgCodecRelationConfig<
@@ -694,8 +694,8 @@ export type PgCodecRelationConfigRemoteResourceOptions<U> =
     : never;
 export interface PgCodecRelationConfig<
   TName extends string = string,
-  TLocalCodec extends AnyPgCodec = AnyPgCodec,
-  TRemoteResourceOptions extends AnyPgResourceOptions = AnyPgResourceOptions,
+  TLocalCodec extends _AnyPgCodec = _AnyPgCodec,
+  TRemoteResourceOptions extends _AnyPgResourceOptions = _AnyPgResourceOptions,
 > extends PgCodecRelationBase<
     TName,
     TLocalCodec,
@@ -710,7 +710,7 @@ export interface DefaultPgRegistryConfig
     DefaultPgResourceOptions,
     DefaultPgCodecRelationConfig
   > {}
-export interface AnyPgRegistryConfig extends PgRegistryConfig<any, any, any> {}
+export interface _AnyPgRegistryConfig extends PgRegistryConfig<any, any, any> {}
 export type PgRegistryConfigCodecs<U> = U extends PgRegistryConfig<
   infer TCodecs,
   any,
@@ -734,9 +734,9 @@ export type PgRegistryConfigRelationConfigs<U> = U extends PgRegistryConfig<
   : never;
 
 export interface PgRegistryConfig<
-  TCodecs extends AnyPgCodec,
-  TResourceOptions extends AnyPgResourceOptions,
-  TRelationConfigs extends AnyPgCodecRelationConfig,
+  TCodecs extends _AnyPgCodec,
+  TResourceOptions extends _AnyPgResourceOptions,
+  TRelationConfigs extends _AnyPgCodecRelationConfig,
 > {
   pgCodecs: PgRegistryCodecs<TCodecs>;
   pgResources: PgRegistryResourceOptions<TResourceOptions>;
@@ -748,19 +748,19 @@ export type Expand<T> = T extends unknown
   ? { [TKey in keyof T]: T[TKey] }
   : never;
 
-export type PgRegistryCodecs<TCodecs extends AnyPgCodec> = {
+export type PgRegistryCodecs<TCodecs extends _AnyPgCodec> = {
   [TCodec in TCodecs as PgCodecName<TCodec>]: TCodec;
 };
 
 export type PgRegistryResourceOptions<
-  TResourceOptions extends AnyPgResourceOptions,
+  TResourceOptions extends _AnyPgResourceOptions,
 > = {
   [TResourceOption in TResourceOptions as PgResourceOptionName<TResourceOption>]: TResourceOption;
 };
 
 export type PgRegistryResources<
-  TResourceOptions extends AnyPgResourceOptions,
-  TRegistry extends AnyPgRegistry,
+  TResourceOptions extends _AnyPgResourceOptions,
+  TRegistry extends _AnyPgRegistry,
 > = {
   [TResourceOption in TResourceOptions as PgResourceOptionName<TResourceOption>]: PgResource<
     PgResourceOptionName<TResourceOption>,
@@ -771,14 +771,14 @@ export type PgRegistryResources<
   >;
 };
 export type PgRegistryRelationConfigs<
-  TRelationConfigs extends AnyPgCodecRelationConfig,
+  TRelationConfigs extends _AnyPgCodecRelationConfig,
 > = {
   [TRelationConfig in TRelationConfigs as PgCodecName<
     PgCodecRelationConfigLocalCodec<TRelationConfig>
   >]: Record<PgCodecRelationConfigName<TRelationConfig>, TRelationConfig>;
 };
 
-export interface AnyPgRelation extends PgRelation<any, any, any, any> {}
+export interface _AnyPgRelation extends PgRelation<any, any, any, any> {}
 export interface DefaultPgRelation
   extends PgRelation<
     string,
@@ -789,9 +789,9 @@ export interface DefaultPgRelation
 
 export interface PgRelation<
   TName extends string,
-  TLocalCodec extends AnyPgCodec,
-  TRemoteResourceOptions extends AnyPgResourceOptions,
-  TRegistry extends AnyPgRegistry,
+  TLocalCodec extends _AnyPgCodec,
+  TRemoteResourceOptions extends _AnyPgResourceOptions,
+  TRegistry extends _AnyPgRegistry,
 > extends Omit<
     PgCodecRelationConfig<TName, TLocalCodec, TRemoteResourceOptions>,
     "remoteResourceOptions"
@@ -806,8 +806,8 @@ export interface PgRelation<
 }
 
 export type PgRegistryCodecRelations<
-  TRelationConfigs extends AnyPgCodecRelationConfig,
-  TRegistry extends AnyPgRegistry,
+  TRelationConfigs extends _AnyPgCodecRelationConfig,
+  TRegistry extends _AnyPgRegistry,
 > = {
   [TRelationConfig in TRelationConfigs as PgCodecName<
     PgCodecRelationConfigLocalCodec<TRelationConfig>
@@ -826,7 +826,7 @@ export type PgRegistryCodecRelations<
     >;
   };
 };
-export interface AnyPgRegistry extends PgRegistry<any, any, any> {}
+export interface _AnyPgRegistry extends PgRegistry<any, any, any> {}
 export interface DefaultPgRegistry
   extends PgRegistry<
     DefaultPgCodec,
@@ -836,9 +836,9 @@ export interface DefaultPgRegistry
 export interface EmptyPgRegistry extends PgRegistry<never, never, never> {}
 
 export interface PgRegistry<
-  TCodecs extends AnyPgCodec,
-  TResourceOptions extends AnyPgResourceOptions,
-  TRelationConfigs extends AnyPgCodecRelationConfig,
+  TCodecs extends _AnyPgCodec,
+  TResourceOptions extends _AnyPgResourceOptions,
+  TRelationConfigs extends _AnyPgCodecRelationConfig,
 > {
   pgCodecs: PgRegistryCodecs<TCodecs>;
   pgResources: PgRegistryResources<TResourceOptions, this>;
@@ -861,35 +861,35 @@ export type GetPgRegistryRelations<U> = U extends PgRegistry<
   ? PgRegistryCodecRelations<TRelationConfigs, U>
   : never;
 
-export type GetPgRegistrySources<TRegistry extends AnyPgRegistry> =
+export type GetPgRegistrySources<TRegistry extends _AnyPgRegistry> =
   TRegistry["pgResources"];
 
 export type GetPgRegistryCodecRelationConfigs<
-  TRegistry extends AnyPgRegistry,
-  TCodec extends AnyPgCodec,
+  TRegistry extends _AnyPgRegistry,
+  TCodec extends _AnyPgCodec,
 > = TRegistry extends PgRegistry<any, any, infer TRelationConfigs>
   ? Extract<TRelationConfigs, { localCodec: { name: PgCodecName<TCodec> } }>
   : never;
 
 export type GetPgRegistryCodecRelations<
-  TRegistry extends AnyPgRegistry,
-  TCodec extends AnyPgCodec,
+  TRegistry extends _AnyPgRegistry,
+  TCodec extends _AnyPgCodec,
 > = GetPgRegistryRelations<TRegistry>[PgCodecName<TCodec>];
 
-export type GetPgResourceRegistry<TResource extends AnyPgResource> =
+export type GetPgResourceRegistry<TResource extends _AnyPgResource> =
   TResource["registry"];
 
-export type GetPgResourceCodec<TResource extends AnyPgResource> =
+export type GetPgResourceCodec<TResource extends _AnyPgResource> =
   TResource["codec"];
 
-export type GetPgResourceAttributes<TResource extends AnyPgResource> =
+export type GetPgResourceAttributes<TResource extends _AnyPgResource> =
   PgCodecAttributes<PgResourceCodec<TResource>>;
-export type GetPgResourceAttributeMap<TResource extends AnyPgResource> =
+export type GetPgResourceAttributeMap<TResource extends _AnyPgResource> =
   PgCodecAttributeMap<PgResourceCodec<TResource>>;
-export type GetPgResourceRelationConfigs<TResource extends AnyPgResource> =
+export type GetPgResourceRelationConfigs<TResource extends _AnyPgResource> =
   GetPgRegistryCodecRelationConfigs<TResource["registry"], TResource["codec"]>;
 
-export type GetPgResourceRelations<TResource extends AnyPgResource> =
+export type GetPgResourceRelations<TResource extends _AnyPgResource> =
   GetPgRegistryCodecRelations<
     GetPgResourceRegistry<TResource>,
     PgResourceCodec<TResource>

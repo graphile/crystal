@@ -169,11 +169,11 @@ function isImportable(
   return (
     (typeof thing === "object" || typeof thing === "function") &&
     thing !== null &&
-    "$$export" in (thing as object | AnyFunction)
+    "$$export" in (thing as object | _AnyFunction)
   );
 }
 
-type AnyFunction = {
+type _AnyFunction = {
   (...args: any[]): any;
   displayName?: string;
 };
@@ -1003,7 +1003,7 @@ function _convertToAST(
       }),
     );
   } else if (typeof thing === "function") {
-    return func(file, thing as AnyFunction, locationHint, nameHint);
+    return func(file, thing as _AnyFunction, locationHint, nameHint);
   } else if (isSchema(thing)) {
     throw new Error(
       "Attempted to export GraphQLSchema directly from `_convertToAST`; this is currently unsupported.",
@@ -1208,7 +1208,7 @@ function iife(statements: t.Statement[]): t.Expression {
 
 function func(
   file: CodegenFile,
-  fn: AnyFunction,
+  fn: _AnyFunction,
   locationHint: string,
   nameHint: string,
 ): t.Expression {
@@ -1300,7 +1300,7 @@ function factoryAst<TTuple extends any[]>(
 }
 
 function funcToAst(
-  fn: AnyFunction,
+  fn: _AnyFunction,
   locationHint: string,
   _nameHint: string,
 ): t.FunctionExpression | t.ArrowFunctionExpression {

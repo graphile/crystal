@@ -7,11 +7,11 @@ import { ExecutableStep, exportAs, isDev, SafeError, setter } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { AnyPgCodecAttribute, PgCodecAttributeName } from "../codecs.js";
+import type { _AnyPgCodecAttribute, PgCodecAttributeName } from "../codecs.js";
 import type { DefaultPgResource, PgResourceUnique } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
-  AnyPgCodec,
+  _AnyPgCodec,
   GetPgResourceAttributes,
   GetPgResourceCodec,
   GetPgResourceUniques,
@@ -19,7 +19,7 @@ import type {
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
-import { AnyPgResource, PgResourceUniques } from "../datasource.js";
+import { _AnyPgResource, PgResourceUniques } from "../datasource.js";
 
 type QueryValueDetailsBySymbol = Map<
   symbol,
@@ -36,14 +36,14 @@ interface PgUpdatePlanFinalizeResults {
   /** When we see the given symbol in the SQL values, what dependency do we replace it with? */
   queryValueDetailsBySymbol: QueryValueDetailsBySymbol;
 }
-export interface AnyPgUpdateSingleStep extends PgUpdateSingleStep<any> {}
+export interface _AnyPgUpdateSingleStep extends PgUpdateSingleStep<any> {}
 export interface DefaultPgUpdateSingleStep
   extends PgUpdateSingleStep<DefaultPgResource> {}
 /**
  * Update a single row identified by the 'getBy' argument.
  */
 export class PgUpdateSingleStep<
-  TResource extends AnyPgResource,
+  TResource extends _AnyPgResource,
 > extends ExecutableStep<unknown[]> {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -80,7 +80,7 @@ export class PgUpdateSingleStep<
   private getBys: Array<{
     name: PgCodecAttributeName<GetPgResourceAttributes<TResource>>;
     depId: number;
-    pgCodec: AnyPgCodec;
+    pgCodec: _AnyPgCodec;
   }> = [];
 
   /**
@@ -89,7 +89,7 @@ export class PgUpdateSingleStep<
   private attributes: Array<{
     name: PgCodecAttributeName<GetPgResourceAttributes<TResource>>;
     depId: number;
-    pgCodec: AnyPgCodec;
+    pgCodec: _AnyPgCodec;
   }> = [];
 
   /**
@@ -238,7 +238,7 @@ export class PgUpdateSingleStep<
     Extract<GetPgResourceAttributes<TResource>, { name: TAttr }>["codec"],
     TResource
   > {
-    const resourceAttribute: AnyPgCodecAttribute =
+    const resourceAttribute: _AnyPgCodecAttribute =
       this.resource.codec.attributes![attr as string];
     if (!resourceAttribute) {
       throw new Error(
@@ -460,7 +460,7 @@ export class PgUpdateSingleStep<
 /**
  * Update a single row identified by the 'getBy' argument.
  */
-export function pgUpdateSingle<TResource extends AnyPgResource>(
+export function pgUpdateSingle<TResource extends _AnyPgResource>(
   resource: TResource,
   getBy: PlanByUniques<
     GetPgResourceAttributes<TResource>,

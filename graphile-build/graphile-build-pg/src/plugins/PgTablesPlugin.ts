@@ -1,11 +1,11 @@
 import type {
-  AnyPgCodecAttribute,
-  AnyPgResource,
+  _AnyPgCodecAttribute,
+  _AnyPgResource,
   DefaultPgResourceOptions,
-  AnyPgResourceUnique,
+  _AnyPgResourceUnique,
   PgCodec,
   PgResource,
-  AnyPgResourceOptions,
+  _AnyPgResourceOptions,
   DefaultPgCodec,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
@@ -147,14 +147,14 @@ declare global {
     interface ScopeObjectFieldsField {
       pgFieldResource?: PgResource<any, any, any, any, any>;
       pgFieldCodec?: DefaultPgCodec;
-      pgFieldAttribute?: AnyPgCodecAttribute;
+      pgFieldAttribute?: _AnyPgCodecAttribute;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
     interface ScopeInterfaceFieldsField {
       pgFieldResource?: PgResource<any, any, any, any, any>;
       pgFieldCodec?: DefaultPgCodec;
-      pgFieldAttribute?: AnyPgCodecAttribute;
+      pgFieldAttribute?: _AnyPgCodecAttribute;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
@@ -180,7 +180,7 @@ declare global {
         serviceName: string;
         pgClass: PgClass;
         pgConstraint: PgConstraint;
-        unique: AnyPgResourceUnique;
+        unique: _AnyPgResourceUnique;
       }): void | Promise<void>;
       /**
        * Passed the PgResourceOptions before it's added to the PgRegistryBuilder.
@@ -209,7 +209,7 @@ interface State {
     string,
     Map<PgClass, Promise<DefaultPgResourceOptions | null>>
   >;
-  resourceByResourceOptions: Map<DefaultPgResourceOptions, Promise<AnyPgResource | null>>;
+  resourceByResourceOptions: Map<DefaultPgResourceOptions, Promise<_AnyPgResource | null>>;
   detailsByResourceOptions: Map<
   DefaultPgResourceOptions,
     { serviceName: string; pgClass: PgClass }
@@ -409,7 +409,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             uniqueAttributeOnlyConstraints.map(async (pgConstraint) => {
               const { tags, description } =
                 pgConstraint.getTagsAndDescription();
-              const unique: AnyPgResourceUnique = {
+              const unique: _AnyPgResourceUnique = {
                 isPrimary: pgConstraint.contype === "p",
                 attributes: pgConstraint.conkey!.map(
                   (k) => attributes.find((att) => att.attnum === k)!.attname,
@@ -546,7 +546,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         await info.helpers.pgIntrospection.getIntrospection();
 
         const toProcess: Array<{
-          resourceOptions: AnyPgResourceOptions;
+          resourceOptions: _AnyPgResourceOptions;
           pgClass: PgClass;
           serviceName: string;
         }> = [];

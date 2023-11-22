@@ -11,7 +11,7 @@ import * as graphql from "graphql";
 
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { inspect } from "./inspect.js";
-import type { AnyInputStep } from "./interfaces.js";
+import type { _AnyInputStep } from "./interfaces.js";
 import { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type { __InputObjectStepWithDollars } from "./steps/__inputObject.js";
 import { __InputObjectStep } from "./steps/__inputObject.js";
@@ -36,7 +36,7 @@ const {
 
 export function assertInputStep(
   itemPlan: unknown,
-): asserts itemPlan is AnyInputStep {
+): asserts itemPlan is _AnyInputStep {
   if (itemPlan instanceof __TrackedValueStep) return;
   if (itemPlan instanceof __InputListStep) return;
   if (itemPlan instanceof __InputStaticLeafStep) return;
@@ -85,7 +85,7 @@ export function inputStep(
   inputType: GraphQLInputType,
   rawInputValue: ValueNode | undefined,
   defaultValue: ConstValueNode | undefined = undefined,
-): AnyInputStep {
+): _AnyInputStep {
   // This prevents recursion
   if (rawInputValue === undefined && defaultValue === undefined) {
     return constant(undefined);
@@ -182,7 +182,7 @@ function inputVariablePlan(
   variableType: GraphQLInputType,
   inputType: GraphQLInputType,
   defaultValue: ConstValueNode | undefined = undefined,
-): AnyInputStep {
+): _AnyInputStep {
   if (
     variableType instanceof GraphQLNonNull &&
     !(inputType instanceof GraphQLNonNull)
@@ -239,7 +239,7 @@ function inputVariablePlan(
  */
 function inputNonNullPlan(
   _operationPlan: OperationPlan,
-  innerPlan: AnyInputStep,
-): AnyInputStep {
+  innerPlan: _AnyInputStep,
+): _AnyInputStep {
   return innerPlan;
 }

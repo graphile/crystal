@@ -80,7 +80,7 @@ import type {
 import type { NodePostgresPgClient, PgSubscriber } from "../adaptors/pg.js";
 import { listOfCodec, PgCodecAttributeName } from "../codecs.js";
 import {
-  AnyPgResource,
+  _AnyPgResource,
   makePgResourceOptions,
   makeRegistry,
   makeRegistryBuilder,
@@ -111,7 +111,7 @@ import {
   TYPES,
 } from "../index.js";
 import type {
-  AnyPgCodec,
+  _AnyPgCodec,
   GetPgResourceAttributeMap,
   GetPgResourceAttributes,
   GetPgResourceRelationConfigs,
@@ -131,7 +131,7 @@ import {
   withPgClientTransaction,
 } from "../steps/withPgClient.js";
 import {
-  AnyPgSelectSingleStep,
+  _AnyPgSelectSingleStep,
   PgSelectSingleStepResource,
 } from "../steps/pgSelectSingle";
 
@@ -213,7 +213,7 @@ export function makeExampleSchema(
     ) => {
       const col = <
         TOptions extends {
-          codec: AnyPgCodec;
+          codec: _AnyPgCodec;
           notNull?: boolean;
           expression?: PgCodecAttribute<any, any, any>["expression"];
           via?: PgCodecAttributeVia<any, any>;
@@ -1702,7 +1702,7 @@ export function makeExampleSchema(
     [__ListTransformStep, options],
   );
 
-  type ResourceConnectionPlan<TResource extends AnyPgResource> = ConnectionStep<
+  type ResourceConnectionPlan<TResource extends _AnyPgResource> = ConnectionStep<
     PgSelectSingleStep<TResource>,
     PgSelectParsedCursorStep,
     PgSelectStep<TResource>,
@@ -1862,7 +1862,7 @@ export function makeExampleSchema(
   });
 
   function attrField<
-    TMyResource extends AnyPgResource,
+    TMyResource extends _AnyPgResource,
     TAttrName extends PgCodecAttributeName<
       GetPgResourceAttributes<TMyResource>
     >,
@@ -1880,7 +1880,7 @@ export function makeExampleSchema(
   }
 
   function singleRelationField<
-    TMyResource extends AnyPgResource,
+    TMyResource extends _AnyPgResource,
     TRelationName extends PgCodecRelationConfigName<
       GetPgResourceRelationConfigs<TMyResource>
     >,

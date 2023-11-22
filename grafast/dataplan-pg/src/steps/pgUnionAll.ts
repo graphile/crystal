@@ -32,8 +32,8 @@ import { $$symbolToIdentifier, sql } from "pg-sql2";
 
 import { TYPES } from "../codecs.js";
 import type {
-  AnyPgResource,
-  AnyPgResourceUnique,
+  _AnyPgResource,
+  _AnyPgResourceUnique,
   PgResource,
   PgResourceUnique,
 } from "../datasource.js";
@@ -44,7 +44,7 @@ import type {
   PgGroupSpec,
 } from "../index.js";
 import type {
-  AnyPgCodec,
+  _AnyPgCodec,
   PgOrderFragmentSpec,
   PgOrderSpec,
   PgTypedExecutableStep,
@@ -129,7 +129,7 @@ type PgUnionAllStepSelect<TAttributes extends string> =
   | {
       type: "expression";
       expression: SQL;
-      codec: AnyPgCodec;
+      codec: _AnyPgCodec;
     }
   | {
       type: "outerExpression";
@@ -138,13 +138,13 @@ type PgUnionAllStepSelect<TAttributes extends string> =
 
 export type PgUnionAllStepConfigAttributes<TAttributes extends string> = {
   [attributeName in TAttributes]: {
-    codec: AnyPgCodec;
+    codec: _AnyPgCodec;
   };
 };
 
 export interface PgUnionAllStepMember<TTypeNames extends string> {
   typeName: TTypeNames;
-  resource: PgResource<any, any, AnyPgResourceUnique, any, any>;
+  resource: PgResource<any, any, _AnyPgResourceUnique, any, any>;
   match?: {
     [resourceAttributeName: string]:
       | {
@@ -153,7 +153,7 @@ export interface PgUnionAllStepMember<TTypeNames extends string> {
         }
       | {
           step: ExecutableStep;
-          codec: AnyPgCodec;
+          codec: _AnyPgCodec;
         };
   };
   path?: PgCodecRefPath;
@@ -164,7 +164,7 @@ export interface PgUnionAllStepConfig<
   TTypeNames extends string,
 > {
   resourceByTypeName: {
-    [typeName in TTypeNames]: AnyPgResource;
+    [typeName in TTypeNames]: _AnyPgResource;
   };
   attributes?: PgUnionAllStepConfigAttributes<TAttributes>;
   members?: PgUnionAllStepMember<TTypeNames>[];
@@ -184,7 +184,7 @@ export interface PgUnionAllStepOrder<TAttributes extends string> {
 
 interface QueryValue {
   dependencyIndex: number;
-  codec: AnyPgCodec;
+  codec: _AnyPgCodec;
   alreadyEncoded: boolean;
 }
 
@@ -200,7 +200,7 @@ interface QueryValue {
  */
 type PgUnionAllPlaceholder = {
   dependencyIndex: number;
-  codec: AnyPgCodec;
+  codec: _AnyPgCodec;
   symbol: symbol;
   alreadyEncoded: boolean;
 };
@@ -302,7 +302,7 @@ export class PgUnionAllSingleStep
   /**
    * Returns a plan representing the result of an expression.
    */
-  expression<TExpressionCodec extends AnyPgCodec>(
+  expression<TExpressionCodec extends _AnyPgCodec>(
     expression: SQL,
     codec: TExpressionCodec,
   ): PgClassExpressionStep<TExpressionCodec, any> {
@@ -319,7 +319,7 @@ export class PgUnionAllSingleStep
     return this.getClassStep().selectAndReturnIndex(fragment);
   }
 
-  public select<TExpressionCodec extends AnyPgCodec>(
+  public select<TExpressionCodec extends _AnyPgCodec>(
     fragment: SQL,
     codec: TExpressionCodec,
   ): PgClassExpressionStep<TExpressionCodec, any> {
@@ -345,7 +345,7 @@ export class PgUnionAllSingleStep
 
 interface MemberDigest<TTypeNames extends string> {
   member: PgUnionAllStepMember<TTypeNames>;
-  finalResource: PgResource<any, any, AnyPgResourceUnique, any, any>;
+  finalResource: PgResource<any, any, _AnyPgResourceUnique, any, any>;
   sqlSource: SQL;
   symbol: symbol;
   alias: SQL;
@@ -375,7 +375,7 @@ function cloneDigests<TTypeNames extends string = string>(
   return digests.map(cloneDigest);
 }
 
-export interface AnyPgUnionAllStep extends PgUnionAllStep<any, any> {}
+export interface _AnyPgUnionAllStep extends PgUnionAllStep<any, any> {}
 
 /**
  * Represents a `UNION ALL` statement, which can have multiple table-like
@@ -388,7 +388,7 @@ export class PgUnionAllStep<
   extends ExecutableStep
   implements
     ConnectionCapableStep<
-      PgSelectSingleStep<AnyPgResource>,
+      PgSelectSingleStep<_AnyPgResource>,
       PgSelectParsedCursorStep
     >
 {
@@ -822,7 +822,7 @@ on (${sql.indent(
     return index;
   }
 
-  selectExpression<TCodec extends AnyPgCodec>(
+  selectExpression<TCodec extends _AnyPgCodec>(
     expression: SQL,
     codec: TCodec,
   ): number {
@@ -1015,12 +1015,12 @@ on (${sql.indent(
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
   public placeholder(
     $step: ExecutableStep,
-    codec: AnyPgCodec,
+    codec: _AnyPgCodec,
     alreadyEncoded?: boolean,
   ): SQL;
   public placeholder(
     $step: ExecutableStep | PgTypedExecutableStep<any>,
-    overrideCodec?: AnyPgCodec,
+    overrideCodec?: _AnyPgCodec,
     alreadyEncoded = false,
   ): SQL {
     if (this.locker.locked) {
@@ -1567,7 +1567,7 @@ and ${condition(i + 1)}`}
         const midSelects: SQL[] = [];
         const innerSelects = this.selects
           .map((s, selectIndex) => {
-            const r = ((): [SQL, AnyPgCodec] | null => {
+            const r = ((): [SQL, _AnyPgCodec] | null => {
               switch (s.type) {
                 case "attribute": {
                   if (!this.spec.attributes) {
