@@ -11,8 +11,10 @@ export type PgLockableParameter =
   | "groupBy";
 export type PgLockCallback<TStep extends _AnyPgStep> = (step: TStep) => void;
 
+/** @internal */
 export type _AnyPgStep = _AnyPgSelectStep | _AnyPgUnionAllStep;
 
+/** @internal */
 export interface _AnyPgLocker extends PgLocker<any> {}
 
 export class PgLocker<TStep extends _AnyPgStep> {

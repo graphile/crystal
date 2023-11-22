@@ -132,6 +132,7 @@ export type PgCodecPolymorphism<TAttributeName extends string> =
 
 export interface DefaultPgRangeItemCodec
   extends PgCodec<string, never, any, any, never, DefaultPgCodec, never> {}
+/** @internal */
 export interface _AnyPgRangeItemCodec
   extends PgCodec<string, never, any, any, never, any, never> {}
 
@@ -197,6 +198,7 @@ export type PgCodecFromPg<U> = PgDecode<
 >;
 export interface DefaultPgCodecAttributesRecord
   extends PgCodecAttributesRecord<DefaultPgCodecAttribute> {}
+/** @internal */
 export interface _AnyPgCodecAttributesRecord
   extends PgCodecAttributesRecord<any> {}
 
@@ -225,8 +227,10 @@ export interface DefaultScalarPgCodec
     DefaultPgCodec,
     DefaultPgCodec
   > {}
+/** @internal */
 export interface _AnyScalarPgCodec
   extends PgCodec<any, never, any, any, any, any, any> {}
+/** @internal */
 export interface _AnyPgCodec
   extends PgCodec<any, any, any, any, any, any, any> {}
 
@@ -674,6 +678,7 @@ export interface DefaultPgCodecRelationConfig
     DefaultPgCodec,
     DefaultPgResourceOptions
   > {}
+/** @internal */
 export interface _AnyPgCodecRelationConfig
   extends PgCodecRelationConfig<any, any, any> {}
 
@@ -710,6 +715,7 @@ export interface DefaultPgRegistryConfig
     DefaultPgResourceOptions,
     DefaultPgCodecRelationConfig
   > {}
+/** @internal */
 export interface _AnyPgRegistryConfig extends PgRegistryConfig<any, any, any> {}
 export type PgRegistryConfigCodecs<U> = U extends PgRegistryConfig<
   infer TCodecs,
@@ -778,6 +784,7 @@ export type PgRegistryRelationConfigs<
   >]: Record<PgCodecRelationConfigName<TRelationConfig>, TRelationConfig>;
 };
 
+/** @internal */
 export interface _AnyPgRelation extends PgRelation<any, any, any, any> {}
 export interface DefaultPgRelation
   extends PgRelation<
@@ -826,6 +833,7 @@ export type PgRegistryCodecRelations<
     >;
   };
 };
+/** @internal */
 export interface _AnyPgRegistry extends PgRegistry<any, any, any> {}
 export interface DefaultPgRegistry
   extends PgRegistry<

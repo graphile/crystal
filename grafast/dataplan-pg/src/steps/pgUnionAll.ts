@@ -375,6 +375,7 @@ function cloneDigests<TTypeNames extends string = string>(
   return digests.map(cloneDigest);
 }
 
+/** @internal */
 export interface _AnyPgUnionAllStep extends PgUnionAllStep<any, any> {}
 
 /**

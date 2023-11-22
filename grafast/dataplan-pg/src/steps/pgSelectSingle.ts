@@ -50,6 +50,7 @@ import { getFragmentAndCodecFromOrder, PgSelectStep } from "./pgSelect.js";
 // const debugPlanVerbose = debugPlan.extend("verbose");
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
+/** @internal */
 export interface _AnyPgSelectSinglePlanOptions
   extends PgSelectSinglePlanOptions<any> {}
 export interface PgSelectSinglePlanOptions<TResource extends _AnyPgResource> {
@@ -79,6 +80,7 @@ const CHEAP_ATTRIBUTE_TYPES = new Set<_AnyPgCodec>([
   TYPES.timestamptz,
 ]);
 
+/** @internal */
 export interface _AnyPgSelectSingleStep extends PgSelectSingleStep<any> {}
 export interface DefaultPgSelectSingleStep extends PgSelectSingleStep<DefaultPgResource> {}
 export type PgSelectSingleStepResource<U> = U extends PgSelectSingleStep<

@@ -94,6 +94,7 @@ export type PgResourceExtensions = DataplanPg.PgResourceExtensions;
 export type PgResourceParameterExtensions =
   DataplanPg.PgResourceParameterExtensions;
 
+/** @internal */
 export interface _AnyPgResourceParameter extends PgResourceParameter<any, any> {}
 export interface DefaultPgResourceParameter
   extends PgResourceParameter<string | null, DefaultPgCodec> {}
@@ -127,6 +128,7 @@ export interface PgResourceParameter<
   extensions?: PgResourceParameterExtensions;
 }
 
+/** @internal */
 export interface _AnyPgResourceUnique extends PgResourceUnique<any> {}
 export interface DefaultPgResourceUnique
   extends PgResourceUnique<DefaultPgCodecAttribute> {}
@@ -177,6 +179,7 @@ export interface DefaultPgResourceOptions<
     DefaultPgResourceParameter
   > {}
 
+/** @internal */
 export interface _AnyPgResourceOptions
   extends PgResourceOptions<any, any, any, any> {}
 
@@ -269,6 +272,7 @@ export interface PgResourceOptions<
   isVirtual?: boolean;
 }
 
+/** @internal */
 export interface _AnyPgFunctionResourceOptions
   extends PgFunctionResourceOptions<any, any, any, any> {}
 export interface DefaultPgFunctionResourceOptions
@@ -353,7 +357,9 @@ export interface DefaultPgResource
     DefaultPgResourceParameter,
     any
   > {}
+/** @internal */
 export interface _AnyPgResource extends PgResource<any, any, any, any, any> {}
+/** @internal */
 export interface _AnyScalarPgResource
   extends PgResource<any, _AnyScalarPgCodec, any, any, any> {}
 
@@ -959,6 +965,7 @@ export class PgResource<
 }
 exportAs("@dataplan/pg", PgResource, "PgResource");
 
+/** @internal */
 export interface _AnyPgRegistryBuilder
   extends PgRegistryBuilder<any, any, any> {}
 export interface EmptyRegistryBuilder

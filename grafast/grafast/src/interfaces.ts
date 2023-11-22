@@ -437,6 +437,7 @@ export type InputStep<TInputType extends GraphQLInputType = GraphQLInputType> =
     : // TYPES: handle the other types
       _AnyInputStep;
 
+/** @internal */
 export type _AnyInputStep =
   | __TrackedValueStepWithDollars<any, GraphQLInputType> // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
   | __InputListStep // .at(), .eval(), .evalLength(), .evalIs(null)
@@ -445,6 +446,7 @@ export type _AnyInputStep =
   | __InputObjectStepWithDollars<GraphQLInputObjectType> // .get(), .eval(), .evalHas(), .evalIs(null), .evalIsEmpty()
   | ConstantStep<undefined>; // .eval(), .evalIs(), .evalIsEmpty()
 
+/** @internal */
 export type _AnyInputStepWithDollars = _AnyInputStep & _AnyInputStepDollars;
 
 // TYPES: solve these lies
@@ -453,6 +455,7 @@ export type _AnyInputStepWithDollars = _AnyInputStep & _AnyInputStepDollars;
  * `{ $input: { $user: { $username } } }` without having to pass loads of
  * generics.
  */
+/** @internal */
 export type _AnyInputStepDollars = {
   [key in string as `$${key}`]: _AnyInputStepWithDollars;
 };

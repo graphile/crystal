@@ -266,6 +266,7 @@ export interface PgSelectOptions<TResource extends _AnyPgResource> {
 }
 
 export interface DefaultPgSelectStep extends PgSelectStep<DefaultPgResource> {}
+/** @internal */
 export interface _AnyPgSelectStep extends PgSelectStep<any> {}
 
 /**

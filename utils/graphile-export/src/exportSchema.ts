@@ -173,6 +173,7 @@ function isImportable(
   );
 }
 
+/** @internal */
 type _AnyFunction = {
   (...args: any[]): any;
   displayName?: string;

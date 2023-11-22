@@ -63,12 +63,15 @@ export type PgCodecAttributeViaExplicit<
   relation: TRelationName;
   attribute: TAttribute;
 };
+/** @internal */
 export interface _AnyPgCodecAttributeVia extends PgCodecAttributeVia<any, any> {}
 export type DefaultPgCodecAttributeVia = PgCodecAttributeVia<string, string>;
+/** @internal */
 export type _AnyPgCodecAttributeViaRelationName<U> =
   U extends PgCodecAttributeVia<infer TRelationName, any>
     ? TRelationName
     : never;
+/** @internal */
 export type _AnyPgCodecAttributeViaAttribute<U> = U extends PgCodecAttributeVia<
   any,
   infer TAttributeName
@@ -101,6 +104,7 @@ export type PgCodecAttributeCodec<U> = U extends PgCodecAttribute<
 
 export interface DefaultPgCodecAttribute
   extends PgCodecAttribute<string, DefaultPgCodec, boolean> {}
+/** @internal */
 export interface _AnyPgCodecAttribute extends PgCodecAttribute<any, any, any> {}
 
 export interface PgCodecAttribute<

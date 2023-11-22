@@ -40,6 +40,7 @@ interface PgDeletePlanFinalizeResults {
   queryValueDetailsBySymbol: QueryValueDetailsBySymbol;
 }
 
+/** @internal */
 export interface _AnyPgDeleteSingleStep extends PgDeleteSingleStep<any> {}
 export interface DefaultPgDeleteSingleStep
   extends PgDeleteSingleStep<DefaultPgResource> {}

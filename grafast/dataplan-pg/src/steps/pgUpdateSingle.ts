@@ -36,6 +36,7 @@ interface PgUpdatePlanFinalizeResults {
   /** When we see the given symbol in the SQL values, what dependency do we replace it with? */
   queryValueDetailsBySymbol: QueryValueDetailsBySymbol;
 }
+/** @internal */
 export interface _AnyPgUpdateSingleStep extends PgUpdateSingleStep<any> {}
 export interface DefaultPgUpdateSingleStep
   extends PgUpdateSingleStep<DefaultPgResource> {}
