@@ -1,4 +1,4 @@
-// Babel config, used by Jest?
+// Babel config, used by Jest
 module.exports = {
   plugins: ["@babel/plugin-transform-modules-commonjs"],
   presets: [

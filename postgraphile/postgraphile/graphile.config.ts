@@ -1,4 +1,6 @@
 /* eslint-disable import/no-unresolved */
+import type { PgSelectSingleStep } from "@dataplan/pg";
+import { TYPES } from "@dataplan/pg";
 import PersistedPlugin from "@grafserv/persisted";
 import { EXPORTABLE, exportSchema } from "graphile-export";
 import { gql, makeExtendSchemaPlugin } from "graphile-utils";
@@ -199,6 +201,28 @@ const NonNullRelationsPlugin: GraphileConfig.Plugin = {
 const preset: GraphileConfig.Preset = {
   plugins: [
     StreamDeferPlugin,
+    makeExtendSchemaPlugin((build) => {
+      const { sql } = build;
+      return {
+        typeDefs: gql`
+          extend type Person {
+            greet(greeting: String! = "Hello"): String
+          }
+        `,
+        plans: {
+          Person: {
+            greet($user: PgSelectSingleStep, { $greeting }) {
+              const placeholderSql = $user.placeholder($greeting, TYPES.text);
+              const alias = $user.getClassStep().alias;
+              return $user.select(
+                sql`${placeholderSql} || ', ' || ${alias}.name`,
+                TYPES.text,
+              );
+            },
+          },
+        },
+      };
+    }),
     makeExtendSchemaPlugin({
       typeDefs: gql`
         extend type Query {
