@@ -1,5 +1,23 @@
 # ruru
 
+## 2.0.0-beta.8
+
+### Patch Changes
+
+- Updated dependencies
+  [[`7aef73319`](https://github.com/graphile/crystal/commit/7aef73319a8a147c700727be62427e1eefdefbf8)]:
+  - graphile-config@0.0.1-beta.4
+
+## 2.0.0-beta.7
+
+### Patch Changes
+
+- [#1799](https://github.com/graphile/crystal/pull/1799)
+  [`3dd5d86d6`](https://github.com/graphile/crystal/commit/3dd5d86d6c1ea7ba106c08e8a315ec47ed6cfa2d)
+  Thanks [@jvandermey](https://github.com/jvandermey)! - Can now pass onEdit
+  callbacks through the Ruru config via the plugin system; e.g. to update the
+  URL search params with the current editor state.
+
 ## 2.0.0-beta.6
 
 ### Patch Changes

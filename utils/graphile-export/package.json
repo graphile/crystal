@@ -1,6 +1,6 @@
 {
   "name": "graphile-export",
-  "version": "0.0.2-beta.5",
+  "version": "0.0.2-beta.6",
   "description": "Export in-memory generated GraphQL schemas to JS files when built with our helpers.",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -43,7 +43,7 @@
     "@babel/generator": "^7.22.10",
     "@babel/parser": "^7.22.14",
     "@babel/template": "^7.22.5",
-    "@babel/traverse": "^7.22.11",
+    "@babel/traverse": "^7.23.2",
     "@babel/types": "^7.22.11",
     "@types/node": "^20.5.7",
     "prettier": "^3.0.3",

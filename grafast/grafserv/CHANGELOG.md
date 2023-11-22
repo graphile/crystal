@@ -1,5 +1,29 @@
 # grafserv
 
+## 0.1.1-beta.3
+
+### Patch Changes
+
+- [#1807](https://github.com/graphile/crystal/pull/1807)
+  [`9696a1b08`](https://github.com/graphile/crystal/commit/9696a1b0885442f44e3a6ca6a4909ec96a445884)
+  Thanks [@innermatrix](https://github.com/innermatrix)! - Export lambda server
+  from `grafserv/lambda/v1`
+
+- Updated dependencies
+  [[`49fcb0d58`](https://github.com/graphile/crystal/commit/49fcb0d585b31b291c9072c339d6f5b550eefc9f),
+  [`7aef73319`](https://github.com/graphile/crystal/commit/7aef73319a8a147c700727be62427e1eefdefbf8)]:
+  - grafast@0.1.1-beta.1
+  - graphile-config@0.0.1-beta.4
+  - ruru@2.0.0-beta.8
+
+## 0.1.1-beta.2
+
+### Patch Changes
+
+- Updated dependencies
+  [[`3dd5d86d6`](https://github.com/graphile/crystal/commit/3dd5d86d6c1ea7ba106c08e8a315ec47ed6cfa2d)]:
+  - ruru@2.0.0-beta.7
+
 ## 0.1.1-beta.1
 
 ### Patch Changes

@@ -45,7 +45,6 @@ export function options(yargs: Argv) {
       alias: "w",
       type: "boolean",
       description: "Watch mode (monitor DB for schema changes)",
-      default: false,
     })
     .option("port", {
       alias: "p",
@@ -56,7 +55,6 @@ export function options(yargs: Argv) {
       alias: "n",
       type: "string",
       description: "The host to bind our HTTP server to",
-      default: "localhost",
     })
     .option("subscriptions", {
       type: "boolean",

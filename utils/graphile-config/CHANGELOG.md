@@ -1,5 +1,13 @@
 # graphile-config
 
+## 0.0.1-beta.4
+
+### Patch Changes
+
+- [`7aef73319`](https://github.com/graphile/crystal/commit/7aef73319a8a147c700727be62427e1eefdefbf8)
+  Thanks [@benjie](https://github.com/benjie)! - TypeScript tweak to use
+  readonly array in one place.
+
 ## 0.0.1-beta.3
 
 ### Patch Changes

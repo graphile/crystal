@@ -7,11 +7,30 @@ becomes simply `users`, `User.postsByAuthorId` becomes simply `User.posts`, and
 **Adding this preset to your schema is almost certainly a breaking change, so do
 it before you ship anything!**
 
-**This preset is recommended for all PostGraphile users.** The main reason this
-preset is not enabled by default is because it increases the risk of conflicts
-where multiple relationships try and use the same field name. This can be
+**This preset is recommended for all PostGraphile users** with a compatible
+database schema. The main reason this preset is not enabled by default is
+because it increases the risk of conflicts where multiple relationships try and
+use the same field name, and because some people name their primary key and
+foreign key columns in a way that would cause conflicts. Conflicts can be
 avoided by careful use of naming conventions or by specifically tagging the
 conflicting relations with their preferred name.
+
+## Incompatible database schemas
+
+This plugin assumes that your primary key and foreign key columns are:
+
+- named `id`, `uuid`, or `pk`; or
+- named ending in `_id`, `_uuid`, or `_pk`; or
+- named ending in `Id`, `Uuid`, or `Pk`.
+
+If your database schema uses a different naming convention (and particularly if
+you name the primary key after the table itself, or the singularized version of
+it, with no prefix or suffix) then you are likely to receive a lot of naming
+conflicts if you use this plugin. If you are affected by this, this plugin is
+probably not for you (but feel free to fork it and make changes to accomodate
+your schemas naming conventions); however you may have luck using the
+"postgraphile/presets/relay" preset which hides primary key and foreign key
+columns throughout the schema, reducing the sources for these conflicts.
 
 ## Customising
 

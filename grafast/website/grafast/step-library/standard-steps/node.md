@@ -1,6 +1,6 @@
 # node
 
-A step to get a Node by it's global object identifier (string). Accepts two parameters:
+A step to get a Node by its global object identifier (string). Accepts two parameters:
 
 - `handlers`: a map from typeName to handler spec (codec to use, how to find the record, etc) - see below
 - `$id`: the step (typically supplied from a field argument) representing the Node ID

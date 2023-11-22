@@ -45,7 +45,7 @@ The callback should return an object with the following keys:
   `postgraphile/utils` (note this is NOT from the `graphql-tag` library, ours
   works in a slightly different way).
 - `plans` (optional, recommended): an object keyed by GraphQL type name that you're adding
-  or extending in `typeDefs`, the values of which are objects keyed by teh
+  or extending in `typeDefs`, the values of which are objects keyed by the
   fieldName you've added, and the value of which is typically a plan resolver
   function (although it can be an object that defines both this and other
   details)
@@ -234,7 +234,7 @@ const $organizationId = $user.get("organization_id");
 You could then feed this into another step, for example:
 
 ```ts
-const $channels = channels.find({ organization_id: $organization_id });
+const $channels = channels.find({ organization_id: $organizationId });
 ```
 
 ### Example
@@ -267,6 +267,15 @@ export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
   };
 });
 ```
+
+:::note
+
+The `Channel` type used in the `typeDefs` above is the type that PostGraphile
+generated automatically for the `channels` table. See
+[Tables](/postgraphile/next/tables) for more on the artifacts generated for each
+database table.
+
+:::
 
 :::info
 

@@ -1,5 +1,13 @@
 # @localrepo/grafast-website
 
+## 0.0.1-beta.2
+
+### Patch Changes
+
+- Updated dependencies
+  [[`49fcb0d58`](https://github.com/graphile/crystal/commit/49fcb0d585b31b291c9072c339d6f5b550eefc9f)]:
+  - grafast@0.1.1-beta.1
+
 ## 0.0.1-beta.1
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # grafast
 
+## 0.1.1-beta.1
+
+### Patch Changes
+
+- [#1808](https://github.com/graphile/crystal/pull/1808)
+  [`49fcb0d58`](https://github.com/graphile/crystal/commit/49fcb0d585b31b291c9072c339d6f5b550eefc9f)
+  Thanks [@morleytatro](https://github.com/morleytatro)! - Fix typos
+
+- Updated dependencies
+  [[`7aef73319`](https://github.com/graphile/crystal/commit/7aef73319a8a147c700727be62427e1eefdefbf8)]:
+  - graphile-config@0.0.1-beta.4
+
 ## 0.1.1-beta.0
 
 ### Patch Changes

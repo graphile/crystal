@@ -16,7 +16,7 @@ import { constant } from "./constant.js";
 import { lambda } from "./lambda.js";
 
 /**
- * A plan to get a Node by it's global object identifier (string). Accepts an
+ * A plan to get a Node by its global object identifier (string). Accepts an
  * object specifying the supported codecs, an object map detailing the
  * typeNames supported and their details (codec to use, how to find the record,
  * etc), and finally the Node id string plan.
@@ -85,7 +85,7 @@ export class NodeStep
 }
 
 /**
- * A plan to get a Node by it's global object identifier (string). Accepts an
+ * A plan to get a Node by its global object identifier (string). Accepts an
  * object specifying the supported codecs, an object map detailing the
  * typeNames supported and their details (codec to use, how to find the record,
  * etc), and finally the Node id string plan.

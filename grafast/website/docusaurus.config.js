@@ -84,6 +84,24 @@ const config = {
         editUrl,
       },
     ],
+    [
+      "@docusaurus/plugin-content-blog",
+      {
+        /**
+         * Required for any multi-instance plugin
+         */
+        id: "news",
+        /**
+         * URL route for the blog section of your site.
+         * *DO NOT* include a trailing slash.
+         */
+        routeBasePath: "news",
+        /**
+         * Path to data on filesystem relative to site dir.
+         */
+        path: "./news",
+      },
+    ],
 
     () => ({
       name: "webpack-customization-plugin",
@@ -178,6 +196,11 @@ const config = {
             position: "left",
           },
           {
+            to: "news",
+            label: "News",
+            position: "right",
+          },
+          {
             href: "https://github.com/grafast/wg",
             label: "Working Group",
             position: "right",
@@ -237,6 +260,25 @@ const config = {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
         additionalLanguages: ["http"],
+      },
+      algolia: {
+        // The application ID provided by Algolia
+        appId: "G81R3UYS9Q",
+
+        // Public API key: it is safe to commit it
+        apiKey: "9fd53308d86655a5995d171b5414d88a",
+        indexName: "grafast",
+
+        // Optional: see doc section below
+        contextualSearch: true,
+
+        // Optional: Algolia search parameters
+        searchParameters: {},
+
+        // Optional: path for search page that enabled by default (`false` to disable it)
+        searchPagePath: "search",
+
+        //... other Algolia params
       },
     }),
   trailingSlash: undefined,

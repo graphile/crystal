@@ -62,7 +62,7 @@ export class AsyncHooks<THooks extends HookObject<THooks>> {
 }
 
 export function applyHooks<THooks extends HookObject<THooks>>(
-  plugins: GraphileConfig.Plugin[] | undefined,
+  plugins: readonly GraphileConfig.Plugin[] | undefined,
   hooksRetriever: (
     plugin: GraphileConfig.Plugin,
   ) => Partial<THooks> | undefined,

@@ -1,5 +1,28 @@
 # ruru-components
 
+## 2.0.0-beta.9
+
+### Patch Changes
+
+- [#1833](https://github.com/graphile/crystal/pull/1833)
+  [`11ceb1753`](https://github.com/graphile/crystal/commit/11ceb1753ee42ee6d991e618dedc670a6f238fab)
+  Thanks [@benjie](https://github.com/benjie)! - Rework how schema fetching
+  works to solve issue with headers not being sent. Thanks @JoviDeCroock for the
+  inspiration.
+- Updated dependencies
+  [[`49fcb0d58`](https://github.com/graphile/crystal/commit/49fcb0d585b31b291c9072c339d6f5b550eefc9f)]:
+  - grafast@0.1.1-beta.1
+
+## 2.0.0-beta.8
+
+### Patch Changes
+
+- [#1799](https://github.com/graphile/crystal/pull/1799)
+  [`3dd5d86d6`](https://github.com/graphile/crystal/commit/3dd5d86d6c1ea7ba106c08e8a315ec47ed6cfa2d)
+  Thanks [@jvandermey](https://github.com/jvandermey)! - Can now pass onEdit
+  callbacks through the Ruru config via the plugin system; e.g. to update the
+  URL search params with the current editor state.
+
 ## 2.0.0-beta.7
 
 ### Patch Changes

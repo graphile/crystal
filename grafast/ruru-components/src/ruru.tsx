@@ -10,6 +10,7 @@ import {
   ToolbarMenu,
   useCopyQuery,
   useMergeQuery,
+  useSchemaContext,
 } from "@graphiql/react";
 import type { GraphiQLProps } from "graphiql";
 import { GraphiQL, GraphiQLInterface, GraphiQLProvider } from "graphiql";
@@ -21,8 +22,8 @@ import { RuruFooter } from "./components/Footer.js";
 import { defaultQuery as DEFAULT_QUERY } from "./defaultQuery.js";
 import { ExplainContext, useExplain } from "./hooks/useExplain.js";
 import { useFetcher } from "./hooks/useFetcher.js";
+import { useGraphQLChangeStream } from "./hooks/useGraphQLChangeStream.js";
 import { usePrettify } from "./hooks/usePrettify.js";
-import { useSchema } from "./hooks/useSchema.js";
 import type { RuruStorage } from "./hooks/useStorage.js";
 import { useStorage } from "./hooks/useStorage.js";
 import type { RuruProps } from "./interfaces.js";
@@ -53,7 +54,6 @@ export const Ruru: FC<RuruProps> = (props) => {
   });
   const [error, setError] = useState<Error | null>(null);
   const explainHelpers = useExplain(storage);
-  const { schema } = useSchema(props, fetcher, setError, streamEndpoint);
   const defaultQuery = props.defaultQuery ?? DEFAULT_QUERY;
   const explorerPlugin = makeExplorerPlugin({
     showAttribution: false,
@@ -73,10 +73,9 @@ export const Ruru: FC<RuruProps> = (props) => {
     >
       <GraphiQLProvider
         fetcher={fetcher}
-        schema={schema}
         defaultQuery={defaultQuery}
-        query={props.initialQuery}
-        variables={props.initialVariables}
+        query={props.query ?? props.initialQuery}
+        variables={props.variables ?? props.initialVariables}
         plugins={plugins}
         shouldPersistHeaders={saveHeaders}
       >
@@ -85,6 +84,9 @@ export const Ruru: FC<RuruProps> = (props) => {
           editorTheme={props.editorTheme}
           error={error}
           setError={setError}
+          onEditQuery={props.onEditQuery}
+          onEditVariables={props.onEditVariables}
+          streamEndpoint={streamEndpoint}
         />
       </GraphiQLProvider>
     </ExplainContext.Provider>
@@ -97,11 +99,23 @@ export const RuruInner: FC<{
   error: Error | null;
   setError: React.Dispatch<React.SetStateAction<Error | null>>;
   onEditQuery?: GraphiQLProps["onEditQuery"];
+  onEditVariables?: GraphiQLProps["onEditVariables"];
+  streamEndpoint: string | null;
 }> = (props) => {
-  const { storage, editorTheme, error, setError, onEditQuery } = props;
+  const {
+    storage,
+    editorTheme,
+    error,
+    setError,
+    onEditQuery,
+    onEditVariables,
+    streamEndpoint,
+  } = props;
   const prettify = usePrettify();
   const mergeQuery = useMergeQuery();
   const copyQuery = useCopyQuery();
+  const schemaContext = useSchemaContext({ nonNull: true });
+  useGraphQLChangeStream(props, schemaContext.introspect, streamEndpoint);
 
   return (
     <div
@@ -126,6 +140,7 @@ export const RuruInner: FC<{
         <GraphiQLInterface
           editorTheme={editorTheme ?? "graphiql"}
           onEditQuery={onEditQuery}
+          onEditVariables={onEditVariables}
         >
           <GraphiQL.Logo>
             <a

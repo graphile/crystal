@@ -4,6 +4,8 @@ set -e -x
 rm -rf builds/
 mkdir builds/
 
+yarn clean
+
 # @graphile/lru
 cd utils/lru
 rm -f *.tgz
@@ -25,20 +27,6 @@ yarn pack -o package.tgz
 mv package.tgz ../../builds/graphile-config.tgz
 cd -
 
-# ruru-components
-cd grafast/ruru-components
-rm -f *.tgz
-yarn pack -o package.tgz
-mv package.tgz ../../builds/ruru-components.tgz
-cd -
-
-# ruru
-cd grafast/ruru
-rm -f *.tgz
-yarn pack -o package.tgz
-mv package.tgz ../../builds/ruru.tgz
-cd -
-
 #grafast
 cd grafast/grafast
 yarn build
@@ -54,6 +42,20 @@ cd -
 mv /tmp/grafast-build/package.tgz ../../builds/grafast.tgz
 rm -Rf /tmp/grafast-build
 cd ../..
+
+# ruru-components
+cd grafast/ruru-components
+rm -f *.tgz
+yarn pack -o package.tgz
+mv package.tgz ../../builds/ruru-components.tgz
+cd -
+
+# ruru
+cd grafast/ruru
+rm -f *.tgz
+yarn pack -o package.tgz
+mv package.tgz ../../builds/ruru.tgz
+cd -
 
 #grafserv
 cd grafast/grafserv
