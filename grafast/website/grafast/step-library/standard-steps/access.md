@@ -2,6 +2,19 @@
 
 Accesses a (potentially nested) property from the result of a source step.
 
+:::warning
+
+`access()` bypasses `.get()` / `.at()`, so you should only use it where doing
+so is truly what you mean. Always use a step's `.get()` or `.at()` if present
+unless you know better.
+
+Many steps require that you use `.get()` or `.at()` in order to function
+properly, for example if you don't call `.get('attribute_name')` on a [`loadOne()`
+step](./loadOne.md) then it won't know to request the `attribute_name` attribute,
+and you may end up with unexpected nulls/undefineds.
+
+:::
+
 Usage:
 
 ```ts
