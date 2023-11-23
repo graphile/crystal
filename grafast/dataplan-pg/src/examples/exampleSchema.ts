@@ -526,6 +526,7 @@ export function makeExampleSchema(
           { attributes: ["username"] },
         ],
       });
+      personResourceOptions.uniques;
 
       const postCodec = recordCodec({
         executor,
@@ -1657,8 +1658,12 @@ export function makeExampleSchema(
      * because it's not being ran as part of a Grafast planning context - hence
      * the `if`.
      */
+    registry.pgResources.people.uniques;
     const $person = registry.pgResources.people.get({
-      person_id: constant(1, false),
+      person_id: constant(1),
+      frog: constant("frog"),
+
+      //person_id: constant(1, false),
     });
     const $posts = $person.manyRelation("posts");
     const $post = $posts.single();

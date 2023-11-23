@@ -88,6 +88,8 @@ export type PgCodecAttributeExtensions = DataplanPg.PgCodecAttributeExtensions;
 export type PgCodecAttributeName<U> = U extends PgCodecAttribute<
   infer TName,
   any,
+  any,
+  any,
   any
 >
   ? TName
@@ -96,20 +98,31 @@ export type PgCodecAttributeName<U> = U extends PgCodecAttribute<
 export type PgCodecAttributeCodec<U> = U extends PgCodecAttribute<
   any,
   infer TCodec,
+  any,
+  any,
   any
 >
   ? TCodec
   : never;
 
 export interface GenericPgCodecAttribute
-  extends PgCodecAttribute<string, GenericPgCodec, boolean> {}
+  extends PgCodecAttribute<
+    string,
+    GenericPgCodec,
+    boolean,
+    GenericPgCodecAttributeVia,
+    GenericPgCodecAttributeVia
+  > {}
 /** @internal */
-export interface _AnyPgCodecAttribute extends PgCodecAttribute<any, any, any> {}
+export interface _AnyPgCodecAttribute
+  extends PgCodecAttribute<any, any, any, any, any> {}
 
 export interface PgCodecAttribute<
   TName extends string,
   TCodec extends _AnyPgCodec,
   TNotNull extends boolean,
+  TVia extends _AnyPgCodecAttributeVia = any,
+  TIdenticalVia extends _AnyPgCodecAttributeVia = any,
 > {
   name: TName;
   /**
@@ -136,7 +149,7 @@ export interface PgCodecAttribute<
    * If this attribute actually exists on a relation rather than locally, the name
    * of the (unique) relation this attribute belongs to.
    */
-  via?: _AnyPgCodecAttributeVia;
+  via?: TVia;
 
   /**
    * If the attribute exists identically on a relation and locally (e.g.
@@ -161,7 +174,7 @@ export interface PgCodecAttribute<
    * these are all plural relationships. So identicalVia is generally one-way
    * (except in 1-to-1 relationships).
    */
-  identicalVia?: _AnyPgCodecAttributeVia;
+  identicalVia?: TIdenticalVia;
   // ENHANCE: can identicalVia be plural? Is that useful? Maybe a attribute that has
   // multiple foreign key references?
 
