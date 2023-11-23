@@ -9,11 +9,7 @@ import { readFile } from "node:fs/promises";
 import { pathToFileURL } from "node:url";
 import { inspect } from "node:util";
 
-import type {
-  PgExecutorContextPlans,
-  PgRegistry,
-  WithPgClient,
-} from "@dataplan/pg";
+import type { PgExecutorContextPlans, WithPgClient } from "@dataplan/pg";
 import {
   makePgResourceOptions,
   makeRegistryBuilder,

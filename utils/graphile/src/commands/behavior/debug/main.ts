@@ -1,4 +1,3 @@
-import type { PgRegistry } from "@dataplan/pg";
 import chalk from "chalk";
 import { resolvePresets } from "graphile-config";
 import { loadConfig } from "graphile-config/load";

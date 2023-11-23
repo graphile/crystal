@@ -4,7 +4,7 @@ import type { SQL } from "pg-sql2";
 import { sql } from "pg-sql2";
 
 import { TYPES } from "../index.js";
-import type { _AnyPgCodec, PgCodec } from "../interfaces.js";
+import type { _AnyPgCodec } from "../interfaces.js";
 
 export type PgWhereConditionSpec<TAttribute extends string> =
   | SQL

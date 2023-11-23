@@ -2,7 +2,7 @@ import type { ExecutableStep } from "grafast";
 import { ModifierStep } from "grafast";
 import type { SQL } from "pg-sql2";
 
-import type { _AnyPgCodec, PgCodec } from "../interfaces.js";
+import type { _AnyPgCodec } from "../interfaces.js";
 import type {
   PgConditionCapableParentStep,
   PgConditionStep,

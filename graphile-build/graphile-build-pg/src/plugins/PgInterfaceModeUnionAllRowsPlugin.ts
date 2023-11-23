@@ -3,7 +3,6 @@ import "graphile-config";
 import type {
   GenericPgCodec,
   GenericPgResource,
-  PgCodec,
   PgUnionAllStepConfigAttributes,
   PgUnionAllStepMember,
 } from "@dataplan/pg";
@@ -21,7 +20,10 @@ declare global {
        * The base inflector used by allInterfaceModeUnionRowsConnection and
        * allInterfaceModeUnionRowsList.
        */
-      _allInterfaceModeUnionRows(this: Inflection, codec: GenericPgCodec): string;
+      _allInterfaceModeUnionRows(
+        this: Inflection,
+        codec: GenericPgCodec,
+      ): string;
 
       /**
        * The field name for a Cursor Connection field that returns all rows
@@ -36,7 +38,10 @@ declare global {
        * The field name for a List field that returns all rows from the given
        * `@interface mode:union` codec.
        */
-      allInterfaceModeUnionRowsList(this: Inflection, codec: GenericPgCodec): string;
+      allInterfaceModeUnionRowsList(
+        this: Inflection,
+        codec: GenericPgCodec,
+      ): string;
     }
   }
 }

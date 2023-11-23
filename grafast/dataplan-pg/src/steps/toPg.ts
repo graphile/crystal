@@ -1,7 +1,7 @@
 import type { ExecutableStep, ExecutionExtra } from "grafast";
 import { UnbatchedExecutableStep } from "grafast";
 
-import type { _AnyPgCodec, PgCodec } from "../interfaces.js";
+import type { _AnyPgCodec } from "../interfaces.js";
 
 /**
  * Converts the given value to the representation suitable for feeding into the

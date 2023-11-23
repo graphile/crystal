@@ -4,10 +4,7 @@ import "graphile-config";
 import type {
   GenericPgSelectSingleStep,
   GenericPgSelectStep,
-  PgCodecWithAttributes,
   PgSelectParsedCursorStep,
-  PgSelectSingleStep,
-  PgSelectStep,
 } from "@dataplan/pg";
 import type { ConnectionStep } from "grafast";
 import type { GraphQLInputObjectType } from "grafast/graphql";

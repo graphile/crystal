@@ -4,7 +4,6 @@ import type {
   GenericPgResource,
   PgConditionStep,
   PgResource,
-  PgResourceParameter,
   PgSelectStep,
 } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";

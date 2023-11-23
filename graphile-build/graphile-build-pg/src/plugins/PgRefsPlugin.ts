@@ -3,14 +3,10 @@ import type {
   _AnyPgCodecRelationConfig,
   _AnyPgResourceOptions,
   GenericPgCodecRelationConfig,
-  PgCodec,
   PgCodecExtensions,
   PgCodecRefPath,
-  PgCodecRelationConfig,
-  PgCodecWithAttributes,
   PgRefDefinition,
   PgRefDefinitions,
-  PgResourceOptions,
 } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
 import { gatherConfig } from "graphile-build";
@@ -206,8 +202,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           ? [tags.refVia]
           : null;
 
-        const refDefinitions = resourceOptions.codec.extensions
-          ?.refDefinitions;
+        const refDefinitions = resourceOptions.codec.extensions?.refDefinitions;
         if (!refDefinitions) {
           if (rawRefVias) {
             throw new Error(`@refVia without matching @ref is invalid`);

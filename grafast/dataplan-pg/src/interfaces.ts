@@ -5,7 +5,6 @@ import type { PgAdaptorOptions } from "./adaptors/pg.js";
 import type {
   _AnyPgCodecAttribute,
   GenericPgCodecAttribute,
-  PgCodecAttribute,
   PgCodecAttributeCodec,
   PgCodecAttributeName,
 } from "./codecs.js";
@@ -14,7 +13,6 @@ import type {
   _AnyPgResourceOptions,
   _AnyPgResourceParameter,
   _AnyPgResourceUnique,
-  GenericPgResource,
   GenericPgResourceOptions,
   PgCodecRefs,
   PgResource,
@@ -35,12 +33,13 @@ import type { PgUpdateSingleStep } from "./steps/pgUpdateSingle.js";
  * A class-like source of information - could be from `SELECT`-ing a row, or
  * `INSERT...RETURNING` or similar. *ALWAYS* represents a single row (or null).
  */
-export type PgClassSingleStep<TResource extends _AnyPgResource = _AnyPgResource> =
-
-    | PgSelectSingleStep<TResource>
-    | PgInsertSingleStep<TResource>
-    | PgUpdateSingleStep<TResource>
-    | PgDeleteSingleStep<TResource>;
+export type PgClassSingleStep<
+  TResource extends _AnyPgResource = _AnyPgResource,
+> =
+  | PgSelectSingleStep<TResource>
+  | PgInsertSingleStep<TResource>
+  | PgUpdateSingleStep<TResource>
+  | PgDeleteSingleStep<TResource>;
 
 /**
  * Given a value of type TInput, returns an `SQL` value to insert into an SQL
@@ -385,14 +384,7 @@ export interface PgCodecWithAttributes<
 > extends PgCodec<any, TAttributes, any, any, never, any, never> {}
 
 export interface PgCodecAnyScalar
-  extends PgCodec<string,
-  never,
-  any,
-  any,
-  never,
-  any,
-  any
-> {}
+  extends PgCodec<string, never, any, any, never, any, any> {}
 
 export type PgCodecList<
   TInnerCodec extends PgCodec<string, any, any, any, any, any, any> = PgCodec<

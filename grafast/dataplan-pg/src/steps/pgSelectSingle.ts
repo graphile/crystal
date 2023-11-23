@@ -82,7 +82,8 @@ const CHEAP_ATTRIBUTE_TYPES = new Set<_AnyPgCodec>([
 
 /** @internal */
 export interface _AnyPgSelectSingleStep extends PgSelectSingleStep<any> {}
-export interface GenericPgSelectSingleStep extends PgSelectSingleStep<GenericPgResource> {}
+export interface GenericPgSelectSingleStep
+  extends PgSelectSingleStep<GenericPgResource> {}
 export type PgSelectSingleStepResource<U> = U extends PgSelectSingleStep<
   infer TResource
 >

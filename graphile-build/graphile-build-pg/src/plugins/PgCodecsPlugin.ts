@@ -4,7 +4,6 @@ import type {
   GenericPgCodecAttribute,
   PgCodec,
   PgCodecAnyScalar,
-  PgCodecAttributes,
   PgCodecExtensions,
   PgEnumCodec,
   PgRecordTypeCodecSpec,

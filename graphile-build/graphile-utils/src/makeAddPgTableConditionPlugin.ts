@@ -1,8 +1,4 @@
-import type {
-  GenericPgSelectStep,
-  PgConditionStep,
-  PgSelectStep,
-} from "@dataplan/pg";
+import type { GenericPgSelectStep, PgConditionStep } from "@dataplan/pg";
 import type { FieldArgs, GrafastInputFieldConfig } from "grafast";
 import type { SQL, sql } from "pg-sql2";
 

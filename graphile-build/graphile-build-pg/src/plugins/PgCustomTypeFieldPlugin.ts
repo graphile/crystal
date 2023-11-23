@@ -14,15 +14,10 @@ import type {
   GenericPgSelectStep,
   GenericPgUpdateSingleStep,
   PgClassSingleStep,
-  PgCodec,
-  PgDeleteSingleStep,
   PgInsertSingleStep,
   PgResource,
-  PgResourceParameter,
   PgSelectArgumentSpec,
-  PgSelectStep,
   PgTypedExecutableStep,
-  PgUpdateSingleStep,
 } from "@dataplan/pg";
 import {
   digestsFromArgumentSpecs,
@@ -178,9 +173,7 @@ declare global {
   }
 }
 
-function shouldUseCustomConnection(
-  pgResource: GenericPgResource,
-): boolean {
+function shouldUseCustomConnection(pgResource: GenericPgResource): boolean {
   const { codec } = pgResource;
   // 'setof <scalar>' functions should use a connection based on the function name, not a generic connection
   const setOrArray = !pgResource.isUnique || !!codec.arrayOfCodec;

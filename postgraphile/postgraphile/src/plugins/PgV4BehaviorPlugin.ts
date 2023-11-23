@@ -1,7 +1,7 @@
 import "graphile-config";
 import "graphile-build-pg";
 
-import type { GenericPgResourceOptions, PgResourceOptions } from "@dataplan/pg";
+import type { GenericPgResourceOptions } from "@dataplan/pg";
 import type { PgProc } from "graphile-build-pg/pg-introspection";
 import { inspect } from "util";
 

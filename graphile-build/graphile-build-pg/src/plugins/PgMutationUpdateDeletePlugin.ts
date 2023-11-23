@@ -6,11 +6,7 @@ import type {
   GenericPgResourceUnique,
   GenericPgUpdateSingleStep,
   PgClassSingleStep,
-  PgCodecWithAttributes,
-  PgDeleteSingleStep,
   PgResource,
-  PgResourceUnique,
-  PgUpdateSingleStep,
 } from "@dataplan/pg";
 import { pgDeleteSingle, pgUpdateSingle } from "@dataplan/pg";
 import type { ExecutableStep, FieldArgs } from "grafast";

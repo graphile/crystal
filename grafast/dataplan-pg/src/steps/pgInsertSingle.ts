@@ -15,6 +15,7 @@ import type {
   PgCodecAttributeCodec,
   PgCodecAttributeName,
 } from "../codecs.js";
+import type { _AnyPgResource } from "../datasource.js";
 import { inspect } from "../inspect.js";
 import type {
   _AnyPgCodec,
@@ -24,7 +25,6 @@ import type {
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
-import { _AnyPgResource } from "../datasource.js";
 
 const EMPTY_MAP = new Map<never, never>();
 
@@ -47,7 +47,9 @@ interface PgInsertSinglePlanFinalizeResults {
 /**
  * Inserts a row into resource with the given specified attribute values.
  */
-export class PgInsertSingleStep<TResource extends _AnyPgResource = _AnyPgResource>
+export class PgInsertSingleStep<
+    TResource extends _AnyPgResource = _AnyPgResource,
+  >
   extends ExecutableStep<
     unknown[] // tuple depending on what's selected
   >

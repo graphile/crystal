@@ -1,10 +1,10 @@
 /* eslint-disable graphile-export/export-instances */
 import type {
+  DefaultRegistryBuilder,
+  EmptyRegistryBuilder,
   GenericPgRegistry,
   PgRegistry,
   PgRegistryBuilder,
-  DefaultRegistryBuilder,
-  EmptyRegistryBuilder,
 } from "@dataplan/pg";
 import { makeRegistryBuilder } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";

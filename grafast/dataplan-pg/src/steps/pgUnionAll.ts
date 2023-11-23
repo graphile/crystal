@@ -393,7 +393,7 @@ export class PgUnionAllStep<
       PgSelectParsedCursorStep
     >
 {
-  _PgUnionAllStep: "PgUnionAllStep" = "PgUnionAllStep";
+  _PgUnionAllStep = "PgUnionAllStep" as const;
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgUnionAllStep",

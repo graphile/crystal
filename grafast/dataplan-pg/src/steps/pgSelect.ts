@@ -2409,9 +2409,9 @@ ${lateralText};`;
     return actualKeyByDesiredKey;
   }
 
-  private mergePlaceholdersInto<TOtherStep extends PgSelectStep<_AnyPgResource>>(
-    otherPlan: TOtherStep,
-  ): void {
+  private mergePlaceholdersInto<
+    TOtherStep extends PgSelectStep<_AnyPgResource>,
+  >(otherPlan: TOtherStep): void {
     for (const placeholder of this.placeholders) {
       const { dependencyIndex, symbol, codec } = placeholder;
       const dep = this.getDep(dependencyIndex);

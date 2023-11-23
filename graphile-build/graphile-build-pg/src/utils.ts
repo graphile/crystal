@@ -1,4 +1,4 @@
-import type { PgCodecRefPath, PgCodecRelation, PgResource } from "@dataplan/pg";
+import type { PgCodecRefPath, PgResource } from "@dataplan/pg";
 import type { PgSmartTagsDict } from "pg-introspection";
 
 export function tagToString(

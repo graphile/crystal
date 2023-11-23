@@ -3,7 +3,8 @@ import { access, exportAs, UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { _AnyPgResource, PgResource } from "../datasource.js";
+import type { PgCodecAttributeCodec, PgCodecAttributeName } from "../codecs.js";
+import type { _AnyPgResource } from "../datasource.js";
 import type {
   _AnyPgCodec,
   PgClassSingleStep,
@@ -15,7 +16,6 @@ import { PgInsertSingleStep } from "./pgInsertSingle.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
 import { PgUnionAllSingleStep } from "./pgUnionAll.js";
 import { PgUpdateSingleStep } from "./pgUpdateSingle.js";
-import { PgCodecAttributeCodec, PgCodecAttributeName } from "../codecs.js";
 
 // const debugPlan = debugFactory("@dataplan/pg:PgClassExpressionStep:plan");
 // const debugExecute = debugFactory( "@dataplan/pg:PgClassExpressionStep:execute",);

@@ -1,12 +1,11 @@
 import type {
   _AnyPgCodecAttribute,
   _AnyPgResource,
-  GenericPgResourceOptions,
-  _AnyPgResourceUnique,
-  PgCodec,
-  PgResource,
   _AnyPgResourceOptions,
+  _AnyPgResourceUnique,
   GenericPgCodec,
+  GenericPgResourceOptions,
+  PgResource,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
 import { object } from "grafast";
@@ -88,10 +87,7 @@ declare global {
        * be called directly, instead it's called from other inflectors to give
        * them common behavior.
        */
-      _codecName(
-        this: Inflection,
-        codec: GenericPgCodec,
-      ): string;
+      _codecName(this: Inflection, codec: GenericPgCodec): string;
 
       /**
        * Takes a `_codecName` and singularizes it. This is also a good place to
@@ -104,10 +100,7 @@ declare global {
        * be called directly, instead it's called from other inflectors to give
        * them common behavior.
        */
-      _singularizedCodecName(
-        this: Inflection,
-        codec: GenericPgCodec,
-      ): string;
+      _singularizedCodecName(this: Inflection, codec: GenericPgCodec): string;
 
       /**
        * Appends '_record' to a name that ends in `_input`, `_patch`, `Input`
@@ -120,10 +113,7 @@ declare global {
        * specific table (more specifically a PostgreSQL "pg_class" which is
        * represented as a certain PgCodec)
        */
-      tableType(
-        this: GraphileBuild.Inflection,
-        codec: GenericPgCodec,
-      ): string;
+      tableType(this: GraphileBuild.Inflection, codec: GenericPgCodec): string;
 
       tableConnectionType(
         this: GraphileBuild.Inflection,
@@ -209,9 +199,12 @@ interface State {
     string,
     Map<PgClass, Promise<GenericPgResourceOptions | null>>
   >;
-  resourceByResourceOptions: Map<GenericPgResourceOptions, Promise<_AnyPgResource | null>>;
+  resourceByResourceOptions: Map<
+    GenericPgResourceOptions,
+    Promise<_AnyPgResource | null>
+  >;
   detailsByResourceOptions: Map<
-  GenericPgResourceOptions,
+    GenericPgResourceOptions,
     { serviceName: string; pgClass: PgClass }
   >;
 }

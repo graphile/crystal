@@ -1,7 +1,7 @@
 import { isDev } from "grafast";
 
-import { _AnyPgSelectStep } from "./steps/pgSelect";
-import { _AnyPgUnionAllStep } from "./steps/pgUnionAll";
+import type { _AnyPgSelectStep } from "./steps/pgSelect";
+import type { _AnyPgUnionAllStep } from "./steps/pgUnionAll";
 
 export type PgLockableParameter =
   | "orderBy"

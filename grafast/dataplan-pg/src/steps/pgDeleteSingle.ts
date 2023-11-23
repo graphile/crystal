@@ -7,6 +7,12 @@ import { ExecutableStep, exportAs, isDev, SafeError } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 
+import type { PgCodecAttributeCodec, PgCodecAttributeName } from "../codecs.js";
+import type {
+  _AnyPgResource,
+  GenericPgResource,
+  PgResourceUnique,
+} from "../datasource.js";
 import { inspect } from "../inspect.js";
 import type {
   _AnyPgCodec,
@@ -17,12 +23,6 @@ import type {
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
-import {
-  _AnyPgResource,
-  GenericPgResource,
-  PgResourceUnique,
-} from "../datasource.js";
-import { PgCodecAttributeCodec, PgCodecAttributeName } from "../codecs.js";
 
 type QueryValueDetailsBySymbol = Map<
   symbol,

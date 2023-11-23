@@ -1,11 +1,6 @@
 import "graphile-config";
 
-import type {
-  GenericPgCodec,
-  GenericPgSelectSingleStep,
-  PgCodec,
-  PgSelectSingleStep,
-} from "@dataplan/pg";
+import type { GenericPgCodec, GenericPgSelectSingleStep } from "@dataplan/pg";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { Secret, SignOptions } from "jsonwebtoken";
 import { sign as signJwt } from "jsonwebtoken";

@@ -42,8 +42,6 @@ import type {
   GenericPgCodec,
   PgCodec,
   PgCodecAttributeMap,
-  PgCodecAttributes,
-  PgCodecAttributesRecord,
   PgCodecExtensions,
   PgCodecFromPostgres,
   PgCodecPolymorphism,
@@ -64,7 +62,8 @@ export type PgCodecAttributeViaExplicit<
   attribute: TAttribute;
 };
 /** @internal */
-export interface _AnyPgCodecAttributeVia extends PgCodecAttributeVia<any, any> {}
+export interface _AnyPgCodecAttributeVia
+  extends PgCodecAttributeVia<any, any> {}
 export type GenericPgCodecAttributeVia = PgCodecAttributeVia<string, string>;
 /** @internal */
 export type _AnyPgCodecAttributeViaRelationName<U> =

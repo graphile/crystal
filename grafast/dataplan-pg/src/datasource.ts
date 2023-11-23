@@ -1,3 +1,4 @@
+import chalk from "chalk";
 import type { GrafastValuesList, ObjectStep } from "grafast";
 import {
   __ValueStep,
@@ -28,29 +29,28 @@ import type {
 } from "./executor.js";
 import { inspect } from "./inspect.js";
 import type {
-  _AnyPgCodecRelationConfig,
-  PgCodecAttributes,
-  GetPgRegistryCodecRelations,
-  PgCodec,
-  PgCodecName,
-  PgCodecRelationConfig,
-  PgRefDefinition,
-  PgRegistry,
-  PgRegistryConfig,
-  PlanByUniques,
   _AnyPgCodec,
+  _AnyPgCodecRelationConfig,
   _AnyPgRegistry,
-  GetPgRegistryCodecRelationConfigs,
-  GetPgRegistryCodecs,
   _AnyPgRegistryConfig,
   _AnyScalarPgCodec,
-  PgCodecRelationConfigName,
-  PgRegistryConfigCodecs,
-  PgRegistryConfigRelationConfigs,
-  PgRegistryConfigResourceOptions,
   Expand,
   GenericPgCodec,
   GenericPgCodecRelationConfig,
+  GetPgRegistryCodecRelationConfigs,
+  GetPgRegistryCodecRelations,
+  GetPgRegistryCodecs,
+  PgCodecAttributes,
+  PgCodecName,
+  PgCodecRelationConfig,
+  PgCodecRelationConfigName,
+  PgRefDefinition,
+  PgRegistry,
+  PgRegistryConfig,
+  PgRegistryConfigCodecs,
+  PgRegistryConfigRelationConfigs,
+  PgRegistryConfigResourceOptions,
+  PlanByUniques,
 } from "./interfaces.js";
 import type { PgClassExpressionStep } from "./steps/pgClassExpression.js";
 import type {
@@ -65,7 +65,6 @@ import type {
   PgSelectSinglePlanOptions,
   PgSelectSingleStep,
 } from "./steps/pgSelectSingle.js";
-import chalk from "chalk";
 
 export function EXPORTABLE<T, TScope extends any[]>(
   factory: (...args: TScope) => T,
@@ -95,7 +94,8 @@ export type PgResourceParameterExtensions =
   DataplanPg.PgResourceParameterExtensions;
 
 /** @internal */
-export interface _AnyPgResourceParameter extends PgResourceParameter<any, any> {}
+export interface _AnyPgResourceParameter
+  extends PgResourceParameter<any, any> {}
 export interface GenericPgResourceParameter
   extends PgResourceParameter<string | null, GenericPgCodec> {}
 
@@ -1139,7 +1139,11 @@ export function makeRegistry<
           }))
         : rawConfig.parameters,
     };
-    const resource = new PgResource(registry, resourceConfig);
+    const resource = EXPORTABLE(
+      (PgResource, registry, resourceConfig) =>
+        new PgResource(registry, resourceConfig),
+      [PgResource, registry, resourceConfig],
+    );
 
     // This is the magic that breaks the circular reference: rather than
     // building PgResource via a factory we tell the system to just retrieve it
@@ -1235,19 +1239,23 @@ export function makeRegistry<
   for (const codec of tableLikeCodecsWithoutTableLikeResources) {
     if (codec.executor) {
       const resourceName = `frmcdc_${codec.name}`;
-      const resource = new PgResource(registry, {
-        name: resourceName,
-        executor: codec.executor,
-        from: sql`(select 1/0 /* codec-only resource; should not select directly */)` as any,
-        codec,
-        identifier: resourceName,
-        isVirtual: true,
-        extensions: {
-          tags: {
-            behavior: "-*",
-          },
-        },
-      });
+      const resource = EXPORTABLE(
+        (PgResource, codec, registry, resourceName, sql) =>
+          new PgResource(registry, {
+            name: resourceName,
+            executor: codec.executor!,
+            from: sql`(select 1/0 /* codec-only resource; should not select directly */)` as any,
+            codec,
+            identifier: resourceName,
+            isVirtual: true,
+            extensions: {
+              tags: {
+                behavior: "-*",
+              },
+            },
+          }),
+        [PgResource, codec, registry, resourceName, sql],
+      );
 
       Object.defineProperties(resource, {
         $exporter$args: { value: [registry, resourceName] },

@@ -1,4 +1,4 @@
-import type { GenericPgSelectStep, PgOrderSpec, PgSelectStep } from "@dataplan/pg";
+import type { GenericPgSelectStep, PgOrderSpec } from "@dataplan/pg";
 
 import { EXPORTABLE } from "./exportable.js";
 

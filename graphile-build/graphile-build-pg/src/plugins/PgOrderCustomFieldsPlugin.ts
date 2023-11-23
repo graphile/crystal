@@ -1,10 +1,7 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type {
-  GenericPgResource,
-  GenericPgSelectStep,
-} from "@dataplan/pg";
+import type { GenericPgResource, GenericPgSelectStep } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
 
 import { version } from "../version.js";

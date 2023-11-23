@@ -8,6 +8,7 @@ import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type { _AnyPgCodecAttribute, PgCodecAttributeName } from "../codecs.js";
+import type { _AnyPgResource, PgResourceUniques } from "../datasource.js";
 import type { GenericPgResource, PgResourceUnique } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
@@ -19,7 +20,6 @@ import type {
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
 import { pgClassExpression } from "./pgClassExpression.js";
-import { _AnyPgResource, PgResourceUniques } from "../datasource.js";
 
 type QueryValueDetailsBySymbol = Map<
   symbol,

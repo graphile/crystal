@@ -1,4 +1,4 @@
-import type { PgCodec, PgResourceUnique } from "@dataplan/pg";
+import type { PgCodec } from "@dataplan/pg";
 import type {} from "graphile-build";
 import type {} from "graphile-build-pg";
 import type { GraphileConfig } from "graphile-config";

@@ -78,15 +78,13 @@ import type {
   WithPgClient,
 } from "../";
 import type { NodePostgresPgClient, PgSubscriber } from "../adaptors/pg.js";
-import { listOfCodec, PgCodecAttributeName } from "../codecs.js";
+import type { PgCodecAttributeName } from "../codecs.js";
+import { listOfCodec } from "../codecs.js";
+import type { _AnyPgResource, PgResourceCodec } from "../datasource.js";
 import {
-  _AnyPgResource,
   makePgResourceOptions,
   makeRegistry,
   makeRegistryBuilder,
-  PgResourceCodec,
-  PgResourceName,
-  PgResourceUniques,
 } from "../datasource.js";
 import {
   enumCodec,
@@ -117,23 +115,19 @@ import type {
   GetPgResourceRelationConfigs,
   PgCodec,
   PgCodecAttributeMap,
-  PgCodecAttributes,
   PgCodecRelationConfigName,
 } from "../interfaces";
 import { PgPageInfoStep } from "../steps/pgPageInfo.js";
 import type { PgPolymorphicTypeMap } from "../steps/pgPolymorphic.js";
 import type { PgSelectParsedCursorStep } from "../steps/pgSelect.js";
 import { sqlFromArgDigests } from "../steps/pgSelect.js";
+import { _AnyPgSelectSingleStep } from "../steps/pgSelectSingle.js";
 import type { PgUnionAllStep } from "../steps/pgUnionAll.js";
 import { pgUnionAll, PgUnionAllSingleStep } from "../steps/pgUnionAll.js";
 import {
   WithPgClientStep,
   withPgClientTransaction,
 } from "../steps/withPgClient.js";
-import {
-  _AnyPgSelectSingleStep,
-  PgSelectSingleStepResource,
-} from "../steps/pgSelectSingle";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -1702,12 +1696,13 @@ export function makeExampleSchema(
     [__ListTransformStep, options],
   );
 
-  type ResourceConnectionPlan<TResource extends _AnyPgResource> = ConnectionStep<
-    PgSelectSingleStep<TResource>,
-    PgSelectParsedCursorStep,
-    PgSelectStep<TResource>,
-    PgSelectSingleStep<TResource>
-  >;
+  type ResourceConnectionPlan<TResource extends _AnyPgResource> =
+    ConnectionStep<
+      PgSelectSingleStep<TResource>,
+      PgSelectParsedCursorStep,
+      PgSelectStep<TResource>,
+      PgSelectSingleStep<TResource>
+    >;
 
   const {
     pgCodecs: { union__entity: unionEntityCodec },
@@ -1826,7 +1821,6 @@ export function makeExampleSchema(
   type PersonBookmarkStep = PgSelectSingleStep<PersonBookmarkResource>;
   type PostStep = PgSelectSingleStep<PostResource>;
   type CommentStep = PgSelectSingleStep<CommentResource>;
-  type SingleTableItemsStep = PgSelectStep<SingleTableItemResource>;
   type SingleTableItemStep = PgSelectSingleStep<SingleTableItemResource>;
   type RelationalItemsStep = PgSelectStep<RelationalItemResource>;
   type RelationalItemStep = PgSelectSingleStep<RelationalItemResource>;
