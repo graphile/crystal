@@ -207,7 +207,7 @@ it("batches across parallel trees with non-identical selection sets", async () =
   expect(CALLS[0].attributes).to.deep.equal(["id", "name", "reallyLongBio"]);
 });
 
-it("skips call on pure ioEquivalence (obj)", async () => {
+it("supports pure ioEquivalence (obj)", async () => {
   const source = /* GraphQL */ `
     {
       t1: thingByIdObj(id: 1) {
@@ -237,7 +237,7 @@ it("skips call on pure ioEquivalence (obj)", async () => {
   expect(CALLS[0].attributes).to.have.length(0);
 });
 
-it("gets input step on pure ioEquivalence (list)", async () => {
+it("supports pure ioEquivalence (list)", async () => {
   const source = /* GraphQL */ `
     {
       t1: thingByIdList(id: 1) {
@@ -267,7 +267,7 @@ it("gets input step on pure ioEquivalence (list)", async () => {
   expect(CALLS[0].attributes).to.have.length(0);
 });
 
-it("supports full call with ioEquivalence", async () => {
+it("supports mixed ioEquivalence", async () => {
   const source = /* GraphQL */ `
     {
       t1: thingById(id: 1) {
@@ -314,6 +314,53 @@ it("supports full call with ioEquivalence", async () => {
   expect(CALLS).to.have.length(3);
   expect(CALLS[0].specs).to.deep.equal([1]);
   expect(CALLS[0].attributes).to.deep.equal(["id", "name"]);
+  expect(CALLS[1].specs).to.deep.equal([{ identifier: 1 }]);
+  expect(CALLS[1].attributes).to.deep.equal(["name"]);
+  expect(CALLS[2].specs).to.deep.equal([[1]]);
+  expect(CALLS[2].attributes).to.deep.equal(["name"]);
+});
+
+it("supports no ioEquivalence", async () => {
+  const source = /* GraphQL */ `
+    {
+      t1: thingById(id: 1) {
+        name
+      }
+      t2: thingByIdObj(id: 1) {
+        name
+      }
+      t3: thingByIdList(id: 1) {
+        name
+      }
+    }
+  `;
+  const schema = makeSchema(false);
+
+  CALLS = [];
+  const result = (await grafast(
+    {
+      schema,
+      source,
+    },
+    {},
+    {},
+  )) as ExecutionResult;
+  expect(result).to.deep.equal({
+    data: {
+      t1: {
+        name: "Eyedee Won",
+      },
+      t2: {
+        name: "Eyedee Won",
+      },
+      t3: {
+        name: "Eyedee Won",
+      },
+    },
+  });
+  expect(CALLS).to.have.length(3);
+  expect(CALLS[0].specs).to.deep.equal([1]);
+  expect(CALLS[0].attributes).to.deep.equal(["name"]);
   expect(CALLS[1].specs).to.deep.equal([{ identifier: 1 }]);
   expect(CALLS[1].attributes).to.deep.equal(["name"]);
   expect(CALLS[2].specs).to.deep.equal([[1]]);

@@ -172,7 +172,6 @@ function throwOnUnhandledRejections(callback: () => Promise<void>) {
       } else {
         payloads = [stream];
       }
-      console.dir(payloads, { depth: 8 });
       const result = payloads[0];
       expect(result.data).to.deep.equal({
         list: [null, null],
