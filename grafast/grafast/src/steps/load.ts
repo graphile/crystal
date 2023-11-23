@@ -12,7 +12,7 @@ import { canonicalJSONStringify } from "../utils.js";
 import { access } from "./access.js";
 
 export interface LoadOptions<TItem, TParams extends Record<string, any>> {
-  attributes: ReadonlyArray<keyof TItem> | null;
+  attributes: ReadonlyArray<keyof TItem>;
   params: Partial<TParams>;
 }
 
@@ -114,8 +114,6 @@ export class LoadedRecordStep<
     return this.sourceDescription ?? null;
   }
   get(attr: keyof TItem & (string | number)) {
-    this.attributes.add(attr);
-
     // Allow auto-collapsing of the waterfall by knowing keys are equivalent
     if (
       this.operationPlan.phase === "plan" &&
@@ -124,6 +122,7 @@ export class LoadedRecordStep<
       return this.ioEquivalence[attr as any];
     }
 
+    this.attributes.add(attr);
     return access(this, attr);
   }
   setParam<TParamKey extends keyof TParams>(
@@ -209,9 +208,12 @@ export class LoadStep<
       return map;
     } else if (typeof this.ioEquivalence === "object") {
       for (const key of Object.keys(this.ioEquivalence)) {
-        map[key] = isObjectLikeStep($spec)
-          ? $spec.get(key)
-          : access($spec, [key]);
+        const attr = this.ioEquivalence[key as keyof TSpec];
+        if (attr != null) {
+          map[attr] = isObjectLikeStep($spec)
+            ? $spec.get(key)
+            : access($spec, [key]);
+        }
       }
       return map;
     } else {
@@ -270,7 +272,7 @@ export class LoadStep<
 
     // Build the loadOptions
     this.loadOptions = {
-      attributes: this.attributes.size ? [...this.attributes].sort() : null,
+      attributes: [...this.attributes].sort(),
       params: this.params,
     };
     // If the canonicalJSONStringify is the same, then we deem that the options are the same

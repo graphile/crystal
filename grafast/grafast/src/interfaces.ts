@@ -991,7 +991,7 @@ export type UnwrapPlanTuple</* const */ TIn extends readonly ExecutableStep[]> =
     [Index in keyof TIn]: TIn[Index] extends ExecutableStep<infer U>
       ? U
       : never;
-  } & { length: number };
+  };
 
 export type NotVariableValueNode = Exclude<ValueNode, VariableNode>;
 

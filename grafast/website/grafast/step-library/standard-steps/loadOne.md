@@ -156,7 +156,7 @@ const $member = loadOne(
 
 ```ts title="Example for an object step"
 const $member = loadOne(
-  list({ oid: $organizationId, uid: $userId }),
+  object({ oid: $organizationId, uid: $userId }),
   { oid: "organization_id", uid: "user_id" },
   batchGetMemberByOrganizationIdAndUserId,
 );
