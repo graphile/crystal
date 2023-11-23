@@ -5,10 +5,10 @@ import { it } from "mocha";
 import type { ExecutableStep, LoadOneCallback } from "../dist/index.js";
 import {
   grafast,
+  list,
   loadOne,
   makeGrafastSchema,
   object,
-  list,
 } from "../dist/index.js";
 
 interface Thing {
