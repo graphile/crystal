@@ -5,7 +5,6 @@ import type { PgAdaptorOptions } from "./adaptors/pg.js";
 import type {
   _AnyPgCodecAttribute,
   GenericPgCodecAttribute,
-  PgCodecAttribute,
   PgCodecAttributeCodec,
   PgCodecAttributeName,
 } from "./codecs.js";
@@ -471,63 +470,28 @@ export interface PgGroupSpec {
 }
 
 export type TuplePlanMap<
-  TAllAttributes extends _AnyPgCodecAttribute,
-  TUniqueAttributeNamesUnion extends ReadonlyArray<
-    PgCodecAttributeName<TAllAttributes>
-  >,
-> = TUniqueAttributeNamesUnion extends any
-  ? //? TUniqueAttributeNamesUnion extends ReadonlyArray<string>
-    {
-      [TKey in TUniqueAttributeNamesUnion[number]]: ExecutableStep<any>;
-    } /*& {
-        [TKey in Exclude<
-          TAllAttributes["name"],
-          TUniqueAttributeNamesUnion[number]
-        >]?: ExecutableStep<any>;
-      }
-    > */
-  : //: never
-    never;
-/*
-type Attr<TName extends string> = PgCodecAttribute<TName, any, any, any, any>;
-
-type A = TuplePlanMap<
-  Attr<"a"> | Attr<"b"> | Attr<"c"> | Attr<"d">,
-  ["a", "b"] | ["c"]
->;
-
-type F = (number | undefined) & number;
-
-// {a: 1, b: 1, c?: 1, d?:1} | {c: 1, a?: 1, b?:1, d?: 1}
-
-const s: ExecutableStep = null as any;
-const a: A = {
-  d: s,
-};
-*/
-
-/*
-
+  TAttributes extends _AnyPgCodecAttribute,
+  TTuple extends ReadonlyArray<PgCodecAttributeName<TAttributes>>,
+> = {
+  [Index in keyof TTuple]: {
     // Optional attributes
     [attribute in Exclude<
-      TAllAttributes,
-      { name: TUniqueAttributeNamesUnion[number] }
+      TAttributes,
+      { name: TTuple[number] }
     > as PgCodecAttributeName<attribute>]?: ExecutableStep<
       ReturnType<PgCodecFromPg<PgCodecAttributeCodec<attribute>>>
     >;
   } & {
     // Required unique combination of attributes
-    [key in TUniqueAttributeNamesUnion[number]]: ExecutableStep<
-
+    [key in TTuple[number]]: ExecutableStep<
       ReturnType<
         PgCodecFromPg<
-          PgCodecAttributeCodec<Extract<TAllAttributes, { name: key }>>
+          PgCodecAttributeCodec<Extract<TAttributes, { name: key }>>
         >
       >
     >;
   };
 };
-*/
 
 /**
  * Represents a spec like `{user_id: ExecutableStep}` or
@@ -540,10 +504,7 @@ const a: A = {
 export type PlanByUniques<
   TAttributes extends _AnyPgCodecAttribute,
   TUniqueAttributes extends PgResourceUnique<TAttributes>,
-> = TuplePlanMap<
-  TAttributes,
-  TUniqueAttributes extends { attributes: infer U } ? U : never
->;
+> = TuplePlanMap<TAttributes, TUniqueAttributes["attributes"]>[number];
 
 export type PgConditionLikeStep = (ModifierStep<any> | ExecutableStep) & {
   alias: SQL;

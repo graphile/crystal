@@ -14,7 +14,6 @@ import sql from "pg-sql2";
 import type {
   _AnyPgCodecAttribute,
   GenericPgCodecAttribute,
-  PgCodecAttribute,
   PgCodecAttributeName,
   PgCodecAttributeVia,
   PgCodecAttributeViaExplicit,
@@ -730,7 +729,7 @@ export class PgResource<
 
   public get<
     TSelectSinglePlanOptions extends PgSelectSinglePlanOptions<this>,
-    TSpec extends PlanByUniques<PgCodecAttributes<TCodec>, TUniques>,
+    TSpec extends Expand<PlanByUniques<PgCodecAttributes<TCodec>, TUniques>>,
   >(
     spec: TSpec,
     // This is internal, it's an optimisation we can use but you shouldn't.
@@ -1478,16 +1477,13 @@ export function makeRegistryBuilder(): EmptyRegistryBuilder {
 
 exportAs("@dataplan/pg", makeRegistryBuilder, "makeRegistryBuilder");
 
-type Foo<
-  TCodec extends _AnyPgCodec,
-  A extends PgCodecAttributes<TCodec>,
-> = A extends any ? PgResourceUnique<A> : never;
-
 export function makePgResourceOptions<
   const TName extends string,
   const TCodec extends _AnyPgCodec,
   const TAttributes extends PgCodecAttributes<TCodec>,
-  const TUniques extends Foo<TCodec, TAttributes> = never,
+  const TUniques extends PgResourceUnique<
+    TAttributes[keyof TAttributes]
+  > = never,
   const TParameters extends _AnyPgResourceParameter = never,
 >(
   options: PgResourceOptions<TName, TCodec, TUniques, TParameters>,

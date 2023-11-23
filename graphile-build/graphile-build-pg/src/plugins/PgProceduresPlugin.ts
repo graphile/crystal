@@ -4,14 +4,10 @@
 
 import type {
   GenericPgCodec,
-  GenericPgCodecAttribute,
   GenericPgCodecAttributesRecord,
   GenericPgFunctionResourceOptions,
   GenericPgResourceOptions,
   GenericPgResourceParameter,
-  GetPgResourceCodec,
-  PgCodecAttributes,
-  PgCodecAttributesRecord,
   PgResourceExtensions,
   PgSelectArgumentDigest,
 } from "@dataplan/pg";
@@ -288,25 +284,23 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                   pgProc,
                   serviceName,
                 });
-              const foo =
-                EXPORTABLE(
-                  (attributes, executor, recordCodec, recordCodecName, sql) =>
-                    recordCodec({
-                      name: recordCodecName,
-                      identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
-                      attributes,
-                      description: undefined,
-                      extensions: {
-                        /* `The return type of our \`${name}\` ${
+              return EXPORTABLE(
+                (attributes, executor, recordCodec, recordCodecName, sql) =>
+                  recordCodec({
+                    name: recordCodecName,
+                    identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
+                    attributes,
+                    description: undefined,
+                    extensions: {
+                      /* `The return type of our \`${name}\` ${
                       pgProc.provolatile === "v" ? "mutation" : "query"
                     }.`, */
-                      },
-                      executor,
-                      isAnonymous: true,
-                    }),
-                  [attributes, executor, recordCodec, recordCodecName, sql],
-                ) ?? null;
-              return foo;
+                    },
+                    executor,
+                    isAnonymous: true,
+                  }),
+                [attributes, executor, recordCodec, recordCodecName, sql],
+              );
             };
 
           const returnCodec = needsPayloadCodecToBeGenerated
@@ -540,19 +534,6 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               pgProc,
               resourceOptions: finalResourceOptions,
             });
-
-            /*
-            type Foo = typeof finalResourceOptions;
-            type Codec = Foo["codec"];
-            type Bar = GenericPgCodecAttribute;
-            type Bar2 = PgCodecAttributes<Codec>;
-            type Bar2a = PgCodecAttributes<GenericPgCodec>;
-            // ISSUE: Bar2 = GenericPgCodecAttribute
-            // SHOULD BE: Bar3 = PgCodecAttributesRecord<GenericPgCodecAttribute>
-            type Bar3 = PgCodecAttributesRecord<GenericPgCodecAttribute>;
-            type Baz = keyof Bar2;
-            type Qux = Bar2[Baz];
-            */
 
             return EXPORTABLE(
               (finalResourceOptions, makePgResourceOptions) =>
