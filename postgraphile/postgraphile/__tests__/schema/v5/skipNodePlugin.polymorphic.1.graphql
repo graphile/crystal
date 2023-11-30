@@ -7546,7 +7546,7 @@ type SingleTableTopic implements SingleTableItem {
     """The method to use when ordering `SingleTableItem`."""
     orderBy: [SingleTableItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemConnection!
-  title: String
+  title: String!
   type: ItemType!
   updatedAt: Datetime!
 }
