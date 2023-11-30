@@ -2,7 +2,7 @@ import type { ExecutableStep } from "grafast";
 import { ModifierStep } from "grafast";
 import type { SQL } from "pg-sql2";
 
-import type { PgCodec } from "../interfaces.js";
+import type { _AnyPgCodec } from "../interfaces.js";
 import type {
   PgConditionCapableParentStep,
   PgConditionStep,
@@ -30,7 +30,10 @@ export class PgClassFilterStep<
     this.conditions.push(condition);
   }
 
-  placeholder($step: ExecutableStep, codec: PgCodec): SQL {
+  placeholder<TCodec extends _AnyPgCodec>(
+    $step: ExecutableStep,
+    codec: TCodec,
+  ): SQL {
     return this.$parent.placeholder($step, codec);
   }
 

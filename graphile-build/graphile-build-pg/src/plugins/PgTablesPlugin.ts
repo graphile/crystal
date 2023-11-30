@@ -1,9 +1,11 @@
 import type {
-  PgCodec,
-  PgCodecAttribute,
+  _AnyPgCodecAttribute,
+  _AnyPgResource,
+  _AnyPgResourceOptions,
+  _AnyPgResourceUnique,
+  GenericPgCodec,
+  GenericPgResourceOptions,
   PgResource,
-  PgResourceOptions,
-  PgResourceUnique,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
 import { object } from "grafast";
@@ -85,10 +87,7 @@ declare global {
        * be called directly, instead it's called from other inflectors to give
        * them common behavior.
        */
-      _codecName(
-        this: Inflection,
-        codec: PgCodec<any, any, any, any, any, any, any>,
-      ): string;
+      _codecName(this: Inflection, codec: GenericPgCodec): string;
 
       /**
        * Takes a `_codecName` and singularizes it. This is also a good place to
@@ -101,10 +100,7 @@ declare global {
        * be called directly, instead it's called from other inflectors to give
        * them common behavior.
        */
-      _singularizedCodecName(
-        this: Inflection,
-        codec: PgCodec<any, any, any, any, any, any, any>,
-      ): string;
+      _singularizedCodecName(this: Inflection, codec: GenericPgCodec): string;
 
       /**
        * Appends '_record' to a name that ends in `_input`, `_patch`, `Input`
@@ -117,19 +113,16 @@ declare global {
        * specific table (more specifically a PostgreSQL "pg_class" which is
        * represented as a certain PgCodec)
        */
-      tableType(
-        this: GraphileBuild.Inflection,
-        codec: PgCodec<any, any, any, any, any, any, any>,
-      ): string;
+      tableType(this: GraphileBuild.Inflection, codec: GenericPgCodec): string;
 
       tableConnectionType(
         this: GraphileBuild.Inflection,
-        codec: PgCodec<any, any, any, any, any, any, any>,
+        codec: GenericPgCodec,
       ): string;
 
       tableEdgeType(
         this: GraphileBuild.Inflection,
-        codec: PgCodec<any, any, any, any, any, any, any>,
+        codec: GenericPgCodec,
       ): string;
 
       patchType(this: GraphileBuild.Inflection, typeName: string): string;
@@ -137,21 +130,21 @@ declare global {
     }
 
     interface ScopeObject {
-      pgCodec?: PgCodec<any, any, any, any, any, any, any>;
+      pgCodec?: GenericPgCodec;
       isPgClassType?: boolean;
       isPgConnectionRelated?: true;
     }
     interface ScopeObjectFieldsField {
       pgFieldResource?: PgResource<any, any, any, any, any>;
-      pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
-      pgFieldAttribute?: PgCodecAttribute<any>;
+      pgFieldCodec?: GenericPgCodec;
+      pgFieldAttribute?: _AnyPgCodecAttribute;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
     interface ScopeInterfaceFieldsField {
       pgFieldResource?: PgResource<any, any, any, any, any>;
-      pgFieldCodec?: PgCodec<any, any, any, any, any, any, any>;
-      pgFieldAttribute?: PgCodecAttribute<any>;
+      pgFieldCodec?: GenericPgCodec;
+      pgFieldAttribute?: _AnyPgCodecAttribute;
       isPgFieldConnection?: boolean;
       isPgFieldSimpleCollection?: boolean;
     }
@@ -165,7 +158,7 @@ declare global {
         getResourceOptions(
           serviceName: string,
           pgClass: PgClass,
-        ): Promise<PgResourceOptions | null>;
+        ): Promise<GenericPgResourceOptions | null>;
       };
     }
 
@@ -177,7 +170,7 @@ declare global {
         serviceName: string;
         pgClass: PgClass;
         pgConstraint: PgConstraint;
-        unique: PgResourceUnique;
+        unique: _AnyPgResourceUnique;
       }): void | Promise<void>;
       /**
        * Passed the PgResourceOptions before it's added to the PgRegistryBuilder.
@@ -185,17 +178,17 @@ declare global {
       pgTables_PgResourceOptions(event: {
         serviceName: string;
         pgClass: PgClass;
-        resourceOptions: PgResourceOptions;
+        resourceOptions: GenericPgResourceOptions;
       }): void | Promise<void>;
       pgTables_PgResourceOptions_relations(event: {
         serviceName: string;
         pgClass: PgClass;
-        resourceOptions: PgResourceOptions;
+        resourceOptions: GenericPgResourceOptions;
       }): Promise<void> | void;
       pgTables_PgResourceOptions_relations_post(event: {
         serviceName: string;
         pgClass: PgClass;
-        resourceOptions: PgResourceOptions;
+        resourceOptions: GenericPgResourceOptions;
       }): Promise<void> | void;
     }
   }
@@ -204,11 +197,14 @@ declare global {
 interface State {
   resourceOptionsByPgClassByService: Map<
     string,
-    Map<PgClass, Promise<PgResourceOptions | null>>
+    Map<PgClass, Promise<GenericPgResourceOptions | null>>
   >;
-  resourceByResourceOptions: Map<PgResourceOptions, Promise<PgResource | null>>;
+  resourceByResourceOptions: Map<
+    GenericPgResourceOptions,
+    Promise<_AnyPgResource | null>
+  >;
   detailsByResourceOptions: Map<
-    PgResourceOptions,
+    GenericPgResourceOptions,
     { serviceName: string; pgClass: PgClass }
   >;
 }
@@ -406,7 +402,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             uniqueAttributeOnlyConstraints.map(async (pgConstraint) => {
               const { tags, description } =
                 pgConstraint.getTagsAndDescription();
-              const unique: PgResourceUnique = {
+              const unique: _AnyPgResourceUnique = {
                 isPrimary: pgConstraint.contype === "p",
                 attributes: pgConstraint.conkey!.map(
                   (k) => attributes.find((att) => att.attnum === k)!.attname,
@@ -543,7 +539,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         await info.helpers.pgIntrospection.getIntrospection();
 
         const toProcess: Array<{
-          resourceOptions: PgResourceOptions;
+          resourceOptions: _AnyPgResourceOptions;
           pgClass: PgClass;
           serviceName: string;
         }> = [];

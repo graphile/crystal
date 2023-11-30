@@ -3,12 +3,12 @@
 // (e.g. they can be relations to other tables), so we've renamed them.
 
 import type {
-  PgCodec,
-  PgCodecAttributes,
-  PgFunctionResourceOptions,
+  GenericPgCodec,
+  GenericPgCodecAttributesRecord,
+  GenericPgFunctionResourceOptions,
+  GenericPgResourceOptions,
+  GenericPgResourceParameter,
   PgResourceExtensions,
-  PgResourceOptions,
-  PgResourceParameter,
   PgSelectArgumentDigest,
 } from "@dataplan/pg";
 import {
@@ -64,7 +64,7 @@ declare global {
         getResourceOptions(
           serviceName: string,
           pgProc: PgProc,
-        ): Promise<PgResourceOptions | null>;
+        ): Promise<GenericPgResourceOptions | null>;
       };
     }
 
@@ -72,15 +72,18 @@ declare global {
       pgProcedures_functionResourceOptions(event: {
         serviceName: string;
         pgProc: PgProc;
-        baseResourceOptions: Pick<PgResourceOptions, "codec" | "executor"> &
-          Partial<Omit<PgResourceOptions, "codec" | "executor">>;
-        functionResourceOptions: PgFunctionResourceOptions;
+        baseResourceOptions: Pick<
+          GenericPgResourceOptions,
+          "codec" | "executor"
+        > &
+          Partial<Omit<GenericPgResourceOptions, "codec" | "executor">>;
+        functionResourceOptions: GenericPgFunctionResourceOptions;
       }): void | Promise<void>;
 
       pgProcedures_PgResourceOptions(event: {
         serviceName: string;
         pgProc: PgProc;
-        resourceOptions: PgResourceOptions;
+        resourceOptions: GenericPgResourceOptions;
       }): void | Promise<void>;
     }
   }
@@ -89,7 +92,7 @@ declare global {
 interface State {
   resourceOptionsByPgProcByService: Map<
     string,
-    Map<PgProc, Promise<PgResourceOptions | null>>
+    Map<PgProc, Promise<GenericPgResourceOptions | null>>
   >;
 }
 const EMPTY_OBJECT = Object.freeze({});
@@ -213,89 +216,92 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const { tags: rawTags, description } = pgProc.getTagsAndDescription();
           const tags = JSON.parse(JSON.stringify(rawTags));
 
-          const makeCodecFromReturn = async (): Promise<PgCodec | null> => {
-            // We're building a PgCodec to represent specifically the
-            // return type of this function.
+          const makeCodecFromReturn =
+            async (): Promise<GenericPgCodec | null> => {
+              // We're building a PgCodec to represent specifically the
+              // return type of this function.
 
-            const numberOfArguments = allArgTypes.length ?? 0;
-            const attributes: PgCodecAttributes = Object.create(null);
-            for (let i = 0, l = numberOfArguments; i < l; i++) {
-              // i for IN arguments, o for OUT arguments, b for INOUT arguments,
-              // v for VARIADIC arguments, t for TABLE arguments
-              const argMode = (pgProc.proargmodes?.[i] ?? "i") as
-                | "i"
-                | "o"
-                | "b"
-                | "v"
-                | "t";
+              const numberOfArguments = allArgTypes.length ?? 0;
+              const attributes: GenericPgCodecAttributesRecord =
+                Object.create(null);
+              for (let i = 0, l = numberOfArguments; i < l; i++) {
+                // i for IN arguments, o for OUT arguments, b for INOUT arguments,
+                // v for VARIADIC arguments, t for TABLE arguments
+                const argMode = (pgProc.proargmodes?.[i] ?? "i") as
+                  | "i"
+                  | "o"
+                  | "b"
+                  | "v"
+                  | "t";
 
-              if (argMode === "o" || argMode === "b" || argMode === "t") {
-                const argType = allArgTypes[i];
-                const trueArgName = pgProc.proargnames?.[i];
-                const argName = trueArgName || `column${i + 1}`;
+                if (argMode === "o" || argMode === "b" || argMode === "t") {
+                  const argType = allArgTypes[i];
+                  const trueArgName = pgProc.proargnames?.[i];
+                  const argName = trueArgName || `column${i + 1}`;
 
-                const tag = tags[`arg${i}modifier`];
-                const typeModifier =
-                  typeof tag === "string"
-                    ? /^[0-9]+$/.test(tag)
-                      ? parseInt(tag, 10)
-                      : tag
-                    : undefined;
+                  const tag = tags[`arg${i}modifier`];
+                  const typeModifier =
+                    typeof tag === "string"
+                      ? /^[0-9]+$/.test(tag)
+                        ? parseInt(tag, 10)
+                        : tag
+                      : undefined;
 
-                // This argument exists on the record type output
-                // NOTE: we treat `OUT foo`, `INOUT foo` and
-                // `RETURNS TABLE (foo ...)` as the same.
-                const attributeCodec =
-                  await info.helpers.pgCodecs.getCodecFromType(
-                    serviceName,
-                    argType,
-                    typeModifier,
-                  );
-                if (!attributeCodec) {
-                  console.warn(
-                    `Could not make codec for '${debugProcName}' argument '${argName}' which has type ${argType} (${
-                      (await info.helpers.pgIntrospection.getType(
-                        serviceName,
-                        argType,
-                      ))!.typname
-                    }); skipping function`,
-                  );
-                  return null;
+                  // This argument exists on the record type output
+                  // NOTE: we treat `OUT foo`, `INOUT foo` and
+                  // `RETURNS TABLE (foo ...)` as the same.
+                  const attributeCodec =
+                    await info.helpers.pgCodecs.getCodecFromType(
+                      serviceName,
+                      argType,
+                      typeModifier,
+                    );
+                  if (!attributeCodec) {
+                    console.warn(
+                      `Could not make codec for '${debugProcName}' argument '${argName}' which has type ${argType} (${
+                        (await info.helpers.pgIntrospection.getType(
+                          serviceName,
+                          argType,
+                        ))!.typname
+                      }); skipping function`,
+                    );
+                    return null;
+                  }
+                  attributes[argName] = {
+                    name: argName,
+                    notNull: false,
+                    codec: attributeCodec,
+                    extensions: {
+                      argIndex: i,
+                      argName: trueArgName,
+                    },
+                    // ENHANCE: could use "param" smart tag in function to add extensions here?
+                  };
                 }
-                attributes[argName] = {
-                  notNull: false,
-                  codec: attributeCodec,
-                  extensions: {
-                    argIndex: i,
-                    argName: trueArgName,
-                  },
-                  // ENHANCE: could use "param" smart tag in function to add extensions here?
-                };
               }
-            }
-            const recordCodecName =
-              info.inflection.functionRecordReturnCodecName({
-                pgProc,
-                serviceName,
-              });
-            return EXPORTABLE(
-              (attributes, executor, recordCodec, recordCodecName, sql) =>
-                recordCodec({
-                  name: recordCodecName,
-                  identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
-                  attributes,
-                  description: undefined,
-                  extensions: {
-                    /* `The return type of our \`${name}\` ${
+              const recordCodecName =
+                info.inflection.functionRecordReturnCodecName({
+                  pgProc,
+                  serviceName,
+                });
+              return EXPORTABLE(
+                (attributes, executor, recordCodec, recordCodecName, sql) =>
+                  recordCodec({
+                    name: recordCodecName,
+                    identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
+                    attributes,
+                    description: undefined,
+                    extensions: {
+                      /* `The return type of our \`${name}\` ${
                       pgProc.provolatile === "v" ? "mutation" : "query"
                     }.`, */
-                  },
-                  executor,
-                  isAnonymous: true,
-                }),
-              [attributes, executor, recordCodec, recordCodecName, sql],
-            );
-          };
+                    },
+                    executor,
+                    isAnonymous: true,
+                  }),
+                [attributes, executor, recordCodec, recordCodecName, sql],
+              );
+            };
 
           const returnCodec = needsPayloadCodecToBeGenerated
             ? await makeCodecFromReturn()
@@ -311,7 +317,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             return null;
           }
 
-          const parameters: PgResourceParameter[] = [];
+          const parameters: GenericPgResourceParameter[] = [];
 
           // const processedFirstInputArg = false;
 
@@ -498,7 +504,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               return null;
             }
 
-            const options: PgFunctionResourceOptions = {
+            const options: GenericPgFunctionResourceOptions = {
               name,
               identifier,
               from: fromCallback,
@@ -535,7 +541,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
               [finalResourceOptions, makePgResourceOptions],
             );
           } else {
-            const options: PgResourceOptions = EXPORTABLE(
+            const options: GenericPgResourceOptions = EXPORTABLE(
               (
                 description,
                 executor,

@@ -5,7 +5,9 @@ import "./PgRelationsPlugin.js";
 import "./PgTablesPlugin.js";
 
 import type {
-  PgCodec,
+  GenericPgCodec,
+  GenericPgRelation,
+  GenericPgSelectSingleStep,
   PgCodecExtensions,
   PgCodecPolymorphism,
   PgCodecPolymorphismRelational,
@@ -14,14 +16,7 @@ import type {
   PgCodecPolymorphismSingleTypeAttributeSpec,
   PgCodecPolymorphismSingleTypeSpec,
   PgCodecRef,
-  PgCodecRelation,
-  PgCodecWithAttributes,
   PgRefDefinition,
-  PgRegistry,
-  PgResource,
-  PgResourceOptions,
-  PgResourceUnique,
-  PgSelectSingleStep,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep } from "@dataplan/pg";
 import type { ExecutableStep, ListStep, NodeIdHandler } from "grafast";
@@ -61,14 +56,14 @@ declare global {
   }
   namespace GraphileBuild {
     interface Build {
-      nodeIdSpecForCodec(codec: PgCodec<any, any, any, any, any, any, any>):
+      nodeIdSpecForCodec(codec: GenericPgCodec):
         | (($nodeId: ExecutableStep<string>) => {
             [key: string]: ExecutableStep<any>;
           })
         | null;
     }
     interface ScopeInterface {
-      pgCodec?: PgCodec<any, any, any, any, any, any, any>;
+      pgCodec?: GenericPgCodec;
       isPgPolymorphicTableType?: boolean;
       pgPolymorphism?: PgCodecPolymorphism<string>;
     }
@@ -335,9 +330,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
       async pgRegistry_PgRegistryBuilder_finalize(info, event) {
         const { registryBuilder } = event;
         const registryConfig = registryBuilder.getRegistryConfig();
-        for (const resource of Object.values(
-          registryConfig.pgResources,
-        ) as PgResourceOptions[]) {
+        for (const resource of Object.values(registryConfig.pgResources)) {
           if (resource.parameters || !resource.codec.attributes) {
             continue;
           }
@@ -359,7 +352,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             continue;
           }
 
-          const poly = (resource.codec as PgCodec).polymorphism;
+          const poly = resource.codec.polymorphism;
           if (poly?.mode === "relational") {
             // Copy common attributes to implementations
             for (const spec of Object.values(poly.types)) {
@@ -438,6 +431,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                     sharedRelationName;
                 } else {
                   otherCodec.attributes[colName] = {
+                    name: colName,
                     codec: colSpec.codec,
                     notNull: colSpec.notNull,
                     hasDefault: colSpec.hasDefault,
@@ -463,13 +457,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           if (rawResource.parameters || !rawResource.codec.attributes) {
             continue;
           }
-          const resource = rawResource as PgResource<
-            string,
-            PgCodecWithAttributes,
-            any,
-            undefined,
-            PgRegistry
-          >;
+          const resource = rawResource;
           if (!resource.extensions?.pg) {
             continue;
           }
@@ -488,11 +476,8 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             continue;
           }
 
-          const relations = registry.pgRelations[resource.codec.name] as Record<
-            string,
-            PgCodecRelation
-          >;
-          const poly = (resource.codec as PgCodec).polymorphism;
+          const relations = registry.pgRelations[resource.codec.name];
+          const poly = resource.codec.polymorphism;
           if (poly?.mode === "relational") {
             // Copy common attributes to implementations
             for (const spec of Object.values(poly.types)) {
@@ -738,7 +723,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             !resource.isUnique &&
             !resource.isVirtual
           ) {
-            if ((resource.codec as PgCodec).polymorphism) {
+            if (resource.codec.polymorphism) {
               // This is a polymorphic type
               newBehavior.push(
                 "-resource:insert -resource:update -resource:delete",
@@ -747,11 +732,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               const resourceTypeName = build.inflection.tableType(
                 resource.codec,
               );
-              const relations: Record<string, PgCodecRelation> =
+              const relations: Record<string, GenericPgRelation> =
                 resource.getRelations();
-              const pk = (
-                resource.uniques as PgResourceUnique[] | undefined
-              )?.find((u) => u.isPrimary);
+              const pk = resource.uniques?.find((u) => u.isPrimary);
               if (pk) {
                 const pkAttributes = pk.attributes;
                 const pkRelations = Object.values(relations).filter((r) =>
@@ -808,9 +791,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   if (!handler) {
                     return null;
                   }
-                  const pk = (
-                    relation.remoteResource.uniques as PgResourceUnique[]
-                  ).find((u) => u.isPrimary);
+                  const pk = relation.remoteResource.uniques.find(
+                    (u) => u.isPrimary,
+                  );
                   if (!pk) {
                     return null;
                   }
@@ -987,7 +970,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           setGraphQLTypeForPgCodec,
           grafast: { list, constant, access },
         } = build;
-        const unionsToRegister = new Map<string, PgCodec[]>();
+        const unionsToRegister = new Map<string, GenericPgCodec[]>();
         for (const codec of build.pgCodecMetaLookup.keys()) {
           if (!codec.attributes) {
             // Only apply to codecs that define attributes
@@ -1048,13 +1031,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   },
                   nonNullNode: pgForbidSetofFunctionsToReturnNull,
                 });
-                const resource = build.pgTableResource(
-                  codec as PgCodecWithAttributes,
-                );
+                const resource = build.pgTableResource(codec);
                 const primaryKey = resource
-                  ? (resource.uniques as PgResourceUnique[]).find(
-                      (u) => u.isPrimary === true,
-                    )
+                  ? resource.uniques.find((u) => u.isPrimary === true)
                   : undefined;
                 const pk = primaryKey?.attributes;
                 for (const [typeIdentifier, spec] of Object.entries(
@@ -1136,7 +1115,7 @@ return function (list, constant) {
                             )
                           : EXPORTABLE(
                               (constant, list, pk, tableTypeName) =>
-                                ($record: PgSelectSingleStep) => {
+                                ($record: GenericPgSelectSingleStep) => {
                                   return list([
                                     constant(tableTypeName, false),
                                     ...pk.map((attribute) =>

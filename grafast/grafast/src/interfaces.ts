@@ -411,17 +411,17 @@ export type FieldArgs = {
   /** Gets the value, evaluating the `inputPlan` at each field if appropriate */
   get(path?: string | ReadonlyArray<string | number>): ExecutableStep;
   /** Gets the value *without* calling any `inputPlan`s */
-  getRaw(path?: string | ReadonlyArray<string | number>): AnyInputStep;
+  getRaw(path?: string | ReadonlyArray<string | number>): _AnyInputStep;
   /** This also works (without path) to apply each list entry against $target */
   apply(
     $target: ExecutableStep | ModifierStep | (() => ModifierStep),
     path?: string | ReadonlyArray<string | number>,
   ): void;
-} & AnyInputStepDollars;
+} & _AnyInputStepDollars;
 
 export type InputStep<TInputType extends GraphQLInputType = GraphQLInputType> =
   GraphQLInputType extends TInputType
-    ? AnyInputStep
+    ? _AnyInputStep
     : TInputType extends GraphQLNonNull<infer U>
     ? Exclude<InputStep<U & GraphQLInputType>, ConstantStep<undefined>>
     : TInputType extends GraphQLList<GraphQLInputType>
@@ -435,9 +435,10 @@ export type InputStep<TInputType extends GraphQLInputType = GraphQLInputType> =
         | __InputObjectStepWithDollars<TInputType> // .get(), .eval(), .evalHas(), .evalIs(null), .evalIsEmpty()
         | ConstantStep<undefined> // .eval(), .evalIs(), .evalIsEmpty()
     : // TYPES: handle the other types
-      AnyInputStep;
+      _AnyInputStep;
 
-export type AnyInputStep =
+/** @internal */
+export type _AnyInputStep =
   | __TrackedValueStepWithDollars<any, GraphQLInputType> // .get(), .eval(), .evalIs(), .evalHas(), .at(), .evalLength(), .evalIsEmpty()
   | __InputListStep // .at(), .eval(), .evalLength(), .evalIs(null)
   | __InputStaticLeafStep // .eval(), .evalIs()
@@ -445,7 +446,8 @@ export type AnyInputStep =
   | __InputObjectStepWithDollars<GraphQLInputObjectType> // .get(), .eval(), .evalHas(), .evalIs(null), .evalIsEmpty()
   | ConstantStep<undefined>; // .eval(), .evalIs(), .evalIsEmpty()
 
-export type AnyInputStepWithDollars = AnyInputStep & AnyInputStepDollars;
+/** @internal */
+export type _AnyInputStepWithDollars = _AnyInputStep & _AnyInputStepDollars;
 
 // TYPES: solve these lies
 /**
@@ -453,8 +455,9 @@ export type AnyInputStepWithDollars = AnyInputStep & AnyInputStepDollars;
  * `{ $input: { $user: { $username } } }` without having to pass loads of
  * generics.
  */
-export type AnyInputStepDollars = {
-  [key in string as `$${key}`]: AnyInputStepWithDollars;
+/** @internal */
+export type _AnyInputStepDollars = {
+  [key in string as `$${key}`]: _AnyInputStepWithDollars;
 };
 
 export interface FieldInfo {
@@ -809,7 +812,7 @@ export type GrafastInputFieldConfig<
 export type TrackedArguments<
   TArgs extends BaseGraphQLArguments = BaseGraphQLArguments,
 > = {
-  get<TKey extends keyof TArgs>(key: TKey): AnyInputStep;
+  get<TKey extends keyof TArgs>(key: TKey): _AnyInputStep;
 };
 
 /**

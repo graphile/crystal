@@ -10,17 +10,31 @@ import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type {
+  _AnyPgCodecAttribute,
   ObjectFromPgCodecAttributes,
-  PgCodecAttribute,
+  PgCodecAttributeCodec,
+  PgCodecAttributeName,
 } from "../codecs.js";
 import { TYPES } from "../codecs.js";
-import type { PgResource } from "../datasource.js";
 import type {
+  _AnyPgResource,
+  GenericPgResource,
+  PgResource,
+  PgResourceCodec,
+  PgResourceRegistry,
+} from "../datasource.js";
+import type {
+  _AnyPgCodec,
+  GetPgRegistryCodecRelationConfigs,
+  GetPgResourceAttributeMap,
   GetPgResourceAttributes,
   GetPgResourceCodec,
+  GetPgResourceRelationConfigs,
   GetPgResourceRelations,
   PgCodec,
-  PgCodecRelation,
+  PgCodecAttributes,
+  PgCodecPolymorphism,
+  PgCodecRelationConfigName,
   PgRegistry,
   PgTypedExecutableStep,
 } from "../interfaces.js";
@@ -36,13 +50,24 @@ import { getFragmentAndCodecFromOrder, PgSelectStep } from "./pgSelect.js";
 // const debugPlanVerbose = debugPlan.extend("verbose");
 // const debugExecuteVerbose = debugExecute.extend("verbose");
 
-export interface PgSelectSinglePlanOptions {
-  fromRelation?: [PgSelectSingleStep<PgResource>, string];
+/** @internal */
+export interface _AnyPgSelectSinglePlanOptions
+  extends PgSelectSinglePlanOptions<any> {}
+export interface PgSelectSinglePlanOptions<TResource extends _AnyPgResource> {
+  fromRelation?: readonly [
+    PgSelectSingleStep<TResource>,
+    PgCodecRelationConfigName<
+      GetPgRegistryCodecRelationConfigs<
+        PgResourceRegistry<TResource>,
+        PgResourceCodec<TResource>
+      >
+    >,
+  ];
 }
 
 // Types that only take a few bytes so adding them to the selection would be
 // cheap to do.
-const CHEAP_ATTRIBUTE_TYPES = new Set([
+const CHEAP_ATTRIBUTE_TYPES = new Set<_AnyPgCodec>([
   TYPES.int2,
   TYPES.int,
   TYPES.bigint,
@@ -55,6 +80,16 @@ const CHEAP_ATTRIBUTE_TYPES = new Set([
   TYPES.timestamptz,
 ]);
 
+/** @internal */
+export interface _AnyPgSelectSingleStep extends PgSelectSingleStep<any> {}
+export interface GenericPgSelectSingleStep
+  extends PgSelectSingleStep<GenericPgResource> {}
+export type PgSelectSingleStepResource<U> = U extends PgSelectSingleStep<
+  infer TResource
+>
+  ? TResource
+  : never;
+
 /**
  * Represents the single result of a unique PgSelectStep. This might be
  * retrieved explicitly by PgSelectStep.single(), or implicitly (via Grafast)
@@ -63,18 +98,12 @@ const CHEAP_ATTRIBUTE_TYPES = new Set([
  * such as `.get` and `.cursor` which can receive specific properties by
  * telling the PgSelectStep to select the relevant expressions.
  */
-export class PgSelectSingleStep<
-    TResource extends PgResource<any, any, any, any, any> = PgResource,
-  >
+export class PgSelectSingleStep<TResource extends _AnyPgResource>
   extends UnbatchedExecutableStep<
     unknown[] /* What we return will be a tuple based on the values selected */
   >
   implements
-    PgTypedExecutableStep<
-      TResource extends PgResource<any, infer UCodec, any, any, any>
-        ? UCodec
-        : never
-    >,
+    PgTypedExecutableStep<GetPgResourceCodec<TResource>>,
     EdgeCapableStep<any>
 {
   static $$export = {
@@ -95,12 +124,12 @@ export class PgSelectSingleStep<
   constructor(
     $class: PgSelectStep<TResource>,
     $item: ExecutableStep<unknown[]>,
-    private options: PgSelectSinglePlanOptions = Object.create(null),
+    private options: PgSelectSinglePlanOptions<TResource> = Object.create(null),
   ) {
     super();
     this.itemStepId = this.addDependency($item);
     this.resource = $class.resource;
-    this.pgCodec = this.resource.codec as GetPgResourceCodec<TResource>;
+    this.pgCodec = this.resource.codec;
     this.mode = $class.mode;
     this.classStepId = $class.id;
   }
@@ -151,15 +180,16 @@ export class PgSelectSingleStep<
    * Returns a plan representing a named attribute (e.g. column) from the class
    * (e.g. table).
    */
-  get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
+  public get<
+    TAttr extends PgCodecAttributeName<
+      PgCodecAttributes<PgResourceCodec<TResource>>
+    >,
+  >(
     attr: TAttr,
   ): PgClassExpressionStep<
-    GetPgResourceAttributes<TResource>[TAttr] extends PgCodecAttribute<
-      infer UCodec,
-      any
-    >
-      ? UCodec
-      : never,
+    PgCodecAttributeCodec<
+      Extract<GetPgResourceAttributes<TResource>, { name: TAttr }>
+    >,
     TResource
   > {
     if (this.mode === "aggregate") {
@@ -171,8 +201,7 @@ export class PgSelectSingleStep<
       );
     }
     const classPlan = this.getClassStep();
-    const resourceAttribute: PgCodecAttribute | undefined =
-      this.resource.codec.attributes?.[attr as string];
+    const resourceAttribute = this.resource.codec.attributes?.[attr];
     if (!resourceAttribute && attr !== "") {
       throw new Error(
         `${this.resource} does not define an attribute named '${String(attr)}'`,
@@ -182,18 +211,18 @@ export class PgSelectSingleStep<
     if (resourceAttribute?.via) {
       const { relation, attribute } = this.resource.resolveVia(
         resourceAttribute.via,
-        attr as string,
+        attr,
       );
-      return this.singleRelation(relation as any).get(attribute) as any;
+      return this.singleRelation(relation).get(attribute) as any;
     }
 
     if (resourceAttribute?.identicalVia) {
       const { relation, attribute } = this.resource.resolveVia(
         resourceAttribute.identicalVia,
-        attr as string,
+        attr,
       );
 
-      const $existingPlan = this.existingSingleRelation(relation as any);
+      const $existingPlan = this.existingSingleRelation(relation);
       if ($existingPlan) {
         // Relation exists already; load it from there for efficiency
         return $existingPlan.get(attribute) as any;
@@ -206,7 +235,10 @@ export class PgSelectSingleStep<
       const [$fromPlan, fromRelationName] = this.options.fromRelation;
       const matchingAttribute = (
         Object.entries($fromPlan.resource.codec.attributes!) as Array<
-          [string, PgCodecAttribute]
+          [
+            PgCodecAttributeName<GetPgResourceAttributes<TResource>>,
+            _AnyPgCodecAttribute,
+          ]
         >
       ).find(([name, col]) => {
         if (col.identicalVia) {
@@ -221,7 +253,7 @@ export class PgSelectSingleStep<
         return false;
       });
       if (matchingAttribute) {
-        return $fromPlan.get(matchingAttribute[0]) as any;
+        return $fromPlan.get(matchingAttribute[0]);
       }
     }
 
@@ -236,7 +268,7 @@ export class PgSelectSingleStep<
      *   decoding these string values.
      */
 
-    const sqlExpr = pgClassExpression<any, TResource>(
+    const sqlExpr = pgClassExpression(
       this,
       attr === ""
         ? this.resource.codec
@@ -260,13 +292,13 @@ export class PgSelectSingleStep<
       this.nonNullAttribute = { attribute: resourceAttribute, attr };
     }
 
-    return colPlan as any;
+    return colPlan;
   }
 
   /**
    * Returns a plan representing the result of an expression.
    */
-  public select<TExpressionCodec extends PgCodec>(
+  public select<TExpressionCodec extends _AnyPgCodec>(
     fragment: SQL,
     codec: TExpressionCodec,
   ): PgClassExpressionStep<TExpressionCodec, TResource> {
@@ -285,10 +317,13 @@ export class PgSelectSingleStep<
   }
 
   public placeholder($step: PgTypedExecutableStep<any>): SQL;
-  public placeholder($step: ExecutableStep, codec: PgCodec): SQL;
-  public placeholder(
+  public placeholder<TCodec extends _AnyPgCodec>(
+    $step: ExecutableStep,
+    codec: TCodec,
+  ): SQL;
+  public placeholder<TCodec extends _AnyPgCodec>(
     $step: ExecutableStep | PgTypedExecutableStep<any>,
-    overrideCodec?: PgCodec,
+    overrideCodec?: TCodec,
   ): SQL {
     return overrideCodec
       ? this.getClassStep().placeholder($step, overrideCodec)
@@ -323,7 +358,9 @@ export class PgSelectSingleStep<
   }
 
   public singleRelation<
-    TRelationName extends keyof GetPgResourceRelations<TResource>,
+    TRelationName extends PgCodecRelationConfigName<
+      GetPgResourceRelationConfigs<TResource>
+    >,
   >(
     relationIdentifier: TRelationName,
   ): PgSelectSingleStep<
@@ -333,9 +370,7 @@ export class PgSelectSingleStep<
     if ($existingPlan) {
       return $existingPlan;
     }
-    const relation = this.resource.getRelation(
-      relationIdentifier,
-    ) as PgCodecRelation;
+    const relation = this.resource.getRelation(relationIdentifier);
     if (!relation || !relation.isUnique) {
       throw new Error(
         `${String(relationIdentifier)} is not a unique relation on ${
@@ -345,11 +380,8 @@ export class PgSelectSingleStep<
     }
     const { remoteResource, remoteAttributes, localAttributes } = relation;
 
-    const options: PgSelectSinglePlanOptions = {
-      fromRelation: [
-        this as PgSelectSingleStep<any>,
-        relationIdentifier as string,
-      ],
+    const options = {
+      fromRelation: [this, relationIdentifier] as const,
     };
     return remoteResource.get(
       remoteAttributes.reduce((memo, remoteAttribute, attributeIndex) => {
@@ -357,19 +389,17 @@ export class PgSelectSingleStep<
         return memo;
       }, Object.create(null)),
       options,
-    ) as PgSelectSingleStep<any>;
+    );
   }
 
   public manyRelation<
-    TRelationName extends keyof GetPgResourceRelations<TResource>,
+    TRelationName extends GetPgResourceRelationConfigs<TResource>["name"],
   >(
     relationIdentifier: TRelationName,
   ): PgSelectStep<
     GetPgResourceRelations<TResource>[TRelationName]["remoteResource"]
   > {
-    const relation = this.resource.getRelation(
-      relationIdentifier,
-    ) as PgCodecRelation;
+    const relation = this.resource.getRelation(relationIdentifier);
     if (!relation) {
       throw new Error(
         `${String(relationIdentifier)} is not a relation on ${this.resource}`,
@@ -377,12 +407,12 @@ export class PgSelectSingleStep<
     }
     const { remoteResource, remoteAttributes, localAttributes } = relation;
 
-    return (remoteResource as PgResource).find(
+    return remoteResource.find(
       remoteAttributes.reduce((memo, remoteAttribute, attributeIndex) => {
         memo[remoteAttribute] = this.get(localAttributes[attributeIndex]);
         return memo;
       }, Object.create(null)),
-    ) as any;
+    );
   }
 
   public record(): PgClassExpressionStep<
@@ -456,7 +486,7 @@ export class PgSelectSingleStep<
   }
 
   planForType(type: GraphQLObjectType): ExecutableStep {
-    const poly = (this.resource.codec as PgCodec).polymorphism;
+    const poly: PgCodecPolymorphism<any> = this.resource.codec.polymorphism;
     if (poly?.mode === "single") {
       return this;
     } else if (poly?.mode === "relational") {
@@ -476,12 +506,12 @@ export class PgSelectSingleStep<
   }
 
   private nonNullAttribute: {
-    attribute: PgCodecAttribute;
+    attribute: _AnyPgCodecAttribute;
     attr: string;
   } | null = null;
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
-    const poly = (this.resource.codec as PgCodec).polymorphism;
+    const poly: PgCodecPolymorphism<any> = this.resource.codec.polymorphism;
     if (poly?.mode === "single" || poly?.mode === "relational") {
       const $class = this.getClassStep();
       this.typeStepIndexList = poly.typeAttributes.map((col) => {
@@ -565,16 +595,18 @@ export class PgSelectSingleStep<
 
   unbatchedExecute(
     _extra: ExecutionExtra,
-    result: ObjectFromPgCodecAttributes<GetPgResourceAttributes<TResource>>,
+    result: ObjectFromPgCodecAttributes<GetPgResourceAttributeMap<TResource>>,
   ): unknown[] {
     if (result == null) {
       return this._coalesceToEmptyObject ? Object.create(null) : null;
     } else if (this.nullCheckAttributeIndex != null) {
+      // @ts-expect-error
       const nullIfAttributeNull = result[this.nullCheckAttributeIndex];
       if (nullIfAttributeNull == null) {
         return this._coalesceToEmptyObject ? Object.create(null) : null;
       }
     } else if (this.nullCheckId != null) {
+      // @ts-expect-error
       const nullIfExpressionNotTrue = result[this.nullCheckId];
       if (
         nullIfExpressionNotTrue == null ||
@@ -597,7 +629,7 @@ export function pgSelectFromRecord<
     PgCodec<any, any, any, any, any, any, any>,
     any,
     any,
-    PgRegistry
+    PgRegistry<any, any, any>
   >,
 >(
   resource: TResource,
@@ -616,9 +648,7 @@ export function pgSelectFromRecord<
  * Given a plan that represents a single record (via
  * PgSelectSingleStep.record()) this turns it back into a PgSelectSingleStep
  */
-export function pgSelectSingleFromRecord<
-  TResource extends PgResource<any, any, any, any>,
->(
+export function pgSelectSingleFromRecord<TResource extends _AnyPgResource>(
   resource: TResource,
   $record: PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>,
 ): PgSelectSingleStep<TResource> {

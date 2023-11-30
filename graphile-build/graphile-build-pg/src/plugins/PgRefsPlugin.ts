@@ -1,12 +1,12 @@
 import type {
-  PgCodec,
+  _AnyPgCodec,
+  _AnyPgCodecRelationConfig,
+  _AnyPgResourceOptions,
+  GenericPgCodecRelationConfig,
   PgCodecExtensions,
   PgCodecRefPath,
-  PgCodecRelationConfig,
-  PgCodecWithAttributes,
   PgRefDefinition,
   PgRefDefinitions,
-  PgResourceOptions,
 } from "@dataplan/pg";
 import { arraysMatch } from "grafast";
 import { gatherConfig } from "graphile-build";
@@ -202,8 +202,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           ? [tags.refVia]
           : null;
 
-        const refDefinitions = (resourceOptions.codec as PgCodec).extensions
-          ?.refDefinitions;
+        const refDefinitions = resourceOptions.codec.extensions?.refDefinitions;
         if (!refDefinitions) {
           if (rawRefVias) {
             throw new Error(`@refVia without matching @ref is invalid`);
@@ -252,16 +251,13 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           outerLoop: for (const via of vias) {
             const path: PgCodecRefPath = [];
             const parts = via.split(";");
-            let currentResourceOptions: PgResourceOptions = resourceOptions;
+            let currentResourceOptions = resourceOptions;
             for (const rawPart of parts) {
-              type RelationEntry = [
-                string,
-                PgCodecRelationConfig<PgCodecWithAttributes, PgResourceOptions>,
-              ];
+              type RelationEntry = [string, GenericPgCodecRelationConfig];
               const relations =
                 registryConfig.pgRelations[currentResourceOptions.codec.name];
               const relationEntries = relations
-                ? (Object.entries(relations) as Array<RelationEntry>)
+                ? Object.entries(relations)
                 : [];
               const part = rawPart.trim();
               // ENHANCE: allow whitespace

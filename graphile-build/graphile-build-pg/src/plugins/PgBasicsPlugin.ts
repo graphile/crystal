@@ -2,15 +2,7 @@ import "./PgTablesPlugin.js";
 import "../interfaces.js";
 import "graphile-config";
 
-import type {
-  PgCodec,
-  PgCodecRef,
-  PgCodecRelation,
-  PgCodecWithAttributes,
-  PgRefDefinition,
-  PgResource,
-  PgResourceUnique,
-} from "@dataplan/pg";
+import type { PgCodecRef, PgRefDefinition, PgResource } from "@dataplan/pg";
 import * as dataplanPg from "@dataplan/pg";
 import type { GraphQLType } from "grafast/graphql";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
@@ -29,19 +21,19 @@ declare global {
       "@dataplan/pg": string;
     }
     type HasGraphQLTypeForPgCodec = (
-      codec: PgCodec<any, any, any, any, any, any, any>,
+      codec: dataplanPg.GenericPgCodec,
       situation?: string,
     ) => boolean;
     type GetGraphQLTypeByPgCodec = (
-      codec: PgCodec<any, any, any, any, any, any, any>,
+      codec: dataplanPg.GenericPgCodec,
       situation: string,
     ) => GraphQLType | null;
     type GetGraphQLTypeNameByPgCodec = (
-      codec: PgCodec<any, any, any, any, any, any, any>,
+      codec: dataplanPg.GenericPgCodec,
       situation: string,
     ) => string | null;
     type SetGraphQLTypeForPgCodec = (
-      codec: PgCodec<any, any, any, any, any, any, any>,
+      codec: dataplanPg.GenericPgCodec,
       situations: string | string[],
       typeName: string,
     ) => void;
@@ -92,26 +84,30 @@ declare global {
       /**
        * Get a table-like resource for the given codec, assuming exactly one exists.
        */
-      pgTableResource<TCodec extends PgCodecWithAttributes>(
+      pgTableResource<TCodec extends dataplanPg.GenericPgCodec>(
         codec: TCodec,
         strict?: boolean,
       ): PgResource<
         string,
         TCodec,
-        ReadonlyArray<PgResourceUnique>,
-        undefined
+        dataplanPg.GenericPgResourceUnique,
+        never,
+        dataplanPg.GenericPgRegistry
       > | null;
     }
 
     interface BehaviorEntities {
-      pgCodec: PgCodec;
-      pgCodecAttribute: [codec: PgCodecWithAttributes, attributeName: string];
-      pgResource: PgResource<any, any, any, any, any>;
-      pgResourceUnique: [
-        resource: PgResource<any, any, any, any, any>,
-        unique: PgResourceUnique,
+      pgCodec: dataplanPg.GenericPgCodec;
+      pgCodecAttribute: [
+        codec: dataplanPg.GenericPgCodec,
+        attributeName: string,
       ];
-      pgCodecRelation: PgCodecRelation;
+      pgResource: dataplanPg.GenericPgResource;
+      pgResourceUnique: [
+        resource: dataplanPg.GenericPgResource,
+        unique: dataplanPg.GenericPgResourceUnique,
+      ];
+      pgCodecRelation: dataplanPg.GenericPgRelation;
       pgCodecRef: PgCodecRef;
       pgRefDefinition: PgRefDefinition;
     }
@@ -190,7 +186,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
               `pgCodecAttribute no longer accepts (codec, attribute) - it now accepts (codec, attributeName). Please update your code. Sorry! (Changed in PostGraphile V5 alpha 13.)`,
             );
           }
-          const attribute = codec.attributes[attributeName];
+          const attribute = codec.attributes![attributeName];
           return [
             behavior,
             getBehavior([codec.extensions, attribute.extensions]),
@@ -334,34 +330,41 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
             }
           };
         const resourceByCodecCacheUnstrict = new Map<
-          PgCodecWithAttributes,
-          PgResource<any, any, any, any, any> | null
+          dataplanPg.GenericPgCodec,
+          dataplanPg.GenericPgResource | null
         >();
         const resourceByCodecCacheStrict = new Map<
-          PgCodecWithAttributes,
-          PgResource<any, any, any, any, any> | null
+          dataplanPg.GenericPgCodec,
+          dataplanPg.GenericPgResource | null
         >();
-        const pgTableResource = <TCodec extends PgCodecWithAttributes>(
+        const pgTableResource = <TCodec extends dataplanPg.GenericPgCodec>(
           codec: TCodec,
           strict = true,
         ): PgResource<
           string,
           TCodec,
-          ReadonlyArray<PgResourceUnique>,
-          undefined
+          dataplanPg.GenericPgResourceUnique,
+          never,
+          dataplanPg.GenericPgRegistry
         > | null => {
           const resourceByCodecCache = strict
             ? resourceByCodecCacheStrict
             : resourceByCodecCacheUnstrict;
           if (resourceByCodecCache.has(codec)) {
-            return resourceByCodecCache.get(codec)!;
+            return resourceByCodecCache.get(codec)! as any;
           }
           const resources = Object.values(
             build.input.pgRegistry.pgResources,
           ).filter(
             (
-              r: PgResource<any, any, any, any>,
-            ): r is PgResource<string, TCodec, any, undefined> =>
+              r,
+            ): r is PgResource<
+              string,
+              TCodec,
+              any,
+              never,
+              dataplanPg.GenericPgRegistry
+            > =>
               r.codec === codec &&
               !r.parameters &&
               r.executor === codec.executor &&

@@ -1,4 +1,4 @@
-import type { PgCodecRefPath, PgCodecRelation, PgResource } from "@dataplan/pg";
+import type { PgCodecRefPath, PgResource } from "@dataplan/pg";
 import type { PgSmartTagsDict } from "pg-introspection";
 
 export function tagToString(
@@ -446,9 +446,7 @@ export const resolveResourceRefPath = (
     layers: [] as Layer[],
   };
   for (const pathEntry of path) {
-    const relation = result.resource.getRelation(
-      pathEntry.relationName,
-    ) as PgCodecRelation;
+    const relation = result.resource.getRelation(pathEntry.relationName);
     const {
       isReferencee,
       localAttributes,

@@ -3,7 +3,7 @@ import type { GraphQLObjectType } from "graphql";
 import { isDev } from "../dev.js";
 import { inspect } from "../inspect.js";
 import type {
-  AnyInputStep,
+  _AnyInputStep,
   ExecutionExtra,
   NodeIdHandler,
   PolymorphicData,
@@ -101,7 +101,7 @@ export function node(
 
 export function specFromNodeId(
   handler: NodeIdHandler<any>,
-  $id: ExecutableStep<string> | AnyInputStep,
+  $id: ExecutableStep<string> | _AnyInputStep,
 ) {
   function decodeWithCodecAndHandler(raw: string) {
     try {

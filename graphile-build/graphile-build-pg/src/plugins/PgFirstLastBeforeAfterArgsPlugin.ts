@@ -2,9 +2,9 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
+  GenericPgSelectSingleStep,
+  GenericPgSelectStep,
   PgSelectParsedCursorStep,
-  PgSelectSingleStep,
-  PgSelectStep,
 } from "@dataplan/pg";
 import type { ConnectionStep, GrafastFieldConfigArgumentMap } from "grafast";
 import { EXPORTABLE } from "graphile-build";
@@ -93,9 +93,9 @@ function commonFn(
             function plan(
               _: any,
               $connection: ConnectionStep<
-                PgSelectSingleStep,
+                GenericPgSelectSingleStep,
                 PgSelectParsedCursorStep,
-                PgSelectStep
+                GenericPgSelectStep
               >,
               arg,
             ) {
@@ -118,9 +118,9 @@ function commonFn(
                   function plan(
                     _: any,
                     $connection: ConnectionStep<
-                      PgSelectSingleStep,
+                      GenericPgSelectSingleStep,
                       PgSelectParsedCursorStep,
-                      PgSelectStep
+                      GenericPgSelectStep
                     >,
                     val,
                   ) {
@@ -145,9 +145,9 @@ function commonFn(
             function plan(
               _: any,
               $connection: ConnectionStep<
-                PgSelectSingleStep,
+                GenericPgSelectSingleStep,
                 PgSelectParsedCursorStep,
-                PgSelectStep
+                GenericPgSelectStep
               >,
               val,
             ) {
@@ -170,9 +170,9 @@ function commonFn(
                   function plan(
                     _: any,
                     $connection: ConnectionStep<
-                      PgSelectSingleStep,
+                      GenericPgSelectSingleStep,
                       PgSelectParsedCursorStep,
-                      PgSelectStep
+                      GenericPgSelectStep
                     >,
                     val,
                   ) {
@@ -193,9 +193,9 @@ function commonFn(
                   function plan(
                     _: any,
                     $connection: ConnectionStep<
-                      PgSelectSingleStep,
+                      GenericPgSelectSingleStep,
                       PgSelectParsedCursorStep,
-                      PgSelectStep
+                      GenericPgSelectStep
                     >,
                     val,
                   ) {

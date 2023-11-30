@@ -1,5 +1,11 @@
 /* eslint-disable graphile-export/export-instances */
-import type { PgRegistry, PgRegistryBuilder } from "@dataplan/pg";
+import type {
+  DefaultRegistryBuilder,
+  EmptyRegistryBuilder,
+  GenericPgRegistry,
+  PgRegistry,
+  PgRegistryBuilder,
+} from "@dataplan/pg";
 import { makeRegistryBuilder } from "@dataplan/pg";
 import type { PromiseOrDirect } from "grafast";
 import { gatherConfig } from "graphile-build";
@@ -10,29 +16,29 @@ declare global {
   namespace GraphileConfig {
     interface GatherHelpers {
       pgRegistry: {
-        getRegistryBuilder(): PromiseOrDirect<PgRegistryBuilder<any, any, any>>;
-        getRegistry(): PromiseOrDirect<PgRegistry<any, any, any>>;
+        getRegistryBuilder(): PromiseOrDirect<DefaultRegistryBuilder>;
+        getRegistry(): PromiseOrDirect<GenericPgRegistry>;
       };
     }
 
     interface GatherHooks {
       pgRegistry_PgRegistryBuilder_init(event: {
-        registryBuilder: PgRegistryBuilder<any, any, any>;
+        registryBuilder: EmptyRegistryBuilder;
       }): PromiseOrDirect<void>;
       pgRegistry_PgRegistryBuilder_pgCodecs(event: {
-        registryBuilder: PgRegistryBuilder<any, any, any>;
+        registryBuilder: DefaultRegistryBuilder;
       }): PromiseOrDirect<void>;
       pgRegistry_PgRegistryBuilder_pgResources(event: {
-        registryBuilder: PgRegistryBuilder<any, any, any>;
+        registryBuilder: DefaultRegistryBuilder;
       }): PromiseOrDirect<void>;
       pgRegistry_PgRegistryBuilder_pgRelations(event: {
-        registryBuilder: PgRegistryBuilder<any, any, any>;
+        registryBuilder: DefaultRegistryBuilder;
       }): PromiseOrDirect<void>;
       pgRegistry_PgRegistryBuilder_finalize(event: {
-        registryBuilder: PgRegistryBuilder<any, any, any>;
+        registryBuilder: DefaultRegistryBuilder;
       }): PromiseOrDirect<void>;
       pgRegistry_PgRegistry(event: {
-        registry: PgRegistry<any, any, any>;
+        registry: GenericPgRegistry;
       }): PromiseOrDirect<void>;
     }
   }

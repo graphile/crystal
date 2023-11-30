@@ -9,13 +9,18 @@ import { ExecutableStep, exportAs, isDev, setter } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 import sql from "pg-sql2";
 
-import type { PgCodecAttribute } from "../codecs.js";
-import type { PgResource } from "../index.js";
+import type {
+  _AnyPgCodecAttribute,
+  PgCodecAttribute,
+  PgCodecAttributeCodec,
+  PgCodecAttributeName,
+} from "../codecs.js";
+import type { _AnyPgResource } from "../datasource.js";
 import { inspect } from "../inspect.js";
 import type {
+  _AnyPgCodec,
   GetPgResourceAttributes,
   GetPgResourceCodec,
-  PgCodec,
   PgTypedExecutableStep,
 } from "../interfaces.js";
 import type { PgClassExpressionStep } from "./pgClassExpression.js";
@@ -43,15 +48,14 @@ interface PgInsertSinglePlanFinalizeResults {
  * Inserts a row into resource with the given specified attribute values.
  */
 export class PgInsertSingleStep<
-    TResource extends PgResource<any, any, any, any, any> = PgResource,
+    TResource extends _AnyPgResource = _AnyPgResource,
   >
   extends ExecutableStep<
     unknown[] // tuple depending on what's selected
   >
   implements
     SetterCapableStep<{
-      [key in keyof GetPgResourceAttributes<TResource> &
-        string]: ExecutableStep;
+      [attribute in GetPgResourceAttributes<TResource> as PgCodecAttributeName<attribute>]: ExecutableStep;
     }>
 {
   static $$export = {
@@ -87,10 +91,10 @@ export class PgInsertSingleStep<
    * The attributes and their dependency ids for us to insert.
    */
   private attributes: Array<{
-    name: keyof GetPgResourceAttributes<TResource>;
+    name: PgCodecAttributeName<GetPgResourceAttributes<TResource>>;
     depId: number;
     // This isn't really needed, we can look it up in the codec, but it acts as a quick reference.
-    pgCodec: PgCodec;
+    pgCodec: _AnyPgCodec;
   }> = [];
 
   /**
@@ -117,9 +121,14 @@ export class PgInsertSingleStep<
   constructor(
     resource: TResource,
     attributes?: {
-      [key in keyof GetPgResourceAttributes<TResource>]?:
+      [attribute in GetPgResourceAttributes<TResource> as PgCodecAttributeName<attribute>]?:
         | PgTypedExecutableStep<
-            GetPgResourceAttributes<TResource>[key]["codec"]
+            PgCodecAttributeCodec<
+              Extract<
+                GetPgResourceAttributes<TResource>,
+                { name: PgCodecAttributeName<attribute> }
+              >
+            >
           >
         | ExecutableStep;
     },
@@ -131,12 +140,16 @@ export class PgInsertSingleStep<
     this.alias = sql.identifier(this.symbol);
     this.contextId = this.addDependency(this.resource.executor.context());
     if (attributes) {
-      Object.entries(attributes).forEach(([key, value]) => {
+      (
+        Object.entries(attributes) as Array<
+          [
+            PgCodecAttributeName<GetPgResourceAttributes<TResource>>,
+            ExecutableStep,
+          ]
+        >
+      ).forEach(([key, value]) => {
         if (value) {
-          this.set(
-            key as keyof GetPgResourceAttributes<TResource>,
-            value as ExecutableStep,
-          );
+          this.set(key, value);
         }
       });
     }
@@ -146,7 +159,7 @@ export class PgInsertSingleStep<
     return `${this.resource.name}(${this.attributes.map((a) => a.name)})`;
   }
 
-  set<TKey extends keyof GetPgResourceAttributes<TResource>>(
+  set<TKey extends PgCodecAttributeName<GetPgResourceAttributes<TResource>>>(
     name: TKey,
     value: ExecutableStep, // | PgTypedExecutableStep<TAttributes[TKey]["codec"]>
   ): void {
@@ -160,9 +173,7 @@ export class PgInsertSingleStep<
         );
       }
     }
-    const attribute = (
-      this.resource.codec.attributes as GetPgResourceAttributes<TResource>
-    )?.[name];
+    const attribute = this.resource.codec.attributes?.[name];
     if (!attribute) {
       throw new Error(
         `Attribute ${String(name)} not found in ${this.resource.codec}`,
@@ -175,8 +186,7 @@ export class PgInsertSingleStep<
 
   setPlan(): SetterStep<
     {
-      [key in keyof GetPgResourceAttributes<TResource> &
-        string]: ExecutableStep;
+      [attribute in GetPgResourceAttributes<TResource> as PgCodecAttributeName<attribute>]: ExecutableStep;
     },
     this
   > {
@@ -192,12 +202,13 @@ export class PgInsertSingleStep<
    * Returns a plan representing a named attribute (e.g. column) from the newly
    * inserted row.
    */
-  get<TAttr extends keyof GetPgResourceAttributes<TResource>>(
+  get<TAttr extends PgCodecAttributeName<GetPgResourceAttributes<TResource>>>(
     attr: TAttr,
   ): PgClassExpressionStep<
-    GetPgResourceAttributes<TResource>[TAttr] extends PgCodecAttribute<
-      infer UCodec
-    >
+    Extract<
+      GetPgResourceAttributes<TResource>,
+      { name: TAttr }
+    > extends PgCodecAttribute<any, infer UCodec, any>
       ? UCodec
       : never,
     TResource
@@ -205,7 +216,7 @@ export class PgInsertSingleStep<
     if (!this.resource.codec.attributes) {
       throw new Error(`Cannot call .get() when there's no attributes.`);
     }
-    const resourceAttribute: PgCodecAttribute =
+    const resourceAttribute: _AnyPgCodecAttribute =
       this.resource.codec.attributes[attr as string];
     if (!resourceAttribute) {
       throw new Error(
@@ -411,13 +422,18 @@ export class PgInsertSingleStep<
 /**
  * Inserts a row into resource with the given specified attribute values.
  */
-export function pgInsertSingle<
-  TResource extends PgResource<any, any, any, any, any>,
->(
+export function pgInsertSingle<TResource extends _AnyPgResource>(
   resource: TResource,
   attributes?: {
-    [key in keyof GetPgResourceAttributes<TResource>]?:
-      | PgTypedExecutableStep<GetPgResourceAttributes<TResource>[key]["codec"]>
+    [attribute in GetPgResourceAttributes<TResource> as PgCodecAttributeName<attribute>]?:
+      | PgTypedExecutableStep<
+          PgCodecAttributeCodec<
+            Extract<
+              GetPgResourceAttributes<TResource>,
+              { name: PgCodecAttributeName<attribute> }
+            >
+          >
+        >
       | ExecutableStep;
   },
 ): PgInsertSingleStep<TResource> {

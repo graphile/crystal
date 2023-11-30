@@ -1,11 +1,7 @@
 import "./PgTablesPlugin.js";
 import "graphile-config";
 
-import type {
-  PgCodecWithAttributes,
-  PgResourceUnique,
-  PgSelectStep,
-} from "@dataplan/pg";
+import type { GenericPgSelectStep } from "@dataplan/pg";
 import { EXPORTABLE } from "graphile-build";
 
 import { version } from "../version.js";
@@ -41,16 +37,14 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
           return values;
         }
 
-        const pgCodec = rawPgCodec as PgCodecWithAttributes;
+        const pgCodec = rawPgCodec;
 
         const resource = build.pgTableResource(pgCodec);
         if (!resource) {
           return values;
         }
 
-        const primaryKey = (resource.uniques as PgResourceUnique[]).find(
-          (unique) => unique.isPrimary,
-        );
+        const primaryKey = resource.uniques.find((unique) => unique.isPrimary);
         if (!primaryKey) {
           return values;
         }
@@ -64,9 +58,9 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                 grafast: {
                   applyPlan: EXPORTABLE(
                     (pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql) =>
-                      (step: PgSelectStep) => {
+                      (step: GenericPgSelectStep) => {
                         primaryKeyAttributes.forEach((attributeName) => {
-                          const attribute = pgCodec.attributes[attributeName];
+                          const attribute = pgCodec.attributes![attributeName];
                           step.orderBy({
                             codec: attribute.codec,
                             fragment: sql`${step.alias}.${sql.identifier(
@@ -92,9 +86,9 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                 grafast: {
                   applyPlan: EXPORTABLE(
                     (pgCodec, pgOrderByNullsLast, primaryKeyAttributes, sql) =>
-                      (step: PgSelectStep) => {
+                      (step: GenericPgSelectStep) => {
                         primaryKeyAttributes.forEach((attributeName) => {
-                          const attribute = pgCodec.attributes[attributeName];
+                          const attribute = pgCodec.attributes![attributeName];
                           step.orderBy({
                             codec: attribute.codec,
                             fragment: sql`${step.alias}.${sql.identifier(

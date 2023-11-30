@@ -138,7 +138,7 @@ spec will resolve to null-ish values (or maybe raise an error).
 ```ts
 function specFromNodeId(
   handler: NodeIdHandler<any>,
-  $id: ExecutableStep<string> | AnyInputStep,
+  $id: ExecutableStep<string> | _AnyInputStep,
 ): any;
 ```
 

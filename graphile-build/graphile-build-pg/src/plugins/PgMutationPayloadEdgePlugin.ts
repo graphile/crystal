@@ -1,10 +1,6 @@
 import "graphile-config";
 
-import type {
-  PgClassSingleStep,
-  PgCodecWithAttributes,
-  PgResourceUnique,
-} from "@dataplan/pg";
+import type { GenericPgCodec, PgClassSingleStep } from "@dataplan/pg";
 import { PgDeleteSingleStep, pgSelectFromRecord } from "@dataplan/pg";
 import type { FieldArgs, FieldInfo, ObjectStep } from "grafast";
 import { connection, constant, EdgeStep, first } from "grafast";
@@ -18,7 +14,7 @@ import { applyOrderToPlan } from "./PgConnectionArgOrderByPlugin.js";
 declare global {
   namespace GraphileBuild {
     interface Inflection {
-      tableEdgeField(this: Inflection, codec: PgCodecWithAttributes): string;
+      tableEdgeField(this: Inflection, codec: GenericPgCodec): string;
     }
 
     interface ScopeObjectFieldsField {
@@ -84,9 +80,7 @@ export const PgMutationPayloadEdgePlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const pk = (resource.uniques as PgResourceUnique[])?.find(
-          (u) => u.isPrimary,
-        );
+        const pk = resource.uniques?.find((u) => u.isPrimary);
         if (!pk) {
           return fields;
         }

@@ -3,15 +3,13 @@ import { BaseStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import { sql } from "pg-sql2";
 
-import type { PgResource } from "../datasource.js";
+import type { _AnyPgResource } from "../datasource.js";
 import type { PgClassFilterStep } from "../filters/pgClassFilter.js";
-import type { PgCodec } from "../interfaces.js";
+import type { _AnyPgCodec } from "../interfaces.js";
 import type { PgConditionCapableParentStep } from "./pgCondition.js";
 import { PgConditionStep } from "./pgCondition.js";
 
-export class PgTempTableStep<
-    TResource extends PgResource<any, any, any, any, any>,
-  >
+export class PgTempTableStep<TResource extends _AnyPgResource>
   extends BaseStep
   implements PgConditionCapableParentStep
 {
@@ -30,7 +28,10 @@ export class PgTempTableStep<
     this.alias = sql.identifier(Symbol(`${resource.name}_filter`));
   }
 
-  placeholder($step: ExecutableStep, codec: PgCodec): SQL {
+  placeholder<TCodec extends _AnyPgCodec>(
+    $step: ExecutableStep,
+    codec: TCodec,
+  ): SQL {
     return this.$parent.placeholder($step, codec);
   }
 

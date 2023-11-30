@@ -1,4 +1,3 @@
-import type { PgRegistry } from "@dataplan/pg";
 import chalk from "chalk";
 import { resolvePresets } from "graphile-config";
 import { loadConfig } from "graphile-config/load";
@@ -185,7 +184,7 @@ function getEntities(
   build: GraphileBuild.Build,
   entityType: keyof GraphileBuild.BehaviorEntities,
 ) {
-  const registry = build.input.pgRegistry as PgRegistry;
+  const registry = build.input.pgRegistry;
   switch (entityType) {
     case "pgCodec": {
       return registry.pgCodecs;

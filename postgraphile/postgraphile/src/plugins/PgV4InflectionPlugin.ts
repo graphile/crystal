@@ -27,13 +27,13 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
       },
       _attributeName(previous, options, details) {
         const { codec, attributeName } = details;
-        const attribute = codec.attributes[attributeName];
+        const attribute = codec.attributes![attributeName];
         if (!attribute) {
           throw new Error(
             `Attempted to access attribute '${attributeName}' of codec '${
               codec.name
             }', but it doesn't have that attribute (known attributes: ${Object.keys(
-              codec.attributes,
+              codec.attributes!,
             ).join(", ")})`,
           );
         }

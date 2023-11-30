@@ -2,7 +2,7 @@ import "./PgTablesPlugin.js";
 import "graphile-config";
 
 import type {
-  PgCodec,
+  GenericPgCodec,
   PgSelectParsedCursorStep,
   PgSelectSingleStep,
   PgSelectStep,
@@ -25,7 +25,7 @@ declare global {
       orderByType(this: Inflection, typeName: string): string;
     }
     interface ScopeEnum {
-      pgCodec?: PgCodec;
+      pgCodec?: GenericPgCodec;
       isPgRowSortEnum?: boolean;
     }
   }

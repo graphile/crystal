@@ -1,9 +1,8 @@
 import "graphile-config";
 
 import type {
-  PgCodec,
-  PgRegistry,
-  PgResource,
+  GenericPgCodec,
+  GenericPgResource,
   PgUnionAllStepConfigAttributes,
   PgUnionAllStepMember,
 } from "@dataplan/pg";
@@ -21,7 +20,10 @@ declare global {
        * The base inflector used by allInterfaceModeUnionRowsConnection and
        * allInterfaceModeUnionRowsList.
        */
-      _allInterfaceModeUnionRows(this: Inflection, codec: PgCodec): string;
+      _allInterfaceModeUnionRows(
+        this: Inflection,
+        codec: GenericPgCodec,
+      ): string;
 
       /**
        * The field name for a Cursor Connection field that returns all rows
@@ -29,14 +31,17 @@ declare global {
        */
       allInterfaceModeUnionRowsConnection(
         this: Inflection,
-        codec: PgCodec,
+        codec: GenericPgCodec,
       ): string;
 
       /**
        * The field name for a List field that returns all rows from the given
        * `@interface mode:union` codec.
        */
-      allInterfaceModeUnionRowsList(this: Inflection, codec: PgCodec): string;
+      allInterfaceModeUnionRowsList(
+        this: Inflection,
+        codec: GenericPgCodec,
+      ): string;
     }
   }
 }
@@ -90,11 +95,11 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const pgRegistry = input.pgRegistry as PgRegistry;
+        const pgRegistry = input.pgRegistry;
 
         const resourcesByPolymorphicTypeName: {
           [polymorphicTypeName: string]: {
-            resources: PgResource[];
+            resources: GenericPgResource[];
             type: "union" | "interface";
           };
         } = Object.create(null);
@@ -135,7 +140,7 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
             for (const interfaceName of interfaces) {
               if (!resourcesByPolymorphicTypeName[interfaceName]) {
                 resourcesByPolymorphicTypeName[interfaceName] = {
-                  resources: [resource as PgResource],
+                  resources: [resource],
                   type: "interface",
                 };
               } else {
@@ -146,15 +151,16 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
                   throw new Error(`Inconsistent polymorphism`);
                 }
                 resourcesByPolymorphicTypeName[interfaceName].resources.push(
-                  resource as PgResource,
+                  resource,
                 );
               }
             }
           }
         }
 
-        const interfaceCodecs: { [polymorphicTypeName: string]: PgCodec } =
-          Object.create(null);
+        const interfaceCodecs: {
+          [polymorphicTypeName: string]: GenericPgCodec;
+        } = Object.create(null);
         for (const codec of Object.values(pgRegistry.pgCodecs)) {
           if (!codec.polymorphism) continue;
           if (codec.polymorphism.mode !== "union") continue;
@@ -216,7 +222,7 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
               if (!interfaceCodec.attributes) return;
               const attributes: PgUnionAllStepConfigAttributes<string> =
                 interfaceCodec.attributes;
-              const resourceByTypeName: Record<string, PgResource> =
+              const resourceByTypeName: Record<string, GenericPgResource> =
                 Object.create(null);
               const members: PgUnionAllStepMember<string>[] = [];
               for (const resource of spec.resources) {

@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import type { PgCodec, PgSelectSingleStep } from "@dataplan/pg";
+import type { GenericPgCodec, GenericPgSelectSingleStep } from "@dataplan/pg";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { Secret, SignOptions } from "jsonwebtoken";
 import { sign as signJwt } from "jsonwebtoken";
@@ -35,7 +35,7 @@ declare global {
 
     interface ScopeScalar {
       isPgJwtType?: boolean;
-      pgCodec?: PgCodec;
+      pgCodec?: GenericPgCodec;
     }
   }
 }
@@ -185,7 +185,7 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
                 plan: EXPORTABLE(
                   () =>
                     function plan($in) {
-                      const $record = $in as PgSelectSingleStep;
+                      const $record = $in as GenericPgSelectSingleStep;
                       return $record.record();
                     },
                   [],

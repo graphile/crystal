@@ -1,4 +1,3 @@
-/* eslint-disable graphile-export/export-instances */
 import chalk from "chalk";
 import type { GrafastValuesList, ObjectStep } from "grafast";
 import {
@@ -13,7 +12,9 @@ import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
 
 import type {
-  PgCodecAttributes,
+  _AnyPgCodecAttribute,
+  GenericPgCodecAttribute,
+  PgCodecAttributeName,
   PgCodecAttributeVia,
   PgCodecAttributeViaExplicit,
 } from "./codecs.js";
@@ -28,17 +29,27 @@ import type {
 } from "./executor.js";
 import { inspect } from "./inspect.js";
 import type {
+  _AnyPgCodec,
+  _AnyPgCodecRelationConfig,
+  _AnyPgRegistry,
+  _AnyPgRegistryConfig,
+  _AnyScalarPgCodec,
   Expand,
-  GetPgCodecAttributes,
+  GenericPgCodec,
+  GenericPgCodecRelationConfig,
+  GetPgRegistryCodecRelationConfigs,
   GetPgRegistryCodecRelations,
   GetPgRegistryCodecs,
-  PgCodec,
-  PgCodecRelation,
+  PgCodecAttributes,
+  PgCodecName,
   PgCodecRelationConfig,
-  PgCodecWithAttributes,
+  PgCodecRelationConfigName,
   PgRefDefinition,
   PgRegistry,
   PgRegistryConfig,
+  PgRegistryConfigCodecs,
+  PgRegistryConfigRelationConfigs,
+  PgRegistryConfigResourceOptions,
   PlanByUniques,
 } from "./interfaces.js";
 import type { PgClassExpressionStep } from "./steps/pgClassExpression.js";
@@ -82,13 +93,19 @@ export type PgResourceExtensions = DataplanPg.PgResourceExtensions;
 export type PgResourceParameterExtensions =
   DataplanPg.PgResourceParameterExtensions;
 
+/** @internal */
+export interface _AnyPgResourceParameter
+  extends PgResourceParameter<any, any> {}
+export interface GenericPgResourceParameter
+  extends PgResourceParameter<string | null, GenericPgCodec> {}
+
 /**
  * If this is a functional (rather than static) resource, this describes one of
  * the parameters it accepts.
  */
 export interface PgResourceParameter<
-  TName extends string | null = string | null,
-  TCodec extends PgCodec = PgCodec,
+  TName extends string | null,
+  TCodec extends _AnyPgCodec,
 > {
   /**
    * Name of the parameter, if null then we must use positional rather than
@@ -111,16 +128,18 @@ export interface PgResourceParameter<
   extensions?: PgResourceParameterExtensions;
 }
 
+/** @internal */
+export interface _AnyPgResourceUnique extends PgResourceUnique<any> {}
+export interface GenericPgResourceUnique
+  extends PgResourceUnique<GenericPgCodecAttribute> {}
 /**
  * Description of a unique constraint on a PgResource.
  */
-export interface PgResourceUnique<
-  TAttributes extends PgCodecAttributes = PgCodecAttributes,
-> {
+export interface PgResourceUnique<TAttributes extends _AnyPgCodecAttribute> {
   /**
    * The attributes that are unique
    */
-  attributes: ReadonlyArray<keyof TAttributes & string>;
+  attributes: Array<PgCodecAttributeName<TAttributes>>;
   /**
    * If this is true, this represents the "primary key" of the resource.
    */
@@ -151,19 +170,60 @@ export interface PgCodecRef {
 export interface PgCodecRefs {
   [refName: string]: PgCodecRef;
 }
+export interface GenericPgResourceOptions<
+  TCodec extends GenericPgCodec = GenericPgCodec,
+> extends PgResourceOptions<
+    string,
+    TCodec,
+    GenericPgResourceUnique,
+    GenericPgResourceParameter
+  > {}
+
+/** @internal */
+export interface _AnyPgResourceOptions
+  extends PgResourceOptions<any, any, any, any> {}
+
+export type PgResourceOptionName<U> = U extends PgResourceOptions<
+  infer TName,
+  any,
+  any,
+  any
+>
+  ? TName
+  : never;
+export type PgResourceOptionCodec<U> = U extends PgResourceOptions<
+  any,
+  infer TCodec,
+  any,
+  any
+>
+  ? TCodec
+  : never;
+export type PgResourceOptionUniques<U> = U extends PgResourceOptions<
+  any,
+  any,
+  infer TUniques,
+  any
+>
+  ? TUniques
+  : never;
+export type PgResourceOptionParameters<U> = U extends PgResourceOptions<
+  any,
+  any,
+  any,
+  infer TParameters
+>
+  ? TParameters
+  : never;
 
 /**
  * Configuration options for your PgResource
  */
 export interface PgResourceOptions<
-  TName extends string = string,
-  TCodec extends PgCodec = PgCodec,
-  TUniques extends ReadonlyArray<
-    PgResourceUnique<GetPgCodecAttributes<TCodec>>
-  > = ReadonlyArray<PgResourceUnique<GetPgCodecAttributes<TCodec>>>,
-  TParameters extends readonly PgResourceParameter[] | undefined =
-    | readonly PgResourceParameter[]
-    | undefined,
+  TName extends string,
+  TCodec extends _AnyPgCodec,
+  TUniques extends PgResourceUnique<PgCodecAttributes<TCodec>>,
+  TParameters extends _AnyPgResourceParameter,
 > {
   /**
    * The associated codec for this resource
@@ -177,18 +237,17 @@ export interface PgResourceOptions<
   executor: PgExecutor;
 
   // TODO: auth should also apply to insert, update and delete, maybe via insertAuth, updateAuth, etc
-  selectAuth?: (
-    $step: PgSelectStep<PgResource<any, any, any, any, any>>,
-  ) => void;
+  selectAuth?: ($step: PgSelectStep<_AnyPgResource>) => void;
 
   name: TName;
   identifier?: string;
-  from: TParameters extends readonly PgResourceParameter[]
-    ? (...args: PgSelectArgumentDigest[]) => SQL
-    : SQL;
-  uniques?: TUniques;
+  // see https://www.typescriptlang.org/docs/handbook/2/conditional-types.html#distributive-conditional-types
+  from: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
+  uniques?: [TUniques] extends [never] ? never : ReadonlyArray<TUniques>;
   extensions?: PgResourceExtensions;
-  parameters?: TParameters;
+  parameters?: [TParameters] extends [never]
+    ? never
+    : ReadonlyArray<TParameters>;
   description?: string;
   /**
    * Set true if this resource will only return at most one record - this is
@@ -213,44 +272,107 @@ export interface PgResourceOptions<
   isVirtual?: boolean;
 }
 
+/** @internal */
+export interface _AnyPgFunctionResourceOptions
+  extends PgFunctionResourceOptions<any, any, any, any> {}
+export interface GenericPgFunctionResourceOptions
+  extends PgFunctionResourceOptions<
+    string,
+    GenericPgCodec,
+    GenericPgResourceUnique,
+    GenericPgResourceParameter
+  > {}
+
 export interface PgFunctionResourceOptions<
-  TNewName extends string = string,
-  TCodec extends PgCodec = PgCodec,
-  TUniques extends ReadonlyArray<
-    PgResourceUnique<GetPgCodecAttributes<TCodec>>
-  > = ReadonlyArray<PgResourceUnique<GetPgCodecAttributes<TCodec>>>,
-  TNewParameters extends
-    readonly PgResourceParameter[] = readonly PgResourceParameter[],
+  TNewName extends string,
+  TCodec extends _AnyPgCodec,
+  TUniques extends PgResourceUnique<PgCodecAttributes<TCodec>>,
+  TNewParameters extends _AnyPgResourceParameter,
 > {
   name: TNewName;
   identifier?: string;
   from: (...args: PgSelectArgumentDigest[]) => SQL;
-  parameters: TNewParameters;
+  parameters?: [TNewParameters] extends [never]
+    ? never
+    : ReadonlyArray<TNewParameters>;
   returnsSetof: boolean;
   returnsArray: boolean;
-  uniques?: TUniques;
+  uniques?: [TUniques] extends [never] ? never : ReadonlyArray<TUniques>;
   extensions?: PgResourceExtensions;
   isMutation?: boolean;
-  selectAuth?: (
-    $step: PgSelectStep<PgResource<any, any, any, any, any>>,
-  ) => void;
+  selectAuth?: ($step: PgSelectStep<_AnyPgResource>) => void;
   description?: string;
 }
+export type PgResourceName<U> = U extends PgResource<
+  infer TName,
+  any,
+  any,
+  any,
+  any
+>
+  ? TName
+  : never;
+export type PgResourceCodec<U> = U extends PgResource<
+  any,
+  infer TCodec,
+  any,
+  any,
+  any
+>
+  ? TCodec
+  : never;
+
+export type PgResourceUniques<U> = U extends PgResource<
+  any,
+  any,
+  infer TUniques,
+  any,
+  any
+>
+  ? TUniques
+  : never;
+export type PgResourceParameters<U> = U extends PgResource<
+  any,
+  any,
+  any,
+  infer TParameters,
+  any
+>
+  ? TParameters
+  : never;
+export type PgResourceRegistry<U> = U extends PgResource<
+  any,
+  any,
+  any,
+  any,
+  infer TRegistry
+>
+  ? TRegistry
+  : never;
+export interface GenericPgResource
+  extends PgResource<
+    string,
+    GenericPgCodec,
+    GenericPgResourceUnique,
+    GenericPgResourceParameter,
+    any
+  > {}
+/** @internal */
+export interface _AnyPgResource extends PgResource<any, any, any, any, any> {}
+/** @internal */
+export interface _AnyScalarPgResource
+  extends PgResource<any, _AnyScalarPgCodec, any, any, any> {}
 
 /**
  * PgResource represents any resource of SELECT-able data in Postgres: tables,
  * views, functions, etc.
  */
 export class PgResource<
-  TName extends string = string,
-  TCodec extends PgCodec = PgCodec,
-  TUniques extends ReadonlyArray<
-    PgResourceUnique<GetPgCodecAttributes<TCodec>>
-  > = ReadonlyArray<PgResourceUnique<GetPgCodecAttributes<TCodec>>>,
-  TParameters extends readonly PgResourceParameter[] | undefined =
-    | readonly PgResourceParameter[]
-    | undefined,
-  TRegistry extends PgRegistry<any, any, any> = PgRegistry<any, any, any>,
+  TName extends string,
+  TCodec extends _AnyPgCodec,
+  TUniques extends PgResourceUnique<PgCodecAttributes<TCodec>>,
+  TParameters extends _AnyPgResourceParameter,
+  TRegistry extends _AnyPgRegistry,
 > {
   public readonly registry: TRegistry;
   public readonly codec: TCodec;
@@ -258,10 +380,10 @@ export class PgResource<
   public readonly name: TName;
   public readonly identifier: string;
   public readonly from: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
-  public readonly uniques: TUniques;
-  private selectAuth?: (
-    $step: PgSelectStep<PgResource<any, any, any, any, any>>,
-  ) => void;
+  public readonly uniques: [TUniques] extends [never]
+    ? never
+    : ReadonlyArray<TUniques>;
+  private selectAuth?: ($step: PgSelectStep<_AnyPgResource>) => void;
 
   // TODO: make a public interface for this information
   /**
@@ -273,7 +395,9 @@ export class PgResource<
    */
   public sqlPartitionByIndex: SQL | null = null;
 
-  public readonly parameters: TParameters;
+  public readonly parameters: [TParameters] extends [never]
+    ? never
+    : ReadonlyArray<TParameters>;
   public readonly description: string | undefined;
   public readonly isUnique: boolean;
   public readonly isMutation: boolean;
@@ -291,7 +415,7 @@ export class PgResource<
    */
   public readonly isVirtual: boolean;
 
-  public extensions: Partial<PgResourceExtensions> | undefined;
+  public extensions: Partial<DataplanPg.PgResourceExtensions> | undefined;
 
   /**
    * @param from - the SQL for the `FROM` clause (without any
@@ -329,7 +453,7 @@ export class PgResource<
     this.identifier = identifier ?? name;
     this.from = from;
     this.uniques = uniques ?? ([] as never);
-    this.parameters = parameters as TParameters;
+    this.parameters = parameters ?? ([] as never);
     this.description = description;
     this.isUnique = !!isUnique;
     this.sqlPartitionByIndex = sqlPartitionByIndex ?? null;
@@ -370,21 +494,21 @@ export class PgResource<
    * type/relations/etc.
    */
   static alternativeResourceOptions<
-    TCodec extends PgCodec,
-    const TNewUniques extends ReadonlyArray<
-      PgResourceUnique<GetPgCodecAttributes<TCodec>>
-    >,
+    TCodec extends _AnyPgCodec,
+    const TNewUniques extends PgResourceUnique<PgCodecAttributes<TCodec>>,
     const TNewName extends string,
   >(
-    baseOptions: PgResourceOptions<any, TCodec, any, undefined>,
+    baseOptions: PgResourceOptions<any, TCodec, any, never>,
     overrideOptions: {
       name: TNewName;
       identifier?: string;
       from: SQL;
-      uniques?: TNewUniques;
-      extensions?: PgResourceExtensions;
+      uniques?: [TNewUniques] extends [never]
+        ? never
+        : ReadonlyArray<TNewUniques>;
+      extensions?: DataplanPg.PgResourceExtensions;
     },
-  ): PgResourceOptions<TNewName, TCodec, TNewUniques, undefined> {
+  ): PgResourceOptions<TNewName, TCodec, TNewUniques, never> {
     const { name, identifier, from, uniques, extensions } = overrideOptions;
     const { codec, executor, selectAuth } = baseOptions;
     return {
@@ -394,7 +518,6 @@ export class PgResource<
       identifier,
       from,
       uniques,
-      parameters: undefined,
       extensions,
       selectAuth,
     };
@@ -407,11 +530,9 @@ export class PgResource<
    * type/relations/etc but pull their rows from functions.
    */
   static functionResourceOptions<
-    TCodec extends PgCodec,
-    const TNewParameters extends readonly PgResourceParameter[],
-    const TNewUniques extends ReadonlyArray<
-      PgResourceUnique<GetPgCodecAttributes<TCodec>>
-    >,
+    TCodec extends _AnyPgCodec,
+    const TNewParameters extends _AnyPgResourceParameter,
+    const TNewUniques extends PgResourceUnique<PgCodecAttributes<TCodec>>,
     const TNewName extends string,
   >(
     baseOptions: Pick<
@@ -518,25 +639,30 @@ export class PgResource<
   }
 
   public getRelation<
-    TRelationName extends keyof GetPgRegistryCodecRelations<TRegistry, TCodec>,
+    TRelationName extends PgCodecRelationConfigName<
+      GetPgRegistryCodecRelationConfigs<TRegistry, TCodec>
+    >,
   >(
     name: TRelationName,
   ): GetPgRegistryCodecRelations<TRegistry, TCodec>[TRelationName] {
     return this.getRelations()[name];
   }
 
-  public resolveVia(
-    via: PgCodecAttributeVia,
-    attr: string,
-  ): PgCodecAttributeViaExplicit {
+  public resolveVia<
+    TRelationName extends PgCodecRelationConfigName<
+      GetPgRegistryCodecRelationConfigs<TRegistry, TCodec>
+    >,
+    TAttribute extends string,
+  >(
+    via: PgCodecAttributeVia<TRelationName, TAttribute>,
+    attr: TAttribute,
+  ): PgCodecAttributeViaExplicit<TRelationName, TAttribute> {
     if (!via) {
       throw new Error("No via to resolve");
     }
     if (typeof via === "string") {
       // Check
-      const relation = this.getRelation(via) as unknown as
-        | PgCodecRelation
-        | undefined;
+      const relation = this.getRelation(via);
       if (!relation) {
         throw new Error(`Unknown relation '${via}' in ${this}`);
       }
@@ -554,20 +680,20 @@ export class PgResource<
   // PERF: this needs optimization.
   public getReciprocal<
     TOtherCodec extends GetPgRegistryCodecs<TRegistry>,
-    TOtherRelationName extends keyof GetPgRegistryCodecRelations<
+    TOtherRelationName extends GetPgRegistryCodecRelationConfigs<
       TRegistry,
       TOtherCodec
-    >,
+    >["name"],
   >(
     otherCodec: TOtherCodec,
     otherRelationName: TOtherRelationName,
   ):
     | [
-        relationName: keyof GetPgRegistryCodecRelations<TRegistry, TCodec>,
-        relation: GetPgRegistryCodecRelations<
+        relationName: GetPgRegistryCodecRelationConfigs<
           TRegistry,
           TCodec
-        >[keyof GetPgRegistryCodecRelations<TRegistry, TCodec>],
+        >["name"],
+        relation: GetPgRegistryCodecRelationConfigs<TRegistry, TCodec>,
       ]
     | null {
     if (this.parameters) {
@@ -577,10 +703,7 @@ export class PgResource<
     }
     const otherRelation =
       this.registry.pgRelations[otherCodec.name]?.[otherRelationName];
-    const relations = this.getRelations() as unknown as Record<
-      string,
-      PgCodecRelation
-    >;
+    const relations = this.getRelations();
     const reciprocal = Object.entries(relations).find(
       ([_relationName, relation]) => {
         if (relation.remoteResource.codec !== otherCodec) {
@@ -599,16 +722,35 @@ export class PgResource<
         return true;
       },
     );
+
+    // TODO: this is still a bit tricky, :-(, but we're almost here!
     return (reciprocal as [any, any]) || null;
   }
 
-  public get(
-    spec: PlanByUniques<GetPgCodecAttributes<TCodec>, TUniques>,
+  public get<
+    TSelectSinglePlanOptions extends PgSelectSinglePlanOptions<this>,
+    TSpec extends Expand<PlanByUniques<PgCodecAttributes<TCodec>, TUniques>>,
+  >(
+    spec: TSpec,
     // This is internal, it's an optimisation we can use but you shouldn't.
-    _internalOptionsDoNotPass?: PgSelectSinglePlanOptions,
-  ): GetPgCodecAttributes<TCodec> extends PgCodecAttributes
-    ? PgSelectSingleStep<this>
-    : PgClassExpressionStep<TCodec, this> {
+    _internalOptionsDoNotPass?: TSelectSinglePlanOptions,
+  ): PgSelectSingleStep<this>;
+  public get<
+    TSelectSinglePlanOptions extends PgSelectSinglePlanOptions<this>,
+    TSpec extends Expand<PlanByUniques<PgCodecAttributes<TCodec>, TUniques>>,
+  >(
+    spec: TSpec,
+    // This is internal, it's an optimisation we can use but you shouldn't.
+    _internalOptionsDoNotPass?: TSelectSinglePlanOptions,
+  ): PgClassExpressionStep<TCodec, this>;
+  public get<
+    TSelectSinglePlanOptions extends PgSelectSinglePlanOptions<this>,
+    TSpec extends Expand<PlanByUniques<PgCodecAttributes<TCodec>, TUniques>>,
+  >(
+    spec: TSpec,
+    // This is internal, it's an optimisation we can use but you shouldn't.
+    _internalOptionsDoNotPass?: TSelectSinglePlanOptions,
+  ): PgClassExpressionStep<TCodec, this> | PgSelectSingleStep<this> {
     if (this.parameters) {
       throw new Error(
         ".get() cannot be used with functional resources; please use .execute()",
@@ -617,12 +759,10 @@ export class PgResource<
     if (!spec) {
       throw new Error(`Cannot ${this}.get without a valid spec`);
     }
-    const keys = Object.keys(spec) as ReadonlyArray<string> as ReadonlyArray<
-      keyof GetPgCodecAttributes<TCodec>
-    >;
+    const keys = Object.keys(spec);
     if (
-      !this.uniques.some((uniq) =>
-        uniq.attributes.every((key) => keys.includes(key as any)),
+      !this.uniques.some((uniq: _AnyPgResourceUnique) =>
+        uniq.attributes.every((key) => keys.includes(key)),
       )
     ) {
       throw new Error(
@@ -633,12 +773,13 @@ export class PgResource<
         )}). Did you mean to call .find() instead?`,
       );
     }
-    return this.find(spec).single(_internalOptionsDoNotPass) as any;
+
+    return this.find(spec).single(_internalOptionsDoNotPass);
   }
 
   public find(
     spec: {
-      [key in keyof GetPgCodecAttributes<TCodec>]?:
+      [attribute in PgCodecAttributes<TCodec> as PgCodecAttributeName<attribute>]?:
         | ExecutableStep
         | string
         | number;
@@ -652,10 +793,10 @@ export class PgResource<
     if (!this.codec.attributes) {
       throw new Error("Cannot call find if there's no attributes");
     }
-    const attributes = this.codec.attributes as NonNullable<
-      GetPgCodecAttributes<TCodec>
+    const attributes = this.codec.attributes;
+    const keys = Object.keys(spec) as Array<
+      PgCodecAttributeName<PgCodecAttributes<TCodec>>
     >;
-    const keys = Object.keys(spec); /* as Array<keyof typeof attributes>*/
     const invalidKeys = keys.filter((key) => attributes[key] == null);
     if (invalidKeys.length > 0) {
       throw new Error(
@@ -696,7 +837,7 @@ export class PgResource<
         matches: (alias: SQL) =>
           typeof attribute.expression === "function"
             ? attribute.expression(alias)
-            : sql`${alias}.${sql.identifier(key as string)}`,
+            : sql`${alias}.${sql.identifier(key)}`,
       };
     });
     return pgSelect({ resource: this, identifiers });
@@ -797,7 +938,9 @@ export class PgResource<
       // Every column in a primary key is non-nullable; so just see if one is null
       const pk = this.uniques.find((u) => u.isPrimary);
       const nonNullableAttribute = this.codec.attributes
-        ? Object.entries(this.codec.attributes).find(
+        ? Object.entries(
+            this.codec.attributes as Record<string, _AnyPgCodecAttribute>,
+          ).find(
             ([_attributeName, spec]) =>
               !spec.via && !spec.expression && spec.notNull,
           )?.[0]
@@ -822,69 +965,47 @@ export class PgResource<
 }
 exportAs("@dataplan/pg", PgResource, "PgResource");
 
+/** @internal */
+export interface _AnyPgRegistryBuilder
+  extends PgRegistryBuilder<any, any, any> {}
+export interface EmptyRegistryBuilder
+  extends PgRegistryBuilder<never, never, never> {}
+export interface DefaultRegistryBuilder
+  extends PgRegistryBuilder<
+    GenericPgCodec,
+    GenericPgResourceOptions,
+    GenericPgCodecRelationConfig
+  > {}
+
 export interface PgRegistryBuilder<
-  TCodecs extends {
-    [name in string]: PgCodec<
-      name,
-      PgCodecAttributes | undefined,
-      any,
-      any,
-      any,
-      any,
-      any
-    >;
-  },
-  TResources extends {
-    [name in string]: PgResourceOptions<
-      name,
-      PgCodec,
-      ReadonlyArray<PgResourceUnique<PgCodecAttributes>>,
-      readonly PgResourceParameter[] | undefined
-    >;
-  },
-  TRelations extends {
-    [codecName in keyof TCodecs]?: {
-      [relationName in string]: PgCodecRelationConfig<
-        PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
-        PgResourceOptions<any, PgCodecWithAttributes, any, any>
-      >;
-    };
-  },
+  TCodecs extends _AnyPgCodec,
+  TResourceOptions extends _AnyPgResourceOptions,
+  TRelationConfigs extends _AnyPgCodecRelationConfig,
 > {
   getRegistryConfig(): PgRegistryConfig<
-    Expand<TCodecs>,
-    Expand<TResources>,
-    Expand<TRelations>
+    TCodecs,
+    TResourceOptions,
+    TRelationConfigs
   >;
-  addCodec<const TCodec extends PgCodec>(
+  addCodec<const TCodec extends _AnyPgCodec>(
     codec: TCodec,
-  ): PgRegistryBuilder<
-    TCodecs & {
-      [name in TCodec["name"]]: TCodec;
-    },
-    TResources,
-    TRelations
-  >;
+  ): PgRegistryBuilder<TCodecs | TCodec, TResourceOptions, TRelationConfigs>;
 
-  addResource<const TResource extends PgResourceOptions<any, any, any, any>>(
-    resource: TResource,
+  addResource<const TResourceOption extends _AnyPgResourceOptions>(
+    resource: TResourceOption,
   ): PgRegistryBuilder<
-    TCodecs & {
-      [name in TResource["codec"]["name"]]: TResource["codec"];
-    },
-    TResources & {
-      [name in TResource["name"]]: TResource;
-    },
-    TRelations
+    TCodecs | PgResourceOptionCodec<TResourceOption>,
+    TResourceOptions | TResourceOption,
+    TRelationConfigs
   >;
 
   addRelation<
-    TCodec extends PgCodec,
+    TCodec extends _AnyPgCodec,
     const TCodecRelationName extends string,
-    const TRemoteResource extends PgResourceOptions<any, any, any, any>,
+    const TRemoteResource extends _AnyPgResourceOptions,
     const TCodecRelation extends Omit<
-      PgCodecRelationConfig<TCodec, TRemoteResource>,
-      "localCodec" | "remoteResourceOptions"
+      PgCodecRelationConfig<TCodecRelationName, TCodec, TRemoteResource>,
+      "localCodec" | "remoteResourceOptions" | "name"
     >,
   >(
     codec: TCodec,
@@ -893,52 +1014,32 @@ export interface PgRegistryBuilder<
     relation: TCodecRelation,
   ): PgRegistryBuilder<
     TCodecs,
-    TResources,
-    TRelations & {
-      [codecName in TCodec["name"]]: {
-        [relationName in TCodecRelationName]: TCodecRelation & {
-          localCodec: TCodec;
-          remoteResourceOptions: TRemoteResource;
-        };
-      };
-    }
+    TResourceOptions,
+    | TRelationConfigs
+    | (TCodecRelation & {
+        name: TCodecRelationName;
+        localCodec: TCodec;
+        remoteResourceOptions: TRemoteResource;
+      })
   >;
 
-  build(): PgRegistry<Expand<TCodecs>, Expand<TResources>, Expand<TRelations>>;
+  build(): PgRegistry<TCodecs, TResourceOptions, TRelationConfigs>;
 }
 
 export function makeRegistry<
-  TCodecs extends {
-    [name in string]: PgCodec<
-      name,
-      PgCodecAttributes | undefined,
-      any,
-      any,
-      any,
-      any,
-      any
-    >;
-  },
-  TResourceOptions extends {
-    [name in string]: PgResourceOptions<
-      name,
-      PgCodec,
-      ReadonlyArray<PgResourceUnique<PgCodecAttributes<any>>>,
-      readonly PgResourceParameter[] | undefined
-    >;
-  },
-  TRelations extends {
-    [codecName in keyof TCodecs]?: {
-      [relationName in string]: PgCodecRelationConfig<
-        PgCodec<string, PgCodecAttributes, any, any, undefined, any, undefined>,
-        PgResourceOptions<any, PgCodecWithAttributes, any, any>
-      >;
-    };
-  },
+  TConfig extends PgRegistryConfig<
+    any,
+    PgResourceOptions<any, any, any, _AnyPgResourceParameter>,
+    _AnyPgCodecRelationConfig
+  >,
 >(
-  config: PgRegistryConfig<TCodecs, TResourceOptions, TRelations>,
-): PgRegistry<TCodecs, TResourceOptions, TRelations> {
-  const registry: PgRegistry<TCodecs, TResourceOptions, TRelations> = {
+  config: TConfig,
+): PgRegistry<
+  PgRegistryConfigCodecs<TConfig>,
+  PgRegistryConfigResourceOptions<TConfig>,
+  PgRegistryConfigRelationConfigs<TConfig>
+> {
+  const registry: _AnyPgRegistry = {
     pgCodecs: Object.create(null) as any,
     pgResources: Object.create(null) as any,
     pgRelations: Object.create(null) as any,
@@ -948,24 +1049,24 @@ export function makeRegistry<
   Object.defineProperties(registry.pgCodecs, {
     $exporter$args: { value: [registry] },
     $exporter$factory: {
-      value: (registry: PgRegistry<any, any, any>) => registry.pgCodecs,
+      value: (registry: _AnyPgRegistry) => registry.pgCodecs,
     },
   });
   Object.defineProperties(registry.pgResources, {
     $exporter$args: { value: [registry] },
     $exporter$factory: {
-      value: (registry: PgRegistry<any, any, any>) => registry.pgResources,
+      value: (registry: _AnyPgRegistry) => registry.pgResources,
     },
   });
   Object.defineProperties(registry.pgRelations, {
     $exporter$args: { value: [registry] },
     $exporter$factory: {
-      value: (registry: PgRegistry<any, any, any>) => registry.pgRelations,
+      value: (registry: _AnyPgRegistry) => registry.pgRelations,
     },
   });
 
   let addCodecForbidden = false;
-  function addCodec(codec: PgCodec): PgCodec {
+  function addCodec<TCodec extends _AnyPgCodec>(codec: TCodec): TCodec {
     if (addCodecForbidden) {
       throw new Error(`It's too late to call addCodec now`);
     }
@@ -977,19 +1078,22 @@ export function makeRegistry<
           new: codec,
         });
         throw new Error(
-          `Codec named '${codecName}' is already registsred; you cannot have two codecs with the same name`,
+          `Codec named '${codecName}' is already registered; you cannot have two codecs with the same name`,
         );
       }
       return codec;
     } else if ((codec as any).$$export || (codec as any).$exporter$factory) {
-      registry.pgCodecs[codecName as keyof TCodecs] = codec as any;
+      registry.pgCodecs[codecName] = codec;
       return codec;
     } else {
       // Custom spec, pin it back to the registry
-      registry.pgCodecs[codecName as keyof TCodecs] = codec as any;
+      registry.pgCodecs[codecName] = codec;
 
       if (codec.attributes) {
-        const prevCols = codec.attributes as PgCodecAttributes;
+        const prevCols = codec.attributes as Record<
+          string,
+          _AnyPgCodecAttribute
+        >;
         for (const col of Object.values(prevCols)) {
           addCodec(col.codec);
         }
@@ -1008,7 +1112,7 @@ export function makeRegistry<
       Object.defineProperties(codec, {
         $exporter$args: { value: [registry, codecName] },
         $exporter$factory: {
-          value: (registry: PgRegistry<any, any, any>, codecName: string) =>
+          value: (registry: _AnyPgRegistry, codecName: string) =>
             registry.pgCodecs[codecName],
         },
       });
@@ -1024,20 +1128,22 @@ export function makeRegistry<
     addCodec(codecSpec);
   }
 
-  for (const [resourceName, rawConfig] of Object.entries(
-    config.pgResources,
-  ) as [keyof TResourceOptions, PgResourceOptions<any, any, any, any>][]) {
-    const resourceConfig = {
+  for (const [resourceName, rawConfig] of Object.entries(config.pgResources)) {
+    const resourceConfig: _AnyPgResourceOptions = {
       ...rawConfig,
       codec: addCodec(rawConfig.codec),
       parameters: rawConfig.parameters
-        ? (rawConfig.parameters as readonly PgResourceParameter[]).map((p) => ({
+        ? rawConfig.parameters.map((p) => ({
             ...p,
             codec: addCodec(p.codec),
           }))
         : rawConfig.parameters,
     };
-    const resource = new PgResource(registry, resourceConfig) as any;
+    const resource = EXPORTABLE(
+      (PgResource, registry, resourceConfig) =>
+        new PgResource(registry, resourceConfig),
+      [PgResource, registry, resourceConfig],
+    );
 
     // This is the magic that breaks the circular reference: rather than
     // building PgResource via a factory we tell the system to just retrieve it
@@ -1045,7 +1151,7 @@ export function makeRegistry<
     Object.defineProperties(resource, {
       $exporter$args: { value: [registry, resourceName] },
       $exporter$factory: {
-        value: (registry: PgRegistry<any, any, any>, resourceName: string) =>
+        value: (registry: _AnyPgRegistry, resourceName: string) =>
           registry.pgResources[resourceName],
       },
     });
@@ -1054,19 +1160,13 @@ export function makeRegistry<
   }
 
   // Ensure all the relation codecs are also added
-  for (const codecName of Object.keys(
-    config.pgRelations,
-  ) as (keyof typeof config.pgRelations)[]) {
+  for (const codecName of Object.keys(config.pgRelations)) {
     const relations = config.pgRelations[codecName];
     if (!relations) {
       continue;
     }
-    for (const relationName of Object.keys(
-      relations,
-    ) as (keyof typeof relations)[]) {
-      const relationConfig = relations![
-        relationName
-      ] as unknown as PgCodecRelationConfig;
+    for (const relationName of Object.keys(relations)) {
+      const relationConfig = relations![relationName];
       if (relationConfig) {
         addCodec(relationConfig.localCodec);
       }
@@ -1083,11 +1183,11 @@ export function makeRegistry<
    * remove the ones that already have resources, then we build resources for the
    * remainder.
    */
-  const tableLikeCodecsWithoutTableLikeResources = new Set<PgCodec>();
-  const walkCodec = (
-    codec: PgCodec,
+  const tableLikeCodecsWithoutTableLikeResources = new Set<_AnyPgCodec>();
+  const walkCodec = <TCodec extends _AnyPgCodec>(
+    codec: TCodec,
     isAccessibleViaAttribute = false,
-    seen = new Set<PgCodec>(),
+    seen = new Set<_AnyPgCodec>(),
   ) => {
     if (seen.has(codec)) {
       return;
@@ -1102,7 +1202,9 @@ export function makeRegistry<
       tableLikeCodecsWithoutTableLikeResources.add(codec);
     }
     if (codec.attributes) {
-      for (const col of Object.values(codec.attributes)) {
+      for (const col of Object.values(
+        codec.attributes as Record<string, _AnyPgCodecAttribute>,
+      )) {
         if (isAccessibleViaAttribute) {
           walkCodec(col.codec, isAccessibleViaAttribute, seen);
         } else {
@@ -1136,26 +1238,29 @@ export function makeRegistry<
   // Now add resources for the table-like codecs that don't have them already
   for (const codec of tableLikeCodecsWithoutTableLikeResources) {
     if (codec.executor) {
-      const resourceName = `frmcdc_${codec.name}` as keyof TResourceOptions &
-        string;
-      const resource = new PgResource(registry, {
-        name: resourceName,
-        executor: codec.executor,
-        from: sql`(select 1/0 /* codec-only resource; should not select directly */)`,
-        codec,
-        identifier: resourceName,
-        isVirtual: true,
-        extensions: {
-          tags: {
-            behavior: "-*",
-          },
-        },
-      }) as any;
+      const resourceName = `frmcdc_${codec.name}`;
+      const resource = EXPORTABLE(
+        (PgResource, codec, registry, resourceName, sql) =>
+          new PgResource(registry, {
+            name: resourceName,
+            executor: codec.executor!,
+            from: sql`(select 1/0 /* codec-only resource; should not select directly */)` as any,
+            codec,
+            identifier: resourceName,
+            isVirtual: true,
+            extensions: {
+              tags: {
+                behavior: "-*",
+              },
+            },
+          }),
+        [PgResource, codec, registry, resourceName, sql],
+      );
 
       Object.defineProperties(resource, {
         $exporter$args: { value: [registry, resourceName] },
         $exporter$factory: {
-          value: (registry: PgRegistry<any, any, any>, resourceName: string) =>
+          value: (registry: _AnyPgRegistry, resourceName: string) =>
             registry.pgResources[resourceName],
         },
       });
@@ -1164,9 +1269,7 @@ export function makeRegistry<
     }
   }
 
-  for (const codecName of Object.keys(
-    config.pgRelations,
-  ) as (keyof typeof config.pgRelations)[]) {
+  for (const codecName of Object.keys(config.pgRelations)) {
     const relations = config.pgRelations[codecName];
     if (!relations) {
       continue;
@@ -1178,34 +1281,30 @@ export function makeRegistry<
     Object.defineProperties(builtRelations, {
       $exporter$args: { value: [registry, codecName] },
       $exporter$factory: {
-        value: (registry: PgRegistry<any, any, any>, codecName: string) =>
+        value: (registry: _AnyPgRegistry, codecName: string) =>
           registry.pgRelations[codecName],
       },
     });
 
-    for (const relationName of Object.keys(
-      relations,
-    ) as (keyof typeof relations)[]) {
-      const relationConfig = relations![
-        relationName
-      ] as unknown as PgCodecRelationConfig;
+    for (const relationName of Object.keys(relations)) {
+      const relationConfig = relations[relationName];
       if (!relationConfig) {
         continue;
       }
       const { localCodec, remoteResourceOptions, ...rest } = relationConfig;
 
       const builtRelation = {
-        ...(rest as any),
+        ...rest,
         localCodec,
         remoteResource: registry.pgResources[remoteResourceOptions.name],
-      } as PgCodecRelation;
+      };
 
       // Tell the system to read the built relation from the registry
       Object.defineProperties(builtRelation, {
         $exporter$args: { value: [registry, codecName, relationName] },
         $exporter$factory: {
           value: (
-            registry: PgRegistry<any, any, any>,
+            registry: _AnyPgRegistry,
             codecName: string,
             relationName: string,
           ) => registry.pgRelations[codecName][relationName],
@@ -1224,16 +1323,24 @@ export function makeRegistry<
 }
 exportAs("@dataplan/pg", makeRegistry, "makeRegistry");
 
-function validateRelations(registry: PgRegistry<any, any, any>): void {
+function validateRelations<
+  TCodecs extends _AnyPgCodec,
+  TResourceOptions extends _AnyPgResourceOptions,
+  TRelationConfigs extends _AnyPgCodecRelationConfig,
+>(registry: PgRegistry<TCodecs, TResourceOptions, TRelationConfigs>): void {
   // PERF: skip this if not isDev?
 
-  const reg = registry as PgRegistry;
+  const reg = registry;
 
-  for (const codec of Object.values(reg.pgCodecs)) {
+  for (const codec of Object.values(reg.pgCodecs) as Array<TCodecs>) {
     // Check that all the `via` and `identicalVia` match actual relations.
-    const relationKeys = Object.keys(reg.pgRelations[codec.name] ?? {});
+    const relationKeys = Object.keys(
+      reg.pgRelations[codec.name as PgCodecName<TCodecs>] ?? {},
+    );
     if (codec.attributes) {
-      Object.entries(codec.attributes).forEach(([attributeName, col]) => {
+      Object.entries(
+        codec.attributes as Record<string, _AnyPgCodecAttribute>,
+      ).forEach(([attributeName, col]) => {
         const { via, identicalVia } = col;
         if (via != null) {
           if (typeof via === "string") {
@@ -1270,15 +1377,14 @@ function validateRelations(registry: PgRegistry<any, any, any>): void {
   }
 }
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
-  const registryConfig: PgRegistryConfig<any, any, any> = {
+export function makeRegistryBuilder(): EmptyRegistryBuilder {
+  const registryConfig: _AnyPgRegistryConfig = {
     pgCodecs: Object.create(null),
     pgResources: Object.create(null),
     pgRelations: Object.create(null),
   };
 
-  const builder: PgRegistryBuilder<any, any, any> = {
+  const builder: _AnyPgRegistryBuilder = {
     getRegistryConfig() {
       return registryConfig;
     },
@@ -1306,7 +1412,9 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
         this.addCodec(codec.rangeOfCodec);
       }
       if (codec.attributes) {
-        for (const col of Object.values(codec.attributes)) {
+        for (const col of Object.values(
+          codec.attributes as Record<string, _AnyPgCodecAttribute>,
+        )) {
           this.addCodec(col.codec);
         }
       }
@@ -1314,9 +1422,7 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
     },
 
     addResource(resource) {
-      const existing = registryConfig.pgResources[resource.name] as
-        | PgResourceOptions
-        | undefined;
+      const existing = registryConfig.pgResources[resource.name];
       if (existing) {
         if (existing !== resource) {
           throw new Error(
@@ -1353,11 +1459,9 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
       registryConfig.pgRelations[localCodec.name][relationName] = {
         localCodec,
         remoteResourceOptions,
+        name: relationName,
         ...relation,
-      } as PgCodecRelationConfig<
-        PgCodecWithAttributes,
-        PgResourceOptions<any, PgCodecWithAttributes, any, any>
-      >;
+      };
       return builder;
     },
 
@@ -1374,14 +1478,29 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
 exportAs("@dataplan/pg", makeRegistryBuilder, "makeRegistryBuilder");
 
 export function makePgResourceOptions<
-  const TResourceOptions extends PgResourceOptions<any, any, any, any>,
->(options: TResourceOptions) {
+  const TName extends string,
+  const TCodec extends _AnyPgCodec,
+  const TAttributes extends PgCodecAttributes<TCodec>,
+  const TUniques extends PgResourceUnique<
+    TAttributes[keyof TAttributes]
+  > = never,
+  const TParameters extends _AnyPgResourceParameter = never,
+>(
+  options: PgResourceOptions<TName, TCodec, TUniques, TParameters>,
+): PgResourceOptions<TName, TCodec, TUniques, TParameters> {
   return options;
 }
 
 exportAs("@dataplan/pg", makePgResourceOptions, "makePgResourceOptions");
 
-function printResourceFrom(resource: PgResourceOptions): string {
+function printResourceFrom<
+  TResource extends PgResourceOptions<
+    any,
+    _AnyPgCodec,
+    any,
+    _AnyPgResourceParameter
+  >,
+>(resource: TResource): string {
   if (typeof resource.from === "function") {
     return `a function accepting ${resource.parameters
       ?.length} parameters and returning SQL type '${
