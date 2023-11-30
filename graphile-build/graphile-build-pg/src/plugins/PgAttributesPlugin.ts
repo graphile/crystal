@@ -91,6 +91,7 @@ function processAttribute(
     | GraphileBuild.ContextInterfaceFields,
   attributeName: string,
   overrideName?: string,
+  isNotNull?: boolean,
 ): void {
   const { extend, inflection } = build;
 
@@ -126,7 +127,7 @@ function processAttribute(
     });
   const resolveResult = build.pgResolveOutputType(
     attribute.codec,
-    attribute.notNull || attribute.extensions?.tags?.notNull,
+    isNotNull || attribute.notNull || attribute.extensions?.tags?.notNull,
   );
   if (!resolveResult) {
     console.warn(
@@ -386,6 +387,7 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
 
         for (const attributeName in pgCodec.attributes) {
           let overrideName: string | undefined = undefined;
+          let isNotNull: boolean | undefined = undefined;
           if (pgPolymorphism) {
             switch (pgPolymorphism.mode) {
               case "single": {
@@ -401,6 +403,7 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
                 if (match?.rename) {
                   overrideName = match.rename;
                 }
+                isNotNull = match?.isNotNull;
 
                 break;
               }
@@ -418,7 +421,14 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
               }
             }
           }
-          processAttribute(fields, build, context, attributeName, overrideName);
+          processAttribute(
+            fields,
+            build,
+            context,
+            attributeName,
+            overrideName,
+            isNotNull,
+          );
         }
         return fields;
       },
