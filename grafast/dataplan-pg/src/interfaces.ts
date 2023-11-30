@@ -45,6 +45,7 @@ export type PgDecode<TForJavaScript, TFromPostgres = string> = (
 export type PgRefDefinitionExtensions = DataplanPg.PgRefDefinitionExtensions;
 export interface PgRefDefinition {
   graphqlType?: string;
+  sourceGraphqlType?: string;
   singular?: boolean;
   description?: string;
   extensions?: DataplanPg.PgRefDefinitionExtensions;

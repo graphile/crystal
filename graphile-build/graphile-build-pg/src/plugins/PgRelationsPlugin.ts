@@ -751,19 +751,31 @@ function addRelations(
   }> = isMutationPayload
     ? []
     : codec.refs
-    ? Object.entries(codec.refs).map(([refName, spec]) => ({
-        refName,
-        refDefinition: spec.definition,
-        ref: spec,
-      }))
+    ? Object.entries(codec.refs)
+        .filter(
+          ([, spec]) =>
+            !spec.definition.sourceGraphqlType ||
+            spec.definition.sourceGraphqlType === context.Self.name,
+        )
+        .map(([refName, spec]) => ({
+          refName,
+          refDefinition: spec.definition,
+          ref: spec,
+        }))
     : Object.entries(
         codec.extensions?.refDefinitions ??
           (Object.create(null) as Record<string, never>),
-      ).map(([refName, refDefinition]) => ({
-        refName,
-        refDefinition,
-        codec,
-      }));
+      )
+        .filter(
+          ([, refDefinition]) =>
+            !refDefinition.sourceGraphqlType ||
+            refDefinition.sourceGraphqlType === context.Self.name,
+        )
+        .map(([refName, refDefinition]) => ({
+          refName,
+          refDefinition,
+          codec,
+        }));
 
   type Digest = {
     identifier: string;
