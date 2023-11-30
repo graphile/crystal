@@ -7103,7 +7103,7 @@ type SingleTableTopic implements Node & SingleTableItem {
     """The method to use when ordering `SingleTableItem`."""
     orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemsConnection!
-  title: String
+  title: String!
   type: ItemType!
   updatedAt: Datetime!
 }
