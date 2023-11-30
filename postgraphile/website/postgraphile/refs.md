@@ -14,6 +14,7 @@ The easiest way to define a ref is with a `@ref` smart tag. The first argument t
 is the name for your reference, and then it supports the following optional parameters:
 
 - `to:` - the name of the GraphQL type we're referencing (required if `via:` is not present)
+- `from:` - the name of the GraphQL type we're applying the reference to when using polymorphism
 - `via:`- the route string (see below) through which we can reach the target
 - `singular` - present if this is a singular relationship
 - `plural` - indicates that the ref is plural (default). Not allowed if
