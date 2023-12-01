@@ -1,13 +1,5 @@
 import type { RuruHTMLParts } from "./server.js";
 
-declare global {
-  namespace GraphileConfig {
-    interface Preset {
-      ruru?: RuruConfig;
-    }
-  }
-}
-
 export interface RuruConfig {
   port?: number;
   endpoint?: string;

@@ -1,6 +1,18 @@
 import "./thereCanBeOnlyOne.js";
 
+import type LRU from "@graphile/lru";
 import debugFactory from "debug";
+import type { PluginHook } from "graphile-config";
+import type {
+  DocumentNode,
+  ExecutionArgs as GraphQLExecutionArgs,
+  GraphQLError,
+  OperationDefinitionNode,
+} from "graphql";
+
+import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
+
+type PromiseOrValue<T> = T | Promise<T>;
 
 import { exportAs, exportAsMany } from "./exportAs.js";
 import { grafastPrint } from "./grafastPrint.js";
@@ -30,6 +42,14 @@ import {
 } from "./error.js";
 import { execute } from "./execute.js";
 import { grafast, grafastSync } from "./grafastGraphql.js";
+import type {
+  $$cacheByOperation,
+  $$hooked,
+  $$queryCache,
+  CacheByOperationEntry,
+  GrafastTimeouts,
+  ScalarInputPlanResolver,
+} from "./interfaces.js";
 import {
   $$bypassGraphQL,
   $$eventEmitter,
@@ -510,3 +530,199 @@ export { version } from "./version.js";
 export const deepEval = applyTransforms;
 /** @deprecated Renamed to 'ApplyTransformsStep' */
 export const DeepEvalStep = ApplyTransformsStep;
+
+declare global {
+  namespace Grafast {
+    type ExecutionArgs = Pick<
+      GraphQLExecutionArgs,
+      "schema" | "document" | "rootValue" | "variableValues" | "operationName"
+    > & { [$$hooked]?: boolean; contextValue: Grafast.Context };
+
+    /**
+     * Details about the incoming GraphQL request - e.g. if it was sent over an
+     * HTTP request, the request itself so headers can be interrogated.
+     *
+     * It's anticipated this will be expanded via declaration merging, e.g. if
+     * your server is Koa v2 then `RequestContext.koav2` might be added.
+     */
+    interface RequestContext {}
+
+    /**
+     * The GraphQL context our schemas expect, generally generated from details in Grafast.RequestContext
+     */
+    interface Context {}
+
+    interface FieldExtensions {
+      plan?: FieldPlanResolver<any, any, any>;
+      subscribePlan?: FieldPlanResolver<any, any, any>;
+    }
+
+    interface ArgumentExtensions {
+      // fooPlan?: ArgumentPlanResolver<any, any, any, any, any>;
+      inputPlan?: ArgumentInputPlanResolver;
+      applyPlan?: ArgumentApplyPlanResolver;
+      autoApplyAfterParentPlan?: boolean;
+      autoApplyAfterParentSubscribePlan?: boolean;
+    }
+
+    interface InputObjectTypeExtensions {
+      inputPlan?: InputObjectTypeInputPlanResolver;
+    }
+
+    interface InputFieldExtensions {
+      // fooPlan?: InputObjectFieldPlanResolver<any, any, any, any>;
+      inputPlan?: InputObjectFieldInputPlanResolver;
+      applyPlan?: InputObjectFieldApplyPlanResolver;
+      autoApplyAfterParentInputPlan?: boolean;
+      autoApplyAfterParentApplyPlan?: boolean;
+    }
+
+    interface ObjectTypeExtensions {
+      assertStep?:
+        | ((step: ExecutableStep) => asserts step is ExecutableStep)
+        | { new (...args: any[]): ExecutableStep }
+        | null;
+    }
+
+    interface EnumTypeExtensions {}
+
+    interface EnumValueExtensions {
+      /**
+       * EXPERIMENTAL!
+       *
+       * @internal
+       */
+      applyPlan?: EnumValueApplyPlanResolver<any>;
+    }
+
+    interface ScalarTypeExtensions {
+      plan?: ScalarPlanResolver;
+      inputPlan?: ScalarInputPlanResolver;
+      /**
+       * Set true if `serialize(serialize(foo)) === serialize(foo)` for all foo
+       */
+      idempotent?: boolean;
+    }
+
+    interface SchemaExtensions {
+      /**
+       * Maximum number of queries to store in this schema's query cache.
+       */
+      queryCacheMaxLength?: number;
+
+      /**
+       * The underlying query cache
+       */
+      [$$queryCache]?: LRU<string, DocumentNode | ReadonlyArray<GraphQLError>>;
+
+      /**
+       * Maximum number of operations to store an operation plan lookup cache for
+       */
+      operationsCacheMaxLength?: number;
+
+      /**
+       * Maximum number of operation plans to store in a single operation's cache
+       */
+      operationOperationPlansCacheMaxLength?: number;
+
+      /**
+       * The starting point for finding/storing the relevant OperationPlan for a request.
+       */
+      [$$cacheByOperation]?: LRU<
+        OperationDefinitionNode,
+        CacheByOperationEntry
+      >;
+    }
+  }
+  namespace GraphileConfig {
+    interface GrafastOptions {
+      /**
+       * An object to merge into the GraphQL context. Alternatively, pass an
+       * (optionally asynchronous) function that returns an object to merge into
+       * the GraphQL context.
+       */
+      context?:
+        | Partial<Grafast.Context>
+        | ((
+            ctx: Partial<Grafast.RequestContext>,
+            args: Grafast.ExecutionArgs,
+          ) => PromiseOrValue<Partial<Grafast.Context>>);
+
+      /**
+       * A list of 'explain' types that should be included in `extensions.explain`.
+       *
+       * - `plan` will cause the plan JSON to be included
+       * - other values are dependent on the plugins in play
+       *
+       * If set to `true` then all possible explain types will be exposed.
+       */
+      explain?: boolean | string[];
+
+      timeouts?: GrafastTimeouts;
+    }
+    interface Preset {
+      /**
+       * Options that control how `grafast` should execute your GraphQL
+       * operations.
+       */
+      grafast?: GraphileConfig.GrafastOptions;
+    }
+    interface GrafastHooks {
+      args: PluginHook<
+        (event: {
+          args: Grafast.ExecutionArgs;
+          ctx: Grafast.RequestContext;
+          resolvedPreset: GraphileConfig.ResolvedPreset;
+        }) => PromiseOrValue<void>
+      >;
+    }
+    interface Plugin {
+      grafast?: {
+        hooks?: GrafastHooks;
+      };
+    }
+  }
+}
+
+/*
+ * We register certain things (plans, etc) into the GraphQL "extensions"
+ * property on the various GraphQL configs (type, field, argument, etc); this
+ * uses declaration merging so that these can be accessed with types.
+ */
+declare module "graphql" {
+  interface GraphQLFieldExtensions<_TSource, _TContext, _TArgs = any> {
+    grafast?: Grafast.FieldExtensions;
+  }
+
+  interface GraphQLArgumentExtensions {
+    grafast?: Grafast.ArgumentExtensions;
+  }
+
+  interface GraphQLInputObjectTypeExtensions {
+    grafast?: Grafast.InputObjectTypeExtensions;
+  }
+
+  interface GraphQLInputFieldExtensions {
+    grafast?: Grafast.InputFieldExtensions;
+  }
+
+  interface GraphQLObjectTypeExtensions<_TSource = any, _TContext = any> {
+    grafast?: Grafast.ObjectTypeExtensions;
+  }
+
+  interface GraphQLEnumTypeExtensions {
+    grafast?: Grafast.EnumTypeExtensions;
+  }
+
+  interface GraphQLEnumValueExtensions {
+    grafast?: Grafast.EnumValueExtensions;
+  }
+
+  interface GraphQLScalarTypeExtensions {
+    grafast?: Grafast.ScalarTypeExtensions;
+  }
+
+  interface GraphQLSchemaExtensions {
+    grafast?: Grafast.SchemaExtensions;
+  }
+}

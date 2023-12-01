@@ -1,5 +1,7 @@
+import type { GrafastSubscriber } from "grafast";
 import { exportAsMany } from "grafast";
 
+import type { PgAdaptorOptions } from "./adaptors/pg.js";
 import {
   domainOfCodec,
   enumCodec,
@@ -406,3 +408,88 @@ export {
 };
 
 export { version } from "./version.js";
+
+declare global {
+  namespace GraphileConfig {
+    interface PgServiceConfiguration<
+      TAdaptor extends
+        keyof GraphileConfig.PgDatabaseAdaptorOptions = keyof GraphileConfig.PgDatabaseAdaptorOptions,
+    > {
+      name: string;
+      schemas?: string[];
+
+      adaptor: TAdaptor;
+      adaptorSettings?: GraphileConfig.PgDatabaseAdaptorOptions[TAdaptor];
+
+      /** The key on 'context' where the withPgClient function will be sourced */
+      withPgClientKey: KeysOfType<Grafast.Context & object, WithPgClient>;
+
+      /** Return settings to set in the session */
+      pgSettings?: (
+        requestContext: Grafast.RequestContext,
+      ) => { [key: string]: string } | null;
+
+      /** Settings to set in the session that performs introspection (during gather phase) */
+      pgSettingsForIntrospection?: { [key: string]: string } | null;
+
+      /** The key on 'context' where the pgSettings for this DB will be sourced */
+      pgSettingsKey?: KeysOfType<
+        Grafast.Context & object,
+        { [key: string]: string } | null | undefined
+      >;
+
+      /** The GrafastSubscriber to use for subscriptions */
+      pgSubscriber?: GrafastSubscriber<Record<string, string>> | null;
+
+      /** Where on the context should the PgSubscriber be stored? */
+      pgSubscriberKey?: KeysOfType<
+        Grafast.Context & object,
+        GrafastSubscriber<any> | null | undefined
+      >;
+    }
+
+    interface Preset {
+      pgServices?: ReadonlyArray<PgServiceConfiguration>;
+    }
+
+    interface PgDatabaseAdaptorOptions {
+      "@dataplan/pg/adaptors/pg": PgAdaptorOptions;
+      /* Add your own via declaration merging */
+    }
+  }
+  namespace DataplanPg {
+    interface PgConditionStepExtensions {}
+    /**
+     * Custom metadata for a codec
+     */
+    interface PgCodecExtensions {
+      oid?: string;
+      pg?: {
+        serviceName: string;
+        schemaName: string;
+        name: string;
+      };
+      listItemNonNull?: boolean;
+      isEnumTableEnum?: boolean;
+    }
+
+    /**
+     * Extra metadata you can attach to a unique constraint.
+     */
+    interface PgResourceUniqueExtensions {}
+
+    /**
+     * Space for extra metadata about this resource
+     */
+    interface PgResourceExtensions {}
+
+    interface PgResourceParameterExtensions {
+      variant?: string;
+    }
+
+    interface PgCodecRefExtensions {}
+    interface PgCodecAttributeExtensions {}
+    interface PgRefDefinitionExtensions {}
+    interface PgCodecRelationExtensions {}
+  }
+}

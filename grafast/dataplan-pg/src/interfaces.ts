@@ -1,7 +1,6 @@
-import type { ExecutableStep, GrafastSubscriber, ModifierStep } from "grafast";
+import type { ExecutableStep, ModifierStep } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
 
-import type { PgAdaptorOptions } from "./adaptors/pg.js";
 import type { PgCodecAttributes } from "./codecs.js";
 import type {
   PgCodecRefs,
@@ -10,7 +9,7 @@ import type {
   PgResourceParameter,
   PgResourceUnique,
 } from "./datasource.js";
-import type { PgExecutor, WithPgClient } from "./executor.js";
+import type { PgExecutor } from "./executor.js";
 import type { PgDeleteSingleStep } from "./steps/pgDeleteSingle.js";
 import type { PgInsertSingleStep } from "./steps/pgInsertSingle.js";
 import type { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
@@ -415,91 +414,6 @@ export type PgConditionLikeStep = (ModifierStep<any> | ExecutableStep) & {
 export type KeysOfType<TObject, TValueType> = {
   [key in keyof TObject]: TObject[key] extends TValueType ? key : never;
 }[keyof TObject];
-
-declare global {
-  namespace GraphileConfig {
-    interface PgServiceConfiguration<
-      TAdaptor extends
-        keyof GraphileConfig.PgDatabaseAdaptorOptions = keyof GraphileConfig.PgDatabaseAdaptorOptions,
-    > {
-      name: string;
-      schemas?: string[];
-
-      adaptor: TAdaptor;
-      adaptorSettings?: GraphileConfig.PgDatabaseAdaptorOptions[TAdaptor];
-
-      /** The key on 'context' where the withPgClient function will be sourced */
-      withPgClientKey: KeysOfType<Grafast.Context & object, WithPgClient>;
-
-      /** Return settings to set in the session */
-      pgSettings?: (
-        requestContext: Grafast.RequestContext,
-      ) => { [key: string]: string } | null;
-
-      /** Settings to set in the session that performs introspection (during gather phase) */
-      pgSettingsForIntrospection?: { [key: string]: string } | null;
-
-      /** The key on 'context' where the pgSettings for this DB will be sourced */
-      pgSettingsKey?: KeysOfType<
-        Grafast.Context & object,
-        { [key: string]: string } | null | undefined
-      >;
-
-      /** The GrafastSubscriber to use for subscriptions */
-      pgSubscriber?: GrafastSubscriber<Record<string, string>> | null;
-
-      /** Where on the context should the PgSubscriber be stored? */
-      pgSubscriberKey?: KeysOfType<
-        Grafast.Context & object,
-        GrafastSubscriber<any> | null | undefined
-      >;
-    }
-
-    interface Preset {
-      pgServices?: ReadonlyArray<PgServiceConfiguration>;
-    }
-
-    interface PgDatabaseAdaptorOptions {
-      "@dataplan/pg/adaptors/pg": PgAdaptorOptions;
-      /* Add your own via declaration merging */
-    }
-  }
-  namespace DataplanPg {
-    interface PgConditionStepExtensions {}
-    /**
-     * Custom metadata for a codec
-     */
-    interface PgCodecExtensions {
-      oid?: string;
-      pg?: {
-        serviceName: string;
-        schemaName: string;
-        name: string;
-      };
-      listItemNonNull?: boolean;
-      isEnumTableEnum?: boolean;
-    }
-
-    /**
-     * Extra metadata you can attach to a unique constraint.
-     */
-    interface PgResourceUniqueExtensions {}
-
-    /**
-     * Space for extra metadata about this resource
-     */
-    interface PgResourceExtensions {}
-
-    interface PgResourceParameterExtensions {
-      variant?: string;
-    }
-
-    interface PgCodecRefExtensions {}
-    interface PgCodecAttributeExtensions {}
-    interface PgRefDefinitionExtensions {}
-    interface PgCodecRelationExtensions {}
-  }
-}
 
 export interface MakePgServiceOptions
   extends Partial<

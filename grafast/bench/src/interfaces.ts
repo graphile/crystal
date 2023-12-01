@@ -19,6 +19,7 @@ export interface GrafastBenchConfig {
   ) => object;
 }
 
+// eslint-disable-next-line no-restricted-syntax
 declare global {
   namespace GraphileConfig {
     interface Preset {
