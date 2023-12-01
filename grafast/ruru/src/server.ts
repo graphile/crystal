@@ -1,6 +1,8 @@
 import { readFileSync } from "fs";
 import type { GraphiQLProps } from "graphiql";
 import * as path from "path";
+
+import type { RuruConfig } from "./interfaces.js";
 export { RuruConfig } from "./interfaces.js";
 
 const { version } = JSON.parse(
@@ -165,4 +167,12 @@ ${bodyScripts}
 ${bodyInitScript}
 </body>
 </html>`;
+}
+
+declare global {
+  namespace GraphileConfig {
+    interface Preset {
+      ruru?: RuruConfig;
+    }
+  }
 }

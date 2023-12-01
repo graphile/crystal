@@ -136,6 +136,21 @@ module.exports = {
       },
     },
 
+    // Rules for interfaces.ts files
+    {
+      files: ["**/interfaces.ts"],
+      rules: {
+        "no-restricted-syntax": [
+          "error",
+          {
+            selector: "TSModuleDeclaration[kind='global']",
+            message:
+              "No `declare global` allowed in `interface.ts` files since these type-only files may not be imported by dependents, recommend adding to `index.ts` instead.",
+          },
+        ],
+      },
+    },
+
     // Rules for TypeScript only
     {
       files: ["*.ts", "*.tsx"],
