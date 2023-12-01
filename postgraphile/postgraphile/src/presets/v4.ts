@@ -6,14 +6,14 @@ import type { IncomingMessage, ServerResponse } from "http";
 
 import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.js";
 import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.js";
-import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
 import { PgV4SimpleSubscriptionsPlugin } from "../plugins/PgV4SimpleSubscriptionsPlugin.js";
+import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
 
 export {
   PgV4BehaviorPlugin,
   PgV4InflectionPlugin,
-  PgV4SmartTagsPlugin,
   PgV4SimpleSubscriptionsPlugin,
+  PgV4SmartTagsPlugin,
 };
 
 type PromiseOrDirect<T> = T | Promise<T>;

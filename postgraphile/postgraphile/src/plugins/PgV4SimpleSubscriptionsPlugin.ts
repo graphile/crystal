@@ -1,6 +1,7 @@
-import { JSONParseStep, jsonParse } from "@dataplan/json";
+import type { JSONParseStep } from "@dataplan/json";
+import { jsonParse } from "@dataplan/json";
 import { context, lambda, listen, node } from "grafast";
-import { makeExtendSchemaPlugin, gql, EXPORTABLE } from "graphile-utils";
+import { EXPORTABLE, gql, makeExtendSchemaPlugin } from "graphile-utils";
 
 export const PgV4SimpleSubscriptionsPlugin = makeExtendSchemaPlugin((build) => {
   const nodeIdHandlerByTypeName = build.getNodeIdHandlerByTypeName?.();
@@ -31,7 +32,7 @@ export const PgV4SimpleSubscriptionsPlugin = makeExtendSchemaPlugin((build) => {
       Subscription: {
         listen: {
           subscribePlan: EXPORTABLE(
-            (context, jsonParse, listen) =>
+            (context, jsonParse, lambda, listen) =>
               function subscribePlan(_$root, { $topic }) {
                 const $pgSubscriber = context().get("pgSubscriber");
                 const $derivedTopic = lambda(
@@ -40,7 +41,7 @@ export const PgV4SimpleSubscriptionsPlugin = makeExtendSchemaPlugin((build) => {
                 );
                 return listen($pgSubscriber, $derivedTopic, jsonParse);
               },
-            [context, jsonParse, listen],
+            [context, jsonParse, lambda, listen],
           ),
           plan: EXPORTABLE(
             () =>
