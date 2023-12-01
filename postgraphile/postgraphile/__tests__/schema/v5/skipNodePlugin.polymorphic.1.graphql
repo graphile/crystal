@@ -6255,6 +6255,11 @@ type SingleTableChecklist implements SingleTableItem {
   """
   Reads a single `SingleTableTopic` that is related to this `SingleTableChecklist`.
   """
+  rootChecklistTopic: SingleTableTopic
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTableChecklist`.
+  """
   rootTopic: SingleTableTopic
   rootTopicId: Int
   rowId: Int!

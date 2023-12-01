@@ -133,6 +133,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
             args: [name],
             params: {
               to,
+              from,
               plural: rawPlural,
               singular: rawSingular,
               via: rawVia,
@@ -154,6 +155,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
           refDefinitions[name] = {
             singular,
             graphqlType: to,
+            sourceGraphqlType: from,
             extensions: {
               via: rawVia,
               tags: {
