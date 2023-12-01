@@ -43,7 +43,11 @@ export const AddNodeInterfaceToSuitableTypesPlugin: GraphileConfig.Plugin = {
         const {
           getTypeByName,
           inflection,
+
+          // To get this in your own plugin, use
+          // `const nodeIdHandlerByTypeName = build.getNodeIdHandlerByTypeName();` instead
           [NODE_ID_HANDLER_BY_TYPE_NAME]: nodeIdHandlerByTypeName,
+
           [NODE_ID_CODECS]: nodeIdCodecs,
           graphql: { GraphQLNonNull, GraphQLID },
         } = build;
