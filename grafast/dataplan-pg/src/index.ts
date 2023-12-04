@@ -462,6 +462,12 @@ declare global {
         Grafast.Context & object,
         GrafastSubscriber<any> | null | undefined
       >;
+
+      /**
+       * Call this when you no longer need this service configuration any more;
+       * releases any created resources (e.g. connection pools).
+       */
+      release?: () => void | PromiseLike<void>;
     }
 
     interface Preset {

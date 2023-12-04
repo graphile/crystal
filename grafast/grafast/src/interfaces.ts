@@ -644,6 +644,7 @@ export type GrafastSubscriber<
   subscribe<TTopic extends keyof TTopics = keyof TTopics>(
     topic: TTopic,
   ): PromiseOrDirect<AsyncIterableIterator<TTopics[TTopic]>>;
+  release?(): PromiseOrDirect<void>;
 };
 
 /**

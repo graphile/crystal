@@ -730,11 +730,12 @@ export function makePgService(
     );
   }
   const Pool = pg.Pool ?? (pg as any).default?.Pool;
-  const pool =
-    options.pool ??
-    new Pool({
-      connectionString,
-    });
+  const releasers: (() => void | PromiseLike<void>)[] = [];
+  let pool = options.pool;
+  if (!pool) {
+    pool = new Pool({ connectionString });
+    releasers.push(() => pool!.end());
+  }
   if (!options.pool) {
     // If you pass your own pool, you're responsible for doing this yourself
     pool.on("connect", (client) => {
@@ -746,8 +747,11 @@ export function makePgService(
       console.error("Client error (in pool)", e);
     });
   }
-  const pgSubscriber =
-    options.pgSubscriber ?? (pubsub ? new PgSubscriber(pool) : null);
+  let pgSubscriber = options.pgSubscriber ?? null;
+  if (!pgSubscriber && pubsub) {
+    pgSubscriber = new PgSubscriber(pool);
+    releasers.push(() => pgSubscriber!.release?.());
+  }
   const service: GraphileConfig.PgServiceConfiguration = {
     name,
     schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
@@ -761,6 +765,12 @@ export function makePgService(
     adaptorSettings: {
       pool,
       superuserConnectionString,
+    },
+    async release() {
+      // Release in reverse order
+      for (const releaser of [...releasers].reverse()) {
+        await releaser();
+      }
     },
   };
   return service;
