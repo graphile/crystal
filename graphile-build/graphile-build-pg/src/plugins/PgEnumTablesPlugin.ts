@@ -1,5 +1,5 @@
 import type { PgCodecExtensions, PgEnumCodec, PgEnumValue } from "@dataplan/pg";
-import { enumCodec } from "@dataplan/pg";
+import { enumCodec, withPgClientFromPgService } from "@dataplan/pg";
 import { gatherConfig } from "graphile-build";
 import type {
   Introspection,
@@ -9,7 +9,6 @@ import type {
 } from "pg-introspection";
 import { sql } from "pg-sql2";
 
-import { withPgClientFromPgService } from "../pgServices.js";
 import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";
 

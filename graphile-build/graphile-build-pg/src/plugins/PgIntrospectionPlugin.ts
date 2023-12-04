@@ -1,5 +1,9 @@
 import type { KeysOfType, WithPgClient } from "@dataplan/pg";
-import { PgExecutor } from "@dataplan/pg";
+import {
+  PgExecutor,
+  withPgClientFromPgService,
+  withSuperuserPgClientFromPgService,
+} from "@dataplan/pg";
 import type { ExecutableStep, PromiseOrDirect } from "grafast";
 import { constant, context, defer, object } from "grafast";
 import type { GatherPluginContext } from "graphile-build";
@@ -28,10 +32,6 @@ import {
   parseIntrospectionResults,
 } from "pg-introspection";
 
-import {
-  withPgClientFromPgService,
-  withSuperuserPgClientFromPgService,
-} from "../pgServices.js";
 import { version } from "../version.js";
 import { watchFixtures } from "../watchFixtures.js";
 

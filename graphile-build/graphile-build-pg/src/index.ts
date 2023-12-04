@@ -1,8 +1,4 @@
 import type { PgRegistry } from "@dataplan/pg";
-export {
-  getWithPgClientFromPgService,
-  withPgClientFromPgService,
-} from "./pgServices.js";
 export { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.js";
 export { PgAttributeDeprecationPlugin } from "./plugins/PgAttributeDeprecationPlugin.js";
 export { PgAttributesPlugin } from "./plugins/PgAttributesPlugin.js";
@@ -141,3 +137,8 @@ declare global {
     }
   }
 }
+
+export {
+  getWithPgClientFromPgService,
+  withPgClientFromPgService,
+} from "@dataplan/pg";

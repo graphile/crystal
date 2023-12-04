@@ -110,6 +110,13 @@ import {
   TuplePlanMap,
 } from "./interfaces.js";
 import { PgLockableParameter, PgLockCallback } from "./pgLocker.js";
+import type { PgAdaptor } from "./pgServices.js";
+import {
+  getWithPgClientFromPgService,
+  withPgClientFromPgService,
+  withSuperuserPgClientFromPgService,
+} from "./pgServices.js";
+import { PgContextPlugin } from "./plugins/PgContextPlugin.js";
 import {
   pgClassExpression,
   PgClassExpressionStep,
@@ -195,6 +202,7 @@ export {
   GetPgResourceRegistry,
   GetPgResourceRelations,
   GetPgResourceUniques,
+  getWithPgClientFromPgService,
   isEnumCodec,
   KeysOfType,
   listOfCodec,
@@ -203,6 +211,7 @@ export {
   makeRegistry,
   makeRegistryBuilder,
   ObjectFromPgCodecAttributes,
+  PgAdaptor,
   PgBooleanFilterStep,
   PgBox,
   PgCircle,
@@ -242,6 +251,7 @@ export {
   PgConditionLikeStep,
   PgConditionStep,
   PgConditionStepExtensions,
+  PgContextPlugin,
   PgCursorStep,
   PgDecode,
   pgDeleteSingle,
@@ -331,9 +341,11 @@ export {
   TYPES,
   WithPgClient,
   withPgClient,
+  withPgClientFromPgService,
   WithPgClientStep,
   WithPgClientStepCallback,
   withPgClientTransaction,
+  withSuperuserPgClientFromPgService,
 };
 
 exportAsMany("@dataplan/pg", {
@@ -392,6 +404,10 @@ exportAsMany("@dataplan/pg", {
   withPgClient,
   withPgClientTransaction,
   WithPgClientStep,
+  getWithPgClientFromPgService,
+  withPgClientFromPgService,
+  withSuperuserPgClientFromPgService,
+  PgContextPlugin,
 });
 
 export {

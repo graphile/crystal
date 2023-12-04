@@ -1,14 +1,14 @@
 import type {} from "grafast";
 
+import type {} from "../interfaces.js";
 import { withPgClientFromPgService } from "../pgServices.js";
 import { version } from "../version.js";
 
 export const PgContextPlugin: GraphileConfig.Plugin = {
   name: "PgContextPlugin",
-  description: "Extends the runtime GraphQL context with details needed",
+  description:
+    "Extends the runtime GraphQL context with details needed to support your configured pgServices",
   version: version,
-
-  schema: {},
 
   grafast: {
     hooks: {
