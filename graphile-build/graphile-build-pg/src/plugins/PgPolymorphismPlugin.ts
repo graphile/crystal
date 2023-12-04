@@ -845,7 +845,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                           );
                           return object({
                             match: lambda($specifier, (specifier) => {
-                              const value = specifier[handler.codec.name];
+                              const value = specifier?.[handler.codec.name];
                               return value != null
                                 ? handler.match(value)
                                 : false;
@@ -916,7 +916,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                           );
                           return object({
                             match: lambda($specifier, (specifier) => {
-                              const value = specifier[handler.codec.name];
+                              const value = specifier?.[handler.codec.name];
                               return value != null
                                 ? handler.match(value)
                                 : false;

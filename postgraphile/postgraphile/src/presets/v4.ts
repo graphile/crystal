@@ -6,9 +6,15 @@ import type { IncomingMessage, ServerResponse } from "http";
 
 import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.js";
 import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.js";
+import { PgV4SimpleSubscriptionsPlugin } from "../plugins/PgV4SimpleSubscriptionsPlugin.js";
 import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
 
-export { PgV4BehaviorPlugin, PgV4InflectionPlugin, PgV4SmartTagsPlugin };
+export {
+  PgV4BehaviorPlugin,
+  PgV4InflectionPlugin,
+  PgV4SimpleSubscriptionsPlugin,
+  PgV4SmartTagsPlugin,
+};
 
 type PromiseOrDirect<T> = T | Promise<T>;
 type DirectOrCallback<Request, T> = T | ((req: Request) => PromiseOrDirect<T>);
@@ -87,6 +93,8 @@ export interface V4Options<
   watchPg?: boolean;
   /** @deprecated Use 'preset.grafast.context' callback instead */
   defaultRole?: never;
+
+  simpleSubscriptions?: boolean;
 }
 
 function isNotNullish<T>(arg: T | undefined | null): arg is T {
@@ -200,6 +208,7 @@ export const makeV4Preset = (
       PgV4InflectionPlugin,
       PgV4SmartTagsPlugin,
       PgV4BehaviorPlugin,
+      options.simpleSubscriptions ? PgV4SimpleSubscriptionsPlugin : null,
       makeV4Plugin(options),
       ...(options.appendPlugins ? options.appendPlugins : []),
     ].filter(isNotNullish),

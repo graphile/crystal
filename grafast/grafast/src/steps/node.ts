@@ -38,7 +38,7 @@ export class NodeStep
     private possibleTypes: {
       [typeName: string]: NodeIdHandler;
     },
-    $id: ExecutableStep<string>,
+    $id: ExecutableStep<string | null | undefined>,
   ) {
     super();
     const decodeNodeId = makeDecodeNodeId(Object.values(possibleTypes));
@@ -94,7 +94,7 @@ export function node(
   possibleTypes: {
     [typeName: string]: NodeIdHandler;
   },
-  $id: ExecutableStep<string>,
+  $id: ExecutableStep<string | null | undefined>,
 ): NodeStep {
   return new NodeStep(possibleTypes, $id);
 }
@@ -126,7 +126,8 @@ export function specFromNodeId(
 export function makeDecodeNodeId(handlers: NodeIdHandler[]) {
   const codecs = [...new Set(handlers.map((h) => h.codec))];
 
-  function decodeNodeIdWithCodecs(raw: string) {
+  function decodeNodeIdWithCodecs(raw: string | null | undefined) {
+    if (raw == null) return null;
     return codecs.reduce(
       (memo, codec) => {
         try {
@@ -142,5 +143,6 @@ export function makeDecodeNodeId(handlers: NodeIdHandler[]) {
     );
   }
   decodeNodeIdWithCodecs.isSyncAndSafe = true; // Optimization
-  return ($id: ExecutableStep<string>) => lambda($id, decodeNodeIdWithCodecs);
+  return ($id: ExecutableStep<string | null | undefined>) =>
+    lambda($id, decodeNodeIdWithCodecs);
 }

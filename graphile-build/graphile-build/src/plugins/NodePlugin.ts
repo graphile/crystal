@@ -20,6 +20,7 @@ declare global {
       registerNodeIdHandler?(matcher: NodeIdHandler): void;
       getNodeIdHandler?(typeName: string): NodeIdHandler | undefined;
       getNodeTypeNames?(): string[];
+      getNodeIdHandlerByTypeName?(): Readonly<Record<string, NodeIdHandler>>;
     }
 
     interface ScopeObjectFieldsField {
@@ -77,8 +78,13 @@ export const NodePlugin: GraphileConfig.Plugin = {
         return build.extend(
           build,
           {
+            /** @internal */
             [NODE_ID_CODECS]: nodeIdCodecs,
+            /** @internal */
             [NODE_ID_HANDLER_BY_TYPE_NAME]: nodeIdHandlerByTypeName,
+            getNodeIdHandlerByTypeName() {
+              return nodeIdHandlerByTypeName;
+            },
             registerNodeIdCodec(codec) {
               const codecName = codec.name;
               if (nodeIdCodecs[codecName]) {
@@ -169,8 +175,8 @@ export const NodePlugin: GraphileConfig.Plugin = {
           extend,
           graphql: { GraphQLNonNull, GraphQLID },
           inflection,
-          [NODE_ID_HANDLER_BY_TYPE_NAME]: nodeIdHandlerByTypeName,
         } = build;
+        const nodeIdHandlerByTypeName = build.getNodeIdHandlerByTypeName!();
         const nodeIdFieldName = build.inflection.nodeIdFieldName();
         const nodeType = getTypeByName(inflection.builtin("Node")) as
           | GraphQLObjectType

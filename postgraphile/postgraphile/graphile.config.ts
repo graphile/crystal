@@ -287,6 +287,7 @@ const preset: GraphileConfig.Preset = {
       graphiql: true,
       graphiqlRoute: "/",
       ignoreRBAC: false,
+      simpleSubscriptions: true,
     }),
     // PgManyToManyPreset,
     // PostGraphileConnectionFilterPreset,

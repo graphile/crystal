@@ -9,7 +9,6 @@
   "include": ["src"],
   "references": [
     { "path": "../../utils/graphile-config" },
-    { "path": "../../grafast/grafast" },
-    { "path": "../../postgraphile/postgraphile/tsconfig.build.json" }
+    { "path": "../../grafast/grafast" }
   ]
 }
