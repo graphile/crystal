@@ -1,5 +1,4 @@
 import "./PgTablesPlugin.js";
-import "../interfaces.js";
 import "graphile-config";
 
 import type {
