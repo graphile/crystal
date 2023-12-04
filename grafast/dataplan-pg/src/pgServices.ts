@@ -1,7 +1,19 @@
 import { pathToFileURL } from "node:url";
 
-import type { PgClient, WithPgClient } from "@dataplan/pg";
-import type { PromiseOrDirect } from "grafast";
+import type { PgClient, WithPgClient } from "./executor.ts";
+
+type PromiseOrDirect<T> = T | PromiseLike<T>;
+
+/** @experimental */
+export interface PgAdaptor<
+  TAdaptor extends
+    keyof GraphileConfig.PgDatabaseAdaptorOptions = keyof GraphileConfig.PgDatabaseAdaptorOptions,
+> {
+  createWithPgClient: (
+    adaptorSettings: GraphileConfig.PgServiceConfiguration<TAdaptor>["adaptorSettings"],
+    variant?: "SUPERUSER" | null,
+  ) => PromiseOrDirect<WithPgClient>;
+}
 
 /**
  * Is "thenable".
@@ -11,8 +23,6 @@ export function isPromiseLike<T>(
 ): t is PromiseLike<T> {
   return t != null && typeof (t as any).then === "function";
 }
-
-import type { PgAdaptor } from "./interfaces.js";
 
 const isTest = process.env.NODE_ENV === "test";
 

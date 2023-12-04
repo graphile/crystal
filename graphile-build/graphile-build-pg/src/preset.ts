@@ -1,5 +1,7 @@
 import "graphile-config";
 
+import { PgContextPlugin } from "@dataplan/pg";
+
 import { PgRBACPlugin } from "./index.js";
 import { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.js";
 import { PgAttributeDeprecationPlugin } from "./plugins/PgAttributeDeprecationPlugin.js";
@@ -11,7 +13,6 @@ import { PgConditionCustomFieldsPlugin } from "./plugins/PgConditionCustomFields
 import { PgConnectionArgOrderByDefaultValuePlugin } from "./plugins/PgConnectionArgOrderByDefaultValuePlugin.js";
 import { PgConnectionArgOrderByPlugin } from "./plugins/PgConnectionArgOrderByPlugin.js";
 import { PgConnectionTotalCountPlugin } from "./plugins/PgConnectionTotalCountPlugin.js";
-import { PgContextPlugin } from "./plugins/PgContextPlugin.js";
 import { PgCustomTypeFieldPlugin } from "./plugins/PgCustomTypeFieldPlugin.js";
 import { PgEnumTablesPlugin } from "./plugins/PgEnumTablesPlugin.js";
 import { PgFakeConstraintsPlugin } from "./plugins/PgFakeConstraintsPlugin.js";

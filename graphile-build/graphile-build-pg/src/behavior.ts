@@ -1,5 +1,3 @@
-import "./interfaces.js";
-
 import type {
   PgCodecExtensions,
   PgCodecRefExtensions,

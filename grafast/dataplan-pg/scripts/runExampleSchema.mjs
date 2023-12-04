@@ -5,32 +5,39 @@ import { grafast } from "grafast";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 import { strict as assert } from "node:assert";
-import pg from "pg";
 
-import { createWithPgClient } from "../dist/adaptors/pg.js";
 import { schema } from "./exampleSchemaExport.mjs";
+import { resolvePresets } from "graphile-config";
+import { PgContextPlugin } from "@dataplan/pg";
+import { makePgService } from "@dataplan/pg/adaptors/pg";
 
-const pool = new pg.Pool({
-  connectionString: process.env.TEST_DATABASE_URL || "graphile_crystal",
-});
+const connectionString =
+  process.env.TEST_DATABASE_URL || "postgres:///graphile_crystal";
+const pgService = makePgService({ connectionString });
+const preset = {
+  plugins: [PgContextPlugin],
+  pgServices: [pgService],
+  grafast: {
+    context() {
+      return {
+        pgSettings: {
+          timezone: "UTC",
+        },
+      };
+    },
+  },
+};
+const resolvedPreset = resolvePresets([preset]);
 
 async function runTestQuery(basePath) {
   const source = await readFile(`${basePath}.test.graphql`, "utf8");
   const expectedData = JSON5.parse(await readFile(`${basePath}.json5`, "utf8"));
 
-  const withPgClient = createWithPgClient({
-    pool,
-  });
-
   const result = await grafast({
     schema,
     source,
-    contextValue: {
-      pgSettings: {
-        timezone: "UTC",
-      },
-      withPgClient,
-    },
+    resolvedPreset,
+    requestContext: {},
   });
   const operationType = "query";
 
@@ -158,5 +165,5 @@ try {
     await runTestQuery(basePath);
   }
 } finally {
-  pool.end();
+  await pgService.release?.();
 }

@@ -6,6 +6,7 @@
 
 import "graphile-config";
 
+import { getWithPgClientFromPgService } from "@dataplan/pg";
 import {
   defaultPreset as graphileBuildPreset,
   QueryQueryPlugin,
@@ -14,7 +15,6 @@ import {
 import { Pool } from "pg";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
-import { getWithPgClientFromPgService } from "../pgServices.js";
 
 // You should set these to be the values you want to use for demonstration
 const DATABASE_CONNECTION_STRING = "postgres:///pagila";

@@ -12,6 +12,7 @@
 import { pathToFileURL } from "node:url";
 import { inspect } from "node:util";
 
+import { getWithPgClientFromPgService } from "@dataplan/pg";
 import { envelop, useExtendContext, useSchema } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
@@ -40,7 +41,6 @@ import { Pool } from "pg";
 import * as ws from "ws";
 
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
-import { getWithPgClientFromPgService } from "../pgServices.js";
 
 const pool = new Pool({
   connectionString: "pggql_test",
