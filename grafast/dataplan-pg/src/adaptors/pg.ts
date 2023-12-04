@@ -26,6 +26,7 @@ import type {
   WithPgClient,
 } from "../executor.js";
 import type { MakePgServiceOptions } from "../interfaces.js";
+import type { PgAdaptor } from "../pgServices.js";
 
 // Set `DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE=0` to disable prepared statements
 const cacheSizeFromEnv = process.env.DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE
@@ -374,7 +375,7 @@ export interface PgAdaptorOptions {
 }
 
 export function createWithPgClient(
-  options: PgAdaptorOptions,
+  options: PgAdaptorOptions = Object.create(null),
   variant?: "SUPERUSER" | string | null,
 ): WithPgClient<NodePostgresPgClient> {
   if (variant === "SUPERUSER") {
@@ -411,6 +412,10 @@ export function createWithPgClient(
     return makePgAdaptorWithPgClient(pool, release);
   }
 }
+
+// This is here as a TypeScript assertion, to ensure we conform to PgAdaptor
+const _testValidAdaptor: PgAdaptor<"@dataplan/pg/adaptors/pg">["createWithPgClient"] =
+  createWithPgClient;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
