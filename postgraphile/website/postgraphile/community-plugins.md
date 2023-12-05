@@ -22,7 +22,7 @@ Schema extension plugins for PostGraphile:
   adds a `filter:` arg to connections that offers a more powerful alternative to
   the built in filtering operations :white_check_mark:
 - [@graphile/pg-aggregates](https://github.com/graphile/pg-aggregates) - aggregate support on connections :white_check_mark:
-- [@graphile/simplify-inflection](https://github.com/benjie/crystal/tree/main/graphile-build/graphile-simplify-inflection) -
+- [@graphile/simplify-inflection](https://github.com/graphile/crystal/tree/main/graphile-build/graphile-simplify-inflection) -
   simplifies field names by automatically removing `ByFooIdAndBarId`-style
   suffixes. :white_check_mark:
 - [@graphile-contrib/pg-omit-archived](https://github.com/graphile-contrib/pg-omit-archived) -
