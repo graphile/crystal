@@ -661,6 +661,17 @@ such as `role`, and will be applied by Postgres.
 
 :::
 
+:::warning
+
+Generally there's no need to set a `name` unless you have more than one pgService.
+When you do, the different services may need different connection settings and will
+definitely be listening with different "subscribers" (different events), so the `pgSettingsKey`
+and `pgSubscriberKey` dictate which key to use for this. Currently the default is if the
+name is `main` (the default name) then we use the `pgSettings`/`pgSubscriber` key, otherwise we prefix this
+with the name of the service and an underscore
+
+:::
+
 ### Exposing HTTP request data to PostgreSQL
 
 Using the `pgSettings` functionality mentioned above you can extend the data
