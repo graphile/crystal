@@ -1,0 +1,29 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+
+{
+  allApplications(only: [GcpApplication, AwsApplication]) {
+    nodes {
+      __typename
+      ... on AwsApplication {
+        awsId
+      }
+      ... on GcpApplication {
+        gcpId
+      }
+      vulnerabilities(only: [ThirdPartyVulnerability]) {
+        nodes {
+          __typename
+          id
+          name
+          ... on FirstPartyVulnerability {
+            teamName
+          }
+          ... on ThirdPartyVulnerability {
+            vendorName
+          }
+        }
+      }
+    }
+  }
+}

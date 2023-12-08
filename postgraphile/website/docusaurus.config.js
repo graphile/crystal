@@ -55,8 +55,7 @@ const config = {
         },
         pages: {
           remarkPlugins: [
-            require("@docusaurus/remark-plugin-npm2yarn"),
-            { sync: true },
+            [require("@docusaurus/remark-plugin-npm2yarn"), { sync: true }],
           ],
         },
         blog: false,

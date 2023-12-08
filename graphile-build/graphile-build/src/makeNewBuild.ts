@@ -412,6 +412,13 @@ style for these configuration options (e.g. change \`interfaces: \
                 return null;
               }
             }
+            if (klass === GraphQLEnumType) {
+              // Perform values check.
+              if (Object.keys(type.getValues()).length === 0) {
+                allTypes[typeName] = null;
+                return null;
+              }
+            }
 
             return type;
           } else {

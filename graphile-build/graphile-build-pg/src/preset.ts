@@ -28,6 +28,7 @@ import { PgNodeIdAttributesPlugin } from "./plugins/PgNodeIdAttributesPlugin.js"
 import { PgOrderAllAttributesPlugin } from "./plugins/PgOrderAllAttributesPlugin.js";
 import { PgOrderByPrimaryKeyPlugin } from "./plugins/PgOrderByPrimaryKeyPlugin.js";
 import { PgOrderCustomFieldsPlugin } from "./plugins/PgOrderCustomFieldsPlugin.js";
+import { PgPolymorphismOnlyArgumentPlugin } from "./plugins/PgPolymorphismOnlyArgumentPlugin.js";
 import { PgPolymorphismPlugin } from "./plugins/PgPolymorphismPlugin.js";
 import { PgProceduresPlugin } from "./plugins/PgProceduresPlugin.js";
 import { PgRefsPlugin } from "./plugins/PgRefsPlugin.js";
@@ -79,5 +80,6 @@ export const defaultPreset: GraphileConfig.Preset = {
     PgRBACPlugin,
     PgIndexBehaviorsPlugin,
     PgRegistryPlugin,
+    PgPolymorphismOnlyArgumentPlugin,
   ],
 };

@@ -2,7 +2,6 @@ import "graphile-config";
 
 import type {
   PgCodec,
-  PgRegistry,
   PgResource,
   PgUnionAllStepConfigAttributes,
   PgUnionAllStepMember,
@@ -78,9 +77,11 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
     hooks: {
       GraphQLObjectType_fields(fields, build, context) {
         const {
+          getTypeByName,
           inflection,
-          input,
           graphql: { GraphQLList, GraphQLNonNull },
+          pgResourcesByPolymorphicTypeName,
+          pgCodecByPolymorphicUnionModeTypeName,
         } = build;
         const {
           scope: { isRootQuery },
@@ -90,96 +91,16 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
           return fields;
         }
 
-        const pgRegistry = input.pgRegistry as PgRegistry;
-
-        const resourcesByPolymorphicTypeName: {
-          [polymorphicTypeName: string]: {
-            resources: PgResource[];
-            type: "union" | "interface";
-          };
-        } = Object.create(null);
-
-        const allResources = Object.values(pgRegistry.pgResources);
-        for (const resource of allResources) {
-          if (resource.parameters) continue;
-          if (typeof resource.from === "function") continue;
-          if (!resource.codec.extensions?.tags) continue;
-          const { implements: implementsTag } = resource.codec.extensions.tags;
-          /*
-          const { unionMember } = resource.codec.extensions.tags;
-          if (unionMember) {
-            const unions = Array.isArray(unionMember)
-              ? unionMember
-              : [unionMember];
-            for (const union of unions) {
-              if (!resourcesByPolymorphicTypeName[union]) {
-                resourcesByPolymorphicTypeName[union] = {
-                  resources: [resource as PgResource],
-                  type: "union",
-                };
-              } else {
-                if (resourcesByPolymorphicTypeName[union].type !== "union") {
-                  throw new Error(`Inconsistent polymorphism`);
-                }
-                resourcesByPolymorphicTypeName[union].resources.push(
-                  resource as PgResource,
-                );
-              }
-            }
-          }
-          */
-          if (implementsTag) {
-            const interfaces = Array.isArray(implementsTag)
-              ? implementsTag
-              : [implementsTag];
-            for (const interfaceName of interfaces) {
-              if (!resourcesByPolymorphicTypeName[interfaceName]) {
-                resourcesByPolymorphicTypeName[interfaceName] = {
-                  resources: [resource as PgResource],
-                  type: "interface",
-                };
-              } else {
-                if (
-                  resourcesByPolymorphicTypeName[interfaceName].type !==
-                  "interface"
-                ) {
-                  throw new Error(`Inconsistent polymorphism`);
-                }
-                resourcesByPolymorphicTypeName[interfaceName].resources.push(
-                  resource as PgResource,
-                );
-              }
-            }
-          }
-        }
-
-        const interfaceCodecs: { [polymorphicTypeName: string]: PgCodec } =
-          Object.create(null);
-        for (const codec of Object.values(pgRegistry.pgCodecs)) {
-          if (!codec.polymorphism) continue;
-          if (codec.polymorphism.mode !== "union") continue;
-
-          const interfaceTypeName = inflection.tableType(codec);
-          interfaceCodecs[interfaceTypeName] = codec;
-
-          // Explicitly allow zero implementations.
-          if (!resourcesByPolymorphicTypeName[interfaceTypeName]) {
-            resourcesByPolymorphicTypeName[interfaceTypeName] = {
-              resources: [],
-              type: "interface",
-            };
-          }
-        }
-
         for (const [polymorphicTypeName, spec] of Object.entries(
-          resourcesByPolymorphicTypeName,
+          pgResourcesByPolymorphicTypeName,
         )) {
           if (spec.type === "union") {
             // We can't add a root field for a basic union because there's
             // nothing to order it by - we wouldn't be able to reliably
             // paginate.
           } else if (spec.type === "interface") {
-            const interfaceCodec = interfaceCodecs[polymorphicTypeName];
+            const interfaceCodec =
+              pgCodecByPolymorphicUnionModeTypeName[polymorphicTypeName];
             if (!interfaceCodec) {
               console.warn(
                 `A number of resources claim to implement '${polymorphicTypeName}', but we couldn't find the definition for that type so we won't add a root field for it. (Perhaps you implemented it in makeExtendSchemaPlugin?) Affected resources: ${spec.resources
@@ -196,14 +117,14 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
             const makeField = (useConnection: boolean): void => {
               if (!interfaceCodec.polymorphism) return;
 
-              const type = build.getTypeByName(
-                build.inflection.tableType(interfaceCodec),
+              const type = getTypeByName(
+                inflection.tableType(interfaceCodec),
               ) as GraphQLInterfaceType | undefined;
               if (!type) return;
 
               const fieldType = useConnection
-                ? (build.getTypeByName(
-                    build.inflection.tableConnectionType(interfaceCodec),
+                ? (getTypeByName(
+                    inflection.tableConnectionType(interfaceCodec),
                   ) as GraphQLObjectType | undefined)
                 : // TODO: nullability.
                   new GraphQLList(new GraphQLNonNull(type));
