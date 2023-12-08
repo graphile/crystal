@@ -11870,7 +11870,6 @@ __metadata:
     pg-sql2: "workspace:^"
     spec-md: "npm:^3.1.0"
     tamedevil: "workspace:^"
-    ts-loader: "npm:^9.4.4"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.6.2"
     typescript: "npm:^5.2.2"
