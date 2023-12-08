@@ -7,7 +7,7 @@ import type {
   PgUnionAllStepMember,
 } from "@dataplan/pg";
 import { pgUnionAll } from "@dataplan/pg";
-import { FieldArgs, connection } from "grafast";
+import { connection } from "grafast";
 import type { GraphQLInterfaceType, GraphQLObjectType } from "grafast/graphql";
 import { EXPORTABLE } from "graphile-build";
 

@@ -1,20 +1,18 @@
-import { GraphileConfig, PluginHook } from "graphile-config";
-import { version } from "../version.js";
-import {
+import type {
   PgCodec,
   PgCodecPolymorphismRelationalTypeSpec,
   PgUnionAllStep,
 } from "@dataplan/pg";
-import {
-  GraphQLEnumValueConfigMap,
-  GraphQLFieldConfigArgumentMap,
-} from "graphql";
-import { EXPORTABLE } from "graphile-build";
-import {
+import type {
   ConnectionStep,
   FieldArgs,
   GrafastFieldConfigArgumentMap,
 } from "grafast";
+import { EXPORTABLE } from "graphile-build";
+import type { GraphileConfig } from "graphile-config";
+import type { GraphQLFieldConfigArgumentMap } from "graphql";
+
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {
@@ -47,7 +45,7 @@ export const PgPolymorphismOnlyArgumentPlugin: GraphileConfig.Plugin = {
       pgPolymorphismEnumType(options, pgCodec) {
         return this.upperCamelCase(`${this._codecName(pgCodec)}-type`);
       },
-      pgPolymorphismOnlyArgument(options, pgCodec) {
+      pgPolymorphismOnlyArgument(_options, _pgCodec) {
         return "only";
       },
     },
