@@ -3,7 +3,19 @@ const TerserPlugin = require("terser-webpack-plugin");
 const path = require("path");
 const LicenseCheckerWebpackPlugin = require("license-checker-webpack-plugin");
 
-module.exports = {
+const OUTPUTS = [
+  {
+    path: path.resolve(__dirname, "browser"),
+    filename: "[name].js",
+    library: {
+      name: "grafast",
+      type: "umd",
+    },
+    globalObject: "this",
+  },
+];
+
+module.exports = OUTPUTS.map((output) => ({
   devtool: false,
   entry: {
     index: "./dist/index.js",
@@ -15,15 +27,7 @@ module.exports = {
       import: "./dist/mermaid.js",
     },
   },
-  output: {
-    path: path.resolve(__dirname, "release/dist"),
-    filename: "[name].js",
-    library: {
-      name: "grafast",
-      type: "umd",
-    },
-    globalObject: "this",
-  },
+  output,
   plugins: [
     new webpack.DefinePlugin({
       "process.env.GRAPHILE_ENV": JSON.stringify("production"),
@@ -86,12 +90,14 @@ module.exports = {
     maxEntrypointSize: 215000,
   },
   optimization: {
-    minimizer: [
-      new TerserPlugin({
-        terserOptions: {
-          keep_classnames: true,
-        },
-      }),
-    ],
+    runtimeChunk: "single",
+    minimize: false,
+    //minimizer: [
+    //  new TerserPlugin({
+    //    terserOptions: {
+    //      keep_classnames: true,
+    //    },
+    //  }),
+    //],
   },
-};
+}));

@@ -7,16 +7,19 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "browser": "./browser/index.js",
       "node": "./dist/index.js",
       "default": "./dist/index.js"
     },
     "./envelop": {
       "types": "./dist/envelop.d.ts",
+      "browser": "./browser/envelop.js",
       "node": "./dist/envelop.js",
       "default": "./dist/envelop.js"
     },
     "./mermaid": {
       "types": "./dist/mermaid.d.ts",
+      "browser": "./browser/mermaid.js",
       "node": "./dist/mermaid.js",
       "default": "./dist/mermaid.js"
     },
@@ -83,7 +86,8 @@
   },
   "files": [
     "fwd",
-    "dist"
+    "dist",
+    "browser"
   ],
   "devDependencies": {
     "@types/chai": "^4.3.5",
