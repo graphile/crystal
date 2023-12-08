@@ -780,14 +780,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     extensions,
                   });
                   return EXPORTABLE(
-                    (
-                      description,
-                      extensions,
-                      innerCodec,
-                      listOfCodec,
-                      typeDelim,
-                    ) =>
-                      listOfCodec(innerCodec, {
+                    (description, extensions, info, innerCodec, listOfCodec, serviceName, type, typeDelim) => listOfCodec(innerCodec, {
                         extensions,
                         typeDelim,
                         description,
@@ -796,13 +789,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                           serviceName,
                         }),
                       }),
-                    [
-                      description,
-                      extensions,
-                      innerCodec,
-                      listOfCodec,
-                      typeDelim,
-                    ],
+                    [description, extensions, info, innerCodec, listOfCodec, serviceName, type, typeDelim],
                   );
                 }
               }
