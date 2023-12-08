@@ -1,0 +1,283 @@
+{
+  allApplications: {
+    nodes: [
+      {
+        __typename: "AwsApplication",
+        awsId: "AWS-0001",
+        vulnerabilities: {
+          nodes: [
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 1,
+              name: "CSRF",
+              vendorName: "98-Factor-Login",
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 2,
+              name: "XSS",
+              vendorName: "Frog-Render-Lib",
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 4,
+              name: "Malware",
+              vendorName: "Frog-Render-Lib",
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 5,
+              name: "License",
+              vendorName: "Frog-Render-Lib",
+            },
+          ],
+        },
+      },
+      {
+        __typename: "AwsApplication",
+        awsId: "AWS-0002",
+        vulnerabilities: {
+          nodes: [],
+        },
+      },
+      {
+        __typename: "AwsApplication",
+        awsId: "AWS-0003",
+        vulnerabilities: {
+          nodes: [
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 1,
+              name: "CSRF",
+              vendorName: "98-Factor-Login",
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 4,
+              name: "Malware",
+              vendorName: "Frog-Render-Lib",
+            },
+          ],
+        },
+      },
+      {
+        __typename: "AwsApplication",
+        awsId: "AWS-0004",
+        vulnerabilities: {
+          nodes: [
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 1,
+              name: "CSRF",
+              vendorName: "98-Factor-Login",
+            },
+          ],
+        },
+      },
+      {
+        __typename: "AwsApplication",
+        awsId: "AWS-0005",
+        vulnerabilities: {
+          nodes: [
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 4,
+              name: "Malware",
+              vendorName: "Frog-Render-Lib",
+            },
+          ],
+        },
+      },
+      {
+        __typename: "AwsApplication",
+        awsId: "AWS-0006",
+        vulnerabilities: {
+          nodes: [
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 2,
+              name: "XSS",
+              vendorName: "Frog-Render-Lib",
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 4,
+              name: "Malware",
+              vendorName: "Frog-Render-Lib",
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 5,
+              name: "License",
+              vendorName: "Frog-Render-Lib",
+            },
+          ],
+        },
+      },
+      {
+        __typename: "AwsApplication",
+        awsId: "AWSKYNET",
+        vulnerabilities: {
+          nodes: [
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 2,
+              name: "XSS",
+              vendorName: "Frog-Render-Lib",
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 4,
+              name: "Malware",
+              vendorName: "Frog-Render-Lib",
+            },
+          ],
+        },
+      },
+      {
+        __typename: "AwsApplication",
+        awsId: "AWS-0008",
+        vulnerabilities: {
+          nodes: [
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 1,
+              name: "CSRF",
+              vendorName: "98-Factor-Login",
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 2,
+              name: "XSS",
+              vendorName: "Frog-Render-Lib",
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 4,
+              name: "Malware",
+              vendorName: "Frog-Render-Lib",
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 5,
+              name: "License",
+              vendorName: "Frog-Render-Lib",
+            },
+          ],
+        },
+      },
+      {
+        __typename: "GcpApplication",
+        gcpId: "GCP_0_1",
+        vulnerabilities: {
+          nodes: [
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 3,
+              name: "SQL injection",
+              vendorName: "Eval-Sequel-Corp",
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 4,
+              name: "Malware",
+              vendorName: "Frog-Render-Lib",
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 5,
+              name: "License",
+              vendorName: "Frog-Render-Lib",
+            },
+          ],
+        },
+      },
+      {
+        __typename: "GcpApplication",
+        gcpId: "GCP_0_2",
+        vulnerabilities: {
+          nodes: [
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 1,
+              name: "CSRF",
+              vendorName: "98-Factor-Login",
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 3,
+              name: "SQL injection",
+              vendorName: "Eval-Sequel-Corp",
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 4,
+              name: "Malware",
+              vendorName: "Frog-Render-Lib",
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 5,
+              name: "License",
+              vendorName: "Frog-Render-Lib",
+            },
+          ],
+        },
+      },
+      {
+        __typename: "GcpApplication",
+        gcpId: "GCP_0_3",
+        vulnerabilities: {
+          nodes: [
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 1,
+              name: "CSRF",
+              vendorName: "98-Factor-Login",
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 3,
+              name: "SQL injection",
+              vendorName: "Eval-Sequel-Corp",
+            },
+          ],
+        },
+      },
+      {
+        __typename: "GcpApplication",
+        gcpId: "GCP_0_4",
+        vulnerabilities: {
+          nodes: [
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 2,
+              name: "XSS",
+              vendorName: "Frog-Render-Lib",
+            },
+          ],
+        },
+      },
+      {
+        __typename: "GcpApplication",
+        gcpId: "GCP_0_5",
+        vulnerabilities: {
+          nodes: [
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 4,
+              name: "Malware",
+              vendorName: "Frog-Render-Lib",
+            },
+            {
+              __typename: "ThirdPartyVulnerability",
+              id: 5,
+              name: "License",
+              vendorName: "Frog-Render-Lib",
+            },
+          ],
+        },
+      },
+    ],
+  },
+}
