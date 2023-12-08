@@ -27,6 +27,9 @@ interface Application {
     based pagination. May not be used with `last`.
     """
     offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
   ): VulnerabilitiesConnection!
 }
 
@@ -43,6 +46,11 @@ input ApplicationCondition {
 
   """Checks for equality with the object’s `name` field."""
   name: String
+}
+
+enum ApplicationType {
+  AwsApplication
+  GcpApplication
 }
 
 """A connection to a list of `Application` values."""
@@ -127,6 +135,9 @@ type AwsApplication implements Application {
     based pagination. May not be used with `last`.
     """
     offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
 
     """The method to use when ordering `Vulnerability`."""
     orderBy: [VulnerabilitiesOrderBy!]
@@ -1266,6 +1277,9 @@ type FirstPartyVulnerability implements Vulnerability {
     """
     offset: Int
 
+    """Filter results to only those of the given types"""
+    only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+
     """The method to use when ordering `Application`."""
     orderBy: [ApplicationsOrderBy!]
   ): ApplicationsConnection!
@@ -1359,6 +1373,9 @@ type GcpApplication implements Application {
     based pagination. May not be used with `last`.
     """
     offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
 
     """The method to use when ordering `Vulnerability`."""
     orderBy: [VulnerabilitiesOrderBy!]
@@ -2143,6 +2160,9 @@ type Person {
     """
     offset: Int
 
+    """Filter results to only those of the given types"""
+    only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+
     """The method to use when ordering `Application`."""
     orderBy: [ApplicationsOrderBy!]
   ): ApplicationsConnection!
@@ -2430,6 +2450,9 @@ type Query {
     based pagination. May not be used with `last`.
     """
     offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
 
     """The method to use when ordering `Application`."""
     orderBy: [ApplicationsOrderBy!]
@@ -3014,6 +3037,9 @@ type Query {
     based pagination. May not be used with `last`.
     """
     offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
 
     """The method to use when ordering `Vulnerability`."""
     orderBy: [VulnerabilitiesOrderBy!]
@@ -6454,6 +6480,9 @@ type ThirdPartyVulnerability implements Vulnerability {
     """
     offset: Int
 
+    """Filter results to only those of the given types"""
+    only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+
     """The method to use when ordering `Application`."""
     orderBy: [ApplicationsOrderBy!]
   ): ApplicationsConnection!
@@ -7125,6 +7154,9 @@ interface Vulnerability {
     based pagination. May not be used with `last`.
     """
     offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
   ): ApplicationsConnection!
   cvssScore: Float!
   id: Int!
@@ -7147,6 +7179,11 @@ input VulnerabilityCondition {
 
   """Checks for equality with the object’s `name` field."""
   name: String
+}
+
+enum VulnerabilityType {
+  FirstPartyVulnerability
+  ThirdPartyVulnerability
 }
 
 interface ZeroImplementation {
