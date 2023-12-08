@@ -18,8 +18,13 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
   inflection: {
     ignoreReplaceIfNotExists: ["deletedNodeId"],
     replace: {
-      _schemaPrefix() {
-        return ``;
+      _schemaPrefix(previous, options, { serviceName }) {
+        const pgService = options.pgServices?.find(
+          (db) => db.name === serviceName,
+        );
+        const databasePrefix = serviceName === "main" ? "" : `${serviceName}_`;
+        const schemaPrefix = "";
+        return `${databasePrefix}${schemaPrefix}`;
       },
       enumValue(previous, options, value, codec) {
         const oldValue = previous!.call(this, value, codec);
