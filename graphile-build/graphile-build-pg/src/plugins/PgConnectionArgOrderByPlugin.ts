@@ -234,6 +234,9 @@ export const applyOrderToPlan = EXPORTABLE(
       TableOrderByType: GraphQLEnumType,
     ) => {
       const val = $value.eval();
+      if (val == null) {
+        return;
+      }
       if (!Array.isArray(val)) {
         throw new Error("Invalid!");
       }
