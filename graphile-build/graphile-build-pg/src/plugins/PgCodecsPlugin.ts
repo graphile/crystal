@@ -779,34 +779,31 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     innerCodec,
                     extensions,
                   });
+                  const name = info.inflection.typeCodecName({
+                    pgType: type,
+                    serviceName,
+                  });
                   return EXPORTABLE(
                     (
                       description,
                       extensions,
-                      info,
                       innerCodec,
                       listOfCodec,
-                      serviceName,
-                      type,
+                      name,
                       typeDelim,
                     ) =>
                       listOfCodec(innerCodec, {
                         extensions,
                         typeDelim,
                         description,
-                        name: info.inflection.typeCodecName({
-                          pgType: type,
-                          serviceName,
-                        }),
+                        name,
                       }),
                     [
                       description,
                       extensions,
-                      info,
                       innerCodec,
                       listOfCodec,
-                      serviceName,
-                      type,
+                      name,
                       typeDelim,
                     ],
                   );
