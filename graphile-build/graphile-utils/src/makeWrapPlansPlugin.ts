@@ -6,6 +6,7 @@ import type {
   FieldPlanResolver,
   GrafastFieldConfig,
 } from "grafast";
+import { isExecutableStep } from "grafast";
 
 type ToOptional<T> = { [K in keyof T]+?: T[K] };
 
@@ -168,7 +169,20 @@ export function makeWrapPlansPlugin<T>(
                 return $prev;
               };
               const [$source, fieldArgs, info] = planParams;
-              return planWrapper(smartPlan, $source, fieldArgs, info);
+              const $newPlan = planWrapper(smartPlan, $source, fieldArgs, info);
+              if ($newPlan === undefined) {
+                throw new Error(
+                  "Your plan wrapper didn't return anything; it must return a step or null!",
+                );
+              }
+              if ($newPlan !== null && !isExecutableStep($newPlan)) {
+                throw new Error(
+                  `Your plan wrapper returned something other than a step... It must return a step (or null). (Returned: ${inspect(
+                    $newPlan,
+                  )})`,
+                );
+              }
+              return $newPlan;
             },
           };
         },
