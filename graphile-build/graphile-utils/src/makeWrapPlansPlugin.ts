@@ -142,9 +142,13 @@ export function makeWrapPlansPlugin<T>(
             return field;
           }
           const {
-            // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-            plan: oldPlan = ($obj: import("grafast").ExecutableStep) =>
-              access($obj, fieldName),
+            plan: oldPlan = EXPORTABLE(
+              (access, fieldName) =>
+                // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+                ($obj: import("grafast").ExecutableStep) =>
+                  access($obj, fieldName),
+              [access, fieldName],
+            ),
           } = field;
           return {
             ...field,
