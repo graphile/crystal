@@ -532,6 +532,17 @@ type CodecWithListCodec<
  */
 export function listOfCodec<
   TInnerCodec extends PgCodec<string, any, any, any, undefined, any, any>,
+  TName extends string = `${TInnerCodec extends PgCodec<
+    infer UName,
+    any,
+    any,
+    any,
+    any,
+    any,
+    any
+  >
+    ? UName
+    : never}[]`,
 >(
   listedCodec: TInnerCodec,
   config?: {
@@ -539,11 +550,10 @@ export function listOfCodec<
     extensions?: Partial<PgCodecExtensions>;
     typeDelim?: string;
     identifier?: SQL;
+    name?: TName;
   },
 ): PgCodec<
-  `${TInnerCodec extends PgCodec<infer UName, any, any, any, any, any, any>
-    ? UName
-    : never}[]`,
+  TName,
   undefined, // Array has no attributes
   string,
   TInnerCodec extends PgCodec<any, any, any, infer UFromJs, undefined, any, any>
@@ -556,7 +566,7 @@ export function listOfCodec<
   const innerCodec: CodecWithListCodec<TInnerCodec> = listedCodec;
 
   if (!config && innerCodec[$$listCodec]) {
-    return innerCodec[$$listCodec];
+    return innerCodec[$$listCodec] as any;
   }
 
   const {
@@ -564,12 +574,11 @@ export function listOfCodec<
     extensions,
     identifier = sql`${listedCodec.sqlType}[]`,
     typeDelim = `,`,
+    name = `${innerCodec.name}[]` as TName,
   } = config ?? ({} as Record<string, never>);
 
   const listCodec: PgCodec<
-    `${TInnerCodec extends PgCodec<infer UName, any, any, any, any, any, any>
-      ? UName
-      : never}[]`,
+    TName,
     undefined, // Array has no attributes
     string,
     TInnerCodec extends PgCodec<
@@ -587,19 +596,7 @@ export function listOfCodec<
     undefined,
     undefined
   > = {
-    name: `${
-      innerCodec.name as TInnerCodec extends PgCodec<
-        infer UName,
-        any,
-        any,
-        any,
-        any,
-        any,
-        any
-      >
-        ? UName
-        : never
-    }[]`,
+    name,
     sqlType: identifier,
     fromPg: (value) =>
       arrayParse(value)

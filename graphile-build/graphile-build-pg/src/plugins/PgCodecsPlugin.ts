@@ -173,7 +173,11 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
       typeCodecName(options, { pgType, serviceName }) {
         const pgNamespace = pgType.getNamespace()!;
         const schemaPrefix = this._schemaPrefix({ pgNamespace, serviceName });
-        return this.camelCase(`${schemaPrefix}${pgType.typname}`);
+        const name =
+          pgType.typcategory === "A" && pgType.typname.startsWith("_")
+            ? pgType.typname.substring(1) + "_array"
+            : pgType.typname;
+        return this.camelCase(`${schemaPrefix}${name}`);
       },
       scalarCodecTypeName(options, codec) {
         return this.upperCamelCase(
@@ -775,24 +779,31 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     innerCodec,
                     extensions,
                   });
+                  const name = info.inflection.typeCodecName({
+                    pgType: type,
+                    serviceName,
+                  });
                   return EXPORTABLE(
                     (
                       description,
                       extensions,
                       innerCodec,
                       listOfCodec,
+                      name,
                       typeDelim,
                     ) =>
                       listOfCodec(innerCodec, {
                         extensions,
                         typeDelim,
                         description,
+                        name,
                       }),
                     [
                       description,
                       extensions,
                       innerCodec,
                       listOfCodec,
+                      name,
                       typeDelim,
                     ],
                   );

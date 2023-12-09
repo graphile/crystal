@@ -228,8 +228,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         const pgService = options.pgServices?.find(
           (db) => db.name === serviceName,
         );
-        const databasePrefix =
-          serviceName === pgService?.name ? "" : `${serviceName}_`;
+        const databasePrefix = serviceName === "main" ? "" : `${serviceName}_`;
         const schemaPrefix =
           pgNamespace.nspname === pgService?.schemas?.[0]
             ? ""

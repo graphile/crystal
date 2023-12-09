@@ -664,7 +664,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           return;
         }
 
-        helpers.pgProcedures.getResourceOptions(serviceName, pgProc);
+        await helpers.pgProcedures.getResourceOptions(serviceName, pgProc);
       },
     },
   }),
