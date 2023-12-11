@@ -349,7 +349,7 @@ const pgServices = [
 
 :::caution Don't set `name` unless you need to!
 
-Generally there's no need to set a `name` unless you have more than one pgService.
+We recommend that you don't set a `name` unless you have more than one pgService.
 If you do, the different services may need different connection settings and will
 definitely be listening with different "subscribers" (different events), so the `pgSettingsKey`
 and `pgSubscriberKey` dictate which key to use for this. The default is if the
