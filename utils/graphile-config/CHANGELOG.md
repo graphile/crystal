@@ -1,5 +1,15 @@
 # graphile-config
 
+## 0.0.1-beta.5
+
+### Patch Changes
+
+- [#1877](https://github.com/graphile/crystal/pull/1877)
+  [`8a0cdb95f`](https://github.com/graphile/crystal/commit/8a0cdb95f200b28b0ea1ab5caa12b23dce5f374f)
+  Thanks [@benjie](https://github.com/benjie)! - Move 'declare global' out of
+  'interfaces.ts' and into 'index.ts' or equivalent. Should make TypeScript more
+  aware of these types.
+
 ## 0.0.1-beta.4
 
 ### Patch Changes

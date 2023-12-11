@@ -1,5 +1,41 @@
 # grafast
 
+## 0.1.1-beta.2
+
+### Patch Changes
+
+- [#1883](https://github.com/graphile/crystal/pull/1883)
+  [`3fdc2bce4`](https://github.com/graphile/crystal/commit/3fdc2bce42418773f808c5b8309dfb361cd95ce9)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bundling issue causing
+  `grafast/envelop` import to fail. (Fixed by entirely removing webpack.)
+
+- [#1870](https://github.com/graphile/crystal/pull/1870)
+  [`aeef362b5`](https://github.com/graphile/crystal/commit/aeef362b5744816f01e4a6f714bbd77f92332bc5)
+  Thanks [@benjie](https://github.com/benjie)! - Fixes a bug in loadOne/loadMany
+  where ioEquivalence for objects doesn't work right. Also now requires that
+  `$obj.get('...')` rather than `access($obj, '...')` is used with loaded
+  records in order to get attributes (consistency fix).
+
+- [#1886](https://github.com/graphile/crystal/pull/1886)
+  [`8a76db07f`](https://github.com/graphile/crystal/commit/8a76db07f4c110cecc6225504f9a05ccbcbc7b92)
+  Thanks [@benjie](https://github.com/benjie)! - Attempt to catch invalid plan
+  resolvers (e.g. those returning `undefined`) sooner.
+
+- [#1877](https://github.com/graphile/crystal/pull/1877)
+  [`8a0cdb95f`](https://github.com/graphile/crystal/commit/8a0cdb95f200b28b0ea1ab5caa12b23dce5f374f)
+  Thanks [@benjie](https://github.com/benjie)! - Move 'declare global' out of
+  'interfaces.ts' and into 'index.ts' or equivalent. Should make TypeScript more
+  aware of these types.
+
+- [#1852](https://github.com/graphile/crystal/pull/1852)
+  [`1c9f1c0ed`](https://github.com/graphile/crystal/commit/1c9f1c0edf4e621a5b6345d3a41527a18143c6ae)
+  Thanks [@benjie](https://github.com/benjie)! - Adds tick-based batching
+  (cross-step batching) to loadOne and loadMany.
+
+- Updated dependencies
+  [[`8a0cdb95f`](https://github.com/graphile/crystal/commit/8a0cdb95f200b28b0ea1ab5caa12b23dce5f374f)]:
+  - graphile-config@0.0.1-beta.5
+
 ## 0.1.1-beta.1
 
 ### Patch Changes

@@ -1,5 +1,79 @@
 # graphile-build-pg
 
+## 5.0.0-beta.16
+
+### Patch Changes
+
+- [#1884](https://github.com/graphile/crystal/pull/1884)
+  [`bce0636d4`](https://github.com/graphile/crystal/commit/bce0636d424476664672166193a181c83476423a)
+  Thanks [@benjie](https://github.com/benjie)! - Fixes multiple pgServices codec
+  name conflicts by prepending the service name if it's not 'main'.
+
+- [#1817](https://github.com/graphile/crystal/pull/1817)
+  [`f305c3278`](https://github.com/graphile/crystal/commit/f305c327848eb7baef46c5384a7cc5af6f79db8d)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for limiting
+  polymorphic plans (only some of them, specifically `pgUnionAll()` right now)
+  to limit the types of their results; exposed via an experimental 'only'
+  argument on fields, for example
+  `allApplications(only: [GcpApplication, AwsApplication])` would limit the type
+  of applications returned to only be the two specified.
+
+- [#1875](https://github.com/graphile/crystal/pull/1875)
+  [`3b558e0c1`](https://github.com/graphile/crystal/commit/3b558e0c110dd49e5d51e49a5ad6463a9ed68ecb)
+  Thanks [@enisdenjo](https://github.com/enisdenjo)! - Consider attribute's
+  `isNotNull` flag for polymorphic types
+
+- [#1884](https://github.com/graphile/crystal/pull/1884)
+  [`2ae8d33aa`](https://github.com/graphile/crystal/commit/2ae8d33aa83955649dcd6e7489604b059ed2daf4)
+  Thanks [@benjie](https://github.com/benjie)! - Fixes missing await which might
+  cause process to exit when something goes wrong during schema building.
+
+- [#1885](https://github.com/graphile/crystal/pull/1885)
+  [`9e1df08b7`](https://github.com/graphile/crystal/commit/9e1df08b702ae32870a8f1324bab37f447cba868)
+  Thanks [@benjie](https://github.com/benjie)! - Fix `orderBy:null` regression
+
+- [#1877](https://github.com/graphile/crystal/pull/1877)
+  [`8a0cdb95f`](https://github.com/graphile/crystal/commit/8a0cdb95f200b28b0ea1ab5caa12b23dce5f374f)
+  Thanks [@benjie](https://github.com/benjie)! - Move 'declare global' out of
+  'interfaces.ts' and into 'index.ts' or equivalent. Should make TypeScript more
+  aware of these types.
+
+- [#1879](https://github.com/graphile/crystal/pull/1879)
+  [`dbd91fdd8`](https://github.com/graphile/crystal/commit/dbd91fdd836f041b6e2ff9d358c6a6f521f43914)
+  Thanks [@benjie](https://github.com/benjie)! - Move PgContextPlugin from
+  graphile-build-pg into @dataplan/pg so it can be used after schema export
+  without needing dependency on graphile-build-pg
+
+- [#1841](https://github.com/graphile/crystal/pull/1841)
+  [`f1d5ad18e`](https://github.com/graphile/crystal/commit/f1d5ad18e1cd0d59b9e74f619ec6b0de57f07b17)
+  Thanks [@benjie](https://github.com/benjie)! - Make smart tags parser more
+  forgiving (track parenthesis)
+
+- [#1884](https://github.com/graphile/crystal/pull/1884)
+  [`c66c3527c`](https://github.com/graphile/crystal/commit/c66c3527ce2bb38afa37242ecb5a22247efd6db9)
+  Thanks [@benjie](https://github.com/benjie)! - List codecs can now have names.
+
+- [#1876](https://github.com/graphile/crystal/pull/1876)
+  [`9fb5cc06e`](https://github.com/graphile/crystal/commit/9fb5cc06ee52165378392969172e6ee8128833f6)
+  Thanks [@enisdenjo](https://github.com/enisdenjo)! - Specify `from` in `@ref`
+  to apply refs to a single type
+
+- Updated dependencies
+  [[`3fdc2bce4`](https://github.com/graphile/crystal/commit/3fdc2bce42418773f808c5b8309dfb361cd95ce9),
+  [`aeef362b5`](https://github.com/graphile/crystal/commit/aeef362b5744816f01e4a6f714bbd77f92332bc5),
+  [`8a76db07f`](https://github.com/graphile/crystal/commit/8a76db07f4c110cecc6225504f9a05ccbcbc7b92),
+  [`f305c3278`](https://github.com/graphile/crystal/commit/f305c327848eb7baef46c5384a7cc5af6f79db8d),
+  [`8a0cdb95f`](https://github.com/graphile/crystal/commit/8a0cdb95f200b28b0ea1ab5caa12b23dce5f374f),
+  [`dbd91fdd8`](https://github.com/graphile/crystal/commit/dbd91fdd836f041b6e2ff9d358c6a6f521f43914),
+  [`c66c3527c`](https://github.com/graphile/crystal/commit/c66c3527ce2bb38afa37242ecb5a22247efd6db9),
+  [`f66cc40b3`](https://github.com/graphile/crystal/commit/f66cc40b3bc5bf2e7f92fe5a6bd5638e2a51ac2b),
+  [`f18635a5c`](https://github.com/graphile/crystal/commit/f18635a5cf55845c9534d82bb483e5fbb9ed179e),
+  [`1c9f1c0ed`](https://github.com/graphile/crystal/commit/1c9f1c0edf4e621a5b6345d3a41527a18143c6ae)]:
+  - grafast@0.1.1-beta.2
+  - @dataplan/pg@0.0.1-beta.13
+  - graphile-build@5.0.0-beta.12
+  - graphile-config@0.0.1-beta.5
+
 ## 5.0.0-beta.15
 
 ### Patch Changes

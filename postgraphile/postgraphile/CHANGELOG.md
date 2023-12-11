@@ -1,5 +1,69 @@
 # postgraphile
 
+## 5.0.0-beta.17
+
+### Patch Changes
+
+- [#1884](https://github.com/graphile/crystal/pull/1884)
+  [`bce0636d4`](https://github.com/graphile/crystal/commit/bce0636d424476664672166193a181c83476423a)
+  Thanks [@benjie](https://github.com/benjie)! - Fixes multiple pgServices codec
+  name conflicts by prepending the service name if it's not 'main'.
+
+- [#1867](https://github.com/graphile/crystal/pull/1867)
+  [`004889258`](https://github.com/graphile/crystal/commit/004889258e22a19ffe9a641f57e4ddd5299db9bf)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in CLI parser where
+  omitting `--watch` would force `watch: false` even if config sets
+  `watch: true`.
+
+- [#1817](https://github.com/graphile/crystal/pull/1817)
+  [`f305c3278`](https://github.com/graphile/crystal/commit/f305c327848eb7baef46c5384a7cc5af6f79db8d)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for limiting
+  polymorphic plans (only some of them, specifically `pgUnionAll()` right now)
+  to limit the types of their results; exposed via an experimental 'only'
+  argument on fields, for example
+  `allApplications(only: [GcpApplication, AwsApplication])` would limit the type
+  of applications returned to only be the two specified.
+
+- [#1885](https://github.com/graphile/crystal/pull/1885)
+  [`9e1df08b7`](https://github.com/graphile/crystal/commit/9e1df08b702ae32870a8f1324bab37f447cba868)
+  Thanks [@benjie](https://github.com/benjie)! - Fix `orderBy:null` regression
+
+- [#1878](https://github.com/graphile/crystal/pull/1878)
+  [`e04238c0a`](https://github.com/graphile/crystal/commit/e04238c0aee46cc86ba61d6461b6636c2f9d1183)
+  Thanks [@benjie](https://github.com/benjie)! - Add emulation for
+  `--simple-subscriptions` to V4 preset.
+
+- [#1884](https://github.com/graphile/crystal/pull/1884)
+  [`c66c3527c`](https://github.com/graphile/crystal/commit/c66c3527ce2bb38afa37242ecb5a22247efd6db9)
+  Thanks [@benjie](https://github.com/benjie)! - List codecs can now have names.
+
+- Updated dependencies
+  [[`3fdc2bce4`](https://github.com/graphile/crystal/commit/3fdc2bce42418773f808c5b8309dfb361cd95ce9),
+  [`aeef362b5`](https://github.com/graphile/crystal/commit/aeef362b5744816f01e4a6f714bbd77f92332bc5),
+  [`8a76db07f`](https://github.com/graphile/crystal/commit/8a76db07f4c110cecc6225504f9a05ccbcbc7b92),
+  [`bce0636d4`](https://github.com/graphile/crystal/commit/bce0636d424476664672166193a181c83476423a),
+  [`f305c3278`](https://github.com/graphile/crystal/commit/f305c327848eb7baef46c5384a7cc5af6f79db8d),
+  [`3b558e0c1`](https://github.com/graphile/crystal/commit/3b558e0c110dd49e5d51e49a5ad6463a9ed68ecb),
+  [`2ae8d33aa`](https://github.com/graphile/crystal/commit/2ae8d33aa83955649dcd6e7489604b059ed2daf4),
+  [`9e1df08b7`](https://github.com/graphile/crystal/commit/9e1df08b702ae32870a8f1324bab37f447cba868),
+  [`8a0cdb95f`](https://github.com/graphile/crystal/commit/8a0cdb95f200b28b0ea1ab5caa12b23dce5f374f),
+  [`dbd91fdd8`](https://github.com/graphile/crystal/commit/dbd91fdd836f041b6e2ff9d358c6a6f521f43914),
+  [`995e25035`](https://github.com/graphile/crystal/commit/995e250352217fdf8f036b8ed6cad3fab520817f),
+  [`f1d5ad18e`](https://github.com/graphile/crystal/commit/f1d5ad18e1cd0d59b9e74f619ec6b0de57f07b17),
+  [`c66c3527c`](https://github.com/graphile/crystal/commit/c66c3527ce2bb38afa37242ecb5a22247efd6db9),
+  [`f66cc40b3`](https://github.com/graphile/crystal/commit/f66cc40b3bc5bf2e7f92fe5a6bd5638e2a51ac2b),
+  [`f18635a5c`](https://github.com/graphile/crystal/commit/f18635a5cf55845c9534d82bb483e5fbb9ed179e),
+  [`1c9f1c0ed`](https://github.com/graphile/crystal/commit/1c9f1c0edf4e621a5b6345d3a41527a18143c6ae),
+  [`9fb5cc06e`](https://github.com/graphile/crystal/commit/9fb5cc06ee52165378392969172e6ee8128833f6)]:
+  - grafast@0.1.1-beta.2
+  - graphile-utils@5.0.0-beta.16
+  - graphile-build-pg@5.0.0-beta.16
+  - @dataplan/pg@0.0.1-beta.13
+  - graphile-build@5.0.0-beta.12
+  - graphile-config@0.0.1-beta.5
+  - grafserv@0.1.1-beta.4
+  - @dataplan/json@0.0.1-beta.11
+
 ## 5.0.0-beta.16
 
 ### Patch Changes

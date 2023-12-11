@@ -1,6 +1,6 @@
 {
   "name": "@grafserv/persisted",
-  "version": "0.0.0-beta.13",
+  "version": "0.0.0-beta.14",
   "description": "Persisted operations support for Grafserv",
   "type": "commonjs",
   "main": "dist/index.js",

@@ -1,5 +1,34 @@
 # graphile-build
 
+## 5.0.0-beta.12
+
+### Patch Changes
+
+- [#1877](https://github.com/graphile/crystal/pull/1877)
+  [`8a0cdb95f`](https://github.com/graphile/crystal/commit/8a0cdb95f200b28b0ea1ab5caa12b23dce5f374f)
+  Thanks [@benjie](https://github.com/benjie)! - Move 'declare global' out of
+  'interfaces.ts' and into 'index.ts' or equivalent. Should make TypeScript more
+  aware of these types.
+
+- [#1817](https://github.com/graphile/crystal/pull/1817)
+  [`f66cc40b3`](https://github.com/graphile/crystal/commit/f66cc40b3bc5bf2e7f92fe5a6bd5638e2a51ac2b)
+  Thanks [@benjie](https://github.com/benjie)! - Enable detecting "empty" enums
+  (enums with no values).
+
+- [#1878](https://github.com/graphile/crystal/pull/1878)
+  [`f18635a5c`](https://github.com/graphile/crystal/commit/f18635a5cf55845c9534d82bb483e5fbb9ed179e)
+  Thanks [@benjie](https://github.com/benjie)! - Export
+  getNodeIdHandlerByTypeName to make writing plugins easier
+
+- Updated dependencies
+  [[`3fdc2bce4`](https://github.com/graphile/crystal/commit/3fdc2bce42418773f808c5b8309dfb361cd95ce9),
+  [`aeef362b5`](https://github.com/graphile/crystal/commit/aeef362b5744816f01e4a6f714bbd77f92332bc5),
+  [`8a76db07f`](https://github.com/graphile/crystal/commit/8a76db07f4c110cecc6225504f9a05ccbcbc7b92),
+  [`8a0cdb95f`](https://github.com/graphile/crystal/commit/8a0cdb95f200b28b0ea1ab5caa12b23dce5f374f),
+  [`1c9f1c0ed`](https://github.com/graphile/crystal/commit/1c9f1c0edf4e621a5b6345d3a41527a18143c6ae)]:
+  - grafast@0.1.1-beta.2
+  - graphile-config@0.0.1-beta.5
+
 ## 5.0.0-beta.11
 
 ### Patch Changes
