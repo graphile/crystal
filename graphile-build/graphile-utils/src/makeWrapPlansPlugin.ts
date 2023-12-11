@@ -96,7 +96,10 @@ export function makeWrapPlansPlugin<T>(
         },
         GraphQLObjectType_fields_field(field, build, context) {
           const rules = (build as any)[symbol].rules as PlanWrapperRules | null;
-          const { access, ExecutableStep } = build.grafast;
+          const {
+            EXPORTABLE,
+            grafast: { access, ExecutableStep, isExecutableStep },
+          } = build;
           const filter = (build as any)[symbol]
             .filter as PlanWrapperFilter<T> | null;
           const {
@@ -139,37 +142,77 @@ export function makeWrapPlansPlugin<T>(
             return field;
           }
           const {
-            // eslint-disable-next-line @typescript-eslint/consistent-type-imports
-            plan: oldPlan = ($obj: import("grafast").ExecutableStep) =>
-              access($obj, fieldName),
+            plan: oldPlan = EXPORTABLE(
+              (access, fieldName) =>
+                // eslint-disable-next-line @typescript-eslint/consistent-type-imports
+                ($obj: import("grafast").ExecutableStep) =>
+                  access($obj, fieldName),
+              [access, fieldName],
+            ),
           } = field;
           return {
             ...field,
-            plan(...planParams) {
-              // A replacement for `oldPlan` that automatically passes through arguments that weren't replaced
-              const smartPlan = (...overrideParams: Array<any>) => {
-                const $prev = oldPlan(
-                  // @ts-ignore We're calling it dynamically, allowing the parent to override args.
-                  ...overrideParams.concat(
-                    planParams.slice(overrideParams.length),
-                  ),
-                );
-                if (!($prev instanceof ExecutableStep)) {
-                  console.error(
-                    `Wrapped a plan function, but that function did not return a step!\n${String(
-                      oldPlan,
-                    )}\n${inspect(field)}`,
-                  );
+            plan: EXPORTABLE(
+              (
+                ExecutableStep,
+                field,
+                inspect,
+                isExecutableStep,
+                oldPlan,
+                planWrapper,
+              ) =>
+                (...planParams) => {
+                  // A replacement for `oldPlan` that automatically passes through arguments that weren't replaced
+                  const smartPlan = (...overrideParams: Array<any>) => {
+                    const $prev = oldPlan(
+                      // @ts-ignore We're calling it dynamically, allowing the parent to override args.
+                      ...overrideParams.concat(
+                        planParams.slice(overrideParams.length),
+                      ),
+                    );
+                    if (!($prev instanceof ExecutableStep)) {
+                      console.error(
+                        `Wrapped a plan function, but that function did not return a step!\n${String(
+                          oldPlan,
+                        )}\n${inspect(field)}`,
+                      );
 
-                  throw new Error(
-                    "Wrapped a plan function, but that function did not return a step!",
+                      throw new Error(
+                        "Wrapped a plan function, but that function did not return a step!",
+                      );
+                    }
+                    return $prev;
+                  };
+                  const [$source, fieldArgs, info] = planParams;
+                  const $newPlan = planWrapper(
+                    smartPlan,
+                    $source,
+                    fieldArgs,
+                    info,
                   );
-                }
-                return $prev;
-              };
-              const [$source, fieldArgs, info] = planParams;
-              return planWrapper(smartPlan, $source, fieldArgs, info);
-            },
+                  if ($newPlan === undefined) {
+                    throw new Error(
+                      "Your plan wrapper didn't return anything; it must return a step or null!",
+                    );
+                  }
+                  if ($newPlan !== null && !isExecutableStep($newPlan)) {
+                    throw new Error(
+                      `Your plan wrapper returned something other than a step... It must return a step (or null). (Returned: ${inspect(
+                        $newPlan,
+                      )})`,
+                    );
+                  }
+                  return $newPlan;
+                },
+              [
+                ExecutableStep,
+                field,
+                inspect,
+                isExecutableStep,
+                oldPlan,
+                planWrapper,
+              ],
+            ),
           };
         },
       },

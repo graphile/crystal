@@ -1802,7 +1802,16 @@ export class OperationPlan {
       let haltTree = false;
       if (step === null || (step instanceof ConstantStep && step.isNull())) {
         // Constantly null; do not step any further in this tree.
-        step = step || constant(null);
+        step =
+          step ||
+          // `withGlobalLayerPlan(layerPlan, polymorphicPaths, () => constant(null))` but with reduced memory allocation
+          withGlobalLayerPlan(
+            layerPlan,
+            polymorphicPaths,
+            constant,
+            null,
+            null,
+          );
         haltTree = true;
       }
       assertExecutableStep(step);
