@@ -78,13 +78,6 @@ yarn pack -o package.tgz
 mv package.tgz ../../builds/eslint-plugin-graphile-export.tgz
 cd -
 
-#graphile-utils
-cd graphile-build/graphile-utils
-rm -f *.tgz
-yarn pack -o package.tgz
-mv package.tgz ../../builds/graphile-utils.tgz
-cd -
-
 #graphile-export
 cd utils/graphile-export
 rm -f *.tgz
@@ -139,6 +132,13 @@ cd graphile-build/graphile-build-pg/
 rm -f *.tgz
 yarn pack -o package.tgz
 mv package.tgz ../../builds/graphile-build-pg.tgz
+cd -
+
+#graphile-utils
+cd graphile-build/graphile-utils
+rm -f *.tgz
+yarn pack -o package.tgz
+mv package.tgz ../../builds/graphile-utils.tgz
 cd -
 
 #postgraphile

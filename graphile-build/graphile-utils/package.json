@@ -46,6 +46,7 @@
     "node": ">=14.17"
   },
   "peerDependencies": {
+    "@dataplan/pg": "workspace:^",
     "grafast": "workspace:^",
     "graphile-build": "workspace:^",
     "graphile-build-pg": "workspace:^",
@@ -54,6 +55,9 @@
     "tamedevil": "workspace:^"
   },
   "peerDependenciesMeta": {
+    "@dataplan/pg": {
+      "optional": true
+    },
     "graphile-build-pg": {
       "optional": true
     }
