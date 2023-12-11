@@ -323,11 +323,11 @@ nitty-gritty: each entry in the list is an object with the following keys (only
   subscribe to LISTEN/NOTIFY events in the database - useful for GraphQL
   subscriptions, and also for schema watch mode.
 - `withPgClientKey: string` - the key on the `context` object to store the
-  `withPgClient` method the schema uses for communicating with the database
+  `withPgClient` method the schema uses for communicating with the database. Defaults to `withPgClient` if `name` is `"main"` (the default), or `${name}_withPgClient` otherwise.
 - `pgSettingsKey: string` - the key on the `context` object to store the
-  `pgSettings` configuration to use when communicating with the database
+  `pgSettings` configuration to use when communicating with the database. Defaults to `pgSettings` if `name` is `"main"` (the default), or `${name}_pgSettings` otherwise.
 - `pgSubscriberKey: string` - the key on the `context` object to store the
-  `pgSubscriber` instance to, for use during GraphQL subscriptions
+  `pgSubscriber` instance to, for use during GraphQL subscriptions. Defaults to `pgSubscriber` if `name` is `"main"` (the default), or `${name}_pgSubscriber` otherwise."
 
 ```js title="Example manual configuration"
 import * as pg from "pg";
@@ -347,13 +347,13 @@ const pgServices = [
 ];
 ```
 
-:::warning Don't set `name` unless you need to!
+:::caution Don't set `name` unless you need to!
 
 Generally there's no need to set a `name` unless you have more than one pgService.
 If you do, the different services may need different connection settings and will
 definitely be listening with different "subscribers" (different events), so the `pgSettingsKey`
-and `pgSubscriberKey` dictate which key to use for this. Currently the default is if the
-name is `main` (the default name) then it uses the `pgSettings`/`pgSubscriber` key, otherwise it prefixes this
+and `pgSubscriberKey` dictate which key to use for this. The default is if the
+`name` is `main` (the default name) then it uses the `pgSettings`/`pgSubscriber` key, otherwise it prefixes this
 with the name of the service and an underscore, for example a pgService with
 `name: "otherdb"` would use the context keys `otherdb_withPgClient`, `otherdb_pgSettings` and `otherdb_pgSubscriber`.
 
