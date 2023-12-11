@@ -347,6 +347,18 @@ const pgServices = [
 ];
 ```
 
+:::warning Don't set `name` unless you need to!
+
+Generally there's no need to set a `name` unless you have more than one pgService.
+If you do, the different services may need different connection settings and will
+definitely be listening with different "subscribers" (different events), so the `pgSettingsKey`
+and `pgSubscriberKey` dictate which key to use for this. Currently the default is if the
+name is `main` (the default name) then it uses the `pgSettings`/`pgSubscriber` key, otherwise it prefixes this
+with the name of the service and an underscore, for example a pgService with
+`name: "otherdb"` would use the context keys `otherdb_withPgClient`, `otherdb_pgSettings` and `otherdb_pgSubscriber`.
+
+:::
+
 ### `makePgService`
 
 When PostGraphile (or, strictly, `@dataplan/pg`) wishes to communicate with
@@ -658,18 +670,6 @@ such as `jwt.` or `myapp.`. Examples: `jwt.claims.userid`, `myapp.is_admin`
 
 Variables without periods will be interpreted as internal Postgres settings,
 such as `role`, and will be applied by Postgres.
-
-:::
-
-:::warning Don't set `name` unless you need to!
-
-Generally there's no need to set a `name` unless you have more than one pgService.
-When you do, the different services may need different connection settings and will
-definitely be listening with different "subscribers" (different events), so the `pgSettingsKey`
-and `pgSubscriberKey` dictate which key to use for this. Currently the default is if the
-name is `main` (the default name) then we use the `pgSettings`/`pgSubscriber` key, otherwise we prefix this
-with the name of the service and an underscore, for example a pgService with
-`name: "otherdb"` would use the context keys `otherdb_withPgClient`, `otherdb_pgSettings` and `otherdb_pgSubscriber`.
 
 :::
 
