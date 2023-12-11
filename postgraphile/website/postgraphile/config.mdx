@@ -668,7 +668,8 @@ When you do, the different services may need different connection settings and w
 definitely be listening with different "subscribers" (different events), so the `pgSettingsKey`
 and `pgSubscriberKey` dictate which key to use for this. Currently the default is if the
 name is `main` (the default name) then we use the `pgSettings`/`pgSubscriber` key, otherwise we prefix this
-with the name of the service and an underscore
+with the name of the service and an underscore, for example a pgService with
+`name: "otherdb"` would use the context keys `otherdb_withPgClient`, `otherdb_pgSettings` and `otherdb_pgSubscriber`.
 
 :::
 
