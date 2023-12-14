@@ -307,7 +307,8 @@ nitty-gritty: each entry in the list is an object with the following keys (only
 `name` and `adaptor` are required):
 
 - `name: string` - an arbitrary unique name for this config; please keep it
-  alphanumeric!
+  alphanumeric! Don't set this unless you have more than one pgService; see
+  warning below.
 - `adaptor: string` - the name of the module to use as the postgres adaptor;
   e.g. `@dataplan/pg/adaptors/pg` for the `pg` module
 - `adaptorSettings` - options to pass to the adaptor, these are different for
@@ -323,11 +324,17 @@ nitty-gritty: each entry in the list is an object with the following keys (only
   subscribe to LISTEN/NOTIFY events in the database - useful for GraphQL
   subscriptions, and also for schema watch mode.
 - `withPgClientKey: string` - the key on the `context` object to store the
-  `withPgClient` method the schema uses for communicating with the database
+  `withPgClient` method the schema uses for communicating with the database.
+  Defaults to `withPgClient` if `name` is `"main"` (the default), or
+  `${name}_withPgClient` otherwise.
 - `pgSettingsKey: string` - the key on the `context` object to store the
-  `pgSettings` configuration to use when communicating with the database
+  `pgSettings` configuration to use when communicating with the database.
+  Defaults to `pgSettings` if `name` is `"main"` (the default), or
+  `${name}_pgSettings` otherwise.
 - `pgSubscriberKey: string` - the key on the `context` object to store the
-  `pgSubscriber` instance to, for use during GraphQL subscriptions
+  `pgSubscriber` instance to, for use during GraphQL subscriptions. Defaults to
+  `pgSubscriber` if `name` is `"main"` (the default), or `${name}_pgSubscriber`
+  otherwise."
 
 ```js title="Example manual configuration"
 import * as pg from "pg";
@@ -346,6 +353,22 @@ const pgServices = [
   },
 ];
 ```
+
+:::caution Don't set `name` unless you need to!
+
+We recommend that you don't set a `name` unless you have more than one
+pgService. If you do, the different services may need different properties on
+`context` to detail how to connect, the settings to use, and how to subscribe
+to events. The `withPgClientKey`, `pgSettingsKey` and `pgSubscriberKey` options
+dictate under which keys these properties are stored on the context. By
+default, if the pgService's `name` is left at its default (`"main"`) then it
+uses `"withPgClient"`, `"pgSettings"` and `"pgSubscriber"` respectively for
+these keys; otherwise it prefixes the keys with the name of the service and an
+underscore, for example a pgService with `name: "otherdb"` would use the
+context keys `otherdb_withPgClient`, `otherdb_pgSettings` and
+`otherdb_pgSubscriber`.
+
+:::
 
 ### `makePgService`
 
