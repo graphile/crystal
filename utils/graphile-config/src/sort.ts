@@ -128,8 +128,6 @@ export function sortWithBeforeAfterProvides<
   }
 
   if (final.length !== rawList.length) {
-    console.dir(final);
-    console.dir(rawList);
     throw new Error(
       `Expected the same number of list entries after sorting (${final.length} != ${rawList.length})`,
     );
