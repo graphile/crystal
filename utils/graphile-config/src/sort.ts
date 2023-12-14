@@ -8,7 +8,12 @@ export function sortWithBeforeAfterProvides<
     [id in TIdKey]: string;
   },
 >(rawList: TSortable[], idKey: TIdKey): TSortable[] {
-  const list = rawList.map((thing) => {
+  const list: Array<{
+    thing: TSortable | symbol;
+    before: string[];
+    after: string[];
+    provides: string[];
+  }> = rawList.map((thing) => {
     const before = [...(thing.before ?? [])];
     const after = [...(thing.after ?? [])];
     const provides = [...(thing.provides ?? [])];
@@ -20,9 +25,36 @@ export function sortWithBeforeAfterProvides<
     return { thing, before, after, provides };
   });
 
+  // Figure out all the possible provides values:
+  const validProvides = new Set<string>();
+  for (const { provides } of list) {
+    for (const provide of provides) {
+      validProvides.add(provide);
+    }
+  }
+
+  // And create fake providers for any values that don't already have one, to
+  // ensure correct ordering
+  for (const { after, before } of list) {
+    for (const val of [...after, ...before]) {
+      if (!validProvides.has(val)) {
+        list.push({
+          thing: Symbol(val),
+          before: [],
+          after: [],
+          provides: [val],
+        });
+        validProvides.add(val);
+      }
+    }
+  }
+
   // "before" and "after" are very similar, lets simplify them into one
   // concept by converting all the "befores" into "afters" on their targets.
   for (const { thing, before } of list) {
+    if (typeof thing === "symbol") {
+      continue;
+    }
     const { [idKey]: id } = thing;
     if (before.length) {
       const previousBefore = before.splice(0, before.length);
@@ -41,23 +73,6 @@ export function sortWithBeforeAfterProvides<
         }
       }
     }
-  }
-
-  // Now lets figure out all the possible provides values:
-  const validProvides = new Set<string>();
-  for (const { provides } of list) {
-    for (const provide of provides) {
-      validProvides.add(provide);
-    }
-  }
-
-  // And ignore any "afters" with no providers:
-  for (const { after } of list) {
-    after.splice(
-      0,
-      after.length,
-      ...after.filter((afterValue) => validProvides.has(afterValue)),
-    );
   }
 
   const final: TSortable[] = [];
@@ -89,7 +104,9 @@ export function sortWithBeforeAfterProvides<
       if (!dependsOnRemaining) {
         changes++;
         remaining.splice(i, 1);
-        final.push(thing);
+        if (typeof thing !== "symbol") {
+          final.push(thing);
+        }
         i--;
       }
     }
@@ -99,16 +116,22 @@ export function sortWithBeforeAfterProvides<
         `Infinite loop in dependencies detected; remaining items:\n  ${remaining
           .map(
             (r) =>
-              `${r.thing[idKey]} (after: ${r.after}; provides: ${r.provides})`,
+              `${
+                typeof r.thing === "symbol"
+                  ? `FakeProvider<${r.thing.description}>`
+                  : r.thing[idKey]
+              } (after: ${r.after}; provides: ${r.provides})`,
           )
           .join("\n  ")}`,
       );
     }
   }
 
-  if (final.length !== list.length) {
+  if (final.length !== rawList.length) {
+    console.dir(final);
+    console.dir(rawList);
     throw new Error(
-      `Expected the same number of list entries after sorting (${final.length} != ${list.length})`,
+      `Expected the same number of list entries after sorting (${final.length} != ${rawList.length})`,
     );
   }
 
