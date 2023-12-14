@@ -2931,7 +2931,11 @@ type Person implements Node {
   createdAt: Datetime
   email: Email!
   exists(email: Email): Boolean @deprecated(reason: "This is deprecated (comment on function c.person_exists).")
+
+  """The first name of the person."""
   firstName: String
+
+  """The first post by the person."""
   firstPost: Post
 
   """Reads and enables pagination through a set of `Person`."""

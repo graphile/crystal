@@ -1407,6 +1407,8 @@ type Person implements Node {
   """
   nodeId: ID!
   computedOut: String!
+
+  """The first name of the person."""
   firstName: String
   computedOutOut: PersonComputedOutOutRecord
   computedInout(ino: String): String
@@ -1414,6 +1416,8 @@ type Person implements Node {
   exists(email: Email): Boolean @deprecated(reason: "This is deprecated (comment on function c.person_exists).")
   computedFirstArgInoutOut: PersonComputedFirstArgInoutOutRecord
   computedComplex(a: Int, b: String): PersonComputedComplexRecord
+
+  """The first post by the person."""
   firstPost: Post
   computedFirstArgInout: Person
 
