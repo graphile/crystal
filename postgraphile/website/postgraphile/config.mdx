@@ -350,11 +350,9 @@ const pgServices = [
 :::caution Don't set `name` unless you need to!
 
 We recommend that you don't set a `name` unless you have more than one pgService.
-If you do, the different services may need different connection settings and will
-definitely be listening with different "subscribers" (different events), so the `pgSettingsKey`
-and `pgSubscriberKey` dictate which key to use for this. The default is if the
-`name` is `main` (the default name) then it uses the `pgSettings`/`pgSubscriber` key, otherwise it prefixes this
-with the name of the service and an underscore, for example a pgService with
+If you do, the different services may need different properties on `context` to detail how to connect, the settings to use, and how to subscribe to events. The `withPgClientKey`, `pgSettingsKey`
+and `pgSubscriberKey` options dictate under which keys these properties are stored on the context. By default, if the
+pgService's `name` is left at its default (`"main"`) then it uses `"withPgClient"`, `"pgSettings"` and `"pgSubscriber"` respectively for these keys; otherwise it prefixes the keys with the name of the service and an underscore, for example a pgService with
 `name: "otherdb"` would use the context keys `otherdb_withPgClient`, `otherdb_pgSettings` and `otherdb_pgSubscriber`.
 
 :::
