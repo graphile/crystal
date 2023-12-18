@@ -1,9 +1,10 @@
 import {
-  aclsForTable,
   OBJECT_ATTRIBUTE,
   OBJECT_DATABASE,
   OBJECT_FUNCTION,
   OBJECT_SCHEMA,
+  OBJECT_SEQUENCE,
+  OBJECT_TABLE,
   parseAcls,
 } from "./acl.js";
 import type {
@@ -274,7 +275,14 @@ export function augmentIntrospection(
       }),
     );
     entity.getTags = memo(() => entity.getTagsAndDescription().tags);
-    entity.getACL = memo(() => aclsForTable(introspection, entity));
+    entity.getACL = memo(() =>
+      parseAcls(
+        introspection,
+        entity.relacl,
+        entity.relowner,
+        entity.relkind === "S" ? OBJECT_SEQUENCE : OBJECT_TABLE,
+      ),
+    );
 
     entity.getAttribute = (by) => {
       const attributes = entity.getAttributes();

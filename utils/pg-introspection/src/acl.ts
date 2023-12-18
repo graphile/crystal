@@ -298,6 +298,10 @@ export type AclDefaultObjectType =
  * and:
  *
  * https://github.com/postgres/postgres/blob/fb3b098fe88441f9531a5169008ea17eac01301f/src/include/utils/acl.h#L153-L167
+ *
+ * and for what the privileges mean, see:
+ *
+ * https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
  */
 export function parseAcls(
   introspection: Introspection,
@@ -374,30 +378,6 @@ export const Permission = {
   temporaryGrant: "temporaryGrant",
 } as const;
 
-/*
- * For default permissions, see:
- * https://github.com/postgres/postgres/blob/14aec03502302eff6c67981d8fd121175c436ce9/src/backend/utils/adt/acl.c#L748-L854
- *
- * For what the privileges mean, see:
- * https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
- */
-
-export function aclsForTable(
-  introspection: Introspection,
-  table: PgClass,
-): AclObject[] {
-  const dbOwner = getRole(introspection, introspection.database.datdba);
-  const isSequence = table.relkind === "S";
-  const tableOwner = getRole(introspection, table.relowner);
-  const defaultAcl = isSequence
-    ? [`${tableOwner.rolname}=/${dbOwner.rolname}`]
-    : [`=/${dbOwner.rolname}`, `${dbOwner.rolname}=/${dbOwner.rolname}`];
-
-  const acls = (table.relacl || defaultAcl).map((aclString) =>
-    parseAcl(aclString),
-  );
-  return acls;
-}
 
 /**
  * Returns all the roles role has been granted (including PUBLIC),
