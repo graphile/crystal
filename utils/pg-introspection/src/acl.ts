@@ -1,9 +1,4 @@
-import type {
-  Introspection,
-  PgClass,
-  PgEntity,
-  PgRoles,
-} from "./introspection.js";
+import type { Introspection, PgEntity, PgRoles } from "./introspection.js";
 
 /**
  * A fake 'pg_roles' record representing the 'public' meta-role.
