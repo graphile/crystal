@@ -1,9 +1,4 @@
-import type {
-  Introspection,
-  PgClass,
-  PgEntity,
-  PgRoles,
-} from "./introspection.js";
+import type { Introspection, PgEntity, PgRoles } from "./introspection.js";
 
 /**
  * A fake 'pg_roles' record representing the 'public' meta-role.
@@ -257,7 +252,7 @@ export function serializeAcl(acl: AclObject) {
 
 export const emptyAclObject = parseAcl("=/postgres");
 
-export const OBJECT_ATTRIBUTE = "OBJECT_ATTRIBUTE";
+export const OBJECT_COLUMN = "OBJECT_COLUMN";
 export const OBJECT_TABLE = "OBJECT_TABLE";
 export const OBJECT_SEQUENCE = "OBJECT_SEQUENCE";
 export const OBJECT_DATABASE = "OBJECT_DATABASE";
@@ -271,8 +266,9 @@ export const OBJECT_FOREIGN_SERVER = "OBJECT_FOREIGN_SERVER";
 export const OBJECT_DOMAIN = "OBJECT_DOMAIN";
 export const OBJECT_TYPE = "OBJECT_TYPE";
 
+// https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/nodes/parsenodes.h#L2094-L2148
 export type AclDefaultObjectType =
-  | typeof OBJECT_ATTRIBUTE
+  | typeof OBJECT_COLUMN
   | typeof OBJECT_TABLE
   | typeof OBJECT_SEQUENCE
   | typeof OBJECT_DATABASE
@@ -285,6 +281,46 @@ export type AclDefaultObjectType =
   | typeof OBJECT_FOREIGN_SERVER
   | typeof OBJECT_DOMAIN
   | typeof OBJECT_TYPE;
+
+// https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/nodes/parsenodes.h#L76-L89
+// https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
+const ACL_SELECT = "r";
+const ACL_INSERT = "a";
+const ACL_UPDATE = "w";
+const ACL_DELETE = "d";
+const ACL_TRUNCATE = "D";
+const ACL_REFERENCES = "x";
+const ACL_TRIGGER = "t";
+const ACL_CREATE = "C";
+const ACL_CONNECT = "c";
+const ACL_CREATE_TEMP = "T";
+const ACL_EXECUTE = "X";
+const ACL_USAGE = "U";
+// const ACL_SET = "s";
+// const ACL_ALTER_SYSTEM = "A";
+
+/** @see {@link https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/nodes/parsenodes.h#L91} */
+const ACL_NO_RIGHTS = "";
+
+/** @see {@link https://github.com/postgres/postgres/blob/4908c5872059c409aa647bcde758dfeffe07996e/src/include/utils/acl.h#L159} */
+const ACL_ALL_RIGHTS_RELATION =
+  ACL_INSERT +
+  ACL_SELECT +
+  ACL_UPDATE +
+  ACL_DELETE +
+  ACL_TRUNCATE +
+  ACL_REFERENCES +
+  ACL_TRIGGER;
+const ACL_ALL_RIGHTS_SEQUENCE = ACL_USAGE + ACL_SELECT + ACL_UPDATE;
+const ACL_ALL_RIGHTS_DATABASE = ACL_CREATE + ACL_CREATE_TEMP + ACL_CONNECT;
+const ACL_ALL_RIGHTS_FDW = ACL_USAGE;
+const ACL_ALL_RIGHTS_FOREIGN_SERVER = ACL_USAGE;
+const ACL_ALL_RIGHTS_FUNCTION = ACL_EXECUTE;
+const ACL_ALL_RIGHTS_LANGUAGE = ACL_USAGE;
+const ACL_ALL_RIGHTS_LARGEOBJECT = ACL_SELECT + ACL_UPDATE;
+const ACL_ALL_RIGHTS_SCHEMA = ACL_USAGE + ACL_CREATE;
+const ACL_ALL_RIGHTS_TABLESPACE = ACL_CREATE;
+const ACL_ALL_RIGHTS_TYPE = ACL_USAGE;
 
 /**
  * Returns a list of AclObject by parsing the given input ACL strings. If no
@@ -303,42 +339,78 @@ export function parseAcls(
   introspection: Introspection,
   inAcls: readonly string[] | null,
   ownerId: string,
-  type: AclDefaultObjectType,
+  objtype: AclDefaultObjectType,
 ): AclObject[] {
   const aclStrings: readonly string[] =
     inAcls ||
     (() => {
       const owner = getRole(introspection, ownerId);
-      switch (type) {
+      let worldDefault: string;
+      let ownerDefault: string;
+      switch (objtype) {
+        case OBJECT_COLUMN:
+          worldDefault = ACL_NO_RIGHTS;
+          ownerDefault = ACL_NO_RIGHTS;
+          break;
         case OBJECT_TABLE:
-          return [`${owner.rolname}=arwdDxt/${owner.rolname}`];
+          worldDefault = ACL_NO_RIGHTS;
+          ownerDefault = ACL_ALL_RIGHTS_RELATION;
+          break;
         case OBJECT_SEQUENCE:
-          return [`${owner.rolname}=Urw/${owner.rolname}`];
+          worldDefault = ACL_NO_RIGHTS;
+          ownerDefault = ACL_ALL_RIGHTS_SEQUENCE;
+          break;
         case OBJECT_DATABASE:
-          return [
-            `=Tc/${owner.rolname}`,
-            `${owner.rolname}=CTc/${owner.rolname}`,
-          ];
+          worldDefault = ACL_CREATE_TEMP + ACL_CONNECT;
+          ownerDefault = ACL_ALL_RIGHTS_DATABASE;
+          break;
         case OBJECT_FUNCTION:
-          return [`=X/${owner.rolname}`, `${owner.rolname}=X/${owner.rolname}`];
+          worldDefault = ACL_EXECUTE;
+          ownerDefault = ACL_ALL_RIGHTS_FUNCTION;
+          break;
         case OBJECT_LANGUAGE:
-          return [`=U/${owner.rolname}`, `${owner.rolname}=U/${owner.rolname}`];
+          worldDefault = ACL_USAGE;
+          ownerDefault = ACL_ALL_RIGHTS_LANGUAGE;
+          break;
         case OBJECT_LARGEOBJECT:
-          return [`${owner.rolname}=rw/${owner.rolname}`];
+          worldDefault = ACL_NO_RIGHTS;
+          ownerDefault = ACL_ALL_RIGHTS_LARGEOBJECT;
+          break;
         case OBJECT_SCHEMA:
-          return [`${owner.rolname}=UC/${owner.rolname}`];
+          worldDefault = ACL_NO_RIGHTS;
+          ownerDefault = ACL_ALL_RIGHTS_SCHEMA;
+          break;
         case OBJECT_TABLESPACE:
-          return [`${owner.rolname}=C/${owner.rolname}`];
+          worldDefault = ACL_NO_RIGHTS;
+          ownerDefault = ACL_ALL_RIGHTS_TABLESPACE;
+          break;
         case OBJECT_FDW:
-          return [`${owner.rolname}=U/${owner.rolname}`];
+          worldDefault = ACL_NO_RIGHTS;
+          ownerDefault = ACL_ALL_RIGHTS_FDW;
+          break;
         case OBJECT_FOREIGN_SERVER:
-          return [`${owner.rolname}=U/${owner.rolname}`];
+          worldDefault = ACL_NO_RIGHTS;
+          ownerDefault = ACL_ALL_RIGHTS_FOREIGN_SERVER;
+          break;
         case OBJECT_DOMAIN:
         case OBJECT_TYPE:
-          return [`=U/${owner.rolname}`, `${owner.rolname}=U/${owner.rolname}`];
+          worldDefault = ACL_USAGE;
+          ownerDefault = ACL_ALL_RIGHTS_TYPE;
+          break;
         default:
-          return [];
+          worldDefault = ACL_NO_RIGHTS;
+          ownerDefault = ACL_NO_RIGHTS;
+          break;
       }
+
+      const acl: string[] = [];
+      if (worldDefault !== ACL_NO_RIGHTS) {
+        acl.push(`=${worldDefault}/${owner.rolname}`);
+      }
+      if (ownerDefault !== ACL_NO_RIGHTS) {
+        acl.push(`${owner.rolname}=${ownerDefault}/${owner.rolname}`);
+      }
+      return acl;
     })();
 
   const acls = aclStrings.map((aclString) => parseAcl(aclString));
@@ -373,31 +445,6 @@ export const Permission = {
   temporary: "temporary",
   temporaryGrant: "temporaryGrant",
 } as const;
-
-/*
- * For default permissions, see:
- * https://github.com/postgres/postgres/blob/14aec03502302eff6c67981d8fd121175c436ce9/src/backend/utils/adt/acl.c#L748-L854
- *
- * For what the privileges mean, see:
- * https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
- */
-
-export function aclsForTable(
-  introspection: Introspection,
-  table: PgClass,
-): AclObject[] {
-  const dbOwner = getRole(introspection, introspection.database.datdba);
-  const isSequence = table.relkind === "S";
-  const tableOwner = getRole(introspection, table.relowner);
-  const defaultAcl = isSequence
-    ? [`${tableOwner.rolname}=/${dbOwner.rolname}`]
-    : [`=/${dbOwner.rolname}`, `${dbOwner.rolname}=/${dbOwner.rolname}`];
-
-  const acls = (table.relacl || defaultAcl).map((aclString) =>
-    parseAcl(aclString),
-  );
-  return acls;
-}
 
 /**
  * Returns all the roles role has been granted (including PUBLIC),
