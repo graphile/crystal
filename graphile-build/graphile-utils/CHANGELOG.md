@@ -1,5 +1,17 @@
 # graphile-utils
 
+## 5.0.0-beta.17
+
+### Patch Changes
+
+- Updated dependencies
+  [[`0df5511ac`](https://github.com/graphile/crystal/commit/0df5511ac8b79ea34f8d12ebf8feeb421f8fe971)]:
+  - graphile-config@0.0.1-beta.6
+  - @dataplan/pg@0.0.1-beta.14
+  - grafast@0.1.1-beta.3
+  - graphile-build@5.0.0-beta.13
+  - graphile-build-pg@5.0.0-beta.17
+
 ## 5.0.0-beta.16
 
 ### Patch Changes

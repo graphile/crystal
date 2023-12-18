@@ -1,5 +1,32 @@
 # postgraphile
 
+## 5.0.0-beta.18
+
+### Patch Changes
+
+- [#1892](https://github.com/graphile/crystal/pull/1892)
+  [`0df5511ac`](https://github.com/graphile/crystal/commit/0df5511ac8b79ea34f8d12ebf8feeb421f8fe971)
+  Thanks [@benjie](https://github.com/benjie)! - Fix plugin ordering bug that
+  ignored before/after when there was no provider; this now means
+  PgSmartTagsPlugin is correctly loaded before PgFakeConstraintPlugin, fixing
+  the `postgraphile.tags.json5` file.
+
+- [#1894](https://github.com/graphile/crystal/pull/1894)
+  [`7851d89ab`](https://github.com/graphile/crystal/commit/7851d89ab4216b0252583f0068a69900fa2ddc88)
+  Thanks [@benjie](https://github.com/benjie)! - Fix logic around RBAC
+  permissions for tables and sequences.
+
+- Updated dependencies
+  [[`0df5511ac`](https://github.com/graphile/crystal/commit/0df5511ac8b79ea34f8d12ebf8feeb421f8fe971)]:
+  - graphile-config@0.0.1-beta.6
+  - @dataplan/pg@0.0.1-beta.14
+  - grafast@0.1.1-beta.3
+  - grafserv@0.1.1-beta.5
+  - graphile-build@5.0.0-beta.13
+  - graphile-build-pg@5.0.0-beta.17
+  - graphile-utils@5.0.0-beta.17
+  - @dataplan/json@0.0.1-beta.12
+
 ## 5.0.0-beta.17
 
 ### Patch Changes

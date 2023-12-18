@@ -1,5 +1,15 @@
 # @grafserv/persisted
 
+## 0.0.0-beta.15
+
+### Patch Changes
+
+- Updated dependencies
+  [[`0df5511ac`](https://github.com/graphile/crystal/commit/0df5511ac8b79ea34f8d12ebf8feeb421f8fe971)]:
+  - graphile-config@0.0.1-beta.6
+  - grafast@0.1.1-beta.3
+  - grafserv@0.1.1-beta.5
+
 ## 0.0.0-beta.14
 
 ### Patch Changes

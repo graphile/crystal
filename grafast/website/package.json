@@ -1,6 +1,6 @@
 {
   "name": "@localrepo/grafast-website",
-  "version": "0.0.1-beta.3",
+  "version": "0.0.1-beta.4",
   "private": true,
   "scripts": {
     "docusaurus": "docusaurus",

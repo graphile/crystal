@@ -1,5 +1,12 @@
 # @localrepo/grafast-website
 
+## 0.0.1-beta.4
+
+### Patch Changes
+
+- Updated dependencies []:
+  - grafast@0.1.1-beta.3
+
 ## 0.0.1-beta.3
 
 ### Patch Changes

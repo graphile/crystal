@@ -1,5 +1,19 @@
 # graphile-build-pg
 
+## 5.0.0-beta.17
+
+### Patch Changes
+
+- Updated dependencies
+  [[`0df5511ac`](https://github.com/graphile/crystal/commit/0df5511ac8b79ea34f8d12ebf8feeb421f8fe971),
+  [`7851d89ab`](https://github.com/graphile/crystal/commit/7851d89ab4216b0252583f0068a69900fa2ddc88),
+  [`470ee4000`](https://github.com/graphile/crystal/commit/470ee40008689de7cf6f206a9897abbe4891ff9b)]:
+  - graphile-config@0.0.1-beta.6
+  - pg-introspection@0.0.1-beta.5
+  - @dataplan/pg@0.0.1-beta.14
+  - grafast@0.1.1-beta.3
+  - graphile-build@5.0.0-beta.13
+
 ## 5.0.0-beta.16
 
 ### Patch Changes

@@ -1,5 +1,19 @@
 # pg-introspection
 
+## 0.0.1-beta.5
+
+### Patch Changes
+
+- [#1894](https://github.com/graphile/crystal/pull/1894)
+  [`7851d89ab`](https://github.com/graphile/crystal/commit/7851d89ab4216b0252583f0068a69900fa2ddc88)
+  Thanks [@benjie](https://github.com/benjie)! - Fix logic around RBAC
+  permissions for tables and sequences.
+
+- [#1893](https://github.com/graphile/crystal/pull/1893)
+  [`470ee4000`](https://github.com/graphile/crystal/commit/470ee40008689de7cf6f206a9897abbe4891ff9b)
+  Thanks [@benjie](https://github.com/benjie)! - Import latest PG16 docs into
+  pg-introspection
+
 ## 0.0.1-beta.4
 
 ### Patch Changes
