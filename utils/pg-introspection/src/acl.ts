@@ -339,7 +339,7 @@ export function parseAcls(
   introspection: Introspection,
   inAcls: readonly string[] | null,
   ownerId: string,
-  type: AclDefaultObjectType,
+  objtype: AclDefaultObjectType,
 ): AclObject[] {
   const aclStrings: readonly string[] =
     inAcls ||
@@ -347,7 +347,7 @@ export function parseAcls(
       const owner = getRole(introspection, ownerId);
       let worldDefault: string;
       let ownerDefault: string;
-      switch (type) {
+      switch (objtype) {
         case OBJECT_COLUMN:
           worldDefault = ACL_NO_RIGHTS;
           ownerDefault = ACL_NO_RIGHTS;
@@ -400,12 +400,17 @@ export function parseAcls(
         default:
           worldDefault = ACL_NO_RIGHTS;
           ownerDefault = ACL_NO_RIGHTS;
+          break;
       }
 
-      return [
-        `=${worldDefault}/${owner.rolname}`,
-        `${owner.rolname}=${ownerDefault}/${owner.rolname}`,
-      ];
+      const acl: string[] = [];
+      if (worldDefault !== ACL_NO_RIGHTS) {
+        acl.push(`=${worldDefault}/${owner.rolname}`);
+      }
+      if (ownerDefault !== ACL_NO_RIGHTS) {
+        acl.push(`${owner.rolname}=${ownerDefault}/${owner.rolname}`);
+      }
+      return acl;
     })();
 
   const acls = aclStrings.map((aclString) => parseAcl(aclString));
