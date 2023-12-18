@@ -1,5 +1,5 @@
 import {
-  OBJECT_ATTRIBUTE,
+  OBJECT_COLUMN,
   OBJECT_DATABASE,
   OBJECT_FUNCTION,
   OBJECT_SCHEMA,
@@ -327,7 +327,7 @@ export function augmentIntrospection(
         introspection,
         entity.attacl,
         entity.getClass()!.relowner,
-        OBJECT_ATTRIBUTE,
+        OBJECT_COLUMN,
       ),
     );
   });

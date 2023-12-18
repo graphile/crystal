@@ -257,7 +257,7 @@ export function serializeAcl(acl: AclObject) {
 
 export const emptyAclObject = parseAcl("=/postgres");
 
-export const OBJECT_ATTRIBUTE = "OBJECT_ATTRIBUTE";
+export const OBJECT_COLUMN = "OBJECT_COLUMN";
 export const OBJECT_TABLE = "OBJECT_TABLE";
 export const OBJECT_SEQUENCE = "OBJECT_SEQUENCE";
 export const OBJECT_DATABASE = "OBJECT_DATABASE";
@@ -272,7 +272,7 @@ export const OBJECT_DOMAIN = "OBJECT_DOMAIN";
 export const OBJECT_TYPE = "OBJECT_TYPE";
 
 export type AclDefaultObjectType =
-  | typeof OBJECT_ATTRIBUTE
+  | typeof OBJECT_COLUMN
   | typeof OBJECT_TABLE
   | typeof OBJECT_SEQUENCE
   | typeof OBJECT_DATABASE
@@ -286,6 +286,42 @@ export type AclDefaultObjectType =
   | typeof OBJECT_DOMAIN
   | typeof OBJECT_TYPE;
 
+// https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
+const ACL_SELECT = "r";
+const ACL_INSERT = "a";
+const ACL_UPDATE = "w";
+const ACL_DELETE = "d";
+const ACL_TRUNCATE = "D";
+const ACL_REFERENCES = "x";
+const ACL_TRIGGER = "t";
+const ACL_CREATE = "C";
+const ACL_CONNECT = "c";
+const ACL_CREATE_TEMP = "T";
+const ACL_EXECUTE = "X";
+const ACL_USAGE = "U";
+// ACL_SET = "s"
+// ACL_ALTER_SYSTEM = "A"
+
+const ACL_NO_RIGHTS = "";
+const ACL_ALL_RIGHTS_SEQUENCE = ACL_USAGE + ACL_SELECT + ACL_UPDATE;
+const ACL_ALL_RIGHTS_RELATION =
+  ACL_INSERT +
+  ACL_SELECT +
+  ACL_UPDATE +
+  ACL_DELETE +
+  ACL_TRUNCATE +
+  ACL_REFERENCES +
+  ACL_TRIGGER;
+const ACL_ALL_RIGHTS_DATABASE = ACL_CREATE + ACL_CREATE_TEMP + ACL_CONNECT;
+const ACL_ALL_RIGHTS_FUNCTION = ACL_EXECUTE;
+const ACL_ALL_RIGHTS_LANGUAGE = ACL_USAGE;
+const ACL_ALL_RIGHTS_LARGEOBJECT = ACL_SELECT + ACL_UPDATE;
+const ACL_ALL_RIGHTS_SCHEMA = ACL_USAGE + ACL_CREATE;
+const ACL_ALL_RIGHTS_TABLESPACE = ACL_CREATE;
+const ACL_ALL_RIGHTS_FDW = ACL_USAGE;
+const ACL_ALL_RIGHTS_FOREIGN_SERVER = ACL_USAGE;
+const ACL_ALL_RIGHTS_TYPE = ACL_USAGE;
+
 /**
  * Returns a list of AclObject by parsing the given input ACL strings. If no
  * ACL strings are present then it will return the default (implied) ACL for
@@ -298,10 +334,6 @@ export type AclDefaultObjectType =
  * and:
  *
  * https://github.com/postgres/postgres/blob/fb3b098fe88441f9531a5169008ea17eac01301f/src/include/utils/acl.h#L153-L167
- *
- * and for what the privileges mean, see:
- *
- * https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
  */
 export function parseAcls(
   introspection: Introspection,
@@ -314,32 +346,67 @@ export function parseAcls(
     (() => {
       const owner = getRole(introspection, ownerId);
       switch (type) {
+        case OBJECT_COLUMN:
+          return [
+            `=${ACL_NO_RIGHTS}/${owner.rolname}`,
+            `${owner.rolname}=${ACL_NO_RIGHTS}/${owner.rolname}`,
+          ];
         case OBJECT_TABLE:
-          return [`${owner.rolname}=arwdDxt/${owner.rolname}`];
+          return [
+            `=${ACL_NO_RIGHTS}/${owner.rolname}`,
+            `${owner.rolname}=${ACL_ALL_RIGHTS_RELATION}/${owner.rolname}`,
+          ];
         case OBJECT_SEQUENCE:
-          return [`${owner.rolname}=Urw/${owner.rolname}`];
+          return [
+            `=${ACL_NO_RIGHTS}/${owner.rolname}`,
+            `${owner.rolname}=${ACL_ALL_RIGHTS_SEQUENCE}/${owner.rolname}`,
+          ];
         case OBJECT_DATABASE:
           return [
-            `=Tc/${owner.rolname}`,
-            `${owner.rolname}=CTc/${owner.rolname}`,
+            `=${ACL_CREATE_TEMP + ACL_CONNECT}/${owner.rolname}`,
+            `${owner.rolname}=${ACL_ALL_RIGHTS_DATABASE}/${owner.rolname}`,
           ];
         case OBJECT_FUNCTION:
-          return [`=X/${owner.rolname}`, `${owner.rolname}=X/${owner.rolname}`];
+          return [
+            `=${ACL_EXECUTE}/${owner.rolname}`,
+            `${owner.rolname}=${ACL_ALL_RIGHTS_FUNCTION}/${owner.rolname}`,
+          ];
         case OBJECT_LANGUAGE:
-          return [`=U/${owner.rolname}`, `${owner.rolname}=U/${owner.rolname}`];
+          return [
+            `=${ACL_USAGE}/${owner.rolname}`,
+            `${owner.rolname}=${ACL_ALL_RIGHTS_LANGUAGE}/${owner.rolname}`,
+          ];
         case OBJECT_LARGEOBJECT:
-          return [`${owner.rolname}=rw/${owner.rolname}`];
+          return [
+            `=${ACL_NO_RIGHTS}/${owner.rolname}`,
+            `${owner.rolname}=${ACL_ALL_RIGHTS_LARGEOBJECT}/${owner.rolname}`,
+          ];
         case OBJECT_SCHEMA:
-          return [`${owner.rolname}=UC/${owner.rolname}`];
+          return [
+            `=${ACL_NO_RIGHTS}/${owner.rolname}`,
+            `${owner.rolname}=${ACL_ALL_RIGHTS_SCHEMA}/${owner.rolname}`,
+          ];
         case OBJECT_TABLESPACE:
-          return [`${owner.rolname}=C/${owner.rolname}`];
+          return [
+            `=${ACL_NO_RIGHTS}/${owner.rolname}`,
+            `${owner.rolname}=${ACL_ALL_RIGHTS_TABLESPACE}/${owner.rolname}`,
+          ];
         case OBJECT_FDW:
-          return [`${owner.rolname}=U/${owner.rolname}`];
+          return [
+            `=${ACL_NO_RIGHTS}/${owner.rolname}`,
+            `${owner.rolname}=${ACL_ALL_RIGHTS_FDW}/${owner.rolname}`,
+          ];
         case OBJECT_FOREIGN_SERVER:
-          return [`${owner.rolname}=U/${owner.rolname}`];
+          return [
+            `=${ACL_NO_RIGHTS}/${owner.rolname}`,
+            `${owner.rolname}=${ACL_ALL_RIGHTS_FOREIGN_SERVER}/${owner.rolname}`,
+          ];
         case OBJECT_DOMAIN:
         case OBJECT_TYPE:
-          return [`=U/${owner.rolname}`, `${owner.rolname}=U/${owner.rolname}`];
+          return [
+            `=${ACL_USAGE}/${owner.rolname}`,
+            `${owner.rolname}=${ACL_ALL_RIGHTS_TYPE}/${owner.rolname}`,
+          ];
         default:
           return [];
       }
@@ -377,7 +444,6 @@ export const Permission = {
   temporary: "temporary",
   temporaryGrant: "temporaryGrant",
 } as const;
-
 
 /**
  * Returns all the roles role has been granted (including PUBLIC),
