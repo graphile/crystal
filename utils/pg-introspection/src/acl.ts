@@ -345,71 +345,67 @@ export function parseAcls(
     inAcls ||
     (() => {
       const owner = getRole(introspection, ownerId);
+      let worldDefault: string;
+      let ownerDefault: string;
       switch (type) {
         case OBJECT_COLUMN:
-          return [
-            `=${ACL_NO_RIGHTS}/${owner.rolname}`,
-            `${owner.rolname}=${ACL_NO_RIGHTS}/${owner.rolname}`,
-          ];
+          worldDefault = ACL_NO_RIGHTS;
+          ownerDefault = ACL_NO_RIGHTS;
+          break;
         case OBJECT_TABLE:
-          return [
-            `=${ACL_NO_RIGHTS}/${owner.rolname}`,
-            `${owner.rolname}=${ACL_ALL_RIGHTS_RELATION}/${owner.rolname}`,
-          ];
+          worldDefault = ACL_NO_RIGHTS;
+          ownerDefault = ACL_ALL_RIGHTS_RELATION;
+          break;
         case OBJECT_SEQUENCE:
-          return [
-            `=${ACL_NO_RIGHTS}/${owner.rolname}`,
-            `${owner.rolname}=${ACL_ALL_RIGHTS_SEQUENCE}/${owner.rolname}`,
-          ];
+          worldDefault = ACL_NO_RIGHTS;
+          ownerDefault = ACL_ALL_RIGHTS_SEQUENCE;
+          break;
         case OBJECT_DATABASE:
-          return [
-            `=${ACL_CREATE_TEMP + ACL_CONNECT}/${owner.rolname}`,
-            `${owner.rolname}=${ACL_ALL_RIGHTS_DATABASE}/${owner.rolname}`,
-          ];
+          worldDefault = ACL_CREATE_TEMP + ACL_CONNECT;
+          ownerDefault = ACL_ALL_RIGHTS_DATABASE;
+          break;
         case OBJECT_FUNCTION:
-          return [
-            `=${ACL_EXECUTE}/${owner.rolname}`,
-            `${owner.rolname}=${ACL_ALL_RIGHTS_FUNCTION}/${owner.rolname}`,
-          ];
+          worldDefault = ACL_EXECUTE;
+          ownerDefault = ACL_ALL_RIGHTS_FUNCTION;
+          break;
         case OBJECT_LANGUAGE:
-          return [
-            `=${ACL_USAGE}/${owner.rolname}`,
-            `${owner.rolname}=${ACL_ALL_RIGHTS_LANGUAGE}/${owner.rolname}`,
-          ];
+          worldDefault = ACL_USAGE;
+          ownerDefault = ACL_ALL_RIGHTS_LANGUAGE;
+          break;
         case OBJECT_LARGEOBJECT:
-          return [
-            `=${ACL_NO_RIGHTS}/${owner.rolname}`,
-            `${owner.rolname}=${ACL_ALL_RIGHTS_LARGEOBJECT}/${owner.rolname}`,
-          ];
+          worldDefault = ACL_NO_RIGHTS;
+          ownerDefault = ACL_ALL_RIGHTS_LARGEOBJECT;
+          break;
         case OBJECT_SCHEMA:
-          return [
-            `=${ACL_NO_RIGHTS}/${owner.rolname}`,
-            `${owner.rolname}=${ACL_ALL_RIGHTS_SCHEMA}/${owner.rolname}`,
-          ];
+          worldDefault = ACL_NO_RIGHTS;
+          ownerDefault = ACL_ALL_RIGHTS_SCHEMA;
+          break;
         case OBJECT_TABLESPACE:
-          return [
-            `=${ACL_NO_RIGHTS}/${owner.rolname}`,
-            `${owner.rolname}=${ACL_ALL_RIGHTS_TABLESPACE}/${owner.rolname}`,
-          ];
+          worldDefault = ACL_NO_RIGHTS;
+          ownerDefault = ACL_ALL_RIGHTS_TABLESPACE;
+          break;
         case OBJECT_FDW:
-          return [
-            `=${ACL_NO_RIGHTS}/${owner.rolname}`,
-            `${owner.rolname}=${ACL_ALL_RIGHTS_FDW}/${owner.rolname}`,
-          ];
+          worldDefault = ACL_NO_RIGHTS;
+          ownerDefault = ACL_ALL_RIGHTS_FDW;
+          break;
         case OBJECT_FOREIGN_SERVER:
-          return [
-            `=${ACL_NO_RIGHTS}/${owner.rolname}`,
-            `${owner.rolname}=${ACL_ALL_RIGHTS_FOREIGN_SERVER}/${owner.rolname}`,
-          ];
+          worldDefault = ACL_NO_RIGHTS;
+          ownerDefault = ACL_ALL_RIGHTS_FOREIGN_SERVER;
+          break;
         case OBJECT_DOMAIN:
         case OBJECT_TYPE:
-          return [
-            `=${ACL_USAGE}/${owner.rolname}`,
-            `${owner.rolname}=${ACL_ALL_RIGHTS_TYPE}/${owner.rolname}`,
-          ];
+          worldDefault = ACL_USAGE;
+          ownerDefault = ACL_ALL_RIGHTS_TYPE;
+          break;
         default:
-          return [];
+          worldDefault = ACL_NO_RIGHTS;
+          ownerDefault = ACL_NO_RIGHTS;
       }
+
+      return [
+        `=${worldDefault}/${owner.rolname}`,
+        `${owner.rolname}=${ownerDefault}/${owner.rolname}`,
+      ];
     })();
 
   const acls = aclStrings.map((aclString) => parseAcl(aclString));
