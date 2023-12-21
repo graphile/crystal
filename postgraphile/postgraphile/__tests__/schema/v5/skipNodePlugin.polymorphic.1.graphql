@@ -4143,6 +4143,27 @@ type Query {
     orderBy: [SingleTableItemOrderBy!] = [PRIMARY_KEY_ASC]
   ): SingleTableItemConnection
 
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  allSingleTables(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTableItemConnection
+
   """
   Reads and enables pagination through a set of `ThirdPartyVulnerability`.
   """

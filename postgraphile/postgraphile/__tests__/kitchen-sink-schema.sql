@@ -1368,6 +1368,12 @@ comment on table polymorphic.single_table_items is $$
   @ref rootChecklistTopic from:SingleTableChecklist to:SingleTableTopic singular via:(root_topic_id)->polymorphic.single_table_items(id)
   $$;
 
+
+create function polymorphic.all_single_tables ()
+returns setof polymorphic.single_table_items as $$
+  select * from polymorphic.single_table_items
+$$ language sql stable;
+
 comment on constraint single_table_items_root_topic_fkey on polymorphic.single_table_items is $$
   @behavior -*
   $$;
