@@ -1,0 +1,41 @@
+%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
+graph TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
+
+
+    %% plan dependencies
+    __Value0["__Value[0∈0]"]:::plan
+    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
+    Connection16{{"Connection[16∈0]<br />ᐸ12ᐳ"}}:::plan
+    Object15{{"Object[15∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access13{{"Access[13∈1]<br />ᐸ3.pgSettingsᐳ"}}:::plan
+    Access14{{"Access[14∈1]<br />ᐸ3.withPgClientᐳ"}}:::plan
+    Access13 & Access14 --> Object15
+    PgSelect17[["PgSelect[17∈1]<br />ᐸall_single_tables(aggregate)ᐳ"]]:::plan
+    Object15 & Connection16 --> PgSelect17
+    __Value3 --> Access13
+    __Value3 --> Access14
+    First18{{"First[18∈1]"}}:::plan
+    PgSelect17 --> First18
+    PgSelectSingle19{{"PgSelectSingle[19∈1]<br />ᐸall_single_tablesᐳ"}}:::plan
+    First18 --> PgSelectSingle19
+    PgClassExpression20{{"PgClassExpression[20∈1]<br />ᐸcount(*)ᐳ"}}:::plan
+    PgSelectSingle19 --> PgClassExpression20
+
+    %% define steps
+
+    subgraph "Buckets for queries/polymorphic/returns-setof"
+    Bucket0("Bucket 0 (root)"):::bucket
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value0,__Value3,__Value5,Connection16 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 16<br /><br />ROOT Connectionᐸ12ᐳ[16]<br />1: <br />ᐳ: Access[13], Access[14], Object[15]<br />2: PgSelect[17]<br />ᐳ: 18, 19, 20"):::bucket
+    classDef bucket1 stroke:#00bfff
+    class Bucket1,Access13,Access14,Object15,PgSelect17,First18,PgSelectSingle19,PgClassExpression20 bucket1
+    Bucket0 --> Bucket1
+    end

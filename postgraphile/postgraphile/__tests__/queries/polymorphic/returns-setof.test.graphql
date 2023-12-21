@@ -1,0 +1,8 @@
+## expect(errors).toBeFalsy()
+#> schema: ["polymorphic"]
+
+{
+  allSingleTables {
+    totalCount
+  }
+}
