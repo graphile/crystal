@@ -7,7 +7,7 @@ import { gql, makeExtendSchemaPlugin } from "graphile-utils";
 import type {} from "postgraphile";
 import { jsonParse } from "postgraphile/@dataplan/json";
 import { makePgService } from "postgraphile/adaptors/pg";
-import { context, listen, object } from "postgraphile/grafast";
+import { constant, context, listen, object } from "postgraphile/grafast";
 import type {} from "postgraphile/grafserv/node";
 import { defaultHTMLParts } from "postgraphile/grafserv/ruru/server";
 import { StreamDeferPlugin } from "postgraphile/graphile-build";
@@ -207,6 +207,7 @@ const preset: GraphileConfig.Preset = {
         typeDefs: gql`
           extend type Person {
             greet(greeting: String! = "Hello"): String
+            query: Query
           }
         `,
         plans: {
@@ -218,6 +219,9 @@ const preset: GraphileConfig.Preset = {
                 sql`${placeholderSql} || ', ' || ${alias}.name`,
                 TYPES.text,
               );
+            },
+            query() {
+              return constant(true);
             },
           },
         },
