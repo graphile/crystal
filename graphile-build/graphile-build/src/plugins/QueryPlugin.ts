@@ -32,8 +32,12 @@ export const QueryPlugin: GraphileConfig.Plugin = {
               isRootQuery: true,
             },
             () => ({
-              // We don't want to assert a step here; any non-null value should suffice
-              // assertStep: __ValueStep,
+              // We don't want to assert any particular step here; any non-null
+              // value should suffice. We do need to assert a step currently,
+              // but only because of the check on interfaces that all
+              // consistituent types either expect a step or don't (which is an
+              // arbitrary constraint we've added that can be removed).
+              assertStep: () => true,
               description:
                 "The root query type which gives access points into the data universe.",
             }),
