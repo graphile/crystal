@@ -32,7 +32,8 @@ export const QueryPlugin: GraphileConfig.Plugin = {
               isRootQuery: true,
             },
             () => ({
-              assertStep: __ValueStep,
+              // We don't want to assert a step here; any non-null value should suffice
+              // assertStep: __ValueStep,
               description:
                 "The root query type which gives access points into the data universe.",
             }),
