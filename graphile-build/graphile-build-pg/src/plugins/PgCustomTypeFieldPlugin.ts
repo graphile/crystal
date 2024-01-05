@@ -760,19 +760,6 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
                   const isVoid = resource.codec === TYPES.void;
 
-                  const returnGraphQLTypeName =
-                    build.getGraphQLTypeNameByPgCodec(
-                      resource.codec.arrayOfCodec ?? resource.codec,
-                      "output",
-                    );
-                  const resultFieldName =
-                    isVoid || !returnGraphQLTypeName
-                      ? null
-                      : inflection.functionMutationResultFieldName({
-                          resource,
-                          returnGraphQLTypeName,
-                        });
-
                   build.registerObjectType(
                     payloadTypeName,
                     {
@@ -811,6 +798,18 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           build,
                           resource,
                         );
+                        const returnGraphQLTypeName =
+                          build.getGraphQLTypeNameByPgCodec(
+                            resource.codec.arrayOfCodec ?? resource.codec,
+                            "output",
+                          );
+                        const resultFieldName =
+                          isVoid || !returnGraphQLTypeName
+                            ? null
+                            : inflection.functionMutationResultFieldName({
+                                resource,
+                                returnGraphQLTypeName,
+                              });
                         if (!baseType || !resultFieldName) {
                           console.warn(
                             `Procedure resource ${resource} has a return type, but we couldn't build it; skipping output field`,
