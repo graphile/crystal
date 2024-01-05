@@ -3,10 +3,25 @@
 When you have two database tables with a foreign key constraint between them,
 PostGraphile will automatically add that relation to your GraphQL schema in
 both directions. Sometimes you want to add additional links between types,
-perhaps links that traverse intermediate tables, or links that perform
-polymorphism. For this need, we have refs. Refs are uni-directional (they do
-not automatically create a reverse relationship) and may be plural or singular.
-Plural refs support both list and connection interfaces in GraphQL.
+perhaps links that traverse multiple relationships (e.g.
+`post -> topic -> forum`), or links that perform polymorphism over relations.
+For this need, we have refs. Refs are uni-directional (they do not
+automatically create a reverse field) and may be plural or singular. Plural
+refs support both list and connection interfaces in GraphQL.
+
+:::note
+
+Refs follow relations defined via foreign key constraints (or
+`@foreignKey` smart tags), attempts to build relations via a `@ref`
+without having an underlying foreign key relation will be ignored, though you
+may see a warning in the console such as:
+
+```
+When processing ref for resource 'posts', could not find matching relation for
+via:'(author_id)->users'
+```
+
+:::
 
 ## @ref and @refVia
 

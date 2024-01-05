@@ -19,7 +19,8 @@ drop schema if exists
   partitions,
   js_reserved,
   nested_arrays,
-  composite_domains
+  composite_domains,
+  refs
 cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
@@ -1881,3 +1882,24 @@ create table composite_domains.posts (
   thread_content composite_domains.user_update_content[],
   created_at timestamp with time zone DEFAULT now() not null
 );
+
+--------------------------------------------------------------------------------
+
+create schema refs;
+
+create table refs.people (
+  id serial primary key,
+  name text not null
+);
+
+create table refs.posts (
+  id serial primary key,
+  user_id int not null,
+  constraint fk_posts_author foreign key (user_id) references refs.people
+);
+
+comment on constraint fk_posts_author on refs.posts is E'@omit';
+comment on column refs.posts.user_id is E'@omit';
+comment on table refs.posts is $$
+@ref author via:(user_id)->people(id) singular
+$$;

@@ -341,7 +341,7 @@ export const PgRefsPlugin: GraphileConfig.Plugin = {
                 console.warn(
                   `When processing ref for resource '${
                     resourceOptions.name
-                  }', could not find matching relation for via:'${via}' ${
+                  }', could not find matching relation for via:'${via}'${
                     rawPart === via
                       ? ""
                       : ` (from: '${currentResourceOptions.name}', path: '${rawPart}')`

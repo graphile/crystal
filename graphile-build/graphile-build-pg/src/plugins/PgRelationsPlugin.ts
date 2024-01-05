@@ -42,12 +42,19 @@ declare global {
       codec: PgCodecWithAttributes;
       relationName: string;
     }
+    interface PgRelationsPluginRefDetails {
+      registry: PgRegistry;
+      codec: PgCodecWithAttributes;
+      ref: PgCodecRef;
+    }
 
     interface ScopeObjectFieldsField {
       isPgSingleRelationField?: boolean;
       isPgManyRelationConnectionField?: boolean;
       isPgManyRelationListField?: boolean;
       pgRelationDetails?: PgRelationsPluginRelationDetails;
+      /** @experimental */
+      pgRefDetails?: PgRelationsPluginRefDetails;
     }
     interface Inflection {
       resourceRelationName(
@@ -798,6 +805,7 @@ function addRelations(
     pgResource?: PgResource;
     pgCodec: PgCodec | undefined;
     pgRelationDetails?: GraphileBuild.PgRelationsPluginRelationDetails;
+    pgRefDetails?: GraphileBuild.PgRelationsPluginRefDetails;
     relatedTypeName: string;
     isNonNull: boolean | undefined;
   };
@@ -1315,6 +1323,15 @@ function addRelations(
       `${relationTypeScope}:resource:list`,
     );
 
+    const pgRefDetails: GraphileBuild.PgRelationsPluginRefDetails | undefined =
+      ref
+        ? {
+            registry: build.input.pgRegistry,
+            codec,
+            ref: ref,
+          }
+        : undefined;
+
     const digest: Digest = {
       identifier,
       isReferencee: hasReferencee,
@@ -1333,6 +1350,7 @@ function addRelations(
       singleRecordPlan,
       listPlan,
       connectionPlan,
+      pgRefDetails,
       relatedTypeName: context.Self.name,
       isNonNull: ref?.extensions?.tags.notNull,
     };
@@ -1361,6 +1379,7 @@ function addRelations(
       pgResource: pgFieldResource,
       pgCodec: pgFieldCodec,
       pgRelationDetails,
+      pgRefDetails,
       relatedTypeName,
     } = digest;
     const OtherType = build.getTypeByName(typeName);
@@ -1387,6 +1406,7 @@ function addRelations(
               fieldBehaviorScope: `${relationTypeScope}:resource:single`,
               isPgSingleRelationField: true,
               pgRelationDetails,
+              pgRefDetails,
             },
             {
               description:
@@ -1420,6 +1440,7 @@ function addRelations(
                 isPgFieldConnection: true,
                 isPgManyRelationConnectionField: true,
                 pgRelationDetails,
+                pgRefDetails,
               },
               {
                 description:
@@ -1453,6 +1474,7 @@ function addRelations(
               isPgFieldSimpleCollection: true,
               isPgManyRelationListField: true,
               pgRelationDetails,
+              pgRefDetails,
             },
             {
               description:
