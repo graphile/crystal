@@ -641,6 +641,11 @@ const disallowedKeys: Array<string | symbol | number> = [
   ...Object.getOwnPropertyNames(Object.prototype),
   ...Object.getOwnPropertySymbols(Object.prototype),
 ];
+if (!disallowedKeys.includes("__proto__")) {
+  // If you're running with `--disable-proto=delete` we still want to check
+  // you're not trying to set __proto__.
+  disallowedKeys.push("__proto__");
+}
 
 /**
  * Returns true if the given key is safe to set as the key of a POJO (without a

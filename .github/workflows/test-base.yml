@@ -37,7 +37,7 @@ jobs:
       TEST_SIMPLIFY_DATABASE_URL: postgres://postgres:postgres@localhost:5432/pg_simplify_inflectors
       TERM: xterm
       FORCE_COLOR: 1
-      NODE_OPTIONS: "--max-old-space-size=4096"
+      NODE_OPTIONS: "--max-old-space-size=4096 --disable-proto=delete"
 
     strategy:
       fail-fast: false
