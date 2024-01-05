@@ -32,31 +32,33 @@ const { GraphQLError } = graphql;
 const sleep = (ms: number) =>
   new Promise<void>((resolve) => setTimeout(resolve, ms));
 
+// TODO: remove this ANSI-removal hack!
 export function handleErrors(
   payload: ExecutionResult | AsyncExecutionResult,
 ): void {
-  if ("errors" in payload && payload.errors) {
+  if (payload.errors !== undefined) {
     (payload.errors as any[]) = payload.errors.map((e) => {
       const obj =
         e instanceof GraphQLError
           ? e.toJSON()
           : { message: (e as any).message, ...(e as object) };
-      return Object.assign(obj, {
+      return {
+        ...obj,
         message: stripAnsi(obj.message),
-        extensions: {
-          ...(e instanceof GraphQLError ? e.extensions : null),
-          ...(e.stack
-            ? {
-                stack: stripAnsi(e.stack).split("\n"),
-              }
-            : null),
-          ...(e.cause
-            ? {
-                cause: stripAnsi(String(e.cause)),
-              }
-            : null),
-        },
-      });
+        ...(e instanceof GraphQLError
+          ? {
+              extensions: {
+                ...e.extensions,
+                ...(typeof e.extensions.stack === "string"
+                  ? { stack: stripAnsi(e.extensions.stack) }
+                  : null),
+                ...(typeof e.extensions.cause === "string"
+                  ? { cause: stripAnsi(e.extensions.cause) }
+                  : null),
+              },
+            }
+          : null),
+      };
     });
   }
 }
