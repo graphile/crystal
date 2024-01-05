@@ -475,7 +475,10 @@ export class PgSelectSingleStep<
     }
   }
 
-  /** The polymorphism if this is a "normal" (non-aggregate) request over a single/relational polymorphic codec; otherwise null */
+  /**
+   * The polymorphism if this is a "regular" (non-aggregate) request over a
+   * single/relational polymorphic codec; otherwise null.
+   */
   private singleOrRelationalPolyIfRegular() {
     const poly = (this.resource.codec as PgCodec).polymorphism;
     if (
