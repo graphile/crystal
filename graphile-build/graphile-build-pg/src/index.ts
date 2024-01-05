@@ -54,6 +54,8 @@ declare global {
       foreignKey: string | string[];
       unique: string | string[];
       deprecated: string | string[];
+      /** For functions returning polymorphic type, which type to choose? */
+      returnType: string;
     }
 
     interface PgResourceUniqueTags extends PgSmartTagsDict {

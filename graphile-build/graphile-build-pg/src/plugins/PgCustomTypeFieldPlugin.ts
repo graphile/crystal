@@ -607,7 +607,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
         after: ["PgCodecs"],
         callback(_, build) {
           const {
-            graphql: { GraphQLList, GraphQLString },
+            graphql: { GraphQLList, GraphQLString, getNamedType },
             inflection,
             options,
             pgGetArgDetailsFromParameters,
@@ -760,19 +760,6 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
                   const isVoid = resource.codec === TYPES.void;
 
-                  const returnGraphQLTypeName =
-                    build.getGraphQLTypeNameByPgCodec(
-                      resource.codec.arrayOfCodec ?? resource.codec,
-                      "output",
-                    );
-                  const resultFieldName =
-                    isVoid || !returnGraphQLTypeName
-                      ? null
-                      : inflection.functionMutationResultFieldName({
-                          resource,
-                          returnGraphQLTypeName,
-                        });
-
                   build.registerObjectType(
                     payloadTypeName,
                     {
@@ -811,12 +798,19 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           build,
                           resource,
                         );
-                        if (!baseType || !resultFieldName) {
+                        if (!baseType) {
                           console.warn(
                             `Procedure resource ${resource} has a return type, but we couldn't build it; skipping output field`,
                           );
-                          return {};
+                          return fields;
                         }
+                        const returnGraphQLTypeName =
+                          getNamedType(baseType).name;
+                        const resultFieldName =
+                          inflection.functionMutationResultFieldName({
+                            resource,
+                            returnGraphQLTypeName,
+                          });
                         const type = resource.isUnique
                           ? baseType
                           : new GraphQLList(
@@ -1285,6 +1279,75 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
   },
 };
 
+function getPreferredType(
+  build: GraphileBuild.Build,
+  rawInnerType: GraphQLOutputType,
+  preferredTypeName: string,
+): GraphQLOutputType {
+  const {
+    graphql: {
+      GraphQLList,
+      GraphQLNonNull,
+      GraphQLUnionType,
+      GraphQLInterfaceType,
+      GraphQLObjectType,
+    },
+    getOutputTypeByName,
+  } = build;
+  if (rawInnerType instanceof GraphQLNonNull) {
+    const preferred = getPreferredType(
+      build,
+      rawInnerType.ofType,
+      preferredTypeName,
+    );
+    if (preferred === rawInnerType.ofType) {
+      return rawInnerType;
+    } else {
+      return new GraphQLNonNull(preferred);
+    }
+  } else if (rawInnerType instanceof GraphQLList) {
+    const preferred = getPreferredType(
+      build,
+      rawInnerType.ofType,
+      preferredTypeName,
+    );
+    if (preferred === rawInnerType.ofType) {
+      return rawInnerType;
+    } else {
+      return new GraphQLList(preferred);
+    }
+  } else if (rawInnerType.name === preferredTypeName) {
+    return rawInnerType;
+  } else if (rawInnerType instanceof GraphQLInterfaceType) {
+    const type = getOutputTypeByName(preferredTypeName);
+    if (
+      type instanceof GraphQLObjectType &&
+      type.getInterfaces().includes(rawInnerType)
+    ) {
+      return type;
+    } else {
+      throw new Error(
+        `Don't know how to turn interface type '${rawInnerType}' into '${preferredTypeName}'`,
+      );
+    }
+  } else if (rawInnerType instanceof GraphQLUnionType) {
+    const type = rawInnerType
+      .getTypes()
+      .find((t) => t.name === preferredTypeName);
+    if (type) {
+      return type;
+    } else {
+      throw new Error(
+        `Don't know how to turn union type '${rawInnerType}' into '${preferredTypeName}'`,
+      );
+    }
+  } else {
+    throw new Error(
+      `Don't know how to turn '${rawInnerType}' into '${preferredTypeName}'`,
+    );
+  }
+}
+
 function getFunctionSourceReturnGraphQLType(
   build: GraphileBuild.Build,
   resource: PgResource<any, any, any, any, any>,
@@ -1295,19 +1358,24 @@ function getFunctionSourceReturnGraphQLType(
     return null;
   }
   const isVoid = resourceInnerCodec === TYPES.void;
-  const innerType = isVoid
+  const rawInnerType = isVoid
     ? null
     : (build.getGraphQLTypeByPgCodec(resourceInnerCodec, "output") as
         | GraphQLOutputType
         | undefined);
-  if (!innerType && !isVoid) {
+  if (!rawInnerType && !isVoid) {
     console.warn(
       `Failed to find a suitable type for codec '${resource.codec.name}'; not adding function field`,
     );
     return null;
-  } else if (!innerType) {
+  } else if (!rawInnerType) {
     return null;
   }
+
+  const preferredType = resource.extensions?.tags?.returnType;
+  const innerType = preferredType
+    ? getPreferredType(build, rawInnerType, preferredType)
+    : rawInnerType;
 
   // TODO: nullability
   const type =
