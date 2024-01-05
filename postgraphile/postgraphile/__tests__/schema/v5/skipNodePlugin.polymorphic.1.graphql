@@ -4272,6 +4272,7 @@ type Query {
 
   """Get a single `GcpApplicationThirdPartyVulnerability`."""
   gcpApplicationThirdPartyVulnerabilityByGcpApplicationIdAndThirdPartyVulnerabilityId(gcpApplicationId: Int!, thirdPartyVulnerabilityId: Int!): GcpApplicationThirdPartyVulnerability
+  getSingleTableTopicById(id: Int): SingleTableTopic
 
   """Get a single `LogEntry`."""
   logEntryByRowId(rowId: Int!): LogEntry

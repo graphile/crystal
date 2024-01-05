@@ -3101,6 +3101,7 @@ type Query {
 
   """Get a single `GcpApplication`."""
   gcpApplicationById(id: Int!): GcpApplication
+  getSingleTableTopicById(id: Int): SingleTableTopic
 
   """Get a single `LogEntry`."""
   logEntryById(id: Int!): LogEntry
