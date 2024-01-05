@@ -1,3 +1,5 @@
 {
-  allSingleTables: null,
+  allSingleTables: {
+    totalCount: 21,
+  },
 }
