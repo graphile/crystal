@@ -479,7 +479,7 @@ export class PgSelectSingleStep<
   private singleOrRelationalPolyIfRegular() {
     const poly = (this.resource.codec as PgCodec).polymorphism;
     if (
-      (this.mode === "normal" || this.mode === "mutation") &&
+      this.mode !== "aggregate" &&
       (poly?.mode === "single" || poly?.mode === "relational")
     ) {
       return poly;
