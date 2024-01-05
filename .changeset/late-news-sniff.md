@@ -3,4 +3,4 @@
 "@dataplan/pg": patch
 ---
 
-Fix issue with aggregates for polymorphic pgSelectSingle.
+Fix issue with aggregates for polymorphic connections.
