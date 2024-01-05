@@ -1397,6 +1397,15 @@ create table polymorphic.single_table_item_relation_composite_pks (
 
 create index on polymorphic.single_table_item_relation_composite_pks (child_id);
 
+create function polymorphic.get_single_table_topic_by_id(id int)
+returns polymorphic.single_table_items
+as $$
+  select * from polymorphic.single_table_items
+  where single_table_items.id = get_single_table_topic_by_id.id
+  and type = 'TOPIC' -- 👈 will guarantee to return a SingleTableTopic
+$$ language sql stable;
+comment on function polymorphic.get_single_table_topic_by_id is '@returnType SingleTableTopic';
+
 ----------------------------------------
 
 create table polymorphic.relational_items (

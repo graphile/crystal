@@ -3578,6 +3578,7 @@ type Query implements Node {
 
   """Get a single `GcpApplication`."""
   gcpApplicationById(id: Int!): GcpApplication
+  getSingleTableTopicById(id: Int): SingleTableTopic
 
   """Reads a single `LogEntry` using its globally unique `ID`."""
   logEntry(

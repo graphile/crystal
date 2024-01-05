@@ -260,6 +260,28 @@ See also: `@fieldName`, `@foreignSimpleFieldName`, `@foreignConnectionFieldName`
 - foreign key constraints: the field on the remote type (the "backwards"
   relation)
 
+## @returnType
+
+Applies to:
+
+- Custom Query functions
+- Custom Mutation functions
+- Computed Column functions
+
+Details the _named_ GraphQL type to use to represent the result of the function
+(this may then be wrapped in a list or connection or non-null or similar, if
+the function demands it). This type must be compatible with the derived type;
+currently this means that if the function returns a polymorphic type then
+the named type must either be the polymorphic type itself, or one of its
+implementations.
+
+:::warning
+
+We trust that you will ensure that results from the function conform to the
+type specified; if you break this then Weird Things may occur.
+
+:::
+
 ## @resultFieldName
 
 Applies to:
