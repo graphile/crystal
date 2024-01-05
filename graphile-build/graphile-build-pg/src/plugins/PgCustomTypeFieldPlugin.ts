@@ -607,7 +607,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
         after: ["PgCodecs"],
         callback(_, build) {
           const {
-            graphql: { GraphQLList, GraphQLString },
+            graphql: { GraphQLList, GraphQLString, getNamedType },
             inflection,
             options,
             pgGetArgDetailsFromParameters,
@@ -798,11 +798,14 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           build,
                           resource,
                         );
-                        const returnGraphQLTypeName =
-                          build.getGraphQLTypeNameByPgCodec(
-                            resource.codec.arrayOfCodec ?? resource.codec,
-                            "output",
+                        if (!baseType) {
+                          console.warn(
+                            `Procedure resource ${resource} has a return type, but we couldn't build it; skipping output field`,
                           );
+                          return {};
+                        }
+                        const returnGraphQLTypeName =
+                          getNamedType(baseType).name;
                         const resultFieldName =
                           isVoid || !returnGraphQLTypeName
                             ? null
@@ -810,9 +813,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                                 resource,
                                 returnGraphQLTypeName,
                               });
-                        if (!baseType || !resultFieldName) {
+                        if (!resultFieldName) {
                           console.warn(
-                            `Procedure resource ${resource} has a return type, but we couldn't build it; skipping output field`,
+                            `Procedure resource ${resource} has a return type, but we couldn't figure out what result field name to use; skipping output field`,
                           );
                           return {};
                         }
