@@ -475,14 +475,30 @@ export class PgSelectSingleStep<
     }
   }
 
+  /**
+   * The polymorphism if this is a "regular" (non-aggregate) request over a
+   * single/relational polymorphic codec; otherwise null.
+   */
+  private singleOrRelationalPolyIfRegular() {
+    const poly = (this.resource.codec as PgCodec).polymorphism;
+    if (
+      this.mode !== "aggregate" &&
+      (poly?.mode === "single" || poly?.mode === "relational")
+    ) {
+      return poly;
+    } else {
+      return null;
+    }
+  }
+
   private nonNullAttribute: {
     attribute: PgCodecAttribute;
     attr: string;
   } | null = null;
   private nullCheckAttributeIndex: number | null = null;
   optimize() {
-    const poly = (this.resource.codec as PgCodec).polymorphism;
-    if (poly?.mode === "single" || poly?.mode === "relational") {
+    const poly = this.singleOrRelationalPolyIfRegular();
+    if (poly) {
       const $class = this.getClassStep();
       this.typeStepIndexList = poly.typeAttributes.map((col) => {
         const attr = this.resource.codec.attributes![col];
@@ -545,8 +561,8 @@ export class PgSelectSingleStep<
   }
 
   finalize() {
-    const poly = this.resource.codec.polymorphism;
-    if (poly?.mode === "single" || poly?.mode === "relational") {
+    const poly = this.singleOrRelationalPolyIfRegular();
+    if (poly) {
       this.handlePolymorphism = (val) => {
         if (val == null) return val;
         const typeList = this.typeStepIndexList!.map((i) => val[i]);
