@@ -802,23 +802,15 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                           console.warn(
                             `Procedure resource ${resource} has a return type, but we couldn't build it; skipping output field`,
                           );
-                          return {};
+                          return fields;
                         }
                         const returnGraphQLTypeName =
                           getNamedType(baseType).name;
                         const resultFieldName =
-                          isVoid || !returnGraphQLTypeName
-                            ? null
-                            : inflection.functionMutationResultFieldName({
-                                resource,
-                                returnGraphQLTypeName,
-                              });
-                        if (!resultFieldName) {
-                          console.warn(
-                            `Procedure resource ${resource} has a return type, but we couldn't figure out what result field name to use; skipping output field`,
-                          );
-                          return {};
-                        }
+                          inflection.functionMutationResultFieldName({
+                            resource,
+                            returnGraphQLTypeName,
+                          });
                         const type = resource.isUnique
                           ? baseType
                           : new GraphQLList(
