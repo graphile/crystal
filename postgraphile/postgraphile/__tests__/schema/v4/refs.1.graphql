@@ -84,7 +84,7 @@ input PersonCondition {
 
 type Post implements Node {
   """Reads a single `Person` that is related to this `Post`."""
-  author: Person
+  author: Person!
   id: Int!
 
   """
