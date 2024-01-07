@@ -5,6 +5,8 @@ import type {
   PgResourceExtensions,
 } from "@dataplan/pg";
 import { isDev } from "grafast";
+
+import { PgSmartTagValueOrArray } from "pg-introspection/src/smartComments";
 import { inspect } from "util";
 
 // NOTE: 'behaviour' is the correct spelling in UK English; we try and stick to
@@ -40,14 +42,14 @@ export function getBehavior(
   }
   return behaviors.join(" ");
 
-  function add(
-    rawBehavior: (string | true)[] | string | true | null | undefined,
-  ): void {
-    const behavior =
-      typeof rawBehavior === "string" ? rawBehavior.trim() : rawBehavior;
-    if (!behavior) {
+  function add(rawBehavior?: PgSmartTagValueOrArray): void {
+    if (rawBehavior == null) {
       return;
     }
+
+    const behavior =
+      typeof rawBehavior === "string" ? rawBehavior.trim() : rawBehavior;
+
     if (Array.isArray(behavior)) {
       if (isDev && !behavior.every(isValidBehavior)) {
         throw new Error(
@@ -59,10 +61,12 @@ export function getBehavior(
       behaviors.push(behavior.join(" "));
       return;
     }
+
     if (isValidBehavior(behavior)) {
       behaviors.push(behavior);
       return;
     }
+
     throw new Error(
       `Invalid value for behavior; expected a string or string array using simple alphanumeric strings, but found ${inspect(
         behavior,

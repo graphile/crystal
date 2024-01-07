@@ -1,4 +1,5 @@
 import type { PgRegistry } from "@dataplan/pg";
+import type { PgSmartTagsDict as PgSmartTagsDictIntrospection } from "pg-introspection";
 export { PgAllRowsPlugin } from "./plugins/PgAllRowsPlugin.js";
 export { PgAttributeDeprecationPlugin } from "./plugins/PgAttributeDeprecationPlugin.js";
 export { PgAttributesPlugin } from "./plugins/PgAttributesPlugin.js";
@@ -91,9 +92,7 @@ declare global {
       unionMember: string | string[];
     }
 
-    interface PgSmartTagsDict {
-      [tagName: string]: null | true | string | (string | true)[];
-    }
+    interface PgSmartTagsDict extends PgSmartTagsDictIntrospection {}
 
     interface BuildInput {
       pgRegistry: PgRegistry;
