@@ -29,8 +29,7 @@ And please give some love to our featured sponsors 🤩:
 <td align="center"><a href="https://www.netflix.com/"><img src="https://graphile.org/images/sponsors/Netflix.png" width="90" height="90" alt="Netflix" /><br />Netflix</a> *</td>
 <td align="center"><a href="https://stellate.co/"><img src="https://graphile.org/images/sponsors/Stellate.png" width="90" height="90" alt="Stellate" /><br />Stellate</a> *</td>
 </tr><tr>
-<td align="center"><a href="https://www.accenture.com/"><img src="https://graphile.org/images/sponsors/accenture.svg" width="90" height="90" alt="Accenture" /><br />Accenture</a> *</td>
-<td align="center"><a href="https://microteam.io/"><img src="https://graphile.org/images/sponsors/micro.png" width="90" height="90" alt="We Love Micro" /><br />We Love Micro</a> *</td>
+<td align="center"><a href="https://gosteelhead.com/"><img src="https://graphile.org/images/sponsors/steelhead.svg" width="90" height="90" alt="Steelhead" /><br />Steelhead</a> *</td>
 </tr></table>
 
 <em>\* Sponsors the entire Graphile suite</em>
