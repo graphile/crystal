@@ -516,12 +516,11 @@ const _makeGraphQLHandlerInternal = (
       operationName,
     };
 
-    await hookArgs(args, resolvedPreset, {
-      ...request.requestContext,
-      http: request,
-    });
-
     try {
+      await hookArgs(args, resolvedPreset, {
+        ...request.requestContext,
+        http: request,
+      });
       const result = await grafastExecute(args, resolvedPreset);
       if (isAsyncIterable(result)) {
         return {
