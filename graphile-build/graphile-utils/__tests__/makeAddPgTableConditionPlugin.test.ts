@@ -11,7 +11,7 @@ import { makeV4Preset } from "postgraphile/presets/v4";
 
 import { makeAddPgTableConditionPlugin } from "../src/index.js";
 
-const clean = (data: any) => {
+const clean = (data: any): any => {
   if (Array.isArray(data)) {
     return data.map(clean);
   } else if (data && typeof data === "object") {
