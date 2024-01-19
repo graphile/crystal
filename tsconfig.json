@@ -49,7 +49,7 @@
     { "path": "grafast/grafast" },
     { "path": "utils/graphile-export" },
     { "path": "utils/graphile-config" },
-    { "path": "graphile-build/graphile-utils" },
+    { "path": "graphile-build/graphile-utils/tsconfig.build.json" },
     { "path": "grafast/dataplan-pg" },
     { "path": "utils/pg-introspection" },
     { "path": "utils/graphile" },

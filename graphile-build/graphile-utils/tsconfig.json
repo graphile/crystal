@@ -1,14 +1,12 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "rootDir": "src",
-    "declarationDir": "./dist",
-    "outDir": "./dist",
-    "moduleResolution": "nodenext"
+    "rootDir": ".",
+    "declarationDir": ".",
+    "outDir": ".",
+    "noEmit": true,
+    "moduleResolution": "nodenext",
+    "module": "nodenext"
   },
-  "include": ["src"],
-  "references": [
-    { "path": "../../utils/graphile-config" },
-    { "path": "../../grafast/grafast" }
-  ]
+  "include": ["."]
 }

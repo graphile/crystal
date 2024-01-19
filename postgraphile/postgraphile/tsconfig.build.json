@@ -17,6 +17,6 @@
     { "path": "../../grafast/ruru/tsconfig.build.json" },
     { "path": "../../grafast/grafserv-persisted" },
     { "path": "../../utils/graphile-config" },
-    { "path": "../../graphile-build/graphile-utils" }
+    { "path": "../../graphile-build/graphile-utils/tsconfig.build.json" }
   ]
 }
