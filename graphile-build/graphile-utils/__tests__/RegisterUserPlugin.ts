@@ -1,14 +1,15 @@
 import { withPgClient } from "@dataplan/pg";
 import {
-  ObjectStep,
-  constant,
-  object,
-  ExecutableStep,
   access,
-  polymorphicBranch,
+  constant,
+  ExecutableStep,
   list,
+  object,
+  ObjectStep,
+  polymorphicBranch,
 } from "grafast";
 import { DatabaseError } from "pg";
+
 import { gql, makeExtendSchemaPlugin } from "../src/index.js";
 
 // Changes to this file should be reflected in `postgraphile/website/postgraphile/make-extend-schema-plugin.md`
@@ -114,9 +115,13 @@ export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
               },
               // In this case, we can just return the object itself as the step
               // representing this polymorphic branch.
-              plan($obj) {
-                return $obj;
-              },
+              plan: EXPORTABLE(
+                () =>
+                  function plan($obj) {
+                    return $obj;
+                  },
+                [],
+              ),
             },
             EmailAddressConflict: {
               // If `match` is not specified, it defaults to checking
@@ -129,10 +134,14 @@ export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
               },
               // In this case, we need to get the record from the database
               // associated with the given user id.
-              plan($obj) {
-                const $id = access($obj, "id");
-                return users.get({ id: $id });
-              },
+              plan: EXPORTABLE(
+                (access, users) =>
+                  function plan($obj) {
+                    const $id = access($obj, "id");
+                    return users.get({ id: $id });
+                  },
+                [access, users],
+              ),
             },
           });
         },

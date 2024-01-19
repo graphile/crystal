@@ -1,12 +1,12 @@
+import { makePgService } from "@dataplan/pg/adaptors/pg";
 import { grafast } from "grafast";
 import { makeSchema } from "graphile-build";
-import { makePgService } from "@dataplan/pg/adaptors/pg";
 import type { Pool } from "pg";
 import pg from "pg";
-
-import { RegisterUserPlugin } from "./RegisterUserPlugin.js";
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
+
+import { RegisterUserPlugin } from "./RegisterUserPlugin.js";
 
 let pgPool: Pool | null = null;
 
