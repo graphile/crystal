@@ -11,6 +11,7 @@
   text-transform: uppercase;
   max-width: 100%;
   margin-left: 1rem;
+  border: 1px solid var(--ifm-color-primary);
 }
 
 .borderbutton:hover {
@@ -23,6 +24,7 @@
   composes: buttonHero from "@site/src/css/common.module.css";
   text-transform: uppercase;
   max-width: 100%;
+  border: 1px solid var(--ifm-color-primary);
 }
 
 .sponsorbutton:before {
@@ -44,9 +46,13 @@
 }
 
 [data-theme="dark"] .sponsorbutton:hover {
-  color: var(--ifm-color-primary-darker);
-  border: 1px solid var(--ifm-color-primary-darker);
-  background-color: var(--ifm-color-primary-darkest);
+  border: 1px solid var(--ifm-color-primary-lightest);
+  background-color: var(--ifm-color-primary-lightest);
+}
+
+[data-theme="dark"] .borderbutton:hover {
+  border: 1px solid var(--ifm-color-primary-lightest);
+  color: var(--ifm-color-lightest);
 }
 
 @media screen and (max-width: 995px) {
