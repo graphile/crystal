@@ -48,7 +48,9 @@ export type FieldPlans =
  * The plans/config for each field of a GraphQL object type.
  */
 export type ObjectPlans = {
-  __Step?: { new (...args: any[]): ExecutableStep };
+  __assertStep?:
+    | ((step: ExecutableStep) => asserts step is ExecutableStep)
+    | { new (...args: any[]): ExecutableStep };
 } & {
   [fieldName: string]: FieldPlans;
 };
@@ -142,6 +144,10 @@ export function makeGrafastSchema(details: {
             type.extensions as graphql.GraphQLObjectTypeExtensions<any, any>
           ).grafast = { assertStep: fieldSpec as any };
           continue;
+        } else if (fieldName.startsWith("__")) {
+          throw new Error(
+            `Unsupported field name '${fieldName}'; perhaps you meant '__assertStep'?`,
+          );
         }
 
         const field = fields[fieldName];
