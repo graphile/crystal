@@ -1,4 +1,4 @@
-import type { FieldPlanResolver } from "grafast";
+import type { ExecutableStep, FieldPlanResolver } from "grafast";
 import type {
   DefinitionNode,
   DirectiveDefinitionNode,
@@ -24,6 +24,7 @@ import type {
   GraphQLIsTypeOfFn,
   GraphQLNamedType,
   GraphQLObjectType,
+  GraphQLObjectTypeExtensions,
   GraphQLOutputType,
   GraphQLScalarType,
   GraphQLScalarTypeConfig,
@@ -69,11 +70,15 @@ export interface ObjectResolver<TSource = any, TContext = any> {
     | ObjectFieldConfig<TSource, TContext>;
 }
 
-export interface ObjectPlan<TSource = any, TContext = any> {
+export type ObjectPlan<TSource = any, TContext = any> = {
+  __assertStep?:
+    | ((step: ExecutableStep) => asserts step is ExecutableStep)
+    | { new (...args: any[]): ExecutableStep };
+} & {
   [key: string]:
     | FieldPlanResolver<any, any, any>
     | ObjectFieldConfig<TSource, TContext>;
-}
+};
 
 export interface EnumResolver {
   [key: string]: string | number | Array<any> | Record<string, any> | symbol;
@@ -410,6 +415,15 @@ export function makeExtendSchemaPlugin(
                   ...(description
                     ? {
                         description,
+                      }
+                    : null),
+                  ...(plans?.[name]?.__assertStep
+                    ? {
+                        extensions: {
+                          grafast: {
+                            assertStep: plans[name].__assertStep as any,
+                          },
+                        } as GraphQLObjectTypeExtensions<any, any>,
                       }
                     : null),
                 }),

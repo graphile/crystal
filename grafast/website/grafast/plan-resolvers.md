@@ -76,6 +76,144 @@ with a `$`.
 Of course the actual body of the plan resolver function will vary based on your
 own application's needs.
 
+## Specifying a field plan resolver
+
+When building a GraphQL schema programatically, plan resolvers are stored into
+`extensions.grafast.plan` of the field; for example:
+
+```ts {9-15}
+import { GraphQLSchema, GraphQLObjectType, GraphQLInt } from "graphql";
+import { constant } from "grafast";
+
+const Query = new GraphQLObjectType({
+  name: "Query",
+  fields: {
+    meaningOfLife: {
+      type: GraphQLInt,
+      extensions: {
+        grafast: {
+          plan() {
+            return constant(42);
+          },
+        },
+      },
+    },
+  },
+});
+
+export const schema = new GraphQLSchema({
+  query: Query,
+});
+```
+
+If you are using `makeGrafastSchema` then the field plan resolver for the field
+`fieldName` on the object type `typeName` would be indicated via the
+`plans[typeName][fieldName]` property:
+
+```ts {11-13}
+import { makeGrafastSchema, constant } from "grafast";
+
+export const schema = makeGrafastSchema({
+  typeDefs: /* GraphQL */ `
+    type Query {
+      meaningOfLife: Int
+    }
+  `,
+  plans: {
+    Query: {
+      meaningOfLife() {
+        return constant(42);
+      },
+    },
+  },
+});
+```
+
+### Asserting an object type's step
+
+Object types in Gra*fast* can indicate that they must be represented by a
+particular step or set of steps to guarantee that the methods on those steps
+are available to the field plan resolvers; this can help to catch bugs early.
+
+This indication takes one of two forms, either it's explicitly the step class
+itself, or it's an assertion function that checks that the incoming step is of
+an appropriate type and throws an error otherwise.
+
+When defining a schema programatically, `assertStep` is defined via
+`objectTypeConfig.extensions.grafast.assertStep`, for example:
+
+```ts {8-14}
+import { GraphQLObjectType } from "graphql";
+import { ObjectStep } from "grafast";
+
+const MyObject = new GraphQLObjectType({
+  name: "MyObject",
+  extensions: {
+    grafast: {
+      assertStep: ObjectStep,
+      /* Or:
+        assertStep($step) {
+          if ($step instanceof ObjectStep) return;
+          throw new Error(`Type 'MyObject' expects a step of type ObjectStep; instead received a step of type '${$step.constructor.name}'`);
+        }
+       */
+    },
+  },
+  fields: {
+    a: {
+      extensions: {
+        grafast: {
+          plan($obj: ObjectStep) {
+            return $obj.get("a");
+          },
+        },
+      },
+    },
+  },
+});
+```
+
+When defined via `makeGrafastSchema` we cannot call the property `assertStep`
+directly as it might conflict with a field name, so instead we use
+`__assertStep`, knowing that GraphQL forbids fields to start with `__` (two
+underscores) since those names are reserved for introspection:
+
+```ts {11-17}
+import { makeGrafastSchema, ObjectStep } from "grafast";
+
+const schema = makeGrafastSchema({
+  typeDefs: /* GraphQL */ `
+    type MyObject {
+      a: Int
+    }
+  `,
+  plans: {
+    MyObject: {
+      __assertStep: ObjectStep,
+      /* Or:
+        __assertStep($step) {
+          if ($step instanceof ObjectStep) return;
+          throw new Error(`Type 'MyObject' expects a step of type ObjectStep; instead received a step of type '${$step.constructor.name}'`);
+        }
+       */
+      a($obj: ObjectStep) {
+        return $obj.get("a");
+      },
+    },
+  },
+});
+```
+
+:::tip
+
+Generally adding a step assertion is optional; however when there's a union or
+interface type all types within it must agree whether a step is expected or
+not. If you want to require steps everywhere but you don't care for a particular
+type what the step actually is, you can use `__assertStep: ExecutableStep` or
+`__assertStep: () => true`.
+
+:::
+
 ## Argument and input field plan resolvers
 
 :::tip
@@ -86,7 +224,7 @@ on these behaviors if present.
 
 :::
 
-In addition to field plan resolvers, Grafast allows you to attach an `inputPlan`
+In addition to field plan resolvers, Gra*fast* allows you to attach an `inputPlan`
 and/or an `applyPlan` to individual arguments or to input fields on input
 objects. These plan resolvers work a little differently.
 

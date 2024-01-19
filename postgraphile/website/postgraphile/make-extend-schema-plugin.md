@@ -158,6 +158,62 @@ const typeDefs = gql`
 
 -->
 
+## "Special" fields
+
+In GraphQL, it is forbidden to name any fields beginning with `__` (two
+underscores) since that is reserved for introspection. We therefore use this
+prefix to provide additional details to types. What additional information is
+relevant depends on the type:
+
+### Object types
+
+Object types in Gra*fast* can [indicate that they must be represented by a
+particular
+step](https://grafast.org/grafast/plan-resolvers#asserting-an-object-types-step)
+or one of a set of steps; this can help to catch bugs early. For example, in
+PostGraphile a database table resource should be represented by a
+`pgSelectSingle` or similar class; representing it with `object({id: 1})` or
+similar would mean the step doesn't have the expected helper methods and
+downstream fields may fail to plan because their expectations are broken.
+
+Object types' `plans` entries may define an `__assertStep` property to indicate
+the type of step the object type's fields' resolvers will be expecting; this is
+equivalent to `typeConfig.extensions.grafast.assertStep` when defining a object
+type programatically.
+
+The value for `__assertStep` can either be a step class itself (e.g.
+`PgSelectSingleStep`) or
+it can be an "assertion function" that throws an error if the passed step is
+not of the right type, e.g.:
+
+```ts
+import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
+
+const schema = makeExtendSchemaPlugin({
+  typeDefs: gql`
+    type MyObject {
+      id: Int
+    }
+  `,
+  plans: {
+    MyObject: {
+      assertStep($step) {
+        if ($step instanceof PgSelectSingleStep) return true;
+        if ($step instanceof PgInsertSingleStep) return true;
+        if ($step instanceof PgUpdateSingleStep) return true;
+        throw new Error(
+          `Type 'User' expects a step of type PgSelectSingleStep, PgInsertSingleStep ` +
+            `or PgUpdateSingleStep; but found step of type '${$step.constructor.name}'.`,
+        );
+      },
+      a($obj: PgSelectSingleStep | PgInsertSingleStep | PgUpdateSingleStep) {
+        return $obj.get("id");
+      },
+    },
+  },
+});
+```
+
 ## Querying the database
 
 You should read [the Gra*fast* introduction](https://grafast.org/grafast/) and
@@ -190,7 +246,7 @@ expecting, but you have a lot of freedom within your plan resolver as to how to
 achieve that.
 
 One common desire is to access the data in the GraphQL context. You can access
-this in Grafast using the `context()` step; for example, you may have stored
+this in Gra*fast* using the `context()` step; for example, you may have stored
 the current user's ID on the GraphQL context via the `userId` property, to
 retrieve these you might do this in your plan resolver function:
 
