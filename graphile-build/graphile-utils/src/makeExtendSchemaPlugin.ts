@@ -14,7 +14,6 @@ import type {
   // Config:
   GraphQLEnumValueConfigMap,
   GraphQLFieldConfigMap,
-  GraphQLObjectTypeExtensions,
   // Resolvers:
   GraphQLFieldResolver,
   GraphQLInputFieldConfigMap,
@@ -25,6 +24,7 @@ import type {
   GraphQLIsTypeOfFn,
   GraphQLNamedType,
   GraphQLObjectType,
+  GraphQLObjectTypeExtensions,
   GraphQLOutputType,
   GraphQLScalarType,
   GraphQLScalarTypeConfig,
