@@ -5,7 +5,15 @@ import { constant, makeGrafastSchema } from "grafast";
 
 import { grafserv } from "../src/servers/node/index.js";
 
-export async function makeExampleServer() {
+export async function makeExampleServer(
+  preset: GraphileConfig.Preset = {
+    grafserv: {
+      graphqlOverGET: true,
+      graphqlPath: "/graphql",
+      dangerouslyAllowAllCORSRequests: true,
+    },
+  },
+) {
   const schema = makeGrafastSchema({
     typeDefs: /* GraphQL */ `
       type Query {
@@ -21,13 +29,6 @@ export async function makeExampleServer() {
     },
   });
 
-  const preset = {
-    grafserv: {
-      graphqlOverGET: true,
-      graphqlPath: "/graphql",
-      dangerouslyAllowAllCORSRequests: true,
-    },
-  }; /*satisfies GraphileConfig.Preset*/
   const serv = grafserv({ schema, preset });
   const server = createServer(serv.createHandler());
   const promise = new Promise<void>((resolve, reject) => {
