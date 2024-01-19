@@ -227,6 +227,7 @@ module.exports = {
         "**/vendor/**/__testUtils__/**/*.ts",
         "**/vendor/**/__testUtils__/**/*.tsx",
         "**/website/examples/**",
+        "graphile-build/graphile-utils/__tests__/*Plugin.ts",
       ],
       rules: {
         "graphile-export/exhaustive-deps": 0,
