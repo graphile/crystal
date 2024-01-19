@@ -729,6 +729,180 @@ const DeleteItemByNodeIdPlugin = makeExtendSchemaPlugin((build) => {
 });
 ```
 
+## Polymorphism mutation example
+
+This is a full example of adding a custom `registerUser` mutation whose payload
+contains a union of a successful result or two expected error types. It uses a
+transaction to perform the mutation, and catches errors that happen in that
+transaction (in which case the transaction will be rolled back) and if they are
+the known, supported, errors then it will return the given error type. It uses
+the `polymorphicBranch` logic to determine which of the event occurred, and
+thus which type to return.
+
+```ts
+import { withPgClient } from "@dataplan/pg";
+import { gql, makeExtendSchemaPlugin } from "graphile-utils";
+import {
+  ObjectStep,
+  constant,
+  object,
+  ExecutableStep,
+  access,
+  polymorphicBranch,
+  list,
+} from "postgraphile/grafast";
+import { DatabaseError } from "pg";
+
+export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
+  const { users } = build.input.pgRegistry.pgResources;
+  const { executor } = users;
+  return {
+    typeDefs: gql`
+      extend type Mutation {
+        registerUser(input: RegisterUserInput!): RegisterUserPayload
+      }
+
+      input RegisterUserInput {
+        username: String!
+        email: String!
+      }
+
+      type RegisterUserPayload {
+        result: RegisterUserResult
+        query: Query
+      }
+
+      union RegisterUserResult = User | UsernameConflict | EmailAddressConflict
+
+      type UsernameConflict {
+        message: String!
+        username: String!
+      }
+
+      type EmailAddressConflict {
+        message: String!
+        email: String!
+      }
+    `,
+    plans: {
+      Mutation: {
+        registerUser(_, { $input: { $username, $email } }) {
+          const $result = withPgClient(
+            executor,
+            list([$username, $email]),
+            async (pgClient, [username, email]) => {
+              try {
+                return await pgClient.withTransaction(async (pgClient) => {
+                  const {
+                    rows: [user],
+                  } = await pgClient.query<{
+                    id: string;
+                    username: string;
+                  }>({
+                    text: `
+                      insert into app_public.users (username)
+                      values ($1)
+                      returning *`,
+                    values: [username],
+                  });
+
+                  await pgClient.query({
+                    text: `
+                      insert into app_public.user_emails(user_id, email)
+                      values ($1, $2)`,
+                    values: [user.id, email],
+                  });
+
+                  await sendEmail(email, "Welcome!");
+
+                  return { id: user.id };
+                });
+              } catch (e) {
+                if (e instanceof DatabaseError && e.code === "23505") {
+                  if (e.constraint === "unique_user_username") {
+                    return {
+                      __typename: "UsernameConflict",
+                      message: `The username '${username}' is already in use`,
+                      username,
+                    };
+                  } else if (e.constraint === "unique_user_email") {
+                    return {
+                      __typename: "EmailAddressConflict",
+                      message: `The email address '${email}' is already in use`,
+                      email,
+                    };
+                  }
+                }
+                throw e;
+              }
+            },
+          );
+
+          return object({ result: $result });
+        },
+      },
+
+      RegisterUserPayload: {
+        __assertStep: ObjectStep,
+        result($data: ObjectStep) {
+          const $result = $data.get("result");
+          return polymorphicBranch($result, {
+            UsernameConflict: {
+              // This is a `UsernameConflict` if the object has a `__typename` property.
+              match(obj) {
+                return obj.__typename === "UsernameConflict";
+              },
+              // In this case, we can just return the object itself as the step
+              // representing this polymorphic branch.
+              plan($obj) {
+                return $obj;
+              },
+            },
+            EmailAddressConflict: {
+              // If `match` is not specified, it defaults to checking
+              // `obj.__typename === 'EmailAddressConfict'`.
+              // If `plan` is not specified, it defaults to `($obj) => $obj`.
+            },
+            User: {
+              match(obj) {
+                return obj.id != null;
+              },
+              // In this case, we need to get the record from the database
+              // associated with the given user id.
+              plan($obj) {
+                const $id = access($obj, "id");
+                return users.get({ id: $id });
+              },
+            },
+          });
+        },
+        query() {
+          // The `Query` type just needs any truthy value.
+          return constant(true);
+        },
+      },
+
+      UsernameConflict: {
+        // Since User expects a step, our types must also expect a step. We
+        // don't care what the step is though.
+        __assertStep: ExecutableStep,
+      },
+      EmailAddressConflict: {
+        __assertStep: ExecutableStep,
+      },
+    },
+  };
+});
+
+async function sendEmail(email: string, message: string) {
+  /*
+    Write your email-sending logic here. Note that we recommend you enqueue a
+    job to send the email rather than sending it directly; if you don't already
+    have a job queue then check out https://worker.graphile.org
+  */
+}
+```
+
 ## Plugin SQL Privileges
 
 Plugins access the database with the same privileges as everything else - they

@@ -68,7 +68,7 @@ const getSchema = async (nullsSortMethod?: NullsSortMethod) => {
         appendPlugins: [makePetsPlugin(nullsSortMethod)],
       }),
     ],
-    pgServices: [makePgService({ pool: pgPool, schemas: ["graphile_utils"] })],
+    pgServices: [makePgService({ pool: pgPool!, schemas: ["graphile_utils"] })],
   });
 
   return schemaResult;
