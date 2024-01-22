@@ -6,25 +6,27 @@
 }
 
 .borderbutton {
-  composes: buttonHero from "@site/src/css/common.module.css";
+  composes: comicFont from from "@site/src/css/common.module.css";
+  font-size: 1.5rem;
   color: var(--ifm-color-primary);
-  text-transform: uppercase;
   max-width: 100%;
   margin-left: 1rem;
   border: 1px solid var(--ifm-color-primary);
+  border-radius: 7px;
 }
 
 .borderbutton:hover {
   border-radius: 7px;
-  border: 1px solid var(--ifm-color-primary-dark);
-  color: var(--ifm-color-primary-dark);
+  border: 1px solid var(--ifm-color-primary-darkest);
+  color: var(--ifm-color-primary-darkest);
 }
 
 .sponsorbutton {
-  composes: buttonHero from "@site/src/css/common.module.css";
-  text-transform: uppercase;
+  composes: comicFont from from "@site/src/css/common.module.css";
+  font-size: 1.5rem;
   max-width: 100%;
   border: 1px solid var(--ifm-color-primary);
+  border-radius: 7px;
 }
 
 .sponsorbutton:before {
@@ -36,8 +38,8 @@
 }
 
 .sponsorbutton:hover {
-  background-color: var(--ifm-color-primary-darker);
-  border: 1px solid var(--ifm-color-primary-darker);
+  background-color: var(--ifm-color-primary-darkest);
+  border: 1px solid var(--ifm-color-primary-darkest);
 }
 
 [data-theme="dark"] .sponsorbutton {

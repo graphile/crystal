@@ -24,33 +24,14 @@
 }
 
 .comicFont {
-  font-family: "Sriracha", "Comic Sans MS", "Comic Sans", sans;
-  text-transform: uppercase;
-  font-weight: bold;
-  font-style: italic;
+  composes: comicFont from "@site/src/css/common.module.css";
 }
 
 .instruction {
-  composes: comicFont;
-  display: inline-block;
-  border: 5px solid var(--black-ish);
-  background: #a3f9a8;
-  box-shadow: 0.5rem 0.5rem 0px var(--black-ish);
-  margin: 1rem 0;
-  padding: 0.25rem 0.75rem 0.25rem 0.5rem;
-}
-
-.instruction {
-  font-size: 1.5rem;
-  line-height: 100%;
-}
-
-[data-theme="dark"] .instruction {
-  background: #008a00;
-  color: white;
-  box-shadow: 0.5rem 0.5rem 0px white;
+  composes: instruction from "@site/src/css/common.module.css";
 }
 
 [data-theme="dark"] .featuresContainer {
-  background-color: var(--black-ish);
+  /*background-color: var(--black-ish);*/
+  background-color: var(--grafast-color-purple);
 }

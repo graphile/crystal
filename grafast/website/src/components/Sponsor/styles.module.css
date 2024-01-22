@@ -15,18 +15,16 @@
 }
 
 .featured {
-  border: 3px solid var(--ifm-color-primary-dark);
+  border: 3px solid var(--ifm-color-primary-darkest);
   background: white;
   border-radius: 12px;
 }
 
 .name {
-  color: var(--ifm-color-primary-darker);
+  color: var(--black-ish);
   text-align: center;
-}
-
-[data-theme="dark"] .name {
-  color: var(--ifm-color-primary-darkest);
+  font-family: "Sriracha", "Comic Sans MS", "Comic Sans", sans;
+  text-transform: uppercase;
 }
 
 .backers {
@@ -34,7 +32,7 @@
 }
 
 .backers .name:hover {
-  color: var(--ifm-color-primary-darker);
+  color: var(--ifm-color-primary-dark);
 }
 
 [data-theme="dark"] .backers .name {

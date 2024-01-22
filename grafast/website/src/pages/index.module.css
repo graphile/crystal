@@ -1,5 +1,10 @@
 :root {
   --black-ish: #1b1c3e;
+  --grafast-color-blue: #009eff;
+  --grafast-color-caption: #a3f9a8;
+  --grafast-color-pink: #e535ab;
+  --grafast-color-purple: #6c4495;
+  --grafast-color-yellow: #fcd120;
   --access-text-size: 3.5rem;
   --access-text-width: 30rem;
   --access-text-offset: 0.2rem;
@@ -50,6 +55,10 @@
   justify-content: right;
 }
 
+[data-theme="dark"] .heroBanner {
+  color: white;
+}
+
 @media screen and (max-width: 996px) {
   .heroBanner {
     padding: 2rem;
@@ -90,11 +99,6 @@
   margin: 1rem 0;
 }
 
-[data-theme="dark"] .subscribe {
-  box-shadow: 0.5rem 0.5rem 0px white;
-  background: var(--black-ish);
-}
-
 .subscribe input[type="email"] {
   outline: 0;
   border: 0;
@@ -105,7 +109,8 @@
 }
 
 [data-theme="dark"] .subscribe input[type="email"] {
-  background: var(--black-ish);
+  color: var(--black-ish);
+  background: white;
 }
 
 .subscribe input[type="submit"] {
@@ -123,7 +128,7 @@
   padding: 0.25rem 0.75rem 0.25rem 0.5rem;
 }
 .instruction {
-  composes: instruction from "../components/HomepageFeatures/styles.module.css";
+  composes: instruction from "@site/src/css/common.module.css";
 }
 .heroSubtitle {
   font-size: 1.3em;
