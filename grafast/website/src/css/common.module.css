@@ -37,8 +37,8 @@
 }
 
 [data-theme="dark"] .instructionSponsor {
-  box-shadow: none;
-  border: none;
+  box-shadow: 0.5rem 0.5rem 0px rgba(255, 255, 255, 0);
+  border: 5px solid rgba(255, 255, 255, 0);
   background: inherit;
   color: var(--ifm-color-primary);
 }
