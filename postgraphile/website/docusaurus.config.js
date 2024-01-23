@@ -151,12 +151,7 @@ const config = {
             position: "right",
           },
           {
-            to: "https://www.graphile.org/support/",
-            label: "Support",
-            position: "right",
-          },
-          {
-            to: "https://www.graphile.org/sponsor/",
+            to: "sponsor",
             label: "Sponsor",
             position: "right",
           },
@@ -172,6 +167,11 @@ const config = {
             docsPluginId: "examples",
             position: "left",
             label: "Example Gallery",
+          },
+          {
+            href: "https://www.graphile.org/support/",
+            label: "Support",
+            position: "right",
           },
           {
             href: `https://github.com/${organizationName}/${projectName}`,
