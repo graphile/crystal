@@ -196,6 +196,11 @@ const config = {
             position: "left",
           },
           {
+            to: "sponsor",
+            label: "Sponsor",
+            position: "right",
+          },
+          {
             to: "news",
             label: "News",
             position: "right",
