@@ -21,6 +21,11 @@
   color: var(--ifm-color-primary-darkest);
 }
 
+[data-theme="dark"] .borderbutton {
+  border: 1px solid var(--grafast-color-pink);
+  color: var(--grafast-color-pink);
+}
+
 .sponsorbutton {
   composes: comicFont from from "@site/src/css/common.module.css";
   font-size: 1.5rem;
@@ -43,13 +48,15 @@
 }
 
 [data-theme="dark"] .sponsorbutton {
-  border: 1px solid var(--ifm-color-primary);
-  background-color: var(--ifm-color-primary);
+  border: 1px solid var(--grafast-color-purple);
+  background-color: var(--grafast-color-purple);
+  color: white;
 }
 
 [data-theme="dark"] .sponsorbutton:hover {
   border: 1px solid var(--ifm-color-primary-lightest);
-  background-color: var(--ifm-color-primary-lightest);
+  background-color: var(--ifm-color-primary-dark);
+  color: white;
 }
 
 [data-theme="dark"] .borderbutton:hover {

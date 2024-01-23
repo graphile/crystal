@@ -12,6 +12,14 @@
 
 .instruction {
   composes: comicFont;
+}
+
+.instructionSponsor {
+  composes: comicFont;
+}
+
+.instruction,
+.instructionSponsor {
   display: inline-block;
   border: 5px solid var(--black-ish);
   background: #a3f9a8;
@@ -19,9 +27,6 @@
   margin: 1rem 0;
   padding: 0.25rem 0.75rem 0.25rem 0.5rem;
   color: var(--black-ish);
-}
-
-.instruction {
   font-size: 1.5rem;
   line-height: 100%;
 }
@@ -29,4 +34,11 @@
 [data-theme="dark"] .instruction {
   background: #008a00;
   color: white;
+}
+
+[data-theme="dark"] .instructionSponsor {
+  box-shadow: none;
+  border: none;
+  background: inherit;
+  color: var(--ifm-color-primary);
 }
