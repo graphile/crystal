@@ -1,5 +1,20 @@
 # @dataplan/pg
 
+## 0.0.1-beta.15
+
+### Patch Changes
+
+- [#1895](https://github.com/graphile/crystal/pull/1895)
+  [`555a2be03`](https://github.com/graphile/crystal/commit/555a2be037f49bd599abbaafe6e5d5ab190c96d6)
+  Thanks [@enisdenjo](https://github.com/enisdenjo)! - Fix issue with aggregates
+  for polymorphic connections.
+
+- Updated dependencies
+  [[`a2176ea32`](https://github.com/graphile/crystal/commit/a2176ea324db0801249661b30e9c9d314c6fb159),
+  [`886833e2e`](https://github.com/graphile/crystal/commit/886833e2e319f23d905d7184ca88fca701b94044)]:
+  - grafast@0.1.1-beta.4
+  - @dataplan/json@0.0.1-beta.13
+
 ## 0.0.1-beta.14
 
 ### Patch Changes

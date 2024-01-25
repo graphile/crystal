@@ -1,5 +1,38 @@
 # graphile-utils
 
+## 5.0.0-beta.18
+
+### Patch Changes
+
+- [#1916](https://github.com/graphile/crystal/pull/1916)
+  [`a2176ea32`](https://github.com/graphile/crystal/commit/a2176ea324db0801249661b30e9c9d314c6fb159)
+  Thanks [@benjie](https://github.com/benjie)! - Add `__assertStep` registration
+  support to makeGrafastSchema and PostGraphile's makeExtendSchemaPlugin.
+
+- [#1917](https://github.com/graphile/crystal/pull/1917)
+  [`886833e2e`](https://github.com/graphile/crystal/commit/886833e2e319f23d905d7184ca88fca701b94044)
+  Thanks [@benjie](https://github.com/benjie)! - Add `polymorphicBranch` step to
+  core to help users deal with simple polymorphic use cases.
+
+- [#1920](https://github.com/graphile/crystal/pull/1920)
+  [`635af159f`](https://github.com/graphile/crystal/commit/635af159fd412171030dbaee3a82b661c516a9f8)
+  Thanks [@benjie](https://github.com/benjie)! - Add ability to set (and infer)
+  scopes to makeExtendSchemaPlugin
+
+- Updated dependencies
+  [[`555a2be03`](https://github.com/graphile/crystal/commit/555a2be037f49bd599abbaafe6e5d5ab190c96d6),
+  [`1b6c2f636`](https://github.com/graphile/crystal/commit/1b6c2f6360a316a8dc550c60e28c61deea538f19),
+  [`a2176ea32`](https://github.com/graphile/crystal/commit/a2176ea324db0801249661b30e9c9d314c6fb159),
+  [`886833e2e`](https://github.com/graphile/crystal/commit/886833e2e319f23d905d7184ca88fca701b94044),
+  [`5b2db0c75`](https://github.com/graphile/crystal/commit/5b2db0c7586182523015f8f79fa4d43f98679c1e),
+  [`184773382`](https://github.com/graphile/crystal/commit/184773382f074a3b5339e4cfabec55173cd4f1e1),
+  [`f97d7976a`](https://github.com/graphile/crystal/commit/f97d7976a683a1e2cb0fed1ce0e30aeff8cc1886)]:
+  - @dataplan/pg@0.0.1-beta.15
+  - tamedevil@0.0.0-beta.4
+  - grafast@0.1.1-beta.4
+  - graphile-build-pg@5.0.0-beta.18
+  - graphile-build@5.0.0-beta.14
+
 ## 5.0.0-beta.17
 
 ### Patch Changes

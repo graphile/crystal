@@ -1,5 +1,18 @@
 # graphile-build
 
+## 5.0.0-beta.14
+
+### Patch Changes
+
+- [#1901](https://github.com/graphile/crystal/pull/1901)
+  [`f97d7976a`](https://github.com/graphile/crystal/commit/f97d7976a683a1e2cb0fed1ce0e30aeff8cc1886)
+  Thanks [@benjie](https://github.com/benjie)! - Loosens step assertion from
+  Query type so it can be served from `constant(true)`.
+- Updated dependencies
+  [[`a2176ea32`](https://github.com/graphile/crystal/commit/a2176ea324db0801249661b30e9c9d314c6fb159),
+  [`886833e2e`](https://github.com/graphile/crystal/commit/886833e2e319f23d905d7184ca88fca701b94044)]:
+  - grafast@0.1.1-beta.4
+
 ## 5.0.0-beta.13
 
 ### Patch Changes

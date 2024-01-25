@@ -1,5 +1,20 @@
 # grafserv
 
+## 0.1.1-beta.6
+
+### Patch Changes
+
+- [#1903](https://github.com/graphile/crystal/pull/1903)
+  [`de7add402`](https://github.com/graphile/crystal/commit/de7add402bd4a45c8782fce69bf210635360cbe8)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug where stack traces are
+  added to masked errors
+
+- Updated dependencies
+  [[`a2176ea32`](https://github.com/graphile/crystal/commit/a2176ea324db0801249661b30e9c9d314c6fb159),
+  [`886833e2e`](https://github.com/graphile/crystal/commit/886833e2e319f23d905d7184ca88fca701b94044)]:
+  - grafast@0.1.1-beta.4
+  - ruru@2.0.0-beta.10
+
 ## 0.1.1-beta.5
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # ruru-components
 
+## 2.0.0-beta.12
+
+### Patch Changes
+
+- Updated dependencies
+  [[`1b6c2f636`](https://github.com/graphile/crystal/commit/1b6c2f6360a316a8dc550c60e28c61deea538f19),
+  [`a2176ea32`](https://github.com/graphile/crystal/commit/a2176ea324db0801249661b30e9c9d314c6fb159),
+  [`886833e2e`](https://github.com/graphile/crystal/commit/886833e2e319f23d905d7184ca88fca701b94044)]:
+  - tamedevil@0.0.0-beta.4
+  - grafast@0.1.1-beta.4
+
 ## 2.0.0-beta.11
 
 ### Patch Changes

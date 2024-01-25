@@ -1,5 +1,14 @@
 # tamedevil
 
+## 0.0.0-beta.4
+
+### Patch Changes
+
+- [#1902](https://github.com/graphile/crystal/pull/1902)
+  [`1b6c2f636`](https://github.com/graphile/crystal/commit/1b6c2f6360a316a8dc550c60e28c61deea538f19)
+  Thanks [@benjie](https://github.com/benjie)! - Forbid `__proto__` set even
+  when `--disable-proto=delete` option is in use.
+
 ## 0.0.0-beta.3
 
 ### Patch Changes

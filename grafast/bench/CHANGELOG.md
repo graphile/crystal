@@ -1,5 +1,14 @@
 # @localrepo/grafast-bench
 
+## 0.0.1-beta.13
+
+### Patch Changes
+
+- Updated dependencies
+  [[`a2176ea32`](https://github.com/graphile/crystal/commit/a2176ea324db0801249661b30e9c9d314c6fb159),
+  [`886833e2e`](https://github.com/graphile/crystal/commit/886833e2e319f23d905d7184ca88fca701b94044)]:
+  - grafast@0.1.1-beta.4
+
 ## 0.0.1-beta.12
 
 ### Patch Changes

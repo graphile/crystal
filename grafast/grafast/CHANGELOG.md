@@ -1,5 +1,22 @@
 # grafast
 
+## 0.1.1-beta.4
+
+### Patch Changes
+
+- [#1916](https://github.com/graphile/crystal/pull/1916)
+  [`a2176ea32`](https://github.com/graphile/crystal/commit/a2176ea324db0801249661b30e9c9d314c6fb159)
+  Thanks [@benjie](https://github.com/benjie)! - Add `__assertStep` registration
+  support to makeGrafastSchema and PostGraphile's makeExtendSchemaPlugin.
+
+- [#1917](https://github.com/graphile/crystal/pull/1917)
+  [`886833e2e`](https://github.com/graphile/crystal/commit/886833e2e319f23d905d7184ca88fca701b94044)
+  Thanks [@benjie](https://github.com/benjie)! - Add `polymorphicBranch` step to
+  core to help users deal with simple polymorphic use cases.
+- Updated dependencies
+  [[`1b6c2f636`](https://github.com/graphile/crystal/commit/1b6c2f6360a316a8dc550c60e28c61deea538f19)]:
+  - tamedevil@0.0.0-beta.4
+
 ## 0.1.1-beta.3
 
 ### Patch Changes
