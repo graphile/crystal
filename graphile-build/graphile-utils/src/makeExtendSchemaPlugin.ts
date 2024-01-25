@@ -54,6 +54,7 @@ import { EXPORTABLE } from "./exportable.js";
 type Maybe<T> = T | null | undefined;
 
 export interface ObjectFieldConfig<TSource = any, TContext = any> {
+  scope?: GraphileBuild.ScopeObjectFieldsField;
   plan?: FieldPlanResolver<any, any, any>;
   subscribePlan?: FieldPlanResolver<any, any, any>;
   /** @deprecated Use 'plan' */
@@ -1019,25 +1020,6 @@ export function makeExtendSchemaPlugin(
           const args = getArguments(field.arguments, build);
           const type = getType(field.type, build);
           const directives = getDirectives(field.directives);
-          const scope: any = {
-            fieldName,
-            /*
-            ...(typeScope.pgIntrospection &&
-            typeScope.pgIntrospection.kind === "class"
-              ? {
-                  pgFieldIntrospection: typeScope.pgIntrospection,
-                }
-              : null),
-            ...(typeScope.isPgRowConnectionType && typeScope.pgIntrospection
-              ? {
-                  isPgFieldConnection: true,
-                  pgFieldIntrospection: typeScope.pgIntrospection,
-                }
-              : null),
-              */
-            fieldDirectives: directives,
-            ...scopeFromDirectives(directives),
-          };
           const deprecatedDirective = directives.find(
             (d) => d.directiveName === "deprecated",
           );
@@ -1086,6 +1068,26 @@ export function makeExtendSchemaPlugin(
               type: type as GraphQLOutputType,
               args,
             };
+          };
+          const scope: any = {
+            fieldName,
+            ...(typeof spec === "object" && spec !== null ? spec.scope : null),
+            /*
+            ...(typeScope.pgIntrospection &&
+            typeScope.pgIntrospection.kind === "class"
+              ? {
+                  pgFieldIntrospection: typeScope.pgIntrospection,
+                }
+              : null),
+            ...(typeScope.isPgRowConnectionType && typeScope.pgIntrospection
+              ? {
+                  isPgFieldConnection: true,
+                  pgFieldIntrospection: typeScope.pgIntrospection,
+                }
+              : null),
+              */
+            fieldDirectives: directives,
+            ...scopeFromDirectives(directives),
           };
           return build.extend(
             memo,
