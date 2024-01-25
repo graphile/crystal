@@ -22,6 +22,7 @@ import type {
   // ONLY import types here, not values
   // Misc:
   GraphQLIsTypeOfFn,
+  GraphQLNamedOutputType,
   GraphQLNamedType,
   GraphQLObjectType,
   GraphQLObjectTypeExtensions,
@@ -1026,6 +1027,9 @@ export function makeExtendSchemaPlugin(
       | GraphileBuild.ContextObjectFields,
     build: GraphileBuild.Build,
   ) {
+    const {
+      graphql: { getNullableType, getNamedType },
+    } = build;
     const { fieldWithHooks } = context;
     const isRootSubscription =
       "isRootSubscription" in context.scope && context.scope.isRootSubscription;
@@ -1090,25 +1094,56 @@ export function makeExtendSchemaPlugin(
               args,
             };
           };
-          const scope: any = {
-            fieldName,
-            ...(typeof spec === "object" && spec !== null ? spec.scope : null),
-            /*
-            ...(typeScope.pgIntrospection &&
-            typeScope.pgIntrospection.kind === "class"
-              ? {
-                  pgFieldIntrospection: typeScope.pgIntrospection,
-                }
-              : null),
-            ...(typeScope.isPgRowConnectionType && typeScope.pgIntrospection
-              ? {
-                  isPgFieldConnection: true,
-                  pgFieldIntrospection: typeScope.pgIntrospection,
-                }
-              : null),
-              */
+          const nullableType = getNullableType(type);
+          const namedType = getNamedType(type) as GraphQLNamedOutputType;
+          const typeScope = build.scopeByType.get(namedType) as
+            | GraphileBuild.ScopeScalar
+            | GraphileBuild.ScopeEnum
+            | GraphileBuild.ScopeInterface
+            | GraphileBuild.ScopeUnion
+            | GraphileBuild.ScopeObject
+            | undefined;
+          const scope: GraphileBuild.ScopeObjectFieldsField = {
             fieldDirectives: directives,
+
+            // Guess a codec and resource
+            ...(typeScope && "pgCodec" in typeScope && typeScope.pgCodec
+              ? {
+                  pgFieldCodec: typeScope.pgCodec,
+                  // First guess at a resource; may be overwritten
+                  pgFieldResource: Object.values(
+                    build.input.pgRegistry.pgResources,
+                  ).find(
+                    (r) =>
+                      r.codec === typeScope.pgCodec &&
+                      !r.isUnique &&
+                      !r.parameters &&
+                      !r.isVirtual &&
+                      !r.isList,
+                  ),
+                }
+              : null),
+
+            // Guess (more accurately) a resource
+            ...(typeScope &&
+            "pgTypeResource" in typeScope &&
+            typeScope.pgTypeResource
+              ? { pgFieldResource: typeScope.pgTypeResource }
+              : null),
+
+            // Guess if it's a connection
+            ...(nullableType === namedType &&
+            typeScope &&
+            "isConnectionType" in typeScope
+              ? { isPgFieldConnection: typeScope.isConnectionType }
+              : null),
+
+            // Allow user to overwrite
             ...scopeFromDirectives(directives),
+            ...(typeof spec === "object" && spec !== null ? spec.scope : null),
+
+            // fieldName always wins
+            fieldName,
           };
           return build.extend(
             memo,
