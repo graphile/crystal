@@ -1119,7 +1119,8 @@ export function makeExtendSchemaPlugin(
                       !r.isUnique &&
                       !r.parameters &&
                       !r.isVirtual &&
-                      !r.isList,
+                      !r.isList &&
+                      !r.codec.polymorphism,
                   ),
                 }
               : null),
