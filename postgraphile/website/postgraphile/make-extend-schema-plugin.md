@@ -165,7 +165,7 @@ underscores) since that is reserved for introspection. We therefore use this
 prefix to provide additional details to types. What additional information is
 relevant depends on the type:
 
-### Object types
+### Object type step assertion
 
 Object types in Gra*fast* can [indicate that they must be represented by a
 particular
@@ -213,6 +213,67 @@ const schema = makeExtendSchemaPlugin({
   },
 });
 ```
+
+### Type and field scopes
+
+Graphile Build plugins use the "scope" that a type/field/argument/etc is
+defined with in order to determine whether or not to hook that entity and
+augment it. For example, the builtin `PgFirstLastBeforeAfterArgsPlugin` will
+automatically add `first`, `last`, `before` and `after` arguments to fields
+that are scoped as `isPgFieldConnection: true` and have an associated and
+suitable `pgFieldResource` scope set.
+
+You can add to/overwrite the Graphile Build "scope" of a type by adding the
+`__scope` property to the object's `plans` object.
+
+You can add to/overwrite the Graphile Build scope of a field by making the
+field definition an object (if it was previously a function, move the function
+to be inside the object using the `plan` key) and adding the `scope` property.
+
+For example:
+
+```ts
+import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
+
+const schema = makeExtendSchemaPlugin((build) => {
+  const { users } = build.input.pgRegistry.pgResources;
+  return {
+    typeDefs: gql`
+      type MyObject {
+        id: Int
+      }
+    `,
+    plans: {
+      MyObject: {
+        // Graphile Build "scope" for the object type 'MyObject'
+        __scope: {
+          pgTypeResource: users,
+        },
+
+        id: {
+          // The Graphile Build "scope" for the 'MyObject.id' field
+          scope: {
+            pgFieldAttribute: users.codec.attributes.id,
+          },
+
+          // The plan resolver for the 'MyObject.id' field
+          plan($obj) {
+            return $obj.get("id");
+          },
+        },
+      },
+    },
+  };
+});
+```
+
+:::note
+
+`makeExtendSchemaPlugin` might try and guess the scopes to use to be helpful;
+if it gets them wrong then be sure to overwrite them using the instructions
+above. To unset scopes, set them to `undefined`.
+
+:::
 
 ## Querying the database
 
