@@ -1,0 +1,1759 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`enables overriding scope 1`] = `
+""""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+
+  """
+  The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
+  """
+  id: ID!
+
+  """Fetches an object given its globally unique \`ID\`."""
+  node(
+    """The globally unique \`ID\`."""
+    id: ID!
+  ): Node
+
+  """Get a single \`TestSmartTag\`."""
+  testSmartTagByEmail(email: String!): TestSmartTag
+
+  """Get a single \`Pet\`."""
+  petByRowId(rowId: Int!): Pet
+
+  """Get a single \`User\`."""
+  userByRowId(rowId: Int!): User
+
+  """Reads a single \`Pet\` using its globally unique \`ID\`."""
+  pet(
+    """The globally unique \`ID\` to be used in selecting a single \`Pet\`."""
+    id: ID!
+  ): Pet
+
+  """Reads a single \`User\` using its globally unique \`ID\`."""
+  user(
+    """The globally unique \`ID\` to be used in selecting a single \`User\`."""
+    id: ID!
+  ): User
+
+  """Reads and enables pagination through a set of \`TestSmartTag\`."""
+  allTestSmartTags(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`TestSmartTag\`."""
+    orderBy: [TestSmartTagOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: TestSmartTagCondition
+  ): TestSmartTagConnection
+
+  """Reads and enables pagination through a set of \`Pet\`."""
+  allPets(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`Pet\`."""
+    orderBy: [PetOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PetCondition
+  ): PetConnection
+
+  """Reads and enables pagination through a set of \`User\`."""
+  allUsers(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`User\`."""
+    orderBy: [UserOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: UserCondition
+  ): UserConnection
+}
+
+"""An object with a globally unique \`ID\`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  id: ID!
+}
+
+type TestSmartTag {
+  email: String!
+  value: Int
+}
+
+type Pet implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  id: ID!
+  rowId: Int!
+  userId: Int!
+  name: String!
+  type: String!
+}
+
+type User implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  id: ID!
+  rowId: Int!
+  name: String!
+  email: String!
+  bio: String
+  renamedComplexColumn: [Complex]
+  createdAt: Datetime!
+  favouritePets: PetConnection
+}
+
+type Complex {
+  numberInt: Int
+  stringText: String
+}
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
+3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
+that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
+to unexpected results.
+"""
+scalar Datetime
+
+"""A connection to a list of \`Pet\` values."""
+type PetConnection {
+  """A list of \`Pet\` objects."""
+  nodes: [Pet]!
+
+  """
+  A list of edges which contains the \`Pet\` and cursor to aid in pagination.
+  """
+  edges: [PetEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Pet\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Pet\` edge in the connection."""
+type PetEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Pet\` at the end of the edge."""
+  node: Pet
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+}
+
+"""A connection to a list of \`TestSmartTag\` values."""
+type TestSmartTagConnection {
+  """A list of \`TestSmartTag\` objects."""
+  nodes: [TestSmartTag]!
+
+  """
+  A list of edges which contains the \`TestSmartTag\` and cursor to aid in pagination.
+  """
+  edges: [TestSmartTagEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`TestSmartTag\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`TestSmartTag\` edge in the connection."""
+type TestSmartTagEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`TestSmartTag\` at the end of the edge."""
+  node: TestSmartTag
+}
+
+"""Methods to use when ordering \`TestSmartTag\`."""
+enum TestSmartTagOrderBy {
+  NATURAL
+  EMAIL_ASC
+  EMAIL_DESC
+}
+
+"""
+A condition to be used against \`TestSmartTag\` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input TestSmartTagCondition {
+  """Checks for equality with the object’s \`email\` field."""
+  email: String
+}
+
+"""Methods to use when ordering \`Pet\`."""
+enum PetOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  USER_ID_ASC
+  USER_ID_DESC
+}
+
+"""
+A condition to be used against \`Pet\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PetCondition {
+  """Checks for equality with the object’s \`rowId\` field."""
+  rowId: Int
+
+  """Checks for equality with the object’s \`userId\` field."""
+  userId: Int
+}
+
+"""A connection to a list of \`User\` values."""
+type UserConnection {
+  """A list of \`User\` objects."""
+  nodes: [User]!
+
+  """
+  A list of edges which contains the \`User\` and cursor to aid in pagination.
+  """
+  edges: [UserEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`User\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`User\` edge in the connection."""
+type UserEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`User\` at the end of the edge."""
+  node: User
+}
+
+"""Methods to use when ordering \`User\`."""
+enum UserOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+}
+
+"""
+A condition to be used against \`User\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input UserCondition {
+  """Checks for equality with the object’s \`rowId\` field."""
+  rowId: Int
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single \`TestSmartTag\`."""
+  createTestSmartTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateTestSmartTagInput!
+  ): CreateTestSmartTagPayload
+
+  """Creates a single \`Pet\`."""
+  createPet(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePetInput!
+  ): CreatePetPayload
+
+  """Creates a single \`User\`."""
+  createUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateUserInput!
+  ): CreateUserPayload
+
+  """Updates a single \`TestSmartTag\` using a unique key and a patch."""
+  updateTestSmartTagByEmail(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateTestSmartTagByEmailInput!
+  ): UpdateTestSmartTagPayload
+
+  """Updates a single \`Pet\` using its globally unique id and a patch."""
+  updatePet(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePetInput!
+  ): UpdatePetPayload
+
+  """Updates a single \`Pet\` using a unique key and a patch."""
+  updatePetByRowId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePetByRowIdInput!
+  ): UpdatePetPayload
+
+  """Updates a single \`User\` using its globally unique id and a patch."""
+  updateUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateUserInput!
+  ): UpdateUserPayload
+
+  """Updates a single \`User\` using a unique key and a patch."""
+  updateUserByRowId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateUserByRowIdInput!
+  ): UpdateUserPayload
+
+  """Deletes a single \`TestSmartTag\` using a unique key."""
+  deleteTestSmartTagByEmail(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteTestSmartTagByEmailInput!
+  ): DeleteTestSmartTagPayload
+
+  """Deletes a single \`Pet\` using its globally unique id."""
+  deletePet(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePetInput!
+  ): DeletePetPayload
+
+  """Deletes a single \`Pet\` using a unique key."""
+  deletePetByRowId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePetByRowIdInput!
+  ): DeletePetPayload
+
+  """Deletes a single \`User\` using its globally unique id."""
+  deleteUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteUserInput!
+  ): DeleteUserPayload
+
+  """Deletes a single \`User\` using a unique key."""
+  deleteUserByRowId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteUserByRowIdInput!
+  ): DeleteUserPayload
+}
+
+"""The output of our create \`TestSmartTag\` mutation."""
+type CreateTestSmartTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`TestSmartTag\` that was created by this mutation."""
+  testSmartTag: TestSmartTag
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create \`TestSmartTag\` mutation."""
+input CreateTestSmartTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`TestSmartTag\` to be created by this mutation."""
+  testSmartTag: TestSmartTagInput!
+}
+
+"""An input for mutations affecting \`TestSmartTag\`"""
+input TestSmartTagInput {
+  email: String!
+  value: Int
+}
+
+"""The output of our create \`Pet\` mutation."""
+type CreatePetPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Pet\` that was created by this mutation."""
+  pet: Pet
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Pet\`. May be used by Relay 1."""
+  petEdge(
+    """The method to use when ordering \`Pet\`."""
+    orderBy: [PetOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PetEdge
+}
+
+"""All input for the create \`Pet\` mutation."""
+input CreatePetInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`Pet\` to be created by this mutation."""
+  pet: PetInput!
+}
+
+"""An input for mutations affecting \`Pet\`"""
+input PetInput {
+  rowId: Int
+  userId: Int!
+  name: String!
+  type: String!
+}
+
+"""The output of our create \`User\` mutation."""
+type CreateUserPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`User\` that was created by this mutation."""
+  user: User
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`User\`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering \`User\`."""
+    orderBy: [UserOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserEdge
+}
+
+"""All input for the create \`User\` mutation."""
+input CreateUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`User\` to be created by this mutation."""
+  user: UserInput!
+}
+
+"""An input for mutations affecting \`User\`"""
+input UserInput {
+  rowId: Int
+  name: String!
+  email: String!
+  bio: String
+  renamedComplexColumn: [ComplexInput]
+  createdAt: Datetime
+}
+
+"""An input for mutations affecting \`Complex\`"""
+input ComplexInput {
+  numberInt: Int
+  stringText: String
+}
+
+"""The output of our update \`TestSmartTag\` mutation."""
+type UpdateTestSmartTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`TestSmartTag\` that was updated by this mutation."""
+  testSmartTag: TestSmartTag
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`updateTestSmartTagByEmail\` mutation."""
+input UpdateTestSmartTagByEmailInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  email: String!
+
+  """
+  An object where the defined keys will be set on the \`TestSmartTag\` being updated.
+  """
+  testSmartTagPatch: TestSmartTagPatch!
+}
+
+"""
+Represents an update to a \`TestSmartTag\`. Fields that are set will be updated.
+"""
+input TestSmartTagPatch {
+  email: String
+  value: Int
+}
+
+"""The output of our update \`Pet\` mutation."""
+type UpdatePetPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Pet\` that was updated by this mutation."""
+  pet: Pet
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Pet\`. May be used by Relay 1."""
+  petEdge(
+    """The method to use when ordering \`Pet\`."""
+    orderBy: [PetOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PetEdge
+}
+
+"""All input for the \`updatePet\` mutation."""
+input UpdatePetInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`Pet\` to be updated.
+  """
+  id: ID!
+
+  """
+  An object where the defined keys will be set on the \`Pet\` being updated.
+  """
+  petPatch: PetPatch!
+}
+
+"""Represents an update to a \`Pet\`. Fields that are set will be updated."""
+input PetPatch {
+  rowId: Int
+  userId: Int
+  name: String
+  type: String
+}
+
+"""All input for the \`updatePetByRowId\` mutation."""
+input UpdatePetByRowIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  rowId: Int!
+
+  """
+  An object where the defined keys will be set on the \`Pet\` being updated.
+  """
+  petPatch: PetPatch!
+}
+
+"""The output of our update \`User\` mutation."""
+type UpdateUserPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`User\` that was updated by this mutation."""
+  user: User
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`User\`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering \`User\`."""
+    orderBy: [UserOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserEdge
+}
+
+"""All input for the \`updateUser\` mutation."""
+input UpdateUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`User\` to be updated.
+  """
+  id: ID!
+
+  """
+  An object where the defined keys will be set on the \`User\` being updated.
+  """
+  userPatch: UserPatch!
+}
+
+"""Represents an update to a \`User\`. Fields that are set will be updated."""
+input UserPatch {
+  rowId: Int
+  name: String
+  email: String
+  bio: String
+  renamedComplexColumn: [ComplexInput]
+  createdAt: Datetime
+}
+
+"""All input for the \`updateUserByRowId\` mutation."""
+input UpdateUserByRowIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  rowId: Int!
+
+  """
+  An object where the defined keys will be set on the \`User\` being updated.
+  """
+  userPatch: UserPatch!
+}
+
+"""The output of our delete \`TestSmartTag\` mutation."""
+type DeleteTestSmartTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`TestSmartTag\` that was deleted by this mutation."""
+  testSmartTag: TestSmartTag
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`deleteTestSmartTagByEmail\` mutation."""
+input DeleteTestSmartTagByEmailInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  email: String!
+}
+
+"""The output of our delete \`Pet\` mutation."""
+type DeletePetPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Pet\` that was deleted by this mutation."""
+  pet: Pet
+  deletedPetId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Pet\`. May be used by Relay 1."""
+  petEdge(
+    """The method to use when ordering \`Pet\`."""
+    orderBy: [PetOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PetEdge
+}
+
+"""All input for the \`deletePet\` mutation."""
+input DeletePetInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`Pet\` to be deleted.
+  """
+  id: ID!
+}
+
+"""All input for the \`deletePetByRowId\` mutation."""
+input DeletePetByRowIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  rowId: Int!
+}
+
+"""The output of our delete \`User\` mutation."""
+type DeleteUserPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`User\` that was deleted by this mutation."""
+  user: User
+  deletedUserId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`User\`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering \`User\`."""
+    orderBy: [UserOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserEdge
+}
+
+"""All input for the \`deleteUser\` mutation."""
+input DeleteUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`User\` to be deleted.
+  """
+  id: ID!
+}
+
+"""All input for the \`deleteUserByRowId\` mutation."""
+input DeleteUserByRowIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  rowId: Int!
+}"
+`;
+
+exports[`infers scope 1`] = `
+""""The root query type which gives access points into the data universe."""
+type Query implements Node {
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+
+  """
+  The root query type must be a \`Node\` to work well with Relay 1 mutations. This just resolves to \`query\`.
+  """
+  id: ID!
+
+  """Fetches an object given its globally unique \`ID\`."""
+  node(
+    """The globally unique \`ID\`."""
+    id: ID!
+  ): Node
+
+  """Get a single \`TestSmartTag\`."""
+  testSmartTagByEmail(email: String!): TestSmartTag
+
+  """Get a single \`Pet\`."""
+  petByRowId(rowId: Int!): Pet
+
+  """Get a single \`User\`."""
+  userByRowId(rowId: Int!): User
+
+  """Reads a single \`Pet\` using its globally unique \`ID\`."""
+  pet(
+    """The globally unique \`ID\` to be used in selecting a single \`Pet\`."""
+    id: ID!
+  ): Pet
+
+  """Reads a single \`User\` using its globally unique \`ID\`."""
+  user(
+    """The globally unique \`ID\` to be used in selecting a single \`User\`."""
+    id: ID!
+  ): User
+
+  """Reads and enables pagination through a set of \`TestSmartTag\`."""
+  allTestSmartTags(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`TestSmartTag\`."""
+    orderBy: [TestSmartTagOrderBy!] = [NATURAL]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: TestSmartTagCondition
+  ): TestSmartTagConnection
+
+  """Reads and enables pagination through a set of \`Pet\`."""
+  allPets(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`Pet\`."""
+    orderBy: [PetOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PetCondition
+  ): PetConnection
+
+  """Reads and enables pagination through a set of \`User\`."""
+  allUsers(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`User\`."""
+    orderBy: [UserOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: UserCondition
+  ): UserConnection
+}
+
+"""An object with a globally unique \`ID\`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  id: ID!
+}
+
+type TestSmartTag {
+  email: String!
+  value: Int
+}
+
+type Pet implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  id: ID!
+  rowId: Int!
+  userId: Int!
+  name: String!
+  type: String!
+}
+
+type User implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  id: ID!
+  rowId: Int!
+  name: String!
+  email: String!
+  bio: String
+  renamedComplexColumn: [Complex]
+  createdAt: Datetime!
+  favouritePets(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`Pet\`."""
+    orderBy: [PetOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PetCondition
+  ): PetConnection
+}
+
+type Complex {
+  numberInt: Int
+  stringText: String
+}
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
+3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
+that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
+to unexpected results.
+"""
+scalar Datetime
+
+"""A connection to a list of \`Pet\` values."""
+type PetConnection {
+  """A list of \`Pet\` objects."""
+  nodes: [Pet]!
+
+  """
+  A list of edges which contains the \`Pet\` and cursor to aid in pagination.
+  """
+  edges: [PetEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Pet\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Pet\` edge in the connection."""
+type PetEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Pet\` at the end of the edge."""
+  node: Pet
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+}
+
+"""Methods to use when ordering \`Pet\`."""
+enum PetOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  USER_ID_ASC
+  USER_ID_DESC
+}
+
+"""
+A condition to be used against \`Pet\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PetCondition {
+  """Checks for equality with the object’s \`rowId\` field."""
+  rowId: Int
+
+  """Checks for equality with the object’s \`userId\` field."""
+  userId: Int
+}
+
+"""A connection to a list of \`TestSmartTag\` values."""
+type TestSmartTagConnection {
+  """A list of \`TestSmartTag\` objects."""
+  nodes: [TestSmartTag]!
+
+  """
+  A list of edges which contains the \`TestSmartTag\` and cursor to aid in pagination.
+  """
+  edges: [TestSmartTagEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`TestSmartTag\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`TestSmartTag\` edge in the connection."""
+type TestSmartTagEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`TestSmartTag\` at the end of the edge."""
+  node: TestSmartTag
+}
+
+"""Methods to use when ordering \`TestSmartTag\`."""
+enum TestSmartTagOrderBy {
+  NATURAL
+  EMAIL_ASC
+  EMAIL_DESC
+}
+
+"""
+A condition to be used against \`TestSmartTag\` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input TestSmartTagCondition {
+  """Checks for equality with the object’s \`email\` field."""
+  email: String
+}
+
+"""A connection to a list of \`User\` values."""
+type UserConnection {
+  """A list of \`User\` objects."""
+  nodes: [User]!
+
+  """
+  A list of edges which contains the \`User\` and cursor to aid in pagination.
+  """
+  edges: [UserEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`User\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`User\` edge in the connection."""
+type UserEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`User\` at the end of the edge."""
+  node: User
+}
+
+"""Methods to use when ordering \`User\`."""
+enum UserOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+}
+
+"""
+A condition to be used against \`User\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input UserCondition {
+  """Checks for equality with the object’s \`rowId\` field."""
+  rowId: Int
+}
+
+"""
+The root mutation type which contains root level fields which mutate data.
+"""
+type Mutation {
+  """Creates a single \`TestSmartTag\`."""
+  createTestSmartTag(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateTestSmartTagInput!
+  ): CreateTestSmartTagPayload
+
+  """Creates a single \`Pet\`."""
+  createPet(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePetInput!
+  ): CreatePetPayload
+
+  """Creates a single \`User\`."""
+  createUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateUserInput!
+  ): CreateUserPayload
+
+  """Updates a single \`TestSmartTag\` using a unique key and a patch."""
+  updateTestSmartTagByEmail(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateTestSmartTagByEmailInput!
+  ): UpdateTestSmartTagPayload
+
+  """Updates a single \`Pet\` using its globally unique id and a patch."""
+  updatePet(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePetInput!
+  ): UpdatePetPayload
+
+  """Updates a single \`Pet\` using a unique key and a patch."""
+  updatePetByRowId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdatePetByRowIdInput!
+  ): UpdatePetPayload
+
+  """Updates a single \`User\` using its globally unique id and a patch."""
+  updateUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateUserInput!
+  ): UpdateUserPayload
+
+  """Updates a single \`User\` using a unique key and a patch."""
+  updateUserByRowId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateUserByRowIdInput!
+  ): UpdateUserPayload
+
+  """Deletes a single \`TestSmartTag\` using a unique key."""
+  deleteTestSmartTagByEmail(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteTestSmartTagByEmailInput!
+  ): DeleteTestSmartTagPayload
+
+  """Deletes a single \`Pet\` using its globally unique id."""
+  deletePet(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePetInput!
+  ): DeletePetPayload
+
+  """Deletes a single \`Pet\` using a unique key."""
+  deletePetByRowId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeletePetByRowIdInput!
+  ): DeletePetPayload
+
+  """Deletes a single \`User\` using its globally unique id."""
+  deleteUser(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteUserInput!
+  ): DeleteUserPayload
+
+  """Deletes a single \`User\` using a unique key."""
+  deleteUserByRowId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteUserByRowIdInput!
+  ): DeleteUserPayload
+}
+
+"""The output of our create \`TestSmartTag\` mutation."""
+type CreateTestSmartTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`TestSmartTag\` that was created by this mutation."""
+  testSmartTag: TestSmartTag
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the create \`TestSmartTag\` mutation."""
+input CreateTestSmartTagInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`TestSmartTag\` to be created by this mutation."""
+  testSmartTag: TestSmartTagInput!
+}
+
+"""An input for mutations affecting \`TestSmartTag\`"""
+input TestSmartTagInput {
+  email: String!
+  value: Int
+}
+
+"""The output of our create \`Pet\` mutation."""
+type CreatePetPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Pet\` that was created by this mutation."""
+  pet: Pet
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Pet\`. May be used by Relay 1."""
+  petEdge(
+    """The method to use when ordering \`Pet\`."""
+    orderBy: [PetOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PetEdge
+}
+
+"""All input for the create \`Pet\` mutation."""
+input CreatePetInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`Pet\` to be created by this mutation."""
+  pet: PetInput!
+}
+
+"""An input for mutations affecting \`Pet\`"""
+input PetInput {
+  rowId: Int
+  userId: Int!
+  name: String!
+  type: String!
+}
+
+"""The output of our create \`User\` mutation."""
+type CreateUserPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`User\` that was created by this mutation."""
+  user: User
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`User\`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering \`User\`."""
+    orderBy: [UserOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserEdge
+}
+
+"""All input for the create \`User\` mutation."""
+input CreateUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`User\` to be created by this mutation."""
+  user: UserInput!
+}
+
+"""An input for mutations affecting \`User\`"""
+input UserInput {
+  rowId: Int
+  name: String!
+  email: String!
+  bio: String
+  renamedComplexColumn: [ComplexInput]
+  createdAt: Datetime
+}
+
+"""An input for mutations affecting \`Complex\`"""
+input ComplexInput {
+  numberInt: Int
+  stringText: String
+}
+
+"""The output of our update \`TestSmartTag\` mutation."""
+type UpdateTestSmartTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`TestSmartTag\` that was updated by this mutation."""
+  testSmartTag: TestSmartTag
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`updateTestSmartTagByEmail\` mutation."""
+input UpdateTestSmartTagByEmailInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  email: String!
+
+  """
+  An object where the defined keys will be set on the \`TestSmartTag\` being updated.
+  """
+  testSmartTagPatch: TestSmartTagPatch!
+}
+
+"""
+Represents an update to a \`TestSmartTag\`. Fields that are set will be updated.
+"""
+input TestSmartTagPatch {
+  email: String
+  value: Int
+}
+
+"""The output of our update \`Pet\` mutation."""
+type UpdatePetPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Pet\` that was updated by this mutation."""
+  pet: Pet
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Pet\`. May be used by Relay 1."""
+  petEdge(
+    """The method to use when ordering \`Pet\`."""
+    orderBy: [PetOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PetEdge
+}
+
+"""All input for the \`updatePet\` mutation."""
+input UpdatePetInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`Pet\` to be updated.
+  """
+  id: ID!
+
+  """
+  An object where the defined keys will be set on the \`Pet\` being updated.
+  """
+  petPatch: PetPatch!
+}
+
+"""Represents an update to a \`Pet\`. Fields that are set will be updated."""
+input PetPatch {
+  rowId: Int
+  userId: Int
+  name: String
+  type: String
+}
+
+"""All input for the \`updatePetByRowId\` mutation."""
+input UpdatePetByRowIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  rowId: Int!
+
+  """
+  An object where the defined keys will be set on the \`Pet\` being updated.
+  """
+  petPatch: PetPatch!
+}
+
+"""The output of our update \`User\` mutation."""
+type UpdateUserPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`User\` that was updated by this mutation."""
+  user: User
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`User\`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering \`User\`."""
+    orderBy: [UserOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserEdge
+}
+
+"""All input for the \`updateUser\` mutation."""
+input UpdateUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`User\` to be updated.
+  """
+  id: ID!
+
+  """
+  An object where the defined keys will be set on the \`User\` being updated.
+  """
+  userPatch: UserPatch!
+}
+
+"""Represents an update to a \`User\`. Fields that are set will be updated."""
+input UserPatch {
+  rowId: Int
+  name: String
+  email: String
+  bio: String
+  renamedComplexColumn: [ComplexInput]
+  createdAt: Datetime
+}
+
+"""All input for the \`updateUserByRowId\` mutation."""
+input UpdateUserByRowIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  rowId: Int!
+
+  """
+  An object where the defined keys will be set on the \`User\` being updated.
+  """
+  userPatch: UserPatch!
+}
+
+"""The output of our delete \`TestSmartTag\` mutation."""
+type DeleteTestSmartTagPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`TestSmartTag\` that was deleted by this mutation."""
+  testSmartTag: TestSmartTag
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`deleteTestSmartTagByEmail\` mutation."""
+input DeleteTestSmartTagByEmailInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  email: String!
+}
+
+"""The output of our delete \`Pet\` mutation."""
+type DeletePetPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Pet\` that was deleted by this mutation."""
+  pet: Pet
+  deletedPetId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Pet\`. May be used by Relay 1."""
+  petEdge(
+    """The method to use when ordering \`Pet\`."""
+    orderBy: [PetOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PetEdge
+}
+
+"""All input for the \`deletePet\` mutation."""
+input DeletePetInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`Pet\` to be deleted.
+  """
+  id: ID!
+}
+
+"""All input for the \`deletePetByRowId\` mutation."""
+input DeletePetByRowIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  rowId: Int!
+}
+
+"""The output of our delete \`User\` mutation."""
+type DeleteUserPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`User\` that was deleted by this mutation."""
+  user: User
+  deletedUserId: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`User\`. May be used by Relay 1."""
+  userEdge(
+    """The method to use when ordering \`User\`."""
+    orderBy: [UserOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): UserEdge
+}
+
+"""All input for the \`deleteUser\` mutation."""
+input DeleteUserInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`User\` to be deleted.
+  """
+  id: ID!
+}
+
+"""All input for the \`deleteUserByRowId\` mutation."""
+input DeleteUserByRowIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  rowId: Int!
+}"
+`;
