@@ -75,18 +75,26 @@ export type ObjectPlan<TSource = any, TContext = any> = {
   __assertStep?:
     | ((step: ExecutableStep) => asserts step is ExecutableStep)
     | { new (...args: any[]): ExecutableStep };
+  __scope?: GraphileBuild.ScopeObject;
 } & {
   [key: string]:
     | FieldPlanResolver<any, any, any>
     | ObjectFieldConfig<TSource, TContext>;
 };
 
-export interface EnumResolver {
+export type EnumResolver = {
+  __scope?: GraphileBuild.ScopeEnum;
+} & {
   [key: string]: string | number | Array<any> | Record<string, any> | symbol;
-}
+};
 
 export interface TypeResolver {
   __resolveType?: GraphQLTypeResolver<any, any>;
+  __scope?: GraphileBuild.ScopeUnion | GraphileBuild.ScopeInterface;
+}
+
+export interface InputObjectResolver {
+  __scope?: GraphileBuild.ScopeInputObject;
 }
 
 /** @deprecated Use Plans instead */
@@ -95,8 +103,11 @@ export interface Resolvers<TSource = any, TContext = any> {
     | ObjectResolver<TSource, TContext>
     | EnumResolver
     | TypeResolver
+    | InputObjectResolver
     | GraphQLScalarType
-    | GraphQLScalarTypeConfig<any, any>;
+    | (GraphQLScalarTypeConfig<any, any> & {
+        __scope?: GraphileBuild.ScopeScalar;
+      });
 }
 
 export interface Plans<TSource = any, TContext = any> {
@@ -381,7 +392,12 @@ export function makeExtendSchemaPlugin(
                 Object.create(null),
               );
 
-              const scope = scopeFromDirectives(directives);
+              const scope = {
+                __origin: `makeExtendSchemaPlugin`,
+                directives,
+                ...scopeFromDirectives(directives),
+                ...plans[name]?.__scope,
+              };
               build.registerEnumType(
                 name,
                 scope,
@@ -398,6 +414,7 @@ export function makeExtendSchemaPlugin(
                 __origin: `makeExtendSchemaPlugin`,
                 directives,
                 ...scopeFromDirectives(directives),
+                ...plans[name]?.__scope,
               };
               build.registerObjectType(
                 name,
@@ -441,6 +458,7 @@ export function makeExtendSchemaPlugin(
                 __origin: `makeExtendSchemaPlugin`,
                 directives,
                 ...scopeFromDirectives(directives),
+                ...plans[name]?.__scope,
               };
               build.registerInputObjectType(
                 name,
@@ -466,6 +484,7 @@ export function makeExtendSchemaPlugin(
                 __origin: `makeExtendSchemaPlugin`,
                 directives,
                 ...scopeFromDirectives(directives),
+                ...plans[name]?.__scope,
               };
               const resolveType = (resolvers[name] as Maybe<TypeResolver>)
                 ?.__resolveType;
@@ -500,6 +519,7 @@ export function makeExtendSchemaPlugin(
                 __origin: `makeExtendSchemaPlugin`,
                 directives,
                 ...scopeFromDirectives(directives),
+                ...plans[name]?.__scope,
               };
               const resolveType = (resolvers[name] as Maybe<TypeResolver>)
                 ?.__resolveType;
@@ -535,6 +555,7 @@ export function makeExtendSchemaPlugin(
                 __origin: `makeExtendSchemaPlugin`,
                 directives,
                 ...scopeFromDirectives(directives),
+                ...plans[name]?.__scope,
               };
               const possiblePlan = plans[name];
               const possibleResolver = resolvers[name] as Maybe<
