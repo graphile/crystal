@@ -1,16 +1,13 @@
-import { constant, grafast } from "grafast";
-import {
-  GraphQLObjectType,
-  GraphQLScalarType,
-  printSchema,
-} from "grafast/graphql";
-import { buildSchema, QueryPlugin } from "graphile-build";
-
-import { EXPORTABLE, gql, makeExtendSchemaPlugin } from "../src/index.js";
-import PostGraphileAmberPreset from "postgraphile/presets/amber";
 import { makePgService } from "@dataplan/pg/adaptors/pg";
+import { constant, grafast } from "grafast";
+import type { GraphQLObjectType } from "grafast/graphql";
+import { GraphQLScalarType, printSchema } from "grafast/graphql";
+import { buildSchema, QueryPlugin } from "graphile-build";
 import pg, { type Pool } from "pg";
 import { makeSchema } from "postgraphile";
+import PostGraphileAmberPreset from "postgraphile/presets/amber";
+
+import { EXPORTABLE, gql, makeExtendSchemaPlugin } from "../src/index.js";
 
 let pgPool: Pool | null = null;
 
