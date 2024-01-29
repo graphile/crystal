@@ -98,3 +98,18 @@ tooling against the exported code to ensure there are no undefined variable
 references or similar.
 
 :::
+
+## Running the export
+
+```ts title="run-exported.mjs"
+import { grafserv } from "postgraphile/grafserv/node";
+import { createServer } from "node:http";
+import preset from "./graphile.config.js";
+import { schema } from "./exported-schema.mjs";
+
+const server = createServer();
+const serv = grafserv({ preset, schema });
+serv.addTo(server);
+server.listen(5555);
+console.log("Listening on http://localhost:5555/");
+```
