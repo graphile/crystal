@@ -715,8 +715,6 @@ export function stack(message: string, length = 4) {
 
 /**
  * Ridiculously, this is faster than `new Array(length).fill(fill)`
- *
- * @internal
  */
 export function arrayOfLength(length: number, fill?: any) {
   const arr = [];
@@ -921,6 +919,24 @@ export function isTypePlanned(
   }
 }
 
+/**
+ * Make protected/private methods accessible.
+ *
+ * @internal
+ */
+export type Sudo<T> = T extends ExecutableStep<any>
+  ? T & { dependencies: ReadonlyArray<ExecutableStep> }
+  : T;
+
+/**
+ * Make protected/private methods accessible.
+ *
+ * @internal
+ */
+export function sudo<T>(obj: T): Sudo<T> {
+  return obj as Sudo<T>;
+}
+
 export function stepADependsOnStepB(
   stepA: ExecutableStep,
   stepB: ExecutableStep,
@@ -929,7 +945,7 @@ export function stepADependsOnStepB(
     throw new Error("Invalid call to stepADependsOnStepB");
   }
   // Depth-first search for match
-  for (const dep of stepA.dependencies) {
+  for (const dep of sudo(stepA).dependencies) {
     if (dep === stepB) {
       return true;
     }

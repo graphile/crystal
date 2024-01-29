@@ -36,7 +36,7 @@ export class JSONParseStep<
   }
 
   toStringMeta(): string {
-    return chalk.bold.yellow(String(this.dependencies[0].id));
+    return chalk.bold.yellow(String(this.getDep(0).id));
   }
 
   get<TKey extends keyof TJSON>(

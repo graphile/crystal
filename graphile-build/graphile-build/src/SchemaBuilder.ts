@@ -70,10 +70,7 @@ class SchemaBuilder<
     );
   }
 
-  /**
-   * @internal
-   */
-  _setPluginName(name: string | null | undefined) {
+  private _setPluginName(name: string | null | undefined) {
     this._currentPluginName = name;
   }
 

@@ -30,7 +30,7 @@ const isDev =
  */
 export interface TERawNode {
   readonly [$$type]: "RAW";
-  /** text */
+  /** text @internal */
   readonly t: string;
 }
 
@@ -40,9 +40,9 @@ export interface TERawNode {
  */
 export interface TERefNode {
   readonly [$$type]: "REF";
-  /** value */
+  /** value @internal */
   readonly v: any;
-  /** name */
+  /** name @internal */
   readonly n: string | undefined;
 }
 
@@ -52,7 +52,7 @@ export interface TERefNode {
  */
 export interface TETemporaryVariableNode {
   readonly [$$type]: "VARIABLE";
-  /** symbol */
+  /** symbol @internal */
   readonly s: symbol;
 }
 
@@ -61,21 +61,19 @@ export interface TETemporaryVariableNode {
  */
 export interface TEIndentNode {
   readonly [$$type]: "INDENT";
-  /** content */
+  /** content @internal */
   readonly c: TEQuery;
 }
 
-/** @internal */
 export type TENode =
   | TERawNode
   | TERefNode
   | TETemporaryVariableNode
   | TEIndentNode;
 
-/** @internal */
 export interface TEQuery {
   readonly [$$type]: "QUERY";
-  /** nodes */
+  /** nodes @internal */
   readonly n: ReadonlyArray<TENode>;
 }
 
@@ -1027,7 +1025,6 @@ function indentIf(condition: boolean, fragment: TE): TE {
  * Makes safe identifiers
  *
  * @experimental
- * @internal
  */
 export class Idents {
   // Initialized with forbidden words

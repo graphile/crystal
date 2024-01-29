@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import { operationPlan } from "grafast";
+import { rootValue } from "grafast";
 
 import { EXPORTABLE } from "../utils.js";
 import { version } from "../version.js";
@@ -39,11 +39,11 @@ export const QueryQueryPlugin: GraphileConfig.Plugin = {
                 ),
                 type: new GraphQLNonNull(Self),
                 plan: EXPORTABLE(
-                  (operationPlan) =>
+                  (rootValue) =>
                     function plan() {
-                      return operationPlan().rootValueStep;
+                      return rootValue();
                     },
-                  [operationPlan],
+                  [rootValue],
                 ),
               },
             },

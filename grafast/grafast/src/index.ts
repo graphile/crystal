@@ -199,10 +199,13 @@ import {
   reverse,
   reverseArray,
   ReverseStep,
+  rootValue,
   setter,
   SetterCapableStep,
   SetterStep,
   specFromNodeId,
+  trackedContext,
+  trackedRootValue,
 } from "./steps/index.js";
 import { stringifyPayload } from "./stringifyPayload.js";
 import { stripAnsi } from "./stripAnsi.js";
@@ -408,6 +411,7 @@ export {
   reverse,
   reverseArray,
   ReverseStep,
+  rootValue,
   SafeError,
   ScalarPlanResolver,
   ScalarPlans,
@@ -424,6 +428,8 @@ export {
   stringifyPayload,
   stripAnsi,
   subscribe,
+  trackedContext,
+  trackedRootValue,
   TypedEventEmitter,
   UnbatchedExecutableStep,
 };
@@ -466,6 +472,9 @@ exportAsMany("grafast", {
   constant,
   ConstantStep,
   context,
+  rootValue,
+  trackedContext,
+  trackedRootValue,
   isGrafastError,
   debugPlans,
   each,
@@ -602,7 +611,7 @@ declare global {
       /**
        * EXPERIMENTAL!
        *
-       * @internal
+       * @experimental
        */
       applyPlan?: EnumValueApplyPlanResolver<any>;
     }

@@ -856,8 +856,6 @@ export class PgSelectStep<
 
   /**
    * @experimental Please use `singleRelation` or `manyRelation` instead.
-   *
-   * @internal
    */
   public join(spec: PgSelectPlanJoin) {
     this.joins.push(spec);
@@ -922,7 +920,6 @@ export class PgSelectStep<
     return new PgSelectStep(this, mode);
   }
 
-  /** @internal */
   connectionClone(
     $connection: ConnectionStep<any, any, any, any>,
     mode?: PgSelectMode,
@@ -1167,7 +1164,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     this.where(finalCondition);
   }
 
-  /** @internal */
   parseCursor(
     $cursorPlan: __InputStaticLeafStep<string>,
   ): PgSelectParsedCursorStep | null {
@@ -1190,7 +1186,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     this.beforeStepId = this.addDependency($parsedCursorPlan);
   }
 
-  /** @internal */
   public pageInfo(
     $connectionPlan: ConnectionStep<any, PgSelectParsedCursorStep, this, any>,
   ): PgPageInfoStep<this> {

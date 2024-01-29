@@ -8,11 +8,13 @@ import type { PgCodec } from "../interfaces.js";
 
 export type PgWhereConditionSpec<TAttribute extends string> =
   | SQL
-  | {
-      type: "attribute";
-      attribute: TAttribute;
-      callback: (fragment: SQL) => SQL;
-    };
+  | PgWhereConditionAttributeSpec<TAttribute>;
+
+export interface PgWhereConditionAttributeSpec<TAttribute extends string> {
+  type: "attribute";
+  attribute: TAttribute;
+  callback: (fragment: SQL) => SQL;
+}
 
 export type PgHavingConditionSpec<_TAttribute extends string> = SQL;
 // | ...

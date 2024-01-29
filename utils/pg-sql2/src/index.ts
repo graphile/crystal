@@ -31,7 +31,7 @@ const isDev =
  */
 export interface SQLRawNode {
   readonly [$$type]: "RAW";
-  /** text */
+  /** text @internal */
   readonly t: string;
 }
 
@@ -42,9 +42,9 @@ export interface SQLRawNode {
  */
 export interface SQLIdentifierNode {
   readonly [$$type]: "IDENTIFIER";
-  /** symbol */
+  /** symbol @internal */
   readonly s: symbol;
-  /** name */
+  /** name @internal */
   readonly n: string;
 }
 
@@ -65,7 +65,7 @@ export type SQLRawValue =
  */
 export interface SQLValueNode {
   readonly [$$type]: "VALUE";
-  /** value */
+  /** value @internal */
   readonly v: SQLRawValue;
 }
 
@@ -74,9 +74,9 @@ export interface SQLValueNode {
  */
 export interface SQLIndentNode {
   readonly [$$type]: "INDENT";
-  /** content */
+  /** content @internal */
   readonly c: SQLQuery;
-  /** flags */
+  /** flags @internal */
   readonly f: number;
 }
 
@@ -85,7 +85,9 @@ export interface SQLIndentNode {
  */
 export interface SQLSymbolAliasNode {
   readonly [$$type]: "SYMBOL_ALIAS";
+  /** @internal */
   readonly a: symbol;
+  /** @internal */
   readonly b: symbol;
 }
 
@@ -95,13 +97,12 @@ export interface SQLSymbolAliasNode {
  */
 export interface SQLPlaceholderNode {
   readonly [$$type]: "PLACEHOLDER";
-  /** symbol */
+  /** symbol @internal */
   readonly s: symbol;
-  /** fallback */
+  /** fallback @internal */
   readonly k?: SQL;
 }
 
-/** @internal */
 export type SQLNode =
   | SQLRawNode
   | SQLValueNode
@@ -110,14 +111,13 @@ export type SQLNode =
   | SQLSymbolAliasNode
   | SQLPlaceholderNode;
 
-/** @internal */
 export interface SQLQuery {
   readonly [$$type]: "QUERY";
-  /** nodes */
+  /** nodes @internal */
   readonly n: ReadonlyArray<SQLNode>;
-  /** flags */
+  /** flags @internal */
   readonly f: number;
-  /** checksum - for faster isEquivalent checks */
+  /** checksum - for faster isEquivalent checks @internal */
   readonly c: number;
 }
 const FLAG_HAS_PARENS = 1 << 0;

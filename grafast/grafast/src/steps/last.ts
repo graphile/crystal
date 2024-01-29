@@ -31,7 +31,7 @@ export class LastStep<TData> extends UnbatchedExecutableStep<TData> {
     const parent = this.getDep(0);
     // The last of a list plan is just the last dependency of the list plan.
     if (parent instanceof ListStep) {
-      return parent.getDep(parent.dependencies.length - 1);
+      return parent.last();
     }
     return this;
   }

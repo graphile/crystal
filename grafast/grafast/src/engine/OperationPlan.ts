@@ -70,6 +70,7 @@ import {
   findVariableNamesUsed,
   hasItemPlan,
   isTypePlanned,
+  sudo,
 } from "../utils.js";
 import type {
   LayerPlanPhase,
@@ -139,7 +140,7 @@ const isDev =
 /** How many times will we try re-optimizing before giving up */
 const MAX_OPTIMIZATION_LOOPS = 10;
 
-/** @internal */
+/** Beware: the list of phases may change over time... @experimental */
 export type OperationPlanPhase =
   | "init"
   | "plan"
@@ -190,8 +191,6 @@ export class OperationPlan {
    * 7. ready
    *
    * Once in 'ready' state we can execute the plan.
-   *
-   * @internal
    */
   public phase: OperationPlanPhase = "init";
   /**
@@ -235,9 +234,7 @@ export class OperationPlan {
   /** Stores the actual value of the context. @internal */
   public readonly contextStep: __ValueStep<Grafast.Context>;
   /** Allows accessing context in a tracked manner (allowing eval). @internal */
-  public readonly trackedContextStep: __TrackedValueStep<{
-    [key: string]: any;
-  }>;
+  public readonly trackedContextStep: __TrackedValueStep<Grafast.Context>;
 
   /** Constraints based on evaluating rootValue. @internal */
   public readonly rootValueConstraints: Constraint[] = [];
@@ -2097,7 +2094,7 @@ export class OperationPlan {
     } else {
       // used for: hoist
 
-      for (const $processFirst of step.dependencies) {
+      for (const $processFirst of sudo(step).dependencies) {
         if (!processed.has($processFirst)) {
           this.processStep(
             actionDescription,
@@ -2230,7 +2227,7 @@ export class OperationPlan {
       dependencies: deps,
       layerPlan: layerPlan,
       constructor: stepConstructor,
-    } = step;
+    } = sudo(step);
     const dependencyCount = deps.length;
 
     if (dependencyCount === 0) {
@@ -2277,7 +2274,7 @@ export class OperationPlan {
           !possiblyPeer.hasSideEffects &&
           possiblyPeer.constructor === stepConstructor &&
           peerLayerPlan.depth >= minDepth &&
-          possiblyPeer.dependencies.length === dependencyCount &&
+          sudo(possiblyPeer).dependencies.length === dependencyCount &&
           peerLayerPlan === ancestry[peerLayerPlan.depth]
         ) {
           if (allPeers === null) {
@@ -2326,7 +2323,7 @@ export class OperationPlan {
               peerDependencyIndex === dependencyIndex &&
               !possiblyPeer.hasSideEffects &&
               possiblyPeer.constructor === stepConstructor &&
-              possiblyPeer.dependencies.length === dependencyCount &&
+              sudo(possiblyPeer).dependencies.length === dependencyCount &&
               possiblyPeer.layerPlan === ancestry[possiblyPeer.layerPlan.depth]
             ) {
               possiblePeers.push(possiblyPeer);
@@ -2347,7 +2344,7 @@ export class OperationPlan {
         // We know the final dependency matches and the dependency count
         // matches - check the other dependencies match.
         for (let i = 0; i < dependencyCount - 1; i++) {
-          if (deps[i] !== possiblyPeer.dependencies[i]) {
+          if (deps[i] !== sudo(possiblyPeer).dependencies[i]) {
             continue outerloop;
           }
         }
@@ -2440,7 +2437,7 @@ export class OperationPlan {
       case "nullableBoundary": {
         // Safe to hoist _unless_ it depends on the root step of the nullableBoundary.
         const $root = step.layerPlan.reason.parentStep!;
-        if (step.dependencies.includes($root)) {
+        if (sudo(step).dependencies.includes($root)) {
           return;
         } else {
           break;
@@ -2482,7 +2479,7 @@ export class OperationPlan {
     }
 
     // Finally, check that none of its dependencies are in the same bucket.
-    const deps = step.dependencies;
+    const deps = sudo(step).dependencies;
     if (deps.some((dep) => dep.layerPlan === step.layerPlan)) {
       return;
     }
@@ -2850,7 +2847,7 @@ export class OperationPlan {
     step: ExecutableStep,
   ) {
     processed.add(step);
-    for (const dep of step.dependencies) {
+    for (const dep of sudo(step).dependencies) {
       if (dep.id >= start && !processed.has(dep)) {
         this.deduplicateStepsProcess(processed, start, dep);
       }
@@ -3118,7 +3115,7 @@ export class OperationPlan {
 
         const sideEffectDeps: ExecutableStep[] = [];
         const rest: ExecutableStep[] = [];
-        for (const dep of step.dependencies) {
+        for (const dep of sudo(step).dependencies) {
           if (dep.layerPlan !== layerPlan) {
             continue;
           }
@@ -3156,7 +3153,7 @@ export class OperationPlan {
       }
 
       const readyToExecute = (step: ExecutableStep): boolean => {
-        for (const dep of step.dependencies) {
+        for (const dep of sudo(step).dependencies) {
           if (dep.layerPlan === layerPlan && pending.has(dep)) {
             return false;
           }
@@ -3252,7 +3249,7 @@ export class OperationPlan {
         if ($$noExec in step) {
           continue;
         }
-        for (const dep of step.dependencies) {
+        for (const dep of sudo(step).dependencies) {
           ensurePlanAvailableInLayer(dep, layerPlan);
         }
       }
@@ -3332,7 +3329,7 @@ export class OperationPlan {
         stepClass: step.constructor.name,
         metaString: metaString ? stripAnsi(metaString) : metaString,
         bucketId: step.layerPlan.id,
-        dependencyIds: step.dependencies.map((d) => d.id),
+        dependencyIds: sudo(step).dependencies.map((d) => d.id),
         polymorphicPaths: step.polymorphicPaths
           ? [...step.polymorphicPaths]
           : undefined,
@@ -3427,7 +3424,7 @@ export class OperationPlan {
     const process = (lp: LayerPlan, known: LayerPlan[]) => {
       for (const step of this.stepTracker.activeSteps) {
         if (step.layerPlan === lp) {
-          for (const dep of step.dependencies) {
+          for (const dep of sudo(step).dependencies) {
             if (!known.includes(dep.layerPlan)) {
               // Naughty naughty
               (subroutineStep as any).addDependency(dep);

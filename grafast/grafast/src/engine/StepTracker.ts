@@ -2,6 +2,7 @@ import { isDev } from "../dev.js";
 import type { OperationPlan } from "../index.js";
 import { $$subroutine } from "../interfaces.js";
 import type { ExecutableStep } from "../step";
+import { sudo } from "../utils.js";
 import type {
   LayerPlan,
   LayerPlanReasonSubroutine,
@@ -285,7 +286,7 @@ export class StepTracker {
     }
     this.stepsWithNoDependencies.delete($dependent);
     const dependencyIndex =
-      writeableArray($dependent.dependencies).push($dependency) - 1;
+      writeableArray(sudo($dependent).dependencies).push($dependency) - 1;
     writeableArray($dependency.dependents).push({
       step: $dependent,
       dependencyIndex,
@@ -394,7 +395,7 @@ export class StepTracker {
       if (dependents.length > 0) {
         const replacementDependents = writeableArray($replacement.dependents);
         for (const dependent of dependents) {
-          writeableArray(dependent.step.dependencies)[
+          writeableArray(sudo(dependent.step).dependencies)[
             dependent.dependencyIndex
           ] = $replacement;
           replacementDependents.push(dependent);
@@ -561,7 +562,7 @@ export class StepTracker {
     }
 
     // Since this step is being removed, it doesn't need its dependencies any more
-    const oldDependencies = $original.dependencies;
+    const oldDependencies = sudo($original).dependencies;
     for (const $dependency of oldDependencies) {
       // $dependency is no longer a dependent of $original, since we're getting
       // rid of $original

@@ -17,6 +17,8 @@
     // time is spent in 'instance_members_initializer' in V8. Disable.
     "useDefineForClassFields": false,
 
+    "stripInternal": true,
+
     "sourceMap": true,
     "pretty": true,
     "importHelpers": true,

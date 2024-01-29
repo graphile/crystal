@@ -59,12 +59,12 @@ export function each<
     meta: `each:${chalk.yellow(listStep.id)}${
       mapper.name ? `/${mapper.name}` : ""
     }`,
-    optimize() {
+    optimize(this: __ListTransformStep<any>) {
       const layerPlan = this.subroutineLayer;
       const rootStep = layerPlan.rootStep;
       if (
         rootStep instanceof __ItemStep &&
-        rootStep.dependencies[0].layerPlan !== layerPlan
+        rootStep.getDep(0).layerPlan !== layerPlan
       ) {
         // We don't do anything; replace ourself with our parent
         return this.getListStep();
