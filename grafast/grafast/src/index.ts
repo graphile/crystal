@@ -531,6 +531,8 @@ exportAsMany("grafast", {
   loadManyCallback,
   LoadedRecordStep,
   LoadStep,
+  isSafeError,
+  SafeError,
 });
 
 export { hookArgs } from "./args.js";

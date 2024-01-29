@@ -67,6 +67,10 @@ export class SafeError<
     | Record<string, any>
     | undefined,
 > extends Error {
+  static $$export = {
+    moduleName: "grafast",
+    exportName: "SafeError",
+  };
   [$$safeError] = true;
   constructor(
     message: string,
