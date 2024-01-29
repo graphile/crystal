@@ -8,11 +8,13 @@ import type { PgCodec } from "../interfaces.js";
 
 export type PgWhereConditionSpec<TAttribute extends string> =
   | SQL
-  | {
-      type: "attribute";
-      attribute: TAttribute;
-      callback: (fragment: SQL) => SQL;
-    };
+  | PgWhereConditionAttributeSpec<TAttribute>;
+
+export interface PgWhereConditionAttributeSpec<TAttribute extends string> {
+  type: "attribute";
+  attribute: TAttribute;
+  callback: (fragment: SQL) => SQL;
+}
 
 export type PgHavingConditionSpec<_TAttribute extends string> = SQL;
 // | ...
@@ -229,14 +231,18 @@ export function pgWhereConditionSpecListToSQL(
       mappedConditions.push(sql.indent(transform(frag)));
       continue;
     } else {
-      switch (c.type) {
+      // Without this, `tsc` gets confused. No idea why.
+      const attributeCondition: PgWhereConditionAttributeSpec<any> = c;
+      switch (attributeCondition.type) {
         case "attribute": {
-          const frag = c.callback(sql`${alias}.${sql.identifier(c.attribute)}`);
+          const frag = attributeCondition.callback(
+            sql`${alias}.${sql.identifier(attributeCondition.attribute)}`,
+          );
           mappedConditions.push(sql.indent(transform(frag)));
           continue;
         }
         default: {
-          const never: never = c.type;
+          const never: never = attributeCondition.type;
           throw new Error(`Unsupported condition: ` + (never as any));
         }
       }

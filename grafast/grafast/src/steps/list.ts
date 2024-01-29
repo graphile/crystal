@@ -89,6 +89,14 @@ export class ListStep<
   ): TPlanTuple[TIndex] {
     return this.getDep(index as number) as TPlanTuple[TIndex];
   }
+
+  public first() {
+    return this.getDep(0) as TPlanTuple[0];
+  }
+
+  public last() {
+    return this.getDep(this.dependencies.length - 1) as TPlanTuple[number];
+  }
 }
 
 /**

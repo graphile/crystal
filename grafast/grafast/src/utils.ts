@@ -921,6 +921,19 @@ export function isTypePlanned(
   }
 }
 
+/**
+ * Make protected/private methods accessible.
+ *
+ * @internal
+ */
+export type Sudo<T> = T extends ExecutableStep<any>
+  ? T & { dependencies: ReadonlyArray<ExecutableStep> }
+  : T;
+
+export function sudo<T>(obj: T): Sudo<T> {
+  return obj as Sudo<T>;
+}
+
 export function stepADependsOnStepB(
   stepA: ExecutableStep,
   stepB: ExecutableStep,
@@ -929,7 +942,7 @@ export function stepADependsOnStepB(
     throw new Error("Invalid call to stepADependsOnStepB");
   }
   // Depth-first search for match
-  for (const dep of stepA.dependencies) {
+  for (const dep of (stepA as Sudo<typeof stepA>).dependencies) {
     if (dep === stepB) {
       return true;
     }

@@ -207,9 +207,8 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
 
   /**
    * The plan this plan will need data from in order to execute.
-   * @internal
    */
-  public readonly dependencies: ReadonlyArray<ExecutableStep>;
+  protected readonly dependencies: ReadonlyArray<ExecutableStep>;
 
   /**
    * Just for mermaid

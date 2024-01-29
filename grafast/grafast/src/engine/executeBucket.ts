@@ -24,7 +24,7 @@ import { isStreamableStep } from "../step.js";
 import { __ItemStep } from "../steps/__item.js";
 import { __ValueStep } from "../steps/__value.js";
 import { timeSource } from "../timeSource.js";
-import { arrayOfLength, isPromiseLike } from "../utils.js";
+import { Sudo, arrayOfLength, isPromiseLike, sudo } from "../utils.js";
 import type { MetaByMetaKey } from "./OperationPlan.js";
 
 const DEBUG_POLYMORPHISM = false;
@@ -516,7 +516,9 @@ export function executeBucket(
           allStepsIndex < allStepsLength;
           allStepsIndex++
         ) {
-          const step = _allSteps[allStepsIndex] as UnbatchedExecutableStep;
+          const step = sudo(
+            _allSteps[allStepsIndex] as UnbatchedExecutableStep,
+          );
           const storeEntry = bucket.store.get(step.id)!;
           try {
             const deps: any = [];
@@ -666,7 +668,10 @@ export function executeBucket(
 
     // Trim the side-effect dependencies back out again
     const dependencies = sideEffectStepsWithErrors
-      ? dependenciesIncludingSideEffects.slice(0, step.dependencies.length)
+      ? dependenciesIncludingSideEffects.slice(
+          0,
+          sudo(step).dependencies.length,
+        )
       : dependenciesIncludingSideEffects;
 
     if (needsNoExecution) {
@@ -714,15 +719,16 @@ export function executeBucket(
         _requestContext: requestContext,
       };
       const dependencies: ReadonlyArray<any>[] = [];
-      const depCount = step.dependencies.length;
+      const sstep = sudo(step);
+      const depCount = sstep.dependencies.length;
       if (depCount > 0 || sideEffectStepsWithErrors !== null) {
         for (let i = 0, l = depCount; i < l; i++) {
-          const $dep = step.dependencies[i];
+          const $dep = sstep.dependencies[i];
           dependencies[i] = store.get($dep.id)!;
         }
         if (sideEffectStepsWithErrors !== null) {
-          if (step.polymorphicPaths) {
-            for (const path of step.polymorphicPaths) {
+          if (sstep.polymorphicPaths) {
+            for (const path of sstep.polymorphicPaths) {
               for (const sideEffectStep of sideEffectStepsWithErrors[path]) {
                 const sideEffectStoreEntry = store.get(sideEffectStep.id)!;
                 if (!dependencies.includes(sideEffectStoreEntry)) {
