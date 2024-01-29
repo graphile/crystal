@@ -9,11 +9,21 @@ export function operationPlan(): OperationPlan {
 
 export function context<
   TContext extends Grafast.Context = Grafast.Context,
+>(): __ValueStep<TContext> {
+  return operationPlan().contextStep as __ValueStep<any>;
+}
+
+export function rootValue(): __ValueStep<Record<string, any>> {
+  return operationPlan().rootValueStep as __ValueStep<any>;
+}
+
+export function trackedContext<
+  TContext extends Grafast.Context = Grafast.Context,
 >(): __TrackedValueStep<TContext> {
   return operationPlan().trackedContextStep as __TrackedValueStep<any>;
 }
 
-export function rootValue(): __TrackedValueStep<Record<string, any>> {
+export function trackedRootValue(): __TrackedValueStep<Record<string, any>> {
   return operationPlan().trackedRootValueStep as __TrackedValueStep<any>;
 }
 
