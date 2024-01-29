@@ -1,6 +1,6 @@
 import { currentLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
 import { getDebug, setDebug } from "../global.js";
-import type { OperationPlan, __TrackedValueStep } from "../index.js";
+import type { __TrackedValueStep, OperationPlan } from "../index.js";
 import type { __ValueStep } from "./__value.js";
 
 export function operationPlan(): OperationPlan {

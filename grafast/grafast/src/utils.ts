@@ -942,7 +942,7 @@ export function stepADependsOnStepB(
     throw new Error("Invalid call to stepADependsOnStepB");
   }
   // Depth-first search for match
-  for (const dep of (stepA as Sudo<typeof stepA>).dependencies) {
+  for (const dep of sudo(stepA).dependencies) {
     if (dep === stepB) {
       return true;
     }
