@@ -140,7 +140,7 @@ const isDev =
 /** How many times will we try re-optimizing before giving up */
 const MAX_OPTIMIZATION_LOOPS = 10;
 
-/** @internal */
+/** Beware: the list of phases may change over time... @experimental */
 export type OperationPlanPhase =
   | "init"
   | "plan"
@@ -191,8 +191,6 @@ export class OperationPlan {
    * 7. ready
    *
    * Once in 'ready' state we can execute the plan.
-   *
-   * @internal
    */
   public phase: OperationPlanPhase = "init";
   /**

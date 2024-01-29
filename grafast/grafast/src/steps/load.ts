@@ -84,8 +84,6 @@ let loadCounter = 0;
 
 /**
  * You shouldn't create instances of this yourself - use `loadOne` or `loadMany` instead.
- *
- * @internal
  */
 export class LoadedRecordStep<
   TItem,

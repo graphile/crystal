@@ -404,7 +404,7 @@ export type ScalarInputPlanResolver<
  * subclasses of ExecutableStep but TypeScript only wants to allow
  * superclasses.
  *
- * @internal
+ * @experimental
  */
 export type EnumValueApplyPlanResolver<
   TParentStep extends ExecutableStep | ModifierStep =
