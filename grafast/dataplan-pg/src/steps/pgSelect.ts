@@ -856,8 +856,6 @@ export class PgSelectStep<
 
   /**
    * @experimental Please use `singleRelation` or `manyRelation` instead.
-   *
-   * @internal
    */
   public join(spec: PgSelectPlanJoin) {
     this.joins.push(spec);
