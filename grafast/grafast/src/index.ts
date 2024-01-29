@@ -200,12 +200,12 @@ import {
   reverseArray,
   ReverseStep,
   rootValue,
-  trackedContext,
-  trackedRootValue,
   setter,
   SetterCapableStep,
   SetterStep,
   specFromNodeId,
+  trackedContext,
+  trackedRootValue,
 } from "./steps/index.js";
 import { stringifyPayload } from "./stringifyPayload.js";
 import { stripAnsi } from "./stripAnsi.js";
@@ -412,8 +412,6 @@ export {
   reverseArray,
   ReverseStep,
   rootValue,
-  trackedContext,
-  trackedRootValue,
   SafeError,
   ScalarPlanResolver,
   ScalarPlans,
@@ -430,6 +428,8 @@ export {
   stringifyPayload,
   stripAnsi,
   subscribe,
+  trackedContext,
+  trackedRootValue,
   TypedEventEmitter,
   UnbatchedExecutableStep,
 };
