@@ -269,7 +269,7 @@ export class PgResource<
    * an array of arrays) - and thus is not appropriate to use for GraphQL
    * Cursor Connections.
    *
-   * @internal
+   * @experimental
    */
   public sqlPartitionByIndex: SQL | null = null;
 
