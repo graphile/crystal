@@ -24,7 +24,7 @@ import { isStreamableStep } from "../step.js";
 import { __ItemStep } from "../steps/__item.js";
 import { __ValueStep } from "../steps/__value.js";
 import { timeSource } from "../timeSource.js";
-import { Sudo, arrayOfLength, isPromiseLike, sudo } from "../utils.js";
+import { arrayOfLength, isPromiseLike, sudo } from "../utils.js";
 import type { MetaByMetaKey } from "./OperationPlan.js";
 
 const DEBUG_POLYMORPHISM = false;
