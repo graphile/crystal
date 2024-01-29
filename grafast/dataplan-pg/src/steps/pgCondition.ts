@@ -231,18 +231,14 @@ export function pgWhereConditionSpecListToSQL(
       mappedConditions.push(sql.indent(transform(frag)));
       continue;
     } else {
-      // Without this, `tsc` gets confused. No idea why.
-      const attributeCondition: PgWhereConditionAttributeSpec<any> = c;
-      switch (attributeCondition.type) {
+      switch (c.type) {
         case "attribute": {
-          const frag = attributeCondition.callback(
-            sql`${alias}.${sql.identifier(attributeCondition.attribute)}`,
-          );
+          const frag = c.callback(sql`${alias}.${sql.identifier(c.attribute)}`);
           mappedConditions.push(sql.indent(transform(frag)));
           continue;
         }
         default: {
-          const never: never = attributeCondition.type;
+          const never: never = c.type;
           throw new Error(`Unsupported condition: ` + (never as any));
         }
       }
