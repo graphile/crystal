@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import { constant, operationPlan } from "grafast";
+import { constant, rootValue } from "grafast";
 
 import { EXPORTABLE } from "../utils.js";
 
@@ -26,10 +26,10 @@ export const RegisterQueryNodePlugin: GraphileConfig.Plugin = {
           ),
           getSpec: () => "irrelevant",
           get: EXPORTABLE(
-            (operationPlan) => () => {
-              return operationPlan().rootValueStep;
+            (rootValue) => () => {
+              return rootValue();
             },
-            [operationPlan],
+            [rootValue],
           ),
           plan: EXPORTABLE(
             (constant) => () => {

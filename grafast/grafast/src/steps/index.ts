@@ -1,6 +1,6 @@
 import { currentLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
 import { getDebug, setDebug } from "../global.js";
-import type { OperationPlan } from "../index.js";
+import type { OperationPlan, __TrackedValueStep } from "../index.js";
 import type { __ValueStep } from "./__value.js";
 
 export function operationPlan(): OperationPlan {
@@ -9,8 +9,12 @@ export function operationPlan(): OperationPlan {
 
 export function context<
   TContext extends Grafast.Context = Grafast.Context,
->(): __ValueStep<TContext> {
-  return operationPlan().contextStep as __ValueStep<any>;
+>(): __TrackedValueStep<TContext> {
+  return operationPlan().trackedContextStep as __TrackedValueStep<any>;
+}
+
+export function rootValue(): __TrackedValueStep<Record<string, any>> {
+  return operationPlan().trackedRootValueStep as __TrackedValueStep<any>;
 }
 
 /**

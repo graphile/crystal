@@ -142,6 +142,7 @@ import {
   constant,
   ConstantStep,
   context,
+  rootValue,
   debugPlans,
   each,
   EdgeCapableStep,
@@ -270,6 +271,7 @@ export {
   constant,
   ConstantStep,
   context,
+  rootValue,
   debugPlans,
   defer,
   Deferred,
@@ -466,6 +468,7 @@ exportAsMany("grafast", {
   constant,
   ConstantStep,
   context,
+  rootValue,
   isGrafastError,
   debugPlans,
   each,
@@ -600,7 +603,7 @@ declare global {
       /**
        * EXPERIMENTAL!
        *
-       * @internal
+       * @experimental
        */
       applyPlan?: EnumValueApplyPlanResolver<any>;
     }

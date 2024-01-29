@@ -221,10 +221,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   }>;
 
   /**
-   * We reserve the right to change our mind as to whether this is a string or
-   * number.
-   *
-   * @internal
+   * Unique identifier for this step within the plan.
    */
   public readonly id: number;
 

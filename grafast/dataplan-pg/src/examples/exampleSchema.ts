@@ -46,7 +46,7 @@ import {
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
   object,
-  operationPlan,
+  rootValue,
 } from "grafast";
 import type { GraphQLOutputType } from "grafast/graphql";
 import {
@@ -4741,11 +4741,11 @@ export function makeExampleSchema(
       query: {
         type: Query,
         plan: EXPORTABLE(
-          (operationPlan) =>
+          (rootValue) =>
             function plan() {
-              return operationPlan().rootValueStep;
+              return rootValue();
             },
-          [operationPlan],
+          [rootValue],
         ),
       },
     },
@@ -4780,11 +4780,11 @@ export function makeExampleSchema(
       query: {
         type: Query,
         plan: EXPORTABLE(
-          (operationPlan) =>
+          (rootValue) =>
             function plan() {
-              return operationPlan().rootValueStep;
+              return rootValue();
             },
-          [operationPlan],
+          [rootValue],
         ),
       },
     },
@@ -4825,11 +4825,11 @@ export function makeExampleSchema(
       query: {
         type: Query,
         plan: EXPORTABLE(
-          (operationPlan) =>
+          (rootValue) =>
             function plan() {
-              return operationPlan().rootValueStep;
+              return rootValue();
             },
-          [operationPlan],
+          [rootValue],
         ),
       },
     },
