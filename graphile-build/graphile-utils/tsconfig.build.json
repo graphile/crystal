@@ -8,6 +8,8 @@
   },
   "include": ["src"],
   "references": [
+    { "path": "../graphile-build" },
+    { "path": "../graphile-build-pg" },
     { "path": "../../utils/graphile-config" },
     { "path": "../../grafast/grafast" }
   ]
