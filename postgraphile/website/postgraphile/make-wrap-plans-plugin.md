@@ -112,6 +112,8 @@ When there's an explicit list of fields that you want to wrap in the same way,
 this method can still be useful:
 
 ```ts
+import { sideEffect } from "postgraphile/grafast";
+
 function assertValidUserData(data) {
   if (!data || data.username?.length === 0) {
     throw new Error("Invalid data");
@@ -123,9 +125,7 @@ const validateUserData = (propName) => {
     const $user = fieldArgs.getRaw(["input", propName]);
 
     // Callback throws error if invalid
-    const $check = lambda($user, (user) => assertValidUserData(user));
-    // Do not tree-shake away this step
-    $check.hasSideEffects = true;
+    sideEffect($user, (user) => assertValidUserData(user));
 
     return plan();
   };
@@ -247,6 +247,7 @@ anything from the above arguments that you need to create your resolver wrapper.
 
 ```ts
 import { makeWrapPlansPlugin } from "postgraphile/utils";
+import { sideEffect } from "postgraphile/grafast";
 
 // Example: log before and after each mutation runs
 export default makeWrapPlansPlugin(
@@ -258,22 +259,18 @@ export default makeWrapPlansPlugin(
   },
   ({ scope }) =>
     (plan, _, fieldArgs) => {
-      const $log1 = lambda(fieldArgs.getRaw(), (args) => {
+      sideEffect(fieldArgs.getRaw(), (args) => {
         console.log(
           `Mutation '${scope.fieldName}' starting with arguments:`,
           args,
         );
       });
-      // Do not tree-shake away this step
-      $log1.hasSideEffects = true;
 
       const $result = plan();
 
-      const $log2 = lambda($result, (result) => {
+      sideEffect($result, (result) => {
         console.log(`Mutation '${scope.fieldName}' result:`, result);
       });
-      // Do not tree-shake away this step
-      $log2.hasSideEffects = true;
 
       return $result;
     },

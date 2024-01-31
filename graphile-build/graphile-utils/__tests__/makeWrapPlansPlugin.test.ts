@@ -7,6 +7,7 @@ import {
   lambda,
   LambdaStep,
   proxy,
+  sideEffect,
 } from "grafast";
 import type { ExecutionResult } from "grafast/graphql";
 import {
@@ -149,12 +150,10 @@ describe("wrapping named plans", () => {
 
   it("can abort plan before", async () => {
     const wrapper: PlanWrapperFn = (plan) => {
-      const $preCheck = lambda(constant(null), async () => {
+      sideEffect(null, async () => {
         await delay(10);
         throw new Error("Abort");
       });
-      // Force this plan to run before any others for this field
-      $preCheck.hasSideEffects = true;
 
       return plan();
     };
@@ -336,20 +335,18 @@ describe("wrapping plans matching a filter", () => {
     }> =
       ({ scope }) =>
       (plan, user, args, _info) => {
-        const $before = lambda(args.get(), (argValues) => {
+        sideEffect(args.get(), (argValues) => {
           before.push([
             `Mutation '${scope.fieldName}' starting with arguments:`,
             argValues,
           ]);
         });
-        $before.hasSideEffects = true;
 
         const $result = plan();
 
-        const $after = lambda($result, (result) => {
+        sideEffect($result, (result) => {
           after.push([`Mutation '${scope.fieldName}' result:`, result]);
         });
-        $after.hasSideEffects = true;
 
         return $result;
       };
