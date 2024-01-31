@@ -1389,6 +1389,25 @@ export interface PgDescription {
 }
 
 /**
+ * The catalog pg_am stores information about relation access methods. There is one row for each access method
+ * supported by the system. Currently, only tables and indexes have access methods. The requirements for table and
+ * index access methods are discussed in detail in [tableam] and [indexam] respectively.
+ */
+export interface PgAm {
+  /** Row identifier */
+  _id: PgOid;
+
+  /** Name of the access method */
+  amname: PgName | null;
+
+  /** OID of a handler function that is responsible for supplying information about the access method */
+  amhandler: PgOid | null;
+
+  /** t = table (including materialized views), i = index. */
+  amtype: string | null;
+}
+
+/**
  * This type contains a description of everything we care about in the database.
  */
 export interface Introspection {
@@ -1409,6 +1428,7 @@ export interface Introspection {
   ranges: Array<PgRange>;
   depends: Array<PgDepend>;
   descriptions: Array<PgDescription>;
+  am: Array<PgAm>;
 
   /**
    * Catalogs such as pg_class, pg_attribute, etc have oids; this loopup lets us
@@ -1448,7 +1468,8 @@ export type PgEntity =
   | PgLanguage
   | PgRange
   | PgDepend
-  | PgDescription;
+  | PgDescription
+  | PgAm;
 
 // We might want this to take options in future, so we've made it a function.
 /**
@@ -1574,6 +1595,12 @@ with
       or (classoid = 'pg_catalog.pg_enum'::regclass and objoid in (select enums._id from enums))
       or (classoid = 'pg_catalog.pg_extension'::regclass and objoid in (select extensions._id from extensions))
     )
+  ),
+
+  am as (
+    select pg_am.oid as _id, *
+    from pg_catalog.pg_am
+    where true
   )
 select json_build_object(
   'database',
@@ -1626,6 +1653,9 @@ select json_build_object(
 
   'descriptions',
   (select coalesce((select json_agg(row_to_json(descriptions) order by objoid, classoid, objsubid) from descriptions), '[]'::json)),
+
+  'am',
+  (select coalesce((select json_agg(row_to_json(am) order by amname) from am), '[]'::json)),
 
   'catalog_by_oid',
   (

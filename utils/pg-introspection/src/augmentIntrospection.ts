@@ -45,7 +45,7 @@ function del<T extends Record<string, any>, TKey extends keyof T>(
 ) {
   for (let i = collection.length - 1; i >= 0; i--) {
     const entry = collection[i];
-    if (toDelete.has(entry[attr])) {
+    if (entry[attr] != null && toDelete.has(entry[attr])) {
       collection.splice(i, 1);
     }
   }
@@ -91,6 +91,8 @@ export function augmentIntrospection(
     del(extensionProcOids, introspection.procs, "_id");
     del(extensionClassOids, introspection.classes, "_id");
     del(extensionClassOids, introspection.attributes, "attrelid");
+    del(extensionClassOids, introspection.constraints, "conrelid");
+    del(extensionClassOids, introspection.constraints, "confrelid");
     del(extensionClassOids, introspection.types, "typrelid");
   }
 
@@ -296,6 +298,11 @@ export function augmentIntrospection(
     };
     entity.getInherited = memo(() =>
       introspection.inherits.filter((inh) => inh.inhrelid === entity._id),
+    );
+    entity.getAccessMethod = memo(() =>
+      entity.relam != null
+        ? introspection.am.find((am) => am._id === entity.relam)
+        : undefined,
     );
   });
   introspection.indexes.forEach((entity) => {
