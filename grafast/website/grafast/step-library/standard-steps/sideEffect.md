@@ -80,7 +80,7 @@ sideEffect(null, () => console.log(new Date().toISOString()));
 
 If you need to pass multiple steps, you can use the
 [`list()`](/grafast/step-library/standard-steps/list) step to do so:
-`lambda(list([$a, $b, $c]), ([a, b, c]) => doSomethingWith(a, b, c))`.
+`sideEffect(list([$a, $b, $c]), ([a, b, c]) => doSomethingWith(a, b, c))`.
 
 If you'd prefer to save a few characters you can pass the array of steps
 directly and we'll automatically wrap it in `list()` for you:
