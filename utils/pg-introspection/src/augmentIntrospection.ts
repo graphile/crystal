@@ -297,6 +297,11 @@ export function augmentIntrospection(
     entity.getInherited = memo(() =>
       introspection.inherits.filter((inh) => inh.inhrelid === entity._id),
     );
+    entity.getAccessMethod = memo(() =>
+      entity.relam != null
+        ? introspection.am.find((am) => am._id === entity.relam)
+        : undefined,
+    );
   });
   introspection.indexes.forEach((entity) => {
     entity._type = "PgIndex";

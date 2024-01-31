@@ -140,6 +140,7 @@ declare module "./introspection" {
     getTags(): PgSmartTagsDict;
     getACL(): AclObject[];
     getInherited(): PgInherits[];
+    getAccessMethod(): PgAm | undefined;
   }
   interface PgIndex {
     _type: "PgIndex";
