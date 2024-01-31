@@ -206,9 +206,28 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   public isSyncAndSafe!: boolean;
 
   /**
-   * The plan this plan will need data from in order to execute.
+   * The plan this plan will need data from in order to execute. For public
+   * access, use `getDependencies()`.
    */
   protected readonly dependencies: ReadonlyArray<ExecutableStep>;
+
+  /**
+   * Returns a copy of the dependencies of this step; not permitted during
+   * planning (only during optimize) in order to help you comply with the
+   * GraphQL specification.
+   *
+   * If a step is trying to access its own dependencies, it should instead
+   * use `this.dependencies`.
+   */
+  public getDependencies(): ReadonlyArray<ExecutableStep> {
+    if (this.operationPlan.phase !== "plan") {
+      return [...this.dependencies];
+    } else {
+      throw new Error(
+        `Accessing dependencies of a step during a plan resolver is forbidden; see: https://err.red/gprd`,
+      );
+    }
+  }
 
   /**
    * Just for mermaid
