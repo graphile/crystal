@@ -408,9 +408,9 @@ however, rely on `String(id)` being unique across an operation plan.
 ### hasSideEffects
 
 Set this true if the step has side effects (i.e. causes a mutation) - if this
-is true then Grafast will _not_ remove this step during tree shaking, and will
-ensure that the step is executed even if it doesn't appear to be used in any
-output.
+is true then Gra*fast* will _not_ remove this step during tree shaking, and
+will ensure that the step is executed even if it doesn't appear to be used in
+any output.
 
 ### isSyncAndSafe
 

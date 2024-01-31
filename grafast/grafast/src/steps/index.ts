@@ -77,6 +77,7 @@ export {
 } from "./remapKeys.js";
 export { reverse, reverseArray, ReverseStep } from "./reverse.js";
 export { setter, SetterCapableStep, SetterStep } from "./setter.js";
+export { sideEffect, SideEffectStep } from "./sideEffect.js";
 
 // Internal plans
 export { __InputListStep } from "./__inputList.js";
