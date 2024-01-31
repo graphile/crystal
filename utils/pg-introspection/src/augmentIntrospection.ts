@@ -91,6 +91,8 @@ export function augmentIntrospection(
     del(extensionProcOids, introspection.procs, "_id");
     del(extensionClassOids, introspection.classes, "_id");
     del(extensionClassOids, introspection.attributes, "attrelid");
+    del(extensionClassOids, introspection.constraints, "conrelid");
+    del(extensionClassOids, introspection.constraints, "confrelid");
     del(extensionClassOids, introspection.types, "typrelid");
   }
 
