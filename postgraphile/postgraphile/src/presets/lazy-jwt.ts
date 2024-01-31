@@ -52,9 +52,14 @@ const GrafservPgJWTPlugin: GraphileConfig.Plugin = {
                       },
                       (err, claims) => {
                         if (err) {
+                          (err as any).statusCode = 401;
                           reject(err);
                         } else if (!claims || typeof claims === "string") {
-                          reject(new Error("Invalid JWT payload"));
+                          reject(
+                            Object.assign(new Error("Invalid JWT payload"), {
+                              statusCode: 401,
+                            }),
+                          );
                         } else {
                           resolve(claims);
                         }
