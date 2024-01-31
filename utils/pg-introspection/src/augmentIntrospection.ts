@@ -45,7 +45,7 @@ function del<T extends Record<string, any>, TKey extends keyof T>(
 ) {
   for (let i = collection.length - 1; i >= 0; i--) {
     const entry = collection[i];
-    if (toDelete.has(entry[attr])) {
+    if (entry[attr] != null && toDelete.has(entry[attr])) {
       collection.splice(i, 1);
     }
   }
