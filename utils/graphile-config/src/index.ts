@@ -39,6 +39,9 @@ declare global {
       extends?: ReadonlyArray<Preset>;
       plugins?: Plugin[];
       disablePlugins?: ReadonlyArray<string>;
+      appendPlugins?: never;
+      prependPlugins?: never;
+      skipPlugins?: never;
       // **IMPORTANT**: if a key gets added here, make sure it's also added to the
       // isScopeKeyForPreset check.
     }

@@ -8,6 +8,10 @@ const PRESET_FORBIDDEN_KEYS = [
   "provides",
   "before",
   "after",
+  // To avoid confusion with PostGraphile V4:
+  "appendPlugins",
+  "prependPlugins",
+  "skipPlugins",
 ];
 const PLUGIN_FORBIDDEN_KEYS = ["plugins", "disablePlugins", "extends"];
 
