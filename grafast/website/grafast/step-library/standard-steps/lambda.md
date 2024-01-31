@@ -7,7 +7,8 @@ callback.
 
 The callback should perform a calculation, or may fetch data, but must not have
 side effects. If you need to do something with side effects use
-[`sideEffect()`]() instead (which has a very similar API).
+[`sideEffect()`](/grafast/step-library/standard-steps/sideEffect) instead
+(which has a very similar API).
 
 If you are 100% certain that your callback function:
 
