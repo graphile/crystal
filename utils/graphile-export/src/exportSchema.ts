@@ -3,10 +3,12 @@ import type { URL } from "node:url";
 import { inspect } from "node:util";
 
 import generate from "@babel/generator";
-import { parse, ParseResult } from "@babel/parser";
+import type { ParseResult } from "@babel/parser";
+import { parse } from "@babel/parser";
 import type { TemplateBuilderOptions } from "@babel/template";
 import template from "@babel/template";
-import traverse, { NodePath } from "@babel/traverse";
+import type { NodePath } from "@babel/traverse";
+import traverse from "@babel/traverse";
 import * as t from "@babel/types";
 import type {
   GraphQLArgumentConfig,
@@ -1305,7 +1307,7 @@ function funcToAst(
   locationHint: string,
   _nameHint: string,
 ): t.FunctionExpression | t.ArrowFunctionExpression {
-  const [doc, ast, path] = _funcToAst(fn, locationHint, _nameHint);
+  const [ast, path] = _funcToAst(fn, locationHint, _nameHint);
 
   const externalReferences = new Set<string>();
 
@@ -1326,6 +1328,8 @@ function funcToAst(
   externalReferences.delete("Buffer");
   externalReferences.delete("console");
   externalReferences.delete("process");
+  externalReferences.delete("setTimeout");
+  externalReferences.delete("setInterval");
 
   if (externalReferences.size > 0) {
     throw new Error(
@@ -1345,14 +1349,12 @@ function parseExpressionViaDoc(funcString: string) {
     sourceType: "module",
     plugins: ["typescript"],
   });
-  let result:
-    | null
-    | [ParseResult<t.File>, t.Expression, NodePath<t.VariableDeclaration>] =
+  let result: null | [t.Expression, NodePath<t.VariableDeclaration>] =
     null as any;
   traverse(doc, {
     VariableDeclaration(path) {
       const ast = path.node.declarations[0].init!;
-      result = [doc, ast, path];
+      result = [ast, path];
       path.stop();
     },
   });
@@ -1367,7 +1369,7 @@ function parseExpressionViaDoc(funcString: string) {
 function _funcToAst(fn: AnyFunction, locationHint: string, _nameHint: string) {
   const funcString = fn.toString().trim();
   try {
-    const [doc, result, path] = parseExpressionViaDoc(funcString);
+    const [result, path] = parseExpressionViaDoc(funcString);
     if (
       result.type !== "FunctionExpression" &&
       result.type !== "ArrowFunctionExpression"
@@ -1389,7 +1391,7 @@ Object.defineProperty(${
         `Expected FunctionExpression or ArrowFunctionExpression but saw ${result.type}`,
       );
     }
-    return [doc, result, path] as const;
+    return [result, path] as const;
   } catch (e) {
     if (e.retry === false) {
       throw e;
@@ -1406,7 +1408,7 @@ Object.defineProperty(${
       const modifiedDefinition = funcString.startsWith("async ")
         ? "async function " + funcString.slice(6)
         : "function " + funcString;
-      const [doc, result, path] = parseExpressionViaDoc(modifiedDefinition);
+      const [result, path] = parseExpressionViaDoc(modifiedDefinition);
       if (
         result.type !== "FunctionExpression" &&
         result.type !== "ArrowFunctionExpression"
@@ -1415,7 +1417,7 @@ Object.defineProperty(${
           `Expected FunctionExpression or ArrowFunctionExpression but saw ${result.type}`,
         );
       }
-      return [doc, result, path] as const;
+      return [result, path] as const;
     } catch {
       throw new Error(
         `Function export error at ${locationHint} - failed to process function definition '${trimDef(
