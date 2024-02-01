@@ -260,13 +260,16 @@ const preset: GraphileConfig.Preset = {
         },
         Subscription: {
           // Test via SQL: `NOTIFY test, '{"a":40}';`
-          sub: EXPORTABLE((context, jsonParse, listen, object) => (_$root, args) => {
-            const $topic = args.get("topic");
-            const $pgSubscriber = context().get("pgSubscriber");
-            return listen($pgSubscriber, $topic, ($payload) =>
-              object({ sub: jsonParse($payload).get("a" as never) }),
-            );
-          }, [context, jsonParse, listen, object]),
+          sub: EXPORTABLE(
+            (context, jsonParse, listen, object) => (_$root, args) => {
+              const $topic = args.get("topic");
+              const $pgSubscriber = context().get("pgSubscriber");
+              return listen($pgSubscriber, $topic, ($payload) =>
+                object({ sub: jsonParse($payload).get("a" as never) }),
+              );
+            },
+            [context, jsonParse, listen, object],
+          ),
           gql: {
             resolve: EXPORTABLE(
               () =>

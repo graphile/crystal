@@ -3,7 +3,6 @@ import type { URL } from "node:url";
 import { inspect } from "node:util";
 
 import generate from "@babel/generator";
-import type { ParseResult } from "@babel/parser";
 import { parse } from "@babel/parser";
 import type { TemplateBuilderOptions } from "@babel/template";
 import template from "@babel/template";
