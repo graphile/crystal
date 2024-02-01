@@ -3,9 +3,11 @@ import type { URL } from "node:url";
 import { inspect } from "node:util";
 
 import generate from "@babel/generator";
-import { parseExpression } from "@babel/parser";
+import { parse } from "@babel/parser";
 import type { TemplateBuilderOptions } from "@babel/template";
 import template from "@babel/template";
+import type { NodePath } from "@babel/traverse";
+import traverse from "@babel/traverse";
 import * as t from "@babel/types";
 import type {
   GraphQLArgumentConfig,
@@ -1304,12 +1306,68 @@ function funcToAst(
   locationHint: string,
   _nameHint: string,
 ): t.FunctionExpression | t.ArrowFunctionExpression {
+  const path = _funcToAst(fn, locationHint, _nameHint);
+
+  const externalReferences = new Set<string>();
+
+  const localBindings = path.scope.bindings;
+  path.traverse({
+    Identifier(path) {
+      if (
+        t.isReferenced(path.node, path.parent) && // Is a variable reference
+        !path.scope.hasBinding(path.node.name) && // Not defined in local scope
+        !localBindings[path.node.name] // Not a parameter of the function
+      ) {
+        externalReferences.add(path.node.name);
+      }
+    },
+  });
+
+  // Remove global things they're allowed to reference
+  externalReferences.delete("Buffer");
+  externalReferences.delete("console");
+  externalReferences.delete("process");
+  externalReferences.delete("setTimeout");
+  externalReferences.delete("setInterval");
+
+  if (externalReferences.size > 0) {
+    throw new Error(
+      `The function being exported as ${locationHint} references external variables: \`${[
+        ...externalReferences,
+      ].join(
+        "`, `",
+      )}\`. Please ensure this function is wrapped in \`EXPORTABLE(() => ...)\`. Fn:\n${fn}`,
+    );
+  }
+
+  return path.node;
+}
+
+function parseExpressionViaDoc(funcString: string) {
+  const doc = parse(`const f = ${funcString}`, {
+    sourceType: "module",
+    plugins: ["typescript"],
+  });
+  let result: null | NodePath<t.Expression> = null as any;
+  traverse(doc, {
+    VariableDeclaration(path) {
+      result = path.get("declarations.0.init") as NodePath<t.Expression>;
+      path.stop();
+    },
+  });
+  if (!result) {
+    throw new Error(
+      `graphile-export internal error - failed to find the variable declaration (?!!)`,
+    );
+  }
+  return result!;
+}
+
+function _funcToAst(fn: AnyFunction, locationHint: string, _nameHint: string) {
   const funcString = fn.toString().trim();
   try {
-    const result = parseExpression(funcString, {
-      sourceType: "module",
-      plugins: ["typescript"],
-    });
+    const path = parseExpressionViaDoc(funcString);
+    const result = path.node;
     if (
       result.type !== "FunctionExpression" &&
       result.type !== "ArrowFunctionExpression"
@@ -1331,7 +1389,7 @@ Object.defineProperty(${
         `Expected FunctionExpression or ArrowFunctionExpression but saw ${result.type}`,
       );
     }
-    return result;
+    return path as NodePath<typeof result>;
   } catch (e) {
     if (e.retry === false) {
       throw e;
@@ -1348,10 +1406,8 @@ Object.defineProperty(${
       const modifiedDefinition = funcString.startsWith("async ")
         ? "async function " + funcString.slice(6)
         : "function " + funcString;
-      const result = parseExpression(modifiedDefinition, {
-        sourceType: "module",
-        plugins: ["typescript"],
-      });
+      const path = parseExpressionViaDoc(modifiedDefinition);
+      const result = path.node;
       if (
         result.type !== "FunctionExpression" &&
         result.type !== "ArrowFunctionExpression"
@@ -1360,7 +1416,7 @@ Object.defineProperty(${
           `Expected FunctionExpression or ArrowFunctionExpression but saw ${result.type}`,
         );
       }
-      return result;
+      return path as NodePath<typeof result>;
     } catch {
       throw new Error(
         `Function export error at ${locationHint} - failed to process function definition '${trimDef(

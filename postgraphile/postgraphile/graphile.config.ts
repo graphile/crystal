@@ -214,17 +214,27 @@ const preset: GraphileConfig.Preset = {
         `,
         plans: {
           Person: {
-            greet($user: PgSelectSingleStep, { $greeting }) {
-              const placeholderSql = $user.placeholder($greeting, TYPES.text);
-              const alias = $user.getClassStep().alias;
-              return $user.select(
-                sql`${placeholderSql} || ', ' || ${alias}.name`,
-                TYPES.text,
-              );
-            },
-            query() {
-              return constant(true);
-            },
+            greet: EXPORTABLE(
+              (TYPES, sql) =>
+                ($user: PgSelectSingleStep, { $greeting }) => {
+                  const placeholderSql = $user.placeholder(
+                    $greeting,
+                    TYPES.text,
+                  );
+                  const alias = $user.getClassStep().alias;
+                  return $user.select(
+                    sql`${placeholderSql} || ', ' || ${alias}.name`,
+                    TYPES.text,
+                  );
+                },
+              [TYPES, sql],
+            ),
+            query: EXPORTABLE(
+              (constant) => () => {
+                return constant(true);
+              },
+              [constant],
+            ),
           },
         },
       };
@@ -241,19 +251,25 @@ const preset: GraphileConfig.Preset = {
       `,
       plans: {
         Query: {
-          mol() {
-            return context().get("mol");
-          },
+          mol: EXPORTABLE(
+            (context) => () => {
+              return context().get("mol");
+            },
+            [context],
+          ),
         },
         Subscription: {
           // Test via SQL: `NOTIFY test, '{"a":40}';`
-          sub(_$root, args) {
-            const $topic = args.get("topic");
-            const $pgSubscriber = context().get("pgSubscriber");
-            return listen($pgSubscriber, $topic, ($payload) =>
-              object({ sub: jsonParse($payload).get("a" as never) }),
-            );
-          },
+          sub: EXPORTABLE(
+            (context, jsonParse, listen, object) => (_$root, args) => {
+              const $topic = args.get("topic");
+              const $pgSubscriber = context().get("pgSubscriber");
+              return listen($pgSubscriber, $topic, ($payload) =>
+                object({ sub: jsonParse($payload).get("a" as never) }),
+              );
+            },
+            [context, jsonParse, listen, object],
+          ),
           gql: {
             resolve: EXPORTABLE(
               () =>
