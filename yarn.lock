@@ -3173,23 +3173,23 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@graphiql/plugin-explorer@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "@graphiql/plugin-explorer@npm:1.0.2"
+"@graphiql/plugin-explorer@npm:^1.0.3-canary-64994e0e.0":
+  version: 1.0.3-canary-64994e0e.0
+  resolution: "@graphiql/plugin-explorer@npm:1.0.3-canary-64994e0e.0"
   dependencies:
     graphiql-explorer: "npm:^0.9.0"
   peerDependencies:
-    "@graphiql/react": ^0.20.2
+    "@graphiql/react": ^0.20.3-canary-64994e0e.0
     graphql: ^15.5.0 || ^16.0.0
     react: ^16.8.0 || ^17 || ^18
     react-dom: ^16.8.0 || ^17 || ^18
-  checksum: bfcef38058d78b626dad422d80c289d3f6446b097eb4dd64b563519bed33a88981c49dc6c756de4d899e719b14d8940a182859b289e98942644e4d5054e9d12f
+  checksum: 1aafd855e72e3b178ddfa4bc80d89609e6ed48ccd2facdfa2d8edc80d81a78ebfc7f5ff9e0cd188e239decae4cd2ab276af3a8c9c9ee9b3ed343c30576f27849
   languageName: node
   linkType: hard
 
-"@graphiql/react@npm:^0.20.2":
-  version: 0.20.2
-  resolution: "@graphiql/react@npm:0.20.2"
+"@graphiql/react@npm:^0.20.3-canary-64994e0e.0":
+  version: 0.20.3-canary-64994e0e.0
+  resolution: "@graphiql/react@npm:0.20.3-canary-64994e0e.0"
   dependencies:
     "@graphiql/toolkit": "npm:^0.9.1"
     "@headlessui/react": "npm:^1.7.15"
@@ -3210,7 +3210,7 @@ __metadata:
     graphql: ^15.5.0 || ^16.0.0
     react: ^16.8.0 || ^17 || ^18
     react-dom: ^16.8.0 || ^17 || ^18
-  checksum: 59b42f0f92832d55adca759be6e18383b2940734aec094909740a1b6fb37963aa333de25d45f94bc0d606be95bf8fdc57d6a341598a3f466f1d2fb1f6420bcd9
+  checksum: 3162b17bb774042992b79df40c53527dc44638fd1e5c41972153c55b9a780e6967dd666f7fb05d40f887c3796bb86d36312df914c6b9f8f723952caf3d85b062
   languageName: node
   linkType: hard
 
@@ -12155,11 +12155,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphiql@npm:^3.1.0":
-  version: 3.1.0
-  resolution: "graphiql@npm:3.1.0"
+"graphiql@npm:^3.1.1-canary-64994e0e.0":
+  version: 3.1.1-canary-64994e0e.0
+  resolution: "graphiql@npm:3.1.1-canary-64994e0e.0"
   dependencies:
-    "@graphiql/react": "npm:^0.20.2"
+    "@graphiql/react": "npm:^0.20.3-canary-64994e0e.0"
     "@graphiql/toolkit": "npm:^0.9.1"
     graphql-language-service: "npm:^5.2.0"
     markdown-it: "npm:^12.2.0"
@@ -12167,7 +12167,7 @@ __metadata:
     graphql: ^15.5.0 || ^16.0.0
     react: ^16.8.0 || ^17 || ^18
     react-dom: ^16.8.0 || ^17 || ^18
-  checksum: 06b420a8af55af987e6714ab212e5cef0ac3c7e682b2071e5490b309b1257d5990056d61b083f944e93fedab5013e65600fc4097e73b3f9cd37c2006c68ed3b1
+  checksum: 8d7152b8f60f6bbbf62d7d0abd177fdf28c280a65c74ca13fbcb36cd695fb32420ad30d9e79c806e6fb39393e13351a345d7296f4d1b5b73c20d886457f0b791
   languageName: node
   linkType: hard
 
@@ -19035,8 +19035,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "ruru-components@workspace:grafast/ruru-components"
   dependencies:
-    "@graphiql/plugin-explorer": "npm:^1.0.2"
-    "@graphiql/react": "npm:^0.20.2"
+    "@graphiql/plugin-explorer": "npm:^1.0.3-canary-64994e0e.0"
+    "@graphiql/react": "npm:^0.20.3-canary-64994e0e.0"
     "@graphiql/toolkit": "npm:^0.9.1"
     "@types/codemirror": "npm:^5.60.9"
     "@types/debug": "npm:^4.1.8"
@@ -19046,7 +19046,7 @@ __metadata:
     "@types/react": "npm:^18.2.21"
     "@types/react-dom": "npm:^18.2.7"
     grafast: "workspace:^"
-    graphiql: "npm:^3.1.0"
+    graphiql: "npm:^3.1.1-canary-64994e0e.0"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     graphql-ws: "npm:^5.14.0"
     jest: "npm:^29.6.4"
