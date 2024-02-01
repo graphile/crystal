@@ -1307,7 +1307,7 @@ function funcToAst(
   locationHint: string,
   _nameHint: string,
 ): t.FunctionExpression | t.ArrowFunctionExpression {
-  const [ast, path] = _funcToAst(fn, locationHint, _nameHint);
+  const path = _funcToAst(fn, locationHint, _nameHint);
 
   const externalReferences = new Set<string>();
 
@@ -1341,7 +1341,7 @@ function funcToAst(
     );
   }
 
-  return ast;
+  return path.node;
 }
 
 function parseExpressionViaDoc(funcString: string) {
@@ -1349,12 +1349,10 @@ function parseExpressionViaDoc(funcString: string) {
     sourceType: "module",
     plugins: ["typescript"],
   });
-  let result: null | [t.Expression, NodePath<t.VariableDeclaration>] =
-    null as any;
+  let result: null | NodePath<t.Expression> = null as any;
   traverse(doc, {
     VariableDeclaration(path) {
-      const ast = path.node.declarations[0].init!;
-      result = [ast, path];
+      result = path.get("declarations.0.init") as NodePath<t.Expression>;
       path.stop();
     },
   });
@@ -1369,7 +1367,8 @@ function parseExpressionViaDoc(funcString: string) {
 function _funcToAst(fn: AnyFunction, locationHint: string, _nameHint: string) {
   const funcString = fn.toString().trim();
   try {
-    const [result, path] = parseExpressionViaDoc(funcString);
+    const path = parseExpressionViaDoc(funcString);
+    const result = path.node;
     if (
       result.type !== "FunctionExpression" &&
       result.type !== "ArrowFunctionExpression"
@@ -1391,7 +1390,7 @@ Object.defineProperty(${
         `Expected FunctionExpression or ArrowFunctionExpression but saw ${result.type}`,
       );
     }
-    return [result, path] as const;
+    return path as NodePath<typeof result>;
   } catch (e) {
     if (e.retry === false) {
       throw e;
@@ -1408,7 +1407,8 @@ Object.defineProperty(${
       const modifiedDefinition = funcString.startsWith("async ")
         ? "async function " + funcString.slice(6)
         : "function " + funcString;
-      const [result, path] = parseExpressionViaDoc(modifiedDefinition);
+      const path = parseExpressionViaDoc(modifiedDefinition);
+      const result = path.node;
       if (
         result.type !== "FunctionExpression" &&
         result.type !== "ArrowFunctionExpression"
@@ -1417,7 +1417,7 @@ Object.defineProperty(${
           `Expected FunctionExpression or ArrowFunctionExpression but saw ${result.type}`,
         );
       }
-      return [result, path] as const;
+      return path as NodePath<typeof result>;
     } catch {
       throw new Error(
         `Function export error at ${locationHint} - failed to process function definition '${trimDef(
