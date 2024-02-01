@@ -31,6 +31,8 @@ export const configs = {
             "serialize",
             "parseValue",
             "parseLiteral",
+            "inputPlan",
+            "applyPlan",
           ],
         },
       ],
