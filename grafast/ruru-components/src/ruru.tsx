@@ -37,6 +37,11 @@ const checkCss = { width: "1.5rem", display: "inline-block" };
 const check = <span style={checkCss}>✔</span>;
 const nocheck = <span style={checkCss}></span>;
 
+const explorerPlugin = makeExplorerPlugin({
+  showAttribution: false,
+});
+const plugins = [explorerPlugin, EXPLAIN_PLUGIN];
+
 export const Ruru: FC<RuruProps> = (props) => {
   const storage = useStorage();
   const explain = storage.get("explain") === "true";
@@ -55,12 +60,6 @@ export const Ruru: FC<RuruProps> = (props) => {
   const [error, setError] = useState<Error | null>(null);
   const explainHelpers = useExplain(storage);
   const defaultQuery = props.defaultQuery ?? DEFAULT_QUERY;
-  const explorerPlugin = makeExplorerPlugin({
-    showAttribution: false,
-  });
-  const plugins = useMemo<GraphiQLPlugin[]>(() => {
-    return [explorerPlugin, EXPLAIN_PLUGIN];
-  }, [explorerPlugin]);
   return (
     //EditorContextProvider
     <ExplainContext.Provider
