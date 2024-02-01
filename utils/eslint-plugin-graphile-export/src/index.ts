@@ -33,6 +33,7 @@ export const configs = {
             "parseLiteral",
             "inputPlan",
             "applyPlan",
+            "assertStep",
           ],
         },
       ],

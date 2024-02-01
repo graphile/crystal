@@ -49,6 +49,9 @@ const ALLOWED_SIBLING_KEYS: string[] = [
   "assertStep",
   "autoApplyAfterParentInputPlan",
   "autoApplyAfterParentApplyPlan",
+  "autoApplyAfterParentPlan",
+  "autoApplyAfterParentSubscribePlan",
+  "idempotent",
   "inputPlan",
   "applyPlan",
 ];
@@ -97,6 +100,7 @@ export const ExportMethods: Rule.RuleModule = {
       "parseLiteral",
       "inputPlan",
       "applyPlan",
+      "assertStep",
     ];
 
     const options: CommonOptions = {
