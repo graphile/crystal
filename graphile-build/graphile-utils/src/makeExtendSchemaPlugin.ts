@@ -9,6 +9,7 @@ import type {
   EnumTypeDefinitionNode,
   EnumValueDefinitionNode,
   FieldDefinitionNode,
+  GraphQLArgumentConfig,
   GraphQLDirective,
   GraphQLEnumType,
   // Config:
@@ -1001,11 +1002,17 @@ export function makeExtendSchemaPlugin(
           if (arg.defaultValue) {
             defaultValue = getValue(arg.defaultValue, type);
           }
+          const argDirectives = getDirectives(arg.directives);
+          const deprecatedDirective = argDirectives.find(
+            (d) => d.directiveName === "deprecated",
+          );
+          const deprecationReason = deprecatedDirective?.args.reason;
           memo[name] = {
             type,
+            deprecationReason,
             ...(defaultValue != null ? { defaultValue } : null),
             ...(description ? { description } : null),
-          };
+          } as GraphQLArgumentConfig;
         } else {
           throw new Error(
             `Unexpected '${arg.kind}', we were expecting an 'InputValueDefinition'`,

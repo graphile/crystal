@@ -206,7 +206,9 @@ const preset: GraphileConfig.Preset = {
       return {
         typeDefs: gql`
           extend type Person {
-            greet(greeting: String! = "Hello"): String
+            greet(
+              greeting: String! = "Hello" @deprecated(reason: "TESTING")
+            ): String
             query: Query
           }
         `,
