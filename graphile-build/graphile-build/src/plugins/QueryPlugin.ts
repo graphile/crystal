@@ -25,7 +25,7 @@ export const QueryPlugin: GraphileConfig.Plugin = {
     hooks: {
       init: {
         callback: (_, build, _context) => {
-          const { registerObjectType, inflection } = build;
+          const { registerObjectType, inflection, EXPORTABLE } = build;
           registerObjectType(
             inflection.builtin("Query"),
             {
