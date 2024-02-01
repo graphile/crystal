@@ -663,9 +663,13 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   description: `An input for mutations affecting \`${tableTypeName}\``,
                   extensions: {
                     grafast: {
-                      inputPlan() {
-                        return object(Object.create(null));
-                      },
+                      inputPlan: EXPORTABLE(
+                        (object) =>
+                          function inputPlan() {
+                            return object(Object.create(null));
+                          },
+                        [object],
+                      ),
                     },
                   },
                 }),
@@ -692,9 +696,13 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   description: `Represents an update to a \`${tableTypeName}\`. Fields that are set will be updated.`,
                   extensions: {
                     grafast: {
-                      inputPlan() {
-                        return object(Object.create(null));
-                      },
+                      inputPlan: EXPORTABLE(
+                        (object) =>
+                          function inputPlan() {
+                            return object(Object.create(null));
+                          },
+                        [object],
+                      ),
                     },
                   },
                 }),
@@ -717,9 +725,13 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   description: `An input representation of \`${tableTypeName}\` with nullable fields.`,
                   extensions: {
                     grafast: {
-                      inputPlan() {
-                        return object(Object.create(null));
-                      },
+                      inputPlan: EXPORTABLE(
+                        (object) =>
+                          function inputPlan() {
+                            return object(Object.create(null));
+                          },
+                        [object],
+                      ),
                     },
                   },
                 }),

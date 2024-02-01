@@ -25,7 +25,7 @@ export const QueryPlugin: GraphileConfig.Plugin = {
     hooks: {
       init: {
         callback: (_, build, _context) => {
-          const { registerObjectType, inflection } = build;
+          const { registerObjectType, inflection, EXPORTABLE } = build;
           registerObjectType(
             inflection.builtin("Query"),
             {
@@ -37,7 +37,7 @@ export const QueryPlugin: GraphileConfig.Plugin = {
               // but only because of the check on interfaces that all
               // consistituent types either expect a step or don't (which is an
               // arbitrary constraint we've added that can be removed).
-              assertStep: () => true,
+              assertStep: EXPORTABLE(() => () => true, []),
               description:
                 "The root query type which gives access points into the data universe.",
             }),

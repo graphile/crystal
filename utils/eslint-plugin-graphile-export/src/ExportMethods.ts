@@ -45,6 +45,15 @@ const ALLOWED_SIBLING_KEYS: string[] = [
 
   // pgSelect args
   "name",
+
+  "assertStep",
+  "autoApplyAfterParentInputPlan",
+  "autoApplyAfterParentApplyPlan",
+  "autoApplyAfterParentPlan",
+  "autoApplyAfterParentSubscribePlan",
+  "idempotent",
+  "inputPlan",
+  "applyPlan",
 ];
 
 export const ExportMethods: Rule.RuleModule = {
@@ -89,6 +98,9 @@ export const ExportMethods: Rule.RuleModule = {
       "serialize",
       "parseValue",
       "parseLiteral",
+      "inputPlan",
+      "applyPlan",
+      "assertStep",
     ];
 
     const options: CommonOptions = {
