@@ -70,6 +70,7 @@ export const Ruru: FC<RuruProps> = (props) => {
       }}
     >
       <GraphiQLProvider
+        inputValueDeprecation={true}
         fetcher={fetcher}
         defaultQuery={defaultQuery}
         query={props.query ?? props.initialQuery}
