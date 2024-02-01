@@ -1,5 +1,4 @@
 import { explorerPlugin as makeExplorerPlugin } from "@graphiql/plugin-explorer";
-import type { GraphiQLPlugin } from "@graphiql/react";
 import {
   CopyIcon,
   GraphiQLProvider as GP2,
@@ -15,7 +14,7 @@ import {
 import type { GraphiQLProps } from "graphiql";
 import { GraphiQL, GraphiQLInterface, GraphiQLProvider } from "graphiql";
 import type { FC } from "react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 
 import { ErrorPopup } from "./components/ErrorPopup.js";
 import { RuruFooter } from "./components/Footer.js";
