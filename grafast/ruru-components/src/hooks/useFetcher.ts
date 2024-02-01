@@ -12,7 +12,6 @@ import {
 import type { GrafastPlanJSON } from "grafast";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { getOperationAST, parse } from "graphql";
-import { createClient } from "graphql-ws";
 import { useEffect, useMemo, useState } from "react";
 
 import type { RuruProps } from "../interfaces.js";
@@ -143,26 +142,18 @@ export const useFetcher = (
     };
   }, [url]);
 
-  const fetcherOptions = useMemo<CreateFetcherOptions>(
-    () => ({
+  const fetcherOptions = useMemo<CreateFetcherOptions>(() => {
+    const headers: Record<string, string> = explain
+      ? { "X-PostGraphile-Explain": "on", "X-GraphQL-Explain": "plan,sql" }
+      : {};
+    return {
       url,
-      headers: {
-        ...(explain
-          ? {
-              "X-PostGraphile-Explain": "on",
-              "X-GraphQL-Explain": "plan,sql",
-            }
-          : null),
-      },
+      headers,
+      wsConnectionParams: headers,
       fetch: ourFetch,
-      wsClient: subscriptionUrl
-        ? createClient({
-            url: subscriptionUrl,
-          })
-        : undefined,
-    }),
-    [explain, url, subscriptionUrl, ourFetch],
-  );
+      subscriptionUrl,
+    };
+  }, [explain, url, subscriptionUrl, ourFetch]);
 
   const fetcher = useMemo(
     () => props.fetcher ?? createGraphiQLFetcher(fetcherOptions),
