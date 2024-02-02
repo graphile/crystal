@@ -46,10 +46,10 @@ import {
 } from "grafast/graphql";
 import type { GraphQLSchemaNormalizedConfig } from "graphql/type/schema";
 import type { PgSQL, SQL } from "pg-sql2";
-import { reservedWords } from "./reservedWords.js";
 
 import type { ExportOptions } from "./interfaces.js";
 import { optimize } from "./optimize/index.js";
+import { reservedWords } from "./reservedWords.js";
 import { wellKnown } from "./wellKnown.js";
 
 // Cannot import sql because it's optional
