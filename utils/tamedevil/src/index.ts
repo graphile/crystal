@@ -839,17 +839,7 @@ export function EXPORTABLE<T, TScope extends any[]>(
   return fn;
 }
 
-function _runCore<TResult>(
-  fragmentOrStrings: TE | TemplateStringsArray,
-  values: TE[],
-  exportable = false,
-): TResult {
-  if ("raw" in fragmentOrStrings) {
-    return run(te(fragmentOrStrings, ...values));
-  }
-  if (values.length > 0) {
-    throw new Error("Invalid call to `te.run`");
-  }
+function _runCore<TResult>(fragmentOrStrings: TE, exportable = false): TResult {
   const fragment =
     fragmentOrStrings[$$type] !== undefined
       ? fragmentOrStrings
@@ -891,7 +881,14 @@ function run<TResult>(
   fragmentOrStrings: TE | TemplateStringsArray,
   ...values: TE[]
 ): TResult {
-  return _runCore(fragmentOrStrings, values);
+  if ("raw" in fragmentOrStrings) {
+    // Turn a template literal run into a run just passing a TE fragment
+    return run(te(fragmentOrStrings, ...values));
+  }
+  if (values.length > 0) {
+    throw new Error("Invalid call to `te.run`");
+  }
+  return _runCore(fragmentOrStrings);
 }
 
 /** Same as `run`, except the result is wrapped in `EXPORTABLE()` */
@@ -904,7 +901,14 @@ function runExportable<TResult>(
   fragmentOrStrings: TE | TemplateStringsArray,
   ...values: TE[]
 ): TResult {
-  return _runCore(fragmentOrStrings, values, true);
+  if ("raw" in fragmentOrStrings) {
+    // Turn a template literal run into a run just passing a TE fragment
+    return runExportable(te(fragmentOrStrings, ...values));
+  }
+  if (values.length > 0) {
+    throw new Error("Invalid call to `te.runExportable`");
+  }
+  return _runCore(fragmentOrStrings, true);
 }
 
 interface Batch {
