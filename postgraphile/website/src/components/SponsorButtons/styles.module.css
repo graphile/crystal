@@ -1,0 +1,76 @@
+.sponsorbuttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.borderbutton {
+  composes: buttonHero from "@site/src/css/common.module.css";
+  color: var(--ifm-color-primary);
+  text-transform: uppercase;
+  max-width: 100%;
+  margin-left: 1rem;
+  border: 1px solid var(--ifm-color-primary);
+}
+
+.borderbutton:hover {
+  border-radius: 7px;
+  border: 1px solid var(--ifm-color-primary-dark);
+  color: var(--ifm-color-primary-dark);
+}
+
+.sponsorbutton {
+  composes: buttonHero from "@site/src/css/common.module.css";
+  text-transform: uppercase;
+  max-width: 100%;
+  border: 1px solid var(--ifm-color-primary);
+}
+
+.sponsorbutton:before {
+  content: "Sponsor Graphile";
+}
+
+.borderbutton:before {
+  content: "Find out more on Graphile.org";
+}
+
+.sponsorbutton:hover {
+  background-color: var(--ifm-color-primary-darker);
+  border: 1px solid var(--ifm-color-primary-darker);
+}
+
+[data-theme="dark"] .sponsorbutton {
+  border: 1px solid var(--ifm-color-primary);
+  background-color: var(--ifm-color-primary);
+}
+
+[data-theme="dark"] .sponsorbutton:hover {
+  border: 1px solid var(--ifm-color-primary-lightest);
+  background-color: var(--ifm-color-primary-lightest);
+}
+
+[data-theme="dark"] .borderbutton:hover {
+  border: 1px solid var(--ifm-color-primary-lightest);
+  color: var(--ifm-color-lightest);
+}
+
+@media screen and (max-width: 995px) {
+  .sponsorbuttons {
+    display: flex;
+    flex-direction: column;
+  }
+  .borderbutton {
+    margin-top: 1rem;
+    margin-left: 0rem;
+  }
+  .borderbutton:before {
+    content: "Graphile.org";
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .sponsorbutton:before {
+    content: "Sponsor";
+  }
+}

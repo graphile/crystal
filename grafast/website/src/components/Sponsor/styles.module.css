@@ -1,0 +1,58 @@
+.sponsor {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: normal;
+  margin: 0.5rem;
+  padding: 1rem;
+  flex: 0 0 18rem;
+  font-size: 1.5rem;
+}
+.featured .name {
+  font-size: 2rem;
+  padding-top: 1rem;
+}
+
+.featured {
+  border: 3px solid var(--ifm-color-primary-darkest);
+  background: white;
+  border-radius: 12px;
+}
+
+.name {
+  color: var(--black-ish);
+  text-align: center;
+  font-family: "Sriracha", "Comic Sans MS", "Comic Sans", sans;
+  text-transform: uppercase;
+}
+
+.backers {
+  flex: none;
+}
+
+.backers .name:hover {
+  color: var(--ifm-color-primary-dark);
+}
+
+[data-theme="dark"] .backers .name {
+  color: var(--ifm-color-primary);
+}
+
+img.avatar {
+  border-radius: 10rem;
+  width: 10rem;
+  height: 10rem;
+}
+
+.business {
+}
+
+.contributor {
+}
+
+.plain {
+  background-color: inherit;
+  border-radius: inherit;
+  border: inherit;
+}

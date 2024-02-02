@@ -200,8 +200,13 @@ const config = {
             position: "right",
           },
           {
+            to: "sponsor",
+            label: "Sponsor",
+            position: "right",
+          },
+          {
             href: "https://github.com/grafast/wg",
-            label: "Working Group",
+            label: "WG",
             position: "right",
           },
           {
