@@ -71,6 +71,9 @@ export const test =
       const { code: exportString } = await exportSchemaAsString(schema, {
         mode: "typeDefs",
         prettier: true,
+        modules: {
+          jsonwebtoken: await import("jsonwebtoken"),
+        },
       });
       const executableSchemaPath = `${testPath.replace(/\.test\.[jt]s$/, "")}${
         sort || i > 1 ? `.${i}` : ""
