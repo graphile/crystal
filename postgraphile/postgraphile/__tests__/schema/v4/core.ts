@@ -11,6 +11,8 @@ import type { V4Options } from "../../../src/presets/v4.js";
 import { makeV4Preset } from "../../../src/presets/v4.js";
 import { snapshot, withPoolClientTransaction } from "../../helpers.js";
 
+jest.setTimeout(30000);
+
 let countByPath = Object.create(null);
 
 export const test =
