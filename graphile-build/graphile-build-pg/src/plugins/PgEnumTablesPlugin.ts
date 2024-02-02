@@ -219,6 +219,7 @@ Original error: ${e.message}
         }
       },
       async processIntrospection(info, event) {
+        const { EXPORTABLE } = info;
         const { introspection, serviceName } = event;
         for (const pgClass of introspection.classes) {
           const pgNamespace = pgClass.getNamespace();
@@ -331,16 +332,21 @@ Original error: ${e.message}
               };
 
               // Build the codec
-              const codec = enumCodec({
-                name: info.inflection.enumTableCodec({
-                  serviceName,
-                  pgClass,
-                  pgConstraint,
-                }),
-                identifier: originalCodec.sqlType,
-                values,
-                extensions,
+              const name = info.inflection.enumTableCodec({
+                serviceName,
+                pgClass,
+                pgConstraint,
               });
+              const codec = EXPORTABLE(
+                (name, originalCodec, values, extensions, enumCodec) =>
+                  enumCodec({
+                    name,
+                    identifier: originalCodec.sqlType,
+                    values,
+                    extensions,
+                  }),
+                [name, originalCodec, values, extensions, enumCodec],
+              );
 
               // Associate this constraint with our new codec
               info.state.codecByPgConstraint.set(pgConstraint, codec);

@@ -74,6 +74,7 @@ import type { PluginHook } from "graphile-config";
 
 import type { GatherPluginContext } from "./interfaces.js";
 import type { NewWithHooksFunction } from "./newWithHooks/index.js";
+import { EXPORTABLE } from "./utils.js";
 
 // export globals for TypeDoc
 export { GraphileBuild, GraphileConfig };
@@ -209,6 +210,7 @@ const gatherBase = (
         inflection,
         resolvedPreset,
         grafast,
+        EXPORTABLE,
       };
       pluginContext.set(plugin, context);
       if (spec.namespace != null) {

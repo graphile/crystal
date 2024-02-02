@@ -1,4 +1,5 @@
 import type { AsyncHooks } from "graphile-config";
+import type { EXPORTABLE } from "./utils.js";
 
 /**
  * The details in the 'info' object passed as the first argument to all gather
@@ -55,4 +56,6 @@ export interface GatherPluginContext<
    */
   // eslint-disable-next-line @typescript-eslint/consistent-type-imports
   grafast: typeof import("grafast");
+
+  EXPORTABLE: typeof EXPORTABLE;
 }
