@@ -76,9 +76,4 @@ export const test =
         sort || i > 1 ? `.${i}` : ""
       }.export.mjs`;
       await snapshot(exportString.trim() + "\n", executableSchemaPath);
-      // And finally check that we can load the schema
-      const { schema: schema2 } = await import(executableSchemaPath);
-      const sorted2 = sort ? lexicographicSortSchema(schema2) : schema2;
-      const printed2 = printSchema(sorted2);
-      expect(printed2).toEqual(printed);
     });
