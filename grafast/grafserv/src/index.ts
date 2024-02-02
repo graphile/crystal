@@ -43,6 +43,7 @@ export type {
   ValidatedGraphQLBody,
 } from "./interfaces.js";
 export { DEFAULT_ALLOWED_REQUEST_CONTENT_TYPES } from "./middleware/graphql.js";
+export { defaultMaskError } from "./options.js";
 export {
   getBodyFromFrameworkBody,
   getBodyFromRequest,
