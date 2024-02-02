@@ -2,6 +2,7 @@ import type { PromiseOrDirect } from "grafast";
 import type { GraphQLSchema } from "grafast/graphql";
 import { lexicographicSortSchema, printSchema } from "grafast/graphql";
 import { makeSchema } from "graphile-build";
+import { exportSchemaAsString } from "graphile-export";
 import type { PoolClient } from "pg";
 
 import AmberPreset from "../../../src/presets/amber.js";
@@ -77,4 +78,18 @@ export const test =
       if (finalCheck) {
         await finalCheck(schema);
       }
+      // Now check the schema exports
+      const { code: exportString } = await exportSchemaAsString(schema, {
+        mode: "typeDefs",
+        prettier: true,
+      });
+      const executableSchemaPath = `${testPath.replace(/\.test\.[jt]s$/, "")}${
+        sort || i > 1 ? `.${i}` : ""
+      }.export.mjs`;
+      await snapshot(exportString.trim() + "\n", executableSchemaPath);
+      // And finally check that we can load the schema
+      const { schema: schema2 } = await import(executableSchemaPath);
+      const sorted2 = sort ? lexicographicSortSchema(schema2) : schema2;
+      const printed2 = printSchema(sorted2);
+      expect(printed2).toEqual(printed);
     });
