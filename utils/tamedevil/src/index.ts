@@ -1217,6 +1217,8 @@ const attributes = {
   dangerouslyIncludeRawCode,
 };
 
+export { reservedWords };
+
 Object.entries(attributes).forEach(([exportName, value]) => {
   if (!(value as any).$$export) {
     exportAs(value, exportName);

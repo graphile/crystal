@@ -46,6 +46,7 @@ import {
 } from "grafast/graphql";
 import type { GraphQLSchemaNormalizedConfig } from "graphql/type/schema";
 import type { PgSQL, SQL } from "pg-sql2";
+import { reservedWords } from "tamedevil";
 
 import type { ExportOptions } from "./interfaces.js";
 import { optimize } from "./optimize/index.js";
@@ -89,6 +90,13 @@ function identifierOrLiteral(key: string | number) {
   }
   if (canRepresentAsIdentifier(key)) {
     return t.identifier(key);
+  } else {
+    return t.stringLiteral(key);
+  }
+}
+function literal(key: string | number) {
+  if (typeof key === "number") {
+    return t.numericLiteral(key);
   } else {
     return t.stringLiteral(key);
   }
@@ -200,49 +208,55 @@ function isBuiltinType(type: GraphQLNamedType): boolean {
   return type.name.startsWith("__") || BUILTINS.includes(type.name);
 }
 
+const RESERVED_VARIABLES: Record<string, true> = {
+  // Reserved variables
+  AbortController: true,
+  Array: true,
+  Buffer: true,
+  DOMException: true,
+  Error: true,
+  Event: true,
+  EventTarget: true,
+  JSON: true,
+  Math: true,
+  MessageChannel: true,
+  MessageEvent: true,
+  MessagePort: true,
+  Object: true,
+  TextDecoder: true,
+  TextEncoder: true,
+  URL: true,
+  URLSearchParams: true,
+  WebAssembly: true,
+  __dirname: true,
+  __filename: true,
+  atob: true,
+  btoa: true,
+  clearImmediate: true,
+  clearInterval: true,
+  clearTimeout: true,
+  console: true,
+  exports: true,
+  global: true,
+  module: true,
+  performance: true,
+  process: true,
+  queueMicrotask: true,
+  require: true,
+  setImmediate: true,
+  setInterval: true,
+  setTimeout: true,
+  structuredClone: true,
+};
+for (const reservedWord of reservedWords) {
+  RESERVED_VARIABLES[reservedWord] = true;
+}
+Object.freeze(RESERVED_VARIABLES);
+
 class CodegenFile {
   _variables: {
     [name: string]: true;
-  } = Object.assign(Object.create(null), {
-    // Reserved variables
-    AbortController: true,
-    Array: true,
-    Buffer: true,
-    DOMException: true,
-    Error: true,
-    Event: true,
-    EventTarget: true,
-    JSON: true,
-    Math: true,
-    MessageChannel: true,
-    MessageEvent: true,
-    MessagePort: true,
-    Object: true,
-    TextDecoder: true,
-    TextEncoder: true,
-    URL: true,
-    URLSearchParams: true,
-    WebAssembly: true,
-    __dirname: true,
-    __filename: true,
-    atob: true,
-    btoa: true,
-    clearImmediate: true,
-    clearInterval: true,
-    clearTimeout: true,
-    console: true,
-    exports: true,
-    global: true,
-    module: true,
-    performance: true,
-    process: true,
-    queueMicrotask: true,
-    require: true,
-    setImmediate: true,
-    setInterval: true,
-    setTimeout: true,
-    structuredClone: true,
-  });
+  } = Object.assign(Object.create(null), RESERVED_VARIABLES);
 
   _imports: {
     [fromModule: string]: {
@@ -1023,14 +1037,12 @@ function _convertToAST(
         value: t.Expression,
       ]
     > = [];
-    let hasUnsafeKeys = false;
-    Object.entries(thing).forEach(([key, value]) => {
-      const tKey = identifierOrLiteral(key);
+    const entries = Object.entries(thing);
+    const hasUnsafeKeys = entries.some(([key]) => !canBeRegularObjectKey(key));
+    entries.forEach(([key, value]) => {
+      const tKey = hasUnsafeKeys ? literal(key) : identifierOrLiteral(key);
       const subvalue = handleSubvalue(value, tKey, key);
       propertyPairs.push([tKey, subvalue]);
-      if (!canBeRegularObjectKey(key)) {
-        hasUnsafeKeys = true;
-      }
     });
     if (prototype === null) {
       if (hasUnsafeKeys) {
