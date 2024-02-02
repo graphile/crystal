@@ -338,14 +338,14 @@ Original error: ${e.message}
                 pgConstraint,
               });
               const codec = EXPORTABLE(
-                (name, originalCodec, values, extensions, enumCodec) =>
+                (enumCodec, extensions, name, originalCodec, values) =>
                   enumCodec({
                     name,
                     identifier: originalCodec.sqlType,
                     values,
                     extensions,
                   }),
-                [name, originalCodec, values, extensions, enumCodec],
+                [enumCodec, extensions, name, originalCodec, values],
               );
 
               // Associate this constraint with our new codec

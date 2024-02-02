@@ -1,4 +1,5 @@
 import type { AsyncHooks } from "graphile-config";
+
 import type { EXPORTABLE } from "./utils.js";
 
 /**
