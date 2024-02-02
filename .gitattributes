@@ -1,4 +1,5 @@
 **/__tests__/**/*.1.graphql linguist-vendored
 **/__tests__/**/*.json5 linguist-vendored
 **/__tests__/**/*.mermaid linguist-vendored
+**/__tests__/**/*.export.mjs linguist-vendored
 */website/** linguist-documentation

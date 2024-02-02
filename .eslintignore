@@ -13,6 +13,10 @@ node_modules
 /graphile-build/graphile-build-pg/webpacked
 /graphile-build/graphile-build-pg/exported-schema-for-webpack.mjs
 /graphile-build/graphile-build-pg/schema-export-output.mjs
+**/__tests__/**/*.1.graphql
+**/__tests__/**/*.json5
+**/__tests__/**/*.mermaid
+**/__tests__/**/*.export.mjs
 /wal2json
 dist
 CHANGELOG.md
