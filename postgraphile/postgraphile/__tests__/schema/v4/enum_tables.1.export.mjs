@@ -1,4 +1,4 @@
-import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
+import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
@@ -194,8 +194,55 @@ const spec_simpleEnum = {
   executor: executor_mainPgExecutor
 };
 const registryConfig_pgCodecs_simpleEnum_simpleEnum = recordCodec(spec_simpleEnum);
-const attributes_letter_codec_LetterAToDEnum = registry.pgCodecs["LetterAToDEnum"];
-const attributes_letter_via_view_codec_LetterAToDViaViewEnum = registry.pgCodecs["LetterAToDViaViewEnum"];
+const extensions4 = {
+  isEnumTableEnum: true,
+  tags: {
+    name: "LetterAToD"
+  }
+};
+const attributes_letter_codec_LetterAToDEnum = enumCodec({
+  name: "LetterAToDEnum",
+  identifier: TYPES.text.sqlType,
+  values: [{
+    value: "A",
+    description: "The letter A"
+  }, {
+    value: "B",
+    description: "The letter B"
+  }, {
+    value: "C",
+    description: "The letter C"
+  }, {
+    value: "D",
+    description: "The letter D"
+  }],
+  extensions: extensions4
+});
+const values2 = [{
+  value: "A",
+  description: "The letter A"
+}, {
+  value: "B",
+  description: "The letter B"
+}, {
+  value: "C",
+  description: "The letter C"
+}, {
+  value: "D",
+  description: "The letter D"
+}];
+const extensions5 = {
+  isEnumTableEnum: true,
+  tags: {
+    name: "LetterAToDViaView"
+  }
+};
+const attributes_letter_via_view_codec_LetterAToDViaViewEnum = enumCodec({
+  name: "LetterAToDViaViewEnum",
+  identifier: TYPES.text.sqlType,
+  values: values2,
+  extensions: extensions5
+});
 const attributes4 = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -234,7 +281,7 @@ const attributes4 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions4 = {
+const extensions6 = {
   oid: "1376705",
   isTableLike: true,
   pg: {
@@ -253,14 +300,110 @@ const spec_letterDescriptions = {
   identifier: sqlIdent4,
   attributes: attributes4,
   description: undefined,
-  extensions: extensions4,
+  extensions: extensions6,
   executor: executor_mainPgExecutor
 };
 const registryConfig_pgCodecs_letterDescriptions_letterDescriptions = recordCodec(spec_letterDescriptions);
-const attributes_enum_1_codec_EnumTheFirstEnum = registry.pgCodecs["EnumTheFirstEnum"];
-const attributes_enum_2_codec_EnumTheSecondEnum = registry.pgCodecs["EnumTheSecondEnum"];
-const attributes_enum_3_codec_LotsOfEnumsEnum3Enum = registry.pgCodecs["LotsOfEnumsEnum3Enum"];
-const attributes_simple_enum_codec_SimpleEnumEnum = registry.pgCodecs["SimpleEnumEnum"];
+const values3 = [{
+  value: "a1",
+  description: "Desc A1"
+}, {
+  value: "a2",
+  description: "Desc A2"
+}, {
+  value: "a3",
+  description: "Desc A3"
+}, {
+  value: "a4",
+  description: "Desc A4"
+}];
+const extensions7 = {
+  isEnumTableEnum: true,
+  tags: {
+    name: "EnumTheFirst"
+  }
+};
+const attributes_enum_1_codec_EnumTheFirstEnum = enumCodec({
+  name: "EnumTheFirstEnum",
+  identifier: TYPES.text.sqlType,
+  values: values3,
+  extensions: extensions7
+});
+const values4 = [{
+  value: "b1",
+  description: "Desc B1"
+}, {
+  value: "b2",
+  description: "Desc B2"
+}, {
+  value: "b3",
+  description: "Desc B3"
+}, {
+  value: "b4",
+  description: "Desc B4"
+}];
+const extensions8 = {
+  isEnumTableEnum: true,
+  tags: {
+    name: "EnumTheSecond"
+  }
+};
+const attributes_enum_2_codec_EnumTheSecondEnum = enumCodec({
+  name: "EnumTheSecondEnum",
+  identifier: TYPES.varchar.sqlType,
+  values: values4,
+  extensions: extensions8
+});
+const values5 = [{
+  value: "c1",
+  description: "Desc C1"
+}, {
+  value: "c2",
+  description: "Desc C2"
+}, {
+  value: "c3",
+  description: "Desc C3"
+}, {
+  value: "c4",
+  description: "Desc C4"
+}];
+const extensions9 = {
+  isEnumTableEnum: true,
+  tags: {
+    name: "LotsOfEnumsEnum3"
+  }
+};
+const attributes_enum_3_codec_LotsOfEnumsEnum3Enum = enumCodec({
+  name: "LotsOfEnumsEnum3Enum",
+  identifier: TYPES.bpchar.sqlType,
+  values: values5,
+  extensions: extensions9
+});
+const values6 = [{
+  value: "Foo",
+  description: "The first metasyntactic variable"
+}, {
+  value: "Bar",
+  description: null
+}, {
+  value: "Baz",
+  description: "The third metasyntactic variable, very similar to its predecessor"
+}, {
+  value: "Qux",
+  description: null
+}];
+const extensions10 = {
+  isEnumTableEnum: true,
+  tags: {
+    name: "SimpleEnum"
+  }
+};
+const attributes_simple_enum_codec_SimpleEnumEnum = enumCodec({
+  name: "SimpleEnumEnum",
+  identifier: TYPES.text.sqlType,
+  values: values6,
+  extensions: extensions10
+});
 const attributes5 = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -308,7 +451,7 @@ const attributes5 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions5 = {
+const extensions11 = {
   oid: "1376740",
   isTableLike: true,
   pg: {
@@ -325,7 +468,7 @@ const spec_referencingTable = {
   identifier: sqlIdent5,
   attributes: attributes5,
   description: undefined,
-  extensions: extensions5,
+  extensions: extensions11,
   executor: executor_mainPgExecutor
 };
 const registryConfig_pgCodecs_referencingTable_referencingTable = recordCodec(spec_referencingTable);
@@ -385,7 +528,7 @@ const attributes6 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions6 = {
+const extensions12 = {
   oid: "1376723",
   isTableLike: true,
   pg: {
@@ -405,11 +548,11 @@ const spec_lotsOfEnums = {
   identifier: sqlIdent6,
   attributes: attributes6,
   description: undefined,
-  extensions: extensions6,
+  extensions: extensions12,
   executor: executor_mainPgExecutor
 };
 const registryConfig_pgCodecs_lotsOfEnums_lotsOfEnums = recordCodec(spec_lotsOfEnums);
-const extensions7 = {
+const extensions13 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -438,9 +581,9 @@ const registryConfig_pgResources_abcd_abcd = {
   }],
   isVirtual: false,
   description: undefined,
-  extensions: extensions7
+  extensions: extensions13
 };
-const extensions8 = {
+const extensions14 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -471,9 +614,9 @@ const registryConfig_pgResources_abcd_view_abcd_view = {
   uniques: uniques2,
   isVirtual: false,
   description: undefined,
-  extensions: extensions8
+  extensions: extensions14
 };
-const extensions9 = {
+const extensions15 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -502,9 +645,9 @@ const registryConfig_pgResources_simple_enum_simple_enum = {
   uniques: uniques3,
   isVirtual: false,
   description: undefined,
-  extensions: extensions9
+  extensions: extensions15
 };
-const extensions10 = {
+const extensions16 = {
   pg: {
     serviceName: "main",
     schemaName: "enum_tables",
@@ -516,7 +659,7 @@ const extensions10 = {
 };
 const parts7 = ["enum_tables", "referencing_table_mutation"];
 const sqlIdent7 = sql.identifier(...parts7);
-const extensions11 = {
+const extensions17 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -558,9 +701,9 @@ const registryConfig_pgResources_letter_descriptions_letter_descriptions = {
   uniques: uniques4,
   isVirtual: false,
   description: undefined,
-  extensions: extensions11
+  extensions: extensions17
 };
-const extensions12 = {
+const extensions18 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -586,9 +729,9 @@ const registryConfig_pgResources_referencing_table_referencing_table = {
   uniques: uniques5,
   isVirtual: false,
   description: undefined,
-  extensions: extensions12
+  extensions: extensions18
 };
-const extensions13 = {
+const extensions19 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -597,7 +740,7 @@ const extensions13 = {
   },
   tags: {
     omit: true,
-    behavior: extensions6.tags.behavior
+    behavior: extensions12.tags.behavior
   }
 };
 const uniques6 = [{
@@ -655,7 +798,7 @@ const registryConfig_pgResources_lots_of_enums_lots_of_enums = {
   uniques: uniques6,
   isVirtual: false,
   description: undefined,
-  extensions: extensions13
+  extensions: extensions19
 };
 const registry = makeRegistry({
   pgCodecs: Object.assign(Object.create(null), {
@@ -697,7 +840,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions10,
+      extensions: extensions16,
       description: undefined
     },
     letter_descriptions: registryConfig_pgResources_letter_descriptions_letter_descriptions,

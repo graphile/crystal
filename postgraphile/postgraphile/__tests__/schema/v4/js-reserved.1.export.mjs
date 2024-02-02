@@ -442,7 +442,7 @@ const spec_null = {
   executor: executor_mainPgExecutor
 };
 const registryConfig_pgCodecs_null_null = recordCodec(spec_null);
-const attributes6 = Object.fromEntries([[id, {
+const attributes6 = Object.fromEntries([["id", {
   description: undefined,
   codec: TYPES.int,
   notNull: true,
@@ -450,7 +450,7 @@ const attributes6 = Object.fromEntries([[id, {
   extensions: {
     tags: {}
   }
-}], [brand, {
+}], ["brand", {
   description: undefined,
   codec: TYPES.text,
   notNull: false,
@@ -1221,8 +1221,8 @@ const registryConfig_pgResources_relational_items_relational_items = {
   extensions: extensions31
 };
 const registryConfig = {
-  pgCodecs: Object.fromEntries([[int4, TYPES.int], [relationalTopics, registryConfig_pgCodecs_relationalTopics_relationalTopics], [text, TYPES.text], ["__proto__", registryConfig_pgCodecs___proto_____proto__], [building, registryConfig_pgCodecs_building_building], [constructor, registryConfig_pgCodecs_constructor_constructor], [crop, registryConfig_pgCodecs_crop_crop], [machine, registryConfig_pgCodecs_machine_machine], [material, registryConfig_pgCodecs_material_material], [null, registryConfig_pgCodecs_null_null], [project, registryConfig_pgCodecs_project_project], [relationalStatus, registryConfig_pgCodecs_relationalStatus_relationalStatus], [yield, registryConfig_pgCodecs_yield_yield], [reserved, registryConfig_pgCodecs_reserved_reserved], [relationalItems, registryConfig_pgCodecs_relationalItems_relationalItems], [itemType, attributes_type_codec_itemType], [varchar, TYPES.varchar], [bpchar, TYPES.bpchar]]),
-  pgResources: Object.fromEntries([[await, {
+  pgCodecs: Object.fromEntries([["int4", TYPES.int], ["relationalTopics", registryConfig_pgCodecs_relationalTopics_relationalTopics], ["text", TYPES.text], ["__proto__", registryConfig_pgCodecs___proto_____proto__], ["building", registryConfig_pgCodecs_building_building], ["constructor", registryConfig_pgCodecs_constructor_constructor], ["crop", registryConfig_pgCodecs_crop_crop], ["machine", registryConfig_pgCodecs_machine_machine], ["material", registryConfig_pgCodecs_material_material], ["null", registryConfig_pgCodecs_null_null], ["project", registryConfig_pgCodecs_project_project], ["relationalStatus", registryConfig_pgCodecs_relationalStatus_relationalStatus], ["yield", registryConfig_pgCodecs_yield_yield], ["reserved", registryConfig_pgCodecs_reserved_reserved], ["relationalItems", registryConfig_pgCodecs_relationalItems_relationalItems], ["itemType", attributes_type_codec_itemType], ["varchar", TYPES.varchar], ["bpchar", TYPES.bpchar]]),
+  pgResources: Object.fromEntries([["await", {
     executor: executor_mainPgExecutor,
     name: "await",
     identifier: "main.js_reserved.await(int4,int4,int4,int4)",
@@ -1256,7 +1256,7 @@ const registryConfig = {
     isMutation: false,
     extensions: extensions15,
     description: undefined
-  }], [case, {
+  }], ["case", {
     executor: executor_mainPgExecutor,
     name: "case",
     identifier: "main.js_reserved.case(int4,int4,int4,int4)",
@@ -1268,7 +1268,7 @@ const registryConfig = {
     isMutation: false,
     extensions: extensions16,
     description: undefined
-  }], [valueOf, {
+  }], ["valueOf", {
     executor: executor_mainPgExecutor,
     name: "valueOf",
     identifier: "main.js_reserved.valueOf(int4,int4,int4,int4)",
@@ -1280,7 +1280,7 @@ const registryConfig = {
     isMutation: false,
     extensions: extensions17,
     description: undefined
-  }], [relational_topics, registryConfig_pgResources_relational_topics_relational_topics], [null_yield, {
+  }], ["relational_topics", registryConfig_pgResources_relational_topics_relational_topics], ["null_yield", {
     executor: executor_mainPgExecutor,
     name: "null_yield",
     identifier: "main.js_reserved.null_yield(js_reserved.null,int4,int4,int4,int4)",
@@ -1302,7 +1302,7 @@ const registryConfig = {
     isVirtual: false,
     description: undefined,
     extensions: extensions20
-  }], [building, registryConfig_pgResources_building_building], [constructor, {
+  }], ["building", registryConfig_pgResources_building_building], ["constructor", {
     executor: executor_mainPgExecutor,
     name: "constructor",
     identifier: "main.js_reserved.constructor",
@@ -1312,7 +1312,7 @@ const registryConfig = {
     isVirtual: false,
     description: undefined,
     extensions: extensions22
-  }], [crop, {
+  }], ["crop", {
     executor: executor_mainPgExecutor,
     name: "crop",
     identifier: "main.js_reserved.crop",
@@ -1322,7 +1322,7 @@ const registryConfig = {
     isVirtual: false,
     description: undefined,
     extensions: extensions23
-  }], [machine, registryConfig_pgResources_machine_machine], [material, {
+  }], ["machine", registryConfig_pgResources_machine_machine], ["material", {
     executor: executor_mainPgExecutor,
     name: "material",
     identifier: "main.js_reserved.material",
@@ -1332,7 +1332,7 @@ const registryConfig = {
     isVirtual: false,
     description: undefined,
     extensions: extensions25
-  }], [null, {
+  }], ["null", {
     executor: executor_mainPgExecutor,
     name: "null",
     identifier: "main.js_reserved.null",
@@ -1342,7 +1342,7 @@ const registryConfig = {
     isVirtual: false,
     description: undefined,
     extensions: extensions26
-  }], [project, {
+  }], ["project", {
     executor: executor_mainPgExecutor,
     name: "project",
     identifier: "main.js_reserved.project",
@@ -1352,7 +1352,7 @@ const registryConfig = {
     isVirtual: false,
     description: undefined,
     extensions: extensions27
-  }], [relational_status, registryConfig_pgResources_relational_status_relational_status], [yield, {
+  }], ["relational_status", registryConfig_pgResources_relational_status_relational_status], ["yield", {
     executor: executor_mainPgExecutor,
     name: "yield",
     identifier: "main.js_reserved.yield",
@@ -1362,7 +1362,7 @@ const registryConfig = {
     isVirtual: false,
     description: undefined,
     extensions: extensions29
-  }], [reserved, {
+  }], ["reserved", {
     executor: executor_mainPgExecutor,
     name: "reserved",
     identifier: "main.js_reserved.reserved",
@@ -1372,7 +1372,7 @@ const registryConfig = {
     isVirtual: false,
     description: undefined,
     extensions: extensions30
-  }], [relational_items, registryConfig_pgResources_relational_items_relational_items]]),
+  }], ["relational_items", registryConfig_pgResources_relational_items_relational_items]]),
   pgRelations: Object.assign(Object.create(null), {
     building: Object.assign(Object.create(null), {
       machinesByTheirConstructor: {
@@ -1508,7 +1508,7 @@ const registryConfig = {
 };
 const registry = makeRegistry(registryConfig);
 const pgResource_relational_topicsPgResource = registry.pgResources["relational_topics"];
-const handler2 = {
+const handler = {
   typeName: "RelationalTopic",
   codec: {
     name: "base64JSON",
@@ -1545,7 +1545,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
       return typeof value === "string" ? value : null;
     }
   },
-  base64JSON: handler2.codec,
+  base64JSON: handler.codec,
   pipeString: {
     name: "pipeString",
     encode(value) {
@@ -1561,7 +1561,7 @@ const relational_items_relational_itemsPgResource = registry.pgResources["relati
 const relational_status_relational_statusPgResource = registry.pgResources["relational_status"];
 const handler2 = {
   typeName: "Building",
-  codec: handler2.codec,
+  codec: handler.codec,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("buildings", false), $record.get("id")]);
@@ -1663,7 +1663,7 @@ function MachinesConnection_pageInfoPlan($connection) {
 }
 const handler3 = {
   typeName: "Machine",
-  codec: handler2.codec,
+  codec: handler.codec,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("machines", false), $record.get("id")]);
@@ -1704,7 +1704,7 @@ function RelationalItemsConnection_pageInfoPlan($connection) {
 }
 const handler4 = {
   typeName: "RelationalStatus",
-  codec: handler2.codec,
+  codec: handler.codec,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("relational_statuses", false), $record.get("id")]);
@@ -1750,10 +1750,10 @@ const pgResource_yieldPgResource = registry.pgResources["yield"];
 const pgResource_reservedPgResource = registry.pgResources["reserved"];
 const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   Query: handler5,
-  RelationalTopic: handler2,
+  RelationalTopic: handler,
   _Proto__: {
     typeName: "_Proto__",
-    codec: handler2.codec,
+    codec: handler.codec,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("__proto__S", false), ...uniques2[0].attributes.map(attribute => $record.get(attribute))]);
@@ -1775,7 +1775,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   Building: handler2,
   Constructor: {
     typeName: "Constructor",
-    codec: handler2.codec,
+    codec: handler.codec,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("constructors", false), $record.get("id")]);
@@ -1794,7 +1794,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   Crop: {
     typeName: "Crop",
-    codec: handler2.codec,
+    codec: handler.codec,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("crops", false), $record.get("id")]);
@@ -1814,7 +1814,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   Machine: handler3,
   Material: {
     typeName: "Material",
-    codec: handler2.codec,
+    codec: handler.codec,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("materials", false), $record.get("id")]);
@@ -1833,7 +1833,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   Null: {
     typeName: "Null",
-    codec: handler2.codec,
+    codec: handler.codec,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("nulls", false), $record.get("id")]);
@@ -1852,7 +1852,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   Project: {
     typeName: "Project",
-    codec: handler2.codec,
+    codec: handler.codec,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("projects", false), $record.get("id")]);
@@ -1872,7 +1872,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   RelationalStatus: handler4,
   Yield: {
     typeName: "Yield",
-    codec: handler2.codec,
+    codec: handler.codec,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("yields", false), $record.get("id")]);
@@ -1891,7 +1891,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   Reserved: {
     typeName: "Reserved",
-    codec: handler2.codec,
+    codec: handler.codec,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("reserveds", false), $record.get("id")]);
@@ -12233,7 +12233,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes6.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), attributes6["id"].codec)}`;
             }
           });
         }
@@ -12256,7 +12256,7 @@ export const plans = {
             type: "attribute",
             attribute: "brand",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes6.brand.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), attributes6["brand"].codec)}`;
             }
           });
         }
@@ -15981,7 +15981,7 @@ export const plans = {
     deletedProtoId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName._Proto__.plan($record);
-      return lambda(specifier, handler2.codec.encode);
+      return lambda(specifier, handler.codec.encode);
     },
     query: DeleteProtoPayload_queryPlan,
     _protoEdge: {
@@ -16101,7 +16101,7 @@ export const plans = {
     deletedConstructorId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Constructor.plan($record);
-      return lambda(specifier, handler2.codec.encode);
+      return lambda(specifier, handler.codec.encode);
     },
     query: DeleteConstructorPayload_queryPlan,
     constructorEdge: {
@@ -16167,7 +16167,7 @@ export const plans = {
     deletedCropId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Crop.plan($record);
-      return lambda(specifier, handler2.codec.encode);
+      return lambda(specifier, handler.codec.encode);
     },
     query: DeleteCropPayload_queryPlan,
     cropEdge: {
@@ -16227,7 +16227,7 @@ export const plans = {
     deletedMachineId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler3.plan($record);
-      return lambda(specifier, handler2.codec.encode);
+      return lambda(specifier, handler3.codec.encode);
     },
     query: DeleteMachinePayload_queryPlan,
     machineEdge: {
@@ -16285,7 +16285,7 @@ export const plans = {
     deletedMaterialId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Material.plan($record);
-      return lambda(specifier, handler2.codec.encode);
+      return lambda(specifier, handler.codec.encode);
     },
     query: DeleteMaterialPayload_queryPlan,
     materialEdge: {
@@ -16351,7 +16351,7 @@ export const plans = {
     deletedNullId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Null.plan($record);
-      return lambda(specifier, handler2.codec.encode);
+      return lambda(specifier, handler.codec.encode);
     },
     query: DeleteNullPayload_queryPlan,
     nullEdge: {
@@ -16417,7 +16417,7 @@ export const plans = {
     deletedProjectId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Project.plan($record);
-      return lambda(specifier, handler2.codec.encode);
+      return lambda(specifier, handler.codec.encode);
     },
     query: DeleteProjectPayload_queryPlan,
     projectEdge: {
@@ -16477,7 +16477,7 @@ export const plans = {
     deletedYieldId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Yield.plan($record);
-      return lambda(specifier, handler2.codec.encode);
+      return lambda(specifier, handler.codec.encode);
     },
     query: DeleteYieldPayload_queryPlan,
     yieldEdge: {
@@ -16537,7 +16537,7 @@ export const plans = {
     deletedReservedId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Reserved.plan($record);
-      return lambda(specifier, handler2.codec.encode);
+      return lambda(specifier, handler.codec.encode);
     },
     query: DeleteReservedPayload_queryPlan,
     reservedEdge: {
