@@ -821,23 +821,25 @@ function tmp(obj: TE, callback: (tmp: TE) => TE): TE {
   return te`(${varName} = ${trustedObj}, ${callback(varName)})`;
 }
 
-/**
- * Evaluates the given TE fragment, and returns the result. Note that the
- * fragment must contain a `return` statement for the result to not be
- * undefined.
- */
-function run<TResult>(fragment: TE): TResult;
-function run<TResult>(strings: TemplateStringsArray, ...values: TE[]): TResult;
-function run<TResult>(
-  fragmentOrStrings: TE | TemplateStringsArray,
-  ...values: TE[]
-): TResult {
-  if ("raw" in fragmentOrStrings) {
-    return run(te(fragmentOrStrings, ...values));
+/** For compatibility with graphile-export */
+export function EXPORTABLE<T, TScope extends any[]>(
+  factory: (...args: TScope) => T,
+  args: [...TScope],
+): T {
+  const fn: T = factory(...args);
+  if (
+    (typeof fn === "function" || (typeof fn === "object" && fn !== null)) &&
+    !("$exporter$factory" in fn)
+  ) {
+    Object.defineProperties(fn, {
+      $exporter$args: { value: args },
+      $exporter$factory: { value: factory },
+    });
   }
-  if (values.length > 0) {
-    throw new Error("Invalid call to `te.run`");
-  }
+  return fn;
+}
+
+function _runCore<TResult>(fragmentOrStrings: TE, exportable = false): TResult {
   const fragment =
     fragmentOrStrings[$$type] !== undefined
       ? fragmentOrStrings
@@ -851,7 +853,13 @@ function run<TResult>(
     );
   }
   try {
-    return newFunction(...argNames, compiled.string)(...argValues) as TResult;
+    const fn = newFunction<any[], TResult>(...argNames, compiled.string);
+    if (exportable) {
+      // eslint-disable-next-line graphile-export/exhaustive-deps
+      return EXPORTABLE(fn, argValues);
+    } else {
+      return fn(...argValues);
+    }
   } catch (e) {
     // ERRORS: improve this!
     console.error(`Error occurred during code generation:`);
@@ -860,6 +868,47 @@ function run<TResult>(
     console.error(compiled.string);
     throw new Error(`Error occurred during code generation.`);
   }
+}
+
+/**
+ * Evaluates the given TE fragment, and returns the result. Note that the
+ * fragment must contain a `return` statement for the result to not be
+ * undefined.
+ */
+function run<TResult>(fragment: TE): TResult;
+function run<TResult>(strings: TemplateStringsArray, ...values: TE[]): TResult;
+function run<TResult>(
+  fragmentOrStrings: TE | TemplateStringsArray,
+  ...values: TE[]
+): TResult {
+  if ("raw" in fragmentOrStrings) {
+    // Turn a template literal run into a run just passing a TE fragment
+    return run(te(fragmentOrStrings, ...values));
+  }
+  if (values.length > 0) {
+    throw new Error("Invalid call to `te.run`");
+  }
+  return _runCore(fragmentOrStrings);
+}
+
+/** Same as `run`, except the result is wrapped in `EXPORTABLE()` */
+function runExportable<TResult>(fragment: TE): TResult;
+function runExportable<TResult>(
+  strings: TemplateStringsArray,
+  ...values: TE[]
+): TResult;
+function runExportable<TResult>(
+  fragmentOrStrings: TE | TemplateStringsArray,
+  ...values: TE[]
+): TResult {
+  if ("raw" in fragmentOrStrings) {
+    // Turn a template literal run into a run just passing a TE fragment
+    return runExportable(te(fragmentOrStrings, ...values));
+  }
+  if (values.length > 0) {
+    throw new Error("Invalid call to `te.runExportable`");
+  }
+  return _runCore(fragmentOrStrings, true);
 }
 
 interface Batch {
@@ -904,8 +953,10 @@ function batch(callback: () => void): void {
 }
 
 /** Because `new Function` retains the scope, we do it at top level to avoid capturing extra values */
-function newFunction(...args: string[]) {
-  return new Function(...args);
+function newFunction<TArgs extends any[], TResult>(
+  ...argNamesAndCode: string[]
+) {
+  return new Function(...argNamesAndCode) as (...args: TArgs) => TResult;
 }
 
 /**
@@ -1079,6 +1130,7 @@ export {
   optionalGet,
   ref,
   run,
+  runExportable,
   runInBatch,
   safeKeyOrThrow,
   set,
@@ -1111,6 +1163,10 @@ export interface TamedEvil {
   tmp: typeof tmp;
   tempVar: typeof tempVar;
   run: {
+    <TResult>(fragment: TE): TResult;
+    <TResult>(strings: TemplateStringsArray, ...values: TE[]): TResult;
+  };
+  runExportable: {
     <TResult>(fragment: TE): TResult;
     <TResult>(strings: TemplateStringsArray, ...values: TE[]): TResult;
   };
@@ -1149,6 +1205,7 @@ const attributes = {
   tempVar,
   run,
   eval: run,
+  runExportable,
   runInBatch,
   batch,
   compile,
@@ -1159,6 +1216,8 @@ const attributes = {
   isTE,
   dangerouslyIncludeRawCode,
 };
+
+export { reservedWords };
 
 Object.entries(attributes).forEach(([exportName, value]) => {
   if (!(value as any).$$export) {

@@ -1,4 +1,4 @@
-export const reservedWords = new Set<string>([
+export const reservedWords = new Set([
   // JS reserved words
   "await",
   "break",
@@ -98,4 +98,4 @@ export const reservedWords = new Set<string>([
   "import",
   "constructor",
   "class",
-]);
+]) as ReadonlySet<string>;

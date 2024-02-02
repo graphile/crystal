@@ -24,11 +24,13 @@ import {
   GraphQLSchema,
   GraphQLUnionType,
   isNamedType,
+  valueFromASTUntyped,
 } from "grafast/graphql";
 import { inspect } from "util";
 
 import type { ScopeForType, SpecForType } from "../global.js";
 import type SchemaBuilder from "../SchemaBuilder.js";
+import { EXPORTABLE } from "../utils.js";
 
 const isString = (str: unknown): str is string => typeof str === "string";
 
@@ -56,6 +58,14 @@ export type NewWithHooksFunction = <
   spec: SpecForType<TType>,
   scope: ScopeForType<TType>,
 ) => TType;
+
+const identity = EXPORTABLE(
+  () =>
+    function identity<T>(value: T): T {
+      return value;
+    },
+  [],
+);
 
 /**
  * Returns a 'newWithHooks' function suitable for creating GraphQL types with
@@ -690,6 +700,21 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             scalarContext,
             `|${rawSpec.name}`,
           );
+
+          // parseLiteral in GraphQL defaults to a dynamic function; that's not
+          // exportable... So we must handle this ourselves.
+          if (!finalSpec.parseValue) {
+            finalSpec.parseValue = identity;
+          }
+          if (!finalSpec.parseLiteral) {
+            const parseValue = finalSpec.parseValue!;
+            finalSpec.parseLiteral = EXPORTABLE(
+              (parseValue, valueFromASTUntyped) => (node, variables) => {
+                return parseValue(valueFromASTUntyped(node, variables));
+              },
+              [parseValue, valueFromASTUntyped],
+            );
+          }
 
           const Self = new GraphQLScalarType(finalSpec);
           return Self;

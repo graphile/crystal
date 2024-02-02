@@ -1,11 +1,13 @@
 import { expect } from "chai";
-import { parse } from "graphql";
+import { ExecutionResult, parse } from "graphql";
 import { it } from "mocha";
 
 import {
   access,
   constant,
+  type ExecutableStep,
   execute,
+  type FieldArgs,
   grafastSync,
   makeGrafastSchema,
 } from "../dist/index.js";
@@ -30,19 +32,19 @@ const schema = makeGrafastSchema({
       },
     },
     Obj: {
-      o($o) {
+      o($o: ExecutableStep) {
         return $o;
       },
-      a($o) {
+      a($o: ExecutableStep) {
         return access($o, "a");
       },
-      b($o) {
+      b($o: ExecutableStep) {
         return access($o, "b");
       },
-      echoNumber(_, { $nr }) {
+      echoNumber(_, { $nr }: FieldArgs) {
         return $nr;
       },
-      echoString(_, { $str }) {
+      echoString(_, { $str }: FieldArgs) {
         return $str;
       },
     },
@@ -94,6 +96,6 @@ it("ok", () => {
     },
     {},
     true,
-  );
+  ) as any;
   expect(JSON.stringify(JSON.parse(result2.data), null, 2)).to.equal(expected);
 });

@@ -140,6 +140,7 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
                        * more performant, but it also makes the code nicer to
                        * read in the exported code.
                        */
+                      // TODO: Use `te.runExportable` instead and give the resource a name!
                       // eslint-disable-next-line graphile-export/exhaustive-deps
                       EXPORTABLE(
                         te.run`\

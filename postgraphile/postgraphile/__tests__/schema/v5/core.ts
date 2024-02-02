@@ -1,7 +1,9 @@
+import { writeFile } from "fs/promises";
 import type { PromiseOrDirect } from "grafast";
 import type { GraphQLSchema } from "grafast/graphql";
 import { lexicographicSortSchema, printSchema } from "grafast/graphql";
 import { makeSchema } from "graphile-build";
+import { exportSchemaAsString } from "graphile-export";
 import type { PoolClient } from "pg";
 
 import AmberPreset from "../../../src/presets/amber.js";
@@ -10,6 +12,8 @@ import {
   snapshot,
   withPoolClientTransaction,
 } from "../../helpers.js";
+
+jest.setTimeout(30000);
 
 let countByPath = Object.create(null);
 
@@ -66,4 +70,18 @@ export const test =
       if (finalCheck) {
         await finalCheck(schema);
       }
+      // Now check the schema exports
+      const { code: exportString } = await exportSchemaAsString(schema, {
+        mode: "typeDefs",
+        prettier: true,
+        modules: {
+          jsonwebtoken: await import("jsonwebtoken"),
+        },
+      });
+      const executableSchemaPath = `${testPath.replace(/\.test\.[jt]s$/, "")}${
+        sort || i > 1 ? `.${i}` : ""
+      }.export.mjs`;
+      // Cannot rely on snapshot until this is more stable
+      await writeFile(executableSchemaPath, exportString.trim() + "\n");
+      //await snapshot(exportString.trim() + "\n", executableSchemaPath);
     });
