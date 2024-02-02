@@ -218,6 +218,12 @@ const attributes_letter_codec_LetterAToDEnum = enumCodec({
   }],
   extensions: extensions4
 });
+const extensions5 = {
+  isEnumTableEnum: true,
+  tags: {
+    name: "LetterAToDViaView"
+  }
+};
 const values2 = [{
   value: "A",
   description: "The letter A"
@@ -231,12 +237,6 @@ const values2 = [{
   value: "D",
   description: "The letter D"
 }];
-const extensions5 = {
-  isEnumTableEnum: true,
-  tags: {
-    name: "LetterAToDViaView"
-  }
-};
 const attributes_letter_via_view_codec_LetterAToDViaViewEnum = enumCodec({
   name: "LetterAToDViaViewEnum",
   identifier: TYPES.text.sqlType,
@@ -304,6 +304,12 @@ const spec_letterDescriptions = {
   executor: executor_mainPgExecutor
 };
 const registryConfig_pgCodecs_letterDescriptions_letterDescriptions = recordCodec(spec_letterDescriptions);
+const extensions7 = {
+  isEnumTableEnum: true,
+  tags: {
+    name: "EnumTheFirst"
+  }
+};
 const values3 = [{
   value: "a1",
   description: "Desc A1"
@@ -317,18 +323,18 @@ const values3 = [{
   value: "a4",
   description: "Desc A4"
 }];
-const extensions7 = {
-  isEnumTableEnum: true,
-  tags: {
-    name: "EnumTheFirst"
-  }
-};
 const attributes_enum_1_codec_EnumTheFirstEnum = enumCodec({
   name: "EnumTheFirstEnum",
   identifier: TYPES.text.sqlType,
   values: values3,
   extensions: extensions7
 });
+const extensions8 = {
+  isEnumTableEnum: true,
+  tags: {
+    name: "EnumTheSecond"
+  }
+};
 const values4 = [{
   value: "b1",
   description: "Desc B1"
@@ -342,18 +348,18 @@ const values4 = [{
   value: "b4",
   description: "Desc B4"
 }];
-const extensions8 = {
-  isEnumTableEnum: true,
-  tags: {
-    name: "EnumTheSecond"
-  }
-};
 const attributes_enum_2_codec_EnumTheSecondEnum = enumCodec({
   name: "EnumTheSecondEnum",
   identifier: TYPES.varchar.sqlType,
   values: values4,
   extensions: extensions8
 });
+const extensions9 = {
+  isEnumTableEnum: true,
+  tags: {
+    name: "LotsOfEnumsEnum3"
+  }
+};
 const values5 = [{
   value: "c1",
   description: "Desc C1"
@@ -367,18 +373,18 @@ const values5 = [{
   value: "c4",
   description: "Desc C4"
 }];
-const extensions9 = {
-  isEnumTableEnum: true,
-  tags: {
-    name: "LotsOfEnumsEnum3"
-  }
-};
 const attributes_enum_3_codec_LotsOfEnumsEnum3Enum = enumCodec({
   name: "LotsOfEnumsEnum3Enum",
   identifier: TYPES.bpchar.sqlType,
   values: values5,
   extensions: extensions9
 });
+const extensions10 = {
+  isEnumTableEnum: true,
+  tags: {
+    name: "SimpleEnum"
+  }
+};
 const values6 = [{
   value: "Foo",
   description: "The first metasyntactic variable"
@@ -392,12 +398,6 @@ const values6 = [{
   value: "Qux",
   description: null
 }];
-const extensions10 = {
-  isEnumTableEnum: true,
-  tags: {
-    name: "SimpleEnum"
-  }
-};
 const attributes_simple_enum_codec_SimpleEnumEnum = enumCodec({
   name: "SimpleEnumEnum",
   identifier: TYPES.text.sqlType,
