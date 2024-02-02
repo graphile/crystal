@@ -141,7 +141,7 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
 
             // Replace all references to this identifier with the value
             binding.referencePaths.forEach((referencePath) => {
-              referencePath.replaceWith(arg);
+              referencePath.replaceWith(t.cloneNode(arg));
             });
 
             // Remove the arg/param
