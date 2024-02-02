@@ -3,11 +3,11 @@ import { ExecutionResult, parse } from "graphql";
 import { it } from "mocha";
 
 import {
-  type FieldArgs,
-  type ExecutableStep,
   access,
   constant,
+  type ExecutableStep,
   execute,
+  type FieldArgs,
   grafastSync,
   makeGrafastSchema,
 } from "../dist/index.js";
