@@ -1,0 +1,1 @@
+../../tamedevil/src/reservedWords.ts
