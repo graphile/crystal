@@ -70,8 +70,12 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
         ) {
           return;
         }
-        const getExpression = (functionBody: t.BlockStatement) => {
-          if (functionBody.body.length === 1) {
+        const getExpression = (
+          functionBody: t.BlockStatement | t.Expression,
+        ) => {
+          if (t.isExpression(functionBody)) {
+            return functionBody;
+          } else if (functionBody.body.length === 1) {
             const statement = functionBody.body[0];
             if (statement.type === "ReturnStatement") {
               return statement.argument;
@@ -79,9 +83,7 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
           }
         };
 
-        const expression = t.isExpression(node.callee.body)
-          ? node.callee.body
-          : getExpression(node.callee.body);
+        const expression = getExpression(node.callee.body);
 
         if (!expression) {
           return;
@@ -134,6 +136,7 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
                 // Remove the arg/param, since it's now pointless
                 argPath.remove();
                 paramPath.remove();
+                paramPath.scope.removeBinding(param.name);
               }
             }
           } else if (t.isLiteral(arg) || t.isMemberExpression(arg)) {
@@ -147,12 +150,13 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
             // Remove the arg/param
             argPath.remove();
             paramPath.remove();
+            paramPath.scope.removeBinding(param.name);
           }
         }
 
         if (node.arguments.length === 0 && node.callee.params.length === 0) {
           // We don't need this IIFE any more
-          path.replaceWith(expression);
+          path.replaceWith(getExpression(node.callee.body)!);
         }
 
         // console.log("REPLACED :", generate(path.node, {}).code);
@@ -163,7 +167,7 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
     Program: {
       exit(path) {
         // Replace all things that are only referenced once
-        for (const [_bindingName, binding] of Object.entries(
+        for (const [bindingName, binding] of Object.entries(
           path.scope.bindings,
         )) {
           if (
@@ -227,6 +231,7 @@ export const optimize = (ast: t.Node, runs = 1): t.Node => {
 
           targetPath.replaceWith(expr);
           binding.path.remove();
+          binding.path.scope.removeBinding(bindingName);
         }
       },
     },
