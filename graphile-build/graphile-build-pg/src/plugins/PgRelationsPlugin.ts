@@ -1046,7 +1046,6 @@ function addRelations(
             ]);
 
             const functionLines: TE[] = [];
-            const prefixLines: TE[] = [];
             if (isMutationPayload) {
               functionLines.push(
                 te`return function PgRelationsPlugin_mutation_payload_relation($in) {`,
@@ -1136,10 +1135,7 @@ function addRelations(
             }
 
             functionLines.push(te.cache`}`);
-            return te.run`${te.join(prefixLines, "\n")}${te.join(
-              functionLines,
-              "\n",
-            )}`;
+            return te.runExportable`${te.join(functionLines, "\n")}`;
           };
           const singleRecordPlan = makePlanResolver("singleRecord");
           const listPlan = makePlanResolver("list");
