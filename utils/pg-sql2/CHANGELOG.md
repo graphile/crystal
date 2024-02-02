@@ -1,5 +1,19 @@
 # pg-sql2
 
+## 5.0.0-beta.5
+
+### Patch Changes
+
+- [#1924](https://github.com/graphile/crystal/pull/1924)
+  [`ef44c29b2`](https://github.com/graphile/crystal/commit/ef44c29b24a1ad5a042ae1536a4546dd64b17195)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 TypeScript is now configured
+  to hide interfaces marked as `@internal`. This may result in a few errors
+  where you're accessing things you oughtn't be, but also may hide some
+  interfaces that should be exposed - please file an issue if an API you were
+  dependent on has been removed from the TypeScript typings. If that API happens
+  to be `step.dependencies`; you should first read this:
+  https://benjie.dev/graphql/ancestors
+
 ## 5.0.0-beta.4
 
 ### Patch Changes

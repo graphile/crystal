@@ -1,5 +1,33 @@
 # ruru-components
 
+## 2.0.0-beta.13
+
+### Patch Changes
+
+- [#1931](https://github.com/graphile/crystal/pull/1931)
+  [`dfac3f790`](https://github.com/graphile/crystal/commit/dfac3f790ec5c446c132202dde624aeeb75b5a6d)
+  Thanks [@benjie](https://github.com/benjie)! - Fix issue where headers weren't
+  sent via websocket connectionParams
+
+- [#1931](https://github.com/graphile/crystal/pull/1931)
+  [`941e28003`](https://github.com/graphile/crystal/commit/941e280038a735014a9fe4e24fc534a197fac0f2)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for deprecated
+  arguments to Ruru.
+
+- [#1931](https://github.com/graphile/crystal/pull/1931)
+  [`068be2f51`](https://github.com/graphile/crystal/commit/068be2f51d7a9c17311f26c6c9451985397c9e1f)
+  Thanks [@benjie](https://github.com/benjie)! - Fix issue typing into Ruru
+  explorer plugin - characters no longer overwritten.
+
+- Updated dependencies
+  [[`49fd8afed`](https://github.com/graphile/crystal/commit/49fd8afed1afe573ea76a2a7a821dfa5d6288e2d),
+  [`63dd7ea99`](https://github.com/graphile/crystal/commit/63dd7ea992d30ad711dd85a73a127484a0e35479),
+  [`d801c9778`](https://github.com/graphile/crystal/commit/d801c9778a86d61e060896460af9fe62a733534a),
+  [`ef44c29b2`](https://github.com/graphile/crystal/commit/ef44c29b24a1ad5a042ae1536a4546dd64b17195),
+  [`8ea67f891`](https://github.com/graphile/crystal/commit/8ea67f8910693edaf70daa9952e35d8396166f38)]:
+  - tamedevil@0.0.0-beta.5
+  - grafast@0.1.1-beta.5
+
 ## 2.0.0-beta.12
 
 ### Patch Changes

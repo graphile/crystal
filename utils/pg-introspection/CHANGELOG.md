@@ -1,5 +1,19 @@
 # pg-introspection
 
+## 0.0.1-beta.6
+
+### Patch Changes
+
+- [#1927](https://github.com/graphile/crystal/pull/1927)
+  [`00d32d887`](https://github.com/graphile/crystal/commit/00d32d887a6ae01374a4fda1babab7c8f14832c0)
+  Thanks [@benjie](https://github.com/benjie)! - Excludes table constraints on
+  tables from extensions if configured to not include extensions.
+
+- [#1927](https://github.com/graphile/crystal/pull/1927)
+  [`c62eee10b`](https://github.com/graphile/crystal/commit/c62eee10b445f9455bf2a0524ad2b828bdf4ffa6)
+  Thanks [@benjie](https://github.com/benjie)! - Add pg_am to pg-introspection
+  to enable determining index access method
+
 ## 0.0.1-beta.5
 
 ### Patch Changes

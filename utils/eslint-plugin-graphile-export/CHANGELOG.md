@@ -1,5 +1,15 @@
 # eslint-plugin-graphile-export
 
+## 0.0.2-beta.4
+
+### Patch Changes
+
+- [#1933](https://github.com/graphile/crystal/pull/1933)
+  [`3a2ea80ee`](https://github.com/graphile/crystal/commit/3a2ea80ee470b2aef91366727d7d60a0c65067f5)
+  Thanks [@mattiarossi](https://github.com/mattiarossi)! -
+  `eslint-plugin-graphile-export` now spots instances of `inputPlan`,
+  `applyPlan` and `assertStep` so they can be checked - thanks @mattiarossi!
+
 ## 0.0.2-beta.3
 
 ### Patch Changes

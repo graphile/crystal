@@ -12079,7 +12079,7 @@ __metadata:
     typescript: "npm:^5.2.2"
   peerDependencies:
     grafast: "workspace:^"
-    pg-sql2: "workspace:^5.0.0-beta.3"
+    pg-sql2: "workspace:^5.0.0-beta.5"
   peerDependenciesMeta:
     pg-sql2:
       optional: true

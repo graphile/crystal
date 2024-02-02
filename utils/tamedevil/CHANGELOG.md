@@ -1,5 +1,30 @@
 # tamedevil
 
+## 0.0.0-beta.5
+
+### Patch Changes
+
+- [#1935](https://github.com/graphile/crystal/pull/1935)
+  [`49fd8afed`](https://github.com/graphile/crystal/commit/49fd8afed1afe573ea76a2a7a821dfa5d6288e2d)
+  Thanks [@benjie](https://github.com/benjie)! - Add `te.runExportable` method,
+  instead of simply calling the generated factory, it exports it in a way that's
+  compatible with `graphile-export`.
+
+- [#1924](https://github.com/graphile/crystal/pull/1924)
+  [`ef44c29b2`](https://github.com/graphile/crystal/commit/ef44c29b24a1ad5a042ae1536a4546dd64b17195)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 TypeScript is now configured
+  to hide interfaces marked as `@internal`. This may result in a few errors
+  where you're accessing things you oughtn't be, but also may hide some
+  interfaces that should be exposed - please file an issue if an API you were
+  dependent on has been removed from the TypeScript typings. If that API happens
+  to be `step.dependencies`; you should first read this:
+  https://benjie.dev/graphql/ancestors
+
+- [#1935](https://github.com/graphile/crystal/pull/1935)
+  [`8ea67f891`](https://github.com/graphile/crystal/commit/8ea67f8910693edaf70daa9952e35d8396166f38)
+  Thanks [@benjie](https://github.com/benjie)! - Fix lots of things related to
+  exporting a schema with `graphile-export`.
+
 ## 0.0.0-beta.4
 
 ### Patch Changes

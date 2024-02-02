@@ -1,5 +1,40 @@
 # graphile-utils
 
+## 5.0.0-beta.19
+
+### Patch Changes
+
+- [#1924](https://github.com/graphile/crystal/pull/1924)
+  [`ef44c29b2`](https://github.com/graphile/crystal/commit/ef44c29b24a1ad5a042ae1536a4546dd64b17195)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 TypeScript is now configured
+  to hide interfaces marked as `@internal`. This may result in a few errors
+  where you're accessing things you oughtn't be, but also may hide some
+  interfaces that should be exposed - please file an issue if an API you were
+  dependent on has been removed from the TypeScript typings. If that API happens
+  to be `step.dependencies`; you should first read this:
+  https://benjie.dev/graphql/ancestors
+
+- [#1931](https://github.com/graphile/crystal/pull/1931)
+  [`ec3112c7b`](https://github.com/graphile/crystal/commit/ec3112c7b58d142b4b1d86cbb7de4ca80bbfda00)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for deprecating
+  arguments to makeExtendSchemaPlugin
+
+- Updated dependencies
+  [[`49fd8afed`](https://github.com/graphile/crystal/commit/49fd8afed1afe573ea76a2a7a821dfa5d6288e2d),
+  [`63dd7ea99`](https://github.com/graphile/crystal/commit/63dd7ea992d30ad711dd85a73a127484a0e35479),
+  [`d801c9778`](https://github.com/graphile/crystal/commit/d801c9778a86d61e060896460af9fe62a733534a),
+  [`3a2ea80ee`](https://github.com/graphile/crystal/commit/3a2ea80ee470b2aef91366727d7d60a0c65067f5),
+  [`ef44c29b2`](https://github.com/graphile/crystal/commit/ef44c29b24a1ad5a042ae1536a4546dd64b17195),
+  [`8ea67f891`](https://github.com/graphile/crystal/commit/8ea67f8910693edaf70daa9952e35d8396166f38),
+  [`5de3e86eb`](https://github.com/graphile/crystal/commit/5de3e86eba1ddfe5e07732d0325c63e5d72d4b5b),
+  [`e20e66ed7`](https://github.com/graphile/crystal/commit/e20e66ed71b499ee5bbf05105f981809fd302212)]:
+  - tamedevil@0.0.0-beta.5
+  - grafast@0.1.1-beta.5
+  - graphile-build-pg@5.0.0-beta.19
+  - graphile-build@5.0.0-beta.15
+  - @dataplan/pg@0.0.1-beta.16
+  - graphile-config@0.0.1-beta.7
+
 ## 5.0.0-beta.18
 
 ### Patch Changes

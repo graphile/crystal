@@ -1,5 +1,43 @@
 # graphile-build-pg
 
+## 5.0.0-beta.19
+
+### Patch Changes
+
+- [#1933](https://github.com/graphile/crystal/pull/1933)
+  [`3a2ea80ee`](https://github.com/graphile/crystal/commit/3a2ea80ee470b2aef91366727d7d60a0c65067f5)
+  Thanks [@mattiarossi](https://github.com/mattiarossi)! -
+  `eslint-plugin-graphile-export` now spots instances of `inputPlan`,
+  `applyPlan` and `assertStep` so they can be checked - thanks @mattiarossi!
+
+- [#1935](https://github.com/graphile/crystal/pull/1935)
+  [`8ea67f891`](https://github.com/graphile/crystal/commit/8ea67f8910693edaf70daa9952e35d8396166f38)
+  Thanks [@benjie](https://github.com/benjie)! - Fix lots of things related to
+  exporting a schema with `graphile-export`.
+
+- [#1935](https://github.com/graphile/crystal/pull/1935)
+  [`e20e66ed7`](https://github.com/graphile/crystal/commit/e20e66ed71b499ee5bbf05105f981809fd302212)
+  Thanks [@benjie](https://github.com/benjie)! - Make even more of the schema
+  exportable, including handling scalars with no parseLiteral definition.
+- Updated dependencies
+  [[`49fd8afed`](https://github.com/graphile/crystal/commit/49fd8afed1afe573ea76a2a7a821dfa5d6288e2d),
+  [`00d32d887`](https://github.com/graphile/crystal/commit/00d32d887a6ae01374a4fda1babab7c8f14832c0),
+  [`63dd7ea99`](https://github.com/graphile/crystal/commit/63dd7ea992d30ad711dd85a73a127484a0e35479),
+  [`c62eee10b`](https://github.com/graphile/crystal/commit/c62eee10b445f9455bf2a0524ad2b828bdf4ffa6),
+  [`d801c9778`](https://github.com/graphile/crystal/commit/d801c9778a86d61e060896460af9fe62a733534a),
+  [`3a2ea80ee`](https://github.com/graphile/crystal/commit/3a2ea80ee470b2aef91366727d7d60a0c65067f5),
+  [`ef44c29b2`](https://github.com/graphile/crystal/commit/ef44c29b24a1ad5a042ae1536a4546dd64b17195),
+  [`8ea67f891`](https://github.com/graphile/crystal/commit/8ea67f8910693edaf70daa9952e35d8396166f38),
+  [`5de3e86eb`](https://github.com/graphile/crystal/commit/5de3e86eba1ddfe5e07732d0325c63e5d72d4b5b),
+  [`e20e66ed7`](https://github.com/graphile/crystal/commit/e20e66ed71b499ee5bbf05105f981809fd302212)]:
+  - tamedevil@0.0.0-beta.5
+  - pg-introspection@0.0.1-beta.6
+  - grafast@0.1.1-beta.5
+  - graphile-build@5.0.0-beta.15
+  - @dataplan/pg@0.0.1-beta.16
+  - pg-sql2@5.0.0-beta.5
+  - graphile-config@0.0.1-beta.7
+
 ## 5.0.0-beta.18
 
 ### Patch Changes

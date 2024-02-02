@@ -1,5 +1,77 @@
 # postgraphile
 
+## 5.0.0-beta.20
+
+### Patch Changes
+
+- [#1927](https://github.com/graphile/crystal/pull/1927)
+  [`00d32d887`](https://github.com/graphile/crystal/commit/00d32d887a6ae01374a4fda1babab7c8f14832c0)
+  Thanks [@benjie](https://github.com/benjie)! - Excludes table constraints on
+  tables from extensions if configured to not include extensions.
+
+- [#1927](https://github.com/graphile/crystal/pull/1927)
+  [`c62eee10b`](https://github.com/graphile/crystal/commit/c62eee10b445f9455bf2a0524ad2b828bdf4ffa6)
+  Thanks [@benjie](https://github.com/benjie)! - Add pg_am to pg-introspection
+  to enable determining index access method
+
+- [#1934](https://github.com/graphile/crystal/pull/1934)
+  [`9ac0ddc01`](https://github.com/graphile/crystal/commit/9ac0ddc014bfceb60b4b5641d6e8db605cc6a79b)
+  Thanks [@benjie](https://github.com/benjie)! - Automatically detect when a
+  `graphile-export` export is invalid, and throw an error indicating which
+  method needs to have `EXPORTABLE` added around it.
+
+- [#1931](https://github.com/graphile/crystal/pull/1931)
+  [`941e28003`](https://github.com/graphile/crystal/commit/941e280038a735014a9fe4e24fc534a197fac0f2)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for deprecated
+  arguments to Ruru.
+
+- [#1935](https://github.com/graphile/crystal/pull/1935)
+  [`8ea67f891`](https://github.com/graphile/crystal/commit/8ea67f8910693edaf70daa9952e35d8396166f38)
+  Thanks [@benjie](https://github.com/benjie)! - Fix lots of things related to
+  exporting a schema with `graphile-export`.
+
+- [#1931](https://github.com/graphile/crystal/pull/1931)
+  [`068be2f51`](https://github.com/graphile/crystal/commit/068be2f51d7a9c17311f26c6c9451985397c9e1f)
+  Thanks [@benjie](https://github.com/benjie)! - Fix issue typing into Ruru
+  explorer plugin - characters no longer overwritten.
+
+- [#1929](https://github.com/graphile/crystal/pull/1929)
+  [`7587ca9e0`](https://github.com/graphile/crystal/commit/7587ca9e0f2bb93d0b22d1e2979d7b7912363600)
+  Thanks [@benjie](https://github.com/benjie)! - PgLazyJWTPreset: return 401
+  error when validation of JWT fails.
+
+- [#1935](https://github.com/graphile/crystal/pull/1935)
+  [`e20e66ed7`](https://github.com/graphile/crystal/commit/e20e66ed71b499ee5bbf05105f981809fd302212)
+  Thanks [@benjie](https://github.com/benjie)! - Make even more of the schema
+  exportable, including handling scalars with no parseLiteral definition.
+
+- [#1931](https://github.com/graphile/crystal/pull/1931)
+  [`ec3112c7b`](https://github.com/graphile/crystal/commit/ec3112c7b58d142b4b1d86cbb7de4ca80bbfda00)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for deprecating
+  arguments to makeExtendSchemaPlugin
+
+- Updated dependencies
+  [[`49fd8afed`](https://github.com/graphile/crystal/commit/49fd8afed1afe573ea76a2a7a821dfa5d6288e2d),
+  [`63dd7ea99`](https://github.com/graphile/crystal/commit/63dd7ea992d30ad711dd85a73a127484a0e35479),
+  [`d801c9778`](https://github.com/graphile/crystal/commit/d801c9778a86d61e060896460af9fe62a733534a),
+  [`c21252541`](https://github.com/graphile/crystal/commit/c212525410cb2d97a808964ad727d0a68dd15f8b),
+  [`3a2ea80ee`](https://github.com/graphile/crystal/commit/3a2ea80ee470b2aef91366727d7d60a0c65067f5),
+  [`ef44c29b2`](https://github.com/graphile/crystal/commit/ef44c29b24a1ad5a042ae1536a4546dd64b17195),
+  [`8ea67f891`](https://github.com/graphile/crystal/commit/8ea67f8910693edaf70daa9952e35d8396166f38),
+  [`5de3e86eb`](https://github.com/graphile/crystal/commit/5de3e86eba1ddfe5e07732d0325c63e5d72d4b5b),
+  [`e20e66ed7`](https://github.com/graphile/crystal/commit/e20e66ed71b499ee5bbf05105f981809fd302212),
+  [`ec3112c7b`](https://github.com/graphile/crystal/commit/ec3112c7b58d142b4b1d86cbb7de4ca80bbfda00)]:
+  - tamedevil@0.0.0-beta.5
+  - grafast@0.1.1-beta.5
+  - grafserv@0.1.1-beta.7
+  - graphile-build-pg@5.0.0-beta.19
+  - graphile-build@5.0.0-beta.15
+  - graphile-utils@5.0.0-beta.19
+  - @dataplan/json@0.0.1-beta.14
+  - @dataplan/pg@0.0.1-beta.16
+  - pg-sql2@5.0.0-beta.5
+  - graphile-config@0.0.1-beta.7
+
 ## 5.0.0-beta.19
 
 ### Patch Changes

@@ -1,5 +1,27 @@
 # graphile-export
 
+## 0.0.2-beta.10
+
+### Patch Changes
+
+- [#1934](https://github.com/graphile/crystal/pull/1934)
+  [`9ac0ddc01`](https://github.com/graphile/crystal/commit/9ac0ddc014bfceb60b4b5641d6e8db605cc6a79b)
+  Thanks [@benjie](https://github.com/benjie)! - Automatically detect when a
+  `graphile-export` export is invalid, and throw an error indicating which
+  method needs to have `EXPORTABLE` added around it.
+
+- [#1935](https://github.com/graphile/crystal/pull/1935)
+  [`8ea67f891`](https://github.com/graphile/crystal/commit/8ea67f8910693edaf70daa9952e35d8396166f38)
+  Thanks [@benjie](https://github.com/benjie)! - Fix lots of things related to
+  exporting a schema with `graphile-export`.
+
+- Updated dependencies
+  [[`63dd7ea99`](https://github.com/graphile/crystal/commit/63dd7ea992d30ad711dd85a73a127484a0e35479),
+  [`d801c9778`](https://github.com/graphile/crystal/commit/d801c9778a86d61e060896460af9fe62a733534a),
+  [`ef44c29b2`](https://github.com/graphile/crystal/commit/ef44c29b24a1ad5a042ae1536a4546dd64b17195)]:
+  - grafast@0.1.1-beta.5
+  - pg-sql2@5.0.0-beta.5
+
 ## 0.0.2-beta.9
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # graphile-config
 
+## 0.0.1-beta.7
+
+### Patch Changes
+
+- [#1930](https://github.com/graphile/crystal/pull/1930)
+  [`5de3e86eb`](https://github.com/graphile/crystal/commit/5de3e86eba1ddfe5e07732d0325c63e5d72d4b5b)
+  Thanks [@benjie](https://github.com/benjie)! - Prevent using
+  appendPlugins/prependPlugins/skipPlugins in presets.
+
 ## 0.0.1-beta.6
 
 ### Patch Changes

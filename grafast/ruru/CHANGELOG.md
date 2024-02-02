@@ -1,5 +1,23 @@
 # ruru
 
+## 2.0.0-beta.11
+
+### Patch Changes
+
+- [#1931](https://github.com/graphile/crystal/pull/1931)
+  [`941e28003`](https://github.com/graphile/crystal/commit/941e280038a735014a9fe4e24fc534a197fac0f2)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for deprecated
+  arguments to Ruru.
+
+- [#1931](https://github.com/graphile/crystal/pull/1931)
+  [`068be2f51`](https://github.com/graphile/crystal/commit/068be2f51d7a9c17311f26c6c9451985397c9e1f)
+  Thanks [@benjie](https://github.com/benjie)! - Fix issue typing into Ruru
+  explorer plugin - characters no longer overwritten.
+
+- Updated dependencies
+  [[`5de3e86eb`](https://github.com/graphile/crystal/commit/5de3e86eba1ddfe5e07732d0325c63e5d72d4b5b)]:
+  - graphile-config@0.0.1-beta.7
+
 ## 2.0.0-beta.10
 
 ### Patch Changes

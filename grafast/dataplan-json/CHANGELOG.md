@@ -1,5 +1,24 @@
 # @dataplan/json
 
+## 0.0.1-beta.14
+
+### Patch Changes
+
+- [#1924](https://github.com/graphile/crystal/pull/1924)
+  [`ef44c29b2`](https://github.com/graphile/crystal/commit/ef44c29b24a1ad5a042ae1536a4546dd64b17195)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 TypeScript is now configured
+  to hide interfaces marked as `@internal`. This may result in a few errors
+  where you're accessing things you oughtn't be, but also may hide some
+  interfaces that should be exposed - please file an issue if an API you were
+  dependent on has been removed from the TypeScript typings. If that API happens
+  to be `step.dependencies`; you should first read this:
+  https://benjie.dev/graphql/ancestors
+- Updated dependencies
+  [[`63dd7ea99`](https://github.com/graphile/crystal/commit/63dd7ea992d30ad711dd85a73a127484a0e35479),
+  [`d801c9778`](https://github.com/graphile/crystal/commit/d801c9778a86d61e060896460af9fe62a733534a),
+  [`ef44c29b2`](https://github.com/graphile/crystal/commit/ef44c29b24a1ad5a042ae1536a4546dd64b17195)]:
+  - grafast@0.1.1-beta.5
+
 ## 0.0.1-beta.13
 
 ### Patch Changes
