@@ -81,6 +81,38 @@ This field has a load of arbitrary tags.
 $$;
 ```
 
+Note that adding two newlines in a row will be interpreted as the start of a multi-line comment, no tags added after the first
+newline will be parsed & will be treated as part of the description.
+
+```sql
+comment on column my_schema.my_table.my_column is $$
+@name meta
+@isImportant
+@jsonField date timestamp
+@jsonField name text
+
+This field has a load of arbitrary tags.
+@jsonField episode enum ONE=1 TWO=2
+$$;
+```
+
+Results in the following JSON tags object:
+
+```json
+{
+  "name": "meta",
+  "isImportant": true,
+  "jsonField": ["date timestamp", "name text"]
+}
+```
+
+and the description:
+
+```
+This field has a load of arbitrary tags.
+@jsonField episode enum ONE=1 TWO=2
+```
+
 ### Applying smart tags to database entities
 
 #### Tables
