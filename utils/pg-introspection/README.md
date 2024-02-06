@@ -58,7 +58,7 @@ const pool = new Pool({
 async function main() {
   const sql = makeIntrospectionQuery();
   const { rows } = await pool.query(sql);
-  const introspection = parseIntrospectionResults(row[0].introspection);
+  const introspection = parseIntrospectionResults(rows[0].introspection);
 
   console.log(
     `The ${introspection.database.datname} DBA is ${
