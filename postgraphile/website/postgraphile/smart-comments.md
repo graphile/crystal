@@ -81,8 +81,9 @@ This field has a load of arbitrary tags.
 $$;
 ```
 
-Note that adding two newlines in a row will be interpreted as the start of a multi-line comment, no tags added after the first
-newline will be parsed & will be treated as part of the description.
+Note that adding two newlines in a row separates the smart tags section from the
+descriptive prose. Content after two newlines will not be parsed for smart tags
+even if it starts with an `@` character.
 
 ```sql
 comment on column my_schema.my_table.my_column is $$
