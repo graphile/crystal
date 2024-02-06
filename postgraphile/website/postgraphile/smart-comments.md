@@ -85,6 +85,8 @@ Note that adding two newlines in a row separates the smart tags section from the
 descriptive prose. Content after two newlines will not be parsed for smart tags
 even if it starts with an `@` character.
 
+For example:
+
 ```sql
 comment on column my_schema.my_table.my_column is $$
 @name meta
@@ -97,7 +99,7 @@ This field has a load of arbitrary tags.
 $$;
 ```
 
-Results in the following JSON tags object:
+results in the following JSON tags object:
 
 ```json
 {
