@@ -109,6 +109,16 @@ export class NodeGrafservBase extends GrafservBase {
     const dynamicOptions = this.dynamicOptions;
     return async (req, res, next) => {
       try {
+        // If middleware prior to this has already finished the response,
+        // then skip processing the request.
+        if (res.writableFinished) {
+          if (typeof next === "function") {
+            next();
+          } 
+
+          return;
+        }
+
         const request = this.getDigest(dynamicOptions, req, res, isHTTPS);
         const result = await this.processRequest(request);
 
