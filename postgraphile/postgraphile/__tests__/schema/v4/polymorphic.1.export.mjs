@@ -2,6 +2,17 @@ import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, PgUnionAllSte
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeDecodeNodeId, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
+function base64JSONDecode(value) {
+  return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+}
+function base64JSONEncode(value) {
+  return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+}
+const handler_codec_base64JSON = {
+  name: "base64JSON",
+  encode: base64JSONEncode,
+  decode: base64JSONDecode
+};
 const executor_mainPgExecutor = new PgExecutor({
   name: "main",
   context() {
@@ -4243,15 +4254,7 @@ const registry = makeRegistry(registryConfig);
 const resource_single_table_itemsPgResource = registry.pgResources["single_table_items"];
 const handler = {
   typeName: "SingleTableTopic",
-  codec: {
-    name: "base64JSON",
-    encode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    },
-    decode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-  },
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("SingleTableTopic", false), $record.get("id")]);
@@ -4268,6 +4271,12 @@ const handler = {
     return obj[0] === "SingleTableTopic";
   }
 };
+function pipeStringDecode(value) {
+  return typeof value === "string" ? value.split("|") : null;
+}
+function pipeStringEncode(value) {
+  return Array.isArray(value) ? value.join("|") : null;
+}
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: {
     name: "raw",
@@ -4278,15 +4287,11 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
       return typeof value === "string" ? value : null;
     }
   },
-  base64JSON: handler.codec,
+  base64JSON: handler_codec_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode(value) {
-      return Array.isArray(value) ? value.join("|") : null;
-    },
-    decode(value) {
-      return typeof value === "string" ? value.split("|") : null;
-    }
+    encode: pipeStringEncode,
+    decode: pipeStringDecode
   }
 });
 const otherSource_peoplePgResource = registry.pgResources["people"];
@@ -4387,7 +4392,7 @@ function SingleTableTopic_singleTableItemRelationCompositePksByParentId_after_ap
 }
 const handler2 = {
   typeName: "Person",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("people", false), $record.get("person_id")]);
@@ -4546,7 +4551,7 @@ function LogEntriesConnection_pageInfoPlan($connection) {
 }
 const handler3 = {
   typeName: "LogEntry",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("log_entries", false), $record.get("id")]);
@@ -4603,7 +4608,7 @@ const resourceByTypeName2 = Object.assign(Object.create(null), {
 });
 const handler4 = {
   typeName: "Organization",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("organizations", false), $record.get("organization_id")]);
@@ -4677,7 +4682,7 @@ function AwsApplicationsConnection_pageInfoPlan($connection) {
 }
 const handler5 = {
   typeName: "AwsApplication",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("aws_applications", false), $record.get("id")]);
@@ -4850,7 +4855,7 @@ function GcpApplicationsConnection_pageInfoPlan($connection) {
 }
 const handler6 = {
   typeName: "GcpApplication",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("gcp_applications", false), $record.get("id")]);
@@ -5006,7 +5011,7 @@ function RelationalItemRelationsConnection_pageInfoPlan($connection) {
 const pgResource_relational_item_relationsPgResource = registry.pgResources["relational_item_relations"];
 const handler7 = {
   typeName: "RelationalItemRelation",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("relational_item_relations", false), $record.get("id")]);
@@ -5036,7 +5041,7 @@ function RelationalItemRelationCompositePksConnection_pageInfoPlan($connection) 
 const pgResource_relational_item_relation_composite_pksPgResource = registry.pgResources["relational_item_relation_composite_pks"];
 const handler8 = {
   typeName: "RelationalItemRelationCompositePk",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("relational_item_relation_composite_pks", false), $record.get("parent_id"), $record.get("child_id")]);
@@ -5066,7 +5071,7 @@ function SingleTableItemRelationsConnection_pageInfoPlan($connection) {
 }
 const handler9 = {
   typeName: "SingleTableItemRelation",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("single_table_item_relations", false), $record.get("id")]);
@@ -5095,7 +5100,7 @@ function SingleTableItemRelationCompositePksConnection_pageInfoPlan($connection)
 }
 const handler10 = {
   typeName: "SingleTableItemRelationCompositePk",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("single_table_item_relation_composite_pks", false), $record.get("parent_id"), $record.get("child_id")]);
@@ -5115,7 +5120,7 @@ const handler10 = {
 };
 const handler11 = {
   typeName: "SingleTablePost",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("SingleTablePost", false), $record.get("id")]);
@@ -5210,7 +5215,7 @@ function SingleTablePost_singleTableItemRelationCompositePksByParentId_after_app
 }
 const handler12 = {
   typeName: "Priority",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("priorities", false), $record.get("id")]);
@@ -5244,7 +5249,7 @@ function Priority_singleTableItemsByPriorityId_after_applyPlan(_, $connection, v
 }
 const handler13 = {
   typeName: "SingleTableDivider",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("SingleTableDivider", false), $record.get("id")]);
@@ -5338,7 +5343,7 @@ function SingleTableDivider_singleTableItemRelationCompositePksByParentId_after_
 }
 const handler14 = {
   typeName: "SingleTableChecklist",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("SingleTableChecklist", false), $record.get("id")]);
@@ -5432,7 +5437,7 @@ function SingleTableChecklist_singleTableItemRelationCompositePksByParentId_afte
 }
 const handler15 = {
   typeName: "SingleTableChecklistItem",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("SingleTableChecklistItem", false), $record.get("id")]);
@@ -5527,7 +5532,7 @@ function SingleTableChecklistItem_singleTableItemRelationCompositePksByParentId_
 const pgResource_relational_topicsPgResource = registry.pgResources["relational_topics"];
 const handler16 = {
   typeName: "RelationalTopic",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("relational_topics", false), $record.get("topic_item_id")]);
@@ -5640,7 +5645,7 @@ function RelationalTopic_relationalItemRelationCompositePksByParentId_after_appl
 }
 const handler17 = {
   typeName: "RelationalPost",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("relational_posts", false), $record.get("post_item_id")]);
@@ -5734,7 +5739,7 @@ function RelationalPost_relationalItemRelationCompositePksByParentId_after_apply
 }
 const handler18 = {
   typeName: "RelationalDivider",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("relational_dividers", false), $record.get("divider_item_id")]);
@@ -5828,7 +5833,7 @@ function RelationalDivider_relationalItemRelationCompositePksByParentId_after_ap
 }
 const handler19 = {
   typeName: "RelationalChecklist",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("relational_checklists", false), $record.get("checklist_item_id")]);
@@ -5922,7 +5927,7 @@ function RelationalChecklist_relationalItemRelationCompositePksByParentId_after_
 }
 const handler20 = {
   typeName: "RelationalChecklistItem",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("relational_checklist_items", false), $record.get("checklist_item_item_id")]);
@@ -6055,7 +6060,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   RelationalPost: handler17,
   FirstPartyVulnerability: {
     typeName: "FirstPartyVulnerability",
-    codec: handler.codec,
+    codec: handler_codec_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("first_party_vulnerabilities", false), $record.get("id")]);
@@ -6074,7 +6079,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   ThirdPartyVulnerability: {
     typeName: "ThirdPartyVulnerability",
-    codec: handler.codec,
+    codec: handler_codec_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("third_party_vulnerabilities", false), $record.get("id")]);
@@ -33871,7 +33876,7 @@ export const plans = {
     deletedOrganizationId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler4.plan($record);
-      return lambda(specifier, handler4.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteOrganizationPayload_queryPlan,
     organizationEdge: {
@@ -33931,7 +33936,7 @@ export const plans = {
     deletedPersonId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler2.plan($record);
-      return lambda(specifier, handler2.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeletePersonPayload_queryPlan,
     personEdge: {
@@ -33991,7 +33996,7 @@ export const plans = {
     deletedRelationalItemRelationCompositePkId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler8.plan($record);
-      return lambda(specifier, handler8.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteRelationalItemRelationCompositePkPayload_queryPlan,
     relationalItemRelationCompositePkEdge: {
@@ -34056,7 +34061,7 @@ export const plans = {
     deletedSingleTableItemRelationCompositePkId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler10.plan($record);
-      return lambda(specifier, handler10.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteSingleTableItemRelationCompositePkPayload_queryPlan,
     singleTableItemRelationCompositePkEdge: {
@@ -34121,7 +34126,7 @@ export const plans = {
     deletedRelationalItemRelationId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler7.plan($record);
-      return lambda(specifier, handler7.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteRelationalItemRelationPayload_queryPlan,
     relationalItemRelationEdge: {
@@ -34192,7 +34197,7 @@ export const plans = {
     deletedSingleTableItemRelationId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler9.plan($record);
-      return lambda(specifier, handler9.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteSingleTableItemRelationPayload_queryPlan,
     singleTableItemRelationEdge: {
@@ -34263,7 +34268,7 @@ export const plans = {
     deletedLogEntryId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler3.plan($record);
-      return lambda(specifier, handler3.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteLogEntryPayload_queryPlan,
     logEntryEdge: {
@@ -34327,7 +34332,7 @@ export const plans = {
     deletedFirstPartyVulnerabilityId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.FirstPartyVulnerability.plan($record);
-      return lambda(specifier, handler.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteFirstPartyVulnerabilityPayload_queryPlan,
     firstPartyVulnerabilityEdge: {
@@ -34381,7 +34386,7 @@ export const plans = {
     deletedThirdPartyVulnerabilityId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.ThirdPartyVulnerability.plan($record);
-      return lambda(specifier, handler.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteThirdPartyVulnerabilityPayload_queryPlan,
     thirdPartyVulnerabilityEdge: {
@@ -34435,7 +34440,7 @@ export const plans = {
     deletedAwsApplicationId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler5.plan($record);
-      return lambda(specifier, handler5.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteAwsApplicationPayload_queryPlan,
     awsApplicationEdge: {
@@ -34499,7 +34504,7 @@ export const plans = {
     deletedGcpApplicationId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler6.plan($record);
-      return lambda(specifier, handler6.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteGcpApplicationPayload_queryPlan,
     gcpApplicationEdge: {

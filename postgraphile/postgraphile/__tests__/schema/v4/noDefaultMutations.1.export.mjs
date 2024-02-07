@@ -29,25 +29,30 @@ const handler = {
     return constant`query`;
   }
 };
+function base64JSONDecode(value) {
+  return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+}
+function base64JSONEncode(value) {
+  return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+}
+const nodeIdCodecs_base64JSON_base64JSON = {
+  name: "base64JSON",
+  encode: base64JSONEncode,
+  decode: base64JSONDecode
+};
+function pipeStringDecode(value) {
+  return typeof value === "string" ? value.split("|") : null;
+}
+function pipeStringEncode(value) {
+  return Array.isArray(value) ? value.join("|") : null;
+}
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
-  base64JSON: {
-    name: "base64JSON",
-    encode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    },
-    decode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-  },
+  base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode(value) {
-      return Array.isArray(value) ? value.join("|") : null;
-    },
-    decode(value) {
-      return typeof value === "string" ? value.split("|") : null;
-    }
+    encode: pipeStringEncode,
+    decode: pipeStringDecode
   }
 });
 const executor_mainPgExecutor = new PgExecutor({
@@ -5270,7 +5275,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   Query: handler,
   MyTable: {
     typeName: "MyTable",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("my_tables", false), $record.get("id")]);
@@ -5289,7 +5294,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   PersonSecret: {
     typeName: "PersonSecret",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: "This is deprecated (comment on table c.person_secret).",
     plan($record) {
       return list([constant("person_secrets", false), $record.get("person_id")]);
@@ -5308,7 +5313,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   CompoundKey: {
     typeName: "CompoundKey",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("compound_keys", false), $record.get("person_id_1"), $record.get("person_id_2")]);
@@ -5328,7 +5333,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   NullTestRecord: {
     typeName: "NullTestRecord",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("null_test_records", false), $record.get("id")]);
@@ -5347,7 +5352,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   LeftArm: {
     typeName: "LeftArm",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("left_arms", false), $record.get("id")]);
@@ -5366,7 +5371,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   Issue756: {
     typeName: "Issue756",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("issue756S", false), $record.get("id")]);
@@ -5385,7 +5390,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   Person: {
     typeName: "Person",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("people", false), $record.get("id")]);
