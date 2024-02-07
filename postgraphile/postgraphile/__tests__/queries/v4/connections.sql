@@ -59,6 +59,44 @@ select
 from "c"."person" as __person__
 order by __person__."person_full_name" desc, __person__."id" asc;
 
+select __person_result__.*
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person__."email" as "2",
+    __person__."config"::text as "3",
+    __person__."last_login_from_ip"::text as "4",
+    __person__."last_login_from_subnet"::text as "5",
+    __person__."user_mac"::text as "6",
+    __person_identifiers__.idx as "7"
+  from "c"."person" as __person__
+  where (
+    __person__."id" < __person_identifiers__."id0"
+  )
+  order by __person__."id" asc
+) as __person_result__;
+
+select __person_result__.*
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person__."email" as "2",
+    __person__."config"::text as "3",
+    __person__."last_login_from_ip"::text as "4",
+    __person__."last_login_from_subnet"::text as "5",
+    __person__."user_mac"::text as "6",
+    __person_identifiers__.idx as "7"
+  from "c"."person" as __person__
+  where (
+    __person__."id" > __person_identifiers__."id0"
+  )
+  order by __person__."id" asc
+) as __person_result__;
+
 select
   __updatable_view__."x"::text as "0",
   __updatable_view__."name" as "1",
@@ -171,6 +209,46 @@ lateral (
     __edge_case__."row_id" = __edge_case_identifiers__."id0"
   )
 ) as __edge_case_result__;
+
+select __person_result__.*
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person__."email" as "2",
+    __person__."config"::text as "3",
+    __person__."last_login_from_ip"::text as "4",
+    __person__."last_login_from_subnet"::text as "5",
+    __person__."user_mac"::text as "6",
+    __person_identifiers__.idx as "7"
+  from "c"."person" as __person__
+  where (
+    __person__."id" > __person_identifiers__."id0"
+  )
+  order by __person__."id" asc
+  limit 2
+) as __person_result__;
+
+select __person_result__.*
+from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
+lateral (
+  select
+    __person__."id"::text as "0",
+    __person__."person_full_name" as "1",
+    __person__."email" as "2",
+    __person__."config"::text as "3",
+    __person__."last_login_from_ip"::text as "4",
+    __person__."last_login_from_subnet"::text as "5",
+    __person__."user_mac"::text as "6",
+    __person_identifiers__.idx as "7"
+  from "c"."person" as __person__
+  where (
+    __person__."id" > __person_identifiers__."id0"
+  )
+  order by __person__."id" desc
+  limit 2
+) as __person_result__;
 
 select
   __person__."id"::text as "0",
@@ -332,84 +410,6 @@ lateral (
   where (
     __person__."id" < __person_identifiers__."id0"
   )
-  order by __person__."id" asc
-) as __person_result__;
-
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person__."email" as "2",
-    __person__."config"::text as "3",
-    __person__."last_login_from_ip"::text as "4",
-    __person__."last_login_from_subnet"::text as "5",
-    __person__."user_mac"::text as "6",
-    __person_identifiers__.idx as "7"
-  from "c"."person" as __person__
-  where (
-    __person__."id" > __person_identifiers__."id0"
-  )
-  order by __person__."id" asc
-) as __person_result__;
-
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person__."email" as "2",
-    __person__."config"::text as "3",
-    __person__."last_login_from_ip"::text as "4",
-    __person__."last_login_from_subnet"::text as "5",
-    __person__."user_mac"::text as "6",
-    __person_identifiers__.idx as "7"
-  from "c"."person" as __person__
-  where (
-    __person__."id" < __person_identifiers__."id0"
-  )
   order by __person__."id" desc
   limit 3
-) as __person_result__;
-
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person__."email" as "2",
-    __person__."config"::text as "3",
-    __person__."last_login_from_ip"::text as "4",
-    __person__."last_login_from_subnet"::text as "5",
-    __person__."user_mac"::text as "6",
-    __person_identifiers__.idx as "7"
-  from "c"."person" as __person__
-  where (
-    __person__."id" > __person_identifiers__."id0"
-  )
-  order by __person__."id" asc
-  limit 2
-) as __person_result__;
-
-select __person_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __person_identifiers__,
-lateral (
-  select
-    __person__."id"::text as "0",
-    __person__."person_full_name" as "1",
-    __person__."email" as "2",
-    __person__."config"::text as "3",
-    __person__."last_login_from_ip"::text as "4",
-    __person__."last_login_from_subnet"::text as "5",
-    __person__."user_mac"::text as "6",
-    __person_identifiers__.idx as "7"
-  from "c"."person" as __person__
-  where (
-    __person__."id" > __person_identifiers__."id0"
-  )
-  order by __person__."id" desc
-  limit 2
 ) as __person_result__;
