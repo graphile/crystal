@@ -1882,7 +1882,16 @@ async function lint(code: string, rawFilePath: string | URL) {
         sourceType: "module",
       },
       rules: {
-        "no-use-before-define": "error",
+        "no-use-before-define": [
+          "error",
+          {
+            functions: false,
+            classes: false,
+            // We often have cyclic dependencies between types, this is handled via callbacks, so we don't care about that.
+            variables: false,
+            allowNamedExports: false,
+          },
+        ],
       },
     },
   });
