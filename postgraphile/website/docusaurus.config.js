@@ -101,15 +101,6 @@ const config = {
         path: "./news",
       },
     ],
-    [
-      "@docusaurus/plugin-content-docs",
-      {
-        id: "examples",
-        path: "examples",
-        routeBasePath: "examples",
-        // ... other options
-      },
-    ],
   ],
 
   stylesheets: [
