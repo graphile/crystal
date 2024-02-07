@@ -1496,7 +1496,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               // We have no idea what this is or how to handle it.
               // TODO: add some default handling, like "behavesLike = TYPES.text"?
               console.warn(
-                `PgCodec '${codec.name}' not understood, please set 'domainOfCodec' to indicate the underlying behaviour the type should have when exposed to GraphQL`,
+                `Do not know how to convert PgCodec '${codec.name}' into a GraphQL type; please use \`build.setGraphQLTypeForPgCodec(codec, mode, typeName)\` inside \`plugin.schema.hooks.init\` for each mode/typeName combo you want to support.`,
               );
             }
           }
