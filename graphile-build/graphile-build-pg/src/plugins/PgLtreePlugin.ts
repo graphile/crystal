@@ -73,19 +73,21 @@ export const PgLtreePlugin: GraphileConfig.Plugin = {
     hooks: {
       init(_, build) {
         const codec = build.input.pgRegistry.pgCodecs.ltree;
-        const ltreeTypeName = build.inflection.builtin("LTree");
-        build.registerScalarType(
-          ltreeTypeName,
-          { pgCodec: codec },
-          () => ({
-            description:
-              "Represents an `ltree` hierarchical label tree as outlined in https://www.postgresql.org/docs/current/ltree.html",
-            // TODO: specifiedByURL: https://postgraphile.org/scalars/ltree
-          }),
-          'Adding "LTree" scalar type from PgLtreePlugin.',
-        );
-        build.setGraphQLTypeForPgCodec(codec, "output", ltreeTypeName);
-        build.setGraphQLTypeForPgCodec(codec, "input", ltreeTypeName);
+        if (codec) {
+          const ltreeTypeName = build.inflection.builtin("LTree");
+          build.registerScalarType(
+            ltreeTypeName,
+            { pgCodec: codec },
+            () => ({
+              description:
+                "Represents an `ltree` hierarchical label tree as outlined in https://www.postgresql.org/docs/current/ltree.html",
+              // TODO: specifiedByURL: https://postgraphile.org/scalars/ltree
+            }),
+            'Adding "LTree" scalar type from PgLtreePlugin.',
+          );
+          build.setGraphQLTypeForPgCodec(codec, "output", ltreeTypeName);
+          build.setGraphQLTypeForPgCodec(codec, "input", ltreeTypeName);
+        }
         return _;
       },
     },
