@@ -19,11 +19,17 @@ export const NodeIdCodecBase64JSONPlugin: GraphileConfig.Plugin = {
         if (!build.registerNodeIdCodec) {
           return _;
         }
-        build.registerNodeIdCodec({
-          name: "base64JSON",
-          encode: base64JSONEncode,
-          decode: base64JSONDecode,
-        });
+        const { EXPORTABLE } = build;
+        build.registerNodeIdCodec(
+          EXPORTABLE(
+            (base64JSONDecode, base64JSONEncode) => ({
+              name: "base64JSON",
+              encode: base64JSONEncode,
+              decode: base64JSONDecode,
+            }),
+            [base64JSONDecode, base64JSONEncode],
+          ),
+        );
         return _;
       },
     },

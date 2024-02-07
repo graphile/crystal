@@ -20,11 +20,17 @@ export const NodeIdCodecPipeStringPlugin: GraphileConfig.Plugin = {
         if (!build.registerNodeIdCodec) {
           return _;
         }
-        build.registerNodeIdCodec({
-          name: "pipeString",
-          encode: pipeStringEncode,
-          decode: pipeStringDecode,
-        });
+        const { EXPORTABLE } = build;
+        build.registerNodeIdCodec(
+          EXPORTABLE(
+            (pipeStringDecode, pipeStringEncode) => ({
+              name: "pipeString",
+              encode: pipeStringEncode,
+              decode: pipeStringDecode,
+            }),
+            [pipeStringDecode, pipeStringEncode],
+          ),
+        );
         return _;
       },
     },
