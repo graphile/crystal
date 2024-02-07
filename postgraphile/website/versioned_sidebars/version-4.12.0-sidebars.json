@@ -8,7 +8,7 @@
     "index",
     {
       "type": "category",
-      "label": "Examples",
+      "label": "Example Gallery",
       "link": {
         "type": "doc",
         "id": "examples/index"
@@ -16,11 +16,11 @@
       "items": [
         "examples/basic",
         "examples/collections",
-        "examples/computed-columns",
-        "examples/custom-mutations",
-        "examples/custom-queries",
+        "examples/relations",
         "examples/mutations",
-        "examples/relations"
+        "examples/custom-queries",
+        "examples/custom-mutations",
+        "examples/computed-columns"
       ]
     },
     {
