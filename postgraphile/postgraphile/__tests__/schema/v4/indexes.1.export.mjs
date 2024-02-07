@@ -425,7 +425,6 @@ const sqlIdent = sql.identifier(...["b", "guid"]);
 const registryConfig_pgCodecs_guid_guid = domainOfCodec(TYPES.varchar, "guid", sqlIdent, {
   description: undefined,
   extensions: {
-    oid: "1467949",
     pg: {
       serviceName: "main",
       schemaName: "b",
@@ -436,7 +435,6 @@ const registryConfig_pgCodecs_guid_guid = domainOfCodec(TYPES.varchar, "guid", s
   notNull: false
 });
 const extensions2 = {
-  oid: "1187",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -451,7 +449,6 @@ const registryConfig_pgCodecs_intervalArray_intervalArray = listOfCodec(TYPES.in
   name: "intervalArray"
 });
 const extensions3 = {
-  oid: "1009",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -479,7 +476,6 @@ const attributes12 = Object.assign(Object.create(null), {
   }
 });
 const extensions4 = {
-  oid: "1468027",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -511,7 +507,6 @@ const attributes13 = Object.assign(Object.create(null), {
   }
 });
 const extensions5 = {
-  oid: "1468240",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -543,7 +538,6 @@ const attributes14 = Object.assign(Object.create(null), {
   }
 });
 const extensions6 = {
-  oid: "1468247",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -575,7 +569,6 @@ const attributes15 = Object.assign(Object.create(null), {
   }
 });
 const extensions7 = {
-  oid: "1468254",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -607,7 +600,6 @@ const attributes16 = Object.assign(Object.create(null), {
   }
 });
 const extensions8 = {
-  oid: "1468268",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -639,7 +631,6 @@ const attributes17 = Object.assign(Object.create(null), {
   }
 });
 const extensions9 = {
-  oid: "1468261",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -682,7 +673,6 @@ const attributes18 = Object.assign(Object.create(null), {
   }
 });
 const extensions10 = {
-  oid: "1468217",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -738,7 +728,6 @@ const attributes19 = Object.assign(Object.create(null), {
   }
 });
 const extensions11 = {
-  oid: "1468046",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -781,7 +770,6 @@ const attributes20 = Object.assign(Object.create(null), {
   }
 });
 const extensions12 = {
-  oid: "1467856",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -837,7 +825,6 @@ const attributes21 = Object.assign(Object.create(null), {
   }
 });
 const extensions13 = {
-  oid: "1468233",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -880,7 +867,6 @@ const attributes22 = Object.assign(Object.create(null), {
   }
 });
 const extensions14 = {
-  oid: "1468064",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -926,7 +912,6 @@ const attributes23 = Object.assign(Object.create(null), {
   }
 });
 const extensions15 = {
-  oid: "1468276",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -970,7 +955,6 @@ const attributes24 = Object.assign(Object.create(null), {
   }
 });
 const extensions16 = {
-  oid: "1467877",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1026,7 +1010,6 @@ const attributes25 = Object.assign(Object.create(null), {
   }
 });
 const extensions17 = {
-  oid: "1468227",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1080,7 +1063,6 @@ const attributes26 = Object.assign(Object.create(null), {
   }
 });
 const extensions18 = {
-  oid: "1468031",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1145,7 +1127,6 @@ const attributes27 = Object.assign(Object.create(null), {
   }
 });
 const extensions19 = {
-  oid: "1468203",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1210,7 +1191,6 @@ const attributes28 = Object.assign(Object.create(null), {
   }
 });
 const extensions20 = {
-  oid: "1468210",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1277,7 +1257,6 @@ const attributes_object_Object_ = Object.assign(Object.create(null), {
   }
 });
 const extensions21 = {
-  oid: "1468023",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1345,7 +1324,6 @@ const attributes29 = Object.assign(Object.create(null), {
   }
 });
 const extensions22 = {
-  oid: "1468294",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1366,7 +1344,6 @@ const spec_nullTestRecord = {
 };
 const registryConfig_pgCodecs_nullTestRecord_nullTestRecord = recordCodec(spec_nullTestRecord);
 const extensions23 = {
-  oid: "2951",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -1416,7 +1393,6 @@ const attributes30 = Object.assign(Object.create(null), {
   }
 });
 const extensions24 = {
-  oid: "1468079",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1479,7 +1455,6 @@ const attributes31 = Object.assign(Object.create(null), {
   }
 });
 const extensions25 = {
-  oid: "1467890",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1557,7 +1532,6 @@ const attributes32 = Object.assign(Object.create(null), {
   }
 });
 const extensions26 = {
-  oid: "1468192",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -1578,7 +1552,6 @@ const spec_jwtToken = {
 };
 const registryConfig_pgCodecs_jwtToken_jwtToken = recordCodec(spec_jwtToken);
 const extensions27 = {
-  oid: "1468283",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -1616,7 +1589,6 @@ const attributes33 = Object.assign(Object.create(null), {
   }
 });
 const extensions28 = {
-  oid: "1468287",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1672,7 +1644,6 @@ const attributes34 = Object.assign(Object.create(null), {
   }
 });
 const extensions29 = {
-  oid: "1468198",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -1695,7 +1666,6 @@ const spec_authPayload = {
 };
 const registryConfig_pgCodecs_authPayload_authPayload = recordCodec(spec_authPayload);
 const extensions30 = {
-  oid: "1467980",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -1714,7 +1684,6 @@ const attributes_c_codec_color = enumCodec({
 });
 const enumLabels2 = ["FOO_BAR", "BAR_FOO", "BAZ_QUX", "0_BAR"];
 const extensions31 = {
-  oid: "1467988",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -1733,7 +1702,6 @@ const attributes_e_codec_enumCaps = enumCodec({
 });
 const enumLabels3 = ["", "one", "two"];
 const extensions32 = {
-  oid: "1467998",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -1841,7 +1809,6 @@ const attributes36 = Object.assign(Object.create(null), {
   }
 });
 const extensions33 = {
-  oid: "1468007",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -1924,7 +1891,6 @@ const registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCom
   isAnonymous: true
 });
 const extensions34 = {
-  oid: "1467907",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -1934,7 +1900,6 @@ const extensions34 = {
 };
 const enumLabels4 = ["awaiting", "rejected", "published", "*", "**", "***", "foo*", "foo*_", "_foo*", "*bar", "*bar_", "_*bar_", "*baz*", "_*baz*_", "%", ">=", "~~", "$"];
 const extensions35 = {
-  oid: "1467908",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -1958,7 +1923,6 @@ const attributes_enums_codec_anEnumArray = listOfCodec(innerCodec_anEnum, {
   name: "anEnumArray"
 });
 const extensions36 = {
-  oid: "1467946",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -1991,7 +1955,6 @@ const attributes40 = Object.assign(Object.create(null), {
   }
 });
 const extensions37 = {
-  oid: "1467947",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -2082,7 +2045,6 @@ const attributes39 = Object.assign(Object.create(null), {
   }
 });
 const extensions38 = {
-  oid: "1467955",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -2204,7 +2166,6 @@ const registryConfig_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOu
   isAnonymous: true
 });
 const extensions39 = {
-  oid: "1467852",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -2220,7 +2181,6 @@ const attributes_email_codec_email = domainOfCodec(TYPES.text, "email", sqlIdent
   notNull: false
 });
 const extensions40 = {
-  oid: "1467847",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -2249,7 +2209,6 @@ const attributes45 = Object.assign(Object.create(null), {
   }
 });
 const extensions41 = {
-  oid: "1467850",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -2391,7 +2350,6 @@ const attributes44 = Object.assign(Object.create(null), {
   }
 });
 const extensions42 = {
-  oid: "1467864",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -2638,7 +2596,6 @@ const registryConfig_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexR
   isAnonymous: true
 });
 const extensions43 = {
-  oid: "1467979",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -2653,7 +2610,6 @@ const attributes_enum_array_codec_colorArray = listOfCodec(attributes_c_codec_co
   name: "colorArray"
 });
 const extensions44 = {
-  oid: "1468085",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -2669,7 +2625,6 @@ const attributes_domain_codec_anInt = domainOfCodec(TYPES.int, "anInt", sqlIdent
   notNull: false
 });
 const extensions45 = {
-  oid: "1468087",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -2685,7 +2640,6 @@ const attributes_domain2_codec_anotherInt = domainOfCodec(attributes_domain_code
   notNull: false
 });
 const extensions46 = {
-  oid: "3906",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -2700,7 +2654,6 @@ const attributes_nullable_range_codec_numrange = rangeOfCodec(TYPES.numeric, "nu
   extensions: extensions46
 });
 const extensions47 = {
-  oid: "3912",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -2715,7 +2668,6 @@ const attributes_daterange_codec_daterange = rangeOfCodec(TYPES.date, "daterange
   extensions: extensions47
 });
 const extensions48 = {
-  oid: "1468091",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -2765,7 +2717,6 @@ const attributes52 = Object.assign(Object.create(null), {
   }
 });
 const extensions49 = {
-  oid: "1468010",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -2786,7 +2737,6 @@ const spec_nestedCompoundType = {
 };
 const attributes_nested_compound_type_codec_nestedCompoundType = recordCodec(spec_nestedCompoundType);
 const extensions50 = {
-  oid: "1468099",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -2802,7 +2752,6 @@ const attributes_text_array_domain_codec_textArrayDomain = domainOfCodec(registr
   notNull: false
 });
 const extensions51 = {
-  oid: "1468101",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -2811,7 +2760,6 @@ const extensions51 = {
   tags: Object.create(null)
 };
 const extensions52 = {
-  oid: "1016",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -2833,7 +2781,6 @@ const attributes_int8_array_domain_codec_int8ArrayDomain = domainOfCodec(innerCo
   notNull: false
 });
 const extensions53 = {
-  oid: "1001",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -3400,7 +3347,6 @@ const attributes51 = Object.assign(Object.create(null), {
   }
 });
 const extensions54 = {
-  oid: "1468105",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -3423,7 +3369,6 @@ const spec_types = {
 };
 const registryConfig_pgCodecs_types_types = recordCodec(spec_types);
 const extensions55 = {
-  oid: "1468006",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3432,7 +3377,6 @@ const extensions55 = {
   tags: Object.create(null)
 };
 const extensions56 = {
-  oid: "1468191",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -3441,7 +3385,6 @@ const extensions56 = {
   tags: Object.create(null)
 };
 const extensions57 = {
-  oid: "1468104",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -3450,7 +3393,6 @@ const extensions57 = {
   tags: Object.create(null)
 };
 const extensions58 = {
-  oid: "1007",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -3465,7 +3407,6 @@ const registryConfig_pgCodecs_int4Array_int4Array = listOfCodec(TYPES.int, {
   name: "int4Array"
 });
 const extensions59 = {
-  oid: "1468014",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3480,7 +3421,6 @@ const registryConfig_pgCodecs_floatrange_floatrange = rangeOfCodec(TYPES.float, 
   extensions: extensions59
 });
 const extensions60 = {
-  oid: "1467954",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3530,7 +3470,6 @@ const attributes53 = Object.assign(Object.create(null), {
   }
 });
 const extensions61 = {
-  oid: "1467395",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -3596,7 +3535,6 @@ const attributes54 = Object.assign(Object.create(null), {
   }
 });
 const extensions62 = {
-  oid: "1467398",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -3673,7 +3611,6 @@ const attributes55 = Object.assign(Object.create(null), {
   }
 });
 const extensions63 = {
-  oid: "1467401",
   isTableLike: false,
   pg: {
     serviceName: "main",

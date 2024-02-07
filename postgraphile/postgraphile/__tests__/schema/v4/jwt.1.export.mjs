@@ -61,7 +61,6 @@ const sqlIdent = sql.identifier(...["b", "guid"]);
 const registryConfig_pgCodecs_guid_guid = domainOfCodec(TYPES.varchar, "guid", sqlIdent, {
   description: undefined,
   extensions: {
-    oid: "1467949",
     pg: {
       serviceName: "main",
       schemaName: "b",
@@ -120,7 +119,6 @@ const executor_mainPgExecutor = new PgExecutor({
   }
 });
 const extensions2 = {
-  oid: "1468023",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -144,7 +142,6 @@ const spec_updatableView = {
 };
 const registryConfig_pgCodecs_updatableView_updatableView = recordCodec(spec_updatableView);
 const extensions3 = {
-  oid: "1468192",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -213,7 +210,6 @@ const spec_jwtToken = {
 };
 const registryConfig_pgCodecs_jwtToken_jwtToken = recordCodec(spec_jwtToken);
 const extensions4 = {
-  oid: "2951",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -257,7 +253,6 @@ const attributes2 = Object.assign(Object.create(null), {
   }
 });
 const extensions5 = {
-  oid: "1468198",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -280,7 +275,6 @@ const spec_authPayload = {
 };
 const registryConfig_pgCodecs_authPayload_authPayload = recordCodec(spec_authPayload);
 const extensions6 = {
-  oid: "1467980",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -299,7 +293,6 @@ const attributes_c_codec_color = enumCodec({
 });
 const enumLabels2 = ["FOO_BAR", "BAR_FOO", "BAZ_QUX", "0_BAR"];
 const extensions7 = {
-  oid: "1467988",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -318,7 +311,6 @@ const attributes_e_codec_enumCaps = enumCodec({
 });
 const enumLabels3 = ["", "one", "two"];
 const extensions8 = {
-  oid: "1467998",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -410,7 +402,6 @@ const attributes3 = Object.assign(Object.create(null), {
   }
 });
 const extensions9 = {
-  oid: "1468007",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -431,7 +422,6 @@ const spec_compoundType = {
 };
 const registryConfig_pgCodecs_compoundType_compoundType = recordCodec(spec_compoundType);
 const extensions10 = {
-  oid: "1467979",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -446,7 +436,6 @@ const attributes_enum_array_codec_colorArray = listOfCodec(attributes_c_codec_co
   name: "colorArray"
 });
 const extensions11 = {
-  oid: "1468085",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -462,7 +451,6 @@ const attributes_domain_codec_anInt = domainOfCodec(TYPES.int, "anInt", sqlIdent
   notNull: false
 });
 const extensions12 = {
-  oid: "1468087",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -478,7 +466,6 @@ const attributes_domain2_codec_anotherInt = domainOfCodec(attributes_domain_code
   notNull: false
 });
 const extensions13 = {
-  oid: "1009",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -493,7 +480,6 @@ const attributes_text_array_codec_textArray = listOfCodec(TYPES.text, {
   name: "textArray"
 });
 const extensions14 = {
-  oid: "3906",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -508,7 +494,6 @@ const attributes_nullable_range_codec_numrange = rangeOfCodec(TYPES.numeric, "nu
   extensions: extensions14
 });
 const extensions15 = {
-  oid: "3912",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -523,7 +508,6 @@ const attributes_daterange_codec_daterange = rangeOfCodec(TYPES.date, "daterange
   extensions: extensions15
 });
 const extensions16 = {
-  oid: "1468091",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -538,7 +522,6 @@ const attributes_an_int_range_codec_anIntRange = rangeOfCodec(attributes_domain_
   extensions: extensions16
 });
 const extensions17 = {
-  oid: "1187",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -582,7 +565,6 @@ const attributes5 = Object.assign(Object.create(null), {
   }
 });
 const extensions18 = {
-  oid: "1468010",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -603,7 +585,6 @@ const spec_nestedCompoundType = {
 };
 const attributes_nested_compound_type_codec_nestedCompoundType = recordCodec(spec_nestedCompoundType);
 const extensions19 = {
-  oid: "1468099",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -619,7 +600,6 @@ const attributes_text_array_domain_codec_textArrayDomain = domainOfCodec(attribu
   notNull: false
 });
 const extensions20 = {
-  oid: "1468101",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -628,7 +608,6 @@ const extensions20 = {
   tags: Object.create(null)
 };
 const extensions21 = {
-  oid: "1016",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -650,7 +629,6 @@ const attributes_int8_array_domain_codec_int8ArrayDomain = domainOfCodec(innerCo
   notNull: false
 });
 const extensions22 = {
-  oid: "1001",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -1121,7 +1099,6 @@ const attributes4 = Object.assign(Object.create(null), {
   }
 });
 const extensions23 = {
-  oid: "1468105",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1144,7 +1121,6 @@ const spec_types = {
 };
 const registryConfig_pgCodecs_types_types = recordCodec(spec_types);
 const extensions24 = {
-  oid: "1468191",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -1153,7 +1129,6 @@ const extensions24 = {
   tags: Object.create(null)
 };
 const extensions25 = {
-  oid: "1468006",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -1162,7 +1137,6 @@ const extensions25 = {
   tags: Object.create(null)
 };
 const extensions26 = {
-  oid: "1468104",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -1171,7 +1145,6 @@ const extensions26 = {
   tags: Object.create(null)
 };
 const extensions27 = {
-  oid: "1467847",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -1198,7 +1171,6 @@ const attributes6 = Object.assign(Object.create(null), {
   }
 });
 const extensions28 = {
-  oid: "1467850",
   isTableLike: false,
   pg: {
     serviceName: "main",

@@ -154,7 +154,6 @@ const spec_geom = {
   attributes,
   description: undefined,
   extensions: {
-    oid: "1468785",
     isTableLike: true,
     pg: {
       serviceName: "main",

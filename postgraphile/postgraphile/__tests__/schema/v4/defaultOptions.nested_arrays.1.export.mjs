@@ -56,7 +56,6 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
   }
 });
 const extensions2 = {
-  oid: "1469408",
   pg: {
     serviceName: "main",
     schemaName: "nested_arrays",
@@ -65,7 +64,6 @@ const extensions2 = {
   tags: Object.create(null)
 };
 const extensions3 = {
-  oid: "1469409",
   pg: {
     serviceName: "main",
     schemaName: "nested_arrays",
@@ -74,7 +72,6 @@ const extensions3 = {
   tags: Object.create(null)
 };
 const extensions4 = {
-  oid: "1469404",
   pg: {
     serviceName: "main",
     schemaName: "nested_arrays",
@@ -83,7 +80,6 @@ const extensions4 = {
   tags: Object.create(null)
 };
 const extensions5 = {
-  oid: "1469405",
   pg: {
     serviceName: "main",
     schemaName: "nested_arrays",
@@ -140,7 +136,6 @@ const executor_mainPgExecutor = new PgExecutor({
   }
 });
 const extensions6 = {
-  oid: "1469403",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -189,7 +184,6 @@ const sqlIdent4 = sql.identifier(...parts4);
 const attributes_v_codec_workingHours = domainOfCodec(innerCodec_workhoursArray, "workingHours", sqlIdent4, {
   description: "Mo, Tu, We, Th, Fr, Sa, Su, Ho",
   extensions: {
-    oid: "1469412",
     pg: {
       serviceName: "main",
       schemaName: "nested_arrays",
@@ -220,7 +214,6 @@ const attributes = Object.assign(Object.create(null), {
   }
 });
 const extensions7 = {
-  oid: "1469417",
   isTableLike: true,
   pg: {
     serviceName: "main",

@@ -19,7 +19,6 @@ const attributes_type_codec_itemType = enumCodec({
   values: ["TOPIC", "STATUS"],
   description: undefined,
   extensions: {
-    oid: "1469201",
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
@@ -82,7 +81,6 @@ const executor_mainPgExecutor = new PgExecutor({
   }
 });
 const extensions2 = {
-  oid: "1469222",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -133,7 +131,6 @@ const attributes_object_Object_ = Object.assign(Object.create(null), {
   }
 });
 const extensions3 = {
-  oid: "1469307",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -183,7 +180,6 @@ const attributes_object_Object_2 = Object.assign(Object.create(null), {
   }
 });
 const extensions4 = {
-  oid: "1469178",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -233,7 +229,6 @@ const attributes_object_Object_3 = Object.assign(Object.create(null), {
   }
 });
 const extensions5 = {
-  oid: "1469283",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -283,7 +278,6 @@ const attributes2 = Object.assign(Object.create(null), {
   }
 });
 const extensions6 = {
-  oid: "1469259",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -333,7 +327,6 @@ const attributes3 = Object.assign(Object.create(null), {
   }
 });
 const extensions7 = {
-  oid: "1469189",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -383,7 +376,6 @@ const attributes4 = Object.assign(Object.create(null), {
   }
 });
 const extensions8 = {
-  oid: "1469270",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -433,7 +425,6 @@ const attributes5 = Object.assign(Object.create(null), {
   }
 });
 const extensions9 = {
-  oid: "1469318",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -479,7 +470,6 @@ const attributes6 = Object.fromEntries([["id", {
   }
 }]]);
 const extensions10 = {
-  oid: "1469248",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -552,7 +542,6 @@ const attributes7 = Object.assign(Object.create(null), {
   }
 });
 const extensions11 = {
-  oid: "1469234",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -603,7 +592,6 @@ const attributes8 = Object.assign(Object.create(null), {
   }
 });
 const extensions12 = {
-  oid: "1469296",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -662,7 +650,6 @@ const attributes9 = Object.assign(Object.create(null), {
   }
 });
 const extensions13 = {
-  oid: "1469331",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -712,7 +699,6 @@ const attributes10 = Object.assign(Object.create(null), {
   }
 });
 const extensions14 = {
-  oid: "1469208",
   isTableLike: true,
   pg: {
     serviceName: "main",

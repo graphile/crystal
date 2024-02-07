@@ -91,7 +91,6 @@ const spec_people = {
   attributes: attributes_object_Object_,
   description: undefined,
   extensions: {
-    oid: "1468572",
     isTableLike: true,
     pg: {
       serviceName: "main",
@@ -133,7 +132,6 @@ const attributes_object_Object_2 = Object.assign(Object.create(null), {
   }
 });
 const extensions2 = {
-  oid: "1468581",
   isTableLike: true,
   pg: {
     serviceName: "main",

@@ -81,7 +81,6 @@ const spec_flamble = {
   }),
   description: undefined,
   extensions: {
-    oid: "1468390",
     isTableLike: false,
     pg: {
       serviceName: "main",
@@ -109,7 +108,6 @@ const attributes2 = Object.assign(Object.create(null), {
   }
 });
 const extensions2 = {
-  oid: "1468349",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -152,7 +150,6 @@ const attributes3 = Object.assign(Object.create(null), {
   }
 });
 const extensions3 = {
-  oid: "1468394",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -193,7 +190,6 @@ const attributes_object_Object_ = Object.assign(Object.create(null), {
   }
 });
 const extensions4 = {
-  oid: "1468399",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -243,7 +239,6 @@ const attributes4 = Object.assign(Object.create(null), {
   }
 });
 const extensions5 = {
-  oid: "1468372",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -296,7 +291,6 @@ const attributes5 = Object.assign(Object.create(null), {
   }
 });
 const extensions6 = {
-  oid: "1468416",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -346,7 +340,6 @@ const attributes6 = Object.assign(Object.create(null), {
   }
 });
 const extensions7 = {
-  oid: "1468406",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -396,7 +389,6 @@ const attributes7 = Object.assign(Object.create(null), {
   }
 });
 const extensions8 = {
-  oid: "1468386",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -530,7 +522,6 @@ const attributes8 = Object.assign(Object.create(null), {
   }
 });
 const extensions9 = {
-  oid: "1468354",
   isTableLike: true,
   pg: {
     serviceName: "main",
