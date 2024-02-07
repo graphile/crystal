@@ -29,25 +29,30 @@ const handler = {
     return constant`query`;
   }
 };
+function base64JSONDecode(value) {
+  return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+}
+function base64JSONEncode(value) {
+  return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+}
+const nodeIdCodecs_base64JSON_base64JSON = {
+  name: "base64JSON",
+  encode: base64JSONEncode,
+  decode: base64JSONDecode
+};
+function pipeStringDecode(value) {
+  return typeof value === "string" ? value.split("|") : null;
+}
+function pipeStringEncode(value) {
+  return Array.isArray(value) ? value.join("|") : null;
+}
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
-  base64JSON: {
-    name: "base64JSON",
-    encode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    },
-    decode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-  },
+  base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode(value) {
-      return Array.isArray(value) ? value.join("|") : null;
-    },
-    decode(value) {
-      return typeof value === "string" ? value.split("|") : null;
-    }
+    encode: pipeStringEncode,
+    decode: pipeStringDecode
   }
 });
 const attributes = Object.assign(Object.create(null), {
@@ -331,7 +336,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   Query: handler,
   File: {
     typeName: "File",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("files", false), $record.get("id")]);
@@ -350,7 +355,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   User: {
     typeName: "User",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("users", false), $record.get("id")]);
@@ -369,7 +374,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   UserFile: {
     typeName: "UserFile",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("user_files", false), $record.get("id")]);
@@ -3277,7 +3282,7 @@ export const plans = {
     deletedFileId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.File.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeleteFilePayload_queryPlan,
     fileEdge: {
@@ -3331,7 +3336,7 @@ export const plans = {
     deletedUserId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.User.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeleteUserPayload_queryPlan,
     userEdge: {
@@ -3385,7 +3390,7 @@ export const plans = {
     deletedUserFileId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.UserFile.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeleteUserFilePayload_queryPlan,
     userFileEdge: {

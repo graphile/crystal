@@ -29,25 +29,30 @@ const handler = {
     return constant`query`;
   }
 };
+function base64JSONDecode(value) {
+  return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+}
+function base64JSONEncode(value) {
+  return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+}
+const nodeIdCodecs_base64JSON_base64JSON = {
+  name: "base64JSON",
+  encode: base64JSONEncode,
+  decode: base64JSONDecode
+};
+function pipeStringDecode(value) {
+  return typeof value === "string" ? value.split("|") : null;
+}
+function pipeStringEncode(value) {
+  return Array.isArray(value) ? value.join("|") : null;
+}
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
-  base64JSON: {
-    name: "base64JSON",
-    encode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    },
-    decode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-  },
+  base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode(value) {
-      return Array.isArray(value) ? value.join("|") : null;
-    },
-    decode(value) {
-      return typeof value === "string" ? value.split("|") : null;
-    }
+    encode: pipeStringEncode,
+    decode: pipeStringDecode
   }
 });
 const executor_mainPgExecutor = new PgExecutor({
@@ -9237,7 +9242,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   Query: handler,
   Input: {
     typeName: "Input",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("inputs", false), $record.get("id")]);
@@ -9256,7 +9261,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   Patch: {
     typeName: "Patch",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("patchs", false), $record.get("id")]);
@@ -9275,7 +9280,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   Reserved: {
     typeName: "Reserved",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("reserveds", false), $record.get("id")]);
@@ -9294,7 +9299,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   ReservedPatchRecord: {
     typeName: "ReservedPatchRecord",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("reservedPatchs", false), $record.get("id")]);
@@ -9313,7 +9318,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   ReservedInputRecord: {
     typeName: "ReservedInputRecord",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("reserved_inputs", false), $record.get("id")]);
@@ -9332,7 +9337,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   DefaultValue: {
     typeName: "DefaultValue",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("default_values", false), $record.get("id")]);
@@ -9351,7 +9356,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   MyTable: {
     typeName: "MyTable",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("my_tables", false), $record.get("id")]);
@@ -9370,7 +9375,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   PersonSecret: {
     typeName: "PersonSecret",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: "This is deprecated (comment on table c.person_secret).",
     plan($record) {
       return list([constant("person_secrets", false), $record.get("person_id")]);
@@ -9389,7 +9394,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   ViewTable: {
     typeName: "ViewTable",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("view_tables", false), $record.get("id")]);
@@ -9408,7 +9413,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   CompoundKey: {
     typeName: "CompoundKey",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("compound_keys", false), $record.get("person_id_1"), $record.get("person_id_2")]);
@@ -9428,7 +9433,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   SimilarTable1: {
     typeName: "SimilarTable1",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("similar_table_1S", false), $record.get("id")]);
@@ -9447,7 +9452,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   SimilarTable2: {
     typeName: "SimilarTable2",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("similar_table_2S", false), $record.get("id")]);
@@ -9466,7 +9471,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   NullTestRecord: {
     typeName: "NullTestRecord",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("null_test_records", false), $record.get("id")]);
@@ -9485,7 +9490,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   Issue756: {
     typeName: "Issue756",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("issue756S", false), $record.get("id")]);
@@ -9504,7 +9509,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   LeftArm: {
     typeName: "LeftArm",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("left_arms", false), $record.get("id")]);
@@ -9523,7 +9528,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   Post: {
     typeName: "Post",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("posts", false), $record.get("id")]);
@@ -9542,7 +9547,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   Person: {
     typeName: "Person",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("people", false), $record.get("id")]);
@@ -9561,7 +9566,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   Type: {
     typeName: "Type",
-    codec: nodeIdCodecs.base64JSON,
+    codec: nodeIdCodecs_base64JSON_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("types", false), $record.get("id")]);
@@ -43682,7 +43687,7 @@ export const plans = {
     deletedInputId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Input.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeleteInputPayload_queryPlan,
     inputEdge: {
@@ -43736,7 +43741,7 @@ export const plans = {
     deletedPatchId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Patch.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeletePatchPayload_queryPlan,
     patchEdge: {
@@ -43790,7 +43795,7 @@ export const plans = {
     deletedReservedId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Reserved.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeleteReservedPayload_queryPlan,
     reservedEdge: {
@@ -43844,7 +43849,7 @@ export const plans = {
     deletedReservedPatchId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.ReservedPatchRecord.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeleteReservedPatchRecordPayload_queryPlan,
     reservedPatchRecordEdge: {
@@ -43898,7 +43903,7 @@ export const plans = {
     deletedReservedInputId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.ReservedInputRecord.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeleteReservedInputRecordPayload_queryPlan,
     reservedInputRecordEdge: {
@@ -43952,7 +43957,7 @@ export const plans = {
     deletedDefaultValueId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.DefaultValue.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeleteDefaultValuePayload_queryPlan,
     defaultValueEdge: {
@@ -44018,7 +44023,7 @@ export const plans = {
     deletedMyTableId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.MyTable.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeleteMyTablePayload_queryPlan,
     myTableEdge: {
@@ -44072,7 +44077,7 @@ export const plans = {
     deletedPersonSecretId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.PersonSecret.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeletePersonSecretPayload_queryPlan,
     personSecretEdge: {
@@ -44131,7 +44136,7 @@ export const plans = {
     deletedViewTableId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.ViewTable.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeleteViewTablePayload_queryPlan,
     viewTableEdge: {
@@ -44185,7 +44190,7 @@ export const plans = {
     deletedCompoundKeyId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.CompoundKey.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeleteCompoundKeyPayload_queryPlan,
     compoundKeyEdge: {
@@ -44250,7 +44255,7 @@ export const plans = {
     deletedSimilarTable1Id($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.SimilarTable1.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeleteSimilarTable1Payload_queryPlan,
     similarTable1Edge: {
@@ -44304,7 +44309,7 @@ export const plans = {
     deletedSimilarTable2Id($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.SimilarTable2.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeleteSimilarTable2Payload_queryPlan,
     similarTable2Edge: {
@@ -44358,7 +44363,7 @@ export const plans = {
     deletedNullTestRecordId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.NullTestRecord.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeleteNullTestRecordPayload_queryPlan,
     nullTestRecordEdge: {
@@ -44412,7 +44417,7 @@ export const plans = {
     deletedIssue756Id($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Issue756.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeleteIssue756Payload_queryPlan,
     issue756Edge: {
@@ -44466,7 +44471,7 @@ export const plans = {
     deletedLeftArmId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.LeftArm.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeleteLeftArmPayload_queryPlan,
     leftArmEdge: {
@@ -44531,7 +44536,7 @@ export const plans = {
     deletedPostId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Post.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeletePostPayload_queryPlan,
     postEdge: {
@@ -44590,7 +44595,7 @@ export const plans = {
     deletedPersonId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Person.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeletePersonPayload_queryPlan,
     personEdge: {
@@ -44650,7 +44655,7 @@ export const plans = {
     deletedTypeId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Type.plan($record);
-      return lambda(specifier, nodeIdCodecs.base64JSON.encode);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
     query: DeleteTypePayload_queryPlan,
     typeEdge: {

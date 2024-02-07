@@ -2,6 +2,17 @@ import { PgDeleteSingleStep, PgExecutor, PgSelectSingleStep, PgSelectStep, PgUni
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
+function base64JSONDecode(value) {
+  return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+}
+function base64JSONEncode(value) {
+  return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+}
+const handler_codec_base64JSON = {
+  name: "base64JSON",
+  encode: base64JSONEncode,
+  decode: base64JSONDecode
+};
 const attributes_type_codec_itemType = enumCodec({
   name: "itemType",
   identifier: sql.identifier(...["js_reserved", "item_type"]),
@@ -1510,15 +1521,7 @@ const registry = makeRegistry(registryConfig);
 const pgResource_relational_topicsPgResource = registry.pgResources["relational_topics"];
 const handler = {
   typeName: "RelationalTopic",
-  codec: {
-    name: "base64JSON",
-    encode(value) {
-      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-    },
-    decode(value) {
-      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-    }
-  },
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("relational_topics", false), $record.get("id")]);
@@ -1535,6 +1538,12 @@ const handler = {
     return obj[0] === "relational_topics";
   }
 };
+function pipeStringDecode(value) {
+  return typeof value === "string" ? value.split("|") : null;
+}
+function pipeStringEncode(value) {
+  return Array.isArray(value) ? value.join("|") : null;
+}
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: {
     name: "raw",
@@ -1545,15 +1554,11 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
       return typeof value === "string" ? value : null;
     }
   },
-  base64JSON: handler.codec,
+  base64JSON: handler_codec_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode(value) {
-      return Array.isArray(value) ? value.join("|") : null;
-    },
-    decode(value) {
-      return typeof value === "string" ? value.split("|") : null;
-    }
+    encode: pipeStringEncode,
+    decode: pipeStringDecode
   }
 });
 const building_buildingPgResource = registry.pgResources["building"];
@@ -1561,7 +1566,7 @@ const relational_items_relational_itemsPgResource = registry.pgResources["relati
 const relational_status_relational_statusPgResource = registry.pgResources["relational_status"];
 const handler2 = {
   typeName: "Building",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("buildings", false), $record.get("id")]);
@@ -1663,7 +1668,7 @@ function MachinesConnection_pageInfoPlan($connection) {
 }
 const handler3 = {
   typeName: "Machine",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("machines", false), $record.get("id")]);
@@ -1704,7 +1709,7 @@ function RelationalItemsConnection_pageInfoPlan($connection) {
 }
 const handler4 = {
   typeName: "RelationalStatus",
-  codec: handler.codec,
+  codec: handler_codec_base64JSON,
   deprecationReason: undefined,
   plan($record) {
     return list([constant("relational_statuses", false), $record.get("id")]);
@@ -1753,7 +1758,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   RelationalTopic: handler,
   _Proto__: {
     typeName: "_Proto__",
-    codec: handler.codec,
+    codec: handler_codec_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("__proto__S", false), ...uniques2[0].attributes.map(attribute => $record.get(attribute))]);
@@ -1775,7 +1780,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   Building: handler2,
   Constructor: {
     typeName: "Constructor",
-    codec: handler.codec,
+    codec: handler_codec_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("constructors", false), $record.get("id")]);
@@ -1794,7 +1799,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   Crop: {
     typeName: "Crop",
-    codec: handler.codec,
+    codec: handler_codec_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("crops", false), $record.get("id")]);
@@ -1814,7 +1819,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   Machine: handler3,
   Material: {
     typeName: "Material",
-    codec: handler.codec,
+    codec: handler_codec_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("materials", false), $record.get("id")]);
@@ -1833,7 +1838,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   Null: {
     typeName: "Null",
-    codec: handler.codec,
+    codec: handler_codec_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("nulls", false), $record.get("id")]);
@@ -1852,7 +1857,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   Project: {
     typeName: "Project",
-    codec: handler.codec,
+    codec: handler_codec_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("projects", false), $record.get("id")]);
@@ -1872,7 +1877,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   RelationalStatus: handler4,
   Yield: {
     typeName: "Yield",
-    codec: handler.codec,
+    codec: handler_codec_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("yields", false), $record.get("id")]);
@@ -1891,7 +1896,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   },
   Reserved: {
     typeName: "Reserved",
-    codec: handler.codec,
+    codec: handler_codec_base64JSON,
     deprecationReason: undefined,
     plan($record) {
       return list([constant("reserveds", false), $record.get("id")]);
@@ -15981,7 +15986,7 @@ export const plans = {
     deletedProtoId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName._Proto__.plan($record);
-      return lambda(specifier, handler.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteProtoPayload_queryPlan,
     _protoEdge: {
@@ -16041,7 +16046,7 @@ export const plans = {
     deletedBuildingId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler2.plan($record);
-      return lambda(specifier, handler2.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteBuildingPayload_queryPlan,
     buildingEdge: {
@@ -16101,7 +16106,7 @@ export const plans = {
     deletedConstructorId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Constructor.plan($record);
-      return lambda(specifier, handler.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteConstructorPayload_queryPlan,
     constructorEdge: {
@@ -16167,7 +16172,7 @@ export const plans = {
     deletedCropId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Crop.plan($record);
-      return lambda(specifier, handler.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteCropPayload_queryPlan,
     cropEdge: {
@@ -16227,7 +16232,7 @@ export const plans = {
     deletedMachineId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler3.plan($record);
-      return lambda(specifier, handler3.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteMachinePayload_queryPlan,
     machineEdge: {
@@ -16285,7 +16290,7 @@ export const plans = {
     deletedMaterialId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Material.plan($record);
-      return lambda(specifier, handler.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteMaterialPayload_queryPlan,
     materialEdge: {
@@ -16351,7 +16356,7 @@ export const plans = {
     deletedNullId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Null.plan($record);
-      return lambda(specifier, handler.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteNullPayload_queryPlan,
     nullEdge: {
@@ -16417,7 +16422,7 @@ export const plans = {
     deletedProjectId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Project.plan($record);
-      return lambda(specifier, handler.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteProjectPayload_queryPlan,
     projectEdge: {
@@ -16477,7 +16482,7 @@ export const plans = {
     deletedYieldId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Yield.plan($record);
-      return lambda(specifier, handler.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteYieldPayload_queryPlan,
     yieldEdge: {
@@ -16537,7 +16542,7 @@ export const plans = {
     deletedReservedId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Reserved.plan($record);
-      return lambda(specifier, handler.codec.encode);
+      return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query: DeleteReservedPayload_queryPlan,
     reservedEdge: {

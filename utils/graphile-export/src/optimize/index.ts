@@ -36,7 +36,7 @@ function isSimpleParam(param: t.Node): param is t.Identifier {
   return t.isIdentifier(param);
 }
 
-export const optimize = (ast: t.Node, runs = 1): t.Node => {
+export const optimize = (ast: t.File, runs = 1): t.File => {
   traverse(ast, {
     VariableDeclaration: {
       enter(path) {
