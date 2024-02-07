@@ -64,7 +64,7 @@ export function each<
       const rootStep = layerPlan.rootStep;
       if (
         rootStep instanceof __ItemStep &&
-        rootStep.getDep(0).layerPlan !== layerPlan
+        rootStep.getParentStep().layerPlan !== layerPlan
       ) {
         // We don't do anything; replace ourself with our parent
         return this.getListStep();

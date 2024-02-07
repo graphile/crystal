@@ -2496,7 +2496,6 @@ ${lateralText};`;
         } else if (dep instanceof ConnectionStep) {
           // We only have this to detect errors, it's an empty object. Safe.
         } else if (dep instanceof PgClassExpressionStep) {
-          const p2 = dep.getDep(dep.rowDependencyId);
           const t2Parent = dep.getParentStep();
           if (!(t2Parent instanceof PgSelectSingleStep)) {
             continue;
@@ -2527,7 +2526,7 @@ ${lateralText};`;
           */
 
           if (t === undefined && p === undefined) {
-            p = p2;
+            p = t2Parent;
             t = t2;
           } else if (t2 !== t) {
             debugPlanVerbose(
@@ -2539,11 +2538,11 @@ ${lateralText};`;
             );
             t = null;
             break;
-          } else if (p2 !== p) {
+          } else if (t2Parent !== p) {
             debugPlanVerbose(
               "Refusing to optimise %c due to parent dependency mismatch: %c != %c",
               this,
-              p2,
+              t2Parent,
               p,
             );
             t = null;
@@ -2688,7 +2687,7 @@ ${lateralText};`;
           parent instanceof PgSelectSingleStep &&
           parent.getClassStep().mode !== "aggregate"
         ) {
-          const parent2 = parent.getDep(parent.itemStepId);
+          const parent2 = parent.getItemStep();
           this.identifierMatches.forEach((identifierMatch, i) => {
             const { dependencyIndex, codec } = this.queryValues[i];
             const step = this.getDep(dependencyIndex);

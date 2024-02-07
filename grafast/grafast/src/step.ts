@@ -286,7 +286,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     return this.layerPlan.getStep(id, this);
   }
 
-  public getDep(depId: number): ExecutableStep {
+  protected getDep(depId: number): ExecutableStep {
     return this.dependencies[depId];
   }
 
