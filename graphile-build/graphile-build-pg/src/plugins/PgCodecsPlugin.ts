@@ -503,15 +503,6 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           await info.process("pgCodecs_findPgCodec", event);
           if (event.pgCodec) {
             const codec = event.pgCodec;
-            if (codec.attributes) {
-              throw new Error(
-                `Invalid codec chosen for '${
-                  type.getNamespace()?.nspname ?? "??"
-                }.${
-                  type.typname
-                }'; this type is not a composite type, and yet the codec has attributes - this is invalid. Please revisit the gather.hooks.pgCodecs_findPgCodec hook that has triggered this.`,
-              );
-            }
             // Be careful not to call this for class codecs!
             await info.process("pgCodecs_PgCodec", {
               pgCodec: codec,
