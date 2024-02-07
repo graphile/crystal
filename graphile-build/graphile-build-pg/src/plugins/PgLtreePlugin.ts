@@ -1,17 +1,9 @@
 import type { PgCodec } from "@dataplan/pg";
 import { listOfCodec } from "@dataplan/pg";
-import { EXPORTABLE, gatherConfig } from "graphile-build";
+import { EXPORTABLE } from "graphile-build";
 import sql from "pg-sql2";
 
 import { version } from "../version.js";
-
-declare global {
-  namespace GraphileConfig {
-    interface GatherHelpers {
-      pgLtree: {};
-    }
-  }
-}
 
 interface State {
   ltreeCodec: PgCodec<string, any, any, any, undefined, any, any>;
