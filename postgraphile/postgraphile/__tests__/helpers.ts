@@ -781,3 +781,16 @@ function applyV4Stuff(
     }),
   );
 }
+
+export const StripOidsPlugin: GraphileConfig.Plugin = {
+  name: "StripOidsPlugin",
+  version: "0.0.0",
+
+  gather: {
+    hooks: {
+      pgCodecs_PgCodec(info, event) {
+        delete event.pgCodec.extensions?.oid;
+      },
+    },
+  },
+};

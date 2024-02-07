@@ -9,7 +9,11 @@ import type { PoolClient } from "pg";
 import AmberPreset from "../../../src/presets/amber.js";
 import type { V4Options } from "../../../src/presets/v4.js";
 import { makeV4Preset } from "../../../src/presets/v4.js";
-import { snapshot, withPoolClientTransaction } from "../../helpers.js";
+import {
+  snapshot,
+  withPoolClientTransaction,
+  StripOidsPlugin,
+} from "../../helpers.js";
 
 jest.setTimeout(30000);
 
@@ -39,6 +43,7 @@ export const test =
       const graphileBuildOptions = {};
       const preset: GraphileConfig.Preset = {
         extends: [AmberPreset, v4Preset, additionalPreset],
+        plugins: [StripOidsPlugin],
         pgServices: [
           {
             adaptor: "@dataplan/pg/adaptors/pg",

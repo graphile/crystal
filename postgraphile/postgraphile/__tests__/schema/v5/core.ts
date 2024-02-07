@@ -8,8 +8,8 @@ import type { PoolClient } from "pg";
 
 import AmberPreset from "../../../src/presets/amber.js";
 import {
-  connectionString,
   snapshot,
+  StripOidsPlugin,
   withPoolClientTransaction,
 } from "../../helpers.js";
 
@@ -39,6 +39,7 @@ export const test =
       const graphileBuildOptions = {};
       const preset: GraphileConfig.Preset = {
         extends: [AmberPreset, additionalPreset],
+        plugins: [StripOidsPlugin],
         pgServices: [
           {
             adaptor: "@dataplan/pg/adaptors/pg",
