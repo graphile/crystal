@@ -6,7 +6,23 @@
       "defaultStyle": false
     },
     "index",
-    "examples",
+    {
+      "type": "category",
+      "label": "Examples",
+      "link": {
+        "type": "doc",
+        "id": "examples/index"
+      },
+      "items": [
+        "examples/basic",
+        "examples/collections",
+        "examples/computed-columns",
+        "examples/custom-mutations",
+        "examples/custom-queries",
+        "examples/mutations",
+        "examples/relations"
+      ]
+    },
     {
       "type": "category",
       "label": "Usage",

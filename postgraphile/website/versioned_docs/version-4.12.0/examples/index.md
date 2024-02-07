@@ -1,11 +1,11 @@
 ---
-layout: page
-path: /postgraphile/examples/
-title: Example queries and mutations
-showExamples: queries
+title: PostGraphile Example Gallery
+sidebar_position: 1
 ---
 
-_If you are new to GraphQL then I recommend you read through the official
+# Example queries and mutations
+
+_If you are new to GraphQL then we recommend you read through the official
 introduction to GraphQL [here](https://graphql.org/learn/) before continuing
 through the PostGraphile documentation._
 
