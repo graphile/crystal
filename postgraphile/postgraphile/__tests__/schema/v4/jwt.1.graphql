@@ -592,6 +592,11 @@ which securely represents claims between two parties.
 """
 scalar JwtToken
 
+"""
+Represents an `ltree` hierarchical label tree as outlined in https://www.postgresql.org/docs/current/ltree.html
+"""
+scalar LTree
+
 """All input for the `listBdeMutation` mutation."""
 input ListBdeMutationInput {
   b: [String]
@@ -1089,6 +1094,8 @@ type Type implements Node {
   intervalArray: [Interval]!
   json: JSON!
   jsonb: JSON!
+  ltree: LTree
+  ltreeArray: [LTree]
   macaddr: String
   money: Float!
   nestedCompoundType: NestedCompoundType!
@@ -1182,6 +1189,12 @@ input TypeCondition {
 
   """Checks for equality with the object’s `jsonb` field."""
   jsonb: JSON
+
+  """Checks for equality with the object’s `ltree` field."""
+  ltree: LTree
+
+  """Checks for equality with the object’s `ltreeArray` field."""
+  ltreeArray: [LTree]
 
   """Checks for equality with the object’s `macaddr` field."""
   macaddr: String
@@ -1366,6 +1379,8 @@ input TypeInput {
   intervalArray: [IntervalInput]!
   json: JSON!
   jsonb: JSON!
+  ltree: LTree
+  ltreeArray: [LTree]
   macaddr: String
   money: Float!
   nestedCompoundType: NestedCompoundTypeInput!
@@ -1417,6 +1432,8 @@ input TypePatch {
   intervalArray: [IntervalInput]
   json: JSON
   jsonb: JSON
+  ltree: LTree
+  ltreeArray: [LTree]
   macaddr: String
   money: Float
   nestedCompoundType: NestedCompoundTypeInput
@@ -1501,6 +1518,8 @@ enum TypesOrderBy {
   JSONB_DESC
   JSON_ASC
   JSON_DESC
+  LTREE_ASC
+  LTREE_DESC
   MACADDR_ASC
   MACADDR_DESC
   MONEY_ASC

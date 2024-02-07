@@ -618,6 +618,8 @@ type BType {
   intervalArray: [Interval]!
   json: JSON!
   jsonb: JSON!
+  ltree: LTree
+  ltreeArray: [LTree]
   macaddr: MacAddress
   money: Float!
   nestedCompoundType: BNestedCompoundType!
@@ -692,6 +694,9 @@ input BTypeCondition {
 
   """Checks for equality with the object’s `jsonb` field."""
   jsonb: JSON
+
+  """Checks for equality with the object’s `ltree` field."""
+  ltree: LTree
 
   """Checks for equality with the object’s `macaddr` field."""
   macaddr: MacAddress
@@ -881,6 +886,8 @@ input BTypeInput {
   intervalArray: [IntervalInput]!
   json: JSON!
   jsonb: JSON!
+  ltree: LTree
+  ltreeArray: [LTree]
   macaddr: MacAddress
   money: Float!
   nestedCompoundType: BNestedCompoundTypeInput!
@@ -938,6 +945,8 @@ enum BTypeOrderBy {
   JSONB_DESC
   JSON_ASC
   JSON_DESC
+  LTREE_ASC
+  LTREE_DESC
   MACADDR_ASC
   MACADDR_DESC
   MONEY_ASC
@@ -1005,6 +1014,8 @@ input BTypePatch {
   intervalArray: [IntervalInput]
   json: JSON
   jsonb: JSON
+  ltree: LTree
+  ltreeArray: [LTree]
   macaddr: MacAddress
   money: Float
   nestedCompoundType: BNestedCompoundTypeInput
@@ -4993,6 +5004,11 @@ scalar JSON
 A set of key/value pairs, keys are strings, values may be a string or null. Exposed as a JSON object.
 """
 scalar KeyValueHash
+
+"""
+Represents an `ltree` hierarchical label tree as outlined in https://www.postgresql.org/docs/current/ltree.html
+"""
+scalar LTree
 
 """A 6-byte MAC address."""
 scalar MacAddress

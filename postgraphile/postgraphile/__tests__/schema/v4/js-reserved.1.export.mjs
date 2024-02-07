@@ -19,7 +19,7 @@ const attributes_type_codec_itemType = enumCodec({
   values: ["TOPIC", "STATUS"],
   description: undefined,
   extensions: {
-    oid: "1377187",
+    oid: "1469201",
     pg: {
       serviceName: "main",
       schemaName: "js_reserved",
@@ -82,7 +82,7 @@ const executor_mainPgExecutor = new PgExecutor({
   }
 });
 const extensions2 = {
-  oid: "1377208",
+  oid: "1469222",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -133,7 +133,7 @@ const attributes_object_Object_ = Object.assign(Object.create(null), {
   }
 });
 const extensions3 = {
-  oid: "1377293",
+  oid: "1469307",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -183,7 +183,7 @@ const attributes_object_Object_2 = Object.assign(Object.create(null), {
   }
 });
 const extensions4 = {
-  oid: "1377164",
+  oid: "1469178",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -233,7 +233,7 @@ const attributes_object_Object_3 = Object.assign(Object.create(null), {
   }
 });
 const extensions5 = {
-  oid: "1377269",
+  oid: "1469283",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -283,7 +283,7 @@ const attributes2 = Object.assign(Object.create(null), {
   }
 });
 const extensions6 = {
-  oid: "1377245",
+  oid: "1469259",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -333,7 +333,7 @@ const attributes3 = Object.assign(Object.create(null), {
   }
 });
 const extensions7 = {
-  oid: "1377175",
+  oid: "1469189",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -383,7 +383,7 @@ const attributes4 = Object.assign(Object.create(null), {
   }
 });
 const extensions8 = {
-  oid: "1377256",
+  oid: "1469270",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -433,7 +433,7 @@ const attributes5 = Object.assign(Object.create(null), {
   }
 });
 const extensions9 = {
-  oid: "1377304",
+  oid: "1469318",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -479,7 +479,7 @@ const attributes6 = Object.fromEntries([["id", {
   }
 }]]);
 const extensions10 = {
-  oid: "1377234",
+  oid: "1469248",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -552,7 +552,7 @@ const attributes7 = Object.assign(Object.create(null), {
   }
 });
 const extensions11 = {
-  oid: "1377220",
+  oid: "1469234",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -603,7 +603,7 @@ const attributes8 = Object.assign(Object.create(null), {
   }
 });
 const extensions12 = {
-  oid: "1377282",
+  oid: "1469296",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -662,7 +662,7 @@ const attributes9 = Object.assign(Object.create(null), {
   }
 });
 const extensions13 = {
-  oid: "1377317",
+  oid: "1469331",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -712,7 +712,7 @@ const attributes10 = Object.assign(Object.create(null), {
   }
 });
 const extensions14 = {
-  oid: "1377194",
+  oid: "1469208",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -816,34 +816,6 @@ const parameters3 = [{
   codec: TYPES.int
 }];
 const extensions18 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "js_reserved",
-    name: "relational_topics"
-  },
-  tags: {}
-};
-const uniques = [{
-  isPrimary: true,
-  attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: Object.create(null)
-  }
-}];
-const registryConfig_pgResources_relational_topics_relational_topics = {
-  executor: executor_mainPgExecutor,
-  name: "relational_topics",
-  identifier: "main.js_reserved.relational_topics",
-  from: registryConfig_pgCodecs_relationalTopics_relationalTopics.sqlType,
-  codec: registryConfig_pgCodecs_relationalTopics_relationalTopics,
-  uniques,
-  isVirtual: false,
-  description: undefined,
-  extensions: extensions18
-};
-const extensions19 = {
   pg: {
     serviceName: "main",
     schemaName: "js_reserved",
@@ -882,6 +854,34 @@ const parameters4 = [{
   notNull: false,
   codec: TYPES.int
 }];
+const extensions19 = {
+  description: undefined,
+  pg: {
+    serviceName: "main",
+    schemaName: "js_reserved",
+    name: "relational_topics"
+  },
+  tags: {}
+};
+const uniques = [{
+  isPrimary: true,
+  attributes: ["id"],
+  description: undefined,
+  extensions: {
+    tags: Object.create(null)
+  }
+}];
+const registryConfig_pgResources_relational_topics_relational_topics = {
+  executor: executor_mainPgExecutor,
+  name: "relational_topics",
+  identifier: "main.js_reserved.relational_topics",
+  from: registryConfig_pgCodecs_relationalTopics_relationalTopics.sqlType,
+  codec: registryConfig_pgCodecs_relationalTopics_relationalTopics,
+  uniques,
+  isVirtual: false,
+  description: undefined,
+  extensions: extensions19
+};
 const extensions20 = {
   description: undefined,
   pg: {
@@ -1291,7 +1291,7 @@ const registryConfig = {
     isMutation: false,
     extensions: extensions17,
     description: undefined
-  }], ["relational_topics", registryConfig_pgResources_relational_topics_relational_topics], ["null_yield", {
+  }], ["null_yield", {
     executor: executor_mainPgExecutor,
     name: "null_yield",
     identifier: "main.js_reserved.null_yield(js_reserved.null,int4,int4,int4,int4)",
@@ -1301,9 +1301,9 @@ const registryConfig = {
     codec: TYPES.int,
     uniques: [],
     isMutation: false,
-    extensions: extensions19,
+    extensions: extensions18,
     description: undefined
-  }], ["__proto__", {
+  }], ["relational_topics", registryConfig_pgResources_relational_topics_relational_topics], ["__proto__", {
     executor: executor_mainPgExecutor,
     name: "__proto__",
     identifier: "main.js_reserved.__proto__",

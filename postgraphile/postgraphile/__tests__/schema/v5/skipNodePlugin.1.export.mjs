@@ -375,7 +375,7 @@ const sqlIdent = sql.identifier(...["b", "guid"]);
 const registryConfig_pgCodecs_bGuid_bGuid = domainOfCodec(TYPES.varchar, "bGuid", sqlIdent, {
   description: undefined,
   extensions: {
-    oid: "1375935",
+    oid: "1467949",
     pg: {
       serviceName: "main",
       schemaName: "b",
@@ -427,7 +427,7 @@ const attributes12 = Object.assign(Object.create(null), {
   }
 });
 const extensions4 = {
-  oid: "1376013",
+  oid: "1468027",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -459,7 +459,7 @@ const attributes13 = Object.assign(Object.create(null), {
   }
 });
 const extensions5 = {
-  oid: "1376226",
+  oid: "1468240",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -491,7 +491,7 @@ const attributes14 = Object.assign(Object.create(null), {
   }
 });
 const extensions6 = {
-  oid: "1376233",
+  oid: "1468247",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -523,7 +523,7 @@ const attributes15 = Object.assign(Object.create(null), {
   }
 });
 const extensions7 = {
-  oid: "1376240",
+  oid: "1468254",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -555,7 +555,7 @@ const attributes16 = Object.assign(Object.create(null), {
   }
 });
 const extensions8 = {
-  oid: "1376254",
+  oid: "1468268",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -587,7 +587,7 @@ const attributes17 = Object.assign(Object.create(null), {
   }
 });
 const extensions9 = {
-  oid: "1376247",
+  oid: "1468261",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -628,7 +628,7 @@ const attributes18 = Object.assign(Object.create(null), {
   }
 });
 const extensions10 = {
-  oid: "1376203",
+  oid: "1468217",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -678,7 +678,7 @@ const attributes19 = Object.assign(Object.create(null), {
   }
 });
 const extensions11 = {
-  oid: "1376032",
+  oid: "1468046",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -719,7 +719,7 @@ const attributes20 = Object.assign(Object.create(null), {
   }
 });
 const extensions12 = {
-  oid: "1375843",
+  oid: "1467856",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -769,7 +769,7 @@ const attributes21 = Object.assign(Object.create(null), {
   }
 });
 const extensions13 = {
-  oid: "1376219",
+  oid: "1468233",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -810,7 +810,7 @@ const attributes22 = Object.assign(Object.create(null), {
   }
 });
 const extensions14 = {
-  oid: "1376050",
+  oid: "1468064",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -853,7 +853,7 @@ const attributes23 = Object.assign(Object.create(null), {
   }
 });
 const extensions15 = {
-  oid: "1376262",
+  oid: "1468276",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -896,7 +896,7 @@ const attributes24 = Object.assign(Object.create(null), {
   }
 });
 const extensions16 = {
-  oid: "1375864",
+  oid: "1467877",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -948,7 +948,7 @@ const attributes25 = Object.assign(Object.create(null), {
   }
 });
 const extensions17 = {
-  oid: "1376213",
+  oid: "1468227",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1007,7 +1007,7 @@ const attributes_object_Object_ = Object.assign(Object.create(null), {
   }
 });
 const extensions18 = {
-  oid: "1376009",
+  oid: "1468023",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1059,7 +1059,7 @@ const attributes26 = Object.assign(Object.create(null), {
   }
 });
 const extensions19 = {
-  oid: "1376017",
+  oid: "1468031",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1118,7 +1118,7 @@ const attributes27 = Object.assign(Object.create(null), {
   }
 });
 const extensions20 = {
-  oid: "1376189",
+  oid: "1468203",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1177,7 +1177,7 @@ const attributes28 = Object.assign(Object.create(null), {
   }
 });
 const extensions21 = {
-  oid: "1376196",
+  oid: "1468210",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1236,7 +1236,7 @@ const attributes29 = Object.assign(Object.create(null), {
   }
 });
 const extensions22 = {
-  oid: "1376280",
+  oid: "1468294",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1301,7 +1301,7 @@ const attributes30 = Object.assign(Object.create(null), {
   }
 });
 const extensions24 = {
-  oid: "1376065",
+  oid: "1468079",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1321,64 +1321,7 @@ const spec_cEdgeCase = {
   executor: executor_mainPgExecutor
 };
 const registryConfig_pgCodecs_cEdgeCase_cEdgeCase = recordCodec(spec_cEdgeCase);
-const extensions25 = {
-  oid: "1376269",
-  pg: {
-    serviceName: "main",
-    schemaName: "c",
-    name: "not_null_timestamp"
-  },
-  tags: Object.create(null)
-};
-const parts22 = ["c", "not_null_timestamp"];
-const sqlIdent22 = sql.identifier(...parts22);
-const attributes_ts_codec_cNotNullTimestamp = domainOfCodec(TYPES.timestamptz, "cNotNullTimestamp", sqlIdent22, {
-  description: undefined,
-  extensions: extensions25,
-  notNull: true
-});
 const attributes31 = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  ts: {
-    description: undefined,
-    codec: attributes_ts_codec_cNotNullTimestamp,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const extensions26 = {
-  oid: "1376273",
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "c",
-    name: "issue756"
-  },
-  tags: Object.create(null)
-};
-const parts23 = ["c", "issue756"];
-const sqlIdent23 = sql.identifier(...parts23);
-const spec_cIssue756 = {
-  name: "cIssue756",
-  identifier: sqlIdent23,
-  attributes: attributes31,
-  description: undefined,
-  extensions: extensions26,
-  executor: executor_mainPgExecutor
-};
-const registryConfig_pgCodecs_cIssue756_cIssue756 = recordCodec(spec_cIssue756);
-const attributes32 = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -1416,8 +1359,8 @@ const attributes32 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions27 = {
-  oid: "1375877",
+const extensions25 = {
+  oid: "1467890",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1426,18 +1369,18 @@ const extensions27 = {
   },
   tags: Object.create(null)
 };
-const parts24 = ["c", "left_arm"];
-const sqlIdent24 = sql.identifier(...parts24);
+const parts22 = ["c", "left_arm"];
+const sqlIdent22 = sql.identifier(...parts22);
 const spec_cLeftArm = {
   name: "cLeftArm",
-  identifier: sqlIdent24,
-  attributes: attributes32,
+  identifier: sqlIdent22,
+  attributes: attributes31,
   description: "Tracks metadata about the left arms of various people",
-  extensions: extensions27,
+  extensions: extensions25,
   executor: executor_mainPgExecutor
 };
 const registryConfig_pgCodecs_cLeftArm_cLeftArm = recordCodec(spec_cLeftArm);
-const attributes33 = Object.assign(Object.create(null), {
+const attributes32 = Object.assign(Object.create(null), {
   role: {
     description: undefined,
     codec: TYPES.text,
@@ -1484,8 +1427,8 @@ const attributes33 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions28 = {
-  oid: "1376178",
+const extensions26 = {
+  oid: "1468192",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -1494,17 +1437,74 @@ const extensions28 = {
   },
   tags: Object.create(null)
 };
-const parts25 = ["b", "jwt_token"];
-const sqlIdent25 = sql.identifier(...parts25);
+const parts23 = ["b", "jwt_token"];
+const sqlIdent23 = sql.identifier(...parts23);
 const spec_bJwtToken = {
   name: "bJwtToken",
+  identifier: sqlIdent23,
+  attributes: attributes32,
+  description: undefined,
+  extensions: extensions26,
+  executor: executor_mainPgExecutor
+};
+const registryConfig_pgCodecs_bJwtToken_bJwtToken = recordCodec(spec_bJwtToken);
+const extensions27 = {
+  oid: "1468283",
+  pg: {
+    serviceName: "main",
+    schemaName: "c",
+    name: "not_null_timestamp"
+  },
+  tags: Object.create(null)
+};
+const parts24 = ["c", "not_null_timestamp"];
+const sqlIdent24 = sql.identifier(...parts24);
+const attributes_ts_codec_cNotNullTimestamp = domainOfCodec(TYPES.timestamptz, "cNotNullTimestamp", sqlIdent24, {
+  description: undefined,
+  extensions: extensions27,
+  notNull: true
+});
+const attributes33 = Object.assign(Object.create(null), {
+  id: {
+    description: undefined,
+    codec: TYPES.int,
+    notNull: true,
+    hasDefault: true,
+    extensions: {
+      tags: {}
+    }
+  },
+  ts: {
+    description: undefined,
+    codec: attributes_ts_codec_cNotNullTimestamp,
+    notNull: true,
+    hasDefault: true,
+    extensions: {
+      tags: {}
+    }
+  }
+});
+const extensions28 = {
+  oid: "1468287",
+  isTableLike: true,
+  pg: {
+    serviceName: "main",
+    schemaName: "c",
+    name: "issue756"
+  },
+  tags: Object.create(null)
+};
+const parts25 = ["c", "issue756"];
+const sqlIdent25 = sql.identifier(...parts25);
+const spec_cIssue756 = {
+  name: "cIssue756",
   identifier: sqlIdent25,
   attributes: attributes33,
   description: undefined,
   extensions: extensions28,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_bJwtToken_bJwtToken = recordCodec(spec_bJwtToken);
+const registryConfig_pgCodecs_cIssue756_cIssue756 = recordCodec(spec_cIssue756);
 const attributes34 = Object.assign(Object.create(null), {
   jwt: {
     description: undefined,
@@ -1535,7 +1535,7 @@ const attributes34 = Object.assign(Object.create(null), {
   }
 });
 const extensions29 = {
-  oid: "1376184",
+  oid: "1468198",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -1558,7 +1558,7 @@ const spec_bAuthPayload = {
 };
 const registryConfig_pgCodecs_bAuthPayload_bAuthPayload = recordCodec(spec_bAuthPayload);
 const extensions30 = {
-  oid: "1375966",
+  oid: "1467980",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -1577,7 +1577,7 @@ const attributes_c_codec_bColor = enumCodec({
 });
 const enumLabels2 = ["FOO_BAR", "BAR_FOO", "BAZ_QUX", "0_BAR"];
 const extensions31 = {
-  oid: "1375974",
+  oid: "1467988",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -1596,7 +1596,7 @@ const attributes_e_codec_bEnumCaps = enumCodec({
 });
 const enumLabels3 = ["", "one", "two"];
 const extensions32 = {
-  oid: "1375984",
+  oid: "1467998",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -1688,7 +1688,7 @@ const attributes36 = Object.assign(Object.create(null), {
   }
 });
 const extensions33 = {
-  oid: "1375993",
+  oid: "1468007",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -1771,7 +1771,7 @@ const registryConfig_pgCodecs_CMutationOutOutCompoundTypeRecord_CMutationOutOutC
   isAnonymous: true
 });
 const extensions34 = {
-  oid: "1375894",
+  oid: "1467907",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -1781,7 +1781,7 @@ const extensions34 = {
 };
 const enumLabels4 = ["awaiting", "rejected", "published", "*", "**", "***", "foo*", "foo*_", "_foo*", "*bar", "*bar_", "_*bar_", "*baz*", "_*baz*_", "%", ">=", "~~", "$"];
 const extensions35 = {
-  oid: "1375895",
+  oid: "1467908",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -1805,7 +1805,7 @@ const attributes_enums_codec_anEnumArray = listOfCodec(innerCodec_anEnum, {
   name: "anEnumArray"
 });
 const extensions36 = {
-  oid: "1375932",
+  oid: "1467946",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -1834,7 +1834,7 @@ const attributes40 = Object.assign(Object.create(null), {
   }
 });
 const extensions37 = {
-  oid: "1375933",
+  oid: "1467947",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -1917,7 +1917,7 @@ const attributes39 = Object.assign(Object.create(null), {
   }
 });
 const extensions38 = {
-  oid: "1375941",
+  oid: "1467955",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -2039,7 +2039,7 @@ const registryConfig_pgCodecs_CPersonComputedInoutOutRecord_CPersonComputedInout
   isAnonymous: true
 });
 const extensions39 = {
-  oid: "1375839",
+  oid: "1467852",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -2055,7 +2055,7 @@ const attributes_email_codec_bEmail = domainOfCodec(TYPES.text, "bEmail", sqlIde
   notNull: false
 });
 const extensions40 = {
-  oid: "1375834",
+  oid: "1467847",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -2082,7 +2082,7 @@ const attributes45 = Object.assign(Object.create(null), {
   }
 });
 const extensions41 = {
-  oid: "1375837",
+  oid: "1467850",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -2208,7 +2208,7 @@ const attributes44 = Object.assign(Object.create(null), {
   }
 });
 const extensions42 = {
-  oid: "1375851",
+  oid: "1467864",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -2455,7 +2455,7 @@ const registryConfig_pgCodecs_CPersonComputedComplexRecord_CPersonComputedComple
   isAnonymous: true
 });
 const extensions43 = {
-  oid: "1375965",
+  oid: "1467979",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -2470,7 +2470,7 @@ const attributes_enum_array_codec_bColorArray = listOfCodec(attributes_c_codec_b
   name: "bColorArray"
 });
 const extensions44 = {
-  oid: "1376071",
+  oid: "1468085",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -2486,7 +2486,7 @@ const attributes_domain_codec_anInt = domainOfCodec(TYPES.int, "anInt", sqlIdent
   notNull: false
 });
 const extensions45 = {
-  oid: "1376073",
+  oid: "1468087",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -2532,7 +2532,7 @@ const attributes_daterange_codec_pgCatalogDaterange = rangeOfCodec(TYPES.date, "
   extensions: extensions47
 });
 const extensions48 = {
-  oid: "1376077",
+  oid: "1468091",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -2576,7 +2576,7 @@ const attributes52 = Object.assign(Object.create(null), {
   }
 });
 const extensions49 = {
-  oid: "1375996",
+  oid: "1468010",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -2597,7 +2597,7 @@ const spec_bNestedCompoundType = {
 };
 const attributes_nested_compound_type_codec_bNestedCompoundType = recordCodec(spec_bNestedCompoundType);
 const extensions50 = {
-  oid: "1376085",
+  oid: "1468099",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -2613,7 +2613,7 @@ const attributes_text_array_domain_codec_cTextArrayDomain = domainOfCodec(regist
   notNull: false
 });
 const extensions51 = {
-  oid: "1376087",
+  oid: "1468101",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -2658,6 +2658,19 @@ const attributes_bytea_array_codec_pgCatalogByteaArray = listOfCodec(TYPES.bytea
   description: undefined,
   name: "pgCatalogByteaArray"
 });
+const attributes_ltree_codec_ltree = {
+  name: "ltree",
+  sqlType: sql`ltree`,
+  toPg(str) {
+    return str;
+  },
+  fromPg(str) {
+    return str;
+  },
+  executor: null,
+  attributes: undefined
+};
+const attributes_ltree_array_codec_ltree_ = listOfCodec(attributes_ltree_codec_ltree);
 const attributes51 = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -3081,10 +3094,28 @@ const attributes51 = Object.assign(Object.create(null), {
     extensions: {
       tags: {}
     }
+  },
+  ltree: {
+    description: undefined,
+    codec: attributes_ltree_codec_ltree,
+    notNull: false,
+    hasDefault: false,
+    extensions: {
+      tags: {}
+    }
+  },
+  ltree_array: {
+    description: undefined,
+    codec: attributes_ltree_array_codec_ltree_,
+    notNull: false,
+    hasDefault: false,
+    extensions: {
+      tags: {}
+    }
   }
 });
 const extensions54 = {
-  oid: "1376091",
+  oid: "1468105",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -3107,7 +3138,7 @@ const spec_bTypes = {
 };
 const registryConfig_pgCodecs_bTypes_bTypes = recordCodec(spec_bTypes);
 const extensions55 = {
-  oid: "1375992",
+  oid: "1468006",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3116,7 +3147,7 @@ const extensions55 = {
   tags: Object.create(null)
 };
 const extensions56 = {
-  oid: "1376177",
+  oid: "1468191",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -3125,7 +3156,7 @@ const extensions56 = {
   tags: Object.create(null)
 };
 const extensions57 = {
-  oid: "1376090",
+  oid: "1468104",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -3149,7 +3180,7 @@ const registryConfig_pgCodecs_pgCatalogInt4Array_pgCatalogInt4Array = listOfCode
   name: "pgCatalogInt4Array"
 });
 const extensions59 = {
-  oid: "1376000",
+  oid: "1468014",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3164,7 +3195,7 @@ const registryConfig_pgCodecs_cFloatrange_cFloatrange = rangeOfCodec(TYPES.float
   extensions: extensions59
 });
 const extensions60 = {
-  oid: "1375940",
+  oid: "1467954",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3208,7 +3239,7 @@ const attributes53 = Object.assign(Object.create(null), {
   }
 });
 const extensions61 = {
-  oid: "1375567",
+  oid: "1467395",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -3266,7 +3297,7 @@ const attributes54 = Object.assign(Object.create(null), {
   }
 });
 const extensions62 = {
-  oid: "1375570",
+  oid: "1467398",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -3333,7 +3364,7 @@ const attributes55 = Object.assign(Object.create(null), {
   }
 });
 const extensions63 = {
-  oid: "1375573",
+  oid: "1467401",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -4920,13 +4951,32 @@ const uniques19 = [{
     tags: Object.create(null)
   }
 }];
-const parts114 = ["c", "return_table_without_grants"];
+const extensions146 = {
+  pg: {
+    serviceName: "main",
+    schemaName: "c",
+    name: "edge_case_computed"
+  },
+  tags: {
+    behavior: ["-filter -order"]
+  }
+};
+const parts114 = ["c", "edge_case_computed"];
 const sqlIdent114 = sql.identifier(...parts114);
+const fromCallback64 = (...args) => sql`${sqlIdent114}(${sqlFromArgDigests(args)})`;
+const parameters64 = [{
+  name: "edge_case",
+  required: true,
+  notNull: false,
+  codec: registryConfig_pgCodecs_cEdgeCase_cEdgeCase
+}];
+const parts115 = ["c", "return_table_without_grants"];
+const sqlIdent115 = sql.identifier(...parts115);
 const options_c_return_table_without_grants = {
   name: "c_return_table_without_grants",
   identifier: "main.c.return_table_without_grants()",
   from(...args) {
-    return sql`${sqlIdent114}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent115}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -4944,7 +4994,7 @@ const options_c_return_table_without_grants = {
   },
   description: undefined
 };
-const extensions146 = {
+const extensions147 = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -4954,10 +5004,10 @@ const extensions146 = {
     behavior: ["-filter -order"]
   }
 };
-const parts115 = ["b", "list_bde_mutation"];
-const sqlIdent115 = sql.identifier(...parts115);
-const fromCallback64 = (...args) => sql`${sqlIdent115}(${sqlFromArgDigests(args)})`;
-const parameters64 = [{
+const parts116 = ["b", "list_bde_mutation"];
+const sqlIdent116 = sql.identifier(...parts116);
+const fromCallback65 = (...args) => sql`${sqlIdent116}(${sqlFromArgDigests(args)})`;
+const parameters65 = [{
   name: "b",
   required: true,
   notNull: false,
@@ -4973,25 +5023,6 @@ const parameters64 = [{
   notNull: false,
   codec: TYPES.text
 }];
-const extensions147 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "c",
-    name: "edge_case_computed"
-  },
-  tags: {
-    behavior: ["-filter -order"]
-  }
-};
-const parts116 = ["c", "edge_case_computed"];
-const sqlIdent116 = sql.identifier(...parts116);
-const fromCallback65 = (...args) => sql`${sqlIdent116}(${sqlFromArgDigests(args)})`;
-const parameters65 = [{
-  name: "edge_case",
-  required: true,
-  notNull: false,
-  codec: registryConfig_pgCodecs_cEdgeCase_cEdgeCase
-}];
 const extensions148 = {
   description: undefined,
   pg: {
@@ -5003,34 +5034,6 @@ const extensions148 = {
 };
 const uniques20 = [];
 const extensions149 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "c",
-    name: "issue756"
-  },
-  tags: {}
-};
-const uniques21 = [{
-  isPrimary: true,
-  attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: Object.create(null)
-  }
-}];
-const registryConfig_pgResources_c_issue756_c_issue756 = {
-  executor: executor_mainPgExecutor,
-  name: "c_issue756",
-  identifier: "main.c.issue756",
-  from: registryConfig_pgCodecs_cIssue756_cIssue756.sqlType,
-  codec: registryConfig_pgCodecs_cIssue756_cIssue756,
-  uniques: uniques21,
-  isVirtual: false,
-  description: undefined,
-  extensions: extensions149
-};
-const extensions150 = {
   description: "Tracks metadata about the left arms of various people",
   pg: {
     serviceName: "main",
@@ -5039,7 +5042,7 @@ const extensions150 = {
   },
   tags: {}
 };
-const uniques22 = [{
+const uniques21 = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -5060,66 +5063,18 @@ const registryConfig_pgResources_c_left_arm_c_left_arm = {
   identifier: "main.c.left_arm",
   from: registryConfig_pgCodecs_cLeftArm_cLeftArm.sqlType,
   codec: registryConfig_pgCodecs_cLeftArm_cLeftArm,
-  uniques: uniques22,
+  uniques: uniques21,
   isVirtual: false,
   description: "Tracks metadata about the left arms of various people",
-  extensions: extensions150
+  extensions: extensions149
 };
-const parts117 = ["c", "issue756_mutation"];
+const parts117 = ["b", "authenticate_fail"];
 const sqlIdent117 = sql.identifier(...parts117);
-const options_c_issue756_mutation = {
-  name: "c_issue756_mutation",
-  identifier: "main.c.issue756_mutation()",
-  from(...args) {
-    return sql`${sqlIdent117}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [],
-  returnsArray: false,
-  returnsSetof: false,
-  isMutation: true,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "c",
-      name: "issue756_mutation"
-    },
-    tags: {
-      behavior: ["-filter -order"]
-    }
-  },
-  description: undefined
-};
-const parts118 = ["c", "issue756_set_mutation"];
-const sqlIdent118 = sql.identifier(...parts118);
-const options_c_issue756_set_mutation = {
-  name: "c_issue756_set_mutation",
-  identifier: "main.c.issue756_set_mutation()",
-  from(...args) {
-    return sql`${sqlIdent118}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [],
-  returnsArray: false,
-  returnsSetof: true,
-  isMutation: true,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "c",
-      name: "issue756_set_mutation"
-    },
-    tags: {
-      behavior: ["-filter -order"]
-    }
-  },
-  description: undefined
-};
-const parts119 = ["b", "authenticate_fail"];
-const sqlIdent119 = sql.identifier(...parts119);
 const options_b_authenticate_fail = {
   name: "b_authenticate_fail",
   identifier: "main.b.authenticate_fail()",
   from(...args) {
-    return sql`${sqlIdent119}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent117}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -5137,7 +5092,7 @@ const options_b_authenticate_fail = {
   },
   description: undefined
 };
-const extensions151 = {
+const extensions150 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -5148,25 +5103,25 @@ const extensions151 = {
     behavior: ["-insert", "-update", "-delete"]
   }
 };
-const uniques23 = [];
+const uniques22 = [];
 const resourceConfig_b_jwt_token = {
   executor: executor_mainPgExecutor,
   name: "b_jwt_token",
   identifier: "main.b.jwt_token",
   from: registryConfig_pgCodecs_bJwtToken_bJwtToken.sqlType,
   codec: registryConfig_pgCodecs_bJwtToken_bJwtToken,
-  uniques: uniques23,
+  uniques: uniques22,
   isVirtual: true,
   description: undefined,
-  extensions: extensions151
+  extensions: extensions150
 };
-const parts120 = ["b", "authenticate"];
-const sqlIdent120 = sql.identifier(...parts120);
+const parts118 = ["b", "authenticate"];
+const sqlIdent118 = sql.identifier(...parts118);
 const options_b_authenticate = {
   name: "b_authenticate",
   identifier: "main.b.authenticate(int4,numeric,int8)",
   from(...args) {
-    return sql`${sqlIdent120}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent118}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "a",
@@ -5199,13 +5154,41 @@ const options_b_authenticate = {
   },
   description: undefined
 };
-const parts121 = ["c", "left_arm_identity"];
-const sqlIdent121 = sql.identifier(...parts121);
+const extensions151 = {
+  description: undefined,
+  pg: {
+    serviceName: "main",
+    schemaName: "c",
+    name: "issue756"
+  },
+  tags: {}
+};
+const uniques23 = [{
+  isPrimary: true,
+  attributes: ["id"],
+  description: undefined,
+  extensions: {
+    tags: Object.create(null)
+  }
+}];
+const registryConfig_pgResources_c_issue756_c_issue756 = {
+  executor: executor_mainPgExecutor,
+  name: "c_issue756",
+  identifier: "main.c.issue756",
+  from: registryConfig_pgCodecs_cIssue756_cIssue756.sqlType,
+  codec: registryConfig_pgCodecs_cIssue756_cIssue756,
+  uniques: uniques23,
+  isVirtual: false,
+  description: undefined,
+  extensions: extensions151
+};
+const parts119 = ["c", "left_arm_identity"];
+const sqlIdent119 = sql.identifier(...parts119);
 const options_c_left_arm_identity = {
   name: "c_left_arm_identity",
   identifier: "main.c.left_arm_identity(c.left_arm)",
   from(...args) {
-    return sql`${sqlIdent121}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent119}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "left_arm",
@@ -5228,6 +5211,54 @@ const options_c_left_arm_identity = {
     tags: {
       arg0variant: "base",
       resultFieldName: "leftArm",
+      behavior: ["-filter -order"]
+    }
+  },
+  description: undefined
+};
+const parts120 = ["c", "issue756_mutation"];
+const sqlIdent120 = sql.identifier(...parts120);
+const options_c_issue756_mutation = {
+  name: "c_issue756_mutation",
+  identifier: "main.c.issue756_mutation()",
+  from(...args) {
+    return sql`${sqlIdent120}(${sqlFromArgDigests(args)})`;
+  },
+  parameters: [],
+  returnsArray: false,
+  returnsSetof: false,
+  isMutation: true,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "c",
+      name: "issue756_mutation"
+    },
+    tags: {
+      behavior: ["-filter -order"]
+    }
+  },
+  description: undefined
+};
+const parts121 = ["c", "issue756_set_mutation"];
+const sqlIdent121 = sql.identifier(...parts121);
+const options_c_issue756_set_mutation = {
+  name: "c_issue756_set_mutation",
+  identifier: "main.c.issue756_set_mutation()",
+  from(...args) {
+    return sql`${sqlIdent121}(${sqlFromArgDigests(args)})`;
+  },
+  parameters: [],
+  returnsArray: false,
+  returnsSetof: true,
+  isMutation: true,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "c",
+      name: "issue756_set_mutation"
+    },
+    tags: {
       behavior: ["-filter -order"]
     }
   },
@@ -5445,44 +5476,6 @@ const parameters68 = [{
 const extensions156 = {
   pg: {
     serviceName: "main",
-    schemaName: "c",
-    name: "func_out_out_compound_type"
-  },
-  tags: {
-    behavior: ["-filter -order"]
-  }
-};
-const parts127 = ["c", "func_out_out_compound_type"];
-const sqlIdent127 = sql.identifier(...parts127);
-const fromCallback69 = (...args) => sql`${sqlIdent127}(${sqlFromArgDigests(args)})`;
-const parameters69 = [{
-  name: "i1",
-  required: true,
-  notNull: false,
-  codec: TYPES.int
-}];
-const extensions157 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "c",
-    name: "mutation_out_out_compound_type"
-  },
-  tags: {
-    behavior: ["-filter -order"]
-  }
-};
-const parts128 = ["c", "mutation_out_out_compound_type"];
-const sqlIdent128 = sql.identifier(...parts128);
-const fromCallback70 = (...args) => sql`${sqlIdent128}(${sqlFromArgDigests(args)})`;
-const parameters70 = [{
-  name: "i1",
-  required: true,
-  notNull: false,
-  codec: TYPES.int
-}];
-const extensions158 = {
-  pg: {
-    serviceName: "main",
     schemaName: "a",
     name: "post_computed_interval_set"
   },
@@ -5490,7 +5483,45 @@ const extensions158 = {
     behavior: ["-filter -order"]
   }
 };
-const parts129 = ["a", "post_computed_interval_set"];
+const parts127 = ["a", "post_computed_interval_set"];
+const sqlIdent127 = sql.identifier(...parts127);
+const fromCallback69 = (...args) => sql`${sqlIdent127}(${sqlFromArgDigests(args)})`;
+const parameters69 = [{
+  name: "post",
+  required: true,
+  notNull: false,
+  codec: attributes_post_codec_post
+}];
+const extensions157 = {
+  pg: {
+    serviceName: "main",
+    schemaName: "a",
+    name: "post_computed_interval_array"
+  },
+  tags: {
+    behavior: ["-filter -order"]
+  }
+};
+const parts128 = ["a", "post_computed_interval_array"];
+const sqlIdent128 = sql.identifier(...parts128);
+const fromCallback70 = (...args) => sql`${sqlIdent128}(${sqlFromArgDigests(args)})`;
+const parameters70 = [{
+  name: "post",
+  required: true,
+  notNull: false,
+  codec: attributes_post_codec_post
+}];
+const extensions158 = {
+  pg: {
+    serviceName: "main",
+    schemaName: "a",
+    name: "post_computed_text_array"
+  },
+  tags: {
+    behavior: ["-filter -order"]
+  }
+};
+const parts129 = ["a", "post_computed_text_array"];
 const sqlIdent129 = sql.identifier(...parts129);
 const fromCallback71 = (...args) => sql`${sqlIdent129}(${sqlFromArgDigests(args)})`;
 const parameters71 = [{
@@ -5503,44 +5534,6 @@ const extensions159 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
-    name: "post_computed_interval_array"
-  },
-  tags: {
-    behavior: ["-filter -order"]
-  }
-};
-const parts130 = ["a", "post_computed_interval_array"];
-const sqlIdent130 = sql.identifier(...parts130);
-const fromCallback72 = (...args) => sql`${sqlIdent130}(${sqlFromArgDigests(args)})`;
-const parameters72 = [{
-  name: "post",
-  required: true,
-  notNull: false,
-  codec: attributes_post_codec_post
-}];
-const extensions160 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "a",
-    name: "post_computed_text_array"
-  },
-  tags: {
-    behavior: ["-filter -order"]
-  }
-};
-const parts131 = ["a", "post_computed_text_array"];
-const sqlIdent131 = sql.identifier(...parts131);
-const fromCallback73 = (...args) => sql`${sqlIdent131}(${sqlFromArgDigests(args)})`;
-const parameters73 = [{
-  name: "post",
-  required: true,
-  notNull: false,
-  codec: attributes_post_codec_post
-}];
-const extensions161 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "a",
     name: "post_computed_with_optional_arg"
   },
   tags: {
@@ -5549,10 +5542,10 @@ const extensions161 = {
     behavior: ["-filter -order"]
   }
 };
-const parts132 = ["a", "post_computed_with_optional_arg"];
-const sqlIdent132 = sql.identifier(...parts132);
-const fromCallback74 = (...args) => sql`${sqlIdent132}(${sqlFromArgDigests(args)})`;
-const parameters74 = [{
+const parts130 = ["a", "post_computed_with_optional_arg"];
+const sqlIdent130 = sql.identifier(...parts130);
+const fromCallback72 = (...args) => sql`${sqlIdent130}(${sqlFromArgDigests(args)})`;
+const parameters72 = [{
   name: "post",
   required: true,
   notNull: true,
@@ -5563,7 +5556,7 @@ const parameters74 = [{
   notNull: true,
   codec: TYPES.int
 }];
-const extensions162 = {
+const extensions160 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -5575,10 +5568,10 @@ const extensions162 = {
     behavior: ["-filter -order"]
   }
 };
-const parts133 = ["a", "post_computed_with_required_arg"];
-const sqlIdent133 = sql.identifier(...parts133);
-const fromCallback75 = (...args) => sql`${sqlIdent133}(${sqlFromArgDigests(args)})`;
-const parameters75 = [{
+const parts131 = ["a", "post_computed_with_required_arg"];
+const sqlIdent131 = sql.identifier(...parts131);
+const fromCallback73 = (...args) => sql`${sqlIdent131}(${sqlFromArgDigests(args)})`;
+const parameters73 = [{
   name: "post",
   required: true,
   notNull: true,
@@ -5587,6 +5580,44 @@ const parameters75 = [{
   name: "i",
   required: true,
   notNull: true,
+  codec: TYPES.int
+}];
+const extensions161 = {
+  pg: {
+    serviceName: "main",
+    schemaName: "c",
+    name: "func_out_out_compound_type"
+  },
+  tags: {
+    behavior: ["-filter -order"]
+  }
+};
+const parts132 = ["c", "func_out_out_compound_type"];
+const sqlIdent132 = sql.identifier(...parts132);
+const fromCallback74 = (...args) => sql`${sqlIdent132}(${sqlFromArgDigests(args)})`;
+const parameters74 = [{
+  name: "i1",
+  required: true,
+  notNull: false,
+  codec: TYPES.int
+}];
+const extensions162 = {
+  pg: {
+    serviceName: "main",
+    schemaName: "c",
+    name: "mutation_out_out_compound_type"
+  },
+  tags: {
+    behavior: ["-filter -order"]
+  }
+};
+const parts133 = ["c", "mutation_out_out_compound_type"];
+const sqlIdent133 = sql.identifier(...parts133);
+const fromCallback75 = (...args) => sql`${sqlIdent133}(${sqlFromArgDigests(args)})`;
+const parameters75 = [{
+  name: "i1",
+  required: true,
+  notNull: false,
   codec: TYPES.int
 }];
 const extensions163 = {
@@ -5676,13 +5707,70 @@ const parameters78 = [{
   notNull: true,
   codec: TYPES.text
 }];
-const parts137 = ["c", "compound_type_set_query"];
+const extensions166 = {
+  pg: {
+    serviceName: "main",
+    schemaName: "c",
+    name: "query_output_two_rows"
+  },
+  tags: {
+    behavior: ["-filter -order"]
+  }
+};
+const parts137 = ["c", "query_output_two_rows"];
 const sqlIdent137 = sql.identifier(...parts137);
+const fromCallback79 = (...args) => sql`${sqlIdent137}(${sqlFromArgDigests(args)})`;
+const parameters79 = [{
+  name: "left_arm_id",
+  required: true,
+  notNull: false,
+  codec: TYPES.int
+}, {
+  name: "post_id",
+  required: true,
+  notNull: false,
+  codec: TYPES.int
+}, {
+  name: "txt",
+  required: true,
+  notNull: false,
+  codec: TYPES.text
+}];
+const extensions167 = {
+  description: undefined,
+  pg: {
+    serviceName: "main",
+    schemaName: "a",
+    name: "post"
+  },
+  tags: {}
+};
+const uniques25 = [{
+  isPrimary: true,
+  attributes: ["id"],
+  description: undefined,
+  extensions: {
+    tags: Object.create(null)
+  }
+}];
+const registryConfig_pgResources_post_post = {
+  executor: executor_mainPgExecutor,
+  name: "post",
+  identifier: "main.a.post",
+  from: attributes_post_codec_post.sqlType,
+  codec: attributes_post_codec_post,
+  uniques: uniques25,
+  isVirtual: false,
+  description: undefined,
+  extensions: extensions167
+};
+const parts138 = ["c", "compound_type_set_query"];
+const sqlIdent138 = sql.identifier(...parts138);
 const options_c_compound_type_set_query = {
   name: "c_compound_type_set_query",
   identifier: "main.c.compound_type_set_query()",
   from(...args) {
-    return sql`${sqlIdent137}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent138}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -5700,7 +5788,7 @@ const options_c_compound_type_set_query = {
   },
   description: undefined
 };
-const extensions166 = {
+const extensions168 = {
   description: "Awesome feature!",
   pg: {
     serviceName: "main",
@@ -5711,25 +5799,25 @@ const extensions166 = {
     behavior: ["-insert", "-update", "-delete"]
   }
 };
-const uniques25 = [];
+const uniques26 = [];
 const resourceConfig_c_compound_type = {
   executor: executor_mainPgExecutor,
   name: "c_compound_type",
   identifier: "main.c.compound_type",
   from: attributes_o2_codec_cCompoundType.sqlType,
   codec: attributes_o2_codec_cCompoundType,
-  uniques: uniques25,
+  uniques: uniques26,
   isVirtual: true,
   description: "Awesome feature!",
-  extensions: extensions166
+  extensions: extensions168
 };
-const parts138 = ["b", "compound_type_mutation"];
-const sqlIdent138 = sql.identifier(...parts138);
+const parts139 = ["b", "compound_type_mutation"];
+const sqlIdent139 = sql.identifier(...parts139);
 const options_b_compound_type_mutation = {
   name: "b_compound_type_mutation",
   identifier: "main.b.compound_type_mutation(c.compound_type)",
   from(...args) {
-    return sql`${sqlIdent138}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent139}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "object",
@@ -5752,13 +5840,13 @@ const options_b_compound_type_mutation = {
   },
   description: undefined
 };
-const parts139 = ["b", "compound_type_query"];
-const sqlIdent139 = sql.identifier(...parts139);
+const parts140 = ["b", "compound_type_query"];
+const sqlIdent140 = sql.identifier(...parts140);
 const options_b_compound_type_query = {
   name: "b_compound_type_query",
   identifier: "main.b.compound_type_query(c.compound_type)",
   from(...args) {
-    return sql`${sqlIdent139}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent140}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "object",
@@ -5781,13 +5869,13 @@ const options_b_compound_type_query = {
   },
   description: undefined
 };
-const parts140 = ["b", "compound_type_set_mutation"];
-const sqlIdent140 = sql.identifier(...parts140);
+const parts141 = ["b", "compound_type_set_mutation"];
+const sqlIdent141 = sql.identifier(...parts141);
 const options_b_compound_type_set_mutation = {
   name: "b_compound_type_set_mutation",
   identifier: "main.b.compound_type_set_mutation(c.compound_type)",
   from(...args) {
-    return sql`${sqlIdent140}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent141}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "object",
@@ -5810,220 +5898,13 @@ const options_b_compound_type_set_mutation = {
   },
   description: undefined
 };
-const extensions167 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "c",
-    name: "query_output_two_rows"
-  },
-  tags: {
-    behavior: ["-filter -order"]
-  }
-};
-const parts141 = ["c", "query_output_two_rows"];
-const sqlIdent141 = sql.identifier(...parts141);
-const fromCallback79 = (...args) => sql`${sqlIdent141}(${sqlFromArgDigests(args)})`;
-const parameters79 = [{
-  name: "left_arm_id",
-  required: true,
-  notNull: false,
-  codec: TYPES.int
-}, {
-  name: "post_id",
-  required: true,
-  notNull: false,
-  codec: TYPES.int
-}, {
-  name: "txt",
-  required: true,
-  notNull: false,
-  codec: TYPES.text
-}];
-const parts142 = ["a", "mutation_compound_type_array"];
+const parts142 = ["c", "table_mutation"];
 const sqlIdent142 = sql.identifier(...parts142);
-const options_mutation_compound_type_array = {
-  name: "mutation_compound_type_array",
-  identifier: "main.a.mutation_compound_type_array(c.compound_type)",
-  from(...args) {
-    return sql`${sqlIdent142}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "object",
-    required: true,
-    notNull: false,
-    codec: attributes_o2_codec_cCompoundType
-  }],
-  returnsArray: true,
-  returnsSetof: false,
-  isMutation: true,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "a",
-      name: "mutation_compound_type_array"
-    },
-    tags: {
-      behavior: ["-filter -order"]
-    }
-  },
-  description: undefined
-};
-const parts143 = ["a", "query_compound_type_array"];
-const sqlIdent143 = sql.identifier(...parts143);
-const options_query_compound_type_array = {
-  name: "query_compound_type_array",
-  identifier: "main.a.query_compound_type_array(c.compound_type)",
-  from(...args) {
-    return sql`${sqlIdent143}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "object",
-    required: true,
-    notNull: false,
-    codec: attributes_o2_codec_cCompoundType
-  }],
-  returnsArray: true,
-  returnsSetof: false,
-  isMutation: false,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "a",
-      name: "query_compound_type_array"
-    },
-    tags: {
-      behavior: ["-filter -order"]
-    }
-  },
-  description: undefined
-};
-const parts144 = ["b", "compound_type_array_mutation"];
-const sqlIdent144 = sql.identifier(...parts144);
-const options_b_compound_type_array_mutation = {
-  name: "b_compound_type_array_mutation",
-  identifier: "main.b.compound_type_array_mutation(c.compound_type)",
-  from(...args) {
-    return sql`${sqlIdent144}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "object",
-    required: true,
-    notNull: false,
-    codec: attributes_o2_codec_cCompoundType
-  }],
-  returnsArray: true,
-  returnsSetof: false,
-  isMutation: true,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "compound_type_array_mutation"
-    },
-    tags: {
-      behavior: ["-filter -order"]
-    }
-  },
-  description: undefined
-};
-const parts145 = ["b", "compound_type_array_query"];
-const sqlIdent145 = sql.identifier(...parts145);
-const options_b_compound_type_array_query = {
-  name: "b_compound_type_array_query",
-  identifier: "main.b.compound_type_array_query(c.compound_type)",
-  from(...args) {
-    return sql`${sqlIdent145}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "object",
-    required: true,
-    notNull: false,
-    codec: attributes_o2_codec_cCompoundType
-  }],
-  returnsArray: true,
-  returnsSetof: false,
-  isMutation: false,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "compound_type_array_query"
-    },
-    tags: {
-      behavior: ["-filter -order"]
-    }
-  },
-  description: undefined
-};
-const extensions168 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "a",
-    name: "post"
-  },
-  tags: {}
-};
-const uniques26 = [{
-  isPrimary: true,
-  attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: Object.create(null)
-  }
-}];
-const registryConfig_pgResources_post_post = {
-  executor: executor_mainPgExecutor,
-  name: "post",
-  identifier: "main.a.post",
-  from: attributes_post_codec_post.sqlType,
-  codec: attributes_post_codec_post,
-  uniques: uniques26,
-  isVirtual: false,
-  description: undefined,
-  extensions: extensions168
-};
-const parts146 = ["a", "post_computed_compound_type_array"];
-const sqlIdent146 = sql.identifier(...parts146);
-const options_post_computed_compound_type_array = {
-  name: "post_computed_compound_type_array",
-  identifier: "main.a.post_computed_compound_type_array(a.post,c.compound_type)",
-  from(...args) {
-    return sql`${sqlIdent146}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "post",
-    required: true,
-    notNull: false,
-    codec: attributes_post_codec_post
-  }, {
-    name: "object",
-    required: true,
-    notNull: false,
-    codec: attributes_o2_codec_cCompoundType
-  }],
-  returnsArray: true,
-  returnsSetof: false,
-  isMutation: false,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "a",
-      name: "post_computed_compound_type_array"
-    },
-    tags: {
-      behavior: ["-filter -order"]
-    }
-  },
-  description: undefined
-};
-const parts147 = ["c", "table_mutation"];
-const sqlIdent147 = sql.identifier(...parts147);
 const options_c_table_mutation = {
   name: "c_table_mutation",
   identifier: "main.c.table_mutation(int4)",
   from(...args) {
-    return sql`${sqlIdent147}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent142}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "id",
@@ -6046,13 +5927,13 @@ const options_c_table_mutation = {
   },
   description: undefined
 };
-const parts148 = ["c", "table_query"];
-const sqlIdent148 = sql.identifier(...parts148);
+const parts143 = ["c", "table_query"];
+const sqlIdent143 = sql.identifier(...parts143);
 const options_c_table_query = {
   name: "c_table_query",
   identifier: "main.c.table_query(int4)",
   from(...args) {
-    return sql`${sqlIdent148}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent143}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "id",
@@ -6075,13 +5956,13 @@ const options_c_table_query = {
   },
   description: undefined
 };
-const parts149 = ["a", "post_with_suffix"];
-const sqlIdent149 = sql.identifier(...parts149);
+const parts144 = ["a", "post_with_suffix"];
+const sqlIdent144 = sql.identifier(...parts144);
 const options_post_with_suffix = {
   name: "post_with_suffix",
   identifier: "main.a.post_with_suffix(a.post,text)",
   from(...args) {
-    return sql`${sqlIdent149}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent144}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "post",
@@ -6105,6 +5986,156 @@ const options_post_with_suffix = {
     },
     tags: {
       deprecated: "This is deprecated (comment on function a.post_with_suffix).",
+      behavior: ["-filter -order"]
+    }
+  },
+  description: undefined
+};
+const parts145 = ["a", "mutation_compound_type_array"];
+const sqlIdent145 = sql.identifier(...parts145);
+const options_mutation_compound_type_array = {
+  name: "mutation_compound_type_array",
+  identifier: "main.a.mutation_compound_type_array(c.compound_type)",
+  from(...args) {
+    return sql`${sqlIdent145}(${sqlFromArgDigests(args)})`;
+  },
+  parameters: [{
+    name: "object",
+    required: true,
+    notNull: false,
+    codec: attributes_o2_codec_cCompoundType
+  }],
+  returnsArray: true,
+  returnsSetof: false,
+  isMutation: true,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "a",
+      name: "mutation_compound_type_array"
+    },
+    tags: {
+      behavior: ["-filter -order"]
+    }
+  },
+  description: undefined
+};
+const parts146 = ["a", "query_compound_type_array"];
+const sqlIdent146 = sql.identifier(...parts146);
+const options_query_compound_type_array = {
+  name: "query_compound_type_array",
+  identifier: "main.a.query_compound_type_array(c.compound_type)",
+  from(...args) {
+    return sql`${sqlIdent146}(${sqlFromArgDigests(args)})`;
+  },
+  parameters: [{
+    name: "object",
+    required: true,
+    notNull: false,
+    codec: attributes_o2_codec_cCompoundType
+  }],
+  returnsArray: true,
+  returnsSetof: false,
+  isMutation: false,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "a",
+      name: "query_compound_type_array"
+    },
+    tags: {
+      behavior: ["-filter -order"]
+    }
+  },
+  description: undefined
+};
+const parts147 = ["b", "compound_type_array_mutation"];
+const sqlIdent147 = sql.identifier(...parts147);
+const options_b_compound_type_array_mutation = {
+  name: "b_compound_type_array_mutation",
+  identifier: "main.b.compound_type_array_mutation(c.compound_type)",
+  from(...args) {
+    return sql`${sqlIdent147}(${sqlFromArgDigests(args)})`;
+  },
+  parameters: [{
+    name: "object",
+    required: true,
+    notNull: false,
+    codec: attributes_o2_codec_cCompoundType
+  }],
+  returnsArray: true,
+  returnsSetof: false,
+  isMutation: true,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "compound_type_array_mutation"
+    },
+    tags: {
+      behavior: ["-filter -order"]
+    }
+  },
+  description: undefined
+};
+const parts148 = ["b", "compound_type_array_query"];
+const sqlIdent148 = sql.identifier(...parts148);
+const options_b_compound_type_array_query = {
+  name: "b_compound_type_array_query",
+  identifier: "main.b.compound_type_array_query(c.compound_type)",
+  from(...args) {
+    return sql`${sqlIdent148}(${sqlFromArgDigests(args)})`;
+  },
+  parameters: [{
+    name: "object",
+    required: true,
+    notNull: false,
+    codec: attributes_o2_codec_cCompoundType
+  }],
+  returnsArray: true,
+  returnsSetof: false,
+  isMutation: false,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "compound_type_array_query"
+    },
+    tags: {
+      behavior: ["-filter -order"]
+    }
+  },
+  description: undefined
+};
+const parts149 = ["a", "post_computed_compound_type_array"];
+const sqlIdent149 = sql.identifier(...parts149);
+const options_post_computed_compound_type_array = {
+  name: "post_computed_compound_type_array",
+  identifier: "main.a.post_computed_compound_type_array(a.post,c.compound_type)",
+  from(...args) {
+    return sql`${sqlIdent149}(${sqlFromArgDigests(args)})`;
+  },
+  parameters: [{
+    name: "post",
+    required: true,
+    notNull: false,
+    codec: attributes_post_codec_post
+  }, {
+    name: "object",
+    required: true,
+    notNull: false,
+    codec: attributes_o2_codec_cCompoundType
+  }],
+  returnsArray: true,
+  returnsSetof: false,
+  isMutation: false,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "a",
+      name: "post_computed_compound_type_array"
+    },
+    tags: {
       behavior: ["-filter -order"]
     }
   },
@@ -7062,13 +7093,13 @@ const registry = makeRegistry({
     uuid: TYPES.uuid,
     cEdgeCase: registryConfig_pgCodecs_cEdgeCase_cEdgeCase,
     int2: TYPES.int2,
-    cIssue756: registryConfig_pgCodecs_cIssue756_cIssue756,
-    cNotNullTimestamp: attributes_ts_codec_cNotNullTimestamp,
-    timestamptz: TYPES.timestamptz,
     cLeftArm: registryConfig_pgCodecs_cLeftArm_cLeftArm,
     float8: TYPES.float,
     bJwtToken: registryConfig_pgCodecs_bJwtToken_bJwtToken,
     numeric: TYPES.numeric,
+    cIssue756: registryConfig_pgCodecs_cIssue756_cIssue756,
+    cNotNullTimestamp: attributes_ts_codec_cNotNullTimestamp,
+    timestamptz: TYPES.timestamptz,
     bAuthPayload: registryConfig_pgCodecs_bAuthPayload_bAuthPayload,
     CFuncOutOutCompoundTypeRecord: registryConfig_pgCodecs_CFuncOutOutCompoundTypeRecord_CFuncOutOutCompoundTypeRecord,
     cCompoundType: attributes_o2_codec_cCompoundType,
@@ -7124,6 +7155,8 @@ const registry = makeRegistry({
     cInt8ArrayDomain: attributes_int8_array_domain_codec_cInt8ArrayDomain,
     bytea: TYPES.bytea,
     pgCatalogByteaArray: attributes_bytea_array_codec_pgCatalogByteaArray,
+    ltree: attributes_ltree_codec_ltree,
+    "ltree[]": attributes_ltree_array_codec_ltree_,
     bpchar: TYPES.bpchar,
     cCompoundTypeArray: listOfCodec(attributes_o2_codec_cCompoundType, {
       extensions: extensions55,
@@ -8142,30 +8175,30 @@ const registry = makeRegistry({
       description: undefined,
       extensions: extensions145
     },
+    c_edge_case_computed: {
+      executor: executor_mainPgExecutor,
+      name: "c_edge_case_computed",
+      identifier: "main.c.edge_case_computed(c.edge_case)",
+      from: fromCallback64,
+      parameters: parameters64,
+      isUnique: !false,
+      codec: TYPES.text,
+      uniques: [],
+      isMutation: false,
+      extensions: extensions146,
+      description: undefined
+    },
     c_return_table_without_grants: PgResource.functionResourceOptions(registryConfig_pgResources_c_compound_key_c_compound_key, options_c_return_table_without_grants),
     b_list_bde_mutation: {
       executor: executor_mainPgExecutor,
       name: "b_list_bde_mutation",
       identifier: "main.b.list_bde_mutation(_text,text,text)",
-      from: fromCallback64,
-      parameters: parameters64,
+      from: fromCallback65,
+      parameters: parameters65,
       isUnique: !false,
       codec: registryConfig_pgCodecs_pgCatalogUuidArray_pgCatalogUuidArray,
       uniques: [],
       isMutation: true,
-      extensions: extensions146,
-      description: undefined
-    },
-    c_edge_case_computed: {
-      executor: executor_mainPgExecutor,
-      name: "c_edge_case_computed",
-      identifier: "main.c.edge_case_computed(c.edge_case)",
-      from: fromCallback65,
-      parameters: parameters65,
-      isUnique: !false,
-      codec: TYPES.text,
-      uniques: [],
-      isMutation: false,
       extensions: extensions147,
       description: undefined
     },
@@ -8180,13 +8213,13 @@ const registry = makeRegistry({
       description: undefined,
       extensions: extensions148
     },
-    c_issue756: registryConfig_pgResources_c_issue756_c_issue756,
     c_left_arm: registryConfig_pgResources_c_left_arm_c_left_arm,
-    c_issue756_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_c_issue756_c_issue756, options_c_issue756_mutation),
-    c_issue756_set_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_c_issue756_c_issue756, options_c_issue756_set_mutation),
     b_authenticate_fail: PgResource.functionResourceOptions(resourceConfig_b_jwt_token, options_b_authenticate_fail),
     b_authenticate: PgResource.functionResourceOptions(resourceConfig_b_jwt_token, options_b_authenticate),
+    c_issue756: registryConfig_pgResources_c_issue756_c_issue756,
     c_left_arm_identity: PgResource.functionResourceOptions(registryConfig_pgResources_c_left_arm_c_left_arm, options_c_left_arm_identity),
+    c_issue756_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_c_issue756_c_issue756, options_c_issue756_mutation),
+    c_issue756_set_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_c_issue756_c_issue756, options_c_issue756_set_mutation),
     b_authenticate_many: PgResource.functionResourceOptions(resourceConfig_b_jwt_token, options_b_authenticate_many),
     b_authenticate_payload: PgResource.functionResourceOptions(resourceConfig_b_auth_payload, options_b_authenticate_payload),
     c_types_mutation: {
@@ -8228,94 +8261,94 @@ const registry = makeRegistry({
       extensions: extensions155,
       description: undefined
     },
-    c_func_out_out_compound_type: {
-      executor: executor_mainPgExecutor,
-      name: "c_func_out_out_compound_type",
-      identifier: "main.c.func_out_out_compound_type(int4,int4,c.compound_type)",
-      from: fromCallback69,
-      parameters: parameters69,
-      isUnique: !false,
-      codec: registryConfig_pgCodecs_CFuncOutOutCompoundTypeRecord_CFuncOutOutCompoundTypeRecord,
-      uniques: [],
-      isMutation: false,
-      extensions: extensions156,
-      description: undefined
-    },
-    c_mutation_out_out_compound_type: {
-      executor: executor_mainPgExecutor,
-      name: "c_mutation_out_out_compound_type",
-      identifier: "main.c.mutation_out_out_compound_type(int4,int4,c.compound_type)",
-      from: fromCallback70,
-      parameters: parameters70,
-      isUnique: !false,
-      codec: registryConfig_pgCodecs_CMutationOutOutCompoundTypeRecord_CMutationOutOutCompoundTypeRecord,
-      uniques: [],
-      isMutation: true,
-      extensions: extensions157,
-      description: undefined
-    },
     post_computed_interval_set: {
       executor: executor_mainPgExecutor,
       name: "post_computed_interval_set",
       identifier: "main.a.post_computed_interval_set(a.post)",
-      from: fromCallback71,
-      parameters: parameters71,
+      from: fromCallback69,
+      parameters: parameters69,
       isUnique: !true,
       codec: TYPES.interval,
       uniques: [],
       isMutation: false,
-      extensions: extensions158,
+      extensions: extensions156,
       description: undefined
     },
     post_computed_interval_array: {
       executor: executor_mainPgExecutor,
       name: "post_computed_interval_array",
       identifier: "main.a.post_computed_interval_array(a.post)",
-      from: fromCallback72,
-      parameters: parameters72,
+      from: fromCallback70,
+      parameters: parameters70,
       isUnique: !false,
       codec: registryConfig_pgCodecs_pgCatalogIntervalArray_pgCatalogIntervalArray,
       uniques: [],
       isMutation: false,
-      extensions: extensions159,
+      extensions: extensions157,
       description: undefined
     },
     post_computed_text_array: {
       executor: executor_mainPgExecutor,
       name: "post_computed_text_array",
       identifier: "main.a.post_computed_text_array(a.post)",
-      from: fromCallback73,
-      parameters: parameters73,
+      from: fromCallback71,
+      parameters: parameters71,
       isUnique: !false,
       codec: registryConfig_pgCodecs_pgCatalogTextArray_pgCatalogTextArray,
       uniques: [],
       isMutation: false,
-      extensions: extensions160,
+      extensions: extensions158,
       description: undefined
     },
     post_computed_with_optional_arg: {
       executor: executor_mainPgExecutor,
       name: "post_computed_with_optional_arg",
       identifier: "main.a.post_computed_with_optional_arg(a.post,int4)",
-      from: fromCallback74,
-      parameters: parameters74,
+      from: fromCallback72,
+      parameters: parameters72,
       isUnique: !false,
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions161,
+      extensions: extensions159,
       description: undefined
     },
     post_computed_with_required_arg: {
       executor: executor_mainPgExecutor,
       name: "post_computed_with_required_arg",
       identifier: "main.a.post_computed_with_required_arg(a.post,int4)",
-      from: fromCallback75,
-      parameters: parameters75,
+      from: fromCallback73,
+      parameters: parameters73,
       isUnique: !false,
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      extensions: extensions160,
+      description: undefined
+    },
+    c_func_out_out_compound_type: {
+      executor: executor_mainPgExecutor,
+      name: "c_func_out_out_compound_type",
+      identifier: "main.c.func_out_out_compound_type(int4,int4,c.compound_type)",
+      from: fromCallback74,
+      parameters: parameters74,
+      isUnique: !false,
+      codec: registryConfig_pgCodecs_CFuncOutOutCompoundTypeRecord_CFuncOutOutCompoundTypeRecord,
+      uniques: [],
+      isMutation: false,
+      extensions: extensions161,
+      description: undefined
+    },
+    c_mutation_out_out_compound_type: {
+      executor: executor_mainPgExecutor,
+      name: "c_mutation_out_out_compound_type",
+      identifier: "main.c.mutation_out_out_compound_type(int4,int4,c.compound_type)",
+      from: fromCallback75,
+      parameters: parameters75,
+      isUnique: !false,
+      codec: registryConfig_pgCodecs_CMutationOutOutCompoundTypeRecord_CMutationOutOutCompoundTypeRecord,
+      uniques: [],
+      isMutation: true,
       extensions: extensions162,
       description: undefined
     },
@@ -8358,10 +8391,6 @@ const registry = makeRegistry({
       extensions: extensions165,
       description: undefined
     },
-    c_compound_type_set_query: PgResource.functionResourceOptions(resourceConfig_c_compound_type, options_c_compound_type_set_query),
-    b_compound_type_mutation: PgResource.functionResourceOptions(resourceConfig_c_compound_type, options_b_compound_type_mutation),
-    b_compound_type_query: PgResource.functionResourceOptions(resourceConfig_c_compound_type, options_b_compound_type_query),
-    b_compound_type_set_mutation: PgResource.functionResourceOptions(resourceConfig_c_compound_type, options_b_compound_type_set_mutation),
     c_query_output_two_rows: {
       executor: executor_mainPgExecutor,
       name: "c_query_output_two_rows",
@@ -8372,18 +8401,22 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_CQueryOutputTwoRowsRecord_CQueryOutputTwoRowsRecord,
       uniques: [],
       isMutation: false,
-      extensions: extensions167,
+      extensions: extensions166,
       description: undefined
     },
+    post: registryConfig_pgResources_post_post,
+    c_compound_type_set_query: PgResource.functionResourceOptions(resourceConfig_c_compound_type, options_c_compound_type_set_query),
+    b_compound_type_mutation: PgResource.functionResourceOptions(resourceConfig_c_compound_type, options_b_compound_type_mutation),
+    b_compound_type_query: PgResource.functionResourceOptions(resourceConfig_c_compound_type, options_b_compound_type_query),
+    b_compound_type_set_mutation: PgResource.functionResourceOptions(resourceConfig_c_compound_type, options_b_compound_type_set_mutation),
+    c_table_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_c_table_mutation),
+    c_table_query: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_c_table_query),
+    post_with_suffix: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_post_with_suffix),
     mutation_compound_type_array: PgResource.functionResourceOptions(resourceConfig_c_compound_type, options_mutation_compound_type_array),
     query_compound_type_array: PgResource.functionResourceOptions(resourceConfig_c_compound_type, options_query_compound_type_array),
     b_compound_type_array_mutation: PgResource.functionResourceOptions(resourceConfig_c_compound_type, options_b_compound_type_array_mutation),
     b_compound_type_array_query: PgResource.functionResourceOptions(resourceConfig_c_compound_type, options_b_compound_type_array_query),
-    post: registryConfig_pgResources_post_post,
     post_computed_compound_type_array: PgResource.functionResourceOptions(resourceConfig_c_compound_type, options_post_computed_compound_type_array),
-    c_table_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_c_table_mutation),
-    c_table_query: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_c_table_query),
-    post_with_suffix: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_post_with_suffix),
     post_many: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_post_many),
     c_person_computed_out: {
       executor: executor_mainPgExecutor,
@@ -8919,8 +8952,8 @@ const resource_c_compound_keyPgResource = registry.pgResources["c_compound_key"]
 const resource_similar_table_1PgResource = registry.pgResources["similar_table_1"];
 const resource_similar_table_2PgResource = registry.pgResources["similar_table_2"];
 const resource_c_null_test_recordPgResource = registry.pgResources["c_null_test_record"];
-const resource_c_issue756PgResource = registry.pgResources["c_issue756"];
 const resource_c_left_armPgResource = registry.pgResources["c_left_arm"];
+const resource_c_issue756PgResource = registry.pgResources["c_issue756"];
 const resource_postPgResource = registry.pgResources["post"];
 const resource_c_personPgResource = registry.pgResources["c_person"];
 const resource_b_typesPgResource = registry.pgResources["b_types"];
@@ -10890,11 +10923,29 @@ const makeArgs34 = (args, path = []) => {
   return selectArgs;
 };
 const resource_c_func_out_out_compound_typePgResource = registry.pgResources["c_func_out_out_compound_type"];
-const argDetailsSimple35 = [];
+const argDetailsSimple35 = [{
+  graphqlArgName: "leftArmId",
+  postgresArgName: "left_arm_id",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "postId",
+  postgresArgName: "post_id",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "txt",
+  postgresArgName: "txt",
+  pgCodec: TYPES.text,
+  required: true,
+  fetcher: null
+}];
 const makeArgs35 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 3; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -10935,37 +10986,12 @@ const makeArgs35 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_c_compound_type_set_queryPgResource = registry.pgResources["c_compound_type_set_query"];
-const getSelectPlanFromParentAndArgs9 = ($root, args, _info) => {
-  const selectArgs = makeArgs35(args);
-  return resource_c_compound_type_set_queryPgResource.execute(selectArgs);
-};
-function Query_cCompoundTypeSetQuery_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_cCompoundTypeSetQuery_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_cCompoundTypeSetQuery_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_cCompoundTypeSetQuery_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_cCompoundTypeSetQuery_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-const argDetailsSimple36 = [{
-  graphqlArgName: "object",
-  postgresArgName: "object",
-  pgCodec: attributes_o2_codec_cCompoundType,
-  required: true,
-  fetcher: null
-}];
+const resource_c_query_output_two_rowsPgResource = registry.pgResources["c_query_output_two_rows"];
+const argDetailsSimple36 = [];
 const makeArgs36 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -11006,30 +11032,37 @@ const makeArgs36 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_b_compound_type_queryPgResource = registry.pgResources["b_compound_type_query"];
+const resource_c_compound_type_set_queryPgResource = registry.pgResources["c_compound_type_set_query"];
+const getSelectPlanFromParentAndArgs9 = ($root, args, _info) => {
+  const selectArgs = makeArgs36(args);
+  return resource_c_compound_type_set_queryPgResource.execute(selectArgs);
+};
+function Query_cCompoundTypeSetQuery_first_applyPlan(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function Query_cCompoundTypeSetQuery_last_applyPlan(_, $connection, val) {
+  $connection.setLast(val.getRaw());
+}
+function Query_cCompoundTypeSetQuery_offset_applyPlan(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
+function Query_cCompoundTypeSetQuery_before_applyPlan(_, $connection, val) {
+  $connection.setBefore(val.getRaw());
+}
+function Query_cCompoundTypeSetQuery_after_applyPlan(_, $connection, val) {
+  $connection.setAfter(val.getRaw());
+}
 const argDetailsSimple37 = [{
-  graphqlArgName: "leftArmId",
-  postgresArgName: "left_arm_id",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "postId",
-  postgresArgName: "post_id",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "txt",
-  postgresArgName: "txt",
-  pgCodec: TYPES.text,
+  graphqlArgName: "object",
+  postgresArgName: "object",
+  pgCodec: attributes_o2_codec_cCompoundType,
   required: true,
   fetcher: null
 }];
 const makeArgs37 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 1; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -11070,11 +11103,11 @@ const makeArgs37 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_c_query_output_two_rowsPgResource = registry.pgResources["c_query_output_two_rows"];
+const resource_b_compound_type_queryPgResource = registry.pgResources["b_compound_type_query"];
 const argDetailsSimple38 = [{
-  graphqlArgName: "object",
-  postgresArgName: "object",
-  pgCodec: attributes_o2_codec_cCompoundType,
+  graphqlArgName: "id",
+  postgresArgName: "id",
+  pgCodec: TYPES.int,
   required: true,
   fetcher: null
 }];
@@ -11122,7 +11155,7 @@ const makeArgs38 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_query_compound_type_arrayPgResource = registry.pgResources["query_compound_type_array"];
+const resource_c_table_queryPgResource = registry.pgResources["c_table_query"];
 const argDetailsSimple39 = [{
   graphqlArgName: "object",
   postgresArgName: "object",
@@ -11174,11 +11207,11 @@ const makeArgs39 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_b_compound_type_array_queryPgResource = registry.pgResources["b_compound_type_array_query"];
+const resource_query_compound_type_arrayPgResource = registry.pgResources["query_compound_type_array"];
 const argDetailsSimple40 = [{
-  graphqlArgName: "id",
-  postgresArgName: "id",
-  pgCodec: TYPES.int,
+  graphqlArgName: "object",
+  postgresArgName: "object",
+  pgCodec: attributes_o2_codec_cCompoundType,
   required: true,
   fetcher: null
 }];
@@ -11226,7 +11259,7 @@ const makeArgs40 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_c_table_queryPgResource = registry.pgResources["c_table_query"];
+const resource_b_compound_type_array_queryPgResource = registry.pgResources["b_compound_type_array_query"];
 const argDetailsSimple41 = [{
   graphqlArgName: "a",
   postgresArgName: "a",
@@ -12154,21 +12187,6 @@ function Query_allCEdgeCases_before_applyPlan(_, $connection, val) {
 function Query_allCEdgeCases_after_applyPlan(_, $connection, val) {
   $connection.setAfter(val.getRaw());
 }
-function Query_allCIssue756S_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allCIssue756S_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allCIssue756S_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allCIssue756S_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allCIssue756S_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 function Query_allCLeftArms_first_applyPlan(_, $connection, arg) {
   $connection.setFirst(arg.getRaw());
 }
@@ -12182,6 +12200,21 @@ function Query_allCLeftArms_before_applyPlan(_, $connection, val) {
   $connection.setBefore(val.getRaw());
 }
 function Query_allCLeftArms_after_applyPlan(_, $connection, val) {
+  $connection.setAfter(val.getRaw());
+}
+function Query_allCIssue756S_first_applyPlan(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function Query_allCIssue756S_last_applyPlan(_, $connection, val) {
+  $connection.setLast(val.getRaw());
+}
+function Query_allCIssue756S_offset_applyPlan(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
+function Query_allCIssue756S_before_applyPlan(_, $connection, val) {
+  $connection.setBefore(val.getRaw());
+}
+function Query_allCIssue756S_after_applyPlan(_, $connection, val) {
   $connection.setAfter(val.getRaw());
 }
 function Query_allPosts_first_applyPlan(_, $connection, arg) {
@@ -14211,16 +14244,6 @@ const makeArgs78 = (args, path = []) => {
   return selectArgs;
 };
 const resource_c_edge_case_computedPgResource = registry.pgResources["c_edge_case_computed"];
-function CIssue756Connection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function CIssue756Connection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function CIssue756Connection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
 function CLeftArmConnection_nodesPlan($connection) {
   return $connection.nodes();
 }
@@ -14228,6 +14251,16 @@ function CLeftArmConnection_edgesPlan($connection) {
   return $connection.edges();
 }
 function CLeftArmConnection_pageInfoPlan($connection) {
+  // TYPES: why is this a TypeScript issue without the 'any'?
+  return $connection.pageInfo();
+}
+function CIssue756Connection_nodesPlan($connection) {
+  return $connection.nodes();
+}
+function CIssue756Connection_edgesPlan($connection) {
+  return $connection.edges();
+}
+function CIssue756Connection_pageInfoPlan($connection) {
   // TYPES: why is this a TypeScript issue without the 'any'?
   return $connection.pageInfo();
 }
@@ -16048,15 +16081,33 @@ const makeArgs111 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_c_issue756_mutationPgResource = registry.pgResources["c_issue756_mutation"];
-function Mutation_cIssue756Mutation_input_applyPlan(_, $object) {
+const resource_b_authenticate_failPgResource = registry.pgResources["b_authenticate_fail"];
+function Mutation_bAuthenticateFail_input_applyPlan(_, $object) {
   return $object;
 }
-const argDetailsSimple112 = [];
+const argDetailsSimple112 = [{
+  graphqlArgName: "a",
+  postgresArgName: "a",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "b",
+  postgresArgName: "b",
+  pgCodec: TYPES.numeric,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "c",
+  postgresArgName: "c",
+  pgCodec: TYPES.bigint,
+  required: true,
+  fetcher: null
+}];
 const makeArgs112 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 3; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -16097,15 +16148,21 @@ const makeArgs112 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_c_issue756_set_mutationPgResource = registry.pgResources["c_issue756_set_mutation"];
-function Mutation_cIssue756SetMutation_input_applyPlan(_, $object) {
+const resource_b_authenticatePgResource = registry.pgResources["b_authenticate"];
+function Mutation_bAuthenticate_input_applyPlan(_, $object) {
   return $object;
 }
-const argDetailsSimple113 = [];
+const argDetailsSimple113 = [{
+  graphqlArgName: "leftArm",
+  postgresArgName: "left_arm",
+  pgCodec: registryConfig_pgCodecs_cLeftArm_cLeftArm,
+  required: true,
+  fetcher: null
+}];
 const makeArgs113 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 1; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -16146,33 +16203,15 @@ const makeArgs113 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_b_authenticate_failPgResource = registry.pgResources["b_authenticate_fail"];
-function Mutation_bAuthenticateFail_input_applyPlan(_, $object) {
+const resource_c_left_arm_identityPgResource = registry.pgResources["c_left_arm_identity"];
+function Mutation_cLeftArmIdentity_input_applyPlan(_, $object) {
   return $object;
 }
-const argDetailsSimple114 = [{
-  graphqlArgName: "a",
-  postgresArgName: "a",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "b",
-  postgresArgName: "b",
-  pgCodec: TYPES.numeric,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "c",
-  postgresArgName: "c",
-  pgCodec: TYPES.bigint,
-  required: true,
-  fetcher: null
-}];
+const argDetailsSimple114 = [];
 const makeArgs114 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -16213,21 +16252,15 @@ const makeArgs114 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_b_authenticatePgResource = registry.pgResources["b_authenticate"];
-function Mutation_bAuthenticate_input_applyPlan(_, $object) {
+const resource_c_issue756_mutationPgResource = registry.pgResources["c_issue756_mutation"];
+function Mutation_cIssue756Mutation_input_applyPlan(_, $object) {
   return $object;
 }
-const argDetailsSimple115 = [{
-  graphqlArgName: "leftArm",
-  postgresArgName: "left_arm",
-  pgCodec: registryConfig_pgCodecs_cLeftArm_cLeftArm,
-  required: true,
-  fetcher: null
-}];
+const argDetailsSimple115 = [];
 const makeArgs115 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -16268,8 +16301,8 @@ const makeArgs115 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_c_left_arm_identityPgResource = registry.pgResources["c_left_arm_identity"];
-function Mutation_cLeftArmIdentity_input_applyPlan(_, $object) {
+const resource_c_issue756_set_mutationPgResource = registry.pgResources["c_issue756_set_mutation"];
+function Mutation_cIssue756SetMutation_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple116 = [{
@@ -16657,9 +16690,9 @@ function Mutation_bCompoundTypeSetMutation_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple122 = [{
-  graphqlArgName: "object",
-  postgresArgName: "object",
-  pgCodec: attributes_o2_codec_cCompoundType,
+  graphqlArgName: "id",
+  postgresArgName: "id",
+  pgCodec: TYPES.int,
   required: true,
   fetcher: null
 }];
@@ -16707,21 +16740,27 @@ const makeArgs122 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_compound_type_arrayPgResource = registry.pgResources["mutation_compound_type_array"];
-function Mutation_mutationCompoundTypeArray_input_applyPlan(_, $object) {
+const resource_c_table_mutationPgResource = registry.pgResources["c_table_mutation"];
+function Mutation_cTableMutation_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple123 = [{
-  graphqlArgName: "object",
-  postgresArgName: "object",
-  pgCodec: attributes_o2_codec_cCompoundType,
+  graphqlArgName: "post",
+  postgresArgName: "post",
+  pgCodec: attributes_post_codec_post,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "suffix",
+  postgresArgName: "suffix",
+  pgCodec: TYPES.text,
   required: true,
   fetcher: null
 }];
 const makeArgs123 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 2; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -16762,14 +16801,14 @@ const makeArgs123 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_b_compound_type_array_mutationPgResource = registry.pgResources["b_compound_type_array_mutation"];
-function Mutation_bCompoundTypeArrayMutation_input_applyPlan(_, $object) {
+const resource_post_with_suffixPgResource = registry.pgResources["post_with_suffix"];
+function Mutation_postWithSuffix_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple124 = [{
-  graphqlArgName: "id",
-  postgresArgName: "id",
-  pgCodec: TYPES.int,
+  graphqlArgName: "object",
+  postgresArgName: "object",
+  pgCodec: attributes_o2_codec_cCompoundType,
   required: true,
   fetcher: null
 }];
@@ -16817,27 +16856,21 @@ const makeArgs124 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_c_table_mutationPgResource = registry.pgResources["c_table_mutation"];
-function Mutation_cTableMutation_input_applyPlan(_, $object) {
+const resource_mutation_compound_type_arrayPgResource = registry.pgResources["mutation_compound_type_array"];
+function Mutation_mutationCompoundTypeArray_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple125 = [{
-  graphqlArgName: "post",
-  postgresArgName: "post",
-  pgCodec: attributes_post_codec_post,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "suffix",
-  postgresArgName: "suffix",
-  pgCodec: TYPES.text,
+  graphqlArgName: "object",
+  postgresArgName: "object",
+  pgCodec: attributes_o2_codec_cCompoundType,
   required: true,
   fetcher: null
 }];
 const makeArgs125 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 1; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -16878,8 +16911,8 @@ const makeArgs125 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_post_with_suffixPgResource = registry.pgResources["post_with_suffix"];
-function Mutation_postWithSuffix_input_applyPlan(_, $object) {
+const resource_b_compound_type_array_mutationPgResource = registry.pgResources["b_compound_type_array_mutation"];
+function Mutation_bCompoundTypeArrayMutation_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple126 = [{
@@ -17416,10 +17449,10 @@ function Mutation_createCNullTestRecord_input_applyPlan(_, $object) {
 function Mutation_createCEdgeCase_input_applyPlan(_, $object) {
   return $object;
 }
-function Mutation_createCIssue756_input_applyPlan(_, $object) {
+function Mutation_createCLeftArm_input_applyPlan(_, $object) {
   return $object;
 }
-function Mutation_createCLeftArm_input_applyPlan(_, $object) {
+function Mutation_createCIssue756_input_applyPlan(_, $object) {
   return $object;
 }
 function Mutation_createPost_input_applyPlan(_, $object) {
@@ -17476,13 +17509,13 @@ function Mutation_updateSimilarTable2ByRowId_input_applyPlan(_, $object) {
 function Mutation_updateCNullTestRecordByRowId_input_applyPlan(_, $object) {
   return $object;
 }
-function Mutation_updateCIssue756ByRowId_input_applyPlan(_, $object) {
-  return $object;
-}
 function Mutation_updateCLeftArmByRowId_input_applyPlan(_, $object) {
   return $object;
 }
 function Mutation_updateCLeftArmByPersonId_input_applyPlan(_, $object) {
+  return $object;
+}
+function Mutation_updateCIssue756ByRowId_input_applyPlan(_, $object) {
   return $object;
 }
 function Mutation_updatePostByRowId_input_applyPlan(_, $object) {
@@ -17542,13 +17575,13 @@ function Mutation_deleteSimilarTable2ByRowId_input_applyPlan(_, $object) {
 function Mutation_deleteCNullTestRecordByRowId_input_applyPlan(_, $object) {
   return $object;
 }
-function Mutation_deleteCIssue756ByRowId_input_applyPlan(_, $object) {
-  return $object;
-}
 function Mutation_deleteCLeftArmByRowId_input_applyPlan(_, $object) {
   return $object;
 }
 function Mutation_deleteCLeftArmByPersonId_input_applyPlan(_, $object) {
+  return $object;
+}
+function Mutation_deleteCIssue756ByRowId_input_applyPlan(_, $object) {
   return $object;
 }
 function Mutation_deletePostByRowId_input_applyPlan(_, $object) {
@@ -17851,24 +17884,6 @@ function BListBdeMutationPayload_queryPlan() {
 function BListBdeMutationInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
-function CIssue756MutationPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function CIssue756MutationPayload_queryPlan() {
-  return rootValue();
-}
-function CIssue756MutationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CIssue756SetMutationPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function CIssue756SetMutationPayload_queryPlan() {
-  return rootValue();
-}
-function CIssue756SetMutationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
 function BAuthenticateFailPayload_clientMutationIdPlan($object) {
   return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
 }
@@ -17894,6 +17909,24 @@ function CLeftArmIdentityPayload_queryPlan() {
   return rootValue();
 }
 function CLeftArmIdentityInput_clientMutationId_applyPlan($input, val) {
+  $input.set("clientMutationId", val.get());
+}
+function CIssue756MutationPayload_clientMutationIdPlan($object) {
+  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+}
+function CIssue756MutationPayload_queryPlan() {
+  return rootValue();
+}
+function CIssue756MutationInput_clientMutationId_applyPlan($input, val) {
+  $input.set("clientMutationId", val.get());
+}
+function CIssue756SetMutationPayload_clientMutationIdPlan($object) {
+  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+}
+function CIssue756SetMutationPayload_queryPlan() {
+  return rootValue();
+}
+function CIssue756SetMutationInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
 function BAuthenticateManyPayload_clientMutationIdPlan($object) {
@@ -17951,24 +17984,6 @@ function BCompoundTypeSetMutationPayload_queryPlan() {
 function BCompoundTypeSetMutationInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
-function MutationCompoundTypeArrayPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function MutationCompoundTypeArrayPayload_queryPlan() {
-  return rootValue();
-}
-function MutationCompoundTypeArrayInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function BCompoundTypeArrayMutationPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function BCompoundTypeArrayMutationPayload_queryPlan() {
-  return rootValue();
-}
-function BCompoundTypeArrayMutationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
 function CTableMutationPayload_clientMutationIdPlan($object) {
   return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
 }
@@ -17985,6 +18000,24 @@ function PostWithSuffixPayload_queryPlan() {
   return rootValue();
 }
 function PostWithSuffixInput_clientMutationId_applyPlan($input, val) {
+  $input.set("clientMutationId", val.get());
+}
+function MutationCompoundTypeArrayPayload_clientMutationIdPlan($object) {
+  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+}
+function MutationCompoundTypeArrayPayload_queryPlan() {
+  return rootValue();
+}
+function MutationCompoundTypeArrayInput_clientMutationId_applyPlan($input, val) {
+  $input.set("clientMutationId", val.get());
+}
+function BCompoundTypeArrayMutationPayload_clientMutationIdPlan($object) {
+  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+}
+function BCompoundTypeArrayMutationPayload_queryPlan() {
+  return rootValue();
+}
+function BCompoundTypeArrayMutationInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
 function PostManyPayload_clientMutationIdPlan($object) {
@@ -18372,22 +18405,6 @@ function CreateCEdgeCaseInput_cEdgeCase_applyPlan($object) {
   const $record = $object.getStepForKey("result");
   return $record.setPlan();
 }
-function CreateCIssue756Payload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateCIssue756Payload_cIssue756Plan($object) {
-  return $object.get("result");
-}
-function CreateCIssue756Payload_queryPlan() {
-  return rootValue();
-}
-function CreateCIssue756Input_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateCIssue756Input_cIssue756_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
 function CreateCLeftArmPayload_clientMutationIdPlan($mutation) {
   return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
 }
@@ -18401,6 +18418,22 @@ function CreateCLeftArmInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
 function CreateCLeftArmInput_cLeftArm_applyPlan($object) {
+  const $record = $object.getStepForKey("result");
+  return $record.setPlan();
+}
+function CreateCIssue756Payload_clientMutationIdPlan($mutation) {
+  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+}
+function CreateCIssue756Payload_cIssue756Plan($object) {
+  return $object.get("result");
+}
+function CreateCIssue756Payload_queryPlan() {
+  return rootValue();
+}
+function CreateCIssue756Input_clientMutationId_applyPlan($input, val) {
+  $input.set("clientMutationId", val.get());
+}
+function CreateCIssue756Input_cIssue756_applyPlan($object) {
   const $record = $object.getStepForKey("result");
   return $record.setPlan();
 }
@@ -18692,22 +18725,6 @@ function UpdateCNullTestRecordByRowIdInput_cNullTestRecordPatch_applyPlan($objec
   const $record = $object.getStepForKey("result");
   return $record.setPlan();
 }
-function UpdateCIssue756Payload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateCIssue756Payload_cIssue756Plan($object) {
-  return $object.get("result");
-}
-function UpdateCIssue756Payload_queryPlan() {
-  return rootValue();
-}
-function UpdateCIssue756ByRowIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateCIssue756ByRowIdInput_cIssue756Patch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
 function UpdateCLeftArmPayload_clientMutationIdPlan($mutation) {
   return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
 }
@@ -18728,6 +18745,22 @@ function UpdateCLeftArmByPersonIdInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
 function UpdateCLeftArmByPersonIdInput_cLeftArmPatch_applyPlan($object) {
+  const $record = $object.getStepForKey("result");
+  return $record.setPlan();
+}
+function UpdateCIssue756Payload_clientMutationIdPlan($mutation) {
+  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+}
+function UpdateCIssue756Payload_cIssue756Plan($object) {
+  return $object.get("result");
+}
+function UpdateCIssue756Payload_queryPlan() {
+  return rootValue();
+}
+function UpdateCIssue756ByRowIdInput_clientMutationId_applyPlan($input, val) {
+  $input.set("clientMutationId", val.get());
+}
+function UpdateCIssue756ByRowIdInput_cIssue756Patch_applyPlan($object) {
   const $record = $object.getStepForKey("result");
   return $record.setPlan();
 }
@@ -18966,18 +18999,6 @@ function DeleteCNullTestRecordPayload_queryPlan() {
 function DeleteCNullTestRecordByRowIdInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
-function DeleteCIssue756Payload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteCIssue756Payload_cIssue756Plan($object) {
-  return $object.get("result");
-}
-function DeleteCIssue756Payload_queryPlan() {
-  return rootValue();
-}
-function DeleteCIssue756ByRowIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
 function DeleteCLeftArmPayload_clientMutationIdPlan($mutation) {
   return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
 }
@@ -18991,6 +19012,18 @@ function DeleteCLeftArmByRowIdInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
 function DeleteCLeftArmByPersonIdInput_clientMutationId_applyPlan($input, val) {
+  $input.set("clientMutationId", val.get());
+}
+function DeleteCIssue756Payload_clientMutationIdPlan($mutation) {
+  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+}
+function DeleteCIssue756Payload_cIssue756Plan($object) {
+  return $object.get("result");
+}
+function DeleteCIssue756Payload_queryPlan() {
+  return rootValue();
+}
+function DeleteCIssue756ByRowIdInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
 function DeletePostPayload_clientMutationIdPlan($mutation) {
@@ -19085,14 +19118,14 @@ type Query {
   """Get a single \`CNullTestRecord\`."""
   cNullTestRecordByRowId(rowId: Int!): CNullTestRecord
 
-  """Get a single \`CIssue756\`."""
-  cIssue756ByRowId(rowId: Int!): CIssue756
-
   """Get a single \`CLeftArm\`."""
   cLeftArmByRowId(rowId: Int!): CLeftArm
 
   """Get a single \`CLeftArm\`."""
   cLeftArmByPersonId(personId: Int!): CLeftArm
+
+  """Get a single \`CIssue756\`."""
+  cIssue756ByRowId(rowId: Int!): CIssue756
 
   """Get a single \`Post\`."""
   postByRowId(rowId: Int!): Post
@@ -19321,6 +19354,7 @@ type Query {
   cTypesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
   cCompoundTypeComputedField(compoundType: CCompoundTypeInput): Int
   cFuncOutOutCompoundType(i1: Int): CFuncOutOutCompoundTypeRecord
+  cQueryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): CQueryOutputTwoRowsRecord
 
   """Reads and enables pagination through a set of \`CCompoundType\`."""
   cCompoundTypeSetQuery(
@@ -19343,10 +19377,9 @@ type Query {
     after: Cursor
   ): CCompoundTypeConnection
   bCompoundTypeQuery(object: CCompoundTypeInput): CCompoundType
-  cQueryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): CQueryOutputTwoRowsRecord
+  cTableQuery(id: Int): Post
   queryCompoundTypeArray(object: CCompoundTypeInput): [CCompoundType]
   bCompoundTypeArrayQuery(object: CCompoundTypeInput): [CCompoundType]
-  cTableQuery(id: Int): Post
   cFuncOutComplex(a: Int, b: String): CFuncOutComplexRecord
 
   """
@@ -20063,35 +20096,6 @@ type Query {
     condition: CEdgeCaseCondition
   ): CEdgeCaseConnection
 
-  """Reads and enables pagination through a set of \`CIssue756\`."""
-  allCIssue756S(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering \`CIssue756\`."""
-    orderBy: [CIssue756OrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: CIssue756Condition
-  ): CIssue756Connection
-
   """Reads and enables pagination through a set of \`CLeftArm\`."""
   allCLeftArms(
     """Only read the first \`n\` values of the set."""
@@ -20120,6 +20124,35 @@ type Query {
     """
     condition: CLeftArmCondition
   ): CLeftArmConnection
+
+  """Reads and enables pagination through a set of \`CIssue756\`."""
+  allCIssue756S(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`CIssue756\`."""
+    orderBy: [CIssue756OrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: CIssue756Condition
+  ): CIssue756Connection
 
   """Reads and enables pagination through a set of \`Post\`."""
   allPosts(
@@ -20847,6 +20880,8 @@ type BType {
   int8ArrayDomain: [BigInt]
   bytea: Base64EncodedBinary
   byteaArray: [Base64EncodedBinary]
+  ltree: LTree
+  ltreeArray: [LTree]
 
   """Reads a single \`Post\` that is related to this \`BType\`."""
   postBySmallint: Post
@@ -20992,6 +21027,11 @@ scalar RegDictionary
 """Binary data encoded using Base64"""
 scalar Base64EncodedBinary
 
+"""
+Represents an \`ltree\` hierarchical label tree as outlined in https://www.postgresql.org/docs/current/ltree.html
+"""
+scalar LTree
+
 """A \`BType\` edge in the connection."""
 type BTypeEdge {
   """A cursor for use in pagination."""
@@ -21070,6 +21110,8 @@ enum BTypeOrderBy {
   REGCONFIG_DESC
   REGDICTIONARY_ASC
   REGDICTIONARY_DESC
+  LTREE_ASC
+  LTREE_DESC
 }
 
 """
@@ -21171,6 +21213,9 @@ input BTypeCondition {
 
   """Checks for equality with the object’s \`regdictionary\` field."""
   regdictionary: RegDictionary
+
+  """Checks for equality with the object’s \`ltree\` field."""
+  ltree: LTree
 }
 
 """A cartesian point."""
@@ -21723,6 +21768,12 @@ type CFuncOutOutCompoundTypeRecord {
   o2: CCompoundType
 }
 
+type CQueryOutputTwoRowsRecord {
+  txt: String
+  leftArm: CLeftArm
+  post: Post
+}
+
 """A connection to a list of \`CCompoundType\` values."""
 type CCompoundTypeConnection {
   """A list of \`CCompoundType\` objects."""
@@ -21747,12 +21798,6 @@ type CCompoundTypeEdge {
 
   """The \`CCompoundType\` at the end of the edge."""
   node: CCompoundType
-}
-
-type CQueryOutputTwoRowsRecord {
-  txt: String
-  leftArm: CLeftArm
-  post: Post
 }
 
 type CFuncOutComplexRecord {
@@ -22725,55 +22770,6 @@ input CEdgeCaseCondition {
   rowId: Int
 }
 
-"""A connection to a list of \`CIssue756\` values."""
-type CIssue756Connection {
-  """A list of \`CIssue756\` objects."""
-  nodes: [CIssue756]!
-
-  """
-  A list of edges which contains the \`CIssue756\` and cursor to aid in pagination.
-  """
-  edges: [CIssue756Edge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`CIssue756\` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A \`CIssue756\` edge in the connection."""
-type CIssue756Edge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`CIssue756\` at the end of the edge."""
-  node: CIssue756
-}
-
-"""Methods to use when ordering \`CIssue756\`."""
-enum CIssue756OrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  TS_ASC
-  TS_DESC
-}
-
-"""
-A condition to be used against \`CIssue756\` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input CIssue756Condition {
-  """Checks for equality with the object’s \`rowId\` field."""
-  rowId: Int
-
-  """Checks for equality with the object’s \`ts\` field."""
-  ts: CNotNullTimestamp
-}
-
 """A connection to a list of \`CLeftArm\` values."""
 type CLeftArmConnection {
   """A list of \`CLeftArm\` objects."""
@@ -22831,6 +22827,55 @@ input CLeftArmCondition {
 
   """Checks for equality with the object’s \`mood\` field."""
   mood: String
+}
+
+"""A connection to a list of \`CIssue756\` values."""
+type CIssue756Connection {
+  """A list of \`CIssue756\` objects."""
+  nodes: [CIssue756]!
+
+  """
+  A list of edges which contains the \`CIssue756\` and cursor to aid in pagination.
+  """
+  edges: [CIssue756Edge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`CIssue756\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`CIssue756\` edge in the connection."""
+type CIssue756Edge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`CIssue756\` at the end of the edge."""
+  node: CIssue756
+}
+
+"""Methods to use when ordering \`CIssue756\`."""
+enum CIssue756OrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  TS_ASC
+  TS_DESC
+}
+
+"""
+A condition to be used against \`CIssue756\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input CIssue756Condition {
+  """Checks for equality with the object’s \`rowId\` field."""
+  rowId: Int
+
+  """Checks for equality with the object’s \`ts\` field."""
+  ts: CNotNullTimestamp
 }
 
 """Methods to use when ordering \`CPerson\`."""
@@ -23094,18 +23139,6 @@ type Mutation {
     """
     input: BListBdeMutationInput!
   ): BListBdeMutationPayload
-  cIssue756Mutation(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CIssue756MutationInput!
-  ): CIssue756MutationPayload
-  cIssue756SetMutation(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CIssue756SetMutationInput!
-  ): CIssue756SetMutationPayload
   bAuthenticateFail(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -23124,6 +23157,18 @@ type Mutation {
     """
     input: CLeftArmIdentityInput!
   ): CLeftArmIdentityPayload
+  cIssue756Mutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CIssue756MutationInput!
+  ): CIssue756MutationPayload
+  cIssue756SetMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CIssue756SetMutationInput!
+  ): CIssue756SetMutationPayload
   bAuthenticateMany(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -23160,18 +23205,6 @@ type Mutation {
     """
     input: BCompoundTypeSetMutationInput!
   ): BCompoundTypeSetMutationPayload
-  mutationCompoundTypeArray(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: MutationCompoundTypeArrayInput!
-  ): MutationCompoundTypeArrayPayload
-  bCompoundTypeArrayMutation(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: BCompoundTypeArrayMutationInput!
-  ): BCompoundTypeArrayMutationPayload
   cTableMutation(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -23184,6 +23217,18 @@ type Mutation {
     """
     input: PostWithSuffixInput!
   ): PostWithSuffixPayload @deprecated(reason: "This is deprecated (comment on function a.post_with_suffix).")
+  mutationCompoundTypeArray(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationCompoundTypeArrayInput!
+  ): MutationCompoundTypeArrayPayload
+  bCompoundTypeArrayMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: BCompoundTypeArrayMutationInput!
+  ): BCompoundTypeArrayMutationPayload
   postMany(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -23391,14 +23436,6 @@ type Mutation {
     input: CreateCEdgeCaseInput!
   ): CreateCEdgeCasePayload
 
-  """Creates a single \`CIssue756\`."""
-  createCIssue756(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateCIssue756Input!
-  ): CreateCIssue756Payload
-
   """Creates a single \`CLeftArm\`."""
   createCLeftArm(
     """
@@ -23406,6 +23443,14 @@ type Mutation {
     """
     input: CreateCLeftArmInput!
   ): CreateCLeftArmPayload
+
+  """Creates a single \`CIssue756\`."""
+  createCIssue756(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateCIssue756Input!
+  ): CreateCIssue756Payload
 
   """Creates a single \`Post\`."""
   createPost(
@@ -23551,14 +23596,6 @@ type Mutation {
     input: UpdateCNullTestRecordByRowIdInput!
   ): UpdateCNullTestRecordPayload
 
-  """Updates a single \`CIssue756\` using a unique key and a patch."""
-  updateCIssue756ByRowId(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateCIssue756ByRowIdInput!
-  ): UpdateCIssue756Payload
-
   """Updates a single \`CLeftArm\` using a unique key and a patch."""
   updateCLeftArmByRowId(
     """
@@ -23574,6 +23611,14 @@ type Mutation {
     """
     input: UpdateCLeftArmByPersonIdInput!
   ): UpdateCLeftArmPayload
+
+  """Updates a single \`CIssue756\` using a unique key and a patch."""
+  updateCIssue756ByRowId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateCIssue756ByRowIdInput!
+  ): UpdateCIssue756Payload
 
   """Updates a single \`Post\` using a unique key and a patch."""
   updatePostByRowId(
@@ -23727,14 +23772,6 @@ type Mutation {
     input: DeleteCNullTestRecordByRowIdInput!
   ): DeleteCNullTestRecordPayload
 
-  """Deletes a single \`CIssue756\` using a unique key."""
-  deleteCIssue756ByRowId(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteCIssue756ByRowIdInput!
-  ): DeleteCIssue756Payload
-
   """Deletes a single \`CLeftArm\` using a unique key."""
   deleteCLeftArmByRowId(
     """
@@ -23750,6 +23787,14 @@ type Mutation {
     """
     input: DeleteCLeftArmByPersonIdInput!
   ): DeleteCLeftArmPayload
+
+  """Deletes a single \`CIssue756\` using a unique key."""
+  deleteCIssue756ByRowId(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteCIssue756ByRowIdInput!
+  ): DeleteCIssue756Payload
 
   """Deletes a single \`Post\` using a unique key."""
   deletePostByRowId(
@@ -24613,60 +24658,6 @@ input BListBdeMutationInput {
   e: String
 }
 
-"""The output of our \`cIssue756Mutation\` mutation."""
-type CIssue756MutationPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: CIssue756
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`CIssue756\`. May be used by Relay 1."""
-  cIssue756Edge(
-    """The method to use when ordering \`CIssue756\`."""
-    orderBy: [CIssue756OrderBy!]! = [PRIMARY_KEY_ASC]
-  ): CIssue756Edge
-}
-
-"""All input for the \`cIssue756Mutation\` mutation."""
-input CIssue756MutationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-}
-
-"""The output of our \`cIssue756SetMutation\` mutation."""
-type CIssue756SetMutationPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: [CIssue756]
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the \`cIssue756SetMutation\` mutation."""
-input CIssue756SetMutationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-}
-
 """The output of our \`bAuthenticateFail\` mutation."""
 type BAuthenticateFailPayload {
   """
@@ -24763,6 +24754,60 @@ input CLeftArmBaseInput {
   personId: Int
   lengthInMetres: Float
   mood: String
+}
+
+"""The output of our \`cIssue756Mutation\` mutation."""
+type CIssue756MutationPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: CIssue756
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`CIssue756\`. May be used by Relay 1."""
+  cIssue756Edge(
+    """The method to use when ordering \`CIssue756\`."""
+    orderBy: [CIssue756OrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CIssue756Edge
+}
+
+"""All input for the \`cIssue756Mutation\` mutation."""
+input CIssue756MutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our \`cIssue756SetMutation\` mutation."""
+type CIssue756SetMutationPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: [CIssue756]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`cIssue756SetMutation\` mutation."""
+input CIssue756SetMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
 }
 
 """The output of our \`bAuthenticateMany\` mutation."""
@@ -24938,56 +24983,6 @@ input BCompoundTypeSetMutationInput {
   object: CCompoundTypeInput
 }
 
-"""The output of our \`mutationCompoundTypeArray\` mutation."""
-type MutationCompoundTypeArrayPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: [CCompoundType]
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the \`mutationCompoundTypeArray\` mutation."""
-input MutationCompoundTypeArrayInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  object: CCompoundTypeInput
-}
-
-"""The output of our \`bCompoundTypeArrayMutation\` mutation."""
-type BCompoundTypeArrayMutationPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  result: [CCompoundType]
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the \`bCompoundTypeArrayMutation\` mutation."""
-input BCompoundTypeArrayMutationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  object: CCompoundTypeInput
-}
-
 """The output of our \`cTableMutation\` mutation."""
 type CTableMutationPayload {
   """
@@ -25065,6 +25060,56 @@ input PostInput {
 input ComptypeInput {
   schedule: Datetime
   isOptimised: Boolean
+}
+
+"""The output of our \`mutationCompoundTypeArray\` mutation."""
+type MutationCompoundTypeArrayPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: [CCompoundType]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`mutationCompoundTypeArray\` mutation."""
+input MutationCompoundTypeArrayInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  object: CCompoundTypeInput
+}
+
+"""The output of our \`bCompoundTypeArrayMutation\` mutation."""
+type BCompoundTypeArrayMutationPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  result: [CCompoundType]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`bCompoundTypeArrayMutation\` mutation."""
+input BCompoundTypeArrayMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  object: CCompoundTypeInput
 }
 
 """The output of our \`postMany\` mutation."""
@@ -26068,47 +26113,6 @@ input CEdgeCaseInput {
   rowId: Int
 }
 
-"""The output of our create \`CIssue756\` mutation."""
-type CreateCIssue756Payload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`CIssue756\` that was created by this mutation."""
-  cIssue756: CIssue756
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`CIssue756\`. May be used by Relay 1."""
-  cIssue756Edge(
-    """The method to use when ordering \`CIssue756\`."""
-    orderBy: [CIssue756OrderBy!]! = [PRIMARY_KEY_ASC]
-  ): CIssue756Edge
-}
-
-"""All input for the create \`CIssue756\` mutation."""
-input CreateCIssue756Input {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The \`CIssue756\` to be created by this mutation."""
-  cIssue756: CIssue756Input!
-}
-
-"""An input for mutations affecting \`CIssue756\`"""
-input CIssue756Input {
-  rowId: Int
-  ts: CNotNullTimestamp
-}
-
 """The output of our create \`CLeftArm\` mutation."""
 type CreateCLeftArmPayload {
   """
@@ -26150,6 +26154,47 @@ input CLeftArmInput {
   personId: Int
   lengthInMetres: Float
   mood: String
+}
+
+"""The output of our create \`CIssue756\` mutation."""
+type CreateCIssue756Payload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`CIssue756\` that was created by this mutation."""
+  cIssue756: CIssue756
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`CIssue756\`. May be used by Relay 1."""
+  cIssue756Edge(
+    """The method to use when ordering \`CIssue756\`."""
+    orderBy: [CIssue756OrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CIssue756Edge
+}
+
+"""All input for the create \`CIssue756\` mutation."""
+input CreateCIssue756Input {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`CIssue756\` to be created by this mutation."""
+  cIssue756: CIssue756Input!
+}
+
+"""An input for mutations affecting \`CIssue756\`"""
+input CIssue756Input {
+  rowId: Int
+  ts: CNotNullTimestamp
 }
 
 """The output of our create \`Post\` mutation."""
@@ -26329,6 +26374,8 @@ input BTypeInput {
   int8ArrayDomain: [BigInt]
   bytea: Base64EncodedBinary
   byteaArray: [Base64EncodedBinary]
+  ltree: LTree
+  ltreeArray: [LTree]
 }
 
 """A range of \`BigFloat\`."""
@@ -27087,52 +27134,6 @@ input CNullTestRecordPatch {
   nonNullText: String
 }
 
-"""The output of our update \`CIssue756\` mutation."""
-type UpdateCIssue756Payload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`CIssue756\` that was updated by this mutation."""
-  cIssue756: CIssue756
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`CIssue756\`. May be used by Relay 1."""
-  cIssue756Edge(
-    """The method to use when ordering \`CIssue756\`."""
-    orderBy: [CIssue756OrderBy!]! = [PRIMARY_KEY_ASC]
-  ): CIssue756Edge
-}
-
-"""All input for the \`updateCIssue756ByRowId\` mutation."""
-input UpdateCIssue756ByRowIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  rowId: Int!
-
-  """
-  An object where the defined keys will be set on the \`CIssue756\` being updated.
-  """
-  cIssue756Patch: CIssue756Patch!
-}
-
-"""
-Represents an update to a \`CIssue756\`. Fields that are set will be updated.
-"""
-input CIssue756Patch {
-  rowId: Int
-  ts: CNotNullTimestamp
-}
-
 """The output of our update \`CLeftArm\` mutation."""
 type UpdateCLeftArmPayload {
   """
@@ -27194,6 +27195,52 @@ input UpdateCLeftArmByPersonIdInput {
   An object where the defined keys will be set on the \`CLeftArm\` being updated.
   """
   cLeftArmPatch: CLeftArmPatch!
+}
+
+"""The output of our update \`CIssue756\` mutation."""
+type UpdateCIssue756Payload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`CIssue756\` that was updated by this mutation."""
+  cIssue756: CIssue756
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`CIssue756\`. May be used by Relay 1."""
+  cIssue756Edge(
+    """The method to use when ordering \`CIssue756\`."""
+    orderBy: [CIssue756OrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CIssue756Edge
+}
+
+"""All input for the \`updateCIssue756ByRowId\` mutation."""
+input UpdateCIssue756ByRowIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  rowId: Int!
+
+  """
+  An object where the defined keys will be set on the \`CIssue756\` being updated.
+  """
+  cIssue756Patch: CIssue756Patch!
+}
+
+"""
+Represents an update to a \`CIssue756\`. Fields that are set will be updated.
+"""
+input CIssue756Patch {
+  rowId: Int
+  ts: CNotNullTimestamp
 }
 
 """The output of our update \`Post\` mutation."""
@@ -27408,6 +27455,8 @@ input BTypePatch {
   int8ArrayDomain: [BigInt]
   bytea: Base64EncodedBinary
   byteaArray: [Base64EncodedBinary]
+  ltree: LTree
+  ltreeArray: [LTree]
 }
 
 """The output of our delete \`Input\` mutation."""
@@ -27899,39 +27948,6 @@ input DeleteCNullTestRecordByRowIdInput {
   rowId: Int!
 }
 
-"""The output of our delete \`CIssue756\` mutation."""
-type DeleteCIssue756Payload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`CIssue756\` that was deleted by this mutation."""
-  cIssue756: CIssue756
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`CIssue756\`. May be used by Relay 1."""
-  cIssue756Edge(
-    """The method to use when ordering \`CIssue756\`."""
-    orderBy: [CIssue756OrderBy!]! = [PRIMARY_KEY_ASC]
-  ): CIssue756Edge
-}
-
-"""All input for the \`deleteCIssue756ByRowId\` mutation."""
-input DeleteCIssue756ByRowIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  rowId: Int!
-}
-
 """The output of our delete \`CLeftArm\` mutation."""
 type DeleteCLeftArmPayload {
   """
@@ -27973,6 +27989,39 @@ input DeleteCLeftArmByPersonIdInput {
   """
   clientMutationId: String
   personId: Int!
+}
+
+"""The output of our delete \`CIssue756\` mutation."""
+type DeleteCIssue756Payload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`CIssue756\` that was deleted by this mutation."""
+  cIssue756: CIssue756
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`CIssue756\`. May be used by Relay 1."""
+  cIssue756Edge(
+    """The method to use when ordering \`CIssue756\`."""
+    orderBy: [CIssue756OrderBy!]! = [PRIMARY_KEY_ASC]
+  ): CIssue756Edge
+}
+
+"""All input for the \`deleteCIssue756ByRowId\` mutation."""
+input DeleteCIssue756ByRowIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  rowId: Int!
 }
 
 """The output of our delete \`Post\` mutation."""
@@ -28245,16 +28294,6 @@ export const plans = {
         rowId: undefined
       }
     },
-    cIssue756ByRowId: {
-      plan(_$root, args) {
-        return resource_c_issue756PgResource.get({
-          id: args.get("rowId")
-        });
-      },
-      args: {
-        rowId: undefined
-      }
-    },
     cLeftArmByRowId: {
       plan(_$root, args) {
         return resource_c_left_armPgResource.get({
@@ -28273,6 +28312,16 @@ export const plans = {
       },
       args: {
         personId: undefined
+      }
+    },
+    cIssue756ByRowId: {
+      plan(_$root, args) {
+        return resource_c_issue756PgResource.get({
+          id: args.get("rowId")
+        });
+      },
+      args: {
+        rowId: undefined
       }
     },
     postByRowId: {
@@ -28745,6 +28794,17 @@ export const plans = {
         i1: undefined
       }
     },
+    cQueryOutputTwoRows: {
+      plan($root, args, _info) {
+        const selectArgs = makeArgs35(args);
+        return resource_c_query_output_two_rowsPgResource.execute(selectArgs);
+      },
+      args: {
+        leftArmId: undefined,
+        postId: undefined,
+        txt: undefined
+      }
+    },
     cCompoundTypeSetQuery: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs9($parent, args, info);
@@ -28775,27 +28835,25 @@ export const plans = {
     },
     bCompoundTypeQuery: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs36(args);
+        const selectArgs = makeArgs37(args);
         return resource_b_compound_type_queryPgResource.execute(selectArgs);
       },
       args: {
         object: undefined
       }
     },
-    cQueryOutputTwoRows: {
+    cTableQuery: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs37(args);
-        return resource_c_query_output_two_rowsPgResource.execute(selectArgs);
+        const selectArgs = makeArgs38(args);
+        return resource_c_table_queryPgResource.execute(selectArgs);
       },
       args: {
-        leftArmId: undefined,
-        postId: undefined,
-        txt: undefined
+        id: undefined
       }
     },
     queryCompoundTypeArray: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs38(args);
+        const selectArgs = makeArgs39(args);
         return resource_query_compound_type_arrayPgResource.execute(selectArgs);
       },
       args: {
@@ -28804,20 +28862,11 @@ export const plans = {
     },
     bCompoundTypeArrayQuery: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs39(args);
+        const selectArgs = makeArgs40(args);
         return resource_b_compound_type_array_queryPgResource.execute(selectArgs);
       },
       args: {
         object: undefined
-      }
-    },
-    cTableQuery: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs40(args);
-        return resource_c_table_queryPgResource.execute(selectArgs);
-      },
-      args: {
-        id: undefined
       }
     },
     cFuncOutComplex: {
@@ -29877,49 +29926,6 @@ export const plans = {
         }
       }
     },
-    allCIssue756S: {
-      plan() {
-        return connection(resource_c_issue756PgResource.find());
-      },
-      args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Query_allCIssue756S_first_applyPlan
-        },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Query_allCIssue756S_last_applyPlan
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Query_allCIssue756S_offset_applyPlan
-        },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Query_allCIssue756S_before_applyPlan
-        },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Query_allCIssue756S_after_applyPlan
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("CIssue756OrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
-        }
-      }
-    },
     allCLeftArms: {
       plan() {
         return connection(resource_c_left_armPgResource.find());
@@ -29951,6 +29957,49 @@ export const plans = {
             const $value = val.getRaw();
             const $select = $connection.getSubplan();
             applyOrderToPlan($select, $value, info.schema.getType("CLeftArmOrderBy"));
+            return null;
+          }
+        },
+        condition: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_condition, $connection) {
+            const $select = $connection.getSubplan();
+            return $select.wherePlan();
+          }
+        }
+      }
+    },
+    allCIssue756S: {
+      plan() {
+        return connection(resource_c_issue756PgResource.find());
+      },
+      args: {
+        first: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Query_allCIssue756S_first_applyPlan
+        },
+        last: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Query_allCIssue756S_last_applyPlan
+        },
+        offset: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Query_allCIssue756S_offset_applyPlan
+        },
+        before: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Query_allCIssue756S_before_applyPlan
+        },
+        after: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Query_allCIssue756S_after_applyPlan
+        },
+        orderBy: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val, info) {
+            const $value = val.getRaw();
+            const $select = $connection.getSubplan();
+            applyOrderToPlan($select, $value, info.schema.getType("CIssue756OrderBy"));
             return null;
           }
         },
@@ -31936,6 +31985,12 @@ export const plans = {
     byteaArray($record) {
       return $record.get("bytea_array");
     },
+    ltree($record) {
+      return $record.get("ltree");
+    },
+    ltreeArray($record) {
+      return $record.get("ltree_array");
+    },
     postBySmallint($record) {
       return resource_postPgResource.get({
         id: $record.get("smallint")
@@ -33110,6 +33165,40 @@ export const plans = {
           plan.setOrderIsUnique();
         }
       }
+    },
+    LTREE_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "ltree",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    LTREE_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "ltree",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
     }
   },
   BTypeCondition: {
@@ -33848,6 +33937,29 @@ export const plans = {
       },
       autoApplyAfterParentInputPlan: true,
       autoApplyAfterParentApplyPlan: true
+    },
+    ltree: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "ltree",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "ltree",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.ltree.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
     }
   },
   PointInput: {
@@ -33902,7 +34014,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques26[0].attributes.forEach(attributeName => {
+        uniques25[0].attributes.forEach(attributeName => {
           const attribute = attributes_post_codec_post.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -33918,7 +34030,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques26[0].attributes.forEach(attributeName => {
+        uniques25[0].attributes.forEach(attributeName => {
           const attribute = attributes_post_codec_post.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -34943,24 +35055,6 @@ export const plans = {
       return $select;
     }
   },
-  CCompoundTypeConnection: {
-    __assertStep: ConnectionStep,
-    nodes: CCompoundTypeConnection_nodesPlan,
-    edges: CCompoundTypeConnection_edgesPlan,
-    pageInfo: CCompoundTypeConnection_pageInfoPlan,
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
-    }
-  },
-  CCompoundTypeEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
   CQueryOutputTwoRowsRecord: {
     __assertStep: assertPgClassSingleStep,
     txt($record) {
@@ -34983,6 +35077,24 @@ export const plans = {
       }
       $select.getClassStep().setTrusted();
       return $select;
+    }
+  },
+  CCompoundTypeConnection: {
+    __assertStep: ConnectionStep,
+    nodes: CCompoundTypeConnection_nodesPlan,
+    edges: CCompoundTypeConnection_edgesPlan,
+    pageInfo: CCompoundTypeConnection_pageInfoPlan,
+    totalCount($connection) {
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+    }
+  },
+  CCompoundTypeEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
     }
   },
   CFuncOutComplexRecord: {
@@ -38301,177 +38413,6 @@ export const plans = {
       autoApplyAfterParentApplyPlan: true
     }
   },
-  CIssue756Connection: {
-    __assertStep: ConnectionStep,
-    nodes: CIssue756Connection_nodesPlan,
-    edges: CIssue756Connection_edgesPlan,
-    pageInfo: CIssue756Connection_pageInfoPlan,
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
-    }
-  },
-  CIssue756Edge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  CIssue756OrderBy: {
-    NATURAL: {
-      applyPlan() {}
-    },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        uniques21[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_cIssue756_cIssue756.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        uniques21[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_cIssue756_cIssue756.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    TS_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "ts",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    TS_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "ts",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    }
-  },
-  CIssue756Condition: {
-    rowId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes31.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    ts: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "ts",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "ts",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes31.ts.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    }
-  },
   CLeftArmConnection: {
     __assertStep: ConnectionStep,
     nodes: CLeftArmConnection_nodesPlan,
@@ -38496,7 +38437,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques22[0].attributes.forEach(attributeName => {
+        uniques21[0].attributes.forEach(attributeName => {
           const attribute = registryConfig_pgCodecs_cLeftArm_cLeftArm.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -38512,7 +38453,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques22[0].attributes.forEach(attributeName => {
+        uniques21[0].attributes.forEach(attributeName => {
           const attribute = registryConfig_pgCodecs_cLeftArm_cLeftArm.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -38679,7 +38620,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes32.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), attributes31.id.codec)}`;
             }
           });
         }
@@ -38702,7 +38643,7 @@ export const plans = {
             type: "attribute",
             attribute: "person_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes32.person_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), attributes31.person_id.codec)}`;
             }
           });
         }
@@ -38725,7 +38666,7 @@ export const plans = {
             type: "attribute",
             attribute: "length_in_metres",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes32.length_in_metres.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), attributes31.length_in_metres.codec)}`;
             }
           });
         }
@@ -38748,7 +38689,178 @@ export const plans = {
             type: "attribute",
             attribute: "mood",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes32.mood.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), attributes31.mood.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
+  CIssue756Connection: {
+    __assertStep: ConnectionStep,
+    nodes: CIssue756Connection_nodesPlan,
+    edges: CIssue756Connection_edgesPlan,
+    pageInfo: CIssue756Connection_pageInfoPlan,
+    totalCount($connection) {
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+    }
+  },
+  CIssue756Edge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
+  },
+  CIssue756OrderBy: {
+    NATURAL: {
+      applyPlan() {}
+    },
+    PRIMARY_KEY_ASC: {
+      applyPlan(step) {
+        uniques23[0].attributes.forEach(attributeName => {
+          const attribute = registryConfig_pgCodecs_cIssue756_cIssue756.attributes[attributeName];
+          step.orderBy({
+            codec: attribute.codec,
+            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            direction: "ASC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+        });
+        step.setOrderIsUnique();
+      }
+    },
+    PRIMARY_KEY_DESC: {
+      applyPlan(step) {
+        uniques23[0].attributes.forEach(attributeName => {
+          const attribute = registryConfig_pgCodecs_cIssue756_cIssue756.attributes[attributeName];
+          step.orderBy({
+            codec: attribute.codec,
+            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            direction: "DESC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+        });
+        step.setOrderIsUnique();
+      }
+    },
+    ID_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "id",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (true) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    ID_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "id",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (true) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    TS_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "ts",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    TS_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "ts",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    }
+  },
+  CIssue756Condition: {
+    rowId: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), attributes33.id.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    ts: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "ts",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "ts",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), attributes33.ts.codec)}`;
             }
           });
         }
@@ -39791,39 +39903,9 @@ export const plans = {
         }
       }
     },
-    cIssue756Mutation: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs111(args, ["input"]);
-        const $result = resource_c_issue756_mutationPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_cIssue756Mutation_input_applyPlan
-        }
-      }
-    },
-    cIssue756SetMutation: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs112(args, ["input"]);
-        const $result = resource_c_issue756_set_mutationPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_cIssue756SetMutation_input_applyPlan
-        }
-      }
-    },
     bAuthenticateFail: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs113(args, ["input"]);
+        const selectArgs = makeArgs111(args, ["input"]);
         const $result = resource_b_authenticate_failPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -39838,7 +39920,7 @@ export const plans = {
     },
     bAuthenticate: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs114(args, ["input"]);
+        const selectArgs = makeArgs112(args, ["input"]);
         const $result = resource_b_authenticatePgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -39853,7 +39935,7 @@ export const plans = {
     },
     cLeftArmIdentity: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs115(args, ["input"]);
+        const selectArgs = makeArgs113(args, ["input"]);
         const $result = resource_c_left_arm_identityPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -39863,6 +39945,36 @@ export const plans = {
         input: {
           autoApplyAfterParentPlan: true,
           applyPlan: Mutation_cLeftArmIdentity_input_applyPlan
+        }
+      }
+    },
+    cIssue756Mutation: {
+      plan($root, args, _info) {
+        const selectArgs = makeArgs114(args, ["input"]);
+        const $result = resource_c_issue756_mutationPgResource.execute(selectArgs, "mutation");
+        return object({
+          result: $result
+        });
+      },
+      args: {
+        input: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Mutation_cIssue756Mutation_input_applyPlan
+        }
+      }
+    },
+    cIssue756SetMutation: {
+      plan($root, args, _info) {
+        const selectArgs = makeArgs115(args, ["input"]);
+        const $result = resource_c_issue756_set_mutationPgResource.execute(selectArgs, "mutation");
+        return object({
+          result: $result
+        });
+      },
+      args: {
+        input: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Mutation_cIssue756SetMutation_input_applyPlan
         }
       }
     },
@@ -39956,39 +40068,9 @@ export const plans = {
         }
       }
     },
-    mutationCompoundTypeArray: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs122(args, ["input"]);
-        const $result = resource_mutation_compound_type_arrayPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_mutationCompoundTypeArray_input_applyPlan
-        }
-      }
-    },
-    bCompoundTypeArrayMutation: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs123(args, ["input"]);
-        const $result = resource_b_compound_type_array_mutationPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_bCompoundTypeArrayMutation_input_applyPlan
-        }
-      }
-    },
     cTableMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs124(args, ["input"]);
+        const selectArgs = makeArgs122(args, ["input"]);
         const $result = resource_c_table_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -40003,7 +40085,7 @@ export const plans = {
     },
     postWithSuffix: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs125(args, ["input"]);
+        const selectArgs = makeArgs123(args, ["input"]);
         const $result = resource_post_with_suffixPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -40013,6 +40095,36 @@ export const plans = {
         input: {
           autoApplyAfterParentPlan: true,
           applyPlan: Mutation_postWithSuffix_input_applyPlan
+        }
+      }
+    },
+    mutationCompoundTypeArray: {
+      plan($root, args, _info) {
+        const selectArgs = makeArgs124(args, ["input"]);
+        const $result = resource_mutation_compound_type_arrayPgResource.execute(selectArgs, "mutation");
+        return object({
+          result: $result
+        });
+      },
+      args: {
+        input: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Mutation_mutationCompoundTypeArray_input_applyPlan
+        }
+      }
+    },
+    bCompoundTypeArrayMutation: {
+      plan($root, args, _info) {
+        const selectArgs = makeArgs125(args, ["input"]);
+        const $result = resource_b_compound_type_array_mutationPgResource.execute(selectArgs, "mutation");
+        return object({
+          result: $result
+        });
+      },
+      args: {
+        input: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Mutation_bCompoundTypeArrayMutation_input_applyPlan
         }
       }
     },
@@ -40436,21 +40548,6 @@ export const plans = {
         }
       }
     },
-    createCIssue756: {
-      plan(_, args) {
-        const plan = object({
-          result: pgInsertSingle(resource_c_issue756PgResource, Object.create(null))
-        });
-        args.apply(plan);
-        return plan;
-      },
-      args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createCIssue756_input_applyPlan
-        }
-      }
-    },
     createCLeftArm: {
       plan(_, args) {
         const plan = object({
@@ -40463,6 +40560,21 @@ export const plans = {
         input: {
           autoApplyAfterParentPlan: true,
           applyPlan: Mutation_createCLeftArm_input_applyPlan
+        }
+      }
+    },
+    createCIssue756: {
+      plan(_, args) {
+        const plan = object({
+          result: pgInsertSingle(resource_c_issue756PgResource, Object.create(null))
+        });
+        args.apply(plan);
+        return plan;
+      },
+      args: {
+        input: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Mutation_createCIssue756_input_applyPlan
         }
       }
     },
@@ -40753,22 +40865,6 @@ export const plans = {
         }
       }
     },
-    updateCIssue756ByRowId: {
-      plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(resource_c_issue756PgResource, {
-            id: args.get(['input', "rowId"])
-          })
-        });
-        args.apply(plan);
-        return plan;
-      },
-      args: {
-        input: {
-          applyPlan: Mutation_updateCIssue756ByRowId_input_applyPlan
-        }
-      }
-    },
     updateCLeftArmByRowId: {
       plan(_$root, args) {
         const plan = object({
@@ -40798,6 +40894,22 @@ export const plans = {
       args: {
         input: {
           applyPlan: Mutation_updateCLeftArmByPersonId_input_applyPlan
+        }
+      }
+    },
+    updateCIssue756ByRowId: {
+      plan(_$root, args) {
+        const plan = object({
+          result: pgUpdateSingle(resource_c_issue756PgResource, {
+            id: args.get(['input', "rowId"])
+          })
+        });
+        args.apply(plan);
+        return plan;
+      },
+      args: {
+        input: {
+          applyPlan: Mutation_updateCIssue756ByRowId_input_applyPlan
         }
       }
     },
@@ -41107,22 +41219,6 @@ export const plans = {
         }
       }
     },
-    deleteCIssue756ByRowId: {
-      plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(resource_c_issue756PgResource, {
-            id: args.get(['input', "rowId"])
-          })
-        });
-        args.apply(plan);
-        return plan;
-      },
-      args: {
-        input: {
-          applyPlan: Mutation_deleteCIssue756ByRowId_input_applyPlan
-        }
-      }
-    },
     deleteCLeftArmByRowId: {
       plan(_$root, args) {
         const plan = object({
@@ -41152,6 +41248,22 @@ export const plans = {
       args: {
         input: {
           applyPlan: Mutation_deleteCLeftArmByPersonId_input_applyPlan
+        }
+      }
+    },
+    deleteCIssue756ByRowId: {
+      plan(_$root, args) {
+        const plan = object({
+          result: pgDeleteSingle(resource_c_issue756PgResource, {
+            id: args.get(['input', "rowId"])
+          })
+        });
+        args.apply(plan);
+        return plan;
+      },
+      args: {
+        input: {
+          applyPlan: Mutation_deleteCIssue756ByRowId_input_applyPlan
         }
       }
     },
@@ -41747,65 +41859,6 @@ export const plans = {
     d: undefined,
     e: undefined
   },
-  CIssue756MutationPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId: CIssue756MutationPayload_clientMutationIdPlan,
-    result($object) {
-      return $object.get("result");
-    },
-    query: CIssue756MutationPayload_queryPlan,
-    cIssue756Edge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_c_issue756PgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("CIssue756OrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
-      }
-    }
-  },
-  CIssue756MutationInput: {
-    clientMutationId: {
-      applyPlan: CIssue756MutationInput_clientMutationId_applyPlan,
-      autoApplyAfterParentApplyPlan: true
-    }
-  },
-  CIssue756SetMutationPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId: CIssue756SetMutationPayload_clientMutationIdPlan,
-    result($object) {
-      return $object.get("result");
-    },
-    query: CIssue756SetMutationPayload_queryPlan
-  },
-  CIssue756SetMutationInput: {
-    clientMutationId: {
-      applyPlan: CIssue756SetMutationInput_clientMutationId_applyPlan,
-      autoApplyAfterParentApplyPlan: true
-    }
-  },
   BAuthenticateFailPayload: {
     __assertStep: ObjectStep,
     clientMutationId: BAuthenticateFailPayload_clientMutationIdPlan,
@@ -41872,7 +41925,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques22[0].attributes.reduce((memo, attributeName) => {
+            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -41928,6 +41981,65 @@ export const plans = {
         $insert.set("mood", val.get());
       },
       autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
+  CIssue756MutationPayload: {
+    __assertStep: ObjectStep,
+    clientMutationId: CIssue756MutationPayload_clientMutationIdPlan,
+    result($object) {
+      return $object.get("result");
+    },
+    query: CIssue756MutationPayload_queryPlan,
+    cIssue756Edge: {
+      plan($mutation, args, info) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = uniques23[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_c_issue756PgResource.find(spec);
+          }
+        })();
+        // Perform ordering
+        const $value = args.getRaw("orderBy");
+        applyOrderToPlan($select, $value, info.schema.getType("CIssue756OrderBy"));
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      args: {
+        orderBy: undefined
+      }
+    }
+  },
+  CIssue756MutationInput: {
+    clientMutationId: {
+      applyPlan: CIssue756MutationInput_clientMutationId_applyPlan,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
+  CIssue756SetMutationPayload: {
+    __assertStep: ObjectStep,
+    clientMutationId: CIssue756SetMutationPayload_clientMutationIdPlan,
+    result($object) {
+      return $object.get("result");
+    },
+    query: CIssue756SetMutationPayload_queryPlan
+  },
+  CIssue756SetMutationInput: {
+    clientMutationId: {
+      applyPlan: CIssue756SetMutationInput_clientMutationId_applyPlan,
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -42068,36 +42180,6 @@ export const plans = {
     },
     object: undefined
   },
-  MutationCompoundTypeArrayPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId: MutationCompoundTypeArrayPayload_clientMutationIdPlan,
-    result($object) {
-      return $object.get("result");
-    },
-    query: MutationCompoundTypeArrayPayload_queryPlan
-  },
-  MutationCompoundTypeArrayInput: {
-    clientMutationId: {
-      applyPlan: MutationCompoundTypeArrayInput_clientMutationId_applyPlan,
-      autoApplyAfterParentApplyPlan: true
-    },
-    object: undefined
-  },
-  BCompoundTypeArrayMutationPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId: BCompoundTypeArrayMutationPayload_clientMutationIdPlan,
-    result($object) {
-      return $object.get("result");
-    },
-    query: BCompoundTypeArrayMutationPayload_queryPlan
-  },
-  BCompoundTypeArrayMutationInput: {
-    clientMutationId: {
-      applyPlan: BCompoundTypeArrayMutationInput_clientMutationId_applyPlan,
-      autoApplyAfterParentApplyPlan: true
-    },
-    object: undefined
-  },
   CTableMutationPayload: {
     __assertStep: ObjectStep,
     clientMutationId: CTableMutationPayload_clientMutationIdPlan,
@@ -42115,7 +42197,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques26[0].attributes.reduce((memo, attributeName) => {
+            const spec = uniques25[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -42161,7 +42243,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques26[0].attributes.reduce((memo, attributeName) => {
+            const spec = uniques25[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -42250,6 +42332,36 @@ export const plans = {
       autoApplyAfterParentInputPlan: true,
       autoApplyAfterParentApplyPlan: true
     }
+  },
+  MutationCompoundTypeArrayPayload: {
+    __assertStep: ObjectStep,
+    clientMutationId: MutationCompoundTypeArrayPayload_clientMutationIdPlan,
+    result($object) {
+      return $object.get("result");
+    },
+    query: MutationCompoundTypeArrayPayload_queryPlan
+  },
+  MutationCompoundTypeArrayInput: {
+    clientMutationId: {
+      applyPlan: MutationCompoundTypeArrayInput_clientMutationId_applyPlan,
+      autoApplyAfterParentApplyPlan: true
+    },
+    object: undefined
+  },
+  BCompoundTypeArrayMutationPayload: {
+    __assertStep: ObjectStep,
+    clientMutationId: BCompoundTypeArrayMutationPayload_clientMutationIdPlan,
+    result($object) {
+      return $object.get("result");
+    },
+    query: BCompoundTypeArrayMutationPayload_queryPlan
+  },
+  BCompoundTypeArrayMutationInput: {
+    clientMutationId: {
+      applyPlan: BCompoundTypeArrayMutationInput_clientMutationId_applyPlan,
+      autoApplyAfterParentApplyPlan: true
+    },
+    object: undefined
   },
   PostManyPayload: {
     __assertStep: ObjectStep,
@@ -43560,69 +43672,6 @@ export const plans = {
       autoApplyAfterParentApplyPlan: true
     }
   },
-  CreateCIssue756Payload: {
-    __assertStep: assertExecutableStep,
-    clientMutationId: CreateCIssue756Payload_clientMutationIdPlan,
-    cIssue756: CreateCIssue756Payload_cIssue756Plan,
-    query: CreateCIssue756Payload_queryPlan,
-    cIssue756Edge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_c_issue756PgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("CIssue756OrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
-      }
-    }
-  },
-  CreateCIssue756Input: {
-    clientMutationId: {
-      applyPlan: CreateCIssue756Input_clientMutationId_applyPlan,
-      autoApplyAfterParentApplyPlan: true
-    },
-    cIssue756: {
-      applyPlan: CreateCIssue756Input_cIssue756_applyPlan,
-      autoApplyAfterParentApplyPlan: true
-    }
-  },
-  CIssue756Input: {
-    rowId: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    ts: {
-      applyPlan($insert, val) {
-        $insert.set("ts", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    }
-  },
   CreateCLeftArmPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId: CreateCLeftArmPayload_clientMutationIdPlan,
@@ -43638,7 +43687,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques22[0].attributes.reduce((memo, attributeName) => {
+            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -43700,6 +43749,69 @@ export const plans = {
       autoApplyAfterParentApplyPlan: true
     }
   },
+  CreateCIssue756Payload: {
+    __assertStep: assertExecutableStep,
+    clientMutationId: CreateCIssue756Payload_clientMutationIdPlan,
+    cIssue756: CreateCIssue756Payload_cIssue756Plan,
+    query: CreateCIssue756Payload_queryPlan,
+    cIssue756Edge: {
+      plan($mutation, args, info) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = uniques23[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_c_issue756PgResource.find(spec);
+          }
+        })();
+        // Perform ordering
+        const $value = args.getRaw("orderBy");
+        applyOrderToPlan($select, $value, info.schema.getType("CIssue756OrderBy"));
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      args: {
+        orderBy: undefined
+      }
+    }
+  },
+  CreateCIssue756Input: {
+    clientMutationId: {
+      applyPlan: CreateCIssue756Input_clientMutationId_applyPlan,
+      autoApplyAfterParentApplyPlan: true
+    },
+    cIssue756: {
+      applyPlan: CreateCIssue756Input_cIssue756_applyPlan,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
+  CIssue756Input: {
+    rowId: {
+      applyPlan($insert, val) {
+        $insert.set("id", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    ts: {
+      applyPlan($insert, val) {
+        $insert.set("ts", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
   CreatePostPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId: CreatePostPayload_clientMutationIdPlan,
@@ -43715,7 +43827,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques26[0].attributes.reduce((memo, attributeName) => {
+            const spec = uniques25[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -44255,6 +44367,20 @@ export const plans = {
     byteaArray: {
       applyPlan($insert, val) {
         $insert.set("bytea_array", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    ltree: {
+      applyPlan($insert, val) {
+        $insert.set("ltree", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    ltreeArray: {
+      applyPlan($insert, val) {
+        $insert.set("ltree_array", val.get());
       },
       autoApplyAfterParentInputPlan: true,
       autoApplyAfterParentApplyPlan: true
@@ -45198,68 +45324,6 @@ export const plans = {
       autoApplyAfterParentApplyPlan: true
     }
   },
-  UpdateCIssue756Payload: {
-    __assertStep: ObjectStep,
-    clientMutationId: UpdateCIssue756Payload_clientMutationIdPlan,
-    cIssue756: UpdateCIssue756Payload_cIssue756Plan,
-    query: UpdateCIssue756Payload_queryPlan,
-    cIssue756Edge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_c_issue756PgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("CIssue756OrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
-      }
-    }
-  },
-  UpdateCIssue756ByRowIdInput: {
-    clientMutationId: {
-      applyPlan: UpdateCIssue756ByRowIdInput_clientMutationId_applyPlan
-    },
-    rowId: undefined,
-    cIssue756Patch: {
-      applyPlan: UpdateCIssue756ByRowIdInput_cIssue756Patch_applyPlan
-    }
-  },
-  CIssue756Patch: {
-    rowId: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    ts: {
-      applyPlan($insert, val) {
-        $insert.set("ts", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    }
-  },
   UpdateCLeftArmPayload: {
     __assertStep: ObjectStep,
     clientMutationId: UpdateCLeftArmPayload_clientMutationIdPlan,
@@ -45275,7 +45339,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques22[0].attributes.reduce((memo, attributeName) => {
+            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -45345,6 +45409,68 @@ export const plans = {
       applyPlan: UpdateCLeftArmByPersonIdInput_cLeftArmPatch_applyPlan
     }
   },
+  UpdateCIssue756Payload: {
+    __assertStep: ObjectStep,
+    clientMutationId: UpdateCIssue756Payload_clientMutationIdPlan,
+    cIssue756: UpdateCIssue756Payload_cIssue756Plan,
+    query: UpdateCIssue756Payload_queryPlan,
+    cIssue756Edge: {
+      plan($mutation, args, info) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = uniques23[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_c_issue756PgResource.find(spec);
+          }
+        })();
+        // Perform ordering
+        const $value = args.getRaw("orderBy");
+        applyOrderToPlan($select, $value, info.schema.getType("CIssue756OrderBy"));
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      args: {
+        orderBy: undefined
+      }
+    }
+  },
+  UpdateCIssue756ByRowIdInput: {
+    clientMutationId: {
+      applyPlan: UpdateCIssue756ByRowIdInput_clientMutationId_applyPlan
+    },
+    rowId: undefined,
+    cIssue756Patch: {
+      applyPlan: UpdateCIssue756ByRowIdInput_cIssue756Patch_applyPlan
+    }
+  },
+  CIssue756Patch: {
+    rowId: {
+      applyPlan($insert, val) {
+        $insert.set("id", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    ts: {
+      applyPlan($insert, val) {
+        $insert.set("ts", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
   UpdatePostPayload: {
     __assertStep: ObjectStep,
     clientMutationId: UpdatePostPayload_clientMutationIdPlan,
@@ -45360,7 +45486,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques26[0].attributes.reduce((memo, attributeName) => {
+            const spec = uniques25[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -45941,6 +46067,20 @@ export const plans = {
     byteaArray: {
       applyPlan($insert, val) {
         $insert.set("bytea_array", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    ltree: {
+      applyPlan($insert, val) {
+        $insert.set("ltree", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    ltreeArray: {
+      applyPlan($insert, val) {
+        $insert.set("ltree_array", val.get());
       },
       autoApplyAfterParentInputPlan: true,
       autoApplyAfterParentApplyPlan: true
@@ -46531,49 +46671,6 @@ export const plans = {
     },
     rowId: undefined
   },
-  DeleteCIssue756Payload: {
-    __assertStep: ObjectStep,
-    clientMutationId: DeleteCIssue756Payload_clientMutationIdPlan,
-    cIssue756: DeleteCIssue756Payload_cIssue756Plan,
-    query: DeleteCIssue756Payload_queryPlan,
-    cIssue756Edge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return resource_c_issue756PgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("CIssue756OrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
-      }
-    }
-  },
-  DeleteCIssue756ByRowIdInput: {
-    clientMutationId: {
-      applyPlan: DeleteCIssue756ByRowIdInput_clientMutationId_applyPlan
-    },
-    rowId: undefined
-  },
   DeleteCLeftArmPayload: {
     __assertStep: ObjectStep,
     clientMutationId: DeleteCLeftArmPayload_clientMutationIdPlan,
@@ -46589,7 +46686,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques22[0].attributes.reduce((memo, attributeName) => {
+            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -46623,6 +46720,49 @@ export const plans = {
     },
     personId: undefined
   },
+  DeleteCIssue756Payload: {
+    __assertStep: ObjectStep,
+    clientMutationId: DeleteCIssue756Payload_clientMutationIdPlan,
+    cIssue756: DeleteCIssue756Payload_cIssue756Plan,
+    query: DeleteCIssue756Payload_queryPlan,
+    cIssue756Edge: {
+      plan($mutation, args, info) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = uniques23[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return resource_c_issue756PgResource.find(spec);
+          }
+        })();
+        // Perform ordering
+        const $value = args.getRaw("orderBy");
+        applyOrderToPlan($select, $value, info.schema.getType("CIssue756OrderBy"));
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      args: {
+        orderBy: undefined
+      }
+    }
+  },
+  DeleteCIssue756ByRowIdInput: {
+    clientMutationId: {
+      applyPlan: DeleteCIssue756ByRowIdInput_clientMutationId_applyPlan
+    },
+    rowId: undefined
+  },
   DeletePostPayload: {
     __assertStep: ObjectStep,
     clientMutationId: DeletePostPayload_clientMutationIdPlan,
@@ -46638,7 +46778,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques26[0].attributes.reduce((memo, attributeName) => {
+            const spec = uniques25[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));

@@ -3299,6 +3299,11 @@ A set of key/value pairs, keys are strings, values may be a string or null. Expo
 """
 scalar KeyValueHash
 
+"""
+Represents an `ltree` hierarchical label tree as outlined in https://www.postgresql.org/docs/current/ltree.html
+"""
+scalar LTree
+
 """Tracks metadata about the left arms of various people"""
 type LeftArm implements Node {
   id: Int!
@@ -8229,6 +8234,8 @@ type Type implements Node {
   intervalArray: [Interval]!
   json: JSON!
   jsonb: JSON!
+  ltree: LTree
+  ltreeArray: [LTree]
   macaddr: String
   money: Float!
   nestedCompoundType: NestedCompoundType!
@@ -8328,6 +8335,12 @@ input TypeCondition {
 
   """Checks for equality with the object’s `jsonb` field."""
   jsonb: JSON
+
+  """Checks for equality with the object’s `ltree` field."""
+  ltree: LTree
+
+  """Checks for equality with the object’s `ltreeArray` field."""
+  ltreeArray: [LTree]
 
   """Checks for equality with the object’s `macaddr` field."""
   macaddr: String
@@ -8518,6 +8531,8 @@ input TypeInput {
   intervalArray: [IntervalInput]!
   json: JSON!
   jsonb: JSON!
+  ltree: LTree
+  ltreeArray: [LTree]
   macaddr: String
   money: Float!
   nestedCompoundType: NestedCompoundTypeInput!
@@ -8569,6 +8584,8 @@ input TypePatch {
   intervalArray: [IntervalInput]
   json: JSON
   jsonb: JSON
+  ltree: LTree
+  ltreeArray: [LTree]
   macaddr: String
   money: Float
   nestedCompoundType: NestedCompoundTypeInput
@@ -8685,6 +8702,8 @@ enum TypesOrderBy {
   JSONB_DESC
   JSON_ASC
   JSON_DESC
+  LTREE_ASC
+  LTREE_DESC
   MACADDR_ASC
   MACADDR_DESC
   MONEY_ASC

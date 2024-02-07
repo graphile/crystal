@@ -100,7 +100,7 @@ const spec_employee = {
   attributes,
   description: undefined,
   extensions: {
-    oid: "1376545",
+    oid: "1468559",
     isTableLike: true,
     pg: {
       serviceName: "main",
