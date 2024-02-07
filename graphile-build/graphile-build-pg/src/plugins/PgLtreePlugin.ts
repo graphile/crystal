@@ -13,7 +13,6 @@ declare global {
   }
 }
 
-interface Cache {}
 interface State {
   ltreeCodec: PgCodec<string, any, any, any, undefined, any, any>;
   ltreeArrayCodec: PgCodec;
@@ -23,9 +22,8 @@ export const PgLtreePlugin: GraphileConfig.Plugin = {
   name: "PgLtreePlugin",
   version,
 
-  gather: gatherConfig<"pgLtree", State, Cache>({
-    namespace: "pgLtree",
-    initialState() {
+  gather: {
+    initialState(): State {
       const ltreeCodec: PgCodec<string, any, any, any, undefined, any, any> =
         EXPORTABLE(
           (sql) => ({
@@ -70,7 +68,7 @@ export const PgLtreePlugin: GraphileConfig.Plugin = {
         }
       },
     },
-  }),
+  },
   schema: {
     hooks: {
       init(_, build) {
