@@ -161,13 +161,6 @@ const config = {
             dropdownActiveClassDisabled: true,
           },
           {
-            type: "doc",
-            docId: "index",
-            docsPluginId: "examples",
-            position: "left",
-            label: "Example Gallery",
-          },
-          {
             href: "https://www.graphile.org/support/",
             label: "Support",
             position: "right",
