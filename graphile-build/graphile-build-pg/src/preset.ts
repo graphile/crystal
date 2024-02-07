@@ -21,6 +21,7 @@ import { PgIndexBehaviorsPlugin } from "./plugins/PgIndexBehaviorsPlugin.js";
 import { PgInterfaceModeUnionAllRowsPlugin } from "./plugins/PgInterfaceModeUnionAllRowsPlugin.js";
 import { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin.js";
 import { PgJWTPlugin } from "./plugins/PgJWTPlugin.js";
+import { PgLtreePlugin } from "./plugins/PgLtreePlugin.js";
 import { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin.js";
 import { PgMutationPayloadEdgePlugin } from "./plugins/PgMutationPayloadEdgePlugin.js";
 import { PgMutationUpdateDeletePlugin } from "./plugins/PgMutationUpdateDeletePlugin.js";
@@ -44,6 +45,7 @@ import { PgTypesPlugin } from "./plugins/PgTypesPlugin.js";
 export const defaultPreset: GraphileConfig.Preset = {
   plugins: [
     PgBasicsPlugin,
+    PgLtreePlugin,
     PgCodecsPlugin,
     PgContextPlugin,
     PgTypesPlugin,

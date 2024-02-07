@@ -16,6 +16,7 @@ export { PgFirstLastBeforeAfterArgsPlugin } from "./plugins/PgFirstLastBeforeAft
 export { PgInterfaceModeUnionAllRowsPlugin } from "./plugins/PgInterfaceModeUnionAllRowsPlugin.js";
 export { PgIntrospectionPlugin } from "./plugins/PgIntrospectionPlugin.js";
 export { PgJWTPlugin } from "./plugins/PgJWTPlugin.js";
+export { PgLtreePlugin } from "./plugins/PgLtreePlugin.js";
 export { PgMutationCreatePlugin } from "./plugins/PgMutationCreatePlugin.js";
 export { PgMutationPayloadEdgePlugin } from "./plugins/PgMutationPayloadEdgePlugin.js";
 export { PgMutationUpdateDeletePlugin } from "./plugins/PgMutationUpdateDeletePlugin.js";
