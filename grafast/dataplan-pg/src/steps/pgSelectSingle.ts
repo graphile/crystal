@@ -126,7 +126,8 @@ export class PgSelectSingleStep<
     return plan;
   }
 
-  private getItemStep(): ExecutableStep<unknown[]> {
+  /** @internal */
+  public getItemStep(): ExecutableStep<unknown[]> {
     const plan = this.getDep(this.itemStepId);
     return plan;
   }

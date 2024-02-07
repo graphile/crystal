@@ -40,6 +40,9 @@ export class __ItemStep<TData> extends UnbatchedExecutableStep<TData> {
     };
   }
 
+  getParentStep(): ExecutableStep {
+    return this.getDep(0);
+  }
   [$$deepDepSkip](): ExecutableStep {
     return this.getDep(0);
   }
