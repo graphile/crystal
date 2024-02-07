@@ -1854,14 +1854,63 @@ export async function exportSchemaAsString(
   return { code };
 }
 
-export async function exportSchema(
-  schema: GraphQLSchema,
+async function loadESLint() {
+  try {
+    return await import("eslint");
+  } catch (e) {
+    return null;
+  }
+}
+
+async function lint(code: string, rawFilePath: string | URL) {
+  const eslintModule = await loadESLint();
+  if (eslintModule == null) {
+    console.warn(
+      `graphile-export could not find 'eslint' so disabling additional checks`,
+    );
+    return;
+  }
+  const { ESLint } = eslintModule;
+  const eslint = new ESLint({
+    useEslintrc: false, // Don't use external config
+    reportUnusedDisableDirectives: "off",
+    allowInlineConfig: false, // Ignore `/* eslint-disable ... */` comments
+    overrideConfig: {
+      reportUnusedDisableDirectives: false,
+      parserOptions: {
+        ecmaVersion: 2020,
+        sourceType: "module",
+      },
+      rules: {
+        "no-use-before-define": "error",
+      },
+    },
+  });
+
+  const filePath =
+    typeof rawFilePath === "string" ? rawFilePath : rawFilePath.pathname;
+  const results = await eslint.lintText(code, { filePath });
+
+  if (results.length !== 1) {
+    throw new Error(`Expected ESLint results to have exactly one entry`);
+  }
+  const [result] = results;
+
+  if (result.errorCount > 0) {
+    console.log(
+      `ESLint found problems in the export; this likely indicates some issue with \`EXPORTABLE\` calls`,
+    );
+    const formatter = await eslint.loadFormatter("stylish");
+    const output = formatter.format(results);
+    console.log(output);
+  }
+}
+
+async function format(
+  toFormat: string,
   toPath: string | URL,
-  options: ExportOptions = {},
-): Promise<void> {
-  const { code } = await exportSchemaAsString(schema, options);
-  const HEADER = `/* eslint-disable graphile-export/export-instances, graphile-export/export-methods, graphile-export/exhaustive-deps */\n`;
-  const toFormat = HEADER + code;
+  options: ExportOptions,
+) {
   if (options.prettier) {
     const prettier = await import("prettier");
     const config = await prettier.resolveConfig(toPath.toString());
@@ -1869,8 +1918,22 @@ export async function exportSchema(
       parser: "babel",
       ...(config ?? {}),
     });
-    await writeFile(toPath, formatted);
+    return formatted;
   } else {
-    await writeFile(toPath, toFormat);
+    return toFormat;
   }
+}
+
+const HEADER = `/* eslint-disable graphile-export/export-instances, graphile-export/export-methods, graphile-export/exhaustive-deps */\n`;
+
+export async function exportSchema(
+  schema: GraphQLSchema,
+  toPath: string | URL,
+  options: ExportOptions = {},
+): Promise<void> {
+  const { code } = await exportSchemaAsString(schema, options);
+  const toFormat = HEADER + code;
+  const formatted = await format(toFormat, toPath, options);
+  await writeFile(toPath, formatted);
+  await lint(formatted, toPath);
 }
