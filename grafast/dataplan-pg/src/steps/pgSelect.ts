@@ -67,7 +67,6 @@ import { pgPageInfo } from "./pgPageInfo.js";
 import type { PgSelectSinglePlanOptions } from "./pgSelectSingle.js";
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
 import { pgValidateParsedCursor } from "./pgValidateParsedCursor.js";
-import { toPg } from "./toPg.js";
 
 export type PgSelectParsedCursorStep = LambdaStep<string, any[]>;
 
@@ -1099,7 +1098,7 @@ export class PgSelectStep<
         getFragmentAndCodecFromOrder(this.alias, order, this.resource.codec);
       const { nulls, direction } = order;
       const sqlValue = this.placeholder(
-        toPg(access($parsedCursorPlan, [i + 1]), orderCodec),
+        access($parsedCursorPlan, [i + 1]),
         orderCodec,
       );
 

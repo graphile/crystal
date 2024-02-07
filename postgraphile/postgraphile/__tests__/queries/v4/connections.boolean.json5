@@ -1,0 +1,40 @@
+{
+  page1: {
+    pageInfo: {
+      startCursor: "WyIzNjY0MzE3ZDgwIixmYWxzZSwyLDFd",
+      endCursor: "WyIzNjY0MzE3ZDgwIixmYWxzZSwyLDFd",
+      hasNextPage: true,
+      hasPreviousPage: false,
+    },
+    totalCount: 6,
+    edges: [
+      {
+        cursor: "WyIzNjY0MzE3ZDgwIixmYWxzZSwyLDFd",
+        node: {
+          extra: false,
+          personId1: 2,
+          personId2: 1,
+        },
+      },
+    ],
+  },
+  page2: {
+    pageInfo: {
+      startCursor: "WyIzNjY0MzE3ZDgwIixmYWxzZSw0LDRd",
+      endCursor: "WyIzNjY0MzE3ZDgwIixmYWxzZSw0LDRd",
+      hasNextPage: true,
+      hasPreviousPage: false,
+    },
+    totalCount: 6,
+    edges: [
+      {
+        cursor: "WyIzNjY0MzE3ZDgwIixmYWxzZSw0LDRd",
+        node: {
+          extra: false,
+          personId1: 4,
+          personId2: 4,
+        },
+      },
+    ],
+  },
+}
