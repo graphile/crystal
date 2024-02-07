@@ -77,6 +77,8 @@ mutation {
         ]
         bytea: "WlPqWn/q"
         byteaArray: ["AaBbCcDd", "AaBb"]
+        ltree: "Foo.Bar.Baz"
+        ltreeArray: ["Bar.Baz.Qux", "Bar.Foo.Fah"]
       }
     }
   ) {
@@ -132,6 +134,8 @@ mutation {
         regtype: "numeric"
         regconfig: "dutch"
         regdictionary: "dutch_stem"
+        ltree: "Foo.Bar.Baz"
+        ltreeArray: ["Bar.Baz.Qux", "Bar.Foo.Fah"]
       }
     }
   ) {
@@ -284,4 +288,6 @@ fragment type on Type {
     id
     headline
   }
+  ltree
+  ltreeArray
 }

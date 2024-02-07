@@ -148,6 +148,8 @@
           id: 11,
           headline: "They’re not aliens, they’re Earth…liens!",
         },
+        ltree: null,
+        ltreeArray: null,
       },
       {
         id: 12,
@@ -309,6 +311,11 @@
         ],
         postBySmallint: null,
         postById: null,
+        ltree: "Top.Child1.Child2",
+        ltreeArray: [
+          "Top.Child1.Child2",
+          "Top.Child3.Child4",
+        ],
       },
     ],
     edges: [
@@ -460,6 +467,8 @@
             id: 11,
             headline: "They’re not aliens, they’re Earth…liens!",
           },
+          ltree: null,
+          ltreeArray: null,
         },
       },
       {
@@ -623,6 +632,11 @@
           ],
           postBySmallint: null,
           postById: null,
+          ltree: "Top.Child1.Child2",
+          ltreeArray: [
+            "Top.Child1.Child2",
+            "Top.Child3.Child4",
+          ],
         },
       },
     ],
@@ -782,6 +796,8 @@
         id: 11,
         headline: "They’re not aliens, they’re Earth…liens!",
       },
+      ltree: null,
+      ltreeArray: null,
     },
     {
       id: 12,
@@ -943,6 +959,11 @@
       ],
       postBySmallint: null,
       postById: null,
+      ltree: "Top.Child1.Child2",
+      ltreeArray: [
+        "Top.Child1.Child2",
+        "Top.Child3.Child4",
+      ],
     },
   ],
   typeById: {
@@ -1092,6 +1113,8 @@
       id: 11,
       headline: "They’re not aliens, they’re Earth…liens!",
     },
+    ltree: null,
+    ltreeArray: null,
   },
   type: {
     id: 11,
@@ -1240,6 +1263,8 @@
       id: 11,
       headline: "They’re not aliens, they’re Earth…liens!",
     },
+    ltree: null,
+    ltreeArray: null,
   },
   node: {
     id: 11,
@@ -1388,6 +1413,8 @@
       id: 11,
       headline: "They’re not aliens, they’re Earth…liens!",
     },
+    ltree: null,
+    ltreeArray: null,
   },
   typeFunction: {
     id: 11,
@@ -1536,6 +1563,8 @@
       id: 11,
       headline: "They’re not aliens, they’re Earth…liens!",
     },
+    ltree: null,
+    ltreeArray: null,
   },
   typeFunctionList: [
     {
@@ -1685,6 +1714,8 @@
         id: 11,
         headline: "They’re not aliens, they’re Earth…liens!",
       },
+      ltree: null,
+      ltreeArray: null,
     },
     {
       id: 12,
@@ -1846,6 +1877,11 @@
       ],
       postBySmallint: null,
       postById: null,
+      ltree: "Top.Child1.Child2",
+      ltreeArray: [
+        "Top.Child1.Child2",
+        "Top.Child3.Child4",
+      ],
     },
   ],
   typeFunctionConnection: {
@@ -1997,6 +2033,8 @@
           id: 11,
           headline: "They’re not aliens, they’re Earth…liens!",
         },
+        ltree: null,
+        ltreeArray: null,
       },
       {
         id: 12,
@@ -2158,6 +2196,11 @@
         ],
         postBySmallint: null,
         postById: null,
+        ltree: "Top.Child1.Child2",
+        ltreeArray: [
+          "Top.Child1.Child2",
+          "Top.Child3.Child4",
+        ],
       },
     ],
     edges: [
@@ -2309,6 +2352,8 @@
             id: 11,
             headline: "They’re not aliens, they’re Earth…liens!",
           },
+          ltree: null,
+          ltreeArray: null,
         },
       },
       {
@@ -2472,6 +2517,11 @@
           ],
           postBySmallint: null,
           postById: null,
+          ltree: "Top.Child1.Child2",
+          ltreeArray: [
+            "Top.Child1.Child2",
+            "Top.Child3.Child4",
+          ],
         },
       },
     ],
@@ -2631,6 +2681,8 @@
         id: 11,
         headline: "They’re not aliens, they’re Earth…liens!",
       },
+      ltree: null,
+      ltreeArray: null,
     },
     typeFunctionList: [
       {
@@ -2780,6 +2832,8 @@
           id: 11,
           headline: "They’re not aliens, they’re Earth…liens!",
         },
+        ltree: null,
+        ltreeArray: null,
       },
       {
         id: 12,
@@ -2941,6 +2995,11 @@
         ],
         postBySmallint: null,
         postById: null,
+        ltree: "Top.Child1.Child2",
+        ltreeArray: [
+          "Top.Child1.Child2",
+          "Top.Child3.Child4",
+        ],
       },
     ],
     typeFunctionConnection: {
@@ -3092,6 +3151,8 @@
             id: 11,
             headline: "They’re not aliens, they’re Earth…liens!",
           },
+          ltree: null,
+          ltreeArray: null,
         },
         {
           id: 12,
@@ -3253,6 +3314,11 @@
           ],
           postBySmallint: null,
           postById: null,
+          ltree: "Top.Child1.Child2",
+          ltreeArray: [
+            "Top.Child1.Child2",
+            "Top.Child3.Child4",
+          ],
         },
       ],
       edges: [
@@ -3404,6 +3470,8 @@
               id: 11,
               headline: "They’re not aliens, they’re Earth…liens!",
             },
+            ltree: null,
+            ltreeArray: null,
           },
         },
         {
@@ -3567,6 +3635,11 @@
             ],
             postBySmallint: null,
             postById: null,
+            ltree: "Top.Child1.Child2",
+            ltreeArray: [
+              "Top.Child1.Child2",
+              "Top.Child3.Child4",
+            ],
           },
         },
       ],
@@ -3729,6 +3802,8 @@
         id: 11,
         headline: "They’re not aliens, they’re Earth…liens!",
       },
+      ltree: null,
+      ltreeArray: null,
     },
     typesBySmallint: {
       nodes: [],
