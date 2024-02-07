@@ -101,15 +101,6 @@ const config = {
         path: "./news",
       },
     ],
-    [
-      "@docusaurus/plugin-content-docs",
-      {
-        id: "examples",
-        path: "examples",
-        routeBasePath: "examples",
-        // ... other options
-      },
-    ],
   ],
 
   stylesheets: [
@@ -159,13 +150,6 @@ const config = {
             position: "left",
             // dropdownItemsAfter: [{ to: "/versions", label: "All versions" }],
             dropdownActiveClassDisabled: true,
-          },
-          {
-            type: "doc",
-            docId: "index",
-            docsPluginId: "examples",
-            position: "left",
-            label: "Example Gallery",
           },
           {
             href: "https://www.graphile.org/support/",
