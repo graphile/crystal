@@ -1,0 +1,37 @@
+## expect(errors).toBeFalsy();
+## expect(data.page1.pageInfo.endCursor).toEqual("WyIzNjY0MzE3ZDgwIixmYWxzZSwyLDFd")
+#> schema: ["a", "b", "c"]
+#> subscriptions: true
+query {
+  page1: allCompoundKeys(
+    orderBy: [EXTRA_ASC, PERSON_ID_1_ASC, PERSON_ID_2_ASC]
+    first: 1
+  ) {
+    ...compoundKeysConnection
+  }
+  page2: allCompoundKeys(
+    orderBy: [EXTRA_ASC, PERSON_ID_1_ASC, PERSON_ID_2_ASC]
+    first: 1
+    after: "WyIzNjY0MzE3ZDgwIixmYWxzZSwyLDFd"
+  ) {
+    ...compoundKeysConnection
+  }
+}
+
+fragment compoundKeysConnection on CompoundKeysConnection {
+  pageInfo {
+    startCursor
+    endCursor
+    hasNextPage
+    hasPreviousPage
+  }
+  totalCount
+  edges {
+    cursor
+    node {
+      extra
+      personId1
+      personId2
+    }
+  }
+}
