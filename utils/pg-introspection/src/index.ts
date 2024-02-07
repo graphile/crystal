@@ -33,6 +33,7 @@ import type {
   PgSmartTagsDict,
 } from "./smartComments.js";
 
+export { default as reservedWords } from "./reservedWords.js";
 export { parseSmartComment } from "./smartComments.js";
 
 export {
