@@ -13,7 +13,6 @@ const executor_mainPgExecutor = new PgExecutor({
   }
 });
 const extensions = {
-  oid: "1377058",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -74,7 +73,6 @@ const attributes2 = Object.assign(Object.create(null), {
   }
 });
 const extensions2 = {
-  oid: "1377073",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -118,7 +116,6 @@ const attributes3 = Object.assign(Object.create(null), {
   }
 });
 const extensions3 = {
-  oid: "1377088",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -162,7 +159,6 @@ const attributes4 = Object.assign(Object.create(null), {
   }
 });
 const extensions4 = {
-  oid: "1377103",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -206,7 +202,6 @@ const attributes_object_Object_ = Object.assign(Object.create(null), {
   }
 });
 const extensions5 = {
-  oid: "1376792",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -249,7 +244,6 @@ const attributes5 = Object.assign(Object.create(null), {
   }
 });
 const extensions6 = {
-  oid: "1376781",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -307,7 +301,6 @@ const attributes6 = Object.assign(Object.create(null), {
   }
 });
 const extensions7 = {
-  oid: "1376834",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -331,7 +324,6 @@ const spec_priorities = {
 };
 const registryConfig_pgCodecs_priorities_priorities = recordCodec(spec_priorities);
 const extensions8 = {
-  oid: "1376821",
   pg: {
     serviceName: "main",
     schemaName: "polymorphic",
@@ -479,7 +471,6 @@ const attributes7 = Object.assign(Object.create(null), {
   }
 });
 const extensions9 = {
-  oid: "1376979",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -521,7 +512,6 @@ const attributes8 = Object.assign(Object.create(null), {
   }
 });
 const extensions10 = {
-  oid: "1377146",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -672,7 +662,6 @@ const attributes9 = Object.assign(Object.create(null), {
   }
 });
 const extensions11 = {
-  oid: "1376937",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -714,7 +703,6 @@ const attributes10 = Object.assign(Object.create(null), {
   }
 });
 const extensions12 = {
-  oid: "1376898",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -874,7 +862,6 @@ const attributes11 = Object.assign(Object.create(null), {
   }
 });
 const extensions13 = {
-  oid: "1376991",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1035,7 +1022,6 @@ const attributes12 = Object.assign(Object.create(null), {
   }
 });
 const extensions14 = {
-  oid: "1376967",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1086,7 +1072,6 @@ const attributes13 = Object.assign(Object.create(null), {
   }
 });
 const extensions15 = {
-  oid: "1377126",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1136,7 +1121,6 @@ const attributes14 = Object.assign(Object.create(null), {
   }
 });
 const extensions16 = {
-  oid: "1376878",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1195,7 +1179,6 @@ const attributes15 = Object.assign(Object.create(null), {
   }
 });
 const extensions17 = {
-  oid: "1376803",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1380,7 +1363,6 @@ const attributes16 = Object.assign(Object.create(null), {
   }
 });
 const extensions18 = {
-  oid: "1376954",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1440,7 +1422,6 @@ const attributes_object_Object_2 = Object.assign(Object.create(null), {
   }
 });
 const extensions19 = {
-  oid: "1377044",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1527,7 +1508,6 @@ const attributes_object_Object_3 = Object.assign(Object.create(null), {
   }
 });
 const extensions20 = {
-  oid: "1377051",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1632,7 +1612,6 @@ const attributes_object_Object_4 = Object.assign(Object.create(null), {
   }
 });
 const extensions21 = {
-  oid: "1377007",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1737,7 +1716,6 @@ const attributes_object_Object_5 = Object.assign(Object.create(null), {
   }
 });
 const extensions22 = {
-  oid: "1377024",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1923,7 +1901,6 @@ const attributes17 = Object.assign(Object.create(null), {
   }
 });
 const extensions23 = {
-  oid: "1376843",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -2064,7 +2041,6 @@ const attributes18 = Object.assign(Object.create(null), {
   }
 });
 const extensions24 = {
-  oid: "1376916",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -2121,7 +2097,6 @@ const attributes_object_Object_6 = Object.assign(Object.create(null), {
   }
 });
 const extensions25 = {
-  oid: "1377004",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -2205,7 +2180,6 @@ const attributes_object_Object_7 = Object.assign(Object.create(null), {
   }
 });
 const extensions26 = {
-  oid: "1377041",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -2274,7 +2248,6 @@ const attributes_object_Object_8 = Object.assign(Object.create(null), {
   }
 });
 const extensions27 = {
-  oid: "1377122",
   isTableLike: false,
   pg: {
     serviceName: "main",

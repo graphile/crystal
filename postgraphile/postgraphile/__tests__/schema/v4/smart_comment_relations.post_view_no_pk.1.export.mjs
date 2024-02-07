@@ -66,7 +66,6 @@ const executor_mainPgExecutor = new PgExecutor({
   }
 });
 const extensions = {
-  oid: "1376504",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -110,7 +109,6 @@ const attributes2 = Object.assign(Object.create(null), {
   }
 });
 const extensions2 = {
-  oid: "1376525",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -155,7 +153,6 @@ const attributes3 = Object.assign(Object.create(null), {
   }
 });
 const extensions3 = {
-  oid: "1376512",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -200,7 +197,6 @@ const attributes4 = Object.assign(Object.create(null), {
   }
 });
 const extensions4 = {
-  oid: "1376529",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -245,7 +241,6 @@ const attributes_object_Object_ = Object.assign(Object.create(null), {
   }
 });
 const extensions5 = {
-  oid: "1376444",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -297,7 +292,6 @@ const attributes5 = Object.assign(Object.create(null), {
   }
 });
 const extensions6 = {
-  oid: "1376453",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -347,7 +341,6 @@ const attributes6 = Object.assign(Object.create(null), {
   }
 });
 const extensions7 = {
-  oid: "1376466",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -437,7 +430,6 @@ const attributes7 = Object.assign(Object.create(null), {
   }
 });
 const extensions8 = {
-  oid: "1376500",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -508,7 +500,6 @@ const attributes_object_Object_2 = Object.assign(Object.create(null), {
   }
 });
 const extensions9 = {
-  oid: "1376484",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -828,8 +819,8 @@ const registry = makeRegistry({
     houses: registryConfig_pgCodecs_houses_houses,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
-    buildings: registryConfig_pgCodecs_buildings_buildings,
-    bool: TYPES.boolean
+    bool: TYPES.boolean,
+    buildings: registryConfig_pgCodecs_buildings_buildings
   }),
   pgResources: Object.assign(Object.create(null), {
     post_table: registryConfig_pgResources_post_table_post_table,

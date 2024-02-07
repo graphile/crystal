@@ -25,6 +25,7 @@ cascade;
 drop extension if exists tablefunc;
 drop extension if exists intarray;
 drop extension if exists hstore;
+drop extension if exists ltree;
 
 create schema a;
 create schema b;
@@ -39,6 +40,7 @@ alter default privileges revoke execute on functions from public;
 create extension tablefunc with schema a;
 create extension hstore;
 create extension intarray;
+create extension ltree;
 
 comment on schema a is 'The a schema.';
 comment on schema b is 'qwerty';
@@ -306,7 +308,9 @@ create table b.types (
   "text_array_domain" c.text_array_domain,
   "int8_array_domain" c.int8_array_domain,
   "bytea" bytea,
-  "bytea_array" bytea[]
+  "bytea_array" bytea[],
+  "ltree" ltree,
+  "ltree_array" ltree[]
 );
 
 comment on table b.types is E'@foreignKey (smallint) references a.post\n@foreignKey (id) references a.post';

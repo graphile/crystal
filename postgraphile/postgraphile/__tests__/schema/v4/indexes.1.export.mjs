@@ -425,7 +425,6 @@ const sqlIdent = sql.identifier(...["b", "guid"]);
 const registryConfig_pgCodecs_guid_guid = domainOfCodec(TYPES.varchar, "guid", sqlIdent, {
   description: undefined,
   extensions: {
-    oid: "1375935",
     pg: {
       serviceName: "main",
       schemaName: "b",
@@ -436,7 +435,6 @@ const registryConfig_pgCodecs_guid_guid = domainOfCodec(TYPES.varchar, "guid", s
   notNull: false
 });
 const extensions2 = {
-  oid: "1187",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -451,7 +449,6 @@ const registryConfig_pgCodecs_intervalArray_intervalArray = listOfCodec(TYPES.in
   name: "intervalArray"
 });
 const extensions3 = {
-  oid: "1009",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -479,7 +476,6 @@ const attributes12 = Object.assign(Object.create(null), {
   }
 });
 const extensions4 = {
-  oid: "1376013",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -511,7 +507,6 @@ const attributes13 = Object.assign(Object.create(null), {
   }
 });
 const extensions5 = {
-  oid: "1376226",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -543,7 +538,6 @@ const attributes14 = Object.assign(Object.create(null), {
   }
 });
 const extensions6 = {
-  oid: "1376233",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -575,7 +569,6 @@ const attributes15 = Object.assign(Object.create(null), {
   }
 });
 const extensions7 = {
-  oid: "1376240",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -607,7 +600,6 @@ const attributes16 = Object.assign(Object.create(null), {
   }
 });
 const extensions8 = {
-  oid: "1376254",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -639,7 +631,6 @@ const attributes17 = Object.assign(Object.create(null), {
   }
 });
 const extensions9 = {
-  oid: "1376247",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -682,7 +673,6 @@ const attributes18 = Object.assign(Object.create(null), {
   }
 });
 const extensions10 = {
-  oid: "1376203",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -738,7 +728,6 @@ const attributes19 = Object.assign(Object.create(null), {
   }
 });
 const extensions11 = {
-  oid: "1376032",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -781,7 +770,6 @@ const attributes20 = Object.assign(Object.create(null), {
   }
 });
 const extensions12 = {
-  oid: "1375843",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -837,7 +825,6 @@ const attributes21 = Object.assign(Object.create(null), {
   }
 });
 const extensions13 = {
-  oid: "1376219",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -880,7 +867,6 @@ const attributes22 = Object.assign(Object.create(null), {
   }
 });
 const extensions14 = {
-  oid: "1376050",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -926,7 +912,6 @@ const attributes23 = Object.assign(Object.create(null), {
   }
 });
 const extensions15 = {
-  oid: "1376262",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -970,7 +955,6 @@ const attributes24 = Object.assign(Object.create(null), {
   }
 });
 const extensions16 = {
-  oid: "1375864",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1026,7 +1010,6 @@ const attributes25 = Object.assign(Object.create(null), {
   }
 });
 const extensions17 = {
-  oid: "1376213",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1080,7 +1063,6 @@ const attributes26 = Object.assign(Object.create(null), {
   }
 });
 const extensions18 = {
-  oid: "1376017",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1145,7 +1127,6 @@ const attributes27 = Object.assign(Object.create(null), {
   }
 });
 const extensions19 = {
-  oid: "1376189",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1210,7 +1191,6 @@ const attributes28 = Object.assign(Object.create(null), {
   }
 });
 const extensions20 = {
-  oid: "1376196",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1277,7 +1257,6 @@ const attributes_object_Object_ = Object.assign(Object.create(null), {
   }
 });
 const extensions21 = {
-  oid: "1376009",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1345,7 +1324,6 @@ const attributes29 = Object.assign(Object.create(null), {
   }
 });
 const extensions22 = {
-  oid: "1376280",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1366,7 +1344,6 @@ const spec_nullTestRecord = {
 };
 const registryConfig_pgCodecs_nullTestRecord_nullTestRecord = recordCodec(spec_nullTestRecord);
 const extensions23 = {
-  oid: "2951",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -1416,7 +1393,6 @@ const attributes30 = Object.assign(Object.create(null), {
   }
 });
 const extensions24 = {
-  oid: "1376065",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1436,66 +1412,7 @@ const spec_edgeCase = {
   executor: executor_mainPgExecutor
 };
 const registryConfig_pgCodecs_edgeCase_edgeCase = recordCodec(spec_edgeCase);
-const extensions25 = {
-  oid: "1376269",
-  pg: {
-    serviceName: "main",
-    schemaName: "c",
-    name: "not_null_timestamp"
-  },
-  tags: Object.create(null)
-};
-const parts22 = ["c", "not_null_timestamp"];
-const sqlIdent22 = sql.identifier(...parts22);
-const attributes_ts_codec_notNullTimestamp = domainOfCodec(TYPES.timestamptz, "notNullTimestamp", sqlIdent22, {
-  description: undefined,
-  extensions: extensions25,
-  notNull: true
-});
 const attributes31 = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  ts: {
-    description: undefined,
-    codec: attributes_ts_codec_notNullTimestamp,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {
-        behavior: ["-filterBy -orderBy"]
-      }
-    }
-  }
-});
-const extensions26 = {
-  oid: "1376273",
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "c",
-    name: "issue756"
-  },
-  tags: Object.create(null)
-};
-const parts23 = ["c", "issue756"];
-const sqlIdent23 = sql.identifier(...parts23);
-const spec_issue756 = {
-  name: "issue756",
-  identifier: sqlIdent23,
-  attributes: attributes31,
-  description: undefined,
-  extensions: extensions26,
-  executor: executor_mainPgExecutor
-};
-const registryConfig_pgCodecs_issue756_issue756 = recordCodec(spec_issue756);
-const attributes32 = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -1537,8 +1454,7 @@ const attributes32 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions27 = {
-  oid: "1375877",
+const extensions25 = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1547,18 +1463,18 @@ const extensions27 = {
   },
   tags: Object.create(null)
 };
-const parts24 = ["c", "left_arm"];
-const sqlIdent24 = sql.identifier(...parts24);
+const parts22 = ["c", "left_arm"];
+const sqlIdent22 = sql.identifier(...parts22);
 const spec_leftArm = {
   name: "leftArm",
-  identifier: sqlIdent24,
-  attributes: attributes32,
+  identifier: sqlIdent22,
+  attributes: attributes31,
   description: "Tracks metadata about the left arms of various people",
-  extensions: extensions27,
+  extensions: extensions25,
   executor: executor_mainPgExecutor
 };
 const registryConfig_pgCodecs_leftArm_leftArm = recordCodec(spec_leftArm);
-const attributes33 = Object.assign(Object.create(null), {
+const attributes32 = Object.assign(Object.create(null), {
   role: {
     description: undefined,
     codec: TYPES.text,
@@ -1615,8 +1531,7 @@ const attributes33 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions28 = {
-  oid: "1376178",
+const extensions26 = {
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -1625,17 +1540,74 @@ const extensions28 = {
   },
   tags: Object.create(null)
 };
-const parts25 = ["b", "jwt_token"];
-const sqlIdent25 = sql.identifier(...parts25);
+const parts23 = ["b", "jwt_token"];
+const sqlIdent23 = sql.identifier(...parts23);
 const spec_jwtToken = {
   name: "jwtToken",
+  identifier: sqlIdent23,
+  attributes: attributes32,
+  description: undefined,
+  extensions: extensions26,
+  executor: executor_mainPgExecutor
+};
+const registryConfig_pgCodecs_jwtToken_jwtToken = recordCodec(spec_jwtToken);
+const extensions27 = {
+  pg: {
+    serviceName: "main",
+    schemaName: "c",
+    name: "not_null_timestamp"
+  },
+  tags: Object.create(null)
+};
+const parts24 = ["c", "not_null_timestamp"];
+const sqlIdent24 = sql.identifier(...parts24);
+const attributes_ts_codec_notNullTimestamp = domainOfCodec(TYPES.timestamptz, "notNullTimestamp", sqlIdent24, {
+  description: undefined,
+  extensions: extensions27,
+  notNull: true
+});
+const attributes33 = Object.assign(Object.create(null), {
+  id: {
+    description: undefined,
+    codec: TYPES.int,
+    notNull: true,
+    hasDefault: true,
+    extensions: {
+      tags: {}
+    }
+  },
+  ts: {
+    description: undefined,
+    codec: attributes_ts_codec_notNullTimestamp,
+    notNull: true,
+    hasDefault: true,
+    extensions: {
+      tags: {
+        behavior: ["-filterBy -orderBy"]
+      }
+    }
+  }
+});
+const extensions28 = {
+  isTableLike: true,
+  pg: {
+    serviceName: "main",
+    schemaName: "c",
+    name: "issue756"
+  },
+  tags: Object.create(null)
+};
+const parts25 = ["c", "issue756"];
+const sqlIdent25 = sql.identifier(...parts25);
+const spec_issue756 = {
+  name: "issue756",
   identifier: sqlIdent25,
   attributes: attributes33,
   description: undefined,
   extensions: extensions28,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_jwtToken_jwtToken = recordCodec(spec_jwtToken);
+const registryConfig_pgCodecs_issue756_issue756 = recordCodec(spec_issue756);
 const attributes34 = Object.assign(Object.create(null), {
   jwt: {
     description: undefined,
@@ -1672,7 +1644,6 @@ const attributes34 = Object.assign(Object.create(null), {
   }
 });
 const extensions29 = {
-  oid: "1376184",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -1695,7 +1666,6 @@ const spec_authPayload = {
 };
 const registryConfig_pgCodecs_authPayload_authPayload = recordCodec(spec_authPayload);
 const extensions30 = {
-  oid: "1375966",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -1714,7 +1684,6 @@ const attributes_c_codec_color = enumCodec({
 });
 const enumLabels2 = ["FOO_BAR", "BAR_FOO", "BAZ_QUX", "0_BAR"];
 const extensions31 = {
-  oid: "1375974",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -1733,7 +1702,6 @@ const attributes_e_codec_enumCaps = enumCodec({
 });
 const enumLabels3 = ["", "one", "two"];
 const extensions32 = {
-  oid: "1375984",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -1841,7 +1809,6 @@ const attributes36 = Object.assign(Object.create(null), {
   }
 });
 const extensions33 = {
-  oid: "1375993",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -1924,7 +1891,6 @@ const registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCom
   isAnonymous: true
 });
 const extensions34 = {
-  oid: "1375894",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -1934,7 +1900,6 @@ const extensions34 = {
 };
 const enumLabels4 = ["awaiting", "rejected", "published", "*", "**", "***", "foo*", "foo*_", "_foo*", "*bar", "*bar_", "_*bar_", "*baz*", "_*baz*_", "%", ">=", "~~", "$"];
 const extensions35 = {
-  oid: "1375895",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -1958,7 +1923,6 @@ const attributes_enums_codec_anEnumArray = listOfCodec(innerCodec_anEnum, {
   name: "anEnumArray"
 });
 const extensions36 = {
-  oid: "1375932",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -1991,7 +1955,6 @@ const attributes40 = Object.assign(Object.create(null), {
   }
 });
 const extensions37 = {
-  oid: "1375933",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -2082,7 +2045,6 @@ const attributes39 = Object.assign(Object.create(null), {
   }
 });
 const extensions38 = {
-  oid: "1375941",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -2204,7 +2166,6 @@ const registryConfig_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOu
   isAnonymous: true
 });
 const extensions39 = {
-  oid: "1375839",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -2220,7 +2181,6 @@ const attributes_email_codec_email = domainOfCodec(TYPES.text, "email", sqlIdent
   notNull: false
 });
 const extensions40 = {
-  oid: "1375834",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -2249,7 +2209,6 @@ const attributes45 = Object.assign(Object.create(null), {
   }
 });
 const extensions41 = {
-  oid: "1375837",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -2391,7 +2350,6 @@ const attributes44 = Object.assign(Object.create(null), {
   }
 });
 const extensions42 = {
-  oid: "1375851",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -2638,7 +2596,6 @@ const registryConfig_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexR
   isAnonymous: true
 });
 const extensions43 = {
-  oid: "1375965",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -2653,7 +2610,6 @@ const attributes_enum_array_codec_colorArray = listOfCodec(attributes_c_codec_co
   name: "colorArray"
 });
 const extensions44 = {
-  oid: "1376071",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -2669,7 +2625,6 @@ const attributes_domain_codec_anInt = domainOfCodec(TYPES.int, "anInt", sqlIdent
   notNull: false
 });
 const extensions45 = {
-  oid: "1376073",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -2685,7 +2640,6 @@ const attributes_domain2_codec_anotherInt = domainOfCodec(attributes_domain_code
   notNull: false
 });
 const extensions46 = {
-  oid: "3906",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -2700,7 +2654,6 @@ const attributes_nullable_range_codec_numrange = rangeOfCodec(TYPES.numeric, "nu
   extensions: extensions46
 });
 const extensions47 = {
-  oid: "3912",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -2715,7 +2668,6 @@ const attributes_daterange_codec_daterange = rangeOfCodec(TYPES.date, "daterange
   extensions: extensions47
 });
 const extensions48 = {
-  oid: "1376077",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -2765,7 +2717,6 @@ const attributes52 = Object.assign(Object.create(null), {
   }
 });
 const extensions49 = {
-  oid: "1375996",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -2786,7 +2737,6 @@ const spec_nestedCompoundType = {
 };
 const attributes_nested_compound_type_codec_nestedCompoundType = recordCodec(spec_nestedCompoundType);
 const extensions50 = {
-  oid: "1376085",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -2802,7 +2752,6 @@ const attributes_text_array_domain_codec_textArrayDomain = domainOfCodec(registr
   notNull: false
 });
 const extensions51 = {
-  oid: "1376087",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -2811,7 +2760,6 @@ const extensions51 = {
   tags: Object.create(null)
 };
 const extensions52 = {
-  oid: "1016",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -2833,7 +2781,6 @@ const attributes_int8_array_domain_codec_int8ArrayDomain = domainOfCodec(innerCo
   notNull: false
 });
 const extensions53 = {
-  oid: "1001",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -2847,6 +2794,19 @@ const attributes_bytea_array_codec_byteaArray = listOfCodec(TYPES.bytea, {
   description: undefined,
   name: "byteaArray"
 });
+const attributes_ltree_codec_ltree = {
+  name: "ltree",
+  sqlType: sql`ltree`,
+  toPg(str) {
+    return str;
+  },
+  fromPg(str) {
+    return str;
+  },
+  executor: null,
+  attributes: undefined
+};
+const attributes_ltree_array_codec_ltree_ = listOfCodec(attributes_ltree_codec_ltree);
 const attributes51 = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -3362,10 +3322,31 @@ const attributes51 = Object.assign(Object.create(null), {
         behavior: ["-filterBy -orderBy"]
       }
     }
+  },
+  ltree: {
+    description: undefined,
+    codec: attributes_ltree_codec_ltree,
+    notNull: false,
+    hasDefault: false,
+    extensions: {
+      tags: {
+        behavior: ["-filterBy -orderBy"]
+      }
+    }
+  },
+  ltree_array: {
+    description: undefined,
+    codec: attributes_ltree_array_codec_ltree_,
+    notNull: false,
+    hasDefault: false,
+    extensions: {
+      tags: {
+        behavior: ["-filterBy -orderBy"]
+      }
+    }
   }
 });
 const extensions54 = {
-  oid: "1376091",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -3388,7 +3369,6 @@ const spec_types = {
 };
 const registryConfig_pgCodecs_types_types = recordCodec(spec_types);
 const extensions55 = {
-  oid: "1375992",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3397,7 +3377,6 @@ const extensions55 = {
   tags: Object.create(null)
 };
 const extensions56 = {
-  oid: "1376177",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -3406,7 +3385,6 @@ const extensions56 = {
   tags: Object.create(null)
 };
 const extensions57 = {
-  oid: "1376090",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -3415,7 +3393,6 @@ const extensions57 = {
   tags: Object.create(null)
 };
 const extensions58 = {
-  oid: "1007",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -3430,7 +3407,6 @@ const registryConfig_pgCodecs_int4Array_int4Array = listOfCodec(TYPES.int, {
   name: "int4Array"
 });
 const extensions59 = {
-  oid: "1376000",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3445,7 +3421,6 @@ const registryConfig_pgCodecs_floatrange_floatrange = rangeOfCodec(TYPES.float, 
   extensions: extensions59
 });
 const extensions60 = {
-  oid: "1375940",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3495,7 +3470,6 @@ const attributes53 = Object.assign(Object.create(null), {
   }
 });
 const extensions61 = {
-  oid: "1375567",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -3561,7 +3535,6 @@ const attributes54 = Object.assign(Object.create(null), {
   }
 });
 const extensions62 = {
-  oid: "1375570",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -3638,7 +3611,6 @@ const attributes55 = Object.assign(Object.create(null), {
   }
 });
 const extensions63 = {
-  oid: "1375573",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -5236,13 +5208,32 @@ const uniques19 = [{
     tags: Object.create(null)
   }
 }];
-const parts114 = ["c", "return_table_without_grants"];
+const extensions146 = {
+  pg: {
+    serviceName: "main",
+    schemaName: "c",
+    name: "edge_case_computed"
+  },
+  tags: {
+    behavior: ["-queryField -mutationField typeField", "-filter -order"]
+  }
+};
+const parts114 = ["c", "edge_case_computed"];
 const sqlIdent114 = sql.identifier(...parts114);
+const fromCallback64 = (...args) => sql`${sqlIdent114}(${sqlFromArgDigests(args)})`;
+const parameters64 = [{
+  name: "edge_case",
+  required: true,
+  notNull: false,
+  codec: registryConfig_pgCodecs_edgeCase_edgeCase
+}];
+const parts115 = ["c", "return_table_without_grants"];
+const sqlIdent115 = sql.identifier(...parts115);
 const options_return_table_without_grants = {
   name: "return_table_without_grants",
   identifier: "main.c.return_table_without_grants()",
   from(...args) {
-    return sql`${sqlIdent114}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent115}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -5260,7 +5251,7 @@ const options_return_table_without_grants = {
   },
   description: undefined
 };
-const extensions146 = {
+const extensions147 = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -5270,10 +5261,10 @@ const extensions146 = {
     behavior: ["-queryField mutationField -typeField", "-filter -order"]
   }
 };
-const parts115 = ["b", "list_bde_mutation"];
-const sqlIdent115 = sql.identifier(...parts115);
-const fromCallback64 = (...args) => sql`${sqlIdent115}(${sqlFromArgDigests(args)})`;
-const parameters64 = [{
+const parts116 = ["b", "list_bde_mutation"];
+const sqlIdent116 = sql.identifier(...parts116);
+const fromCallback65 = (...args) => sql`${sqlIdent116}(${sqlFromArgDigests(args)})`;
+const parameters65 = [{
   name: "b",
   required: true,
   notNull: false,
@@ -5289,25 +5280,6 @@ const parameters64 = [{
   notNull: false,
   codec: TYPES.text
 }];
-const extensions147 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "c",
-    name: "edge_case_computed"
-  },
-  tags: {
-    behavior: ["-queryField -mutationField typeField", "-filter -order"]
-  }
-};
-const parts116 = ["c", "edge_case_computed"];
-const sqlIdent116 = sql.identifier(...parts116);
-const fromCallback65 = (...args) => sql`${sqlIdent116}(${sqlFromArgDigests(args)})`;
-const parameters65 = [{
-  name: "edge_case",
-  required: true,
-  notNull: false,
-  codec: registryConfig_pgCodecs_edgeCase_edgeCase
-}];
 const extensions148 = {
   description: undefined,
   pg: {
@@ -5319,34 +5291,6 @@ const extensions148 = {
 };
 const uniques20 = [];
 const extensions149 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "c",
-    name: "issue756"
-  },
-  tags: {}
-};
-const uniques21 = [{
-  isPrimary: true,
-  attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: Object.create(null)
-  }
-}];
-const registryConfig_pgResources_issue756_issue756 = {
-  executor: executor_mainPgExecutor,
-  name: "issue756",
-  identifier: "main.c.issue756",
-  from: registryConfig_pgCodecs_issue756_issue756.sqlType,
-  codec: registryConfig_pgCodecs_issue756_issue756,
-  uniques: uniques21,
-  isVirtual: false,
-  description: undefined,
-  extensions: extensions149
-};
-const extensions150 = {
   description: "Tracks metadata about the left arms of various people",
   pg: {
     serviceName: "main",
@@ -5355,7 +5299,7 @@ const extensions150 = {
   },
   tags: {}
 };
-const uniques22 = [{
+const uniques21 = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -5376,66 +5320,18 @@ const registryConfig_pgResources_left_arm_left_arm = {
   identifier: "main.c.left_arm",
   from: registryConfig_pgCodecs_leftArm_leftArm.sqlType,
   codec: registryConfig_pgCodecs_leftArm_leftArm,
-  uniques: uniques22,
+  uniques: uniques21,
   isVirtual: false,
   description: "Tracks metadata about the left arms of various people",
-  extensions: extensions150
+  extensions: extensions149
 };
-const parts117 = ["c", "issue756_mutation"];
+const parts117 = ["b", "authenticate_fail"];
 const sqlIdent117 = sql.identifier(...parts117);
-const options_issue756_mutation = {
-  name: "issue756_mutation",
-  identifier: "main.c.issue756_mutation()",
-  from(...args) {
-    return sql`${sqlIdent117}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [],
-  returnsArray: false,
-  returnsSetof: false,
-  isMutation: true,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "c",
-      name: "issue756_mutation"
-    },
-    tags: {
-      behavior: ["-queryField mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const parts118 = ["c", "issue756_set_mutation"];
-const sqlIdent118 = sql.identifier(...parts118);
-const options_issue756_set_mutation = {
-  name: "issue756_set_mutation",
-  identifier: "main.c.issue756_set_mutation()",
-  from(...args) {
-    return sql`${sqlIdent118}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [],
-  returnsArray: false,
-  returnsSetof: true,
-  isMutation: true,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "c",
-      name: "issue756_set_mutation"
-    },
-    tags: {
-      behavior: ["-queryField mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const parts119 = ["b", "authenticate_fail"];
-const sqlIdent119 = sql.identifier(...parts119);
 const options_authenticate_fail = {
   name: "authenticate_fail",
   identifier: "main.b.authenticate_fail()",
   from(...args) {
-    return sql`${sqlIdent119}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent117}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -5453,7 +5349,7 @@ const options_authenticate_fail = {
   },
   description: undefined
 };
-const extensions151 = {
+const extensions150 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -5464,25 +5360,25 @@ const extensions151 = {
     behavior: ["-insert", "-update", "-delete"]
   }
 };
-const uniques23 = [];
+const uniques22 = [];
 const resourceConfig_jwt_token = {
   executor: executor_mainPgExecutor,
   name: "jwt_token",
   identifier: "main.b.jwt_token",
   from: registryConfig_pgCodecs_jwtToken_jwtToken.sqlType,
   codec: registryConfig_pgCodecs_jwtToken_jwtToken,
-  uniques: uniques23,
+  uniques: uniques22,
   isVirtual: true,
   description: undefined,
-  extensions: extensions151
+  extensions: extensions150
 };
-const parts120 = ["b", "authenticate"];
-const sqlIdent120 = sql.identifier(...parts120);
+const parts118 = ["b", "authenticate"];
+const sqlIdent118 = sql.identifier(...parts118);
 const options_authenticate = {
   name: "authenticate",
   identifier: "main.b.authenticate(int4,numeric,int8)",
   from(...args) {
-    return sql`${sqlIdent120}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent118}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "a",
@@ -5515,13 +5411,41 @@ const options_authenticate = {
   },
   description: undefined
 };
-const parts121 = ["c", "left_arm_identity"];
-const sqlIdent121 = sql.identifier(...parts121);
+const extensions151 = {
+  description: undefined,
+  pg: {
+    serviceName: "main",
+    schemaName: "c",
+    name: "issue756"
+  },
+  tags: {}
+};
+const uniques23 = [{
+  isPrimary: true,
+  attributes: ["id"],
+  description: undefined,
+  extensions: {
+    tags: Object.create(null)
+  }
+}];
+const registryConfig_pgResources_issue756_issue756 = {
+  executor: executor_mainPgExecutor,
+  name: "issue756",
+  identifier: "main.c.issue756",
+  from: registryConfig_pgCodecs_issue756_issue756.sqlType,
+  codec: registryConfig_pgCodecs_issue756_issue756,
+  uniques: uniques23,
+  isVirtual: false,
+  description: undefined,
+  extensions: extensions151
+};
+const parts119 = ["c", "left_arm_identity"];
+const sqlIdent119 = sql.identifier(...parts119);
 const options_left_arm_identity = {
   name: "left_arm_identity",
   identifier: "main.c.left_arm_identity(c.left_arm)",
   from(...args) {
-    return sql`${sqlIdent121}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent119}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "left_arm",
@@ -5544,6 +5468,54 @@ const options_left_arm_identity = {
     tags: {
       arg0variant: "base",
       resultFieldName: "leftArm",
+      behavior: ["-queryField mutationField -typeField", "-filter -order"]
+    }
+  },
+  description: undefined
+};
+const parts120 = ["c", "issue756_mutation"];
+const sqlIdent120 = sql.identifier(...parts120);
+const options_issue756_mutation = {
+  name: "issue756_mutation",
+  identifier: "main.c.issue756_mutation()",
+  from(...args) {
+    return sql`${sqlIdent120}(${sqlFromArgDigests(args)})`;
+  },
+  parameters: [],
+  returnsArray: false,
+  returnsSetof: false,
+  isMutation: true,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "c",
+      name: "issue756_mutation"
+    },
+    tags: {
+      behavior: ["-queryField mutationField -typeField", "-filter -order"]
+    }
+  },
+  description: undefined
+};
+const parts121 = ["c", "issue756_set_mutation"];
+const sqlIdent121 = sql.identifier(...parts121);
+const options_issue756_set_mutation = {
+  name: "issue756_set_mutation",
+  identifier: "main.c.issue756_set_mutation()",
+  from(...args) {
+    return sql`${sqlIdent121}(${sqlFromArgDigests(args)})`;
+  },
+  parameters: [],
+  returnsArray: false,
+  returnsSetof: true,
+  isMutation: true,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "c",
+      name: "issue756_set_mutation"
+    },
+    tags: {
       behavior: ["-queryField mutationField -typeField", "-filter -order"]
     }
   },
@@ -5761,44 +5733,6 @@ const parameters68 = [{
 const extensions156 = {
   pg: {
     serviceName: "main",
-    schemaName: "c",
-    name: "func_out_out_compound_type"
-  },
-  tags: {
-    behavior: ["queryField -mutationField -typeField", "-filter -order"]
-  }
-};
-const parts127 = ["c", "func_out_out_compound_type"];
-const sqlIdent127 = sql.identifier(...parts127);
-const fromCallback69 = (...args) => sql`${sqlIdent127}(${sqlFromArgDigests(args)})`;
-const parameters69 = [{
-  name: "i1",
-  required: true,
-  notNull: false,
-  codec: TYPES.int
-}];
-const extensions157 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "c",
-    name: "mutation_out_out_compound_type"
-  },
-  tags: {
-    behavior: ["-queryField mutationField -typeField", "-filter -order"]
-  }
-};
-const parts128 = ["c", "mutation_out_out_compound_type"];
-const sqlIdent128 = sql.identifier(...parts128);
-const fromCallback70 = (...args) => sql`${sqlIdent128}(${sqlFromArgDigests(args)})`;
-const parameters70 = [{
-  name: "i1",
-  required: true,
-  notNull: false,
-  codec: TYPES.int
-}];
-const extensions158 = {
-  pg: {
-    serviceName: "main",
     schemaName: "a",
     name: "post_computed_interval_set"
   },
@@ -5806,7 +5740,45 @@ const extensions158 = {
     behavior: ["-queryField -mutationField typeField", "-filter -order"]
   }
 };
-const parts129 = ["a", "post_computed_interval_set"];
+const parts127 = ["a", "post_computed_interval_set"];
+const sqlIdent127 = sql.identifier(...parts127);
+const fromCallback69 = (...args) => sql`${sqlIdent127}(${sqlFromArgDigests(args)})`;
+const parameters69 = [{
+  name: "post",
+  required: true,
+  notNull: false,
+  codec: attributes_post_codec_post
+}];
+const extensions157 = {
+  pg: {
+    serviceName: "main",
+    schemaName: "a",
+    name: "post_computed_interval_array"
+  },
+  tags: {
+    behavior: ["-queryField -mutationField typeField", "-filter -order"]
+  }
+};
+const parts128 = ["a", "post_computed_interval_array"];
+const sqlIdent128 = sql.identifier(...parts128);
+const fromCallback70 = (...args) => sql`${sqlIdent128}(${sqlFromArgDigests(args)})`;
+const parameters70 = [{
+  name: "post",
+  required: true,
+  notNull: false,
+  codec: attributes_post_codec_post
+}];
+const extensions158 = {
+  pg: {
+    serviceName: "main",
+    schemaName: "a",
+    name: "post_computed_text_array"
+  },
+  tags: {
+    behavior: ["-queryField -mutationField typeField", "-filter -order"]
+  }
+};
+const parts129 = ["a", "post_computed_text_array"];
 const sqlIdent129 = sql.identifier(...parts129);
 const fromCallback71 = (...args) => sql`${sqlIdent129}(${sqlFromArgDigests(args)})`;
 const parameters71 = [{
@@ -5819,44 +5791,6 @@ const extensions159 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
-    name: "post_computed_interval_array"
-  },
-  tags: {
-    behavior: ["-queryField -mutationField typeField", "-filter -order"]
-  }
-};
-const parts130 = ["a", "post_computed_interval_array"];
-const sqlIdent130 = sql.identifier(...parts130);
-const fromCallback72 = (...args) => sql`${sqlIdent130}(${sqlFromArgDigests(args)})`;
-const parameters72 = [{
-  name: "post",
-  required: true,
-  notNull: false,
-  codec: attributes_post_codec_post
-}];
-const extensions160 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "a",
-    name: "post_computed_text_array"
-  },
-  tags: {
-    behavior: ["-queryField -mutationField typeField", "-filter -order"]
-  }
-};
-const parts131 = ["a", "post_computed_text_array"];
-const sqlIdent131 = sql.identifier(...parts131);
-const fromCallback73 = (...args) => sql`${sqlIdent131}(${sqlFromArgDigests(args)})`;
-const parameters73 = [{
-  name: "post",
-  required: true,
-  notNull: false,
-  codec: attributes_post_codec_post
-}];
-const extensions161 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "a",
     name: "post_computed_with_optional_arg"
   },
   tags: {
@@ -5865,10 +5799,10 @@ const extensions161 = {
     behavior: ["-queryField -mutationField typeField", "-filter -order", "filter filterBy", "orderBy order"]
   }
 };
-const parts132 = ["a", "post_computed_with_optional_arg"];
-const sqlIdent132 = sql.identifier(...parts132);
-const fromCallback74 = (...args) => sql`${sqlIdent132}(${sqlFromArgDigests(args)})`;
-const parameters74 = [{
+const parts130 = ["a", "post_computed_with_optional_arg"];
+const sqlIdent130 = sql.identifier(...parts130);
+const fromCallback72 = (...args) => sql`${sqlIdent130}(${sqlFromArgDigests(args)})`;
+const parameters72 = [{
   name: "post",
   required: true,
   notNull: true,
@@ -5879,7 +5813,7 @@ const parameters74 = [{
   notNull: true,
   codec: TYPES.int
 }];
-const extensions162 = {
+const extensions160 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -5891,10 +5825,10 @@ const extensions162 = {
     behavior: ["-queryField -mutationField typeField", "-filter -order", "filter filterBy", "orderBy order"]
   }
 };
-const parts133 = ["a", "post_computed_with_required_arg"];
-const sqlIdent133 = sql.identifier(...parts133);
-const fromCallback75 = (...args) => sql`${sqlIdent133}(${sqlFromArgDigests(args)})`;
-const parameters75 = [{
+const parts131 = ["a", "post_computed_with_required_arg"];
+const sqlIdent131 = sql.identifier(...parts131);
+const fromCallback73 = (...args) => sql`${sqlIdent131}(${sqlFromArgDigests(args)})`;
+const parameters73 = [{
   name: "post",
   required: true,
   notNull: true,
@@ -5903,6 +5837,44 @@ const parameters75 = [{
   name: "i",
   required: true,
   notNull: true,
+  codec: TYPES.int
+}];
+const extensions161 = {
+  pg: {
+    serviceName: "main",
+    schemaName: "c",
+    name: "func_out_out_compound_type"
+  },
+  tags: {
+    behavior: ["queryField -mutationField -typeField", "-filter -order"]
+  }
+};
+const parts132 = ["c", "func_out_out_compound_type"];
+const sqlIdent132 = sql.identifier(...parts132);
+const fromCallback74 = (...args) => sql`${sqlIdent132}(${sqlFromArgDigests(args)})`;
+const parameters74 = [{
+  name: "i1",
+  required: true,
+  notNull: false,
+  codec: TYPES.int
+}];
+const extensions162 = {
+  pg: {
+    serviceName: "main",
+    schemaName: "c",
+    name: "mutation_out_out_compound_type"
+  },
+  tags: {
+    behavior: ["-queryField mutationField -typeField", "-filter -order"]
+  }
+};
+const parts133 = ["c", "mutation_out_out_compound_type"];
+const sqlIdent133 = sql.identifier(...parts133);
+const fromCallback75 = (...args) => sql`${sqlIdent133}(${sqlFromArgDigests(args)})`;
+const parameters75 = [{
+  name: "i1",
+  required: true,
+  notNull: false,
   codec: TYPES.int
 }];
 const extensions163 = {
@@ -5992,13 +5964,70 @@ const parameters78 = [{
   notNull: true,
   codec: TYPES.text
 }];
-const parts137 = ["c", "compound_type_set_query"];
+const extensions166 = {
+  pg: {
+    serviceName: "main",
+    schemaName: "c",
+    name: "query_output_two_rows"
+  },
+  tags: {
+    behavior: ["queryField -mutationField -typeField", "-filter -order"]
+  }
+};
+const parts137 = ["c", "query_output_two_rows"];
 const sqlIdent137 = sql.identifier(...parts137);
+const fromCallback79 = (...args) => sql`${sqlIdent137}(${sqlFromArgDigests(args)})`;
+const parameters79 = [{
+  name: "left_arm_id",
+  required: true,
+  notNull: false,
+  codec: TYPES.int
+}, {
+  name: "post_id",
+  required: true,
+  notNull: false,
+  codec: TYPES.int
+}, {
+  name: "txt",
+  required: true,
+  notNull: false,
+  codec: TYPES.text
+}];
+const extensions167 = {
+  description: undefined,
+  pg: {
+    serviceName: "main",
+    schemaName: "a",
+    name: "post"
+  },
+  tags: {}
+};
+const uniques25 = [{
+  isPrimary: true,
+  attributes: ["id"],
+  description: undefined,
+  extensions: {
+    tags: Object.create(null)
+  }
+}];
+const registryConfig_pgResources_post_post = {
+  executor: executor_mainPgExecutor,
+  name: "post",
+  identifier: "main.a.post",
+  from: attributes_post_codec_post.sqlType,
+  codec: attributes_post_codec_post,
+  uniques: uniques25,
+  isVirtual: false,
+  description: undefined,
+  extensions: extensions167
+};
+const parts138 = ["c", "compound_type_set_query"];
+const sqlIdent138 = sql.identifier(...parts138);
 const options_compound_type_set_query = {
   name: "compound_type_set_query",
   identifier: "main.c.compound_type_set_query()",
   from(...args) {
-    return sql`${sqlIdent137}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent138}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -6016,7 +6045,7 @@ const options_compound_type_set_query = {
   },
   description: undefined
 };
-const extensions166 = {
+const extensions168 = {
   description: "Awesome feature!",
   pg: {
     serviceName: "main",
@@ -6027,25 +6056,25 @@ const extensions166 = {
     behavior: ["-insert", "-update", "-delete"]
   }
 };
-const uniques25 = [];
+const uniques26 = [];
 const resourceConfig_compound_type = {
   executor: executor_mainPgExecutor,
   name: "compound_type",
   identifier: "main.c.compound_type",
   from: attributes_o2_codec_compoundType.sqlType,
   codec: attributes_o2_codec_compoundType,
-  uniques: uniques25,
+  uniques: uniques26,
   isVirtual: true,
   description: "Awesome feature!",
-  extensions: extensions166
+  extensions: extensions168
 };
-const parts138 = ["b", "compound_type_mutation"];
-const sqlIdent138 = sql.identifier(...parts138);
+const parts139 = ["b", "compound_type_mutation"];
+const sqlIdent139 = sql.identifier(...parts139);
 const options_compound_type_mutation = {
   name: "compound_type_mutation",
   identifier: "main.b.compound_type_mutation(c.compound_type)",
   from(...args) {
-    return sql`${sqlIdent138}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent139}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "object",
@@ -6068,13 +6097,13 @@ const options_compound_type_mutation = {
   },
   description: undefined
 };
-const parts139 = ["b", "compound_type_query"];
-const sqlIdent139 = sql.identifier(...parts139);
+const parts140 = ["b", "compound_type_query"];
+const sqlIdent140 = sql.identifier(...parts140);
 const options_compound_type_query = {
   name: "compound_type_query",
   identifier: "main.b.compound_type_query(c.compound_type)",
   from(...args) {
-    return sql`${sqlIdent139}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent140}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "object",
@@ -6097,13 +6126,13 @@ const options_compound_type_query = {
   },
   description: undefined
 };
-const parts140 = ["b", "compound_type_set_mutation"];
-const sqlIdent140 = sql.identifier(...parts140);
+const parts141 = ["b", "compound_type_set_mutation"];
+const sqlIdent141 = sql.identifier(...parts141);
 const options_compound_type_set_mutation = {
   name: "compound_type_set_mutation",
   identifier: "main.b.compound_type_set_mutation(c.compound_type)",
   from(...args) {
-    return sql`${sqlIdent140}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent141}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "object",
@@ -6126,220 +6155,13 @@ const options_compound_type_set_mutation = {
   },
   description: undefined
 };
-const extensions167 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "c",
-    name: "query_output_two_rows"
-  },
-  tags: {
-    behavior: ["queryField -mutationField -typeField", "-filter -order"]
-  }
-};
-const parts141 = ["c", "query_output_two_rows"];
-const sqlIdent141 = sql.identifier(...parts141);
-const fromCallback79 = (...args) => sql`${sqlIdent141}(${sqlFromArgDigests(args)})`;
-const parameters79 = [{
-  name: "left_arm_id",
-  required: true,
-  notNull: false,
-  codec: TYPES.int
-}, {
-  name: "post_id",
-  required: true,
-  notNull: false,
-  codec: TYPES.int
-}, {
-  name: "txt",
-  required: true,
-  notNull: false,
-  codec: TYPES.text
-}];
-const parts142 = ["a", "mutation_compound_type_array"];
+const parts142 = ["c", "table_mutation"];
 const sqlIdent142 = sql.identifier(...parts142);
-const options_mutation_compound_type_array = {
-  name: "mutation_compound_type_array",
-  identifier: "main.a.mutation_compound_type_array(c.compound_type)",
-  from(...args) {
-    return sql`${sqlIdent142}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "object",
-    required: true,
-    notNull: false,
-    codec: attributes_o2_codec_compoundType
-  }],
-  returnsArray: true,
-  returnsSetof: false,
-  isMutation: true,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "a",
-      name: "mutation_compound_type_array"
-    },
-    tags: {
-      behavior: ["-queryField mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const parts143 = ["a", "query_compound_type_array"];
-const sqlIdent143 = sql.identifier(...parts143);
-const options_query_compound_type_array = {
-  name: "query_compound_type_array",
-  identifier: "main.a.query_compound_type_array(c.compound_type)",
-  from(...args) {
-    return sql`${sqlIdent143}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "object",
-    required: true,
-    notNull: false,
-    codec: attributes_o2_codec_compoundType
-  }],
-  returnsArray: true,
-  returnsSetof: false,
-  isMutation: false,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "a",
-      name: "query_compound_type_array"
-    },
-    tags: {
-      behavior: ["queryField -mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const parts144 = ["b", "compound_type_array_mutation"];
-const sqlIdent144 = sql.identifier(...parts144);
-const options_compound_type_array_mutation = {
-  name: "compound_type_array_mutation",
-  identifier: "main.b.compound_type_array_mutation(c.compound_type)",
-  from(...args) {
-    return sql`${sqlIdent144}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "object",
-    required: true,
-    notNull: false,
-    codec: attributes_o2_codec_compoundType
-  }],
-  returnsArray: true,
-  returnsSetof: false,
-  isMutation: true,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "compound_type_array_mutation"
-    },
-    tags: {
-      behavior: ["-queryField mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const parts145 = ["b", "compound_type_array_query"];
-const sqlIdent145 = sql.identifier(...parts145);
-const options_compound_type_array_query = {
-  name: "compound_type_array_query",
-  identifier: "main.b.compound_type_array_query(c.compound_type)",
-  from(...args) {
-    return sql`${sqlIdent145}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "object",
-    required: true,
-    notNull: false,
-    codec: attributes_o2_codec_compoundType
-  }],
-  returnsArray: true,
-  returnsSetof: false,
-  isMutation: false,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "compound_type_array_query"
-    },
-    tags: {
-      behavior: ["queryField -mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const extensions168 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "a",
-    name: "post"
-  },
-  tags: {}
-};
-const uniques26 = [{
-  isPrimary: true,
-  attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: Object.create(null)
-  }
-}];
-const registryConfig_pgResources_post_post = {
-  executor: executor_mainPgExecutor,
-  name: "post",
-  identifier: "main.a.post",
-  from: attributes_post_codec_post.sqlType,
-  codec: attributes_post_codec_post,
-  uniques: uniques26,
-  isVirtual: false,
-  description: undefined,
-  extensions: extensions168
-};
-const parts146 = ["a", "post_computed_compound_type_array"];
-const sqlIdent146 = sql.identifier(...parts146);
-const options_post_computed_compound_type_array = {
-  name: "post_computed_compound_type_array",
-  identifier: "main.a.post_computed_compound_type_array(a.post,c.compound_type)",
-  from(...args) {
-    return sql`${sqlIdent146}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "post",
-    required: true,
-    notNull: false,
-    codec: attributes_post_codec_post
-  }, {
-    name: "object",
-    required: true,
-    notNull: false,
-    codec: attributes_o2_codec_compoundType
-  }],
-  returnsArray: true,
-  returnsSetof: false,
-  isMutation: false,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "a",
-      name: "post_computed_compound_type_array"
-    },
-    tags: {
-      behavior: ["-queryField -mutationField typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const parts147 = ["c", "table_mutation"];
-const sqlIdent147 = sql.identifier(...parts147);
 const options_table_mutation = {
   name: "table_mutation",
   identifier: "main.c.table_mutation(int4)",
   from(...args) {
-    return sql`${sqlIdent147}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent142}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "id",
@@ -6362,13 +6184,13 @@ const options_table_mutation = {
   },
   description: undefined
 };
-const parts148 = ["c", "table_query"];
-const sqlIdent148 = sql.identifier(...parts148);
+const parts143 = ["c", "table_query"];
+const sqlIdent143 = sql.identifier(...parts143);
 const options_table_query = {
   name: "table_query",
   identifier: "main.c.table_query(int4)",
   from(...args) {
-    return sql`${sqlIdent148}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent143}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "id",
@@ -6391,13 +6213,13 @@ const options_table_query = {
   },
   description: undefined
 };
-const parts149 = ["a", "post_with_suffix"];
-const sqlIdent149 = sql.identifier(...parts149);
+const parts144 = ["a", "post_with_suffix"];
+const sqlIdent144 = sql.identifier(...parts144);
 const options_post_with_suffix = {
   name: "post_with_suffix",
   identifier: "main.a.post_with_suffix(a.post,text)",
   from(...args) {
-    return sql`${sqlIdent149}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent144}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "post",
@@ -6422,6 +6244,156 @@ const options_post_with_suffix = {
     tags: {
       deprecated: "This is deprecated (comment on function a.post_with_suffix).",
       behavior: ["-queryField mutationField -typeField", "-filter -order"]
+    }
+  },
+  description: undefined
+};
+const parts145 = ["a", "mutation_compound_type_array"];
+const sqlIdent145 = sql.identifier(...parts145);
+const options_mutation_compound_type_array = {
+  name: "mutation_compound_type_array",
+  identifier: "main.a.mutation_compound_type_array(c.compound_type)",
+  from(...args) {
+    return sql`${sqlIdent145}(${sqlFromArgDigests(args)})`;
+  },
+  parameters: [{
+    name: "object",
+    required: true,
+    notNull: false,
+    codec: attributes_o2_codec_compoundType
+  }],
+  returnsArray: true,
+  returnsSetof: false,
+  isMutation: true,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "a",
+      name: "mutation_compound_type_array"
+    },
+    tags: {
+      behavior: ["-queryField mutationField -typeField", "-filter -order"]
+    }
+  },
+  description: undefined
+};
+const parts146 = ["a", "query_compound_type_array"];
+const sqlIdent146 = sql.identifier(...parts146);
+const options_query_compound_type_array = {
+  name: "query_compound_type_array",
+  identifier: "main.a.query_compound_type_array(c.compound_type)",
+  from(...args) {
+    return sql`${sqlIdent146}(${sqlFromArgDigests(args)})`;
+  },
+  parameters: [{
+    name: "object",
+    required: true,
+    notNull: false,
+    codec: attributes_o2_codec_compoundType
+  }],
+  returnsArray: true,
+  returnsSetof: false,
+  isMutation: false,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "a",
+      name: "query_compound_type_array"
+    },
+    tags: {
+      behavior: ["queryField -mutationField -typeField", "-filter -order"]
+    }
+  },
+  description: undefined
+};
+const parts147 = ["b", "compound_type_array_mutation"];
+const sqlIdent147 = sql.identifier(...parts147);
+const options_compound_type_array_mutation = {
+  name: "compound_type_array_mutation",
+  identifier: "main.b.compound_type_array_mutation(c.compound_type)",
+  from(...args) {
+    return sql`${sqlIdent147}(${sqlFromArgDigests(args)})`;
+  },
+  parameters: [{
+    name: "object",
+    required: true,
+    notNull: false,
+    codec: attributes_o2_codec_compoundType
+  }],
+  returnsArray: true,
+  returnsSetof: false,
+  isMutation: true,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "compound_type_array_mutation"
+    },
+    tags: {
+      behavior: ["-queryField mutationField -typeField", "-filter -order"]
+    }
+  },
+  description: undefined
+};
+const parts148 = ["b", "compound_type_array_query"];
+const sqlIdent148 = sql.identifier(...parts148);
+const options_compound_type_array_query = {
+  name: "compound_type_array_query",
+  identifier: "main.b.compound_type_array_query(c.compound_type)",
+  from(...args) {
+    return sql`${sqlIdent148}(${sqlFromArgDigests(args)})`;
+  },
+  parameters: [{
+    name: "object",
+    required: true,
+    notNull: false,
+    codec: attributes_o2_codec_compoundType
+  }],
+  returnsArray: true,
+  returnsSetof: false,
+  isMutation: false,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "compound_type_array_query"
+    },
+    tags: {
+      behavior: ["queryField -mutationField -typeField", "-filter -order"]
+    }
+  },
+  description: undefined
+};
+const parts149 = ["a", "post_computed_compound_type_array"];
+const sqlIdent149 = sql.identifier(...parts149);
+const options_post_computed_compound_type_array = {
+  name: "post_computed_compound_type_array",
+  identifier: "main.a.post_computed_compound_type_array(a.post,c.compound_type)",
+  from(...args) {
+    return sql`${sqlIdent149}(${sqlFromArgDigests(args)})`;
+  },
+  parameters: [{
+    name: "post",
+    required: true,
+    notNull: false,
+    codec: attributes_post_codec_post
+  }, {
+    name: "object",
+    required: true,
+    notNull: false,
+    codec: attributes_o2_codec_compoundType
+  }],
+  returnsArray: true,
+  returnsSetof: false,
+  isMutation: false,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "a",
+      name: "post_computed_compound_type_array"
+    },
+    tags: {
+      behavior: ["-queryField -mutationField typeField", "-filter -order"]
     }
   },
   description: undefined
@@ -7378,13 +7350,13 @@ const registry = makeRegistry({
     uuid: TYPES.uuid,
     edgeCase: registryConfig_pgCodecs_edgeCase_edgeCase,
     int2: TYPES.int2,
-    issue756: registryConfig_pgCodecs_issue756_issue756,
-    notNullTimestamp: attributes_ts_codec_notNullTimestamp,
-    timestamptz: TYPES.timestamptz,
     leftArm: registryConfig_pgCodecs_leftArm_leftArm,
     float8: TYPES.float,
     jwtToken: registryConfig_pgCodecs_jwtToken_jwtToken,
     numeric: TYPES.numeric,
+    issue756: registryConfig_pgCodecs_issue756_issue756,
+    notNullTimestamp: attributes_ts_codec_notNullTimestamp,
+    timestamptz: TYPES.timestamptz,
     authPayload: registryConfig_pgCodecs_authPayload_authPayload,
     FuncOutOutCompoundTypeRecord: registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord,
     compoundType: attributes_o2_codec_compoundType,
@@ -7440,6 +7412,8 @@ const registry = makeRegistry({
     int8ArrayDomain: attributes_int8_array_domain_codec_int8ArrayDomain,
     bytea: TYPES.bytea,
     byteaArray: attributes_bytea_array_codec_byteaArray,
+    ltree: attributes_ltree_codec_ltree,
+    "ltree[]": attributes_ltree_array_codec_ltree_,
     bpchar: TYPES.bpchar,
     compoundTypeArray: listOfCodec(attributes_o2_codec_compoundType, {
       extensions: extensions55,
@@ -8458,30 +8432,30 @@ const registry = makeRegistry({
       description: undefined,
       extensions: extensions145
     },
+    edge_case_computed: {
+      executor: executor_mainPgExecutor,
+      name: "edge_case_computed",
+      identifier: "main.c.edge_case_computed(c.edge_case)",
+      from: fromCallback64,
+      parameters: parameters64,
+      isUnique: !false,
+      codec: TYPES.text,
+      uniques: [],
+      isMutation: false,
+      extensions: extensions146,
+      description: undefined
+    },
     return_table_without_grants: PgResource.functionResourceOptions(registryConfig_pgResources_compound_key_compound_key, options_return_table_without_grants),
     list_bde_mutation: {
       executor: executor_mainPgExecutor,
       name: "list_bde_mutation",
       identifier: "main.b.list_bde_mutation(_text,text,text)",
-      from: fromCallback64,
-      parameters: parameters64,
+      from: fromCallback65,
+      parameters: parameters65,
       isUnique: !false,
       codec: registryConfig_pgCodecs_uuidArray_uuidArray,
       uniques: [],
       isMutation: true,
-      extensions: extensions146,
-      description: undefined
-    },
-    edge_case_computed: {
-      executor: executor_mainPgExecutor,
-      name: "edge_case_computed",
-      identifier: "main.c.edge_case_computed(c.edge_case)",
-      from: fromCallback65,
-      parameters: parameters65,
-      isUnique: !false,
-      codec: TYPES.text,
-      uniques: [],
-      isMutation: false,
       extensions: extensions147,
       description: undefined
     },
@@ -8496,13 +8470,13 @@ const registry = makeRegistry({
       description: undefined,
       extensions: extensions148
     },
-    issue756: registryConfig_pgResources_issue756_issue756,
     left_arm: registryConfig_pgResources_left_arm_left_arm,
-    issue756_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_issue756_issue756, options_issue756_mutation),
-    issue756_set_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_issue756_issue756, options_issue756_set_mutation),
     authenticate_fail: PgResource.functionResourceOptions(resourceConfig_jwt_token, options_authenticate_fail),
     authenticate: PgResource.functionResourceOptions(resourceConfig_jwt_token, options_authenticate),
+    issue756: registryConfig_pgResources_issue756_issue756,
     left_arm_identity: PgResource.functionResourceOptions(registryConfig_pgResources_left_arm_left_arm, options_left_arm_identity),
+    issue756_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_issue756_issue756, options_issue756_mutation),
+    issue756_set_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_issue756_issue756, options_issue756_set_mutation),
     authenticate_many: PgResource.functionResourceOptions(resourceConfig_jwt_token, options_authenticate_many),
     authenticate_payload: PgResource.functionResourceOptions(resourceConfig_auth_payload, options_authenticate_payload),
     types_mutation: {
@@ -8544,94 +8518,94 @@ const registry = makeRegistry({
       extensions: extensions155,
       description: undefined
     },
-    func_out_out_compound_type: {
-      executor: executor_mainPgExecutor,
-      name: "func_out_out_compound_type",
-      identifier: "main.c.func_out_out_compound_type(int4,int4,c.compound_type)",
-      from: fromCallback69,
-      parameters: parameters69,
-      isUnique: !false,
-      codec: registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord,
-      uniques: [],
-      isMutation: false,
-      extensions: extensions156,
-      description: undefined
-    },
-    mutation_out_out_compound_type: {
-      executor: executor_mainPgExecutor,
-      name: "mutation_out_out_compound_type",
-      identifier: "main.c.mutation_out_out_compound_type(int4,int4,c.compound_type)",
-      from: fromCallback70,
-      parameters: parameters70,
-      isUnique: !false,
-      codec: registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCompoundTypeRecord,
-      uniques: [],
-      isMutation: true,
-      extensions: extensions157,
-      description: undefined
-    },
     post_computed_interval_set: {
       executor: executor_mainPgExecutor,
       name: "post_computed_interval_set",
       identifier: "main.a.post_computed_interval_set(a.post)",
-      from: fromCallback71,
-      parameters: parameters71,
+      from: fromCallback69,
+      parameters: parameters69,
       isUnique: !true,
       codec: TYPES.interval,
       uniques: [],
       isMutation: false,
-      extensions: extensions158,
+      extensions: extensions156,
       description: undefined
     },
     post_computed_interval_array: {
       executor: executor_mainPgExecutor,
       name: "post_computed_interval_array",
       identifier: "main.a.post_computed_interval_array(a.post)",
-      from: fromCallback72,
-      parameters: parameters72,
+      from: fromCallback70,
+      parameters: parameters70,
       isUnique: !false,
       codec: registryConfig_pgCodecs_intervalArray_intervalArray,
       uniques: [],
       isMutation: false,
-      extensions: extensions159,
+      extensions: extensions157,
       description: undefined
     },
     post_computed_text_array: {
       executor: executor_mainPgExecutor,
       name: "post_computed_text_array",
       identifier: "main.a.post_computed_text_array(a.post)",
-      from: fromCallback73,
-      parameters: parameters73,
+      from: fromCallback71,
+      parameters: parameters71,
       isUnique: !false,
       codec: registryConfig_pgCodecs_textArray_textArray,
       uniques: [],
       isMutation: false,
-      extensions: extensions160,
+      extensions: extensions158,
       description: undefined
     },
     post_computed_with_optional_arg: {
       executor: executor_mainPgExecutor,
       name: "post_computed_with_optional_arg",
       identifier: "main.a.post_computed_with_optional_arg(a.post,int4)",
-      from: fromCallback74,
-      parameters: parameters74,
+      from: fromCallback72,
+      parameters: parameters72,
       isUnique: !false,
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions161,
+      extensions: extensions159,
       description: undefined
     },
     post_computed_with_required_arg: {
       executor: executor_mainPgExecutor,
       name: "post_computed_with_required_arg",
       identifier: "main.a.post_computed_with_required_arg(a.post,int4)",
-      from: fromCallback75,
-      parameters: parameters75,
+      from: fromCallback73,
+      parameters: parameters73,
       isUnique: !false,
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
+      extensions: extensions160,
+      description: undefined
+    },
+    func_out_out_compound_type: {
+      executor: executor_mainPgExecutor,
+      name: "func_out_out_compound_type",
+      identifier: "main.c.func_out_out_compound_type(int4,int4,c.compound_type)",
+      from: fromCallback74,
+      parameters: parameters74,
+      isUnique: !false,
+      codec: registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord,
+      uniques: [],
+      isMutation: false,
+      extensions: extensions161,
+      description: undefined
+    },
+    mutation_out_out_compound_type: {
+      executor: executor_mainPgExecutor,
+      name: "mutation_out_out_compound_type",
+      identifier: "main.c.mutation_out_out_compound_type(int4,int4,c.compound_type)",
+      from: fromCallback75,
+      parameters: parameters75,
+      isUnique: !false,
+      codec: registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCompoundTypeRecord,
+      uniques: [],
+      isMutation: true,
       extensions: extensions162,
       description: undefined
     },
@@ -8674,10 +8648,6 @@ const registry = makeRegistry({
       extensions: extensions165,
       description: undefined
     },
-    compound_type_set_query: PgResource.functionResourceOptions(resourceConfig_compound_type, options_compound_type_set_query),
-    compound_type_mutation: PgResource.functionResourceOptions(resourceConfig_compound_type, options_compound_type_mutation),
-    compound_type_query: PgResource.functionResourceOptions(resourceConfig_compound_type, options_compound_type_query),
-    compound_type_set_mutation: PgResource.functionResourceOptions(resourceConfig_compound_type, options_compound_type_set_mutation),
     query_output_two_rows: {
       executor: executor_mainPgExecutor,
       name: "query_output_two_rows",
@@ -8688,18 +8658,22 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord,
       uniques: [],
       isMutation: false,
-      extensions: extensions167,
+      extensions: extensions166,
       description: undefined
     },
+    post: registryConfig_pgResources_post_post,
+    compound_type_set_query: PgResource.functionResourceOptions(resourceConfig_compound_type, options_compound_type_set_query),
+    compound_type_mutation: PgResource.functionResourceOptions(resourceConfig_compound_type, options_compound_type_mutation),
+    compound_type_query: PgResource.functionResourceOptions(resourceConfig_compound_type, options_compound_type_query),
+    compound_type_set_mutation: PgResource.functionResourceOptions(resourceConfig_compound_type, options_compound_type_set_mutation),
+    table_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_table_mutation),
+    table_query: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_table_query),
+    post_with_suffix: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_post_with_suffix),
     mutation_compound_type_array: PgResource.functionResourceOptions(resourceConfig_compound_type, options_mutation_compound_type_array),
     query_compound_type_array: PgResource.functionResourceOptions(resourceConfig_compound_type, options_query_compound_type_array),
     compound_type_array_mutation: PgResource.functionResourceOptions(resourceConfig_compound_type, options_compound_type_array_mutation),
     compound_type_array_query: PgResource.functionResourceOptions(resourceConfig_compound_type, options_compound_type_array_query),
-    post: registryConfig_pgResources_post_post,
     post_computed_compound_type_array: PgResource.functionResourceOptions(resourceConfig_compound_type, options_post_computed_compound_type_array),
-    table_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_table_mutation),
-    table_query: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_table_query),
-    post_with_suffix: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_post_with_suffix),
     post_many: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_post_many),
     person_computed_out: {
       executor: executor_mainPgExecutor,
@@ -9233,8 +9207,8 @@ const pgResource_compound_keyPgResource = registry.pgResources["compound_key"];
 const pgResource_similar_table_1PgResource = registry.pgResources["similar_table_1"];
 const pgResource_similar_table_2PgResource = registry.pgResources["similar_table_2"];
 const pgResource_null_test_recordPgResource = registry.pgResources["null_test_record"];
-const pgResource_issue756PgResource = registry.pgResources["issue756"];
 const pgResource_left_armPgResource = registry.pgResources["left_arm"];
+const pgResource_issue756PgResource = registry.pgResources["issue756"];
 const pgResource_postPgResource = registry.pgResources["post"];
 const pgResource_personPgResource = registry.pgResources["person"];
 const pgResource_typesPgResource = registry.pgResources["types"];
@@ -9488,25 +9462,6 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
       return obj[0] === "null_test_records";
     }
   },
-  Issue756: {
-    typeName: "Issue756",
-    codec: nodeIdCodecs_base64JSON_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("issue756S", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: access($list, [1])
-      };
-    },
-    get(spec) {
-      return pgResource_issue756PgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "issue756S";
-    }
-  },
   LeftArm: {
     typeName: "LeftArm",
     codec: nodeIdCodecs_base64JSON_base64JSON,
@@ -9524,6 +9479,25 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     match(obj) {
       return obj[0] === "left_arms";
+    }
+  },
+  Issue756: {
+    typeName: "Issue756",
+    codec: nodeIdCodecs_base64JSON_base64JSON,
+    deprecationReason: undefined,
+    plan($record) {
+      return list([constant("issue756S", false), $record.get("id")]);
+    },
+    getSpec($list) {
+      return {
+        id: access($list, [1])
+      };
+    },
+    get(spec) {
+      return pgResource_issue756PgResource.get(spec);
+    },
+    match(obj) {
+      return obj[0] === "issue756S";
     }
   },
   Post: {
@@ -11487,11 +11461,29 @@ const makeArgs33 = (args, path = []) => {
   return selectArgs;
 };
 const resource_func_out_out_compound_typePgResource = registry.pgResources["func_out_out_compound_type"];
-const argDetailsSimple34 = [];
+const argDetailsSimple34 = [{
+  graphqlArgName: "leftArmId",
+  postgresArgName: "left_arm_id",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "postId",
+  postgresArgName: "post_id",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "txt",
+  postgresArgName: "txt",
+  pgCodec: TYPES.text,
+  required: true,
+  fetcher: null
+}];
 const makeArgs34 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 3; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -11532,37 +11524,12 @@ const makeArgs34 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_compound_type_set_queryPgResource = registry.pgResources["compound_type_set_query"];
-const getSelectPlanFromParentAndArgs8 = ($root, args, _info) => {
-  const selectArgs = makeArgs34(args);
-  return resource_compound_type_set_queryPgResource.execute(selectArgs);
-};
-function Query_compoundTypeSetQuery_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_compoundTypeSetQuery_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_compoundTypeSetQuery_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_compoundTypeSetQuery_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_compoundTypeSetQuery_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-const argDetailsSimple35 = [{
-  graphqlArgName: "object",
-  postgresArgName: "object",
-  pgCodec: attributes_o2_codec_compoundType,
-  required: true,
-  fetcher: null
-}];
+const resource_query_output_two_rowsPgResource = registry.pgResources["query_output_two_rows"];
+const argDetailsSimple35 = [];
 const makeArgs35 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -11603,30 +11570,37 @@ const makeArgs35 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_compound_type_queryPgResource = registry.pgResources["compound_type_query"];
+const resource_compound_type_set_queryPgResource = registry.pgResources["compound_type_set_query"];
+const getSelectPlanFromParentAndArgs8 = ($root, args, _info) => {
+  const selectArgs = makeArgs35(args);
+  return resource_compound_type_set_queryPgResource.execute(selectArgs);
+};
+function Query_compoundTypeSetQuery_first_applyPlan(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function Query_compoundTypeSetQuery_last_applyPlan(_, $connection, val) {
+  $connection.setLast(val.getRaw());
+}
+function Query_compoundTypeSetQuery_offset_applyPlan(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
+function Query_compoundTypeSetQuery_before_applyPlan(_, $connection, val) {
+  $connection.setBefore(val.getRaw());
+}
+function Query_compoundTypeSetQuery_after_applyPlan(_, $connection, val) {
+  $connection.setAfter(val.getRaw());
+}
 const argDetailsSimple36 = [{
-  graphqlArgName: "leftArmId",
-  postgresArgName: "left_arm_id",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "postId",
-  postgresArgName: "post_id",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "txt",
-  postgresArgName: "txt",
-  pgCodec: TYPES.text,
+  graphqlArgName: "object",
+  postgresArgName: "object",
+  pgCodec: attributes_o2_codec_compoundType,
   required: true,
   fetcher: null
 }];
 const makeArgs36 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 1; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -11667,11 +11641,11 @@ const makeArgs36 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_query_output_two_rowsPgResource = registry.pgResources["query_output_two_rows"];
+const resource_compound_type_queryPgResource = registry.pgResources["compound_type_query"];
 const argDetailsSimple37 = [{
-  graphqlArgName: "object",
-  postgresArgName: "object",
-  pgCodec: attributes_o2_codec_compoundType,
+  graphqlArgName: "id",
+  postgresArgName: "id",
+  pgCodec: TYPES.int,
   required: true,
   fetcher: null
 }];
@@ -11719,7 +11693,7 @@ const makeArgs37 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_query_compound_type_arrayPgResource = registry.pgResources["query_compound_type_array"];
+const resource_table_queryPgResource = registry.pgResources["table_query"];
 const argDetailsSimple38 = [{
   graphqlArgName: "object",
   postgresArgName: "object",
@@ -11771,11 +11745,11 @@ const makeArgs38 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_compound_type_array_queryPgResource = registry.pgResources["compound_type_array_query"];
+const resource_query_compound_type_arrayPgResource = registry.pgResources["query_compound_type_array"];
 const argDetailsSimple39 = [{
-  graphqlArgName: "id",
-  postgresArgName: "id",
-  pgCodec: TYPES.int,
+  graphqlArgName: "object",
+  postgresArgName: "object",
+  pgCodec: attributes_o2_codec_compoundType,
   required: true,
   fetcher: null
 }];
@@ -11823,7 +11797,7 @@ const makeArgs39 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_table_queryPgResource = registry.pgResources["table_query"];
+const resource_compound_type_array_queryPgResource = registry.pgResources["compound_type_array_query"];
 const argDetailsSimple40 = [{
   graphqlArgName: "a",
   postgresArgName: "a",
@@ -12575,7 +12549,7 @@ const fetcher14 = (handler => {
   };
   fn.deprecationReason = handler.deprecationReason;
   return fn;
-})(nodeIdHandlerByTypeName.Issue756);
+})(nodeIdHandlerByTypeName.LeftArm);
 const fetcher15 = (handler => {
   const fn = $nodeId => {
     const $decoded = lambda($nodeId, specForHandler(handler));
@@ -12583,7 +12557,7 @@ const fetcher15 = (handler => {
   };
   fn.deprecationReason = handler.deprecationReason;
   return fn;
-})(nodeIdHandlerByTypeName.LeftArm);
+})(nodeIdHandlerByTypeName.Issue756);
 const fetcher16 = (handler => {
   const fn = $nodeId => {
     const $decoded = lambda($nodeId, specForHandler(handler));
@@ -12898,21 +12872,6 @@ function Query_allEdgeCases_before_applyPlan(_, $connection, val) {
 function Query_allEdgeCases_after_applyPlan(_, $connection, val) {
   $connection.setAfter(val.getRaw());
 }
-function Query_allIssue756S_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allIssue756S_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allIssue756S_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allIssue756S_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allIssue756S_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 function Query_allLeftArms_first_applyPlan(_, $connection, arg) {
   $connection.setFirst(arg.getRaw());
 }
@@ -12926,6 +12885,21 @@ function Query_allLeftArms_before_applyPlan(_, $connection, val) {
   $connection.setBefore(val.getRaw());
 }
 function Query_allLeftArms_after_applyPlan(_, $connection, val) {
+  $connection.setAfter(val.getRaw());
+}
+function Query_allIssue756S_first_applyPlan(_, $connection, arg) {
+  $connection.setFirst(arg.getRaw());
+}
+function Query_allIssue756S_last_applyPlan(_, $connection, val) {
+  $connection.setLast(val.getRaw());
+}
+function Query_allIssue756S_offset_applyPlan(_, $connection, val) {
+  $connection.setOffset(val.getRaw());
+}
+function Query_allIssue756S_before_applyPlan(_, $connection, val) {
+  $connection.setBefore(val.getRaw());
+}
+function Query_allIssue756S_after_applyPlan(_, $connection, val) {
   $connection.setAfter(val.getRaw());
 }
 function Query_allPosts_first_applyPlan(_, $connection, arg) {
@@ -14756,16 +14730,6 @@ const makeArgs74 = (args, path = []) => {
   return selectArgs;
 };
 const resource_edge_case_computedPgResource = registry.pgResources["edge_case_computed"];
-function Issue756SConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function Issue756SConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function Issue756SConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
 function LeftArmsConnection_nodesPlan($connection) {
   return $connection.nodes();
 }
@@ -14773,6 +14737,16 @@ function LeftArmsConnection_edgesPlan($connection) {
   return $connection.edges();
 }
 function LeftArmsConnection_pageInfoPlan($connection) {
+  // TYPES: why is this a TypeScript issue without the 'any'?
+  return $connection.pageInfo();
+}
+function Issue756SConnection_nodesPlan($connection) {
+  return $connection.nodes();
+}
+function Issue756SConnection_edgesPlan($connection) {
+  return $connection.edges();
+}
+function Issue756SConnection_pageInfoPlan($connection) {
   // TYPES: why is this a TypeScript issue without the 'any'?
   return $connection.pageInfo();
 }
@@ -16593,15 +16567,33 @@ const makeArgs107 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_issue756_mutationPgResource = registry.pgResources["issue756_mutation"];
-function Mutation_issue756Mutation_input_applyPlan(_, $object) {
+const resource_authenticate_failPgResource = registry.pgResources["authenticate_fail"];
+function Mutation_authenticateFail_input_applyPlan(_, $object) {
   return $object;
 }
-const argDetailsSimple108 = [];
+const argDetailsSimple108 = [{
+  graphqlArgName: "a",
+  postgresArgName: "a",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "b",
+  postgresArgName: "b",
+  pgCodec: TYPES.numeric,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "c",
+  postgresArgName: "c",
+  pgCodec: TYPES.bigint,
+  required: true,
+  fetcher: null
+}];
 const makeArgs108 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 3; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -16642,15 +16634,21 @@ const makeArgs108 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_issue756_set_mutationPgResource = registry.pgResources["issue756_set_mutation"];
-function Mutation_issue756SetMutation_input_applyPlan(_, $object) {
+const resource_authenticatePgResource = registry.pgResources["authenticate"];
+function Mutation_authenticate_input_applyPlan(_, $object) {
   return $object;
 }
-const argDetailsSimple109 = [];
+const argDetailsSimple109 = [{
+  graphqlArgName: "leftArm",
+  postgresArgName: "left_arm",
+  pgCodec: registryConfig_pgCodecs_leftArm_leftArm,
+  required: true,
+  fetcher: null
+}];
 const makeArgs109 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 1; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -16691,33 +16689,15 @@ const makeArgs109 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_authenticate_failPgResource = registry.pgResources["authenticate_fail"];
-function Mutation_authenticateFail_input_applyPlan(_, $object) {
+const resource_left_arm_identityPgResource = registry.pgResources["left_arm_identity"];
+function Mutation_leftArmIdentity_input_applyPlan(_, $object) {
   return $object;
 }
-const argDetailsSimple110 = [{
-  graphqlArgName: "a",
-  postgresArgName: "a",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "b",
-  postgresArgName: "b",
-  pgCodec: TYPES.numeric,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "c",
-  postgresArgName: "c",
-  pgCodec: TYPES.bigint,
-  required: true,
-  fetcher: null
-}];
+const argDetailsSimple110 = [];
 const makeArgs110 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -16758,21 +16738,15 @@ const makeArgs110 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_authenticatePgResource = registry.pgResources["authenticate"];
-function Mutation_authenticate_input_applyPlan(_, $object) {
+const resource_issue756_mutationPgResource = registry.pgResources["issue756_mutation"];
+function Mutation_issue756Mutation_input_applyPlan(_, $object) {
   return $object;
 }
-const argDetailsSimple111 = [{
-  graphqlArgName: "leftArm",
-  postgresArgName: "left_arm",
-  pgCodec: registryConfig_pgCodecs_leftArm_leftArm,
-  required: true,
-  fetcher: null
-}];
+const argDetailsSimple111 = [];
 const makeArgs111 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -16813,8 +16787,8 @@ const makeArgs111 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_left_arm_identityPgResource = registry.pgResources["left_arm_identity"];
-function Mutation_leftArmIdentity_input_applyPlan(_, $object) {
+const resource_issue756_set_mutationPgResource = registry.pgResources["issue756_set_mutation"];
+function Mutation_issue756SetMutation_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple112 = [{
@@ -17202,9 +17176,9 @@ function Mutation_compoundTypeSetMutation_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple118 = [{
-  graphqlArgName: "object",
-  postgresArgName: "object",
-  pgCodec: attributes_o2_codec_compoundType,
+  graphqlArgName: "id",
+  postgresArgName: "id",
+  pgCodec: TYPES.int,
   required: true,
   fetcher: null
 }];
@@ -17252,21 +17226,27 @@ const makeArgs118 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_compound_type_arrayPgResource = registry.pgResources["mutation_compound_type_array"];
-function Mutation_mutationCompoundTypeArray_input_applyPlan(_, $object) {
+const resource_table_mutationPgResource = registry.pgResources["table_mutation"];
+function Mutation_tableMutation_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple119 = [{
-  graphqlArgName: "object",
-  postgresArgName: "object",
-  pgCodec: attributes_o2_codec_compoundType,
+  graphqlArgName: "post",
+  postgresArgName: "post",
+  pgCodec: attributes_post_codec_post,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "suffix",
+  postgresArgName: "suffix",
+  pgCodec: TYPES.text,
   required: true,
   fetcher: null
 }];
 const makeArgs119 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 2; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -17307,14 +17287,14 @@ const makeArgs119 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_compound_type_array_mutationPgResource = registry.pgResources["compound_type_array_mutation"];
-function Mutation_compoundTypeArrayMutation_input_applyPlan(_, $object) {
+const resource_post_with_suffixPgResource = registry.pgResources["post_with_suffix"];
+function Mutation_postWithSuffix_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple120 = [{
-  graphqlArgName: "id",
-  postgresArgName: "id",
-  pgCodec: TYPES.int,
+  graphqlArgName: "object",
+  postgresArgName: "object",
+  pgCodec: attributes_o2_codec_compoundType,
   required: true,
   fetcher: null
 }];
@@ -17362,27 +17342,21 @@ const makeArgs120 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_table_mutationPgResource = registry.pgResources["table_mutation"];
-function Mutation_tableMutation_input_applyPlan(_, $object) {
+const resource_mutation_compound_type_arrayPgResource = registry.pgResources["mutation_compound_type_array"];
+function Mutation_mutationCompoundTypeArray_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple121 = [{
-  graphqlArgName: "post",
-  postgresArgName: "post",
-  pgCodec: attributes_post_codec_post,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "suffix",
-  postgresArgName: "suffix",
-  pgCodec: TYPES.text,
+  graphqlArgName: "object",
+  postgresArgName: "object",
+  pgCodec: attributes_o2_codec_compoundType,
   required: true,
   fetcher: null
 }];
 const makeArgs121 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 1; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -17423,8 +17397,8 @@ const makeArgs121 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_post_with_suffixPgResource = registry.pgResources["post_with_suffix"];
-function Mutation_postWithSuffix_input_applyPlan(_, $object) {
+const resource_compound_type_array_mutationPgResource = registry.pgResources["compound_type_array_mutation"];
+function Mutation_compoundTypeArrayMutation_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple122 = [{
@@ -17958,10 +17932,10 @@ function Mutation_createNullTestRecord_input_applyPlan(_, $object) {
 function Mutation_createEdgeCase_input_applyPlan(_, $object) {
   return $object;
 }
-function Mutation_createIssue756_input_applyPlan(_, $object) {
+function Mutation_createLeftArm_input_applyPlan(_, $object) {
   return $object;
 }
-function Mutation_createLeftArm_input_applyPlan(_, $object) {
+function Mutation_createIssue756_input_applyPlan(_, $object) {
   return $object;
 }
 function Mutation_createPost_input_applyPlan(_, $object) {
@@ -18108,16 +18082,6 @@ function Mutation_updateNullTestRecordById_input_applyPlan(_, $object) {
 }
 const specFromArgs14 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Issue756, $nodeId);
-};
-function Mutation_updateIssue756_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateIssue756ById_input_applyPlan(_, $object) {
-  return $object;
-}
-const specFromArgs15 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.LeftArm, $nodeId);
 };
 function Mutation_updateLeftArm_input_applyPlan(_, $object) {
@@ -18127,6 +18091,16 @@ function Mutation_updateLeftArmById_input_applyPlan(_, $object) {
   return $object;
 }
 function Mutation_updateLeftArmByPersonId_input_applyPlan(_, $object) {
+  return $object;
+}
+const specFromArgs15 = args => {
+  const $nodeId = args.get(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandlerByTypeName.Issue756, $nodeId);
+};
+function Mutation_updateIssue756_input_applyPlan(_, $object) {
+  return $object;
+}
+function Mutation_updateIssue756ById_input_applyPlan(_, $object) {
   return $object;
 }
 const specFromArgs16 = args => {
@@ -18297,16 +18271,6 @@ function Mutation_deleteNullTestRecordById_input_applyPlan(_, $object) {
 }
 const specFromArgs32 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Issue756, $nodeId);
-};
-function Mutation_deleteIssue756_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteIssue756ById_input_applyPlan(_, $object) {
-  return $object;
-}
-const specFromArgs33 = args => {
-  const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.LeftArm, $nodeId);
 };
 function Mutation_deleteLeftArm_input_applyPlan(_, $object) {
@@ -18316,6 +18280,16 @@ function Mutation_deleteLeftArmById_input_applyPlan(_, $object) {
   return $object;
 }
 function Mutation_deleteLeftArmByPersonId_input_applyPlan(_, $object) {
+  return $object;
+}
+const specFromArgs33 = args => {
+  const $nodeId = args.get(["input", "nodeId"]);
+  return specFromNodeId(nodeIdHandlerByTypeName.Issue756, $nodeId);
+};
+function Mutation_deleteIssue756_input_applyPlan(_, $object) {
+  return $object;
+}
+function Mutation_deleteIssue756ById_input_applyPlan(_, $object) {
   return $object;
 }
 const specFromArgs34 = args => {
@@ -18639,24 +18613,6 @@ function ListBdeMutationPayload_queryPlan() {
 function ListBdeMutationInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
-function Issue756MutationPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function Issue756MutationPayload_queryPlan() {
-  return rootValue();
-}
-function Issue756MutationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function Issue756SetMutationPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function Issue756SetMutationPayload_queryPlan() {
-  return rootValue();
-}
-function Issue756SetMutationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
 function AuthenticateFailPayload_clientMutationIdPlan($object) {
   return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
 }
@@ -18682,6 +18638,24 @@ function LeftArmIdentityPayload_queryPlan() {
   return rootValue();
 }
 function LeftArmIdentityInput_clientMutationId_applyPlan($input, val) {
+  $input.set("clientMutationId", val.get());
+}
+function Issue756MutationPayload_clientMutationIdPlan($object) {
+  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+}
+function Issue756MutationPayload_queryPlan() {
+  return rootValue();
+}
+function Issue756MutationInput_clientMutationId_applyPlan($input, val) {
+  $input.set("clientMutationId", val.get());
+}
+function Issue756SetMutationPayload_clientMutationIdPlan($object) {
+  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+}
+function Issue756SetMutationPayload_queryPlan() {
+  return rootValue();
+}
+function Issue756SetMutationInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
 function AuthenticateManyPayload_clientMutationIdPlan($object) {
@@ -18739,24 +18713,6 @@ function CompoundTypeSetMutationPayload_queryPlan() {
 function CompoundTypeSetMutationInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
-function MutationCompoundTypeArrayPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function MutationCompoundTypeArrayPayload_queryPlan() {
-  return rootValue();
-}
-function MutationCompoundTypeArrayInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CompoundTypeArrayMutationPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function CompoundTypeArrayMutationPayload_queryPlan() {
-  return rootValue();
-}
-function CompoundTypeArrayMutationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
 function TableMutationPayload_clientMutationIdPlan($object) {
   return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
 }
@@ -18773,6 +18729,24 @@ function PostWithSuffixPayload_queryPlan() {
   return rootValue();
 }
 function PostWithSuffixInput_clientMutationId_applyPlan($input, val) {
+  $input.set("clientMutationId", val.get());
+}
+function MutationCompoundTypeArrayPayload_clientMutationIdPlan($object) {
+  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+}
+function MutationCompoundTypeArrayPayload_queryPlan() {
+  return rootValue();
+}
+function MutationCompoundTypeArrayInput_clientMutationId_applyPlan($input, val) {
+  $input.set("clientMutationId", val.get());
+}
+function CompoundTypeArrayMutationPayload_clientMutationIdPlan($object) {
+  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+}
+function CompoundTypeArrayMutationPayload_queryPlan() {
+  return rootValue();
+}
+function CompoundTypeArrayMutationInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
 function PostManyPayload_clientMutationIdPlan($object) {
@@ -19144,22 +19118,6 @@ function CreateEdgeCaseInput_edgeCase_applyPlan($object) {
   const $record = $object.getStepForKey("result");
   return $record.setPlan();
 }
-function CreateIssue756Payload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateIssue756Payload_issue756Plan($object) {
-  return $object.get("result");
-}
-function CreateIssue756Payload_queryPlan() {
-  return rootValue();
-}
-function CreateIssue756Input_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateIssue756Input_issue756_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
 function CreateLeftArmPayload_clientMutationIdPlan($mutation) {
   return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
 }
@@ -19173,6 +19131,22 @@ function CreateLeftArmInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
 function CreateLeftArmInput_leftArm_applyPlan($object) {
+  const $record = $object.getStepForKey("result");
+  return $record.setPlan();
+}
+function CreateIssue756Payload_clientMutationIdPlan($mutation) {
+  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+}
+function CreateIssue756Payload_issue756Plan($object) {
+  return $object.get("result");
+}
+function CreateIssue756Payload_queryPlan() {
+  return rootValue();
+}
+function CreateIssue756Input_clientMutationId_applyPlan($input, val) {
+  $input.set("clientMutationId", val.get());
+}
+function CreateIssue756Input_issue756_applyPlan($object) {
   const $record = $object.getStepForKey("result");
   return $record.setPlan();
 }
@@ -19539,29 +19513,6 @@ function UpdateNullTestRecordByIdInput_nullTestRecordPatch_applyPlan($object) {
   const $record = $object.getStepForKey("result");
   return $record.setPlan();
 }
-function UpdateIssue756Payload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateIssue756Payload_issue756Plan($object) {
-  return $object.get("result");
-}
-function UpdateIssue756Payload_queryPlan() {
-  return rootValue();
-}
-function UpdateIssue756Input_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateIssue756Input_issue756Patch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateIssue756ByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateIssue756ByIdInput_issue756Patch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
 function UpdateLeftArmPayload_clientMutationIdPlan($mutation) {
   return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
 }
@@ -19589,6 +19540,29 @@ function UpdateLeftArmByPersonIdInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
 function UpdateLeftArmByPersonIdInput_leftArmPatch_applyPlan($object) {
+  const $record = $object.getStepForKey("result");
+  return $record.setPlan();
+}
+function UpdateIssue756Payload_clientMutationIdPlan($mutation) {
+  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+}
+function UpdateIssue756Payload_issue756Plan($object) {
+  return $object.get("result");
+}
+function UpdateIssue756Payload_queryPlan() {
+  return rootValue();
+}
+function UpdateIssue756Input_clientMutationId_applyPlan($input, val) {
+  $input.set("clientMutationId", val.get());
+}
+function UpdateIssue756Input_issue756Patch_applyPlan($object) {
+  const $record = $object.getStepForKey("result");
+  return $record.setPlan();
+}
+function UpdateIssue756ByIdInput_clientMutationId_applyPlan($input, val) {
+  $input.set("clientMutationId", val.get());
+}
+function UpdateIssue756ByIdInput_issue756Patch_applyPlan($object) {
   const $record = $object.getStepForKey("result");
   return $record.setPlan();
 }
@@ -19875,21 +19849,6 @@ function DeleteNullTestRecordInput_clientMutationId_applyPlan($input, val) {
 function DeleteNullTestRecordByIdInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
-function DeleteIssue756Payload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteIssue756Payload_issue756Plan($object) {
-  return $object.get("result");
-}
-function DeleteIssue756Payload_queryPlan() {
-  return rootValue();
-}
-function DeleteIssue756Input_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteIssue756ByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
 function DeleteLeftArmPayload_clientMutationIdPlan($mutation) {
   return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
 }
@@ -19906,6 +19865,21 @@ function DeleteLeftArmByIdInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
 function DeleteLeftArmByPersonIdInput_clientMutationId_applyPlan($input, val) {
+  $input.set("clientMutationId", val.get());
+}
+function DeleteIssue756Payload_clientMutationIdPlan($mutation) {
+  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+}
+function DeleteIssue756Payload_issue756Plan($object) {
+  return $object.get("result");
+}
+function DeleteIssue756Payload_queryPlan() {
+  return rootValue();
+}
+function DeleteIssue756Input_clientMutationId_applyPlan($input, val) {
+  $input.set("clientMutationId", val.get());
+}
+function DeleteIssue756ByIdInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
 function DeletePostPayload_clientMutationIdPlan($mutation) {
@@ -20020,14 +19994,14 @@ type Query implements Node {
   """Get a single \`NullTestRecord\`."""
   nullTestRecordById(id: Int!): NullTestRecord
 
-  """Get a single \`Issue756\`."""
-  issue756ById(id: Int!): Issue756
-
   """Get a single \`LeftArm\`."""
   leftArmById(id: Int!): LeftArm
 
   """Get a single \`LeftArm\`."""
   leftArmByPersonId(personId: Int!): LeftArm
+
+  """Get a single \`Issue756\`."""
+  issue756ById(id: Int!): Issue756
 
   """Get a single \`Post\`."""
   postById(id: Int!): Post
@@ -20237,6 +20211,7 @@ type Query implements Node {
   returnTableWithoutGrants: CompoundKey
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
   funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
+  queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
 
   """Reads and enables pagination through a set of \`CompoundType\`."""
   compoundTypeSetQuery(
@@ -20259,10 +20234,9 @@ type Query implements Node {
     after: Cursor
   ): CompoundTypesConnection
   compoundTypeQuery(object: CompoundTypeInput): CompoundType
-  queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
+  tableQuery(id: Int): Post
   queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
   compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
-  tableQuery(id: Int): Post
   funcOutComplex(a: Int, b: String): FuncOutComplexRecord
 
   """
@@ -20501,17 +20475,17 @@ type Query implements Node {
     nodeId: ID!
   ): NullTestRecord
 
-  """Reads a single \`Issue756\` using its globally unique \`ID\`."""
-  issue756(
-    """The globally unique \`ID\` to be used in selecting a single \`Issue756\`."""
-    nodeId: ID!
-  ): Issue756
-
   """Reads a single \`LeftArm\` using its globally unique \`ID\`."""
   leftArm(
     """The globally unique \`ID\` to be used in selecting a single \`LeftArm\`."""
     nodeId: ID!
   ): LeftArm
+
+  """Reads a single \`Issue756\` using its globally unique \`ID\`."""
+  issue756(
+    """The globally unique \`ID\` to be used in selecting a single \`Issue756\`."""
+    nodeId: ID!
+  ): Issue756
 
   """Reads a single \`Post\` using its globally unique \`ID\`."""
   post(
@@ -21057,35 +21031,6 @@ type Query implements Node {
     orderBy: [EdgeCasesOrderBy!] = [NATURAL]
   ): EdgeCasesConnection
 
-  """Reads and enables pagination through a set of \`Issue756\`."""
-  allIssue756S(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering \`Issue756\`."""
-    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: Issue756Condition
-  ): Issue756SConnection
-
   """Reads and enables pagination through a set of \`LeftArm\`."""
   allLeftArms(
     """Only read the first \`n\` values of the set."""
@@ -21114,6 +21059,35 @@ type Query implements Node {
     """
     condition: LeftArmCondition
   ): LeftArmsConnection
+
+  """Reads and enables pagination through a set of \`Issue756\`."""
+  allIssue756S(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`Issue756\`."""
+    orderBy: [Issue756SOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: Issue756Condition
+  ): Issue756SConnection
 
   """Reads and enables pagination through a set of \`Post\`."""
   allPosts(
@@ -21803,6 +21777,8 @@ type Type implements Node {
   int8ArrayDomain: [BigInt]
   bytea: Base64EncodedBinary
   byteaArray: [Base64EncodedBinary]
+  ltree: LTree
+  ltreeArray: [LTree]
 
   """Reads a single \`Post\` that is related to this \`Type\`."""
   postBySmallint: Post
@@ -21941,6 +21917,11 @@ scalar RegDictionary
 
 """Binary data encoded using Base64"""
 scalar Base64EncodedBinary
+
+"""
+Represents an \`ltree\` hierarchical label tree as outlined in https://www.postgresql.org/docs/current/ltree.html
+"""
+scalar LTree
 
 """A \`Type\` edge in the connection."""
 type TypesEdge {
@@ -22452,6 +22433,12 @@ type FuncOutOutCompoundTypeRecord {
   o2: CompoundType
 }
 
+type QueryOutputTwoRowsRecord {
+  txt: String
+  leftArm: LeftArm
+  post: Post
+}
+
 """A connection to a list of \`CompoundType\` values."""
 type CompoundTypesConnection {
   """A list of \`CompoundType\` objects."""
@@ -22476,12 +22463,6 @@ type CompoundTypesEdge {
 
   """The \`CompoundType\` at the end of the edge."""
   node: CompoundType
-}
-
-type QueryOutputTwoRowsRecord {
-  txt: String
-  leftArm: LeftArm
-  post: Post
 }
 
 type FuncOutComplexRecord {
@@ -23305,50 +23286,6 @@ enum EdgeCasesOrderBy {
   NATURAL
 }
 
-"""A connection to a list of \`Issue756\` values."""
-type Issue756SConnection {
-  """A list of \`Issue756\` objects."""
-  nodes: [Issue756]!
-
-  """
-  A list of edges which contains the \`Issue756\` and cursor to aid in pagination.
-  """
-  edges: [Issue756SEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`Issue756\` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A \`Issue756\` edge in the connection."""
-type Issue756SEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`Issue756\` at the end of the edge."""
-  node: Issue756
-}
-
-"""Methods to use when ordering \`Issue756\`."""
-enum Issue756SOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-}
-
-"""
-A condition to be used against \`Issue756\` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input Issue756Condition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-}
-
 """A connection to a list of \`LeftArm\` values."""
 type LeftArmsConnection {
   """A list of \`LeftArm\` objects."""
@@ -23395,6 +23332,50 @@ input LeftArmCondition {
 
   """Checks for equality with the object’s \`personId\` field."""
   personId: Int
+}
+
+"""A connection to a list of \`Issue756\` values."""
+type Issue756SConnection {
+  """A list of \`Issue756\` objects."""
+  nodes: [Issue756]!
+
+  """
+  A list of edges which contains the \`Issue756\` and cursor to aid in pagination.
+  """
+  edges: [Issue756SEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Issue756\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Issue756\` edge in the connection."""
+type Issue756SEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Issue756\` at the end of the edge."""
+  node: Issue756
+}
+
+"""Methods to use when ordering \`Issue756\`."""
+enum Issue756SOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+}
+
+"""
+A condition to be used against \`Issue756\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input Issue756Condition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
 }
 
 """
@@ -23601,18 +23582,6 @@ type Mutation {
     """
     input: ListBdeMutationInput!
   ): ListBdeMutationPayload
-  issue756Mutation(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: Issue756MutationInput!
-  ): Issue756MutationPayload
-  issue756SetMutation(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: Issue756SetMutationInput!
-  ): Issue756SetMutationPayload
   authenticateFail(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -23631,6 +23600,18 @@ type Mutation {
     """
     input: LeftArmIdentityInput!
   ): LeftArmIdentityPayload
+  issue756Mutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: Issue756MutationInput!
+  ): Issue756MutationPayload
+  issue756SetMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: Issue756SetMutationInput!
+  ): Issue756SetMutationPayload
   authenticateMany(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -23667,18 +23648,6 @@ type Mutation {
     """
     input: CompoundTypeSetMutationInput!
   ): CompoundTypeSetMutationPayload
-  mutationCompoundTypeArray(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: MutationCompoundTypeArrayInput!
-  ): MutationCompoundTypeArrayPayload
-  compoundTypeArrayMutation(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CompoundTypeArrayMutationInput!
-  ): CompoundTypeArrayMutationPayload
   tableMutation(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -23691,6 +23660,18 @@ type Mutation {
     """
     input: PostWithSuffixInput!
   ): PostWithSuffixPayload @deprecated(reason: "This is deprecated (comment on function a.post_with_suffix).")
+  mutationCompoundTypeArray(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: MutationCompoundTypeArrayInput!
+  ): MutationCompoundTypeArrayPayload
+  compoundTypeArrayMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CompoundTypeArrayMutationInput!
+  ): CompoundTypeArrayMutationPayload
   postMany(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -23890,14 +23871,6 @@ type Mutation {
     input: CreateEdgeCaseInput!
   ): CreateEdgeCasePayload
 
-  """Creates a single \`Issue756\`."""
-  createIssue756(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreateIssue756Input!
-  ): CreateIssue756Payload
-
   """Creates a single \`LeftArm\`."""
   createLeftArm(
     """
@@ -23905,6 +23878,14 @@ type Mutation {
     """
     input: CreateLeftArmInput!
   ): CreateLeftArmPayload
+
+  """Creates a single \`Issue756\`."""
+  createIssue756(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreateIssue756Input!
+  ): CreateIssue756Payload
 
   """Creates a single \`Post\`."""
   createPost(
@@ -24162,22 +24143,6 @@ type Mutation {
     input: UpdateNullTestRecordByIdInput!
   ): UpdateNullTestRecordPayload
 
-  """Updates a single \`Issue756\` using its globally unique id and a patch."""
-  updateIssue756(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateIssue756Input!
-  ): UpdateIssue756Payload
-
-  """Updates a single \`Issue756\` using a unique key and a patch."""
-  updateIssue756ById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: UpdateIssue756ByIdInput!
-  ): UpdateIssue756Payload
-
   """Updates a single \`LeftArm\` using its globally unique id and a patch."""
   updateLeftArm(
     """
@@ -24201,6 +24166,22 @@ type Mutation {
     """
     input: UpdateLeftArmByPersonIdInput!
   ): UpdateLeftArmPayload
+
+  """Updates a single \`Issue756\` using its globally unique id and a patch."""
+  updateIssue756(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateIssue756Input!
+  ): UpdateIssue756Payload
+
+  """Updates a single \`Issue756\` using a unique key and a patch."""
+  updateIssue756ById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: UpdateIssue756ByIdInput!
+  ): UpdateIssue756Payload
 
   """Updates a single \`Post\` using its globally unique id and a patch."""
   updatePost(
@@ -24474,22 +24455,6 @@ type Mutation {
     input: DeleteNullTestRecordByIdInput!
   ): DeleteNullTestRecordPayload
 
-  """Deletes a single \`Issue756\` using its globally unique id."""
-  deleteIssue756(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteIssue756Input!
-  ): DeleteIssue756Payload
-
-  """Deletes a single \`Issue756\` using a unique key."""
-  deleteIssue756ById(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: DeleteIssue756ByIdInput!
-  ): DeleteIssue756Payload
-
   """Deletes a single \`LeftArm\` using its globally unique id."""
   deleteLeftArm(
     """
@@ -24513,6 +24478,22 @@ type Mutation {
     """
     input: DeleteLeftArmByPersonIdInput!
   ): DeleteLeftArmPayload
+
+  """Deletes a single \`Issue756\` using its globally unique id."""
+  deleteIssue756(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteIssue756Input!
+  ): DeleteIssue756Payload
+
+  """Deletes a single \`Issue756\` using a unique key."""
+  deleteIssue756ById(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: DeleteIssue756ByIdInput!
+  ): DeleteIssue756Payload
 
   """Deletes a single \`Post\` using its globally unique id."""
   deletePost(
@@ -25400,60 +25381,6 @@ input ListBdeMutationInput {
   e: String
 }
 
-"""The output of our \`issue756Mutation\` mutation."""
-type Issue756MutationPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  issue756: Issue756
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`Issue756\`. May be used by Relay 1."""
-  issue756Edge(
-    """The method to use when ordering \`Issue756\`."""
-    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): Issue756SEdge
-}
-
-"""All input for the \`issue756Mutation\` mutation."""
-input Issue756MutationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-}
-
-"""The output of our \`issue756SetMutation\` mutation."""
-type Issue756SetMutationPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  issue756S: [Issue756]
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the \`issue756SetMutation\` mutation."""
-input Issue756SetMutationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-}
-
 """The output of our \`authenticateFail\` mutation."""
 type AuthenticateFailPayload {
   """
@@ -25553,6 +25480,60 @@ input LeftArmBaseInput {
   personId: Int
   lengthInMetres: Float
   mood: String
+}
+
+"""The output of our \`issue756Mutation\` mutation."""
+type Issue756MutationPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  issue756: Issue756
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Issue756\`. May be used by Relay 1."""
+  issue756Edge(
+    """The method to use when ordering \`Issue756\`."""
+    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): Issue756SEdge
+}
+
+"""All input for the \`issue756Mutation\` mutation."""
+input Issue756MutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+}
+
+"""The output of our \`issue756SetMutation\` mutation."""
+type Issue756SetMutationPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  issue756S: [Issue756]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`issue756SetMutation\` mutation."""
+input Issue756SetMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
 }
 
 """The output of our \`authenticateMany\` mutation."""
@@ -25731,56 +25712,6 @@ input CompoundTypeSetMutationInput {
   object: CompoundTypeInput
 }
 
-"""The output of our \`mutationCompoundTypeArray\` mutation."""
-type MutationCompoundTypeArrayPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  compoundTypes: [CompoundType]
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the \`mutationCompoundTypeArray\` mutation."""
-input MutationCompoundTypeArrayInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  object: CompoundTypeInput
-}
-
-"""The output of our \`compoundTypeArrayMutation\` mutation."""
-type CompoundTypeArrayMutationPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  compoundTypes: [CompoundType]
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the \`compoundTypeArrayMutation\` mutation."""
-input CompoundTypeArrayMutationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  object: CompoundTypeInput
-}
-
 """The output of our \`tableMutation\` mutation."""
 type TableMutationPayload {
   """
@@ -25864,6 +25795,56 @@ input PostInput {
 input ComptypeInput {
   schedule: Datetime
   isOptimised: Boolean
+}
+
+"""The output of our \`mutationCompoundTypeArray\` mutation."""
+type MutationCompoundTypeArrayPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  compoundTypes: [CompoundType]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`mutationCompoundTypeArray\` mutation."""
+input MutationCompoundTypeArrayInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  object: CompoundTypeInput
+}
+
+"""The output of our \`compoundTypeArrayMutation\` mutation."""
+type CompoundTypeArrayMutationPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  compoundTypes: [CompoundType]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`compoundTypeArrayMutation\` mutation."""
+input CompoundTypeArrayMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  object: CompoundTypeInput
 }
 
 """The output of our \`postMany\` mutation."""
@@ -26853,47 +26834,6 @@ input EdgeCaseInput {
   rowId: Int
 }
 
-"""The output of our create \`Issue756\` mutation."""
-type CreateIssue756Payload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`Issue756\` that was created by this mutation."""
-  issue756: Issue756
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`Issue756\`. May be used by Relay 1."""
-  issue756Edge(
-    """The method to use when ordering \`Issue756\`."""
-    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): Issue756SEdge
-}
-
-"""All input for the create \`Issue756\` mutation."""
-input CreateIssue756Input {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """The \`Issue756\` to be created by this mutation."""
-  issue756: Issue756Input!
-}
-
-"""An input for mutations affecting \`Issue756\`"""
-input Issue756Input {
-  id: Int
-  ts: NotNullTimestamp
-}
-
 """The output of our create \`LeftArm\` mutation."""
 type CreateLeftArmPayload {
   """
@@ -26938,6 +26878,47 @@ input LeftArmInput {
   personId: Int
   lengthInMetres: Float
   mood: String
+}
+
+"""The output of our create \`Issue756\` mutation."""
+type CreateIssue756Payload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Issue756\` that was created by this mutation."""
+  issue756: Issue756
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Issue756\`. May be used by Relay 1."""
+  issue756Edge(
+    """The method to use when ordering \`Issue756\`."""
+    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): Issue756SEdge
+}
+
+"""All input for the create \`Issue756\` mutation."""
+input CreateIssue756Input {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`Issue756\` to be created by this mutation."""
+  issue756: Issue756Input!
+}
+
+"""An input for mutations affecting \`Issue756\`"""
+input Issue756Input {
+  id: Int
+  ts: NotNullTimestamp
 }
 
 """The output of our create \`Post\` mutation."""
@@ -27126,6 +27107,8 @@ input TypeInput {
   int8ArrayDomain: [BigInt]
   bytea: Base64EncodedBinary
   byteaArray: [Base64EncodedBinary]
+  ltree: LTree
+  ltreeArray: [LTree]
 }
 
 """A range of \`BigFloat\`."""
@@ -28101,71 +28084,6 @@ input UpdateNullTestRecordByIdInput {
   nullTestRecordPatch: NullTestRecordPatch!
 }
 
-"""The output of our update \`Issue756\` mutation."""
-type UpdateIssue756Payload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`Issue756\` that was updated by this mutation."""
-  issue756: Issue756
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`Issue756\`. May be used by Relay 1."""
-  issue756Edge(
-    """The method to use when ordering \`Issue756\`."""
-    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): Issue756SEdge
-}
-
-"""All input for the \`updateIssue756\` mutation."""
-input UpdateIssue756Input {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique \`ID\` which will identify a single \`Issue756\` to be updated.
-  """
-  nodeId: ID!
-
-  """
-  An object where the defined keys will be set on the \`Issue756\` being updated.
-  """
-  issue756Patch: Issue756Patch!
-}
-
-"""
-Represents an update to a \`Issue756\`. Fields that are set will be updated.
-"""
-input Issue756Patch {
-  id: Int
-  ts: NotNullTimestamp
-}
-
-"""All input for the \`updateIssue756ById\` mutation."""
-input UpdateIssue756ByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-
-  """
-  An object where the defined keys will be set on the \`Issue756\` being updated.
-  """
-  issue756Patch: Issue756Patch!
-}
-
 """The output of our update \`LeftArm\` mutation."""
 type UpdateLeftArmPayload {
   """
@@ -28249,6 +28167,71 @@ input UpdateLeftArmByPersonIdInput {
   An object where the defined keys will be set on the \`LeftArm\` being updated.
   """
   leftArmPatch: LeftArmPatch!
+}
+
+"""The output of our update \`Issue756\` mutation."""
+type UpdateIssue756Payload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Issue756\` that was updated by this mutation."""
+  issue756: Issue756
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Issue756\`. May be used by Relay 1."""
+  issue756Edge(
+    """The method to use when ordering \`Issue756\`."""
+    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): Issue756SEdge
+}
+
+"""All input for the \`updateIssue756\` mutation."""
+input UpdateIssue756Input {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`Issue756\` to be updated.
+  """
+  nodeId: ID!
+
+  """
+  An object where the defined keys will be set on the \`Issue756\` being updated.
+  """
+  issue756Patch: Issue756Patch!
+}
+
+"""
+Represents an update to a \`Issue756\`. Fields that are set will be updated.
+"""
+input Issue756Patch {
+  id: Int
+  ts: NotNullTimestamp
+}
+
+"""All input for the \`updateIssue756ById\` mutation."""
+input UpdateIssue756ByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
+
+  """
+  An object where the defined keys will be set on the \`Issue756\` being updated.
+  """
+  issue756Patch: Issue756Patch!
 }
 
 """The output of our update \`Post\` mutation."""
@@ -28512,6 +28495,8 @@ input TypePatch {
   int8ArrayDomain: [BigInt]
   bytea: Base64EncodedBinary
   byteaArray: [Base64EncodedBinary]
+  ltree: LTree
+  ltreeArray: [LTree]
 }
 
 """All input for the \`updateTypeById\` mutation."""
@@ -29190,54 +29175,6 @@ input DeleteNullTestRecordByIdInput {
   id: Int!
 }
 
-"""The output of our delete \`Issue756\` mutation."""
-type DeleteIssue756Payload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-
-  """The \`Issue756\` that was deleted by this mutation."""
-  issue756: Issue756
-  deletedIssue756Id: ID
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`Issue756\`. May be used by Relay 1."""
-  issue756Edge(
-    """The method to use when ordering \`Issue756\`."""
-    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): Issue756SEdge
-}
-
-"""All input for the \`deleteIssue756\` mutation."""
-input DeleteIssue756Input {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-
-  """
-  The globally unique \`ID\` which will identify a single \`Issue756\` to be deleted.
-  """
-  nodeId: ID!
-}
-
-"""All input for the \`deleteIssue756ById\` mutation."""
-input DeleteIssue756ByIdInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  id: Int!
-}
-
 """The output of our delete \`LeftArm\` mutation."""
 type DeleteLeftArmPayload {
   """
@@ -29297,6 +29234,54 @@ input DeleteLeftArmByPersonIdInput {
   """
   clientMutationId: String
   personId: Int!
+}
+
+"""The output of our delete \`Issue756\` mutation."""
+type DeleteIssue756Payload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Issue756\` that was deleted by this mutation."""
+  issue756: Issue756
+  deletedIssue756Id: ID
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Issue756\`. May be used by Relay 1."""
+  issue756Edge(
+    """The method to use when ordering \`Issue756\`."""
+    orderBy: [Issue756SOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): Issue756SEdge
+}
+
+"""All input for the \`deleteIssue756\` mutation."""
+input DeleteIssue756Input {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """
+  The globally unique \`ID\` which will identify a single \`Issue756\` to be deleted.
+  """
+  nodeId: ID!
+}
+
+"""All input for the \`deleteIssue756ById\` mutation."""
+input DeleteIssue756ByIdInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  id: Int!
 }
 
 """The output of our delete \`Post\` mutation."""
@@ -29635,16 +29620,6 @@ export const plans = {
         id: undefined
       }
     },
-    issue756ById: {
-      plan(_$root, args) {
-        return pgResource_issue756PgResource.get({
-          id: args.get("id")
-        });
-      },
-      args: {
-        id: undefined
-      }
-    },
     leftArmById: {
       plan(_$root, args) {
         return pgResource_left_armPgResource.get({
@@ -29663,6 +29638,16 @@ export const plans = {
       },
       args: {
         personId: undefined
+      }
+    },
+    issue756ById: {
+      plan(_$root, args) {
+        return pgResource_issue756PgResource.get({
+          id: args.get("id")
+        });
+      },
+      args: {
+        id: undefined
       }
     },
     postById: {
@@ -30114,6 +30099,17 @@ export const plans = {
         i1: undefined
       }
     },
+    queryOutputTwoRows: {
+      plan($root, args, _info) {
+        const selectArgs = makeArgs34(args);
+        return resource_query_output_two_rowsPgResource.execute(selectArgs);
+      },
+      args: {
+        leftArmId: undefined,
+        postId: undefined,
+        txt: undefined
+      }
+    },
     compoundTypeSetQuery: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs8($parent, args, info);
@@ -30144,27 +30140,25 @@ export const plans = {
     },
     compoundTypeQuery: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs35(args);
+        const selectArgs = makeArgs36(args);
         return resource_compound_type_queryPgResource.execute(selectArgs);
       },
       args: {
         object: undefined
       }
     },
-    queryOutputTwoRows: {
+    tableQuery: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs36(args);
-        return resource_query_output_two_rowsPgResource.execute(selectArgs);
+        const selectArgs = makeArgs37(args);
+        return resource_table_queryPgResource.execute(selectArgs);
       },
       args: {
-        leftArmId: undefined,
-        postId: undefined,
-        txt: undefined
+        id: undefined
       }
     },
     queryCompoundTypeArray: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs37(args);
+        const selectArgs = makeArgs38(args);
         return resource_query_compound_type_arrayPgResource.execute(selectArgs);
       },
       args: {
@@ -30173,20 +30167,11 @@ export const plans = {
     },
     compoundTypeArrayQuery: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs38(args);
+        const selectArgs = makeArgs39(args);
         return resource_compound_type_array_queryPgResource.execute(selectArgs);
       },
       args: {
         object: undefined
-      }
-    },
-    tableQuery: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs39(args);
-        return resource_table_queryPgResource.execute(selectArgs);
-      },
-      args: {
-        id: undefined
       }
     },
     funcOutComplex: {
@@ -30519,7 +30504,7 @@ export const plans = {
         nodeId: undefined
       }
     },
-    issue756: {
+    leftArm: {
       plan(_$parent, args) {
         const $nodeId = args.get("nodeId");
         return fetcher14($nodeId);
@@ -30528,7 +30513,7 @@ export const plans = {
         nodeId: undefined
       }
     },
-    leftArm: {
+    issue756: {
       plan(_$parent, args) {
         const $nodeId = args.get("nodeId");
         return fetcher15($nodeId);
@@ -31346,49 +31331,6 @@ export const plans = {
         }
       }
     },
-    allIssue756S: {
-      plan() {
-        return connection(pgResource_issue756PgResource.find());
-      },
-      args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Query_allIssue756S_first_applyPlan
-        },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Query_allIssue756S_last_applyPlan
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Query_allIssue756S_offset_applyPlan
-        },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Query_allIssue756S_before_applyPlan
-        },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Query_allIssue756S_after_applyPlan
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("Issue756SOrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
-        }
-      }
-    },
     allLeftArms: {
       plan() {
         return connection(pgResource_left_armPgResource.find());
@@ -31420,6 +31362,49 @@ export const plans = {
             const $value = val.getRaw();
             const $select = $connection.getSubplan();
             applyOrderToPlan($select, $value, info.schema.getType("LeftArmsOrderBy"));
+            return null;
+          }
+        },
+        condition: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_condition, $connection) {
+            const $select = $connection.getSubplan();
+            return $select.wherePlan();
+          }
+        }
+      }
+    },
+    allIssue756S: {
+      plan() {
+        return connection(pgResource_issue756PgResource.find());
+      },
+      args: {
+        first: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Query_allIssue756S_first_applyPlan
+        },
+        last: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Query_allIssue756S_last_applyPlan
+        },
+        offset: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Query_allIssue756S_offset_applyPlan
+        },
+        before: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Query_allIssue756S_before_applyPlan
+        },
+        after: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Query_allIssue756S_after_applyPlan
+        },
+        orderBy: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val, info) {
+            const $value = val.getRaw();
+            const $select = $connection.getSubplan();
+            applyOrderToPlan($select, $value, info.schema.getType("Issue756SOrderBy"));
             return null;
           }
         },
@@ -33239,6 +33224,12 @@ export const plans = {
     byteaArray($record) {
       return $record.get("bytea_array");
     },
+    ltree($record) {
+      return $record.get("ltree");
+    },
+    ltreeArray($record) {
+      return $record.get("ltree_array");
+    },
     postBySmallint($record) {
       return pgResource_postPgResource.get({
         id: $record.get("smallint")
@@ -33629,7 +33620,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques26[0].attributes.forEach(attributeName => {
+        uniques25[0].attributes.forEach(attributeName => {
           const attribute = attributes_post_codec_post.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -33645,7 +33636,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques26[0].attributes.forEach(attributeName => {
+        uniques25[0].attributes.forEach(attributeName => {
           const attribute = attributes_post_codec_post.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -34252,24 +34243,6 @@ export const plans = {
       return $select;
     }
   },
-  CompoundTypesConnection: {
-    __assertStep: ConnectionStep,
-    nodes: CompoundTypesConnection_nodesPlan,
-    edges: CompoundTypesConnection_edgesPlan,
-    pageInfo: CompoundTypesConnection_pageInfoPlan,
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
-    }
-  },
-  CompoundTypesEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
   QueryOutputTwoRowsRecord: {
     __assertStep: assertPgClassSingleStep,
     txt($record) {
@@ -34292,6 +34265,24 @@ export const plans = {
       }
       $select.getClassStep().setTrusted();
       return $select;
+    }
+  },
+  CompoundTypesConnection: {
+    __assertStep: ConnectionStep,
+    nodes: CompoundTypesConnection_nodesPlan,
+    edges: CompoundTypesConnection_edgesPlan,
+    pageInfo: CompoundTypesConnection_pageInfoPlan,
+    totalCount($connection) {
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+    }
+  },
+  CompoundTypesEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
     }
   },
   FuncOutComplexRecord: {
@@ -36090,120 +36081,6 @@ export const plans = {
       applyPlan() {}
     }
   },
-  Issue756SConnection: {
-    __assertStep: ConnectionStep,
-    nodes: Issue756SConnection_nodesPlan,
-    edges: Issue756SConnection_edgesPlan,
-    pageInfo: Issue756SConnection_pageInfoPlan,
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
-    }
-  },
-  Issue756SEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  Issue756SOrderBy: {
-    NATURAL: {
-      applyPlan() {}
-    },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        uniques21[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_issue756_issue756.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        uniques21[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_issue756_issue756.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    }
-  },
-  Issue756Condition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes31.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    }
-  },
   LeftArmsConnection: {
     __assertStep: ConnectionStep,
     nodes: LeftArmsConnection_nodesPlan,
@@ -36228,7 +36105,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques22[0].attributes.forEach(attributeName => {
+        uniques21[0].attributes.forEach(attributeName => {
           const attribute = registryConfig_pgCodecs_leftArm_leftArm.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -36244,7 +36121,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques22[0].attributes.forEach(attributeName => {
+        uniques21[0].attributes.forEach(attributeName => {
           const attribute = registryConfig_pgCodecs_leftArm_leftArm.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -36343,7 +36220,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes32.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), attributes31.id.codec)}`;
             }
           });
         }
@@ -36366,7 +36243,121 @@ export const plans = {
             type: "attribute",
             attribute: "person_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes32.person_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), attributes31.person_id.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
+  Issue756SConnection: {
+    __assertStep: ConnectionStep,
+    nodes: Issue756SConnection_nodesPlan,
+    edges: Issue756SConnection_edgesPlan,
+    pageInfo: Issue756SConnection_pageInfoPlan,
+    totalCount($connection) {
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+    }
+  },
+  Issue756SEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
+  },
+  Issue756SOrderBy: {
+    NATURAL: {
+      applyPlan() {}
+    },
+    PRIMARY_KEY_ASC: {
+      applyPlan(step) {
+        uniques23[0].attributes.forEach(attributeName => {
+          const attribute = registryConfig_pgCodecs_issue756_issue756.attributes[attributeName];
+          step.orderBy({
+            codec: attribute.codec,
+            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            direction: "ASC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+        });
+        step.setOrderIsUnique();
+      }
+    },
+    PRIMARY_KEY_DESC: {
+      applyPlan(step) {
+        uniques23[0].attributes.forEach(attributeName => {
+          const attribute = registryConfig_pgCodecs_issue756_issue756.attributes[attributeName];
+          step.orderBy({
+            codec: attribute.codec,
+            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            direction: "DESC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+        });
+        step.setOrderIsUnique();
+      }
+    },
+    ID_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "id",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (true) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    ID_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "id",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (true) {
+          plan.setOrderIsUnique();
+        }
+      }
+    }
+  },
+  Issue756Condition: {
+    id: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), attributes33.id.codec)}`;
             }
           });
         }
@@ -36857,39 +36848,9 @@ export const plans = {
         }
       }
     },
-    issue756Mutation: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs107(args, ["input"]);
-        const $result = resource_issue756_mutationPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_issue756Mutation_input_applyPlan
-        }
-      }
-    },
-    issue756SetMutation: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs108(args, ["input"]);
-        const $result = resource_issue756_set_mutationPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_issue756SetMutation_input_applyPlan
-        }
-      }
-    },
     authenticateFail: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs109(args, ["input"]);
+        const selectArgs = makeArgs107(args, ["input"]);
         const $result = resource_authenticate_failPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -36904,7 +36865,7 @@ export const plans = {
     },
     authenticate: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs110(args, ["input"]);
+        const selectArgs = makeArgs108(args, ["input"]);
         const $result = resource_authenticatePgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -36919,7 +36880,7 @@ export const plans = {
     },
     leftArmIdentity: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs111(args, ["input"]);
+        const selectArgs = makeArgs109(args, ["input"]);
         const $result = resource_left_arm_identityPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -36929,6 +36890,36 @@ export const plans = {
         input: {
           autoApplyAfterParentPlan: true,
           applyPlan: Mutation_leftArmIdentity_input_applyPlan
+        }
+      }
+    },
+    issue756Mutation: {
+      plan($root, args, _info) {
+        const selectArgs = makeArgs110(args, ["input"]);
+        const $result = resource_issue756_mutationPgResource.execute(selectArgs, "mutation");
+        return object({
+          result: $result
+        });
+      },
+      args: {
+        input: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Mutation_issue756Mutation_input_applyPlan
+        }
+      }
+    },
+    issue756SetMutation: {
+      plan($root, args, _info) {
+        const selectArgs = makeArgs111(args, ["input"]);
+        const $result = resource_issue756_set_mutationPgResource.execute(selectArgs, "mutation");
+        return object({
+          result: $result
+        });
+      },
+      args: {
+        input: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Mutation_issue756SetMutation_input_applyPlan
         }
       }
     },
@@ -37022,39 +37013,9 @@ export const plans = {
         }
       }
     },
-    mutationCompoundTypeArray: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs118(args, ["input"]);
-        const $result = resource_mutation_compound_type_arrayPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_mutationCompoundTypeArray_input_applyPlan
-        }
-      }
-    },
-    compoundTypeArrayMutation: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs119(args, ["input"]);
-        const $result = resource_compound_type_array_mutationPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_compoundTypeArrayMutation_input_applyPlan
-        }
-      }
-    },
     tableMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs120(args, ["input"]);
+        const selectArgs = makeArgs118(args, ["input"]);
         const $result = resource_table_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -37069,7 +37030,7 @@ export const plans = {
     },
     postWithSuffix: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs121(args, ["input"]);
+        const selectArgs = makeArgs119(args, ["input"]);
         const $result = resource_post_with_suffixPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -37079,6 +37040,36 @@ export const plans = {
         input: {
           autoApplyAfterParentPlan: true,
           applyPlan: Mutation_postWithSuffix_input_applyPlan
+        }
+      }
+    },
+    mutationCompoundTypeArray: {
+      plan($root, args, _info) {
+        const selectArgs = makeArgs120(args, ["input"]);
+        const $result = resource_mutation_compound_type_arrayPgResource.execute(selectArgs, "mutation");
+        return object({
+          result: $result
+        });
+      },
+      args: {
+        input: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Mutation_mutationCompoundTypeArray_input_applyPlan
+        }
+      }
+    },
+    compoundTypeArrayMutation: {
+      plan($root, args, _info) {
+        const selectArgs = makeArgs121(args, ["input"]);
+        const $result = resource_compound_type_array_mutationPgResource.execute(selectArgs, "mutation");
+        return object({
+          result: $result
+        });
+      },
+      args: {
+        input: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Mutation_compoundTypeArrayMutation_input_applyPlan
         }
       }
     },
@@ -37487,21 +37478,6 @@ export const plans = {
         }
       }
     },
-    createIssue756: {
-      plan(_, args) {
-        const plan = object({
-          result: pgInsertSingle(pgResource_issue756PgResource, Object.create(null))
-        });
-        args.apply(plan);
-        return plan;
-      },
-      args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createIssue756_input_applyPlan
-        }
-      }
-    },
     createLeftArm: {
       plan(_, args) {
         const plan = object({
@@ -37514,6 +37490,21 @@ export const plans = {
         input: {
           autoApplyAfterParentPlan: true,
           applyPlan: Mutation_createLeftArm_input_applyPlan
+        }
+      }
+    },
+    createIssue756: {
+      plan(_, args) {
+        const plan = object({
+          result: pgInsertSingle(pgResource_issue756PgResource, Object.create(null))
+        });
+        args.apply(plan);
+        return plan;
+      },
+      args: {
+        input: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Mutation_createIssue756_input_applyPlan
         }
       }
     },
@@ -37969,40 +37960,10 @@ export const plans = {
         }
       }
     },
-    updateIssue756: {
-      plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_issue756PgResource, specFromArgs14(args))
-        });
-        args.apply(plan);
-        return plan;
-      },
-      args: {
-        input: {
-          applyPlan: Mutation_updateIssue756_input_applyPlan
-        }
-      }
-    },
-    updateIssue756ById: {
-      plan(_$root, args) {
-        const plan = object({
-          result: pgUpdateSingle(pgResource_issue756PgResource, {
-            id: args.get(['input', "id"])
-          })
-        });
-        args.apply(plan);
-        return plan;
-      },
-      args: {
-        input: {
-          applyPlan: Mutation_updateIssue756ById_input_applyPlan
-        }
-      }
-    },
     updateLeftArm: {
       plan(_$root, args) {
         const plan = object({
-          result: pgUpdateSingle(pgResource_left_armPgResource, specFromArgs15(args))
+          result: pgUpdateSingle(pgResource_left_armPgResource, specFromArgs14(args))
         });
         args.apply(plan);
         return plan;
@@ -38042,6 +38003,36 @@ export const plans = {
       args: {
         input: {
           applyPlan: Mutation_updateLeftArmByPersonId_input_applyPlan
+        }
+      }
+    },
+    updateIssue756: {
+      plan(_$root, args) {
+        const plan = object({
+          result: pgUpdateSingle(pgResource_issue756PgResource, specFromArgs15(args))
+        });
+        args.apply(plan);
+        return plan;
+      },
+      args: {
+        input: {
+          applyPlan: Mutation_updateIssue756_input_applyPlan
+        }
+      }
+    },
+    updateIssue756ById: {
+      plan(_$root, args) {
+        const plan = object({
+          result: pgUpdateSingle(pgResource_issue756PgResource, {
+            id: args.get(['input', "id"])
+          })
+        });
+        args.apply(plan);
+        return plan;
+      },
+      args: {
+        input: {
+          applyPlan: Mutation_updateIssue756ById_input_applyPlan
         }
       }
     },
@@ -38558,40 +38549,10 @@ export const plans = {
         }
       }
     },
-    deleteIssue756: {
-      plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_issue756PgResource, specFromArgs32(args))
-        });
-        args.apply(plan);
-        return plan;
-      },
-      args: {
-        input: {
-          applyPlan: Mutation_deleteIssue756_input_applyPlan
-        }
-      }
-    },
-    deleteIssue756ById: {
-      plan(_$root, args) {
-        const plan = object({
-          result: pgDeleteSingle(pgResource_issue756PgResource, {
-            id: args.get(['input', "id"])
-          })
-        });
-        args.apply(plan);
-        return plan;
-      },
-      args: {
-        input: {
-          applyPlan: Mutation_deleteIssue756ById_input_applyPlan
-        }
-      }
-    },
     deleteLeftArm: {
       plan(_$root, args) {
         const plan = object({
-          result: pgDeleteSingle(pgResource_left_armPgResource, specFromArgs33(args))
+          result: pgDeleteSingle(pgResource_left_armPgResource, specFromArgs32(args))
         });
         args.apply(plan);
         return plan;
@@ -38631,6 +38592,36 @@ export const plans = {
       args: {
         input: {
           applyPlan: Mutation_deleteLeftArmByPersonId_input_applyPlan
+        }
+      }
+    },
+    deleteIssue756: {
+      plan(_$root, args) {
+        const plan = object({
+          result: pgDeleteSingle(pgResource_issue756PgResource, specFromArgs33(args))
+        });
+        args.apply(plan);
+        return plan;
+      },
+      args: {
+        input: {
+          applyPlan: Mutation_deleteIssue756_input_applyPlan
+        }
+      }
+    },
+    deleteIssue756ById: {
+      plan(_$root, args) {
+        const plan = object({
+          result: pgDeleteSingle(pgResource_issue756PgResource, {
+            id: args.get(['input', "id"])
+          })
+        });
+        args.apply(plan);
+        return plan;
+      },
+      args: {
+        input: {
+          applyPlan: Mutation_deleteIssue756ById_input_applyPlan
         }
       }
     },
@@ -39268,65 +39259,6 @@ export const plans = {
     d: undefined,
     e: undefined
   },
-  Issue756MutationPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId: Issue756MutationPayload_clientMutationIdPlan,
-    issue756($object) {
-      return $object.get("result");
-    },
-    query: Issue756MutationPayload_queryPlan,
-    issue756Edge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_issue756PgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("Issue756SOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
-      }
-    }
-  },
-  Issue756MutationInput: {
-    clientMutationId: {
-      applyPlan: Issue756MutationInput_clientMutationId_applyPlan,
-      autoApplyAfterParentApplyPlan: true
-    }
-  },
-  Issue756SetMutationPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId: Issue756SetMutationPayload_clientMutationIdPlan,
-    issue756S($object) {
-      return $object.get("result");
-    },
-    query: Issue756SetMutationPayload_queryPlan
-  },
-  Issue756SetMutationInput: {
-    clientMutationId: {
-      applyPlan: Issue756SetMutationInput_clientMutationId_applyPlan,
-      autoApplyAfterParentApplyPlan: true
-    }
-  },
   AuthenticateFailPayload: {
     __assertStep: ObjectStep,
     clientMutationId: AuthenticateFailPayload_clientMutationIdPlan,
@@ -39393,7 +39325,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques22[0].attributes.reduce((memo, attributeName) => {
+            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -39454,6 +39386,65 @@ export const plans = {
         $insert.set("mood", val.get());
       },
       autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
+  Issue756MutationPayload: {
+    __assertStep: ObjectStep,
+    clientMutationId: Issue756MutationPayload_clientMutationIdPlan,
+    issue756($object) {
+      return $object.get("result");
+    },
+    query: Issue756MutationPayload_queryPlan,
+    issue756Edge: {
+      plan($mutation, args, info) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = uniques23[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return pgResource_issue756PgResource.find(spec);
+          }
+        })();
+        // Perform ordering
+        const $value = args.getRaw("orderBy");
+        applyOrderToPlan($select, $value, info.schema.getType("Issue756SOrderBy"));
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      args: {
+        orderBy: undefined
+      }
+    }
+  },
+  Issue756MutationInput: {
+    clientMutationId: {
+      applyPlan: Issue756MutationInput_clientMutationId_applyPlan,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
+  Issue756SetMutationPayload: {
+    __assertStep: ObjectStep,
+    clientMutationId: Issue756SetMutationPayload_clientMutationIdPlan,
+    issue756S($object) {
+      return $object.get("result");
+    },
+    query: Issue756SetMutationPayload_queryPlan
+  },
+  Issue756SetMutationInput: {
+    clientMutationId: {
+      applyPlan: Issue756SetMutationInput_clientMutationId_applyPlan,
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -39599,36 +39590,6 @@ export const plans = {
     },
     object: undefined
   },
-  MutationCompoundTypeArrayPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId: MutationCompoundTypeArrayPayload_clientMutationIdPlan,
-    compoundTypes($object) {
-      return $object.get("result");
-    },
-    query: MutationCompoundTypeArrayPayload_queryPlan
-  },
-  MutationCompoundTypeArrayInput: {
-    clientMutationId: {
-      applyPlan: MutationCompoundTypeArrayInput_clientMutationId_applyPlan,
-      autoApplyAfterParentApplyPlan: true
-    },
-    object: undefined
-  },
-  CompoundTypeArrayMutationPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId: CompoundTypeArrayMutationPayload_clientMutationIdPlan,
-    compoundTypes($object) {
-      return $object.get("result");
-    },
-    query: CompoundTypeArrayMutationPayload_queryPlan
-  },
-  CompoundTypeArrayMutationInput: {
-    clientMutationId: {
-      applyPlan: CompoundTypeArrayMutationInput_clientMutationId_applyPlan,
-      autoApplyAfterParentApplyPlan: true
-    },
-    object: undefined
-  },
   TableMutationPayload: {
     __assertStep: ObjectStep,
     clientMutationId: TableMutationPayload_clientMutationIdPlan,
@@ -39646,7 +39607,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques26[0].attributes.reduce((memo, attributeName) => {
+            const spec = uniques25[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -39697,7 +39658,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques26[0].attributes.reduce((memo, attributeName) => {
+            const spec = uniques25[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -39791,6 +39752,36 @@ export const plans = {
       autoApplyAfterParentInputPlan: true,
       autoApplyAfterParentApplyPlan: true
     }
+  },
+  MutationCompoundTypeArrayPayload: {
+    __assertStep: ObjectStep,
+    clientMutationId: MutationCompoundTypeArrayPayload_clientMutationIdPlan,
+    compoundTypes($object) {
+      return $object.get("result");
+    },
+    query: MutationCompoundTypeArrayPayload_queryPlan
+  },
+  MutationCompoundTypeArrayInput: {
+    clientMutationId: {
+      applyPlan: MutationCompoundTypeArrayInput_clientMutationId_applyPlan,
+      autoApplyAfterParentApplyPlan: true
+    },
+    object: undefined
+  },
+  CompoundTypeArrayMutationPayload: {
+    __assertStep: ObjectStep,
+    clientMutationId: CompoundTypeArrayMutationPayload_clientMutationIdPlan,
+    compoundTypes($object) {
+      return $object.get("result");
+    },
+    query: CompoundTypeArrayMutationPayload_queryPlan
+  },
+  CompoundTypeArrayMutationInput: {
+    clientMutationId: {
+      applyPlan: CompoundTypeArrayMutationInput_clientMutationId_applyPlan,
+      autoApplyAfterParentApplyPlan: true
+    },
+    object: undefined
   },
   PostManyPayload: {
     __assertStep: ObjectStep,
@@ -41105,69 +41096,6 @@ export const plans = {
       autoApplyAfterParentApplyPlan: true
     }
   },
-  CreateIssue756Payload: {
-    __assertStep: assertExecutableStep,
-    clientMutationId: CreateIssue756Payload_clientMutationIdPlan,
-    issue756: CreateIssue756Payload_issue756Plan,
-    query: CreateIssue756Payload_queryPlan,
-    issue756Edge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_issue756PgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("Issue756SOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
-      }
-    }
-  },
-  CreateIssue756Input: {
-    clientMutationId: {
-      applyPlan: CreateIssue756Input_clientMutationId_applyPlan,
-      autoApplyAfterParentApplyPlan: true
-    },
-    issue756: {
-      applyPlan: CreateIssue756Input_issue756_applyPlan,
-      autoApplyAfterParentApplyPlan: true
-    }
-  },
-  Issue756Input: {
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    ts: {
-      applyPlan($insert, val) {
-        $insert.set("ts", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    }
-  },
   CreateLeftArmPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId: CreateLeftArmPayload_clientMutationIdPlan,
@@ -41183,7 +41111,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques22[0].attributes.reduce((memo, attributeName) => {
+            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -41250,6 +41178,69 @@ export const plans = {
       autoApplyAfterParentApplyPlan: true
     }
   },
+  CreateIssue756Payload: {
+    __assertStep: assertExecutableStep,
+    clientMutationId: CreateIssue756Payload_clientMutationIdPlan,
+    issue756: CreateIssue756Payload_issue756Plan,
+    query: CreateIssue756Payload_queryPlan,
+    issue756Edge: {
+      plan($mutation, args, info) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = uniques23[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return pgResource_issue756PgResource.find(spec);
+          }
+        })();
+        // Perform ordering
+        const $value = args.getRaw("orderBy");
+        applyOrderToPlan($select, $value, info.schema.getType("Issue756SOrderBy"));
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      args: {
+        orderBy: undefined
+      }
+    }
+  },
+  CreateIssue756Input: {
+    clientMutationId: {
+      applyPlan: CreateIssue756Input_clientMutationId_applyPlan,
+      autoApplyAfterParentApplyPlan: true
+    },
+    issue756: {
+      applyPlan: CreateIssue756Input_issue756_applyPlan,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
+  Issue756Input: {
+    id: {
+      applyPlan($insert, val) {
+        $insert.set("id", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    ts: {
+      applyPlan($insert, val) {
+        $insert.set("ts", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
   CreatePostPayload: {
     __assertStep: assertExecutableStep,
     clientMutationId: CreatePostPayload_clientMutationIdPlan,
@@ -41265,7 +41256,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques26[0].attributes.reduce((memo, attributeName) => {
+            const spec = uniques25[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -41820,6 +41811,20 @@ export const plans = {
     byteaArray: {
       applyPlan($insert, val) {
         $insert.set("bytea_array", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    ltree: {
+      applyPlan($insert, val) {
+        $insert.set("ltree", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    ltreeArray: {
+      applyPlan($insert, val) {
+        $insert.set("ltree_array", val.get());
       },
       autoApplyAfterParentInputPlan: true,
       autoApplyAfterParentApplyPlan: true
@@ -42867,77 +42872,6 @@ export const plans = {
       applyPlan: UpdateNullTestRecordByIdInput_nullTestRecordPatch_applyPlan
     }
   },
-  UpdateIssue756Payload: {
-    __assertStep: ObjectStep,
-    clientMutationId: UpdateIssue756Payload_clientMutationIdPlan,
-    issue756: UpdateIssue756Payload_issue756Plan,
-    query: UpdateIssue756Payload_queryPlan,
-    issue756Edge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_issue756PgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("Issue756SOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
-      }
-    }
-  },
-  UpdateIssue756Input: {
-    clientMutationId: {
-      applyPlan: UpdateIssue756Input_clientMutationId_applyPlan
-    },
-    nodeId: undefined,
-    issue756Patch: {
-      applyPlan: UpdateIssue756Input_issue756Patch_applyPlan
-    }
-  },
-  Issue756Patch: {
-    id: {
-      applyPlan($insert, val) {
-        $insert.set("id", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    ts: {
-      applyPlan($insert, val) {
-        $insert.set("ts", val.get());
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    }
-  },
-  UpdateIssue756ByIdInput: {
-    clientMutationId: {
-      applyPlan: UpdateIssue756ByIdInput_clientMutationId_applyPlan
-    },
-    id: undefined,
-    issue756Patch: {
-      applyPlan: UpdateIssue756ByIdInput_issue756Patch_applyPlan
-    }
-  },
   UpdateLeftArmPayload: {
     __assertStep: ObjectStep,
     clientMutationId: UpdateLeftArmPayload_clientMutationIdPlan,
@@ -42953,7 +42887,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques22[0].attributes.reduce((memo, attributeName) => {
+            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -43037,6 +42971,77 @@ export const plans = {
       applyPlan: UpdateLeftArmByPersonIdInput_leftArmPatch_applyPlan
     }
   },
+  UpdateIssue756Payload: {
+    __assertStep: ObjectStep,
+    clientMutationId: UpdateIssue756Payload_clientMutationIdPlan,
+    issue756: UpdateIssue756Payload_issue756Plan,
+    query: UpdateIssue756Payload_queryPlan,
+    issue756Edge: {
+      plan($mutation, args, info) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = uniques23[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return pgResource_issue756PgResource.find(spec);
+          }
+        })();
+        // Perform ordering
+        const $value = args.getRaw("orderBy");
+        applyOrderToPlan($select, $value, info.schema.getType("Issue756SOrderBy"));
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      args: {
+        orderBy: undefined
+      }
+    }
+  },
+  UpdateIssue756Input: {
+    clientMutationId: {
+      applyPlan: UpdateIssue756Input_clientMutationId_applyPlan
+    },
+    nodeId: undefined,
+    issue756Patch: {
+      applyPlan: UpdateIssue756Input_issue756Patch_applyPlan
+    }
+  },
+  Issue756Patch: {
+    id: {
+      applyPlan($insert, val) {
+        $insert.set("id", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    ts: {
+      applyPlan($insert, val) {
+        $insert.set("ts", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
+  UpdateIssue756ByIdInput: {
+    clientMutationId: {
+      applyPlan: UpdateIssue756ByIdInput_clientMutationId_applyPlan
+    },
+    id: undefined,
+    issue756Patch: {
+      applyPlan: UpdateIssue756ByIdInput_issue756Patch_applyPlan
+    }
+  },
   UpdatePostPayload: {
     __assertStep: ObjectStep,
     clientMutationId: UpdatePostPayload_clientMutationIdPlan,
@@ -43052,7 +43057,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques26[0].attributes.reduce((memo, attributeName) => {
+            const spec = uniques25[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -43666,6 +43671,20 @@ export const plans = {
     byteaArray: {
       applyPlan($insert, val) {
         $insert.set("bytea_array", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    ltree: {
+      applyPlan($insert, val) {
+        $insert.set("ltree", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    ltreeArray: {
+      applyPlan($insert, val) {
+        $insert.set("ltree_array", val.get());
       },
       autoApplyAfterParentInputPlan: true,
       autoApplyAfterParentApplyPlan: true
@@ -44410,60 +44429,6 @@ export const plans = {
     },
     id: undefined
   },
-  DeleteIssue756Payload: {
-    __assertStep: ObjectStep,
-    clientMutationId: DeleteIssue756Payload_clientMutationIdPlan,
-    issue756: DeleteIssue756Payload_issue756Plan,
-    deletedIssue756Id($object) {
-      const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.Issue756.plan($record);
-      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
-    },
-    query: DeleteIssue756Payload_queryPlan,
-    issue756Edge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_issue756PgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("Issue756SOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
-      }
-    }
-  },
-  DeleteIssue756Input: {
-    clientMutationId: {
-      applyPlan: DeleteIssue756Input_clientMutationId_applyPlan
-    },
-    nodeId: undefined
-  },
-  DeleteIssue756ByIdInput: {
-    clientMutationId: {
-      applyPlan: DeleteIssue756ByIdInput_clientMutationId_applyPlan
-    },
-    id: undefined
-  },
   DeleteLeftArmPayload: {
     __assertStep: ObjectStep,
     clientMutationId: DeleteLeftArmPayload_clientMutationIdPlan,
@@ -44484,7 +44449,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques22[0].attributes.reduce((memo, attributeName) => {
+            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -44529,6 +44494,60 @@ export const plans = {
     },
     personId: undefined
   },
+  DeleteIssue756Payload: {
+    __assertStep: ObjectStep,
+    clientMutationId: DeleteIssue756Payload_clientMutationIdPlan,
+    issue756: DeleteIssue756Payload_issue756Plan,
+    deletedIssue756Id($object) {
+      const $record = $object.getStepForKey("result");
+      const specifier = nodeIdHandlerByTypeName.Issue756.plan($record);
+      return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
+    },
+    query: DeleteIssue756Payload_queryPlan,
+    issue756Edge: {
+      plan($mutation, args, info) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = uniques23[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return pgResource_issue756PgResource.find(spec);
+          }
+        })();
+        // Perform ordering
+        const $value = args.getRaw("orderBy");
+        applyOrderToPlan($select, $value, info.schema.getType("Issue756SOrderBy"));
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      args: {
+        orderBy: undefined
+      }
+    }
+  },
+  DeleteIssue756Input: {
+    clientMutationId: {
+      applyPlan: DeleteIssue756Input_clientMutationId_applyPlan
+    },
+    nodeId: undefined
+  },
+  DeleteIssue756ByIdInput: {
+    clientMutationId: {
+      applyPlan: DeleteIssue756ByIdInput_clientMutationId_applyPlan
+    },
+    id: undefined
+  },
   DeletePostPayload: {
     __assertStep: ObjectStep,
     clientMutationId: DeletePostPayload_clientMutationIdPlan,
@@ -44549,7 +44568,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques26[0].attributes.reduce((memo, attributeName) => {
+            const spec = uniques25[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));

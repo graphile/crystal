@@ -4,6 +4,7 @@ import { TYPES } from "@dataplan/pg";
 import PersistedPlugin from "@grafserv/persisted";
 import { EXPORTABLE, exportSchema } from "graphile-export";
 import { gql, makeExtendSchemaPlugin } from "graphile-utils";
+import * as jsonwebtoken from "jsonwebtoken";
 import type {} from "postgraphile";
 import { jsonParse } from "postgraphile/@dataplan/json";
 import { makePgService } from "postgraphile/adaptors/pg";
@@ -152,6 +153,9 @@ const ExportSchemaPlugin: GraphileConfig.Plugin = {
       finalize(schema) {
         exportSchema(schema, `${__dirname}/exported-schema.mjs`, {
           mode: "typeDefs",
+          modules: {
+            jsonwebtoken,
+          },
         }).catch((e) => {
           console.error(e);
         });

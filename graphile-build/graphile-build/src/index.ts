@@ -150,6 +150,10 @@ export const buildInflection = (
   return inflectors as GraphileBuild.Inflection;
 };
 
+function pluginNamespace(plugin: GraphileConfig.Plugin): string {
+  return plugin.gather?.namespace ?? plugin.name;
+}
+
 /**
  * @internal
  */
@@ -181,19 +185,15 @@ const gatherBase = (
     // Prepare the plugins to run by preparing their initial states, and registering the helpers (hooks area already done).
     for (const plugin of gatherPlugins) {
       const spec = plugin.gather!;
-      if (spec.namespace != null) {
-        if (spec.namespace in globalState) {
-          // ERRORS: track who registers which namespace, output more helpful error.
-          throw new Error(
-            `Namespace '${spec.namespace}' was already registered, it cannot be registered by two plugins - namespaces must be unique.`,
-          );
-        }
+      const specNamespace = pluginNamespace(plugin);
+      if (specNamespace in globalState) {
+        // ERRORS: track who registers which namespace, output more helpful error.
+        throw new Error(
+          `Namespace '${specNamespace}' was already registered, it cannot be registered by two plugins - namespaces must be unique. Latest plugin was '${plugin.name}'.`,
+        );
       }
-      const cache =
-        spec.namespace != null
-          ? (globalState[spec.namespace] =
-              spec.initialCache?.() ?? Object.create(null))
-          : EMPTY_OBJECT;
+      const cache = (globalState[specNamespace] =
+        spec.initialCache?.() ?? Object.create(null));
       if (typeof cache.then === "function") {
         // ENHANCE: can we just make `initialCache` allow promises?
         throw new Error(
@@ -213,18 +213,21 @@ const gatherBase = (
         EXPORTABLE,
       };
       pluginContext.set(plugin, context);
-      if (spec.namespace != null) {
-        helpers[spec.namespace] = Object.create(null);
-        if (spec.helpers != null) {
-          const specHelpers = spec.helpers;
-          for (const helperName of Object.keys(specHelpers)) {
-            helpers[spec.namespace][helperName] = (...args: any[]): any => {
-              return (specHelpers as Record<string, any>)[helperName](
-                context,
-                ...args,
-              );
-            };
-          }
+      helpers[specNamespace] = Object.create(null);
+      if (spec.helpers != null) {
+        if (!spec.namespace) {
+          throw new Error(
+            `Plugin '${plugin.name}' tries to add helpers but is using an implicit namespace. Please use an explicit \`plugin.gather.namespace\`.`,
+          );
+        }
+        const specHelpers = spec.helpers;
+        for (const helperName of Object.keys(specHelpers)) {
+          helpers[specNamespace][helperName] = (...args: any[]): any => {
+            return (specHelpers as Record<string, any>)[helperName](
+              context,
+              ...args,
+            );
+          };
         }
       }
     }
@@ -251,14 +254,13 @@ const gatherBase = (
       // Reset state
       for (const plugin of gatherPlugins) {
         const spec = plugin.gather!;
+        const specNamespace = pluginNamespace(plugin);
         const context = pluginContext.get(plugin)!;
-        if (spec.namespace != null) {
-          const val =
-            typeof spec.initialState === "function"
-              ? await spec.initialState(context.cache)
-              : {};
-          context.state = gatherState[spec.namespace] = val;
-        }
+        const val =
+          typeof spec.initialState === "function"
+            ? await spec.initialState(context.cache)
+            : Object.create(null);
+        context.state = gatherState[specNamespace] = val;
       }
 
       // Now call the main functions

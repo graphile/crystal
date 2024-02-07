@@ -147,6 +147,8 @@
         id: 11,
         headline: "They’re not aliens, they’re Earth…liens!",
       },
+      ltree: null,
+      ltreeArray: null,
     },
   },
   typeFunctionListMutation: {
@@ -298,6 +300,8 @@
           id: 11,
           headline: "They’re not aliens, they’re Earth…liens!",
         },
+        ltree: null,
+        ltreeArray: null,
       },
       {
         id: 12,
@@ -459,6 +463,11 @@
         ],
         postBySmallint: null,
         postById: null,
+        ltree: "Top.Child1.Child2",
+        ltreeArray: [
+          "Top.Child1.Child2",
+          "Top.Child3.Child4",
+        ],
       },
     ],
   },
@@ -611,6 +620,8 @@
           id: 11,
           headline: "They’re not aliens, they’re Earth…liens!",
         },
+        ltree: null,
+        ltreeArray: null,
       },
       {
         id: 12,
@@ -772,6 +783,11 @@
         ],
         postBySmallint: null,
         postById: null,
+        ltree: "Top.Child1.Child2",
+        ltreeArray: [
+          "Top.Child1.Child2",
+          "Top.Child3.Child4",
+        ],
       },
     ],
   },
@@ -918,6 +934,11 @@
         id: 11,
         headline: "They’re not aliens, they’re Earth…liens!",
       },
+      ltree: "Foo.Bar.Baz",
+      ltreeArray: [
+        "Bar.Baz.Qux",
+        "Bar.Foo.Fah",
+      ],
     },
   },
   createType: {
@@ -1049,6 +1070,11 @@
         id: 1,
         headline: "No… It’s a thing; it’s like a plan, but with more greatness.",
       },
+      ltree: "Foo.Bar.Baz",
+      ltreeArray: [
+        "Bar.Baz.Qux",
+        "Bar.Foo.Fah",
+      ],
     },
   },
 }

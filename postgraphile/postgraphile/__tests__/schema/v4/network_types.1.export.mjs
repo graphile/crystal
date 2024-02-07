@@ -109,7 +109,6 @@ const spec_network = {
   attributes,
   description: undefined,
   extensions: {
-    oid: "1376645",
     isTableLike: true,
     pg: {
       serviceName: "main",

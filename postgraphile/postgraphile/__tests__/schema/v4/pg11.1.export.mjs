@@ -93,7 +93,6 @@ const spec_alwaysAsIdentity = {
   attributes,
   description: undefined,
   extensions: {
-    oid: "1377467",
     isTableLike: true,
     pg: {
       serviceName: "main",
@@ -126,7 +125,6 @@ const attributes2 = Object.assign(Object.create(null), {
   }
 });
 const extensions2 = {
-  oid: "1377475",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -194,7 +192,6 @@ const attributes3 = Object.assign(Object.create(null), {
   }
 });
 const extensions3 = {
-  oid: "1377483",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -215,7 +212,6 @@ const spec_network = {
 };
 const registryConfig_pgCodecs_network_network = recordCodec(spec_network);
 const extensions4 = {
-  oid: "1377492",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -224,7 +220,6 @@ const extensions4 = {
   tags: Object.create(null)
 };
 const extensions5 = {
-  oid: "1377489",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -233,7 +228,6 @@ const extensions5 = {
   tags: Object.create(null)
 };
 const extensions6 = {
-  oid: "1377490",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -262,7 +256,6 @@ const registryConfig_pgCodecs_bigintDomainArrayDomain_bigintDomainArrayDomain = 
   notNull: false
 });
 const extensions7 = {
-  oid: "1377494",
   pg: {
     serviceName: "main",
     schemaName: "pg11",
@@ -271,7 +264,6 @@ const extensions7 = {
   tags: Object.create(null)
 };
 const extensions8 = {
-  oid: "1375966",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -290,7 +282,6 @@ const attributes_c_codec_color = enumCodec({
 });
 const enumLabels2 = ["FOO_BAR", "BAR_FOO", "BAZ_QUX", "0_BAR"];
 const extensions9 = {
-  oid: "1375974",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -309,7 +300,6 @@ const attributes_e_codec_enumCaps = enumCodec({
 });
 const enumLabels3 = ["", "one", "two"];
 const extensions10 = {
-  oid: "1375984",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -401,7 +391,6 @@ const attributes4 = Object.assign(Object.create(null), {
   }
 });
 const extensions11 = {
-  oid: "1375993",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -476,7 +465,6 @@ const attributes5 = Object.assign(Object.create(null), {
   }
 });
 const extensions12 = {
-  oid: "1377499",
   isTableLike: true,
   pg: {
     serviceName: "main",

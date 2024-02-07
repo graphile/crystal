@@ -91,7 +91,6 @@ const spec_file = {
   attributes,
   description: undefined,
   extensions: {
-    oid: "1376423",
     isTableLike: true,
     pg: {
       serviceName: "main",
@@ -124,7 +123,6 @@ const attributes_object_Object_ = Object.assign(Object.create(null), {
   }
 });
 const extensions2 = {
-  oid: "1376414",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -174,7 +172,6 @@ const attributes2 = Object.assign(Object.create(null), {
   }
 });
 const extensions3 = {
-  oid: "1376431",
   isTableLike: true,
   pg: {
     serviceName: "main",

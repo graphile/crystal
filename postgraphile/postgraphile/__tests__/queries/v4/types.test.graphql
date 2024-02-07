@@ -193,6 +193,8 @@ fragment type on Type {
     id
     headline
   }
+  ltree
+  ltreeArray
 }
 
 fragment typesConnection on TypesConnection {

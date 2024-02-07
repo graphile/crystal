@@ -61,7 +61,6 @@ const sqlIdent = sql.identifier(...["b", "guid"]);
 const registryConfig_pgCodecs_guid_guid = domainOfCodec(TYPES.varchar, "guid", sqlIdent, {
   description: undefined,
   extensions: {
-    oid: "1375935",
     pg: {
       serviceName: "main",
       schemaName: "b",
@@ -120,7 +119,6 @@ const executor_mainPgExecutor = new PgExecutor({
   }
 });
 const extensions2 = {
-  oid: "1376009",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -144,22 +142,6 @@ const spec_updatableView = {
 };
 const registryConfig_pgCodecs_updatableView_updatableView = recordCodec(spec_updatableView);
 const extensions3 = {
-  oid: "2951",
-  pg: {
-    serviceName: "main",
-    schemaName: "pg_catalog",
-    name: "_uuid"
-  },
-  tags: Object.create(null)
-};
-const registryConfig_pgCodecs_uuidArray_uuidArray = listOfCodec(TYPES.uuid, {
-  extensions: extensions3,
-  typeDelim: ",",
-  description: undefined,
-  name: "uuidArray"
-});
-const extensions4 = {
-  oid: "1376178",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -223,10 +205,24 @@ const spec_jwtToken = {
     }
   }),
   description: undefined,
-  extensions: extensions4,
+  extensions: extensions3,
   executor: executor_mainPgExecutor
 };
 const registryConfig_pgCodecs_jwtToken_jwtToken = recordCodec(spec_jwtToken);
+const extensions4 = {
+  pg: {
+    serviceName: "main",
+    schemaName: "pg_catalog",
+    name: "_uuid"
+  },
+  tags: Object.create(null)
+};
+const registryConfig_pgCodecs_uuidArray_uuidArray = listOfCodec(TYPES.uuid, {
+  extensions: extensions4,
+  typeDelim: ",",
+  description: undefined,
+  name: "uuidArray"
+});
 const attributes2 = Object.assign(Object.create(null), {
   jwt: {
     description: undefined,
@@ -257,7 +253,6 @@ const attributes2 = Object.assign(Object.create(null), {
   }
 });
 const extensions5 = {
-  oid: "1376184",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -280,7 +275,6 @@ const spec_authPayload = {
 };
 const registryConfig_pgCodecs_authPayload_authPayload = recordCodec(spec_authPayload);
 const extensions6 = {
-  oid: "1375966",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -299,7 +293,6 @@ const attributes_c_codec_color = enumCodec({
 });
 const enumLabels2 = ["FOO_BAR", "BAR_FOO", "BAZ_QUX", "0_BAR"];
 const extensions7 = {
-  oid: "1375974",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -318,7 +311,6 @@ const attributes_e_codec_enumCaps = enumCodec({
 });
 const enumLabels3 = ["", "one", "two"];
 const extensions8 = {
-  oid: "1375984",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -410,7 +402,6 @@ const attributes3 = Object.assign(Object.create(null), {
   }
 });
 const extensions9 = {
-  oid: "1375993",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -431,7 +422,6 @@ const spec_compoundType = {
 };
 const registryConfig_pgCodecs_compoundType_compoundType = recordCodec(spec_compoundType);
 const extensions10 = {
-  oid: "1375965",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -446,7 +436,6 @@ const attributes_enum_array_codec_colorArray = listOfCodec(attributes_c_codec_co
   name: "colorArray"
 });
 const extensions11 = {
-  oid: "1376071",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -462,7 +451,6 @@ const attributes_domain_codec_anInt = domainOfCodec(TYPES.int, "anInt", sqlIdent
   notNull: false
 });
 const extensions12 = {
-  oid: "1376073",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -478,7 +466,6 @@ const attributes_domain2_codec_anotherInt = domainOfCodec(attributes_domain_code
   notNull: false
 });
 const extensions13 = {
-  oid: "1009",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -493,7 +480,6 @@ const attributes_text_array_codec_textArray = listOfCodec(TYPES.text, {
   name: "textArray"
 });
 const extensions14 = {
-  oid: "3906",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -508,7 +494,6 @@ const attributes_nullable_range_codec_numrange = rangeOfCodec(TYPES.numeric, "nu
   extensions: extensions14
 });
 const extensions15 = {
-  oid: "3912",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -523,7 +508,6 @@ const attributes_daterange_codec_daterange = rangeOfCodec(TYPES.date, "daterange
   extensions: extensions15
 });
 const extensions16 = {
-  oid: "1376077",
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -538,7 +522,6 @@ const attributes_an_int_range_codec_anIntRange = rangeOfCodec(attributes_domain_
   extensions: extensions16
 });
 const extensions17 = {
-  oid: "1187",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -582,7 +565,6 @@ const attributes5 = Object.assign(Object.create(null), {
   }
 });
 const extensions18 = {
-  oid: "1375996",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -603,7 +585,6 @@ const spec_nestedCompoundType = {
 };
 const attributes_nested_compound_type_codec_nestedCompoundType = recordCodec(spec_nestedCompoundType);
 const extensions19 = {
-  oid: "1376085",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -619,7 +600,6 @@ const attributes_text_array_domain_codec_textArrayDomain = domainOfCodec(attribu
   notNull: false
 });
 const extensions20 = {
-  oid: "1376087",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -628,7 +608,6 @@ const extensions20 = {
   tags: Object.create(null)
 };
 const extensions21 = {
-  oid: "1016",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -650,7 +629,6 @@ const attributes_int8_array_domain_codec_int8ArrayDomain = domainOfCodec(innerCo
   notNull: false
 });
 const extensions22 = {
-  oid: "1001",
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -664,6 +642,19 @@ const attributes_bytea_array_codec_byteaArray = listOfCodec(TYPES.bytea, {
   description: undefined,
   name: "byteaArray"
 });
+const attributes_ltree_codec_ltree = {
+  name: "ltree",
+  sqlType: sql`ltree`,
+  toPg(str) {
+    return str;
+  },
+  fromPg(str) {
+    return str;
+  },
+  executor: null,
+  attributes: undefined
+};
+const attributes_ltree_array_codec_ltree_ = listOfCodec(attributes_ltree_codec_ltree);
 const attributes4 = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -1087,10 +1078,27 @@ const attributes4 = Object.assign(Object.create(null), {
     extensions: {
       tags: {}
     }
+  },
+  ltree: {
+    description: undefined,
+    codec: attributes_ltree_codec_ltree,
+    notNull: false,
+    hasDefault: false,
+    extensions: {
+      tags: {}
+    }
+  },
+  ltree_array: {
+    description: undefined,
+    codec: attributes_ltree_array_codec_ltree_,
+    notNull: false,
+    hasDefault: false,
+    extensions: {
+      tags: {}
+    }
   }
 });
 const extensions23 = {
-  oid: "1376091",
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1113,7 +1121,6 @@ const spec_types = {
 };
 const registryConfig_pgCodecs_types_types = recordCodec(spec_types);
 const extensions24 = {
-  oid: "1376177",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -1122,7 +1129,6 @@ const extensions24 = {
   tags: Object.create(null)
 };
 const extensions25 = {
-  oid: "1375992",
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -1131,7 +1137,6 @@ const extensions25 = {
   tags: Object.create(null)
 };
 const extensions26 = {
-  oid: "1376090",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -1140,7 +1145,6 @@ const extensions26 = {
   tags: Object.create(null)
 };
 const extensions27 = {
-  oid: "1375834",
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -1167,7 +1171,6 @@ const attributes6 = Object.assign(Object.create(null), {
   }
 });
 const extensions28 = {
-  oid: "1375837",
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -1301,42 +1304,13 @@ const extensions34 = {
     unique: "x|@behavior -single -update -delete"
   }
 };
-const extensions35 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "list_bde_mutation"
-  },
-  tags: {
-    behavior: ["-queryField mutationField -typeField", "-filter -order"]
-  }
-};
-const parts25 = ["b", "list_bde_mutation"];
+const parts25 = ["b", "authenticate_fail"];
 const sqlIdent25 = sql.identifier(...parts25);
-const fromCallback6 = (...args) => sql`${sqlIdent25}(${sqlFromArgDigests(args)})`;
-const parameters6 = [{
-  name: "b",
-  required: true,
-  notNull: false,
-  codec: attributes_text_array_codec_textArray
-}, {
-  name: "d",
-  required: true,
-  notNull: false,
-  codec: TYPES.text
-}, {
-  name: "e",
-  required: true,
-  notNull: false,
-  codec: TYPES.text
-}];
-const parts26 = ["b", "authenticate_fail"];
-const sqlIdent26 = sql.identifier(...parts26);
 const options_authenticate_fail = {
   name: "authenticate_fail",
   identifier: "main.b.authenticate_fail()",
   from(...args) {
-    return sql`${sqlIdent26}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent25}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -1354,7 +1328,7 @@ const options_authenticate_fail = {
   },
   description: undefined
 };
-const extensions36 = {
+const extensions35 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -1375,15 +1349,15 @@ const resourceConfig_jwt_token = {
   uniques: uniques2,
   isVirtual: true,
   description: undefined,
-  extensions: extensions36
+  extensions: extensions35
 };
-const parts27 = ["b", "authenticate"];
-const sqlIdent27 = sql.identifier(...parts27);
+const parts26 = ["b", "authenticate"];
+const sqlIdent26 = sql.identifier(...parts26);
 const options_authenticate = {
   name: "authenticate",
   identifier: "main.b.authenticate(int4,numeric,int8)",
   from(...args) {
-    return sql`${sqlIdent27}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent26}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "a",
@@ -1416,6 +1390,35 @@ const options_authenticate = {
   },
   description: undefined
 };
+const extensions36 = {
+  pg: {
+    serviceName: "main",
+    schemaName: "b",
+    name: "list_bde_mutation"
+  },
+  tags: {
+    behavior: ["-queryField mutationField -typeField", "-filter -order"]
+  }
+};
+const parts27 = ["b", "list_bde_mutation"];
+const sqlIdent27 = sql.identifier(...parts27);
+const fromCallback6 = (...args) => sql`${sqlIdent27}(${sqlFromArgDigests(args)})`;
+const parameters6 = [{
+  name: "b",
+  required: true,
+  notNull: false,
+  codec: attributes_text_array_codec_textArray
+}, {
+  name: "d",
+  required: true,
+  notNull: false,
+  codec: TYPES.text
+}, {
+  name: "e",
+  required: true,
+  notNull: false,
+  codec: TYPES.text
+}];
 const parts28 = ["b", "authenticate_many"];
 const sqlIdent28 = sql.identifier(...parts28);
 const options_authenticate_many = {
@@ -1874,11 +1877,11 @@ const registry = makeRegistry({
     varchar: TYPES.varchar,
     updatableView: registryConfig_pgCodecs_updatableView_updatableView,
     text: TYPES.text,
-    uuidArray: registryConfig_pgCodecs_uuidArray_uuidArray,
-    uuid: TYPES.uuid,
     jwtToken: registryConfig_pgCodecs_jwtToken_jwtToken,
     int8: TYPES.bigint,
     numeric: TYPES.numeric,
+    uuidArray: registryConfig_pgCodecs_uuidArray_uuidArray,
+    uuid: TYPES.uuid,
     authPayload: registryConfig_pgCodecs_authPayload_authPayload,
     bool: TYPES.boolean,
     compoundType: registryConfig_pgCodecs_compoundType_compoundType,
@@ -1921,6 +1924,8 @@ const registry = makeRegistry({
     int8ArrayDomain: attributes_int8_array_domain_codec_int8ArrayDomain,
     bytea: TYPES.bytea,
     byteaArray: attributes_bytea_array_codec_byteaArray,
+    ltree: attributes_ltree_codec_ltree,
+    "ltree[]": attributes_ltree_array_codec_ltree_,
     bpchar: TYPES.bpchar,
     jwtTokenArray: listOfCodec(registryConfig_pgCodecs_jwtToken_jwtToken, {
       extensions: extensions24,
@@ -2042,6 +2047,8 @@ const registry = makeRegistry({
       description: "YOYOYO!!",
       extensions: extensions34
     },
+    authenticate_fail: PgResource.functionResourceOptions(resourceConfig_jwt_token, options_authenticate_fail),
+    authenticate: PgResource.functionResourceOptions(resourceConfig_jwt_token, options_authenticate),
     list_bde_mutation: {
       executor: executor_mainPgExecutor,
       name: "list_bde_mutation",
@@ -2052,11 +2059,9 @@ const registry = makeRegistry({
       codec: registryConfig_pgCodecs_uuidArray_uuidArray,
       uniques: [],
       isMutation: true,
-      extensions: extensions35,
+      extensions: extensions36,
       description: undefined
     },
-    authenticate_fail: PgResource.functionResourceOptions(resourceConfig_jwt_token, options_authenticate_fail),
-    authenticate: PgResource.functionResourceOptions(resourceConfig_jwt_token, options_authenticate),
     authenticate_many: PgResource.functionResourceOptions(resourceConfig_jwt_token, options_authenticate_many),
     authenticate_payload: PgResource.functionResourceOptions(resourceConfig_auth_payload, options_authenticate_payload),
     compound_type_mutation: PgResource.functionResourceOptions(resourceConfig, options_compound_type_mutation),
@@ -2788,29 +2793,11 @@ const resource_guid_fnPgResource = registry.pgResources["guid_fn"];
 function Mutation_guidFn_input_applyPlan(_, $object) {
   return $object;
 }
-const argDetailsSimple11 = [{
-  graphqlArgName: "b",
-  postgresArgName: "b",
-  pgCodec: attributes_text_array_codec_textArray,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "d",
-  postgresArgName: "d",
-  pgCodec: TYPES.text,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "e",
-  postgresArgName: "e",
-  pgCodec: TYPES.text,
-  required: true,
-  fetcher: null
-}];
+const argDetailsSimple11 = [];
 const makeArgs11 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -2851,15 +2838,33 @@ const makeArgs11 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_list_bde_mutationPgResource = registry.pgResources["list_bde_mutation"];
-function Mutation_listBdeMutation_input_applyPlan(_, $object) {
+const resource_authenticate_failPgResource = registry.pgResources["authenticate_fail"];
+function Mutation_authenticateFail_input_applyPlan(_, $object) {
   return $object;
 }
-const argDetailsSimple12 = [];
+const argDetailsSimple12 = [{
+  graphqlArgName: "a",
+  postgresArgName: "a",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "b",
+  postgresArgName: "b",
+  pgCodec: TYPES.numeric,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "c",
+  postgresArgName: "c",
+  pgCodec: TYPES.bigint,
+  required: true,
+  fetcher: null
+}];
 const makeArgs12 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 3; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -2900,26 +2905,26 @@ const makeArgs12 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_authenticate_failPgResource = registry.pgResources["authenticate_fail"];
-function Mutation_authenticateFail_input_applyPlan(_, $object) {
+const resource_authenticatePgResource = registry.pgResources["authenticate"];
+function Mutation_authenticate_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple13 = [{
-  graphqlArgName: "a",
-  postgresArgName: "a",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}, {
   graphqlArgName: "b",
   postgresArgName: "b",
-  pgCodec: TYPES.numeric,
+  pgCodec: attributes_text_array_codec_textArray,
   required: true,
   fetcher: null
 }, {
-  graphqlArgName: "c",
-  postgresArgName: "c",
-  pgCodec: TYPES.bigint,
+  graphqlArgName: "d",
+  postgresArgName: "d",
+  pgCodec: TYPES.text,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "e",
+  postgresArgName: "e",
+  pgCodec: TYPES.text,
   required: true,
   fetcher: null
 }];
@@ -2967,8 +2972,8 @@ const makeArgs13 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_authenticatePgResource = registry.pgResources["authenticate"];
-function Mutation_authenticate_input_applyPlan(_, $object) {
+const resource_list_bde_mutationPgResource = registry.pgResources["list_bde_mutation"];
+function Mutation_listBdeMutation_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple14 = [{
@@ -3494,15 +3499,6 @@ function GuidFnPayload_queryPlan() {
 function GuidFnInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
-function ListBdeMutationPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function ListBdeMutationPayload_queryPlan() {
-  return rootValue();
-}
-function ListBdeMutationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
 function AuthenticateFailPayload_clientMutationIdPlan($object) {
   return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
 }
@@ -3527,6 +3523,15 @@ function AuthenticatePayload_queryPlan() {
   return rootValue();
 }
 function AuthenticateInput_clientMutationId_applyPlan($input, val) {
+  $input.set("clientMutationId", val.get());
+}
+function ListBdeMutationPayload_clientMutationIdPlan($object) {
+  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+}
+function ListBdeMutationPayload_queryPlan() {
+  return rootValue();
+}
+function ListBdeMutationInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
 function AuthenticateManyPayload_clientMutationIdPlan($object) {
@@ -3844,6 +3849,8 @@ type Type implements Node {
   int8ArrayDomain: [BigInt]
   bytea: Base64EncodedBinary
   byteaArray: [Base64EncodedBinary]
+  ltree: LTree
+  ltreeArray: [LTree]
 }
 
 """
@@ -4048,6 +4055,11 @@ scalar RegDictionary
 
 """Binary data encoded using Base64"""
 scalar Base64EncodedBinary
+
+"""
+Represents an \`ltree\` hierarchical label tree as outlined in https://www.postgresql.org/docs/current/ltree.html
+"""
+scalar LTree
 
 """An input for mutations affecting \`CompoundType\`"""
 input CompoundTypeInput {
@@ -4276,6 +4288,8 @@ enum TypesOrderBy {
   REGCONFIG_DESC
   REGDICTIONARY_ASC
   REGDICTIONARY_DESC
+  LTREE_ASC
+  LTREE_DESC
 }
 
 """
@@ -4418,6 +4432,12 @@ input TypeCondition {
 
   """Checks for equality with the object’s \`int8ArrayDomain\` field."""
   int8ArrayDomain: [BigInt]
+
+  """Checks for equality with the object’s \`ltree\` field."""
+  ltree: LTree
+
+  """Checks for equality with the object’s \`ltreeArray\` field."""
+  ltreeArray: [LTree]
 }
 
 """A range of \`BigFloat\`."""
@@ -4527,12 +4547,6 @@ type Mutation {
     """
     input: GuidFnInput!
   ): GuidFnPayload
-  listBdeMutation(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: ListBdeMutationInput!
-  ): ListBdeMutationPayload
   authenticateFail(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4545,6 +4559,12 @@ type Mutation {
     """
     input: AuthenticateInput!
   ): AuthenticatePayload
+  listBdeMutation(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: ListBdeMutationInput!
+  ): ListBdeMutationPayload
   authenticateMany(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -4774,33 +4794,6 @@ input GuidFnInput {
   g: Guid
 }
 
-"""The output of our \`listBdeMutation\` mutation."""
-type ListBdeMutationPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  uuids: [UUID]
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-}
-
-"""All input for the \`listBdeMutation\` mutation."""
-input ListBdeMutationInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  b: [String]
-  d: String
-  e: String
-}
-
 """The output of our \`authenticateFail\` mutation."""
 type AuthenticateFailPayload {
   """
@@ -4856,6 +4849,33 @@ input AuthenticateInput {
   a: Int
   b: BigFloat
   c: BigInt
+}
+
+"""The output of our \`listBdeMutation\` mutation."""
+type ListBdeMutationPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  uuids: [UUID]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`listBdeMutation\` mutation."""
+input ListBdeMutationInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  b: [String]
+  d: String
+  e: String
 }
 
 """The output of our \`authenticateMany\` mutation."""
@@ -5195,6 +5215,8 @@ input TypeInput {
   int8ArrayDomain: [BigInt]
   bytea: Base64EncodedBinary
   byteaArray: [Base64EncodedBinary]
+  ltree: LTree
+  ltreeArray: [LTree]
 }
 
 """The output of our update \`Type\` mutation."""
@@ -5288,6 +5310,8 @@ input TypePatch {
   int8ArrayDomain: [BigInt]
   bytea: Base64EncodedBinary
   byteaArray: [Base64EncodedBinary]
+  ltree: LTree
+  ltreeArray: [LTree]
 }
 
 """All input for the \`updateTypeById\` mutation."""
@@ -5702,6 +5726,12 @@ export const plans = {
     },
     byteaArray($record) {
       return $record.get("bytea_array");
+    },
+    ltree($record) {
+      return $record.get("ltree");
+    },
+    ltreeArray($record) {
+      return $record.get("ltree_array");
     }
   },
   Color: {
@@ -7420,6 +7450,40 @@ export const plans = {
           plan.setOrderIsUnique();
         }
       }
+    },
+    LTREE_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "ltree",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    LTREE_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "ltree",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
     }
   },
   TypeCondition: {
@@ -8457,6 +8521,52 @@ export const plans = {
       },
       autoApplyAfterParentInputPlan: true,
       autoApplyAfterParentApplyPlan: true
+    },
+    ltree: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "ltree",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "ltree",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), attributes4.ltree.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    ltreeArray: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "ltree_array",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "ltree_array",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), attributes4.ltree_array.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
     }
   },
   BigFloatRangeInput: {
@@ -8587,24 +8697,9 @@ export const plans = {
         }
       }
     },
-    listBdeMutation: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs11(args, ["input"]);
-        const $result = resource_list_bde_mutationPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_listBdeMutation_input_applyPlan
-        }
-      }
-    },
     authenticateFail: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs12(args, ["input"]);
+        const selectArgs = makeArgs11(args, ["input"]);
         const $result = resource_authenticate_failPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -8619,7 +8714,7 @@ export const plans = {
     },
     authenticate: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs13(args, ["input"]);
+        const selectArgs = makeArgs12(args, ["input"]);
         const $result = resource_authenticatePgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -8629,6 +8724,21 @@ export const plans = {
         input: {
           autoApplyAfterParentPlan: true,
           applyPlan: Mutation_authenticate_input_applyPlan
+        }
+      }
+    },
+    listBdeMutation: {
+      plan($root, args, _info) {
+        const selectArgs = makeArgs13(args, ["input"]);
+        const $result = resource_list_bde_mutationPgResource.execute(selectArgs, "mutation");
+        return object({
+          result: $result
+        });
+      },
+      args: {
+        input: {
+          autoApplyAfterParentPlan: true,
+          applyPlan: Mutation_listBdeMutation_input_applyPlan
         }
       }
     },
@@ -8922,23 +9032,6 @@ export const plans = {
     },
     g: undefined
   },
-  ListBdeMutationPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId: ListBdeMutationPayload_clientMutationIdPlan,
-    uuids($object) {
-      return $object.get("result");
-    },
-    query: ListBdeMutationPayload_queryPlan
-  },
-  ListBdeMutationInput: {
-    clientMutationId: {
-      applyPlan: ListBdeMutationInput_clientMutationId_applyPlan,
-      autoApplyAfterParentApplyPlan: true
-    },
-    b: undefined,
-    d: undefined,
-    e: undefined
-  },
   AuthenticateFailPayload: {
     __assertStep: ObjectStep,
     clientMutationId: AuthenticateFailPayload_clientMutationIdPlan,
@@ -8994,6 +9087,23 @@ export const plans = {
     a: undefined,
     b: undefined,
     c: undefined
+  },
+  ListBdeMutationPayload: {
+    __assertStep: ObjectStep,
+    clientMutationId: ListBdeMutationPayload_clientMutationIdPlan,
+    uuids($object) {
+      return $object.get("result");
+    },
+    query: ListBdeMutationPayload_queryPlan
+  },
+  ListBdeMutationInput: {
+    clientMutationId: {
+      applyPlan: ListBdeMutationInput_clientMutationId_applyPlan,
+      autoApplyAfterParentApplyPlan: true
+    },
+    b: undefined,
+    d: undefined,
+    e: undefined
   },
   AuthenticateManyPayload: {
     __assertStep: ObjectStep,
@@ -9588,6 +9698,20 @@ export const plans = {
       },
       autoApplyAfterParentInputPlan: true,
       autoApplyAfterParentApplyPlan: true
+    },
+    ltree: {
+      applyPlan($insert, val) {
+        $insert.set("ltree", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    ltreeArray: {
+      applyPlan($insert, val) {
+        $insert.set("ltree_array", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
     }
   },
   UpdateTypePayload: {
@@ -9962,6 +10086,20 @@ export const plans = {
     byteaArray: {
       applyPlan($insert, val) {
         $insert.set("bytea_array", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    ltree: {
+      applyPlan($insert, val) {
+        $insert.set("ltree", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    ltreeArray: {
+      applyPlan($insert, val) {
+        $insert.set("ltree_array", val.get());
       },
       autoApplyAfterParentInputPlan: true,
       autoApplyAfterParentApplyPlan: true

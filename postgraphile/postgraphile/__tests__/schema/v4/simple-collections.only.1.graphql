@@ -1150,6 +1150,11 @@ A set of key/value pairs, keys are strings, values may be a string or null. Expo
 """
 scalar KeyValueHash
 
+"""
+Represents an `ltree` hierarchical label tree as outlined in https://www.postgresql.org/docs/current/ltree.html
+"""
+scalar LTree
+
 """Tracks metadata about the left arms of various people"""
 type LeftArm implements Node {
   id: Int!
@@ -3102,6 +3107,8 @@ type Type {
   intervalArray: [Interval]!
   json: JSON!
   jsonb: JSON!
+  ltree: LTree
+  ltreeArray: [LTree]
   macaddr: String
   money: Float!
   nestedCompoundType: NestedCompoundType!
