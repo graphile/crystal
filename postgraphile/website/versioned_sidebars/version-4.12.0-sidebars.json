@@ -70,15 +70,7 @@
         "custom-queries",
         "custom-mutations",
         "function-restrictions",
-        {
-          "type": "category",
-          "label": "Function Gallery",
-          "link": {
-            "type": "doc",
-            "id": "function-gallery"
-          },
-          "items": ["function-gallery"]
-        }
+        "function-gallery/index"
       ]
     },
     "enums",
