@@ -49,13 +49,6 @@ server of choice in [the Grafserv
 documentation](https://grafast.org/grafserv/); typically there's a
 `serv.addTo(...)` method you can use.
 
-:::info
-
-During the early access period you'll need to enter `helping2test` to get into
-the above website. You are helping to test, right?
-
-:::
-
 Here's an example with Node's HTTP server:
 
 ```js title="example-node.js"
