@@ -70,7 +70,7 @@
         "custom-queries",
         "custom-mutations",
         "function-restrictions",
-        "function-gallery/index"
+        "function-gallery"
       ]
     },
     "enums",
