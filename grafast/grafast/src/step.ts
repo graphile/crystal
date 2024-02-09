@@ -13,6 +13,7 @@ import {
   currentPolymorphicPaths,
   withGlobalLayerPlan,
 } from "./engine/lib/withGlobalLayerPlan.js";
+import { $$unlock } from "./engine/lock.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import { getDebug } from "./global.js";
 import { inspect } from "./inspect.js";
@@ -180,6 +181,9 @@ export abstract class BaseStep {
 export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   // Explicitly we do not add $$export here because we want children to set it
   static $$export: any;
+
+  /** @internal */
+  [$$unlock]: undefined | (() => void) = undefined;
 
   /**
    * Setting this true is a performance optimisation, but it comes with strong

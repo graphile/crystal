@@ -80,6 +80,7 @@ import type {
 } from "./LayerPlan.js";
 import { LayerPlan } from "./LayerPlan.js";
 import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
+import { lock, unlock } from "./lock.js";
 import { OutputPlan } from "./OutputPlan.js";
 import { StepTracker } from "./StepTracker.js";
 
@@ -2115,6 +2116,7 @@ export class OperationPlan {
 
     let replacementStep: ExecutableStep = step;
     try {
+      const wasLocked = isDev && unlock(step);
       replacementStep = withGlobalLayerPlan(
         step.layerPlan,
         step.polymorphicPaths,
@@ -2122,6 +2124,7 @@ export class OperationPlan {
         this,
         step,
       );
+      if (wasLocked) lock(step);
     } catch (e) {
       console.error(
         `Error occurred during ${actionDescription}; whilst processing ${step} in ${order} mode an error occurred:`,
@@ -2165,6 +2168,16 @@ export class OperationPlan {
     const previousStepCount = this.stepTracker.stepCount;
 
     const processed = new Set<ExecutableStep>();
+
+    if (isDev) {
+      // Lock all the steps
+      for (let i = 0; i < this.stepTracker.stepCount; i++) {
+        const step = this.stepTracker.getStepById(i, true);
+        if (step && step.id === i) {
+          lock(step);
+        }
+      }
+    }
 
     for (let i = 0; i < this.stepTracker.stepCount; i++) {
       const step = this.stepTracker.getStepById(i, true);
@@ -2210,6 +2223,16 @@ export class OperationPlan {
       // validated once "plan" is finished, so no need to do it here for that
       // phase.
       this.validateSteps(previousStepCount);
+    }
+
+    if (isDev) {
+      // Unlock all the steps
+      for (let i = 0; i < this.stepTracker.stepCount; i++) {
+        const step = this.stepTracker.getStepById(i, true);
+        if (step && step.id === i) {
+          unlock(step);
+        }
+      }
     }
   }
 
@@ -2738,7 +2761,9 @@ export class OperationPlan {
     // planned, which the step class may want to acknowledge by locking certain
     // facets of its functionality (such as adding filters). We'll simplify its
     // work though by giving it an empty array to filter.
+    const wasLocked = isDev && unlock(step);
     const equivalentSteps = step.deduplicate!(peers);
+    if (wasLocked) lock(step);
     if (equivalentSteps.length === 0) {
       // No other equivalents
       return null;
@@ -2797,12 +2822,16 @@ export class OperationPlan {
 
     // Give the steps a chance to pass their responsibilities to the winner.
     if (winner !== step) {
+      const wasLocked = isDev && unlock(step);
       step.deduplicatedWith?.(winner);
+      if (wasLocked) lock(step);
       this.stepTracker.replaceStep(step, winner);
     }
     for (const target of equivalentSteps) {
       if (winner !== target) {
+        const wasLocked = isDev && unlock(target);
         target.deduplicatedWith?.(winner);
+        if (wasLocked) lock(target);
         this.stepTracker.replaceStep(target, winner);
       }
     }
