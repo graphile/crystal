@@ -31,6 +31,7 @@ import {
   __ValueStep,
   error,
   ExecutableStep,
+  isDev,
   object,
   SafeError,
   stripAnsi,
@@ -80,6 +81,7 @@ import type {
 } from "./LayerPlan.js";
 import { LayerPlan } from "./LayerPlan.js";
 import { withGlobalLayerPlan } from "./lib/withGlobalLayerPlan.js";
+import { lock, unlock } from "./lock.js";
 import { OutputPlan } from "./OutputPlan.js";
 import { StepTracker } from "./StepTracker.js";
 
@@ -131,11 +133,6 @@ const EMPTY_ARRAY = Object.freeze([]);
 export const POLYMORPHIC_ROOT_PATH = null;
 export const POLYMORPHIC_ROOT_PATHS: ReadonlySet<string> | null = null;
 Object.freeze(POLYMORPHIC_ROOT_PATHS);
-
-/** In development we might run additional checks */
-const isDev =
-  typeof process !== "undefined" &&
-  (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test");
 
 /** How many times will we try re-optimizing before giving up */
 const MAX_OPTIMIZATION_LOOPS = 10;
@@ -2162,6 +2159,7 @@ export class OperationPlan {
     isReadonly: boolean,
     callback: (plan: ExecutableStep) => ExecutableStep,
   ): void {
+    if (isDev) this.stepTracker.lockNewSteps();
     const previousStepCount = this.stepTracker.stepCount;
 
     const processed = new Set<ExecutableStep>();
@@ -2190,14 +2188,20 @@ export class OperationPlan {
           );
         }
       }
-      if (isReadonly && this.stepTracker.stepCount > previousStepCount) {
-        throwNoNewStepsError(
-          this,
-          actionDescription,
-          step,
-          previousStepCount,
-          "Creating steps in isReadonly mode is forbidden",
-        );
+      if (
+        (isReadonly || isDev) &&
+        this.stepTracker.stepCount > previousStepCount
+      ) {
+        if (isReadonly) {
+          throwNoNewStepsError(
+            this,
+            actionDescription,
+            step,
+            previousStepCount,
+            "Creating steps in isReadonly mode is forbidden",
+          );
+        }
+        if (isDev) this.stepTracker.lockNewSteps();
       }
     }
 
@@ -2738,7 +2742,9 @@ export class OperationPlan {
     // planned, which the step class may want to acknowledge by locking certain
     // facets of its functionality (such as adding filters). We'll simplify its
     // work though by giving it an empty array to filter.
+    const wasLocked = isDev && unlock(step);
     const equivalentSteps = step.deduplicate!(peers);
+    if (wasLocked) lock(step);
     if (equivalentSteps.length === 0) {
       // No other equivalents
       return null;
@@ -2797,12 +2803,16 @@ export class OperationPlan {
 
     // Give the steps a chance to pass their responsibilities to the winner.
     if (winner !== step) {
+      const wasLocked = isDev && unlock(step);
       step.deduplicatedWith?.(winner);
+      if (wasLocked) lock(step);
       this.stepTracker.replaceStep(step, winner);
     }
     for (const target of equivalentSteps) {
       if (winner !== target) {
+        const wasLocked = isDev && unlock(target);
         target.deduplicatedWith?.(winner);
+        if (wasLocked) lock(target);
         this.stepTracker.replaceStep(target, winner);
       }
     }
@@ -2975,10 +2985,12 @@ export class OperationPlan {
         this.optimizeMeta.set(step.optimizeMetaKey, meta);
       }
     }
+    const wasLocked = isDev && unlock(step);
     const replacementStep = step.optimize({
       ...stepOptions,
       meta,
     });
+    if (wasLocked) lock(step);
     if (!replacementStep) {
       throw new Error(
         `Bug in ${step}'s class: the 'optimize' method must return a step. Hint: did you forget 'return this;'?`,
@@ -3043,7 +3055,9 @@ export class OperationPlan {
       "No modifier steps expected when performing finalizeSteps",
     );
     for (const step of this.stepTracker.activeSteps) {
+      const wasLocked = isDev && unlock(step);
       step.finalize();
+      if (wasLocked) lock(step);
       assertFinalized(step);
       if (isDev && this.stepTracker.stepCount !== initialStepCount) {
         throw new Error(

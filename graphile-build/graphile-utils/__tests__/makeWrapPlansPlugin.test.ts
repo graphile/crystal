@@ -93,7 +93,6 @@ describe("wrapping named plans", () => {
           },
         }),
       ]);
-      const rootValue = { root: true };
       const result = (await grafast({
         schema,
         source: `
@@ -101,7 +100,6 @@ describe("wrapping named plans", () => {
             echo(message: "Hello")
           }
         `,
-        rootValue,
         contextValue: { test: true },
       })) as ExecutionResult;
       expect(result.errors).toBeFalsy();
@@ -127,7 +125,6 @@ describe("wrapping named plans", () => {
         },
       }),
     ]);
-    const rootValue = { root: true };
     const result = (await grafast({
       schema,
       source: `
@@ -135,7 +132,6 @@ describe("wrapping named plans", () => {
           echo(message: "Hello")
         }
       `,
-      rootValue,
       contextValue: { test: true },
     })) as ExecutionResult;
     expect(result.errors).toBeFalsy();
@@ -172,7 +168,6 @@ describe("wrapping named plans", () => {
         },
       }),
     ]);
-    const rootValue = { root: true };
     const result = (await grafast({
       schema,
       source: `
@@ -180,7 +175,6 @@ describe("wrapping named plans", () => {
           echo(message: "Hello")
         }
       `,
-      rootValue,
       contextValue: { test: true },
     })) as ExecutionResult;
     expect(result.errors).toBeTruthy();
@@ -221,7 +215,6 @@ describe("wrapping named plans", () => {
         },
       }),
     ]);
-    const rootValue = { root: true };
     const result = (await grafast({
       schema,
       source: `
@@ -229,7 +222,6 @@ describe("wrapping named plans", () => {
           echo(message: "Hello")
         }
       `,
-      rootValue,
       contextValue: { test: true },
     })) as ExecutionResult;
     expect(result.errors).toBeTruthy();
@@ -254,7 +246,6 @@ describe("wrapping named plans", () => {
         },
       }),
     ]);
-    const rootValue = { root: true };
     const result = (await grafast({
       schema,
       source: `
@@ -262,7 +253,6 @@ describe("wrapping named plans", () => {
           echo(message: "Hello")
         }
       `,
-      rootValue,
       contextValue: { test: true },
     })) as ExecutionResult;
     expect(result.errors).toBeFalsy();
@@ -294,7 +284,6 @@ describe("wrapping named plans", () => {
         };
       }),
     ]);
-    const rootValue = { root: true };
     const result = (await grafast({
       schema,
       source: `
@@ -302,7 +291,6 @@ describe("wrapping named plans", () => {
           echo(message: "Hello")
         }
       `,
-      rootValue,
       contextValue: { test: true },
     })) as ExecutionResult;
     expect(options).toBeTruthy();
@@ -377,7 +365,6 @@ describe("wrapping plans matching a filter", () => {
       }),
       makeWrapPlansPlugin(filter, rule),
     ]);
-    const rootValue = { root: true };
     const result = (await grafast({
       schema,
       source: `
@@ -387,7 +374,6 @@ describe("wrapping plans matching a filter", () => {
           c(arg2: "NOWRAP")
         }
       `,
-      rootValue,
       contextValue: { test: true },
     })) as ExecutionResult;
     expect(result.errors).toBeFalsy();

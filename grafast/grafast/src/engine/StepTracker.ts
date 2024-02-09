@@ -8,6 +8,7 @@ import type {
   LayerPlanReasonSubroutine,
   LayerPlanReasonsWithParentStep,
 } from "./LayerPlan";
+import { lock } from "./lock.js";
 import type { OutputPlan } from "./OutputPlan";
 
 /**
@@ -33,6 +34,8 @@ function writeableArray<T>(a: ReadonlyArray<T>): Array<T> {
 export class StepTracker {
   /** @internal */
   public stepCount = 0;
+  /** @internal */
+  public lockedStepCount = 0;
   /** @internal */
   public activeSteps = new Set<ExecutableStep>();
   /** @internal */
@@ -648,5 +651,16 @@ export class StepTracker {
 
   removeStepFromItsLayerPlan(step: ExecutableStep) {
     step.layerPlan.stepsByConstructor.get(step.constructor)!.delete(step);
+  }
+
+  lockNewSteps() {
+    if (!isDev) return;
+    for (let i = this.lockedStepCount; i < this.stepCount; i++) {
+      const step = this.getStepById(i, true);
+      if (step && step.id === i) {
+        lock(step);
+      }
+    }
+    this.lockedStepCount = this.stepCount;
   }
 }
