@@ -55,7 +55,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     decode: pipeStringDecode
   }
 });
-const attributes = Object.assign(Object.create(null), {
+const networkAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -103,10 +103,11 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const spec_network = {
+const networkIdentifier = sql.identifier(...["network_types", "network"]);
+const networkCodecSpec = {
   name: "network",
-  identifier: sql.identifier(...["network_types", "network"]),
-  attributes,
+  identifier: networkIdentifier,
+  attributes: networkAttributes,
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -119,7 +120,7 @@ const spec_network = {
   },
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_network_network = recordCodec(spec_network);
+const networkCodec = recordCodec(networkCodecSpec);
 const extensions2 = {
   description: undefined,
   pg: {
@@ -144,7 +145,7 @@ const pgResource_networkPgResource = makeRegistry({
     bpchar: TYPES.bpchar,
     int4: TYPES.int,
     inet: TYPES.inet,
-    network: registryConfig_pgCodecs_network_network,
+    network: networkCodec,
     cidr: TYPES.cidr,
     macaddr: TYPES.macaddr
   }),
@@ -153,8 +154,8 @@ const pgResource_networkPgResource = makeRegistry({
       executor: executor_mainPgExecutor,
       name: "network",
       identifier: "main.network_types.network",
-      from: registryConfig_pgCodecs_network_network.sqlType,
-      codec: registryConfig_pgCodecs_network_network,
+      from: networkCodec.sqlType,
+      codec: networkCodec,
       uniques,
       isVirtual: false,
       description: undefined,
@@ -837,7 +838,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_network_network.attributes[attributeName];
+          const attribute = networkCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -853,7 +854,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_network_network.attributes[attributeName];
+          const attribute = networkCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -1019,7 +1020,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), networkAttributes.id.codec)}`;
             }
           });
         }
@@ -1042,7 +1043,7 @@ export const plans = {
             type: "attribute",
             attribute: "inet",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.inet.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), networkAttributes.inet.codec)}`;
             }
           });
         }
@@ -1065,7 +1066,7 @@ export const plans = {
             type: "attribute",
             attribute: "cidr",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.cidr.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), networkAttributes.cidr.codec)}`;
             }
           });
         }
@@ -1088,7 +1089,7 @@ export const plans = {
             type: "attribute",
             attribute: "macaddr",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.macaddr.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), networkAttributes.macaddr.codec)}`;
             }
           });
         }

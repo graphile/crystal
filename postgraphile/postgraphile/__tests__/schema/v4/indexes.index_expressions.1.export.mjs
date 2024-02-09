@@ -55,7 +55,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     decode: pipeStringDecode
   }
 });
-const attributes = Object.assign(Object.create(null), {
+const employeeAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -94,10 +94,11 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const spec_employee = {
+const employeeIdentifier = sql.identifier(...["index_expressions", "employee"]);
+const employeeCodecSpec = {
   name: "employee",
-  identifier: sql.identifier(...["index_expressions", "employee"]),
-  attributes,
+  identifier: employeeIdentifier,
+  attributes: employeeAttributes,
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -110,7 +111,7 @@ const spec_employee = {
   },
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_employee_employee = recordCodec(spec_employee);
+const employeeCodec = recordCodec(employeeCodecSpec);
 const extensions2 = {
   description: undefined,
   pg: {
@@ -134,15 +135,15 @@ const pgResource_employeePgResource = makeRegistry({
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
     int4: TYPES.int,
-    employee: registryConfig_pgCodecs_employee_employee
+    employee: employeeCodec
   }),
   pgResources: Object.assign(Object.create(null), {
     employee: {
       executor: executor_mainPgExecutor,
       name: "employee",
       identifier: "main.index_expressions.employee",
-      from: registryConfig_pgCodecs_employee_employee.sqlType,
-      codec: registryConfig_pgCodecs_employee_employee,
+      from: employeeCodec.sqlType,
+      codec: employeeCodec,
       uniques,
       isVirtual: false,
       description: undefined,
@@ -528,7 +529,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_employee_employee.attributes[attributeName];
+          const attribute = employeeCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -544,7 +545,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_employee_employee.attributes[attributeName];
+          const attribute = employeeCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -676,7 +677,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), employeeAttributes.id.codec)}`;
             }
           });
         }
@@ -699,7 +700,7 @@ export const plans = {
             type: "attribute",
             attribute: "first_name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.first_name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), employeeAttributes.first_name.codec)}`;
             }
           });
         }
@@ -722,7 +723,7 @@ export const plans = {
             type: "attribute",
             attribute: "last_name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.last_name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), employeeAttributes.last_name.codec)}`;
             }
           });
         }

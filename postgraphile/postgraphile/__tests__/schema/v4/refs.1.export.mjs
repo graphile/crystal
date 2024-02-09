@@ -55,7 +55,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     decode: pipeStringDecode
   }
 });
-const attributes_object_Object_ = Object.assign(Object.create(null), {
+const peopleAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -85,10 +85,11 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const spec_people = {
+const peopleIdentifier = sql.identifier(...["refs", "people"]);
+const peopleCodecSpec = {
   name: "people",
-  identifier: sql.identifier(...["refs", "people"]),
-  attributes: attributes_object_Object_,
+  identifier: peopleIdentifier,
+  attributes: peopleAttributes,
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -101,8 +102,8 @@ const spec_people = {
   },
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_people_people = recordCodec(spec_people);
-const attributes = Object.assign(Object.create(null), {
+const peopleCodec = recordCodec(peopleCodecSpec);
+const postsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -150,16 +151,16 @@ const extensions2 = {
   })
 };
 const parts2 = ["refs", "posts"];
-const sqlIdent2 = sql.identifier(...parts2);
-const spec_posts = {
+const postsIdentifier = sql.identifier(...parts2);
+const postsCodecSpec = {
   name: "posts",
-  identifier: sqlIdent2,
-  attributes,
+  identifier: postsIdentifier,
+  attributes: postsAttributes,
   description: undefined,
   extensions: extensions2,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_posts_posts = recordCodec(spec_posts);
+const postsCodec = recordCodec(postsCodecSpec);
 const extensions3 = {
   description: undefined,
   pg: {
@@ -181,8 +182,8 @@ const registryConfig_pgResources_people_people = {
   executor: executor_mainPgExecutor,
   name: "people",
   identifier: "main.refs.people",
-  from: registryConfig_pgCodecs_people_people.sqlType,
-  codec: registryConfig_pgCodecs_people_people,
+  from: peopleCodec.sqlType,
+  codec: peopleCodec,
   uniques,
   isVirtual: false,
   description: undefined,
@@ -211,8 +212,8 @@ const registryConfig_pgResources_posts_posts = {
   executor: executor_mainPgExecutor,
   name: "posts",
   identifier: "main.refs.posts",
-  from: registryConfig_pgCodecs_posts_posts.sqlType,
-  codec: registryConfig_pgCodecs_posts_posts,
+  from: postsCodec.sqlType,
+  codec: postsCodec,
   uniques: uniques2,
   isVirtual: false,
   description: undefined,
@@ -224,8 +225,8 @@ const registry = makeRegistry({
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
     int4: TYPES.int,
-    people: registryConfig_pgCodecs_people_people,
-    posts: registryConfig_pgCodecs_posts_posts
+    people: peopleCodec,
+    posts: postsCodec
   }),
   pgResources: Object.assign(Object.create(null), {
     people: registryConfig_pgResources_people_people,
@@ -234,7 +235,7 @@ const registry = makeRegistry({
   pgRelations: Object.assign(Object.create(null), {
     people: Object.assign(Object.create(null), {
       postsByTheirUserId: {
-        localCodec: registryConfig_pgCodecs_people_people,
+        localCodec: peopleCodec,
         remoteResourceOptions: registryConfig_pgResources_posts_posts,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -252,7 +253,7 @@ const registry = makeRegistry({
     }),
     posts: Object.assign(Object.create(null), {
       peopleByMyUserId: {
-        localCodec: registryConfig_pgCodecs_posts_posts,
+        localCodec: postsCodec,
         remoteResourceOptions: registryConfig_pgResources_people_people,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["user_id"],
@@ -860,7 +861,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_people_people.attributes[attributeName];
+          const attribute = peopleCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -876,7 +877,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_people_people.attributes[attributeName];
+          const attribute = peopleCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -974,7 +975,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), peopleAttributes.id.codec)}`;
             }
           });
         }
@@ -997,7 +998,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), peopleAttributes.name.codec)}`;
             }
           });
         }
@@ -1031,7 +1032,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques2[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_posts_posts.attributes[attributeName];
+          const attribute = postsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -1047,7 +1048,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques2[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_posts_posts.attributes[attributeName];
+          const attribute = postsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -1111,7 +1112,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), postsAttributes.id.codec)}`;
             }
           });
         }

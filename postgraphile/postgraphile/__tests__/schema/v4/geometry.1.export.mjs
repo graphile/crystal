@@ -55,7 +55,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     decode: pipeStringDecode
   }
 });
-const attributes = Object.assign(Object.create(null), {
+const geomAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -148,10 +148,11 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const spec_geom = {
+const geomIdentifier = sql.identifier(...["geometry", "geom"]);
+const geomCodecSpec = {
   name: "geom",
-  identifier: sql.identifier(...["geometry", "geom"]),
-  attributes,
+  identifier: geomIdentifier,
+  attributes: geomAttributes,
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -164,7 +165,7 @@ const spec_geom = {
   },
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_geom_geom = recordCodec(spec_geom);
+const geomCodec = recordCodec(geomCodecSpec);
 const extensions2 = {
   description: undefined,
   pg: {
@@ -189,7 +190,7 @@ const pgResource_geomPgResource = makeRegistry({
     bpchar: TYPES.bpchar,
     int4: TYPES.int,
     point: TYPES.point,
-    geom: registryConfig_pgCodecs_geom_geom,
+    geom: geomCodec,
     line: TYPES.line,
     lseg: TYPES.lseg,
     box: TYPES.box,
@@ -202,8 +203,8 @@ const pgResource_geomPgResource = makeRegistry({
       executor: executor_mainPgExecutor,
       name: "geom",
       identifier: "main.geometry.geom",
-      from: registryConfig_pgCodecs_geom_geom.sqlType,
-      codec: registryConfig_pgCodecs_geom_geom,
+      from: geomCodec.sqlType,
+      codec: geomCodec,
       uniques,
       isVirtual: false,
       description: undefined,
@@ -1023,7 +1024,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_geom_geom.attributes[attributeName];
+          const attribute = geomCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -1039,7 +1040,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_geom_geom.attributes[attributeName];
+          const attribute = geomCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -1375,7 +1376,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), geomAttributes.id.codec)}`;
             }
           });
         }
@@ -1398,7 +1399,7 @@ export const plans = {
             type: "attribute",
             attribute: "point",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.point.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), geomAttributes.point.codec)}`;
             }
           });
         }
@@ -1421,7 +1422,7 @@ export const plans = {
             type: "attribute",
             attribute: "line",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.line.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), geomAttributes.line.codec)}`;
             }
           });
         }
@@ -1444,7 +1445,7 @@ export const plans = {
             type: "attribute",
             attribute: "lseg",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.lseg.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), geomAttributes.lseg.codec)}`;
             }
           });
         }
@@ -1467,7 +1468,7 @@ export const plans = {
             type: "attribute",
             attribute: "box",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.box.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), geomAttributes.box.codec)}`;
             }
           });
         }
@@ -1490,7 +1491,7 @@ export const plans = {
             type: "attribute",
             attribute: "open_path",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.open_path.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), geomAttributes.open_path.codec)}`;
             }
           });
         }
@@ -1513,7 +1514,7 @@ export const plans = {
             type: "attribute",
             attribute: "closed_path",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.closed_path.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), geomAttributes.closed_path.codec)}`;
             }
           });
         }
@@ -1536,7 +1537,7 @@ export const plans = {
             type: "attribute",
             attribute: "polygon",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.polygon.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), geomAttributes.polygon.codec)}`;
             }
           });
         }
@@ -1559,7 +1560,7 @@ export const plans = {
             type: "attribute",
             attribute: "circle",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.circle.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), geomAttributes.circle.codec)}`;
             }
           });
         }

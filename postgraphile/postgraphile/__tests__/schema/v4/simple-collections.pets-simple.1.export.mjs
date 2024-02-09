@@ -55,7 +55,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     decode: pipeStringDecode
   }
 });
-const attributes_object_Object_ = Object.assign(Object.create(null), {
+const peopleAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -85,10 +85,11 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const spec_people = {
+const peopleIdentifier = sql.identifier(...["simple_collections", "people"]);
+const peopleCodecSpec = {
   name: "people",
-  identifier: sql.identifier(...["simple_collections", "people"]),
-  attributes: attributes_object_Object_,
+  identifier: peopleIdentifier,
+  attributes: peopleAttributes,
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -101,8 +102,8 @@ const spec_people = {
   },
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_people_people = recordCodec(spec_people);
-const attributes_object_Object_2 = Object.assign(Object.create(null), {
+const peopleCodec = recordCodec(peopleCodecSpec);
+const petsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -141,16 +142,16 @@ const extensions2 = {
   tags: Object.create(null)
 };
 const parts2 = ["simple_collections", "pets"];
-const sqlIdent2 = sql.identifier(...parts2);
-const spec_pets = {
+const petsIdentifier = sql.identifier(...parts2);
+const petsCodecSpec = {
   name: "pets",
-  identifier: sqlIdent2,
-  attributes: attributes_object_Object_2,
+  identifier: petsIdentifier,
+  attributes: petsAttributes,
   description: undefined,
   extensions: extensions2,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_pets_pets = recordCodec(spec_pets);
+const petsCodec = recordCodec(petsCodecSpec);
 const extensions3 = {
   description: undefined,
   pg: {
@@ -172,8 +173,8 @@ const registryConfig_pgResources_people_people = {
   executor: executor_mainPgExecutor,
   name: "people",
   identifier: "main.simple_collections.people",
-  from: registryConfig_pgCodecs_people_people.sqlType,
-  codec: registryConfig_pgCodecs_people_people,
+  from: peopleCodec.sqlType,
+  codec: peopleCodec,
   uniques,
   isVirtual: false,
   description: undefined,
@@ -200,26 +201,26 @@ const registryConfig_pgResources_pets_pets = {
   executor: executor_mainPgExecutor,
   name: "pets",
   identifier: "main.simple_collections.pets",
-  from: registryConfig_pgCodecs_pets_pets.sqlType,
-  codec: registryConfig_pgCodecs_pets_pets,
+  from: petsCodec.sqlType,
+  codec: petsCodec,
   uniques: uniques2,
   isVirtual: false,
   description: undefined,
   extensions: extensions4
 };
 const parts3 = ["simple_collections", "people_odd_pets"];
-const sqlIdent3 = sql.identifier(...parts3);
+const sqlIdent = sql.identifier(...parts3);
 const options_people_odd_pets = {
   name: "people_odd_pets",
   identifier: "main.simple_collections.people_odd_pets(simple_collections.people)",
   from(...args) {
-    return sql`${sqlIdent3}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "p",
     required: true,
     notNull: false,
-    codec: registryConfig_pgCodecs_people_people
+    codec: peopleCodec
   }],
   returnsArray: false,
   returnsSetof: true,
@@ -238,10 +239,10 @@ const options_people_odd_pets = {
 };
 const registry = makeRegistry({
   pgCodecs: Object.assign(Object.create(null), {
-    people: registryConfig_pgCodecs_people_people,
+    people: peopleCodec,
     int4: TYPES.int,
     text: TYPES.text,
-    pets: registryConfig_pgCodecs_pets_pets,
+    pets: petsCodec,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar
   }),
@@ -253,7 +254,7 @@ const registry = makeRegistry({
   pgRelations: Object.assign(Object.create(null), {
     people: Object.assign(Object.create(null), {
       petsByTheirOwnerId: {
-        localCodec: registryConfig_pgCodecs_people_people,
+        localCodec: peopleCodec,
         remoteResourceOptions: registryConfig_pgResources_pets_pets,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -271,7 +272,7 @@ const registry = makeRegistry({
     }),
     pets: Object.assign(Object.create(null), {
       peopleByMyOwnerId: {
-        localCodec: registryConfig_pgCodecs_pets_pets,
+        localCodec: petsCodec,
         remoteResourceOptions: registryConfig_pgResources_people_people,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["owner_id"],
@@ -1655,7 +1656,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques2[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_pets_pets.attributes[attributeName];
+          const attribute = petsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -1671,7 +1672,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques2[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_pets_pets.attributes[attributeName];
+          const attribute = petsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -1803,7 +1804,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_2.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), petsAttributes.id.codec)}`;
             }
           });
         }
@@ -1826,7 +1827,7 @@ export const plans = {
             type: "attribute",
             attribute: "owner_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_2.owner_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), petsAttributes.owner_id.codec)}`;
             }
           });
         }
@@ -1849,7 +1850,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_2.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), petsAttributes.name.codec)}`;
             }
           });
         }
@@ -1883,7 +1884,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_people_people.attributes[attributeName];
+          const attribute = peopleCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -1899,7 +1900,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_people_people.attributes[attributeName];
+          const attribute = peopleCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -1997,7 +1998,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), peopleAttributes.id.codec)}`;
             }
           });
         }
@@ -2020,7 +2021,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), peopleAttributes.name.codec)}`;
             }
           });
         }

@@ -55,7 +55,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     decode: pipeStringDecode
   }
 });
-const attributes = Object.assign(Object.create(null), {
+const alwaysAsIdentityAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -87,10 +87,11 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const spec_alwaysAsIdentity = {
+const alwaysAsIdentityIdentifier = sql.identifier(...["pg11", "always_as_identity"]);
+const alwaysAsIdentityCodecSpec = {
   name: "alwaysAsIdentity",
-  identifier: sql.identifier(...["pg11", "always_as_identity"]),
-  attributes,
+  identifier: alwaysAsIdentityIdentifier,
+  attributes: alwaysAsIdentityAttributes,
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -103,8 +104,8 @@ const spec_alwaysAsIdentity = {
   },
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_alwaysAsIdentity_alwaysAsIdentity = recordCodec(spec_alwaysAsIdentity);
-const attributes2 = Object.assign(Object.create(null), {
+const alwaysAsIdentityCodec = recordCodec(alwaysAsIdentityCodecSpec);
+const byDefaultAsIdentityAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -134,17 +135,17 @@ const extensions2 = {
   tags: Object.create(null)
 };
 const parts2 = ["pg11", "by_default_as_identity"];
-const sqlIdent2 = sql.identifier(...parts2);
-const spec_byDefaultAsIdentity = {
+const byDefaultAsIdentityIdentifier = sql.identifier(...parts2);
+const byDefaultAsIdentityCodecSpec = {
   name: "byDefaultAsIdentity",
-  identifier: sqlIdent2,
-  attributes: attributes2,
+  identifier: byDefaultAsIdentityIdentifier,
+  attributes: byDefaultAsIdentityAttributes,
   description: undefined,
   extensions: extensions2,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_byDefaultAsIdentity_byDefaultAsIdentity = recordCodec(spec_byDefaultAsIdentity);
-const attributes3 = Object.assign(Object.create(null), {
+const byDefaultAsIdentityCodec = recordCodec(byDefaultAsIdentityCodecSpec);
+const networkAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -201,16 +202,16 @@ const extensions3 = {
   tags: Object.create(null)
 };
 const parts3 = ["pg11", "network"];
-const sqlIdent3 = sql.identifier(...parts3);
-const spec_network = {
+const networkIdentifier = sql.identifier(...parts3);
+const networkCodecSpec = {
   name: "network",
-  identifier: sqlIdent3,
-  attributes: attributes3,
+  identifier: networkIdentifier,
+  attributes: networkAttributes,
   description: undefined,
   extensions: extensions3,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_network_network = recordCodec(spec_network);
+const networkCodec = recordCodec(networkCodecSpec);
 const extensions4 = {
   pg: {
     serviceName: "main",
@@ -219,7 +220,7 @@ const extensions4 = {
   },
   tags: Object.create(null)
 };
-const extensions5 = {
+const bigintDomainArrayCodecExtensions = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -227,7 +228,7 @@ const extensions5 = {
   },
   tags: Object.create(null)
 };
-const extensions6 = {
+const extensions5 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -236,26 +237,26 @@ const extensions6 = {
   tags: Object.create(null)
 };
 const parts4 = ["c", "bigint_domain"];
-const sqlIdent4 = sql.identifier(...parts4);
-const innerCodec_bigintDomain = domainOfCodec(TYPES.bigint, "bigintDomain", sqlIdent4, {
+const bigintDomainIdentifier = sql.identifier(...parts4);
+const bigintDomainCodec = domainOfCodec(TYPES.bigint, "bigintDomain", bigintDomainIdentifier, {
   description: undefined,
-  extensions: extensions6,
+  extensions: extensions5,
   notNull: false
 });
-const innerCodec_bigintDomainArray = listOfCodec(innerCodec_bigintDomain, {
-  extensions: extensions5,
+const bigintDomainArrayCodec = listOfCodec(bigintDomainCodec, {
+  extensions: bigintDomainArrayCodecExtensions,
   typeDelim: ",",
   description: undefined,
   name: "bigintDomainArray"
 });
 const parts5 = ["c", "bigint_domain_array_domain"];
-const sqlIdent5 = sql.identifier(...parts5);
-const registryConfig_pgCodecs_bigintDomainArrayDomain_bigintDomainArrayDomain = domainOfCodec(innerCodec_bigintDomainArray, "bigintDomainArrayDomain", sqlIdent5, {
+const bigintDomainArrayDomainIdentifier = sql.identifier(...parts5);
+const bigintDomainArrayDomainCodec = domainOfCodec(bigintDomainArrayCodec, "bigintDomainArrayDomain", bigintDomainArrayDomainIdentifier, {
   description: undefined,
   extensions: extensions4,
   notNull: false
 });
-const extensions7 = {
+const extensions6 = {
   pg: {
     serviceName: "main",
     schemaName: "pg11",
@@ -263,7 +264,7 @@ const extensions7 = {
   },
   tags: Object.create(null)
 };
-const extensions8 = {
+const extensions7 = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -272,16 +273,15 @@ const extensions8 = {
   tags: Object.create(null)
 };
 const parts6 = ["b", "color"];
-const sqlIdent6 = sql.identifier(...parts6);
-const attributes_c_codec_color = enumCodec({
+const colorCodec = enumCodec({
   name: "color",
-  identifier: sqlIdent6,
+  identifier: sql.identifier(...parts6),
   values: ["red", "green", "blue"],
   description: undefined,
-  extensions: extensions8
+  extensions: extensions7
 });
 const enumLabels2 = ["FOO_BAR", "BAR_FOO", "BAZ_QUX", "0_BAR"];
-const extensions9 = {
+const extensions8 = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -290,16 +290,16 @@ const extensions9 = {
   tags: Object.create(null)
 };
 const parts7 = ["b", "enum_caps"];
-const sqlIdent7 = sql.identifier(...parts7);
-const attributes_e_codec_enumCaps = enumCodec({
+const sqlIdent2 = sql.identifier(...parts7);
+const enumCapsCodec = enumCodec({
   name: "enumCaps",
-  identifier: sqlIdent7,
+  identifier: sqlIdent2,
   values: enumLabels2,
   description: undefined,
-  extensions: extensions9
+  extensions: extensions8
 });
 const enumLabels3 = ["", "one", "two"];
-const extensions10 = {
+const extensions9 = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -308,15 +308,15 @@ const extensions10 = {
   tags: Object.create(null)
 };
 const parts8 = ["b", "enum_with_empty_string"];
-const sqlIdent8 = sql.identifier(...parts8);
-const attributes_f_codec_enumWithEmptyString = enumCodec({
+const sqlIdent3 = sql.identifier(...parts8);
+const enumWithEmptyStringCodec = enumCodec({
   name: "enumWithEmptyString",
-  identifier: sqlIdent8,
+  identifier: sqlIdent3,
   values: enumLabels3,
   description: undefined,
-  extensions: extensions10
+  extensions: extensions9
 });
-const attributes4 = Object.assign(Object.create(null), {
+const compoundTypeAttributes = Object.assign(Object.create(null), {
   a: {
     description: undefined,
     codec: TYPES.int,
@@ -337,7 +337,7 @@ const attributes4 = Object.assign(Object.create(null), {
   },
   c: {
     description: undefined,
-    codec: attributes_c_codec_color,
+    codec: colorCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -355,7 +355,7 @@ const attributes4 = Object.assign(Object.create(null), {
   },
   e: {
     description: undefined,
-    codec: attributes_e_codec_enumCaps,
+    codec: enumCapsCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -364,7 +364,7 @@ const attributes4 = Object.assign(Object.create(null), {
   },
   f: {
     description: undefined,
-    codec: attributes_f_codec_enumWithEmptyString,
+    codec: enumWithEmptyStringCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -390,7 +390,7 @@ const attributes4 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions11 = {
+const extensions10 = {
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -400,24 +400,24 @@ const extensions11 = {
   tags: Object.create(null)
 };
 const parts9 = ["c", "compound_type"];
-const sqlIdent9 = sql.identifier(...parts9);
-const spec_compoundType = {
+const compoundTypeIdentifier = sql.identifier(...parts9);
+const compoundTypeCodecSpec = {
   name: "compoundType",
-  identifier: sqlIdent9,
-  attributes: attributes4,
+  identifier: compoundTypeIdentifier,
+  attributes: compoundTypeAttributes,
   description: "Awesome feature!",
-  extensions: extensions11,
+  extensions: extensions10,
   executor: executor_mainPgExecutor
 };
-const innerCodec_compoundType = recordCodec(spec_compoundType);
+const compoundTypeCodec = recordCodec(compoundTypeCodecSpec);
 const parts10 = ["pg11", "domain_constrained_compound_type"];
-const sqlIdent10 = sql.identifier(...parts10);
-const registryConfig_pgCodecs_domainConstrainedCompoundType_domainConstrainedCompoundType = domainOfCodec(innerCodec_compoundType, "domainConstrainedCompoundType", sqlIdent10, {
+const domainConstrainedCompoundTypeIdentifier = sql.identifier(...parts10);
+const domainConstrainedCompoundTypeCodec = domainOfCodec(compoundTypeCodec, "domainConstrainedCompoundType", domainConstrainedCompoundTypeIdentifier, {
   description: undefined,
-  extensions: extensions7,
+  extensions: extensions6,
   notNull: false
 });
-const attributes5 = Object.assign(Object.create(null), {
+const typesAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -447,7 +447,7 @@ const attributes5 = Object.assign(Object.create(null), {
   },
   bigint_domain_array_domain: {
     description: undefined,
-    codec: registryConfig_pgCodecs_bigintDomainArrayDomain_bigintDomainArrayDomain,
+    codec: bigintDomainArrayDomainCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -456,7 +456,7 @@ const attributes5 = Object.assign(Object.create(null), {
   },
   domain_constrained_compound_type: {
     description: undefined,
-    codec: registryConfig_pgCodecs_domainConstrainedCompoundType_domainConstrainedCompoundType,
+    codec: domainConstrainedCompoundTypeCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -464,7 +464,7 @@ const attributes5 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions12 = {
+const extensions11 = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -474,17 +474,17 @@ const extensions12 = {
   tags: Object.create(null)
 };
 const parts11 = ["pg11", "types"];
-const sqlIdent11 = sql.identifier(...parts11);
-const spec_types = {
+const typesIdentifier = sql.identifier(...parts11);
+const typesCodecSpec = {
   name: "types",
-  identifier: sqlIdent11,
-  attributes: attributes5,
+  identifier: typesIdentifier,
+  attributes: typesAttributes,
   description: undefined,
-  extensions: extensions12,
+  extensions: extensions11,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_types_types = recordCodec(spec_types);
-const extensions13 = {
+const typesCodec = recordCodec(typesCodecSpec);
+const extensions12 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -501,7 +501,7 @@ const uniques = [{
     tags: Object.create(null)
   }
 }];
-const extensions14 = {
+const extensions13 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -518,7 +518,7 @@ const uniques2 = [{
     tags: Object.create(null)
   }
 }];
-const extensions15 = {
+const extensions14 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -535,7 +535,7 @@ const uniques3 = [{
     tags: Object.create(null)
   }
 }];
-const extensions16 = {
+const extensions15 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -554,11 +554,11 @@ const uniques4 = [{
 }];
 const registry = makeRegistry({
   pgCodecs: Object.assign(Object.create(null), {
-    alwaysAsIdentity: registryConfig_pgCodecs_alwaysAsIdentity_alwaysAsIdentity,
+    alwaysAsIdentity: alwaysAsIdentityCodec,
     int4: TYPES.int,
     text: TYPES.text,
-    byDefaultAsIdentity: registryConfig_pgCodecs_byDefaultAsIdentity_byDefaultAsIdentity,
-    network: registryConfig_pgCodecs_network_network,
+    byDefaultAsIdentity: byDefaultAsIdentityCodec,
+    network: networkCodec,
     inet: TYPES.inet,
     cidr: TYPES.cidr,
     macaddr: TYPES.macaddr,
@@ -567,63 +567,63 @@ const registry = makeRegistry({
     bpchar: TYPES.bpchar,
     regrole: TYPES.regrole,
     regnamespace: TYPES.regnamespace,
-    bigintDomainArrayDomain: registryConfig_pgCodecs_bigintDomainArrayDomain_bigintDomainArrayDomain,
-    bigintDomain: innerCodec_bigintDomain,
+    bigintDomainArrayDomain: bigintDomainArrayDomainCodec,
+    bigintDomain: bigintDomainCodec,
     int8: TYPES.bigint,
-    bigintDomainArray: innerCodec_bigintDomainArray,
-    domainConstrainedCompoundType: registryConfig_pgCodecs_domainConstrainedCompoundType_domainConstrainedCompoundType,
-    compoundType: innerCodec_compoundType,
-    color: attributes_c_codec_color,
+    bigintDomainArray: bigintDomainArrayCodec,
+    domainConstrainedCompoundType: domainConstrainedCompoundTypeCodec,
+    compoundType: compoundTypeCodec,
+    color: colorCodec,
     uuid: TYPES.uuid,
-    enumCaps: attributes_e_codec_enumCaps,
-    enumWithEmptyString: attributes_f_codec_enumWithEmptyString,
+    enumCaps: enumCapsCodec,
+    enumWithEmptyString: enumWithEmptyStringCodec,
     interval: TYPES.interval,
-    types: registryConfig_pgCodecs_types_types
+    types: typesCodec
   }),
   pgResources: Object.assign(Object.create(null), {
     always_as_identity: {
       executor: executor_mainPgExecutor,
       name: "always_as_identity",
       identifier: "main.pg11.always_as_identity",
-      from: registryConfig_pgCodecs_alwaysAsIdentity_alwaysAsIdentity.sqlType,
-      codec: registryConfig_pgCodecs_alwaysAsIdentity_alwaysAsIdentity,
+      from: alwaysAsIdentityCodec.sqlType,
+      codec: alwaysAsIdentityCodec,
       uniques,
       isVirtual: false,
       description: undefined,
-      extensions: extensions13
+      extensions: extensions12
     },
     by_default_as_identity: {
       executor: executor_mainPgExecutor,
       name: "by_default_as_identity",
       identifier: "main.pg11.by_default_as_identity",
-      from: registryConfig_pgCodecs_byDefaultAsIdentity_byDefaultAsIdentity.sqlType,
-      codec: registryConfig_pgCodecs_byDefaultAsIdentity_byDefaultAsIdentity,
+      from: byDefaultAsIdentityCodec.sqlType,
+      codec: byDefaultAsIdentityCodec,
       uniques: uniques2,
       isVirtual: false,
       description: undefined,
-      extensions: extensions14
+      extensions: extensions13
     },
     network: {
       executor: executor_mainPgExecutor,
       name: "network",
       identifier: "main.pg11.network",
-      from: registryConfig_pgCodecs_network_network.sqlType,
-      codec: registryConfig_pgCodecs_network_network,
+      from: networkCodec.sqlType,
+      codec: networkCodec,
       uniques: uniques3,
       isVirtual: false,
       description: undefined,
-      extensions: extensions15
+      extensions: extensions14
     },
     types: {
       executor: executor_mainPgExecutor,
       name: "types",
       identifier: "main.pg11.types",
-      from: registryConfig_pgCodecs_types_types.sqlType,
-      codec: registryConfig_pgCodecs_types_types,
+      from: typesCodec.sqlType,
+      codec: typesCodec,
       uniques: uniques4,
       isVirtual: false,
       description: undefined,
-      extensions: extensions16
+      extensions: extensions15
     }
   }),
   pgRelations: Object.create(null)
@@ -3039,7 +3039,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_alwaysAsIdentity_alwaysAsIdentity.attributes[attributeName];
+          const attribute = alwaysAsIdentityCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -3055,7 +3055,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_alwaysAsIdentity_alwaysAsIdentity.attributes[attributeName];
+          const attribute = alwaysAsIdentityCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -3153,7 +3153,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), alwaysAsIdentityAttributes.id.codec)}`;
             }
           });
         }
@@ -3176,7 +3176,7 @@ export const plans = {
             type: "attribute",
             attribute: "t",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.t.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), alwaysAsIdentityAttributes.t.codec)}`;
             }
           });
         }
@@ -3210,7 +3210,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques2[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_byDefaultAsIdentity_byDefaultAsIdentity.attributes[attributeName];
+          const attribute = byDefaultAsIdentityCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -3226,7 +3226,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques2[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_byDefaultAsIdentity_byDefaultAsIdentity.attributes[attributeName];
+          const attribute = byDefaultAsIdentityCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -3324,7 +3324,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes2.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), byDefaultAsIdentityAttributes.id.codec)}`;
             }
           });
         }
@@ -3347,7 +3347,7 @@ export const plans = {
             type: "attribute",
             attribute: "t",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes2.t.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), byDefaultAsIdentityAttributes.t.codec)}`;
             }
           });
         }
@@ -3381,7 +3381,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques3[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_network_network.attributes[attributeName];
+          const attribute = networkCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -3397,7 +3397,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques3[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_network_network.attributes[attributeName];
+          const attribute = networkCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -3597,7 +3597,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes3.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), networkAttributes.id.codec)}`;
             }
           });
         }
@@ -3620,7 +3620,7 @@ export const plans = {
             type: "attribute",
             attribute: "inet",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes3.inet.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), networkAttributes.inet.codec)}`;
             }
           });
         }
@@ -3643,7 +3643,7 @@ export const plans = {
             type: "attribute",
             attribute: "cidr",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes3.cidr.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), networkAttributes.cidr.codec)}`;
             }
           });
         }
@@ -3666,7 +3666,7 @@ export const plans = {
             type: "attribute",
             attribute: "macaddr",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes3.macaddr.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), networkAttributes.macaddr.codec)}`;
             }
           });
         }
@@ -3689,7 +3689,7 @@ export const plans = {
             type: "attribute",
             attribute: "macaddr8",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes3.macaddr8.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), networkAttributes.macaddr8.codec)}`;
             }
           });
         }
@@ -3723,7 +3723,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques4[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_types_types.attributes[attributeName];
+          const attribute = typesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -3739,7 +3739,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques4[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_types_types.attributes[attributeName];
+          const attribute = typesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -3905,7 +3905,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes5.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.id.codec)}`;
             }
           });
         }
@@ -3928,7 +3928,7 @@ export const plans = {
             type: "attribute",
             attribute: "regrole",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes5.regrole.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.regrole.codec)}`;
             }
           });
         }
@@ -3951,7 +3951,7 @@ export const plans = {
             type: "attribute",
             attribute: "regnamespace",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes5.regnamespace.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.regnamespace.codec)}`;
             }
           });
         }
@@ -3974,7 +3974,7 @@ export const plans = {
             type: "attribute",
             attribute: "bigint_domain_array_domain",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes5.bigint_domain_array_domain.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.bigint_domain_array_domain.codec)}`;
             }
           });
         }
@@ -3997,7 +3997,7 @@ export const plans = {
             type: "attribute",
             attribute: "domain_constrained_compound_type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes5.domain_constrained_compound_type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.domain_constrained_compound_type.codec)}`;
             }
           });
         }

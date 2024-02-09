@@ -2,7 +2,7 @@ import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, PgUnionAllSte
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, makeGrafastSchema, object, rootValue } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
-const attributes = Object.assign(Object.create(null), {
+const awsApplicationFirstPartyVulnerabilitiesAttributes = Object.assign(Object.create(null), {
   aws_application_id: {
     description: undefined,
     codec: TYPES.int,
@@ -32,10 +32,11 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const spec_awsApplicationFirstPartyVulnerabilities = {
+const awsApplicationFirstPartyVulnerabilitiesIdentifier = sql.identifier(...["polymorphic", "aws_application_first_party_vulnerabilities"]);
+const awsApplicationFirstPartyVulnerabilitiesCodecSpec = {
   name: "awsApplicationFirstPartyVulnerabilities",
-  identifier: sql.identifier(...["polymorphic", "aws_application_first_party_vulnerabilities"]),
-  attributes,
+  identifier: awsApplicationFirstPartyVulnerabilitiesIdentifier,
+  attributes: awsApplicationFirstPartyVulnerabilitiesAttributes,
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -50,8 +51,8 @@ const spec_awsApplicationFirstPartyVulnerabilities = {
   },
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_awsApplicationFirstPartyVulnerabilities_awsApplicationFirstPartyVulnerabilities = recordCodec(spec_awsApplicationFirstPartyVulnerabilities);
-const attributes2 = Object.assign(Object.create(null), {
+const awsApplicationFirstPartyVulnerabilitiesCodec = recordCodec(awsApplicationFirstPartyVulnerabilitiesCodecSpec);
+const awsApplicationThirdPartyVulnerabilitiesAttributes = Object.assign(Object.create(null), {
   aws_application_id: {
     description: undefined,
     codec: TYPES.int,
@@ -83,17 +84,17 @@ const extensions2 = {
   })
 };
 const parts2 = ["polymorphic", "aws_application_third_party_vulnerabilities"];
-const sqlIdent2 = sql.identifier(...parts2);
-const spec_awsApplicationThirdPartyVulnerabilities = {
+const awsApplicationThirdPartyVulnerabilitiesIdentifier = sql.identifier(...parts2);
+const awsApplicationThirdPartyVulnerabilitiesCodecSpec = {
   name: "awsApplicationThirdPartyVulnerabilities",
-  identifier: sqlIdent2,
-  attributes: attributes2,
+  identifier: awsApplicationThirdPartyVulnerabilitiesIdentifier,
+  attributes: awsApplicationThirdPartyVulnerabilitiesAttributes,
   description: undefined,
   extensions: extensions2,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_awsApplicationThirdPartyVulnerabilities_awsApplicationThirdPartyVulnerabilities = recordCodec(spec_awsApplicationThirdPartyVulnerabilities);
-const attributes3 = Object.assign(Object.create(null), {
+const awsApplicationThirdPartyVulnerabilitiesCodec = recordCodec(awsApplicationThirdPartyVulnerabilitiesCodecSpec);
+const gcpApplicationFirstPartyVulnerabilitiesAttributes = Object.assign(Object.create(null), {
   gcp_application_id: {
     description: undefined,
     codec: TYPES.int,
@@ -125,17 +126,17 @@ const extensions3 = {
   })
 };
 const parts3 = ["polymorphic", "gcp_application_first_party_vulnerabilities"];
-const sqlIdent3 = sql.identifier(...parts3);
-const spec_gcpApplicationFirstPartyVulnerabilities = {
+const gcpApplicationFirstPartyVulnerabilitiesIdentifier = sql.identifier(...parts3);
+const gcpApplicationFirstPartyVulnerabilitiesCodecSpec = {
   name: "gcpApplicationFirstPartyVulnerabilities",
-  identifier: sqlIdent3,
-  attributes: attributes3,
+  identifier: gcpApplicationFirstPartyVulnerabilitiesIdentifier,
+  attributes: gcpApplicationFirstPartyVulnerabilitiesAttributes,
   description: undefined,
   extensions: extensions3,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_gcpApplicationFirstPartyVulnerabilities_gcpApplicationFirstPartyVulnerabilities = recordCodec(spec_gcpApplicationFirstPartyVulnerabilities);
-const attributes4 = Object.assign(Object.create(null), {
+const gcpApplicationFirstPartyVulnerabilitiesCodec = recordCodec(gcpApplicationFirstPartyVulnerabilitiesCodecSpec);
+const gcpApplicationThirdPartyVulnerabilitiesAttributes = Object.assign(Object.create(null), {
   gcp_application_id: {
     description: undefined,
     codec: TYPES.int,
@@ -167,17 +168,17 @@ const extensions4 = {
   })
 };
 const parts4 = ["polymorphic", "gcp_application_third_party_vulnerabilities"];
-const sqlIdent4 = sql.identifier(...parts4);
-const spec_gcpApplicationThirdPartyVulnerabilities = {
+const gcpApplicationThirdPartyVulnerabilitiesIdentifier = sql.identifier(...parts4);
+const gcpApplicationThirdPartyVulnerabilitiesCodecSpec = {
   name: "gcpApplicationThirdPartyVulnerabilities",
-  identifier: sqlIdent4,
-  attributes: attributes4,
+  identifier: gcpApplicationThirdPartyVulnerabilitiesIdentifier,
+  attributes: gcpApplicationThirdPartyVulnerabilitiesAttributes,
   description: undefined,
   extensions: extensions4,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_gcpApplicationThirdPartyVulnerabilities_gcpApplicationThirdPartyVulnerabilities = recordCodec(spec_gcpApplicationThirdPartyVulnerabilities);
-const attributes_object_Object_ = Object.assign(Object.create(null), {
+const gcpApplicationThirdPartyVulnerabilitiesCodec = recordCodec(gcpApplicationThirdPartyVulnerabilitiesCodecSpec);
+const organizationsAttributes = Object.assign(Object.create(null), {
   organization_id: {
     description: undefined,
     codec: TYPES.int,
@@ -209,17 +210,17 @@ const extensions5 = {
   })
 };
 const parts5 = ["polymorphic", "organizations"];
-const sqlIdent5 = sql.identifier(...parts5);
-const spec_organizations = {
+const organizationsIdentifier = sql.identifier(...parts5);
+const organizationsCodecSpec = {
   name: "organizations",
-  identifier: sqlIdent5,
-  attributes: attributes_object_Object_,
+  identifier: organizationsIdentifier,
+  attributes: organizationsAttributes,
   description: undefined,
   extensions: extensions5,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_organizations_organizations = recordCodec(spec_organizations);
-const attributes5 = Object.assign(Object.create(null), {
+const organizationsCodec = recordCodec(organizationsCodecSpec);
+const peopleAttributes = Object.assign(Object.create(null), {
   person_id: {
     description: undefined,
     codec: TYPES.int,
@@ -266,17 +267,17 @@ const extensions6 = {
   })
 };
 const parts6 = ["polymorphic", "people"];
-const sqlIdent6 = sql.identifier(...parts6);
-const spec_people = {
+const peopleIdentifier = sql.identifier(...parts6);
+const peopleCodecSpec = {
   name: "people",
-  identifier: sqlIdent6,
-  attributes: attributes5,
+  identifier: peopleIdentifier,
+  attributes: peopleAttributes,
   description: undefined,
   extensions: extensions6,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_people_people = recordCodec(spec_people);
-const attributes6 = Object.assign(Object.create(null), {
+const peopleCodec = recordCodec(peopleCodecSpec);
+const prioritiesAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -308,16 +309,16 @@ const extensions7 = {
   })
 };
 const parts7 = ["polymorphic", "priorities"];
-const sqlIdent7 = sql.identifier(...parts7);
-const spec_priorities = {
+const prioritiesIdentifier = sql.identifier(...parts7);
+const prioritiesCodecSpec = {
   name: "priorities",
-  identifier: sqlIdent7,
-  attributes: attributes6,
+  identifier: prioritiesIdentifier,
+  attributes: prioritiesAttributes,
   description: undefined,
   extensions: extensions7,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_priorities_priorities = recordCodec(spec_priorities);
+const prioritiesCodec = recordCodec(prioritiesCodecSpec);
 const extensions8 = {
   pg: {
     serviceName: "main",
@@ -327,15 +328,14 @@ const extensions8 = {
   tags: Object.create(null)
 };
 const parts8 = ["polymorphic", "item_type"];
-const sqlIdent8 = sql.identifier(...parts8);
-const attributes_type_codec_itemType = enumCodec({
+const itemTypeCodec = enumCodec({
   name: "itemType",
-  identifier: sqlIdent8,
+  identifier: sql.identifier(...parts8),
   values: ["TOPIC", "POST", "DIVIDER", "CHECKLIST", "CHECKLIST_ITEM"],
   description: undefined,
   extensions: extensions8
 });
-const attributes7 = Object.assign(Object.create(null), {
+const relationalChecklistsAttributes = Object.assign(Object.create(null), {
   checklist_item_id: {
     description: undefined,
     codec: TYPES.int,
@@ -366,7 +366,7 @@ const attributes7 = Object.assign(Object.create(null), {
     }
   },
   type: {
-    codec: attributes_type_codec_itemType,
+    codec: itemTypeCodec,
     notNull: true,
     hasDefault: true,
     via: "relationalItemsByMyChecklistItemId",
@@ -476,17 +476,17 @@ const extensions9 = {
   relationalInterfaceCodecName: "relationalItems"
 };
 const parts9 = ["polymorphic", "relational_checklists"];
-const sqlIdent9 = sql.identifier(...parts9);
-const spec_relationalChecklists = {
+const relationalChecklistsIdentifier = sql.identifier(...parts9);
+const relationalChecklistsCodecSpec = {
   name: "relationalChecklists",
-  identifier: sqlIdent9,
-  attributes: attributes7,
+  identifier: relationalChecklistsIdentifier,
+  attributes: relationalChecklistsAttributes,
   description: undefined,
   extensions: extensions9,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_relationalChecklists_relationalChecklists = recordCodec(spec_relationalChecklists);
-const attributes8 = Object.assign(Object.create(null), {
+const relationalChecklistsCodec = recordCodec(relationalChecklistsCodecSpec);
+const relationalItemRelationCompositePksAttributes = Object.assign(Object.create(null), {
   parent_id: {
     description: undefined,
     codec: TYPES.int,
@@ -516,17 +516,17 @@ const extensions10 = {
   tags: Object.create(null)
 };
 const parts10 = ["polymorphic", "relational_item_relation_composite_pks"];
-const sqlIdent10 = sql.identifier(...parts10);
-const spec_relationalItemRelationCompositePks = {
+const relationalItemRelationCompositePksIdentifier = sql.identifier(...parts10);
+const relationalItemRelationCompositePksCodecSpec = {
   name: "relationalItemRelationCompositePks",
-  identifier: sqlIdent10,
-  attributes: attributes8,
+  identifier: relationalItemRelationCompositePksIdentifier,
+  attributes: relationalItemRelationCompositePksAttributes,
   description: undefined,
   extensions: extensions10,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_relationalItemRelationCompositePks_relationalItemRelationCompositePks = recordCodec(spec_relationalItemRelationCompositePks);
-const attributes9 = Object.assign(Object.create(null), {
+const relationalItemRelationCompositePksCodec = recordCodec(relationalItemRelationCompositePksCodecSpec);
+const relationalTopicsAttributes = Object.assign(Object.create(null), {
   topic_item_id: {
     description: undefined,
     codec: TYPES.int,
@@ -553,18 +553,18 @@ const attributes9 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.id.extensions.tags
+      tags: relationalChecklistsAttributes.id.extensions.tags
     }
   },
   type: {
-    codec: attributes_type_codec_itemType,
+    codec: itemTypeCodec,
     notNull: true,
     hasDefault: true,
     via: "relationalItemsByMyTopicItemId",
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.type.extensions.tags
+      tags: relationalChecklistsAttributes.type.extensions.tags
     }
   },
   parent_id: {
@@ -575,7 +575,7 @@ const attributes9 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.parent_id.extensions.tags
+      tags: relationalChecklistsAttributes.parent_id.extensions.tags
     }
   },
   root_topic_id: {
@@ -586,7 +586,7 @@ const attributes9 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.root_topic_id.extensions.tags
+      tags: relationalChecklistsAttributes.root_topic_id.extensions.tags
     }
   },
   author_id: {
@@ -597,7 +597,7 @@ const attributes9 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.author_id.extensions.tags
+      tags: relationalChecklistsAttributes.author_id.extensions.tags
     }
   },
   position: {
@@ -608,7 +608,7 @@ const attributes9 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.position.extensions.tags
+      tags: relationalChecklistsAttributes.position.extensions.tags
     }
   },
   created_at: {
@@ -619,7 +619,7 @@ const attributes9 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.created_at.extensions.tags
+      tags: relationalChecklistsAttributes.created_at.extensions.tags
     }
   },
   updated_at: {
@@ -630,7 +630,7 @@ const attributes9 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.updated_at.extensions.tags
+      tags: relationalChecklistsAttributes.updated_at.extensions.tags
     }
   },
   is_explicitly_archived: {
@@ -641,7 +641,7 @@ const attributes9 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.is_explicitly_archived.extensions.tags
+      tags: relationalChecklistsAttributes.is_explicitly_archived.extensions.tags
     }
   },
   archived_at: {
@@ -652,7 +652,7 @@ const attributes9 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.archived_at.extensions.tags
+      tags: relationalChecklistsAttributes.archived_at.extensions.tags
     }
   }
 });
@@ -667,17 +667,17 @@ const extensions11 = {
   relationalInterfaceCodecName: "relationalItems"
 };
 const parts11 = ["polymorphic", "relational_topics"];
-const sqlIdent11 = sql.identifier(...parts11);
-const spec_relationalTopics = {
+const relationalTopicsIdentifier = sql.identifier(...parts11);
+const relationalTopicsCodecSpec = {
   name: "relationalTopics",
-  identifier: sqlIdent11,
-  attributes: attributes9,
+  identifier: relationalTopicsIdentifier,
+  attributes: relationalTopicsAttributes,
   description: undefined,
   extensions: extensions11,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_relationalTopics_relationalTopics = recordCodec(spec_relationalTopics);
-const attributes10 = Object.assign(Object.create(null), {
+const relationalTopicsCodec = recordCodec(relationalTopicsCodecSpec);
+const singleTableItemRelationCompositePksAttributes = Object.assign(Object.create(null), {
   parent_id: {
     description: undefined,
     codec: TYPES.int,
@@ -707,17 +707,17 @@ const extensions12 = {
   tags: Object.create(null)
 };
 const parts12 = ["polymorphic", "single_table_item_relation_composite_pks"];
-const sqlIdent12 = sql.identifier(...parts12);
-const spec_singleTableItemRelationCompositePks = {
+const singleTableItemRelationCompositePksIdentifier = sql.identifier(...parts12);
+const singleTableItemRelationCompositePksCodecSpec = {
   name: "singleTableItemRelationCompositePks",
-  identifier: sqlIdent12,
-  attributes: attributes10,
+  identifier: singleTableItemRelationCompositePksIdentifier,
+  attributes: singleTableItemRelationCompositePksAttributes,
   description: undefined,
   extensions: extensions12,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_singleTableItemRelationCompositePks_singleTableItemRelationCompositePks = recordCodec(spec_singleTableItemRelationCompositePks);
-const attributes11 = Object.assign(Object.create(null), {
+const singleTableItemRelationCompositePksCodec = recordCodec(singleTableItemRelationCompositePksCodecSpec);
+const relationalChecklistItemsAttributes = Object.assign(Object.create(null), {
   checklist_item_item_id: {
     description: undefined,
     codec: TYPES.int,
@@ -753,18 +753,18 @@ const attributes11 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.id.extensions.tags
+      tags: relationalChecklistsAttributes.id.extensions.tags
     }
   },
   type: {
-    codec: attributes_type_codec_itemType,
+    codec: itemTypeCodec,
     notNull: true,
     hasDefault: true,
     via: "relationalItemsByMyChecklistItemItemId",
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.type.extensions.tags
+      tags: relationalChecklistsAttributes.type.extensions.tags
     }
   },
   parent_id: {
@@ -775,7 +775,7 @@ const attributes11 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.parent_id.extensions.tags
+      tags: relationalChecklistsAttributes.parent_id.extensions.tags
     }
   },
   root_topic_id: {
@@ -786,7 +786,7 @@ const attributes11 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.root_topic_id.extensions.tags
+      tags: relationalChecklistsAttributes.root_topic_id.extensions.tags
     }
   },
   author_id: {
@@ -797,7 +797,7 @@ const attributes11 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.author_id.extensions.tags
+      tags: relationalChecklistsAttributes.author_id.extensions.tags
     }
   },
   position: {
@@ -808,7 +808,7 @@ const attributes11 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.position.extensions.tags
+      tags: relationalChecklistsAttributes.position.extensions.tags
     }
   },
   created_at: {
@@ -819,7 +819,7 @@ const attributes11 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.created_at.extensions.tags
+      tags: relationalChecklistsAttributes.created_at.extensions.tags
     }
   },
   updated_at: {
@@ -830,7 +830,7 @@ const attributes11 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.updated_at.extensions.tags
+      tags: relationalChecklistsAttributes.updated_at.extensions.tags
     }
   },
   is_explicitly_archived: {
@@ -841,7 +841,7 @@ const attributes11 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.is_explicitly_archived.extensions.tags
+      tags: relationalChecklistsAttributes.is_explicitly_archived.extensions.tags
     }
   },
   archived_at: {
@@ -852,7 +852,7 @@ const attributes11 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.archived_at.extensions.tags
+      tags: relationalChecklistsAttributes.archived_at.extensions.tags
     }
   }
 });
@@ -867,17 +867,17 @@ const extensions13 = {
   relationalInterfaceCodecName: "relationalItems"
 };
 const parts13 = ["polymorphic", "relational_checklist_items"];
-const sqlIdent13 = sql.identifier(...parts13);
-const spec_relationalChecklistItems = {
+const relationalChecklistItemsIdentifier = sql.identifier(...parts13);
+const relationalChecklistItemsCodecSpec = {
   name: "relationalChecklistItems",
-  identifier: sqlIdent13,
-  attributes: attributes11,
+  identifier: relationalChecklistItemsIdentifier,
+  attributes: relationalChecklistItemsAttributes,
   description: undefined,
   extensions: extensions13,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_relationalChecklistItems_relationalChecklistItems = recordCodec(spec_relationalChecklistItems);
-const attributes12 = Object.assign(Object.create(null), {
+const relationalChecklistItemsCodec = recordCodec(relationalChecklistItemsCodecSpec);
+const relationalDividersAttributes = Object.assign(Object.create(null), {
   divider_item_id: {
     description: undefined,
     codec: TYPES.int,
@@ -913,18 +913,18 @@ const attributes12 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.id.extensions.tags
+      tags: relationalChecklistsAttributes.id.extensions.tags
     }
   },
   type: {
-    codec: attributes_type_codec_itemType,
+    codec: itemTypeCodec,
     notNull: true,
     hasDefault: true,
     via: "relationalItemsByMyDividerItemId",
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.type.extensions.tags
+      tags: relationalChecklistsAttributes.type.extensions.tags
     }
   },
   parent_id: {
@@ -935,7 +935,7 @@ const attributes12 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.parent_id.extensions.tags
+      tags: relationalChecklistsAttributes.parent_id.extensions.tags
     }
   },
   root_topic_id: {
@@ -946,7 +946,7 @@ const attributes12 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.root_topic_id.extensions.tags
+      tags: relationalChecklistsAttributes.root_topic_id.extensions.tags
     }
   },
   author_id: {
@@ -957,7 +957,7 @@ const attributes12 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.author_id.extensions.tags
+      tags: relationalChecklistsAttributes.author_id.extensions.tags
     }
   },
   position: {
@@ -968,7 +968,7 @@ const attributes12 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.position.extensions.tags
+      tags: relationalChecklistsAttributes.position.extensions.tags
     }
   },
   created_at: {
@@ -979,7 +979,7 @@ const attributes12 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.created_at.extensions.tags
+      tags: relationalChecklistsAttributes.created_at.extensions.tags
     }
   },
   updated_at: {
@@ -990,7 +990,7 @@ const attributes12 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.updated_at.extensions.tags
+      tags: relationalChecklistsAttributes.updated_at.extensions.tags
     }
   },
   is_explicitly_archived: {
@@ -1001,7 +1001,7 @@ const attributes12 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.is_explicitly_archived.extensions.tags
+      tags: relationalChecklistsAttributes.is_explicitly_archived.extensions.tags
     }
   },
   archived_at: {
@@ -1012,7 +1012,7 @@ const attributes12 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.archived_at.extensions.tags
+      tags: relationalChecklistsAttributes.archived_at.extensions.tags
     }
   }
 });
@@ -1027,17 +1027,17 @@ const extensions14 = {
   relationalInterfaceCodecName: "relationalItems"
 };
 const parts14 = ["polymorphic", "relational_dividers"];
-const sqlIdent14 = sql.identifier(...parts14);
-const spec_relationalDividers = {
+const relationalDividersIdentifier = sql.identifier(...parts14);
+const relationalDividersCodecSpec = {
   name: "relationalDividers",
-  identifier: sqlIdent14,
-  attributes: attributes12,
+  identifier: relationalDividersIdentifier,
+  attributes: relationalDividersAttributes,
   description: undefined,
   extensions: extensions14,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_relationalDividers_relationalDividers = recordCodec(spec_relationalDividers);
-const attributes13 = Object.assign(Object.create(null), {
+const relationalDividersCodec = recordCodec(relationalDividersCodecSpec);
+const relationalItemRelationsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -1076,17 +1076,17 @@ const extensions15 = {
   tags: Object.create(null)
 };
 const parts15 = ["polymorphic", "relational_item_relations"];
-const sqlIdent15 = sql.identifier(...parts15);
-const spec_relationalItemRelations = {
+const relationalItemRelationsIdentifier = sql.identifier(...parts15);
+const relationalItemRelationsCodecSpec = {
   name: "relationalItemRelations",
-  identifier: sqlIdent15,
-  attributes: attributes13,
+  identifier: relationalItemRelationsIdentifier,
+  attributes: relationalItemRelationsAttributes,
   description: undefined,
   extensions: extensions15,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_relationalItemRelations_relationalItemRelations = recordCodec(spec_relationalItemRelations);
-const attributes14 = Object.assign(Object.create(null), {
+const relationalItemRelationsCodec = recordCodec(relationalItemRelationsCodecSpec);
+const singleTableItemRelationsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -1125,17 +1125,17 @@ const extensions16 = {
   tags: Object.create(null)
 };
 const parts16 = ["polymorphic", "single_table_item_relations"];
-const sqlIdent16 = sql.identifier(...parts16);
-const spec_singleTableItemRelations = {
+const singleTableItemRelationsIdentifier = sql.identifier(...parts16);
+const singleTableItemRelationsCodecSpec = {
   name: "singleTableItemRelations",
-  identifier: sqlIdent16,
-  attributes: attributes14,
+  identifier: singleTableItemRelationsIdentifier,
+  attributes: singleTableItemRelationsAttributes,
   description: undefined,
   extensions: extensions16,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_singleTableItemRelations_singleTableItemRelations = recordCodec(spec_singleTableItemRelations);
-const attributes15 = Object.assign(Object.create(null), {
+const singleTableItemRelationsCodec = recordCodec(singleTableItemRelationsCodecSpec);
+const logEntriesAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -1199,17 +1199,17 @@ const extensions17 = {
   })
 };
 const parts17 = ["polymorphic", "log_entries"];
-const sqlIdent17 = sql.identifier(...parts17);
-const spec_logEntries = {
+const logEntriesIdentifier = sql.identifier(...parts17);
+const logEntriesCodecSpec = {
   name: "logEntries",
-  identifier: sqlIdent17,
-  attributes: attributes15,
+  identifier: logEntriesIdentifier,
+  attributes: logEntriesAttributes,
   description: undefined,
   extensions: extensions17,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_logEntries_logEntries = recordCodec(spec_logEntries);
-const attributes16 = Object.assign(Object.create(null), {
+const logEntriesCodec = recordCodec(logEntriesCodecSpec);
+const relationalPostsAttributes = Object.assign(Object.create(null), {
   post_item_id: {
     description: undefined,
     codec: TYPES.int,
@@ -1254,18 +1254,18 @@ const attributes16 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.id.extensions.tags
+      tags: relationalChecklistsAttributes.id.extensions.tags
     }
   },
   type: {
-    codec: attributes_type_codec_itemType,
+    codec: itemTypeCodec,
     notNull: true,
     hasDefault: true,
     via: "relationalItemsByMyPostItemId",
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.type.extensions.tags
+      tags: relationalChecklistsAttributes.type.extensions.tags
     }
   },
   parent_id: {
@@ -1276,7 +1276,7 @@ const attributes16 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.parent_id.extensions.tags
+      tags: relationalChecklistsAttributes.parent_id.extensions.tags
     }
   },
   root_topic_id: {
@@ -1287,7 +1287,7 @@ const attributes16 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.root_topic_id.extensions.tags
+      tags: relationalChecklistsAttributes.root_topic_id.extensions.tags
     }
   },
   author_id: {
@@ -1298,7 +1298,7 @@ const attributes16 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.author_id.extensions.tags
+      tags: relationalChecklistsAttributes.author_id.extensions.tags
     }
   },
   position: {
@@ -1309,7 +1309,7 @@ const attributes16 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.position.extensions.tags
+      tags: relationalChecklistsAttributes.position.extensions.tags
     }
   },
   created_at: {
@@ -1320,7 +1320,7 @@ const attributes16 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.created_at.extensions.tags
+      tags: relationalChecklistsAttributes.created_at.extensions.tags
     }
   },
   updated_at: {
@@ -1331,7 +1331,7 @@ const attributes16 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.updated_at.extensions.tags
+      tags: relationalChecklistsAttributes.updated_at.extensions.tags
     }
   },
   is_explicitly_archived: {
@@ -1342,7 +1342,7 @@ const attributes16 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.is_explicitly_archived.extensions.tags
+      tags: relationalChecklistsAttributes.is_explicitly_archived.extensions.tags
     }
   },
   archived_at: {
@@ -1353,7 +1353,7 @@ const attributes16 = Object.assign(Object.create(null), {
     restrictedAccess: undefined,
     description: undefined,
     extensions: {
-      tags: attributes7.archived_at.extensions.tags
+      tags: relationalChecklistsAttributes.archived_at.extensions.tags
     }
   }
 });
@@ -1368,17 +1368,17 @@ const extensions18 = {
   relationalInterfaceCodecName: "relationalItems"
 };
 const parts18 = ["polymorphic", "relational_posts"];
-const sqlIdent18 = sql.identifier(...parts18);
-const spec_relationalPosts = {
+const relationalPostsIdentifier = sql.identifier(...parts18);
+const relationalPostsCodecSpec = {
   name: "relationalPosts",
-  identifier: sqlIdent18,
-  attributes: attributes16,
+  identifier: relationalPostsIdentifier,
+  attributes: relationalPostsAttributes,
   description: undefined,
   extensions: extensions18,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_relationalPosts_relationalPosts = recordCodec(spec_relationalPosts);
-const attributes_object_Object_2 = Object.assign(Object.create(null), {
+const relationalPostsCodec = recordCodec(relationalPostsCodecSpec);
+const firstPartyVulnerabilitiesAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -1454,17 +1454,17 @@ const extensions19 = {
   })
 };
 const parts19 = ["polymorphic", "first_party_vulnerabilities"];
-const sqlIdent19 = sql.identifier(...parts19);
-const spec_firstPartyVulnerabilities = {
+const firstPartyVulnerabilitiesIdentifier = sql.identifier(...parts19);
+const firstPartyVulnerabilitiesCodecSpec = {
   name: "firstPartyVulnerabilities",
-  identifier: sqlIdent19,
-  attributes: attributes_object_Object_2,
+  identifier: firstPartyVulnerabilitiesIdentifier,
+  attributes: firstPartyVulnerabilitiesAttributes,
   description: undefined,
   extensions: extensions19,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_firstPartyVulnerabilities_firstPartyVulnerabilities = recordCodec(spec_firstPartyVulnerabilities);
-const attributes_object_Object_3 = Object.assign(Object.create(null), {
+const firstPartyVulnerabilitiesCodec = recordCodec(firstPartyVulnerabilitiesCodecSpec);
+const thirdPartyVulnerabilitiesAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -1540,17 +1540,17 @@ const extensions20 = {
   })
 };
 const parts20 = ["polymorphic", "third_party_vulnerabilities"];
-const sqlIdent20 = sql.identifier(...parts20);
-const spec_thirdPartyVulnerabilities = {
+const thirdPartyVulnerabilitiesIdentifier = sql.identifier(...parts20);
+const thirdPartyVulnerabilitiesCodecSpec = {
   name: "thirdPartyVulnerabilities",
-  identifier: sqlIdent20,
-  attributes: attributes_object_Object_3,
+  identifier: thirdPartyVulnerabilitiesIdentifier,
+  attributes: thirdPartyVulnerabilitiesAttributes,
   description: undefined,
   extensions: extensions20,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_thirdPartyVulnerabilities_thirdPartyVulnerabilities = recordCodec(spec_thirdPartyVulnerabilities);
-const attributes_object_Object_4 = Object.assign(Object.create(null), {
+const thirdPartyVulnerabilitiesCodec = recordCodec(thirdPartyVulnerabilitiesCodecSpec);
+const awsApplicationsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -1644,17 +1644,17 @@ const extensions21 = {
   })
 };
 const parts21 = ["polymorphic", "aws_applications"];
-const sqlIdent21 = sql.identifier(...parts21);
-const spec_awsApplications = {
+const awsApplicationsIdentifier = sql.identifier(...parts21);
+const awsApplicationsCodecSpec = {
   name: "awsApplications",
-  identifier: sqlIdent21,
-  attributes: attributes_object_Object_4,
+  identifier: awsApplicationsIdentifier,
+  attributes: awsApplicationsAttributes,
   description: undefined,
   extensions: extensions21,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_awsApplications_awsApplications = recordCodec(spec_awsApplications);
-const attributes_object_Object_5 = Object.assign(Object.create(null), {
+const awsApplicationsCodec = recordCodec(awsApplicationsCodecSpec);
+const gcpApplicationsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -1748,17 +1748,17 @@ const extensions22 = {
   })
 };
 const parts22 = ["polymorphic", "gcp_applications"];
-const sqlIdent22 = sql.identifier(...parts22);
-const spec_gcpApplications = {
+const gcpApplicationsIdentifier = sql.identifier(...parts22);
+const gcpApplicationsCodecSpec = {
   name: "gcpApplications",
-  identifier: sqlIdent22,
-  attributes: attributes_object_Object_5,
+  identifier: gcpApplicationsIdentifier,
+  attributes: gcpApplicationsAttributes,
   description: undefined,
   extensions: extensions22,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_gcpApplications_gcpApplications = recordCodec(spec_gcpApplications);
-const attributes17 = Object.assign(Object.create(null), {
+const gcpApplicationsCodec = recordCodec(gcpApplicationsCodecSpec);
+const singleTableItemsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -1770,7 +1770,7 @@ const attributes17 = Object.assign(Object.create(null), {
   },
   type: {
     description: undefined,
-    codec: attributes_type_codec_itemType,
+    codec: itemTypeCodec,
     notNull: true,
     hasDefault: true,
     extensions: {
@@ -1933,33 +1933,33 @@ const extensions23 = {
   })
 };
 const parts23 = ["polymorphic", "single_table_items"];
-const sqlIdent23 = sql.identifier(...parts23);
-const spec_singleTableItems = {
+const singleTableItemsIdentifier = sql.identifier(...parts23);
+const singleTableItemsCodecSpec = {
   name: "singleTableItems",
-  identifier: sqlIdent23,
-  attributes: attributes17,
+  identifier: singleTableItemsIdentifier,
+  attributes: singleTableItemsAttributes,
   description: undefined,
   extensions: extensions23,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_singleTableItems_singleTableItems = recordCodec(spec_singleTableItems);
-const attributes18 = Object.assign(Object.create(null), {
+const singleTableItemsCodec = recordCodec(singleTableItemsCodecSpec);
+const relationalItemsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
     notNull: true,
     hasDefault: true,
     extensions: {
-      tags: attributes7.id.extensions.tags
+      tags: relationalChecklistsAttributes.id.extensions.tags
     }
   },
   type: {
     description: undefined,
-    codec: attributes_type_codec_itemType,
+    codec: itemTypeCodec,
     notNull: true,
     hasDefault: true,
     extensions: {
-      tags: attributes7.type.extensions.tags
+      tags: relationalChecklistsAttributes.type.extensions.tags
     }
   },
   parent_id: {
@@ -1968,7 +1968,7 @@ const attributes18 = Object.assign(Object.create(null), {
     notNull: false,
     hasDefault: false,
     extensions: {
-      tags: attributes7.parent_id.extensions.tags
+      tags: relationalChecklistsAttributes.parent_id.extensions.tags
     }
   },
   root_topic_id: {
@@ -1977,7 +1977,7 @@ const attributes18 = Object.assign(Object.create(null), {
     notNull: false,
     hasDefault: false,
     extensions: {
-      tags: attributes7.root_topic_id.extensions.tags
+      tags: relationalChecklistsAttributes.root_topic_id.extensions.tags
     }
   },
   author_id: {
@@ -1986,7 +1986,7 @@ const attributes18 = Object.assign(Object.create(null), {
     notNull: true,
     hasDefault: false,
     extensions: {
-      tags: attributes7.author_id.extensions.tags
+      tags: relationalChecklistsAttributes.author_id.extensions.tags
     }
   },
   position: {
@@ -1995,7 +1995,7 @@ const attributes18 = Object.assign(Object.create(null), {
     notNull: true,
     hasDefault: true,
     extensions: {
-      tags: attributes7.position.extensions.tags
+      tags: relationalChecklistsAttributes.position.extensions.tags
     }
   },
   created_at: {
@@ -2004,7 +2004,7 @@ const attributes18 = Object.assign(Object.create(null), {
     notNull: true,
     hasDefault: true,
     extensions: {
-      tags: attributes7.created_at.extensions.tags
+      tags: relationalChecklistsAttributes.created_at.extensions.tags
     }
   },
   updated_at: {
@@ -2013,7 +2013,7 @@ const attributes18 = Object.assign(Object.create(null), {
     notNull: true,
     hasDefault: true,
     extensions: {
-      tags: attributes7.updated_at.extensions.tags
+      tags: relationalChecklistsAttributes.updated_at.extensions.tags
     }
   },
   is_explicitly_archived: {
@@ -2022,7 +2022,7 @@ const attributes18 = Object.assign(Object.create(null), {
     notNull: true,
     hasDefault: true,
     extensions: {
-      tags: attributes7.is_explicitly_archived.extensions.tags
+      tags: relationalChecklistsAttributes.is_explicitly_archived.extensions.tags
     }
   },
   archived_at: {
@@ -2031,7 +2031,7 @@ const attributes18 = Object.assign(Object.create(null), {
     notNull: false,
     hasDefault: false,
     extensions: {
-      tags: attributes7.archived_at.extensions.tags
+      tags: relationalChecklistsAttributes.archived_at.extensions.tags
     }
   }
 });
@@ -2048,17 +2048,17 @@ const extensions24 = {
   })
 };
 const parts24 = ["polymorphic", "relational_items"];
-const sqlIdent24 = sql.identifier(...parts24);
-const spec_relationalItems = {
+const relationalItemsIdentifier = sql.identifier(...parts24);
+const relationalItemsCodecSpec = {
   name: "relationalItems",
-  identifier: sqlIdent24,
-  attributes: attributes18,
+  identifier: relationalItemsIdentifier,
+  attributes: relationalItemsAttributes,
   description: undefined,
   extensions: extensions24,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_relationalItems_relationalItems = recordCodec(spec_relationalItems);
-const attributes_object_Object_6 = Object.assign(Object.create(null), {
+const relationalItemsCodec = recordCodec(relationalItemsCodecSpec);
+const ApplicationAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -2130,16 +2130,16 @@ const extensions25 = {
   })
 };
 const parts25 = ["polymorphic", "applications"];
-const sqlIdent25 = sql.identifier(...parts25);
-const spec_Application = {
+const ApplicationIdentifier = sql.identifier(...parts25);
+const ApplicationCodecSpec = {
   name: "Application",
-  identifier: sqlIdent25,
-  attributes: attributes_object_Object_6,
+  identifier: ApplicationIdentifier,
+  attributes: ApplicationAttributes,
   description: undefined,
   extensions: extensions25,
   executor: executor_mainPgExecutor
 };
-const attributes_object_Object_7 = Object.assign(Object.create(null), {
+const VulnerabilityAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -2213,16 +2213,16 @@ const extensions26 = {
   })
 };
 const parts26 = ["polymorphic", "vulnerabilities"];
-const sqlIdent26 = sql.identifier(...parts26);
-const spec_Vulnerability = {
+const VulnerabilityIdentifier = sql.identifier(...parts26);
+const VulnerabilityCodecSpec = {
   name: "Vulnerability",
-  identifier: sqlIdent26,
-  attributes: attributes_object_Object_7,
+  identifier: VulnerabilityIdentifier,
+  attributes: VulnerabilityAttributes,
   description: undefined,
   extensions: extensions26,
   executor: executor_mainPgExecutor
 };
-const attributes_object_Object_8 = Object.assign(Object.create(null), {
+const ZeroImplementationAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -2256,11 +2256,11 @@ const extensions27 = {
   })
 };
 const parts27 = ["polymorphic", "zero_implementation"];
-const sqlIdent27 = sql.identifier(...parts27);
-const spec_ZeroImplementation = {
+const ZeroImplementationIdentifier = sql.identifier(...parts27);
+const ZeroImplementationCodecSpec = {
   name: "ZeroImplementation",
-  identifier: sqlIdent27,
-  attributes: attributes_object_Object_8,
+  identifier: ZeroImplementationIdentifier,
+  attributes: ZeroImplementationAttributes,
   description: undefined,
   extensions: extensions27,
   executor: executor_mainPgExecutor
@@ -2288,8 +2288,8 @@ const registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws
   executor: executor_mainPgExecutor,
   name: "aws_application_first_party_vulnerabilities",
   identifier: "main.polymorphic.aws_application_first_party_vulnerabilities",
-  from: registryConfig_pgCodecs_awsApplicationFirstPartyVulnerabilities_awsApplicationFirstPartyVulnerabilities.sqlType,
-  codec: registryConfig_pgCodecs_awsApplicationFirstPartyVulnerabilities_awsApplicationFirstPartyVulnerabilities,
+  from: awsApplicationFirstPartyVulnerabilitiesCodec.sqlType,
+  codec: awsApplicationFirstPartyVulnerabilitiesCodec,
   uniques,
   isVirtual: false,
   description: undefined,
@@ -2318,8 +2318,8 @@ const registryConfig_pgResources_aws_application_third_party_vulnerabilities_aws
   executor: executor_mainPgExecutor,
   name: "aws_application_third_party_vulnerabilities",
   identifier: "main.polymorphic.aws_application_third_party_vulnerabilities",
-  from: registryConfig_pgCodecs_awsApplicationThirdPartyVulnerabilities_awsApplicationThirdPartyVulnerabilities.sqlType,
-  codec: registryConfig_pgCodecs_awsApplicationThirdPartyVulnerabilities_awsApplicationThirdPartyVulnerabilities,
+  from: awsApplicationThirdPartyVulnerabilitiesCodec.sqlType,
+  codec: awsApplicationThirdPartyVulnerabilitiesCodec,
   uniques: uniques2,
   isVirtual: false,
   description: undefined,
@@ -2348,8 +2348,8 @@ const registryConfig_pgResources_gcp_application_first_party_vulnerabilities_gcp
   executor: executor_mainPgExecutor,
   name: "gcp_application_first_party_vulnerabilities",
   identifier: "main.polymorphic.gcp_application_first_party_vulnerabilities",
-  from: registryConfig_pgCodecs_gcpApplicationFirstPartyVulnerabilities_gcpApplicationFirstPartyVulnerabilities.sqlType,
-  codec: registryConfig_pgCodecs_gcpApplicationFirstPartyVulnerabilities_gcpApplicationFirstPartyVulnerabilities,
+  from: gcpApplicationFirstPartyVulnerabilitiesCodec.sqlType,
+  codec: gcpApplicationFirstPartyVulnerabilitiesCodec,
   uniques: uniques3,
   isVirtual: false,
   description: undefined,
@@ -2378,8 +2378,8 @@ const registryConfig_pgResources_gcp_application_third_party_vulnerabilities_gcp
   executor: executor_mainPgExecutor,
   name: "gcp_application_third_party_vulnerabilities",
   identifier: "main.polymorphic.gcp_application_third_party_vulnerabilities",
-  from: registryConfig_pgCodecs_gcpApplicationThirdPartyVulnerabilities_gcpApplicationThirdPartyVulnerabilities.sqlType,
-  codec: registryConfig_pgCodecs_gcpApplicationThirdPartyVulnerabilities_gcpApplicationThirdPartyVulnerabilities,
+  from: gcpApplicationThirdPartyVulnerabilitiesCodec.sqlType,
+  codec: gcpApplicationThirdPartyVulnerabilitiesCodec,
   uniques: uniques4,
   isVirtual: false,
   description: undefined,
@@ -2415,8 +2415,8 @@ const registryConfig_pgResources_organizations_organizations = {
   executor: executor_mainPgExecutor,
   name: "organizations",
   identifier: "main.polymorphic.organizations",
-  from: registryConfig_pgCodecs_organizations_organizations.sqlType,
-  codec: registryConfig_pgCodecs_organizations_organizations,
+  from: organizationsCodec.sqlType,
+  codec: organizationsCodec,
   uniques: uniques5,
   isVirtual: false,
   description: undefined,
@@ -2454,8 +2454,8 @@ const registryConfig_pgResources_people_people = {
   executor: executor_mainPgExecutor,
   name: "people",
   identifier: "main.polymorphic.people",
-  from: registryConfig_pgCodecs_people_people.sqlType,
-  codec: registryConfig_pgCodecs_people_people,
+  from: peopleCodec.sqlType,
+  codec: peopleCodec,
   uniques: uniques6,
   isVirtual: false,
   description: undefined,
@@ -2484,8 +2484,8 @@ const registryConfig_pgResources_priorities_priorities = {
   executor: executor_mainPgExecutor,
   name: "priorities",
   identifier: "main.polymorphic.priorities",
-  from: registryConfig_pgCodecs_priorities_priorities.sqlType,
-  codec: registryConfig_pgCodecs_priorities_priorities,
+  from: prioritiesCodec.sqlType,
+  codec: prioritiesCodec,
   uniques: uniques7,
   isVirtual: false,
   description: undefined,
@@ -2512,8 +2512,8 @@ const registryConfig_pgResources_relational_checklists_relational_checklists = {
   executor: executor_mainPgExecutor,
   name: "relational_checklists",
   identifier: "main.polymorphic.relational_checklists",
-  from: registryConfig_pgCodecs_relationalChecklists_relationalChecklists.sqlType,
-  codec: registryConfig_pgCodecs_relationalChecklists_relationalChecklists,
+  from: relationalChecklistsCodec.sqlType,
+  codec: relationalChecklistsCodec,
   uniques: uniques8,
   isVirtual: false,
   description: undefined,
@@ -2540,8 +2540,8 @@ const registryConfig_pgResources_relational_item_relation_composite_pks_relation
   executor: executor_mainPgExecutor,
   name: "relational_item_relation_composite_pks",
   identifier: "main.polymorphic.relational_item_relation_composite_pks",
-  from: registryConfig_pgCodecs_relationalItemRelationCompositePks_relationalItemRelationCompositePks.sqlType,
-  codec: registryConfig_pgCodecs_relationalItemRelationCompositePks_relationalItemRelationCompositePks,
+  from: relationalItemRelationCompositePksCodec.sqlType,
+  codec: relationalItemRelationCompositePksCodec,
   uniques: uniques9,
   isVirtual: false,
   description: undefined,
@@ -2568,8 +2568,8 @@ const registryConfig_pgResources_relational_topics_relational_topics = {
   executor: executor_mainPgExecutor,
   name: "relational_topics",
   identifier: "main.polymorphic.relational_topics",
-  from: registryConfig_pgCodecs_relationalTopics_relationalTopics.sqlType,
-  codec: registryConfig_pgCodecs_relationalTopics_relationalTopics,
+  from: relationalTopicsCodec.sqlType,
+  codec: relationalTopicsCodec,
   uniques: uniques10,
   isVirtual: false,
   description: undefined,
@@ -2596,8 +2596,8 @@ const registryConfig_pgResources_single_table_item_relation_composite_pks_single
   executor: executor_mainPgExecutor,
   name: "single_table_item_relation_composite_pks",
   identifier: "main.polymorphic.single_table_item_relation_composite_pks",
-  from: registryConfig_pgCodecs_singleTableItemRelationCompositePks_singleTableItemRelationCompositePks.sqlType,
-  codec: registryConfig_pgCodecs_singleTableItemRelationCompositePks_singleTableItemRelationCompositePks,
+  from: singleTableItemRelationCompositePksCodec.sqlType,
+  codec: singleTableItemRelationCompositePksCodec,
   uniques: uniques11,
   isVirtual: false,
   description: undefined,
@@ -2624,8 +2624,8 @@ const registryConfig_pgResources_relational_checklist_items_relational_checklist
   executor: executor_mainPgExecutor,
   name: "relational_checklist_items",
   identifier: "main.polymorphic.relational_checklist_items",
-  from: registryConfig_pgCodecs_relationalChecklistItems_relationalChecklistItems.sqlType,
-  codec: registryConfig_pgCodecs_relationalChecklistItems_relationalChecklistItems,
+  from: relationalChecklistItemsCodec.sqlType,
+  codec: relationalChecklistItemsCodec,
   uniques: uniques12,
   isVirtual: false,
   description: undefined,
@@ -2652,8 +2652,8 @@ const registryConfig_pgResources_relational_dividers_relational_dividers = {
   executor: executor_mainPgExecutor,
   name: "relational_dividers",
   identifier: "main.polymorphic.relational_dividers",
-  from: registryConfig_pgCodecs_relationalDividers_relationalDividers.sqlType,
-  codec: registryConfig_pgCodecs_relationalDividers_relationalDividers,
+  from: relationalDividersCodec.sqlType,
+  codec: relationalDividersCodec,
   uniques: uniques13,
   isVirtual: false,
   description: undefined,
@@ -2687,8 +2687,8 @@ const registryConfig_pgResources_relational_item_relations_relational_item_relat
   executor: executor_mainPgExecutor,
   name: "relational_item_relations",
   identifier: "main.polymorphic.relational_item_relations",
-  from: registryConfig_pgCodecs_relationalItemRelations_relationalItemRelations.sqlType,
-  codec: registryConfig_pgCodecs_relationalItemRelations_relationalItemRelations,
+  from: relationalItemRelationsCodec.sqlType,
+  codec: relationalItemRelationsCodec,
   uniques: uniques14,
   isVirtual: false,
   description: undefined,
@@ -2722,8 +2722,8 @@ const registryConfig_pgResources_single_table_item_relations_single_table_item_r
   executor: executor_mainPgExecutor,
   name: "single_table_item_relations",
   identifier: "main.polymorphic.single_table_item_relations",
-  from: registryConfig_pgCodecs_singleTableItemRelations_singleTableItemRelations.sqlType,
-  codec: registryConfig_pgCodecs_singleTableItemRelations_singleTableItemRelations,
+  from: singleTableItemRelationsCodec.sqlType,
+  codec: singleTableItemRelationsCodec,
   uniques: uniques15,
   isVirtual: false,
   description: undefined,
@@ -2753,8 +2753,8 @@ const registryConfig_pgResources_log_entries_log_entries = {
   executor: executor_mainPgExecutor,
   name: "log_entries",
   identifier: "main.polymorphic.log_entries",
-  from: registryConfig_pgCodecs_logEntries_logEntries.sqlType,
-  codec: registryConfig_pgCodecs_logEntries_logEntries,
+  from: logEntriesCodec.sqlType,
+  codec: logEntriesCodec,
   uniques: uniques16,
   isVirtual: false,
   description: undefined,
@@ -2781,8 +2781,8 @@ const registryConfig_pgResources_relational_posts_relational_posts = {
   executor: executor_mainPgExecutor,
   name: "relational_posts",
   identifier: "main.polymorphic.relational_posts",
-  from: registryConfig_pgCodecs_relationalPosts_relationalPosts.sqlType,
-  codec: registryConfig_pgCodecs_relationalPosts_relationalPosts,
+  from: relationalPostsCodec.sqlType,
+  codec: relationalPostsCodec,
   uniques: uniques17,
   isVirtual: false,
   description: undefined,
@@ -2813,8 +2813,8 @@ const registryConfig_pgResources_first_party_vulnerabilities_first_party_vulnera
   executor: executor_mainPgExecutor,
   name: "first_party_vulnerabilities",
   identifier: "main.polymorphic.first_party_vulnerabilities",
-  from: registryConfig_pgCodecs_firstPartyVulnerabilities_firstPartyVulnerabilities.sqlType,
-  codec: registryConfig_pgCodecs_firstPartyVulnerabilities_firstPartyVulnerabilities,
+  from: firstPartyVulnerabilitiesCodec.sqlType,
+  codec: firstPartyVulnerabilitiesCodec,
   uniques: uniques18,
   isVirtual: false,
   description: undefined,
@@ -2845,8 +2845,8 @@ const registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnera
   executor: executor_mainPgExecutor,
   name: "third_party_vulnerabilities",
   identifier: "main.polymorphic.third_party_vulnerabilities",
-  from: registryConfig_pgCodecs_thirdPartyVulnerabilities_thirdPartyVulnerabilities.sqlType,
-  codec: registryConfig_pgCodecs_thirdPartyVulnerabilities_thirdPartyVulnerabilities,
+  from: thirdPartyVulnerabilitiesCodec.sqlType,
+  codec: thirdPartyVulnerabilitiesCodec,
   uniques: uniques19,
   isVirtual: false,
   description: undefined,
@@ -2877,8 +2877,8 @@ const registryConfig_pgResources_aws_applications_aws_applications = {
   executor: executor_mainPgExecutor,
   name: "aws_applications",
   identifier: "main.polymorphic.aws_applications",
-  from: registryConfig_pgCodecs_awsApplications_awsApplications.sqlType,
-  codec: registryConfig_pgCodecs_awsApplications_awsApplications,
+  from: awsApplicationsCodec.sqlType,
+  codec: awsApplicationsCodec,
   uniques: uniques20,
   isVirtual: false,
   description: undefined,
@@ -2909,8 +2909,8 @@ const registryConfig_pgResources_gcp_applications_gcp_applications = {
   executor: executor_mainPgExecutor,
   name: "gcp_applications",
   identifier: "main.polymorphic.gcp_applications",
-  from: registryConfig_pgCodecs_gcpApplications_gcpApplications.sqlType,
-  codec: registryConfig_pgCodecs_gcpApplications_gcpApplications,
+  from: gcpApplicationsCodec.sqlType,
+  codec: gcpApplicationsCodec,
   uniques: uniques21,
   isVirtual: false,
   description: undefined,
@@ -2928,7 +2928,7 @@ const extensions49 = {
   }
 };
 const parts28 = ["polymorphic", "custom_delete_relational_item"];
-const sqlIdent28 = sql.identifier(...parts28);
+const sqlIdent2 = sql.identifier(...parts28);
 const extensions50 = {
   description: undefined,
   pg: {
@@ -2954,20 +2954,20 @@ const registryConfig_pgResources_single_table_items_single_table_items = {
   executor: executor_mainPgExecutor,
   name: "single_table_items",
   identifier: "main.polymorphic.single_table_items",
-  from: registryConfig_pgCodecs_singleTableItems_singleTableItems.sqlType,
-  codec: registryConfig_pgCodecs_singleTableItems_singleTableItems,
+  from: singleTableItemsCodec.sqlType,
+  codec: singleTableItemsCodec,
   uniques: uniques22,
   isVirtual: false,
   description: undefined,
   extensions: extensions50
 };
 const parts29 = ["polymorphic", "all_single_tables"];
-const sqlIdent29 = sql.identifier(...parts29);
+const sqlIdent3 = sql.identifier(...parts29);
 const options_all_single_tables = {
   name: "all_single_tables",
   identifier: "main.polymorphic.all_single_tables()",
   from(...args) {
-    return sql`${sqlIdent29}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent3}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -2986,12 +2986,12 @@ const options_all_single_tables = {
   description: undefined
 };
 const parts30 = ["polymorphic", "get_single_table_topic_by_id"];
-const sqlIdent30 = sql.identifier(...parts30);
+const sqlIdent4 = sql.identifier(...parts30);
 const options_get_single_table_topic_by_id = {
   name: "get_single_table_topic_by_id",
   identifier: "main.polymorphic.get_single_table_topic_by_id(int4)",
   from(...args) {
-    return sql`${sqlIdent30}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent4}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "id",
@@ -3039,8 +3039,8 @@ const registryConfig_pgResources_relational_items_relational_items = {
   executor: executor_mainPgExecutor,
   name: "relational_items",
   identifier: "main.polymorphic.relational_items",
-  from: registryConfig_pgCodecs_relationalItems_relationalItems.sqlType,
-  codec: registryConfig_pgCodecs_relationalItems_relationalItems,
+  from: relationalItemsCodec.sqlType,
+  codec: relationalItemsCodec,
   uniques: uniques23,
   isVirtual: false,
   description: undefined,
@@ -3048,41 +3048,41 @@ const registryConfig_pgResources_relational_items_relational_items = {
 };
 const registryConfig = {
   pgCodecs: Object.assign(Object.create(null), {
-    awsApplicationFirstPartyVulnerabilities: registryConfig_pgCodecs_awsApplicationFirstPartyVulnerabilities_awsApplicationFirstPartyVulnerabilities,
+    awsApplicationFirstPartyVulnerabilities: awsApplicationFirstPartyVulnerabilitiesCodec,
     int4: TYPES.int,
-    awsApplicationThirdPartyVulnerabilities: registryConfig_pgCodecs_awsApplicationThirdPartyVulnerabilities_awsApplicationThirdPartyVulnerabilities,
-    gcpApplicationFirstPartyVulnerabilities: registryConfig_pgCodecs_gcpApplicationFirstPartyVulnerabilities_gcpApplicationFirstPartyVulnerabilities,
-    gcpApplicationThirdPartyVulnerabilities: registryConfig_pgCodecs_gcpApplicationThirdPartyVulnerabilities_gcpApplicationThirdPartyVulnerabilities,
-    organizations: registryConfig_pgCodecs_organizations_organizations,
+    awsApplicationThirdPartyVulnerabilities: awsApplicationThirdPartyVulnerabilitiesCodec,
+    gcpApplicationFirstPartyVulnerabilities: gcpApplicationFirstPartyVulnerabilitiesCodec,
+    gcpApplicationThirdPartyVulnerabilities: gcpApplicationThirdPartyVulnerabilitiesCodec,
+    organizations: organizationsCodec,
     text: TYPES.text,
-    people: registryConfig_pgCodecs_people_people,
-    priorities: registryConfig_pgCodecs_priorities_priorities,
-    relationalChecklists: registryConfig_pgCodecs_relationalChecklists_relationalChecklists,
-    relationalItemRelationCompositePks: registryConfig_pgCodecs_relationalItemRelationCompositePks_relationalItemRelationCompositePks,
-    relationalTopics: registryConfig_pgCodecs_relationalTopics_relationalTopics,
-    singleTableItemRelationCompositePks: registryConfig_pgCodecs_singleTableItemRelationCompositePks_singleTableItemRelationCompositePks,
-    relationalChecklistItems: registryConfig_pgCodecs_relationalChecklistItems_relationalChecklistItems,
-    relationalDividers: registryConfig_pgCodecs_relationalDividers_relationalDividers,
-    relationalItemRelations: registryConfig_pgCodecs_relationalItemRelations_relationalItemRelations,
-    singleTableItemRelations: registryConfig_pgCodecs_singleTableItemRelations_singleTableItemRelations,
-    logEntries: registryConfig_pgCodecs_logEntries_logEntries,
-    relationalPosts: registryConfig_pgCodecs_relationalPosts_relationalPosts,
-    firstPartyVulnerabilities: registryConfig_pgCodecs_firstPartyVulnerabilities_firstPartyVulnerabilities,
+    people: peopleCodec,
+    priorities: prioritiesCodec,
+    relationalChecklists: relationalChecklistsCodec,
+    relationalItemRelationCompositePks: relationalItemRelationCompositePksCodec,
+    relationalTopics: relationalTopicsCodec,
+    singleTableItemRelationCompositePks: singleTableItemRelationCompositePksCodec,
+    relationalChecklistItems: relationalChecklistItemsCodec,
+    relationalDividers: relationalDividersCodec,
+    relationalItemRelations: relationalItemRelationsCodec,
+    singleTableItemRelations: singleTableItemRelationsCodec,
+    logEntries: logEntriesCodec,
+    relationalPosts: relationalPostsCodec,
+    firstPartyVulnerabilities: firstPartyVulnerabilitiesCodec,
     float8: TYPES.float,
-    thirdPartyVulnerabilities: registryConfig_pgCodecs_thirdPartyVulnerabilities_thirdPartyVulnerabilities,
-    awsApplications: registryConfig_pgCodecs_awsApplications_awsApplications,
+    thirdPartyVulnerabilities: thirdPartyVulnerabilitiesCodec,
+    awsApplications: awsApplicationsCodec,
     timestamptz: TYPES.timestamptz,
-    gcpApplications: registryConfig_pgCodecs_gcpApplications_gcpApplications,
+    gcpApplications: gcpApplicationsCodec,
     bool: TYPES.boolean,
-    singleTableItems: registryConfig_pgCodecs_singleTableItems_singleTableItems,
-    itemType: attributes_type_codec_itemType,
+    singleTableItems: singleTableItemsCodec,
+    itemType: itemTypeCodec,
     int8: TYPES.bigint,
-    relationalItems: registryConfig_pgCodecs_relationalItems_relationalItems,
+    relationalItems: relationalItemsCodec,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
-    Application: recordCodec(spec_Application),
-    Vulnerability: recordCodec(spec_Vulnerability),
-    ZeroImplementation: recordCodec(spec_ZeroImplementation)
+    Application: recordCodec(ApplicationCodecSpec),
+    Vulnerability: recordCodec(VulnerabilityCodecSpec),
+    ZeroImplementation: recordCodec(ZeroImplementationCodecSpec)
   }),
   pgResources: Object.assign(Object.create(null), {
     aws_application_first_party_vulnerabilities: registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws_application_first_party_vulnerabilities,
@@ -3111,13 +3111,13 @@ const registryConfig = {
       name: "custom_delete_relational_item",
       identifier: "main.polymorphic.custom_delete_relational_item(polymorphic.relational_items)",
       from(...args) {
-        return sql`${sqlIdent28}(${sqlFromArgDigests(args)})`;
+        return sql`${sqlIdent2}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "nodeId",
         required: true,
         notNull: false,
-        codec: registryConfig_pgCodecs_relationalItems_relationalItems,
+        codec: relationalItemsCodec,
         extensions: {
           variant: "nodeId"
         }
@@ -3137,7 +3137,7 @@ const registryConfig = {
   pgRelations: Object.assign(Object.create(null), {
     awsApplicationFirstPartyVulnerabilities: Object.assign(Object.create(null), {
       firstPartyVulnerabilitiesByMyFirstPartyVulnerabilityId: {
-        localCodec: registryConfig_pgCodecs_awsApplicationFirstPartyVulnerabilities_awsApplicationFirstPartyVulnerabilities,
+        localCodec: awsApplicationFirstPartyVulnerabilitiesCodec,
         remoteResourceOptions: registryConfig_pgResources_first_party_vulnerabilities_first_party_vulnerabilities,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["first_party_vulnerability_id"],
@@ -3152,7 +3152,7 @@ const registryConfig = {
         }
       },
       awsApplicationsByMyAwsApplicationId: {
-        localCodec: registryConfig_pgCodecs_awsApplicationFirstPartyVulnerabilities_awsApplicationFirstPartyVulnerabilities,
+        localCodec: awsApplicationFirstPartyVulnerabilitiesCodec,
         remoteResourceOptions: registryConfig_pgResources_aws_applications_aws_applications,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["aws_application_id"],
@@ -3169,7 +3169,7 @@ const registryConfig = {
     }),
     awsApplicationThirdPartyVulnerabilities: Object.assign(Object.create(null), {
       thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId: {
-        localCodec: registryConfig_pgCodecs_awsApplicationThirdPartyVulnerabilities_awsApplicationThirdPartyVulnerabilities,
+        localCodec: awsApplicationThirdPartyVulnerabilitiesCodec,
         remoteResourceOptions: registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnerabilities,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["third_party_vulnerability_id"],
@@ -3184,7 +3184,7 @@ const registryConfig = {
         }
       },
       awsApplicationsByMyAwsApplicationId: {
-        localCodec: registryConfig_pgCodecs_awsApplicationThirdPartyVulnerabilities_awsApplicationThirdPartyVulnerabilities,
+        localCodec: awsApplicationThirdPartyVulnerabilitiesCodec,
         remoteResourceOptions: registryConfig_pgResources_aws_applications_aws_applications,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["aws_application_id"],
@@ -3201,7 +3201,7 @@ const registryConfig = {
     }),
     awsApplications: Object.assign(Object.create(null), {
       organizationsByMyOrganizationId: {
-        localCodec: registryConfig_pgCodecs_awsApplications_awsApplications,
+        localCodec: awsApplicationsCodec,
         remoteResourceOptions: registryConfig_pgResources_organizations_organizations,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["organization_id"],
@@ -3216,7 +3216,7 @@ const registryConfig = {
         }
       },
       peopleByMyPersonId: {
-        localCodec: registryConfig_pgCodecs_awsApplications_awsApplications,
+        localCodec: awsApplicationsCodec,
         remoteResourceOptions: registryConfig_pgResources_people_people,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["person_id"],
@@ -3231,7 +3231,7 @@ const registryConfig = {
         }
       },
       awsApplicationFirstPartyVulnerabilitiesByTheirAwsApplicationId: {
-        localCodec: registryConfig_pgCodecs_awsApplications_awsApplications,
+        localCodec: awsApplicationsCodec,
         remoteResourceOptions: registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws_application_first_party_vulnerabilities,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -3246,7 +3246,7 @@ const registryConfig = {
         }
       },
       awsApplicationThirdPartyVulnerabilitiesByTheirAwsApplicationId: {
-        localCodec: registryConfig_pgCodecs_awsApplications_awsApplications,
+        localCodec: awsApplicationsCodec,
         remoteResourceOptions: registryConfig_pgResources_aws_application_third_party_vulnerabilities_aws_application_third_party_vulnerabilities,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -3263,7 +3263,7 @@ const registryConfig = {
     }),
     firstPartyVulnerabilities: Object.assign(Object.create(null), {
       awsApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId: {
-        localCodec: registryConfig_pgCodecs_firstPartyVulnerabilities_firstPartyVulnerabilities,
+        localCodec: firstPartyVulnerabilitiesCodec,
         remoteResourceOptions: registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws_application_first_party_vulnerabilities,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -3278,7 +3278,7 @@ const registryConfig = {
         }
       },
       gcpApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId: {
-        localCodec: registryConfig_pgCodecs_firstPartyVulnerabilities_firstPartyVulnerabilities,
+        localCodec: firstPartyVulnerabilitiesCodec,
         remoteResourceOptions: registryConfig_pgResources_gcp_application_first_party_vulnerabilities_gcp_application_first_party_vulnerabilities,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -3295,7 +3295,7 @@ const registryConfig = {
     }),
     gcpApplicationFirstPartyVulnerabilities: Object.assign(Object.create(null), {
       firstPartyVulnerabilitiesByMyFirstPartyVulnerabilityId: {
-        localCodec: registryConfig_pgCodecs_gcpApplicationFirstPartyVulnerabilities_gcpApplicationFirstPartyVulnerabilities,
+        localCodec: gcpApplicationFirstPartyVulnerabilitiesCodec,
         remoteResourceOptions: registryConfig_pgResources_first_party_vulnerabilities_first_party_vulnerabilities,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["first_party_vulnerability_id"],
@@ -3310,7 +3310,7 @@ const registryConfig = {
         }
       },
       gcpApplicationsByMyGcpApplicationId: {
-        localCodec: registryConfig_pgCodecs_gcpApplicationFirstPartyVulnerabilities_gcpApplicationFirstPartyVulnerabilities,
+        localCodec: gcpApplicationFirstPartyVulnerabilitiesCodec,
         remoteResourceOptions: registryConfig_pgResources_gcp_applications_gcp_applications,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["gcp_application_id"],
@@ -3327,7 +3327,7 @@ const registryConfig = {
     }),
     gcpApplicationThirdPartyVulnerabilities: Object.assign(Object.create(null), {
       thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId: {
-        localCodec: registryConfig_pgCodecs_gcpApplicationThirdPartyVulnerabilities_gcpApplicationThirdPartyVulnerabilities,
+        localCodec: gcpApplicationThirdPartyVulnerabilitiesCodec,
         remoteResourceOptions: registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnerabilities,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["third_party_vulnerability_id"],
@@ -3342,7 +3342,7 @@ const registryConfig = {
         }
       },
       gcpApplicationsByMyGcpApplicationId: {
-        localCodec: registryConfig_pgCodecs_gcpApplicationThirdPartyVulnerabilities_gcpApplicationThirdPartyVulnerabilities,
+        localCodec: gcpApplicationThirdPartyVulnerabilitiesCodec,
         remoteResourceOptions: registryConfig_pgResources_gcp_applications_gcp_applications,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["gcp_application_id"],
@@ -3359,7 +3359,7 @@ const registryConfig = {
     }),
     gcpApplications: Object.assign(Object.create(null), {
       organizationsByMyOrganizationId: {
-        localCodec: registryConfig_pgCodecs_gcpApplications_gcpApplications,
+        localCodec: gcpApplicationsCodec,
         remoteResourceOptions: registryConfig_pgResources_organizations_organizations,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["organization_id"],
@@ -3374,7 +3374,7 @@ const registryConfig = {
         }
       },
       peopleByMyPersonId: {
-        localCodec: registryConfig_pgCodecs_gcpApplications_gcpApplications,
+        localCodec: gcpApplicationsCodec,
         remoteResourceOptions: registryConfig_pgResources_people_people,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["person_id"],
@@ -3389,7 +3389,7 @@ const registryConfig = {
         }
       },
       gcpApplicationFirstPartyVulnerabilitiesByTheirGcpApplicationId: {
-        localCodec: registryConfig_pgCodecs_gcpApplications_gcpApplications,
+        localCodec: gcpApplicationsCodec,
         remoteResourceOptions: registryConfig_pgResources_gcp_application_first_party_vulnerabilities_gcp_application_first_party_vulnerabilities,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -3404,7 +3404,7 @@ const registryConfig = {
         }
       },
       gcpApplicationThirdPartyVulnerabilitiesByTheirGcpApplicationId: {
-        localCodec: registryConfig_pgCodecs_gcpApplications_gcpApplications,
+        localCodec: gcpApplicationsCodec,
         remoteResourceOptions: registryConfig_pgResources_gcp_application_third_party_vulnerabilities_gcp_application_third_party_vulnerabilities,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -3421,7 +3421,7 @@ const registryConfig = {
     }),
     logEntries: Object.assign(Object.create(null), {
       organizationsByMyOrganizationId: {
-        localCodec: registryConfig_pgCodecs_logEntries_logEntries,
+        localCodec: logEntriesCodec,
         remoteResourceOptions: registryConfig_pgResources_organizations_organizations,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["organization_id"],
@@ -3436,7 +3436,7 @@ const registryConfig = {
         }
       },
       peopleByMyPersonId: {
-        localCodec: registryConfig_pgCodecs_logEntries_logEntries,
+        localCodec: logEntriesCodec,
         remoteResourceOptions: registryConfig_pgResources_people_people,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["person_id"],
@@ -3453,7 +3453,7 @@ const registryConfig = {
     }),
     organizations: Object.assign(Object.create(null), {
       logEntriesByTheirOrganizationId: {
-        localCodec: registryConfig_pgCodecs_organizations_organizations,
+        localCodec: organizationsCodec,
         remoteResourceOptions: registryConfig_pgResources_log_entries_log_entries,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["organization_id"],
@@ -3468,7 +3468,7 @@ const registryConfig = {
         }
       },
       awsApplicationsByTheirOrganizationId: {
-        localCodec: registryConfig_pgCodecs_organizations_organizations,
+        localCodec: organizationsCodec,
         remoteResourceOptions: registryConfig_pgResources_aws_applications_aws_applications,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["organization_id"],
@@ -3483,7 +3483,7 @@ const registryConfig = {
         }
       },
       gcpApplicationsByTheirOrganizationId: {
-        localCodec: registryConfig_pgCodecs_organizations_organizations,
+        localCodec: organizationsCodec,
         remoteResourceOptions: registryConfig_pgResources_gcp_applications_gcp_applications,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["organization_id"],
@@ -3500,7 +3500,7 @@ const registryConfig = {
     }),
     people: Object.assign(Object.create(null), {
       logEntriesByTheirPersonId: {
-        localCodec: registryConfig_pgCodecs_people_people,
+        localCodec: peopleCodec,
         remoteResourceOptions: registryConfig_pgResources_log_entries_log_entries,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["person_id"],
@@ -3515,7 +3515,7 @@ const registryConfig = {
         }
       },
       singleTableItemsByTheirAuthorId: {
-        localCodec: registryConfig_pgCodecs_people_people,
+        localCodec: peopleCodec,
         remoteResourceOptions: registryConfig_pgResources_single_table_items_single_table_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["person_id"],
@@ -3530,7 +3530,7 @@ const registryConfig = {
         }
       },
       relationalItemsByTheirAuthorId: {
-        localCodec: registryConfig_pgCodecs_people_people,
+        localCodec: peopleCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["person_id"],
@@ -3545,7 +3545,7 @@ const registryConfig = {
         }
       },
       awsApplicationsByTheirPersonId: {
-        localCodec: registryConfig_pgCodecs_people_people,
+        localCodec: peopleCodec,
         remoteResourceOptions: registryConfig_pgResources_aws_applications_aws_applications,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["person_id"],
@@ -3560,7 +3560,7 @@ const registryConfig = {
         }
       },
       gcpApplicationsByTheirPersonId: {
-        localCodec: registryConfig_pgCodecs_people_people,
+        localCodec: peopleCodec,
         remoteResourceOptions: registryConfig_pgResources_gcp_applications_gcp_applications,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["person_id"],
@@ -3577,7 +3577,7 @@ const registryConfig = {
     }),
     priorities: Object.assign(Object.create(null), {
       singleTableItemsByTheirPriorityId: {
-        localCodec: registryConfig_pgCodecs_priorities_priorities,
+        localCodec: prioritiesCodec,
         remoteResourceOptions: registryConfig_pgResources_single_table_items_single_table_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -3594,7 +3594,7 @@ const registryConfig = {
     }),
     relationalChecklistItems: Object.assign(Object.create(null), {
       relationalItemsByMyChecklistItemItemId: {
-        localCodec: registryConfig_pgCodecs_relationalChecklistItems_relationalChecklistItems,
+        localCodec: relationalChecklistItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["checklist_item_item_id"],
@@ -3611,7 +3611,7 @@ const registryConfig = {
     }),
     relationalChecklists: Object.assign(Object.create(null), {
       relationalItemsByMyChecklistItemId: {
-        localCodec: registryConfig_pgCodecs_relationalChecklists_relationalChecklists,
+        localCodec: relationalChecklistsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["checklist_item_id"],
@@ -3628,7 +3628,7 @@ const registryConfig = {
     }),
     relationalDividers: Object.assign(Object.create(null), {
       relationalItemsByMyDividerItemId: {
-        localCodec: registryConfig_pgCodecs_relationalDividers_relationalDividers,
+        localCodec: relationalDividersCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["divider_item_id"],
@@ -3645,7 +3645,7 @@ const registryConfig = {
     }),
     relationalItemRelationCompositePks: Object.assign(Object.create(null), {
       relationalItemsByMyChildId: {
-        localCodec: registryConfig_pgCodecs_relationalItemRelationCompositePks_relationalItemRelationCompositePks,
+        localCodec: relationalItemRelationCompositePksCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["child_id"],
@@ -3660,7 +3660,7 @@ const registryConfig = {
         }
       },
       relationalItemsByMyParentId: {
-        localCodec: registryConfig_pgCodecs_relationalItemRelationCompositePks_relationalItemRelationCompositePks,
+        localCodec: relationalItemRelationCompositePksCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["parent_id"],
@@ -3677,7 +3677,7 @@ const registryConfig = {
     }),
     relationalItemRelations: Object.assign(Object.create(null), {
       relationalItemsByMyChildId: {
-        localCodec: registryConfig_pgCodecs_relationalItemRelations_relationalItemRelations,
+        localCodec: relationalItemRelationsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["child_id"],
@@ -3692,7 +3692,7 @@ const registryConfig = {
         }
       },
       relationalItemsByMyParentId: {
-        localCodec: registryConfig_pgCodecs_relationalItemRelations_relationalItemRelations,
+        localCodec: relationalItemRelationsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["parent_id"],
@@ -3709,7 +3709,7 @@ const registryConfig = {
     }),
     relationalItems: Object.assign(Object.create(null), {
       peopleByMyAuthorId: {
-        localCodec: registryConfig_pgCodecs_relationalItems_relationalItems,
+        localCodec: relationalItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_people_people,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["author_id"],
@@ -3724,7 +3724,7 @@ const registryConfig = {
         }
       },
       relationalItemsByMyParentId: {
-        localCodec: registryConfig_pgCodecs_relationalItems_relationalItems,
+        localCodec: relationalItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["parent_id"],
@@ -3739,7 +3739,7 @@ const registryConfig = {
         }
       },
       relationalTopicsByMyRootTopicId: {
-        localCodec: registryConfig_pgCodecs_relationalItems_relationalItems,
+        localCodec: relationalItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_topics_relational_topics,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["root_topic_id"],
@@ -3754,7 +3754,7 @@ const registryConfig = {
         }
       },
       relationalItemsByTheirParentId: {
-        localCodec: registryConfig_pgCodecs_relationalItems_relationalItems,
+        localCodec: relationalItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -3769,7 +3769,7 @@ const registryConfig = {
         }
       },
       relationalTopicsByTheirTopicItemId: {
-        localCodec: registryConfig_pgCodecs_relationalItems_relationalItems,
+        localCodec: relationalItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_topics_relational_topics,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -3784,7 +3784,7 @@ const registryConfig = {
         }
       },
       relationalPostsByTheirPostItemId: {
-        localCodec: registryConfig_pgCodecs_relationalItems_relationalItems,
+        localCodec: relationalItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_posts_relational_posts,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -3799,7 +3799,7 @@ const registryConfig = {
         }
       },
       relationalDividersByTheirDividerItemId: {
-        localCodec: registryConfig_pgCodecs_relationalItems_relationalItems,
+        localCodec: relationalItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_dividers_relational_dividers,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -3814,7 +3814,7 @@ const registryConfig = {
         }
       },
       relationalChecklistsByTheirChecklistItemId: {
-        localCodec: registryConfig_pgCodecs_relationalItems_relationalItems,
+        localCodec: relationalItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_checklists_relational_checklists,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -3829,7 +3829,7 @@ const registryConfig = {
         }
       },
       relationalChecklistItemsByTheirChecklistItemItemId: {
-        localCodec: registryConfig_pgCodecs_relationalItems_relationalItems,
+        localCodec: relationalItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_checklist_items_relational_checklist_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -3844,7 +3844,7 @@ const registryConfig = {
         }
       },
       relationalItemRelationsByTheirChildId: {
-        localCodec: registryConfig_pgCodecs_relationalItems_relationalItems,
+        localCodec: relationalItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_item_relations_relational_item_relations,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -3859,7 +3859,7 @@ const registryConfig = {
         }
       },
       relationalItemRelationsByTheirParentId: {
-        localCodec: registryConfig_pgCodecs_relationalItems_relationalItems,
+        localCodec: relationalItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_item_relations_relational_item_relations,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -3874,7 +3874,7 @@ const registryConfig = {
         }
       },
       relationalItemRelationCompositePksByTheirChildId: {
-        localCodec: registryConfig_pgCodecs_relationalItems_relationalItems,
+        localCodec: relationalItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_item_relation_composite_pks_relational_item_relation_composite_pks,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -3889,7 +3889,7 @@ const registryConfig = {
         }
       },
       relationalItemRelationCompositePksByTheirParentId: {
-        localCodec: registryConfig_pgCodecs_relationalItems_relationalItems,
+        localCodec: relationalItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_item_relation_composite_pks_relational_item_relation_composite_pks,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -3906,7 +3906,7 @@ const registryConfig = {
     }),
     relationalPosts: Object.assign(Object.create(null), {
       relationalItemsByMyPostItemId: {
-        localCodec: registryConfig_pgCodecs_relationalPosts_relationalPosts,
+        localCodec: relationalPostsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["post_item_id"],
@@ -3923,7 +3923,7 @@ const registryConfig = {
     }),
     relationalTopics: Object.assign(Object.create(null), {
       relationalItemsByMyTopicItemId: {
-        localCodec: registryConfig_pgCodecs_relationalTopics_relationalTopics,
+        localCodec: relationalTopicsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["topic_item_id"],
@@ -3938,7 +3938,7 @@ const registryConfig = {
         }
       },
       relationalItemsByTheirRootTopicId: {
-        localCodec: registryConfig_pgCodecs_relationalTopics_relationalTopics,
+        localCodec: relationalTopicsCodec,
         remoteResourceOptions: registryConfig_pgResources_relational_items_relational_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["topic_item_id"],
@@ -3955,7 +3955,7 @@ const registryConfig = {
     }),
     singleTableItemRelationCompositePks: Object.assign(Object.create(null), {
       singleTableItemsByMyChildId: {
-        localCodec: registryConfig_pgCodecs_singleTableItemRelationCompositePks_singleTableItemRelationCompositePks,
+        localCodec: singleTableItemRelationCompositePksCodec,
         remoteResourceOptions: registryConfig_pgResources_single_table_items_single_table_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["child_id"],
@@ -3970,7 +3970,7 @@ const registryConfig = {
         }
       },
       singleTableItemsByMyParentId: {
-        localCodec: registryConfig_pgCodecs_singleTableItemRelationCompositePks_singleTableItemRelationCompositePks,
+        localCodec: singleTableItemRelationCompositePksCodec,
         remoteResourceOptions: registryConfig_pgResources_single_table_items_single_table_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["parent_id"],
@@ -3987,7 +3987,7 @@ const registryConfig = {
     }),
     singleTableItemRelations: Object.assign(Object.create(null), {
       singleTableItemsByMyChildId: {
-        localCodec: registryConfig_pgCodecs_singleTableItemRelations_singleTableItemRelations,
+        localCodec: singleTableItemRelationsCodec,
         remoteResourceOptions: registryConfig_pgResources_single_table_items_single_table_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["child_id"],
@@ -4002,7 +4002,7 @@ const registryConfig = {
         }
       },
       singleTableItemsByMyParentId: {
-        localCodec: registryConfig_pgCodecs_singleTableItemRelations_singleTableItemRelations,
+        localCodec: singleTableItemRelationsCodec,
         remoteResourceOptions: registryConfig_pgResources_single_table_items_single_table_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["parent_id"],
@@ -4019,7 +4019,7 @@ const registryConfig = {
     }),
     singleTableItems: Object.assign(Object.create(null), {
       peopleByMyAuthorId: {
-        localCodec: registryConfig_pgCodecs_singleTableItems_singleTableItems,
+        localCodec: singleTableItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_people_people,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["author_id"],
@@ -4034,7 +4034,7 @@ const registryConfig = {
         }
       },
       singleTableItemsByMyParentId: {
-        localCodec: registryConfig_pgCodecs_singleTableItems_singleTableItems,
+        localCodec: singleTableItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_single_table_items_single_table_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["parent_id"],
@@ -4049,7 +4049,7 @@ const registryConfig = {
         }
       },
       prioritiesByMyPriorityId: {
-        localCodec: registryConfig_pgCodecs_singleTableItems_singleTableItems,
+        localCodec: singleTableItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_priorities_priorities,
         localCodecPolymorphicTypes: ["POST", "CHECKLIST_ITEM"],
         localAttributes: ["priority_id"],
@@ -4064,7 +4064,7 @@ const registryConfig = {
         }
       },
       singleTableItemsByMyRootTopicId: {
-        localCodec: registryConfig_pgCodecs_singleTableItems_singleTableItems,
+        localCodec: singleTableItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_single_table_items_single_table_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["root_topic_id"],
@@ -4079,7 +4079,7 @@ const registryConfig = {
         }
       },
       singleTableItemsByTheirParentId: {
-        localCodec: registryConfig_pgCodecs_singleTableItems_singleTableItems,
+        localCodec: singleTableItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_single_table_items_single_table_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -4094,7 +4094,7 @@ const registryConfig = {
         }
       },
       singleTableItemsByTheirRootTopicId: {
-        localCodec: registryConfig_pgCodecs_singleTableItems_singleTableItems,
+        localCodec: singleTableItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_single_table_items_single_table_items,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -4109,7 +4109,7 @@ const registryConfig = {
         }
       },
       singleTableItemRelationsByTheirChildId: {
-        localCodec: registryConfig_pgCodecs_singleTableItems_singleTableItems,
+        localCodec: singleTableItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_single_table_item_relations_single_table_item_relations,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -4124,7 +4124,7 @@ const registryConfig = {
         }
       },
       singleTableItemRelationsByTheirParentId: {
-        localCodec: registryConfig_pgCodecs_singleTableItems_singleTableItems,
+        localCodec: singleTableItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_single_table_item_relations_single_table_item_relations,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -4139,7 +4139,7 @@ const registryConfig = {
         }
       },
       singleTableItemRelationCompositePksByTheirChildId: {
-        localCodec: registryConfig_pgCodecs_singleTableItems_singleTableItems,
+        localCodec: singleTableItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_single_table_item_relation_composite_pks_single_table_item_relation_composite_pks,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -4154,7 +4154,7 @@ const registryConfig = {
         }
       },
       singleTableItemRelationCompositePksByTheirParentId: {
-        localCodec: registryConfig_pgCodecs_singleTableItems_singleTableItems,
+        localCodec: singleTableItemsCodec,
         remoteResourceOptions: registryConfig_pgResources_single_table_item_relation_composite_pks_single_table_item_relation_composite_pks,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -4171,7 +4171,7 @@ const registryConfig = {
     }),
     thirdPartyVulnerabilities: Object.assign(Object.create(null), {
       awsApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId: {
-        localCodec: registryConfig_pgCodecs_thirdPartyVulnerabilities_thirdPartyVulnerabilities,
+        localCodec: thirdPartyVulnerabilitiesCodec,
         remoteResourceOptions: registryConfig_pgResources_aws_application_third_party_vulnerabilities_aws_application_third_party_vulnerabilities,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -4186,7 +4186,7 @@ const registryConfig = {
         }
       },
       gcpApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId: {
-        localCodec: registryConfig_pgCodecs_thirdPartyVulnerabilities_thirdPartyVulnerabilities,
+        localCodec: thirdPartyVulnerabilitiesCodec,
         remoteResourceOptions: registryConfig_pgResources_gcp_application_third_party_vulnerabilities_gcp_application_third_party_vulnerabilities,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -4442,7 +4442,7 @@ function LogEntryConnection_pageInfoPlan($connection) {
   return $connection.pageInfo();
 }
 const otherSource_organizationsPgResource = registry.pgResources["organizations"];
-const attributes19 = {};
+const attributes = {};
 const members2 = [{
   resource: otherSource_peoplePgResource,
   typeName: "Person",
@@ -4635,7 +4635,7 @@ function AwsApplication_vulnerabilities_before_applyPlan(_, $connection, val) {
 function AwsApplication_vulnerabilities_after_applyPlan(_, $connection, val) {
   $connection.setAfter(val.getRaw());
 }
-const attributes20 = {};
+const attributes2 = {};
 const members4 = [{
   resource: otherSource_peoplePgResource,
   typeName: "Person",
@@ -4816,7 +4816,7 @@ function FirstPartyVulnerability_applications_before_applyPlan(_, $connection, v
 function FirstPartyVulnerability_applications_after_applyPlan(_, $connection, val) {
   $connection.setAfter(val.getRaw());
 }
-const attributes21 = {};
+const attributes3 = {};
 const members6 = [{
   resource: otherSource_aws_application_first_party_vulnerabilitiesPgResource,
   typeName: "Person",
@@ -5055,7 +5055,7 @@ function GcpApplication_vulnerabilities_before_applyPlan(_, $connection, val) {
 function GcpApplication_vulnerabilities_after_applyPlan(_, $connection, val) {
   $connection.setAfter(val.getRaw());
 }
-const attributes22 = {};
+const attributes4 = {};
 const members8 = [{
   resource: otherSource_peoplePgResource,
   typeName: "Person",
@@ -5199,7 +5199,7 @@ function ThirdPartyVulnerability_applications_before_applyPlan(_, $connection, v
 function ThirdPartyVulnerability_applications_after_applyPlan(_, $connection, val) {
   $connection.setAfter(val.getRaw());
 }
-const attributes23 = {};
+const attributes5 = {};
 const members10 = [{
   resource: otherSource_aws_application_third_party_vulnerabilitiesPgResource,
   typeName: "Person",
@@ -16891,7 +16891,7 @@ export const plans = {
           }, Object.create(null));
         }
         const $list = pgUnionAll({
-          attributes: attributes_object_Object_6,
+          attributes: ApplicationAttributes,
           resourceByTypeName,
           members,
           name: "applications"
@@ -16998,7 +16998,7 @@ export const plans = {
         }, Object.create(null));
       }
       const $list = pgUnionAll({
-        attributes: attributes19,
+        attributes,
         resourceByTypeName: resourceByTypeName2,
         members: members2,
         name: "author"
@@ -17166,7 +17166,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques16[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_logEntries_logEntries.attributes[attributeName];
+          const attribute = logEntriesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -17182,7 +17182,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques16[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_logEntries_logEntries.attributes[attributeName];
+          const attribute = logEntriesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -17348,7 +17348,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes15.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), logEntriesAttributes.id.codec)}`;
             }
           });
         }
@@ -17371,7 +17371,7 @@ export const plans = {
             type: "attribute",
             attribute: "person_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes15.person_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), logEntriesAttributes.person_id.codec)}`;
             }
           });
         }
@@ -17394,7 +17394,7 @@ export const plans = {
             type: "attribute",
             attribute: "organization_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes15.organization_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), logEntriesAttributes.organization_id.codec)}`;
             }
           });
         }
@@ -17417,7 +17417,7 @@ export const plans = {
             type: "attribute",
             attribute: "text",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes15.text.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), logEntriesAttributes.text.codec)}`;
             }
           });
         }
@@ -17572,7 +17572,7 @@ export const plans = {
           }, Object.create(null));
         }
         const $list = pgUnionAll({
-          attributes: attributes_object_Object_7,
+          attributes: VulnerabilityAttributes,
           resourceByTypeName: resourceByTypeName3,
           members: members3,
           name: "vulnerabilities"
@@ -17645,7 +17645,7 @@ export const plans = {
         }, Object.create(null));
       }
       const $list = pgUnionAll({
-        attributes: attributes20,
+        attributes: attributes2,
         resourceByTypeName: resourceByTypeName4,
         members: members4,
         name: "owner"
@@ -17870,7 +17870,7 @@ export const plans = {
           }, Object.create(null));
         }
         const $list = pgUnionAll({
-          attributes: attributes_object_Object_6,
+          attributes: ApplicationAttributes,
           resourceByTypeName: resourceByTypeName5,
           members: members5,
           name: "applications"
@@ -17943,7 +17943,7 @@ export const plans = {
         }, Object.create(null));
       }
       const $list = pgUnionAll({
-        attributes: attributes21,
+        attributes: attributes3,
         resourceByTypeName: resourceByTypeName6,
         members: members6,
         name: "owners"
@@ -17964,7 +17964,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_awsApplicationFirstPartyVulnerabilities_awsApplicationFirstPartyVulnerabilities.attributes[attributeName];
+          const attribute = awsApplicationFirstPartyVulnerabilitiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -17980,7 +17980,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_awsApplicationFirstPartyVulnerabilities_awsApplicationFirstPartyVulnerabilities.attributes[attributeName];
+          const attribute = awsApplicationFirstPartyVulnerabilitiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -18078,7 +18078,7 @@ export const plans = {
             type: "attribute",
             attribute: "aws_application_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.aws_application_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), awsApplicationFirstPartyVulnerabilitiesAttributes.aws_application_id.codec)}`;
             }
           });
         }
@@ -18101,7 +18101,7 @@ export const plans = {
             type: "attribute",
             attribute: "first_party_vulnerability_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.first_party_vulnerability_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), awsApplicationFirstPartyVulnerabilitiesAttributes.first_party_vulnerability_id.codec)}`;
             }
           });
         }
@@ -18275,7 +18275,7 @@ export const plans = {
           }, Object.create(null));
         }
         const $list = pgUnionAll({
-          attributes: attributes_object_Object_7,
+          attributes: VulnerabilityAttributes,
           resourceByTypeName: resourceByTypeName7,
           members: members7,
           name: "vulnerabilities"
@@ -18348,7 +18348,7 @@ export const plans = {
         }, Object.create(null));
       }
       const $list = pgUnionAll({
-        attributes: attributes22,
+        attributes: attributes4,
         resourceByTypeName: resourceByTypeName8,
         members: members8,
         name: "owner"
@@ -18369,7 +18369,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques3[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_gcpApplicationFirstPartyVulnerabilities_gcpApplicationFirstPartyVulnerabilities.attributes[attributeName];
+          const attribute = gcpApplicationFirstPartyVulnerabilitiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -18385,7 +18385,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques3[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_gcpApplicationFirstPartyVulnerabilities_gcpApplicationFirstPartyVulnerabilities.attributes[attributeName];
+          const attribute = gcpApplicationFirstPartyVulnerabilitiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -18483,7 +18483,7 @@ export const plans = {
             type: "attribute",
             attribute: "gcp_application_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes3.gcp_application_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), gcpApplicationFirstPartyVulnerabilitiesAttributes.gcp_application_id.codec)}`;
             }
           });
         }
@@ -18506,7 +18506,7 @@ export const plans = {
             type: "attribute",
             attribute: "first_party_vulnerability_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes3.first_party_vulnerability_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), gcpApplicationFirstPartyVulnerabilitiesAttributes.first_party_vulnerability_id.codec)}`;
             }
           });
         }
@@ -18664,7 +18664,7 @@ export const plans = {
           }, Object.create(null));
         }
         const $list = pgUnionAll({
-          attributes: attributes_object_Object_6,
+          attributes: ApplicationAttributes,
           resourceByTypeName: resourceByTypeName9,
           members: members9,
           name: "applications"
@@ -18737,7 +18737,7 @@ export const plans = {
         }, Object.create(null));
       }
       const $list = pgUnionAll({
-        attributes: attributes23,
+        attributes: attributes5,
         resourceByTypeName: resourceByTypeName10,
         members: members10,
         name: "owners"
@@ -18795,7 +18795,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques2[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_awsApplicationThirdPartyVulnerabilities_awsApplicationThirdPartyVulnerabilities.attributes[attributeName];
+          const attribute = awsApplicationThirdPartyVulnerabilitiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -18811,7 +18811,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques2[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_awsApplicationThirdPartyVulnerabilities_awsApplicationThirdPartyVulnerabilities.attributes[attributeName];
+          const attribute = awsApplicationThirdPartyVulnerabilitiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -18909,7 +18909,7 @@ export const plans = {
             type: "attribute",
             attribute: "aws_application_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes2.aws_application_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), awsApplicationThirdPartyVulnerabilitiesAttributes.aws_application_id.codec)}`;
             }
           });
         }
@@ -18932,7 +18932,7 @@ export const plans = {
             type: "attribute",
             attribute: "third_party_vulnerability_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes2.third_party_vulnerability_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), awsApplicationThirdPartyVulnerabilitiesAttributes.third_party_vulnerability_id.codec)}`;
             }
           });
         }
@@ -18948,7 +18948,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques4[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_gcpApplicationThirdPartyVulnerabilities_gcpApplicationThirdPartyVulnerabilities.attributes[attributeName];
+          const attribute = gcpApplicationThirdPartyVulnerabilitiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -18964,7 +18964,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques4[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_gcpApplicationThirdPartyVulnerabilities_gcpApplicationThirdPartyVulnerabilities.attributes[attributeName];
+          const attribute = gcpApplicationThirdPartyVulnerabilitiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -19062,7 +19062,7 @@ export const plans = {
             type: "attribute",
             attribute: "gcp_application_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes4.gcp_application_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), gcpApplicationThirdPartyVulnerabilitiesAttributes.gcp_application_id.codec)}`;
             }
           });
         }
@@ -19085,7 +19085,7 @@ export const plans = {
             type: "attribute",
             attribute: "third_party_vulnerability_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes4.third_party_vulnerability_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), gcpApplicationThirdPartyVulnerabilitiesAttributes.third_party_vulnerability_id.codec)}`;
             }
           });
         }
@@ -19217,7 +19217,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_6.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), ApplicationAttributes.id.codec)}`;
             }
           });
         }
@@ -19240,7 +19240,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_6.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), ApplicationAttributes.name.codec)}`;
             }
           });
         }
@@ -19263,7 +19263,7 @@ export const plans = {
             type: "attribute",
             attribute: "last_deployed",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_6.last_deployed.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), ApplicationAttributes.last_deployed.codec)}`;
             }
           });
         }
@@ -19404,7 +19404,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_7.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), VulnerabilityAttributes.id.codec)}`;
             }
           });
         }
@@ -19427,7 +19427,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_7.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), VulnerabilityAttributes.name.codec)}`;
             }
           });
         }
@@ -19450,7 +19450,7 @@ export const plans = {
             type: "attribute",
             attribute: "cvss_score",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_7.cvss_score.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), VulnerabilityAttributes.cvss_score.codec)}`;
             }
           });
         }
@@ -19493,7 +19493,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques20[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_awsApplications_awsApplications.attributes[attributeName];
+          const attribute = awsApplicationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -19509,7 +19509,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques20[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_awsApplications_awsApplications.attributes[attributeName];
+          const attribute = awsApplicationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -19743,7 +19743,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_4.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), awsApplicationsAttributes.id.codec)}`;
             }
           });
         }
@@ -19766,7 +19766,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_4.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), awsApplicationsAttributes.name.codec)}`;
             }
           });
         }
@@ -19789,7 +19789,7 @@ export const plans = {
             type: "attribute",
             attribute: "last_deployed",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_4.last_deployed.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), awsApplicationsAttributes.last_deployed.codec)}`;
             }
           });
         }
@@ -19812,7 +19812,7 @@ export const plans = {
             type: "attribute",
             attribute: "person_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_4.person_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), awsApplicationsAttributes.person_id.codec)}`;
             }
           });
         }
@@ -19835,7 +19835,7 @@ export const plans = {
             type: "attribute",
             attribute: "organization_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_4.organization_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), awsApplicationsAttributes.organization_id.codec)}`;
             }
           });
         }
@@ -19858,7 +19858,7 @@ export const plans = {
             type: "attribute",
             attribute: "aws_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_4.aws_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), awsApplicationsAttributes.aws_id.codec)}`;
             }
           });
         }
@@ -19892,7 +19892,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques21[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_gcpApplications_gcpApplications.attributes[attributeName];
+          const attribute = gcpApplicationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -19908,7 +19908,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques21[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_gcpApplications_gcpApplications.attributes[attributeName];
+          const attribute = gcpApplicationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -20142,7 +20142,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_5.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), gcpApplicationsAttributes.id.codec)}`;
             }
           });
         }
@@ -20165,7 +20165,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_5.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), gcpApplicationsAttributes.name.codec)}`;
             }
           });
         }
@@ -20188,7 +20188,7 @@ export const plans = {
             type: "attribute",
             attribute: "last_deployed",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_5.last_deployed.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), gcpApplicationsAttributes.last_deployed.codec)}`;
             }
           });
         }
@@ -20211,7 +20211,7 @@ export const plans = {
             type: "attribute",
             attribute: "person_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_5.person_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), gcpApplicationsAttributes.person_id.codec)}`;
             }
           });
         }
@@ -20234,7 +20234,7 @@ export const plans = {
             type: "attribute",
             attribute: "organization_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_5.organization_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), gcpApplicationsAttributes.organization_id.codec)}`;
             }
           });
         }
@@ -20257,7 +20257,7 @@ export const plans = {
             type: "attribute",
             attribute: "gcp_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_5.gcp_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), gcpApplicationsAttributes.gcp_id.codec)}`;
             }
           });
         }
@@ -20300,7 +20300,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques22[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_singleTableItems_singleTableItems.attributes[attributeName];
+          const attribute = singleTableItemsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -20316,7 +20316,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques22[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_singleTableItems_singleTableItems.attributes[attributeName];
+          const attribute = singleTableItemsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -20686,7 +20686,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes17.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.id.codec)}`;
             }
           });
         }
@@ -20709,7 +20709,7 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes17.type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.type.codec)}`;
             }
           });
         }
@@ -20732,7 +20732,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes17.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.parent_id.codec)}`;
             }
           });
         }
@@ -20755,7 +20755,7 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes17.root_topic_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.root_topic_id.codec)}`;
             }
           });
         }
@@ -20778,7 +20778,7 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes17.author_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.author_id.codec)}`;
             }
           });
         }
@@ -20801,7 +20801,7 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes17.position.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.position.codec)}`;
             }
           });
         }
@@ -20824,7 +20824,7 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes17.created_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.created_at.codec)}`;
             }
           });
         }
@@ -20847,7 +20847,7 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes17.updated_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.updated_at.codec)}`;
             }
           });
         }
@@ -20870,7 +20870,7 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes17.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.is_explicitly_archived.codec)}`;
             }
           });
         }
@@ -20893,7 +20893,7 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes17.archived_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.archived_at.codec)}`;
             }
           });
         }
@@ -21004,7 +21004,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques23[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_relationalItems_relationalItems.attributes[attributeName];
+          const attribute = relationalItemsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -21020,7 +21020,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques23[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_relationalItems_relationalItems.attributes[attributeName];
+          const attribute = relationalItemsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -21390,7 +21390,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes18.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.id.codec)}`;
             }
           });
         }
@@ -21413,7 +21413,7 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes18.type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.type.codec)}`;
             }
           });
         }
@@ -21436,7 +21436,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes18.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.parent_id.codec)}`;
             }
           });
         }
@@ -21459,7 +21459,7 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes18.root_topic_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.root_topic_id.codec)}`;
             }
           });
         }
@@ -21482,7 +21482,7 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes18.author_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.author_id.codec)}`;
             }
           });
         }
@@ -21505,7 +21505,7 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes18.position.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.position.codec)}`;
             }
           });
         }
@@ -21528,7 +21528,7 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes18.created_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.created_at.codec)}`;
             }
           });
         }
@@ -21551,7 +21551,7 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes18.updated_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.updated_at.codec)}`;
             }
           });
         }
@@ -21574,7 +21574,7 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes18.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.is_explicitly_archived.codec)}`;
             }
           });
         }
@@ -21597,7 +21597,7 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes18.archived_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.archived_at.codec)}`;
             }
           });
         }
@@ -21690,7 +21690,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques15[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_singleTableItemRelations_singleTableItemRelations.attributes[attributeName];
+          const attribute = singleTableItemRelationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -21706,7 +21706,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques15[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_singleTableItemRelations_singleTableItemRelations.attributes[attributeName];
+          const attribute = singleTableItemRelationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -21838,7 +21838,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes14.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemRelationsAttributes.id.codec)}`;
             }
           });
         }
@@ -21861,7 +21861,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes14.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemRelationsAttributes.parent_id.codec)}`;
             }
           });
         }
@@ -21884,7 +21884,7 @@ export const plans = {
             type: "attribute",
             attribute: "child_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes14.child_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemRelationsAttributes.child_id.codec)}`;
             }
           });
         }
@@ -21900,7 +21900,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques11[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_singleTableItemRelationCompositePks_singleTableItemRelationCompositePks.attributes[attributeName];
+          const attribute = singleTableItemRelationCompositePksCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -21916,7 +21916,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques11[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_singleTableItemRelationCompositePks_singleTableItemRelationCompositePks.attributes[attributeName];
+          const attribute = singleTableItemRelationCompositePksCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -22014,7 +22014,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes10.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemRelationCompositePksAttributes.parent_id.codec)}`;
             }
           });
         }
@@ -22037,7 +22037,7 @@ export const plans = {
             type: "attribute",
             attribute: "child_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes10.child_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemRelationCompositePksAttributes.child_id.codec)}`;
             }
           });
         }
@@ -23729,7 +23729,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques14[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_relationalItemRelations_relationalItemRelations.attributes[attributeName];
+          const attribute = relationalItemRelationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -23745,7 +23745,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques14[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_relationalItemRelations_relationalItemRelations.attributes[attributeName];
+          const attribute = relationalItemRelationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -23877,7 +23877,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes13.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemRelationsAttributes.id.codec)}`;
             }
           });
         }
@@ -23900,7 +23900,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes13.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemRelationsAttributes.parent_id.codec)}`;
             }
           });
         }
@@ -23923,7 +23923,7 @@ export const plans = {
             type: "attribute",
             attribute: "child_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes13.child_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemRelationsAttributes.child_id.codec)}`;
             }
           });
         }
@@ -23939,7 +23939,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques9[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_relationalItemRelationCompositePks_relationalItemRelationCompositePks.attributes[attributeName];
+          const attribute = relationalItemRelationCompositePksCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -23955,7 +23955,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques9[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_relationalItemRelationCompositePks_relationalItemRelationCompositePks.attributes[attributeName];
+          const attribute = relationalItemRelationCompositePksCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -24053,7 +24053,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes8.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemRelationCompositePksAttributes.parent_id.codec)}`;
             }
           });
         }
@@ -24076,7 +24076,7 @@ export const plans = {
             type: "attribute",
             attribute: "child_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes8.child_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemRelationCompositePksAttributes.child_id.codec)}`;
             }
           });
         }
@@ -26077,7 +26077,7 @@ export const plans = {
     allVulnerabilities: {
       plan() {
         const $list = pgUnionAll({
-          attributes: attributes_object_Object_7,
+          attributes: VulnerabilityAttributes,
           resourceByTypeName: resourceByTypeName11,
           members: members11,
           name: "Vulnerability"
@@ -26133,7 +26133,7 @@ export const plans = {
     allApplications: {
       plan() {
         const $list = pgUnionAll({
-          attributes: attributes_object_Object_6,
+          attributes: ApplicationAttributes,
           resourceByTypeName: resourceByTypeName12,
           members: members12,
           name: "Application"
@@ -26189,7 +26189,7 @@ export const plans = {
     allZeroImplementations: {
       plan() {
         const $list = pgUnionAll({
-          attributes: attributes_object_Object_8,
+          attributes: ZeroImplementationAttributes,
           resourceByTypeName: resourceByTypeName13,
           members: members13,
           name: "ZeroImplementation"
@@ -27332,7 +27332,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_8.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), ZeroImplementationAttributes.id.codec)}`;
             }
           });
         }
@@ -27355,7 +27355,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_8.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), ZeroImplementationAttributes.name.codec)}`;
             }
           });
         }
@@ -27389,7 +27389,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques5[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_organizations_organizations.attributes[attributeName];
+          const attribute = organizationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -27405,7 +27405,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques5[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_organizations_organizations.attributes[attributeName];
+          const attribute = organizationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -27503,7 +27503,7 @@ export const plans = {
             type: "attribute",
             attribute: "organization_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.organization_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), organizationsAttributes.organization_id.codec)}`;
             }
           });
         }
@@ -27526,7 +27526,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), organizationsAttributes.name.codec)}`;
             }
           });
         }
@@ -27560,7 +27560,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques6[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_people_people.attributes[attributeName];
+          const attribute = peopleCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -27576,7 +27576,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques6[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_people_people.attributes[attributeName];
+          const attribute = peopleCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -27674,7 +27674,7 @@ export const plans = {
             type: "attribute",
             attribute: "person_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes5.person_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), peopleAttributes.person_id.codec)}`;
             }
           });
         }
@@ -27697,7 +27697,7 @@ export const plans = {
             type: "attribute",
             attribute: "username",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes5.username.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), peopleAttributes.username.codec)}`;
             }
           });
         }
@@ -27731,7 +27731,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques7[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_priorities_priorities.attributes[attributeName];
+          const attribute = prioritiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -27747,7 +27747,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques7[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_priorities_priorities.attributes[attributeName];
+          const attribute = prioritiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -27845,7 +27845,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes6.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), prioritiesAttributes.id.codec)}`;
             }
           });
         }
@@ -27868,7 +27868,7 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes6.title.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), prioritiesAttributes.title.codec)}`;
             }
           });
         }
@@ -27902,7 +27902,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques8[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_relationalChecklists_relationalChecklists.attributes[attributeName];
+          const attribute = relationalChecklistsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -27918,7 +27918,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques8[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_relationalChecklists_relationalChecklists.attributes[attributeName];
+          const attribute = relationalChecklistsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -28322,7 +28322,7 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes7.title.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.title.codec)}`;
             }
           });
         }
@@ -28345,7 +28345,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes7.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.id.codec)}`;
             }
           });
         }
@@ -28368,7 +28368,7 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes7.type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.type.codec)}`;
             }
           });
         }
@@ -28391,7 +28391,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes7.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.parent_id.codec)}`;
             }
           });
         }
@@ -28414,7 +28414,7 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes7.root_topic_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.root_topic_id.codec)}`;
             }
           });
         }
@@ -28437,7 +28437,7 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes7.author_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.author_id.codec)}`;
             }
           });
         }
@@ -28460,7 +28460,7 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes7.position.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.position.codec)}`;
             }
           });
         }
@@ -28483,7 +28483,7 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes7.created_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.created_at.codec)}`;
             }
           });
         }
@@ -28506,7 +28506,7 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes7.updated_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.updated_at.codec)}`;
             }
           });
         }
@@ -28529,7 +28529,7 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes7.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.is_explicitly_archived.codec)}`;
             }
           });
         }
@@ -28552,7 +28552,7 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes7.archived_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.archived_at.codec)}`;
             }
           });
         }
@@ -28586,7 +28586,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques10[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_relationalTopics_relationalTopics.attributes[attributeName];
+          const attribute = relationalTopicsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -28602,7 +28602,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques10[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_relationalTopics_relationalTopics.attributes[attributeName];
+          const attribute = relationalTopicsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -29006,7 +29006,7 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes9.title.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.title.codec)}`;
             }
           });
         }
@@ -29029,7 +29029,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes9.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.id.codec)}`;
             }
           });
         }
@@ -29052,7 +29052,7 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes9.type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.type.codec)}`;
             }
           });
         }
@@ -29075,7 +29075,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes9.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.parent_id.codec)}`;
             }
           });
         }
@@ -29098,7 +29098,7 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes9.root_topic_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.root_topic_id.codec)}`;
             }
           });
         }
@@ -29121,7 +29121,7 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes9.author_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.author_id.codec)}`;
             }
           });
         }
@@ -29144,7 +29144,7 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes9.position.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.position.codec)}`;
             }
           });
         }
@@ -29167,7 +29167,7 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes9.created_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.created_at.codec)}`;
             }
           });
         }
@@ -29190,7 +29190,7 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes9.updated_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.updated_at.codec)}`;
             }
           });
         }
@@ -29213,7 +29213,7 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes9.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.is_explicitly_archived.codec)}`;
             }
           });
         }
@@ -29236,7 +29236,7 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes9.archived_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.archived_at.codec)}`;
             }
           });
         }
@@ -29270,7 +29270,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques12[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_relationalChecklistItems_relationalChecklistItems.attributes[attributeName];
+          const attribute = relationalChecklistItemsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -29286,7 +29286,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques12[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_relationalChecklistItems_relationalChecklistItems.attributes[attributeName];
+          const attribute = relationalChecklistItemsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -29724,7 +29724,7 @@ export const plans = {
             type: "attribute",
             attribute: "description",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes11.description.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.description.codec)}`;
             }
           });
         }
@@ -29747,7 +29747,7 @@ export const plans = {
             type: "attribute",
             attribute: "note",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes11.note.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.note.codec)}`;
             }
           });
         }
@@ -29770,7 +29770,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes11.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.id.codec)}`;
             }
           });
         }
@@ -29793,7 +29793,7 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes11.type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.type.codec)}`;
             }
           });
         }
@@ -29816,7 +29816,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes11.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.parent_id.codec)}`;
             }
           });
         }
@@ -29839,7 +29839,7 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes11.root_topic_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.root_topic_id.codec)}`;
             }
           });
         }
@@ -29862,7 +29862,7 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes11.author_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.author_id.codec)}`;
             }
           });
         }
@@ -29885,7 +29885,7 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes11.position.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.position.codec)}`;
             }
           });
         }
@@ -29908,7 +29908,7 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes11.created_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.created_at.codec)}`;
             }
           });
         }
@@ -29931,7 +29931,7 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes11.updated_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.updated_at.codec)}`;
             }
           });
         }
@@ -29954,7 +29954,7 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes11.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.is_explicitly_archived.codec)}`;
             }
           });
         }
@@ -29977,7 +29977,7 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes11.archived_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.archived_at.codec)}`;
             }
           });
         }
@@ -30011,7 +30011,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques13[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_relationalDividers_relationalDividers.attributes[attributeName];
+          const attribute = relationalDividersCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -30027,7 +30027,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques13[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_relationalDividers_relationalDividers.attributes[attributeName];
+          const attribute = relationalDividersCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -30465,7 +30465,7 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes12.title.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.title.codec)}`;
             }
           });
         }
@@ -30488,7 +30488,7 @@ export const plans = {
             type: "attribute",
             attribute: "color",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes12.color.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.color.codec)}`;
             }
           });
         }
@@ -30511,7 +30511,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes12.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.id.codec)}`;
             }
           });
         }
@@ -30534,7 +30534,7 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes12.type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.type.codec)}`;
             }
           });
         }
@@ -30557,7 +30557,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes12.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.parent_id.codec)}`;
             }
           });
         }
@@ -30580,7 +30580,7 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes12.root_topic_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.root_topic_id.codec)}`;
             }
           });
         }
@@ -30603,7 +30603,7 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes12.author_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.author_id.codec)}`;
             }
           });
         }
@@ -30626,7 +30626,7 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes12.position.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.position.codec)}`;
             }
           });
         }
@@ -30649,7 +30649,7 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes12.created_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.created_at.codec)}`;
             }
           });
         }
@@ -30672,7 +30672,7 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes12.updated_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.updated_at.codec)}`;
             }
           });
         }
@@ -30695,7 +30695,7 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes12.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.is_explicitly_archived.codec)}`;
             }
           });
         }
@@ -30718,7 +30718,7 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes12.archived_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.archived_at.codec)}`;
             }
           });
         }
@@ -30752,7 +30752,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques17[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_relationalPosts_relationalPosts.attributes[attributeName];
+          const attribute = relationalPostsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -30768,7 +30768,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques17[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_relationalPosts_relationalPosts.attributes[attributeName];
+          const attribute = relationalPostsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -31240,7 +31240,7 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes16.title.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.title.codec)}`;
             }
           });
         }
@@ -31263,7 +31263,7 @@ export const plans = {
             type: "attribute",
             attribute: "description",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes16.description.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.description.codec)}`;
             }
           });
         }
@@ -31286,7 +31286,7 @@ export const plans = {
             type: "attribute",
             attribute: "note",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes16.note.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.note.codec)}`;
             }
           });
         }
@@ -31309,7 +31309,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes16.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.id.codec)}`;
             }
           });
         }
@@ -31332,7 +31332,7 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes16.type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.type.codec)}`;
             }
           });
         }
@@ -31355,7 +31355,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes16.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.parent_id.codec)}`;
             }
           });
         }
@@ -31378,7 +31378,7 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes16.root_topic_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.root_topic_id.codec)}`;
             }
           });
         }
@@ -31401,7 +31401,7 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes16.author_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.author_id.codec)}`;
             }
           });
         }
@@ -31424,7 +31424,7 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes16.position.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.position.codec)}`;
             }
           });
         }
@@ -31447,7 +31447,7 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes16.created_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.created_at.codec)}`;
             }
           });
         }
@@ -31470,7 +31470,7 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes16.updated_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.updated_at.codec)}`;
             }
           });
         }
@@ -31493,7 +31493,7 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes16.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.is_explicitly_archived.codec)}`;
             }
           });
         }
@@ -31516,7 +31516,7 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes16.archived_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.archived_at.codec)}`;
             }
           });
         }
@@ -31550,7 +31550,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques18[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_firstPartyVulnerabilities_firstPartyVulnerabilities.attributes[attributeName];
+          const attribute = firstPartyVulnerabilitiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -31566,7 +31566,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques18[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_firstPartyVulnerabilities_firstPartyVulnerabilities.attributes[attributeName];
+          const attribute = firstPartyVulnerabilitiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -31732,7 +31732,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_2.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), firstPartyVulnerabilitiesAttributes.id.codec)}`;
             }
           });
         }
@@ -31755,7 +31755,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_2.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), firstPartyVulnerabilitiesAttributes.name.codec)}`;
             }
           });
         }
@@ -31778,7 +31778,7 @@ export const plans = {
             type: "attribute",
             attribute: "cvss_score",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_2.cvss_score.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), firstPartyVulnerabilitiesAttributes.cvss_score.codec)}`;
             }
           });
         }
@@ -31801,7 +31801,7 @@ export const plans = {
             type: "attribute",
             attribute: "team_name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_2.team_name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), firstPartyVulnerabilitiesAttributes.team_name.codec)}`;
             }
           });
         }
@@ -31835,7 +31835,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques19[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_thirdPartyVulnerabilities_thirdPartyVulnerabilities.attributes[attributeName];
+          const attribute = thirdPartyVulnerabilitiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -31851,7 +31851,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques19[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_thirdPartyVulnerabilities_thirdPartyVulnerabilities.attributes[attributeName];
+          const attribute = thirdPartyVulnerabilitiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -32017,7 +32017,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_3.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), thirdPartyVulnerabilitiesAttributes.id.codec)}`;
             }
           });
         }
@@ -32040,7 +32040,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_3.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), thirdPartyVulnerabilitiesAttributes.name.codec)}`;
             }
           });
         }
@@ -32063,7 +32063,7 @@ export const plans = {
             type: "attribute",
             attribute: "cvss_score",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_3.cvss_score.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), thirdPartyVulnerabilitiesAttributes.cvss_score.codec)}`;
             }
           });
         }
@@ -32086,7 +32086,7 @@ export const plans = {
             type: "attribute",
             attribute: "vendor_name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_3.vendor_name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), thirdPartyVulnerabilitiesAttributes.vendor_name.codec)}`;
             }
           });
         }

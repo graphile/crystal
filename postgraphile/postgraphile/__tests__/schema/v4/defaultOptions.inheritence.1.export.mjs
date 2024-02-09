@@ -55,7 +55,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     decode: pipeStringDecode
   }
 });
-const attributes = Object.assign(Object.create(null), {
+const fileAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -85,10 +85,11 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const spec_file = {
+const fileIdentifier = sql.identifier(...["inheritence", "file"]);
+const fileCodecSpec = {
   name: "file",
-  identifier: sql.identifier(...["inheritence", "file"]),
-  attributes,
+  identifier: fileIdentifier,
+  attributes: fileAttributes,
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -101,8 +102,8 @@ const spec_file = {
   },
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_file_file = recordCodec(spec_file);
-const attributes_object_Object_ = Object.assign(Object.create(null), {
+const fileCodec = recordCodec(fileCodecSpec);
+const userAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -132,17 +133,17 @@ const extensions2 = {
   tags: Object.create(null)
 };
 const parts2 = ["inheritence", "user"];
-const sqlIdent2 = sql.identifier(...parts2);
-const spec_user = {
+const userIdentifier = sql.identifier(...parts2);
+const userCodecSpec = {
   name: "user",
-  identifier: sqlIdent2,
-  attributes: attributes_object_Object_,
+  identifier: userIdentifier,
+  attributes: userAttributes,
   description: undefined,
   extensions: extensions2,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_user_user = recordCodec(spec_user);
-const attributes2 = Object.assign(Object.create(null), {
+const userCodec = recordCodec(userCodecSpec);
+const userFileAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -181,16 +182,16 @@ const extensions3 = {
   tags: Object.create(null)
 };
 const parts3 = ["inheritence", "user_file"];
-const sqlIdent3 = sql.identifier(...parts3);
-const spec_userFile = {
+const userFileIdentifier = sql.identifier(...parts3);
+const userFileCodecSpec = {
   name: "userFile",
-  identifier: sqlIdent3,
-  attributes: attributes2,
+  identifier: userFileIdentifier,
+  attributes: userFileAttributes,
   description: undefined,
   extensions: extensions3,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_userFile_userFile = recordCodec(spec_userFile);
+const userFileCodec = recordCodec(userFileCodecSpec);
 const extensions4 = {
   description: undefined,
   pg: {
@@ -229,8 +230,8 @@ const registryConfig_pgResources_user_user = {
   executor: executor_mainPgExecutor,
   name: "user",
   identifier: "main.inheritence.user",
-  from: registryConfig_pgCodecs_user_user.sqlType,
-  codec: registryConfig_pgCodecs_user_user,
+  from: userCodec.sqlType,
+  codec: userCodec,
   uniques: uniques2,
   isVirtual: false,
   description: undefined,
@@ -257,8 +258,8 @@ const registryConfig_pgResources_user_file_user_file = {
   executor: executor_mainPgExecutor,
   name: "user_file",
   identifier: "main.inheritence.user_file",
-  from: registryConfig_pgCodecs_userFile_userFile.sqlType,
-  codec: registryConfig_pgCodecs_userFile_userFile,
+  from: userFileCodec.sqlType,
+  codec: userFileCodec,
   uniques: uniques3,
   isVirtual: false,
   description: undefined,
@@ -270,17 +271,17 @@ const registry = makeRegistry({
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
     int4: TYPES.int,
-    file: registryConfig_pgCodecs_file_file,
-    user: registryConfig_pgCodecs_user_user,
-    userFile: registryConfig_pgCodecs_userFile_userFile
+    file: fileCodec,
+    user: userCodec,
+    userFile: userFileCodec
   }),
   pgResources: Object.assign(Object.create(null), {
     file: {
       executor: executor_mainPgExecutor,
       name: "file",
       identifier: "main.inheritence.file",
-      from: registryConfig_pgCodecs_file_file.sqlType,
-      codec: registryConfig_pgCodecs_file_file,
+      from: fileCodec.sqlType,
+      codec: fileCodec,
       uniques,
       isVirtual: false,
       description: undefined,
@@ -292,7 +293,7 @@ const registry = makeRegistry({
   pgRelations: Object.assign(Object.create(null), {
     user: Object.assign(Object.create(null), {
       userFilesByTheirUserId: {
-        localCodec: registryConfig_pgCodecs_user_user,
+        localCodec: userCodec,
         remoteResourceOptions: registryConfig_pgResources_user_file_user_file,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -309,7 +310,7 @@ const registry = makeRegistry({
     }),
     userFile: Object.assign(Object.create(null), {
       userByMyUserId: {
-        localCodec: registryConfig_pgCodecs_userFile_userFile,
+        localCodec: userFileCodec,
         remoteResourceOptions: registryConfig_pgResources_user_user,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["user_id"],
@@ -2073,7 +2074,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques3[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_userFile_userFile.attributes[attributeName];
+          const attribute = userFileCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -2089,7 +2090,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques3[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_userFile_userFile.attributes[attributeName];
+          const attribute = userFileCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -2221,7 +2222,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes2.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), userFileAttributes.id.codec)}`;
             }
           });
         }
@@ -2244,7 +2245,7 @@ export const plans = {
             type: "attribute",
             attribute: "filename",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes2.filename.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), userFileAttributes.filename.codec)}`;
             }
           });
         }
@@ -2267,7 +2268,7 @@ export const plans = {
             type: "attribute",
             attribute: "user_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes2.user_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), userFileAttributes.user_id.codec)}`;
             }
           });
         }
@@ -2301,7 +2302,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_file_file.attributes[attributeName];
+          const attribute = fileCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -2317,7 +2318,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_file_file.attributes[attributeName];
+          const attribute = fileCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -2415,7 +2416,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), fileAttributes.id.codec)}`;
             }
           });
         }
@@ -2438,7 +2439,7 @@ export const plans = {
             type: "attribute",
             attribute: "filename",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.filename.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), fileAttributes.filename.codec)}`;
             }
           });
         }
@@ -2472,7 +2473,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques2[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_user_user.attributes[attributeName];
+          const attribute = userCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -2488,7 +2489,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques2[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_user_user.attributes[attributeName];
+          const attribute = userCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -2586,7 +2587,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), userAttributes.id.codec)}`;
             }
           });
         }
@@ -2609,7 +2610,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), userAttributes.name.codec)}`;
             }
           });
         }

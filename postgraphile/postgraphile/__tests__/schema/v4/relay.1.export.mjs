@@ -55,6 +55,17 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     decode: pipeStringDecode
   }
 });
+const flambleAttributes = Object.assign(Object.create(null), {
+  f: {
+    description: undefined,
+    codec: TYPES.text,
+    notNull: false,
+    hasDefault: false,
+    extensions: {
+      tags: {}
+    }
+  }
+});
 const executor_mainPgExecutor = new PgExecutor({
   name: "main",
   context() {
@@ -65,20 +76,11 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const spec_flamble = {
+const flambleIdentifier = sql.identifier(...["d", "flibble"]);
+const flambleCodecSpec = {
   name: "flamble",
-  identifier: sql.identifier(...["d", "flibble"]),
-  attributes: Object.assign(Object.create(null), {
-    f: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
-    }
-  }),
+  identifier: flambleIdentifier,
+  attributes: flambleAttributes,
   description: undefined,
   extensions: {
     isTableLike: false,
@@ -93,8 +95,8 @@ const spec_flamble = {
   },
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_flamble_flamble = recordCodec(spec_flamble);
-const attributes2 = Object.assign(Object.create(null), {
+const flambleCodec = recordCodec(flambleCodecSpec);
+const renamed_tableAttributes = Object.assign(Object.create(null), {
   col1: {
     description: undefined,
     codec: TYPES.int,
@@ -119,17 +121,17 @@ const extensions2 = {
   })
 };
 const parts2 = ["d", "original_table"];
-const sqlIdent2 = sql.identifier(...parts2);
-const spec_renamed_table = {
+const renamed_tableIdentifier = sql.identifier(...parts2);
+const renamed_tableCodecSpec = {
   name: "renamed_table",
-  identifier: sqlIdent2,
-  attributes: attributes2,
+  identifier: renamed_tableIdentifier,
+  attributes: renamed_tableAttributes,
   description: undefined,
   extensions: extensions2,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_renamed_table_renamed_table = recordCodec(spec_renamed_table);
-const attributes3 = Object.assign(Object.create(null), {
+const renamed_tableCodec = recordCodec(renamed_tableCodecSpec);
+const filmsAttributes = Object.assign(Object.create(null), {
   code: {
     description: undefined,
     codec: TYPES.int,
@@ -159,17 +161,17 @@ const extensions3 = {
   tags: Object.create(null)
 };
 const parts3 = ["d", "films"];
-const sqlIdent3 = sql.identifier(...parts3);
-const spec_films = {
+const filmsIdentifier = sql.identifier(...parts3);
+const filmsCodecSpec = {
   name: "films",
-  identifier: sqlIdent3,
-  attributes: attributes3,
+  identifier: filmsIdentifier,
+  attributes: filmsAttributes,
   description: undefined,
   extensions: extensions3,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_films_films = recordCodec(spec_films);
-const attributes_object_Object_ = Object.assign(Object.create(null), {
+const filmsCodec = recordCodec(filmsCodecSpec);
+const studiosAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -199,17 +201,17 @@ const extensions4 = {
   tags: Object.create(null)
 };
 const parts4 = ["d", "studios"];
-const sqlIdent4 = sql.identifier(...parts4);
-const spec_studios = {
+const studiosIdentifier = sql.identifier(...parts4);
+const studiosCodecSpec = {
   name: "studios",
-  identifier: sqlIdent4,
-  attributes: attributes_object_Object_,
+  identifier: studiosIdentifier,
+  attributes: studiosAttributes,
   description: undefined,
   extensions: extensions4,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_studios_studios = recordCodec(spec_studios);
-const attributes4 = Object.assign(Object.create(null), {
+const studiosCodec = recordCodec(studiosCodecSpec);
+const postAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -248,17 +250,17 @@ const extensions5 = {
   tags: Object.create(null)
 };
 const parts5 = ["d", "post"];
-const sqlIdent5 = sql.identifier(...parts5);
-const spec_post = {
+const postIdentifier = sql.identifier(...parts5);
+const postCodecSpec = {
   name: "post",
-  identifier: sqlIdent5,
-  attributes: attributes4,
+  identifier: postIdentifier,
+  attributes: postAttributes,
   description: undefined,
   extensions: extensions5,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_post_post = recordCodec(spec_post);
-const attributes5 = Object.assign(Object.create(null), {
+const postCodec = recordCodec(postCodecSpec);
+const tvEpisodesAttributes = Object.assign(Object.create(null), {
   code: {
     description: undefined,
     codec: TYPES.int,
@@ -297,17 +299,17 @@ const extensions6 = {
   tags: Object.create(null)
 };
 const parts6 = ["d", "tv_episodes"];
-const sqlIdent6 = sql.identifier(...parts6);
-const spec_tvEpisodes = {
+const tvEpisodesIdentifier = sql.identifier(...parts6);
+const tvEpisodesCodecSpec = {
   name: "tvEpisodes",
-  identifier: sqlIdent6,
-  attributes: attributes5,
+  identifier: tvEpisodesIdentifier,
+  attributes: tvEpisodesAttributes,
   description: undefined,
   extensions: extensions6,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_tvEpisodes_tvEpisodes = recordCodec(spec_tvEpisodes);
-const attributes6 = Object.assign(Object.create(null), {
+const tvEpisodesCodec = recordCodec(tvEpisodesCodecSpec);
+const tvShowsAttributes = Object.assign(Object.create(null), {
   code: {
     description: undefined,
     codec: TYPES.int,
@@ -346,17 +348,17 @@ const extensions7 = {
   tags: Object.create(null)
 };
 const parts7 = ["d", "tv_shows"];
-const sqlIdent7 = sql.identifier(...parts7);
-const spec_tvShows = {
+const tvShowsIdentifier = sql.identifier(...parts7);
+const tvShowsCodecSpec = {
   name: "tvShows",
-  identifier: sqlIdent7,
-  attributes: attributes6,
+  identifier: tvShowsIdentifier,
+  attributes: tvShowsAttributes,
   description: undefined,
   extensions: extensions7,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_tvShows_tvShows = recordCodec(spec_tvShows);
-const attributes7 = Object.assign(Object.create(null), {
+const tvShowsCodec = recordCodec(tvShowsCodecSpec);
+const jwtTokenAttributes = Object.assign(Object.create(null), {
   role: {
     description: undefined,
     codec: TYPES.text,
@@ -395,17 +397,17 @@ const extensions8 = {
   tags: Object.create(null)
 };
 const parts8 = ["d", "jwt_token"];
-const sqlIdent8 = sql.identifier(...parts8);
-const spec_jwtToken = {
+const jwtTokenIdentifier = sql.identifier(...parts8);
+const jwtTokenCodecSpec = {
   name: "jwtToken",
-  identifier: sqlIdent8,
-  attributes: attributes7,
+  identifier: jwtTokenIdentifier,
+  attributes: jwtTokenAttributes,
   description: undefined,
   extensions: extensions8,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_jwtToken_jwtToken = recordCodec(spec_jwtToken);
-const attributes8 = Object.assign(Object.create(null), {
+const jwtTokenCodec = recordCodec(jwtTokenCodecSpec);
+const personAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -528,16 +530,16 @@ const extensions9 = {
   tags: Object.create(null)
 };
 const parts9 = ["d", "person"];
-const sqlIdent9 = sql.identifier(...parts9);
-const spec_person = {
+const personIdentifier = sql.identifier(...parts9);
+const personCodecSpec = {
   name: "person",
-  identifier: sqlIdent9,
-  attributes: attributes8,
+  identifier: personIdentifier,
+  attributes: personAttributes,
   description: undefined,
   extensions: extensions9,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_person_person = recordCodec(spec_person);
+const personCodec = recordCodec(personCodecSpec);
 const extensions10 = {
   pg: {
     serviceName: "main",
@@ -550,14 +552,14 @@ const extensions10 = {
   }
 };
 const parts10 = ["d", "original_function"];
-const sqlIdent10 = sql.identifier(...parts10);
+const sqlIdent = sql.identifier(...parts10);
 const parts11 = ["d", "getflamble"];
-const sqlIdent11 = sql.identifier(...parts11);
+const sqlIdent2 = sql.identifier(...parts11);
 const options_getflamble = {
   name: "getflamble",
   identifier: "main.d.getflamble()",
   from(...args) {
-    return sql`${sqlIdent11}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent2}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -591,8 +593,8 @@ const resourceConfig_flamble = {
   executor: executor_mainPgExecutor,
   name: "flamble",
   identifier: "main.d.flibble",
-  from: registryConfig_pgCodecs_flamble_flamble.sqlType,
-  codec: registryConfig_pgCodecs_flamble_flamble,
+  from: flambleCodec.sqlType,
+  codec: flambleCodec,
   uniques: [],
   isVirtual: true,
   description: undefined,
@@ -648,8 +650,8 @@ const registryConfig_pgResources_studios_studios = {
   executor: executor_mainPgExecutor,
   name: "studios",
   identifier: "main.d.studios",
-  from: registryConfig_pgCodecs_studios_studios.sqlType,
-  codec: registryConfig_pgCodecs_studios_studios,
+  from: studiosCodec.sqlType,
+  codec: studiosCodec,
   uniques: uniques4,
   isVirtual: false,
   description: undefined,
@@ -676,8 +678,8 @@ const registryConfig_pgResources_post_post = {
   executor: executor_mainPgExecutor,
   name: "post",
   identifier: "main.d.post",
-  from: registryConfig_pgCodecs_post_post.sqlType,
-  codec: registryConfig_pgCodecs_post_post,
+  from: postCodec.sqlType,
+  codec: postCodec,
   uniques: uniques5,
   isVirtual: false,
   description: undefined,
@@ -704,8 +706,8 @@ const registryConfig_pgResources_tv_episodes_tv_episodes = {
   executor: executor_mainPgExecutor,
   name: "tv_episodes",
   identifier: "main.d.tv_episodes",
-  from: registryConfig_pgCodecs_tvEpisodes_tvEpisodes.sqlType,
-  codec: registryConfig_pgCodecs_tvEpisodes_tvEpisodes,
+  from: tvEpisodesCodec.sqlType,
+  codec: tvEpisodesCodec,
   uniques: uniques6,
   isVirtual: false,
   description: undefined,
@@ -732,20 +734,20 @@ const registryConfig_pgResources_tv_shows_tv_shows = {
   executor: executor_mainPgExecutor,
   name: "tv_shows",
   identifier: "main.d.tv_shows",
-  from: registryConfig_pgCodecs_tvShows_tvShows.sqlType,
-  codec: registryConfig_pgCodecs_tvShows_tvShows,
+  from: tvShowsCodec.sqlType,
+  codec: tvShowsCodec,
   uniques: uniques7,
   isVirtual: false,
   description: undefined,
   extensions: extensions17
 };
 const parts12 = ["d", "authenticate"];
-const sqlIdent12 = sql.identifier(...parts12);
+const sqlIdent3 = sql.identifier(...parts12);
 const options_login = {
   name: "login",
   identifier: "main.d.authenticate(int4)",
   from(...args) {
-    return sql`${sqlIdent12}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent3}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "a",
@@ -786,8 +788,8 @@ const resourceConfig_jwt_token = {
   executor: executor_mainPgExecutor,
   name: "jwt_token",
   identifier: "main.d.jwt_token",
-  from: registryConfig_pgCodecs_jwtToken_jwtToken.sqlType,
-  codec: registryConfig_pgCodecs_jwtToken_jwtToken,
+  from: jwtTokenCodec.sqlType,
+  codec: jwtTokenCodec,
   uniques: uniques8,
   isVirtual: true,
   description: undefined,
@@ -806,24 +808,24 @@ const extensions19 = {
   }
 };
 const parts13 = ["d", "person_full_name"];
-const sqlIdent13 = sql.identifier(...parts13);
-const fromCallback2 = (...args) => sql`${sqlIdent13}(${sqlFromArgDigests(args)})`;
+const sqlIdent4 = sql.identifier(...parts13);
+const fromCallback2 = (...args) => sql`${sqlIdent4}(${sqlFromArgDigests(args)})`;
 const parameters2 = [{
   name: "n",
   required: true,
   notNull: false,
-  codec: registryConfig_pgCodecs_person_person,
+  codec: personCodec,
   extensions: {
     variant: "nodeId"
   }
 }];
 const parts14 = ["d", "search_posts"];
-const sqlIdent14 = sql.identifier(...parts14);
+const sqlIdent5 = sql.identifier(...parts14);
 const options_returnPostsMatching = {
   name: "returnPostsMatching",
   identifier: "main.d.search_posts(text)",
   from(...args) {
-    return sql`${sqlIdent14}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent5}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "search",
@@ -870,8 +872,8 @@ const registryConfig_pgResources_person_person = {
   executor: executor_mainPgExecutor,
   name: "person",
   identifier: "main.d.person",
-  from: registryConfig_pgCodecs_person_person.sqlType,
-  codec: registryConfig_pgCodecs_person_person,
+  from: personCodec.sqlType,
+  codec: personCodec,
   uniques: uniques9,
   isVirtual: false,
   description: undefined,
@@ -880,17 +882,17 @@ const registryConfig_pgResources_person_person = {
 const registryConfig = {
   pgCodecs: Object.assign(Object.create(null), {
     int4: TYPES.int,
-    flamble: registryConfig_pgCodecs_flamble_flamble,
+    flamble: flambleCodec,
     text: TYPES.text,
-    renamed_table: registryConfig_pgCodecs_renamed_table_renamed_table,
-    films: registryConfig_pgCodecs_films_films,
+    renamed_table: renamed_tableCodec,
+    films: filmsCodec,
     varchar: TYPES.varchar,
-    studios: registryConfig_pgCodecs_studios_studios,
-    post: registryConfig_pgCodecs_post_post,
-    tvEpisodes: registryConfig_pgCodecs_tvEpisodes_tvEpisodes,
-    tvShows: registryConfig_pgCodecs_tvShows_tvShows,
-    jwtToken: registryConfig_pgCodecs_jwtToken_jwtToken,
-    person: registryConfig_pgCodecs_person_person,
+    studios: studiosCodec,
+    post: postCodec,
+    tvEpisodes: tvEpisodesCodec,
+    tvShows: tvShowsCodec,
+    jwtToken: jwtTokenCodec,
+    person: personCodec,
     bpchar: TYPES.bpchar
   }),
   pgResources: Object.assign(Object.create(null), {
@@ -899,7 +901,7 @@ const registryConfig = {
       name: "renamed_function",
       identifier: "main.d.original_function()",
       from(...args) {
-        return sql`${sqlIdent10}(${sqlFromArgDigests(args)})`;
+        return sql`${sqlIdent}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
       isUnique: !false,
@@ -914,8 +916,8 @@ const registryConfig = {
       executor: executor_mainPgExecutor,
       name: "renamed_table",
       identifier: "main.d.original_table",
-      from: registryConfig_pgCodecs_renamed_table_renamed_table.sqlType,
-      codec: registryConfig_pgCodecs_renamed_table_renamed_table,
+      from: renamed_tableCodec.sqlType,
+      codec: renamed_tableCodec,
       uniques: uniques2,
       isVirtual: false,
       description: undefined,
@@ -925,8 +927,8 @@ const registryConfig = {
       executor: executor_mainPgExecutor,
       name: "films",
       identifier: "main.d.films",
-      from: registryConfig_pgCodecs_films_films.sqlType,
-      codec: registryConfig_pgCodecs_films_films,
+      from: filmsCodec.sqlType,
+      codec: filmsCodec,
       uniques: uniques3,
       isVirtual: false,
       description: undefined,
@@ -956,7 +958,7 @@ const registryConfig = {
   pgRelations: Object.assign(Object.create(null), {
     person: Object.assign(Object.create(null), {
       posts: {
-        localCodec: registryConfig_pgCodecs_person_person,
+        localCodec: personCodec,
         remoteResourceOptions: registryConfig_pgResources_post_post,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -975,7 +977,7 @@ const registryConfig = {
     }),
     post: Object.assign(Object.create(null), {
       author: {
-        localCodec: registryConfig_pgCodecs_post_post,
+        localCodec: postCodec,
         remoteResourceOptions: registryConfig_pgResources_person_person,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["author_id"],
@@ -994,7 +996,7 @@ const registryConfig = {
     }),
     studios: Object.assign(Object.create(null), {
       tvShowsByTheirStudioId: {
-        localCodec: registryConfig_pgCodecs_studios_studios,
+        localCodec: studiosCodec,
         remoteResourceOptions: registryConfig_pgResources_tv_shows_tv_shows,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -1011,7 +1013,7 @@ const registryConfig = {
     }),
     tvEpisodes: Object.assign(Object.create(null), {
       tvShowsByMyShowId: {
-        localCodec: registryConfig_pgCodecs_tvEpisodes_tvEpisodes,
+        localCodec: tvEpisodesCodec,
         remoteResourceOptions: registryConfig_pgResources_tv_shows_tv_shows,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["show_id"],
@@ -1028,7 +1030,7 @@ const registryConfig = {
     }),
     tvShows: Object.assign(Object.create(null), {
       studiosByMyStudioId: {
-        localCodec: registryConfig_pgCodecs_tvShows_tvShows,
+        localCodec: tvShowsCodec,
         remoteResourceOptions: registryConfig_pgResources_studios_studios,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["studio_id"],
@@ -1043,7 +1045,7 @@ const registryConfig = {
         }
       },
       tvEpisodesByTheirShowId: {
-        localCodec: registryConfig_pgCodecs_tvShows_tvShows,
+        localCodec: tvShowsCodec,
         remoteResourceOptions: registryConfig_pgResources_tv_episodes_tv_episodes,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["code"],
@@ -1257,7 +1259,7 @@ const getSpec = $nodeId => {
 const argDetailsSimple2 = [{
   graphqlArgName: "n",
   postgresArgName: "n",
-  pgCodec: registryConfig_pgCodecs_person_person,
+  pgCodec: personCodec,
   required: true,
   fetcher($nodeId) {
     return pgResource_personPgResource.get(getSpec($nodeId));
@@ -4678,7 +4680,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques5[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_post_post.attributes[attributeName];
+          const attribute = postCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -4694,7 +4696,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques5[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_post_post.attributes[attributeName];
+          const attribute = postCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -4758,7 +4760,7 @@ export const plans = {
             type: "attribute",
             attribute: "body",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes4.body.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), postAttributes.body.codec)}`;
             }
           });
         }
@@ -4995,7 +4997,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques6[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_tvEpisodes_tvEpisodes.attributes[attributeName];
+          const attribute = tvEpisodesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -5011,7 +5013,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques6[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_tvEpisodes_tvEpisodes.attributes[attributeName];
+          const attribute = tvEpisodesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -5075,7 +5077,7 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes5.title.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), tvEpisodesAttributes.title.codec)}`;
             }
           });
         }
@@ -5132,7 +5134,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques7[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_tvShows_tvShows.attributes[attributeName];
+          const attribute = tvShowsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -5148,7 +5150,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques7[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_tvShows_tvShows.attributes[attributeName];
+          const attribute = tvShowsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -5212,7 +5214,7 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes6.title.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), tvShowsAttributes.title.codec)}`;
             }
           });
         }
@@ -5332,7 +5334,7 @@ export const plans = {
             type: "attribute",
             attribute: "col1",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes2.col1.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), renamed_tableAttributes.col1.codec)}`;
             }
           });
         }
@@ -5366,7 +5368,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques3[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_films_films.attributes[attributeName];
+          const attribute = filmsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -5382,7 +5384,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques3[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_films_films.attributes[attributeName];
+          const attribute = filmsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -5446,7 +5448,7 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes3.title.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), filmsAttributes.title.codec)}`;
             }
           });
         }
@@ -5480,7 +5482,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques4[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_studios_studios.attributes[attributeName];
+          const attribute = studiosCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -5496,7 +5498,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques4[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_studios_studios.attributes[attributeName];
+          const attribute = studiosCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -5560,7 +5562,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), studiosAttributes.name.codec)}`;
             }
           });
         }
@@ -5594,7 +5596,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques9[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_person_person.attributes[attributeName];
+          const attribute = personCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -5610,7 +5612,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques9[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_person_person.attributes[attributeName];
+          const attribute = personCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -5844,7 +5846,7 @@ export const plans = {
             type: "attribute",
             attribute: "first_name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes8.first_name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.first_name.codec)}`;
             }
           });
         }
@@ -5867,7 +5869,7 @@ export const plans = {
             type: "attribute",
             attribute: "last_name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes8.last_name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.last_name.codec)}`;
             }
           });
         }
@@ -5890,7 +5892,7 @@ export const plans = {
             type: "attribute",
             attribute: "col_no_create",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes8.col_no_create.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.col_no_create.codec)}`;
             }
           });
         }
@@ -5913,7 +5915,7 @@ export const plans = {
             type: "attribute",
             attribute: "col_no_update",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes8.col_no_update.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.col_no_update.codec)}`;
             }
           });
         }
@@ -5936,7 +5938,7 @@ export const plans = {
             type: "attribute",
             attribute: "col_no_order",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes8.col_no_order.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.col_no_order.codec)}`;
             }
           });
         }
@@ -5959,7 +5961,7 @@ export const plans = {
             type: "attribute",
             attribute: "col_no_create_update",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes8.col_no_create_update.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.col_no_create_update.codec)}`;
             }
           });
         }

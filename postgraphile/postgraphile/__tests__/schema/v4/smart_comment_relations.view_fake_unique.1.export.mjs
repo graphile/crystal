@@ -55,6 +55,17 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     decode: pipeStringDecode
   }
 });
+const post_tableAttributes = Object.assign(Object.create(null), {
+  id: {
+    description: undefined,
+    codec: TYPES.text,
+    notNull: true,
+    hasDefault: false,
+    extensions: {
+      tags: {}
+    }
+  }
+});
 const executor_mainPgExecutor = new PgExecutor({
   name: "main",
   context() {
@@ -78,26 +89,17 @@ const extensions = {
     behavior: ["-*"]
   })
 };
-const spec_post_table = {
+const post_tableIdentifier = sql.identifier(...["smart_comment_relations", "post"]);
+const post_tableCodecSpec = {
   name: "post_table",
-  identifier: sql.identifier(...["smart_comment_relations", "post"]),
-  attributes: Object.assign(Object.create(null), {
-    id: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
-    }
-  }),
+  identifier: post_tableIdentifier,
+  attributes: post_tableAttributes,
   description: undefined,
   extensions,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_post_table_post_table = recordCodec(spec_post_table);
-const attributes2 = Object.assign(Object.create(null), {
+const post_tableCodec = recordCodec(post_tableCodecSpec);
+const postsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.text,
@@ -121,17 +123,17 @@ const extensions2 = {
   })
 };
 const parts2 = ["smart_comment_relations", "post_view"];
-const sqlIdent2 = sql.identifier(...parts2);
-const spec_posts = {
+const postsIdentifier = sql.identifier(...parts2);
+const postsCodecSpec = {
   name: "posts",
-  identifier: sqlIdent2,
-  attributes: attributes2,
+  identifier: postsIdentifier,
+  attributes: postsAttributes,
   description: undefined,
   extensions: extensions2,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_posts_posts = recordCodec(spec_posts);
-const attributes3 = Object.assign(Object.create(null), {
+const postsCodec = recordCodec(postsCodecSpec);
+const offer_tableAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -165,17 +167,17 @@ const extensions3 = {
   })
 };
 const parts3 = ["smart_comment_relations", "offer"];
-const sqlIdent3 = sql.identifier(...parts3);
-const spec_offer_table = {
+const offer_tableIdentifier = sql.identifier(...parts3);
+const offer_tableCodecSpec = {
   name: "offer_table",
-  identifier: sqlIdent3,
-  attributes: attributes3,
+  identifier: offer_tableIdentifier,
+  attributes: offer_tableAttributes,
   description: undefined,
   extensions: extensions3,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_offer_table_offer_table = recordCodec(spec_offer_table);
-const attributes4 = Object.assign(Object.create(null), {
+const offer_tableCodec = recordCodec(offer_tableCodecSpec);
+const offersAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -209,17 +211,17 @@ const extensions4 = {
   })
 };
 const parts4 = ["smart_comment_relations", "offer_view"];
-const sqlIdent4 = sql.identifier(...parts4);
-const spec_offers = {
+const offersIdentifier = sql.identifier(...parts4);
+const offersCodecSpec = {
   name: "offers",
-  identifier: sqlIdent4,
-  attributes: attributes4,
+  identifier: offersIdentifier,
+  attributes: offersAttributes,
   description: undefined,
   extensions: extensions4,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_offers_offers = recordCodec(spec_offers);
-const attributes_object_Object_ = Object.assign(Object.create(null), {
+const offersCodec = recordCodec(offersCodecSpec);
+const streetsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -251,17 +253,17 @@ const extensions5 = {
   })
 };
 const parts5 = ["smart_comment_relations", "streets"];
-const sqlIdent5 = sql.identifier(...parts5);
-const spec_streets = {
+const streetsIdentifier = sql.identifier(...parts5);
+const streetsCodecSpec = {
   name: "streets",
-  identifier: sqlIdent5,
-  attributes: attributes_object_Object_,
+  identifier: streetsIdentifier,
+  attributes: streetsAttributes,
   description: undefined,
   extensions: extensions5,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_streets_streets = recordCodec(spec_streets);
-const attributes5 = Object.assign(Object.create(null), {
+const streetsCodec = recordCodec(streetsCodecSpec);
+const propertiesAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -300,17 +302,17 @@ const extensions6 = {
   tags: Object.create(null)
 };
 const parts6 = ["smart_comment_relations", "properties"];
-const sqlIdent6 = sql.identifier(...parts6);
-const spec_properties = {
+const propertiesIdentifier = sql.identifier(...parts6);
+const propertiesCodecSpec = {
   name: "properties",
-  identifier: sqlIdent6,
-  attributes: attributes5,
+  identifier: propertiesIdentifier,
+  attributes: propertiesAttributes,
   description: undefined,
   extensions: extensions6,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_properties_properties = recordCodec(spec_properties);
-const attributes6 = Object.assign(Object.create(null), {
+const propertiesCodec = recordCodec(propertiesCodecSpec);
+const streetPropertyAttributes = Object.assign(Object.create(null), {
   str_id: {
     description: undefined,
     codec: TYPES.int,
@@ -349,17 +351,17 @@ const extensions7 = {
   tags: Object.create(null)
 };
 const parts7 = ["smart_comment_relations", "street_property"];
-const sqlIdent7 = sql.identifier(...parts7);
-const spec_streetProperty = {
+const streetPropertyIdentifier = sql.identifier(...parts7);
+const streetPropertyCodecSpec = {
   name: "streetProperty",
-  identifier: sqlIdent7,
-  attributes: attributes6,
+  identifier: streetPropertyIdentifier,
+  attributes: streetPropertyAttributes,
   description: undefined,
   extensions: extensions7,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_streetProperty_streetProperty = recordCodec(spec_streetProperty);
-const attributes7 = Object.assign(Object.create(null), {
+const streetPropertyCodec = recordCodec(streetPropertyCodecSpec);
+const housesAttributes = Object.assign(Object.create(null), {
   building_name: {
     description: undefined,
     codec: TYPES.text,
@@ -441,17 +443,17 @@ const extensions8 = {
   })
 };
 const parts8 = ["smart_comment_relations", "houses"];
-const sqlIdent8 = sql.identifier(...parts8);
-const spec_houses = {
+const housesIdentifier = sql.identifier(...parts8);
+const housesCodecSpec = {
   name: "houses",
-  identifier: sqlIdent8,
-  attributes: attributes7,
+  identifier: housesIdentifier,
+  attributes: housesAttributes,
   description: undefined,
   extensions: extensions8,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_houses_houses = recordCodec(spec_houses);
-const attributes_object_Object_2 = Object.assign(Object.create(null), {
+const housesCodec = recordCodec(housesCodecSpec);
+const buildingsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -510,16 +512,16 @@ const extensions9 = {
   })
 };
 const parts9 = ["smart_comment_relations", "buildings"];
-const sqlIdent9 = sql.identifier(...parts9);
-const spec_buildings = {
+const buildingsIdentifier = sql.identifier(...parts9);
+const buildingsCodecSpec = {
   name: "buildings",
-  identifier: sqlIdent9,
-  attributes: attributes_object_Object_2,
+  identifier: buildingsIdentifier,
+  attributes: buildingsAttributes,
   description: undefined,
   extensions: extensions9,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_buildings_buildings = recordCodec(spec_buildings);
+const buildingsCodec = recordCodec(buildingsCodecSpec);
 const extensions10 = {
   description: undefined,
   pg: {
@@ -537,8 +539,8 @@ const registryConfig_pgResources_post_table_post_table = {
   executor: executor_mainPgExecutor,
   name: "post_table",
   identifier: "main.smart_comment_relations.post",
-  from: registryConfig_pgCodecs_post_table_post_table.sqlType,
-  codec: registryConfig_pgCodecs_post_table_post_table,
+  from: post_tableCodec.sqlType,
+  codec: post_tableCodec,
   uniques: [{
     isPrimary: true,
     attributes: ["id"],
@@ -575,8 +577,8 @@ const registryConfig_pgResources_posts_posts = {
   executor: executor_mainPgExecutor,
   name: "posts",
   identifier: "main.smart_comment_relations.post_view",
-  from: registryConfig_pgCodecs_posts_posts.sqlType,
-  codec: registryConfig_pgCodecs_posts_posts,
+  from: postsCodec.sqlType,
+  codec: postsCodec,
   uniques: uniques2,
   isVirtual: false,
   description: undefined,
@@ -607,8 +609,8 @@ const registryConfig_pgResources_offer_table_offer_table = {
   executor: executor_mainPgExecutor,
   name: "offer_table",
   identifier: "main.smart_comment_relations.offer",
-  from: registryConfig_pgCodecs_offer_table_offer_table.sqlType,
-  codec: registryConfig_pgCodecs_offer_table_offer_table,
+  from: offer_tableCodec.sqlType,
+  codec: offer_tableCodec,
   uniques: uniques3,
   isVirtual: false,
   description: undefined,
@@ -639,8 +641,8 @@ const registryConfig_pgResources_offers_offers = {
   executor: executor_mainPgExecutor,
   name: "offers",
   identifier: "main.smart_comment_relations.offer_view",
-  from: registryConfig_pgCodecs_offers_offers.sqlType,
-  codec: registryConfig_pgCodecs_offers_offers,
+  from: offersCodec.sqlType,
+  codec: offersCodec,
   uniques: uniques4,
   isVirtual: false,
   description: undefined,
@@ -676,8 +678,8 @@ const registryConfig_pgResources_streets_streets = {
   executor: executor_mainPgExecutor,
   name: "streets",
   identifier: "main.smart_comment_relations.streets",
-  from: registryConfig_pgCodecs_streets_streets.sqlType,
-  codec: registryConfig_pgCodecs_streets_streets,
+  from: streetsCodec.sqlType,
+  codec: streetsCodec,
   uniques: uniques5,
   isVirtual: false,
   description: undefined,
@@ -704,8 +706,8 @@ const registryConfig_pgResources_properties_properties = {
   executor: executor_mainPgExecutor,
   name: "properties",
   identifier: "main.smart_comment_relations.properties",
-  from: registryConfig_pgCodecs_properties_properties.sqlType,
-  codec: registryConfig_pgCodecs_properties_properties,
+  from: propertiesCodec.sqlType,
+  codec: propertiesCodec,
   uniques: uniques6,
   isVirtual: false,
   description: undefined,
@@ -732,8 +734,8 @@ const registryConfig_pgResources_street_property_street_property = {
   executor: executor_mainPgExecutor,
   name: "street_property",
   identifier: "main.smart_comment_relations.street_property",
-  from: registryConfig_pgCodecs_streetProperty_streetProperty.sqlType,
-  codec: registryConfig_pgCodecs_streetProperty_streetProperty,
+  from: streetPropertyCodec.sqlType,
+  codec: streetPropertyCodec,
   uniques: uniques7,
   isVirtual: false,
   description: undefined,
@@ -764,8 +766,8 @@ const registryConfig_pgResources_houses_houses = {
   executor: executor_mainPgExecutor,
   name: "houses",
   identifier: "main.smart_comment_relations.houses",
-  from: registryConfig_pgCodecs_houses_houses.sqlType,
-  codec: registryConfig_pgCodecs_houses_houses,
+  from: housesCodec.sqlType,
+  codec: housesCodec,
   uniques: uniques8,
   isVirtual: false,
   description: undefined,
@@ -794,8 +796,8 @@ const registryConfig_pgResources_buildings_buildings = {
   executor: executor_mainPgExecutor,
   name: "buildings",
   identifier: "main.smart_comment_relations.buildings",
-  from: registryConfig_pgCodecs_buildings_buildings.sqlType,
-  codec: registryConfig_pgCodecs_buildings_buildings,
+  from: buildingsCodec.sqlType,
+  codec: buildingsCodec,
   uniques: uniques9,
   isVirtual: false,
   description: undefined,
@@ -803,20 +805,20 @@ const registryConfig_pgResources_buildings_buildings = {
 };
 const registry = makeRegistry({
   pgCodecs: Object.assign(Object.create(null), {
-    post_table: registryConfig_pgCodecs_post_table_post_table,
+    post_table: post_tableCodec,
     text: TYPES.text,
-    posts: registryConfig_pgCodecs_posts_posts,
-    offer_table: registryConfig_pgCodecs_offer_table_offer_table,
+    posts: postsCodec,
+    offer_table: offer_tableCodec,
     int4: TYPES.int,
-    offers: registryConfig_pgCodecs_offers_offers,
-    streets: registryConfig_pgCodecs_streets_streets,
-    properties: registryConfig_pgCodecs_properties_properties,
-    streetProperty: registryConfig_pgCodecs_streetProperty_streetProperty,
-    houses: registryConfig_pgCodecs_houses_houses,
+    offers: offersCodec,
+    streets: streetsCodec,
+    properties: propertiesCodec,
+    streetProperty: streetPropertyCodec,
+    houses: housesCodec,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
     bool: TYPES.boolean,
-    buildings: registryConfig_pgCodecs_buildings_buildings
+    buildings: buildingsCodec
   }),
   pgResources: Object.assign(Object.create(null), {
     post_table: registryConfig_pgResources_post_table_post_table,
@@ -832,7 +834,7 @@ const registry = makeRegistry({
   pgRelations: Object.assign(Object.create(null), {
     buildings: Object.assign(Object.create(null), {
       propertiesByMyPropertyId: {
-        localCodec: registryConfig_pgCodecs_buildings_buildings,
+        localCodec: buildingsCodec,
         remoteResourceOptions: registryConfig_pgResources_properties_properties,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["property_id"],
@@ -847,7 +849,7 @@ const registry = makeRegistry({
         }
       },
       namedAfterStreet: {
-        localCodec: registryConfig_pgCodecs_buildings_buildings,
+        localCodec: buildingsCodec,
         remoteResourceOptions: registryConfig_pgResources_streets_streets,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["name"],
@@ -865,7 +867,7 @@ const registry = makeRegistry({
         }
       },
       housesByTheirBuildingId: {
-        localCodec: registryConfig_pgCodecs_buildings_buildings,
+        localCodec: buildingsCodec,
         remoteResourceOptions: registryConfig_pgResources_houses_houses,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -882,7 +884,7 @@ const registry = makeRegistry({
     }),
     houses: Object.assign(Object.create(null), {
       streetsByMyStreetId: {
-        localCodec: registryConfig_pgCodecs_houses_houses,
+        localCodec: housesCodec,
         remoteResourceOptions: registryConfig_pgResources_streets_streets,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["street_id"],
@@ -897,7 +899,7 @@ const registry = makeRegistry({
         }
       },
       buildingsByMyBuildingId: {
-        localCodec: registryConfig_pgCodecs_houses_houses,
+        localCodec: housesCodec,
         remoteResourceOptions: registryConfig_pgResources_buildings_buildings,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["building_id"],
@@ -912,7 +914,7 @@ const registry = makeRegistry({
         }
       },
       propertiesByMyPropertyId: {
-        localCodec: registryConfig_pgCodecs_houses_houses,
+        localCodec: housesCodec,
         remoteResourceOptions: registryConfig_pgResources_properties_properties,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["property_id"],
@@ -927,7 +929,7 @@ const registry = makeRegistry({
         }
       },
       streetPropertyByMyStreetIdAndPropertyId: {
-        localCodec: registryConfig_pgCodecs_houses_houses,
+        localCodec: housesCodec,
         remoteResourceOptions: registryConfig_pgResources_street_property_street_property,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["street_id", "property_id"],
@@ -944,7 +946,7 @@ const registry = makeRegistry({
     }),
     offer_table: Object.assign(Object.create(null), {
       postTableByMyPostId: {
-        localCodec: registryConfig_pgCodecs_offer_table_offer_table,
+        localCodec: offer_tableCodec,
         remoteResourceOptions: registryConfig_pgResources_post_table_post_table,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["post_id"],
@@ -961,7 +963,7 @@ const registry = makeRegistry({
     }),
     offers: Object.assign(Object.create(null), {
       postsByMyPostId: {
-        localCodec: registryConfig_pgCodecs_offers_offers,
+        localCodec: offersCodec,
         remoteResourceOptions: registryConfig_pgResources_posts_posts,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["post_id"],
@@ -978,7 +980,7 @@ const registry = makeRegistry({
     }),
     post_table: Object.assign(Object.create(null), {
       offerTablesByTheirPostId: {
-        localCodec: registryConfig_pgCodecs_post_table_post_table,
+        localCodec: post_tableCodec,
         remoteResourceOptions: registryConfig_pgResources_offer_table_offer_table,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -995,7 +997,7 @@ const registry = makeRegistry({
     }),
     posts: Object.assign(Object.create(null), {
       offersByTheirPostId: {
-        localCodec: registryConfig_pgCodecs_posts_posts,
+        localCodec: postsCodec,
         remoteResourceOptions: registryConfig_pgResources_offers_offers,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -1012,7 +1014,7 @@ const registry = makeRegistry({
     }),
     properties: Object.assign(Object.create(null), {
       streetsByMyStreetId: {
-        localCodec: registryConfig_pgCodecs_properties_properties,
+        localCodec: propertiesCodec,
         remoteResourceOptions: registryConfig_pgResources_streets_streets,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["street_id"],
@@ -1027,7 +1029,7 @@ const registry = makeRegistry({
         }
       },
       streetPropertiesByTheirPropId: {
-        localCodec: registryConfig_pgCodecs_properties_properties,
+        localCodec: propertiesCodec,
         remoteResourceOptions: registryConfig_pgResources_street_property_street_property,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -1042,7 +1044,7 @@ const registry = makeRegistry({
         }
       },
       buildingsByTheirPropertyId: {
-        localCodec: registryConfig_pgCodecs_properties_properties,
+        localCodec: propertiesCodec,
         remoteResourceOptions: registryConfig_pgResources_buildings_buildings,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -1057,7 +1059,7 @@ const registry = makeRegistry({
         }
       },
       housesByTheirPropertyId: {
-        localCodec: registryConfig_pgCodecs_properties_properties,
+        localCodec: propertiesCodec,
         remoteResourceOptions: registryConfig_pgResources_houses_houses,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -1074,7 +1076,7 @@ const registry = makeRegistry({
     }),
     streetProperty: Object.assign(Object.create(null), {
       propertiesByMyPropId: {
-        localCodec: registryConfig_pgCodecs_streetProperty_streetProperty,
+        localCodec: streetPropertyCodec,
         remoteResourceOptions: registryConfig_pgResources_properties_properties,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["prop_id"],
@@ -1089,7 +1091,7 @@ const registry = makeRegistry({
         }
       },
       streetsByMyStrId: {
-        localCodec: registryConfig_pgCodecs_streetProperty_streetProperty,
+        localCodec: streetPropertyCodec,
         remoteResourceOptions: registryConfig_pgResources_streets_streets,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["str_id"],
@@ -1104,7 +1106,7 @@ const registry = makeRegistry({
         }
       },
       housesByTheirStreetIdAndPropertyId: {
-        localCodec: registryConfig_pgCodecs_streetProperty_streetProperty,
+        localCodec: streetPropertyCodec,
         remoteResourceOptions: registryConfig_pgResources_houses_houses,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["str_id", "prop_id"],
@@ -1121,7 +1123,7 @@ const registry = makeRegistry({
     }),
     streets: Object.assign(Object.create(null), {
       propertiesByTheirStreetId: {
-        localCodec: registryConfig_pgCodecs_streets_streets,
+        localCodec: streetsCodec,
         remoteResourceOptions: registryConfig_pgResources_properties_properties,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -1136,7 +1138,7 @@ const registry = makeRegistry({
         }
       },
       streetPropertiesByTheirStrId: {
-        localCodec: registryConfig_pgCodecs_streets_streets,
+        localCodec: streetsCodec,
         remoteResourceOptions: registryConfig_pgResources_street_property_street_property,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -1151,7 +1153,7 @@ const registry = makeRegistry({
         }
       },
       buildingsNamedAfterStreet: {
-        localCodec: registryConfig_pgCodecs_streets_streets,
+        localCodec: streetsCodec,
         remoteResourceOptions: registryConfig_pgResources_buildings_buildings,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["name"],
@@ -1169,7 +1171,7 @@ const registry = makeRegistry({
         }
       },
       housesByTheirStreetId: {
-        localCodec: registryConfig_pgCodecs_streets_streets,
+        localCodec: streetsCodec,
         remoteResourceOptions: registryConfig_pgResources_houses_houses,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -4990,7 +4992,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques4[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_offers_offers.attributes[attributeName];
+          const attribute = offersCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -5006,7 +5008,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques4[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_offers_offers.attributes[attributeName];
+          const attribute = offersCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -5104,7 +5106,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes4.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), offersAttributes.id.codec)}`;
             }
           });
         }
@@ -5127,7 +5129,7 @@ export const plans = {
             type: "attribute",
             attribute: "post_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes4.post_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), offersAttributes.post_id.codec)}`;
             }
           });
         }
@@ -5694,7 +5696,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques8[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_houses_houses.attributes[attributeName];
+          const attribute = housesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -5710,7 +5712,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques8[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_houses_houses.attributes[attributeName];
+          const attribute = housesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -5978,7 +5980,7 @@ export const plans = {
             type: "attribute",
             attribute: "building_name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes7.building_name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), housesAttributes.building_name.codec)}`;
             }
           });
         }
@@ -6001,7 +6003,7 @@ export const plans = {
             type: "attribute",
             attribute: "property_name_or_number",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes7.property_name_or_number.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), housesAttributes.property_name_or_number.codec)}`;
             }
           });
         }
@@ -6024,7 +6026,7 @@ export const plans = {
             type: "attribute",
             attribute: "street_name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes7.street_name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), housesAttributes.street_name.codec)}`;
             }
           });
         }
@@ -6047,7 +6049,7 @@ export const plans = {
             type: "attribute",
             attribute: "street_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes7.street_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), housesAttributes.street_id.codec)}`;
             }
           });
         }
@@ -6070,7 +6072,7 @@ export const plans = {
             type: "attribute",
             attribute: "building_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes7.building_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), housesAttributes.building_id.codec)}`;
             }
           });
         }
@@ -6093,7 +6095,7 @@ export const plans = {
             type: "attribute",
             attribute: "property_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes7.property_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), housesAttributes.property_id.codec)}`;
             }
           });
         }
@@ -6116,7 +6118,7 @@ export const plans = {
             type: "attribute",
             attribute: "floors",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes7.floors.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), housesAttributes.floors.codec)}`;
             }
           });
         }
@@ -6141,7 +6143,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques7[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_streetProperty_streetProperty.attributes[attributeName];
+          const attribute = streetPropertyCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -6157,7 +6159,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques7[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_streetProperty_streetProperty.attributes[attributeName];
+          const attribute = streetPropertyCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -6289,7 +6291,7 @@ export const plans = {
             type: "attribute",
             attribute: "str_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes6.str_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), streetPropertyAttributes.str_id.codec)}`;
             }
           });
         }
@@ -6312,7 +6314,7 @@ export const plans = {
             type: "attribute",
             attribute: "prop_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes6.prop_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), streetPropertyAttributes.prop_id.codec)}`;
             }
           });
         }
@@ -6335,7 +6337,7 @@ export const plans = {
             type: "attribute",
             attribute: "current_owner",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes6.current_owner.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), streetPropertyAttributes.current_owner.codec)}`;
             }
           });
         }
@@ -6369,7 +6371,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques9[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_buildings_buildings.attributes[attributeName];
+          const attribute = buildingsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -6385,7 +6387,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques9[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_buildings_buildings.attributes[attributeName];
+          const attribute = buildingsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -6585,7 +6587,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_2.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), buildingsAttributes.id.codec)}`;
             }
           });
         }
@@ -6608,7 +6610,7 @@ export const plans = {
             type: "attribute",
             attribute: "property_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_2.property_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), buildingsAttributes.property_id.codec)}`;
             }
           });
         }
@@ -6631,7 +6633,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_2.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), buildingsAttributes.name.codec)}`;
             }
           });
         }
@@ -6654,7 +6656,7 @@ export const plans = {
             type: "attribute",
             attribute: "floors",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_2.floors.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), buildingsAttributes.floors.codec)}`;
             }
           });
         }
@@ -6677,7 +6679,7 @@ export const plans = {
             type: "attribute",
             attribute: "is_primary",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_2.is_primary.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), buildingsAttributes.is_primary.codec)}`;
             }
           });
         }
@@ -6702,7 +6704,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques6[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_properties_properties.attributes[attributeName];
+          const attribute = propertiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -6718,7 +6720,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques6[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_properties_properties.attributes[attributeName];
+          const attribute = propertiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -6850,7 +6852,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes5.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), propertiesAttributes.id.codec)}`;
             }
           });
         }
@@ -6873,7 +6875,7 @@ export const plans = {
             type: "attribute",
             attribute: "street_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes5.street_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), propertiesAttributes.street_id.codec)}`;
             }
           });
         }
@@ -6896,7 +6898,7 @@ export const plans = {
             type: "attribute",
             attribute: "name_or_number",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes5.name_or_number.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), propertiesAttributes.name_or_number.codec)}`;
             }
           });
         }
@@ -6978,7 +6980,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes2.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), postsAttributes.id.codec)}`;
             }
           });
         }
@@ -7012,7 +7014,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques5[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_streets_streets.attributes[attributeName];
+          const attribute = streetsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -7028,7 +7030,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques5[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_streets_streets.attributes[attributeName];
+          const attribute = streetsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -7126,7 +7128,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), streetsAttributes.id.codec)}`;
             }
           });
         }
@@ -7149,7 +7151,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), streetsAttributes.name.codec)}`;
             }
           });
         }

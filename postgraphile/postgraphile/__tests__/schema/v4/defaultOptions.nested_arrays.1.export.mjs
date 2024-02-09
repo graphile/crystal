@@ -55,7 +55,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     decode: pipeStringDecode
   }
 });
-const extensions2 = {
+const workhoursArrayCodecExtensions = {
   pg: {
     serviceName: "main",
     schemaName: "nested_arrays",
@@ -63,7 +63,7 @@ const extensions2 = {
   },
   tags: Object.create(null)
 };
-const extensions3 = {
+const extensions2 = {
   pg: {
     serviceName: "main",
     schemaName: "nested_arrays",
@@ -71,7 +71,7 @@ const extensions3 = {
   },
   tags: Object.create(null)
 };
-const extensions4 = {
+const workHourArrayCodecExtensions = {
   pg: {
     serviceName: "main",
     schemaName: "nested_arrays",
@@ -79,7 +79,7 @@ const extensions4 = {
   },
   tags: Object.create(null)
 };
-const extensions5 = {
+const extensions3 = {
   pg: {
     serviceName: "main",
     schemaName: "nested_arrays",
@@ -87,7 +87,7 @@ const extensions5 = {
   },
   tags: Object.create(null)
 };
-const attributes2 = Object.assign(Object.create(null), {
+const workHourPartsAttributes = Object.assign(Object.create(null), {
   from_hours: {
     description: undefined,
     codec: TYPES.int2,
@@ -135,7 +135,7 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const extensions6 = {
+const extensions4 = {
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -144,44 +144,45 @@ const extensions6 = {
   },
   tags: Object.create(null)
 };
-const spec_workHourParts = {
+const workHourPartsIdentifier = sql.identifier(...["nested_arrays", "work_hour_parts"]);
+const workHourPartsCodecSpec = {
   name: "workHourParts",
-  identifier: sql.identifier(...["nested_arrays", "work_hour_parts"]),
-  attributes: attributes2,
+  identifier: workHourPartsIdentifier,
+  attributes: workHourPartsAttributes,
   description: undefined,
-  extensions: extensions6,
+  extensions: extensions4,
   executor: executor_mainPgExecutor
 };
-const innerCodec_workHourParts = recordCodec(spec_workHourParts);
+const workHourPartsCodec = recordCodec(workHourPartsCodecSpec);
 const parts2 = ["nested_arrays", "work_hour"];
-const sqlIdent2 = sql.identifier(...parts2);
-const innerCodec_workHour = domainOfCodec(innerCodec_workHourParts, "workHour", sqlIdent2, {
+const workHourIdentifier = sql.identifier(...parts2);
+const workHourCodec = domainOfCodec(workHourPartsCodec, "workHour", workHourIdentifier, {
   description: undefined,
-  extensions: extensions5,
+  extensions: extensions3,
   notNull: true
 });
-const innerCodec_workHourArray = listOfCodec(innerCodec_workHour, {
-  extensions: extensions4,
+const workHourArrayCodec = listOfCodec(workHourCodec, {
+  extensions: workHourArrayCodecExtensions,
   typeDelim: ",",
   description: undefined,
   name: "workHourArray"
 });
 const parts3 = ["nested_arrays", "workhours"];
-const sqlIdent3 = sql.identifier(...parts3);
-const innerCodec_workhours = domainOfCodec(innerCodec_workHourArray, "workhours", sqlIdent3, {
+const workhoursIdentifier = sql.identifier(...parts3);
+const workhoursCodec = domainOfCodec(workHourArrayCodec, "workhours", workhoursIdentifier, {
   description: undefined,
-  extensions: extensions3,
+  extensions: extensions2,
   notNull: true
 });
-const innerCodec_workhoursArray = listOfCodec(innerCodec_workhours, {
-  extensions: extensions2,
+const workhoursArrayCodec = listOfCodec(workhoursCodec, {
+  extensions: workhoursArrayCodecExtensions,
   typeDelim: ",",
   description: undefined,
   name: "workhoursArray"
 });
 const parts4 = ["nested_arrays", "working_hours"];
-const sqlIdent4 = sql.identifier(...parts4);
-const attributes_v_codec_workingHours = domainOfCodec(innerCodec_workhoursArray, "workingHours", sqlIdent4, {
+const workingHoursIdentifier = sql.identifier(...parts4);
+const workingHoursCodec = domainOfCodec(workhoursArrayCodec, "workingHours", workingHoursIdentifier, {
   description: "Mo, Tu, We, Th, Fr, Sa, Su, Ho",
   extensions: {
     pg: {
@@ -193,7 +194,7 @@ const attributes_v_codec_workingHours = domainOfCodec(innerCodec_workhoursArray,
   },
   notNull: false
 });
-const attributes = Object.assign(Object.create(null), {
+const tAttributes = Object.assign(Object.create(null), {
   k: {
     description: undefined,
     codec: TYPES.int,
@@ -205,7 +206,7 @@ const attributes = Object.assign(Object.create(null), {
   },
   v: {
     description: undefined,
-    codec: attributes_v_codec_workingHours,
+    codec: workingHoursCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -213,7 +214,7 @@ const attributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions7 = {
+const extensions5 = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -223,17 +224,17 @@ const extensions7 = {
   tags: Object.create(null)
 };
 const parts5 = ["nested_arrays", "t"];
-const sqlIdent5 = sql.identifier(...parts5);
-const spec_t = {
+const tIdentifier = sql.identifier(...parts5);
+const tCodecSpec = {
   name: "t",
-  identifier: sqlIdent5,
-  attributes,
+  identifier: tIdentifier,
+  attributes: tAttributes,
   description: undefined,
-  extensions: extensions7,
+  extensions: extensions5,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_t_t = recordCodec(spec_t);
-const extensions8 = {
+const tCodec = recordCodec(tCodecSpec);
+const extensions6 = {
   pg: {
     serviceName: "main",
     schemaName: "nested_arrays",
@@ -244,8 +245,8 @@ const extensions8 = {
   }
 };
 const parts6 = ["nested_arrays", "check_work_hours"];
-const sqlIdent6 = sql.identifier(...parts6);
-const extensions9 = {
+const sqlIdent = sql.identifier(...parts6);
+const extensions7 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -265,18 +266,18 @@ const uniques = [{
 const registry = makeRegistry({
   pgCodecs: Object.assign(Object.create(null), {
     bool: TYPES.boolean,
-    t: registryConfig_pgCodecs_t_t,
+    t: tCodec,
     int4: TYPES.int,
-    workingHours: attributes_v_codec_workingHours,
-    workhours: innerCodec_workhours,
-    workHour: innerCodec_workHour,
-    workHourParts: innerCodec_workHourParts,
+    workingHours: workingHoursCodec,
+    workhours: workhoursCodec,
+    workHour: workHourCodec,
+    workHourParts: workHourPartsCodec,
     int2: TYPES.int2,
     text: TYPES.text,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
-    workHourArray: innerCodec_workHourArray,
-    workhoursArray: innerCodec_workhoursArray
+    workHourArray: workHourArrayCodec,
+    workhoursArray: workhoursArrayCodec
   }),
   pgResources: Object.assign(Object.create(null), {
     check_work_hours: {
@@ -284,31 +285,31 @@ const registry = makeRegistry({
       name: "check_work_hours",
       identifier: "main.nested_arrays.check_work_hours(nested_arrays._work_hour)",
       from(...args) {
-        return sql`${sqlIdent6}(${sqlFromArgDigests(args)})`;
+        return sql`${sqlIdent}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "wh",
         required: true,
         notNull: true,
-        codec: innerCodec_workHourArray
+        codec: workHourArrayCodec
       }],
       isUnique: !false,
       codec: TYPES.boolean,
       uniques: [],
       isMutation: false,
-      extensions: extensions8,
+      extensions: extensions6,
       description: undefined
     },
     t: {
       executor: executor_mainPgExecutor,
       name: "t",
       identifier: "main.nested_arrays.t",
-      from: registryConfig_pgCodecs_t_t.sqlType,
-      codec: registryConfig_pgCodecs_t_t,
+      from: tCodec.sqlType,
+      codec: tCodec,
       uniques,
       isVirtual: false,
       description: undefined,
-      extensions: extensions9
+      extensions: extensions7
     }
   }),
   pgRelations: Object.create(null)
@@ -339,7 +340,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
 const argDetailsSimple = [{
   graphqlArgName: "wh",
   postgresArgName: "wh",
-  pgCodec: innerCodec_workHourArray,
+  pgCodec: workHourArrayCodec,
   required: true,
   fetcher: null
 }];
@@ -1077,7 +1078,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_t_t.attributes[attributeName];
+          const attribute = tCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -1093,7 +1094,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_t_t.attributes[attributeName];
+          const attribute = tCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -1157,7 +1158,7 @@ export const plans = {
             type: "attribute",
             attribute: "k",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.k.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), tAttributes.k.codec)}`;
             }
           });
         }
@@ -1180,7 +1181,7 @@ export const plans = {
             type: "attribute",
             attribute: "v",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.v.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), tAttributes.v.codec)}`;
             }
           });
         }
