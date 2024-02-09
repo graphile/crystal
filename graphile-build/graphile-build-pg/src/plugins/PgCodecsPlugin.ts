@@ -416,6 +416,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           const executor =
             info.helpers.pgIntrospection.getExecutorForService(serviceName);
           const sqlIdent = info.helpers.pgBasics.identifier(nspName, className);
+          exportNameHint(sqlIdent, `${codecName}Identifier`);
           exportNameHint(attributes, `${codecName}Attributes`);
           const spec: PgRecordTypeCodecSpec<any, any> = EXPORTABLE(
             (
@@ -767,6 +768,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               namespaceName,
               typeName,
             );
+            exportNameHint(sqlIdent, `${codecName}Identifier`);
             event.pgCodec = EXPORTABLE(
               (
                 codecName,
@@ -834,6 +836,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 pgType: type,
                 serviceName,
               });
+              exportNameHint(extensions, `${name}CodecExtensions`);
               event.pgCodec = EXPORTABLE(
                 (
                   description,

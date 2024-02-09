@@ -65,7 +65,7 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const registryConfig_pgCodecs_FuncOutOutRecord_FuncOutOutRecord = recordCodec({
+const registry_pgCodecs_FuncOutOutRecord_FuncOutOutRecord = recordCodec({
   name: "FuncOutOutRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
   attributes: Object.assign(Object.create(null), {
@@ -113,7 +113,7 @@ const attributes2 = Object.assign(Object.create(null), {
     }
   }
 });
-const registryConfig_pgCodecs_FuncOutOutSetofRecord_FuncOutOutSetofRecord = recordCodec({
+const registry_pgCodecs_FuncOutOutSetofRecord_FuncOutOutSetofRecord = recordCodec({
   name: "FuncOutOutSetofRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
   attributes: attributes2,
@@ -144,7 +144,7 @@ const attributes3 = Object.assign(Object.create(null), {
     }
   }
 });
-const registryConfig_pgCodecs_FuncOutOutUnnamedRecord_FuncOutOutUnnamedRecord = recordCodec({
+const registry_pgCodecs_FuncOutOutUnnamedRecord_FuncOutOutUnnamedRecord = recordCodec({
   name: "FuncOutOutUnnamedRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
   attributes: attributes3,
@@ -175,7 +175,7 @@ const attributes4 = Object.assign(Object.create(null), {
     }
   }
 });
-const registryConfig_pgCodecs_MutationOutOutRecord_MutationOutOutRecord = recordCodec({
+const registry_pgCodecs_MutationOutOutRecord_MutationOutOutRecord = recordCodec({
   name: "MutationOutOutRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
   attributes: attributes4,
@@ -206,7 +206,7 @@ const attributes5 = Object.assign(Object.create(null), {
     }
   }
 });
-const registryConfig_pgCodecs_MutationOutOutSetofRecord_MutationOutOutSetofRecord = recordCodec({
+const registry_pgCodecs_MutationOutOutSetofRecord_MutationOutOutSetofRecord = recordCodec({
   name: "MutationOutOutSetofRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
   attributes: attributes5,
@@ -237,7 +237,7 @@ const attributes6 = Object.assign(Object.create(null), {
     }
   }
 });
-const registryConfig_pgCodecs_MutationOutOutUnnamedRecord_MutationOutOutUnnamedRecord = recordCodec({
+const registry_pgCodecs_MutationOutOutUnnamedRecord_MutationOutOutUnnamedRecord = recordCodec({
   name: "MutationOutOutUnnamedRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
   attributes: attributes6,
@@ -268,7 +268,7 @@ const attributes7 = Object.assign(Object.create(null), {
     }
   }
 });
-const registryConfig_pgCodecs_SearchTestSummariesRecord_SearchTestSummariesRecord = recordCodec({
+const registry_pgCodecs_SearchTestSummariesRecord_SearchTestSummariesRecord = recordCodec({
   name: "SearchTestSummariesRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
   attributes: attributes7,
@@ -307,7 +307,7 @@ const attributes8 = Object.assign(Object.create(null), {
     }
   }
 });
-const registryConfig_pgCodecs_FuncOutUnnamedOutOutUnnamedRecord_FuncOutUnnamedOutOutUnnamedRecord = recordCodec({
+const registry_pgCodecs_FuncOutUnnamedOutOutUnnamedRecord_FuncOutUnnamedOutOutUnnamedRecord = recordCodec({
   name: "FuncOutUnnamedOutOutUnnamedRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
   attributes: attributes8,
@@ -338,7 +338,7 @@ const attributes9 = Object.assign(Object.create(null), {
     }
   }
 });
-const registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord = recordCodec({
+const registry_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord = recordCodec({
   name: "FuncReturnsTableMultiColRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
   attributes: attributes9,
@@ -377,7 +377,7 @@ const attributes10 = Object.assign(Object.create(null), {
     }
   }
 });
-const registryConfig_pgCodecs_MutationOutUnnamedOutOutUnnamedRecord_MutationOutUnnamedOutOutUnnamedRecord = recordCodec({
+const registry_pgCodecs_MutationOutUnnamedOutOutUnnamedRecord_MutationOutUnnamedOutOutUnnamedRecord = recordCodec({
   name: "MutationOutUnnamedOutOutUnnamedRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
   attributes: attributes10,
@@ -408,7 +408,7 @@ const attributes11 = Object.assign(Object.create(null), {
     }
   }
 });
-const registryConfig_pgCodecs_MutationReturnsTableMultiColRecord_MutationReturnsTableMultiColRecord = recordCodec({
+const registry_pgCodecs_MutationReturnsTableMultiColRecord_MutationReturnsTableMultiColRecord = recordCodec({
   name: "MutationReturnsTableMultiColRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
   attributes: attributes11,
@@ -421,20 +421,21 @@ const registryConfig_pgCodecs_MutationReturnsTableMultiColRecord_MutationReturns
   executor: executor_mainPgExecutor,
   isAnonymous: true
 });
-const sqlIdent = sql.identifier(...["b", "guid"]);
-const registryConfig_pgCodecs_guid_guid = domainOfCodec(TYPES.varchar, "guid", sqlIdent, {
-  description: undefined,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "guid"
-    },
-    tags: Object.create(null)
+const guidCodec = {
+  pg: {
+    serviceName: "main",
+    schemaName: "b",
+    name: "guid"
   },
+  tags: Object.create(null)
+};
+const guidCodec2 = sql.identifier(...["b", "guid"]);
+const registry_pgCodecs_guid_guidCodec = domainOfCodec(TYPES.varchar, "guid", guidCodec2, {
+  description: undefined,
+  extensions: guidCodec,
   notNull: false
 });
-const extensions2 = {
+const intervalArrayCodec = {
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -442,13 +443,13 @@ const extensions2 = {
   },
   tags: Object.create(null)
 };
-const registryConfig_pgCodecs_intervalArray_intervalArray = listOfCodec(TYPES.interval, {
-  extensions: extensions2,
+const registry_pgCodecs_intervalArray_intervalArrayCodec = listOfCodec(TYPES.interval, {
+  extensions: intervalArrayCodec,
   typeDelim: ",",
   description: undefined,
   name: "intervalArray"
 });
-const extensions3 = {
+const textArrayCodec = {
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -456,13 +457,13 @@ const extensions3 = {
   },
   tags: Object.create(null)
 };
-const registryConfig_pgCodecs_textArray_textArray = listOfCodec(TYPES.text, {
-  extensions: extensions3,
+const registry_pgCodecs_textArray_textArrayCodec = listOfCodec(TYPES.text, {
+  extensions: textArrayCodec,
   typeDelim: ",",
   description: undefined,
   name: "textArray"
 });
-const attributes12 = Object.assign(Object.create(null), {
+const nonUpdatableViewCodecSpec_nonUpdatableViewAttributes = Object.assign(Object.create(null), {
   "?column?": {
     description: undefined,
     codec: TYPES.int,
@@ -473,7 +474,7 @@ const attributes12 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions4 = {
+const nonUpdatableViewCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -483,17 +484,17 @@ const extensions4 = {
   tags: Object.create(null)
 };
 const parts2 = ["a", "non_updatable_view"];
-const sqlIdent2 = sql.identifier(...parts2);
-const spec_nonUpdatableView = {
+const nonUpdatableViewCodecSpec2 = sql.identifier(...parts2);
+const nonUpdatableViewCodec_nonUpdatableViewCodecSpec = {
   name: "nonUpdatableView",
-  identifier: sqlIdent2,
-  attributes: attributes12,
+  identifier: nonUpdatableViewCodecSpec2,
+  attributes: nonUpdatableViewCodecSpec_nonUpdatableViewAttributes,
   description: undefined,
-  extensions: extensions4,
+  extensions: nonUpdatableViewCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_nonUpdatableView_nonUpdatableView = recordCodec(spec_nonUpdatableView);
-const attributes13 = Object.assign(Object.create(null), {
+const registry_pgCodecs_nonUpdatableView_nonUpdatableViewCodec = recordCodec(nonUpdatableViewCodec_nonUpdatableViewCodecSpec);
+const inputsCodecSpec_inputsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -504,7 +505,7 @@ const attributes13 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions5 = {
+const inputsCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -514,17 +515,17 @@ const extensions5 = {
   tags: Object.create(null)
 };
 const parts3 = ["a", "inputs"];
-const sqlIdent3 = sql.identifier(...parts3);
-const spec_inputs = {
+const inputsCodecSpec2 = sql.identifier(...parts3);
+const inputsCodec_inputsCodecSpec = {
   name: "inputs",
-  identifier: sqlIdent3,
-  attributes: attributes13,
+  identifier: inputsCodecSpec2,
+  attributes: inputsCodecSpec_inputsAttributes,
   description: "Should output as Input",
-  extensions: extensions5,
+  extensions: inputsCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_inputs_inputs = recordCodec(spec_inputs);
-const attributes14 = Object.assign(Object.create(null), {
+const registry_pgCodecs_inputs_inputsCodec = recordCodec(inputsCodec_inputsCodecSpec);
+const patchsCodecSpec_patchsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -535,7 +536,7 @@ const attributes14 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions6 = {
+const patchsCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -545,17 +546,17 @@ const extensions6 = {
   tags: Object.create(null)
 };
 const parts4 = ["a", "patchs"];
-const sqlIdent4 = sql.identifier(...parts4);
-const spec_patchs = {
+const patchsCodecSpec2 = sql.identifier(...parts4);
+const patchsCodec_patchsCodecSpec = {
   name: "patchs",
-  identifier: sqlIdent4,
-  attributes: attributes14,
+  identifier: patchsCodecSpec2,
+  attributes: patchsCodecSpec_patchsAttributes,
   description: "Should output as Patch",
-  extensions: extensions6,
+  extensions: patchsCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_patchs_patchs = recordCodec(spec_patchs);
-const attributes15 = Object.assign(Object.create(null), {
+const registry_pgCodecs_patchs_patchsCodec = recordCodec(patchsCodec_patchsCodecSpec);
+const reservedCodecSpec_reservedAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -566,7 +567,7 @@ const attributes15 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions7 = {
+const reservedCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -576,17 +577,17 @@ const extensions7 = {
   tags: Object.create(null)
 };
 const parts5 = ["a", "reserved"];
-const sqlIdent5 = sql.identifier(...parts5);
-const spec_reserved = {
+const reservedCodecSpec2 = sql.identifier(...parts5);
+const reservedCodec_reservedCodecSpec = {
   name: "reserved",
-  identifier: sqlIdent5,
-  attributes: attributes15,
+  identifier: reservedCodecSpec2,
+  attributes: reservedCodecSpec_reservedAttributes,
   description: undefined,
-  extensions: extensions7,
+  extensions: reservedCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_reserved_reserved = recordCodec(spec_reserved);
-const attributes16 = Object.assign(Object.create(null), {
+const registry_pgCodecs_reserved_reservedCodec = recordCodec(reservedCodec_reservedCodecSpec);
+const reservedPatchsCodecSpec_reservedPatchsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -597,7 +598,7 @@ const attributes16 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions8 = {
+const reservedPatchsCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -607,17 +608,17 @@ const extensions8 = {
   tags: Object.create(null)
 };
 const parts6 = ["a", "reservedPatchs"];
-const sqlIdent6 = sql.identifier(...parts6);
-const spec_reservedPatchs = {
+const reservedPatchsCodecSpec2 = sql.identifier(...parts6);
+const reservedPatchsCodec_reservedPatchsCodecSpec = {
   name: "reservedPatchs",
-  identifier: sqlIdent6,
-  attributes: attributes16,
+  identifier: reservedPatchsCodecSpec2,
+  attributes: reservedPatchsCodecSpec_reservedPatchsAttributes,
   description: "`reservedPatchs` table should get renamed to ReservedPatchRecord to prevent clashes with ReservedPatch from `reserved` table",
-  extensions: extensions8,
+  extensions: reservedPatchsCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_reservedPatchs_reservedPatchs = recordCodec(spec_reservedPatchs);
-const attributes17 = Object.assign(Object.create(null), {
+const registry_pgCodecs_reservedPatchs_reservedPatchsCodec = recordCodec(reservedPatchsCodec_reservedPatchsCodecSpec);
+const reservedInputCodecSpec_reservedInputAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -628,7 +629,7 @@ const attributes17 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions9 = {
+const reservedInputCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -638,17 +639,17 @@ const extensions9 = {
   tags: Object.create(null)
 };
 const parts7 = ["a", "reserved_input"];
-const sqlIdent7 = sql.identifier(...parts7);
-const spec_reservedInput = {
+const reservedInputCodecSpec2 = sql.identifier(...parts7);
+const reservedInputCodec_reservedInputCodecSpec = {
   name: "reservedInput",
-  identifier: sqlIdent7,
-  attributes: attributes17,
+  identifier: reservedInputCodecSpec2,
+  attributes: reservedInputCodecSpec_reservedInputAttributes,
   description: "`reserved_input` table should get renamed to ReservedInputRecord to prevent clashes with ReservedInput from `reserved` table",
-  extensions: extensions9,
+  extensions: reservedInputCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_reservedInput_reservedInput = recordCodec(spec_reservedInput);
-const attributes18 = Object.assign(Object.create(null), {
+const registry_pgCodecs_reservedInput_reservedInputCodec = recordCodec(reservedInputCodec_reservedInputCodecSpec);
+const defaultValueCodecSpec_defaultValueAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -668,7 +669,7 @@ const attributes18 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions10 = {
+const defaultValueCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -678,17 +679,17 @@ const extensions10 = {
   tags: Object.create(null)
 };
 const parts8 = ["a", "default_value"];
-const sqlIdent8 = sql.identifier(...parts8);
-const spec_defaultValue = {
+const defaultValueCodecSpec2 = sql.identifier(...parts8);
+const defaultValueCodec_defaultValueCodecSpec = {
   name: "defaultValue",
-  identifier: sqlIdent8,
-  attributes: attributes18,
+  identifier: defaultValueCodecSpec2,
+  attributes: defaultValueCodecSpec_defaultValueAttributes,
   description: undefined,
-  extensions: extensions10,
+  extensions: defaultValueCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_defaultValue_defaultValue = recordCodec(spec_defaultValue);
-const attributes19 = Object.assign(Object.create(null), {
+const registry_pgCodecs_defaultValue_defaultValueCodec = recordCodec(defaultValueCodec_defaultValueCodecSpec);
+const foreignKeyCodecSpec_foreignKeyAttributes = Object.assign(Object.create(null), {
   person_id: {
     description: undefined,
     codec: TYPES.int,
@@ -717,7 +718,7 @@ const attributes19 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions11 = {
+const foreignKeyCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -727,17 +728,17 @@ const extensions11 = {
   tags: Object.create(null)
 };
 const parts9 = ["a", "foreign_key"];
-const sqlIdent9 = sql.identifier(...parts9);
-const spec_foreignKey = {
+const foreignKeyCodecSpec2 = sql.identifier(...parts9);
+const foreignKeyCodec_foreignKeyCodecSpec = {
   name: "foreignKey",
-  identifier: sqlIdent9,
-  attributes: attributes19,
+  identifier: foreignKeyCodecSpec2,
+  attributes: foreignKeyCodecSpec_foreignKeyAttributes,
   description: undefined,
-  extensions: extensions11,
+  extensions: foreignKeyCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_foreignKey_foreignKey = recordCodec(spec_foreignKey);
-const attributes20 = Object.assign(Object.create(null), {
+const registry_pgCodecs_foreignKey_foreignKeyCodec = recordCodec(foreignKeyCodec_foreignKeyCodecSpec);
+const noPrimaryKeyCodecSpec_noPrimaryKeyAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -757,7 +758,7 @@ const attributes20 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions12 = {
+const noPrimaryKeyCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -767,17 +768,17 @@ const extensions12 = {
   tags: Object.create(null)
 };
 const parts10 = ["a", "no_primary_key"];
-const sqlIdent10 = sql.identifier(...parts10);
-const spec_noPrimaryKey = {
+const noPrimaryKeyCodecSpec2 = sql.identifier(...parts10);
+const noPrimaryKeyCodec_noPrimaryKeyCodecSpec = {
   name: "noPrimaryKey",
-  identifier: sqlIdent10,
-  attributes: attributes20,
+  identifier: noPrimaryKeyCodecSpec2,
+  attributes: noPrimaryKeyCodecSpec_noPrimaryKeyAttributes,
   description: undefined,
-  extensions: extensions12,
+  extensions: noPrimaryKeyCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_noPrimaryKey_noPrimaryKey = recordCodec(spec_noPrimaryKey);
-const attributes21 = Object.assign(Object.create(null), {
+const registry_pgCodecs_noPrimaryKey_noPrimaryKeyCodec = recordCodec(noPrimaryKeyCodec_noPrimaryKeyCodecSpec);
+const testviewCodecSpec_testviewAttributes = Object.assign(Object.create(null), {
   testviewid: {
     description: undefined,
     codec: TYPES.int,
@@ -806,7 +807,7 @@ const attributes21 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions13 = {
+const testviewCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -816,17 +817,17 @@ const extensions13 = {
   tags: Object.create(null)
 };
 const parts11 = ["a", "testview"];
-const sqlIdent11 = sql.identifier(...parts11);
-const spec_testview = {
+const testviewCodecSpec2 = sql.identifier(...parts11);
+const testviewCodec_testviewCodecSpec = {
   name: "testview",
-  identifier: sqlIdent11,
-  attributes: attributes21,
+  identifier: testviewCodecSpec2,
+  attributes: testviewCodecSpec_testviewAttributes,
   description: undefined,
-  extensions: extensions13,
+  extensions: testviewCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_testview_testview = recordCodec(spec_testview);
-const attributes22 = Object.assign(Object.create(null), {
+const registry_pgCodecs_testview_testviewCodec = recordCodec(testviewCodec_testviewCodecSpec);
+const uniqueForeignKeyCodecSpec_uniqueForeignKeyAttributes = Object.assign(Object.create(null), {
   compound_key_1: {
     description: undefined,
     codec: TYPES.int,
@@ -846,7 +847,7 @@ const attributes22 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions14 = {
+const uniqueForeignKeyCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -859,17 +860,17 @@ const extensions14 = {
   })
 };
 const parts12 = ["a", "unique_foreign_key"];
-const sqlIdent12 = sql.identifier(...parts12);
-const spec_uniqueForeignKey = {
+const uniqueForeignKeyCodecSpec2 = sql.identifier(...parts12);
+const uniqueForeignKeyCodec_uniqueForeignKeyCodecSpec = {
   name: "uniqueForeignKey",
-  identifier: sqlIdent12,
-  attributes: attributes22,
+  identifier: uniqueForeignKeyCodecSpec2,
+  attributes: uniqueForeignKeyCodecSpec_uniqueForeignKeyAttributes,
   description: undefined,
-  extensions: extensions14,
+  extensions: uniqueForeignKeyCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_uniqueForeignKey_uniqueForeignKey = recordCodec(spec_uniqueForeignKey);
-const attributes23 = Object.assign(Object.create(null), {
+const registry_pgCodecs_uniqueForeignKey_uniqueForeignKeyCodec = recordCodec(uniqueForeignKeyCodec_uniqueForeignKeyCodecSpec);
+const myTableCodecSpec_myTableAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -889,7 +890,7 @@ const attributes23 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions15 = {
+const myTableCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -899,17 +900,17 @@ const extensions15 = {
   tags: Object.create(null)
 };
 const parts13 = ["c", "my_table"];
-const sqlIdent13 = sql.identifier(...parts13);
-const spec_myTable = {
+const myTableCodecSpec2 = sql.identifier(...parts13);
+const myTableCodec_myTableCodecSpec = {
   name: "myTable",
-  identifier: sqlIdent13,
-  attributes: attributes23,
+  identifier: myTableCodecSpec2,
+  attributes: myTableCodecSpec_myTableAttributes,
   description: undefined,
-  extensions: extensions15,
+  extensions: myTableCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_myTable_myTable = recordCodec(spec_myTable);
-const attributes24 = Object.assign(Object.create(null), {
+const registry_pgCodecs_myTable_myTableCodec = recordCodec(myTableCodec_myTableCodecSpec);
+const personSecretCodecSpec_personSecretAttributes = Object.assign(Object.create(null), {
   person_id: {
     description: undefined,
     codec: TYPES.int,
@@ -931,7 +932,7 @@ const attributes24 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions16 = {
+const personSecretCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -943,17 +944,17 @@ const extensions16 = {
   })
 };
 const parts14 = ["c", "person_secret"];
-const sqlIdent14 = sql.identifier(...parts14);
-const spec_personSecret = {
+const personSecretCodecSpec2 = sql.identifier(...parts14);
+const personSecretCodec_personSecretCodecSpec = {
   name: "personSecret",
-  identifier: sqlIdent14,
-  attributes: attributes24,
+  identifier: personSecretCodecSpec2,
+  attributes: personSecretCodecSpec_personSecretAttributes,
   description: "Tracks the person's secret",
-  extensions: extensions16,
+  extensions: personSecretCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_personSecret_personSecret = recordCodec(spec_personSecret);
-const attributes25 = Object.assign(Object.create(null), {
+const registry_pgCodecs_personSecret_personSecretCodec = recordCodec(personSecretCodec_personSecretCodecSpec);
+const viewTableCodecSpec_viewTableAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -982,7 +983,7 @@ const attributes25 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions17 = {
+const viewTableCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -992,17 +993,17 @@ const extensions17 = {
   tags: Object.create(null)
 };
 const parts15 = ["a", "view_table"];
-const sqlIdent15 = sql.identifier(...parts15);
-const spec_viewTable = {
+const viewTableCodecSpec2 = sql.identifier(...parts15);
+const viewTableCodec_viewTableCodecSpec = {
   name: "viewTable",
-  identifier: sqlIdent15,
-  attributes: attributes25,
+  identifier: viewTableCodecSpec2,
+  attributes: viewTableCodecSpec_viewTableAttributes,
   description: undefined,
-  extensions: extensions17,
+  extensions: viewTableCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_viewTable_viewTable = recordCodec(spec_viewTable);
-const attributes26 = Object.assign(Object.create(null), {
+const registry_pgCodecs_viewTable_viewTableCodec = recordCodec(viewTableCodec_viewTableCodecSpec);
+const compoundKeyCodecSpec_compoundKeyAttributes = Object.assign(Object.create(null), {
   person_id_2: {
     description: undefined,
     codec: TYPES.int,
@@ -1031,7 +1032,7 @@ const attributes26 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions18 = {
+const compoundKeyCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1041,17 +1042,17 @@ const extensions18 = {
   tags: Object.create(null)
 };
 const parts16 = ["c", "compound_key"];
-const sqlIdent16 = sql.identifier(...parts16);
-const spec_compoundKey = {
+const compoundKeyCodecSpec2 = sql.identifier(...parts16);
+const compoundKeyCodec_compoundKeyCodecSpec = {
   name: "compoundKey",
-  identifier: sqlIdent16,
-  attributes: attributes26,
+  identifier: compoundKeyCodecSpec2,
+  attributes: compoundKeyCodecSpec_compoundKeyAttributes,
   description: undefined,
-  extensions: extensions18,
+  extensions: compoundKeyCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_compoundKey_compoundKey = recordCodec(spec_compoundKey);
-const attributes27 = Object.assign(Object.create(null), {
+const registry_pgCodecs_compoundKey_compoundKeyCodec = recordCodec(compoundKeyCodec_compoundKeyCodecSpec);
+const similarTable1CodecSpec_similarTable1Attributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -1089,7 +1090,7 @@ const attributes27 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions19 = {
+const similarTable1CodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1099,17 +1100,17 @@ const extensions19 = {
   tags: Object.create(null)
 };
 const parts17 = ["a", "similar_table_1"];
-const sqlIdent17 = sql.identifier(...parts17);
-const spec_similarTable1 = {
+const similarTable1CodecSpec2 = sql.identifier(...parts17);
+const similarTable1Codec_similarTable1CodecSpec = {
   name: "similarTable1",
-  identifier: sqlIdent17,
-  attributes: attributes27,
+  identifier: similarTable1CodecSpec2,
+  attributes: similarTable1CodecSpec_similarTable1Attributes,
   description: undefined,
-  extensions: extensions19,
+  extensions: similarTable1CodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_similarTable1_similarTable1 = recordCodec(spec_similarTable1);
-const attributes28 = Object.assign(Object.create(null), {
+const registry_pgCodecs_similarTable1_similarTable1Codec = recordCodec(similarTable1Codec_similarTable1CodecSpec);
+const similarTable2CodecSpec_similarTable2Attributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -1147,7 +1148,7 @@ const attributes28 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions20 = {
+const similarTable2CodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1157,17 +1158,17 @@ const extensions20 = {
   tags: Object.create(null)
 };
 const parts18 = ["a", "similar_table_2"];
-const sqlIdent18 = sql.identifier(...parts18);
-const spec_similarTable2 = {
+const similarTable2CodecSpec2 = sql.identifier(...parts18);
+const similarTable2Codec_similarTable2CodecSpec = {
   name: "similarTable2",
-  identifier: sqlIdent18,
-  attributes: attributes28,
+  identifier: similarTable2CodecSpec2,
+  attributes: similarTable2CodecSpec_similarTable2Attributes,
   description: undefined,
-  extensions: extensions20,
+  extensions: similarTable2CodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_similarTable2_similarTable2 = recordCodec(spec_similarTable2);
-const attributes_object_Object_ = Object.assign(Object.create(null), {
+const registry_pgCodecs_similarTable2_similarTable2Codec = recordCodec(similarTable2Codec_similarTable2CodecSpec);
+const updatableViewCodecSpec_updatableViewAttributes = Object.assign(Object.create(null), {
   x: {
     description: undefined,
     codec: TYPES.int,
@@ -1205,7 +1206,7 @@ const attributes_object_Object_ = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions21 = {
+const updatableViewCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1218,17 +1219,17 @@ const extensions21 = {
   })
 };
 const parts19 = ["b", "updatable_view"];
-const sqlIdent19 = sql.identifier(...parts19);
-const spec_updatableView = {
+const updatableViewCodecSpec2 = sql.identifier(...parts19);
+const updatableViewCodec_updatableViewCodecSpec = {
   name: "updatableView",
-  identifier: sqlIdent19,
-  attributes: attributes_object_Object_,
+  identifier: updatableViewCodecSpec2,
+  attributes: updatableViewCodecSpec_updatableViewAttributes,
   description: "YOYOYO!!",
-  extensions: extensions21,
+  extensions: updatableViewCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_updatableView_updatableView = recordCodec(spec_updatableView);
-const attributes29 = Object.assign(Object.create(null), {
+const registry_pgCodecs_updatableView_updatableViewCodec = recordCodec(updatableViewCodec_updatableViewCodecSpec);
+const nullTestRecordCodecSpec_nullTestRecordAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -1266,7 +1267,7 @@ const attributes29 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions22 = {
+const nullTestRecordCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1276,17 +1277,17 @@ const extensions22 = {
   tags: Object.create(null)
 };
 const parts20 = ["c", "null_test_record"];
-const sqlIdent20 = sql.identifier(...parts20);
-const spec_nullTestRecord = {
+const nullTestRecordCodecSpec2 = sql.identifier(...parts20);
+const nullTestRecordCodec_nullTestRecordCodecSpec = {
   name: "nullTestRecord",
-  identifier: sqlIdent20,
-  attributes: attributes29,
+  identifier: nullTestRecordCodecSpec2,
+  attributes: nullTestRecordCodecSpec_nullTestRecordAttributes,
   description: undefined,
-  extensions: extensions22,
+  extensions: nullTestRecordCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_nullTestRecord_nullTestRecord = recordCodec(spec_nullTestRecord);
-const extensions23 = {
+const registry_pgCodecs_nullTestRecord_nullTestRecordCodec = recordCodec(nullTestRecordCodec_nullTestRecordCodecSpec);
+const uuidArrayCodec = {
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -1294,13 +1295,13 @@ const extensions23 = {
   },
   tags: Object.create(null)
 };
-const registryConfig_pgCodecs_uuidArray_uuidArray = listOfCodec(TYPES.uuid, {
-  extensions: extensions23,
+const registry_pgCodecs_uuidArray_uuidArrayCodec = listOfCodec(TYPES.uuid, {
+  extensions: uuidArrayCodec,
   typeDelim: ",",
   description: undefined,
   name: "uuidArray"
 });
-const attributes30 = Object.assign(Object.create(null), {
+const edgeCaseCodecSpec_edgeCaseAttributes = Object.assign(Object.create(null), {
   not_null_has_default: {
     description: undefined,
     codec: TYPES.boolean,
@@ -1329,7 +1330,7 @@ const attributes30 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions24 = {
+const edgeCaseCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1339,17 +1340,17 @@ const extensions24 = {
   tags: Object.create(null)
 };
 const parts21 = ["c", "edge_case"];
-const sqlIdent21 = sql.identifier(...parts21);
-const spec_edgeCase = {
+const edgeCaseCodecSpec2 = sql.identifier(...parts21);
+const edgeCaseCodec_edgeCaseCodecSpec = {
   name: "edgeCase",
-  identifier: sqlIdent21,
-  attributes: attributes30,
+  identifier: edgeCaseCodecSpec2,
+  attributes: edgeCaseCodecSpec_edgeCaseAttributes,
   description: undefined,
-  extensions: extensions24,
+  extensions: edgeCaseCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_edgeCase_edgeCase = recordCodec(spec_edgeCase);
-const attributes31 = Object.assign(Object.create(null), {
+const registry_pgCodecs_edgeCase_edgeCaseCodec = recordCodec(edgeCaseCodec_edgeCaseCodecSpec);
+const leftArmCodecSpec_leftArmAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -1387,7 +1388,7 @@ const attributes31 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions25 = {
+const leftArmCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1397,17 +1398,17 @@ const extensions25 = {
   tags: Object.create(null)
 };
 const parts22 = ["c", "left_arm"];
-const sqlIdent22 = sql.identifier(...parts22);
-const spec_leftArm = {
+const leftArmCodecSpec2 = sql.identifier(...parts22);
+const leftArmCodec_leftArmCodecSpec = {
   name: "leftArm",
-  identifier: sqlIdent22,
-  attributes: attributes31,
+  identifier: leftArmCodecSpec2,
+  attributes: leftArmCodecSpec_leftArmAttributes,
   description: "Tracks metadata about the left arms of various people",
-  extensions: extensions25,
+  extensions: leftArmCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_leftArm_leftArm = recordCodec(spec_leftArm);
-const attributes32 = Object.assign(Object.create(null), {
+const registry_pgCodecs_leftArm_leftArmCodec = recordCodec(leftArmCodec_leftArmCodecSpec);
+const jwtTokenCodecSpec_jwtTokenAttributes = Object.assign(Object.create(null), {
   role: {
     description: undefined,
     codec: TYPES.text,
@@ -1454,7 +1455,7 @@ const attributes32 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions26 = {
+const jwtTokenCodecSpec = {
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -1464,17 +1465,17 @@ const extensions26 = {
   tags: Object.create(null)
 };
 const parts23 = ["b", "jwt_token"];
-const sqlIdent23 = sql.identifier(...parts23);
-const spec_jwtToken = {
+const jwtTokenCodecSpec2 = sql.identifier(...parts23);
+const jwtTokenCodec_jwtTokenCodecSpec = {
   name: "jwtToken",
-  identifier: sqlIdent23,
-  attributes: attributes32,
+  identifier: jwtTokenCodecSpec2,
+  attributes: jwtTokenCodecSpec_jwtTokenAttributes,
   description: undefined,
-  extensions: extensions26,
+  extensions: jwtTokenCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_jwtToken_jwtToken = recordCodec(spec_jwtToken);
-const extensions27 = {
+const registry_pgCodecs_jwtToken_jwtTokenCodec = recordCodec(jwtTokenCodec_jwtTokenCodecSpec);
+const notNullTimestampCodec = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -1483,13 +1484,13 @@ const extensions27 = {
   tags: Object.create(null)
 };
 const parts24 = ["c", "not_null_timestamp"];
-const sqlIdent24 = sql.identifier(...parts24);
-const attributes_ts_codec_notNullTimestamp = domainOfCodec(TYPES.timestamptz, "notNullTimestamp", sqlIdent24, {
+const notNullTimestampCodec2 = sql.identifier(...parts24);
+const issue756CodecSpec_issue756Attributes_ts_codec_notNullTimestampCodec = domainOfCodec(TYPES.timestamptz, "notNullTimestamp", notNullTimestampCodec2, {
   description: undefined,
-  extensions: extensions27,
+  extensions: notNullTimestampCodec,
   notNull: true
 });
-const attributes33 = Object.assign(Object.create(null), {
+const issue756CodecSpec_issue756Attributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -1501,7 +1502,7 @@ const attributes33 = Object.assign(Object.create(null), {
   },
   ts: {
     description: undefined,
-    codec: attributes_ts_codec_notNullTimestamp,
+    codec: issue756CodecSpec_issue756Attributes_ts_codec_notNullTimestampCodec,
     notNull: true,
     hasDefault: true,
     extensions: {
@@ -1509,7 +1510,7 @@ const attributes33 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions28 = {
+const issue756CodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1519,20 +1520,20 @@ const extensions28 = {
   tags: Object.create(null)
 };
 const parts25 = ["c", "issue756"];
-const sqlIdent25 = sql.identifier(...parts25);
-const spec_issue756 = {
+const issue756CodecSpec2 = sql.identifier(...parts25);
+const issue756Codec_issue756CodecSpec = {
   name: "issue756",
-  identifier: sqlIdent25,
-  attributes: attributes33,
+  identifier: issue756CodecSpec2,
+  attributes: issue756CodecSpec_issue756Attributes,
   description: undefined,
-  extensions: extensions28,
+  extensions: issue756CodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_issue756_issue756 = recordCodec(spec_issue756);
-const attributes34 = Object.assign(Object.create(null), {
+const registry_pgCodecs_issue756_issue756Codec = recordCodec(issue756Codec_issue756CodecSpec);
+const authPayloadCodecSpec_authPayloadAttributes = Object.assign(Object.create(null), {
   jwt: {
     description: undefined,
-    codec: registryConfig_pgCodecs_jwtToken_jwtToken,
+    codec: registry_pgCodecs_jwtToken_jwtTokenCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -1558,7 +1559,7 @@ const attributes34 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions29 = {
+const authPayloadCodecSpec = {
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -1570,17 +1571,18 @@ const extensions29 = {
   })
 };
 const parts26 = ["b", "auth_payload"];
-const sqlIdent26 = sql.identifier(...parts26);
-const spec_authPayload = {
+const authPayloadCodecSpec2 = sql.identifier(...parts26);
+const authPayloadCodec_authPayloadCodecSpec = {
   name: "authPayload",
-  identifier: sqlIdent26,
-  attributes: attributes34,
+  identifier: authPayloadCodecSpec2,
+  attributes: authPayloadCodecSpec_authPayloadAttributes,
   description: undefined,
-  extensions: extensions29,
+  extensions: authPayloadCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_authPayload_authPayload = recordCodec(spec_authPayload);
-const extensions30 = {
+const registry_pgCodecs_authPayload_authPayloadCodec = recordCodec(authPayloadCodec_authPayloadCodecSpec);
+const colorCodec = ["red", "green", "blue"];
+const colorCodec2 = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -1589,16 +1591,16 @@ const extensions30 = {
   tags: Object.create(null)
 };
 const parts27 = ["b", "color"];
-const sqlIdent27 = sql.identifier(...parts27);
-const attributes_c_codec_color = enumCodec({
+const colorCodec3 = sql.identifier(...parts27);
+const compoundTypeCodecSpec_compoundTypeAttributes_c_codec_colorCodec = enumCodec({
   name: "color",
-  identifier: sqlIdent27,
-  values: ["red", "green", "blue"],
+  identifier: colorCodec3,
+  values: colorCodec,
   description: undefined,
-  extensions: extensions30
+  extensions: colorCodec2
 });
-const enumLabels2 = ["FOO_BAR", "BAR_FOO", "BAZ_QUX", "0_BAR"];
-const extensions31 = {
+const enumCapsCodec = ["FOO_BAR", "BAR_FOO", "BAZ_QUX", "0_BAR"];
+const enumCapsCodec2 = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -1607,16 +1609,16 @@ const extensions31 = {
   tags: Object.create(null)
 };
 const parts28 = ["b", "enum_caps"];
-const sqlIdent28 = sql.identifier(...parts28);
-const attributes_e_codec_enumCaps = enumCodec({
+const enumCapsCodec3 = sql.identifier(...parts28);
+const compoundTypeCodecSpec_compoundTypeAttributes_e_codec_enumCapsCodec = enumCodec({
   name: "enumCaps",
-  identifier: sqlIdent28,
-  values: enumLabels2,
+  identifier: enumCapsCodec3,
+  values: enumCapsCodec,
   description: undefined,
-  extensions: extensions31
+  extensions: enumCapsCodec2
 });
-const enumLabels3 = ["", "one", "two"];
-const extensions32 = {
+const enumWithEmptyStringCodec = ["", "one", "two"];
+const enumWithEmptyStringCodec2 = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -1625,15 +1627,15 @@ const extensions32 = {
   tags: Object.create(null)
 };
 const parts29 = ["b", "enum_with_empty_string"];
-const sqlIdent29 = sql.identifier(...parts29);
-const attributes_f_codec_enumWithEmptyString = enumCodec({
+const enumWithEmptyStringCodec3 = sql.identifier(...parts29);
+const compoundTypeCodecSpec_compoundTypeAttributes_f_codec_enumWithEmptyStringCodec = enumCodec({
   name: "enumWithEmptyString",
-  identifier: sqlIdent29,
-  values: enumLabels3,
+  identifier: enumWithEmptyStringCodec3,
+  values: enumWithEmptyStringCodec,
   description: undefined,
-  extensions: extensions32
+  extensions: enumWithEmptyStringCodec2
 });
-const attributes36 = Object.assign(Object.create(null), {
+const compoundTypeCodecSpec_compoundTypeAttributes = Object.assign(Object.create(null), {
   a: {
     description: undefined,
     codec: TYPES.int,
@@ -1654,7 +1656,7 @@ const attributes36 = Object.assign(Object.create(null), {
   },
   c: {
     description: undefined,
-    codec: attributes_c_codec_color,
+    codec: compoundTypeCodecSpec_compoundTypeAttributes_c_codec_colorCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -1672,7 +1674,7 @@ const attributes36 = Object.assign(Object.create(null), {
   },
   e: {
     description: undefined,
-    codec: attributes_e_codec_enumCaps,
+    codec: compoundTypeCodecSpec_compoundTypeAttributes_e_codec_enumCapsCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -1681,7 +1683,7 @@ const attributes36 = Object.assign(Object.create(null), {
   },
   f: {
     description: undefined,
-    codec: attributes_f_codec_enumWithEmptyString,
+    codec: compoundTypeCodecSpec_compoundTypeAttributes_f_codec_enumWithEmptyStringCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -1707,7 +1709,7 @@ const attributes36 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions33 = {
+const compoundTypeCodecSpec = {
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -1717,17 +1719,17 @@ const extensions33 = {
   tags: Object.create(null)
 };
 const parts30 = ["c", "compound_type"];
-const sqlIdent30 = sql.identifier(...parts30);
-const spec_compoundType = {
+const compoundTypeCodecSpec2 = sql.identifier(...parts30);
+const compoundTypeCodec_compoundTypeCodecSpec = {
   name: "compoundType",
-  identifier: sqlIdent30,
-  attributes: attributes36,
+  identifier: compoundTypeCodecSpec2,
+  attributes: compoundTypeCodecSpec_compoundTypeAttributes,
   description: "Awesome feature!",
-  extensions: extensions33,
+  extensions: compoundTypeCodecSpec,
   executor: executor_mainPgExecutor
 };
-const attributes_o2_codec_compoundType = recordCodec(spec_compoundType);
-const attributes35 = Object.assign(Object.create(null), {
+const attributes_o2_codec_compoundTypeCodec = recordCodec(compoundTypeCodec_compoundTypeCodecSpec);
+const attributes12 = Object.assign(Object.create(null), {
   o1: {
     notNull: false,
     codec: TYPES.int,
@@ -1738,17 +1740,17 @@ const attributes35 = Object.assign(Object.create(null), {
   },
   o2: {
     notNull: false,
-    codec: attributes_o2_codec_compoundType,
+    codec: attributes_o2_codec_compoundTypeCodec,
     extensions: {
       argIndex: 2,
       argName: "o2"
     }
   }
 });
-const registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord = recordCodec({
+const registry_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord = recordCodec({
   name: "FuncOutOutCompoundTypeRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
-  attributes: attributes35,
+  attributes: attributes12,
   description: undefined,
   extensions: {
     /* `The return type of our \`${name}\` ${
@@ -1758,7 +1760,7 @@ const registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTyp
   executor: executor_mainPgExecutor,
   isAnonymous: true
 });
-const attributes37 = Object.assign(Object.create(null), {
+const attributes13 = Object.assign(Object.create(null), {
   o1: {
     notNull: false,
     codec: TYPES.int,
@@ -1769,17 +1771,17 @@ const attributes37 = Object.assign(Object.create(null), {
   },
   o2: {
     notNull: false,
-    codec: attributes_o2_codec_compoundType,
+    codec: attributes_o2_codec_compoundTypeCodec,
     extensions: {
       argIndex: 2,
       argName: "o2"
     }
   }
 });
-const registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCompoundTypeRecord = recordCodec({
+const registry_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCompoundTypeRecord = recordCodec({
   name: "MutationOutOutCompoundTypeRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
-  attributes: attributes37,
+  attributes: attributes13,
   description: undefined,
   extensions: {
     /* `The return type of our \`${name}\` ${
@@ -1789,7 +1791,7 @@ const registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCom
   executor: executor_mainPgExecutor,
   isAnonymous: true
 });
-const extensions34 = {
+const anEnumArrayCodec = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -1797,8 +1799,8 @@ const extensions34 = {
   },
   tags: Object.create(null)
 };
-const enumLabels4 = ["awaiting", "rejected", "published", "*", "**", "***", "foo*", "foo*_", "_foo*", "*bar", "*bar_", "_*bar_", "*baz*", "_*baz*_", "%", ">=", "~~", "$"];
-const extensions35 = {
+const anEnumCodec = ["awaiting", "rejected", "published", "*", "**", "***", "foo*", "foo*_", "_foo*", "*bar", "*bar_", "_*bar_", "*baz*", "_*baz*_", "%", ">=", "~~", "$"];
+const anEnumCodec2 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -1807,21 +1809,21 @@ const extensions35 = {
   tags: Object.create(null)
 };
 const parts31 = ["a", "an_enum"];
-const sqlIdent31 = sql.identifier(...parts31);
-const innerCodec_anEnum = enumCodec({
+const anEnumCodec3 = sql.identifier(...parts31);
+const anEnumArrayCodec_anEnumCodec = enumCodec({
   name: "anEnum",
-  identifier: sqlIdent31,
-  values: enumLabels4,
+  identifier: anEnumCodec3,
+  values: anEnumCodec,
   description: undefined,
-  extensions: extensions35
+  extensions: anEnumCodec2
 });
-const attributes_enums_codec_anEnumArray = listOfCodec(innerCodec_anEnum, {
-  extensions: extensions34,
+const postCodecSpec_postAttributes_enums_codec_anEnumArrayCodec = listOfCodec(anEnumArrayCodec_anEnumCodec, {
+  extensions: anEnumArrayCodec,
   typeDelim: ",",
   description: undefined,
   name: "anEnumArray"
 });
-const extensions36 = {
+const comptypeArrayCodec = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -1829,7 +1831,7 @@ const extensions36 = {
   },
   tags: Object.create(null)
 };
-const attributes40 = Object.assign(Object.create(null), {
+const comptypeCodecSpec_comptypeAttributes = Object.assign(Object.create(null), {
   schedule: {
     description: undefined,
     codec: TYPES.timestamptz,
@@ -1849,7 +1851,7 @@ const attributes40 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions37 = {
+const comptypeCodecSpec = {
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -1859,23 +1861,23 @@ const extensions37 = {
   tags: Object.create(null)
 };
 const parts32 = ["a", "comptype"];
-const sqlIdent32 = sql.identifier(...parts32);
-const spec_comptype = {
+const comptypeCodecSpec2 = sql.identifier(...parts32);
+const comptypeCodec_comptypeCodecSpec = {
   name: "comptype",
-  identifier: sqlIdent32,
-  attributes: attributes40,
+  identifier: comptypeCodecSpec2,
+  attributes: comptypeCodecSpec_comptypeAttributes,
   description: undefined,
-  extensions: extensions37,
+  extensions: comptypeCodecSpec,
   executor: executor_mainPgExecutor
 };
-const innerCodec_comptype = recordCodec(spec_comptype);
-const attributes_comptypes_codec_comptypeArray = listOfCodec(innerCodec_comptype, {
-  extensions: extensions36,
+const comptypeArrayCodec_comptypeCodec = recordCodec(comptypeCodec_comptypeCodecSpec);
+const postCodecSpec_postAttributes_comptypes_codec_comptypeArrayCodec = listOfCodec(comptypeArrayCodec_comptypeCodec, {
+  extensions: comptypeArrayCodec,
   typeDelim: ",",
   description: undefined,
   name: "comptypeArray"
 });
-const attributes39 = Object.assign(Object.create(null), {
+const postCodecSpec_postAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -1914,7 +1916,7 @@ const attributes39 = Object.assign(Object.create(null), {
   },
   enums: {
     description: undefined,
-    codec: attributes_enums_codec_anEnumArray,
+    codec: postCodecSpec_postAttributes_enums_codec_anEnumArrayCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -1923,7 +1925,7 @@ const attributes39 = Object.assign(Object.create(null), {
   },
   comptypes: {
     description: undefined,
-    codec: attributes_comptypes_codec_comptypeArray,
+    codec: postCodecSpec_postAttributes_comptypes_codec_comptypeArrayCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -1931,7 +1933,7 @@ const attributes39 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions38 = {
+const postCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -1941,17 +1943,17 @@ const extensions38 = {
   tags: Object.create(null)
 };
 const parts33 = ["a", "post"];
-const sqlIdent33 = sql.identifier(...parts33);
-const spec_post = {
+const postCodecSpec2 = sql.identifier(...parts33);
+const postCodec_postCodecSpec = {
   name: "post",
-  identifier: sqlIdent33,
-  attributes: attributes39,
+  identifier: postCodecSpec2,
+  attributes: postCodecSpec_postAttributes,
   description: undefined,
-  extensions: extensions38,
+  extensions: postCodecSpec,
   executor: executor_mainPgExecutor
 };
-const attributes_post_codec_post = recordCodec(spec_post);
-const attributes38 = Object.assign(Object.create(null), {
+const attributes_post_codec_postCodec = recordCodec(postCodec_postCodecSpec);
+const attributes14 = Object.assign(Object.create(null), {
   txt: {
     notNull: false,
     codec: TYPES.text,
@@ -1962,7 +1964,7 @@ const attributes38 = Object.assign(Object.create(null), {
   },
   left_arm: {
     notNull: false,
-    codec: registryConfig_pgCodecs_leftArm_leftArm,
+    codec: registry_pgCodecs_leftArm_leftArmCodec,
     extensions: {
       argIndex: 3,
       argName: "left_arm"
@@ -1970,17 +1972,17 @@ const attributes38 = Object.assign(Object.create(null), {
   },
   post: {
     notNull: false,
-    codec: attributes_post_codec_post,
+    codec: attributes_post_codec_postCodec,
     extensions: {
       argIndex: 4,
       argName: "post"
     }
   }
 });
-const registryConfig_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord = recordCodec({
+const registry_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord = recordCodec({
   name: "QueryOutputTwoRowsRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
-  attributes: attributes38,
+  attributes: attributes14,
   description: undefined,
   extensions: {
     /* `The return type of our \`${name}\` ${
@@ -1990,7 +1992,7 @@ const registryConfig_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord 
   executor: executor_mainPgExecutor,
   isAnonymous: true
 });
-const attributes41 = Object.assign(Object.create(null), {
+const attributes15 = Object.assign(Object.create(null), {
   o1: {
     notNull: false,
     codec: TYPES.text,
@@ -2008,10 +2010,10 @@ const attributes41 = Object.assign(Object.create(null), {
     }
   }
 });
-const registryConfig_pgCodecs_PersonComputedOutOutRecord_PersonComputedOutOutRecord = recordCodec({
+const registry_pgCodecs_PersonComputedOutOutRecord_PersonComputedOutOutRecord = recordCodec({
   name: "PersonComputedOutOutRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
-  attributes: attributes41,
+  attributes: attributes15,
   description: undefined,
   extensions: {
     /* `The return type of our \`${name}\` ${
@@ -2021,7 +2023,7 @@ const registryConfig_pgCodecs_PersonComputedOutOutRecord_PersonComputedOutOutRec
   executor: executor_mainPgExecutor,
   isAnonymous: true
 });
-const attributes42 = Object.assign(Object.create(null), {
+const attributes16 = Object.assign(Object.create(null), {
   ino: {
     notNull: false,
     codec: TYPES.text,
@@ -2039,10 +2041,10 @@ const attributes42 = Object.assign(Object.create(null), {
     }
   }
 });
-const registryConfig_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOutRecord = recordCodec({
+const registry_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOutRecord = recordCodec({
   name: "PersonComputedInoutOutRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
-  attributes: attributes42,
+  attributes: attributes16,
   description: undefined,
   extensions: {
     /* `The return type of our \`${name}\` ${
@@ -2052,7 +2054,7 @@ const registryConfig_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOu
   executor: executor_mainPgExecutor,
   isAnonymous: true
 });
-const extensions39 = {
+const emailCodec = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -2061,13 +2063,13 @@ const extensions39 = {
   tags: Object.create(null)
 };
 const parts34 = ["b", "email"];
-const sqlIdent34 = sql.identifier(...parts34);
-const attributes_email_codec_email = domainOfCodec(TYPES.text, "email", sqlIdent34, {
+const emailCodec2 = sql.identifier(...parts34);
+const personCodecSpec_personAttributes_email_codec_emailCodec = domainOfCodec(TYPES.text, "email", emailCodec2, {
   description: undefined,
-  extensions: extensions39,
+  extensions: emailCodec,
   notNull: false
 });
-const extensions40 = {
+const notNullUrlCodec = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -2076,16 +2078,16 @@ const extensions40 = {
   tags: Object.create(null)
 };
 const parts35 = ["b", "not_null_url"];
-const sqlIdent35 = sql.identifier(...parts35);
-const attributes_url_codec_notNullUrl = domainOfCodec(TYPES.varchar, "notNullUrl", sqlIdent35, {
+const notNullUrlCodec2 = sql.identifier(...parts35);
+const wrappedUrlCodecSpec_wrappedUrlAttributes_url_codec_notNullUrlCodec = domainOfCodec(TYPES.varchar, "notNullUrl", notNullUrlCodec2, {
   description: undefined,
-  extensions: extensions40,
+  extensions: notNullUrlCodec,
   notNull: true
 });
-const attributes45 = Object.assign(Object.create(null), {
+const wrappedUrlCodecSpec_wrappedUrlAttributes = Object.assign(Object.create(null), {
   url: {
     description: undefined,
-    codec: attributes_url_codec_notNullUrl,
+    codec: wrappedUrlCodecSpec_wrappedUrlAttributes_url_codec_notNullUrlCodec,
     notNull: true,
     hasDefault: false,
     extensions: {
@@ -2093,7 +2095,7 @@ const attributes45 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions41 = {
+const wrappedUrlCodecSpec = {
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -2103,17 +2105,17 @@ const extensions41 = {
   tags: Object.create(null)
 };
 const parts36 = ["b", "wrapped_url"];
-const sqlIdent36 = sql.identifier(...parts36);
-const spec_wrappedUrl = {
+const wrappedUrlCodecSpec2 = sql.identifier(...parts36);
+const wrappedUrlCodec_wrappedUrlCodecSpec = {
   name: "wrappedUrl",
-  identifier: sqlIdent36,
-  attributes: attributes45,
+  identifier: wrappedUrlCodecSpec2,
+  attributes: wrappedUrlCodecSpec_wrappedUrlAttributes,
   description: undefined,
-  extensions: extensions41,
+  extensions: wrappedUrlCodecSpec,
   executor: executor_mainPgExecutor
 };
-const attributes_site_codec_wrappedUrl = recordCodec(spec_wrappedUrl);
-const attributes44 = Object.assign(Object.create(null), {
+const personCodecSpec_personAttributes_site_codec_wrappedUrlCodec = recordCodec(wrappedUrlCodec_wrappedUrlCodecSpec);
+const personCodecSpec_personAttributes = Object.assign(Object.create(null), {
   id: {
     description: "The primary unique identifier for the person",
     codec: TYPES.int,
@@ -2136,7 +2138,7 @@ const attributes44 = Object.assign(Object.create(null), {
   },
   aliases: {
     description: undefined,
-    codec: registryConfig_pgCodecs_textArray_textArray,
+    codec: registry_pgCodecs_textArray_textArrayCodec,
     notNull: true,
     hasDefault: true,
     extensions: {
@@ -2154,7 +2156,7 @@ const attributes44 = Object.assign(Object.create(null), {
   },
   email: {
     description: undefined,
-    codec: attributes_email_codec_email,
+    codec: personCodecSpec_personAttributes_email_codec_emailCodec,
     notNull: true,
     hasDefault: false,
     extensions: {
@@ -2163,7 +2165,7 @@ const attributes44 = Object.assign(Object.create(null), {
   },
   site: {
     description: undefined,
-    codec: attributes_site_codec_wrappedUrl,
+    codec: personCodecSpec_personAttributes_site_codec_wrappedUrlCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -2218,7 +2220,7 @@ const attributes44 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions42 = {
+const personCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -2228,20 +2230,20 @@ const extensions42 = {
   tags: Object.create(null)
 };
 const parts37 = ["c", "person"];
-const sqlIdent37 = sql.identifier(...parts37);
-const spec_person = {
+const personCodecSpec2 = sql.identifier(...parts37);
+const personCodec_personCodecSpec = {
   name: "person",
-  identifier: sqlIdent37,
-  attributes: attributes44,
+  identifier: personCodecSpec2,
+  attributes: personCodecSpec_personAttributes,
   description: "Person test comment",
-  extensions: extensions42,
+  extensions: personCodecSpec,
   executor: executor_mainPgExecutor
 };
-const attributes_person_codec_person = recordCodec(spec_person);
-const attributes43 = Object.assign(Object.create(null), {
+const attributes_person_codec_personCodec = recordCodec(personCodec_personCodecSpec);
+const attributes17 = Object.assign(Object.create(null), {
   person: {
     notNull: false,
-    codec: attributes_person_codec_person,
+    codec: attributes_person_codec_personCodec,
     extensions: {
       argIndex: 0,
       argName: "person"
@@ -2256,10 +2258,10 @@ const attributes43 = Object.assign(Object.create(null), {
     }
   }
 });
-const registryConfig_pgCodecs_PersonComputedFirstArgInoutOutRecord_PersonComputedFirstArgInoutOutRecord = recordCodec({
+const registry_pgCodecs_PersonComputedFirstArgInoutOutRecord_PersonComputedFirstArgInoutOutRecord = recordCodec({
   name: "PersonComputedFirstArgInoutOutRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
-  attributes: attributes43,
+  attributes: attributes17,
   description: undefined,
   extensions: {
     /* `The return type of our \`${name}\` ${
@@ -2269,7 +2271,7 @@ const registryConfig_pgCodecs_PersonComputedFirstArgInoutOutRecord_PersonCompute
   executor: executor_mainPgExecutor,
   isAnonymous: true
 });
-const attributes46 = Object.assign(Object.create(null), {
+const attributes18 = Object.assign(Object.create(null), {
   x: {
     notNull: false,
     codec: TYPES.int,
@@ -2280,7 +2282,7 @@ const attributes46 = Object.assign(Object.create(null), {
   },
   y: {
     notNull: false,
-    codec: attributes_o2_codec_compoundType,
+    codec: attributes_o2_codec_compoundTypeCodec,
     extensions: {
       argIndex: 3,
       argName: "y"
@@ -2288,17 +2290,17 @@ const attributes46 = Object.assign(Object.create(null), {
   },
   z: {
     notNull: false,
-    codec: attributes_person_codec_person,
+    codec: attributes_person_codec_personCodec,
     extensions: {
       argIndex: 4,
       argName: "z"
     }
   }
 });
-const registryConfig_pgCodecs_FuncOutComplexRecord_FuncOutComplexRecord = recordCodec({
+const registry_pgCodecs_FuncOutComplexRecord_FuncOutComplexRecord = recordCodec({
   name: "FuncOutComplexRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
-  attributes: attributes46,
+  attributes: attributes18,
   description: undefined,
   extensions: {
     /* `The return type of our \`${name}\` ${
@@ -2308,7 +2310,7 @@ const registryConfig_pgCodecs_FuncOutComplexRecord_FuncOutComplexRecord = record
   executor: executor_mainPgExecutor,
   isAnonymous: true
 });
-const attributes47 = Object.assign(Object.create(null), {
+const attributes19 = Object.assign(Object.create(null), {
   x: {
     notNull: false,
     codec: TYPES.int,
@@ -2319,7 +2321,7 @@ const attributes47 = Object.assign(Object.create(null), {
   },
   y: {
     notNull: false,
-    codec: attributes_o2_codec_compoundType,
+    codec: attributes_o2_codec_compoundTypeCodec,
     extensions: {
       argIndex: 3,
       argName: "y"
@@ -2327,17 +2329,17 @@ const attributes47 = Object.assign(Object.create(null), {
   },
   z: {
     notNull: false,
-    codec: attributes_person_codec_person,
+    codec: attributes_person_codec_personCodec,
     extensions: {
       argIndex: 4,
       argName: "z"
     }
   }
 });
-const registryConfig_pgCodecs_FuncOutComplexSetofRecord_FuncOutComplexSetofRecord = recordCodec({
+const registry_pgCodecs_FuncOutComplexSetofRecord_FuncOutComplexSetofRecord = recordCodec({
   name: "FuncOutComplexSetofRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
-  attributes: attributes47,
+  attributes: attributes19,
   description: undefined,
   extensions: {
     /* `The return type of our \`${name}\` ${
@@ -2347,7 +2349,7 @@ const registryConfig_pgCodecs_FuncOutComplexSetofRecord_FuncOutComplexSetofRecor
   executor: executor_mainPgExecutor,
   isAnonymous: true
 });
-const attributes48 = Object.assign(Object.create(null), {
+const attributes20 = Object.assign(Object.create(null), {
   x: {
     notNull: false,
     codec: TYPES.int,
@@ -2358,7 +2360,7 @@ const attributes48 = Object.assign(Object.create(null), {
   },
   y: {
     notNull: false,
-    codec: attributes_o2_codec_compoundType,
+    codec: attributes_o2_codec_compoundTypeCodec,
     extensions: {
       argIndex: 3,
       argName: "y"
@@ -2366,17 +2368,17 @@ const attributes48 = Object.assign(Object.create(null), {
   },
   z: {
     notNull: false,
-    codec: attributes_person_codec_person,
+    codec: attributes_person_codec_personCodec,
     extensions: {
       argIndex: 4,
       argName: "z"
     }
   }
 });
-const registryConfig_pgCodecs_MutationOutComplexRecord_MutationOutComplexRecord = recordCodec({
+const registry_pgCodecs_MutationOutComplexRecord_MutationOutComplexRecord = recordCodec({
   name: "MutationOutComplexRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
-  attributes: attributes48,
+  attributes: attributes20,
   description: undefined,
   extensions: {
     /* `The return type of our \`${name}\` ${
@@ -2386,7 +2388,7 @@ const registryConfig_pgCodecs_MutationOutComplexRecord_MutationOutComplexRecord 
   executor: executor_mainPgExecutor,
   isAnonymous: true
 });
-const attributes49 = Object.assign(Object.create(null), {
+const attributes21 = Object.assign(Object.create(null), {
   x: {
     notNull: false,
     codec: TYPES.int,
@@ -2397,7 +2399,7 @@ const attributes49 = Object.assign(Object.create(null), {
   },
   y: {
     notNull: false,
-    codec: attributes_o2_codec_compoundType,
+    codec: attributes_o2_codec_compoundTypeCodec,
     extensions: {
       argIndex: 3,
       argName: "y"
@@ -2405,17 +2407,17 @@ const attributes49 = Object.assign(Object.create(null), {
   },
   z: {
     notNull: false,
-    codec: attributes_person_codec_person,
+    codec: attributes_person_codec_personCodec,
     extensions: {
       argIndex: 4,
       argName: "z"
     }
   }
 });
-const registryConfig_pgCodecs_MutationOutComplexSetofRecord_MutationOutComplexSetofRecord = recordCodec({
+const registry_pgCodecs_MutationOutComplexSetofRecord_MutationOutComplexSetofRecord = recordCodec({
   name: "MutationOutComplexSetofRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
-  attributes: attributes49,
+  attributes: attributes21,
   description: undefined,
   extensions: {
     /* `The return type of our \`${name}\` ${
@@ -2425,7 +2427,7 @@ const registryConfig_pgCodecs_MutationOutComplexSetofRecord_MutationOutComplexSe
   executor: executor_mainPgExecutor,
   isAnonymous: true
 });
-const attributes50 = Object.assign(Object.create(null), {
+const attributes22 = Object.assign(Object.create(null), {
   x: {
     notNull: false,
     codec: TYPES.int,
@@ -2436,7 +2438,7 @@ const attributes50 = Object.assign(Object.create(null), {
   },
   y: {
     notNull: false,
-    codec: attributes_o2_codec_compoundType,
+    codec: attributes_o2_codec_compoundTypeCodec,
     extensions: {
       argIndex: 4,
       argName: "y"
@@ -2444,17 +2446,17 @@ const attributes50 = Object.assign(Object.create(null), {
   },
   z: {
     notNull: false,
-    codec: attributes_person_codec_person,
+    codec: attributes_person_codec_personCodec,
     extensions: {
       argIndex: 5,
       argName: "z"
     }
   }
 });
-const registryConfig_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexRecord = recordCodec({
+const registry_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexRecord = recordCodec({
   name: "PersonComputedComplexRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
-  attributes: attributes50,
+  attributes: attributes22,
   description: undefined,
   extensions: {
     /* `The return type of our \`${name}\` ${
@@ -2464,7 +2466,7 @@ const registryConfig_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexR
   executor: executor_mainPgExecutor,
   isAnonymous: true
 });
-const extensions43 = {
+const colorArrayCodec = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -2472,13 +2474,13 @@ const extensions43 = {
   },
   tags: Object.create(null)
 };
-const attributes_enum_array_codec_colorArray = listOfCodec(attributes_c_codec_color, {
-  extensions: extensions43,
+const typesCodecSpec_typesAttributes_enum_array_codec_colorArrayCodec = listOfCodec(compoundTypeCodecSpec_compoundTypeAttributes_c_codec_colorCodec, {
+  extensions: colorArrayCodec,
   typeDelim: ",",
   description: undefined,
   name: "colorArray"
 });
-const extensions44 = {
+const anIntCodec = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -2487,13 +2489,13 @@ const extensions44 = {
   tags: Object.create(null)
 };
 const parts38 = ["a", "an_int"];
-const sqlIdent38 = sql.identifier(...parts38);
-const attributes_domain_codec_anInt = domainOfCodec(TYPES.int, "anInt", sqlIdent38, {
+const anIntCodec2 = sql.identifier(...parts38);
+const typesCodecSpec_typesAttributes_domain_codec_anIntCodec = domainOfCodec(TYPES.int, "anInt", anIntCodec2, {
   description: undefined,
-  extensions: extensions44,
+  extensions: anIntCodec,
   notNull: false
 });
-const extensions45 = {
+const anotherIntCodec = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -2502,13 +2504,13 @@ const extensions45 = {
   tags: Object.create(null)
 };
 const parts39 = ["b", "another_int"];
-const sqlIdent39 = sql.identifier(...parts39);
-const attributes_domain2_codec_anotherInt = domainOfCodec(attributes_domain_codec_anInt, "anotherInt", sqlIdent39, {
+const anotherIntCodec2 = sql.identifier(...parts39);
+const typesCodecSpec_typesAttributes_domain2_codec_anotherIntCodec = domainOfCodec(typesCodecSpec_typesAttributes_domain_codec_anIntCodec, "anotherInt", anotherIntCodec2, {
   description: undefined,
-  extensions: extensions45,
+  extensions: anotherIntCodec,
   notNull: false
 });
-const extensions46 = {
+const numrangeCodec = {
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -2517,12 +2519,12 @@ const extensions46 = {
   tags: Object.create(null)
 };
 const parts40 = ["pg_catalog", "numrange"];
-const sqlIdent40 = sql.identifier(...parts40);
-const attributes_nullable_range_codec_numrange = rangeOfCodec(TYPES.numeric, "numrange", sqlIdent40, {
+const numrangeCodec2 = sql.identifier(...parts40);
+const typesCodecSpec_typesAttributes_nullable_range_codec_numrangeCodec = rangeOfCodec(TYPES.numeric, "numrange", numrangeCodec2, {
   description: "range of numerics",
-  extensions: extensions46
+  extensions: numrangeCodec
 });
-const extensions47 = {
+const daterangeCodec = {
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -2531,12 +2533,12 @@ const extensions47 = {
   tags: Object.create(null)
 };
 const parts41 = ["pg_catalog", "daterange"];
-const sqlIdent41 = sql.identifier(...parts41);
-const attributes_daterange_codec_daterange = rangeOfCodec(TYPES.date, "daterange", sqlIdent41, {
+const daterangeCodec2 = sql.identifier(...parts41);
+const typesCodecSpec_typesAttributes_daterange_codec_daterangeCodec = rangeOfCodec(TYPES.date, "daterange", daterangeCodec2, {
   description: "range of dates",
-  extensions: extensions47
+  extensions: daterangeCodec
 });
-const extensions48 = {
+const anIntRangeCodec = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -2545,15 +2547,15 @@ const extensions48 = {
   tags: Object.create(null)
 };
 const parts42 = ["a", "an_int_range"];
-const sqlIdent42 = sql.identifier(...parts42);
-const attributes_an_int_range_codec_anIntRange = rangeOfCodec(attributes_domain_codec_anInt, "anIntRange", sqlIdent42, {
+const anIntRangeCodec2 = sql.identifier(...parts42);
+const typesCodecSpec_typesAttributes_an_int_range_codec_anIntRangeCodec = rangeOfCodec(typesCodecSpec_typesAttributes_domain_codec_anIntCodec, "anIntRange", anIntRangeCodec2, {
   description: undefined,
-  extensions: extensions48
+  extensions: anIntRangeCodec
 });
-const attributes52 = Object.assign(Object.create(null), {
+const nestedCompoundTypeCodecSpec_nestedCompoundTypeAttributes = Object.assign(Object.create(null), {
   a: {
     description: undefined,
-    codec: attributes_o2_codec_compoundType,
+    codec: attributes_o2_codec_compoundTypeCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -2562,7 +2564,7 @@ const attributes52 = Object.assign(Object.create(null), {
   },
   b: {
     description: undefined,
-    codec: attributes_o2_codec_compoundType,
+    codec: attributes_o2_codec_compoundTypeCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -2579,7 +2581,7 @@ const attributes52 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions49 = {
+const nestedCompoundTypeCodecSpec = {
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -2589,17 +2591,17 @@ const extensions49 = {
   tags: Object.create(null)
 };
 const parts43 = ["b", "nested_compound_type"];
-const sqlIdent43 = sql.identifier(...parts43);
-const spec_nestedCompoundType = {
+const nestedCompoundTypeCodecSpec2 = sql.identifier(...parts43);
+const nestedCompoundTypeCodec_nestedCompoundTypeCodecSpec = {
   name: "nestedCompoundType",
-  identifier: sqlIdent43,
-  attributes: attributes52,
+  identifier: nestedCompoundTypeCodecSpec2,
+  attributes: nestedCompoundTypeCodecSpec_nestedCompoundTypeAttributes,
   description: undefined,
-  extensions: extensions49,
+  extensions: nestedCompoundTypeCodecSpec,
   executor: executor_mainPgExecutor
 };
-const attributes_nested_compound_type_codec_nestedCompoundType = recordCodec(spec_nestedCompoundType);
-const extensions50 = {
+const typesCodecSpec_typesAttributes_nested_compound_type_codec_nestedCompoundTypeCodec = recordCodec(nestedCompoundTypeCodec_nestedCompoundTypeCodecSpec);
+const textArrayDomainCodec = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -2608,13 +2610,13 @@ const extensions50 = {
   tags: Object.create(null)
 };
 const parts44 = ["c", "text_array_domain"];
-const sqlIdent44 = sql.identifier(...parts44);
-const attributes_text_array_domain_codec_textArrayDomain = domainOfCodec(registryConfig_pgCodecs_textArray_textArray, "textArrayDomain", sqlIdent44, {
+const textArrayDomainCodec2 = sql.identifier(...parts44);
+const typesCodecSpec_typesAttributes_text_array_domain_codec_textArrayDomainCodec = domainOfCodec(registry_pgCodecs_textArray_textArrayCodec, "textArrayDomain", textArrayDomainCodec2, {
   description: undefined,
-  extensions: extensions50,
+  extensions: textArrayDomainCodec,
   notNull: false
 });
-const extensions51 = {
+const int8ArrayDomainCodec = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -2622,7 +2624,7 @@ const extensions51 = {
   },
   tags: Object.create(null)
 };
-const extensions52 = {
+const int8ArrayCodec = {
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -2630,20 +2632,20 @@ const extensions52 = {
   },
   tags: Object.create(null)
 };
-const innerCodec_int8Array = listOfCodec(TYPES.bigint, {
-  extensions: extensions52,
+const int8ArrayDomainCodec_int8ArrayCodec = listOfCodec(TYPES.bigint, {
+  extensions: int8ArrayCodec,
   typeDelim: ",",
   description: undefined,
   name: "int8Array"
 });
 const parts45 = ["c", "int8_array_domain"];
-const sqlIdent45 = sql.identifier(...parts45);
-const attributes_int8_array_domain_codec_int8ArrayDomain = domainOfCodec(innerCodec_int8Array, "int8ArrayDomain", sqlIdent45, {
+const int8ArrayDomainCodec2 = sql.identifier(...parts45);
+const typesCodecSpec_typesAttributes_int8_array_domain_codec_int8ArrayDomainCodec = domainOfCodec(int8ArrayDomainCodec_int8ArrayCodec, "int8ArrayDomain", int8ArrayDomainCodec2, {
   description: undefined,
-  extensions: extensions51,
+  extensions: int8ArrayDomainCodec,
   notNull: false
 });
-const extensions53 = {
+const byteaArrayCodec = {
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -2651,13 +2653,13 @@ const extensions53 = {
   },
   tags: Object.create(null)
 };
-const attributes_bytea_array_codec_byteaArray = listOfCodec(TYPES.bytea, {
-  extensions: extensions53,
+const typesCodecSpec_typesAttributes_bytea_array_codec_byteaArrayCodec = listOfCodec(TYPES.bytea, {
+  extensions: byteaArrayCodec,
   typeDelim: ",",
   description: undefined,
   name: "byteaArray"
 });
-const attributes_ltree_codec_ltree = {
+const typesCodecSpec_typesAttributes_ltree_codec_ltree = {
   name: "ltree",
   sqlType: sql`ltree`,
   toPg(str) {
@@ -2669,8 +2671,8 @@ const attributes_ltree_codec_ltree = {
   executor: null,
   attributes: undefined
 };
-const attributes_ltree_array_codec_ltree_ = listOfCodec(attributes_ltree_codec_ltree);
-const attributes51 = Object.assign(Object.create(null), {
+const typesCodecSpec_typesAttributes_ltree_array_codec_ltree_ = listOfCodec(typesCodecSpec_typesAttributes_ltree_codec_ltree);
+const typesCodecSpec_typesAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -2736,7 +2738,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   enum: {
     description: undefined,
-    codec: attributes_c_codec_color,
+    codec: compoundTypeCodecSpec_compoundTypeAttributes_c_codec_colorCodec,
     notNull: true,
     hasDefault: false,
     extensions: {
@@ -2745,7 +2747,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   enum_array: {
     description: undefined,
-    codec: attributes_enum_array_codec_colorArray,
+    codec: typesCodecSpec_typesAttributes_enum_array_codec_colorArrayCodec,
     notNull: true,
     hasDefault: false,
     extensions: {
@@ -2754,7 +2756,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   domain: {
     description: undefined,
-    codec: attributes_domain_codec_anInt,
+    codec: typesCodecSpec_typesAttributes_domain_codec_anIntCodec,
     notNull: true,
     hasDefault: false,
     extensions: {
@@ -2763,7 +2765,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   domain2: {
     description: undefined,
-    codec: attributes_domain2_codec_anotherInt,
+    codec: typesCodecSpec_typesAttributes_domain2_codec_anotherIntCodec,
     notNull: true,
     hasDefault: false,
     extensions: {
@@ -2772,7 +2774,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   text_array: {
     description: undefined,
-    codec: registryConfig_pgCodecs_textArray_textArray,
+    codec: registry_pgCodecs_textArray_textArrayCodec,
     notNull: true,
     hasDefault: false,
     extensions: {
@@ -2799,7 +2801,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   nullable_range: {
     description: undefined,
-    codec: attributes_nullable_range_codec_numrange,
+    codec: typesCodecSpec_typesAttributes_nullable_range_codec_numrangeCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -2808,7 +2810,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   numrange: {
     description: undefined,
-    codec: attributes_nullable_range_codec_numrange,
+    codec: typesCodecSpec_typesAttributes_nullable_range_codec_numrangeCodec,
     notNull: true,
     hasDefault: false,
     extensions: {
@@ -2817,7 +2819,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   daterange: {
     description: undefined,
-    codec: attributes_daterange_codec_daterange,
+    codec: typesCodecSpec_typesAttributes_daterange_codec_daterangeCodec,
     notNull: true,
     hasDefault: false,
     extensions: {
@@ -2826,7 +2828,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   an_int_range: {
     description: undefined,
-    codec: attributes_an_int_range_codec_anIntRange,
+    codec: typesCodecSpec_typesAttributes_an_int_range_codec_anIntRangeCodec,
     notNull: true,
     hasDefault: false,
     extensions: {
@@ -2889,7 +2891,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   interval_array: {
     description: undefined,
-    codec: registryConfig_pgCodecs_intervalArray_intervalArray,
+    codec: registry_pgCodecs_intervalArray_intervalArrayCodec,
     notNull: true,
     hasDefault: false,
     extensions: {
@@ -2907,7 +2909,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   compound_type: {
     description: undefined,
-    codec: attributes_o2_codec_compoundType,
+    codec: attributes_o2_codec_compoundTypeCodec,
     notNull: true,
     hasDefault: false,
     extensions: {
@@ -2916,7 +2918,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   nested_compound_type: {
     description: undefined,
-    codec: attributes_nested_compound_type_codec_nestedCompoundType,
+    codec: typesCodecSpec_typesAttributes_nested_compound_type_codec_nestedCompoundTypeCodec,
     notNull: true,
     hasDefault: false,
     extensions: {
@@ -2925,7 +2927,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   nullable_compound_type: {
     description: undefined,
-    codec: attributes_o2_codec_compoundType,
+    codec: attributes_o2_codec_compoundTypeCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -2934,7 +2936,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   nullable_nested_compound_type: {
     description: undefined,
-    codec: attributes_nested_compound_type_codec_nestedCompoundType,
+    codec: typesCodecSpec_typesAttributes_nested_compound_type_codec_nestedCompoundTypeCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -3060,7 +3062,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   text_array_domain: {
     description: undefined,
-    codec: attributes_text_array_domain_codec_textArrayDomain,
+    codec: typesCodecSpec_typesAttributes_text_array_domain_codec_textArrayDomainCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -3069,7 +3071,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   int8_array_domain: {
     description: undefined,
-    codec: attributes_int8_array_domain_codec_int8ArrayDomain,
+    codec: typesCodecSpec_typesAttributes_int8_array_domain_codec_int8ArrayDomainCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -3087,7 +3089,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   bytea_array: {
     description: undefined,
-    codec: attributes_bytea_array_codec_byteaArray,
+    codec: typesCodecSpec_typesAttributes_bytea_array_codec_byteaArrayCodec,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -3096,7 +3098,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   ltree: {
     description: undefined,
-    codec: attributes_ltree_codec_ltree,
+    codec: typesCodecSpec_typesAttributes_ltree_codec_ltree,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -3105,7 +3107,7 @@ const attributes51 = Object.assign(Object.create(null), {
   },
   ltree_array: {
     description: undefined,
-    codec: attributes_ltree_array_codec_ltree_,
+    codec: typesCodecSpec_typesAttributes_ltree_array_codec_ltree_,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -3113,7 +3115,7 @@ const attributes51 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions54 = {
+const typesCodecSpec = {
   isTableLike: true,
   pg: {
     serviceName: "main",
@@ -3125,17 +3127,17 @@ const extensions54 = {
   })
 };
 const parts46 = ["b", "types"];
-const sqlIdent46 = sql.identifier(...parts46);
-const spec_types = {
+const typesCodecSpec2 = sql.identifier(...parts46);
+const typesCodec_typesCodecSpec = {
   name: "types",
-  identifier: sqlIdent46,
-  attributes: attributes51,
+  identifier: typesCodecSpec2,
+  attributes: typesCodecSpec_typesAttributes,
   description: undefined,
-  extensions: extensions54,
+  extensions: typesCodecSpec,
   executor: executor_mainPgExecutor
 };
-const registryConfig_pgCodecs_types_types = recordCodec(spec_types);
-const extensions55 = {
+const registry_pgCodecs_types_typesCodec = recordCodec(typesCodec_typesCodecSpec);
+const compoundTypeArrayCodec = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3143,7 +3145,7 @@ const extensions55 = {
   },
   tags: Object.create(null)
 };
-const extensions56 = {
+const jwtTokenArrayCodec = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -3151,7 +3153,7 @@ const extensions56 = {
   },
   tags: Object.create(null)
 };
-const extensions57 = {
+const typesArrayCodec = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -3159,7 +3161,7 @@ const extensions57 = {
   },
   tags: Object.create(null)
 };
-const extensions58 = {
+const int4ArrayCodec = {
   pg: {
     serviceName: "main",
     schemaName: "pg_catalog",
@@ -3167,13 +3169,13 @@ const extensions58 = {
   },
   tags: Object.create(null)
 };
-const registryConfig_pgCodecs_int4Array_int4Array = listOfCodec(TYPES.int, {
-  extensions: extensions58,
+const registry_pgCodecs_int4Array_int4ArrayCodec = listOfCodec(TYPES.int, {
+  extensions: int4ArrayCodec,
   typeDelim: ",",
   description: undefined,
   name: "int4Array"
 });
-const extensions59 = {
+const floatrangeCodec = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3182,12 +3184,12 @@ const extensions59 = {
   tags: Object.create(null)
 };
 const parts47 = ["c", "floatrange"];
-const sqlIdent47 = sql.identifier(...parts47);
-const registryConfig_pgCodecs_floatrange_floatrange = rangeOfCodec(TYPES.float, "floatrange", sqlIdent47, {
+const floatrangeCodec2 = sql.identifier(...parts47);
+const registry_pgCodecs_floatrange_floatrangeCodec = rangeOfCodec(TYPES.float, "floatrange", floatrangeCodec2, {
   description: undefined,
-  extensions: extensions59
+  extensions: floatrangeCodec
 });
-const extensions60 = {
+const postArrayCodec = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3195,13 +3197,13 @@ const extensions60 = {
   },
   tags: Object.create(null)
 };
-const registryConfig_pgCodecs_postArray_postArray = listOfCodec(attributes_post_codec_post, {
-  extensions: extensions60,
+const registry_pgCodecs_postArray_postArrayCodec = listOfCodec(attributes_post_codec_postCodec, {
+  extensions: postArrayCodec,
   typeDelim: ",",
   description: undefined,
   name: "postArray"
 });
-const attributes53 = Object.assign(Object.create(null), {
+const tablefuncCrosstab2CodecSpec_tablefuncCrosstab2Attributes = Object.assign(Object.create(null), {
   row_name: {
     description: undefined,
     codec: TYPES.text,
@@ -3230,7 +3232,7 @@ const attributes53 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions61 = {
+const tablefuncCrosstab2CodecSpec = {
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -3240,16 +3242,16 @@ const extensions61 = {
   tags: Object.create(null)
 };
 const parts48 = ["a", "tablefunc_crosstab_2"];
-const sqlIdent48 = sql.identifier(...parts48);
-const spec_tablefuncCrosstab2 = {
+const tablefuncCrosstab2CodecSpec2 = sql.identifier(...parts48);
+const tablefuncCrosstab2Codec_tablefuncCrosstab2CodecSpec = {
   name: "tablefuncCrosstab2",
-  identifier: sqlIdent48,
-  attributes: attributes53,
+  identifier: tablefuncCrosstab2CodecSpec2,
+  attributes: tablefuncCrosstab2CodecSpec_tablefuncCrosstab2Attributes,
   description: undefined,
-  extensions: extensions61,
+  extensions: tablefuncCrosstab2CodecSpec,
   executor: executor_mainPgExecutor
 };
-const attributes54 = Object.assign(Object.create(null), {
+const tablefuncCrosstab3CodecSpec_tablefuncCrosstab3Attributes = Object.assign(Object.create(null), {
   row_name: {
     description: undefined,
     codec: TYPES.text,
@@ -3287,7 +3289,7 @@ const attributes54 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions62 = {
+const tablefuncCrosstab3CodecSpec = {
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -3297,16 +3299,16 @@ const extensions62 = {
   tags: Object.create(null)
 };
 const parts49 = ["a", "tablefunc_crosstab_3"];
-const sqlIdent49 = sql.identifier(...parts49);
-const spec_tablefuncCrosstab3 = {
+const tablefuncCrosstab3CodecSpec2 = sql.identifier(...parts49);
+const tablefuncCrosstab3Codec_tablefuncCrosstab3CodecSpec = {
   name: "tablefuncCrosstab3",
-  identifier: sqlIdent49,
-  attributes: attributes54,
+  identifier: tablefuncCrosstab3CodecSpec2,
+  attributes: tablefuncCrosstab3CodecSpec_tablefuncCrosstab3Attributes,
   description: undefined,
-  extensions: extensions62,
+  extensions: tablefuncCrosstab3CodecSpec,
   executor: executor_mainPgExecutor
 };
-const attributes55 = Object.assign(Object.create(null), {
+const tablefuncCrosstab4CodecSpec_tablefuncCrosstab4Attributes = Object.assign(Object.create(null), {
   row_name: {
     description: undefined,
     codec: TYPES.text,
@@ -3353,7 +3355,7 @@ const attributes55 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions63 = {
+const tablefuncCrosstab4CodecSpec = {
   isTableLike: false,
   pg: {
     serviceName: "main",
@@ -3363,28 +3365,18 @@ const extensions63 = {
   tags: Object.create(null)
 };
 const parts50 = ["a", "tablefunc_crosstab_4"];
-const sqlIdent50 = sql.identifier(...parts50);
-const spec_tablefuncCrosstab4 = {
+const tablefuncCrosstab4CodecSpec2 = sql.identifier(...parts50);
+const tablefuncCrosstab4Codec_tablefuncCrosstab4CodecSpec = {
   name: "tablefuncCrosstab4",
-  identifier: sqlIdent50,
-  attributes: attributes55,
+  identifier: tablefuncCrosstab4CodecSpec2,
+  attributes: tablefuncCrosstab4CodecSpec_tablefuncCrosstab4Attributes,
   description: undefined,
-  extensions: extensions63,
+  extensions: tablefuncCrosstab4CodecSpec,
   executor: executor_mainPgExecutor
 };
-const extensions64 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "c",
-    name: "current_user_id"
-  },
-  tags: {
-    behavior: ["queryField -mutationField -typeField", "-filter -order"]
-  }
-};
 const parts51 = ["c", "current_user_id"];
-const sqlIdent51 = sql.identifier(...parts51);
-const extensions65 = {
+const sqlIdent = sql.identifier(...parts51);
+const extensions2 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3396,10 +3388,10 @@ const extensions65 = {
   singleOutputParameterName: "o"
 };
 const parts52 = ["c", "func_out"];
-const sqlIdent52 = sql.identifier(...parts52);
-const fromCallback2 = (...args) => sql`${sqlIdent52}(${sqlFromArgDigests(args)})`;
+const sqlIdent2 = sql.identifier(...parts52);
+const fromCallback2 = (...args) => sql`${sqlIdent2}(${sqlFromArgDigests(args)})`;
 const parameters2 = [];
-const extensions66 = {
+const extensions3 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3411,10 +3403,10 @@ const extensions66 = {
   singleOutputParameterName: "o"
 };
 const parts53 = ["c", "func_out_setof"];
-const sqlIdent53 = sql.identifier(...parts53);
-const fromCallback3 = (...args) => sql`${sqlIdent53}(${sqlFromArgDigests(args)})`;
+const sqlIdent3 = sql.identifier(...parts53);
+const fromCallback3 = (...args) => sql`${sqlIdent3}(${sqlFromArgDigests(args)})`;
 const parameters3 = [];
-const extensions67 = {
+const extensions4 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3425,10 +3417,10 @@ const extensions67 = {
   }
 };
 const parts54 = ["c", "func_out_unnamed"];
-const sqlIdent54 = sql.identifier(...parts54);
-const fromCallback4 = (...args) => sql`${sqlIdent54}(${sqlFromArgDigests(args)})`;
+const sqlIdent4 = sql.identifier(...parts54);
+const fromCallback4 = (...args) => sql`${sqlIdent4}(${sqlFromArgDigests(args)})`;
 const parameters4 = [];
-const extensions68 = {
+const extensions5 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3440,10 +3432,10 @@ const extensions68 = {
   singleOutputParameterName: "o"
 };
 const parts55 = ["c", "mutation_out"];
-const sqlIdent55 = sql.identifier(...parts55);
-const fromCallback5 = (...args) => sql`${sqlIdent55}(${sqlFromArgDigests(args)})`;
+const sqlIdent5 = sql.identifier(...parts55);
+const fromCallback5 = (...args) => sql`${sqlIdent5}(${sqlFromArgDigests(args)})`;
 const parameters5 = [];
-const extensions69 = {
+const extensions6 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3455,10 +3447,10 @@ const extensions69 = {
   singleOutputParameterName: "o"
 };
 const parts56 = ["c", "mutation_out_setof"];
-const sqlIdent56 = sql.identifier(...parts56);
-const fromCallback6 = (...args) => sql`${sqlIdent56}(${sqlFromArgDigests(args)})`;
+const sqlIdent6 = sql.identifier(...parts56);
+const fromCallback6 = (...args) => sql`${sqlIdent6}(${sqlFromArgDigests(args)})`;
 const parameters6 = [];
-const extensions70 = {
+const extensions7 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3469,10 +3461,10 @@ const extensions70 = {
   }
 };
 const parts57 = ["c", "mutation_out_unnamed"];
-const sqlIdent57 = sql.identifier(...parts57);
-const fromCallback7 = (...args) => sql`${sqlIdent57}(${sqlFromArgDigests(args)})`;
+const sqlIdent7 = sql.identifier(...parts57);
+const fromCallback7 = (...args) => sql`${sqlIdent7}(${sqlFromArgDigests(args)})`;
 const parameters7 = [];
-const extensions71 = {
+const extensions8 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3483,10 +3475,10 @@ const extensions71 = {
   }
 };
 const parts58 = ["c", "no_args_mutation"];
-const sqlIdent58 = sql.identifier(...parts58);
-const fromCallback8 = (...args) => sql`${sqlIdent58}(${sqlFromArgDigests(args)})`;
+const sqlIdent8 = sql.identifier(...parts58);
+const fromCallback8 = (...args) => sql`${sqlIdent8}(${sqlFromArgDigests(args)})`;
 const parameters8 = [];
-const extensions72 = {
+const extensions9 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3497,10 +3489,10 @@ const extensions72 = {
   }
 };
 const parts59 = ["c", "no_args_query"];
-const sqlIdent59 = sql.identifier(...parts59);
-const fromCallback9 = (...args) => sql`${sqlIdent59}(${sqlFromArgDigests(args)})`;
+const sqlIdent9 = sql.identifier(...parts59);
+const fromCallback9 = (...args) => sql`${sqlIdent9}(${sqlFromArgDigests(args)})`;
 const parameters9 = [];
-const extensions73 = {
+const extensions10 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3511,10 +3503,10 @@ const extensions73 = {
   }
 };
 const parts60 = ["a", "return_void_mutation"];
-const sqlIdent60 = sql.identifier(...parts60);
-const fromCallback10 = (...args) => sql`${sqlIdent60}(${sqlFromArgDigests(args)})`;
+const sqlIdent10 = sql.identifier(...parts60);
+const fromCallback10 = (...args) => sql`${sqlIdent10}(${sqlFromArgDigests(args)})`;
 const parameters10 = [];
-const extensions74 = {
+const extensions11 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3525,10 +3517,10 @@ const extensions74 = {
   }
 };
 const parts61 = ["a", "mutation_interval_set"];
-const sqlIdent61 = sql.identifier(...parts61);
-const fromCallback11 = (...args) => sql`${sqlIdent61}(${sqlFromArgDigests(args)})`;
+const sqlIdent11 = sql.identifier(...parts61);
+const fromCallback11 = (...args) => sql`${sqlIdent11}(${sqlFromArgDigests(args)})`;
 const parameters11 = [];
-const extensions75 = {
+const extensions12 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3539,10 +3531,10 @@ const extensions75 = {
   }
 };
 const parts62 = ["a", "query_interval_set"];
-const sqlIdent62 = sql.identifier(...parts62);
-const fromCallback12 = (...args) => sql`${sqlIdent62}(${sqlFromArgDigests(args)})`;
+const sqlIdent12 = sql.identifier(...parts62);
+const fromCallback12 = (...args) => sql`${sqlIdent12}(${sqlFromArgDigests(args)})`;
 const parameters12 = [];
-const extensions76 = {
+const extensions13 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3553,10 +3545,10 @@ const extensions76 = {
   }
 };
 const parts63 = ["a", "static_big_integer"];
-const sqlIdent63 = sql.identifier(...parts63);
-const fromCallback13 = (...args) => sql`${sqlIdent63}(${sqlFromArgDigests(args)})`;
+const sqlIdent13 = sql.identifier(...parts63);
+const fromCallback13 = (...args) => sql`${sqlIdent13}(${sqlFromArgDigests(args)})`;
 const parameters13 = [];
-const extensions77 = {
+const extensions14 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3568,15 +3560,15 @@ const extensions77 = {
   singleOutputParameterName: "o"
 };
 const parts64 = ["c", "func_in_out"];
-const sqlIdent64 = sql.identifier(...parts64);
-const fromCallback14 = (...args) => sql`${sqlIdent64}(${sqlFromArgDigests(args)})`;
+const sqlIdent14 = sql.identifier(...parts64);
+const fromCallback14 = (...args) => sql`${sqlIdent14}(${sqlFromArgDigests(args)})`;
 const parameters14 = [{
   name: "i",
   required: true,
   notNull: false,
   codec: TYPES.int
 }];
-const extensions78 = {
+const extensions15 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3588,15 +3580,15 @@ const extensions78 = {
   singleOutputParameterName: "col1"
 };
 const parts65 = ["c", "func_returns_table_one_col"];
-const sqlIdent65 = sql.identifier(...parts65);
-const fromCallback15 = (...args) => sql`${sqlIdent65}(${sqlFromArgDigests(args)})`;
+const sqlIdent15 = sql.identifier(...parts65);
+const fromCallback15 = (...args) => sql`${sqlIdent15}(${sqlFromArgDigests(args)})`;
 const parameters15 = [{
   name: "i",
   required: true,
   notNull: false,
   codec: TYPES.int
 }];
-const extensions79 = {
+const extensions16 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3608,15 +3600,15 @@ const extensions79 = {
   singleOutputParameterName: "o"
 };
 const parts66 = ["c", "mutation_in_out"];
-const sqlIdent66 = sql.identifier(...parts66);
-const fromCallback16 = (...args) => sql`${sqlIdent66}(${sqlFromArgDigests(args)})`;
+const sqlIdent16 = sql.identifier(...parts66);
+const fromCallback16 = (...args) => sql`${sqlIdent16}(${sqlFromArgDigests(args)})`;
 const parameters16 = [{
   name: "i",
   required: true,
   notNull: false,
   codec: TYPES.int
 }];
-const extensions80 = {
+const extensions17 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3628,15 +3620,15 @@ const extensions80 = {
   singleOutputParameterName: "col1"
 };
 const parts67 = ["c", "mutation_returns_table_one_col"];
-const sqlIdent67 = sql.identifier(...parts67);
-const fromCallback17 = (...args) => sql`${sqlIdent67}(${sqlFromArgDigests(args)})`;
+const sqlIdent17 = sql.identifier(...parts67);
+const fromCallback17 = (...args) => sql`${sqlIdent17}(${sqlFromArgDigests(args)})`;
 const parameters17 = [{
   name: "i",
   required: true,
   notNull: false,
   codec: TYPES.int
 }];
-const extensions81 = {
+const extensions18 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3647,15 +3639,15 @@ const extensions81 = {
   }
 };
 const parts68 = ["a", "assert_something"];
-const sqlIdent68 = sql.identifier(...parts68);
-const fromCallback18 = (...args) => sql`${sqlIdent68}(${sqlFromArgDigests(args)})`;
+const sqlIdent18 = sql.identifier(...parts68);
+const fromCallback18 = (...args) => sql`${sqlIdent18}(${sqlFromArgDigests(args)})`;
 const parameters18 = [{
   name: "in_arg",
   required: true,
   notNull: false,
   codec: TYPES.text
 }];
-const extensions82 = {
+const extensions19 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3667,15 +3659,15 @@ const extensions82 = {
   }
 };
 const parts69 = ["a", "assert_something_nx"];
-const sqlIdent69 = sql.identifier(...parts69);
-const fromCallback19 = (...args) => sql`${sqlIdent69}(${sqlFromArgDigests(args)})`;
+const sqlIdent19 = sql.identifier(...parts69);
+const fromCallback19 = (...args) => sql`${sqlIdent19}(${sqlFromArgDigests(args)})`;
 const parameters19 = [{
   name: "in_arg",
   required: true,
   notNull: false,
   codec: TYPES.text
 }];
-const extensions83 = {
+const extensions20 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3686,15 +3678,15 @@ const extensions83 = {
   }
 };
 const parts70 = ["c", "json_identity"];
-const sqlIdent70 = sql.identifier(...parts70);
-const fromCallback20 = (...args) => sql`${sqlIdent70}(${sqlFromArgDigests(args)})`;
+const sqlIdent20 = sql.identifier(...parts70);
+const fromCallback20 = (...args) => sql`${sqlIdent20}(${sqlFromArgDigests(args)})`;
 const parameters20 = [{
   name: "json",
   required: true,
   notNull: false,
   codec: TYPES.json
 }];
-const extensions84 = {
+const extensions21 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3705,15 +3697,15 @@ const extensions84 = {
   }
 };
 const parts71 = ["c", "json_identity_mutation"];
-const sqlIdent71 = sql.identifier(...parts71);
-const fromCallback21 = (...args) => sql`${sqlIdent71}(${sqlFromArgDigests(args)})`;
+const sqlIdent21 = sql.identifier(...parts71);
+const fromCallback21 = (...args) => sql`${sqlIdent21}(${sqlFromArgDigests(args)})`;
 const parameters21 = [{
   name: "json",
   required: true,
   notNull: false,
   codec: TYPES.json
 }];
-const extensions85 = {
+const extensions22 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3724,15 +3716,15 @@ const extensions85 = {
   }
 };
 const parts72 = ["c", "jsonb_identity"];
-const sqlIdent72 = sql.identifier(...parts72);
-const fromCallback22 = (...args) => sql`${sqlIdent72}(${sqlFromArgDigests(args)})`;
+const sqlIdent22 = sql.identifier(...parts72);
+const fromCallback22 = (...args) => sql`${sqlIdent22}(${sqlFromArgDigests(args)})`;
 const parameters22 = [{
   name: "json",
   required: true,
   notNull: false,
   codec: TYPES.jsonb
 }];
-const extensions86 = {
+const extensions23 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3743,15 +3735,15 @@ const extensions86 = {
   }
 };
 const parts73 = ["c", "jsonb_identity_mutation"];
-const sqlIdent73 = sql.identifier(...parts73);
-const fromCallback23 = (...args) => sql`${sqlIdent73}(${sqlFromArgDigests(args)})`;
+const sqlIdent23 = sql.identifier(...parts73);
+const fromCallback23 = (...args) => sql`${sqlIdent23}(${sqlFromArgDigests(args)})`;
 const parameters23 = [{
   name: "json",
   required: true,
   notNull: false,
   codec: TYPES.jsonb
 }];
-const extensions87 = {
+const extensions24 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3762,15 +3754,15 @@ const extensions87 = {
   }
 };
 const parts74 = ["c", "jsonb_identity_mutation_plpgsql"];
-const sqlIdent74 = sql.identifier(...parts74);
-const fromCallback24 = (...args) => sql`${sqlIdent74}(${sqlFromArgDigests(args)})`;
+const sqlIdent24 = sql.identifier(...parts74);
+const fromCallback24 = (...args) => sql`${sqlIdent24}(${sqlFromArgDigests(args)})`;
 const parameters24 = [{
   name: "_the_json",
   required: true,
   notNull: true,
   codec: TYPES.jsonb
 }];
-const extensions88 = {
+const extensions25 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -3781,15 +3773,15 @@ const extensions88 = {
   }
 };
 const parts75 = ["c", "jsonb_identity_mutation_plpgsql_with_default"];
-const sqlIdent75 = sql.identifier(...parts75);
-const fromCallback25 = (...args) => sql`${sqlIdent75}(${sqlFromArgDigests(args)})`;
+const sqlIdent25 = sql.identifier(...parts75);
+const fromCallback25 = (...args) => sql`${sqlIdent25}(${sqlFromArgDigests(args)})`;
 const parameters25 = [{
   name: "_the_json",
   required: false,
   notNull: true,
   codec: TYPES.jsonb
 }];
-const extensions89 = {
+const extensions26 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3800,8 +3792,8 @@ const extensions89 = {
   }
 };
 const parts76 = ["a", "add_1_mutation"];
-const sqlIdent76 = sql.identifier(...parts76);
-const fromCallback26 = (...args) => sql`${sqlIdent76}(${sqlFromArgDigests(args)})`;
+const sqlIdent26 = sql.identifier(...parts76);
+const fromCallback26 = (...args) => sql`${sqlIdent26}(${sqlFromArgDigests(args)})`;
 const parameters26 = [{
   name: null,
   required: true,
@@ -3813,7 +3805,7 @@ const parameters26 = [{
   notNull: true,
   codec: TYPES.int
 }];
-const extensions90 = {
+const extensions27 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3824,8 +3816,8 @@ const extensions90 = {
   }
 };
 const parts77 = ["a", "add_1_query"];
-const sqlIdent77 = sql.identifier(...parts77);
-const fromCallback27 = (...args) => sql`${sqlIdent77}(${sqlFromArgDigests(args)})`;
+const sqlIdent27 = sql.identifier(...parts77);
+const fromCallback27 = (...args) => sql`${sqlIdent27}(${sqlFromArgDigests(args)})`;
 const parameters27 = [{
   name: null,
   required: true,
@@ -3837,7 +3829,7 @@ const parameters27 = [{
   notNull: true,
   codec: TYPES.int
 }];
-const extensions91 = {
+const extensions28 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3848,8 +3840,8 @@ const extensions91 = {
   }
 };
 const parts78 = ["a", "add_2_mutation"];
-const sqlIdent78 = sql.identifier(...parts78);
-const fromCallback28 = (...args) => sql`${sqlIdent78}(${sqlFromArgDigests(args)})`;
+const sqlIdent28 = sql.identifier(...parts78);
+const fromCallback28 = (...args) => sql`${sqlIdent28}(${sqlFromArgDigests(args)})`;
 const parameters28 = [{
   name: "a",
   required: true,
@@ -3861,7 +3853,7 @@ const parameters28 = [{
   notNull: true,
   codec: TYPES.int
 }];
-const extensions92 = {
+const extensions29 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3872,8 +3864,8 @@ const extensions92 = {
   }
 };
 const parts79 = ["a", "add_2_query"];
-const sqlIdent79 = sql.identifier(...parts79);
-const fromCallback29 = (...args) => sql`${sqlIdent79}(${sqlFromArgDigests(args)})`;
+const sqlIdent29 = sql.identifier(...parts79);
+const fromCallback29 = (...args) => sql`${sqlIdent29}(${sqlFromArgDigests(args)})`;
 const parameters29 = [{
   name: "a",
   required: true,
@@ -3885,7 +3877,7 @@ const parameters29 = [{
   notNull: true,
   codec: TYPES.int
 }];
-const extensions93 = {
+const extensions30 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3896,8 +3888,8 @@ const extensions93 = {
   }
 };
 const parts80 = ["a", "add_3_mutation"];
-const sqlIdent80 = sql.identifier(...parts80);
-const fromCallback30 = (...args) => sql`${sqlIdent80}(${sqlFromArgDigests(args)})`;
+const sqlIdent30 = sql.identifier(...parts80);
+const fromCallback30 = (...args) => sql`${sqlIdent30}(${sqlFromArgDigests(args)})`;
 const parameters30 = [{
   name: "a",
   required: true,
@@ -3909,7 +3901,7 @@ const parameters30 = [{
   notNull: false,
   codec: TYPES.int
 }];
-const extensions94 = {
+const extensions31 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3920,8 +3912,8 @@ const extensions94 = {
   }
 };
 const parts81 = ["a", "add_3_query"];
-const sqlIdent81 = sql.identifier(...parts81);
-const fromCallback31 = (...args) => sql`${sqlIdent81}(${sqlFromArgDigests(args)})`;
+const sqlIdent31 = sql.identifier(...parts81);
+const fromCallback31 = (...args) => sql`${sqlIdent31}(${sqlFromArgDigests(args)})`;
 const parameters31 = [{
   name: "a",
   required: true,
@@ -3933,7 +3925,7 @@ const parameters31 = [{
   notNull: false,
   codec: TYPES.int
 }];
-const extensions95 = {
+const extensions32 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3944,8 +3936,8 @@ const extensions95 = {
   }
 };
 const parts82 = ["a", "add_4_mutation"];
-const sqlIdent82 = sql.identifier(...parts82);
-const fromCallback32 = (...args) => sql`${sqlIdent82}(${sqlFromArgDigests(args)})`;
+const sqlIdent32 = sql.identifier(...parts82);
+const fromCallback32 = (...args) => sql`${sqlIdent32}(${sqlFromArgDigests(args)})`;
 const parameters32 = [{
   name: "",
   required: true,
@@ -3957,7 +3949,7 @@ const parameters32 = [{
   notNull: false,
   codec: TYPES.int
 }];
-const extensions96 = {
+const extensions33 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3968,8 +3960,8 @@ const extensions96 = {
   }
 };
 const parts83 = ["a", "add_4_mutation_error"];
-const sqlIdent83 = sql.identifier(...parts83);
-const fromCallback33 = (...args) => sql`${sqlIdent83}(${sqlFromArgDigests(args)})`;
+const sqlIdent33 = sql.identifier(...parts83);
+const fromCallback33 = (...args) => sql`${sqlIdent33}(${sqlFromArgDigests(args)})`;
 const parameters33 = [{
   name: "",
   required: true,
@@ -3981,7 +3973,7 @@ const parameters33 = [{
   notNull: false,
   codec: TYPES.int
 }];
-const extensions97 = {
+const extensions34 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -3992,8 +3984,8 @@ const extensions97 = {
   }
 };
 const parts84 = ["a", "add_4_query"];
-const sqlIdent84 = sql.identifier(...parts84);
-const fromCallback34 = (...args) => sql`${sqlIdent84}(${sqlFromArgDigests(args)})`;
+const sqlIdent34 = sql.identifier(...parts84);
+const fromCallback34 = (...args) => sql`${sqlIdent34}(${sqlFromArgDigests(args)})`;
 const parameters34 = [{
   name: "",
   required: true,
@@ -4005,7 +3997,7 @@ const parameters34 = [{
   notNull: false,
   codec: TYPES.int
 }];
-const extensions98 = {
+const extensions35 = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -4016,8 +4008,8 @@ const extensions98 = {
   }
 };
 const parts85 = ["b", "mult_1"];
-const sqlIdent85 = sql.identifier(...parts85);
-const fromCallback35 = (...args) => sql`${sqlIdent85}(${sqlFromArgDigests(args)})`;
+const sqlIdent35 = sql.identifier(...parts85);
+const fromCallback35 = (...args) => sql`${sqlIdent35}(${sqlFromArgDigests(args)})`;
 const parameters35 = [{
   name: null,
   required: true,
@@ -4029,7 +4021,7 @@ const parameters35 = [{
   notNull: false,
   codec: TYPES.int
 }];
-const extensions99 = {
+const extensions36 = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -4040,8 +4032,8 @@ const extensions99 = {
   }
 };
 const parts86 = ["b", "mult_2"];
-const sqlIdent86 = sql.identifier(...parts86);
-const fromCallback36 = (...args) => sql`${sqlIdent86}(${sqlFromArgDigests(args)})`;
+const sqlIdent36 = sql.identifier(...parts86);
+const fromCallback36 = (...args) => sql`${sqlIdent36}(${sqlFromArgDigests(args)})`;
 const parameters36 = [{
   name: null,
   required: true,
@@ -4053,7 +4045,7 @@ const parameters36 = [{
   notNull: false,
   codec: TYPES.int
 }];
-const extensions100 = {
+const extensions37 = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -4064,8 +4056,8 @@ const extensions100 = {
   }
 };
 const parts87 = ["b", "mult_3"];
-const sqlIdent87 = sql.identifier(...parts87);
-const fromCallback37 = (...args) => sql`${sqlIdent87}(${sqlFromArgDigests(args)})`;
+const sqlIdent37 = sql.identifier(...parts87);
+const fromCallback37 = (...args) => sql`${sqlIdent37}(${sqlFromArgDigests(args)})`;
 const parameters37 = [{
   name: null,
   required: true,
@@ -4077,7 +4069,7 @@ const parameters37 = [{
   notNull: true,
   codec: TYPES.int
 }];
-const extensions101 = {
+const extensions38 = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -4088,8 +4080,8 @@ const extensions101 = {
   }
 };
 const parts88 = ["b", "mult_4"];
-const sqlIdent88 = sql.identifier(...parts88);
-const fromCallback38 = (...args) => sql`${sqlIdent88}(${sqlFromArgDigests(args)})`;
+const sqlIdent38 = sql.identifier(...parts88);
+const fromCallback38 = (...args) => sql`${sqlIdent38}(${sqlFromArgDigests(args)})`;
 const parameters38 = [{
   name: null,
   required: true,
@@ -4101,7 +4093,7 @@ const parameters38 = [{
   notNull: true,
   codec: TYPES.int
 }];
-const extensions102 = {
+const extensions39 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -4113,8 +4105,8 @@ const extensions102 = {
   singleOutputParameterName: "ino"
 };
 const parts89 = ["c", "func_in_inout"];
-const sqlIdent89 = sql.identifier(...parts89);
-const fromCallback39 = (...args) => sql`${sqlIdent89}(${sqlFromArgDigests(args)})`;
+const sqlIdent39 = sql.identifier(...parts89);
+const fromCallback39 = (...args) => sql`${sqlIdent39}(${sqlFromArgDigests(args)})`;
 const parameters39 = [{
   name: "i",
   required: true,
@@ -4126,7 +4118,7 @@ const parameters39 = [{
   notNull: false,
   codec: TYPES.int
 }];
-const extensions103 = {
+const extensions40 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -4137,10 +4129,10 @@ const extensions103 = {
   }
 };
 const parts90 = ["c", "func_out_out"];
-const sqlIdent90 = sql.identifier(...parts90);
-const fromCallback40 = (...args) => sql`${sqlIdent90}(${sqlFromArgDigests(args)})`;
+const sqlIdent40 = sql.identifier(...parts90);
+const fromCallback40 = (...args) => sql`${sqlIdent40}(${sqlFromArgDigests(args)})`;
 const parameters40 = [];
-const extensions104 = {
+const extensions41 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -4151,10 +4143,10 @@ const extensions104 = {
   }
 };
 const parts91 = ["c", "func_out_out_setof"];
-const sqlIdent91 = sql.identifier(...parts91);
-const fromCallback41 = (...args) => sql`${sqlIdent91}(${sqlFromArgDigests(args)})`;
+const sqlIdent41 = sql.identifier(...parts91);
+const fromCallback41 = (...args) => sql`${sqlIdent41}(${sqlFromArgDigests(args)})`;
 const parameters41 = [];
-const extensions105 = {
+const extensions42 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -4165,10 +4157,10 @@ const extensions105 = {
   }
 };
 const parts92 = ["c", "func_out_out_unnamed"];
-const sqlIdent92 = sql.identifier(...parts92);
-const fromCallback42 = (...args) => sql`${sqlIdent92}(${sqlFromArgDigests(args)})`;
+const sqlIdent42 = sql.identifier(...parts92);
+const fromCallback42 = (...args) => sql`${sqlIdent42}(${sqlFromArgDigests(args)})`;
 const parameters42 = [];
-const extensions106 = {
+const extensions43 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -4180,8 +4172,8 @@ const extensions106 = {
   singleOutputParameterName: "ino"
 };
 const parts93 = ["c", "mutation_in_inout"];
-const sqlIdent93 = sql.identifier(...parts93);
-const fromCallback43 = (...args) => sql`${sqlIdent93}(${sqlFromArgDigests(args)})`;
+const sqlIdent43 = sql.identifier(...parts93);
+const fromCallback43 = (...args) => sql`${sqlIdent43}(${sqlFromArgDigests(args)})`;
 const parameters43 = [{
   name: "i",
   required: true,
@@ -4193,7 +4185,7 @@ const parameters43 = [{
   notNull: false,
   codec: TYPES.int
 }];
-const extensions107 = {
+const extensions44 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -4204,10 +4196,10 @@ const extensions107 = {
   }
 };
 const parts94 = ["c", "mutation_out_out"];
-const sqlIdent94 = sql.identifier(...parts94);
-const fromCallback44 = (...args) => sql`${sqlIdent94}(${sqlFromArgDigests(args)})`;
+const sqlIdent44 = sql.identifier(...parts94);
+const fromCallback44 = (...args) => sql`${sqlIdent44}(${sqlFromArgDigests(args)})`;
 const parameters44 = [];
-const extensions108 = {
+const extensions45 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -4218,10 +4210,10 @@ const extensions108 = {
   }
 };
 const parts95 = ["c", "mutation_out_out_setof"];
-const sqlIdent95 = sql.identifier(...parts95);
-const fromCallback45 = (...args) => sql`${sqlIdent95}(${sqlFromArgDigests(args)})`;
+const sqlIdent45 = sql.identifier(...parts95);
+const fromCallback45 = (...args) => sql`${sqlIdent45}(${sqlFromArgDigests(args)})`;
 const parameters45 = [];
-const extensions109 = {
+const extensions46 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -4232,10 +4224,10 @@ const extensions109 = {
   }
 };
 const parts96 = ["c", "mutation_out_out_unnamed"];
-const sqlIdent96 = sql.identifier(...parts96);
-const fromCallback46 = (...args) => sql`${sqlIdent96}(${sqlFromArgDigests(args)})`;
+const sqlIdent46 = sql.identifier(...parts96);
+const fromCallback46 = (...args) => sql`${sqlIdent46}(${sqlFromArgDigests(args)})`;
 const parameters46 = [];
-const extensions110 = {
+const extensions47 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -4247,10 +4239,10 @@ const extensions110 = {
   }
 };
 const parts97 = ["c", "search_test_summaries"];
-const sqlIdent97 = sql.identifier(...parts97);
-const fromCallback47 = (...args) => sql`${sqlIdent97}(${sqlFromArgDigests(args)})`;
+const sqlIdent47 = sql.identifier(...parts97);
+const fromCallback47 = (...args) => sql`${sqlIdent47}(${sqlFromArgDigests(args)})`;
 const parameters47 = [];
-const extensions111 = {
+const extensions48 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -4261,8 +4253,8 @@ const extensions111 = {
   }
 };
 const parts98 = ["a", "optional_missing_middle_1"];
-const sqlIdent98 = sql.identifier(...parts98);
-const fromCallback48 = (...args) => sql`${sqlIdent98}(${sqlFromArgDigests(args)})`;
+const sqlIdent48 = sql.identifier(...parts98);
+const fromCallback48 = (...args) => sql`${sqlIdent48}(${sqlFromArgDigests(args)})`;
 const parameters48 = [{
   name: "",
   required: true,
@@ -4279,7 +4271,7 @@ const parameters48 = [{
   notNull: true,
   codec: TYPES.int
 }];
-const extensions112 = {
+const extensions49 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -4290,8 +4282,8 @@ const extensions112 = {
   }
 };
 const parts99 = ["a", "optional_missing_middle_2"];
-const sqlIdent99 = sql.identifier(...parts99);
-const fromCallback49 = (...args) => sql`${sqlIdent99}(${sqlFromArgDigests(args)})`;
+const sqlIdent49 = sql.identifier(...parts99);
+const fromCallback49 = (...args) => sql`${sqlIdent49}(${sqlFromArgDigests(args)})`;
 const parameters49 = [{
   name: "a",
   required: true,
@@ -4308,7 +4300,7 @@ const parameters49 = [{
   notNull: true,
   codec: TYPES.int
 }];
-const extensions113 = {
+const extensions50 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -4319,8 +4311,8 @@ const extensions113 = {
   }
 };
 const parts100 = ["a", "optional_missing_middle_3"];
-const sqlIdent100 = sql.identifier(...parts100);
-const fromCallback50 = (...args) => sql`${sqlIdent100}(${sqlFromArgDigests(args)})`;
+const sqlIdent50 = sql.identifier(...parts100);
+const fromCallback50 = (...args) => sql`${sqlIdent50}(${sqlFromArgDigests(args)})`;
 const parameters50 = [{
   name: "a",
   required: true,
@@ -4337,7 +4329,7 @@ const parameters50 = [{
   notNull: true,
   codec: TYPES.int
 }];
-const extensions114 = {
+const extensions51 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -4348,8 +4340,8 @@ const extensions114 = {
   }
 };
 const parts101 = ["a", "optional_missing_middle_4"];
-const sqlIdent101 = sql.identifier(...parts101);
-const fromCallback51 = (...args) => sql`${sqlIdent101}(${sqlFromArgDigests(args)})`;
+const sqlIdent51 = sql.identifier(...parts101);
+const fromCallback51 = (...args) => sql`${sqlIdent51}(${sqlFromArgDigests(args)})`;
 const parameters51 = [{
   name: "",
   required: true,
@@ -4366,7 +4358,7 @@ const parameters51 = [{
   notNull: true,
   codec: TYPES.int
 }];
-const extensions115 = {
+const extensions52 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -4377,8 +4369,8 @@ const extensions115 = {
   }
 };
 const parts102 = ["a", "optional_missing_middle_5"];
-const sqlIdent102 = sql.identifier(...parts102);
-const fromCallback52 = (...args) => sql`${sqlIdent102}(${sqlFromArgDigests(args)})`;
+const sqlIdent52 = sql.identifier(...parts102);
+const fromCallback52 = (...args) => sql`${sqlIdent52}(${sqlFromArgDigests(args)})`;
 const parameters52 = [{
   name: "a",
   required: true,
@@ -4395,7 +4387,7 @@ const parameters52 = [{
   notNull: true,
   codec: TYPES.int
 }];
-const extensions116 = {
+const extensions53 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -4406,10 +4398,10 @@ const extensions116 = {
   }
 };
 const parts103 = ["c", "func_out_unnamed_out_out_unnamed"];
-const sqlIdent103 = sql.identifier(...parts103);
-const fromCallback53 = (...args) => sql`${sqlIdent103}(${sqlFromArgDigests(args)})`;
+const sqlIdent53 = sql.identifier(...parts103);
+const fromCallback53 = (...args) => sql`${sqlIdent53}(${sqlFromArgDigests(args)})`;
 const parameters53 = [];
-const extensions117 = {
+const extensions54 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -4420,15 +4412,15 @@ const extensions117 = {
   }
 };
 const parts104 = ["c", "func_returns_table_multi_col"];
-const sqlIdent104 = sql.identifier(...parts104);
-const fromCallback54 = (...args) => sql`${sqlIdent104}(${sqlFromArgDigests(args)})`;
+const sqlIdent54 = sql.identifier(...parts104);
+const fromCallback54 = (...args) => sql`${sqlIdent54}(${sqlFromArgDigests(args)})`;
 const parameters54 = [{
   name: "i",
   required: true,
   notNull: false,
   codec: TYPES.int
 }];
-const extensions118 = {
+const extensions55 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -4439,8 +4431,8 @@ const extensions118 = {
   }
 };
 const parts105 = ["c", "int_set_mutation"];
-const sqlIdent105 = sql.identifier(...parts105);
-const fromCallback55 = (...args) => sql`${sqlIdent105}(${sqlFromArgDigests(args)})`;
+const sqlIdent55 = sql.identifier(...parts105);
+const fromCallback55 = (...args) => sql`${sqlIdent55}(${sqlFromArgDigests(args)})`;
 const parameters55 = [{
   name: "x",
   required: true,
@@ -4457,7 +4449,7 @@ const parameters55 = [{
   notNull: false,
   codec: TYPES.int
 }];
-const extensions119 = {
+const extensions56 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -4468,8 +4460,8 @@ const extensions119 = {
   }
 };
 const parts106 = ["c", "int_set_query"];
-const sqlIdent106 = sql.identifier(...parts106);
-const fromCallback56 = (...args) => sql`${sqlIdent106}(${sqlFromArgDigests(args)})`;
+const sqlIdent56 = sql.identifier(...parts106);
+const fromCallback56 = (...args) => sql`${sqlIdent56}(${sqlFromArgDigests(args)})`;
 const parameters56 = [{
   name: "x",
   required: true,
@@ -4486,7 +4478,7 @@ const parameters56 = [{
   notNull: false,
   codec: TYPES.int
 }];
-const extensions120 = {
+const extensions57 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -4497,10 +4489,10 @@ const extensions120 = {
   }
 };
 const parts107 = ["c", "mutation_out_unnamed_out_out_unnamed"];
-const sqlIdent107 = sql.identifier(...parts107);
-const fromCallback57 = (...args) => sql`${sqlIdent107}(${sqlFromArgDigests(args)})`;
+const sqlIdent57 = sql.identifier(...parts107);
+const fromCallback57 = (...args) => sql`${sqlIdent57}(${sqlFromArgDigests(args)})`;
 const parameters57 = [];
-const extensions121 = {
+const extensions58 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -4511,15 +4503,15 @@ const extensions121 = {
   }
 };
 const parts108 = ["c", "mutation_returns_table_multi_col"];
-const sqlIdent108 = sql.identifier(...parts108);
-const fromCallback58 = (...args) => sql`${sqlIdent108}(${sqlFromArgDigests(args)})`;
+const sqlIdent58 = sql.identifier(...parts108);
+const fromCallback58 = (...args) => sql`${sqlIdent58}(${sqlFromArgDigests(args)})`;
 const parameters58 = [{
   name: "i",
   required: true,
   notNull: false,
   codec: TYPES.int
 }];
-const extensions122 = {
+const extensions59 = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -4530,15 +4522,15 @@ const extensions122 = {
   }
 };
 const parts109 = ["b", "guid_fn"];
-const sqlIdent109 = sql.identifier(...parts109);
-const fromCallback59 = (...args) => sql`${sqlIdent109}(${sqlFromArgDigests(args)})`;
+const sqlIdent59 = sql.identifier(...parts109);
+const fromCallback59 = (...args) => sql`${sqlIdent59}(${sqlFromArgDigests(args)})`;
 const parameters59 = [{
   name: "g",
   required: true,
   notNull: false,
-  codec: registryConfig_pgCodecs_guid_guid
+  codec: registry_pgCodecs_guid_guidCodec
 }];
-const extensions123 = {
+const extensions60 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -4549,10 +4541,10 @@ const extensions123 = {
   }
 };
 const parts110 = ["a", "mutation_interval_array"];
-const sqlIdent110 = sql.identifier(...parts110);
-const fromCallback60 = (...args) => sql`${sqlIdent110}(${sqlFromArgDigests(args)})`;
+const sqlIdent60 = sql.identifier(...parts110);
+const fromCallback60 = (...args) => sql`${sqlIdent60}(${sqlFromArgDigests(args)})`;
 const parameters60 = [];
-const extensions124 = {
+const extensions61 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -4563,10 +4555,10 @@ const extensions124 = {
   }
 };
 const parts111 = ["a", "query_interval_array"];
-const sqlIdent111 = sql.identifier(...parts111);
-const fromCallback61 = (...args) => sql`${sqlIdent111}(${sqlFromArgDigests(args)})`;
+const sqlIdent61 = sql.identifier(...parts111);
+const fromCallback61 = (...args) => sql`${sqlIdent61}(${sqlFromArgDigests(args)})`;
 const parameters61 = [];
-const extensions125 = {
+const extensions62 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -4577,10 +4569,10 @@ const extensions125 = {
   }
 };
 const parts112 = ["a", "mutation_text_array"];
-const sqlIdent112 = sql.identifier(...parts112);
-const fromCallback62 = (...args) => sql`${sqlIdent112}(${sqlFromArgDigests(args)})`;
+const sqlIdent62 = sql.identifier(...parts112);
+const fromCallback62 = (...args) => sql`${sqlIdent62}(${sqlFromArgDigests(args)})`;
 const parameters62 = [];
-const extensions126 = {
+const extensions63 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -4591,10 +4583,10 @@ const extensions126 = {
   }
 };
 const parts113 = ["a", "query_text_array"];
-const sqlIdent113 = sql.identifier(...parts113);
-const fromCallback63 = (...args) => sql`${sqlIdent113}(${sqlFromArgDigests(args)})`;
+const sqlIdent63 = sql.identifier(...parts113);
+const fromCallback63 = (...args) => sql`${sqlIdent63}(${sqlFromArgDigests(args)})`;
 const parameters63 = [];
-const extensions127 = {
+const extensions64 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -4605,7 +4597,7 @@ const extensions127 = {
     behavior: ["-insert", "-update", "-delete"]
   }
 };
-const extensions128 = {
+const extensions65 = {
   description: "Should output as Input",
   pg: {
     serviceName: "main",
@@ -4622,7 +4614,7 @@ const uniques2 = [{
     tags: Object.create(null)
   }
 }];
-const extensions129 = {
+const extensions66 = {
   description: "Should output as Patch",
   pg: {
     serviceName: "main",
@@ -4639,7 +4631,7 @@ const uniques3 = [{
     tags: Object.create(null)
   }
 }];
-const extensions130 = {
+const extensions67 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -4656,7 +4648,7 @@ const uniques4 = [{
     tags: Object.create(null)
   }
 }];
-const extensions131 = {
+const extensions68 = {
   description: "`reservedPatchs` table should get renamed to ReservedPatchRecord to prevent clashes with ReservedPatch from `reserved` table",
   pg: {
     serviceName: "main",
@@ -4673,7 +4665,7 @@ const uniques5 = [{
     tags: Object.create(null)
   }
 }];
-const extensions132 = {
+const extensions69 = {
   description: "`reserved_input` table should get renamed to ReservedInputRecord to prevent clashes with ReservedInput from `reserved` table",
   pg: {
     serviceName: "main",
@@ -4690,7 +4682,7 @@ const uniques6 = [{
     tags: Object.create(null)
   }
 }];
-const extensions133 = {
+const extensions70 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -4707,7 +4699,7 @@ const uniques7 = [{
     tags: Object.create(null)
   }
 }];
-const extensions134 = {
+const extensions71 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -4717,18 +4709,18 @@ const extensions134 = {
   tags: {}
 };
 const uniques8 = [];
-const registryConfig_pgResources_foreign_key_foreign_key = {
+const registry_pgResources_foreign_key_foreign_key = {
   executor: executor_mainPgExecutor,
   name: "foreign_key",
   identifier: "main.a.foreign_key",
-  from: registryConfig_pgCodecs_foreignKey_foreignKey.sqlType,
-  codec: registryConfig_pgCodecs_foreignKey_foreignKey,
+  from: registry_pgCodecs_foreignKey_foreignKeyCodec.sqlType,
+  codec: registry_pgCodecs_foreignKey_foreignKeyCodec,
   uniques: uniques8,
   isVirtual: false,
   description: undefined,
-  extensions: extensions134
+  extensions: extensions71
 };
-const extensions135 = {
+const extensions72 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -4745,7 +4737,7 @@ const uniques9 = [{
     tags: Object.create(null)
   }
 }];
-const extensions136 = {
+const extensions73 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -4755,7 +4747,7 @@ const extensions136 = {
   tags: {}
 };
 const uniques10 = [];
-const extensions137 = {
+const extensions74 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -4764,7 +4756,7 @@ const extensions137 = {
   },
   tags: {
     omit: "create,update,delete,all,order,filter",
-    behavior: extensions14.tags.behavior
+    behavior: uniqueForeignKeyCodecSpec.tags.behavior
   }
 };
 const uniques11 = [{
@@ -4775,18 +4767,18 @@ const uniques11 = [{
     tags: Object.create(null)
   }
 }];
-const registryConfig_pgResources_unique_foreign_key_unique_foreign_key = {
+const registry_pgResources_unique_foreign_key_unique_foreign_key = {
   executor: executor_mainPgExecutor,
   name: "unique_foreign_key",
   identifier: "main.a.unique_foreign_key",
-  from: registryConfig_pgCodecs_uniqueForeignKey_uniqueForeignKey.sqlType,
-  codec: registryConfig_pgCodecs_uniqueForeignKey_uniqueForeignKey,
+  from: registry_pgCodecs_uniqueForeignKey_uniqueForeignKeyCodec.sqlType,
+  codec: registry_pgCodecs_uniqueForeignKey_uniqueForeignKeyCodec,
   uniques: uniques11,
   isVirtual: false,
   description: undefined,
-  extensions: extensions137
+  extensions: extensions74
 };
-const extensions138 = {
+const extensions75 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -4803,7 +4795,7 @@ const uniques12 = [{
     tags: Object.create(null)
   }
 }];
-const extensions139 = {
+const extensions76 = {
   description: "Tracks the person's secret",
   pg: {
     serviceName: "main",
@@ -4822,18 +4814,18 @@ const uniques13 = [{
     tags: Object.create(null)
   }
 }];
-const registryConfig_pgResources_person_secret_person_secret = {
+const registry_pgResources_person_secret_person_secret = {
   executor: executor_mainPgExecutor,
   name: "person_secret",
   identifier: "main.c.person_secret",
-  from: registryConfig_pgCodecs_personSecret_personSecret.sqlType,
-  codec: registryConfig_pgCodecs_personSecret_personSecret,
+  from: registry_pgCodecs_personSecret_personSecretCodec.sqlType,
+  codec: registry_pgCodecs_personSecret_personSecretCodec,
   uniques: uniques13,
   isVirtual: false,
   description: "Tracks the person's secret",
-  extensions: extensions139
+  extensions: extensions76
 };
-const extensions140 = {
+const extensions77 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -4850,7 +4842,7 @@ const uniques14 = [{
     tags: Object.create(null)
   }
 }];
-const extensions141 = {
+const extensions78 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -4867,18 +4859,18 @@ const uniques15 = [{
     tags: Object.create(null)
   }
 }];
-const registryConfig_pgResources_compound_key_compound_key = {
+const registry_pgResources_compound_key_compound_key = {
   executor: executor_mainPgExecutor,
   name: "compound_key",
   identifier: "main.c.compound_key",
-  from: registryConfig_pgCodecs_compoundKey_compoundKey.sqlType,
-  codec: registryConfig_pgCodecs_compoundKey_compoundKey,
+  from: registry_pgCodecs_compoundKey_compoundKeyCodec.sqlType,
+  codec: registry_pgCodecs_compoundKey_compoundKeyCodec,
   uniques: uniques15,
   isVirtual: false,
   description: undefined,
-  extensions: extensions141
+  extensions: extensions78
 };
-const extensions142 = {
+const extensions79 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -4895,7 +4887,7 @@ const uniques16 = [{
     tags: Object.create(null)
   }
 }];
-const extensions143 = {
+const extensions80 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -4912,7 +4904,7 @@ const uniques17 = [{
     tags: Object.create(null)
   }
 }];
-const extensions144 = {
+const extensions81 = {
   description: "YOYOYO!!",
   pg: {
     serviceName: "main",
@@ -4934,7 +4926,7 @@ const uniques18 = [{
     })
   }
 }];
-const extensions145 = {
+const extensions82 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -4951,7 +4943,7 @@ const uniques19 = [{
     tags: Object.create(null)
   }
 }];
-const extensions146 = {
+const extensions83 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -4962,21 +4954,21 @@ const extensions146 = {
   }
 };
 const parts114 = ["c", "edge_case_computed"];
-const sqlIdent114 = sql.identifier(...parts114);
-const fromCallback64 = (...args) => sql`${sqlIdent114}(${sqlFromArgDigests(args)})`;
+const sqlIdent64 = sql.identifier(...parts114);
+const fromCallback64 = (...args) => sql`${sqlIdent64}(${sqlFromArgDigests(args)})`;
 const parameters64 = [{
   name: "edge_case",
   required: true,
   notNull: false,
-  codec: registryConfig_pgCodecs_edgeCase_edgeCase
+  codec: registry_pgCodecs_edgeCase_edgeCaseCodec
 }];
 const parts115 = ["c", "return_table_without_grants"];
-const sqlIdent115 = sql.identifier(...parts115);
+const sqlIdent65 = sql.identifier(...parts115);
 const options_return_table_without_grants = {
   name: "return_table_without_grants",
   identifier: "main.c.return_table_without_grants()",
   from(...args) {
-    return sql`${sqlIdent115}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent65}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -4994,7 +4986,7 @@ const options_return_table_without_grants = {
   },
   description: undefined
 };
-const extensions147 = {
+const extensions84 = {
   pg: {
     serviceName: "main",
     schemaName: "b",
@@ -5005,13 +4997,13 @@ const extensions147 = {
   }
 };
 const parts116 = ["b", "list_bde_mutation"];
-const sqlIdent116 = sql.identifier(...parts116);
-const fromCallback65 = (...args) => sql`${sqlIdent116}(${sqlFromArgDigests(args)})`;
+const sqlIdent66 = sql.identifier(...parts116);
+const fromCallback65 = (...args) => sql`${sqlIdent66}(${sqlFromArgDigests(args)})`;
 const parameters65 = [{
   name: "b",
   required: true,
   notNull: false,
-  codec: registryConfig_pgCodecs_textArray_textArray
+  codec: registry_pgCodecs_textArray_textArrayCodec
 }, {
   name: "d",
   required: true,
@@ -5023,7 +5015,7 @@ const parameters65 = [{
   notNull: false,
   codec: TYPES.text
 }];
-const extensions148 = {
+const extensions85 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -5033,7 +5025,7 @@ const extensions148 = {
   tags: {}
 };
 const uniques20 = [];
-const extensions149 = {
+const extensions86 = {
   description: "Tracks metadata about the left arms of various people",
   pg: {
     serviceName: "main",
@@ -5057,24 +5049,24 @@ const uniques21 = [{
     tags: Object.create(null)
   }
 }];
-const registryConfig_pgResources_left_arm_left_arm = {
+const registry_pgResources_left_arm_left_arm = {
   executor: executor_mainPgExecutor,
   name: "left_arm",
   identifier: "main.c.left_arm",
-  from: registryConfig_pgCodecs_leftArm_leftArm.sqlType,
-  codec: registryConfig_pgCodecs_leftArm_leftArm,
+  from: registry_pgCodecs_leftArm_leftArmCodec.sqlType,
+  codec: registry_pgCodecs_leftArm_leftArmCodec,
   uniques: uniques21,
   isVirtual: false,
   description: "Tracks metadata about the left arms of various people",
-  extensions: extensions149
+  extensions: extensions86
 };
 const parts117 = ["b", "authenticate_fail"];
-const sqlIdent117 = sql.identifier(...parts117);
+const sqlIdent67 = sql.identifier(...parts117);
 const options_authenticate_fail = {
   name: "authenticate_fail",
   identifier: "main.b.authenticate_fail()",
   from(...args) {
-    return sql`${sqlIdent117}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent67}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -5092,7 +5084,7 @@ const options_authenticate_fail = {
   },
   description: undefined
 };
-const extensions150 = {
+const extensions87 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -5108,20 +5100,20 @@ const resourceConfig_jwt_token = {
   executor: executor_mainPgExecutor,
   name: "jwt_token",
   identifier: "main.b.jwt_token",
-  from: registryConfig_pgCodecs_jwtToken_jwtToken.sqlType,
-  codec: registryConfig_pgCodecs_jwtToken_jwtToken,
+  from: registry_pgCodecs_jwtToken_jwtTokenCodec.sqlType,
+  codec: registry_pgCodecs_jwtToken_jwtTokenCodec,
   uniques: uniques22,
   isVirtual: true,
   description: undefined,
-  extensions: extensions150
+  extensions: extensions87
 };
 const parts118 = ["b", "authenticate"];
-const sqlIdent118 = sql.identifier(...parts118);
+const sqlIdent68 = sql.identifier(...parts118);
 const options_authenticate = {
   name: "authenticate",
   identifier: "main.b.authenticate(int4,numeric,int8)",
   from(...args) {
-    return sql`${sqlIdent118}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent68}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "a",
@@ -5154,7 +5146,7 @@ const options_authenticate = {
   },
   description: undefined
 };
-const extensions151 = {
+const extensions88 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -5171,30 +5163,30 @@ const uniques23 = [{
     tags: Object.create(null)
   }
 }];
-const registryConfig_pgResources_issue756_issue756 = {
+const registry_pgResources_issue756_issue756 = {
   executor: executor_mainPgExecutor,
   name: "issue756",
   identifier: "main.c.issue756",
-  from: registryConfig_pgCodecs_issue756_issue756.sqlType,
-  codec: registryConfig_pgCodecs_issue756_issue756,
+  from: registry_pgCodecs_issue756_issue756Codec.sqlType,
+  codec: registry_pgCodecs_issue756_issue756Codec,
   uniques: uniques23,
   isVirtual: false,
   description: undefined,
-  extensions: extensions151
+  extensions: extensions88
 };
 const parts119 = ["c", "left_arm_identity"];
-const sqlIdent119 = sql.identifier(...parts119);
+const sqlIdent69 = sql.identifier(...parts119);
 const options_left_arm_identity = {
   name: "left_arm_identity",
   identifier: "main.c.left_arm_identity(c.left_arm)",
   from(...args) {
-    return sql`${sqlIdent119}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent69}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "left_arm",
     required: true,
     notNull: false,
-    codec: registryConfig_pgCodecs_leftArm_leftArm,
+    codec: registry_pgCodecs_leftArm_leftArmCodec,
     extensions: {
       variant: "base"
     }
@@ -5217,12 +5209,12 @@ const options_left_arm_identity = {
   description: undefined
 };
 const parts120 = ["c", "issue756_mutation"];
-const sqlIdent120 = sql.identifier(...parts120);
+const sqlIdent70 = sql.identifier(...parts120);
 const options_issue756_mutation = {
   name: "issue756_mutation",
   identifier: "main.c.issue756_mutation()",
   from(...args) {
-    return sql`${sqlIdent120}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent70}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -5241,12 +5233,12 @@ const options_issue756_mutation = {
   description: undefined
 };
 const parts121 = ["c", "issue756_set_mutation"];
-const sqlIdent121 = sql.identifier(...parts121);
+const sqlIdent71 = sql.identifier(...parts121);
 const options_issue756_set_mutation = {
   name: "issue756_set_mutation",
   identifier: "main.c.issue756_set_mutation()",
   from(...args) {
-    return sql`${sqlIdent121}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent71}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -5265,12 +5257,12 @@ const options_issue756_set_mutation = {
   description: undefined
 };
 const parts122 = ["b", "authenticate_many"];
-const sqlIdent122 = sql.identifier(...parts122);
+const sqlIdent72 = sql.identifier(...parts122);
 const options_authenticate_many = {
   name: "authenticate_many",
   identifier: "main.b.authenticate_many(int4,numeric,int8)",
   from(...args) {
-    return sql`${sqlIdent122}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent72}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "a",
@@ -5304,12 +5296,12 @@ const options_authenticate_many = {
   description: undefined
 };
 const parts123 = ["b", "authenticate_payload"];
-const sqlIdent123 = sql.identifier(...parts123);
+const sqlIdent73 = sql.identifier(...parts123);
 const options_authenticate_payload = {
   name: "authenticate_payload",
   identifier: "main.b.authenticate_payload(int4,numeric,int8)",
   from(...args) {
-    return sql`${sqlIdent123}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent73}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "a",
@@ -5342,7 +5334,7 @@ const options_authenticate_payload = {
   },
   description: undefined
 };
-const extensions152 = {
+const extensions89 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -5359,14 +5351,14 @@ const resourceConfig_auth_payload = {
   executor: executor_mainPgExecutor,
   name: "auth_payload",
   identifier: "main.b.auth_payload",
-  from: registryConfig_pgCodecs_authPayload_authPayload.sqlType,
-  codec: registryConfig_pgCodecs_authPayload_authPayload,
+  from: registry_pgCodecs_authPayload_authPayloadCodec.sqlType,
+  codec: registry_pgCodecs_authPayload_authPayloadCodec,
   uniques: uniques24,
   isVirtual: true,
   description: undefined,
-  extensions: extensions152
+  extensions: extensions89
 };
-const extensions153 = {
+const extensions90 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -5377,8 +5369,8 @@ const extensions153 = {
   }
 };
 const parts124 = ["c", "types_mutation"];
-const sqlIdent124 = sql.identifier(...parts124);
-const fromCallback66 = (...args) => sql`${sqlIdent124}(${sqlFromArgDigests(args)})`;
+const sqlIdent74 = sql.identifier(...parts124);
+const fromCallback66 = (...args) => sql`${sqlIdent74}(${sqlFromArgDigests(args)})`;
 const parameters66 = [{
   name: "a",
   required: true,
@@ -5398,7 +5390,7 @@ const parameters66 = [{
   name: "d",
   required: true,
   notNull: true,
-  codec: registryConfig_pgCodecs_int4Array_int4Array
+  codec: registry_pgCodecs_int4Array_int4ArrayCodec
 }, {
   name: "e",
   required: true,
@@ -5408,9 +5400,9 @@ const parameters66 = [{
   name: "f",
   required: true,
   notNull: true,
-  codec: registryConfig_pgCodecs_floatrange_floatrange
+  codec: registry_pgCodecs_floatrange_floatrangeCodec
 }];
-const extensions154 = {
+const extensions91 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -5421,8 +5413,8 @@ const extensions154 = {
   }
 };
 const parts125 = ["c", "types_query"];
-const sqlIdent125 = sql.identifier(...parts125);
-const fromCallback67 = (...args) => sql`${sqlIdent125}(${sqlFromArgDigests(args)})`;
+const sqlIdent75 = sql.identifier(...parts125);
+const fromCallback67 = (...args) => sql`${sqlIdent75}(${sqlFromArgDigests(args)})`;
 const parameters67 = [{
   name: "a",
   required: true,
@@ -5442,7 +5434,7 @@ const parameters67 = [{
   name: "d",
   required: true,
   notNull: true,
-  codec: registryConfig_pgCodecs_int4Array_int4Array
+  codec: registry_pgCodecs_int4Array_int4ArrayCodec
 }, {
   name: "e",
   required: true,
@@ -5452,9 +5444,9 @@ const parameters67 = [{
   name: "f",
   required: true,
   notNull: true,
-  codec: registryConfig_pgCodecs_floatrange_floatrange
+  codec: registry_pgCodecs_floatrange_floatrangeCodec
 }];
-const extensions155 = {
+const extensions92 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -5465,15 +5457,15 @@ const extensions155 = {
   }
 };
 const parts126 = ["c", "compound_type_computed_field"];
-const sqlIdent126 = sql.identifier(...parts126);
-const fromCallback68 = (...args) => sql`${sqlIdent126}(${sqlFromArgDigests(args)})`;
+const sqlIdent76 = sql.identifier(...parts126);
+const fromCallback68 = (...args) => sql`${sqlIdent76}(${sqlFromArgDigests(args)})`;
 const parameters68 = [{
   name: "compound_type",
   required: true,
   notNull: false,
-  codec: attributes_o2_codec_compoundType
+  codec: attributes_o2_codec_compoundTypeCodec
 }];
-const extensions156 = {
+const extensions93 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -5484,15 +5476,15 @@ const extensions156 = {
   }
 };
 const parts127 = ["a", "post_computed_interval_set"];
-const sqlIdent127 = sql.identifier(...parts127);
-const fromCallback69 = (...args) => sql`${sqlIdent127}(${sqlFromArgDigests(args)})`;
+const sqlIdent77 = sql.identifier(...parts127);
+const fromCallback69 = (...args) => sql`${sqlIdent77}(${sqlFromArgDigests(args)})`;
 const parameters69 = [{
   name: "post",
   required: true,
   notNull: false,
-  codec: attributes_post_codec_post
+  codec: attributes_post_codec_postCodec
 }];
-const extensions157 = {
+const extensions94 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -5503,15 +5495,15 @@ const extensions157 = {
   }
 };
 const parts128 = ["a", "post_computed_interval_array"];
-const sqlIdent128 = sql.identifier(...parts128);
-const fromCallback70 = (...args) => sql`${sqlIdent128}(${sqlFromArgDigests(args)})`;
+const sqlIdent78 = sql.identifier(...parts128);
+const fromCallback70 = (...args) => sql`${sqlIdent78}(${sqlFromArgDigests(args)})`;
 const parameters70 = [{
   name: "post",
   required: true,
   notNull: false,
-  codec: attributes_post_codec_post
+  codec: attributes_post_codec_postCodec
 }];
-const extensions158 = {
+const extensions95 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -5522,15 +5514,15 @@ const extensions158 = {
   }
 };
 const parts129 = ["a", "post_computed_text_array"];
-const sqlIdent129 = sql.identifier(...parts129);
-const fromCallback71 = (...args) => sql`${sqlIdent129}(${sqlFromArgDigests(args)})`;
+const sqlIdent79 = sql.identifier(...parts129);
+const fromCallback71 = (...args) => sql`${sqlIdent79}(${sqlFromArgDigests(args)})`;
 const parameters71 = [{
   name: "post",
   required: true,
   notNull: false,
-  codec: attributes_post_codec_post
+  codec: attributes_post_codec_postCodec
 }];
-const extensions159 = {
+const extensions96 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -5543,20 +5535,20 @@ const extensions159 = {
   }
 };
 const parts130 = ["a", "post_computed_with_optional_arg"];
-const sqlIdent130 = sql.identifier(...parts130);
-const fromCallback72 = (...args) => sql`${sqlIdent130}(${sqlFromArgDigests(args)})`;
+const sqlIdent80 = sql.identifier(...parts130);
+const fromCallback72 = (...args) => sql`${sqlIdent80}(${sqlFromArgDigests(args)})`;
 const parameters72 = [{
   name: "post",
   required: true,
   notNull: true,
-  codec: attributes_post_codec_post
+  codec: attributes_post_codec_postCodec
 }, {
   name: "i",
   required: false,
   notNull: true,
   codec: TYPES.int
 }];
-const extensions160 = {
+const extensions97 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -5569,20 +5561,20 @@ const extensions160 = {
   }
 };
 const parts131 = ["a", "post_computed_with_required_arg"];
-const sqlIdent131 = sql.identifier(...parts131);
-const fromCallback73 = (...args) => sql`${sqlIdent131}(${sqlFromArgDigests(args)})`;
+const sqlIdent81 = sql.identifier(...parts131);
+const fromCallback73 = (...args) => sql`${sqlIdent81}(${sqlFromArgDigests(args)})`;
 const parameters73 = [{
   name: "post",
   required: true,
   notNull: true,
-  codec: attributes_post_codec_post
+  codec: attributes_post_codec_postCodec
 }, {
   name: "i",
   required: true,
   notNull: true,
   codec: TYPES.int
 }];
-const extensions161 = {
+const extensions98 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -5593,15 +5585,15 @@ const extensions161 = {
   }
 };
 const parts132 = ["c", "func_out_out_compound_type"];
-const sqlIdent132 = sql.identifier(...parts132);
-const fromCallback74 = (...args) => sql`${sqlIdent132}(${sqlFromArgDigests(args)})`;
+const sqlIdent82 = sql.identifier(...parts132);
+const fromCallback74 = (...args) => sql`${sqlIdent82}(${sqlFromArgDigests(args)})`;
 const parameters74 = [{
   name: "i1",
   required: true,
   notNull: false,
   codec: TYPES.int
 }];
-const extensions162 = {
+const extensions99 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -5612,15 +5604,15 @@ const extensions162 = {
   }
 };
 const parts133 = ["c", "mutation_out_out_compound_type"];
-const sqlIdent133 = sql.identifier(...parts133);
-const fromCallback75 = (...args) => sql`${sqlIdent133}(${sqlFromArgDigests(args)})`;
+const sqlIdent83 = sql.identifier(...parts133);
+const fromCallback75 = (...args) => sql`${sqlIdent83}(${sqlFromArgDigests(args)})`;
 const parameters75 = [{
   name: "i1",
   required: true,
   notNull: false,
   codec: TYPES.int
 }];
-const extensions163 = {
+const extensions100 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -5631,13 +5623,13 @@ const extensions163 = {
   }
 };
 const parts134 = ["a", "post_headline_trimmed"];
-const sqlIdent134 = sql.identifier(...parts134);
-const fromCallback76 = (...args) => sql`${sqlIdent134}(${sqlFromArgDigests(args)})`;
+const sqlIdent84 = sql.identifier(...parts134);
+const fromCallback76 = (...args) => sql`${sqlIdent84}(${sqlFromArgDigests(args)})`;
 const parameters76 = [{
   name: "post",
   required: true,
   notNull: false,
-  codec: attributes_post_codec_post
+  codec: attributes_post_codec_postCodec
 }, {
   name: "length",
   required: false,
@@ -5649,7 +5641,7 @@ const parameters76 = [{
   notNull: false,
   codec: TYPES.text
 }];
-const extensions164 = {
+const extensions101 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -5660,13 +5652,13 @@ const extensions164 = {
   }
 };
 const parts135 = ["a", "post_headline_trimmed_no_defaults"];
-const sqlIdent135 = sql.identifier(...parts135);
-const fromCallback77 = (...args) => sql`${sqlIdent135}(${sqlFromArgDigests(args)})`;
+const sqlIdent85 = sql.identifier(...parts135);
+const fromCallback77 = (...args) => sql`${sqlIdent85}(${sqlFromArgDigests(args)})`;
 const parameters77 = [{
   name: "post",
   required: true,
   notNull: false,
-  codec: attributes_post_codec_post
+  codec: attributes_post_codec_postCodec
 }, {
   name: "length",
   required: true,
@@ -5678,7 +5670,7 @@ const parameters77 = [{
   notNull: false,
   codec: TYPES.text
 }];
-const extensions165 = {
+const extensions102 = {
   pg: {
     serviceName: "main",
     schemaName: "a",
@@ -5689,13 +5681,13 @@ const extensions165 = {
   }
 };
 const parts136 = ["a", "post_headline_trimmed_strict"];
-const sqlIdent136 = sql.identifier(...parts136);
-const fromCallback78 = (...args) => sql`${sqlIdent136}(${sqlFromArgDigests(args)})`;
+const sqlIdent86 = sql.identifier(...parts136);
+const fromCallback78 = (...args) => sql`${sqlIdent86}(${sqlFromArgDigests(args)})`;
 const parameters78 = [{
   name: "post",
   required: true,
   notNull: true,
-  codec: attributes_post_codec_post
+  codec: attributes_post_codec_postCodec
 }, {
   name: "length",
   required: false,
@@ -5707,7 +5699,7 @@ const parameters78 = [{
   notNull: true,
   codec: TYPES.text
 }];
-const extensions166 = {
+const extensions103 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -5718,8 +5710,8 @@ const extensions166 = {
   }
 };
 const parts137 = ["c", "query_output_two_rows"];
-const sqlIdent137 = sql.identifier(...parts137);
-const fromCallback79 = (...args) => sql`${sqlIdent137}(${sqlFromArgDigests(args)})`;
+const sqlIdent87 = sql.identifier(...parts137);
+const fromCallback79 = (...args) => sql`${sqlIdent87}(${sqlFromArgDigests(args)})`;
 const parameters79 = [{
   name: "left_arm_id",
   required: true,
@@ -5736,7 +5728,7 @@ const parameters79 = [{
   notNull: false,
   codec: TYPES.text
 }];
-const extensions167 = {
+const extensions104 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -5753,24 +5745,24 @@ const uniques25 = [{
     tags: Object.create(null)
   }
 }];
-const registryConfig_pgResources_post_post = {
+const registry_pgResources_post_post = {
   executor: executor_mainPgExecutor,
   name: "post",
   identifier: "main.a.post",
-  from: attributes_post_codec_post.sqlType,
-  codec: attributes_post_codec_post,
+  from: attributes_post_codec_postCodec.sqlType,
+  codec: attributes_post_codec_postCodec,
   uniques: uniques25,
   isVirtual: false,
   description: undefined,
-  extensions: extensions167
+  extensions: extensions104
 };
 const parts138 = ["c", "compound_type_set_query"];
-const sqlIdent138 = sql.identifier(...parts138);
+const sqlIdent88 = sql.identifier(...parts138);
 const options_compound_type_set_query = {
   name: "compound_type_set_query",
   identifier: "main.c.compound_type_set_query()",
   from(...args) {
-    return sql`${sqlIdent138}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent88}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -5788,7 +5780,7 @@ const options_compound_type_set_query = {
   },
   description: undefined
 };
-const extensions168 = {
+const extensions105 = {
   description: "Awesome feature!",
   pg: {
     serviceName: "main",
@@ -5804,26 +5796,26 @@ const resourceConfig_compound_type = {
   executor: executor_mainPgExecutor,
   name: "compound_type",
   identifier: "main.c.compound_type",
-  from: attributes_o2_codec_compoundType.sqlType,
-  codec: attributes_o2_codec_compoundType,
+  from: attributes_o2_codec_compoundTypeCodec.sqlType,
+  codec: attributes_o2_codec_compoundTypeCodec,
   uniques: uniques26,
   isVirtual: true,
   description: "Awesome feature!",
-  extensions: extensions168
+  extensions: extensions105
 };
 const parts139 = ["b", "compound_type_mutation"];
-const sqlIdent139 = sql.identifier(...parts139);
+const sqlIdent89 = sql.identifier(...parts139);
 const options_compound_type_mutation = {
   name: "compound_type_mutation",
   identifier: "main.b.compound_type_mutation(c.compound_type)",
   from(...args) {
-    return sql`${sqlIdent139}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent89}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "object",
     required: true,
     notNull: false,
-    codec: attributes_o2_codec_compoundType
+    codec: attributes_o2_codec_compoundTypeCodec
   }],
   returnsArray: false,
   returnsSetof: false,
@@ -5841,18 +5833,18 @@ const options_compound_type_mutation = {
   description: undefined
 };
 const parts140 = ["b", "compound_type_query"];
-const sqlIdent140 = sql.identifier(...parts140);
+const sqlIdent90 = sql.identifier(...parts140);
 const options_compound_type_query = {
   name: "compound_type_query",
   identifier: "main.b.compound_type_query(c.compound_type)",
   from(...args) {
-    return sql`${sqlIdent140}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent90}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "object",
     required: true,
     notNull: false,
-    codec: attributes_o2_codec_compoundType
+    codec: attributes_o2_codec_compoundTypeCodec
   }],
   returnsArray: false,
   returnsSetof: false,
@@ -5870,18 +5862,18 @@ const options_compound_type_query = {
   description: undefined
 };
 const parts141 = ["b", "compound_type_set_mutation"];
-const sqlIdent141 = sql.identifier(...parts141);
+const sqlIdent91 = sql.identifier(...parts141);
 const options_compound_type_set_mutation = {
   name: "compound_type_set_mutation",
   identifier: "main.b.compound_type_set_mutation(c.compound_type)",
   from(...args) {
-    return sql`${sqlIdent141}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent91}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "object",
     required: true,
     notNull: false,
-    codec: attributes_o2_codec_compoundType
+    codec: attributes_o2_codec_compoundTypeCodec
   }],
   returnsArray: false,
   returnsSetof: true,
@@ -5899,12 +5891,12 @@ const options_compound_type_set_mutation = {
   description: undefined
 };
 const parts142 = ["c", "table_mutation"];
-const sqlIdent142 = sql.identifier(...parts142);
+const sqlIdent92 = sql.identifier(...parts142);
 const options_table_mutation = {
   name: "table_mutation",
   identifier: "main.c.table_mutation(int4)",
   from(...args) {
-    return sql`${sqlIdent142}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent92}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "id",
@@ -5928,12 +5920,12 @@ const options_table_mutation = {
   description: undefined
 };
 const parts143 = ["c", "table_query"];
-const sqlIdent143 = sql.identifier(...parts143);
+const sqlIdent93 = sql.identifier(...parts143);
 const options_table_query = {
   name: "table_query",
   identifier: "main.c.table_query(int4)",
   from(...args) {
-    return sql`${sqlIdent143}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent93}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "id",
@@ -5957,18 +5949,18 @@ const options_table_query = {
   description: undefined
 };
 const parts144 = ["a", "post_with_suffix"];
-const sqlIdent144 = sql.identifier(...parts144);
+const sqlIdent94 = sql.identifier(...parts144);
 const options_post_with_suffix = {
   name: "post_with_suffix",
   identifier: "main.a.post_with_suffix(a.post,text)",
   from(...args) {
-    return sql`${sqlIdent144}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent94}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "post",
     required: true,
     notNull: false,
-    codec: attributes_post_codec_post
+    codec: attributes_post_codec_postCodec
   }, {
     name: "suffix",
     required: true,
@@ -5992,18 +5984,18 @@ const options_post_with_suffix = {
   description: undefined
 };
 const parts145 = ["a", "mutation_compound_type_array"];
-const sqlIdent145 = sql.identifier(...parts145);
+const sqlIdent95 = sql.identifier(...parts145);
 const options_mutation_compound_type_array = {
   name: "mutation_compound_type_array",
   identifier: "main.a.mutation_compound_type_array(c.compound_type)",
   from(...args) {
-    return sql`${sqlIdent145}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent95}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "object",
     required: true,
     notNull: false,
-    codec: attributes_o2_codec_compoundType
+    codec: attributes_o2_codec_compoundTypeCodec
   }],
   returnsArray: true,
   returnsSetof: false,
@@ -6021,18 +6013,18 @@ const options_mutation_compound_type_array = {
   description: undefined
 };
 const parts146 = ["a", "query_compound_type_array"];
-const sqlIdent146 = sql.identifier(...parts146);
+const sqlIdent96 = sql.identifier(...parts146);
 const options_query_compound_type_array = {
   name: "query_compound_type_array",
   identifier: "main.a.query_compound_type_array(c.compound_type)",
   from(...args) {
-    return sql`${sqlIdent146}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent96}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "object",
     required: true,
     notNull: false,
-    codec: attributes_o2_codec_compoundType
+    codec: attributes_o2_codec_compoundTypeCodec
   }],
   returnsArray: true,
   returnsSetof: false,
@@ -6050,18 +6042,18 @@ const options_query_compound_type_array = {
   description: undefined
 };
 const parts147 = ["b", "compound_type_array_mutation"];
-const sqlIdent147 = sql.identifier(...parts147);
+const sqlIdent97 = sql.identifier(...parts147);
 const options_compound_type_array_mutation = {
   name: "compound_type_array_mutation",
   identifier: "main.b.compound_type_array_mutation(c.compound_type)",
   from(...args) {
-    return sql`${sqlIdent147}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent97}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "object",
     required: true,
     notNull: false,
-    codec: attributes_o2_codec_compoundType
+    codec: attributes_o2_codec_compoundTypeCodec
   }],
   returnsArray: true,
   returnsSetof: false,
@@ -6079,18 +6071,18 @@ const options_compound_type_array_mutation = {
   description: undefined
 };
 const parts148 = ["b", "compound_type_array_query"];
-const sqlIdent148 = sql.identifier(...parts148);
+const sqlIdent98 = sql.identifier(...parts148);
 const options_compound_type_array_query = {
   name: "compound_type_array_query",
   identifier: "main.b.compound_type_array_query(c.compound_type)",
   from(...args) {
-    return sql`${sqlIdent148}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent98}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "object",
     required: true,
     notNull: false,
-    codec: attributes_o2_codec_compoundType
+    codec: attributes_o2_codec_compoundTypeCodec
   }],
   returnsArray: true,
   returnsSetof: false,
@@ -6108,23 +6100,23 @@ const options_compound_type_array_query = {
   description: undefined
 };
 const parts149 = ["a", "post_computed_compound_type_array"];
-const sqlIdent149 = sql.identifier(...parts149);
+const sqlIdent99 = sql.identifier(...parts149);
 const options_post_computed_compound_type_array = {
   name: "post_computed_compound_type_array",
   identifier: "main.a.post_computed_compound_type_array(a.post,c.compound_type)",
   from(...args) {
-    return sql`${sqlIdent149}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent99}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "post",
     required: true,
     notNull: false,
-    codec: attributes_post_codec_post
+    codec: attributes_post_codec_postCodec
   }, {
     name: "object",
     required: true,
     notNull: false,
-    codec: attributes_o2_codec_compoundType
+    codec: attributes_o2_codec_compoundTypeCodec
   }],
   returnsArray: true,
   returnsSetof: false,
@@ -6142,18 +6134,18 @@ const options_post_computed_compound_type_array = {
   description: undefined
 };
 const parts150 = ["a", "post_many"];
-const sqlIdent150 = sql.identifier(...parts150);
+const sqlIdent100 = sql.identifier(...parts150);
 const options_post_many = {
   name: "post_many",
   identifier: "main.a.post_many(a._post)",
   from(...args) {
-    return sql`${sqlIdent150}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent100}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "posts",
     required: true,
     notNull: false,
-    codec: registryConfig_pgCodecs_postArray_postArray
+    codec: registry_pgCodecs_postArray_postArrayCodec
   }],
   returnsArray: false,
   returnsSetof: true,
@@ -6170,7 +6162,7 @@ const options_post_many = {
   },
   description: undefined
 };
-const extensions169 = {
+const extensions106 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -6185,15 +6177,15 @@ const extensions169 = {
   singleOutputParameterName: "o1"
 };
 const parts151 = ["c", "person_computed_out"];
-const sqlIdent151 = sql.identifier(...parts151);
-const fromCallback80 = (...args) => sql`${sqlIdent151}(${sqlFromArgDigests(args)})`;
+const sqlIdent101 = sql.identifier(...parts151);
+const fromCallback80 = (...args) => sql`${sqlIdent101}(${sqlFromArgDigests(args)})`;
 const parameters80 = [{
   name: "person",
   required: true,
   notNull: false,
-  codec: attributes_person_codec_person
+  codec: attributes_person_codec_personCodec
 }];
-const extensions170 = {
+const extensions107 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -6205,15 +6197,15 @@ const extensions170 = {
   }
 };
 const parts152 = ["c", "person_first_name"];
-const sqlIdent152 = sql.identifier(...parts152);
-const fromCallback81 = (...args) => sql`${sqlIdent152}(${sqlFromArgDigests(args)})`;
+const sqlIdent102 = sql.identifier(...parts152);
+const fromCallback81 = (...args) => sql`${sqlIdent102}(${sqlFromArgDigests(args)})`;
 const parameters81 = [{
   name: "person",
   required: true,
   notNull: false,
-  codec: attributes_person_codec_person
+  codec: attributes_person_codec_personCodec
 }];
-const extensions171 = {
+const extensions108 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -6224,15 +6216,15 @@ const extensions171 = {
   }
 };
 const parts153 = ["c", "person_computed_out_out"];
-const sqlIdent153 = sql.identifier(...parts153);
-const fromCallback82 = (...args) => sql`${sqlIdent153}(${sqlFromArgDigests(args)})`;
+const sqlIdent103 = sql.identifier(...parts153);
+const fromCallback82 = (...args) => sql`${sqlIdent103}(${sqlFromArgDigests(args)})`;
 const parameters82 = [{
   name: "person",
   required: true,
   notNull: false,
-  codec: attributes_person_codec_person
+  codec: attributes_person_codec_personCodec
 }];
-const extensions172 = {
+const extensions109 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -6244,20 +6236,20 @@ const extensions172 = {
   singleOutputParameterName: "ino"
 };
 const parts154 = ["c", "person_computed_inout"];
-const sqlIdent154 = sql.identifier(...parts154);
-const fromCallback83 = (...args) => sql`${sqlIdent154}(${sqlFromArgDigests(args)})`;
+const sqlIdent104 = sql.identifier(...parts154);
+const fromCallback83 = (...args) => sql`${sqlIdent104}(${sqlFromArgDigests(args)})`;
 const parameters83 = [{
   name: "person",
   required: true,
   notNull: false,
-  codec: attributes_person_codec_person
+  codec: attributes_person_codec_personCodec
 }, {
   name: "ino",
   required: true,
   notNull: false,
   codec: TYPES.text
 }];
-const extensions173 = {
+const extensions110 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -6268,20 +6260,20 @@ const extensions173 = {
   }
 };
 const parts155 = ["c", "person_computed_inout_out"];
-const sqlIdent155 = sql.identifier(...parts155);
-const fromCallback84 = (...args) => sql`${sqlIdent155}(${sqlFromArgDigests(args)})`;
+const sqlIdent105 = sql.identifier(...parts155);
+const fromCallback84 = (...args) => sql`${sqlIdent105}(${sqlFromArgDigests(args)})`;
 const parameters84 = [{
   name: "person",
   required: true,
   notNull: false,
-  codec: attributes_person_codec_person
+  codec: attributes_person_codec_personCodec
 }, {
   name: "ino",
   required: true,
   notNull: false,
   codec: TYPES.text
 }];
-const extensions174 = {
+const extensions111 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -6293,20 +6285,20 @@ const extensions174 = {
   }
 };
 const parts156 = ["c", "person_exists"];
-const sqlIdent156 = sql.identifier(...parts156);
-const fromCallback85 = (...args) => sql`${sqlIdent156}(${sqlFromArgDigests(args)})`;
+const sqlIdent106 = sql.identifier(...parts156);
+const fromCallback85 = (...args) => sql`${sqlIdent106}(${sqlFromArgDigests(args)})`;
 const parameters85 = [{
   name: "person",
   required: true,
   notNull: false,
-  codec: attributes_person_codec_person
+  codec: attributes_person_codec_personCodec
 }, {
   name: "email",
   required: true,
   notNull: false,
-  codec: attributes_email_codec_email
+  codec: personCodecSpec_personAttributes_email_codec_emailCodec
 }];
-const extensions175 = {
+const extensions112 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -6317,15 +6309,15 @@ const extensions175 = {
   }
 };
 const parts157 = ["c", "person_computed_first_arg_inout_out"];
-const sqlIdent157 = sql.identifier(...parts157);
-const fromCallback86 = (...args) => sql`${sqlIdent157}(${sqlFromArgDigests(args)})`;
+const sqlIdent107 = sql.identifier(...parts157);
+const fromCallback86 = (...args) => sql`${sqlIdent107}(${sqlFromArgDigests(args)})`;
 const parameters86 = [{
   name: "person",
   required: true,
   notNull: false,
-  codec: attributes_person_codec_person
+  codec: attributes_person_codec_personCodec
 }];
-const extensions176 = {
+const extensions113 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -6336,8 +6328,8 @@ const extensions176 = {
   }
 };
 const parts158 = ["c", "func_out_complex"];
-const sqlIdent158 = sql.identifier(...parts158);
-const fromCallback87 = (...args) => sql`${sqlIdent158}(${sqlFromArgDigests(args)})`;
+const sqlIdent108 = sql.identifier(...parts158);
+const fromCallback87 = (...args) => sql`${sqlIdent108}(${sqlFromArgDigests(args)})`;
 const parameters87 = [{
   name: "a",
   required: true,
@@ -6349,7 +6341,7 @@ const parameters87 = [{
   notNull: false,
   codec: TYPES.text
 }];
-const extensions177 = {
+const extensions114 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -6360,8 +6352,8 @@ const extensions177 = {
   }
 };
 const parts159 = ["c", "func_out_complex_setof"];
-const sqlIdent159 = sql.identifier(...parts159);
-const fromCallback88 = (...args) => sql`${sqlIdent159}(${sqlFromArgDigests(args)})`;
+const sqlIdent109 = sql.identifier(...parts159);
+const fromCallback88 = (...args) => sql`${sqlIdent109}(${sqlFromArgDigests(args)})`;
 const parameters88 = [{
   name: "a",
   required: true,
@@ -6373,7 +6365,7 @@ const parameters88 = [{
   notNull: false,
   codec: TYPES.text
 }];
-const extensions178 = {
+const extensions115 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -6384,8 +6376,8 @@ const extensions178 = {
   }
 };
 const parts160 = ["c", "mutation_out_complex"];
-const sqlIdent160 = sql.identifier(...parts160);
-const fromCallback89 = (...args) => sql`${sqlIdent160}(${sqlFromArgDigests(args)})`;
+const sqlIdent110 = sql.identifier(...parts160);
+const fromCallback89 = (...args) => sql`${sqlIdent110}(${sqlFromArgDigests(args)})`;
 const parameters89 = [{
   name: "a",
   required: true,
@@ -6397,7 +6389,7 @@ const parameters89 = [{
   notNull: false,
   codec: TYPES.text
 }];
-const extensions179 = {
+const extensions116 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -6408,8 +6400,8 @@ const extensions179 = {
   }
 };
 const parts161 = ["c", "mutation_out_complex_setof"];
-const sqlIdent161 = sql.identifier(...parts161);
-const fromCallback90 = (...args) => sql`${sqlIdent161}(${sqlFromArgDigests(args)})`;
+const sqlIdent111 = sql.identifier(...parts161);
+const fromCallback90 = (...args) => sql`${sqlIdent111}(${sqlFromArgDigests(args)})`;
 const parameters90 = [{
   name: "a",
   required: true,
@@ -6421,7 +6413,7 @@ const parameters90 = [{
   notNull: false,
   codec: TYPES.text
 }];
-const extensions180 = {
+const extensions117 = {
   pg: {
     serviceName: "main",
     schemaName: "c",
@@ -6432,13 +6424,13 @@ const extensions180 = {
   }
 };
 const parts162 = ["c", "person_computed_complex"];
-const sqlIdent162 = sql.identifier(...parts162);
-const fromCallback91 = (...args) => sql`${sqlIdent162}(${sqlFromArgDigests(args)})`;
+const sqlIdent112 = sql.identifier(...parts162);
+const fromCallback91 = (...args) => sql`${sqlIdent112}(${sqlFromArgDigests(args)})`;
 const parameters91 = [{
   name: "person",
   required: true,
   notNull: false,
-  codec: attributes_person_codec_person
+  codec: attributes_person_codec_personCodec
 }, {
   name: "a",
   required: true,
@@ -6451,18 +6443,18 @@ const parameters91 = [{
   codec: TYPES.text
 }];
 const parts163 = ["c", "person_first_post"];
-const sqlIdent163 = sql.identifier(...parts163);
+const sqlIdent113 = sql.identifier(...parts163);
 const options_person_first_post = {
   name: "person_first_post",
   identifier: "main.c.person_first_post(c.person)",
   from(...args) {
-    return sql`${sqlIdent163}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent113}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "person",
     required: true,
     notNull: false,
-    codec: attributes_person_codec_person
+    codec: attributes_person_codec_personCodec
   }],
   returnsArray: false,
   returnsSetof: false,
@@ -6479,7 +6471,7 @@ const options_person_first_post = {
   },
   description: "The first post by the person."
 };
-const extensions181 = {
+const extensions118 = {
   description: "Person test comment",
   pg: {
     serviceName: "main",
@@ -6503,24 +6495,24 @@ const uniques27 = [{
     tags: Object.create(null)
   }
 }];
-const registryConfig_pgResources_person_person = {
+const registry_pgResources_person_person = {
   executor: executor_mainPgExecutor,
   name: "person",
   identifier: "main.c.person",
-  from: attributes_person_codec_person.sqlType,
-  codec: attributes_person_codec_person,
+  from: attributes_person_codec_personCodec.sqlType,
+  codec: attributes_person_codec_personCodec,
   uniques: uniques27,
   isVirtual: false,
   description: "Person test comment",
-  extensions: extensions181
+  extensions: extensions118
 };
 const parts164 = ["c", "badly_behaved_function"];
-const sqlIdent164 = sql.identifier(...parts164);
+const sqlIdent114 = sql.identifier(...parts164);
 const options_badly_behaved_function = {
   name: "badly_behaved_function",
   identifier: "main.c.badly_behaved_function()",
   from(...args) {
-    return sql`${sqlIdent164}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent114}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -6540,12 +6532,12 @@ const options_badly_behaved_function = {
   description: undefined
 };
 const parts165 = ["c", "func_out_table"];
-const sqlIdent165 = sql.identifier(...parts165);
+const sqlIdent115 = sql.identifier(...parts165);
 const options_func_out_table = {
   name: "func_out_table",
   identifier: "main.c.func_out_table(c.person)",
   from(...args) {
-    return sql`${sqlIdent165}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent115}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -6564,12 +6556,12 @@ const options_func_out_table = {
   description: undefined
 };
 const parts166 = ["c", "func_out_table_setof"];
-const sqlIdent166 = sql.identifier(...parts166);
+const sqlIdent116 = sql.identifier(...parts166);
 const options_func_out_table_setof = {
   name: "func_out_table_setof",
   identifier: "main.c.func_out_table_setof(c.person)",
   from(...args) {
-    return sql`${sqlIdent166}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent116}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -6588,12 +6580,12 @@ const options_func_out_table_setof = {
   description: undefined
 };
 const parts167 = ["c", "mutation_out_table"];
-const sqlIdent167 = sql.identifier(...parts167);
+const sqlIdent117 = sql.identifier(...parts167);
 const options_mutation_out_table = {
   name: "mutation_out_table",
   identifier: "main.c.mutation_out_table(c.person)",
   from(...args) {
-    return sql`${sqlIdent167}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent117}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -6612,12 +6604,12 @@ const options_mutation_out_table = {
   description: undefined
 };
 const parts168 = ["c", "mutation_out_table_setof"];
-const sqlIdent168 = sql.identifier(...parts168);
+const sqlIdent118 = sql.identifier(...parts168);
 const options_mutation_out_table_setof = {
   name: "mutation_out_table_setof",
   identifier: "main.c.mutation_out_table_setof(c.person)",
   from(...args) {
-    return sql`${sqlIdent168}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent118}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -6636,12 +6628,12 @@ const options_mutation_out_table_setof = {
   description: undefined
 };
 const parts169 = ["c", "table_set_mutation"];
-const sqlIdent169 = sql.identifier(...parts169);
+const sqlIdent119 = sql.identifier(...parts169);
 const options_table_set_mutation = {
   name: "table_set_mutation",
   identifier: "main.c.table_set_mutation()",
   from(...args) {
-    return sql`${sqlIdent169}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent119}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -6660,12 +6652,12 @@ const options_table_set_mutation = {
   description: undefined
 };
 const parts170 = ["c", "table_set_query"];
-const sqlIdent170 = sql.identifier(...parts170);
+const sqlIdent120 = sql.identifier(...parts170);
 const options_table_set_query = {
   name: "table_set_query",
   identifier: "main.c.table_set_query()",
   from(...args) {
-    return sql`${sqlIdent170}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent120}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -6686,12 +6678,12 @@ const options_table_set_query = {
   description: undefined
 };
 const parts171 = ["c", "table_set_query_plpgsql"];
-const sqlIdent171 = sql.identifier(...parts171);
+const sqlIdent121 = sql.identifier(...parts171);
 const options_table_set_query_plpgsql = {
   name: "table_set_query_plpgsql",
   identifier: "main.c.table_set_query_plpgsql()",
   from(...args) {
-    return sql`${sqlIdent171}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent121}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -6710,18 +6702,18 @@ const options_table_set_query_plpgsql = {
   description: undefined
 };
 const parts172 = ["c", "person_computed_first_arg_inout"];
-const sqlIdent172 = sql.identifier(...parts172);
+const sqlIdent122 = sql.identifier(...parts172);
 const options_person_computed_first_arg_inout = {
   name: "person_computed_first_arg_inout",
   identifier: "main.c.person_computed_first_arg_inout(c.person)",
   from(...args) {
-    return sql`${sqlIdent172}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent122}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "person",
     required: true,
     notNull: false,
-    codec: attributes_person_codec_person
+    codec: attributes_person_codec_personCodec
   }],
   returnsArray: false,
   returnsSetof: false,
@@ -6740,18 +6732,18 @@ const options_person_computed_first_arg_inout = {
   description: undefined
 };
 const parts173 = ["c", "person_friends"];
-const sqlIdent173 = sql.identifier(...parts173);
+const sqlIdent123 = sql.identifier(...parts173);
 const options_person_friends = {
   name: "person_friends",
   identifier: "main.c.person_friends(c.person)",
   from(...args) {
-    return sql`${sqlIdent173}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent123}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "person",
     required: true,
     notNull: false,
-    codec: attributes_person_codec_person
+    codec: attributes_person_codec_personCodec
   }],
   returnsArray: false,
   returnsSetof: true,
@@ -6769,7 +6761,7 @@ const options_person_friends = {
   },
   description: undefined
 };
-const extensions182 = {
+const extensions119 = {
   description: undefined,
   pg: {
     serviceName: "main",
@@ -6777,7 +6769,7 @@ const extensions182 = {
     name: "types"
   },
   tags: {
-    foreignKey: extensions54.tags.foreignKey
+    foreignKey: typesCodecSpec.tags.foreignKey
   }
 };
 const uniques28 = [{
@@ -6788,24 +6780,24 @@ const uniques28 = [{
     tags: Object.create(null)
   }
 }];
-const registryConfig_pgResources_types_types = {
+const registry_pgResources_types_types = {
   executor: executor_mainPgExecutor,
   name: "types",
   identifier: "main.b.types",
-  from: registryConfig_pgCodecs_types_types.sqlType,
-  codec: registryConfig_pgCodecs_types_types,
+  from: registry_pgCodecs_types_typesCodec.sqlType,
+  codec: registry_pgCodecs_types_typesCodec,
   uniques: uniques28,
   isVirtual: false,
   description: undefined,
-  extensions: extensions182
+  extensions: extensions119
 };
 const parts174 = ["b", "type_function_connection"];
-const sqlIdent174 = sql.identifier(...parts174);
+const sqlIdent124 = sql.identifier(...parts174);
 const options_type_function_connection = {
   name: "type_function_connection",
   identifier: "main.b.type_function_connection()",
   from(...args) {
-    return sql`${sqlIdent174}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent124}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -6824,12 +6816,12 @@ const options_type_function_connection = {
   description: undefined
 };
 const parts175 = ["b", "type_function_connection_mutation"];
-const sqlIdent175 = sql.identifier(...parts175);
+const sqlIdent125 = sql.identifier(...parts175);
 const options_type_function_connection_mutation = {
   name: "type_function_connection_mutation",
   identifier: "main.b.type_function_connection_mutation()",
   from(...args) {
-    return sql`${sqlIdent175}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent125}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: false,
@@ -6848,12 +6840,12 @@ const options_type_function_connection_mutation = {
   description: undefined
 };
 const parts176 = ["b", "type_function"];
-const sqlIdent176 = sql.identifier(...parts176);
+const sqlIdent126 = sql.identifier(...parts176);
 const options_type_function = {
   name: "type_function",
   identifier: "main.b.type_function(int4)",
   from(...args) {
-    return sql`${sqlIdent176}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent126}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "id",
@@ -6877,12 +6869,12 @@ const options_type_function = {
   description: undefined
 };
 const parts177 = ["b", "type_function_mutation"];
-const sqlIdent177 = sql.identifier(...parts177);
+const sqlIdent127 = sql.identifier(...parts177);
 const options_type_function_mutation = {
   name: "type_function_mutation",
   identifier: "main.b.type_function_mutation(int4)",
   from(...args) {
-    return sql`${sqlIdent177}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent127}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "id",
@@ -6906,18 +6898,18 @@ const options_type_function_mutation = {
   description: undefined
 };
 const parts178 = ["c", "person_type_function_connection"];
-const sqlIdent178 = sql.identifier(...parts178);
+const sqlIdent128 = sql.identifier(...parts178);
 const options_person_type_function_connection = {
   name: "person_type_function_connection",
   identifier: "main.c.person_type_function_connection(c.person)",
   from(...args) {
-    return sql`${sqlIdent178}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent128}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "p",
     required: true,
     notNull: false,
-    codec: attributes_person_codec_person
+    codec: attributes_person_codec_personCodec
   }],
   returnsArray: false,
   returnsSetof: true,
@@ -6935,18 +6927,18 @@ const options_person_type_function_connection = {
   description: undefined
 };
 const parts179 = ["c", "person_type_function"];
-const sqlIdent179 = sql.identifier(...parts179);
+const sqlIdent129 = sql.identifier(...parts179);
 const options_person_type_function = {
   name: "person_type_function",
   identifier: "main.c.person_type_function(c.person,int4)",
   from(...args) {
-    return sql`${sqlIdent179}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent129}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "p",
     required: true,
     notNull: false,
-    codec: attributes_person_codec_person
+    codec: attributes_person_codec_personCodec
   }, {
     name: "id",
     required: true,
@@ -6969,12 +6961,12 @@ const options_person_type_function = {
   description: undefined
 };
 const parts180 = ["b", "type_function_list"];
-const sqlIdent180 = sql.identifier(...parts180);
+const sqlIdent130 = sql.identifier(...parts180);
 const options_type_function_list = {
   name: "type_function_list",
   identifier: "main.b.type_function_list()",
   from(...args) {
-    return sql`${sqlIdent180}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent130}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: true,
@@ -6993,12 +6985,12 @@ const options_type_function_list = {
   description: undefined
 };
 const parts181 = ["b", "type_function_list_mutation"];
-const sqlIdent181 = sql.identifier(...parts181);
+const sqlIdent131 = sql.identifier(...parts181);
 const options_type_function_list_mutation = {
   name: "type_function_list_mutation",
   identifier: "main.b.type_function_list_mutation()",
   from(...args) {
-    return sql`${sqlIdent181}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent131}(${sqlFromArgDigests(args)})`;
   },
   parameters: [],
   returnsArray: true,
@@ -7017,18 +7009,18 @@ const options_type_function_list_mutation = {
   description: undefined
 };
 const parts182 = ["c", "person_type_function_list"];
-const sqlIdent182 = sql.identifier(...parts182);
+const sqlIdent132 = sql.identifier(...parts182);
 const options_person_type_function_list = {
   name: "person_type_function_list",
   identifier: "main.c.person_type_function_list(c.person)",
   from(...args) {
-    return sql`${sqlIdent182}(${sqlFromArgDigests(args)})`;
+    return sql`${sqlIdent132}(${sqlFromArgDigests(args)})`;
   },
   parameters: [{
     name: "p",
     required: true,
     notNull: false,
-    codec: attributes_person_codec_person
+    codec: attributes_person_codec_personCodec
   }],
   returnsArray: true,
   returnsSetof: false,
@@ -7045,7 +7037,7 @@ const options_person_type_function_list = {
   },
   description: undefined
 };
-const registry = makeRegistry({
+const registry = {
   pgCodecs: Object.assign(Object.create(null), {
     int4: TYPES.int,
     void: TYPES.void,
@@ -7053,95 +7045,95 @@ const registry = makeRegistry({
     int8: TYPES.bigint,
     json: TYPES.json,
     jsonb: TYPES.jsonb,
-    FuncOutOutRecord: registryConfig_pgCodecs_FuncOutOutRecord_FuncOutOutRecord,
+    FuncOutOutRecord: registry_pgCodecs_FuncOutOutRecord_FuncOutOutRecord,
     text: TYPES.text,
-    FuncOutOutSetofRecord: registryConfig_pgCodecs_FuncOutOutSetofRecord_FuncOutOutSetofRecord,
-    FuncOutOutUnnamedRecord: registryConfig_pgCodecs_FuncOutOutUnnamedRecord_FuncOutOutUnnamedRecord,
-    MutationOutOutRecord: registryConfig_pgCodecs_MutationOutOutRecord_MutationOutOutRecord,
-    MutationOutOutSetofRecord: registryConfig_pgCodecs_MutationOutOutSetofRecord_MutationOutOutSetofRecord,
-    MutationOutOutUnnamedRecord: registryConfig_pgCodecs_MutationOutOutUnnamedRecord_MutationOutOutUnnamedRecord,
-    SearchTestSummariesRecord: registryConfig_pgCodecs_SearchTestSummariesRecord_SearchTestSummariesRecord,
-    FuncOutUnnamedOutOutUnnamedRecord: registryConfig_pgCodecs_FuncOutUnnamedOutOutUnnamedRecord_FuncOutUnnamedOutOutUnnamedRecord,
-    FuncReturnsTableMultiColRecord: registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord,
-    MutationOutUnnamedOutOutUnnamedRecord: registryConfig_pgCodecs_MutationOutUnnamedOutOutUnnamedRecord_MutationOutUnnamedOutOutUnnamedRecord,
-    MutationReturnsTableMultiColRecord: registryConfig_pgCodecs_MutationReturnsTableMultiColRecord_MutationReturnsTableMultiColRecord,
-    guid: registryConfig_pgCodecs_guid_guid,
+    FuncOutOutSetofRecord: registry_pgCodecs_FuncOutOutSetofRecord_FuncOutOutSetofRecord,
+    FuncOutOutUnnamedRecord: registry_pgCodecs_FuncOutOutUnnamedRecord_FuncOutOutUnnamedRecord,
+    MutationOutOutRecord: registry_pgCodecs_MutationOutOutRecord_MutationOutOutRecord,
+    MutationOutOutSetofRecord: registry_pgCodecs_MutationOutOutSetofRecord_MutationOutOutSetofRecord,
+    MutationOutOutUnnamedRecord: registry_pgCodecs_MutationOutOutUnnamedRecord_MutationOutOutUnnamedRecord,
+    SearchTestSummariesRecord: registry_pgCodecs_SearchTestSummariesRecord_SearchTestSummariesRecord,
+    FuncOutUnnamedOutOutUnnamedRecord: registry_pgCodecs_FuncOutUnnamedOutOutUnnamedRecord_FuncOutUnnamedOutOutUnnamedRecord,
+    FuncReturnsTableMultiColRecord: registry_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord,
+    MutationOutUnnamedOutOutUnnamedRecord: registry_pgCodecs_MutationOutUnnamedOutOutUnnamedRecord_MutationOutUnnamedOutOutUnnamedRecord,
+    MutationReturnsTableMultiColRecord: registry_pgCodecs_MutationReturnsTableMultiColRecord_MutationReturnsTableMultiColRecord,
+    guid: registry_pgCodecs_guid_guidCodec,
     varchar: TYPES.varchar,
-    intervalArray: registryConfig_pgCodecs_intervalArray_intervalArray,
-    textArray: registryConfig_pgCodecs_textArray_textArray,
-    nonUpdatableView: registryConfig_pgCodecs_nonUpdatableView_nonUpdatableView,
-    inputs: registryConfig_pgCodecs_inputs_inputs,
-    patchs: registryConfig_pgCodecs_patchs_patchs,
-    reserved: registryConfig_pgCodecs_reserved_reserved,
-    reservedPatchs: registryConfig_pgCodecs_reservedPatchs_reservedPatchs,
-    reservedInput: registryConfig_pgCodecs_reservedInput_reservedInput,
-    defaultValue: registryConfig_pgCodecs_defaultValue_defaultValue,
-    foreignKey: registryConfig_pgCodecs_foreignKey_foreignKey,
-    noPrimaryKey: registryConfig_pgCodecs_noPrimaryKey_noPrimaryKey,
-    testview: registryConfig_pgCodecs_testview_testview,
-    uniqueForeignKey: registryConfig_pgCodecs_uniqueForeignKey_uniqueForeignKey,
-    myTable: registryConfig_pgCodecs_myTable_myTable,
-    personSecret: registryConfig_pgCodecs_personSecret_personSecret,
-    viewTable: registryConfig_pgCodecs_viewTable_viewTable,
-    compoundKey: registryConfig_pgCodecs_compoundKey_compoundKey,
+    intervalArray: registry_pgCodecs_intervalArray_intervalArrayCodec,
+    textArray: registry_pgCodecs_textArray_textArrayCodec,
+    nonUpdatableView: registry_pgCodecs_nonUpdatableView_nonUpdatableViewCodec,
+    inputs: registry_pgCodecs_inputs_inputsCodec,
+    patchs: registry_pgCodecs_patchs_patchsCodec,
+    reserved: registry_pgCodecs_reserved_reservedCodec,
+    reservedPatchs: registry_pgCodecs_reservedPatchs_reservedPatchsCodec,
+    reservedInput: registry_pgCodecs_reservedInput_reservedInputCodec,
+    defaultValue: registry_pgCodecs_defaultValue_defaultValueCodec,
+    foreignKey: registry_pgCodecs_foreignKey_foreignKeyCodec,
+    noPrimaryKey: registry_pgCodecs_noPrimaryKey_noPrimaryKeyCodec,
+    testview: registry_pgCodecs_testview_testviewCodec,
+    uniqueForeignKey: registry_pgCodecs_uniqueForeignKey_uniqueForeignKeyCodec,
+    myTable: registry_pgCodecs_myTable_myTableCodec,
+    personSecret: registry_pgCodecs_personSecret_personSecretCodec,
+    viewTable: registry_pgCodecs_viewTable_viewTableCodec,
+    compoundKey: registry_pgCodecs_compoundKey_compoundKeyCodec,
     bool: TYPES.boolean,
-    similarTable1: registryConfig_pgCodecs_similarTable1_similarTable1,
-    similarTable2: registryConfig_pgCodecs_similarTable2_similarTable2,
-    updatableView: registryConfig_pgCodecs_updatableView_updatableView,
-    nullTestRecord: registryConfig_pgCodecs_nullTestRecord_nullTestRecord,
-    uuidArray: registryConfig_pgCodecs_uuidArray_uuidArray,
+    similarTable1: registry_pgCodecs_similarTable1_similarTable1Codec,
+    similarTable2: registry_pgCodecs_similarTable2_similarTable2Codec,
+    updatableView: registry_pgCodecs_updatableView_updatableViewCodec,
+    nullTestRecord: registry_pgCodecs_nullTestRecord_nullTestRecordCodec,
+    uuidArray: registry_pgCodecs_uuidArray_uuidArrayCodec,
     uuid: TYPES.uuid,
-    edgeCase: registryConfig_pgCodecs_edgeCase_edgeCase,
+    edgeCase: registry_pgCodecs_edgeCase_edgeCaseCodec,
     int2: TYPES.int2,
-    leftArm: registryConfig_pgCodecs_leftArm_leftArm,
+    leftArm: registry_pgCodecs_leftArm_leftArmCodec,
     float8: TYPES.float,
-    jwtToken: registryConfig_pgCodecs_jwtToken_jwtToken,
+    jwtToken: registry_pgCodecs_jwtToken_jwtTokenCodec,
     numeric: TYPES.numeric,
-    issue756: registryConfig_pgCodecs_issue756_issue756,
-    notNullTimestamp: attributes_ts_codec_notNullTimestamp,
+    issue756: registry_pgCodecs_issue756_issue756Codec,
+    notNullTimestamp: issue756CodecSpec_issue756Attributes_ts_codec_notNullTimestampCodec,
     timestamptz: TYPES.timestamptz,
-    authPayload: registryConfig_pgCodecs_authPayload_authPayload,
-    FuncOutOutCompoundTypeRecord: registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord,
-    compoundType: attributes_o2_codec_compoundType,
-    color: attributes_c_codec_color,
-    enumCaps: attributes_e_codec_enumCaps,
-    enumWithEmptyString: attributes_f_codec_enumWithEmptyString,
-    MutationOutOutCompoundTypeRecord: registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCompoundTypeRecord,
-    QueryOutputTwoRowsRecord: registryConfig_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord,
-    post: attributes_post_codec_post,
-    anEnumArray: attributes_enums_codec_anEnumArray,
-    anEnum: innerCodec_anEnum,
-    comptypeArray: attributes_comptypes_codec_comptypeArray,
-    comptype: innerCodec_comptype,
-    PersonComputedOutOutRecord: registryConfig_pgCodecs_PersonComputedOutOutRecord_PersonComputedOutOutRecord,
-    PersonComputedInoutOutRecord: registryConfig_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOutRecord,
-    PersonComputedFirstArgInoutOutRecord: registryConfig_pgCodecs_PersonComputedFirstArgInoutOutRecord_PersonComputedFirstArgInoutOutRecord,
-    person: attributes_person_codec_person,
-    email: attributes_email_codec_email,
-    wrappedUrl: attributes_site_codec_wrappedUrl,
-    notNullUrl: attributes_url_codec_notNullUrl,
+    authPayload: registry_pgCodecs_authPayload_authPayloadCodec,
+    FuncOutOutCompoundTypeRecord: registry_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord,
+    compoundType: attributes_o2_codec_compoundTypeCodec,
+    color: compoundTypeCodecSpec_compoundTypeAttributes_c_codec_colorCodec,
+    enumCaps: compoundTypeCodecSpec_compoundTypeAttributes_e_codec_enumCapsCodec,
+    enumWithEmptyString: compoundTypeCodecSpec_compoundTypeAttributes_f_codec_enumWithEmptyStringCodec,
+    MutationOutOutCompoundTypeRecord: registry_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCompoundTypeRecord,
+    QueryOutputTwoRowsRecord: registry_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord,
+    post: attributes_post_codec_postCodec,
+    anEnumArray: postCodecSpec_postAttributes_enums_codec_anEnumArrayCodec,
+    anEnum: anEnumArrayCodec_anEnumCodec,
+    comptypeArray: postCodecSpec_postAttributes_comptypes_codec_comptypeArrayCodec,
+    comptype: comptypeArrayCodec_comptypeCodec,
+    PersonComputedOutOutRecord: registry_pgCodecs_PersonComputedOutOutRecord_PersonComputedOutOutRecord,
+    PersonComputedInoutOutRecord: registry_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOutRecord,
+    PersonComputedFirstArgInoutOutRecord: registry_pgCodecs_PersonComputedFirstArgInoutOutRecord_PersonComputedFirstArgInoutOutRecord,
+    person: attributes_person_codec_personCodec,
+    email: personCodecSpec_personAttributes_email_codec_emailCodec,
+    wrappedUrl: personCodecSpec_personAttributes_site_codec_wrappedUrlCodec,
+    notNullUrl: wrappedUrlCodecSpec_wrappedUrlAttributes_url_codec_notNullUrlCodec,
     hstore: TYPES.hstore,
     inet: TYPES.inet,
     cidr: TYPES.cidr,
     macaddr: TYPES.macaddr,
     timestamp: TYPES.timestamp,
-    FuncOutComplexRecord: registryConfig_pgCodecs_FuncOutComplexRecord_FuncOutComplexRecord,
-    FuncOutComplexSetofRecord: registryConfig_pgCodecs_FuncOutComplexSetofRecord_FuncOutComplexSetofRecord,
-    MutationOutComplexRecord: registryConfig_pgCodecs_MutationOutComplexRecord_MutationOutComplexRecord,
-    MutationOutComplexSetofRecord: registryConfig_pgCodecs_MutationOutComplexSetofRecord_MutationOutComplexSetofRecord,
-    PersonComputedComplexRecord: registryConfig_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexRecord,
-    types: registryConfig_pgCodecs_types_types,
-    colorArray: attributes_enum_array_codec_colorArray,
-    anInt: attributes_domain_codec_anInt,
-    anotherInt: attributes_domain2_codec_anotherInt,
-    numrange: attributes_nullable_range_codec_numrange,
-    daterange: attributes_daterange_codec_daterange,
+    FuncOutComplexRecord: registry_pgCodecs_FuncOutComplexRecord_FuncOutComplexRecord,
+    FuncOutComplexSetofRecord: registry_pgCodecs_FuncOutComplexSetofRecord_FuncOutComplexSetofRecord,
+    MutationOutComplexRecord: registry_pgCodecs_MutationOutComplexRecord_MutationOutComplexRecord,
+    MutationOutComplexSetofRecord: registry_pgCodecs_MutationOutComplexSetofRecord_MutationOutComplexSetofRecord,
+    PersonComputedComplexRecord: registry_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexRecord,
+    types: registry_pgCodecs_types_typesCodec,
+    colorArray: typesCodecSpec_typesAttributes_enum_array_codec_colorArrayCodec,
+    anInt: typesCodecSpec_typesAttributes_domain_codec_anIntCodec,
+    anotherInt: typesCodecSpec_typesAttributes_domain2_codec_anotherIntCodec,
+    numrange: typesCodecSpec_typesAttributes_nullable_range_codec_numrangeCodec,
+    daterange: typesCodecSpec_typesAttributes_daterange_codec_daterangeCodec,
     date: TYPES.date,
-    anIntRange: attributes_an_int_range_codec_anIntRange,
+    anIntRange: typesCodecSpec_typesAttributes_an_int_range_codec_anIntRangeCodec,
     time: TYPES.time,
     timetz: TYPES.timetz,
     money: TYPES.money,
-    nestedCompoundType: attributes_nested_compound_type_codec_nestedCompoundType,
+    nestedCompoundType: typesCodecSpec_typesAttributes_nested_compound_type_codec_nestedCompoundTypeCodec,
     point: TYPES.point,
     regproc: TYPES.regproc,
     regprocedure: TYPES.regprocedure,
@@ -7151,38 +7143,38 @@ const registry = makeRegistry({
     regtype: TYPES.regtype,
     regconfig: TYPES.regconfig,
     regdictionary: TYPES.regdictionary,
-    textArrayDomain: attributes_text_array_domain_codec_textArrayDomain,
-    int8ArrayDomain: attributes_int8_array_domain_codec_int8ArrayDomain,
+    textArrayDomain: typesCodecSpec_typesAttributes_text_array_domain_codec_textArrayDomainCodec,
+    int8ArrayDomain: typesCodecSpec_typesAttributes_int8_array_domain_codec_int8ArrayDomainCodec,
     bytea: TYPES.bytea,
-    byteaArray: attributes_bytea_array_codec_byteaArray,
-    ltree: attributes_ltree_codec_ltree,
-    "ltree[]": attributes_ltree_array_codec_ltree_,
+    byteaArray: typesCodecSpec_typesAttributes_bytea_array_codec_byteaArrayCodec,
+    ltree: typesCodecSpec_typesAttributes_ltree_codec_ltree,
+    "ltree[]": typesCodecSpec_typesAttributes_ltree_array_codec_ltree_,
     bpchar: TYPES.bpchar,
-    compoundTypeArray: listOfCodec(attributes_o2_codec_compoundType, {
-      extensions: extensions55,
+    compoundTypeArray: listOfCodec(attributes_o2_codec_compoundTypeCodec, {
+      extensions: compoundTypeArrayCodec,
       typeDelim: ",",
       description: undefined,
       name: "compoundTypeArray"
     }),
-    jwtTokenArray: listOfCodec(registryConfig_pgCodecs_jwtToken_jwtToken, {
-      extensions: extensions56,
+    jwtTokenArray: listOfCodec(registry_pgCodecs_jwtToken_jwtTokenCodec, {
+      extensions: jwtTokenArrayCodec,
       typeDelim: ",",
       description: undefined,
       name: "jwtTokenArray"
     }),
-    typesArray: listOfCodec(registryConfig_pgCodecs_types_types, {
-      extensions: extensions57,
+    typesArray: listOfCodec(registry_pgCodecs_types_typesCodec, {
+      extensions: typesArrayCodec,
       typeDelim: ",",
       description: undefined,
       name: "typesArray"
     }),
-    int4Array: registryConfig_pgCodecs_int4Array_int4Array,
-    floatrange: registryConfig_pgCodecs_floatrange_floatrange,
-    postArray: registryConfig_pgCodecs_postArray_postArray,
-    int8Array: innerCodec_int8Array,
-    tablefuncCrosstab2: recordCodec(spec_tablefuncCrosstab2),
-    tablefuncCrosstab3: recordCodec(spec_tablefuncCrosstab3),
-    tablefuncCrosstab4: recordCodec(spec_tablefuncCrosstab4)
+    int4Array: registry_pgCodecs_int4Array_int4ArrayCodec,
+    floatrange: registry_pgCodecs_floatrange_floatrangeCodec,
+    postArray: registry_pgCodecs_postArray_postArrayCodec,
+    int8Array: int8ArrayDomainCodec_int8ArrayCodec,
+    tablefuncCrosstab2: recordCodec(tablefuncCrosstab2Codec_tablefuncCrosstab2CodecSpec),
+    tablefuncCrosstab3: recordCodec(tablefuncCrosstab3Codec_tablefuncCrosstab3CodecSpec),
+    tablefuncCrosstab4: recordCodec(tablefuncCrosstab4Codec_tablefuncCrosstab4CodecSpec)
   }),
   pgResources: Object.assign(Object.create(null), {
     current_user_id: {
@@ -7190,14 +7182,23 @@ const registry = makeRegistry({
       name: "current_user_id",
       identifier: "main.c.current_user_id()",
       from(...args) {
-        return sql`${sqlIdent51}(${sqlFromArgDigests(args)})`;
+        return sql`${sqlIdent}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
       isUnique: !false,
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions64,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "current_user_id"
+        },
+        tags: {
+          behavior: ["queryField -mutationField -typeField", "-filter -order"]
+        }
+      },
       description: undefined
     },
     func_out: {
@@ -7210,7 +7211,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions65,
+      extensions: extensions2,
       description: undefined
     },
     func_out_setof: {
@@ -7223,7 +7224,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions66,
+      extensions: extensions3,
       description: undefined
     },
     func_out_unnamed: {
@@ -7236,7 +7237,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions67,
+      extensions: extensions4,
       description: undefined
     },
     mutation_out: {
@@ -7249,7 +7250,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions68,
+      extensions: extensions5,
       description: undefined
     },
     mutation_out_setof: {
@@ -7262,7 +7263,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions69,
+      extensions: extensions6,
       description: undefined
     },
     mutation_out_unnamed: {
@@ -7275,7 +7276,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions70,
+      extensions: extensions7,
       description: undefined
     },
     no_args_mutation: {
@@ -7288,7 +7289,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions71,
+      extensions: extensions8,
       description: undefined
     },
     no_args_query: {
@@ -7301,7 +7302,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions72,
+      extensions: extensions9,
       description: undefined
     },
     return_void_mutation: {
@@ -7314,7 +7315,7 @@ const registry = makeRegistry({
       codec: TYPES.void,
       uniques: [],
       isMutation: true,
-      extensions: extensions73,
+      extensions: extensions10,
       description: undefined
     },
     mutation_interval_set: {
@@ -7327,7 +7328,7 @@ const registry = makeRegistry({
       codec: TYPES.interval,
       uniques: [],
       isMutation: true,
-      extensions: extensions74,
+      extensions: extensions11,
       description: undefined
     },
     query_interval_set: {
@@ -7340,7 +7341,7 @@ const registry = makeRegistry({
       codec: TYPES.interval,
       uniques: [],
       isMutation: false,
-      extensions: extensions75,
+      extensions: extensions12,
       description: undefined
     },
     static_big_integer: {
@@ -7353,7 +7354,7 @@ const registry = makeRegistry({
       codec: TYPES.bigint,
       uniques: [],
       isMutation: false,
-      extensions: extensions76,
+      extensions: extensions13,
       description: undefined
     },
     func_in_out: {
@@ -7366,7 +7367,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions77,
+      extensions: extensions14,
       description: undefined
     },
     func_returns_table_one_col: {
@@ -7379,7 +7380,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions78,
+      extensions: extensions15,
       description: undefined
     },
     mutation_in_out: {
@@ -7392,7 +7393,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions79,
+      extensions: extensions16,
       description: undefined
     },
     mutation_returns_table_one_col: {
@@ -7405,7 +7406,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions80,
+      extensions: extensions17,
       description: undefined
     },
     assert_something: {
@@ -7418,7 +7419,7 @@ const registry = makeRegistry({
       codec: TYPES.void,
       uniques: [],
       isMutation: false,
-      extensions: extensions81,
+      extensions: extensions18,
       description: undefined
     },
     assert_something_nx: {
@@ -7431,7 +7432,7 @@ const registry = makeRegistry({
       codec: TYPES.void,
       uniques: [],
       isMutation: false,
-      extensions: extensions82,
+      extensions: extensions19,
       description: undefined
     },
     json_identity: {
@@ -7444,7 +7445,7 @@ const registry = makeRegistry({
       codec: TYPES.json,
       uniques: [],
       isMutation: false,
-      extensions: extensions83,
+      extensions: extensions20,
       description: undefined
     },
     json_identity_mutation: {
@@ -7457,7 +7458,7 @@ const registry = makeRegistry({
       codec: TYPES.json,
       uniques: [],
       isMutation: true,
-      extensions: extensions84,
+      extensions: extensions21,
       description: undefined
     },
     jsonb_identity: {
@@ -7470,7 +7471,7 @@ const registry = makeRegistry({
       codec: TYPES.jsonb,
       uniques: [],
       isMutation: false,
-      extensions: extensions85,
+      extensions: extensions22,
       description: undefined
     },
     jsonb_identity_mutation: {
@@ -7483,7 +7484,7 @@ const registry = makeRegistry({
       codec: TYPES.jsonb,
       uniques: [],
       isMutation: true,
-      extensions: extensions86,
+      extensions: extensions23,
       description: undefined
     },
     jsonb_identity_mutation_plpgsql: {
@@ -7496,7 +7497,7 @@ const registry = makeRegistry({
       codec: TYPES.jsonb,
       uniques: [],
       isMutation: true,
-      extensions: extensions87,
+      extensions: extensions24,
       description: undefined
     },
     jsonb_identity_mutation_plpgsql_with_default: {
@@ -7509,7 +7510,7 @@ const registry = makeRegistry({
       codec: TYPES.jsonb,
       uniques: [],
       isMutation: true,
-      extensions: extensions88,
+      extensions: extensions25,
       description: undefined
     },
     add_1_mutation: {
@@ -7522,7 +7523,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions89,
+      extensions: extensions26,
       description: "lol, add some stuff 1 mutation"
     },
     add_1_query: {
@@ -7535,7 +7536,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions90,
+      extensions: extensions27,
       description: "lol, add some stuff 1 query"
     },
     add_2_mutation: {
@@ -7548,7 +7549,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions91,
+      extensions: extensions28,
       description: "lol, add some stuff 2 mutation"
     },
     add_2_query: {
@@ -7561,7 +7562,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions92,
+      extensions: extensions29,
       description: "lol, add some stuff 2 query"
     },
     add_3_mutation: {
@@ -7574,7 +7575,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions93,
+      extensions: extensions30,
       description: "lol, add some stuff 3 mutation"
     },
     add_3_query: {
@@ -7587,7 +7588,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions94,
+      extensions: extensions31,
       description: "lol, add some stuff 3 query"
     },
     add_4_mutation: {
@@ -7600,7 +7601,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions95,
+      extensions: extensions32,
       description: "lol, add some stuff 4 mutation"
     },
     add_4_mutation_error: {
@@ -7613,7 +7614,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions96,
+      extensions: extensions33,
       description: undefined
     },
     add_4_query: {
@@ -7626,7 +7627,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions97,
+      extensions: extensions34,
       description: "lol, add some stuff 4 query"
     },
     mult_1: {
@@ -7639,7 +7640,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions98,
+      extensions: extensions35,
       description: undefined
     },
     mult_2: {
@@ -7652,7 +7653,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions99,
+      extensions: extensions36,
       description: undefined
     },
     mult_3: {
@@ -7665,7 +7666,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions100,
+      extensions: extensions37,
       description: undefined
     },
     mult_4: {
@@ -7678,7 +7679,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions101,
+      extensions: extensions38,
       description: undefined
     },
     func_in_inout: {
@@ -7691,7 +7692,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions102,
+      extensions: extensions39,
       description: undefined
     },
     func_out_out: {
@@ -7701,10 +7702,10 @@ const registry = makeRegistry({
       from: fromCallback40,
       parameters: parameters40,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_FuncOutOutRecord_FuncOutOutRecord,
+      codec: registry_pgCodecs_FuncOutOutRecord_FuncOutOutRecord,
       uniques: [],
       isMutation: false,
-      extensions: extensions103,
+      extensions: extensions40,
       description: undefined
     },
     func_out_out_setof: {
@@ -7714,10 +7715,10 @@ const registry = makeRegistry({
       from: fromCallback41,
       parameters: parameters41,
       isUnique: !true,
-      codec: registryConfig_pgCodecs_FuncOutOutSetofRecord_FuncOutOutSetofRecord,
+      codec: registry_pgCodecs_FuncOutOutSetofRecord_FuncOutOutSetofRecord,
       uniques: [],
       isMutation: false,
-      extensions: extensions104,
+      extensions: extensions41,
       description: undefined
     },
     func_out_out_unnamed: {
@@ -7727,10 +7728,10 @@ const registry = makeRegistry({
       from: fromCallback42,
       parameters: parameters42,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_FuncOutOutUnnamedRecord_FuncOutOutUnnamedRecord,
+      codec: registry_pgCodecs_FuncOutOutUnnamedRecord_FuncOutOutUnnamedRecord,
       uniques: [],
       isMutation: false,
-      extensions: extensions105,
+      extensions: extensions42,
       description: undefined
     },
     mutation_in_inout: {
@@ -7743,7 +7744,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions106,
+      extensions: extensions43,
       description: undefined
     },
     mutation_out_out: {
@@ -7753,10 +7754,10 @@ const registry = makeRegistry({
       from: fromCallback44,
       parameters: parameters44,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_MutationOutOutRecord_MutationOutOutRecord,
+      codec: registry_pgCodecs_MutationOutOutRecord_MutationOutOutRecord,
       uniques: [],
       isMutation: true,
-      extensions: extensions107,
+      extensions: extensions44,
       description: undefined
     },
     mutation_out_out_setof: {
@@ -7766,10 +7767,10 @@ const registry = makeRegistry({
       from: fromCallback45,
       parameters: parameters45,
       isUnique: !true,
-      codec: registryConfig_pgCodecs_MutationOutOutSetofRecord_MutationOutOutSetofRecord,
+      codec: registry_pgCodecs_MutationOutOutSetofRecord_MutationOutOutSetofRecord,
       uniques: [],
       isMutation: true,
-      extensions: extensions108,
+      extensions: extensions45,
       description: undefined
     },
     mutation_out_out_unnamed: {
@@ -7779,10 +7780,10 @@ const registry = makeRegistry({
       from: fromCallback46,
       parameters: parameters46,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_MutationOutOutUnnamedRecord_MutationOutOutUnnamedRecord,
+      codec: registry_pgCodecs_MutationOutOutUnnamedRecord_MutationOutOutUnnamedRecord,
       uniques: [],
       isMutation: true,
-      extensions: extensions109,
+      extensions: extensions46,
       description: undefined
     },
     search_test_summaries: {
@@ -7792,10 +7793,10 @@ const registry = makeRegistry({
       from: fromCallback47,
       parameters: parameters47,
       isUnique: !true,
-      codec: registryConfig_pgCodecs_SearchTestSummariesRecord_SearchTestSummariesRecord,
+      codec: registry_pgCodecs_SearchTestSummariesRecord_SearchTestSummariesRecord,
       uniques: [],
       isMutation: false,
-      extensions: extensions110,
+      extensions: extensions47,
       description: undefined
     },
     optional_missing_middle_1: {
@@ -7808,7 +7809,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions111,
+      extensions: extensions48,
       description: undefined
     },
     optional_missing_middle_2: {
@@ -7821,7 +7822,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions112,
+      extensions: extensions49,
       description: undefined
     },
     optional_missing_middle_3: {
@@ -7834,7 +7835,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions113,
+      extensions: extensions50,
       description: undefined
     },
     optional_missing_middle_4: {
@@ -7847,7 +7848,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions114,
+      extensions: extensions51,
       description: undefined
     },
     optional_missing_middle_5: {
@@ -7860,7 +7861,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions115,
+      extensions: extensions52,
       description: undefined
     },
     func_out_unnamed_out_out_unnamed: {
@@ -7870,10 +7871,10 @@ const registry = makeRegistry({
       from: fromCallback53,
       parameters: parameters53,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_FuncOutUnnamedOutOutUnnamedRecord_FuncOutUnnamedOutOutUnnamedRecord,
+      codec: registry_pgCodecs_FuncOutUnnamedOutOutUnnamedRecord_FuncOutUnnamedOutOutUnnamedRecord,
       uniques: [],
       isMutation: false,
-      extensions: extensions116,
+      extensions: extensions53,
       description: undefined
     },
     func_returns_table_multi_col: {
@@ -7883,10 +7884,10 @@ const registry = makeRegistry({
       from: fromCallback54,
       parameters: parameters54,
       isUnique: !true,
-      codec: registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord,
+      codec: registry_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord,
       uniques: [],
       isMutation: false,
-      extensions: extensions117,
+      extensions: extensions54,
       description: undefined
     },
     int_set_mutation: {
@@ -7899,7 +7900,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions118,
+      extensions: extensions55,
       description: undefined
     },
     int_set_query: {
@@ -7912,7 +7913,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions119,
+      extensions: extensions56,
       description: undefined
     },
     mutation_out_unnamed_out_out_unnamed: {
@@ -7922,10 +7923,10 @@ const registry = makeRegistry({
       from: fromCallback57,
       parameters: parameters57,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_MutationOutUnnamedOutOutUnnamedRecord_MutationOutUnnamedOutOutUnnamedRecord,
+      codec: registry_pgCodecs_MutationOutUnnamedOutOutUnnamedRecord_MutationOutUnnamedOutOutUnnamedRecord,
       uniques: [],
       isMutation: true,
-      extensions: extensions120,
+      extensions: extensions57,
       description: undefined
     },
     mutation_returns_table_multi_col: {
@@ -7935,10 +7936,10 @@ const registry = makeRegistry({
       from: fromCallback58,
       parameters: parameters58,
       isUnique: !true,
-      codec: registryConfig_pgCodecs_MutationReturnsTableMultiColRecord_MutationReturnsTableMultiColRecord,
+      codec: registry_pgCodecs_MutationReturnsTableMultiColRecord_MutationReturnsTableMultiColRecord,
       uniques: [],
       isMutation: true,
-      extensions: extensions121,
+      extensions: extensions58,
       description: undefined
     },
     guid_fn: {
@@ -7948,10 +7949,10 @@ const registry = makeRegistry({
       from: fromCallback59,
       parameters: parameters59,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_guid_guid,
+      codec: registry_pgCodecs_guid_guidCodec,
       uniques: [],
       isMutation: true,
-      extensions: extensions122,
+      extensions: extensions59,
       description: undefined
     },
     mutation_interval_array: {
@@ -7961,10 +7962,10 @@ const registry = makeRegistry({
       from: fromCallback60,
       parameters: parameters60,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_intervalArray_intervalArray,
+      codec: registry_pgCodecs_intervalArray_intervalArrayCodec,
       uniques: [],
       isMutation: true,
-      extensions: extensions123,
+      extensions: extensions60,
       description: undefined
     },
     query_interval_array: {
@@ -7974,10 +7975,10 @@ const registry = makeRegistry({
       from: fromCallback61,
       parameters: parameters61,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_intervalArray_intervalArray,
+      codec: registry_pgCodecs_intervalArray_intervalArrayCodec,
       uniques: [],
       isMutation: false,
-      extensions: extensions124,
+      extensions: extensions61,
       description: undefined
     },
     mutation_text_array: {
@@ -7987,10 +7988,10 @@ const registry = makeRegistry({
       from: fromCallback62,
       parameters: parameters62,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_textArray_textArray,
+      codec: registry_pgCodecs_textArray_textArrayCodec,
       uniques: [],
       isMutation: true,
-      extensions: extensions125,
+      extensions: extensions62,
       description: undefined
     },
     query_text_array: {
@@ -8000,180 +8001,180 @@ const registry = makeRegistry({
       from: fromCallback63,
       parameters: parameters63,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_textArray_textArray,
+      codec: registry_pgCodecs_textArray_textArrayCodec,
       uniques: [],
       isMutation: false,
-      extensions: extensions126,
+      extensions: extensions63,
       description: undefined
     },
     non_updatable_view: {
       executor: executor_mainPgExecutor,
       name: "non_updatable_view",
       identifier: "main.a.non_updatable_view",
-      from: registryConfig_pgCodecs_nonUpdatableView_nonUpdatableView.sqlType,
-      codec: registryConfig_pgCodecs_nonUpdatableView_nonUpdatableView,
+      from: registry_pgCodecs_nonUpdatableView_nonUpdatableViewCodec.sqlType,
+      codec: registry_pgCodecs_nonUpdatableView_nonUpdatableViewCodec,
       uniques: [],
       isVirtual: false,
       description: undefined,
-      extensions: extensions127
+      extensions: extensions64
     },
     inputs: {
       executor: executor_mainPgExecutor,
       name: "inputs",
       identifier: "main.a.inputs",
-      from: registryConfig_pgCodecs_inputs_inputs.sqlType,
-      codec: registryConfig_pgCodecs_inputs_inputs,
+      from: registry_pgCodecs_inputs_inputsCodec.sqlType,
+      codec: registry_pgCodecs_inputs_inputsCodec,
       uniques: uniques2,
       isVirtual: false,
       description: "Should output as Input",
-      extensions: extensions128
+      extensions: extensions65
     },
     patchs: {
       executor: executor_mainPgExecutor,
       name: "patchs",
       identifier: "main.a.patchs",
-      from: registryConfig_pgCodecs_patchs_patchs.sqlType,
-      codec: registryConfig_pgCodecs_patchs_patchs,
+      from: registry_pgCodecs_patchs_patchsCodec.sqlType,
+      codec: registry_pgCodecs_patchs_patchsCodec,
       uniques: uniques3,
       isVirtual: false,
       description: "Should output as Patch",
-      extensions: extensions129
+      extensions: extensions66
     },
     reserved: {
       executor: executor_mainPgExecutor,
       name: "reserved",
       identifier: "main.a.reserved",
-      from: registryConfig_pgCodecs_reserved_reserved.sqlType,
-      codec: registryConfig_pgCodecs_reserved_reserved,
+      from: registry_pgCodecs_reserved_reservedCodec.sqlType,
+      codec: registry_pgCodecs_reserved_reservedCodec,
       uniques: uniques4,
       isVirtual: false,
       description: undefined,
-      extensions: extensions130
+      extensions: extensions67
     },
     reservedPatchs: {
       executor: executor_mainPgExecutor,
       name: "reservedPatchs",
       identifier: "main.a.reservedPatchs",
-      from: registryConfig_pgCodecs_reservedPatchs_reservedPatchs.sqlType,
-      codec: registryConfig_pgCodecs_reservedPatchs_reservedPatchs,
+      from: registry_pgCodecs_reservedPatchs_reservedPatchsCodec.sqlType,
+      codec: registry_pgCodecs_reservedPatchs_reservedPatchsCodec,
       uniques: uniques5,
       isVirtual: false,
       description: "`reservedPatchs` table should get renamed to ReservedPatchRecord to prevent clashes with ReservedPatch from `reserved` table",
-      extensions: extensions131
+      extensions: extensions68
     },
     reserved_input: {
       executor: executor_mainPgExecutor,
       name: "reserved_input",
       identifier: "main.a.reserved_input",
-      from: registryConfig_pgCodecs_reservedInput_reservedInput.sqlType,
-      codec: registryConfig_pgCodecs_reservedInput_reservedInput,
+      from: registry_pgCodecs_reservedInput_reservedInputCodec.sqlType,
+      codec: registry_pgCodecs_reservedInput_reservedInputCodec,
       uniques: uniques6,
       isVirtual: false,
       description: "`reserved_input` table should get renamed to ReservedInputRecord to prevent clashes with ReservedInput from `reserved` table",
-      extensions: extensions132
+      extensions: extensions69
     },
     default_value: {
       executor: executor_mainPgExecutor,
       name: "default_value",
       identifier: "main.a.default_value",
-      from: registryConfig_pgCodecs_defaultValue_defaultValue.sqlType,
-      codec: registryConfig_pgCodecs_defaultValue_defaultValue,
+      from: registry_pgCodecs_defaultValue_defaultValueCodec.sqlType,
+      codec: registry_pgCodecs_defaultValue_defaultValueCodec,
       uniques: uniques7,
       isVirtual: false,
       description: undefined,
-      extensions: extensions133
+      extensions: extensions70
     },
-    foreign_key: registryConfig_pgResources_foreign_key_foreign_key,
+    foreign_key: registry_pgResources_foreign_key_foreign_key,
     no_primary_key: {
       executor: executor_mainPgExecutor,
       name: "no_primary_key",
       identifier: "main.a.no_primary_key",
-      from: registryConfig_pgCodecs_noPrimaryKey_noPrimaryKey.sqlType,
-      codec: registryConfig_pgCodecs_noPrimaryKey_noPrimaryKey,
+      from: registry_pgCodecs_noPrimaryKey_noPrimaryKeyCodec.sqlType,
+      codec: registry_pgCodecs_noPrimaryKey_noPrimaryKeyCodec,
       uniques: uniques9,
       isVirtual: false,
       description: undefined,
-      extensions: extensions135
+      extensions: extensions72
     },
     testview: {
       executor: executor_mainPgExecutor,
       name: "testview",
       identifier: "main.a.testview",
-      from: registryConfig_pgCodecs_testview_testview.sqlType,
-      codec: registryConfig_pgCodecs_testview_testview,
+      from: registry_pgCodecs_testview_testviewCodec.sqlType,
+      codec: registry_pgCodecs_testview_testviewCodec,
       uniques: uniques10,
       isVirtual: false,
       description: undefined,
-      extensions: extensions136
+      extensions: extensions73
     },
-    unique_foreign_key: registryConfig_pgResources_unique_foreign_key_unique_foreign_key,
+    unique_foreign_key: registry_pgResources_unique_foreign_key_unique_foreign_key,
     my_table: {
       executor: executor_mainPgExecutor,
       name: "my_table",
       identifier: "main.c.my_table",
-      from: registryConfig_pgCodecs_myTable_myTable.sqlType,
-      codec: registryConfig_pgCodecs_myTable_myTable,
+      from: registry_pgCodecs_myTable_myTableCodec.sqlType,
+      codec: registry_pgCodecs_myTable_myTableCodec,
       uniques: uniques12,
       isVirtual: false,
       description: undefined,
-      extensions: extensions138
+      extensions: extensions75
     },
-    person_secret: registryConfig_pgResources_person_secret_person_secret,
+    person_secret: registry_pgResources_person_secret_person_secret,
     view_table: {
       executor: executor_mainPgExecutor,
       name: "view_table",
       identifier: "main.a.view_table",
-      from: registryConfig_pgCodecs_viewTable_viewTable.sqlType,
-      codec: registryConfig_pgCodecs_viewTable_viewTable,
+      from: registry_pgCodecs_viewTable_viewTableCodec.sqlType,
+      codec: registry_pgCodecs_viewTable_viewTableCodec,
       uniques: uniques14,
       isVirtual: false,
       description: undefined,
-      extensions: extensions140
+      extensions: extensions77
     },
-    compound_key: registryConfig_pgResources_compound_key_compound_key,
+    compound_key: registry_pgResources_compound_key_compound_key,
     similar_table_1: {
       executor: executor_mainPgExecutor,
       name: "similar_table_1",
       identifier: "main.a.similar_table_1",
-      from: registryConfig_pgCodecs_similarTable1_similarTable1.sqlType,
-      codec: registryConfig_pgCodecs_similarTable1_similarTable1,
+      from: registry_pgCodecs_similarTable1_similarTable1Codec.sqlType,
+      codec: registry_pgCodecs_similarTable1_similarTable1Codec,
       uniques: uniques16,
       isVirtual: false,
       description: undefined,
-      extensions: extensions142
+      extensions: extensions79
     },
     similar_table_2: {
       executor: executor_mainPgExecutor,
       name: "similar_table_2",
       identifier: "main.a.similar_table_2",
-      from: registryConfig_pgCodecs_similarTable2_similarTable2.sqlType,
-      codec: registryConfig_pgCodecs_similarTable2_similarTable2,
+      from: registry_pgCodecs_similarTable2_similarTable2Codec.sqlType,
+      codec: registry_pgCodecs_similarTable2_similarTable2Codec,
       uniques: uniques17,
       isVirtual: false,
       description: undefined,
-      extensions: extensions143
+      extensions: extensions80
     },
     updatable_view: {
       executor: executor_mainPgExecutor,
       name: "updatable_view",
       identifier: "main.b.updatable_view",
-      from: registryConfig_pgCodecs_updatableView_updatableView.sqlType,
-      codec: registryConfig_pgCodecs_updatableView_updatableView,
+      from: registry_pgCodecs_updatableView_updatableViewCodec.sqlType,
+      codec: registry_pgCodecs_updatableView_updatableViewCodec,
       uniques: uniques18,
       isVirtual: false,
       description: "YOYOYO!!",
-      extensions: extensions144
+      extensions: extensions81
     },
     null_test_record: {
       executor: executor_mainPgExecutor,
       name: "null_test_record",
       identifier: "main.c.null_test_record",
-      from: registryConfig_pgCodecs_nullTestRecord_nullTestRecord.sqlType,
-      codec: registryConfig_pgCodecs_nullTestRecord_nullTestRecord,
+      from: registry_pgCodecs_nullTestRecord_nullTestRecordCodec.sqlType,
+      codec: registry_pgCodecs_nullTestRecord_nullTestRecordCodec,
       uniques: uniques19,
       isVirtual: false,
       description: undefined,
-      extensions: extensions145
+      extensions: extensions82
     },
     edge_case_computed: {
       executor: executor_mainPgExecutor,
@@ -8185,10 +8186,10 @@ const registry = makeRegistry({
       codec: TYPES.text,
       uniques: [],
       isMutation: false,
-      extensions: extensions146,
+      extensions: extensions83,
       description: undefined
     },
-    return_table_without_grants: PgResource.functionResourceOptions(registryConfig_pgResources_compound_key_compound_key, options_return_table_without_grants),
+    return_table_without_grants: PgResource.functionResourceOptions(registry_pgResources_compound_key_compound_key, options_return_table_without_grants),
     list_bde_mutation: {
       executor: executor_mainPgExecutor,
       name: "list_bde_mutation",
@@ -8196,30 +8197,30 @@ const registry = makeRegistry({
       from: fromCallback65,
       parameters: parameters65,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_uuidArray_uuidArray,
+      codec: registry_pgCodecs_uuidArray_uuidArrayCodec,
       uniques: [],
       isMutation: true,
-      extensions: extensions147,
+      extensions: extensions84,
       description: undefined
     },
     edge_case: {
       executor: executor_mainPgExecutor,
       name: "edge_case",
       identifier: "main.c.edge_case",
-      from: registryConfig_pgCodecs_edgeCase_edgeCase.sqlType,
-      codec: registryConfig_pgCodecs_edgeCase_edgeCase,
+      from: registry_pgCodecs_edgeCase_edgeCaseCodec.sqlType,
+      codec: registry_pgCodecs_edgeCase_edgeCaseCodec,
       uniques: uniques20,
       isVirtual: false,
       description: undefined,
-      extensions: extensions148
+      extensions: extensions85
     },
-    left_arm: registryConfig_pgResources_left_arm_left_arm,
+    left_arm: registry_pgResources_left_arm_left_arm,
     authenticate_fail: PgResource.functionResourceOptions(resourceConfig_jwt_token, options_authenticate_fail),
     authenticate: PgResource.functionResourceOptions(resourceConfig_jwt_token, options_authenticate),
-    issue756: registryConfig_pgResources_issue756_issue756,
-    left_arm_identity: PgResource.functionResourceOptions(registryConfig_pgResources_left_arm_left_arm, options_left_arm_identity),
-    issue756_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_issue756_issue756, options_issue756_mutation),
-    issue756_set_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_issue756_issue756, options_issue756_set_mutation),
+    issue756: registry_pgResources_issue756_issue756,
+    left_arm_identity: PgResource.functionResourceOptions(registry_pgResources_left_arm_left_arm, options_left_arm_identity),
+    issue756_mutation: PgResource.functionResourceOptions(registry_pgResources_issue756_issue756, options_issue756_mutation),
+    issue756_set_mutation: PgResource.functionResourceOptions(registry_pgResources_issue756_issue756, options_issue756_set_mutation),
     authenticate_many: PgResource.functionResourceOptions(resourceConfig_jwt_token, options_authenticate_many),
     authenticate_payload: PgResource.functionResourceOptions(resourceConfig_auth_payload, options_authenticate_payload),
     types_mutation: {
@@ -8232,7 +8233,7 @@ const registry = makeRegistry({
       codec: TYPES.boolean,
       uniques: [],
       isMutation: true,
-      extensions: extensions153,
+      extensions: extensions90,
       description: undefined
     },
     types_query: {
@@ -8245,7 +8246,7 @@ const registry = makeRegistry({
       codec: TYPES.boolean,
       uniques: [],
       isMutation: false,
-      extensions: extensions154,
+      extensions: extensions91,
       description: undefined
     },
     compound_type_computed_field: {
@@ -8258,7 +8259,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions155,
+      extensions: extensions92,
       description: undefined
     },
     post_computed_interval_set: {
@@ -8271,7 +8272,7 @@ const registry = makeRegistry({
       codec: TYPES.interval,
       uniques: [],
       isMutation: false,
-      extensions: extensions156,
+      extensions: extensions93,
       description: undefined
     },
     post_computed_interval_array: {
@@ -8281,10 +8282,10 @@ const registry = makeRegistry({
       from: fromCallback70,
       parameters: parameters70,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_intervalArray_intervalArray,
+      codec: registry_pgCodecs_intervalArray_intervalArrayCodec,
       uniques: [],
       isMutation: false,
-      extensions: extensions157,
+      extensions: extensions94,
       description: undefined
     },
     post_computed_text_array: {
@@ -8294,10 +8295,10 @@ const registry = makeRegistry({
       from: fromCallback71,
       parameters: parameters71,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_textArray_textArray,
+      codec: registry_pgCodecs_textArray_textArrayCodec,
       uniques: [],
       isMutation: false,
-      extensions: extensions158,
+      extensions: extensions95,
       description: undefined
     },
     post_computed_with_optional_arg: {
@@ -8310,7 +8311,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions159,
+      extensions: extensions96,
       description: undefined
     },
     post_computed_with_required_arg: {
@@ -8323,7 +8324,7 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions160,
+      extensions: extensions97,
       description: undefined
     },
     func_out_out_compound_type: {
@@ -8333,10 +8334,10 @@ const registry = makeRegistry({
       from: fromCallback74,
       parameters: parameters74,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord,
+      codec: registry_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord,
       uniques: [],
       isMutation: false,
-      extensions: extensions161,
+      extensions: extensions98,
       description: undefined
     },
     mutation_out_out_compound_type: {
@@ -8346,10 +8347,10 @@ const registry = makeRegistry({
       from: fromCallback75,
       parameters: parameters75,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCompoundTypeRecord,
+      codec: registry_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCompoundTypeRecord,
       uniques: [],
       isMutation: true,
-      extensions: extensions162,
+      extensions: extensions99,
       description: undefined
     },
     post_headline_trimmed: {
@@ -8362,7 +8363,7 @@ const registry = makeRegistry({
       codec: TYPES.text,
       uniques: [],
       isMutation: false,
-      extensions: extensions163,
+      extensions: extensions100,
       description: undefined
     },
     post_headline_trimmed_no_defaults: {
@@ -8375,7 +8376,7 @@ const registry = makeRegistry({
       codec: TYPES.text,
       uniques: [],
       isMutation: false,
-      extensions: extensions164,
+      extensions: extensions101,
       description: undefined
     },
     post_headline_trimmed_strict: {
@@ -8388,7 +8389,7 @@ const registry = makeRegistry({
       codec: TYPES.text,
       uniques: [],
       isMutation: false,
-      extensions: extensions165,
+      extensions: extensions102,
       description: undefined
     },
     query_output_two_rows: {
@@ -8398,26 +8399,26 @@ const registry = makeRegistry({
       from: fromCallback79,
       parameters: parameters79,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord,
+      codec: registry_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord,
       uniques: [],
       isMutation: false,
-      extensions: extensions166,
+      extensions: extensions103,
       description: undefined
     },
-    post: registryConfig_pgResources_post_post,
+    post: registry_pgResources_post_post,
     compound_type_set_query: PgResource.functionResourceOptions(resourceConfig_compound_type, options_compound_type_set_query),
     compound_type_mutation: PgResource.functionResourceOptions(resourceConfig_compound_type, options_compound_type_mutation),
     compound_type_query: PgResource.functionResourceOptions(resourceConfig_compound_type, options_compound_type_query),
     compound_type_set_mutation: PgResource.functionResourceOptions(resourceConfig_compound_type, options_compound_type_set_mutation),
-    table_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_table_mutation),
-    table_query: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_table_query),
-    post_with_suffix: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_post_with_suffix),
+    table_mutation: PgResource.functionResourceOptions(registry_pgResources_post_post, options_table_mutation),
+    table_query: PgResource.functionResourceOptions(registry_pgResources_post_post, options_table_query),
+    post_with_suffix: PgResource.functionResourceOptions(registry_pgResources_post_post, options_post_with_suffix),
     mutation_compound_type_array: PgResource.functionResourceOptions(resourceConfig_compound_type, options_mutation_compound_type_array),
     query_compound_type_array: PgResource.functionResourceOptions(resourceConfig_compound_type, options_query_compound_type_array),
     compound_type_array_mutation: PgResource.functionResourceOptions(resourceConfig_compound_type, options_compound_type_array_mutation),
     compound_type_array_query: PgResource.functionResourceOptions(resourceConfig_compound_type, options_compound_type_array_query),
     post_computed_compound_type_array: PgResource.functionResourceOptions(resourceConfig_compound_type, options_post_computed_compound_type_array),
-    post_many: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_post_many),
+    post_many: PgResource.functionResourceOptions(registry_pgResources_post_post, options_post_many),
     person_computed_out: {
       executor: executor_mainPgExecutor,
       name: "person_computed_out",
@@ -8428,7 +8429,7 @@ const registry = makeRegistry({
       codec: TYPES.text,
       uniques: [],
       isMutation: false,
-      extensions: extensions169,
+      extensions: extensions106,
       description: undefined
     },
     person_first_name: {
@@ -8441,7 +8442,7 @@ const registry = makeRegistry({
       codec: TYPES.text,
       uniques: [],
       isMutation: false,
-      extensions: extensions170,
+      extensions: extensions107,
       description: "The first name of the person."
     },
     person_computed_out_out: {
@@ -8451,10 +8452,10 @@ const registry = makeRegistry({
       from: fromCallback82,
       parameters: parameters82,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_PersonComputedOutOutRecord_PersonComputedOutOutRecord,
+      codec: registry_pgCodecs_PersonComputedOutOutRecord_PersonComputedOutOutRecord,
       uniques: [],
       isMutation: false,
-      extensions: extensions171,
+      extensions: extensions108,
       description: undefined
     },
     person_computed_inout: {
@@ -8467,7 +8468,7 @@ const registry = makeRegistry({
       codec: TYPES.text,
       uniques: [],
       isMutation: false,
-      extensions: extensions172,
+      extensions: extensions109,
       description: undefined
     },
     person_computed_inout_out: {
@@ -8477,10 +8478,10 @@ const registry = makeRegistry({
       from: fromCallback84,
       parameters: parameters84,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOutRecord,
+      codec: registry_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOutRecord,
       uniques: [],
       isMutation: false,
-      extensions: extensions173,
+      extensions: extensions110,
       description: undefined
     },
     person_exists: {
@@ -8493,7 +8494,7 @@ const registry = makeRegistry({
       codec: TYPES.boolean,
       uniques: [],
       isMutation: false,
-      extensions: extensions174,
+      extensions: extensions111,
       description: undefined
     },
     person_computed_first_arg_inout_out: {
@@ -8503,10 +8504,10 @@ const registry = makeRegistry({
       from: fromCallback86,
       parameters: parameters86,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_PersonComputedFirstArgInoutOutRecord_PersonComputedFirstArgInoutOutRecord,
+      codec: registry_pgCodecs_PersonComputedFirstArgInoutOutRecord_PersonComputedFirstArgInoutOutRecord,
       uniques: [],
       isMutation: false,
-      extensions: extensions175,
+      extensions: extensions112,
       description: undefined
     },
     func_out_complex: {
@@ -8516,10 +8517,10 @@ const registry = makeRegistry({
       from: fromCallback87,
       parameters: parameters87,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_FuncOutComplexRecord_FuncOutComplexRecord,
+      codec: registry_pgCodecs_FuncOutComplexRecord_FuncOutComplexRecord,
       uniques: [],
       isMutation: false,
-      extensions: extensions176,
+      extensions: extensions113,
       description: undefined
     },
     func_out_complex_setof: {
@@ -8529,10 +8530,10 @@ const registry = makeRegistry({
       from: fromCallback88,
       parameters: parameters88,
       isUnique: !true,
-      codec: registryConfig_pgCodecs_FuncOutComplexSetofRecord_FuncOutComplexSetofRecord,
+      codec: registry_pgCodecs_FuncOutComplexSetofRecord_FuncOutComplexSetofRecord,
       uniques: [],
       isMutation: false,
-      extensions: extensions177,
+      extensions: extensions114,
       description: undefined
     },
     mutation_out_complex: {
@@ -8542,10 +8543,10 @@ const registry = makeRegistry({
       from: fromCallback89,
       parameters: parameters89,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_MutationOutComplexRecord_MutationOutComplexRecord,
+      codec: registry_pgCodecs_MutationOutComplexRecord_MutationOutComplexRecord,
       uniques: [],
       isMutation: true,
-      extensions: extensions178,
+      extensions: extensions115,
       description: undefined
     },
     mutation_out_complex_setof: {
@@ -8555,10 +8556,10 @@ const registry = makeRegistry({
       from: fromCallback90,
       parameters: parameters90,
       isUnique: !true,
-      codec: registryConfig_pgCodecs_MutationOutComplexSetofRecord_MutationOutComplexSetofRecord,
+      codec: registry_pgCodecs_MutationOutComplexSetofRecord_MutationOutComplexSetofRecord,
       uniques: [],
       isMutation: true,
-      extensions: extensions179,
+      extensions: extensions116,
       description: undefined
     },
     person_computed_complex: {
@@ -8568,40 +8569,40 @@ const registry = makeRegistry({
       from: fromCallback91,
       parameters: parameters91,
       isUnique: !false,
-      codec: registryConfig_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexRecord,
+      codec: registry_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexRecord,
       uniques: [],
       isMutation: false,
-      extensions: extensions180,
+      extensions: extensions117,
       description: undefined
     },
-    person_first_post: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_person_first_post),
-    person: registryConfig_pgResources_person_person,
-    badly_behaved_function: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, options_badly_behaved_function),
-    func_out_table: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, options_func_out_table),
-    func_out_table_setof: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, options_func_out_table_setof),
-    mutation_out_table: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, options_mutation_out_table),
-    mutation_out_table_setof: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, options_mutation_out_table_setof),
-    table_set_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, options_table_set_mutation),
-    table_set_query: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, options_table_set_query),
-    table_set_query_plpgsql: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, options_table_set_query_plpgsql),
-    person_computed_first_arg_inout: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, options_person_computed_first_arg_inout),
-    person_friends: PgResource.functionResourceOptions(registryConfig_pgResources_person_person, options_person_friends),
-    types: registryConfig_pgResources_types_types,
-    type_function_connection: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, options_type_function_connection),
-    type_function_connection_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, options_type_function_connection_mutation),
-    type_function: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, options_type_function),
-    type_function_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, options_type_function_mutation),
-    person_type_function_connection: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, options_person_type_function_connection),
-    person_type_function: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, options_person_type_function),
-    type_function_list: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, options_type_function_list),
-    type_function_list_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, options_type_function_list_mutation),
-    person_type_function_list: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, options_person_type_function_list)
+    person_first_post: PgResource.functionResourceOptions(registry_pgResources_post_post, options_person_first_post),
+    person: registry_pgResources_person_person,
+    badly_behaved_function: PgResource.functionResourceOptions(registry_pgResources_person_person, options_badly_behaved_function),
+    func_out_table: PgResource.functionResourceOptions(registry_pgResources_person_person, options_func_out_table),
+    func_out_table_setof: PgResource.functionResourceOptions(registry_pgResources_person_person, options_func_out_table_setof),
+    mutation_out_table: PgResource.functionResourceOptions(registry_pgResources_person_person, options_mutation_out_table),
+    mutation_out_table_setof: PgResource.functionResourceOptions(registry_pgResources_person_person, options_mutation_out_table_setof),
+    table_set_mutation: PgResource.functionResourceOptions(registry_pgResources_person_person, options_table_set_mutation),
+    table_set_query: PgResource.functionResourceOptions(registry_pgResources_person_person, options_table_set_query),
+    table_set_query_plpgsql: PgResource.functionResourceOptions(registry_pgResources_person_person, options_table_set_query_plpgsql),
+    person_computed_first_arg_inout: PgResource.functionResourceOptions(registry_pgResources_person_person, options_person_computed_first_arg_inout),
+    person_friends: PgResource.functionResourceOptions(registry_pgResources_person_person, options_person_friends),
+    types: registry_pgResources_types_types,
+    type_function_connection: PgResource.functionResourceOptions(registry_pgResources_types_types, options_type_function_connection),
+    type_function_connection_mutation: PgResource.functionResourceOptions(registry_pgResources_types_types, options_type_function_connection_mutation),
+    type_function: PgResource.functionResourceOptions(registry_pgResources_types_types, options_type_function),
+    type_function_mutation: PgResource.functionResourceOptions(registry_pgResources_types_types, options_type_function_mutation),
+    person_type_function_connection: PgResource.functionResourceOptions(registry_pgResources_types_types, options_person_type_function_connection),
+    person_type_function: PgResource.functionResourceOptions(registry_pgResources_types_types, options_person_type_function),
+    type_function_list: PgResource.functionResourceOptions(registry_pgResources_types_types, options_type_function_list),
+    type_function_list_mutation: PgResource.functionResourceOptions(registry_pgResources_types_types, options_type_function_list_mutation),
+    person_type_function_list: PgResource.functionResourceOptions(registry_pgResources_types_types, options_person_type_function_list)
   }),
   pgRelations: Object.assign(Object.create(null), {
     foreignKey: Object.assign(Object.create(null), {
       compoundKeyByMyCompoundKey1AndCompoundKey2: {
-        localCodec: registryConfig_pgCodecs_foreignKey_foreignKey,
-        remoteResourceOptions: registryConfig_pgResources_compound_key_compound_key,
+        localCodec: registry_pgCodecs_foreignKey_foreignKeyCodec,
+        remoteResourceOptions: registry_pgResources_compound_key_compound_key,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["compound_key_1", "compound_key_2"],
         remoteAttributes: ["person_id_1", "person_id_2"],
@@ -8615,8 +8616,8 @@ const registry = makeRegistry({
         }
       },
       personByMyPersonId: {
-        localCodec: registryConfig_pgCodecs_foreignKey_foreignKey,
-        remoteResourceOptions: registryConfig_pgResources_person_person,
+        localCodec: registry_pgCodecs_foreignKey_foreignKeyCodec,
+        remoteResourceOptions: registry_pgResources_person_person,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["person_id"],
         remoteAttributes: ["id"],
@@ -8632,8 +8633,8 @@ const registry = makeRegistry({
     }),
     post: Object.assign(Object.create(null), {
       personByMyAuthorId: {
-        localCodec: attributes_post_codec_post,
-        remoteResourceOptions: registryConfig_pgResources_person_person,
+        localCodec: attributes_post_codec_postCodec,
+        remoteResourceOptions: registry_pgResources_person_person,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["author_id"],
         remoteAttributes: ["id"],
@@ -8647,8 +8648,8 @@ const registry = makeRegistry({
         }
       },
       typesByTheirSmallint: {
-        localCodec: attributes_post_codec_post,
-        remoteResourceOptions: registryConfig_pgResources_types_types,
+        localCodec: attributes_post_codec_postCodec,
+        remoteResourceOptions: registry_pgResources_types_types,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
         remoteAttributes: ["smallint"],
@@ -8662,8 +8663,8 @@ const registry = makeRegistry({
         }
       },
       typesByTheirId: {
-        localCodec: attributes_post_codec_post,
-        remoteResourceOptions: registryConfig_pgResources_types_types,
+        localCodec: attributes_post_codec_postCodec,
+        remoteResourceOptions: registry_pgResources_types_types,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
         remoteAttributes: ["id"],
@@ -8679,8 +8680,8 @@ const registry = makeRegistry({
     }),
     uniqueForeignKey: Object.assign(Object.create(null), {
       compoundKeyByMyCompoundKey1AndCompoundKey2: {
-        localCodec: registryConfig_pgCodecs_uniqueForeignKey_uniqueForeignKey,
-        remoteResourceOptions: registryConfig_pgResources_compound_key_compound_key,
+        localCodec: registry_pgCodecs_uniqueForeignKey_uniqueForeignKeyCodec,
+        remoteResourceOptions: registry_pgResources_compound_key_compound_key,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["compound_key_1", "compound_key_2"],
         remoteAttributes: ["person_id_1", "person_id_2"],
@@ -8696,8 +8697,8 @@ const registry = makeRegistry({
     }),
     authPayload: Object.assign(Object.create(null), {
       personByMyId: {
-        localCodec: registryConfig_pgCodecs_authPayload_authPayload,
-        remoteResourceOptions: registryConfig_pgResources_person_person,
+        localCodec: registry_pgCodecs_authPayload_authPayloadCodec,
+        remoteResourceOptions: registry_pgResources_person_person,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
         remoteAttributes: ["id"],
@@ -8713,8 +8714,8 @@ const registry = makeRegistry({
     }),
     types: Object.assign(Object.create(null), {
       postByMySmallint: {
-        localCodec: registryConfig_pgCodecs_types_types,
-        remoteResourceOptions: registryConfig_pgResources_post_post,
+        localCodec: registry_pgCodecs_types_typesCodec,
+        remoteResourceOptions: registry_pgResources_post_post,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["smallint"],
         remoteAttributes: ["id"],
@@ -8728,8 +8729,8 @@ const registry = makeRegistry({
         }
       },
       postByMyId: {
-        localCodec: registryConfig_pgCodecs_types_types,
-        remoteResourceOptions: registryConfig_pgResources_post_post,
+        localCodec: registry_pgCodecs_types_typesCodec,
+        remoteResourceOptions: registry_pgResources_post_post,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
         remoteAttributes: ["id"],
@@ -8745,8 +8746,8 @@ const registry = makeRegistry({
     }),
     compoundKey: Object.assign(Object.create(null), {
       personByMyPersonId1: {
-        localCodec: registryConfig_pgCodecs_compoundKey_compoundKey,
-        remoteResourceOptions: registryConfig_pgResources_person_person,
+        localCodec: registry_pgCodecs_compoundKey_compoundKeyCodec,
+        remoteResourceOptions: registry_pgResources_person_person,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["person_id_1"],
         remoteAttributes: ["id"],
@@ -8760,8 +8761,8 @@ const registry = makeRegistry({
         }
       },
       personByMyPersonId2: {
-        localCodec: registryConfig_pgCodecs_compoundKey_compoundKey,
-        remoteResourceOptions: registryConfig_pgResources_person_person,
+        localCodec: registry_pgCodecs_compoundKey_compoundKeyCodec,
+        remoteResourceOptions: registry_pgResources_person_person,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["person_id_2"],
         remoteAttributes: ["id"],
@@ -8775,8 +8776,8 @@ const registry = makeRegistry({
         }
       },
       foreignKeysByTheirCompoundKey1AndCompoundKey2: {
-        localCodec: registryConfig_pgCodecs_compoundKey_compoundKey,
-        remoteResourceOptions: registryConfig_pgResources_foreign_key_foreign_key,
+        localCodec: registry_pgCodecs_compoundKey_compoundKeyCodec,
+        remoteResourceOptions: registry_pgResources_foreign_key_foreign_key,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["person_id_1", "person_id_2"],
         remoteAttributes: ["compound_key_1", "compound_key_2"],
@@ -8790,8 +8791,8 @@ const registry = makeRegistry({
         }
       },
       uniqueForeignKeyByTheirCompoundKey1AndCompoundKey2: {
-        localCodec: registryConfig_pgCodecs_compoundKey_compoundKey,
-        remoteResourceOptions: registryConfig_pgResources_unique_foreign_key_unique_foreign_key,
+        localCodec: registry_pgCodecs_compoundKey_compoundKeyCodec,
+        remoteResourceOptions: registry_pgResources_unique_foreign_key_unique_foreign_key,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["person_id_1", "person_id_2"],
         remoteAttributes: ["compound_key_1", "compound_key_2"],
@@ -8807,8 +8808,8 @@ const registry = makeRegistry({
     }),
     leftArm: Object.assign(Object.create(null), {
       personByMyPersonId: {
-        localCodec: registryConfig_pgCodecs_leftArm_leftArm,
-        remoteResourceOptions: registryConfig_pgResources_person_person,
+        localCodec: registry_pgCodecs_leftArm_leftArmCodec,
+        remoteResourceOptions: registry_pgResources_person_person,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["person_id"],
         remoteAttributes: ["id"],
@@ -8824,8 +8825,8 @@ const registry = makeRegistry({
     }),
     person: Object.assign(Object.create(null), {
       postsByTheirAuthorId: {
-        localCodec: attributes_person_codec_person,
-        remoteResourceOptions: registryConfig_pgResources_post_post,
+        localCodec: attributes_person_codec_personCodec,
+        remoteResourceOptions: registry_pgResources_post_post,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
         remoteAttributes: ["author_id"],
@@ -8839,8 +8840,8 @@ const registry = makeRegistry({
         }
       },
       foreignKeysByTheirPersonId: {
-        localCodec: attributes_person_codec_person,
-        remoteResourceOptions: registryConfig_pgResources_foreign_key_foreign_key,
+        localCodec: attributes_person_codec_personCodec,
+        remoteResourceOptions: registry_pgResources_foreign_key_foreign_key,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
         remoteAttributes: ["person_id"],
@@ -8854,8 +8855,8 @@ const registry = makeRegistry({
         }
       },
       personSecretByTheirPersonId: {
-        localCodec: attributes_person_codec_person,
-        remoteResourceOptions: registryConfig_pgResources_person_secret_person_secret,
+        localCodec: attributes_person_codec_personCodec,
+        remoteResourceOptions: registry_pgResources_person_secret_person_secret,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
         remoteAttributes: ["person_id"],
@@ -8871,8 +8872,8 @@ const registry = makeRegistry({
         }
       },
       leftArmByTheirPersonId: {
-        localCodec: attributes_person_codec_person,
-        remoteResourceOptions: registryConfig_pgResources_left_arm_left_arm,
+        localCodec: attributes_person_codec_personCodec,
+        remoteResourceOptions: registry_pgResources_left_arm_left_arm,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
         remoteAttributes: ["person_id"],
@@ -8886,8 +8887,8 @@ const registry = makeRegistry({
         }
       },
       compoundKeysByTheirPersonId1: {
-        localCodec: attributes_person_codec_person,
-        remoteResourceOptions: registryConfig_pgResources_compound_key_compound_key,
+        localCodec: attributes_person_codec_personCodec,
+        remoteResourceOptions: registry_pgResources_compound_key_compound_key,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
         remoteAttributes: ["person_id_1"],
@@ -8901,8 +8902,8 @@ const registry = makeRegistry({
         }
       },
       compoundKeysByTheirPersonId2: {
-        localCodec: attributes_person_codec_person,
-        remoteResourceOptions: registryConfig_pgResources_compound_key_compound_key,
+        localCodec: attributes_person_codec_personCodec,
+        remoteResourceOptions: registry_pgResources_compound_key_compound_key,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
         remoteAttributes: ["person_id_2"],
@@ -8918,8 +8919,8 @@ const registry = makeRegistry({
     }),
     personSecret: Object.assign(Object.create(null), {
       personByMyPersonId: {
-        localCodec: registryConfig_pgCodecs_personSecret_personSecret,
-        remoteResourceOptions: registryConfig_pgResources_person_person,
+        localCodec: registry_pgCodecs_personSecret_personSecretCodec,
+        remoteResourceOptions: registry_pgResources_person_person,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["person_id"],
         remoteAttributes: ["id"],
@@ -8936,25 +8937,26 @@ const registry = makeRegistry({
       }
     })
   })
-});
-const pgResource_inputsPgResource = registry.pgResources["inputs"];
-const pgResource_patchsPgResource = registry.pgResources["patchs"];
-const pgResource_reservedPgResource = registry.pgResources["reserved"];
-const pgResource_reservedPatchsPgResource = registry.pgResources["reservedPatchs"];
-const pgResource_reserved_inputPgResource = registry.pgResources["reserved_input"];
-const pgResource_default_valuePgResource = registry.pgResources["default_value"];
-const pgResource_my_tablePgResource = registry.pgResources["my_table"];
-const pgResource_person_secretPgResource = registry.pgResources["person_secret"];
-const pgResource_view_tablePgResource = registry.pgResources["view_table"];
-const pgResource_compound_keyPgResource = registry.pgResources["compound_key"];
-const pgResource_similar_table_1PgResource = registry.pgResources["similar_table_1"];
-const pgResource_similar_table_2PgResource = registry.pgResources["similar_table_2"];
-const pgResource_null_test_recordPgResource = registry.pgResources["null_test_record"];
-const pgResource_left_armPgResource = registry.pgResources["left_arm"];
-const pgResource_issue756PgResource = registry.pgResources["issue756"];
-const pgResource_postPgResource = registry.pgResources["post"];
-const pgResource_personPgResource = registry.pgResources["person"];
-const pgResource_typesPgResource = registry.pgResources["types"];
+};
+const registry_registry = makeRegistry(registry);
+const pgResource_inputsPgResource = registry_registry.pgResources["inputs"];
+const pgResource_patchsPgResource = registry_registry.pgResources["patchs"];
+const pgResource_reservedPgResource = registry_registry.pgResources["reserved"];
+const pgResource_reservedPatchsPgResource = registry_registry.pgResources["reservedPatchs"];
+const pgResource_reserved_inputPgResource = registry_registry.pgResources["reserved_input"];
+const pgResource_default_valuePgResource = registry_registry.pgResources["default_value"];
+const pgResource_my_tablePgResource = registry_registry.pgResources["my_table"];
+const pgResource_person_secretPgResource = registry_registry.pgResources["person_secret"];
+const pgResource_view_tablePgResource = registry_registry.pgResources["view_table"];
+const pgResource_compound_keyPgResource = registry_registry.pgResources["compound_key"];
+const pgResource_similar_table_1PgResource = registry_registry.pgResources["similar_table_1"];
+const pgResource_similar_table_2PgResource = registry_registry.pgResources["similar_table_2"];
+const pgResource_null_test_recordPgResource = registry_registry.pgResources["null_test_record"];
+const pgResource_left_armPgResource = registry_registry.pgResources["left_arm"];
+const pgResource_issue756PgResource = registry_registry.pgResources["issue756"];
+const pgResource_postPgResource = registry_registry.pgResources["post"];
+const pgResource_personPgResource = registry_registry.pgResources["person"];
+const pgResource_typesPgResource = registry_registry.pgResources["types"];
 const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
   Query: handler,
   Input: {
@@ -9301,8 +9303,8 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     }
   }
 });
-const resource_no_primary_keyPgResource = registry.pgResources["no_primary_key"];
-const resource_unique_foreign_keyPgResource = registry.pgResources["unique_foreign_key"];
+const resource_no_primary_keyPgResource = registry_registry.pgResources["no_primary_key"];
+const resource_unique_foreign_keyPgResource = registry_registry.pgResources["unique_foreign_key"];
 const argDetailsSimple = [];
 const makeArgs = (args, path = []) => {
   const selectArgs = [];
@@ -9348,7 +9350,7 @@ const makeArgs = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_current_user_idPgResource = registry.pgResources["current_user_id"];
+const resource_current_user_idPgResource = registry_registry.pgResources["current_user_id"];
 const argDetailsSimple2 = [];
 const makeArgs2 = (args, path = []) => {
   const selectArgs = [];
@@ -9394,7 +9396,7 @@ const makeArgs2 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_func_outPgResource = registry.pgResources["func_out"];
+const resource_func_outPgResource = registry_registry.pgResources["func_out"];
 const argDetailsSimple3 = [];
 const makeArgs3 = (args, path = []) => {
   const selectArgs = [];
@@ -9440,7 +9442,7 @@ const makeArgs3 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_func_out_setofPgResource = registry.pgResources["func_out_setof"];
+const resource_func_out_setofPgResource = registry_registry.pgResources["func_out_setof"];
 const getSelectPlanFromParentAndArgs = ($root, args, _info) => {
   const selectArgs = makeArgs3(args);
   return resource_func_out_setofPgResource.execute(selectArgs);
@@ -9509,7 +9511,7 @@ const makeArgs4 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_func_out_unnamedPgResource = registry.pgResources["func_out_unnamed"];
+const resource_func_out_unnamedPgResource = registry_registry.pgResources["func_out_unnamed"];
 const argDetailsSimple5 = [];
 const makeArgs5 = (args, path = []) => {
   const selectArgs = [];
@@ -9555,7 +9557,7 @@ const makeArgs5 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_no_args_queryPgResource = registry.pgResources["no_args_query"];
+const resource_no_args_queryPgResource = registry_registry.pgResources["no_args_query"];
 const argDetailsSimple6 = [];
 const makeArgs6 = (args, path = []) => {
   const selectArgs = [];
@@ -9601,7 +9603,7 @@ const makeArgs6 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_query_interval_setPgResource = registry.pgResources["query_interval_set"];
+const resource_query_interval_setPgResource = registry_registry.pgResources["query_interval_set"];
 const getSelectPlanFromParentAndArgs2 = ($root, args, _info) => {
   const selectArgs = makeArgs6(args);
   return resource_query_interval_setPgResource.execute(selectArgs);
@@ -9666,7 +9668,7 @@ const makeArgs7 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_static_big_integerPgResource = registry.pgResources["static_big_integer"];
+const resource_static_big_integerPgResource = registry_registry.pgResources["static_big_integer"];
 const getSelectPlanFromParentAndArgs3 = ($root, args, _info) => {
   const selectArgs = makeArgs7(args);
   return resource_static_big_integerPgResource.execute(selectArgs);
@@ -9737,7 +9739,7 @@ const makeArgs8 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_func_in_outPgResource = registry.pgResources["func_in_out"];
+const resource_func_in_outPgResource = registry_registry.pgResources["func_in_out"];
 const argDetailsSimple9 = [{
   graphqlArgName: "i",
   postgresArgName: "i",
@@ -9789,7 +9791,7 @@ const makeArgs9 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_func_returns_table_one_colPgResource = registry.pgResources["func_returns_table_one_col"];
+const resource_func_returns_table_one_colPgResource = registry_registry.pgResources["func_returns_table_one_col"];
 const getSelectPlanFromParentAndArgs4 = ($root, args, _info) => {
   const selectArgs = makeArgs9(args);
   return resource_func_returns_table_one_colPgResource.execute(selectArgs);
@@ -9860,7 +9862,7 @@ const makeArgs10 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_json_identityPgResource = registry.pgResources["json_identity"];
+const resource_json_identityPgResource = registry_registry.pgResources["json_identity"];
 const argDetailsSimple11 = [{
   graphqlArgName: "json",
   postgresArgName: "json",
@@ -9912,7 +9914,7 @@ const makeArgs11 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_jsonb_identityPgResource = registry.pgResources["jsonb_identity"];
+const resource_jsonb_identityPgResource = registry_registry.pgResources["jsonb_identity"];
 const argDetailsSimple12 = [{
   graphqlArgName: "arg0",
   postgresArgName: null,
@@ -9970,7 +9972,7 @@ const makeArgs12 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_add_1_queryPgResource = registry.pgResources["add_1_query"];
+const resource_add_1_queryPgResource = registry_registry.pgResources["add_1_query"];
 const argDetailsSimple13 = [{
   graphqlArgName: "a",
   postgresArgName: "a",
@@ -10028,7 +10030,7 @@ const makeArgs13 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_add_2_queryPgResource = registry.pgResources["add_2_query"];
+const resource_add_2_queryPgResource = registry_registry.pgResources["add_2_query"];
 const argDetailsSimple14 = [{
   graphqlArgName: "a",
   postgresArgName: "a",
@@ -10086,7 +10088,7 @@ const makeArgs14 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_add_3_queryPgResource = registry.pgResources["add_3_query"];
+const resource_add_3_queryPgResource = registry_registry.pgResources["add_3_query"];
 const argDetailsSimple15 = [{
   graphqlArgName: "arg0",
   postgresArgName: "",
@@ -10144,7 +10146,7 @@ const makeArgs15 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_add_4_queryPgResource = registry.pgResources["add_4_query"];
+const resource_add_4_queryPgResource = registry_registry.pgResources["add_4_query"];
 const argDetailsSimple16 = [{
   graphqlArgName: "i",
   postgresArgName: "i",
@@ -10202,7 +10204,7 @@ const makeArgs16 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_func_in_inoutPgResource = registry.pgResources["func_in_inout"];
+const resource_func_in_inoutPgResource = registry_registry.pgResources["func_in_inout"];
 const argDetailsSimple17 = [];
 const makeArgs17 = (args, path = []) => {
   const selectArgs = [];
@@ -10248,7 +10250,7 @@ const makeArgs17 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_func_out_outPgResource = registry.pgResources["func_out_out"];
+const resource_func_out_outPgResource = registry_registry.pgResources["func_out_out"];
 const argDetailsSimple18 = [];
 const makeArgs18 = (args, path = []) => {
   const selectArgs = [];
@@ -10294,7 +10296,7 @@ const makeArgs18 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_func_out_out_setofPgResource = registry.pgResources["func_out_out_setof"];
+const resource_func_out_out_setofPgResource = registry_registry.pgResources["func_out_out_setof"];
 const getSelectPlanFromParentAndArgs5 = ($root, args, _info) => {
   const selectArgs = makeArgs18(args);
   return resource_func_out_out_setofPgResource.execute(selectArgs);
@@ -10359,7 +10361,7 @@ const makeArgs19 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_func_out_out_unnamedPgResource = registry.pgResources["func_out_out_unnamed"];
+const resource_func_out_out_unnamedPgResource = registry_registry.pgResources["func_out_out_unnamed"];
 const argDetailsSimple20 = [];
 const makeArgs20 = (args, path = []) => {
   const selectArgs = [];
@@ -10405,7 +10407,7 @@ const makeArgs20 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_search_test_summariesPgResource = registry.pgResources["search_test_summaries"];
+const resource_search_test_summariesPgResource = registry_registry.pgResources["search_test_summaries"];
 function Query_searchTestSummariesList_first_applyPlan(_, $connection, arg) {
   $connection.setFirst(arg.getRaw());
 }
@@ -10475,7 +10477,7 @@ const makeArgs21 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_optional_missing_middle_1PgResource = registry.pgResources["optional_missing_middle_1"];
+const resource_optional_missing_middle_1PgResource = registry_registry.pgResources["optional_missing_middle_1"];
 const argDetailsSimple22 = [{
   graphqlArgName: "a",
   postgresArgName: "a",
@@ -10539,7 +10541,7 @@ const makeArgs22 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_optional_missing_middle_2PgResource = registry.pgResources["optional_missing_middle_2"];
+const resource_optional_missing_middle_2PgResource = registry_registry.pgResources["optional_missing_middle_2"];
 const argDetailsSimple23 = [{
   graphqlArgName: "a",
   postgresArgName: "a",
@@ -10603,7 +10605,7 @@ const makeArgs23 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_optional_missing_middle_3PgResource = registry.pgResources["optional_missing_middle_3"];
+const resource_optional_missing_middle_3PgResource = registry_registry.pgResources["optional_missing_middle_3"];
 const argDetailsSimple24 = [{
   graphqlArgName: "arg0",
   postgresArgName: "",
@@ -10667,7 +10669,7 @@ const makeArgs24 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_optional_missing_middle_4PgResource = registry.pgResources["optional_missing_middle_4"];
+const resource_optional_missing_middle_4PgResource = registry_registry.pgResources["optional_missing_middle_4"];
 const argDetailsSimple25 = [{
   graphqlArgName: "a",
   postgresArgName: "a",
@@ -10731,7 +10733,7 @@ const makeArgs25 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_optional_missing_middle_5PgResource = registry.pgResources["optional_missing_middle_5"];
+const resource_optional_missing_middle_5PgResource = registry_registry.pgResources["optional_missing_middle_5"];
 const argDetailsSimple26 = [];
 const makeArgs26 = (args, path = []) => {
   const selectArgs = [];
@@ -10777,7 +10779,7 @@ const makeArgs26 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_func_out_unnamed_out_out_unnamedPgResource = registry.pgResources["func_out_unnamed_out_out_unnamed"];
+const resource_func_out_unnamed_out_out_unnamedPgResource = registry_registry.pgResources["func_out_unnamed_out_out_unnamed"];
 const argDetailsSimple27 = [{
   graphqlArgName: "i",
   postgresArgName: "i",
@@ -10829,7 +10831,7 @@ const makeArgs27 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_func_returns_table_multi_colPgResource = registry.pgResources["func_returns_table_multi_col"];
+const resource_func_returns_table_multi_colPgResource = registry_registry.pgResources["func_returns_table_multi_col"];
 const getSelectPlanFromParentAndArgs6 = ($root, args, _info) => {
   const selectArgs = makeArgs27(args);
   return resource_func_returns_table_multi_colPgResource.execute(selectArgs);
@@ -10912,7 +10914,7 @@ const makeArgs28 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_int_set_queryPgResource = registry.pgResources["int_set_query"];
+const resource_int_set_queryPgResource = registry_registry.pgResources["int_set_query"];
 const getSelectPlanFromParentAndArgs7 = ($root, args, _info) => {
   const selectArgs = makeArgs28(args);
   return resource_int_set_queryPgResource.execute(selectArgs);
@@ -10977,7 +10979,7 @@ const makeArgs29 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_query_interval_arrayPgResource = registry.pgResources["query_interval_array"];
+const resource_query_interval_arrayPgResource = registry_registry.pgResources["query_interval_array"];
 const argDetailsSimple30 = [];
 const makeArgs30 = (args, path = []) => {
   const selectArgs = [];
@@ -11023,7 +11025,7 @@ const makeArgs30 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_query_text_arrayPgResource = registry.pgResources["query_text_array"];
+const resource_query_text_arrayPgResource = registry_registry.pgResources["query_text_array"];
 const argDetailsSimple31 = [];
 const makeArgs31 = (args, path = []) => {
   const selectArgs = [];
@@ -11069,7 +11071,7 @@ const makeArgs31 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_return_table_without_grantsPgResource = registry.pgResources["return_table_without_grants"];
+const resource_return_table_without_grantsPgResource = registry_registry.pgResources["return_table_without_grants"];
 const argDetailsSimple32 = [{
   graphqlArgName: "a",
   postgresArgName: "a",
@@ -11091,7 +11093,7 @@ const argDetailsSimple32 = [{
 }, {
   graphqlArgName: "d",
   postgresArgName: "d",
-  pgCodec: registryConfig_pgCodecs_int4Array_int4Array,
+  pgCodec: registry_pgCodecs_int4Array_int4ArrayCodec,
   required: true,
   fetcher: null
 }, {
@@ -11103,7 +11105,7 @@ const argDetailsSimple32 = [{
 }, {
   graphqlArgName: "f",
   postgresArgName: "f",
-  pgCodec: registryConfig_pgCodecs_floatrange_floatrange,
+  pgCodec: registry_pgCodecs_floatrange_floatrangeCodec,
   required: true,
   fetcher: null
 }];
@@ -11151,7 +11153,7 @@ const makeArgs32 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_types_queryPgResource = registry.pgResources["types_query"];
+const resource_types_queryPgResource = registry_registry.pgResources["types_query"];
 const argDetailsSimple33 = [{
   graphqlArgName: "i1",
   postgresArgName: "i1",
@@ -11203,7 +11205,7 @@ const makeArgs33 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_func_out_out_compound_typePgResource = registry.pgResources["func_out_out_compound_type"];
+const resource_func_out_out_compound_typePgResource = registry_registry.pgResources["func_out_out_compound_type"];
 const argDetailsSimple34 = [{
   graphqlArgName: "leftArmId",
   postgresArgName: "left_arm_id",
@@ -11267,7 +11269,7 @@ const makeArgs34 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_query_output_two_rowsPgResource = registry.pgResources["query_output_two_rows"];
+const resource_query_output_two_rowsPgResource = registry_registry.pgResources["query_output_two_rows"];
 const argDetailsSimple35 = [];
 const makeArgs35 = (args, path = []) => {
   const selectArgs = [];
@@ -11313,7 +11315,7 @@ const makeArgs35 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_compound_type_set_queryPgResource = registry.pgResources["compound_type_set_query"];
+const resource_compound_type_set_queryPgResource = registry_registry.pgResources["compound_type_set_query"];
 const getSelectPlanFromParentAndArgs8 = ($root, args, _info) => {
   const selectArgs = makeArgs35(args);
   return resource_compound_type_set_queryPgResource.execute(selectArgs);
@@ -11336,7 +11338,7 @@ function Query_compoundTypeSetQuery_after_applyPlan(_, $connection, val) {
 const argDetailsSimple36 = [{
   graphqlArgName: "object",
   postgresArgName: "object",
-  pgCodec: attributes_o2_codec_compoundType,
+  pgCodec: attributes_o2_codec_compoundTypeCodec,
   required: true,
   fetcher: null
 }];
@@ -11384,7 +11386,7 @@ const makeArgs36 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_compound_type_queryPgResource = registry.pgResources["compound_type_query"];
+const resource_compound_type_queryPgResource = registry_registry.pgResources["compound_type_query"];
 const argDetailsSimple37 = [{
   graphqlArgName: "id",
   postgresArgName: "id",
@@ -11436,11 +11438,11 @@ const makeArgs37 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_table_queryPgResource = registry.pgResources["table_query"];
+const resource_table_queryPgResource = registry_registry.pgResources["table_query"];
 const argDetailsSimple38 = [{
   graphqlArgName: "object",
   postgresArgName: "object",
-  pgCodec: attributes_o2_codec_compoundType,
+  pgCodec: attributes_o2_codec_compoundTypeCodec,
   required: true,
   fetcher: null
 }];
@@ -11488,11 +11490,11 @@ const makeArgs38 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_query_compound_type_arrayPgResource = registry.pgResources["query_compound_type_array"];
+const resource_query_compound_type_arrayPgResource = registry_registry.pgResources["query_compound_type_array"];
 const argDetailsSimple39 = [{
   graphqlArgName: "object",
   postgresArgName: "object",
-  pgCodec: attributes_o2_codec_compoundType,
+  pgCodec: attributes_o2_codec_compoundTypeCodec,
   required: true,
   fetcher: null
 }];
@@ -11540,7 +11542,7 @@ const makeArgs39 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_compound_type_array_queryPgResource = registry.pgResources["compound_type_array_query"];
+const resource_compound_type_array_queryPgResource = registry_registry.pgResources["compound_type_array_query"];
 const argDetailsSimple40 = [{
   graphqlArgName: "a",
   postgresArgName: "a",
@@ -11598,7 +11600,7 @@ const makeArgs40 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_func_out_complexPgResource = registry.pgResources["func_out_complex"];
+const resource_func_out_complexPgResource = registry_registry.pgResources["func_out_complex"];
 const argDetailsSimple41 = [{
   graphqlArgName: "a",
   postgresArgName: "a",
@@ -11656,7 +11658,7 @@ const makeArgs41 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_func_out_complex_setofPgResource = registry.pgResources["func_out_complex_setof"];
+const resource_func_out_complex_setofPgResource = registry_registry.pgResources["func_out_complex_setof"];
 const getSelectPlanFromParentAndArgs9 = ($root, args, _info) => {
   const selectArgs = makeArgs41(args);
   return resource_func_out_complex_setofPgResource.execute(selectArgs);
@@ -11721,7 +11723,7 @@ const makeArgs42 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_badly_behaved_functionPgResource = registry.pgResources["badly_behaved_function"];
+const resource_badly_behaved_functionPgResource = registry_registry.pgResources["badly_behaved_function"];
 const getSelectPlanFromParentAndArgs10 = ($root, args, _info) => {
   const selectArgs = makeArgs42(args);
   return resource_badly_behaved_functionPgResource.execute(selectArgs);
@@ -11786,7 +11788,7 @@ const makeArgs43 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_func_out_tablePgResource = registry.pgResources["func_out_table"];
+const resource_func_out_tablePgResource = registry_registry.pgResources["func_out_table"];
 const argDetailsSimple44 = [];
 const makeArgs44 = (args, path = []) => {
   const selectArgs = [];
@@ -11832,7 +11834,7 @@ const makeArgs44 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_func_out_table_setofPgResource = registry.pgResources["func_out_table_setof"];
+const resource_func_out_table_setofPgResource = registry_registry.pgResources["func_out_table_setof"];
 const getSelectPlanFromParentAndArgs11 = ($root, args, _info) => {
   const selectArgs = makeArgs44(args);
   return resource_func_out_table_setofPgResource.execute(selectArgs);
@@ -11897,7 +11899,7 @@ const makeArgs45 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_table_set_queryPgResource = registry.pgResources["table_set_query"];
+const resource_table_set_queryPgResource = registry_registry.pgResources["table_set_query"];
 const getSelectPlanFromParentAndArgs12 = ($root, args, _info) => {
   const selectArgs = makeArgs45(args);
   return resource_table_set_queryPgResource.execute(selectArgs);
@@ -11980,7 +11982,7 @@ const makeArgs46 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_table_set_query_plpgsqlPgResource = registry.pgResources["table_set_query_plpgsql"];
+const resource_table_set_query_plpgsqlPgResource = registry_registry.pgResources["table_set_query_plpgsql"];
 const getSelectPlanFromParentAndArgs13 = ($root, args, _info) => {
   const selectArgs = makeArgs46(args);
   return resource_table_set_query_plpgsqlPgResource.execute(selectArgs);
@@ -12045,7 +12047,7 @@ const makeArgs47 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_type_function_connectionPgResource = registry.pgResources["type_function_connection"];
+const resource_type_function_connectionPgResource = registry_registry.pgResources["type_function_connection"];
 const getSelectPlanFromParentAndArgs14 = ($root, args, _info) => {
   const selectArgs = makeArgs47(args);
   return resource_type_function_connectionPgResource.execute(selectArgs);
@@ -12116,7 +12118,7 @@ const makeArgs48 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_type_functionPgResource = registry.pgResources["type_function"];
+const resource_type_functionPgResource = registry_registry.pgResources["type_function"];
 const argDetailsSimple49 = [];
 const makeArgs49 = (args, path = []) => {
   const selectArgs = [];
@@ -12162,7 +12164,7 @@ const makeArgs49 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_type_function_listPgResource = registry.pgResources["type_function_list"];
+const resource_type_function_listPgResource = registry_registry.pgResources["type_function_list"];
 function specForHandler(handler) {
   function spec(nodeId) {
     // We only want to return the specifier if it matches
@@ -12325,7 +12327,7 @@ const fetcher18 = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.Type);
-const resource_non_updatable_viewPgResource = registry.pgResources["non_updatable_view"];
+const resource_non_updatable_viewPgResource = registry_registry.pgResources["non_updatable_view"];
 function Query_allNonUpdatableViews_first_applyPlan(_, $connection, arg) {
   $connection.setFirst(arg.getRaw());
 }
@@ -12431,7 +12433,7 @@ function Query_allDefaultValues_before_applyPlan(_, $connection, val) {
 function Query_allDefaultValues_after_applyPlan(_, $connection, val) {
   $connection.setAfter(val.getRaw());
 }
-const resource_foreign_keyPgResource = registry.pgResources["foreign_key"];
+const resource_foreign_keyPgResource = registry_registry.pgResources["foreign_key"];
 function Query_allForeignKeys_first_applyPlan(_, $connection, arg) {
   $connection.setFirst(arg.getRaw());
 }
@@ -12462,7 +12464,7 @@ function Query_allNoPrimaryKeys_before_applyPlan(_, $connection, val) {
 function Query_allNoPrimaryKeys_after_applyPlan(_, $connection, val) {
   $connection.setAfter(val.getRaw());
 }
-const resource_testviewPgResource = registry.pgResources["testview"];
+const resource_testviewPgResource = registry_registry.pgResources["testview"];
 function Query_allTestviews_first_applyPlan(_, $connection, arg) {
   $connection.setFirst(arg.getRaw());
 }
@@ -12568,7 +12570,7 @@ function Query_allSimilarTable2S_before_applyPlan(_, $connection, val) {
 function Query_allSimilarTable2S_after_applyPlan(_, $connection, val) {
   $connection.setAfter(val.getRaw());
 }
-const resource_updatable_viewPgResource = registry.pgResources["updatable_view"];
+const resource_updatable_viewPgResource = registry_registry.pgResources["updatable_view"];
 function Query_allUpdatableViews_first_applyPlan(_, $connection, arg) {
   $connection.setFirst(arg.getRaw());
 }
@@ -12599,7 +12601,7 @@ function Query_allNullTestRecords_before_applyPlan(_, $connection, val) {
 function Query_allNullTestRecords_after_applyPlan(_, $connection, val) {
   $connection.setAfter(val.getRaw());
 }
-const resource_edge_casePgResource = registry.pgResources["edge_case"];
+const resource_edge_casePgResource = registry_registry.pgResources["edge_case"];
 function Query_allEdgeCases_first_applyPlan(_, $connection, arg) {
   $connection.setFirst(arg.getRaw());
 }
@@ -12753,7 +12755,7 @@ const makeArgs50 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_computed_outPgResource = registry.pgResources["person_computed_out"];
+const resource_person_computed_outPgResource = registry_registry.pgResources["person_computed_out"];
 const argDetailsSimple51 = [];
 const makeArgs51 = (args, path = []) => {
   const selectArgs = [];
@@ -12799,7 +12801,7 @@ const makeArgs51 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_first_namePgResource = registry.pgResources["person_first_name"];
+const resource_person_first_namePgResource = registry_registry.pgResources["person_first_name"];
 const argDetailsSimple52 = [];
 const makeArgs52 = (args, path = []) => {
   const selectArgs = [];
@@ -12845,7 +12847,7 @@ const makeArgs52 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_computed_out_outPgResource = registry.pgResources["person_computed_out_out"];
+const resource_person_computed_out_outPgResource = registry_registry.pgResources["person_computed_out_out"];
 const argDetailsSimple53 = [{
   graphqlArgName: "ino",
   postgresArgName: "ino",
@@ -12897,7 +12899,7 @@ const makeArgs53 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_computed_inoutPgResource = registry.pgResources["person_computed_inout"];
+const resource_person_computed_inoutPgResource = registry_registry.pgResources["person_computed_inout"];
 const argDetailsSimple54 = [{
   graphqlArgName: "ino",
   postgresArgName: "ino",
@@ -12949,11 +12951,11 @@ const makeArgs54 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_computed_inout_outPgResource = registry.pgResources["person_computed_inout_out"];
+const resource_person_computed_inout_outPgResource = registry_registry.pgResources["person_computed_inout_out"];
 const argDetailsSimple55 = [{
   graphqlArgName: "email",
   postgresArgName: "email",
-  pgCodec: attributes_email_codec_email,
+  pgCodec: personCodecSpec_personAttributes_email_codec_emailCodec,
   required: true,
   fetcher: null
 }];
@@ -13001,7 +13003,7 @@ const makeArgs55 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_existsPgResource = registry.pgResources["person_exists"];
+const resource_person_existsPgResource = registry_registry.pgResources["person_exists"];
 const argDetailsSimple56 = [];
 const makeArgs56 = (args, path = []) => {
   const selectArgs = [];
@@ -13047,7 +13049,7 @@ const makeArgs56 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_computed_first_arg_inout_outPgResource = registry.pgResources["person_computed_first_arg_inout_out"];
+const resource_person_computed_first_arg_inout_outPgResource = registry_registry.pgResources["person_computed_first_arg_inout_out"];
 const argDetailsSimple57 = [{
   graphqlArgName: "a",
   postgresArgName: "a",
@@ -13105,7 +13107,7 @@ const makeArgs57 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_computed_complexPgResource = registry.pgResources["person_computed_complex"];
+const resource_person_computed_complexPgResource = registry_registry.pgResources["person_computed_complex"];
 const argDetailsSimple58 = [];
 const makeArgs58 = (args, path = []) => {
   const selectArgs = [];
@@ -13151,7 +13153,7 @@ const makeArgs58 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_first_postPgResource = registry.pgResources["person_first_post"];
+const resource_person_first_postPgResource = registry_registry.pgResources["person_first_post"];
 const argDetailsSimple59 = [];
 const makeArgs59 = (args, path = []) => {
   const selectArgs = [];
@@ -13197,7 +13199,7 @@ const makeArgs59 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_computed_first_arg_inoutPgResource = registry.pgResources["person_computed_first_arg_inout"];
+const resource_person_computed_first_arg_inoutPgResource = registry_registry.pgResources["person_computed_first_arg_inout"];
 const argDetailsSimple60 = [];
 const makeArgs60 = (args, path = []) => {
   const selectArgs = [];
@@ -13243,7 +13245,7 @@ const makeArgs60 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_friendsPgResource = registry.pgResources["person_friends"];
+const resource_person_friendsPgResource = registry_registry.pgResources["person_friends"];
 const getSelectPlanFromParentAndArgs15 = ($in, args, _info) => {
   if (!hasRecord($in)) {
     throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
@@ -13338,7 +13340,7 @@ const makeArgs61 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_type_function_connectionPgResource = registry.pgResources["person_type_function_connection"];
+const resource_person_type_function_connectionPgResource = registry_registry.pgResources["person_type_function_connection"];
 const getSelectPlanFromParentAndArgs16 = ($in, args, _info) => {
   if (!hasRecord($in)) {
     throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
@@ -13439,7 +13441,7 @@ const makeArgs62 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_type_functionPgResource = registry.pgResources["person_type_function"];
+const resource_person_type_functionPgResource = registry_registry.pgResources["person_type_function"];
 const argDetailsSimple63 = [];
 const makeArgs63 = (args, path = []) => {
   const selectArgs = [];
@@ -13485,8 +13487,8 @@ const makeArgs63 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_type_function_listPgResource = registry.pgResources["person_type_function_list"];
-const resource_frmcdc_wrappedUrlPgResource = registry.pgResources["frmcdc_wrappedUrl"];
+const resource_person_type_function_listPgResource = registry_registry.pgResources["person_type_function_list"];
+const resource_frmcdc_wrappedUrlPgResource = registry_registry.pgResources["frmcdc_wrappedUrl"];
 function Person_postsByAuthorId_first_applyPlan(_, $connection, arg) {
   $connection.setFirst(arg.getRaw());
 }
@@ -13547,7 +13549,7 @@ function Person_compoundKeysByPersonId2_before_applyPlan(_, $connection, val) {
 function Person_compoundKeysByPersonId2_after_applyPlan(_, $connection, val) {
   $connection.setAfter(val.getRaw());
 }
-const resource_frmcdc_compoundTypePgResource = registry.pgResources["frmcdc_compoundType"];
+const resource_frmcdc_compoundTypePgResource = registry_registry.pgResources["frmcdc_compoundType"];
 const argDetailsSimple64 = [];
 const makeArgs64 = (args, path = []) => {
   const selectArgs = [];
@@ -13593,7 +13595,7 @@ const makeArgs64 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_compound_type_computed_fieldPgResource = registry.pgResources["compound_type_computed_field"];
+const resource_compound_type_computed_fieldPgResource = registry_registry.pgResources["compound_type_computed_field"];
 function Interval_secondsPlan($r) {
   return access($r, ["seconds"]);
 }
@@ -13657,7 +13659,7 @@ const makeArgs65 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_post_computed_interval_setPgResource = registry.pgResources["post_computed_interval_set"];
+const resource_post_computed_interval_setPgResource = registry_registry.pgResources["post_computed_interval_set"];
 const getSelectPlanFromParentAndArgs17 = ($in, args, _info) => {
   if (!hasRecord($in)) {
     throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
@@ -13752,7 +13754,7 @@ const makeArgs66 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_post_computed_interval_arrayPgResource = registry.pgResources["post_computed_interval_array"];
+const resource_post_computed_interval_arrayPgResource = registry_registry.pgResources["post_computed_interval_array"];
 const argDetailsSimple67 = [];
 const makeArgs67 = (args, path = []) => {
   const selectArgs = [];
@@ -13798,7 +13800,7 @@ const makeArgs67 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_post_computed_text_arrayPgResource = registry.pgResources["post_computed_text_array"];
+const resource_post_computed_text_arrayPgResource = registry_registry.pgResources["post_computed_text_array"];
 const argDetailsSimple68 = [{
   graphqlArgName: "i",
   postgresArgName: "i",
@@ -13850,7 +13852,7 @@ const makeArgs68 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_post_computed_with_optional_argPgResource = registry.pgResources["post_computed_with_optional_arg"];
+const resource_post_computed_with_optional_argPgResource = registry_registry.pgResources["post_computed_with_optional_arg"];
 const argDetailsSimple69 = [{
   graphqlArgName: "i",
   postgresArgName: "i",
@@ -13902,7 +13904,7 @@ const makeArgs69 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_post_computed_with_required_argPgResource = registry.pgResources["post_computed_with_required_arg"];
+const resource_post_computed_with_required_argPgResource = registry_registry.pgResources["post_computed_with_required_arg"];
 const argDetailsSimple70 = [{
   graphqlArgName: "length",
   postgresArgName: "length",
@@ -13960,7 +13962,7 @@ const makeArgs70 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_post_headline_trimmedPgResource = registry.pgResources["post_headline_trimmed"];
+const resource_post_headline_trimmedPgResource = registry_registry.pgResources["post_headline_trimmed"];
 const argDetailsSimple71 = [{
   graphqlArgName: "length",
   postgresArgName: "length",
@@ -14018,7 +14020,7 @@ const makeArgs71 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_post_headline_trimmed_no_defaultsPgResource = registry.pgResources["post_headline_trimmed_no_defaults"];
+const resource_post_headline_trimmed_no_defaultsPgResource = registry_registry.pgResources["post_headline_trimmed_no_defaults"];
 const argDetailsSimple72 = [{
   graphqlArgName: "length",
   postgresArgName: "length",
@@ -14076,11 +14078,11 @@ const makeArgs72 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_post_headline_trimmed_strictPgResource = registry.pgResources["post_headline_trimmed_strict"];
+const resource_post_headline_trimmed_strictPgResource = registry_registry.pgResources["post_headline_trimmed_strict"];
 const argDetailsSimple73 = [{
   graphqlArgName: "object",
   postgresArgName: "object",
-  pgCodec: attributes_o2_codec_compoundType,
+  pgCodec: attributes_o2_codec_compoundTypeCodec,
   required: true,
   fetcher: null
 }];
@@ -14128,8 +14130,8 @@ const makeArgs73 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_post_computed_compound_type_arrayPgResource = registry.pgResources["post_computed_compound_type_array"];
-const resource_frmcdc_comptypePgResource = registry.pgResources["frmcdc_comptype"];
+const resource_post_computed_compound_type_arrayPgResource = registry_registry.pgResources["post_computed_compound_type_array"];
+const resource_frmcdc_comptypePgResource = registry_registry.pgResources["frmcdc_comptype"];
 function Post_typesBySmallint_first_applyPlan(_, $connection, arg) {
   $connection.setFirst(arg.getRaw());
 }
@@ -14171,7 +14173,7 @@ function TypesConnection_pageInfoPlan($connection) {
   // TYPES: why is this a TypeScript issue without the 'any'?
   return $connection.pageInfo();
 }
-const resource_frmcdc_nestedCompoundTypePgResource = registry.pgResources["frmcdc_nestedCompoundType"];
+const resource_frmcdc_nestedCompoundTypePgResource = registry_registry.pgResources["frmcdc_nestedCompoundType"];
 function PeopleConnection_nodesPlan($connection) {
   return $connection.nodes();
 }
@@ -14517,7 +14519,7 @@ const makeArgs74 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_edge_case_computedPgResource = registry.pgResources["edge_case_computed"];
+const resource_edge_case_computedPgResource = registry_registry.pgResources["edge_case_computed"];
 function LeftArmsConnection_nodesPlan($connection) {
   return $connection.nodes();
 }
@@ -14583,7 +14585,7 @@ const makeArgs75 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_outPgResource = registry.pgResources["mutation_out"];
+const resource_mutation_outPgResource = registry_registry.pgResources["mutation_out"];
 function Mutation_mutationOut_input_applyPlan(_, $object) {
   return $object;
 }
@@ -14632,7 +14634,7 @@ const makeArgs76 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_setofPgResource = registry.pgResources["mutation_out_setof"];
+const resource_mutation_out_setofPgResource = registry_registry.pgResources["mutation_out_setof"];
 function Mutation_mutationOutSetof_input_applyPlan(_, $object) {
   return $object;
 }
@@ -14681,7 +14683,7 @@ const makeArgs77 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_unnamedPgResource = registry.pgResources["mutation_out_unnamed"];
+const resource_mutation_out_unnamedPgResource = registry_registry.pgResources["mutation_out_unnamed"];
 function Mutation_mutationOutUnnamed_input_applyPlan(_, $object) {
   return $object;
 }
@@ -14730,7 +14732,7 @@ const makeArgs78 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_no_args_mutationPgResource = registry.pgResources["no_args_mutation"];
+const resource_no_args_mutationPgResource = registry_registry.pgResources["no_args_mutation"];
 function Mutation_noArgsMutation_input_applyPlan(_, $object) {
   return $object;
 }
@@ -14779,7 +14781,7 @@ const makeArgs79 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_return_void_mutationPgResource = registry.pgResources["return_void_mutation"];
+const resource_return_void_mutationPgResource = registry_registry.pgResources["return_void_mutation"];
 function Mutation_returnVoidMutation_input_applyPlan(_, $object) {
   return $object;
 }
@@ -14828,7 +14830,7 @@ const makeArgs80 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_interval_setPgResource = registry.pgResources["mutation_interval_set"];
+const resource_mutation_interval_setPgResource = registry_registry.pgResources["mutation_interval_set"];
 function Mutation_mutationIntervalSet_input_applyPlan(_, $object) {
   return $object;
 }
@@ -14883,7 +14885,7 @@ const makeArgs81 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_in_outPgResource = registry.pgResources["mutation_in_out"];
+const resource_mutation_in_outPgResource = registry_registry.pgResources["mutation_in_out"];
 function Mutation_mutationInOut_input_applyPlan(_, $object) {
   return $object;
 }
@@ -14938,7 +14940,7 @@ const makeArgs82 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_returns_table_one_colPgResource = registry.pgResources["mutation_returns_table_one_col"];
+const resource_mutation_returns_table_one_colPgResource = registry_registry.pgResources["mutation_returns_table_one_col"];
 function Mutation_mutationReturnsTableOneCol_input_applyPlan(_, $object) {
   return $object;
 }
@@ -14993,7 +14995,7 @@ const makeArgs83 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_json_identity_mutationPgResource = registry.pgResources["json_identity_mutation"];
+const resource_json_identity_mutationPgResource = registry_registry.pgResources["json_identity_mutation"];
 function Mutation_jsonIdentityMutation_input_applyPlan(_, $object) {
   return $object;
 }
@@ -15048,7 +15050,7 @@ const makeArgs84 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_jsonb_identity_mutationPgResource = registry.pgResources["jsonb_identity_mutation"];
+const resource_jsonb_identity_mutationPgResource = registry_registry.pgResources["jsonb_identity_mutation"];
 function Mutation_jsonbIdentityMutation_input_applyPlan(_, $object) {
   return $object;
 }
@@ -15103,7 +15105,7 @@ const makeArgs85 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_jsonb_identity_mutation_plpgsqlPgResource = registry.pgResources["jsonb_identity_mutation_plpgsql"];
+const resource_jsonb_identity_mutation_plpgsqlPgResource = registry_registry.pgResources["jsonb_identity_mutation_plpgsql"];
 function Mutation_jsonbIdentityMutationPlpgsql_input_applyPlan(_, $object) {
   return $object;
 }
@@ -15158,7 +15160,7 @@ const makeArgs86 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_jsonb_identity_mutation_plpgsql_with_defaultPgResource = registry.pgResources["jsonb_identity_mutation_plpgsql_with_default"];
+const resource_jsonb_identity_mutation_plpgsql_with_defaultPgResource = registry_registry.pgResources["jsonb_identity_mutation_plpgsql_with_default"];
 function Mutation_jsonbIdentityMutationPlpgsqlWithDefault_input_applyPlan(_, $object) {
   return $object;
 }
@@ -15219,7 +15221,7 @@ const makeArgs87 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_add_1_mutationPgResource = registry.pgResources["add_1_mutation"];
+const resource_add_1_mutationPgResource = registry_registry.pgResources["add_1_mutation"];
 function Mutation_add1Mutation_input_applyPlan(_, $object) {
   return $object;
 }
@@ -15280,7 +15282,7 @@ const makeArgs88 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_add_2_mutationPgResource = registry.pgResources["add_2_mutation"];
+const resource_add_2_mutationPgResource = registry_registry.pgResources["add_2_mutation"];
 function Mutation_add2Mutation_input_applyPlan(_, $object) {
   return $object;
 }
@@ -15341,7 +15343,7 @@ const makeArgs89 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_add_3_mutationPgResource = registry.pgResources["add_3_mutation"];
+const resource_add_3_mutationPgResource = registry_registry.pgResources["add_3_mutation"];
 function Mutation_add3Mutation_input_applyPlan(_, $object) {
   return $object;
 }
@@ -15402,7 +15404,7 @@ const makeArgs90 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_add_4_mutationPgResource = registry.pgResources["add_4_mutation"];
+const resource_add_4_mutationPgResource = registry_registry.pgResources["add_4_mutation"];
 function Mutation_add4Mutation_input_applyPlan(_, $object) {
   return $object;
 }
@@ -15463,7 +15465,7 @@ const makeArgs91 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_add_4_mutation_errorPgResource = registry.pgResources["add_4_mutation_error"];
+const resource_add_4_mutation_errorPgResource = registry_registry.pgResources["add_4_mutation_error"];
 function Mutation_add4MutationError_input_applyPlan(_, $object) {
   return $object;
 }
@@ -15524,7 +15526,7 @@ const makeArgs92 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mult_1PgResource = registry.pgResources["mult_1"];
+const resource_mult_1PgResource = registry_registry.pgResources["mult_1"];
 function Mutation_mult1_input_applyPlan(_, $object) {
   return $object;
 }
@@ -15585,7 +15587,7 @@ const makeArgs93 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mult_2PgResource = registry.pgResources["mult_2"];
+const resource_mult_2PgResource = registry_registry.pgResources["mult_2"];
 function Mutation_mult2_input_applyPlan(_, $object) {
   return $object;
 }
@@ -15646,7 +15648,7 @@ const makeArgs94 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mult_3PgResource = registry.pgResources["mult_3"];
+const resource_mult_3PgResource = registry_registry.pgResources["mult_3"];
 function Mutation_mult3_input_applyPlan(_, $object) {
   return $object;
 }
@@ -15707,7 +15709,7 @@ const makeArgs95 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mult_4PgResource = registry.pgResources["mult_4"];
+const resource_mult_4PgResource = registry_registry.pgResources["mult_4"];
 function Mutation_mult4_input_applyPlan(_, $object) {
   return $object;
 }
@@ -15768,7 +15770,7 @@ const makeArgs96 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_in_inoutPgResource = registry.pgResources["mutation_in_inout"];
+const resource_mutation_in_inoutPgResource = registry_registry.pgResources["mutation_in_inout"];
 function Mutation_mutationInInout_input_applyPlan(_, $object) {
   return $object;
 }
@@ -15817,7 +15819,7 @@ const makeArgs97 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_outPgResource = registry.pgResources["mutation_out_out"];
+const resource_mutation_out_outPgResource = registry_registry.pgResources["mutation_out_out"];
 function Mutation_mutationOutOut_input_applyPlan(_, $object) {
   return $object;
 }
@@ -15866,7 +15868,7 @@ const makeArgs98 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_out_setofPgResource = registry.pgResources["mutation_out_out_setof"];
+const resource_mutation_out_out_setofPgResource = registry_registry.pgResources["mutation_out_out_setof"];
 function Mutation_mutationOutOutSetof_input_applyPlan(_, $object) {
   return $object;
 }
@@ -15915,7 +15917,7 @@ const makeArgs99 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_out_unnamedPgResource = registry.pgResources["mutation_out_out_unnamed"];
+const resource_mutation_out_out_unnamedPgResource = registry_registry.pgResources["mutation_out_out_unnamed"];
 function Mutation_mutationOutOutUnnamed_input_applyPlan(_, $object) {
   return $object;
 }
@@ -15982,7 +15984,7 @@ const makeArgs100 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_int_set_mutationPgResource = registry.pgResources["int_set_mutation"];
+const resource_int_set_mutationPgResource = registry_registry.pgResources["int_set_mutation"];
 function Mutation_intSetMutation_input_applyPlan(_, $object) {
   return $object;
 }
@@ -16031,7 +16033,7 @@ const makeArgs101 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_unnamed_out_out_unnamedPgResource = registry.pgResources["mutation_out_unnamed_out_out_unnamed"];
+const resource_mutation_out_unnamed_out_out_unnamedPgResource = registry_registry.pgResources["mutation_out_unnamed_out_out_unnamed"];
 function Mutation_mutationOutUnnamedOutOutUnnamed_input_applyPlan(_, $object) {
   return $object;
 }
@@ -16086,14 +16088,14 @@ const makeArgs102 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_returns_table_multi_colPgResource = registry.pgResources["mutation_returns_table_multi_col"];
+const resource_mutation_returns_table_multi_colPgResource = registry_registry.pgResources["mutation_returns_table_multi_col"];
 function Mutation_mutationReturnsTableMultiCol_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple103 = [{
   graphqlArgName: "g",
   postgresArgName: "g",
-  pgCodec: registryConfig_pgCodecs_guid_guid,
+  pgCodec: registry_pgCodecs_guid_guidCodec,
   required: true,
   fetcher: null
 }];
@@ -16141,7 +16143,7 @@ const makeArgs103 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_guid_fnPgResource = registry.pgResources["guid_fn"];
+const resource_guid_fnPgResource = registry_registry.pgResources["guid_fn"];
 function Mutation_guidFn_input_applyPlan(_, $object) {
   return $object;
 }
@@ -16190,7 +16192,7 @@ const makeArgs104 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_interval_arrayPgResource = registry.pgResources["mutation_interval_array"];
+const resource_mutation_interval_arrayPgResource = registry_registry.pgResources["mutation_interval_array"];
 function Mutation_mutationIntervalArray_input_applyPlan(_, $object) {
   return $object;
 }
@@ -16239,14 +16241,14 @@ const makeArgs105 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_text_arrayPgResource = registry.pgResources["mutation_text_array"];
+const resource_mutation_text_arrayPgResource = registry_registry.pgResources["mutation_text_array"];
 function Mutation_mutationTextArray_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple106 = [{
   graphqlArgName: "b",
   postgresArgName: "b",
-  pgCodec: registryConfig_pgCodecs_textArray_textArray,
+  pgCodec: registry_pgCodecs_textArray_textArrayCodec,
   required: true,
   fetcher: null
 }, {
@@ -16306,7 +16308,7 @@ const makeArgs106 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_list_bde_mutationPgResource = registry.pgResources["list_bde_mutation"];
+const resource_list_bde_mutationPgResource = registry_registry.pgResources["list_bde_mutation"];
 function Mutation_listBdeMutation_input_applyPlan(_, $object) {
   return $object;
 }
@@ -16355,7 +16357,7 @@ const makeArgs107 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_authenticate_failPgResource = registry.pgResources["authenticate_fail"];
+const resource_authenticate_failPgResource = registry_registry.pgResources["authenticate_fail"];
 function Mutation_authenticateFail_input_applyPlan(_, $object) {
   return $object;
 }
@@ -16422,14 +16424,14 @@ const makeArgs108 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_authenticatePgResource = registry.pgResources["authenticate"];
+const resource_authenticatePgResource = registry_registry.pgResources["authenticate"];
 function Mutation_authenticate_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple109 = [{
   graphqlArgName: "leftArm",
   postgresArgName: "left_arm",
-  pgCodec: registryConfig_pgCodecs_leftArm_leftArm,
+  pgCodec: registry_pgCodecs_leftArm_leftArmCodec,
   required: true,
   fetcher: null
 }];
@@ -16477,7 +16479,7 @@ const makeArgs109 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_left_arm_identityPgResource = registry.pgResources["left_arm_identity"];
+const resource_left_arm_identityPgResource = registry_registry.pgResources["left_arm_identity"];
 function Mutation_leftArmIdentity_input_applyPlan(_, $object) {
   return $object;
 }
@@ -16526,7 +16528,7 @@ const makeArgs110 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_issue756_mutationPgResource = registry.pgResources["issue756_mutation"];
+const resource_issue756_mutationPgResource = registry_registry.pgResources["issue756_mutation"];
 function Mutation_issue756Mutation_input_applyPlan(_, $object) {
   return $object;
 }
@@ -16575,7 +16577,7 @@ const makeArgs111 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_issue756_set_mutationPgResource = registry.pgResources["issue756_set_mutation"];
+const resource_issue756_set_mutationPgResource = registry_registry.pgResources["issue756_set_mutation"];
 function Mutation_issue756SetMutation_input_applyPlan(_, $object) {
   return $object;
 }
@@ -16642,7 +16644,7 @@ const makeArgs112 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_authenticate_manyPgResource = registry.pgResources["authenticate_many"];
+const resource_authenticate_manyPgResource = registry_registry.pgResources["authenticate_many"];
 function Mutation_authenticateMany_input_applyPlan(_, $object) {
   return $object;
 }
@@ -16709,7 +16711,7 @@ const makeArgs113 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_authenticate_payloadPgResource = registry.pgResources["authenticate_payload"];
+const resource_authenticate_payloadPgResource = registry_registry.pgResources["authenticate_payload"];
 function Mutation_authenticatePayload_input_applyPlan(_, $object) {
   return $object;
 }
@@ -16734,7 +16736,7 @@ const argDetailsSimple114 = [{
 }, {
   graphqlArgName: "d",
   postgresArgName: "d",
-  pgCodec: registryConfig_pgCodecs_int4Array_int4Array,
+  pgCodec: registry_pgCodecs_int4Array_int4ArrayCodec,
   required: true,
   fetcher: null
 }, {
@@ -16746,7 +16748,7 @@ const argDetailsSimple114 = [{
 }, {
   graphqlArgName: "f",
   postgresArgName: "f",
-  pgCodec: registryConfig_pgCodecs_floatrange_floatrange,
+  pgCodec: registry_pgCodecs_floatrange_floatrangeCodec,
   required: true,
   fetcher: null
 }];
@@ -16794,7 +16796,7 @@ const makeArgs114 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_types_mutationPgResource = registry.pgResources["types_mutation"];
+const resource_types_mutationPgResource = registry_registry.pgResources["types_mutation"];
 function Mutation_typesMutation_input_applyPlan(_, $object) {
   return $object;
 }
@@ -16849,14 +16851,14 @@ const makeArgs115 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_out_compound_typePgResource = registry.pgResources["mutation_out_out_compound_type"];
+const resource_mutation_out_out_compound_typePgResource = registry_registry.pgResources["mutation_out_out_compound_type"];
 function Mutation_mutationOutOutCompoundType_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple116 = [{
   graphqlArgName: "object",
   postgresArgName: "object",
-  pgCodec: attributes_o2_codec_compoundType,
+  pgCodec: attributes_o2_codec_compoundTypeCodec,
   required: true,
   fetcher: null
 }];
@@ -16904,14 +16906,14 @@ const makeArgs116 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_compound_type_mutationPgResource = registry.pgResources["compound_type_mutation"];
+const resource_compound_type_mutationPgResource = registry_registry.pgResources["compound_type_mutation"];
 function Mutation_compoundTypeMutation_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple117 = [{
   graphqlArgName: "object",
   postgresArgName: "object",
-  pgCodec: attributes_o2_codec_compoundType,
+  pgCodec: attributes_o2_codec_compoundTypeCodec,
   required: true,
   fetcher: null
 }];
@@ -16959,7 +16961,7 @@ const makeArgs117 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_compound_type_set_mutationPgResource = registry.pgResources["compound_type_set_mutation"];
+const resource_compound_type_set_mutationPgResource = registry_registry.pgResources["compound_type_set_mutation"];
 function Mutation_compoundTypeSetMutation_input_applyPlan(_, $object) {
   return $object;
 }
@@ -17014,14 +17016,14 @@ const makeArgs118 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_table_mutationPgResource = registry.pgResources["table_mutation"];
+const resource_table_mutationPgResource = registry_registry.pgResources["table_mutation"];
 function Mutation_tableMutation_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple119 = [{
   graphqlArgName: "post",
   postgresArgName: "post",
-  pgCodec: attributes_post_codec_post,
+  pgCodec: attributes_post_codec_postCodec,
   required: true,
   fetcher: null
 }, {
@@ -17075,14 +17077,14 @@ const makeArgs119 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_post_with_suffixPgResource = registry.pgResources["post_with_suffix"];
+const resource_post_with_suffixPgResource = registry_registry.pgResources["post_with_suffix"];
 function Mutation_postWithSuffix_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple120 = [{
   graphqlArgName: "object",
   postgresArgName: "object",
-  pgCodec: attributes_o2_codec_compoundType,
+  pgCodec: attributes_o2_codec_compoundTypeCodec,
   required: true,
   fetcher: null
 }];
@@ -17130,14 +17132,14 @@ const makeArgs120 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_compound_type_arrayPgResource = registry.pgResources["mutation_compound_type_array"];
+const resource_mutation_compound_type_arrayPgResource = registry_registry.pgResources["mutation_compound_type_array"];
 function Mutation_mutationCompoundTypeArray_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple121 = [{
   graphqlArgName: "object",
   postgresArgName: "object",
-  pgCodec: attributes_o2_codec_compoundType,
+  pgCodec: attributes_o2_codec_compoundTypeCodec,
   required: true,
   fetcher: null
 }];
@@ -17185,14 +17187,14 @@ const makeArgs121 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_compound_type_array_mutationPgResource = registry.pgResources["compound_type_array_mutation"];
+const resource_compound_type_array_mutationPgResource = registry_registry.pgResources["compound_type_array_mutation"];
 function Mutation_compoundTypeArrayMutation_input_applyPlan(_, $object) {
   return $object;
 }
 const argDetailsSimple122 = [{
   graphqlArgName: "posts",
   postgresArgName: "posts",
-  pgCodec: registryConfig_pgCodecs_postArray_postArray,
+  pgCodec: registry_pgCodecs_postArray_postArrayCodec,
   required: true,
   fetcher: null
 }];
@@ -17240,7 +17242,7 @@ const makeArgs122 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_post_manyPgResource = registry.pgResources["post_many"];
+const resource_post_manyPgResource = registry_registry.pgResources["post_many"];
 function Mutation_postMany_input_applyPlan(_, $object) {
   return $object;
 }
@@ -17301,7 +17303,7 @@ const makeArgs123 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_complexPgResource = registry.pgResources["mutation_out_complex"];
+const resource_mutation_out_complexPgResource = registry_registry.pgResources["mutation_out_complex"];
 function Mutation_mutationOutComplex_input_applyPlan(_, $object) {
   return $object;
 }
@@ -17362,7 +17364,7 @@ const makeArgs124 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_complex_setofPgResource = registry.pgResources["mutation_out_complex_setof"];
+const resource_mutation_out_complex_setofPgResource = registry_registry.pgResources["mutation_out_complex_setof"];
 function Mutation_mutationOutComplexSetof_input_applyPlan(_, $object) {
   return $object;
 }
@@ -17411,7 +17413,7 @@ const makeArgs125 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_tablePgResource = registry.pgResources["mutation_out_table"];
+const resource_mutation_out_tablePgResource = registry_registry.pgResources["mutation_out_table"];
 function Mutation_mutationOutTable_input_applyPlan(_, $object) {
   return $object;
 }
@@ -17460,7 +17462,7 @@ const makeArgs126 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_table_setofPgResource = registry.pgResources["mutation_out_table_setof"];
+const resource_mutation_out_table_setofPgResource = registry_registry.pgResources["mutation_out_table_setof"];
 function Mutation_mutationOutTableSetof_input_applyPlan(_, $object) {
   return $object;
 }
@@ -17509,7 +17511,7 @@ const makeArgs127 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_table_set_mutationPgResource = registry.pgResources["table_set_mutation"];
+const resource_table_set_mutationPgResource = registry_registry.pgResources["table_set_mutation"];
 function Mutation_tableSetMutation_input_applyPlan(_, $object) {
   return $object;
 }
@@ -17558,7 +17560,7 @@ const makeArgs128 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_type_function_connection_mutationPgResource = registry.pgResources["type_function_connection_mutation"];
+const resource_type_function_connection_mutationPgResource = registry_registry.pgResources["type_function_connection_mutation"];
 function Mutation_typeFunctionConnectionMutation_input_applyPlan(_, $object) {
   return $object;
 }
@@ -17613,7 +17615,7 @@ const makeArgs129 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_type_function_mutationPgResource = registry.pgResources["type_function_mutation"];
+const resource_type_function_mutationPgResource = registry_registry.pgResources["type_function_mutation"];
 function Mutation_typeFunctionMutation_input_applyPlan(_, $object) {
   return $object;
 }
@@ -17662,7 +17664,7 @@ const makeArgs130 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_type_function_list_mutationPgResource = registry.pgResources["type_function_list_mutation"];
+const resource_type_function_list_mutationPgResource = registry_registry.pgResources["type_function_list_mutation"];
 function Mutation_typeFunctionListMutation_input_applyPlan(_, $object) {
   return $object;
 }
@@ -18461,7 +18463,7 @@ function AuthenticatePayloadPayload_clientMutationIdPlan($object) {
 function AuthenticatePayloadPayload_queryPlan() {
   return rootValue();
 }
-const resource_frmcdc_jwtTokenPgResource = registry.pgResources["frmcdc_jwtToken"];
+const resource_frmcdc_jwtTokenPgResource = registry_registry.pgResources["frmcdc_jwtToken"];
 function AuthenticatePayloadInput_clientMutationId_applyPlan($input, val) {
   $input.set("clientMutationId", val.get());
 }
@@ -33833,7 +33835,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques28[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_types_types.attributes[attributeName];
+          const attribute = registry_pgCodecs_types_typesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -33849,7 +33851,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques28[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_types_types.attributes[attributeName];
+          const attribute = registry_pgCodecs_types_typesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -35137,7 +35139,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.id.codec)}`;
             }
           });
         }
@@ -35160,7 +35162,7 @@ export const plans = {
             type: "attribute",
             attribute: "smallint",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.smallint.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.smallint.codec)}`;
             }
           });
         }
@@ -35183,7 +35185,7 @@ export const plans = {
             type: "attribute",
             attribute: "bigint",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.bigint.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.bigint.codec)}`;
             }
           });
         }
@@ -35206,7 +35208,7 @@ export const plans = {
             type: "attribute",
             attribute: "numeric",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.numeric.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.numeric.codec)}`;
             }
           });
         }
@@ -35229,7 +35231,7 @@ export const plans = {
             type: "attribute",
             attribute: "decimal",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.decimal.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.decimal.codec)}`;
             }
           });
         }
@@ -35252,7 +35254,7 @@ export const plans = {
             type: "attribute",
             attribute: "boolean",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.boolean.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.boolean.codec)}`;
             }
           });
         }
@@ -35275,7 +35277,7 @@ export const plans = {
             type: "attribute",
             attribute: "varchar",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.varchar.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.varchar.codec)}`;
             }
           });
         }
@@ -35298,7 +35300,7 @@ export const plans = {
             type: "attribute",
             attribute: "enum",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.enum.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.enum.codec)}`;
             }
           });
         }
@@ -35321,7 +35323,7 @@ export const plans = {
             type: "attribute",
             attribute: "enum_array",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.enum_array.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.enum_array.codec)}`;
             }
           });
         }
@@ -35344,7 +35346,7 @@ export const plans = {
             type: "attribute",
             attribute: "domain",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.domain.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.domain.codec)}`;
             }
           });
         }
@@ -35367,7 +35369,7 @@ export const plans = {
             type: "attribute",
             attribute: "domain2",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.domain2.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.domain2.codec)}`;
             }
           });
         }
@@ -35390,7 +35392,7 @@ export const plans = {
             type: "attribute",
             attribute: "text_array",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.text_array.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.text_array.codec)}`;
             }
           });
         }
@@ -35413,7 +35415,7 @@ export const plans = {
             type: "attribute",
             attribute: "json",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.json.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.json.codec)}`;
             }
           });
         }
@@ -35436,7 +35438,7 @@ export const plans = {
             type: "attribute",
             attribute: "jsonb",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.jsonb.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.jsonb.codec)}`;
             }
           });
         }
@@ -35459,7 +35461,7 @@ export const plans = {
             type: "attribute",
             attribute: "nullable_range",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.nullable_range.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.nullable_range.codec)}`;
             }
           });
         }
@@ -35482,7 +35484,7 @@ export const plans = {
             type: "attribute",
             attribute: "numrange",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.numrange.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.numrange.codec)}`;
             }
           });
         }
@@ -35505,7 +35507,7 @@ export const plans = {
             type: "attribute",
             attribute: "daterange",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.daterange.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.daterange.codec)}`;
             }
           });
         }
@@ -35528,7 +35530,7 @@ export const plans = {
             type: "attribute",
             attribute: "an_int_range",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.an_int_range.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.an_int_range.codec)}`;
             }
           });
         }
@@ -35551,7 +35553,7 @@ export const plans = {
             type: "attribute",
             attribute: "timestamp",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.timestamp.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.timestamp.codec)}`;
             }
           });
         }
@@ -35574,7 +35576,7 @@ export const plans = {
             type: "attribute",
             attribute: "timestamptz",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.timestamptz.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.timestamptz.codec)}`;
             }
           });
         }
@@ -35597,7 +35599,7 @@ export const plans = {
             type: "attribute",
             attribute: "date",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.date.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.date.codec)}`;
             }
           });
         }
@@ -35620,7 +35622,7 @@ export const plans = {
             type: "attribute",
             attribute: "time",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.time.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.time.codec)}`;
             }
           });
         }
@@ -35643,7 +35645,7 @@ export const plans = {
             type: "attribute",
             attribute: "timetz",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.timetz.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.timetz.codec)}`;
             }
           });
         }
@@ -35666,7 +35668,7 @@ export const plans = {
             type: "attribute",
             attribute: "interval",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.interval.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.interval.codec)}`;
             }
           });
         }
@@ -35689,7 +35691,7 @@ export const plans = {
             type: "attribute",
             attribute: "interval_array",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.interval_array.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.interval_array.codec)}`;
             }
           });
         }
@@ -35712,7 +35714,7 @@ export const plans = {
             type: "attribute",
             attribute: "money",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.money.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.money.codec)}`;
             }
           });
         }
@@ -35735,7 +35737,7 @@ export const plans = {
             type: "attribute",
             attribute: "compound_type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.compound_type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.compound_type.codec)}`;
             }
           });
         }
@@ -35758,7 +35760,7 @@ export const plans = {
             type: "attribute",
             attribute: "nested_compound_type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.nested_compound_type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.nested_compound_type.codec)}`;
             }
           });
         }
@@ -35781,7 +35783,7 @@ export const plans = {
             type: "attribute",
             attribute: "nullable_compound_type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.nullable_compound_type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.nullable_compound_type.codec)}`;
             }
           });
         }
@@ -35804,7 +35806,7 @@ export const plans = {
             type: "attribute",
             attribute: "nullable_nested_compound_type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.nullable_nested_compound_type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.nullable_nested_compound_type.codec)}`;
             }
           });
         }
@@ -35827,7 +35829,7 @@ export const plans = {
             type: "attribute",
             attribute: "point",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.point.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.point.codec)}`;
             }
           });
         }
@@ -35850,7 +35852,7 @@ export const plans = {
             type: "attribute",
             attribute: "nullablePoint",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.nullablePoint.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.nullablePoint.codec)}`;
             }
           });
         }
@@ -35873,7 +35875,7 @@ export const plans = {
             type: "attribute",
             attribute: "inet",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.inet.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.inet.codec)}`;
             }
           });
         }
@@ -35896,7 +35898,7 @@ export const plans = {
             type: "attribute",
             attribute: "cidr",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.cidr.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.cidr.codec)}`;
             }
           });
         }
@@ -35919,7 +35921,7 @@ export const plans = {
             type: "attribute",
             attribute: "macaddr",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.macaddr.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.macaddr.codec)}`;
             }
           });
         }
@@ -35942,7 +35944,7 @@ export const plans = {
             type: "attribute",
             attribute: "regproc",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.regproc.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.regproc.codec)}`;
             }
           });
         }
@@ -35965,7 +35967,7 @@ export const plans = {
             type: "attribute",
             attribute: "regprocedure",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.regprocedure.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.regprocedure.codec)}`;
             }
           });
         }
@@ -35988,7 +35990,7 @@ export const plans = {
             type: "attribute",
             attribute: "regoper",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.regoper.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.regoper.codec)}`;
             }
           });
         }
@@ -36011,7 +36013,7 @@ export const plans = {
             type: "attribute",
             attribute: "regoperator",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.regoperator.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.regoperator.codec)}`;
             }
           });
         }
@@ -36034,7 +36036,7 @@ export const plans = {
             type: "attribute",
             attribute: "regclass",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.regclass.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.regclass.codec)}`;
             }
           });
         }
@@ -36057,7 +36059,7 @@ export const plans = {
             type: "attribute",
             attribute: "regtype",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.regtype.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.regtype.codec)}`;
             }
           });
         }
@@ -36080,7 +36082,7 @@ export const plans = {
             type: "attribute",
             attribute: "regconfig",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.regconfig.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.regconfig.codec)}`;
             }
           });
         }
@@ -36103,7 +36105,7 @@ export const plans = {
             type: "attribute",
             attribute: "regdictionary",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.regdictionary.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.regdictionary.codec)}`;
             }
           });
         }
@@ -36126,7 +36128,7 @@ export const plans = {
             type: "attribute",
             attribute: "text_array_domain",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.text_array_domain.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.text_array_domain.codec)}`;
             }
           });
         }
@@ -36149,7 +36151,7 @@ export const plans = {
             type: "attribute",
             attribute: "int8_array_domain",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.int8_array_domain.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.int8_array_domain.codec)}`;
             }
           });
         }
@@ -36172,7 +36174,7 @@ export const plans = {
             type: "attribute",
             attribute: "ltree",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.ltree.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.ltree.codec)}`;
             }
           });
         }
@@ -36195,7 +36197,7 @@ export const plans = {
             type: "attribute",
             attribute: "ltree_array",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes51.ltree_array.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), typesCodecSpec_typesAttributes.ltree_array.codec)}`;
             }
           });
         }
@@ -36340,7 +36342,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques27[0].attributes.forEach(attributeName => {
-          const attribute = attributes_person_codec_person.attributes[attributeName];
+          const attribute = attributes_person_codec_personCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -36356,7 +36358,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques27[0].attributes.forEach(attributeName => {
-          const attribute = attributes_person_codec_person.attributes[attributeName];
+          const attribute = attributes_person_codec_personCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -36771,7 +36773,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques25[0].attributes.forEach(attributeName => {
-          const attribute = attributes_post_codec_post.attributes[attributeName];
+          const attribute = attributes_post_codec_postCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -36787,7 +36789,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques25[0].attributes.forEach(attributeName => {
-          const attribute = attributes_post_codec_post.attributes[attributeName];
+          const attribute = attributes_post_codec_postCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -36953,7 +36955,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes39.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), postCodecSpec_postAttributes.id.codec)}`;
             }
           });
         }
@@ -36976,7 +36978,7 @@ export const plans = {
             type: "attribute",
             attribute: "headline",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes39.headline.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), postCodecSpec_postAttributes.headline.codec)}`;
             }
           });
         }
@@ -36999,7 +37001,7 @@ export const plans = {
             type: "attribute",
             attribute: "body",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes39.body.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), postCodecSpec_postAttributes.body.codec)}`;
             }
           });
         }
@@ -37022,7 +37024,7 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes39.author_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), postCodecSpec_postAttributes.author_id.codec)}`;
             }
           });
         }
@@ -37045,7 +37047,7 @@ export const plans = {
             type: "attribute",
             attribute: "enums",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes39.enums.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), postCodecSpec_postAttributes.enums.codec)}`;
             }
           });
         }
@@ -37068,7 +37070,7 @@ export const plans = {
             type: "attribute",
             attribute: "comptypes",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes39.comptypes.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), postCodecSpec_postAttributes.comptypes.codec)}`;
             }
           });
         }
@@ -37272,7 +37274,7 @@ export const plans = {
             type: "attribute",
             attribute: "person_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes19.person_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), foreignKeyCodecSpec_foreignKeyAttributes.person_id.codec)}`;
             }
           });
         }
@@ -37295,7 +37297,7 @@ export const plans = {
             type: "attribute",
             attribute: "compound_key_1",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes19.compound_key_1.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), foreignKeyCodecSpec_foreignKeyAttributes.compound_key_1.codec)}`;
             }
           });
         }
@@ -37318,7 +37320,7 @@ export const plans = {
             type: "attribute",
             attribute: "compound_key_2",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes19.compound_key_2.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), foreignKeyCodecSpec_foreignKeyAttributes.compound_key_2.codec)}`;
             }
           });
         }
@@ -37394,7 +37396,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques15[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_compoundKey_compoundKey.attributes[attributeName];
+          const attribute = registry_pgCodecs_compoundKey_compoundKeyCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -37410,7 +37412,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques15[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_compoundKey_compoundKey.attributes[attributeName];
+          const attribute = registry_pgCodecs_compoundKey_compoundKeyCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -37542,7 +37544,7 @@ export const plans = {
             type: "attribute",
             attribute: "person_id_2",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes26.person_id_2.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), compoundKeyCodecSpec_compoundKeyAttributes.person_id_2.codec)}`;
             }
           });
         }
@@ -37565,7 +37567,7 @@ export const plans = {
             type: "attribute",
             attribute: "person_id_1",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes26.person_id_1.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), compoundKeyCodecSpec_compoundKeyAttributes.person_id_1.codec)}`;
             }
           });
         }
@@ -37588,7 +37590,7 @@ export const plans = {
             type: "attribute",
             attribute: "extra",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes26.extra.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), compoundKeyCodecSpec_compoundKeyAttributes.extra.codec)}`;
             }
           });
         }
@@ -38026,7 +38028,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes44.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personCodecSpec_personAttributes.id.codec)}`;
             }
           });
         }
@@ -38049,7 +38051,7 @@ export const plans = {
             type: "attribute",
             attribute: "person_full_name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes44.person_full_name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personCodecSpec_personAttributes.person_full_name.codec)}`;
             }
           });
         }
@@ -38072,7 +38074,7 @@ export const plans = {
             type: "attribute",
             attribute: "aliases",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes44.aliases.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personCodecSpec_personAttributes.aliases.codec)}`;
             }
           });
         }
@@ -38095,7 +38097,7 @@ export const plans = {
             type: "attribute",
             attribute: "about",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes44.about.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personCodecSpec_personAttributes.about.codec)}`;
             }
           });
         }
@@ -38118,7 +38120,7 @@ export const plans = {
             type: "attribute",
             attribute: "email",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes44.email.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personCodecSpec_personAttributes.email.codec)}`;
             }
           });
         }
@@ -38141,7 +38143,7 @@ export const plans = {
             type: "attribute",
             attribute: "site",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes44.site.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personCodecSpec_personAttributes.site.codec)}`;
             }
           });
         }
@@ -38164,7 +38166,7 @@ export const plans = {
             type: "attribute",
             attribute: "config",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes44.config.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personCodecSpec_personAttributes.config.codec)}`;
             }
           });
         }
@@ -38187,7 +38189,7 @@ export const plans = {
             type: "attribute",
             attribute: "last_login_from_ip",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes44.last_login_from_ip.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personCodecSpec_personAttributes.last_login_from_ip.codec)}`;
             }
           });
         }
@@ -38210,7 +38212,7 @@ export const plans = {
             type: "attribute",
             attribute: "last_login_from_subnet",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes44.last_login_from_subnet.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personCodecSpec_personAttributes.last_login_from_subnet.codec)}`;
             }
           });
         }
@@ -38233,7 +38235,7 @@ export const plans = {
             type: "attribute",
             attribute: "user_mac",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes44.user_mac.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personCodecSpec_personAttributes.user_mac.codec)}`;
             }
           });
         }
@@ -38256,7 +38258,7 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes44.created_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personCodecSpec_personAttributes.created_at.codec)}`;
             }
           });
         }
@@ -38368,7 +38370,7 @@ export const plans = {
             type: "attribute",
             attribute: "?column?",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes12["?column?"].codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), nonUpdatableViewCodecSpec_nonUpdatableViewAttributes["?column?"].codec)}`;
             }
           });
         }
@@ -38402,7 +38404,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques2[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_inputs_inputs.attributes[attributeName];
+          const attribute = registry_pgCodecs_inputs_inputsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -38418,7 +38420,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques2[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_inputs_inputs.attributes[attributeName];
+          const attribute = registry_pgCodecs_inputs_inputsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -38482,7 +38484,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes13.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), inputsCodecSpec_inputsAttributes.id.codec)}`;
             }
           });
         }
@@ -38516,7 +38518,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques3[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_patchs_patchs.attributes[attributeName];
+          const attribute = registry_pgCodecs_patchs_patchsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -38532,7 +38534,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques3[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_patchs_patchs.attributes[attributeName];
+          const attribute = registry_pgCodecs_patchs_patchsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -38596,7 +38598,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes14.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), patchsCodecSpec_patchsAttributes.id.codec)}`;
             }
           });
         }
@@ -38630,7 +38632,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques4[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_reserved_reserved.attributes[attributeName];
+          const attribute = registry_pgCodecs_reserved_reservedCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -38646,7 +38648,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques4[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_reserved_reserved.attributes[attributeName];
+          const attribute = registry_pgCodecs_reserved_reservedCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -38710,7 +38712,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes15.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), reservedCodecSpec_reservedAttributes.id.codec)}`;
             }
           });
         }
@@ -38744,7 +38746,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques5[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_reservedPatchs_reservedPatchs.attributes[attributeName];
+          const attribute = registry_pgCodecs_reservedPatchs_reservedPatchsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -38760,7 +38762,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques5[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_reservedPatchs_reservedPatchs.attributes[attributeName];
+          const attribute = registry_pgCodecs_reservedPatchs_reservedPatchsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -38824,7 +38826,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes16.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), reservedPatchsCodecSpec_reservedPatchsAttributes.id.codec)}`;
             }
           });
         }
@@ -38858,7 +38860,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques6[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_reservedInput_reservedInput.attributes[attributeName];
+          const attribute = registry_pgCodecs_reservedInput_reservedInputCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -38874,7 +38876,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques6[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_reservedInput_reservedInput.attributes[attributeName];
+          const attribute = registry_pgCodecs_reservedInput_reservedInputCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -38938,7 +38940,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes17.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), reservedInputCodecSpec_reservedInputAttributes.id.codec)}`;
             }
           });
         }
@@ -38972,7 +38974,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques7[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_defaultValue_defaultValue.attributes[attributeName];
+          const attribute = registry_pgCodecs_defaultValue_defaultValueCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -38988,7 +38990,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques7[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_defaultValue_defaultValue.attributes[attributeName];
+          const attribute = registry_pgCodecs_defaultValue_defaultValueCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -39086,7 +39088,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes18.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), defaultValueCodecSpec_defaultValueAttributes.id.codec)}`;
             }
           });
         }
@@ -39109,7 +39111,7 @@ export const plans = {
             type: "attribute",
             attribute: "null_value",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes18.null_value.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), defaultValueCodecSpec_defaultValueAttributes.null_value.codec)}`;
             }
           });
         }
@@ -39225,7 +39227,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes20.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), noPrimaryKeyCodecSpec_noPrimaryKeyAttributes.id.codec)}`;
             }
           });
         }
@@ -39248,7 +39250,7 @@ export const plans = {
             type: "attribute",
             attribute: "str",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes20.str.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), noPrimaryKeyCodecSpec_noPrimaryKeyAttributes.str.codec)}`;
             }
           });
         }
@@ -39410,7 +39412,7 @@ export const plans = {
             type: "attribute",
             attribute: "testviewid",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes21.testviewid.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), testviewCodecSpec_testviewAttributes.testviewid.codec)}`;
             }
           });
         }
@@ -39433,7 +39435,7 @@ export const plans = {
             type: "attribute",
             attribute: "col1",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes21.col1.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), testviewCodecSpec_testviewAttributes.col1.codec)}`;
             }
           });
         }
@@ -39456,7 +39458,7 @@ export const plans = {
             type: "attribute",
             attribute: "col2",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes21.col2.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), testviewCodecSpec_testviewAttributes.col2.codec)}`;
             }
           });
         }
@@ -39490,7 +39492,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques12[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_myTable_myTable.attributes[attributeName];
+          const attribute = registry_pgCodecs_myTable_myTableCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -39506,7 +39508,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques12[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_myTable_myTable.attributes[attributeName];
+          const attribute = registry_pgCodecs_myTable_myTableCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -39604,7 +39606,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes23.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), myTableCodecSpec_myTableAttributes.id.codec)}`;
             }
           });
         }
@@ -39627,7 +39629,7 @@ export const plans = {
             type: "attribute",
             attribute: "json_data",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes23.json_data.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), myTableCodecSpec_myTableAttributes.json_data.codec)}`;
             }
           });
         }
@@ -39661,7 +39663,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques13[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_personSecret_personSecret.attributes[attributeName];
+          const attribute = registry_pgCodecs_personSecret_personSecretCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -39677,7 +39679,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques13[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_personSecret_personSecret.attributes[attributeName];
+          const attribute = registry_pgCodecs_personSecret_personSecretCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -39775,7 +39777,7 @@ export const plans = {
             type: "attribute",
             attribute: "person_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes24.person_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personSecretCodecSpec_personSecretAttributes.person_id.codec)}`;
             }
           });
         }
@@ -39798,7 +39800,7 @@ export const plans = {
             type: "attribute",
             attribute: "sekrit",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes24.sekrit.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), personSecretCodecSpec_personSecretAttributes.sekrit.codec)}`;
             }
           });
         }
@@ -39832,7 +39834,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques14[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_viewTable_viewTable.attributes[attributeName];
+          const attribute = registry_pgCodecs_viewTable_viewTableCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -39848,7 +39850,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques14[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_viewTable_viewTable.attributes[attributeName];
+          const attribute = registry_pgCodecs_viewTable_viewTableCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -39980,7 +39982,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes25.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), viewTableCodecSpec_viewTableAttributes.id.codec)}`;
             }
           });
         }
@@ -40003,7 +40005,7 @@ export const plans = {
             type: "attribute",
             attribute: "col1",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes25.col1.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), viewTableCodecSpec_viewTableAttributes.col1.codec)}`;
             }
           });
         }
@@ -40026,7 +40028,7 @@ export const plans = {
             type: "attribute",
             attribute: "col2",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes25.col2.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), viewTableCodecSpec_viewTableAttributes.col2.codec)}`;
             }
           });
         }
@@ -40060,7 +40062,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques16[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_similarTable1_similarTable1.attributes[attributeName];
+          const attribute = registry_pgCodecs_similarTable1_similarTable1Codec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -40076,7 +40078,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques16[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_similarTable1_similarTable1.attributes[attributeName];
+          const attribute = registry_pgCodecs_similarTable1_similarTable1Codec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -40242,7 +40244,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes27.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), similarTable1CodecSpec_similarTable1Attributes.id.codec)}`;
             }
           });
         }
@@ -40265,7 +40267,7 @@ export const plans = {
             type: "attribute",
             attribute: "col1",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes27.col1.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), similarTable1CodecSpec_similarTable1Attributes.col1.codec)}`;
             }
           });
         }
@@ -40288,7 +40290,7 @@ export const plans = {
             type: "attribute",
             attribute: "col2",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes27.col2.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), similarTable1CodecSpec_similarTable1Attributes.col2.codec)}`;
             }
           });
         }
@@ -40311,7 +40313,7 @@ export const plans = {
             type: "attribute",
             attribute: "col3",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes27.col3.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), similarTable1CodecSpec_similarTable1Attributes.col3.codec)}`;
             }
           });
         }
@@ -40345,7 +40347,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques17[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_similarTable2_similarTable2.attributes[attributeName];
+          const attribute = registry_pgCodecs_similarTable2_similarTable2Codec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -40361,7 +40363,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques17[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_similarTable2_similarTable2.attributes[attributeName];
+          const attribute = registry_pgCodecs_similarTable2_similarTable2Codec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -40527,7 +40529,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes28.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), similarTable2CodecSpec_similarTable2Attributes.id.codec)}`;
             }
           });
         }
@@ -40550,7 +40552,7 @@ export const plans = {
             type: "attribute",
             attribute: "col3",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes28.col3.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), similarTable2CodecSpec_similarTable2Attributes.col3.codec)}`;
             }
           });
         }
@@ -40573,7 +40575,7 @@ export const plans = {
             type: "attribute",
             attribute: "col4",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes28.col4.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), similarTable2CodecSpec_similarTable2Attributes.col4.codec)}`;
             }
           });
         }
@@ -40596,7 +40598,7 @@ export const plans = {
             type: "attribute",
             attribute: "col5",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes28.col5.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), similarTable2CodecSpec_similarTable2Attributes.col5.codec)}`;
             }
           });
         }
@@ -40795,7 +40797,7 @@ export const plans = {
             type: "attribute",
             attribute: "x",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.x.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), updatableViewCodecSpec_updatableViewAttributes.x.codec)}`;
             }
           });
         }
@@ -40818,7 +40820,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), updatableViewCodecSpec_updatableViewAttributes.name.codec)}`;
             }
           });
         }
@@ -40841,7 +40843,7 @@ export const plans = {
             type: "attribute",
             attribute: "description",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.description.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), updatableViewCodecSpec_updatableViewAttributes.description.codec)}`;
             }
           });
         }
@@ -40864,7 +40866,7 @@ export const plans = {
             type: "attribute",
             attribute: "constant",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.constant.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), updatableViewCodecSpec_updatableViewAttributes.constant.codec)}`;
             }
           });
         }
@@ -40898,7 +40900,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques19[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_nullTestRecord_nullTestRecord.attributes[attributeName];
+          const attribute = registry_pgCodecs_nullTestRecord_nullTestRecordCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -40914,7 +40916,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques19[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_nullTestRecord_nullTestRecord.attributes[attributeName];
+          const attribute = registry_pgCodecs_nullTestRecord_nullTestRecordCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -41080,7 +41082,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes29.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), nullTestRecordCodecSpec_nullTestRecordAttributes.id.codec)}`;
             }
           });
         }
@@ -41103,7 +41105,7 @@ export const plans = {
             type: "attribute",
             attribute: "nullable_text",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes29.nullable_text.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), nullTestRecordCodecSpec_nullTestRecordAttributes.nullable_text.codec)}`;
             }
           });
         }
@@ -41126,7 +41128,7 @@ export const plans = {
             type: "attribute",
             attribute: "nullable_int",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes29.nullable_int.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), nullTestRecordCodecSpec_nullTestRecordAttributes.nullable_int.codec)}`;
             }
           });
         }
@@ -41149,7 +41151,7 @@ export const plans = {
             type: "attribute",
             attribute: "non_null_text",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes29.non_null_text.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), nullTestRecordCodecSpec_nullTestRecordAttributes.non_null_text.codec)}`;
             }
           });
         }
@@ -41345,7 +41347,7 @@ export const plans = {
             type: "attribute",
             attribute: "not_null_has_default",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes30.not_null_has_default.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), edgeCaseCodecSpec_edgeCaseAttributes.not_null_has_default.codec)}`;
             }
           });
         }
@@ -41368,7 +41370,7 @@ export const plans = {
             type: "attribute",
             attribute: "wont_cast_easy",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes30.wont_cast_easy.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), edgeCaseCodecSpec_edgeCaseAttributes.wont_cast_easy.codec)}`;
             }
           });
         }
@@ -41391,7 +41393,7 @@ export const plans = {
             type: "attribute",
             attribute: "row_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes30.row_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), edgeCaseCodecSpec_edgeCaseAttributes.row_id.codec)}`;
             }
           });
         }
@@ -41425,7 +41427,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques21[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_leftArm_leftArm.attributes[attributeName];
+          const attribute = registry_pgCodecs_leftArm_leftArmCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -41441,7 +41443,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques21[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_leftArm_leftArm.attributes[attributeName];
+          const attribute = registry_pgCodecs_leftArm_leftArmCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -41607,7 +41609,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes31.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), leftArmCodecSpec_leftArmAttributes.id.codec)}`;
             }
           });
         }
@@ -41630,7 +41632,7 @@ export const plans = {
             type: "attribute",
             attribute: "person_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes31.person_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), leftArmCodecSpec_leftArmAttributes.person_id.codec)}`;
             }
           });
         }
@@ -41653,7 +41655,7 @@ export const plans = {
             type: "attribute",
             attribute: "length_in_metres",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes31.length_in_metres.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), leftArmCodecSpec_leftArmAttributes.length_in_metres.codec)}`;
             }
           });
         }
@@ -41676,7 +41678,7 @@ export const plans = {
             type: "attribute",
             attribute: "mood",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes31.mood.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), leftArmCodecSpec_leftArmAttributes.mood.codec)}`;
             }
           });
         }
@@ -41710,7 +41712,7 @@ export const plans = {
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
         uniques23[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_issue756_issue756.attributes[attributeName];
+          const attribute = registry_pgCodecs_issue756_issue756Codec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -41726,7 +41728,7 @@ export const plans = {
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
         uniques23[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_issue756_issue756.attributes[attributeName];
+          const attribute = registry_pgCodecs_issue756_issue756Codec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -41824,7 +41826,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes33.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), issue756CodecSpec_issue756Attributes.id.codec)}`;
             }
           });
         }
@@ -41847,7 +41849,7 @@ export const plans = {
             type: "attribute",
             attribute: "ts",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes33.ts.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), issue756CodecSpec_issue756Attributes.ts.codec)}`;
             }
           });
         }

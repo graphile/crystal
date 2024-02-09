@@ -22,7 +22,7 @@ export function EXPORTABLE<T, TScope extends any[]>(
     Object.defineProperties(fn, {
       $exporter$args: { value: args },
       $exporter$factory: { value: factory },
-      $exporter$name: { value: nameHint },
+      $exporter$name: { writable: true, value: nameHint },
     });
   }
   return fn;
@@ -30,11 +30,13 @@ export function EXPORTABLE<T, TScope extends any[]>(
 
 export function exportNameHint(obj: any, nameHint: string): void {
   if ((typeof obj === "object" && obj != null) || typeof obj === "function") {
-    if (!obj.$exporter$name) {
+    if (!("$exporter$name" in obj)) {
       Object.defineProperty(obj, "$exporter$name", {
         writable: true,
         value: nameHint,
       });
+    } else if (!obj.$exporter$name) {
+      obj.$exporter$name = nameHint;
     }
   }
 }
