@@ -212,14 +212,16 @@ export function makeGrafastSchema(details: {
                   `Invalid configuration for plans.${typeName}.${fieldName}.args.${argName} - saw a function, but expected an object with 'inputPlan' (optional) and 'applyPlan' (optional) plans`,
                 );
               } else {
-                exportNameHint(
-                  argSpec.applyPlan,
-                  `${typeName}_${fieldName}_${argName}_applyPlan`,
-                );
-                exportNameHint(
-                  argSpec.inputPlan,
-                  `${typeName}_${fieldName}_${argName}_inputPlan`,
-                );
+                if (argSpec) {
+                  exportNameHint(
+                    argSpec.applyPlan,
+                    `${typeName}_${fieldName}_${argName}_applyPlan`,
+                  );
+                  exportNameHint(
+                    argSpec.inputPlan,
+                    `${typeName}_${fieldName}_${argName}_inputPlan`,
+                  );
+                }
                 const grafastExtensions: Grafast.ArgumentExtensions =
                   Object.create(null);
                 (arg.extensions as any).grafast = grafastExtensions;
@@ -251,14 +253,16 @@ export function makeGrafastSchema(details: {
             `Expected input object type '${typeName}' field '${fieldName}' to be an object, but found a function. We don't know if this should be the 'inputPlan' or 'applyPlan' - please supply an object.`,
           );
         } else {
-          exportNameHint(
-            fieldSpec.inputPlan,
-            `${typeName}_${fieldName}_inputPlan`,
-          );
-          exportNameHint(
-            fieldSpec.applyPlan,
-            `${typeName}_${fieldName}_applyPlan`,
-          );
+          if (fieldSpec) {
+            exportNameHint(
+              fieldSpec.inputPlan,
+              `${typeName}_${fieldName}_inputPlan`,
+            );
+            exportNameHint(
+              fieldSpec.applyPlan,
+              `${typeName}_${fieldName}_applyPlan`,
+            );
+          }
           // it's a spec
           const grafastExtensions: Grafast.InputFieldExtensions =
             Object.create(null);
