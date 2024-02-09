@@ -835,7 +835,7 @@ export function EXPORTABLE<T, TScope extends any[]>(
     Object.defineProperties(fn, {
       $exporter$args: { value: args },
       $exporter$factory: { value: factory },
-      $exporter$name: { value: nameHint },
+      $exporter$name: { writable: true, value: nameHint },
     });
   }
   return fn;

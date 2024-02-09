@@ -68,7 +68,7 @@ export function EXPORTABLE<T, TScope extends any[]>(
     Object.defineProperties(fn, {
       $exporter$args: { value: args },
       $exporter$factory: { value: factory },
-      $exporter$name: { value: nameHint },
+      $exporter$name: { writable: true, value: nameHint },
     });
   }
   return fn;
@@ -464,6 +464,7 @@ export class PgResource<
           (...args: PgSelectArgumentDigest[]) =>
             sql`unnest(${fnFrom(...args)})`,
         [fnFrom, sql],
+        `${name}_from`,
       );
       return {
         codec,
@@ -491,6 +492,7 @@ export class PgResource<
               ...args,
             )} with ordinality as ${sqlTmp} (arr, ${sqlPartitionByIndex}) cross join lateral unnest (${sqlTmp}.arr)`,
         [fnFrom, sql, sqlPartitionByIndex, sqlTmp],
+        `${name}_from`,
       );
       return {
         codec,
@@ -1367,6 +1369,7 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
       return EXPORTABLE(
         (makeRegistry, registryConfig) => makeRegistry(registryConfig),
         [makeRegistry, registryConfig],
+        "registry",
       );
     },
   };

@@ -48,7 +48,7 @@ undefined
 
 When you do so, the `add` function is augmented with the properties
 `$exporter$factory` and `$exporter$args` that represent the first and second
-arguments to the `EXPORTABLE(factory, args)` function respectively.
+arguments to the `EXPORTABLE(factory, args, nameHint)` function respectively.
 
 The function still works as before:
 

@@ -46,7 +46,7 @@ undefined
 
 When you do so, the `add` function is augmented with the properties
 `$exporter$factory` and `$exporter$args` that represent the first and second
-arguments to the `EXPORTABLE(factory, args)` function respectively.
+arguments to the `EXPORTABLE(factory, args, nameHint)` function respectively.
 
 The function still works as before:
 
@@ -167,7 +167,7 @@ export function EXPORTABLE<T, TScope extends any[]>(
     Object.defineProperties(fn, {
       $exporter$args: { value: args },
       $exporter$factory: { value: factory },
-      $exporter$name: { value: nameHint },
+      $exporter$name: { writable: true, value: nameHint },
     });
   }
   return fn;
@@ -186,7 +186,7 @@ export function EXPORTABLE(factory, args, nameHint) {
     Object.defineProperties(fn, {
       $exporter$args: { value: args },
       $exporter$factory: { value: factory },
-      $exporter$name: { value: nameHint },
+      $exporter$name: { writable: true, value: nameHint },
     });
   }
   return fn;

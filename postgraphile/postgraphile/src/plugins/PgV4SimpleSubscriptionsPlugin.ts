@@ -90,6 +90,7 @@ const nodeObjToNodeId = EXPORTABLE(
       return Buffer.from(JSON.stringify(obj), "utf8").toString("base64");
     },
   [],
+  "nodeObjToNodeId",
 );
 
 // WARNING: this function assumes that you're using the `base64JSON` NodeID codec, which was the case for PostGraphile V4. If you are not doing so, YMMV.
@@ -101,4 +102,5 @@ const nodeIdFromEvent = EXPORTABLE(
       return $nodeId;
     },
   [lambda, nodeObjToNodeId],
+  "nodeIdFromEvent",
 );

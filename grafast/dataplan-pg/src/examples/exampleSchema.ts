@@ -134,7 +134,7 @@ export function EXPORTABLE<T, TScope extends any[]>(
     Object.defineProperties(fn, {
       $exporter$args: { value: args },
       $exporter$factory: { value: factory },
-      $exporter$name: { value: nameHint },
+      $exporter$name: { writable: true, value: nameHint },
     });
   }
   return fn;
@@ -171,6 +171,7 @@ export function makeExampleSchema(
         },
       }),
     [PgExecutor, context, object],
+    "defaultPgExecutor",
   );
 
   /**
@@ -181,6 +182,7 @@ export function makeExampleSchema(
       $step.where(sql`true /* authorization checks */`);
     },
     [sql],
+    "selectAuth",
   );
 
   const registryConfig = EXPORTABLE(
@@ -1621,11 +1623,13 @@ export function makeExampleSchema(
       sql,
       sqlFromArgDigests,
     ],
+    "registryConfig",
   );
 
   const registry = EXPORTABLE(
     (makeRegistry, registryConfig) => makeRegistry(registryConfig),
     [makeRegistry, registryConfig],
+    "registry",
   );
 
   if (Math.random() > 2) {
