@@ -2163,7 +2163,7 @@ export class OperationPlan {
     isReadonly: boolean,
     callback: (plan: ExecutableStep) => ExecutableStep,
   ): void {
-    this.stepTracker.lockNewSteps();
+    if (isDev) this.stepTracker.lockNewSteps();
     const previousStepCount = this.stepTracker.stepCount;
 
     const processed = new Set<ExecutableStep>();
@@ -2192,7 +2192,10 @@ export class OperationPlan {
           );
         }
       }
-      if (this.stepTracker.stepCount > previousStepCount) {
+      if (
+        (isReadonly || isDev) &&
+        this.stepTracker.stepCount > previousStepCount
+      ) {
         if (isReadonly) {
           throwNoNewStepsError(
             this,
@@ -2202,7 +2205,7 @@ export class OperationPlan {
             "Creating steps in isReadonly mode is forbidden",
           );
         }
-        this.stepTracker.lockNewSteps();
+        if (isDev) this.stepTracker.lockNewSteps();
       }
     }
 
