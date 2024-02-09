@@ -1067,7 +1067,10 @@ export function hasItemPlan(
 export function exportNameHint(obj: any, nameHint: string): void {
   if ((typeof obj === "object" && obj != null) || typeof obj === "function") {
     if (!obj.$exporter$name) {
-      obj.$exporter$name = nameHint;
+      Object.defineProperty(obj, "$exporter$name", {
+        writable: true,
+        value: nameHint,
+      });
     }
   }
 }
