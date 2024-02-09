@@ -48,7 +48,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     }
   }
 });
-const executor_mainPgExecutor = new PgExecutor({
+const executor = new PgExecutor({
   name: "main",
   context() {
     const ctx = context();
@@ -87,7 +87,7 @@ const post_tableCodec = recordCodec({
   }),
   description: undefined,
   extensions,
-  executor: executor_mainPgExecutor
+  executor
 });
 const postsAttributes = Object.assign(Object.create(null), {
   id: {
@@ -117,7 +117,7 @@ const postsCodec = recordCodec({
       unique: "id"
     })
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const extensions3 = {
   isTableLike: true,
@@ -157,7 +157,7 @@ const offer_tableCodec = recordCodec({
   }),
   description: undefined,
   extensions: extensions3,
-  executor: executor_mainPgExecutor
+  executor
 });
 const offersAttributes = Object.assign(Object.create(null), {
   id: {
@@ -197,7 +197,7 @@ const offersCodec = recordCodec({
       foreignKey: "(post_id) references post_view(id)"
     })
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const streetsAttributes = Object.assign(Object.create(null), {
   id: {
@@ -235,7 +235,7 @@ const streetsCodec = recordCodec({
       unique: "name"
     })
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const propertiesAttributes = Object.assign(Object.create(null), {
   id: {
@@ -280,7 +280,7 @@ const propertiesCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const streetPropertyAttributes = Object.assign(Object.create(null), {
   str_id: {
@@ -325,7 +325,7 @@ const streetPropertyCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const housesAttributes = Object.assign(Object.create(null), {
   building_name: {
@@ -414,7 +414,7 @@ const housesCodec = recordCodec({
   attributes: housesAttributes,
   description: undefined,
   extensions: extensions8,
-  executor: executor_mainPgExecutor
+  executor
 });
 const buildingsAttributes = Object.assign(Object.create(null), {
   id: {
@@ -479,10 +479,10 @@ const buildingsCodec = recordCodec({
       foreignKey: "(name) references streets (name)|@fieldName namedAfterStreet|@foreignFieldName buildingsNamedAfterStreet|@foreignSimpleFieldName buildingsNamedAfterStreetList"
     })
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const registryConfig_pgResources_post_table_post_table = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "post_table",
   identifier: "main.smart_comment_relations.post",
   from: post_tableCodec.sqlType,
@@ -512,7 +512,7 @@ const registryConfig_pgResources_post_table_post_table = {
   }
 };
 const registryConfig_pgResources_posts_posts = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "posts",
   identifier: "main.smart_comment_relations.post_view",
   from: postsCodec.sqlType,
@@ -541,7 +541,7 @@ const registryConfig_pgResources_posts_posts = {
   }
 };
 const registryConfig_pgResources_offer_table_offer_table = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "offer_table",
   identifier: "main.smart_comment_relations.offer",
   from: offer_tableCodec.sqlType,
@@ -570,7 +570,7 @@ const registryConfig_pgResources_offer_table_offer_table = {
     }
   }
 };
-const uniques4 = [{
+const offersUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -579,12 +579,12 @@ const uniques4 = [{
   }
 }];
 const registryConfig_pgResources_offers_offers = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "offers",
   identifier: "main.smart_comment_relations.offer_view",
   from: offersCodec.sqlType,
   codec: offersCodec,
-  uniques: uniques4,
+  uniques: offersUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -601,7 +601,7 @@ const registryConfig_pgResources_offers_offers = {
     }
   }
 };
-const uniques5 = [{
+const streetsUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -617,12 +617,12 @@ const uniques5 = [{
   }
 }];
 const registryConfig_pgResources_streets_streets = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "streets",
   identifier: "main.smart_comment_relations.streets",
   from: streetsCodec.sqlType,
   codec: streetsCodec,
-  uniques: uniques5,
+  uniques: streetsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -637,7 +637,7 @@ const registryConfig_pgResources_streets_streets = {
     }
   }
 };
-const uniques6 = [{
+const propertiesUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -646,12 +646,12 @@ const uniques6 = [{
   }
 }];
 const registryConfig_pgResources_properties_properties = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "properties",
   identifier: "main.smart_comment_relations.properties",
   from: propertiesCodec.sqlType,
   codec: propertiesCodec,
-  uniques: uniques6,
+  uniques: propertiesUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -664,7 +664,7 @@ const registryConfig_pgResources_properties_properties = {
     tags: {}
   }
 };
-const uniques7 = [{
+const street_propertyUniques = [{
   isPrimary: true,
   attributes: ["str_id", "prop_id"],
   description: undefined,
@@ -673,12 +673,12 @@ const uniques7 = [{
   }
 }];
 const registryConfig_pgResources_street_property_street_property = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "street_property",
   identifier: "main.smart_comment_relations.street_property",
   from: streetPropertyCodec.sqlType,
   codec: streetPropertyCodec,
-  uniques: uniques7,
+  uniques: street_propertyUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -691,7 +691,7 @@ const registryConfig_pgResources_street_property_street_property = {
     tags: {}
   }
 };
-const uniques8 = [{
+const housesUniques = [{
   isPrimary: true,
   attributes: ["street_id", "property_id"],
   description: undefined,
@@ -700,12 +700,12 @@ const uniques8 = [{
   }
 }];
 const registryConfig_pgResources_houses_houses = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "houses",
   identifier: "main.smart_comment_relations.houses",
   from: housesCodec.sqlType,
   codec: housesCodec,
-  uniques: uniques8,
+  uniques: housesUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -722,7 +722,7 @@ const registryConfig_pgResources_houses_houses = {
     }
   }
 };
-const uniques9 = [{
+const buildingsUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -731,12 +731,12 @@ const uniques9 = [{
   }
 }];
 const registryConfig_pgResources_buildings_buildings = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "buildings",
   identifier: "main.smart_comment_relations.buildings",
   from: buildingsCodec.sqlType,
   codec: buildingsCodec,
-  uniques: uniques9,
+  uniques: buildingsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -4302,7 +4302,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques4[0].attributes.forEach(attributeName => {
+        offersUniques[0].attributes.forEach(attributeName => {
           const attribute = offersCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -4318,7 +4318,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques4[0].attributes.forEach(attributeName => {
+        offersUniques[0].attributes.forEach(attributeName => {
           const attribute = offersCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -5107,7 +5107,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques8[0].attributes.forEach(attributeName => {
+        housesUniques[0].attributes.forEach(attributeName => {
           const attribute = housesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -5123,7 +5123,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques8[0].attributes.forEach(attributeName => {
+        housesUniques[0].attributes.forEach(attributeName => {
           const attribute = housesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -5554,7 +5554,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques7[0].attributes.forEach(attributeName => {
+        street_propertyUniques[0].attributes.forEach(attributeName => {
           const attribute = streetPropertyCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -5570,7 +5570,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques7[0].attributes.forEach(attributeName => {
+        street_propertyUniques[0].attributes.forEach(attributeName => {
           const attribute = streetPropertyCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -5789,7 +5789,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques9[0].attributes.forEach(attributeName => {
+        buildingsUniques[0].attributes.forEach(attributeName => {
           const attribute = buildingsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -5805,7 +5805,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques9[0].attributes.forEach(attributeName => {
+        buildingsUniques[0].attributes.forEach(attributeName => {
           const attribute = buildingsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -6122,7 +6122,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques6[0].attributes.forEach(attributeName => {
+        propertiesUniques[0].attributes.forEach(attributeName => {
           const attribute = propertiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -6138,7 +6138,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques6[0].attributes.forEach(attributeName => {
+        propertiesUniques[0].attributes.forEach(attributeName => {
           const attribute = propertiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -6446,7 +6446,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques5[0].attributes.forEach(attributeName => {
+        streetsUniques[0].attributes.forEach(attributeName => {
           const attribute = streetsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -6462,7 +6462,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques5[0].attributes.forEach(attributeName => {
+        streetsUniques[0].attributes.forEach(attributeName => {
           const attribute = streetsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -7169,7 +7169,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = offersUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7248,7 +7248,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques5[0].attributes.reduce((memo, attributeName) => {
+            const spec = streetsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7322,7 +7322,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques6[0].attributes.reduce((memo, attributeName) => {
+            const spec = propertiesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7408,7 +7408,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques7[0].attributes.reduce((memo, attributeName) => {
+            const spec = street_propertyUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7499,7 +7499,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques9[0].attributes.reduce((memo, attributeName) => {
+            const spec = buildingsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7639,7 +7639,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = offersUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7731,7 +7731,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques5[0].attributes.reduce((memo, attributeName) => {
+            const spec = streetsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7832,7 +7832,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques6[0].attributes.reduce((memo, attributeName) => {
+            const spec = propertiesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7931,7 +7931,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques7[0].attributes.reduce((memo, attributeName) => {
+            const spec = street_propertyUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -8036,7 +8036,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques9[0].attributes.reduce((memo, attributeName) => {
+            const spec = buildingsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -8179,7 +8179,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = offersUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -8248,7 +8248,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques5[0].attributes.reduce((memo, attributeName) => {
+            const spec = streetsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -8320,7 +8320,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques6[0].attributes.reduce((memo, attributeName) => {
+            const spec = propertiesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -8389,7 +8389,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques7[0].attributes.reduce((memo, attributeName) => {
+            const spec = street_propertyUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -8464,7 +8464,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques9[0].attributes.reduce((memo, attributeName) => {
+            const spec = buildingsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));

@@ -68,7 +68,7 @@ const usersAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const executor_mainPgExecutor = new PgExecutor({
+const executor = new PgExecutor({
   name: "main",
   context() {
     const ctx = context();
@@ -92,7 +92,7 @@ const usersCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const measurementsAttributes = Object.assign(Object.create(null), {
   timestamp: {
@@ -146,9 +146,9 @@ const measurementsCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
-const uniques = [{
+const usersUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -157,12 +157,12 @@ const uniques = [{
   }
 }];
 const registryConfig_pgResources_users_users = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "users",
   identifier: "main.partitions.users",
   from: usersCodec.sqlType,
   codec: usersCodec,
-  uniques,
+  uniques: usersUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -175,7 +175,7 @@ const registryConfig_pgResources_users_users = {
     tags: {}
   }
 };
-const uniques2 = [{
+const measurementsUniques = [{
   isPrimary: true,
   attributes: ["timestamp", "key"],
   description: undefined,
@@ -184,12 +184,12 @@ const uniques2 = [{
   }
 }];
 const registryConfig_pgResources_measurements_measurements = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "measurements",
   identifier: "main.partitions.measurements",
   from: measurementsCodec.sqlType,
   codec: measurementsCodec,
-  uniques: uniques2,
+  uniques: measurementsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -1371,7 +1371,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques2[0].attributes.forEach(attributeName => {
+        measurementsUniques[0].attributes.forEach(attributeName => {
           const attribute = measurementsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -1387,7 +1387,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques2[0].attributes.forEach(attributeName => {
+        measurementsUniques[0].attributes.forEach(attributeName => {
           const attribute = measurementsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -1663,7 +1663,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
+        usersUniques[0].attributes.forEach(attributeName => {
           const attribute = usersCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -1679,7 +1679,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
+        usersUniques[0].attributes.forEach(attributeName => {
           const attribute = usersCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -2006,7 +2006,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = usersUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -2080,7 +2080,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques2[0].attributes.reduce((memo, attributeName) => {
+            const spec = measurementsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -2173,7 +2173,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = usersUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -2260,7 +2260,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques2[0].attributes.reduce((memo, attributeName) => {
+            const spec = measurementsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -2372,7 +2372,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = usersUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -2436,7 +2436,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques2[0].attributes.reduce((memo, attributeName) => {
+            const spec = measurementsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));

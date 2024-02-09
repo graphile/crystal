@@ -48,7 +48,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     }
   }
 });
-const executor_mainPgExecutor = new PgExecutor({
+const executor = new PgExecutor({
   name: "main",
   context() {
     const ctx = context();
@@ -84,7 +84,7 @@ const flambleCodec = recordCodec({
       name: "flamble"
     })
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const renamed_tableAttributes = Object.assign(Object.create(null), {
   col1: {
@@ -115,7 +115,7 @@ const renamed_tableCodec = recordCodec({
       name: "renamed_table"
     })
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const filmsAttributes = Object.assign(Object.create(null), {
   code: {
@@ -151,7 +151,7 @@ const filmsCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const studiosAttributes = Object.assign(Object.create(null), {
   id: {
@@ -187,7 +187,7 @@ const studiosCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const postAttributes = Object.assign(Object.create(null), {
   id: {
@@ -232,7 +232,7 @@ const postCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const tvEpisodesAttributes = Object.assign(Object.create(null), {
   code: {
@@ -277,7 +277,7 @@ const tvEpisodesCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const tvShowsAttributes = Object.assign(Object.create(null), {
   code: {
@@ -322,7 +322,7 @@ const tvShowsCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const jwtTokenCodec = recordCodec({
   name: "jwtToken",
@@ -366,7 +366,7 @@ const jwtTokenCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const personAttributes = Object.assign(Object.create(null), {
   id: {
@@ -495,11 +495,11 @@ const personCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
-const sqlIdent = sql.identifier("d", "original_function");
-const sqlIdent2 = sql.identifier("d", "getflamble");
-const uniques3 = [{
+const original_functionFunctionIdentifer = sql.identifier("d", "original_function");
+const getflambleFunctionIdentifer = sql.identifier("d", "getflamble");
+const filmsUniques = [{
   isPrimary: true,
   attributes: ["code"],
   description: undefined,
@@ -507,7 +507,7 @@ const uniques3 = [{
     tags: Object.create(null)
   }
 }];
-const uniques4 = [{
+const studiosUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -516,12 +516,12 @@ const uniques4 = [{
   }
 }];
 const registryConfig_pgResources_studios_studios = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "studios",
   identifier: "main.d.studios",
   from: studiosCodec.sqlType,
   codec: studiosCodec,
-  uniques: uniques4,
+  uniques: studiosUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -534,7 +534,7 @@ const registryConfig_pgResources_studios_studios = {
     tags: {}
   }
 };
-const uniques5 = [{
+const postUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -543,12 +543,12 @@ const uniques5 = [{
   }
 }];
 const registryConfig_pgResources_post_post = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "post",
   identifier: "main.d.post",
   from: postCodec.sqlType,
   codec: postCodec,
-  uniques: uniques5,
+  uniques: postUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -561,7 +561,7 @@ const registryConfig_pgResources_post_post = {
     tags: {}
   }
 };
-const uniques6 = [{
+const tv_episodesUniques = [{
   isPrimary: true,
   attributes: ["code"],
   description: undefined,
@@ -570,12 +570,12 @@ const uniques6 = [{
   }
 }];
 const registryConfig_pgResources_tv_episodes_tv_episodes = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "tv_episodes",
   identifier: "main.d.tv_episodes",
   from: tvEpisodesCodec.sqlType,
   codec: tvEpisodesCodec,
-  uniques: uniques6,
+  uniques: tv_episodesUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -588,7 +588,7 @@ const registryConfig_pgResources_tv_episodes_tv_episodes = {
     tags: {}
   }
 };
-const uniques7 = [{
+const tv_showsUniques = [{
   isPrimary: true,
   attributes: ["code"],
   description: undefined,
@@ -597,12 +597,12 @@ const uniques7 = [{
   }
 }];
 const registryConfig_pgResources_tv_shows_tv_shows = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "tv_shows",
   identifier: "main.d.tv_shows",
   from: tvShowsCodec.sqlType,
   codec: tvShowsCodec,
-  uniques: uniques7,
+  uniques: tv_showsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -615,10 +615,10 @@ const registryConfig_pgResources_tv_shows_tv_shows = {
     tags: {}
   }
 };
-const sqlIdent3 = sql.identifier("d", "authenticate");
-const sqlIdent4 = sql.identifier("d", "person_full_name");
-const sqlIdent5 = sql.identifier("d", "search_posts");
-const uniques9 = [{
+const authenticateFunctionIdentifer = sql.identifier("d", "authenticate");
+const person_full_nameFunctionIdentifer = sql.identifier("d", "person_full_name");
+const search_postsFunctionIdentifer = sql.identifier("d", "search_posts");
+const personUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -629,12 +629,12 @@ const uniques9 = [{
   }
 }];
 const registryConfig_pgResources_person_person = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "person",
   identifier: "main.d.person",
   from: personCodec.sqlType,
   codec: personCodec,
-  uniques: uniques9,
+  uniques: personUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -665,11 +665,11 @@ const registry = makeRegistry({
   }),
   pgResources: Object.assign(Object.create(null), {
     renamed_function: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "renamed_function",
       identifier: "main.d.original_function()",
       from(...args) {
-        return sql`${sqlIdent}(${sqlFromArgDigests(args)})`;
+        return sql`${original_functionFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
       isUnique: !false,
@@ -690,7 +690,7 @@ const registry = makeRegistry({
       description: undefined
     },
     getflamble: PgResource.functionResourceOptions({
-      executor: executor_mainPgExecutor,
+      executor,
       name: "flamble",
       identifier: "main.d.flibble",
       from: flambleCodec.sqlType,
@@ -714,7 +714,7 @@ const registry = makeRegistry({
       name: "getflamble",
       identifier: "main.d.getflamble()",
       from(...args) {
-        return sql`${sqlIdent2}(${sqlFromArgDigests(args)})`;
+        return sql`${getflambleFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
       returnsArray: false,
@@ -733,7 +733,7 @@ const registry = makeRegistry({
       description: undefined
     }),
     renamed_table: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "renamed_table",
       identifier: "main.d.original_table",
       from: renamed_tableCodec.sqlType,
@@ -754,12 +754,12 @@ const registry = makeRegistry({
       }
     },
     films: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "films",
       identifier: "main.d.films",
       from: filmsCodec.sqlType,
       codec: filmsCodec,
-      uniques: uniques3,
+      uniques: filmsUniques,
       isVirtual: false,
       description: undefined,
       extensions: {
@@ -777,7 +777,7 @@ const registry = makeRegistry({
     tv_episodes: registryConfig_pgResources_tv_episodes_tv_episodes,
     tv_shows: registryConfig_pgResources_tv_shows_tv_shows,
     login: PgResource.functionResourceOptions({
-      executor: executor_mainPgExecutor,
+      executor,
       name: "jwt_token",
       identifier: "main.d.jwt_token",
       from: jwtTokenCodec.sqlType,
@@ -800,7 +800,7 @@ const registry = makeRegistry({
       name: "login",
       identifier: "main.d.authenticate(int4)",
       from(...args) {
-        return sql`${sqlIdent3}(${sqlFromArgDigests(args)})`;
+        return sql`${authenticateFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "a",
@@ -826,11 +826,11 @@ const registry = makeRegistry({
       description: undefined
     }),
     person_full_name: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "person_full_name",
       identifier: "main.d.person_full_name(d.person)",
       from(...args) {
-        return sql`${sqlIdent4}(${sqlFromArgDigests(args)})`;
+        return sql`${person_full_nameFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "n",
@@ -863,7 +863,7 @@ const registry = makeRegistry({
       name: "returnPostsMatching",
       identifier: "main.d.search_posts(text)",
       from(...args) {
-        return sql`${sqlIdent5}(${sqlFromArgDigests(args)})`;
+        return sql`${search_postsFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "search",
@@ -4543,7 +4543,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques6[0].attributes.forEach(attributeName => {
+        tv_episodesUniques[0].attributes.forEach(attributeName => {
           const attribute = tvEpisodesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -4559,7 +4559,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques6[0].attributes.forEach(attributeName => {
+        tv_episodesUniques[0].attributes.forEach(attributeName => {
           const attribute = tvEpisodesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -4762,7 +4762,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques7[0].attributes.forEach(attributeName => {
+        tv_showsUniques[0].attributes.forEach(attributeName => {
           const attribute = tvShowsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -4778,7 +4778,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques7[0].attributes.forEach(attributeName => {
+        tv_showsUniques[0].attributes.forEach(attributeName => {
           const attribute = tvShowsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -5142,7 +5142,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques5[0].attributes.forEach(attributeName => {
+        postUniques[0].attributes.forEach(attributeName => {
           const attribute = postCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -5158,7 +5158,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques5[0].attributes.forEach(attributeName => {
+        postUniques[0].attributes.forEach(attributeName => {
           const attribute = postCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -5472,7 +5472,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques3[0].attributes.forEach(attributeName => {
+        filmsUniques[0].attributes.forEach(attributeName => {
           const attribute = filmsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -5488,7 +5488,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques3[0].attributes.forEach(attributeName => {
+        filmsUniques[0].attributes.forEach(attributeName => {
           const attribute = filmsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -5650,7 +5650,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques4[0].attributes.forEach(attributeName => {
+        studiosUniques[0].attributes.forEach(attributeName => {
           const attribute = studiosCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -5666,7 +5666,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques4[0].attributes.forEach(attributeName => {
+        studiosUniques[0].attributes.forEach(attributeName => {
           const attribute = studiosCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -5828,7 +5828,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques9[0].attributes.forEach(attributeName => {
+        personUniques[0].attributes.forEach(attributeName => {
           const attribute = personCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -5844,7 +5844,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques9[0].attributes.forEach(attributeName => {
+        personUniques[0].attributes.forEach(attributeName => {
           const attribute = personCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -6940,7 +6940,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques3[0].attributes.reduce((memo, attributeName) => {
+            const spec = filmsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7014,7 +7014,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = studiosUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7088,7 +7088,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques5[0].attributes.reduce((memo, attributeName) => {
+            const spec = postUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7174,7 +7174,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques6[0].attributes.reduce((memo, attributeName) => {
+            const spec = tv_episodesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7260,7 +7260,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques7[0].attributes.reduce((memo, attributeName) => {
+            const spec = tv_showsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7346,7 +7346,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques9[0].attributes.reduce((memo, attributeName) => {
+            const spec = personUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7448,7 +7448,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques3[0].attributes.reduce((memo, attributeName) => {
+            const spec = filmsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7535,7 +7535,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = studiosUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7622,7 +7622,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques5[0].attributes.reduce((memo, attributeName) => {
+            const spec = postUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7721,7 +7721,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques6[0].attributes.reduce((memo, attributeName) => {
+            const spec = tv_episodesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7820,7 +7820,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques7[0].attributes.reduce((memo, attributeName) => {
+            const spec = tv_showsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -7919,7 +7919,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques9[0].attributes.reduce((memo, attributeName) => {
+            const spec = personUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -8039,7 +8039,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques3[0].attributes.reduce((memo, attributeName) => {
+            const spec = filmsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -8103,7 +8103,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = studiosUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -8167,7 +8167,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques5[0].attributes.reduce((memo, attributeName) => {
+            const spec = postUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -8236,7 +8236,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques6[0].attributes.reduce((memo, attributeName) => {
+            const spec = tv_episodesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -8305,7 +8305,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques7[0].attributes.reduce((memo, attributeName) => {
+            const spec = tv_showsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -8374,7 +8374,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques9[0].attributes.reduce((memo, attributeName) => {
+            const spec = personUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));

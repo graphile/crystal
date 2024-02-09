@@ -100,7 +100,7 @@ const updatableViewAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const executor_mainPgExecutor = new PgExecutor({
+const executor = new PgExecutor({
   name: "main",
   context() {
     const ctx = context();
@@ -127,7 +127,7 @@ const updatableViewCodec = recordCodec({
       unique: "x|@behavior -single -update -delete"
     })
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const jwtTokenCodec = recordCodec({
   name: "jwtToken",
@@ -191,7 +191,7 @@ const jwtTokenCodec = recordCodec({
       behavior: ["-table", "jwt"]
     })
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const uuidArrayCodec = listOfCodec(TYPES.uuid, {
   extensions: {
@@ -250,7 +250,7 @@ const authPayloadCodec = recordCodec({
       foreignKey: "(id) references c.person"
     })
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const colorCodec = enumCodec({
   name: "color",
@@ -381,7 +381,7 @@ const compoundTypeCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const colorArrayCodec = listOfCodec(colorCodec, {
   extensions: {
@@ -521,7 +521,7 @@ const nestedCompoundTypeCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const textArrayDomainCodec = domainOfCodec(textArrayCodec, "textArrayDomain", sql.identifier("c", "text_array_domain"), {
   description: undefined,
@@ -1046,7 +1046,7 @@ const typesCodec = recordCodec({
   attributes: typesAttributes,
   description: undefined,
   extensions: extensions17,
-  executor: executor_mainPgExecutor
+  executor
 });
 const notNullUrlCodec = domainOfCodec(TYPES.varchar, "notNullUrl", sql.identifier("b", "not_null_url"), {
   description: undefined,
@@ -1060,14 +1060,14 @@ const notNullUrlCodec = domainOfCodec(TYPES.varchar, "notNullUrl", sql.identifie
   },
   notNull: true
 });
-const sqlIdent7 = sql.identifier("b", "mult_1");
-const sqlIdent8 = sql.identifier("b", "mult_2");
-const sqlIdent9 = sql.identifier("b", "mult_3");
-const sqlIdent10 = sql.identifier("b", "mult_4");
-const sqlIdent11 = sql.identifier("b", "guid_fn");
-const sqlIdent12 = sql.identifier("b", "authenticate_fail");
+const mult_1FunctionIdentifer = sql.identifier("b", "mult_1");
+const mult_2FunctionIdentifer = sql.identifier("b", "mult_2");
+const mult_3FunctionIdentifer = sql.identifier("b", "mult_3");
+const mult_4FunctionIdentifer = sql.identifier("b", "mult_4");
+const guid_fnFunctionIdentifer = sql.identifier("b", "guid_fn");
+const authenticate_failFunctionIdentifer = sql.identifier("b", "authenticate_fail");
 const resourceConfig_jwt_token = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "jwt_token",
   identifier: "main.b.jwt_token",
   from: jwtTokenCodec.sqlType,
@@ -1087,16 +1087,16 @@ const resourceConfig_jwt_token = {
     }
   }
 };
-const sqlIdent13 = sql.identifier("b", "authenticate");
-const sqlIdent14 = sql.identifier("b", "list_bde_mutation");
-const sqlIdent15 = sql.identifier("b", "authenticate_many");
-const sqlIdent16 = sql.identifier("b", "authenticate_payload");
-const sqlIdent17 = sql.identifier("b", "compound_type_mutation");
-const sqlIdent18 = sql.identifier("b", "compound_type_query");
-const sqlIdent19 = sql.identifier("b", "compound_type_set_mutation");
-const sqlIdent20 = sql.identifier("b", "compound_type_array_mutation");
-const sqlIdent21 = sql.identifier("b", "compound_type_array_query");
-const uniques4 = [{
+const authenticateFunctionIdentifer = sql.identifier("b", "authenticate");
+const list_bde_mutationFunctionIdentifer = sql.identifier("b", "list_bde_mutation");
+const authenticate_manyFunctionIdentifer = sql.identifier("b", "authenticate_many");
+const authenticate_payloadFunctionIdentifer = sql.identifier("b", "authenticate_payload");
+const compound_type_mutationFunctionIdentifer = sql.identifier("b", "compound_type_mutation");
+const compound_type_queryFunctionIdentifer = sql.identifier("b", "compound_type_query");
+const compound_type_set_mutationFunctionIdentifer = sql.identifier("b", "compound_type_set_mutation");
+const compound_type_array_mutationFunctionIdentifer = sql.identifier("b", "compound_type_array_mutation");
+const compound_type_array_queryFunctionIdentifer = sql.identifier("b", "compound_type_array_query");
+const typesUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -1105,12 +1105,12 @@ const uniques4 = [{
   }
 }];
 const registryConfig_pgResources_types_types = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "types",
   identifier: "main.b.types",
   from: typesCodec.sqlType,
   codec: typesCodec,
-  uniques: uniques4,
+  uniques: typesUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -1125,12 +1125,12 @@ const registryConfig_pgResources_types_types = {
     }
   }
 };
-const sqlIdent22 = sql.identifier("b", "type_function_connection");
-const sqlIdent23 = sql.identifier("b", "type_function_connection_mutation");
-const sqlIdent24 = sql.identifier("b", "type_function");
-const sqlIdent25 = sql.identifier("b", "type_function_mutation");
-const sqlIdent26 = sql.identifier("b", "type_function_list");
-const sqlIdent27 = sql.identifier("b", "type_function_list_mutation");
+const type_function_connectionFunctionIdentifer = sql.identifier("b", "type_function_connection");
+const type_function_connection_mutationFunctionIdentifer = sql.identifier("b", "type_function_connection_mutation");
+const type_functionFunctionIdentifer = sql.identifier("b", "type_function");
+const type_function_mutationFunctionIdentifer = sql.identifier("b", "type_function_mutation");
+const type_function_listFunctionIdentifer = sql.identifier("b", "type_function_list");
+const type_function_list_mutationFunctionIdentifer = sql.identifier("b", "type_function_list_mutation");
 const registry = makeRegistry({
   pgCodecs: Object.assign(Object.create(null), {
     int4: TYPES.int,
@@ -1253,16 +1253,16 @@ const registry = makeRegistry({
         },
         tags: Object.create(null)
       },
-      executor: executor_mainPgExecutor
+      executor
     })
   }),
   pgResources: Object.assign(Object.create(null), {
     mult_1: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "mult_1",
       identifier: "main.b.mult_1(int4,int4)",
       from(...args) {
-        return sql`${sqlIdent7}(${sqlFromArgDigests(args)})`;
+        return sql`${mult_1FunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: null,
@@ -1292,11 +1292,11 @@ const registry = makeRegistry({
       description: undefined
     },
     mult_2: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "mult_2",
       identifier: "main.b.mult_2(int4,int4)",
       from(...args) {
-        return sql`${sqlIdent8}(${sqlFromArgDigests(args)})`;
+        return sql`${mult_2FunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: null,
@@ -1326,11 +1326,11 @@ const registry = makeRegistry({
       description: undefined
     },
     mult_3: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "mult_3",
       identifier: "main.b.mult_3(int4,int4)",
       from(...args) {
-        return sql`${sqlIdent9}(${sqlFromArgDigests(args)})`;
+        return sql`${mult_3FunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: null,
@@ -1360,11 +1360,11 @@ const registry = makeRegistry({
       description: undefined
     },
     mult_4: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "mult_4",
       identifier: "main.b.mult_4(int4,int4)",
       from(...args) {
-        return sql`${sqlIdent10}(${sqlFromArgDigests(args)})`;
+        return sql`${mult_4FunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: null,
@@ -1394,11 +1394,11 @@ const registry = makeRegistry({
       description: undefined
     },
     guid_fn: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "guid_fn",
       identifier: "main.b.guid_fn(b.guid)",
       from(...args) {
-        return sql`${sqlIdent11}(${sqlFromArgDigests(args)})`;
+        return sql`${guid_fnFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "g",
@@ -1423,7 +1423,7 @@ const registry = makeRegistry({
       description: undefined
     },
     updatable_view: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "updatable_view",
       identifier: "main.b.updatable_view",
       from: updatableViewCodec.sqlType,
@@ -1457,7 +1457,7 @@ const registry = makeRegistry({
       name: "authenticate_fail",
       identifier: "main.b.authenticate_fail()",
       from(...args) {
-        return sql`${sqlIdent12}(${sqlFromArgDigests(args)})`;
+        return sql`${authenticate_failFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
       returnsArray: false,
@@ -1479,7 +1479,7 @@ const registry = makeRegistry({
       name: "authenticate",
       identifier: "main.b.authenticate(int4,numeric,int8)",
       from(...args) {
-        return sql`${sqlIdent13}(${sqlFromArgDigests(args)})`;
+        return sql`${authenticateFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "a",
@@ -1513,11 +1513,11 @@ const registry = makeRegistry({
       description: undefined
     }),
     list_bde_mutation: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "list_bde_mutation",
       identifier: "main.b.list_bde_mutation(_text,text,text)",
       from(...args) {
-        return sql`${sqlIdent14}(${sqlFromArgDigests(args)})`;
+        return sql`${list_bde_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "b",
@@ -1555,7 +1555,7 @@ const registry = makeRegistry({
       name: "authenticate_many",
       identifier: "main.b.authenticate_many(int4,numeric,int8)",
       from(...args) {
-        return sql`${sqlIdent15}(${sqlFromArgDigests(args)})`;
+        return sql`${authenticate_manyFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "a",
@@ -1589,7 +1589,7 @@ const registry = makeRegistry({
       description: undefined
     }),
     authenticate_payload: PgResource.functionResourceOptions({
-      executor: executor_mainPgExecutor,
+      executor,
       name: "auth_payload",
       identifier: "main.b.auth_payload",
       from: authPayloadCodec.sqlType,
@@ -1613,7 +1613,7 @@ const registry = makeRegistry({
       name: "authenticate_payload",
       identifier: "main.b.authenticate_payload(int4,numeric,int8)",
       from(...args) {
-        return sql`${sqlIdent16}(${sqlFromArgDigests(args)})`;
+        return sql`${authenticate_payloadFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "a",
@@ -1648,12 +1648,12 @@ const registry = makeRegistry({
     }),
     compound_type_mutation: PgResource.functionResourceOptions({
       codec: compoundTypeCodec,
-      executor: executor_mainPgExecutor
+      executor: executor
     }, {
       name: "compound_type_mutation",
       identifier: "main.b.compound_type_mutation(c.compound_type)",
       from(...args) {
-        return sql`${sqlIdent17}(${sqlFromArgDigests(args)})`;
+        return sql`${compound_type_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "object",
@@ -1678,12 +1678,12 @@ const registry = makeRegistry({
     }),
     compound_type_query: PgResource.functionResourceOptions({
       codec: compoundTypeCodec,
-      executor: executor_mainPgExecutor
+      executor: executor
     }, {
       name: "compound_type_query",
       identifier: "main.b.compound_type_query(c.compound_type)",
       from(...args) {
-        return sql`${sqlIdent18}(${sqlFromArgDigests(args)})`;
+        return sql`${compound_type_queryFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "object",
@@ -1708,12 +1708,12 @@ const registry = makeRegistry({
     }),
     compound_type_set_mutation: PgResource.functionResourceOptions({
       codec: compoundTypeCodec,
-      executor: executor_mainPgExecutor
+      executor: executor
     }, {
       name: "compound_type_set_mutation",
       identifier: "main.b.compound_type_set_mutation(c.compound_type)",
       from(...args) {
-        return sql`${sqlIdent19}(${sqlFromArgDigests(args)})`;
+        return sql`${compound_type_set_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "object",
@@ -1738,12 +1738,12 @@ const registry = makeRegistry({
     }),
     compound_type_array_mutation: PgResource.functionResourceOptions({
       codec: compoundTypeCodec,
-      executor: executor_mainPgExecutor
+      executor: executor
     }, {
       name: "compound_type_array_mutation",
       identifier: "main.b.compound_type_array_mutation(c.compound_type)",
       from(...args) {
-        return sql`${sqlIdent20}(${sqlFromArgDigests(args)})`;
+        return sql`${compound_type_array_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "object",
@@ -1768,12 +1768,12 @@ const registry = makeRegistry({
     }),
     compound_type_array_query: PgResource.functionResourceOptions({
       codec: compoundTypeCodec,
-      executor: executor_mainPgExecutor
+      executor: executor
     }, {
       name: "compound_type_array_query",
       identifier: "main.b.compound_type_array_query(c.compound_type)",
       from(...args) {
-        return sql`${sqlIdent21}(${sqlFromArgDigests(args)})`;
+        return sql`${compound_type_array_queryFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "object",
@@ -1801,7 +1801,7 @@ const registry = makeRegistry({
       name: "type_function_connection",
       identifier: "main.b.type_function_connection()",
       from(...args) {
-        return sql`${sqlIdent22}(${sqlFromArgDigests(args)})`;
+        return sql`${type_function_connectionFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
       returnsArray: false,
@@ -1823,7 +1823,7 @@ const registry = makeRegistry({
       name: "type_function_connection_mutation",
       identifier: "main.b.type_function_connection_mutation()",
       from(...args) {
-        return sql`${sqlIdent23}(${sqlFromArgDigests(args)})`;
+        return sql`${type_function_connection_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
       returnsArray: false,
@@ -1845,7 +1845,7 @@ const registry = makeRegistry({
       name: "type_function",
       identifier: "main.b.type_function(int4)",
       from(...args) {
-        return sql`${sqlIdent24}(${sqlFromArgDigests(args)})`;
+        return sql`${type_functionFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "id",
@@ -1872,7 +1872,7 @@ const registry = makeRegistry({
       name: "type_function_mutation",
       identifier: "main.b.type_function_mutation(int4)",
       from(...args) {
-        return sql`${sqlIdent25}(${sqlFromArgDigests(args)})`;
+        return sql`${type_function_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "id",
@@ -1899,7 +1899,7 @@ const registry = makeRegistry({
       name: "type_function_list",
       identifier: "main.b.type_function_list()",
       from(...args) {
-        return sql`${sqlIdent26}(${sqlFromArgDigests(args)})`;
+        return sql`${type_function_listFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
       returnsArray: true,
@@ -1921,7 +1921,7 @@ const registry = makeRegistry({
       name: "type_function_list_mutation",
       identifier: "main.b.type_function_list_mutation()",
       from(...args) {
-        return sql`${sqlIdent27}(${sqlFromArgDigests(args)})`;
+        return sql`${type_function_list_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
       returnsArray: true,
@@ -5748,7 +5748,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques4[0].attributes.forEach(attributeName => {
+        typesUniques[0].attributes.forEach(attributeName => {
           const attribute = typesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -5764,7 +5764,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques4[0].attributes.forEach(attributeName => {
+        typesUniques[0].attributes.forEach(attributeName => {
           const attribute = typesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -8919,7 +8919,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = typesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -9048,7 +9048,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = typesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -9451,7 +9451,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = typesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -9872,7 +9872,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = typesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));

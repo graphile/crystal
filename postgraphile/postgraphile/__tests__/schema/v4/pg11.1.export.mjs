@@ -70,7 +70,7 @@ const alwaysAsIdentityAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const executor_mainPgExecutor = new PgExecutor({
+const executor = new PgExecutor({
   name: "main",
   context() {
     const ctx = context();
@@ -94,7 +94,7 @@ const alwaysAsIdentityCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const byDefaultAsIdentityAttributes = Object.assign(Object.create(null), {
   id: {
@@ -130,7 +130,7 @@ const byDefaultAsIdentityCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const networkAttributes = Object.assign(Object.create(null), {
   id: {
@@ -193,7 +193,7 @@ const networkCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const bigintDomainCodec = domainOfCodec(TYPES.bigint, "bigintDomain", sql.identifier("c", "bigint_domain"), {
   description: undefined,
@@ -361,7 +361,7 @@ const compoundTypeCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const domainConstrainedCompoundTypeCodec = domainOfCodec(compoundTypeCodec, "domainConstrainedCompoundType", sql.identifier("pg11", "domain_constrained_compound_type"), {
   description: undefined,
@@ -436,9 +436,9 @@ const typesCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
-const uniques = [{
+const always_as_identityUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -446,7 +446,7 @@ const uniques = [{
     tags: Object.create(null)
   }
 }];
-const uniques2 = [{
+const by_default_as_identityUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -454,7 +454,7 @@ const uniques2 = [{
     tags: Object.create(null)
   }
 }];
-const uniques3 = [{
+const networkUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -462,7 +462,7 @@ const uniques3 = [{
     tags: Object.create(null)
   }
 }];
-const uniques4 = [{
+const typesUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -500,12 +500,12 @@ const registry = makeRegistry({
   }),
   pgResources: Object.assign(Object.create(null), {
     always_as_identity: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "always_as_identity",
       identifier: "main.pg11.always_as_identity",
       from: alwaysAsIdentityCodec.sqlType,
       codec: alwaysAsIdentityCodec,
-      uniques,
+      uniques: always_as_identityUniques,
       isVirtual: false,
       description: undefined,
       extensions: {
@@ -519,12 +519,12 @@ const registry = makeRegistry({
       }
     },
     by_default_as_identity: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "by_default_as_identity",
       identifier: "main.pg11.by_default_as_identity",
       from: byDefaultAsIdentityCodec.sqlType,
       codec: byDefaultAsIdentityCodec,
-      uniques: uniques2,
+      uniques: by_default_as_identityUniques,
       isVirtual: false,
       description: undefined,
       extensions: {
@@ -538,12 +538,12 @@ const registry = makeRegistry({
       }
     },
     network: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "network",
       identifier: "main.pg11.network",
       from: networkCodec.sqlType,
       codec: networkCodec,
-      uniques: uniques3,
+      uniques: networkUniques,
       isVirtual: false,
       description: undefined,
       extensions: {
@@ -557,12 +557,12 @@ const registry = makeRegistry({
       }
     },
     types: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "types",
       identifier: "main.pg11.types",
       from: typesCodec.sqlType,
       codec: typesCodec,
-      uniques: uniques4,
+      uniques: typesUniques,
       isVirtual: false,
       description: undefined,
       extensions: {
@@ -2644,7 +2644,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
+        always_as_identityUniques[0].attributes.forEach(attributeName => {
           const attribute = alwaysAsIdentityCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -2660,7 +2660,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
+        always_as_identityUniques[0].attributes.forEach(attributeName => {
           const attribute = alwaysAsIdentityCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -2822,7 +2822,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques2[0].attributes.forEach(attributeName => {
+        by_default_as_identityUniques[0].attributes.forEach(attributeName => {
           const attribute = byDefaultAsIdentityCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -2838,7 +2838,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques2[0].attributes.forEach(attributeName => {
+        by_default_as_identityUniques[0].attributes.forEach(attributeName => {
           const attribute = byDefaultAsIdentityCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -3000,7 +3000,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques3[0].attributes.forEach(attributeName => {
+        networkUniques[0].attributes.forEach(attributeName => {
           const attribute = networkCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -3016,7 +3016,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques3[0].attributes.forEach(attributeName => {
+        networkUniques[0].attributes.forEach(attributeName => {
           const attribute = networkCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -3349,7 +3349,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques4[0].attributes.forEach(attributeName => {
+        typesUniques[0].attributes.forEach(attributeName => {
           const attribute = typesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -3365,7 +3365,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques4[0].attributes.forEach(attributeName => {
+        typesUniques[0].attributes.forEach(attributeName => {
           const attribute = typesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -4063,7 +4063,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = always_as_identityUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -4130,7 +4130,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques2[0].attributes.reduce((memo, attributeName) => {
+            const spec = by_default_as_identityUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -4204,7 +4204,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques3[0].attributes.reduce((memo, attributeName) => {
+            const spec = networkUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -4299,7 +4299,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = typesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -4394,7 +4394,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = always_as_identityUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -4474,7 +4474,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques2[0].attributes.reduce((memo, attributeName) => {
+            const spec = by_default_as_identityUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -4561,7 +4561,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques3[0].attributes.reduce((memo, attributeName) => {
+            const spec = networkUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -4669,7 +4669,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = typesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -4782,7 +4782,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = always_as_identityUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -4846,7 +4846,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques2[0].attributes.reduce((memo, attributeName) => {
+            const spec = by_default_as_identityUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -4910,7 +4910,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques3[0].attributes.reduce((memo, attributeName) => {
+            const spec = networkUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -4974,7 +4974,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = typesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));

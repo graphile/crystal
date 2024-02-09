@@ -131,7 +131,7 @@ const geomAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const executor_mainPgExecutor = new PgExecutor({
+const executor = new PgExecutor({
   name: "main",
   context() {
     const ctx = context();
@@ -155,9 +155,9 @@ const geomCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
-const uniques = [{
+const geomUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -182,12 +182,12 @@ const pgResource_geomPgResource = makeRegistry({
   }),
   pgResources: Object.assign(Object.create(null), {
     geom: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "geom",
       identifier: "main.geometry.geom",
       from: geomCodec.sqlType,
       codec: geomCodec,
-      uniques,
+      uniques: geomUniques,
       isVirtual: false,
       description: undefined,
       extensions: {
@@ -936,7 +936,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
+        geomUniques[0].attributes.forEach(attributeName => {
           const attribute = geomCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -952,7 +952,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
+        geomUniques[0].attributes.forEach(attributeName => {
           const attribute = geomCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -1618,7 +1618,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = geomUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -1741,7 +1741,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = geomUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -1882,7 +1882,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = geomUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));

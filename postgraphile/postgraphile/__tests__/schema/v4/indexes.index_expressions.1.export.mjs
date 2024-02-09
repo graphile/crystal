@@ -77,7 +77,7 @@ const employeeAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const executor_mainPgExecutor = new PgExecutor({
+const executor = new PgExecutor({
   name: "main",
   context() {
     const ctx = context();
@@ -101,9 +101,9 @@ const employeeCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
-const uniques = [{
+const employeeUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -121,12 +121,12 @@ const pgResource_employeePgResource = makeRegistry({
   }),
   pgResources: Object.assign(Object.create(null), {
     employee: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "employee",
       identifier: "main.index_expressions.employee",
       from: employeeCodec.sqlType,
       codec: employeeCodec,
-      uniques,
+      uniques: employeeUniques,
       isVirtual: false,
       description: undefined,
       extensions: {
@@ -510,7 +510,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
+        employeeUniques[0].attributes.forEach(attributeName => {
           const attribute = employeeCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -526,7 +526,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
+        employeeUniques[0].attributes.forEach(attributeName => {
           const attribute = employeeCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,

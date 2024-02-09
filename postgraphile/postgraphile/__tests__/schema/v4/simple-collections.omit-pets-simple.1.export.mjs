@@ -68,7 +68,7 @@ const peopleAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const executor_mainPgExecutor = new PgExecutor({
+const executor = new PgExecutor({
   name: "main",
   context() {
     const ctx = context();
@@ -92,7 +92,7 @@ const peopleCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const petsAttributes = Object.assign(Object.create(null), {
   id: {
@@ -137,9 +137,9 @@ const petsCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
-const uniques = [{
+const peopleUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -148,12 +148,12 @@ const uniques = [{
   }
 }];
 const registryConfig_pgResources_people_people = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "people",
   identifier: "main.simple_collections.people",
   from: peopleCodec.sqlType,
   codec: peopleCodec,
-  uniques,
+  uniques: peopleUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -166,7 +166,7 @@ const registryConfig_pgResources_people_people = {
     tags: {}
   }
 };
-const uniques2 = [{
+const petsUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -175,12 +175,12 @@ const uniques2 = [{
   }
 }];
 const registryConfig_pgResources_pets_pets = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "pets",
   identifier: "main.simple_collections.pets",
   from: petsCodec.sqlType,
   codec: petsCodec,
-  uniques: uniques2,
+  uniques: petsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -193,7 +193,7 @@ const registryConfig_pgResources_pets_pets = {
     tags: {}
   }
 };
-const sqlIdent = sql.identifier("simple_collections", "people_odd_pets");
+const people_odd_petsFunctionIdentifer = sql.identifier("simple_collections", "people_odd_pets");
 const registry = makeRegistry({
   pgCodecs: Object.assign(Object.create(null), {
     people: peopleCodec,
@@ -210,7 +210,7 @@ const registry = makeRegistry({
       name: "people_odd_pets",
       identifier: "main.simple_collections.people_odd_pets(simple_collections.people)",
       from(...args) {
-        return sql`${sqlIdent}(${sqlFromArgDigests(args)})`;
+        return sql`${people_odd_petsFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "p",
@@ -1465,7 +1465,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques2[0].attributes.forEach(attributeName => {
+        petsUniques[0].attributes.forEach(attributeName => {
           const attribute = petsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -1481,7 +1481,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques2[0].attributes.forEach(attributeName => {
+        petsUniques[0].attributes.forEach(attributeName => {
           const attribute = petsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -1700,7 +1700,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
+        peopleUniques[0].attributes.forEach(attributeName => {
           const attribute = peopleCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -1716,7 +1716,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
+        peopleUniques[0].attributes.forEach(attributeName => {
           const attribute = peopleCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -2041,7 +2041,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = peopleUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -2115,7 +2115,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques2[0].attributes.reduce((memo, attributeName) => {
+            const spec = petsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -2201,7 +2201,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = peopleUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -2288,7 +2288,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques2[0].attributes.reduce((memo, attributeName) => {
+            const spec = petsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -2392,7 +2392,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = peopleUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -2456,7 +2456,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques2[0].attributes.reduce((memo, attributeName) => {
+            const spec = petsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));

@@ -2,7 +2,7 @@ import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, PgUnionAllSte
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, makeGrafastSchema, object, rootValue } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
-const executor_mainPgExecutor = new PgExecutor({
+const executor = new PgExecutor({
   name: "main",
   context() {
     const ctx = context();
@@ -49,7 +49,7 @@ const awsApplicationFirstPartyVulnerabilitiesCodec = recordCodec({
   }),
   description: undefined,
   extensions,
-  executor: executor_mainPgExecutor
+  executor
 });
 const extensions2 = {
   isTableLike: true,
@@ -88,7 +88,7 @@ const awsApplicationThirdPartyVulnerabilitiesCodec = recordCodec({
   }),
   description: undefined,
   extensions: extensions2,
-  executor: executor_mainPgExecutor
+  executor
 });
 const extensions3 = {
   isTableLike: true,
@@ -127,7 +127,7 @@ const gcpApplicationFirstPartyVulnerabilitiesCodec = recordCodec({
   }),
   description: undefined,
   extensions: extensions3,
-  executor: executor_mainPgExecutor
+  executor
 });
 const extensions4 = {
   isTableLike: true,
@@ -166,7 +166,7 @@ const gcpApplicationThirdPartyVulnerabilitiesCodec = recordCodec({
   }),
   description: undefined,
   extensions: extensions4,
-  executor: executor_mainPgExecutor
+  executor
 });
 const organizationsAttributes = Object.assign(Object.create(null), {
   organization_id: {
@@ -204,7 +204,7 @@ const organizationsCodec = recordCodec({
       unionMember: "PersonOrOrganization"
     })
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const peopleAttributes = Object.assign(Object.create(null), {
   person_id: {
@@ -258,7 +258,7 @@ const peopleCodec = recordCodec({
   attributes: peopleAttributes,
   description: undefined,
   extensions: extensions6,
-  executor: executor_mainPgExecutor
+  executor
 });
 const extensions7 = {
   isTableLike: true,
@@ -297,7 +297,7 @@ const prioritiesCodec = recordCodec({
   }),
   description: undefined,
   extensions: extensions7,
-  executor: executor_mainPgExecutor
+  executor
 });
 const itemTypeCodec = enumCodec({
   name: "itemType",
@@ -458,7 +458,7 @@ const relationalChecklistsCodec = recordCodec({
     tags: Object.create(null),
     relationalInterfaceCodecName: "relationalItems"
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const relationalItemRelationCompositePksAttributes = Object.assign(Object.create(null), {
   parent_id: {
@@ -494,7 +494,7 @@ const relationalItemRelationCompositePksCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const relationalTopicsAttributes = Object.assign(Object.create(null), {
   topic_item_id: {
@@ -641,7 +641,7 @@ const relationalTopicsCodec = recordCodec({
     tags: Object.create(null),
     relationalInterfaceCodecName: "relationalItems"
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const singleTableItemRelationCompositePksAttributes = Object.assign(Object.create(null), {
   parent_id: {
@@ -677,7 +677,7 @@ const singleTableItemRelationCompositePksCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const relationalChecklistItemsAttributes = Object.assign(Object.create(null), {
   checklist_item_item_id: {
@@ -833,7 +833,7 @@ const relationalChecklistItemsCodec = recordCodec({
     tags: Object.create(null),
     relationalInterfaceCodecName: "relationalItems"
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const relationalDividersAttributes = Object.assign(Object.create(null), {
   divider_item_id: {
@@ -989,7 +989,7 @@ const relationalDividersCodec = recordCodec({
     tags: Object.create(null),
     relationalInterfaceCodecName: "relationalItems"
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const relationalItemRelationsAttributes = Object.assign(Object.create(null), {
   id: {
@@ -1034,7 +1034,7 @@ const relationalItemRelationsCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const singleTableItemRelationsAttributes = Object.assign(Object.create(null), {
   id: {
@@ -1079,7 +1079,7 @@ const singleTableItemRelationsCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const logEntriesAttributes = Object.assign(Object.create(null), {
   id: {
@@ -1150,7 +1150,7 @@ const logEntriesCodec = recordCodec({
   attributes: logEntriesAttributes,
   description: undefined,
   extensions: extensions17,
-  executor: executor_mainPgExecutor
+  executor
 });
 const relationalPostsAttributes = Object.assign(Object.create(null), {
   post_item_id: {
@@ -1315,7 +1315,7 @@ const relationalPostsCodec = recordCodec({
     tags: Object.create(null),
     relationalInterfaceCodecName: "relationalItems"
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const firstPartyVulnerabilitiesAttributes = Object.assign(Object.create(null), {
   id: {
@@ -1398,7 +1398,7 @@ const firstPartyVulnerabilitiesCodec = recordCodec({
   attributes: firstPartyVulnerabilitiesAttributes,
   description: undefined,
   extensions: extensions19,
-  executor: executor_mainPgExecutor
+  executor
 });
 const thirdPartyVulnerabilitiesAttributes = Object.assign(Object.create(null), {
   id: {
@@ -1481,7 +1481,7 @@ const thirdPartyVulnerabilitiesCodec = recordCodec({
   attributes: thirdPartyVulnerabilitiesAttributes,
   description: undefined,
   extensions: extensions20,
-  executor: executor_mainPgExecutor
+  executor
 });
 const awsApplicationsAttributes = Object.assign(Object.create(null), {
   id: {
@@ -1582,7 +1582,7 @@ const awsApplicationsCodec = recordCodec({
   attributes: awsApplicationsAttributes,
   description: undefined,
   extensions: extensions21,
-  executor: executor_mainPgExecutor
+  executor
 });
 const gcpApplicationsAttributes = Object.assign(Object.create(null), {
   id: {
@@ -1683,7 +1683,7 @@ const gcpApplicationsCodec = recordCodec({
   attributes: gcpApplicationsAttributes,
   description: undefined,
   extensions: extensions22,
-  executor: executor_mainPgExecutor
+  executor
 });
 const singleTableItemsAttributes = Object.assign(Object.create(null), {
   id: {
@@ -1865,7 +1865,7 @@ const singleTableItemsCodec = recordCodec({
   attributes: singleTableItemsAttributes,
   description: undefined,
   extensions: extensions23,
-  executor: executor_mainPgExecutor
+  executor
 });
 const relationalItemsAttributes = Object.assign(Object.create(null), {
   id: {
@@ -1977,7 +1977,7 @@ const relationalItemsCodec = recordCodec({
   attributes: relationalItemsAttributes,
   description: undefined,
   extensions: extensions24,
-  executor: executor_mainPgExecutor
+  executor
 });
 const ApplicationAttributes = Object.assign(Object.create(null), {
   id: {
@@ -2068,7 +2068,7 @@ const ZeroImplementationAttributes = Object.assign(Object.create(null), {
   }
 });
 const registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws_application_first_party_vulnerabilities = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "aws_application_first_party_vulnerabilities",
   identifier: "main.polymorphic.aws_application_first_party_vulnerabilities",
   from: awsApplicationFirstPartyVulnerabilitiesCodec.sqlType,
@@ -2097,7 +2097,7 @@ const registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws
   }
 };
 const registryConfig_pgResources_aws_application_third_party_vulnerabilities_aws_application_third_party_vulnerabilities = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "aws_application_third_party_vulnerabilities",
   identifier: "main.polymorphic.aws_application_third_party_vulnerabilities",
   from: awsApplicationThirdPartyVulnerabilitiesCodec.sqlType,
@@ -2126,7 +2126,7 @@ const registryConfig_pgResources_aws_application_third_party_vulnerabilities_aws
   }
 };
 const registryConfig_pgResources_gcp_application_first_party_vulnerabilities_gcp_application_first_party_vulnerabilities = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "gcp_application_first_party_vulnerabilities",
   identifier: "main.polymorphic.gcp_application_first_party_vulnerabilities",
   from: gcpApplicationFirstPartyVulnerabilitiesCodec.sqlType,
@@ -2155,7 +2155,7 @@ const registryConfig_pgResources_gcp_application_first_party_vulnerabilities_gcp
   }
 };
 const registryConfig_pgResources_gcp_application_third_party_vulnerabilities_gcp_application_third_party_vulnerabilities = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "gcp_application_third_party_vulnerabilities",
   identifier: "main.polymorphic.gcp_application_third_party_vulnerabilities",
   from: gcpApplicationThirdPartyVulnerabilitiesCodec.sqlType,
@@ -2183,7 +2183,7 @@ const registryConfig_pgResources_gcp_application_third_party_vulnerabilities_gcp
     }
   }
 };
-const uniques5 = [{
+const organizationsUniques = [{
   isPrimary: true,
   attributes: ["organization_id"],
   description: undefined,
@@ -2199,12 +2199,12 @@ const uniques5 = [{
   }
 }];
 const registryConfig_pgResources_organizations_organizations = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "organizations",
   identifier: "main.polymorphic.organizations",
   from: organizationsCodec.sqlType,
   codec: organizationsCodec,
-  uniques: uniques5,
+  uniques: organizationsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2219,7 +2219,7 @@ const registryConfig_pgResources_organizations_organizations = {
     }
   }
 };
-const uniques6 = [{
+const peopleUniques = [{
   isPrimary: true,
   attributes: ["person_id"],
   description: undefined,
@@ -2235,12 +2235,12 @@ const uniques6 = [{
   }
 }];
 const registryConfig_pgResources_people_people = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "people",
   identifier: "main.polymorphic.people",
   from: peopleCodec.sqlType,
   codec: peopleCodec,
-  uniques: uniques6,
+  uniques: peopleUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2258,7 +2258,7 @@ const registryConfig_pgResources_people_people = {
   }
 };
 const registryConfig_pgResources_priorities_priorities = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "priorities",
   identifier: "main.polymorphic.priorities",
   from: prioritiesCodec.sqlType,
@@ -2286,7 +2286,7 @@ const registryConfig_pgResources_priorities_priorities = {
     }
   }
 };
-const uniques8 = [{
+const relational_checklistsUniques = [{
   isPrimary: true,
   attributes: ["checklist_item_id"],
   description: undefined,
@@ -2295,12 +2295,12 @@ const uniques8 = [{
   }
 }];
 const registryConfig_pgResources_relational_checklists_relational_checklists = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "relational_checklists",
   identifier: "main.polymorphic.relational_checklists",
   from: relationalChecklistsCodec.sqlType,
   codec: relationalChecklistsCodec,
-  uniques: uniques8,
+  uniques: relational_checklistsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2313,7 +2313,7 @@ const registryConfig_pgResources_relational_checklists_relational_checklists = {
     tags: {}
   }
 };
-const uniques9 = [{
+const relational_item_relation_composite_pksUniques = [{
   isPrimary: true,
   attributes: ["parent_id", "child_id"],
   description: undefined,
@@ -2322,12 +2322,12 @@ const uniques9 = [{
   }
 }];
 const registryConfig_pgResources_relational_item_relation_composite_pks_relational_item_relation_composite_pks = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "relational_item_relation_composite_pks",
   identifier: "main.polymorphic.relational_item_relation_composite_pks",
   from: relationalItemRelationCompositePksCodec.sqlType,
   codec: relationalItemRelationCompositePksCodec,
-  uniques: uniques9,
+  uniques: relational_item_relation_composite_pksUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2340,7 +2340,7 @@ const registryConfig_pgResources_relational_item_relation_composite_pks_relation
     tags: {}
   }
 };
-const uniques10 = [{
+const relational_topicsUniques = [{
   isPrimary: true,
   attributes: ["topic_item_id"],
   description: undefined,
@@ -2349,12 +2349,12 @@ const uniques10 = [{
   }
 }];
 const registryConfig_pgResources_relational_topics_relational_topics = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "relational_topics",
   identifier: "main.polymorphic.relational_topics",
   from: relationalTopicsCodec.sqlType,
   codec: relationalTopicsCodec,
-  uniques: uniques10,
+  uniques: relational_topicsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2367,7 +2367,7 @@ const registryConfig_pgResources_relational_topics_relational_topics = {
     tags: {}
   }
 };
-const uniques11 = [{
+const single_table_item_relation_composite_pksUniques = [{
   isPrimary: true,
   attributes: ["parent_id", "child_id"],
   description: undefined,
@@ -2376,12 +2376,12 @@ const uniques11 = [{
   }
 }];
 const registryConfig_pgResources_single_table_item_relation_composite_pks_single_table_item_relation_composite_pks = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "single_table_item_relation_composite_pks",
   identifier: "main.polymorphic.single_table_item_relation_composite_pks",
   from: singleTableItemRelationCompositePksCodec.sqlType,
   codec: singleTableItemRelationCompositePksCodec,
-  uniques: uniques11,
+  uniques: single_table_item_relation_composite_pksUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2394,7 +2394,7 @@ const registryConfig_pgResources_single_table_item_relation_composite_pks_single
     tags: {}
   }
 };
-const uniques12 = [{
+const relational_checklist_itemsUniques = [{
   isPrimary: true,
   attributes: ["checklist_item_item_id"],
   description: undefined,
@@ -2403,12 +2403,12 @@ const uniques12 = [{
   }
 }];
 const registryConfig_pgResources_relational_checklist_items_relational_checklist_items = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "relational_checklist_items",
   identifier: "main.polymorphic.relational_checklist_items",
   from: relationalChecklistItemsCodec.sqlType,
   codec: relationalChecklistItemsCodec,
-  uniques: uniques12,
+  uniques: relational_checklist_itemsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2421,7 +2421,7 @@ const registryConfig_pgResources_relational_checklist_items_relational_checklist
     tags: {}
   }
 };
-const uniques13 = [{
+const relational_dividersUniques = [{
   isPrimary: true,
   attributes: ["divider_item_id"],
   description: undefined,
@@ -2430,12 +2430,12 @@ const uniques13 = [{
   }
 }];
 const registryConfig_pgResources_relational_dividers_relational_dividers = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "relational_dividers",
   identifier: "main.polymorphic.relational_dividers",
   from: relationalDividersCodec.sqlType,
   codec: relationalDividersCodec,
-  uniques: uniques13,
+  uniques: relational_dividersUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2448,7 +2448,7 @@ const registryConfig_pgResources_relational_dividers_relational_dividers = {
     tags: {}
   }
 };
-const uniques14 = [{
+const relational_item_relationsUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -2464,12 +2464,12 @@ const uniques14 = [{
   }
 }];
 const registryConfig_pgResources_relational_item_relations_relational_item_relations = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "relational_item_relations",
   identifier: "main.polymorphic.relational_item_relations",
   from: relationalItemRelationsCodec.sqlType,
   codec: relationalItemRelationsCodec,
-  uniques: uniques14,
+  uniques: relational_item_relationsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2482,7 +2482,7 @@ const registryConfig_pgResources_relational_item_relations_relational_item_relat
     tags: {}
   }
 };
-const uniques15 = [{
+const single_table_item_relationsUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -2498,12 +2498,12 @@ const uniques15 = [{
   }
 }];
 const registryConfig_pgResources_single_table_item_relations_single_table_item_relations = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "single_table_item_relations",
   identifier: "main.polymorphic.single_table_item_relations",
   from: singleTableItemRelationsCodec.sqlType,
   codec: singleTableItemRelationsCodec,
-  uniques: uniques15,
+  uniques: single_table_item_relationsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2516,7 +2516,7 @@ const registryConfig_pgResources_single_table_item_relations_single_table_item_r
     tags: {}
   }
 };
-const uniques16 = [{
+const log_entriesUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -2525,12 +2525,12 @@ const uniques16 = [{
   }
 }];
 const registryConfig_pgResources_log_entries_log_entries = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "log_entries",
   identifier: "main.polymorphic.log_entries",
   from: logEntriesCodec.sqlType,
   codec: logEntriesCodec,
-  uniques: uniques16,
+  uniques: log_entriesUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2546,7 +2546,7 @@ const registryConfig_pgResources_log_entries_log_entries = {
     }
   }
 };
-const uniques17 = [{
+const relational_postsUniques = [{
   isPrimary: true,
   attributes: ["post_item_id"],
   description: undefined,
@@ -2555,12 +2555,12 @@ const uniques17 = [{
   }
 }];
 const registryConfig_pgResources_relational_posts_relational_posts = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "relational_posts",
   identifier: "main.polymorphic.relational_posts",
   from: relationalPostsCodec.sqlType,
   codec: relationalPostsCodec,
-  uniques: uniques17,
+  uniques: relational_postsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2573,7 +2573,7 @@ const registryConfig_pgResources_relational_posts_relational_posts = {
     tags: {}
   }
 };
-const uniques18 = [{
+const first_party_vulnerabilitiesUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -2582,12 +2582,12 @@ const uniques18 = [{
   }
 }];
 const registryConfig_pgResources_first_party_vulnerabilities_first_party_vulnerabilities = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "first_party_vulnerabilities",
   identifier: "main.polymorphic.first_party_vulnerabilities",
   from: firstPartyVulnerabilitiesCodec.sqlType,
   codec: firstPartyVulnerabilitiesCodec,
-  uniques: uniques18,
+  uniques: first_party_vulnerabilitiesUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2604,7 +2604,7 @@ const registryConfig_pgResources_first_party_vulnerabilities_first_party_vulnera
     }
   }
 };
-const uniques19 = [{
+const third_party_vulnerabilitiesUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -2613,12 +2613,12 @@ const uniques19 = [{
   }
 }];
 const registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnerabilities = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "third_party_vulnerabilities",
   identifier: "main.polymorphic.third_party_vulnerabilities",
   from: thirdPartyVulnerabilitiesCodec.sqlType,
   codec: thirdPartyVulnerabilitiesCodec,
-  uniques: uniques19,
+  uniques: third_party_vulnerabilitiesUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2635,7 +2635,7 @@ const registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnera
     }
   }
 };
-const uniques20 = [{
+const aws_applicationsUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -2644,12 +2644,12 @@ const uniques20 = [{
   }
 }];
 const registryConfig_pgResources_aws_applications_aws_applications = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "aws_applications",
   identifier: "main.polymorphic.aws_applications",
   from: awsApplicationsCodec.sqlType,
   codec: awsApplicationsCodec,
-  uniques: uniques20,
+  uniques: aws_applicationsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2666,7 +2666,7 @@ const registryConfig_pgResources_aws_applications_aws_applications = {
     }
   }
 };
-const uniques21 = [{
+const gcp_applicationsUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -2675,12 +2675,12 @@ const uniques21 = [{
   }
 }];
 const registryConfig_pgResources_gcp_applications_gcp_applications = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "gcp_applications",
   identifier: "main.polymorphic.gcp_applications",
   from: gcpApplicationsCodec.sqlType,
   codec: gcpApplicationsCodec,
-  uniques: uniques21,
+  uniques: gcp_applicationsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2697,8 +2697,8 @@ const registryConfig_pgResources_gcp_applications_gcp_applications = {
     }
   }
 };
-const sqlIdent2 = sql.identifier("polymorphic", "custom_delete_relational_item");
-const uniques22 = [{
+const custom_delete_relational_itemFunctionIdentifer = sql.identifier("polymorphic", "custom_delete_relational_item");
+const single_table_itemsUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -2707,12 +2707,12 @@ const uniques22 = [{
   }
 }];
 const registryConfig_pgResources_single_table_items_single_table_items = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "single_table_items",
   identifier: "main.polymorphic.single_table_items",
   from: singleTableItemsCodec.sqlType,
   codec: singleTableItemsCodec,
-  uniques: uniques22,
+  uniques: single_table_itemsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2729,9 +2729,9 @@ const registryConfig_pgResources_single_table_items_single_table_items = {
     }
   }
 };
-const sqlIdent3 = sql.identifier("polymorphic", "all_single_tables");
-const sqlIdent4 = sql.identifier("polymorphic", "get_single_table_topic_by_id");
-const uniques23 = [{
+const all_single_tablesFunctionIdentifer = sql.identifier("polymorphic", "all_single_tables");
+const get_single_table_topic_by_idFunctionIdentifer = sql.identifier("polymorphic", "get_single_table_topic_by_id");
+const relational_itemsUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -2740,12 +2740,12 @@ const uniques23 = [{
   }
 }];
 const registryConfig_pgResources_relational_items_relational_items = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "relational_items",
   identifier: "main.polymorphic.relational_items",
   from: relationalItemsCodec.sqlType,
   codec: relationalItemsCodec,
-  uniques: uniques23,
+  uniques: relational_itemsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -2838,7 +2838,7 @@ const registryConfig = {
           }
         })
       },
-      executor: executor_mainPgExecutor
+      executor
     }),
     Vulnerability: recordCodec({
       name: "Vulnerability",
@@ -2883,7 +2883,7 @@ const registryConfig = {
           }
         })
       },
-      executor: executor_mainPgExecutor
+      executor
     }),
     ZeroImplementation: recordCodec({
       name: "ZeroImplementation",
@@ -2903,7 +2903,7 @@ const registryConfig = {
           behavior: "node"
         })
       },
-      executor: executor_mainPgExecutor
+      executor
     })
   }),
   pgResources: Object.assign(Object.create(null), {
@@ -2929,11 +2929,11 @@ const registryConfig = {
     aws_applications: registryConfig_pgResources_aws_applications_aws_applications,
     gcp_applications: registryConfig_pgResources_gcp_applications_gcp_applications,
     custom_delete_relational_item: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "custom_delete_relational_item",
       identifier: "main.polymorphic.custom_delete_relational_item(polymorphic.relational_items)",
       from(...args) {
-        return sql`${sqlIdent2}(${sqlFromArgDigests(args)})`;
+        return sql`${custom_delete_relational_itemFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "nodeId",
@@ -2966,7 +2966,7 @@ const registryConfig = {
       name: "all_single_tables",
       identifier: "main.polymorphic.all_single_tables()",
       from(...args) {
-        return sql`${sqlIdent3}(${sqlFromArgDigests(args)})`;
+        return sql`${all_single_tablesFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [],
       returnsArray: false,
@@ -2988,7 +2988,7 @@ const registryConfig = {
       name: "get_single_table_topic_by_id",
       identifier: "main.polymorphic.get_single_table_topic_by_id(int4)",
       from(...args) {
-        return sql`${sqlIdent4}(${sqlFromArgDigests(args)})`;
+        return sql`${get_single_table_topic_by_idFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "id",
@@ -13084,7 +13084,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques16[0].attributes.forEach(attributeName => {
+        log_entriesUniques[0].attributes.forEach(attributeName => {
           const attribute = logEntriesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -13100,7 +13100,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques16[0].attributes.forEach(attributeName => {
+        log_entriesUniques[0].attributes.forEach(attributeName => {
           const attribute = logEntriesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -13783,7 +13783,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques20[0].attributes.forEach(attributeName => {
+        aws_applicationsUniques[0].attributes.forEach(attributeName => {
           const attribute = awsApplicationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -13799,7 +13799,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques20[0].attributes.forEach(attributeName => {
+        aws_applicationsUniques[0].attributes.forEach(attributeName => {
           const attribute = awsApplicationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -14331,7 +14331,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques21[0].attributes.forEach(attributeName => {
+        gcp_applicationsUniques[0].attributes.forEach(attributeName => {
           const attribute = gcpApplicationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -14347,7 +14347,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques21[0].attributes.forEach(attributeName => {
+        gcp_applicationsUniques[0].attributes.forEach(attributeName => {
           const attribute = gcpApplicationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -14746,7 +14746,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques22[0].attributes.forEach(attributeName => {
+        single_table_itemsUniques[0].attributes.forEach(attributeName => {
           const attribute = singleTableItemsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -14762,7 +14762,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques22[0].attributes.forEach(attributeName => {
+        single_table_itemsUniques[0].attributes.forEach(attributeName => {
           const attribute = singleTableItemsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -15471,7 +15471,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques23[0].attributes.forEach(attributeName => {
+        relational_itemsUniques[0].attributes.forEach(attributeName => {
           const attribute = relationalItemsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -15487,7 +15487,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques23[0].attributes.forEach(attributeName => {
+        relational_itemsUniques[0].attributes.forEach(attributeName => {
           const attribute = relationalItemsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -16349,7 +16349,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques15[0].attributes.forEach(attributeName => {
+        single_table_item_relationsUniques[0].attributes.forEach(attributeName => {
           const attribute = singleTableItemRelationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -16365,7 +16365,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques15[0].attributes.forEach(attributeName => {
+        single_table_item_relationsUniques[0].attributes.forEach(attributeName => {
           const attribute = singleTableItemRelationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -16559,7 +16559,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques11[0].attributes.forEach(attributeName => {
+        single_table_item_relation_composite_pksUniques[0].attributes.forEach(attributeName => {
           const attribute = singleTableItemRelationCompositePksCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -16575,7 +16575,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques11[0].attributes.forEach(attributeName => {
+        single_table_item_relation_composite_pksUniques[0].attributes.forEach(attributeName => {
           const attribute = singleTableItemRelationCompositePksCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -18658,7 +18658,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques14[0].attributes.forEach(attributeName => {
+        relational_item_relationsUniques[0].attributes.forEach(attributeName => {
           const attribute = relationalItemRelationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -18674,7 +18674,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques14[0].attributes.forEach(attributeName => {
+        relational_item_relationsUniques[0].attributes.forEach(attributeName => {
           const attribute = relationalItemRelationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -18868,7 +18868,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques9[0].attributes.forEach(attributeName => {
+        relational_item_relation_composite_pksUniques[0].attributes.forEach(attributeName => {
           const attribute = relationalItemRelationCompositePksCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -18884,7 +18884,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques9[0].attributes.forEach(attributeName => {
+        relational_item_relation_composite_pksUniques[0].attributes.forEach(attributeName => {
           const attribute = relationalItemRelationCompositePksCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -22783,7 +22783,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques5[0].attributes.forEach(attributeName => {
+        organizationsUniques[0].attributes.forEach(attributeName => {
           const attribute = organizationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -22799,7 +22799,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques5[0].attributes.forEach(attributeName => {
+        organizationsUniques[0].attributes.forEach(attributeName => {
           const attribute = organizationsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -22961,7 +22961,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques6[0].attributes.forEach(attributeName => {
+        peopleUniques[0].attributes.forEach(attributeName => {
           const attribute = peopleCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -22977,7 +22977,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques6[0].attributes.forEach(attributeName => {
+        peopleUniques[0].attributes.forEach(attributeName => {
           const attribute = peopleCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -23164,7 +23164,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques8[0].attributes.forEach(attributeName => {
+        relational_checklistsUniques[0].attributes.forEach(attributeName => {
           const attribute = relationalChecklistsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -23180,7 +23180,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques8[0].attributes.forEach(attributeName => {
+        relational_checklistsUniques[0].attributes.forEach(attributeName => {
           const attribute = relationalChecklistsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -23855,7 +23855,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques10[0].attributes.forEach(attributeName => {
+        relational_topicsUniques[0].attributes.forEach(attributeName => {
           const attribute = relationalTopicsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -23871,7 +23871,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques10[0].attributes.forEach(attributeName => {
+        relational_topicsUniques[0].attributes.forEach(attributeName => {
           const attribute = relationalTopicsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -24546,7 +24546,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques12[0].attributes.forEach(attributeName => {
+        relational_checklist_itemsUniques[0].attributes.forEach(attributeName => {
           const attribute = relationalChecklistItemsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -24562,7 +24562,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques12[0].attributes.forEach(attributeName => {
+        relational_checklist_itemsUniques[0].attributes.forEach(attributeName => {
           const attribute = relationalChecklistItemsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -25294,7 +25294,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques13[0].attributes.forEach(attributeName => {
+        relational_dividersUniques[0].attributes.forEach(attributeName => {
           const attribute = relationalDividersCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -25310,7 +25310,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques13[0].attributes.forEach(attributeName => {
+        relational_dividersUniques[0].attributes.forEach(attributeName => {
           const attribute = relationalDividersCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -26042,7 +26042,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques17[0].attributes.forEach(attributeName => {
+        relational_postsUniques[0].attributes.forEach(attributeName => {
           const attribute = relationalPostsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -26058,7 +26058,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques17[0].attributes.forEach(attributeName => {
+        relational_postsUniques[0].attributes.forEach(attributeName => {
           const attribute = relationalPostsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -26847,7 +26847,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques18[0].attributes.forEach(attributeName => {
+        first_party_vulnerabilitiesUniques[0].attributes.forEach(attributeName => {
           const attribute = firstPartyVulnerabilitiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -26863,7 +26863,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques18[0].attributes.forEach(attributeName => {
+        first_party_vulnerabilitiesUniques[0].attributes.forEach(attributeName => {
           const attribute = firstPartyVulnerabilitiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -27139,7 +27139,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques19[0].attributes.forEach(attributeName => {
+        third_party_vulnerabilitiesUniques[0].attributes.forEach(attributeName => {
           const attribute = thirdPartyVulnerabilitiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -27155,7 +27155,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques19[0].attributes.forEach(attributeName => {
+        third_party_vulnerabilitiesUniques[0].attributes.forEach(attributeName => {
           const attribute = thirdPartyVulnerabilitiesCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -28159,7 +28159,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques5[0].attributes.reduce((memo, attributeName) => {
+            const spec = organizationsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -28233,7 +28233,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques6[0].attributes.reduce((memo, attributeName) => {
+            const spec = peopleUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -28307,7 +28307,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques9[0].attributes.reduce((memo, attributeName) => {
+            const spec = relational_item_relation_composite_pksUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -28391,7 +28391,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques11[0].attributes.reduce((memo, attributeName) => {
+            const spec = single_table_item_relation_composite_pksUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -28475,7 +28475,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques14[0].attributes.reduce((memo, attributeName) => {
+            const spec = relational_item_relationsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -28566,7 +28566,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques15[0].attributes.reduce((memo, attributeName) => {
+            const spec = single_table_item_relationsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -28657,7 +28657,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques16[0].attributes.reduce((memo, attributeName) => {
+            const spec = log_entriesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -28755,7 +28755,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques18[0].attributes.reduce((memo, attributeName) => {
+            const spec = first_party_vulnerabilitiesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -28843,7 +28843,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques19[0].attributes.reduce((memo, attributeName) => {
+            const spec = third_party_vulnerabilitiesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -28931,7 +28931,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques20[0].attributes.reduce((memo, attributeName) => {
+            const spec = aws_applicationsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -29043,7 +29043,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
+            const spec = gcp_applicationsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -29155,7 +29155,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques5[0].attributes.reduce((memo, attributeName) => {
+            const spec = organizationsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -29242,7 +29242,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques6[0].attributes.reduce((memo, attributeName) => {
+            const spec = peopleUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -29329,7 +29329,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques9[0].attributes.reduce((memo, attributeName) => {
+            const spec = relational_item_relation_composite_pksUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -29413,7 +29413,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques11[0].attributes.reduce((memo, attributeName) => {
+            const spec = single_table_item_relation_composite_pksUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -29497,7 +29497,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques14[0].attributes.reduce((memo, attributeName) => {
+            const spec = relational_item_relationsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -29602,7 +29602,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques15[0].attributes.reduce((memo, attributeName) => {
+            const spec = single_table_item_relationsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -29707,7 +29707,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques16[0].attributes.reduce((memo, attributeName) => {
+            const spec = log_entriesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -29804,7 +29804,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques18[0].attributes.reduce((memo, attributeName) => {
+            const spec = first_party_vulnerabilitiesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -29891,7 +29891,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques19[0].attributes.reduce((memo, attributeName) => {
+            const spec = third_party_vulnerabilitiesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -29978,7 +29978,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques20[0].attributes.reduce((memo, attributeName) => {
+            const spec = aws_applicationsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -30089,7 +30089,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
+            const spec = gcp_applicationsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -30200,7 +30200,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques5[0].attributes.reduce((memo, attributeName) => {
+            const spec = organizationsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -30259,7 +30259,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques6[0].attributes.reduce((memo, attributeName) => {
+            const spec = peopleUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -30318,7 +30318,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques9[0].attributes.reduce((memo, attributeName) => {
+            const spec = relational_item_relation_composite_pksUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -30380,7 +30380,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques11[0].attributes.reduce((memo, attributeName) => {
+            const spec = single_table_item_relation_composite_pksUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -30442,7 +30442,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques14[0].attributes.reduce((memo, attributeName) => {
+            const spec = relational_item_relationsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -30512,7 +30512,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques15[0].attributes.reduce((memo, attributeName) => {
+            const spec = single_table_item_relationsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -30582,7 +30582,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques16[0].attributes.reduce((memo, attributeName) => {
+            const spec = log_entriesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -30643,7 +30643,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques18[0].attributes.reduce((memo, attributeName) => {
+            const spec = first_party_vulnerabilitiesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -30694,7 +30694,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques19[0].attributes.reduce((memo, attributeName) => {
+            const spec = third_party_vulnerabilitiesUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -30745,7 +30745,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques20[0].attributes.reduce((memo, attributeName) => {
+            const spec = aws_applicationsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -30806,7 +30806,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques21[0].attributes.reduce((memo, attributeName) => {
+            const spec = gcp_applicationsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));

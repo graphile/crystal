@@ -48,7 +48,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     }
   }
 });
-const executor_mainPgExecutor = new PgExecutor({
+const executor = new PgExecutor({
   name: "main",
   context() {
     const ctx = context();
@@ -109,7 +109,7 @@ const workHourPartsCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const workHourCodec = domainOfCodec(workHourPartsCodec, "workHour", sql.identifier("nested_arrays", "work_hour"), {
   description: undefined,
@@ -207,10 +207,10 @@ const tCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
-const sqlIdent = sql.identifier("nested_arrays", "check_work_hours");
-const uniques = [{
+const check_work_hoursFunctionIdentifer = sql.identifier("nested_arrays", "check_work_hours");
+const tUniques = [{
   isPrimary: true,
   attributes: ["k"],
   description: undefined,
@@ -236,11 +236,11 @@ const registry = makeRegistry({
   }),
   pgResources: Object.assign(Object.create(null), {
     check_work_hours: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "check_work_hours",
       identifier: "main.nested_arrays.check_work_hours(nested_arrays._work_hour)",
       from(...args) {
-        return sql`${sqlIdent}(${sqlFromArgDigests(args)})`;
+        return sql`${check_work_hoursFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "wh",
@@ -265,12 +265,12 @@ const registry = makeRegistry({
       description: undefined
     },
     t: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "t",
       identifier: "main.nested_arrays.t",
       from: tCodec.sqlType,
       codec: tCodec,
-      uniques,
+      uniques: tUniques,
       isVirtual: false,
       description: undefined,
       extensions: {
@@ -972,7 +972,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
+        tUniques[0].attributes.forEach(attributeName => {
           const attribute = tCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -988,7 +988,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
+        tUniques[0].attributes.forEach(attributeName => {
           const attribute = tCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -1194,7 +1194,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = tUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -1268,7 +1268,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = tUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -1360,7 +1360,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = tUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));

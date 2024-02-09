@@ -48,7 +48,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     }
   }
 });
-const executor_mainPgExecutor = new PgExecutor({
+const executor = new PgExecutor({
   name: "main",
   context() {
     const ctx = context();
@@ -98,7 +98,7 @@ const abcdCodec = recordCodec({
   }),
   description: undefined,
   extensions,
-  executor: executor_mainPgExecutor
+  executor
 });
 const extensions2 = {
   isTableLike: true,
@@ -139,7 +139,7 @@ const abcdViewCodec = recordCodec({
   }),
   description: undefined,
   extensions: extensions2,
-  executor: executor_mainPgExecutor
+  executor
 });
 const extensions3 = {
   isTableLike: true,
@@ -178,7 +178,7 @@ const simpleEnumCodec = recordCodec({
   }),
   description: undefined,
   extensions: extensions3,
-  executor: executor_mainPgExecutor
+  executor
 });
 const letterDescriptionsAttributes_letter_codec_LetterAToDEnum = enumCodec({
   name: "LetterAToDEnum",
@@ -280,7 +280,7 @@ const letterDescriptionsCodec = recordCodec({
       foreignKey: "(letter_via_view) references enum_tables.abcd_view"
     })
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const referencingTableAttributes_enum_1_codec_EnumTheFirstEnum = enumCodec({
   name: "EnumTheFirstEnum",
@@ -435,7 +435,7 @@ const referencingTableCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const extensions12 = {
   isTableLike: true,
@@ -510,10 +510,10 @@ const lotsOfEnumsCodec = recordCodec({
   }),
   description: undefined,
   extensions: extensions12,
-  executor: executor_mainPgExecutor
+  executor
 });
 const registryConfig_pgResources_abcd_abcd = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "abcd",
   identifier: "main.enum_tables.abcd",
   from: abcdCodec.sqlType,
@@ -543,7 +543,7 @@ const registryConfig_pgResources_abcd_abcd = {
   }
 };
 const registryConfig_pgResources_abcd_view_abcd_view = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "abcd_view",
   identifier: "main.enum_tables.abcd_view",
   from: abcdViewCodec.sqlType,
@@ -574,7 +574,7 @@ const registryConfig_pgResources_abcd_view_abcd_view = {
   }
 };
 const registryConfig_pgResources_simple_enum_simple_enum = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "simple_enum",
   identifier: "main.enum_tables.simple_enum",
   from: simpleEnumCodec.sqlType,
@@ -602,8 +602,8 @@ const registryConfig_pgResources_simple_enum_simple_enum = {
     }
   }
 };
-const sqlIdent = sql.identifier("enum_tables", "referencing_table_mutation");
-const uniques4 = [{
+const referencing_table_mutationFunctionIdentifer = sql.identifier("enum_tables", "referencing_table_mutation");
+const letter_descriptionsUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -626,12 +626,12 @@ const uniques4 = [{
   }
 }];
 const registryConfig_pgResources_letter_descriptions_letter_descriptions = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "letter_descriptions",
   identifier: "main.enum_tables.letter_descriptions",
   from: letterDescriptionsCodec.sqlType,
   codec: letterDescriptionsCodec,
-  uniques: uniques4,
+  uniques: letter_descriptionsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -646,7 +646,7 @@ const registryConfig_pgResources_letter_descriptions_letter_descriptions = {
     }
   }
 };
-const uniques5 = [{
+const referencing_tableUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -655,12 +655,12 @@ const uniques5 = [{
   }
 }];
 const registryConfig_pgResources_referencing_table_referencing_table = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "referencing_table",
   identifier: "main.enum_tables.referencing_table",
   from: referencingTableCodec.sqlType,
   codec: referencingTableCodec,
-  uniques: uniques5,
+  uniques: referencing_tableUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -674,7 +674,7 @@ const registryConfig_pgResources_referencing_table_referencing_table = {
   }
 };
 const registryConfig_pgResources_lots_of_enums_lots_of_enums = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "lots_of_enums",
   identifier: "main.enum_tables.lots_of_enums",
   from: lotsOfEnumsCodec.sqlType,
@@ -764,11 +764,11 @@ const registry = makeRegistry({
     abcd_view: registryConfig_pgResources_abcd_view_abcd_view,
     simple_enum: registryConfig_pgResources_simple_enum_simple_enum,
     referencing_table_mutation: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "referencing_table_mutation",
       identifier: "main.enum_tables.referencing_table_mutation(enum_tables.referencing_table)",
       from(...args) {
-        return sql`${sqlIdent}(${sqlFromArgDigests(args)})`;
+        return sql`${referencing_table_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "t",
@@ -2364,7 +2364,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques4[0].attributes.forEach(attributeName => {
+        letter_descriptionsUniques[0].attributes.forEach(attributeName => {
           const attribute = letterDescriptionsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -2380,7 +2380,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques4[0].attributes.forEach(attributeName => {
+        letter_descriptionsUniques[0].attributes.forEach(attributeName => {
           const attribute = letterDescriptionsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -2656,7 +2656,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques5[0].attributes.forEach(attributeName => {
+        referencing_tableUniques[0].attributes.forEach(attributeName => {
           const attribute = referencingTableCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -2672,7 +2672,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques5[0].attributes.forEach(attributeName => {
+        referencing_tableUniques[0].attributes.forEach(attributeName => {
           const attribute = referencingTableCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -3315,7 +3315,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = letter_descriptionsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -3403,7 +3403,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques5[0].attributes.reduce((memo, attributeName) => {
+            const spec = referencing_tableUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -3461,7 +3461,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = letter_descriptionsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -3590,7 +3590,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques5[0].attributes.reduce((memo, attributeName) => {
+            const spec = referencing_tableUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -3703,7 +3703,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = letter_descriptionsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -3783,7 +3783,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques5[0].attributes.reduce((memo, attributeName) => {
+            const spec = referencing_tableUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));

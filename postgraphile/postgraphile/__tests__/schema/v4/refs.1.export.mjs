@@ -68,7 +68,7 @@ const peopleAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const executor_mainPgExecutor = new PgExecutor({
+const executor = new PgExecutor({
   name: "main",
   context() {
     const ctx = context();
@@ -92,7 +92,7 @@ const peopleCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
+  executor
 });
 const postsAttributes = Object.assign(Object.create(null), {
   id: {
@@ -146,9 +146,9 @@ const postsCodec = recordCodec({
       }
     })
   },
-  executor: executor_mainPgExecutor
+  executor
 });
-const uniques = [{
+const peopleUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -157,12 +157,12 @@ const uniques = [{
   }
 }];
 const registryConfig_pgResources_people_people = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "people",
   identifier: "main.refs.people",
   from: peopleCodec.sqlType,
   codec: peopleCodec,
-  uniques,
+  uniques: peopleUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -175,7 +175,7 @@ const registryConfig_pgResources_people_people = {
     tags: {}
   }
 };
-const uniques2 = [{
+const postsUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -184,12 +184,12 @@ const uniques2 = [{
   }
 }];
 const registryConfig_pgResources_posts_posts = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "posts",
   identifier: "main.refs.posts",
   from: postsCodec.sqlType,
   codec: postsCodec,
-  uniques: uniques2,
+  uniques: postsUniques,
   isVirtual: false,
   description: undefined,
   extensions: {
@@ -822,7 +822,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
+        peopleUniques[0].attributes.forEach(attributeName => {
           const attribute = peopleCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -838,7 +838,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
+        peopleUniques[0].attributes.forEach(attributeName => {
           const attribute = peopleCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -1000,7 +1000,7 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques2[0].attributes.forEach(attributeName => {
+        postsUniques[0].attributes.forEach(attributeName => {
           const attribute = postsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
@@ -1016,7 +1016,7 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques2[0].attributes.forEach(attributeName => {
+        postsUniques[0].attributes.forEach(attributeName => {
           const attribute = postsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
