@@ -281,6 +281,7 @@ export class LoadStep<
       idByLoad.set(this.load, loadId);
     }
     this.metaKey = `LoadStep|${loadId}|${this.loadOptionsKey}`;
+    super.finalize();
   }
 
   execute(
