@@ -313,6 +313,7 @@ declare global {
       EXPORTABLE<T, TScope extends any[]>(
         factory: (...args: TScope) => T,
         args: [...TScope],
+        nameHint?: string,
       ): T;
 
       /**

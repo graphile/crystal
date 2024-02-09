@@ -124,6 +124,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 export function EXPORTABLE<T, TScope extends any[]>(
   factory: (...args: TScope) => T,
   args: [...TScope],
+  nameHint?: string,
 ): T {
   const fn: T = factory(...args);
   if (
@@ -133,6 +134,7 @@ export function EXPORTABLE<T, TScope extends any[]>(
     Object.defineProperties(fn, {
       $exporter$args: { value: args },
       $exporter$factory: { value: factory },
+      $exporter$name: { value: nameHint },
     });
   }
   return fn;
