@@ -38,6 +38,7 @@ jobs:
       TERM: xterm
       FORCE_COLOR: 1
       NODE_OPTIONS: "--max-old-space-size=4096 --disable-proto=delete"
+      NODE_ENV: test
 
     strategy:
       fail-fast: false

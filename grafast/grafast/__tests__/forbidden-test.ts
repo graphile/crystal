@@ -1,4 +1,3 @@
-process.env.GRAPHILE_ENV = "test";
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { expect } from "chai";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
@@ -13,6 +12,10 @@ import {
   lambda,
   makeGrafastSchema,
 } from "../dist/index.js";
+
+if (process.env.NODE_ENV !== "test") {
+  throw new Error(`Tests must run with NODE_ENV=test`);
+}
 
 class SomeStep extends ExecutableStep {
   deduplicate(
