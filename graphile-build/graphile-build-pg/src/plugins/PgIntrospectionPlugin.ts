@@ -371,6 +371,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
             serviceName,
             withPgClientKey,
           ],
+          serviceName === "main" ? `executor` : `${serviceName}Executor`,
         );
         info.state.executors[serviceName] = executor;
         return executor;
