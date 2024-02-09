@@ -7,14 +7,12 @@ import type {
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
 import { NULL_PRESET } from "./config.js";
+import { isDev } from "./dev.js";
 import { inspect } from "./inspect.js";
 import type { ExecutionEventEmitter, ExecutionEventMap } from "./interfaces.js";
 import { $$eventEmitter, $$extensions } from "./interfaces.js";
 import { grafastPrepare } from "./prepare.js";
 import { isPromiseLike } from "./utils.js";
-
-const isDev =
-  typeof process !== "undefined" && process.env.NODE_ENV === "development";
 
 /**
  * Used by `execute` and `subscribe`.

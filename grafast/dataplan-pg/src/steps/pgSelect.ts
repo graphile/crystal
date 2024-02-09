@@ -29,6 +29,7 @@ import {
   exportAs,
   first,
   isAsyncIterable,
+  isDev,
   isPromiseLike,
   lambda,
   list,
@@ -76,9 +77,6 @@ const UNHANDLED_PLACEHOLDER = sql`(1/0) /* ERROR! Unhandled pgSelect placeholder
 // could do base64... but meh.)
 const hash = (text: string): string =>
   createHash("sha256").update(text).digest("hex").slice(0, 63);
-
-const isDev =
-  process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test";
 
 function parseCursor(cursor: string | null) {
   if (cursor == null) {

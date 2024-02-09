@@ -31,6 +31,7 @@ import {
   __ValueStep,
   error,
   ExecutableStep,
+  isDev,
   object,
   SafeError,
   stripAnsi,
@@ -132,11 +133,6 @@ const EMPTY_ARRAY = Object.freeze([]);
 export const POLYMORPHIC_ROOT_PATH = null;
 export const POLYMORPHIC_ROOT_PATHS: ReadonlySet<string> | null = null;
 Object.freeze(POLYMORPHIC_ROOT_PATHS);
-
-/** In development we might run additional checks */
-const isDev =
-  typeof process !== "undefined" &&
-  (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test");
 
 /** How many times will we try re-optimizing before giving up */
 const MAX_OPTIMIZATION_LOOPS = 10;
