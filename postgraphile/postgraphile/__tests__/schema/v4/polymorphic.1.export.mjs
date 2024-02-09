@@ -2,37 +2,15 @@ import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, PgUnionAllSte
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeDecodeNodeId, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
-function base64JSONDecode(value) {
-  return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-}
-function base64JSONEncode(value) {
-  return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-}
 const handler_codec_base64JSON = {
   name: "base64JSON",
-  encode: base64JSONEncode,
-  decode: base64JSONDecode
-};
-const awsApplicationFirstPartyVulnerabilitiesAttributes = Object.assign(Object.create(null), {
-  aws_application_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
+  encode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
   },
-  first_party_vulnerability_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
+  decode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
   }
-});
+};
 const executor_mainPgExecutor = new PgExecutor({
   name: "main",
   context() {
@@ -55,35 +33,32 @@ const extensions = {
     behavior: ["-*"]
   })
 };
-const awsApplicationFirstPartyVulnerabilitiesIdentifier = sql.identifier(...["polymorphic", "aws_application_first_party_vulnerabilities"]);
-const awsApplicationFirstPartyVulnerabilitiesCodecSpec = {
+const awsApplicationFirstPartyVulnerabilitiesCodec = recordCodec({
   name: "awsApplicationFirstPartyVulnerabilities",
-  identifier: awsApplicationFirstPartyVulnerabilitiesIdentifier,
-  attributes: awsApplicationFirstPartyVulnerabilitiesAttributes,
+  identifier: sql.identifier("polymorphic", "aws_application_first_party_vulnerabilities"),
+  attributes: Object.assign(Object.create(null), {
+    aws_application_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    first_party_vulnerability_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions,
   executor: executor_mainPgExecutor
-};
-const awsApplicationFirstPartyVulnerabilitiesCodec = recordCodec(awsApplicationFirstPartyVulnerabilitiesCodecSpec);
-const awsApplicationThirdPartyVulnerabilitiesAttributes = Object.assign(Object.create(null), {
-  aws_application_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  third_party_vulnerability_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
 });
 const extensions2 = {
   isTableLike: true,
@@ -97,36 +72,32 @@ const extensions2 = {
     behavior: ["-*"]
   })
 };
-const parts2 = ["polymorphic", "aws_application_third_party_vulnerabilities"];
-const awsApplicationThirdPartyVulnerabilitiesIdentifier = sql.identifier(...parts2);
-const awsApplicationThirdPartyVulnerabilitiesCodecSpec = {
+const awsApplicationThirdPartyVulnerabilitiesCodec = recordCodec({
   name: "awsApplicationThirdPartyVulnerabilities",
-  identifier: awsApplicationThirdPartyVulnerabilitiesIdentifier,
-  attributes: awsApplicationThirdPartyVulnerabilitiesAttributes,
+  identifier: sql.identifier("polymorphic", "aws_application_third_party_vulnerabilities"),
+  attributes: Object.assign(Object.create(null), {
+    aws_application_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    third_party_vulnerability_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: extensions2,
   executor: executor_mainPgExecutor
-};
-const awsApplicationThirdPartyVulnerabilitiesCodec = recordCodec(awsApplicationThirdPartyVulnerabilitiesCodecSpec);
-const gcpApplicationFirstPartyVulnerabilitiesAttributes = Object.assign(Object.create(null), {
-  gcp_application_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  first_party_vulnerability_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
 });
 const extensions3 = {
   isTableLike: true,
@@ -140,36 +111,32 @@ const extensions3 = {
     behavior: ["-*"]
   })
 };
-const parts3 = ["polymorphic", "gcp_application_first_party_vulnerabilities"];
-const gcpApplicationFirstPartyVulnerabilitiesIdentifier = sql.identifier(...parts3);
-const gcpApplicationFirstPartyVulnerabilitiesCodecSpec = {
+const gcpApplicationFirstPartyVulnerabilitiesCodec = recordCodec({
   name: "gcpApplicationFirstPartyVulnerabilities",
-  identifier: gcpApplicationFirstPartyVulnerabilitiesIdentifier,
-  attributes: gcpApplicationFirstPartyVulnerabilitiesAttributes,
+  identifier: sql.identifier("polymorphic", "gcp_application_first_party_vulnerabilities"),
+  attributes: Object.assign(Object.create(null), {
+    gcp_application_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    first_party_vulnerability_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: extensions3,
   executor: executor_mainPgExecutor
-};
-const gcpApplicationFirstPartyVulnerabilitiesCodec = recordCodec(gcpApplicationFirstPartyVulnerabilitiesCodecSpec);
-const gcpApplicationThirdPartyVulnerabilitiesAttributes = Object.assign(Object.create(null), {
-  gcp_application_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  third_party_vulnerability_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
 });
 const extensions4 = {
   isTableLike: true,
@@ -183,17 +150,33 @@ const extensions4 = {
     behavior: ["-*"]
   })
 };
-const parts4 = ["polymorphic", "gcp_application_third_party_vulnerabilities"];
-const gcpApplicationThirdPartyVulnerabilitiesIdentifier = sql.identifier(...parts4);
-const gcpApplicationThirdPartyVulnerabilitiesCodecSpec = {
+const gcpApplicationThirdPartyVulnerabilitiesCodec = recordCodec({
   name: "gcpApplicationThirdPartyVulnerabilities",
-  identifier: gcpApplicationThirdPartyVulnerabilitiesIdentifier,
-  attributes: gcpApplicationThirdPartyVulnerabilitiesAttributes,
+  identifier: sql.identifier("polymorphic", "gcp_application_third_party_vulnerabilities"),
+  attributes: Object.assign(Object.create(null), {
+    gcp_application_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    third_party_vulnerability_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: extensions4,
   executor: executor_mainPgExecutor
-};
-const gcpApplicationThirdPartyVulnerabilitiesCodec = recordCodec(gcpApplicationThirdPartyVulnerabilitiesCodecSpec);
+});
 const organizationsAttributes = Object.assign(Object.create(null), {
   organization_id: {
     description: undefined,
@@ -214,28 +197,24 @@ const organizationsAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions5 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "organizations"
-  },
-  tags: Object.assign(Object.create(null), {
-    unionMember: "PersonOrOrganization"
-  })
-};
-const parts5 = ["polymorphic", "organizations"];
-const organizationsIdentifier = sql.identifier(...parts5);
-const organizationsCodecSpec = {
+const organizationsCodec = recordCodec({
   name: "organizations",
-  identifier: organizationsIdentifier,
+  identifier: sql.identifier("polymorphic", "organizations"),
   attributes: organizationsAttributes,
   description: undefined,
-  extensions: extensions5,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "organizations"
+    },
+    tags: Object.assign(Object.create(null), {
+      unionMember: "PersonOrOrganization"
+    })
+  },
   executor: executor_mainPgExecutor
-};
-const organizationsCodec = recordCodec(organizationsCodecSpec);
+});
 const peopleAttributes = Object.assign(Object.create(null), {
   person_id: {
     description: undefined,
@@ -282,36 +261,13 @@ const extensions6 = {
     }
   })
 };
-const parts6 = ["polymorphic", "people"];
-const peopleIdentifier = sql.identifier(...parts6);
-const peopleCodecSpec = {
+const peopleCodec = recordCodec({
   name: "people",
-  identifier: peopleIdentifier,
+  identifier: sql.identifier("polymorphic", "people"),
   attributes: peopleAttributes,
   description: undefined,
   extensions: extensions6,
   executor: executor_mainPgExecutor
-};
-const peopleCodec = recordCodec(peopleCodecSpec);
-const prioritiesAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  title: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
 });
 const extensions7 = {
   isTableLike: true,
@@ -325,32 +281,46 @@ const extensions7 = {
     behavior: ["-insert -update -delete -filter -filterBy -order -orderBy"]
   })
 };
-const parts7 = ["polymorphic", "priorities"];
-const prioritiesIdentifier = sql.identifier(...parts7);
-const prioritiesCodecSpec = {
+const prioritiesCodec = recordCodec({
   name: "priorities",
-  identifier: prioritiesIdentifier,
-  attributes: prioritiesAttributes,
+  identifier: sql.identifier("polymorphic", "priorities"),
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    title: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: extensions7,
   executor: executor_mainPgExecutor
-};
-const prioritiesCodec = recordCodec(prioritiesCodecSpec);
-const extensions8 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "item_type"
-  },
-  tags: Object.create(null)
-};
-const parts8 = ["polymorphic", "item_type"];
+});
 const itemTypeCodec = enumCodec({
   name: "itemType",
-  identifier: sql.identifier(...parts8),
+  identifier: sql.identifier("polymorphic", "item_type"),
   values: ["TOPIC", "POST", "DIVIDER", "CHECKLIST", "CHECKLIST_ITEM"],
   description: undefined,
-  extensions: extensions8
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "item_type"
+    },
+    tags: Object.create(null)
+  }
 });
 const relationalChecklistsAttributes = Object.assign(Object.create(null), {
   checklist_item_id: {
@@ -482,27 +452,23 @@ const relationalChecklistsAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions9 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "relational_checklists"
-  },
-  tags: Object.create(null),
-  relationalInterfaceCodecName: "relationalItems"
-};
-const parts9 = ["polymorphic", "relational_checklists"];
-const relationalChecklistsIdentifier = sql.identifier(...parts9);
-const relationalChecklistsCodecSpec = {
+const relationalChecklistsCodec = recordCodec({
   name: "relationalChecklists",
-  identifier: relationalChecklistsIdentifier,
+  identifier: sql.identifier("polymorphic", "relational_checklists"),
   attributes: relationalChecklistsAttributes,
   description: undefined,
-  extensions: extensions9,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_checklists"
+    },
+    tags: Object.create(null),
+    relationalInterfaceCodecName: "relationalItems"
+  },
   executor: executor_mainPgExecutor
-};
-const relationalChecklistsCodec = recordCodec(relationalChecklistsCodecSpec);
+});
 const relationalItemRelationCompositePksAttributes = Object.assign(Object.create(null), {
   parent_id: {
     description: undefined,
@@ -523,26 +489,22 @@ const relationalItemRelationCompositePksAttributes = Object.assign(Object.create
     }
   }
 });
-const extensions10 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "relational_item_relation_composite_pks"
-  },
-  tags: Object.create(null)
-};
-const parts10 = ["polymorphic", "relational_item_relation_composite_pks"];
-const relationalItemRelationCompositePksIdentifier = sql.identifier(...parts10);
-const relationalItemRelationCompositePksCodecSpec = {
+const relationalItemRelationCompositePksCodec = recordCodec({
   name: "relationalItemRelationCompositePks",
-  identifier: relationalItemRelationCompositePksIdentifier,
+  identifier: sql.identifier("polymorphic", "relational_item_relation_composite_pks"),
   attributes: relationalItemRelationCompositePksAttributes,
   description: undefined,
-  extensions: extensions10,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_item_relation_composite_pks"
+    },
+    tags: Object.create(null)
+  },
   executor: executor_mainPgExecutor
-};
-const relationalItemRelationCompositePksCodec = recordCodec(relationalItemRelationCompositePksCodecSpec);
+});
 const relationalTopicsAttributes = Object.assign(Object.create(null), {
   topic_item_id: {
     description: undefined,
@@ -673,27 +635,23 @@ const relationalTopicsAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions11 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "relational_topics"
-  },
-  tags: Object.create(null),
-  relationalInterfaceCodecName: "relationalItems"
-};
-const parts11 = ["polymorphic", "relational_topics"];
-const relationalTopicsIdentifier = sql.identifier(...parts11);
-const relationalTopicsCodecSpec = {
+const relationalTopicsCodec = recordCodec({
   name: "relationalTopics",
-  identifier: relationalTopicsIdentifier,
+  identifier: sql.identifier("polymorphic", "relational_topics"),
   attributes: relationalTopicsAttributes,
   description: undefined,
-  extensions: extensions11,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_topics"
+    },
+    tags: Object.create(null),
+    relationalInterfaceCodecName: "relationalItems"
+  },
   executor: executor_mainPgExecutor
-};
-const relationalTopicsCodec = recordCodec(relationalTopicsCodecSpec);
+});
 const singleTableItemRelationCompositePksAttributes = Object.assign(Object.create(null), {
   parent_id: {
     description: undefined,
@@ -714,26 +672,22 @@ const singleTableItemRelationCompositePksAttributes = Object.assign(Object.creat
     }
   }
 });
-const extensions12 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "single_table_item_relation_composite_pks"
-  },
-  tags: Object.create(null)
-};
-const parts12 = ["polymorphic", "single_table_item_relation_composite_pks"];
-const singleTableItemRelationCompositePksIdentifier = sql.identifier(...parts12);
-const singleTableItemRelationCompositePksCodecSpec = {
+const singleTableItemRelationCompositePksCodec = recordCodec({
   name: "singleTableItemRelationCompositePks",
-  identifier: singleTableItemRelationCompositePksIdentifier,
+  identifier: sql.identifier("polymorphic", "single_table_item_relation_composite_pks"),
   attributes: singleTableItemRelationCompositePksAttributes,
   description: undefined,
-  extensions: extensions12,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "single_table_item_relation_composite_pks"
+    },
+    tags: Object.create(null)
+  },
   executor: executor_mainPgExecutor
-};
-const singleTableItemRelationCompositePksCodec = recordCodec(singleTableItemRelationCompositePksCodecSpec);
+});
 const relationalChecklistItemsAttributes = Object.assign(Object.create(null), {
   checklist_item_item_id: {
     description: undefined,
@@ -873,27 +827,23 @@ const relationalChecklistItemsAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions13 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "relational_checklist_items"
-  },
-  tags: Object.create(null),
-  relationalInterfaceCodecName: "relationalItems"
-};
-const parts13 = ["polymorphic", "relational_checklist_items"];
-const relationalChecklistItemsIdentifier = sql.identifier(...parts13);
-const relationalChecklistItemsCodecSpec = {
+const relationalChecklistItemsCodec = recordCodec({
   name: "relationalChecklistItems",
-  identifier: relationalChecklistItemsIdentifier,
+  identifier: sql.identifier("polymorphic", "relational_checklist_items"),
   attributes: relationalChecklistItemsAttributes,
   description: undefined,
-  extensions: extensions13,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_checklist_items"
+    },
+    tags: Object.create(null),
+    relationalInterfaceCodecName: "relationalItems"
+  },
   executor: executor_mainPgExecutor
-};
-const relationalChecklistItemsCodec = recordCodec(relationalChecklistItemsCodecSpec);
+});
 const relationalDividersAttributes = Object.assign(Object.create(null), {
   divider_item_id: {
     description: undefined,
@@ -1033,27 +983,23 @@ const relationalDividersAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions14 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "relational_dividers"
-  },
-  tags: Object.create(null),
-  relationalInterfaceCodecName: "relationalItems"
-};
-const parts14 = ["polymorphic", "relational_dividers"];
-const relationalDividersIdentifier = sql.identifier(...parts14);
-const relationalDividersCodecSpec = {
+const relationalDividersCodec = recordCodec({
   name: "relationalDividers",
-  identifier: relationalDividersIdentifier,
+  identifier: sql.identifier("polymorphic", "relational_dividers"),
   attributes: relationalDividersAttributes,
   description: undefined,
-  extensions: extensions14,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_dividers"
+    },
+    tags: Object.create(null),
+    relationalInterfaceCodecName: "relationalItems"
+  },
   executor: executor_mainPgExecutor
-};
-const relationalDividersCodec = recordCodec(relationalDividersCodecSpec);
+});
 const relationalItemRelationsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -1083,26 +1029,22 @@ const relationalItemRelationsAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions15 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "relational_item_relations"
-  },
-  tags: Object.create(null)
-};
-const parts15 = ["polymorphic", "relational_item_relations"];
-const relationalItemRelationsIdentifier = sql.identifier(...parts15);
-const relationalItemRelationsCodecSpec = {
+const relationalItemRelationsCodec = recordCodec({
   name: "relationalItemRelations",
-  identifier: relationalItemRelationsIdentifier,
+  identifier: sql.identifier("polymorphic", "relational_item_relations"),
   attributes: relationalItemRelationsAttributes,
   description: undefined,
-  extensions: extensions15,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_item_relations"
+    },
+    tags: Object.create(null)
+  },
   executor: executor_mainPgExecutor
-};
-const relationalItemRelationsCodec = recordCodec(relationalItemRelationsCodecSpec);
+});
 const singleTableItemRelationsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -1132,26 +1074,22 @@ const singleTableItemRelationsAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions16 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "single_table_item_relations"
-  },
-  tags: Object.create(null)
-};
-const parts16 = ["polymorphic", "single_table_item_relations"];
-const singleTableItemRelationsIdentifier = sql.identifier(...parts16);
-const singleTableItemRelationsCodecSpec = {
+const singleTableItemRelationsCodec = recordCodec({
   name: "singleTableItemRelations",
-  identifier: singleTableItemRelationsIdentifier,
+  identifier: sql.identifier("polymorphic", "single_table_item_relations"),
   attributes: singleTableItemRelationsAttributes,
   description: undefined,
-  extensions: extensions16,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "single_table_item_relations"
+    },
+    tags: Object.create(null)
+  },
   executor: executor_mainPgExecutor
-};
-const singleTableItemRelationsCodec = recordCodec(singleTableItemRelationsCodecSpec);
+});
 const logEntriesAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -1215,17 +1153,14 @@ const extensions17 = {
     }
   })
 };
-const parts17 = ["polymorphic", "log_entries"];
-const logEntriesIdentifier = sql.identifier(...parts17);
-const logEntriesCodecSpec = {
+const logEntriesCodec = recordCodec({
   name: "logEntries",
-  identifier: logEntriesIdentifier,
+  identifier: sql.identifier("polymorphic", "log_entries"),
   attributes: logEntriesAttributes,
   description: undefined,
   extensions: extensions17,
   executor: executor_mainPgExecutor
-};
-const logEntriesCodec = recordCodec(logEntriesCodecSpec);
+});
 const relationalPostsAttributes = Object.assign(Object.create(null), {
   post_item_id: {
     description: undefined,
@@ -1374,27 +1309,23 @@ const relationalPostsAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions18 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "relational_posts"
-  },
-  tags: Object.create(null),
-  relationalInterfaceCodecName: "relationalItems"
-};
-const parts18 = ["polymorphic", "relational_posts"];
-const relationalPostsIdentifier = sql.identifier(...parts18);
-const relationalPostsCodecSpec = {
+const relationalPostsCodec = recordCodec({
   name: "relationalPosts",
-  identifier: relationalPostsIdentifier,
+  identifier: sql.identifier("polymorphic", "relational_posts"),
   attributes: relationalPostsAttributes,
   description: undefined,
-  extensions: extensions18,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_posts"
+    },
+    tags: Object.create(null),
+    relationalInterfaceCodecName: "relationalItems"
+  },
   executor: executor_mainPgExecutor
-};
-const relationalPostsCodec = recordCodec(relationalPostsCodecSpec);
+});
 const firstPartyVulnerabilitiesAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -1470,17 +1401,14 @@ const extensions19 = {
     }
   })
 };
-const parts19 = ["polymorphic", "first_party_vulnerabilities"];
-const firstPartyVulnerabilitiesIdentifier = sql.identifier(...parts19);
-const firstPartyVulnerabilitiesCodecSpec = {
+const firstPartyVulnerabilitiesCodec = recordCodec({
   name: "firstPartyVulnerabilities",
-  identifier: firstPartyVulnerabilitiesIdentifier,
+  identifier: sql.identifier("polymorphic", "first_party_vulnerabilities"),
   attributes: firstPartyVulnerabilitiesAttributes,
   description: undefined,
   extensions: extensions19,
   executor: executor_mainPgExecutor
-};
-const firstPartyVulnerabilitiesCodec = recordCodec(firstPartyVulnerabilitiesCodecSpec);
+});
 const thirdPartyVulnerabilitiesAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -1556,17 +1484,14 @@ const extensions20 = {
     }
   })
 };
-const parts20 = ["polymorphic", "third_party_vulnerabilities"];
-const thirdPartyVulnerabilitiesIdentifier = sql.identifier(...parts20);
-const thirdPartyVulnerabilitiesCodecSpec = {
+const thirdPartyVulnerabilitiesCodec = recordCodec({
   name: "thirdPartyVulnerabilities",
-  identifier: thirdPartyVulnerabilitiesIdentifier,
+  identifier: sql.identifier("polymorphic", "third_party_vulnerabilities"),
   attributes: thirdPartyVulnerabilitiesAttributes,
   description: undefined,
   extensions: extensions20,
   executor: executor_mainPgExecutor
-};
-const thirdPartyVulnerabilitiesCodec = recordCodec(thirdPartyVulnerabilitiesCodecSpec);
+});
 const awsApplicationsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -1660,17 +1585,14 @@ const extensions21 = {
     }
   })
 };
-const parts21 = ["polymorphic", "aws_applications"];
-const awsApplicationsIdentifier = sql.identifier(...parts21);
-const awsApplicationsCodecSpec = {
+const awsApplicationsCodec = recordCodec({
   name: "awsApplications",
-  identifier: awsApplicationsIdentifier,
+  identifier: sql.identifier("polymorphic", "aws_applications"),
   attributes: awsApplicationsAttributes,
   description: undefined,
   extensions: extensions21,
   executor: executor_mainPgExecutor
-};
-const awsApplicationsCodec = recordCodec(awsApplicationsCodecSpec);
+});
 const gcpApplicationsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -1764,17 +1686,14 @@ const extensions22 = {
     }
   })
 };
-const parts22 = ["polymorphic", "gcp_applications"];
-const gcpApplicationsIdentifier = sql.identifier(...parts22);
-const gcpApplicationsCodecSpec = {
+const gcpApplicationsCodec = recordCodec({
   name: "gcpApplications",
-  identifier: gcpApplicationsIdentifier,
+  identifier: sql.identifier("polymorphic", "gcp_applications"),
   attributes: gcpApplicationsAttributes,
   description: undefined,
   extensions: extensions22,
   executor: executor_mainPgExecutor
-};
-const gcpApplicationsCodec = recordCodec(gcpApplicationsCodecSpec);
+});
 const singleTableItemsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -1949,17 +1868,14 @@ const extensions23 = {
     }
   })
 };
-const parts23 = ["polymorphic", "single_table_items"];
-const singleTableItemsIdentifier = sql.identifier(...parts23);
-const singleTableItemsCodecSpec = {
+const singleTableItemsCodec = recordCodec({
   name: "singleTableItems",
-  identifier: singleTableItemsIdentifier,
+  identifier: sql.identifier("polymorphic", "single_table_items"),
   attributes: singleTableItemsAttributes,
   description: undefined,
   extensions: extensions23,
   executor: executor_mainPgExecutor
-};
-const singleTableItemsCodec = recordCodec(singleTableItemsCodecSpec);
+});
 const relationalItemsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -2064,17 +1980,14 @@ const extensions24 = {
     type: ["TOPIC references:relational_topics", "POST references:relational_posts", "DIVIDER references:relational_dividers", "CHECKLIST references:relational_checklists", "CHECKLIST_ITEM references:relational_checklist_items"]
   })
 };
-const parts24 = ["polymorphic", "relational_items"];
-const relationalItemsIdentifier = sql.identifier(...parts24);
-const relationalItemsCodecSpec = {
+const relationalItemsCodec = recordCodec({
   name: "relationalItems",
-  identifier: relationalItemsIdentifier,
+  identifier: sql.identifier("polymorphic", "relational_items"),
   attributes: relationalItemsAttributes,
   description: undefined,
   extensions: extensions24,
   executor: executor_mainPgExecutor
-};
-const relationalItemsCodec = recordCodec(relationalItemsCodecSpec);
+});
 const ApplicationAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -2108,54 +2021,6 @@ const ApplicationAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions25 = {
-  isTableLike: false,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "applications"
-  },
-  tags: Object.assign(Object.create(null), {
-    interface: "mode:union",
-    name: "Application",
-    behavior: "node",
-    ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"]
-  }),
-  refDefinitions: Object.assign(Object.create(null), {
-    vulnerabilities: {
-      singular: false,
-      graphqlType: "Vulnerability",
-      sourceGraphqlType: undefined,
-      extensions: {
-        via: undefined,
-        tags: {
-          behavior: undefined
-        }
-      }
-    },
-    owner: {
-      singular: true,
-      graphqlType: "PersonOrOrganization",
-      sourceGraphqlType: undefined,
-      extensions: {
-        via: undefined,
-        tags: {
-          behavior: undefined
-        }
-      }
-    }
-  })
-};
-const parts25 = ["polymorphic", "applications"];
-const ApplicationIdentifier = sql.identifier(...parts25);
-const ApplicationCodecSpec = {
-  name: "Application",
-  identifier: ApplicationIdentifier,
-  attributes: ApplicationAttributes,
-  description: undefined,
-  extensions: extensions25,
-  executor: executor_mainPgExecutor
-};
 const VulnerabilityAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -2191,54 +2056,6 @@ const VulnerabilityAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions26 = {
-  isTableLike: false,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "vulnerabilities"
-  },
-  tags: Object.assign(Object.create(null), {
-    interface: "mode:union",
-    name: "Vulnerability",
-    behavior: "node",
-    ref: ["applications to:Application plural", "owners to:PersonOrOrganization plural"]
-  }),
-  refDefinitions: Object.assign(Object.create(null), {
-    applications: {
-      singular: false,
-      graphqlType: "Application",
-      sourceGraphqlType: undefined,
-      extensions: {
-        via: undefined,
-        tags: {
-          behavior: undefined
-        }
-      }
-    },
-    owners: {
-      singular: false,
-      graphqlType: "PersonOrOrganization",
-      sourceGraphqlType: undefined,
-      extensions: {
-        via: undefined,
-        tags: {
-          behavior: undefined
-        }
-      }
-    }
-  })
-};
-const parts26 = ["polymorphic", "vulnerabilities"];
-const VulnerabilityIdentifier = sql.identifier(...parts26);
-const VulnerabilityCodecSpec = {
-  name: "Vulnerability",
-  identifier: VulnerabilityIdentifier,
-  attributes: VulnerabilityAttributes,
-  description: undefined,
-  extensions: extensions26,
-  executor: executor_mainPgExecutor
-};
 const ZeroImplementationAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -2259,41 +2076,6 @@ const ZeroImplementationAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions27 = {
-  isTableLike: false,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "zero_implementation"
-  },
-  tags: Object.assign(Object.create(null), {
-    interface: "mode:union",
-    name: "ZeroImplementation",
-    behavior: "node"
-  })
-};
-const parts27 = ["polymorphic", "zero_implementation"];
-const ZeroImplementationIdentifier = sql.identifier(...parts27);
-const ZeroImplementationCodecSpec = {
-  name: "ZeroImplementation",
-  identifier: ZeroImplementationIdentifier,
-  attributes: ZeroImplementationAttributes,
-  description: undefined,
-  extensions: extensions27,
-  executor: executor_mainPgExecutor
-};
-const extensions28 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "aws_application_first_party_vulnerabilities"
-  },
-  tags: {
-    omit: true,
-    behavior: extensions.tags.behavior
-  }
-};
 const registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws_application_first_party_vulnerabilities = {
   executor: executor_mainPgExecutor,
   name: "aws_application_first_party_vulnerabilities",
@@ -2310,110 +2092,104 @@ const registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws
   }],
   isVirtual: false,
   description: undefined,
-  extensions: extensions28
-};
-const extensions29 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "aws_application_third_party_vulnerabilities"
-  },
-  tags: {
-    omit: true,
-    behavior: extensions2.tags.behavior
-  }
-};
-const uniques2 = [{
-  isPrimary: true,
-  attributes: ["aws_application_id", "third_party_vulnerability_id"],
-  description: undefined,
   extensions: {
-    tags: Object.create(null)
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "aws_application_first_party_vulnerabilities"
+    },
+    tags: {
+      omit: true,
+      behavior: extensions.tags.behavior
+    }
   }
-}];
+};
 const registryConfig_pgResources_aws_application_third_party_vulnerabilities_aws_application_third_party_vulnerabilities = {
   executor: executor_mainPgExecutor,
   name: "aws_application_third_party_vulnerabilities",
   identifier: "main.polymorphic.aws_application_third_party_vulnerabilities",
   from: awsApplicationThirdPartyVulnerabilitiesCodec.sqlType,
   codec: awsApplicationThirdPartyVulnerabilitiesCodec,
-  uniques: uniques2,
+  uniques: [{
+    isPrimary: true,
+    attributes: ["aws_application_id", "third_party_vulnerability_id"],
+    description: undefined,
+    extensions: {
+      tags: Object.create(null)
+    }
+  }],
   isVirtual: false,
   description: undefined,
-  extensions: extensions29
-};
-const extensions30 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "gcp_application_first_party_vulnerabilities"
-  },
-  tags: {
-    omit: true,
-    behavior: extensions3.tags.behavior
-  }
-};
-const uniques3 = [{
-  isPrimary: true,
-  attributes: ["gcp_application_id", "first_party_vulnerability_id"],
-  description: undefined,
   extensions: {
-    tags: Object.create(null)
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "aws_application_third_party_vulnerabilities"
+    },
+    tags: {
+      omit: true,
+      behavior: extensions2.tags.behavior
+    }
   }
-}];
+};
 const registryConfig_pgResources_gcp_application_first_party_vulnerabilities_gcp_application_first_party_vulnerabilities = {
   executor: executor_mainPgExecutor,
   name: "gcp_application_first_party_vulnerabilities",
   identifier: "main.polymorphic.gcp_application_first_party_vulnerabilities",
   from: gcpApplicationFirstPartyVulnerabilitiesCodec.sqlType,
   codec: gcpApplicationFirstPartyVulnerabilitiesCodec,
-  uniques: uniques3,
+  uniques: [{
+    isPrimary: true,
+    attributes: ["gcp_application_id", "first_party_vulnerability_id"],
+    description: undefined,
+    extensions: {
+      tags: Object.create(null)
+    }
+  }],
   isVirtual: false,
   description: undefined,
-  extensions: extensions30
-};
-const extensions31 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "gcp_application_third_party_vulnerabilities"
-  },
-  tags: {
-    omit: true,
-    behavior: extensions4.tags.behavior
-  }
-};
-const uniques4 = [{
-  isPrimary: true,
-  attributes: ["gcp_application_id", "third_party_vulnerability_id"],
-  description: undefined,
   extensions: {
-    tags: Object.create(null)
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "gcp_application_first_party_vulnerabilities"
+    },
+    tags: {
+      omit: true,
+      behavior: extensions3.tags.behavior
+    }
   }
-}];
+};
 const registryConfig_pgResources_gcp_application_third_party_vulnerabilities_gcp_application_third_party_vulnerabilities = {
   executor: executor_mainPgExecutor,
   name: "gcp_application_third_party_vulnerabilities",
   identifier: "main.polymorphic.gcp_application_third_party_vulnerabilities",
   from: gcpApplicationThirdPartyVulnerabilitiesCodec.sqlType,
   codec: gcpApplicationThirdPartyVulnerabilitiesCodec,
-  uniques: uniques4,
+  uniques: [{
+    isPrimary: true,
+    attributes: ["gcp_application_id", "third_party_vulnerability_id"],
+    description: undefined,
+    extensions: {
+      tags: Object.create(null)
+    }
+  }],
   isVirtual: false,
   description: undefined,
-  extensions: extensions31
-};
-const extensions32 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "organizations"
-  },
-  tags: {
-    unionMember: "PersonOrOrganization"
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "gcp_application_third_party_vulnerabilities"
+    },
+    tags: {
+      omit: true,
+      behavior: extensions4.tags.behavior
+    }
   }
 };
 const uniques5 = [{
@@ -2440,19 +2216,16 @@ const registryConfig_pgResources_organizations_organizations = {
   uniques: uniques5,
   isVirtual: false,
   description: undefined,
-  extensions: extensions32
-};
-const extensions33 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "people"
-  },
-  tags: {
-    unionMember: "PersonOrOrganization",
-    ref: "applications to:Application",
-    refVia: extensions6.tags.refVia
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "organizations"
+    },
+    tags: {
+      unionMember: "PersonOrOrganization"
+    }
   }
 };
 const uniques6 = [{
@@ -2479,47 +2252,48 @@ const registryConfig_pgResources_people_people = {
   uniques: uniques6,
   isVirtual: false,
   description: undefined,
-  extensions: extensions33
-};
-const extensions34 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "priorities"
-  },
-  tags: {
-    omit: "create,update,delete,filter,order",
-    behavior: extensions7.tags.behavior
-  }
-};
-const uniques7 = [{
-  isPrimary: true,
-  attributes: ["id"],
-  description: undefined,
   extensions: {
-    tags: Object.create(null)
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "people"
+    },
+    tags: {
+      unionMember: "PersonOrOrganization",
+      ref: "applications to:Application",
+      refVia: extensions6.tags.refVia
+    }
   }
-}];
+};
 const registryConfig_pgResources_priorities_priorities = {
   executor: executor_mainPgExecutor,
   name: "priorities",
   identifier: "main.polymorphic.priorities",
   from: prioritiesCodec.sqlType,
   codec: prioritiesCodec,
-  uniques: uniques7,
+  uniques: [{
+    isPrimary: true,
+    attributes: ["id"],
+    description: undefined,
+    extensions: {
+      tags: Object.create(null)
+    }
+  }],
   isVirtual: false,
   description: undefined,
-  extensions: extensions34
-};
-const extensions35 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "relational_checklists"
-  },
-  tags: {}
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "priorities"
+    },
+    tags: {
+      omit: "create,update,delete,filter,order",
+      behavior: extensions7.tags.behavior
+    }
+  }
 };
 const uniques8 = [{
   isPrimary: true,
@@ -2538,16 +2312,15 @@ const registryConfig_pgResources_relational_checklists_relational_checklists = {
   uniques: uniques8,
   isVirtual: false,
   description: undefined,
-  extensions: extensions35
-};
-const extensions36 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "relational_item_relation_composite_pks"
-  },
-  tags: {}
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_checklists"
+    },
+    tags: {}
+  }
 };
 const uniques9 = [{
   isPrimary: true,
@@ -2566,16 +2339,15 @@ const registryConfig_pgResources_relational_item_relation_composite_pks_relation
   uniques: uniques9,
   isVirtual: false,
   description: undefined,
-  extensions: extensions36
-};
-const extensions37 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "relational_topics"
-  },
-  tags: {}
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_item_relation_composite_pks"
+    },
+    tags: {}
+  }
 };
 const uniques10 = [{
   isPrimary: true,
@@ -2594,16 +2366,15 @@ const registryConfig_pgResources_relational_topics_relational_topics = {
   uniques: uniques10,
   isVirtual: false,
   description: undefined,
-  extensions: extensions37
-};
-const extensions38 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "single_table_item_relation_composite_pks"
-  },
-  tags: {}
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_topics"
+    },
+    tags: {}
+  }
 };
 const uniques11 = [{
   isPrimary: true,
@@ -2622,16 +2393,15 @@ const registryConfig_pgResources_single_table_item_relation_composite_pks_single
   uniques: uniques11,
   isVirtual: false,
   description: undefined,
-  extensions: extensions38
-};
-const extensions39 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "relational_checklist_items"
-  },
-  tags: {}
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "single_table_item_relation_composite_pks"
+    },
+    tags: {}
+  }
 };
 const uniques12 = [{
   isPrimary: true,
@@ -2650,16 +2420,15 @@ const registryConfig_pgResources_relational_checklist_items_relational_checklist
   uniques: uniques12,
   isVirtual: false,
   description: undefined,
-  extensions: extensions39
-};
-const extensions40 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "relational_dividers"
-  },
-  tags: {}
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_checklist_items"
+    },
+    tags: {}
+  }
 };
 const uniques13 = [{
   isPrimary: true,
@@ -2678,16 +2447,15 @@ const registryConfig_pgResources_relational_dividers_relational_dividers = {
   uniques: uniques13,
   isVirtual: false,
   description: undefined,
-  extensions: extensions40
-};
-const extensions41 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "relational_item_relations"
-  },
-  tags: {}
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_dividers"
+    },
+    tags: {}
+  }
 };
 const uniques14 = [{
   isPrimary: true,
@@ -2713,16 +2481,15 @@ const registryConfig_pgResources_relational_item_relations_relational_item_relat
   uniques: uniques14,
   isVirtual: false,
   description: undefined,
-  extensions: extensions41
-};
-const extensions42 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "single_table_item_relations"
-  },
-  tags: {}
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_item_relations"
+    },
+    tags: {}
+  }
 };
 const uniques15 = [{
   isPrimary: true,
@@ -2748,18 +2515,14 @@ const registryConfig_pgResources_single_table_item_relations_single_table_item_r
   uniques: uniques15,
   isVirtual: false,
   description: undefined,
-  extensions: extensions42
-};
-const extensions43 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "log_entries"
-  },
-  tags: {
-    ref: "author to:PersonOrOrganization singular",
-    refVia: extensions17.tags.refVia
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "single_table_item_relations"
+    },
+    tags: {}
   }
 };
 const uniques16 = [{
@@ -2779,16 +2542,18 @@ const registryConfig_pgResources_log_entries_log_entries = {
   uniques: uniques16,
   isVirtual: false,
   description: undefined,
-  extensions: extensions43
-};
-const extensions44 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "relational_posts"
-  },
-  tags: {}
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "log_entries"
+    },
+    tags: {
+      ref: "author to:PersonOrOrganization singular",
+      refVia: extensions17.tags.refVia
+    }
+  }
 };
 const uniques17 = [{
   isPrimary: true,
@@ -2807,19 +2572,14 @@ const registryConfig_pgResources_relational_posts_relational_posts = {
   uniques: uniques17,
   isVirtual: false,
   description: undefined,
-  extensions: extensions44
-};
-const extensions45 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "first_party_vulnerabilities"
-  },
-  tags: {
-    implements: "Vulnerability",
-    ref: extensions19.tags.ref,
-    refVia: extensions19.tags.refVia
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_posts"
+    },
+    tags: {}
   }
 };
 const uniques18 = [{
@@ -2839,19 +2599,18 @@ const registryConfig_pgResources_first_party_vulnerabilities_first_party_vulnera
   uniques: uniques18,
   isVirtual: false,
   description: undefined,
-  extensions: extensions45
-};
-const extensions46 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "third_party_vulnerabilities"
-  },
-  tags: {
-    implements: "Vulnerability",
-    ref: extensions20.tags.ref,
-    refVia: extensions20.tags.refVia
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "first_party_vulnerabilities"
+    },
+    tags: {
+      implements: "Vulnerability",
+      ref: extensions19.tags.ref,
+      refVia: extensions19.tags.refVia
+    }
   }
 };
 const uniques19 = [{
@@ -2871,19 +2630,18 @@ const registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnera
   uniques: uniques19,
   isVirtual: false,
   description: undefined,
-  extensions: extensions46
-};
-const extensions47 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "aws_applications"
-  },
-  tags: {
-    implements: "Application",
-    ref: extensions21.tags.ref,
-    refVia: extensions21.tags.refVia
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "third_party_vulnerabilities"
+    },
+    tags: {
+      implements: "Vulnerability",
+      ref: extensions20.tags.ref,
+      refVia: extensions20.tags.refVia
+    }
   }
 };
 const uniques20 = [{
@@ -2903,19 +2661,18 @@ const registryConfig_pgResources_aws_applications_aws_applications = {
   uniques: uniques20,
   isVirtual: false,
   description: undefined,
-  extensions: extensions47
-};
-const extensions48 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "gcp_applications"
-  },
-  tags: {
-    implements: "Application",
-    ref: extensions22.tags.ref,
-    refVia: extensions22.tags.refVia
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "aws_applications"
+    },
+    tags: {
+      implements: "Application",
+      ref: extensions21.tags.ref,
+      refVia: extensions21.tags.refVia
+    }
   }
 };
 const uniques21 = [{
@@ -2935,34 +2692,21 @@ const registryConfig_pgResources_gcp_applications_gcp_applications = {
   uniques: uniques21,
   isVirtual: false,
   description: undefined,
-  extensions: extensions48
-};
-const extensions49 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "custom_delete_relational_item"
-  },
-  tags: {
-    arg0variant: "nodeId",
-    behavior: ["-queryField mutationField -typeField", "-filter -order"]
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "gcp_applications"
+    },
+    tags: {
+      implements: "Application",
+      ref: extensions22.tags.ref,
+      refVia: extensions22.tags.refVia
+    }
   }
 };
-const parts28 = ["polymorphic", "custom_delete_relational_item"];
-const sqlIdent2 = sql.identifier(...parts28);
-const extensions50 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "single_table_items"
-  },
-  tags: {
-    interface: "mode:single type:type",
-    type: extensions23.tags.type,
-    ref: extensions23.tags.ref
-  }
-};
+const sqlIdent2 = sql.identifier("polymorphic", "custom_delete_relational_item");
 const uniques22 = [{
   isPrimary: true,
   attributes: ["id"],
@@ -2980,74 +2724,22 @@ const registryConfig_pgResources_single_table_items_single_table_items = {
   uniques: uniques22,
   isVirtual: false,
   description: undefined,
-  extensions: extensions50
-};
-const parts29 = ["polymorphic", "all_single_tables"];
-const sqlIdent3 = sql.identifier(...parts29);
-const options_all_single_tables = {
-  name: "all_single_tables",
-  identifier: "main.polymorphic.all_single_tables()",
-  from(...args) {
-    return sql`${sqlIdent3}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [],
-  returnsArray: false,
-  returnsSetof: true,
-  isMutation: false,
   extensions: {
+    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "polymorphic",
-      name: "all_single_tables"
+      name: "single_table_items"
     },
     tags: {
-      behavior: ["queryField -mutationField -typeField", "-filter -order"]
+      interface: "mode:single type:type",
+      type: extensions23.tags.type,
+      ref: extensions23.tags.ref
     }
-  },
-  description: undefined
-};
-const parts30 = ["polymorphic", "get_single_table_topic_by_id"];
-const sqlIdent4 = sql.identifier(...parts30);
-const options_get_single_table_topic_by_id = {
-  name: "get_single_table_topic_by_id",
-  identifier: "main.polymorphic.get_single_table_topic_by_id(int4)",
-  from(...args) {
-    return sql`${sqlIdent4}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "id",
-    required: true,
-    notNull: false,
-    codec: TYPES.int
-  }],
-  returnsArray: false,
-  returnsSetof: false,
-  isMutation: false,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "get_single_table_topic_by_id"
-    },
-    tags: {
-      returnType: "SingleTableTopic",
-      behavior: ["queryField -mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const extensions51 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "relational_items"
-  },
-  tags: {
-    interface: "mode:relational",
-    type: extensions24.tags.type
   }
 };
+const sqlIdent3 = sql.identifier("polymorphic", "all_single_tables");
+const sqlIdent4 = sql.identifier("polymorphic", "get_single_table_topic_by_id");
 const uniques23 = [{
   isPrimary: true,
   attributes: ["id"],
@@ -3065,7 +2757,18 @@ const registryConfig_pgResources_relational_items_relational_items = {
   uniques: uniques23,
   isVirtual: false,
   description: undefined,
-  extensions: extensions51
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_items"
+    },
+    tags: {
+      interface: "mode:relational",
+      type: extensions24.tags.type
+    }
+  }
 };
 const registryConfig = {
   pgCodecs: Object.assign(Object.create(null), {
@@ -3101,9 +2804,116 @@ const registryConfig = {
     relationalItems: relationalItemsCodec,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
-    Application: recordCodec(ApplicationCodecSpec),
-    Vulnerability: recordCodec(VulnerabilityCodecSpec),
-    ZeroImplementation: recordCodec(ZeroImplementationCodecSpec)
+    Application: recordCodec({
+      name: "Application",
+      identifier: sql.identifier("polymorphic", "applications"),
+      attributes: ApplicationAttributes,
+      description: undefined,
+      extensions: {
+        isTableLike: false,
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "applications"
+        },
+        tags: Object.assign(Object.create(null), {
+          interface: "mode:union",
+          name: "Application",
+          behavior: "node",
+          ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"]
+        }),
+        refDefinitions: Object.assign(Object.create(null), {
+          vulnerabilities: {
+            singular: false,
+            graphqlType: "Vulnerability",
+            sourceGraphqlType: undefined,
+            extensions: {
+              via: undefined,
+              tags: {
+                behavior: undefined
+              }
+            }
+          },
+          owner: {
+            singular: true,
+            graphqlType: "PersonOrOrganization",
+            sourceGraphqlType: undefined,
+            extensions: {
+              via: undefined,
+              tags: {
+                behavior: undefined
+              }
+            }
+          }
+        })
+      },
+      executor: executor_mainPgExecutor
+    }),
+    Vulnerability: recordCodec({
+      name: "Vulnerability",
+      identifier: sql.identifier("polymorphic", "vulnerabilities"),
+      attributes: VulnerabilityAttributes,
+      description: undefined,
+      extensions: {
+        isTableLike: false,
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "vulnerabilities"
+        },
+        tags: Object.assign(Object.create(null), {
+          interface: "mode:union",
+          name: "Vulnerability",
+          behavior: "node",
+          ref: ["applications to:Application plural", "owners to:PersonOrOrganization plural"]
+        }),
+        refDefinitions: Object.assign(Object.create(null), {
+          applications: {
+            singular: false,
+            graphqlType: "Application",
+            sourceGraphqlType: undefined,
+            extensions: {
+              via: undefined,
+              tags: {
+                behavior: undefined
+              }
+            }
+          },
+          owners: {
+            singular: false,
+            graphqlType: "PersonOrOrganization",
+            sourceGraphqlType: undefined,
+            extensions: {
+              via: undefined,
+              tags: {
+                behavior: undefined
+              }
+            }
+          }
+        })
+      },
+      executor: executor_mainPgExecutor
+    }),
+    ZeroImplementation: recordCodec({
+      name: "ZeroImplementation",
+      identifier: sql.identifier("polymorphic", "zero_implementation"),
+      attributes: ZeroImplementationAttributes,
+      description: undefined,
+      extensions: {
+        isTableLike: false,
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "zero_implementation"
+        },
+        tags: Object.assign(Object.create(null), {
+          interface: "mode:union",
+          name: "ZeroImplementation",
+          behavior: "node"
+        })
+      },
+      executor: executor_mainPgExecutor
+    })
   }),
   pgResources: Object.assign(Object.create(null), {
     aws_application_first_party_vulnerabilities: registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws_application_first_party_vulnerabilities,
@@ -3147,12 +2957,70 @@ const registryConfig = {
       codec: TYPES.boolean,
       uniques: [],
       isMutation: true,
-      extensions: extensions49,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "custom_delete_relational_item"
+        },
+        tags: {
+          arg0variant: "nodeId",
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
       description: undefined
     },
     single_table_items: registryConfig_pgResources_single_table_items_single_table_items,
-    all_single_tables: PgResource.functionResourceOptions(registryConfig_pgResources_single_table_items_single_table_items, options_all_single_tables),
-    get_single_table_topic_by_id: PgResource.functionResourceOptions(registryConfig_pgResources_single_table_items_single_table_items, options_get_single_table_topic_by_id),
+    all_single_tables: PgResource.functionResourceOptions(registryConfig_pgResources_single_table_items_single_table_items, {
+      name: "all_single_tables",
+      identifier: "main.polymorphic.all_single_tables()",
+      from(...args) {
+        return sql`${sqlIdent3}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsArray: false,
+      returnsSetof: true,
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "all_single_tables"
+        },
+        tags: {
+          behavior: ["queryField -mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
+    get_single_table_topic_by_id: PgResource.functionResourceOptions(registryConfig_pgResources_single_table_items_single_table_items, {
+      name: "get_single_table_topic_by_id",
+      identifier: "main.polymorphic.get_single_table_topic_by_id(int4)",
+      from(...args) {
+        return sql`${sqlIdent4}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "id",
+        required: true,
+        notNull: false,
+        codec: TYPES.int
+      }],
+      returnsArray: false,
+      returnsSetof: false,
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "get_single_table_topic_by_id"
+        },
+        tags: {
+          returnType: "SingleTableTopic",
+          behavior: ["queryField -mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
     relational_items: registryConfig_pgResources_relational_items_relational_items
   }),
   pgRelations: Object.assign(Object.create(null), {
@@ -4245,12 +4113,6 @@ const handler = {
     return obj[0] === "SingleTableTopic";
   }
 };
-function pipeStringDecode(value) {
-  return typeof value === "string" ? value.split("|") : null;
-}
-function pipeStringEncode(value) {
-  return Array.isArray(value) ? value.join("|") : null;
-}
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: {
     name: "raw",
@@ -4264,26 +4126,15 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
   base64JSON: handler_codec_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode: pipeStringEncode,
-    decode: pipeStringDecode
+    encode(value) {
+      return Array.isArray(value) ? value.join("|") : null;
+    },
+    decode(value) {
+      return typeof value === "string" ? value.split("|") : null;
+    }
   }
 });
 const otherSource_peoplePgResource = registry.pgResources["people"];
-function SingleTableTopic_singleTableItemsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableTopic_singleTableItemsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableTopic_singleTableItemsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableTopic_singleTableItemsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableTopic_singleTableItemsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const applyOrderToPlan = ($select, $value, TableOrderByType) => {
   const val = $value.eval();
   if (val == null) {
@@ -4303,67 +4154,7 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
   });
 };
 const otherSource_single_table_item_relationsPgResource = registry.pgResources["single_table_item_relations"];
-function SingleTableTopic_singleTableItemRelationsByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableTopic_singleTableItemRelationsByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableTopic_singleTableItemRelationsByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableTopic_singleTableItemRelationsByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableTopic_singleTableItemRelationsByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function SingleTableTopic_singleTableItemRelationsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableTopic_singleTableItemRelationsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableTopic_singleTableItemRelationsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableTopic_singleTableItemRelationsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableTopic_singleTableItemRelationsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const otherSource_single_table_item_relation_composite_pksPgResource = registry.pgResources["single_table_item_relation_composite_pks"];
-function SingleTableTopic_singleTableItemRelationCompositePksByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableTopic_singleTableItemRelationCompositePksByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableTopic_singleTableItemRelationCompositePksByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableTopic_singleTableItemRelationCompositePksByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableTopic_singleTableItemRelationCompositePksByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function SingleTableTopic_singleTableItemRelationCompositePksByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableTopic_singleTableItemRelationCompositePksByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableTopic_singleTableItemRelationCompositePksByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableTopic_singleTableItemRelationCompositePksByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableTopic_singleTableItemRelationCompositePksByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const handler2 = {
   typeName: "Person",
   codec: handler_codec_base64JSON,
@@ -4384,84 +4175,9 @@ const handler2 = {
   }
 };
 const otherSource_log_entriesPgResource = registry.pgResources["log_entries"];
-function Person_logEntriesByPersonId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Person_logEntriesByPersonId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Person_logEntriesByPersonId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Person_logEntriesByPersonId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Person_logEntriesByPersonId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Person_singleTableItemsByAuthorId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Person_singleTableItemsByAuthorId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Person_singleTableItemsByAuthorId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Person_singleTableItemsByAuthorId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Person_singleTableItemsByAuthorId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const otherSource_relational_itemsPgResource = registry.pgResources["relational_items"];
-function Person_relationalItemsByAuthorId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Person_relationalItemsByAuthorId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Person_relationalItemsByAuthorId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Person_relationalItemsByAuthorId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Person_relationalItemsByAuthorId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const otherSource_aws_applicationsPgResource = registry.pgResources["aws_applications"];
-function Person_awsApplicationsByPersonId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Person_awsApplicationsByPersonId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Person_awsApplicationsByPersonId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Person_awsApplicationsByPersonId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Person_awsApplicationsByPersonId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const otherSource_gcp_applicationsPgResource = registry.pgResources["gcp_applications"];
-function Person_gcpApplicationsByPersonId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Person_gcpApplicationsByPersonId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Person_gcpApplicationsByPersonId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Person_gcpApplicationsByPersonId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Person_gcpApplicationsByPersonId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const members = [{
   resource: otherSource_aws_applicationsPgResource,
   typeName: "AwsApplication",
@@ -4498,31 +4214,6 @@ const resourceByTypeName = Object.assign(Object.create(null), {
   AwsApplication: otherSource_aws_applicationsPgResource,
   GcpApplication: otherSource_gcp_applicationsPgResource
 });
-function Person_applications_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Person_applications_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Person_applications_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Person_applications_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Person_applications_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function LogEntriesConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function LogEntriesConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function LogEntriesConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
 const handler3 = {
   typeName: "LogEntry",
   codec: handler_codec_base64JSON,
@@ -4599,61 +4290,6 @@ const handler4 = {
     return obj[0] === "organizations";
   }
 };
-function Organization_logEntriesByOrganizationId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Organization_logEntriesByOrganizationId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Organization_logEntriesByOrganizationId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Organization_logEntriesByOrganizationId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Organization_logEntriesByOrganizationId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Organization_awsApplicationsByOrganizationId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Organization_awsApplicationsByOrganizationId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Organization_awsApplicationsByOrganizationId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Organization_awsApplicationsByOrganizationId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Organization_awsApplicationsByOrganizationId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Organization_gcpApplicationsByOrganizationId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Organization_gcpApplicationsByOrganizationId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Organization_gcpApplicationsByOrganizationId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Organization_gcpApplicationsByOrganizationId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Organization_gcpApplicationsByOrganizationId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function AwsApplicationsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function AwsApplicationsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function AwsApplicationsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
 const handler5 = {
   typeName: "AwsApplication",
   codec: handler_codec_base64JSON,
@@ -4729,21 +4365,6 @@ const resourceByTypeName3 = Object.assign(Object.create(null), {
   FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
   ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
 });
-function AwsApplication_vulnerabilities_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function AwsApplication_vulnerabilities_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function AwsApplication_vulnerabilities_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function AwsApplication_vulnerabilities_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function AwsApplication_vulnerabilities_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const attributes2 = {};
 const members4 = [{
   resource: otherSource_peoplePgResource,
@@ -4781,52 +4402,6 @@ const resourceByTypeName4 = Object.assign(Object.create(null), {
   Person: otherSource_peoplePgResource,
   Organization: otherSource_organizationsPgResource
 });
-function VulnerabilitiesConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function VulnerabilitiesConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function VulnerabilitiesConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function ApplicationsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function ApplicationsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function ApplicationsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function PageInfo_hasNextPagePlan($pageInfo) {
-  return $pageInfo.hasNextPage();
-}
-function PageInfo_hasPreviousPagePlan($pageInfo) {
-  return $pageInfo.hasPreviousPage();
-}
-function PersonOrOrganizationConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function PersonOrOrganizationConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function PersonOrOrganizationConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function GcpApplicationsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function GcpApplicationsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function GcpApplicationsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
 const handler6 = {
   typeName: "GcpApplication",
   codec: handler_codec_base64JSON,
@@ -4900,21 +4475,6 @@ const resourceByTypeName5 = Object.assign(Object.create(null), {
   FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
   ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
 });
-function GcpApplication_vulnerabilities_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function GcpApplication_vulnerabilities_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function GcpApplication_vulnerabilities_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function GcpApplication_vulnerabilities_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function GcpApplication_vulnerabilities_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const attributes3 = {};
 const members6 = [{
   resource: otherSource_peoplePgResource,
@@ -4952,36 +4512,6 @@ const resourceByTypeName6 = Object.assign(Object.create(null), {
   Person: otherSource_peoplePgResource,
   Organization: otherSource_organizationsPgResource
 });
-function SingleTableItemsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function SingleTableItemsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function SingleTableItemsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function RelationalItemsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function RelationalItemsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function RelationalItemsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function RelationalItemRelationsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function RelationalItemRelationsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function RelationalItemRelationsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
 const pgResource_relational_item_relationsPgResource = registry.pgResources["relational_item_relations"];
 const handler7 = {
   typeName: "RelationalItemRelation",
@@ -5002,16 +4532,6 @@ const handler7 = {
     return obj[0] === "relational_item_relations";
   }
 };
-function RelationalItemRelationCompositePksConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function RelationalItemRelationCompositePksConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function RelationalItemRelationCompositePksConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
 const pgResource_relational_item_relation_composite_pksPgResource = registry.pgResources["relational_item_relation_composite_pks"];
 const handler8 = {
   typeName: "RelationalItemRelationCompositePk",
@@ -5033,16 +4553,6 @@ const handler8 = {
     return obj[0] === "relational_item_relation_composite_pks";
   }
 };
-function SingleTableItemRelationsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function SingleTableItemRelationsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function SingleTableItemRelationsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
 const handler9 = {
   typeName: "SingleTableItemRelation",
   codec: handler_codec_base64JSON,
@@ -5062,16 +4572,6 @@ const handler9 = {
     return obj[0] === "single_table_item_relations";
   }
 };
-function SingleTableItemRelationCompositePksConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function SingleTableItemRelationCompositePksConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function SingleTableItemRelationCompositePksConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
 const handler10 = {
   typeName: "SingleTableItemRelationCompositePk",
   codec: handler_codec_base64JSON,
@@ -5112,81 +4612,6 @@ const handler11 = {
   }
 };
 const otherSource_prioritiesPgResource = registry.pgResources["priorities"];
-function SingleTablePost_singleTableItemsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTablePost_singleTableItemsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTablePost_singleTableItemsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTablePost_singleTableItemsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTablePost_singleTableItemsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function SingleTablePost_singleTableItemRelationsByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTablePost_singleTableItemRelationsByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTablePost_singleTableItemRelationsByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTablePost_singleTableItemRelationsByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTablePost_singleTableItemRelationsByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function SingleTablePost_singleTableItemRelationsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTablePost_singleTableItemRelationsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTablePost_singleTableItemRelationsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTablePost_singleTableItemRelationsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTablePost_singleTableItemRelationsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function SingleTablePost_singleTableItemRelationCompositePksByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTablePost_singleTableItemRelationCompositePksByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTablePost_singleTableItemRelationCompositePksByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTablePost_singleTableItemRelationCompositePksByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTablePost_singleTableItemRelationCompositePksByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function SingleTablePost_singleTableItemRelationCompositePksByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTablePost_singleTableItemRelationCompositePksByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTablePost_singleTableItemRelationCompositePksByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTablePost_singleTableItemRelationCompositePksByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTablePost_singleTableItemRelationCompositePksByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const handler12 = {
   typeName: "Priority",
   codec: handler_codec_base64JSON,
@@ -5206,21 +4631,6 @@ const handler12 = {
     return obj[0] === "priorities";
   }
 };
-function Priority_singleTableItemsByPriorityId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Priority_singleTableItemsByPriorityId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Priority_singleTableItemsByPriorityId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Priority_singleTableItemsByPriorityId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Priority_singleTableItemsByPriorityId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const handler13 = {
   typeName: "SingleTableDivider",
   codec: handler_codec_base64JSON,
@@ -5240,81 +4650,6 @@ const handler13 = {
     return obj[0] === "SingleTableDivider";
   }
 };
-function SingleTableDivider_singleTableItemsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableDivider_singleTableItemsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableDivider_singleTableItemsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableDivider_singleTableItemsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableDivider_singleTableItemsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationsByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationsByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationsByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationsByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationsByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationCompositePksByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationCompositePksByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationCompositePksByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationCompositePksByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationCompositePksByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationCompositePksByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationCompositePksByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationCompositePksByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationCompositePksByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableDivider_singleTableItemRelationCompositePksByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const handler14 = {
   typeName: "SingleTableChecklist",
   codec: handler_codec_base64JSON,
@@ -5334,81 +4669,6 @@ const handler14 = {
     return obj[0] === "SingleTableChecklist";
   }
 };
-function SingleTableChecklist_singleTableItemsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableChecklist_singleTableItemsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationsByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationsByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationsByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationsByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationsByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationCompositePksByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationCompositePksByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationCompositePksByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationCompositePksByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationCompositePksByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationCompositePksByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationCompositePksByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationCompositePksByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationCompositePksByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableChecklist_singleTableItemRelationCompositePksByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const handler15 = {
   typeName: "SingleTableChecklistItem",
   codec: handler_codec_base64JSON,
@@ -5428,81 +4688,6 @@ const handler15 = {
     return obj[0] === "SingleTableChecklistItem";
   }
 };
-function SingleTableChecklistItem_singleTableItemsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationsByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationsByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationsByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationsByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationsByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationCompositePksByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationCompositePksByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationCompositePksByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationCompositePksByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationCompositePksByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationCompositePksByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationCompositePksByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationCompositePksByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationCompositePksByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function SingleTableChecklistItem_singleTableItemRelationCompositePksByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const pgResource_relational_topicsPgResource = registry.pgResources["relational_topics"];
 const handler16 = {
   typeName: "RelationalTopic",
@@ -5523,100 +4708,10 @@ const handler16 = {
     return obj[0] === "relational_topics";
   }
 };
-function RelationalTopic_relationalItemsByRootTopicId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalTopic_relationalItemsByRootTopicId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalTopic_relationalItemsByRootTopicId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalTopic_relationalItemsByRootTopicId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalTopic_relationalItemsByRootTopicId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalTopic_relationalItemsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalTopic_relationalItemsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalTopic_relationalItemsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalTopic_relationalItemsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalTopic_relationalItemsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const relational_posts_relational_postsPgResource = registry.pgResources["relational_posts"];
 const relational_dividers_relational_dividersPgResource = registry.pgResources["relational_dividers"];
 const relational_checklists_relational_checklistsPgResource = registry.pgResources["relational_checklists"];
 const relational_checklist_items_relational_checklist_itemsPgResource = registry.pgResources["relational_checklist_items"];
-function RelationalTopic_relationalItemRelationsByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalTopic_relationalItemRelationsByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalTopic_relationalItemRelationsByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalTopic_relationalItemRelationsByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalTopic_relationalItemRelationsByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalTopic_relationalItemRelationsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalTopic_relationalItemRelationsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalTopic_relationalItemRelationsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalTopic_relationalItemRelationsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalTopic_relationalItemRelationsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalTopic_relationalItemRelationCompositePksByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalTopic_relationalItemRelationCompositePksByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalTopic_relationalItemRelationCompositePksByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalTopic_relationalItemRelationCompositePksByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalTopic_relationalItemRelationCompositePksByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalTopic_relationalItemRelationCompositePksByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalTopic_relationalItemRelationCompositePksByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalTopic_relationalItemRelationCompositePksByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalTopic_relationalItemRelationCompositePksByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalTopic_relationalItemRelationCompositePksByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const handler17 = {
   typeName: "RelationalPost",
   codec: handler_codec_base64JSON,
@@ -5636,81 +4731,6 @@ const handler17 = {
     return obj[0] === "relational_posts";
   }
 };
-function RelationalPost_relationalItemsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalPost_relationalItemsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalPost_relationalItemsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalPost_relationalItemsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalPost_relationalItemsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalPost_relationalItemRelationsByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalPost_relationalItemRelationsByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalPost_relationalItemRelationsByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalPost_relationalItemRelationsByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalPost_relationalItemRelationsByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalPost_relationalItemRelationsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalPost_relationalItemRelationsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalPost_relationalItemRelationsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalPost_relationalItemRelationsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalPost_relationalItemRelationsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalPost_relationalItemRelationCompositePksByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalPost_relationalItemRelationCompositePksByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalPost_relationalItemRelationCompositePksByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalPost_relationalItemRelationCompositePksByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalPost_relationalItemRelationCompositePksByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalPost_relationalItemRelationCompositePksByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalPost_relationalItemRelationCompositePksByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalPost_relationalItemRelationCompositePksByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalPost_relationalItemRelationCompositePksByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalPost_relationalItemRelationCompositePksByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const handler18 = {
   typeName: "RelationalDivider",
   codec: handler_codec_base64JSON,
@@ -5730,81 +4750,6 @@ const handler18 = {
     return obj[0] === "relational_dividers";
   }
 };
-function RelationalDivider_relationalItemsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalDivider_relationalItemsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalDivider_relationalItemsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalDivider_relationalItemsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalDivider_relationalItemsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalDivider_relationalItemRelationsByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalDivider_relationalItemRelationsByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalDivider_relationalItemRelationsByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalDivider_relationalItemRelationsByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalDivider_relationalItemRelationsByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalDivider_relationalItemRelationsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalDivider_relationalItemRelationsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalDivider_relationalItemRelationsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalDivider_relationalItemRelationsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalDivider_relationalItemRelationsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalDivider_relationalItemRelationCompositePksByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalDivider_relationalItemRelationCompositePksByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalDivider_relationalItemRelationCompositePksByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalDivider_relationalItemRelationCompositePksByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalDivider_relationalItemRelationCompositePksByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalDivider_relationalItemRelationCompositePksByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalDivider_relationalItemRelationCompositePksByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalDivider_relationalItemRelationCompositePksByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalDivider_relationalItemRelationCompositePksByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalDivider_relationalItemRelationCompositePksByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const handler19 = {
   typeName: "RelationalChecklist",
   codec: handler_codec_base64JSON,
@@ -5824,81 +4769,6 @@ const handler19 = {
     return obj[0] === "relational_checklists";
   }
 };
-function RelationalChecklist_relationalItemsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalChecklist_relationalItemsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalChecklist_relationalItemsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalChecklist_relationalItemsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalChecklist_relationalItemsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalChecklist_relationalItemRelationsByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalChecklist_relationalItemRelationsByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalChecklist_relationalItemRelationsByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalChecklist_relationalItemRelationsByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalChecklist_relationalItemRelationsByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalChecklist_relationalItemRelationsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalChecklist_relationalItemRelationsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalChecklist_relationalItemRelationsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalChecklist_relationalItemRelationsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalChecklist_relationalItemRelationsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalChecklist_relationalItemRelationCompositePksByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalChecklist_relationalItemRelationCompositePksByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalChecklist_relationalItemRelationCompositePksByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalChecklist_relationalItemRelationCompositePksByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalChecklist_relationalItemRelationCompositePksByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalChecklist_relationalItemRelationCompositePksByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalChecklist_relationalItemRelationCompositePksByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalChecklist_relationalItemRelationCompositePksByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalChecklist_relationalItemRelationCompositePksByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalChecklist_relationalItemRelationCompositePksByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const handler20 = {
   typeName: "RelationalChecklistItem",
   codec: handler_codec_base64JSON,
@@ -5918,84 +4788,6 @@ const handler20 = {
     return obj[0] === "relational_checklist_items";
   }
 };
-function RelationalChecklistItem_relationalItemsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalChecklistItem_relationalItemsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationsByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationsByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationsByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationsByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationsByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationsByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationsByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationsByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationsByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationsByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationCompositePksByChildId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationCompositePksByChildId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationCompositePksByChildId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationCompositePksByChildId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationCompositePksByChildId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationCompositePksByParentId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationCompositePksByParentId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationCompositePksByParentId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationCompositePksByParentId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function RelationalChecklistItem_relationalItemRelationCompositePksByParentId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_queryPlan() {
-  return rootValue();
-}
 const handler21 = {
   typeName: "Query",
   codec: nodeIdCodecs.raw,
@@ -6123,25 +4915,6 @@ const getSelectPlanFromParentAndArgs = ($root, args, _info) => {
   const selectArgs = makeArgs(args);
   return resource_all_single_tablesPgResource.execute(selectArgs);
 };
-function Query_allSingleTablesPlan($parent, args, info) {
-  const $select = getSelectPlanFromParentAndArgs($parent, args, info);
-  return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
-}
-function Query_allSingleTables_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allSingleTables_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allSingleTables_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allSingleTables_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allSingleTables_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const argDetailsSimple2 = [{
   graphqlArgName: "id",
   postgresArgName: "id",
@@ -6399,21 +5172,6 @@ const resourceByTypeName7 = Object.assign(Object.create(null), {
   FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
   ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
 });
-function Query_allVulnerabilities_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allVulnerabilities_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allVulnerabilities_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allVulnerabilities_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allVulnerabilities_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const members8 = [{
   resource: otherSource_aws_applicationsPgResource,
   typeName: "AwsApplication"
@@ -6425,323 +5183,8 @@ const resourceByTypeName8 = Object.assign(Object.create(null), {
   AwsApplication: otherSource_aws_applicationsPgResource,
   GcpApplication: otherSource_gcp_applicationsPgResource
 });
-function Query_allApplications_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allApplications_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allApplications_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allApplications_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allApplications_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const members9 = [];
 const resourceByTypeName9 = Object.create(null);
-function Query_allZeroImplementations_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allZeroImplementations_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allZeroImplementations_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allZeroImplementations_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allZeroImplementations_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allOrganizations_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allOrganizations_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allOrganizations_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allOrganizations_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allOrganizations_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allPeople_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allPeople_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allPeople_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allPeople_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allPeople_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allPriorities_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allPriorities_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allPriorities_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allPriorities_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allPriorities_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allRelationalChecklists_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allRelationalChecklists_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allRelationalChecklists_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allRelationalChecklists_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allRelationalChecklists_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allRelationalItemRelationCompositePks_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allRelationalItemRelationCompositePks_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allRelationalItemRelationCompositePks_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allRelationalItemRelationCompositePks_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allRelationalItemRelationCompositePks_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allRelationalTopics_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allRelationalTopics_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allRelationalTopics_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allRelationalTopics_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allRelationalTopics_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allSingleTableItemRelationCompositePks_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allSingleTableItemRelationCompositePks_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allSingleTableItemRelationCompositePks_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allSingleTableItemRelationCompositePks_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allSingleTableItemRelationCompositePks_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allRelationalChecklistItems_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allRelationalChecklistItems_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allRelationalChecklistItems_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allRelationalChecklistItems_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allRelationalChecklistItems_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allRelationalDividers_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allRelationalDividers_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allRelationalDividers_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allRelationalDividers_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allRelationalDividers_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allRelationalItemRelations_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allRelationalItemRelations_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allRelationalItemRelations_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allRelationalItemRelations_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allRelationalItemRelations_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allSingleTableItemRelations_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allSingleTableItemRelations_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allSingleTableItemRelations_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allSingleTableItemRelations_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allSingleTableItemRelations_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allLogEntries_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allLogEntries_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allLogEntries_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allLogEntries_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allLogEntries_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allRelationalPosts_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allRelationalPosts_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allRelationalPosts_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allRelationalPosts_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allRelationalPosts_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allFirstPartyVulnerabilities_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allFirstPartyVulnerabilities_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allFirstPartyVulnerabilities_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allFirstPartyVulnerabilities_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allFirstPartyVulnerabilities_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allThirdPartyVulnerabilities_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allThirdPartyVulnerabilities_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allThirdPartyVulnerabilities_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allThirdPartyVulnerabilities_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allThirdPartyVulnerabilities_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allAwsApplications_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allAwsApplications_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allAwsApplications_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allAwsApplications_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allAwsApplications_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allGcpApplications_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allGcpApplications_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allGcpApplications_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allGcpApplications_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allGcpApplications_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allSingleTableItems_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allSingleTableItems_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allSingleTableItems_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allSingleTableItems_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allSingleTableItems_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allRelationalItems_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allRelationalItems_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allRelationalItems_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allRelationalItems_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allRelationalItems_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const members10 = [{
   resource: members_0_resource_aws_application_first_party_vulnerabilitiesPgResource,
   typeName: "AwsApplication",
@@ -6794,21 +5237,6 @@ const resourceByTypeName10 = Object.assign(Object.create(null), {
   AwsApplication: otherSource_aws_applicationsPgResource,
   GcpApplication: otherSource_gcp_applicationsPgResource
 });
-function FirstPartyVulnerability_applications_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function FirstPartyVulnerability_applications_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function FirstPartyVulnerability_applications_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function FirstPartyVulnerability_applications_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function FirstPartyVulnerability_applications_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const attributes4 = {};
 const members11 = [{
   resource: members_0_resource_aws_application_first_party_vulnerabilitiesPgResource,
@@ -6992,21 +5420,6 @@ const resourceByTypeName12 = Object.assign(Object.create(null), {
   AwsApplication: otherSource_aws_applicationsPgResource,
   GcpApplication: otherSource_gcp_applicationsPgResource
 });
-function ThirdPartyVulnerability_applications_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function ThirdPartyVulnerability_applications_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function ThirdPartyVulnerability_applications_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function ThirdPartyVulnerability_applications_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function ThirdPartyVulnerability_applications_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const attributes5 = {};
 const members13 = [{
   resource: members_1_resource_aws_application_third_party_vulnerabilitiesPgResource,
@@ -7138,116 +5551,6 @@ const resourceByTypeName13 = Object.assign(Object.create(null), {
   Person: otherSource_peoplePgResource,
   Organization: otherSource_organizationsPgResource
 });
-function ZeroImplementationsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function ZeroImplementationsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function ZeroImplementationsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function OrganizationsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function OrganizationsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function OrganizationsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function PeopleConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function PeopleConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function PeopleConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function PrioritiesConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function PrioritiesConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function PrioritiesConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function RelationalChecklistsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function RelationalChecklistsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function RelationalChecklistsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function RelationalTopicsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function RelationalTopicsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function RelationalTopicsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function RelationalChecklistItemsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function RelationalChecklistItemsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function RelationalChecklistItemsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function RelationalDividersConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function RelationalDividersConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function RelationalDividersConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function RelationalPostsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function RelationalPostsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function RelationalPostsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function FirstPartyVulnerabilitiesConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function FirstPartyVulnerabilitiesConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function FirstPartyVulnerabilitiesConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function ThirdPartyVulnerabilitiesConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function ThirdPartyVulnerabilitiesConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function ThirdPartyVulnerabilitiesConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
 const decodeNodeId = makeDecodeNodeId([handler16, handler17, handler18, handler19, handler20]);
 const details = [{
   pkAttributes: uniques10[0].attributes,
@@ -7343,929 +5646,94 @@ const makeArgs3 = (args, path = []) => {
   return selectArgs;
 };
 const resource_custom_delete_relational_itemPgResource = registry.pgResources["custom_delete_relational_item"];
-function Mutation_customDeleteRelationalItem_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createOrganization_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createPerson_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createRelationalItemRelationCompositePk_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createSingleTableItemRelationCompositePk_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createRelationalItemRelation_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createSingleTableItemRelation_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createLogEntry_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createFirstPartyVulnerability_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createThirdPartyVulnerability_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createAwsApplication_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createGcpApplication_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(handler4, $nodeId);
 };
-function Mutation_updateOrganization_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateOrganizationByOrganizationId_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateOrganizationByName_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs2 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(handler2, $nodeId);
 };
-function Mutation_updatePerson_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updatePersonByPersonId_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updatePersonByUsername_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs3 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(handler8, $nodeId);
 };
-function Mutation_updateRelationalItemRelationCompositePk_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateRelationalItemRelationCompositePkByParentIdAndChildId_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs4 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(handler10, $nodeId);
 };
-function Mutation_updateSingleTableItemRelationCompositePk_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateSingleTableItemRelationCompositePkByParentIdAndChildId_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs5 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(handler7, $nodeId);
 };
-function Mutation_updateRelationalItemRelation_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateRelationalItemRelationById_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateRelationalItemRelationByParentIdAndChildId_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs6 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(handler9, $nodeId);
 };
-function Mutation_updateSingleTableItemRelation_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateSingleTableItemRelationById_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateSingleTableItemRelationByParentIdAndChildId_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs7 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(handler3, $nodeId);
 };
-function Mutation_updateLogEntry_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateLogEntryById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs8 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.FirstPartyVulnerability, $nodeId);
 };
-function Mutation_updateFirstPartyVulnerability_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateFirstPartyVulnerabilityById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs9 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.ThirdPartyVulnerability, $nodeId);
 };
-function Mutation_updateThirdPartyVulnerability_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateThirdPartyVulnerabilityById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs10 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(handler5, $nodeId);
 };
-function Mutation_updateAwsApplication_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateAwsApplicationById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs11 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(handler6, $nodeId);
 };
-function Mutation_updateGcpApplication_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateGcpApplicationById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs12 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(handler4, $nodeId);
 };
-function Mutation_deleteOrganization_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteOrganizationByOrganizationId_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteOrganizationByName_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs13 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(handler2, $nodeId);
 };
-function Mutation_deletePerson_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deletePersonByPersonId_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deletePersonByUsername_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs14 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(handler8, $nodeId);
 };
-function Mutation_deleteRelationalItemRelationCompositePk_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteRelationalItemRelationCompositePkByParentIdAndChildId_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs15 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(handler10, $nodeId);
 };
-function Mutation_deleteSingleTableItemRelationCompositePk_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteSingleTableItemRelationCompositePkByParentIdAndChildId_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs16 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(handler7, $nodeId);
 };
-function Mutation_deleteRelationalItemRelation_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteRelationalItemRelationById_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteRelationalItemRelationByParentIdAndChildId_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs17 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(handler9, $nodeId);
 };
-function Mutation_deleteSingleTableItemRelation_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteSingleTableItemRelationById_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteSingleTableItemRelationByParentIdAndChildId_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs18 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(handler3, $nodeId);
 };
-function Mutation_deleteLogEntry_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteLogEntryById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs19 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.FirstPartyVulnerability, $nodeId);
 };
-function Mutation_deleteFirstPartyVulnerability_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteFirstPartyVulnerabilityById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs20 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.ThirdPartyVulnerability, $nodeId);
 };
-function Mutation_deleteThirdPartyVulnerability_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteThirdPartyVulnerabilityById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs21 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(handler5, $nodeId);
 };
-function Mutation_deleteAwsApplication_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteAwsApplicationById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs22 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(handler6, $nodeId);
 };
-function Mutation_deleteGcpApplication_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteGcpApplicationById_input_applyPlan(_, $object) {
-  return $object;
-}
-function CustomDeleteRelationalItemPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function CustomDeleteRelationalItemPayload_queryPlan() {
-  return rootValue();
-}
-function CustomDeleteRelationalItemInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateOrganizationPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateOrganizationPayload_organizationPlan($object) {
-  return $object.get("result");
-}
-function CreateOrganizationPayload_queryPlan() {
-  return rootValue();
-}
-function CreateOrganizationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateOrganizationInput_organization_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreatePersonPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreatePersonPayload_personPlan($object) {
-  return $object.get("result");
-}
-function CreatePersonPayload_queryPlan() {
-  return rootValue();
-}
-function CreatePersonInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreatePersonInput_person_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateRelationalItemRelationCompositePkPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateRelationalItemRelationCompositePkPayload_relationalItemRelationCompositePkPlan($object) {
-  return $object.get("result");
-}
-function CreateRelationalItemRelationCompositePkPayload_queryPlan() {
-  return rootValue();
-}
-function CreateRelationalItemRelationCompositePkInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateRelationalItemRelationCompositePkInput_relationalItemRelationCompositePk_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateSingleTableItemRelationCompositePkPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateSingleTableItemRelationCompositePkPayload_singleTableItemRelationCompositePkPlan($object) {
-  return $object.get("result");
-}
-function CreateSingleTableItemRelationCompositePkPayload_queryPlan() {
-  return rootValue();
-}
-function CreateSingleTableItemRelationCompositePkInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateSingleTableItemRelationCompositePkInput_singleTableItemRelationCompositePk_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateRelationalItemRelationPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateRelationalItemRelationPayload_relationalItemRelationPlan($object) {
-  return $object.get("result");
-}
-function CreateRelationalItemRelationPayload_queryPlan() {
-  return rootValue();
-}
-function CreateRelationalItemRelationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateRelationalItemRelationInput_relationalItemRelation_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateSingleTableItemRelationPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateSingleTableItemRelationPayload_singleTableItemRelationPlan($object) {
-  return $object.get("result");
-}
-function CreateSingleTableItemRelationPayload_queryPlan() {
-  return rootValue();
-}
-function CreateSingleTableItemRelationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateSingleTableItemRelationInput_singleTableItemRelation_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateLogEntryPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateLogEntryPayload_logEntryPlan($object) {
-  return $object.get("result");
-}
-function CreateLogEntryPayload_queryPlan() {
-  return rootValue();
-}
-function CreateLogEntryInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateLogEntryInput_logEntry_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateFirstPartyVulnerabilityPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateFirstPartyVulnerabilityPayload_firstPartyVulnerabilityPlan($object) {
-  return $object.get("result");
-}
-function CreateFirstPartyVulnerabilityPayload_queryPlan() {
-  return rootValue();
-}
-function CreateFirstPartyVulnerabilityInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateFirstPartyVulnerabilityInput_firstPartyVulnerability_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateThirdPartyVulnerabilityPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateThirdPartyVulnerabilityPayload_thirdPartyVulnerabilityPlan($object) {
-  return $object.get("result");
-}
-function CreateThirdPartyVulnerabilityPayload_queryPlan() {
-  return rootValue();
-}
-function CreateThirdPartyVulnerabilityInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateThirdPartyVulnerabilityInput_thirdPartyVulnerability_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateAwsApplicationPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateAwsApplicationPayload_awsApplicationPlan($object) {
-  return $object.get("result");
-}
-function CreateAwsApplicationPayload_queryPlan() {
-  return rootValue();
-}
-function CreateAwsApplicationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateAwsApplicationInput_awsApplication_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateGcpApplicationPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateGcpApplicationPayload_gcpApplicationPlan($object) {
-  return $object.get("result");
-}
-function CreateGcpApplicationPayload_queryPlan() {
-  return rootValue();
-}
-function CreateGcpApplicationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateGcpApplicationInput_gcpApplication_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateOrganizationPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateOrganizationPayload_organizationPlan($object) {
-  return $object.get("result");
-}
-function UpdateOrganizationPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateOrganizationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateOrganizationInput_organizationPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateOrganizationByOrganizationIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateOrganizationByOrganizationIdInput_organizationPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateOrganizationByNameInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateOrganizationByNameInput_organizationPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdatePersonPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdatePersonPayload_personPlan($object) {
-  return $object.get("result");
-}
-function UpdatePersonPayload_queryPlan() {
-  return rootValue();
-}
-function UpdatePersonInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdatePersonInput_personPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdatePersonByPersonIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdatePersonByPersonIdInput_personPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdatePersonByUsernameInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdatePersonByUsernameInput_personPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateRelationalItemRelationCompositePkPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateRelationalItemRelationCompositePkPayload_relationalItemRelationCompositePkPlan($object) {
-  return $object.get("result");
-}
-function UpdateRelationalItemRelationCompositePkPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateRelationalItemRelationCompositePkInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateRelationalItemRelationCompositePkInput_relationalItemRelationCompositePkPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateRelationalItemRelationCompositePkByParentIdAndChildIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateRelationalItemRelationCompositePkByParentIdAndChildIdInput_relationalItemRelationCompositePkPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateSingleTableItemRelationCompositePkPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateSingleTableItemRelationCompositePkPayload_singleTableItemRelationCompositePkPlan($object) {
-  return $object.get("result");
-}
-function UpdateSingleTableItemRelationCompositePkPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateSingleTableItemRelationCompositePkInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateSingleTableItemRelationCompositePkInput_singleTableItemRelationCompositePkPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateSingleTableItemRelationCompositePkByParentIdAndChildIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateSingleTableItemRelationCompositePkByParentIdAndChildIdInput_singleTableItemRelationCompositePkPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateRelationalItemRelationPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateRelationalItemRelationPayload_relationalItemRelationPlan($object) {
-  return $object.get("result");
-}
-function UpdateRelationalItemRelationPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateRelationalItemRelationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateRelationalItemRelationInput_relationalItemRelationPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateRelationalItemRelationByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateRelationalItemRelationByIdInput_relationalItemRelationPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateRelationalItemRelationByParentIdAndChildIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateRelationalItemRelationByParentIdAndChildIdInput_relationalItemRelationPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateSingleTableItemRelationPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateSingleTableItemRelationPayload_singleTableItemRelationPlan($object) {
-  return $object.get("result");
-}
-function UpdateSingleTableItemRelationPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateSingleTableItemRelationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateSingleTableItemRelationInput_singleTableItemRelationPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateSingleTableItemRelationByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateSingleTableItemRelationByIdInput_singleTableItemRelationPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateSingleTableItemRelationByParentIdAndChildIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateSingleTableItemRelationByParentIdAndChildIdInput_singleTableItemRelationPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateLogEntryPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateLogEntryPayload_logEntryPlan($object) {
-  return $object.get("result");
-}
-function UpdateLogEntryPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateLogEntryInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateLogEntryInput_logEntryPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateLogEntryByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateLogEntryByIdInput_logEntryPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateFirstPartyVulnerabilityPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateFirstPartyVulnerabilityPayload_firstPartyVulnerabilityPlan($object) {
-  return $object.get("result");
-}
-function UpdateFirstPartyVulnerabilityPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateFirstPartyVulnerabilityInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateFirstPartyVulnerabilityInput_firstPartyVulnerabilityPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateFirstPartyVulnerabilityByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateFirstPartyVulnerabilityByIdInput_firstPartyVulnerabilityPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateThirdPartyVulnerabilityPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateThirdPartyVulnerabilityPayload_thirdPartyVulnerabilityPlan($object) {
-  return $object.get("result");
-}
-function UpdateThirdPartyVulnerabilityPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateThirdPartyVulnerabilityInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateThirdPartyVulnerabilityInput_thirdPartyVulnerabilityPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateThirdPartyVulnerabilityByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateThirdPartyVulnerabilityByIdInput_thirdPartyVulnerabilityPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateAwsApplicationPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateAwsApplicationPayload_awsApplicationPlan($object) {
-  return $object.get("result");
-}
-function UpdateAwsApplicationPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateAwsApplicationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateAwsApplicationInput_awsApplicationPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateAwsApplicationByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateAwsApplicationByIdInput_awsApplicationPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateGcpApplicationPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateGcpApplicationPayload_gcpApplicationPlan($object) {
-  return $object.get("result");
-}
-function UpdateGcpApplicationPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateGcpApplicationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateGcpApplicationInput_gcpApplicationPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateGcpApplicationByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateGcpApplicationByIdInput_gcpApplicationPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function DeleteOrganizationPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteOrganizationPayload_organizationPlan($object) {
-  return $object.get("result");
-}
-function DeleteOrganizationPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteOrganizationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteOrganizationByOrganizationIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteOrganizationByNameInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeletePersonPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeletePersonPayload_personPlan($object) {
-  return $object.get("result");
-}
-function DeletePersonPayload_queryPlan() {
-  return rootValue();
-}
-function DeletePersonInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeletePersonByPersonIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeletePersonByUsernameInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteRelationalItemRelationCompositePkPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteRelationalItemRelationCompositePkPayload_relationalItemRelationCompositePkPlan($object) {
-  return $object.get("result");
-}
-function DeleteRelationalItemRelationCompositePkPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteRelationalItemRelationCompositePkInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteRelationalItemRelationCompositePkByParentIdAndChildIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteSingleTableItemRelationCompositePkPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteSingleTableItemRelationCompositePkPayload_singleTableItemRelationCompositePkPlan($object) {
-  return $object.get("result");
-}
-function DeleteSingleTableItemRelationCompositePkPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteSingleTableItemRelationCompositePkInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteSingleTableItemRelationCompositePkByParentIdAndChildIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteRelationalItemRelationPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteRelationalItemRelationPayload_relationalItemRelationPlan($object) {
-  return $object.get("result");
-}
-function DeleteRelationalItemRelationPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteRelationalItemRelationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteRelationalItemRelationByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteRelationalItemRelationByParentIdAndChildIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteSingleTableItemRelationPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteSingleTableItemRelationPayload_singleTableItemRelationPlan($object) {
-  return $object.get("result");
-}
-function DeleteSingleTableItemRelationPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteSingleTableItemRelationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteSingleTableItemRelationByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteSingleTableItemRelationByParentIdAndChildIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteLogEntryPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteLogEntryPayload_logEntryPlan($object) {
-  return $object.get("result");
-}
-function DeleteLogEntryPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteLogEntryInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteLogEntryByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteFirstPartyVulnerabilityPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteFirstPartyVulnerabilityPayload_firstPartyVulnerabilityPlan($object) {
-  return $object.get("result");
-}
-function DeleteFirstPartyVulnerabilityPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteFirstPartyVulnerabilityInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteFirstPartyVulnerabilityByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteThirdPartyVulnerabilityPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteThirdPartyVulnerabilityPayload_thirdPartyVulnerabilityPlan($object) {
-  return $object.get("result");
-}
-function DeleteThirdPartyVulnerabilityPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteThirdPartyVulnerabilityInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteThirdPartyVulnerabilityByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteAwsApplicationPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteAwsApplicationPayload_awsApplicationPlan($object) {
-  return $object.get("result");
-}
-function DeleteAwsApplicationPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteAwsApplicationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteAwsApplicationByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteGcpApplicationPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteGcpApplicationPayload_gcpApplicationPlan($object) {
-  return $object.get("result");
-}
-function DeleteGcpApplicationPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteGcpApplicationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteGcpApplicationByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
 export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTableItem & Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -16511,23 +13979,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -16557,23 +14035,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationsByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationsByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationsByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationsByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationsByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -16603,23 +14091,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -16649,23 +14147,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationCompositePksByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationCompositePksByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationCompositePksByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationCompositePksByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationCompositePksByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -16695,23 +14203,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationCompositePksByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationCompositePksByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationCompositePksByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationCompositePksByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableTopic_singleTableItemRelationCompositePksByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -16759,23 +14277,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_logEntriesByPersonId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_logEntriesByPersonId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_logEntriesByPersonId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_logEntriesByPersonId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_logEntriesByPersonId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -16805,23 +14333,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_singleTableItemsByAuthorId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_singleTableItemsByAuthorId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_singleTableItemsByAuthorId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_singleTableItemsByAuthorId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_singleTableItemsByAuthorId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -16851,23 +14389,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_relationalItemsByAuthorId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_relationalItemsByAuthorId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_relationalItemsByAuthorId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_relationalItemsByAuthorId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_relationalItemsByAuthorId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -16897,23 +14445,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_awsApplicationsByPersonId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_awsApplicationsByPersonId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_awsApplicationsByPersonId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_awsApplicationsByPersonId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_awsApplicationsByPersonId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -16943,23 +14501,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_gcpApplicationsByPersonId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_gcpApplicationsByPersonId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_gcpApplicationsByPersonId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_gcpApplicationsByPersonId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_gcpApplicationsByPersonId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -17010,23 +14578,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_applications_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_applications_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_applications_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_applications_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_applications_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -17056,9 +14634,16 @@ export const plans = {
   },
   LogEntriesConnection: {
     __assertStep: ConnectionStep,
-    nodes: LogEntriesConnection_nodesPlan,
-    edges: LogEntriesConnection_edgesPlan,
-    pageInfo: LogEntriesConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -17141,23 +14726,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Organization_logEntriesByOrganizationId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Organization_logEntriesByOrganizationId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Organization_logEntriesByOrganizationId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Organization_logEntriesByOrganizationId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Organization_logEntriesByOrganizationId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -17187,23 +14782,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Organization_awsApplicationsByOrganizationId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Organization_awsApplicationsByOrganizationId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Organization_awsApplicationsByOrganizationId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Organization_awsApplicationsByOrganizationId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Organization_awsApplicationsByOrganizationId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -17233,23 +14838,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Organization_gcpApplicationsByOrganizationId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Organization_gcpApplicationsByOrganizationId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Organization_gcpApplicationsByOrganizationId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Organization_gcpApplicationsByOrganizationId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Organization_gcpApplicationsByOrganizationId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -17539,9 +15154,16 @@ export const plans = {
   },
   AwsApplicationsConnection: {
     __assertStep: ConnectionStep,
-    nodes: AwsApplicationsConnection_nodesPlan,
-    edges: AwsApplicationsConnection_edgesPlan,
-    pageInfo: AwsApplicationsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -17611,23 +15233,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: AwsApplication_vulnerabilities_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: AwsApplication_vulnerabilities_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: AwsApplication_vulnerabilities_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: AwsApplication_vulnerabilities_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: AwsApplication_vulnerabilities_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -17684,18 +15316,32 @@ export const plans = {
   },
   VulnerabilitiesConnection: {
     __assertStep: ConnectionStep,
-    nodes: VulnerabilitiesConnection_nodesPlan,
-    edges: VulnerabilitiesConnection_edgesPlan,
-    pageInfo: VulnerabilitiesConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
   },
   ApplicationsConnection: {
     __assertStep: ConnectionStep,
-    nodes: ApplicationsConnection_nodesPlan,
-    edges: ApplicationsConnection_edgesPlan,
-    pageInfo: ApplicationsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -17711,8 +15357,12 @@ export const plans = {
   },
   PageInfo: {
     __assertStep: assertPageInfoCapableStep,
-    hasNextPage: PageInfo_hasNextPagePlan,
-    hasPreviousPage: PageInfo_hasPreviousPagePlan,
+    hasNextPage($pageInfo) {
+      return $pageInfo.hasNextPage();
+    },
+    hasPreviousPage($pageInfo) {
+      return $pageInfo.hasPreviousPage();
+    },
     startCursor($pageInfo) {
       return $pageInfo.startCursor();
     },
@@ -17722,9 +15372,16 @@ export const plans = {
   },
   PersonOrOrganizationConnection: {
     __assertStep: ConnectionStep,
-    nodes: PersonOrOrganizationConnection_nodesPlan,
-    edges: PersonOrOrganizationConnection_edgesPlan,
-    pageInfo: PersonOrOrganizationConnection_pageInfoPlan
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    }
   },
   PersonOrOrganizationEdge: {
     __assertStep: assertEdgeCapableStep,
@@ -18314,9 +15971,16 @@ export const plans = {
   },
   GcpApplicationsConnection: {
     __assertStep: ConnectionStep,
-    nodes: GcpApplicationsConnection_nodesPlan,
-    edges: GcpApplicationsConnection_edgesPlan,
-    pageInfo: GcpApplicationsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -18386,23 +16050,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: GcpApplication_vulnerabilities_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: GcpApplication_vulnerabilities_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: GcpApplication_vulnerabilities_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: GcpApplication_vulnerabilities_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: GcpApplication_vulnerabilities_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -18858,9 +16532,16 @@ export const plans = {
   },
   SingleTableItemsConnection: {
     __assertStep: ConnectionStep,
-    nodes: SingleTableItemsConnection_nodesPlan,
-    edges: SingleTableItemsConnection_edgesPlan,
-    pageInfo: SingleTableItemsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -19485,18 +17166,32 @@ export const plans = {
   },
   RelationalItemsConnection: {
     __assertStep: ConnectionStep,
-    nodes: RelationalItemsConnection_nodesPlan,
-    edges: RelationalItemsConnection_edgesPlan,
-    pageInfo: RelationalItemsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
   },
   RelationalItemRelationsConnection: {
     __assertStep: ConnectionStep,
-    nodes: RelationalItemRelationsConnection_nodesPlan,
-    edges: RelationalItemRelationsConnection_edgesPlan,
-    pageInfo: RelationalItemRelationsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -19538,9 +17233,16 @@ export const plans = {
   },
   RelationalItemRelationCompositePksConnection: {
     __assertStep: ConnectionStep,
-    nodes: RelationalItemRelationCompositePksConnection_nodesPlan,
-    edges: RelationalItemRelationCompositePksConnection_edgesPlan,
-    pageInfo: RelationalItemRelationCompositePksConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -20375,9 +18077,16 @@ export const plans = {
   },
   SingleTableItemRelationsConnection: {
     __assertStep: ConnectionStep,
-    nodes: SingleTableItemRelationsConnection_nodesPlan,
-    edges: SingleTableItemRelationsConnection_edgesPlan,
-    pageInfo: SingleTableItemRelationsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -20419,9 +18128,16 @@ export const plans = {
   },
   SingleTableItemRelationCompositePksConnection: {
     __assertStep: ConnectionStep,
-    nodes: SingleTableItemRelationCompositePksConnection_nodesPlan,
-    edges: SingleTableItemRelationCompositePksConnection_edgesPlan,
-    pageInfo: SingleTableItemRelationCompositePksConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -20894,23 +18610,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -20940,23 +18666,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationsByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationsByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationsByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationsByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationsByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -20986,23 +18722,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -21032,23 +18778,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationCompositePksByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationCompositePksByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationCompositePksByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationCompositePksByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationCompositePksByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -21078,23 +18834,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationCompositePksByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationCompositePksByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationCompositePksByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationCompositePksByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTablePost_singleTableItemRelationCompositePksByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -21142,23 +18908,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Priority_singleTableItemsByPriorityId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Priority_singleTableItemsByPriorityId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Priority_singleTableItemsByPriorityId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Priority_singleTableItemsByPriorityId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Priority_singleTableItemsByPriorityId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -21241,23 +19017,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -21287,23 +19073,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationsByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationsByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationsByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationsByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationsByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -21333,23 +19129,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -21379,23 +19185,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationCompositePksByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationCompositePksByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationCompositePksByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationCompositePksByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationCompositePksByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -21425,23 +19241,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationCompositePksByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationCompositePksByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationCompositePksByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationCompositePksByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableDivider_singleTableItemRelationCompositePksByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -21526,23 +19352,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -21572,23 +19408,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationsByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationsByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationsByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationsByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationsByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -21618,23 +19464,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -21664,23 +19520,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationCompositePksByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationCompositePksByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationCompositePksByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationCompositePksByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationCompositePksByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -21710,23 +19576,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationCompositePksByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationCompositePksByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationCompositePksByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationCompositePksByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklist_singleTableItemRelationCompositePksByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -21827,23 +19703,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -21873,23 +19759,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationsByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationsByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationsByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationsByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationsByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -21919,23 +19815,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -21965,23 +19871,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationCompositePksByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationCompositePksByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationCompositePksByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationCompositePksByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationCompositePksByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -22011,23 +19927,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationCompositePksByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationCompositePksByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationCompositePksByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationCompositePksByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: SingleTableChecklistItem_singleTableItemRelationCompositePksByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -22102,23 +20028,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemsByRootTopicId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemsByRootTopicId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemsByRootTopicId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemsByRootTopicId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemsByRootTopicId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -22198,23 +20134,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -22322,23 +20268,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationsByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationsByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationsByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationsByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationsByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -22376,23 +20332,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -22430,23 +20396,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationCompositePksByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationCompositePksByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationCompositePksByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationCompositePksByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationCompositePksByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -22484,23 +20460,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationCompositePksByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationCompositePksByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationCompositePksByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationCompositePksByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalTopic_relationalItemRelationCompositePksByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -22989,23 +20975,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -23113,23 +21109,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationsByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationsByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationsByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationsByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationsByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -23167,23 +21173,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -23221,23 +21237,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationCompositePksByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationCompositePksByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationCompositePksByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationCompositePksByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationCompositePksByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -23275,23 +21301,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationCompositePksByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationCompositePksByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationCompositePksByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationCompositePksByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalPost_relationalItemRelationCompositePksByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -23414,23 +21450,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -23538,23 +21584,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationsByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationsByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationsByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationsByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationsByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -23592,23 +21648,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -23646,23 +21712,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationCompositePksByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationCompositePksByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationCompositePksByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationCompositePksByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationCompositePksByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -23700,23 +21776,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationCompositePksByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationCompositePksByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationCompositePksByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationCompositePksByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalDivider_relationalItemRelationCompositePksByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -23836,23 +21922,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -23960,23 +22056,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationsByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationsByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationsByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationsByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationsByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -24014,23 +22120,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -24068,23 +22184,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationCompositePksByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationCompositePksByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationCompositePksByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationCompositePksByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationCompositePksByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -24122,23 +22248,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationCompositePksByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationCompositePksByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationCompositePksByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationCompositePksByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklist_relationalItemRelationCompositePksByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -24261,23 +22397,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -24385,23 +22531,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationsByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationsByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationsByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationsByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationsByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -24439,23 +22595,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationsByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationsByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationsByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationsByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationsByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -24493,23 +22659,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationCompositePksByChildId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationCompositePksByChildId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationCompositePksByChildId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationCompositePksByChildId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationCompositePksByChildId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -24547,23 +22723,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationCompositePksByParentId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationCompositePksByParentId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationCompositePksByParentId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationCompositePksByParentId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: RelationalChecklistItem_relationalItemRelationCompositePksByParentId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -24588,7 +22774,9 @@ export const plans = {
     __assertStep() {
       return true;
     },
-    query: Query_queryPlan,
+    query() {
+      return rootValue();
+    },
     nodeId($parent) {
       const specifier = handler21.plan($parent);
       return lambda(specifier, nodeIdCodecs[handler21.codec.name].encode);
@@ -24820,27 +23008,40 @@ export const plans = {
       }
     },
     allSingleTables: {
-      plan: Query_allSingleTablesPlan,
+      plan($parent, args, info) {
+        const $select = getSelectPlanFromParentAndArgs($parent, args, info);
+        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+      },
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTables_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTables_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTables_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTables_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTables_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         }
       }
     },
@@ -25064,23 +23265,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allVulnerabilities_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allVulnerabilities_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allVulnerabilities_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allVulnerabilities_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allVulnerabilities_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25120,23 +23331,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allApplications_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allApplications_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allApplications_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allApplications_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allApplications_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25176,23 +23397,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allZeroImplementations_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allZeroImplementations_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allZeroImplementations_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allZeroImplementations_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allZeroImplementations_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25219,23 +23450,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allOrganizations_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allOrganizations_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allOrganizations_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allOrganizations_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allOrganizations_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25262,23 +23503,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPeople_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPeople_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPeople_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPeople_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPeople_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25305,23 +23556,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPriorities_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPriorities_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPriorities_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPriorities_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPriorities_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         }
       }
     },
@@ -25332,23 +23593,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalChecklists_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalChecklists_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalChecklists_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalChecklists_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalChecklists_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25375,23 +23646,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalItemRelationCompositePks_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalItemRelationCompositePks_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalItemRelationCompositePks_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalItemRelationCompositePks_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalItemRelationCompositePks_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25418,23 +23699,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalTopics_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalTopics_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalTopics_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalTopics_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalTopics_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25461,23 +23752,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTableItemRelationCompositePks_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTableItemRelationCompositePks_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTableItemRelationCompositePks_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTableItemRelationCompositePks_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTableItemRelationCompositePks_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25504,23 +23805,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalChecklistItems_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalChecklistItems_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalChecklistItems_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalChecklistItems_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalChecklistItems_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25547,23 +23858,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalDividers_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalDividers_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalDividers_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalDividers_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalDividers_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25590,23 +23911,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalItemRelations_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalItemRelations_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalItemRelations_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalItemRelations_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalItemRelations_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25633,23 +23964,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTableItemRelations_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTableItemRelations_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTableItemRelations_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTableItemRelations_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTableItemRelations_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25676,23 +24017,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allLogEntries_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allLogEntries_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allLogEntries_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allLogEntries_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allLogEntries_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25719,23 +24070,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalPosts_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalPosts_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalPosts_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalPosts_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalPosts_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25762,23 +24123,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allFirstPartyVulnerabilities_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allFirstPartyVulnerabilities_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allFirstPartyVulnerabilities_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allFirstPartyVulnerabilities_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allFirstPartyVulnerabilities_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25805,23 +24176,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allThirdPartyVulnerabilities_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allThirdPartyVulnerabilities_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allThirdPartyVulnerabilities_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allThirdPartyVulnerabilities_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allThirdPartyVulnerabilities_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25848,23 +24229,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allAwsApplications_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allAwsApplications_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allAwsApplications_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allAwsApplications_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allAwsApplications_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25891,23 +24282,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allGcpApplications_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allGcpApplications_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allGcpApplications_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allGcpApplications_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allGcpApplications_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25934,23 +24335,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTableItems_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTableItems_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTableItems_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTableItems_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allSingleTableItems_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -25977,23 +24388,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalItems_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalItems_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalItems_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalItems_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRelationalItems_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -26063,23 +24484,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: FirstPartyVulnerability_applications_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: FirstPartyVulnerability_applications_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: FirstPartyVulnerability_applications_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: FirstPartyVulnerability_applications_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: FirstPartyVulnerability_applications_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -26183,23 +24614,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: ThirdPartyVulnerability_applications_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: ThirdPartyVulnerability_applications_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: ThirdPartyVulnerability_applications_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: ThirdPartyVulnerability_applications_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: ThirdPartyVulnerability_applications_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -26256,9 +24697,16 @@ export const plans = {
   },
   ZeroImplementationsConnection: {
     __assertStep: ConnectionStep,
-    nodes: ZeroImplementationsConnection_nodesPlan,
-    edges: ZeroImplementationsConnection_edgesPlan,
-    pageInfo: ZeroImplementationsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -26395,9 +24843,16 @@ export const plans = {
   },
   OrganizationsConnection: {
     __assertStep: ConnectionStep,
-    nodes: OrganizationsConnection_nodesPlan,
-    edges: OrganizationsConnection_edgesPlan,
-    pageInfo: OrganizationsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -26566,9 +25021,16 @@ export const plans = {
   },
   PeopleConnection: {
     __assertStep: ConnectionStep,
-    nodes: PeopleConnection_nodesPlan,
-    edges: PeopleConnection_edgesPlan,
-    pageInfo: PeopleConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -26737,9 +25199,16 @@ export const plans = {
   },
   PrioritiesConnection: {
     __assertStep: ConnectionStep,
-    nodes: PrioritiesConnection_nodesPlan,
-    edges: PrioritiesConnection_edgesPlan,
-    pageInfo: PrioritiesConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -26755,9 +25224,16 @@ export const plans = {
   },
   RelationalChecklistsConnection: {
     __assertStep: ConnectionStep,
-    nodes: RelationalChecklistsConnection_nodesPlan,
-    edges: RelationalChecklistsConnection_edgesPlan,
-    pageInfo: RelationalChecklistsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -27439,9 +25915,16 @@ export const plans = {
   },
   RelationalTopicsConnection: {
     __assertStep: ConnectionStep,
-    nodes: RelationalTopicsConnection_nodesPlan,
-    edges: RelationalTopicsConnection_edgesPlan,
-    pageInfo: RelationalTopicsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -28123,9 +26606,16 @@ export const plans = {
   },
   RelationalChecklistItemsConnection: {
     __assertStep: ConnectionStep,
-    nodes: RelationalChecklistItemsConnection_nodesPlan,
-    edges: RelationalChecklistItemsConnection_edgesPlan,
-    pageInfo: RelationalChecklistItemsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -28864,9 +27354,16 @@ export const plans = {
   },
   RelationalDividersConnection: {
     __assertStep: ConnectionStep,
-    nodes: RelationalDividersConnection_nodesPlan,
-    edges: RelationalDividersConnection_edgesPlan,
-    pageInfo: RelationalDividersConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -29605,9 +28102,16 @@ export const plans = {
   },
   RelationalPostsConnection: {
     __assertStep: ConnectionStep,
-    nodes: RelationalPostsConnection_nodesPlan,
-    edges: RelationalPostsConnection_edgesPlan,
-    pageInfo: RelationalPostsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -30403,9 +28907,16 @@ export const plans = {
   },
   FirstPartyVulnerabilitiesConnection: {
     __assertStep: ConnectionStep,
-    nodes: FirstPartyVulnerabilitiesConnection_nodesPlan,
-    edges: FirstPartyVulnerabilitiesConnection_edgesPlan,
-    pageInfo: FirstPartyVulnerabilitiesConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -30688,9 +29199,16 @@ export const plans = {
   },
   ThirdPartyVulnerabilitiesConnection: {
     __assertStep: ConnectionStep,
-    nodes: ThirdPartyVulnerabilitiesConnection_nodesPlan,
-    edges: ThirdPartyVulnerabilitiesConnection_edgesPlan,
-    pageInfo: ThirdPartyVulnerabilitiesConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -30984,7 +29502,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_customDeleteRelationalItem_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -30999,7 +29519,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createOrganization_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31014,7 +29536,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createPerson_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31029,7 +29553,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createRelationalItemRelationCompositePk_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31044,7 +29570,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createSingleTableItemRelationCompositePk_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31059,7 +29587,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createRelationalItemRelation_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31074,7 +29604,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createSingleTableItemRelation_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31089,7 +29621,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createLogEntry_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31104,7 +29638,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createFirstPartyVulnerability_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31119,7 +29655,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createThirdPartyVulnerability_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31134,7 +29672,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createAwsApplication_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31149,7 +29689,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createGcpApplication_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31163,7 +29705,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateOrganization_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31179,7 +29723,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateOrganizationByOrganizationId_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31195,7 +29741,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateOrganizationByName_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31209,7 +29757,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updatePerson_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31225,7 +29775,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updatePersonByPersonId_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31241,7 +29793,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updatePersonByUsername_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31255,7 +29809,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateRelationalItemRelationCompositePk_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31272,7 +29828,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateRelationalItemRelationCompositePkByParentIdAndChildId_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31286,7 +29844,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateSingleTableItemRelationCompositePk_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31303,7 +29863,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateSingleTableItemRelationCompositePkByParentIdAndChildId_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31317,7 +29879,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateRelationalItemRelation_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31333,7 +29897,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateRelationalItemRelationById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31350,7 +29916,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateRelationalItemRelationByParentIdAndChildId_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31364,7 +29932,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateSingleTableItemRelation_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31380,7 +29950,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateSingleTableItemRelationById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31397,7 +29969,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateSingleTableItemRelationByParentIdAndChildId_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31411,7 +29985,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateLogEntry_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31427,7 +30003,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateLogEntryById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31441,7 +30019,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateFirstPartyVulnerability_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31457,7 +30037,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateFirstPartyVulnerabilityById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31471,7 +30053,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateThirdPartyVulnerability_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31487,7 +30071,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateThirdPartyVulnerabilityById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31501,7 +30087,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateAwsApplication_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31517,7 +30105,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateAwsApplicationById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31531,7 +30121,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateGcpApplication_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31547,7 +30139,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateGcpApplicationById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31561,7 +30155,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteOrganization_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31577,7 +30173,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteOrganizationByOrganizationId_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31593,7 +30191,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteOrganizationByName_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31607,7 +30207,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deletePerson_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31623,7 +30225,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deletePersonByPersonId_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31639,7 +30243,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deletePersonByUsername_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31653,7 +30259,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteRelationalItemRelationCompositePk_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31670,7 +30278,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteRelationalItemRelationCompositePkByParentIdAndChildId_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31684,7 +30294,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteSingleTableItemRelationCompositePk_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31701,7 +30313,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteSingleTableItemRelationCompositePkByParentIdAndChildId_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31715,7 +30329,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteRelationalItemRelation_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31731,7 +30347,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteRelationalItemRelationById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31748,7 +30366,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteRelationalItemRelationByParentIdAndChildId_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31762,7 +30382,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteSingleTableItemRelation_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31778,7 +30400,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteSingleTableItemRelationById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31795,7 +30419,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteSingleTableItemRelationByParentIdAndChildId_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31809,7 +30435,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteLogEntry_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31825,7 +30453,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteLogEntryById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31839,7 +30469,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteFirstPartyVulnerability_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31855,7 +30487,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteFirstPartyVulnerabilityById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31869,7 +30503,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteThirdPartyVulnerability_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31885,7 +30521,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteThirdPartyVulnerabilityById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31899,7 +30537,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteAwsApplication_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31915,7 +30555,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteAwsApplicationById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31929,7 +30571,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteGcpApplication_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -31945,31 +30589,45 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteGcpApplicationById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     }
   },
   CustomDeleteRelationalItemPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: CustomDeleteRelationalItemPayload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     boolean($object) {
       return $object.get("result");
     },
-    query: CustomDeleteRelationalItemPayload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   CustomDeleteRelationalItemInput: {
     clientMutationId: {
-      applyPlan: CustomDeleteRelationalItemInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     nodeId: undefined
   },
   CreateOrganizationPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateOrganizationPayload_clientMutationIdPlan,
-    organization: CreateOrganizationPayload_organizationPlan,
-    query: CreateOrganizationPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    organization($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     organizationEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -32004,11 +30662,16 @@ export const plans = {
   },
   CreateOrganizationInput: {
     clientMutationId: {
-      applyPlan: CreateOrganizationInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     organization: {
-      applyPlan: CreateOrganizationInput_organization_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -32030,9 +30693,15 @@ export const plans = {
   },
   CreatePersonPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreatePersonPayload_clientMutationIdPlan,
-    person: CreatePersonPayload_personPlan,
-    query: CreatePersonPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    person($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     personEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -32067,11 +30736,16 @@ export const plans = {
   },
   CreatePersonInput: {
     clientMutationId: {
-      applyPlan: CreatePersonInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     person: {
-      applyPlan: CreatePersonInput_person_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -32093,9 +30767,15 @@ export const plans = {
   },
   CreateRelationalItemRelationCompositePkPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateRelationalItemRelationCompositePkPayload_clientMutationIdPlan,
-    relationalItemRelationCompositePk: CreateRelationalItemRelationCompositePkPayload_relationalItemRelationCompositePkPlan,
-    query: CreateRelationalItemRelationCompositePkPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    relationalItemRelationCompositePk($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     relationalItemRelationCompositePkEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -32140,11 +30820,16 @@ export const plans = {
   },
   CreateRelationalItemRelationCompositePkInput: {
     clientMutationId: {
-      applyPlan: CreateRelationalItemRelationCompositePkInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     relationalItemRelationCompositePk: {
-      applyPlan: CreateRelationalItemRelationCompositePkInput_relationalItemRelationCompositePk_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -32166,9 +30851,15 @@ export const plans = {
   },
   CreateSingleTableItemRelationCompositePkPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateSingleTableItemRelationCompositePkPayload_clientMutationIdPlan,
-    singleTableItemRelationCompositePk: CreateSingleTableItemRelationCompositePkPayload_singleTableItemRelationCompositePkPlan,
-    query: CreateSingleTableItemRelationCompositePkPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    singleTableItemRelationCompositePk($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     singleTableItemRelationCompositePkEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -32213,11 +30904,16 @@ export const plans = {
   },
   CreateSingleTableItemRelationCompositePkInput: {
     clientMutationId: {
-      applyPlan: CreateSingleTableItemRelationCompositePkInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     singleTableItemRelationCompositePk: {
-      applyPlan: CreateSingleTableItemRelationCompositePkInput_singleTableItemRelationCompositePk_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -32239,9 +30935,15 @@ export const plans = {
   },
   CreateRelationalItemRelationPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateRelationalItemRelationPayload_clientMutationIdPlan,
-    relationalItemRelation: CreateRelationalItemRelationPayload_relationalItemRelationPlan,
-    query: CreateRelationalItemRelationPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    relationalItemRelation($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     relationalItemRelationEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -32286,11 +30988,16 @@ export const plans = {
   },
   CreateRelationalItemRelationInput: {
     clientMutationId: {
-      applyPlan: CreateRelationalItemRelationInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     relationalItemRelation: {
-      applyPlan: CreateRelationalItemRelationInput_relationalItemRelation_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -32319,9 +31026,15 @@ export const plans = {
   },
   CreateSingleTableItemRelationPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateSingleTableItemRelationPayload_clientMutationIdPlan,
-    singleTableItemRelation: CreateSingleTableItemRelationPayload_singleTableItemRelationPlan,
-    query: CreateSingleTableItemRelationPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    singleTableItemRelation($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     singleTableItemRelationEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -32366,11 +31079,16 @@ export const plans = {
   },
   CreateSingleTableItemRelationInput: {
     clientMutationId: {
-      applyPlan: CreateSingleTableItemRelationInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     singleTableItemRelation: {
-      applyPlan: CreateSingleTableItemRelationInput_singleTableItemRelation_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -32399,9 +31117,15 @@ export const plans = {
   },
   CreateLogEntryPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateLogEntryPayload_clientMutationIdPlan,
-    logEntry: CreateLogEntryPayload_logEntryPlan,
-    query: CreateLogEntryPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    logEntry($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     logEntryEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -32446,11 +31170,16 @@ export const plans = {
   },
   CreateLogEntryInput: {
     clientMutationId: {
-      applyPlan: CreateLogEntryInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     logEntry: {
-      applyPlan: CreateLogEntryInput_logEntry_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -32486,9 +31215,15 @@ export const plans = {
   },
   CreateFirstPartyVulnerabilityPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateFirstPartyVulnerabilityPayload_clientMutationIdPlan,
-    firstPartyVulnerability: CreateFirstPartyVulnerabilityPayload_firstPartyVulnerabilityPlan,
-    query: CreateFirstPartyVulnerabilityPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    firstPartyVulnerability($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     firstPartyVulnerabilityEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -32523,11 +31258,16 @@ export const plans = {
   },
   CreateFirstPartyVulnerabilityInput: {
     clientMutationId: {
-      applyPlan: CreateFirstPartyVulnerabilityInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     firstPartyVulnerability: {
-      applyPlan: CreateFirstPartyVulnerabilityInput_firstPartyVulnerability_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -32563,9 +31303,15 @@ export const plans = {
   },
   CreateThirdPartyVulnerabilityPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateThirdPartyVulnerabilityPayload_clientMutationIdPlan,
-    thirdPartyVulnerability: CreateThirdPartyVulnerabilityPayload_thirdPartyVulnerabilityPlan,
-    query: CreateThirdPartyVulnerabilityPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    thirdPartyVulnerability($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     thirdPartyVulnerabilityEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -32600,11 +31346,16 @@ export const plans = {
   },
   CreateThirdPartyVulnerabilityInput: {
     clientMutationId: {
-      applyPlan: CreateThirdPartyVulnerabilityInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     thirdPartyVulnerability: {
-      applyPlan: CreateThirdPartyVulnerabilityInput_thirdPartyVulnerability_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -32640,9 +31391,15 @@ export const plans = {
   },
   CreateAwsApplicationPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateAwsApplicationPayload_clientMutationIdPlan,
-    awsApplication: CreateAwsApplicationPayload_awsApplicationPlan,
-    query: CreateAwsApplicationPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    awsApplication($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     awsApplicationEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -32687,11 +31444,16 @@ export const plans = {
   },
   CreateAwsApplicationInput: {
     clientMutationId: {
-      applyPlan: CreateAwsApplicationInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     awsApplication: {
-      applyPlan: CreateAwsApplicationInput_awsApplication_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -32741,9 +31503,15 @@ export const plans = {
   },
   CreateGcpApplicationPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateGcpApplicationPayload_clientMutationIdPlan,
-    gcpApplication: CreateGcpApplicationPayload_gcpApplicationPlan,
-    query: CreateGcpApplicationPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    gcpApplication($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     gcpApplicationEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -32788,11 +31556,16 @@ export const plans = {
   },
   CreateGcpApplicationInput: {
     clientMutationId: {
-      applyPlan: CreateGcpApplicationInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     gcpApplication: {
-      applyPlan: CreateGcpApplicationInput_gcpApplication_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -32842,9 +31615,15 @@ export const plans = {
   },
   UpdateOrganizationPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateOrganizationPayload_clientMutationIdPlan,
-    organization: UpdateOrganizationPayload_organizationPlan,
-    query: UpdateOrganizationPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    organization($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     organizationEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -32879,11 +31658,16 @@ export const plans = {
   },
   UpdateOrganizationInput: {
     clientMutationId: {
-      applyPlan: UpdateOrganizationInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     organizationPatch: {
-      applyPlan: UpdateOrganizationInput_organizationPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   OrganizationPatch: {
@@ -32904,27 +31688,43 @@ export const plans = {
   },
   UpdateOrganizationByOrganizationIdInput: {
     clientMutationId: {
-      applyPlan: UpdateOrganizationByOrganizationIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     organizationId: undefined,
     organizationPatch: {
-      applyPlan: UpdateOrganizationByOrganizationIdInput_organizationPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateOrganizationByNameInput: {
     clientMutationId: {
-      applyPlan: UpdateOrganizationByNameInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     name: undefined,
     organizationPatch: {
-      applyPlan: UpdateOrganizationByNameInput_organizationPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdatePersonPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdatePersonPayload_clientMutationIdPlan,
-    person: UpdatePersonPayload_personPlan,
-    query: UpdatePersonPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    person($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     personEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -32959,11 +31759,16 @@ export const plans = {
   },
   UpdatePersonInput: {
     clientMutationId: {
-      applyPlan: UpdatePersonInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     personPatch: {
-      applyPlan: UpdatePersonInput_personPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   PersonPatch: {
@@ -32984,27 +31789,43 @@ export const plans = {
   },
   UpdatePersonByPersonIdInput: {
     clientMutationId: {
-      applyPlan: UpdatePersonByPersonIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     personId: undefined,
     personPatch: {
-      applyPlan: UpdatePersonByPersonIdInput_personPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdatePersonByUsernameInput: {
     clientMutationId: {
-      applyPlan: UpdatePersonByUsernameInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     username: undefined,
     personPatch: {
-      applyPlan: UpdatePersonByUsernameInput_personPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateRelationalItemRelationCompositePkPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateRelationalItemRelationCompositePkPayload_clientMutationIdPlan,
-    relationalItemRelationCompositePk: UpdateRelationalItemRelationCompositePkPayload_relationalItemRelationCompositePkPlan,
-    query: UpdateRelationalItemRelationCompositePkPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    relationalItemRelationCompositePk($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     relationalItemRelationCompositePkEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -33049,11 +31870,16 @@ export const plans = {
   },
   UpdateRelationalItemRelationCompositePkInput: {
     clientMutationId: {
-      applyPlan: UpdateRelationalItemRelationCompositePkInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     relationalItemRelationCompositePkPatch: {
-      applyPlan: UpdateRelationalItemRelationCompositePkInput_relationalItemRelationCompositePkPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   RelationalItemRelationCompositePkPatch: {
@@ -33074,19 +31900,30 @@ export const plans = {
   },
   UpdateRelationalItemRelationCompositePkByParentIdAndChildIdInput: {
     clientMutationId: {
-      applyPlan: UpdateRelationalItemRelationCompositePkByParentIdAndChildIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     parentId: undefined,
     childId: undefined,
     relationalItemRelationCompositePkPatch: {
-      applyPlan: UpdateRelationalItemRelationCompositePkByParentIdAndChildIdInput_relationalItemRelationCompositePkPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateSingleTableItemRelationCompositePkPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateSingleTableItemRelationCompositePkPayload_clientMutationIdPlan,
-    singleTableItemRelationCompositePk: UpdateSingleTableItemRelationCompositePkPayload_singleTableItemRelationCompositePkPlan,
-    query: UpdateSingleTableItemRelationCompositePkPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    singleTableItemRelationCompositePk($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     singleTableItemRelationCompositePkEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -33131,11 +31968,16 @@ export const plans = {
   },
   UpdateSingleTableItemRelationCompositePkInput: {
     clientMutationId: {
-      applyPlan: UpdateSingleTableItemRelationCompositePkInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     singleTableItemRelationCompositePkPatch: {
-      applyPlan: UpdateSingleTableItemRelationCompositePkInput_singleTableItemRelationCompositePkPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   SingleTableItemRelationCompositePkPatch: {
@@ -33156,19 +31998,30 @@ export const plans = {
   },
   UpdateSingleTableItemRelationCompositePkByParentIdAndChildIdInput: {
     clientMutationId: {
-      applyPlan: UpdateSingleTableItemRelationCompositePkByParentIdAndChildIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     parentId: undefined,
     childId: undefined,
     singleTableItemRelationCompositePkPatch: {
-      applyPlan: UpdateSingleTableItemRelationCompositePkByParentIdAndChildIdInput_singleTableItemRelationCompositePkPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateRelationalItemRelationPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateRelationalItemRelationPayload_clientMutationIdPlan,
-    relationalItemRelation: UpdateRelationalItemRelationPayload_relationalItemRelationPlan,
-    query: UpdateRelationalItemRelationPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    relationalItemRelation($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     relationalItemRelationEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -33213,11 +32066,16 @@ export const plans = {
   },
   UpdateRelationalItemRelationInput: {
     clientMutationId: {
-      applyPlan: UpdateRelationalItemRelationInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     relationalItemRelationPatch: {
-      applyPlan: UpdateRelationalItemRelationInput_relationalItemRelationPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   RelationalItemRelationPatch: {
@@ -33245,28 +32103,44 @@ export const plans = {
   },
   UpdateRelationalItemRelationByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateRelationalItemRelationByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     relationalItemRelationPatch: {
-      applyPlan: UpdateRelationalItemRelationByIdInput_relationalItemRelationPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateRelationalItemRelationByParentIdAndChildIdInput: {
     clientMutationId: {
-      applyPlan: UpdateRelationalItemRelationByParentIdAndChildIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     parentId: undefined,
     childId: undefined,
     relationalItemRelationPatch: {
-      applyPlan: UpdateRelationalItemRelationByParentIdAndChildIdInput_relationalItemRelationPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateSingleTableItemRelationPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateSingleTableItemRelationPayload_clientMutationIdPlan,
-    singleTableItemRelation: UpdateSingleTableItemRelationPayload_singleTableItemRelationPlan,
-    query: UpdateSingleTableItemRelationPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    singleTableItemRelation($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     singleTableItemRelationEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -33311,11 +32185,16 @@ export const plans = {
   },
   UpdateSingleTableItemRelationInput: {
     clientMutationId: {
-      applyPlan: UpdateSingleTableItemRelationInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     singleTableItemRelationPatch: {
-      applyPlan: UpdateSingleTableItemRelationInput_singleTableItemRelationPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   SingleTableItemRelationPatch: {
@@ -33343,28 +32222,44 @@ export const plans = {
   },
   UpdateSingleTableItemRelationByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateSingleTableItemRelationByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     singleTableItemRelationPatch: {
-      applyPlan: UpdateSingleTableItemRelationByIdInput_singleTableItemRelationPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateSingleTableItemRelationByParentIdAndChildIdInput: {
     clientMutationId: {
-      applyPlan: UpdateSingleTableItemRelationByParentIdAndChildIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     parentId: undefined,
     childId: undefined,
     singleTableItemRelationPatch: {
-      applyPlan: UpdateSingleTableItemRelationByParentIdAndChildIdInput_singleTableItemRelationPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateLogEntryPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateLogEntryPayload_clientMutationIdPlan,
-    logEntry: UpdateLogEntryPayload_logEntryPlan,
-    query: UpdateLogEntryPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    logEntry($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     logEntryEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -33409,11 +32304,16 @@ export const plans = {
   },
   UpdateLogEntryInput: {
     clientMutationId: {
-      applyPlan: UpdateLogEntryInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     logEntryPatch: {
-      applyPlan: UpdateLogEntryInput_logEntryPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   LogEntryPatch: {
@@ -33448,18 +32348,29 @@ export const plans = {
   },
   UpdateLogEntryByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateLogEntryByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     logEntryPatch: {
-      applyPlan: UpdateLogEntryByIdInput_logEntryPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateFirstPartyVulnerabilityPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateFirstPartyVulnerabilityPayload_clientMutationIdPlan,
-    firstPartyVulnerability: UpdateFirstPartyVulnerabilityPayload_firstPartyVulnerabilityPlan,
-    query: UpdateFirstPartyVulnerabilityPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    firstPartyVulnerability($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     firstPartyVulnerabilityEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -33494,11 +32405,16 @@ export const plans = {
   },
   UpdateFirstPartyVulnerabilityInput: {
     clientMutationId: {
-      applyPlan: UpdateFirstPartyVulnerabilityInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     firstPartyVulnerabilityPatch: {
-      applyPlan: UpdateFirstPartyVulnerabilityInput_firstPartyVulnerabilityPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   FirstPartyVulnerabilityPatch: {
@@ -33533,18 +32449,29 @@ export const plans = {
   },
   UpdateFirstPartyVulnerabilityByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateFirstPartyVulnerabilityByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     firstPartyVulnerabilityPatch: {
-      applyPlan: UpdateFirstPartyVulnerabilityByIdInput_firstPartyVulnerabilityPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateThirdPartyVulnerabilityPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateThirdPartyVulnerabilityPayload_clientMutationIdPlan,
-    thirdPartyVulnerability: UpdateThirdPartyVulnerabilityPayload_thirdPartyVulnerabilityPlan,
-    query: UpdateThirdPartyVulnerabilityPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    thirdPartyVulnerability($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     thirdPartyVulnerabilityEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -33579,11 +32506,16 @@ export const plans = {
   },
   UpdateThirdPartyVulnerabilityInput: {
     clientMutationId: {
-      applyPlan: UpdateThirdPartyVulnerabilityInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     thirdPartyVulnerabilityPatch: {
-      applyPlan: UpdateThirdPartyVulnerabilityInput_thirdPartyVulnerabilityPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   ThirdPartyVulnerabilityPatch: {
@@ -33618,18 +32550,29 @@ export const plans = {
   },
   UpdateThirdPartyVulnerabilityByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateThirdPartyVulnerabilityByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     thirdPartyVulnerabilityPatch: {
-      applyPlan: UpdateThirdPartyVulnerabilityByIdInput_thirdPartyVulnerabilityPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateAwsApplicationPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateAwsApplicationPayload_clientMutationIdPlan,
-    awsApplication: UpdateAwsApplicationPayload_awsApplicationPlan,
-    query: UpdateAwsApplicationPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    awsApplication($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     awsApplicationEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -33674,11 +32617,16 @@ export const plans = {
   },
   UpdateAwsApplicationInput: {
     clientMutationId: {
-      applyPlan: UpdateAwsApplicationInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     awsApplicationPatch: {
-      applyPlan: UpdateAwsApplicationInput_awsApplicationPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   AwsApplicationPatch: {
@@ -33727,18 +32675,29 @@ export const plans = {
   },
   UpdateAwsApplicationByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateAwsApplicationByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     awsApplicationPatch: {
-      applyPlan: UpdateAwsApplicationByIdInput_awsApplicationPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateGcpApplicationPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateGcpApplicationPayload_clientMutationIdPlan,
-    gcpApplication: UpdateGcpApplicationPayload_gcpApplicationPlan,
-    query: UpdateGcpApplicationPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    gcpApplication($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     gcpApplicationEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -33783,11 +32742,16 @@ export const plans = {
   },
   UpdateGcpApplicationInput: {
     clientMutationId: {
-      applyPlan: UpdateGcpApplicationInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     gcpApplicationPatch: {
-      applyPlan: UpdateGcpApplicationInput_gcpApplicationPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   GcpApplicationPatch: {
@@ -33836,23 +32800,34 @@ export const plans = {
   },
   UpdateGcpApplicationByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateGcpApplicationByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     gcpApplicationPatch: {
-      applyPlan: UpdateGcpApplicationByIdInput_gcpApplicationPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   DeleteOrganizationPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteOrganizationPayload_clientMutationIdPlan,
-    organization: DeleteOrganizationPayload_organizationPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    organization($object) {
+      return $object.get("result");
+    },
     deletedOrganizationId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler4.plan($record);
       return lambda(specifier, handler_codec_base64JSON.encode);
     },
-    query: DeleteOrganizationPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     organizationEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -33887,32 +32862,44 @@ export const plans = {
   },
   DeleteOrganizationInput: {
     clientMutationId: {
-      applyPlan: DeleteOrganizationInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteOrganizationByOrganizationIdInput: {
     clientMutationId: {
-      applyPlan: DeleteOrganizationByOrganizationIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     organizationId: undefined
   },
   DeleteOrganizationByNameInput: {
     clientMutationId: {
-      applyPlan: DeleteOrganizationByNameInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     name: undefined
   },
   DeletePersonPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeletePersonPayload_clientMutationIdPlan,
-    person: DeletePersonPayload_personPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    person($object) {
+      return $object.get("result");
+    },
     deletedPersonId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler2.plan($record);
       return lambda(specifier, handler_codec_base64JSON.encode);
     },
-    query: DeletePersonPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     personEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -33947,32 +32934,44 @@ export const plans = {
   },
   DeletePersonInput: {
     clientMutationId: {
-      applyPlan: DeletePersonInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeletePersonByPersonIdInput: {
     clientMutationId: {
-      applyPlan: DeletePersonByPersonIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     personId: undefined
   },
   DeletePersonByUsernameInput: {
     clientMutationId: {
-      applyPlan: DeletePersonByUsernameInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     username: undefined
   },
   DeleteRelationalItemRelationCompositePkPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteRelationalItemRelationCompositePkPayload_clientMutationIdPlan,
-    relationalItemRelationCompositePk: DeleteRelationalItemRelationCompositePkPayload_relationalItemRelationCompositePkPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    relationalItemRelationCompositePk($object) {
+      return $object.get("result");
+    },
     deletedRelationalItemRelationCompositePkId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler8.plan($record);
       return lambda(specifier, handler_codec_base64JSON.encode);
     },
-    query: DeleteRelationalItemRelationCompositePkPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     relationalItemRelationCompositePkEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -34017,27 +33016,37 @@ export const plans = {
   },
   DeleteRelationalItemRelationCompositePkInput: {
     clientMutationId: {
-      applyPlan: DeleteRelationalItemRelationCompositePkInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteRelationalItemRelationCompositePkByParentIdAndChildIdInput: {
     clientMutationId: {
-      applyPlan: DeleteRelationalItemRelationCompositePkByParentIdAndChildIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     parentId: undefined,
     childId: undefined
   },
   DeleteSingleTableItemRelationCompositePkPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteSingleTableItemRelationCompositePkPayload_clientMutationIdPlan,
-    singleTableItemRelationCompositePk: DeleteSingleTableItemRelationCompositePkPayload_singleTableItemRelationCompositePkPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    singleTableItemRelationCompositePk($object) {
+      return $object.get("result");
+    },
     deletedSingleTableItemRelationCompositePkId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler10.plan($record);
       return lambda(specifier, handler_codec_base64JSON.encode);
     },
-    query: DeleteSingleTableItemRelationCompositePkPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     singleTableItemRelationCompositePkEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -34082,27 +33091,37 @@ export const plans = {
   },
   DeleteSingleTableItemRelationCompositePkInput: {
     clientMutationId: {
-      applyPlan: DeleteSingleTableItemRelationCompositePkInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteSingleTableItemRelationCompositePkByParentIdAndChildIdInput: {
     clientMutationId: {
-      applyPlan: DeleteSingleTableItemRelationCompositePkByParentIdAndChildIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     parentId: undefined,
     childId: undefined
   },
   DeleteRelationalItemRelationPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteRelationalItemRelationPayload_clientMutationIdPlan,
-    relationalItemRelation: DeleteRelationalItemRelationPayload_relationalItemRelationPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    relationalItemRelation($object) {
+      return $object.get("result");
+    },
     deletedRelationalItemRelationId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler7.plan($record);
       return lambda(specifier, handler_codec_base64JSON.encode);
     },
-    query: DeleteRelationalItemRelationPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     relationalItemRelationEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -34147,33 +33166,45 @@ export const plans = {
   },
   DeleteRelationalItemRelationInput: {
     clientMutationId: {
-      applyPlan: DeleteRelationalItemRelationInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteRelationalItemRelationByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteRelationalItemRelationByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   },
   DeleteRelationalItemRelationByParentIdAndChildIdInput: {
     clientMutationId: {
-      applyPlan: DeleteRelationalItemRelationByParentIdAndChildIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     parentId: undefined,
     childId: undefined
   },
   DeleteSingleTableItemRelationPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteSingleTableItemRelationPayload_clientMutationIdPlan,
-    singleTableItemRelation: DeleteSingleTableItemRelationPayload_singleTableItemRelationPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    singleTableItemRelation($object) {
+      return $object.get("result");
+    },
     deletedSingleTableItemRelationId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler9.plan($record);
       return lambda(specifier, handler_codec_base64JSON.encode);
     },
-    query: DeleteSingleTableItemRelationPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     singleTableItemRelationEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -34218,33 +33249,45 @@ export const plans = {
   },
   DeleteSingleTableItemRelationInput: {
     clientMutationId: {
-      applyPlan: DeleteSingleTableItemRelationInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteSingleTableItemRelationByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteSingleTableItemRelationByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   },
   DeleteSingleTableItemRelationByParentIdAndChildIdInput: {
     clientMutationId: {
-      applyPlan: DeleteSingleTableItemRelationByParentIdAndChildIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     parentId: undefined,
     childId: undefined
   },
   DeleteLogEntryPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteLogEntryPayload_clientMutationIdPlan,
-    logEntry: DeleteLogEntryPayload_logEntryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    logEntry($object) {
+      return $object.get("result");
+    },
     deletedLogEntryId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler3.plan($record);
       return lambda(specifier, handler_codec_base64JSON.encode);
     },
-    query: DeleteLogEntryPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     logEntryEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -34289,26 +33332,36 @@ export const plans = {
   },
   DeleteLogEntryInput: {
     clientMutationId: {
-      applyPlan: DeleteLogEntryInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteLogEntryByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteLogEntryByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   },
   DeleteFirstPartyVulnerabilityPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteFirstPartyVulnerabilityPayload_clientMutationIdPlan,
-    firstPartyVulnerability: DeleteFirstPartyVulnerabilityPayload_firstPartyVulnerabilityPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    firstPartyVulnerability($object) {
+      return $object.get("result");
+    },
     deletedFirstPartyVulnerabilityId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.FirstPartyVulnerability.plan($record);
       return lambda(specifier, handler_codec_base64JSON.encode);
     },
-    query: DeleteFirstPartyVulnerabilityPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     firstPartyVulnerabilityEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -34343,26 +33396,36 @@ export const plans = {
   },
   DeleteFirstPartyVulnerabilityInput: {
     clientMutationId: {
-      applyPlan: DeleteFirstPartyVulnerabilityInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteFirstPartyVulnerabilityByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteFirstPartyVulnerabilityByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   },
   DeleteThirdPartyVulnerabilityPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteThirdPartyVulnerabilityPayload_clientMutationIdPlan,
-    thirdPartyVulnerability: DeleteThirdPartyVulnerabilityPayload_thirdPartyVulnerabilityPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    thirdPartyVulnerability($object) {
+      return $object.get("result");
+    },
     deletedThirdPartyVulnerabilityId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.ThirdPartyVulnerability.plan($record);
       return lambda(specifier, handler_codec_base64JSON.encode);
     },
-    query: DeleteThirdPartyVulnerabilityPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     thirdPartyVulnerabilityEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -34397,26 +33460,36 @@ export const plans = {
   },
   DeleteThirdPartyVulnerabilityInput: {
     clientMutationId: {
-      applyPlan: DeleteThirdPartyVulnerabilityInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteThirdPartyVulnerabilityByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteThirdPartyVulnerabilityByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   },
   DeleteAwsApplicationPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteAwsApplicationPayload_clientMutationIdPlan,
-    awsApplication: DeleteAwsApplicationPayload_awsApplicationPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    awsApplication($object) {
+      return $object.get("result");
+    },
     deletedAwsApplicationId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler5.plan($record);
       return lambda(specifier, handler_codec_base64JSON.encode);
     },
-    query: DeleteAwsApplicationPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     awsApplicationEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -34461,26 +33534,36 @@ export const plans = {
   },
   DeleteAwsApplicationInput: {
     clientMutationId: {
-      applyPlan: DeleteAwsApplicationInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteAwsApplicationByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteAwsApplicationByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   },
   DeleteGcpApplicationPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteGcpApplicationPayload_clientMutationIdPlan,
-    gcpApplication: DeleteGcpApplicationPayload_gcpApplicationPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    gcpApplication($object) {
+      return $object.get("result");
+    },
     deletedGcpApplicationId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = handler6.plan($record);
       return lambda(specifier, handler_codec_base64JSON.encode);
     },
-    query: DeleteGcpApplicationPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     gcpApplicationEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -34525,13 +33608,17 @@ export const plans = {
   },
   DeleteGcpApplicationInput: {
     clientMutationId: {
-      applyPlan: DeleteGcpApplicationInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteGcpApplicationByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteGcpApplicationByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   }

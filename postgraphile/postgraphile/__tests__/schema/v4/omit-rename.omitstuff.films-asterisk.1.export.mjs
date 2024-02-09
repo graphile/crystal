@@ -2,9 +2,6 @@ import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelec
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
-function Query_queryPlan() {
-  return rootValue();
-}
 const handler = {
   typeName: "Query",
   codec: {
@@ -29,40 +26,25 @@ const handler = {
     return constant`query`;
   }
 };
-function base64JSONDecode(value) {
-  return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-}
-function base64JSONEncode(value) {
-  return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-}
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode: base64JSONEncode,
-  decode: base64JSONDecode
+  encode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  },
+  decode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }
 };
-function pipeStringDecode(value) {
-  return typeof value === "string" ? value.split("|") : null;
-}
-function pipeStringEncode(value) {
-  return Array.isArray(value) ? value.join("|") : null;
-}
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode: pipeStringEncode,
-    decode: pipeStringDecode
-  }
-});
-const flambleAttributes = Object.assign(Object.create(null), {
-  f: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
+    encode(value) {
+      return Array.isArray(value) ? value.join("|") : null;
+    },
+    decode(value) {
+      return typeof value === "string" ? value.split("|") : null;
     }
   }
 });
@@ -76,11 +58,20 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const flambleIdentifier = sql.identifier(...["d", "flibble"]);
-const flambleCodecSpec = {
+const flambleCodec = recordCodec({
   name: "flamble",
-  identifier: flambleIdentifier,
-  attributes: flambleAttributes,
+  identifier: sql.identifier("d", "flibble"),
+  attributes: Object.assign(Object.create(null), {
+    f: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: false,
@@ -94,8 +85,7 @@ const flambleCodecSpec = {
     })
   },
   executor: executor_mainPgExecutor
-};
-const flambleCodec = recordCodec(flambleCodecSpec);
+});
 const renamed_tableAttributes = Object.assign(Object.create(null), {
   col1: {
     description: undefined,
@@ -109,47 +99,23 @@ const renamed_tableAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions2 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "d",
-    name: "original_table"
-  },
-  tags: Object.assign(Object.create(null), {
-    name: "renamed_table"
-  })
-};
-const parts2 = ["d", "original_table"];
-const renamed_tableIdentifier = sql.identifier(...parts2);
-const renamed_tableCodecSpec = {
+const renamed_tableCodec = recordCodec({
   name: "renamed_table",
-  identifier: renamed_tableIdentifier,
+  identifier: sql.identifier("d", "original_table"),
   attributes: renamed_tableAttributes,
   description: undefined,
-  extensions: extensions2,
-  executor: executor_mainPgExecutor
-};
-const renamed_tableCodec = recordCodec(renamed_tableCodecSpec);
-const filmsAttributes = Object.assign(Object.create(null), {
-  code: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "original_table"
+    },
+    tags: Object.assign(Object.create(null), {
+      name: "renamed_table"
+    })
   },
-  title: {
-    description: undefined,
-    codec: TYPES.varchar,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
+  executor: executor_mainPgExecutor
 });
 const extensions3 = {
   isTableLike: true,
@@ -163,17 +129,33 @@ const extensions3 = {
     behavior: ["-*"]
   })
 };
-const parts3 = ["d", "films"];
-const filmsIdentifier = sql.identifier(...parts3);
-const filmsCodecSpec = {
+const filmsCodec = recordCodec({
   name: "films",
-  identifier: filmsIdentifier,
-  attributes: filmsAttributes,
+  identifier: sql.identifier("d", "films"),
+  attributes: Object.assign(Object.create(null), {
+    code: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    title: {
+      description: undefined,
+      codec: TYPES.varchar,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: extensions3,
   executor: executor_mainPgExecutor
-};
-const filmsCodec = recordCodec(filmsCodecSpec);
+});
 const studiosAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -194,26 +176,22 @@ const studiosAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions4 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "d",
-    name: "studios"
-  },
-  tags: Object.create(null)
-};
-const parts4 = ["d", "studios"];
-const studiosIdentifier = sql.identifier(...parts4);
-const studiosCodecSpec = {
+const studiosCodec = recordCodec({
   name: "studios",
-  identifier: studiosIdentifier,
+  identifier: sql.identifier("d", "studios"),
   attributes: studiosAttributes,
   description: undefined,
-  extensions: extensions4,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "studios"
+    },
+    tags: Object.create(null)
+  },
   executor: executor_mainPgExecutor
-};
-const studiosCodec = recordCodec(studiosCodecSpec);
+});
 const postAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -243,26 +221,22 @@ const postAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions5 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "d",
-    name: "post"
-  },
-  tags: Object.create(null)
-};
-const parts5 = ["d", "post"];
-const postIdentifier = sql.identifier(...parts5);
-const postCodecSpec = {
+const postCodec = recordCodec({
   name: "post",
-  identifier: postIdentifier,
+  identifier: sql.identifier("d", "post"),
   attributes: postAttributes,
   description: undefined,
-  extensions: extensions5,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "post"
+    },
+    tags: Object.create(null)
+  },
   executor: executor_mainPgExecutor
-};
-const postCodec = recordCodec(postCodecSpec);
+});
 const tvEpisodesAttributes = Object.assign(Object.create(null), {
   code: {
     description: undefined,
@@ -292,54 +266,21 @@ const tvEpisodesAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions6 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "d",
-    name: "tv_episodes"
-  },
-  tags: Object.create(null)
-};
-const parts6 = ["d", "tv_episodes"];
-const tvEpisodesIdentifier = sql.identifier(...parts6);
-const tvEpisodesCodecSpec = {
+const tvEpisodesCodec = recordCodec({
   name: "tvEpisodes",
-  identifier: tvEpisodesIdentifier,
+  identifier: sql.identifier("d", "tv_episodes"),
   attributes: tvEpisodesAttributes,
   description: undefined,
-  extensions: extensions6,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "tv_episodes"
+    },
+    tags: Object.create(null)
+  },
   executor: executor_mainPgExecutor
-};
-const tvEpisodesCodec = recordCodec(tvEpisodesCodecSpec);
-const tvShowsAttributes = Object.assign(Object.create(null), {
-  code: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  title: {
-    description: undefined,
-    codec: TYPES.varchar,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  studio_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
 });
 const extensions7 = {
   isTableLike: true,
@@ -353,66 +294,86 @@ const extensions7 = {
     behavior: ["-*"]
   })
 };
-const parts7 = ["d", "tv_shows"];
-const tvShowsIdentifier = sql.identifier(...parts7);
-const tvShowsCodecSpec = {
+const tvShowsCodec = recordCodec({
   name: "tvShows",
-  identifier: tvShowsIdentifier,
-  attributes: tvShowsAttributes,
+  identifier: sql.identifier("d", "tv_shows"),
+  attributes: Object.assign(Object.create(null), {
+    code: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    title: {
+      description: undefined,
+      codec: TYPES.varchar,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    studio_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: extensions7,
   executor: executor_mainPgExecutor
-};
-const tvShowsCodec = recordCodec(tvShowsCodecSpec);
-const jwtTokenAttributes = Object.assign(Object.create(null), {
-  role: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  exp: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  a: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
 });
-const extensions8 = {
-  isTableLike: false,
-  pg: {
-    serviceName: "main",
-    schemaName: "d",
-    name: "jwt_token"
-  },
-  tags: Object.create(null)
-};
-const parts8 = ["d", "jwt_token"];
-const jwtTokenIdentifier = sql.identifier(...parts8);
-const jwtTokenCodecSpec = {
+const jwtTokenCodec = recordCodec({
   name: "jwtToken",
-  identifier: jwtTokenIdentifier,
-  attributes: jwtTokenAttributes,
+  identifier: sql.identifier("d", "jwt_token"),
+  attributes: Object.assign(Object.create(null), {
+    role: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    exp: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    a: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
-  extensions: extensions8,
+  extensions: {
+    isTableLike: false,
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "jwt_token"
+    },
+    tags: Object.create(null)
+  },
   executor: executor_mainPgExecutor
-};
-const jwtTokenCodec = recordCodec(jwtTokenCodecSpec);
+});
 const personAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -526,127 +487,24 @@ const personAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions9 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "d",
-    name: "person"
-  },
-  tags: Object.create(null)
-};
-const parts9 = ["d", "person"];
-const personIdentifier = sql.identifier(...parts9);
-const personCodecSpec = {
+const personCodec = recordCodec({
   name: "person",
-  identifier: personIdentifier,
+  identifier: sql.identifier("d", "person"),
   attributes: personAttributes,
   description: undefined,
-  extensions: extensions9,
-  executor: executor_mainPgExecutor
-};
-const personCodec = recordCodec(personCodecSpec);
-const extensions10 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "d",
-    name: "original_function"
-  },
-  tags: {
-    name: "renamed_function",
-    behavior: ["queryField -mutationField -typeField", "-filter -order"]
-  }
-};
-const parts10 = ["d", "original_function"];
-const sqlIdent = sql.identifier(...parts10);
-const parts11 = ["d", "getflamble"];
-const sqlIdent2 = sql.identifier(...parts11);
-const options_getflamble = {
-  name: "getflamble",
-  identifier: "main.d.getflamble()",
-  from(...args) {
-    return sql`${sqlIdent2}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [],
-  returnsArray: false,
-  returnsSetof: true,
-  isMutation: true,
   extensions: {
+    isTableLike: true,
     pg: {
       serviceName: "main",
       schemaName: "d",
-      name: "getflamble"
+      name: "person"
     },
-    tags: {
-      behavior: ["-queryField mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const extensions11 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "d",
-    name: "flibble"
-  },
-  tags: {
-    name: "flamble",
-    behavior: ["-insert", "-update", "-delete"]
-  }
-};
-const resourceConfig_flamble = {
-  executor: executor_mainPgExecutor,
-  name: "flamble",
-  identifier: "main.d.flibble",
-  from: flambleCodec.sqlType,
-  codec: flambleCodec,
-  uniques: [],
-  isVirtual: true,
-  description: undefined,
-  extensions: extensions11
-};
-const extensions12 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "d",
-    name: "original_table"
-  },
-  tags: {
-    name: "renamed_table"
-  }
-};
-const uniques2 = [];
-const extensions13 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "d",
-    name: "films"
-  },
-  tags: {
-    omit: "*",
-    behavior: extensions3.tags.behavior
-  }
-};
-const uniques3 = [{
-  isPrimary: true,
-  attributes: ["code"],
-  description: undefined,
-  extensions: {
     tags: Object.create(null)
-  }
-}];
-const extensions14 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "d",
-    name: "studios"
   },
-  tags: {}
-};
+  executor: executor_mainPgExecutor
+});
+const sqlIdent = sql.identifier("d", "original_function");
+const sqlIdent2 = sql.identifier("d", "getflamble");
 const uniques4 = [{
   isPrimary: true,
   attributes: ["id"],
@@ -664,16 +522,15 @@ const registryConfig_pgResources_studios_studios = {
   uniques: uniques4,
   isVirtual: false,
   description: undefined,
-  extensions: extensions14
-};
-const extensions15 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "d",
-    name: "post"
-  },
-  tags: {}
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "studios"
+    },
+    tags: {}
+  }
 };
 const uniques5 = [{
   isPrimary: true,
@@ -692,16 +549,15 @@ const registryConfig_pgResources_post_post = {
   uniques: uniques5,
   isVirtual: false,
   description: undefined,
-  extensions: extensions15
-};
-const extensions16 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "d",
-    name: "tv_episodes"
-  },
-  tags: {}
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "post"
+    },
+    tags: {}
+  }
 };
 const uniques6 = [{
   isPrimary: true,
@@ -720,156 +576,48 @@ const registryConfig_pgResources_tv_episodes_tv_episodes = {
   uniques: uniques6,
   isVirtual: false,
   description: undefined,
-  extensions: extensions16
-};
-const extensions17 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "d",
-    name: "tv_shows"
-  },
-  tags: {
-    omit: true,
-    behavior: extensions7.tags.behavior
-  }
-};
-const uniques7 = [{
-  isPrimary: true,
-  attributes: ["code"],
-  description: undefined,
   extensions: {
-    tags: Object.create(null)
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "tv_episodes"
+    },
+    tags: {}
   }
-}];
+};
 const registryConfig_pgResources_tv_shows_tv_shows = {
   executor: executor_mainPgExecutor,
   name: "tv_shows",
   identifier: "main.d.tv_shows",
   from: tvShowsCodec.sqlType,
   codec: tvShowsCodec,
-  uniques: uniques7,
+  uniques: [{
+    isPrimary: true,
+    attributes: ["code"],
+    description: undefined,
+    extensions: {
+      tags: Object.create(null)
+    }
+  }],
   isVirtual: false,
   description: undefined,
-  extensions: extensions17
-};
-const parts12 = ["d", "authenticate"];
-const sqlIdent3 = sql.identifier(...parts12);
-const options_login = {
-  name: "login",
-  identifier: "main.d.authenticate(int4)",
-  from(...args) {
-    return sql`${sqlIdent3}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "a",
-    required: true,
-    notNull: false,
-    codec: TYPES.int
-  }],
-  returnsArray: false,
-  returnsSetof: false,
-  isMutation: true,
   extensions: {
+    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "d",
-      name: "authenticate"
+      name: "tv_shows"
     },
     tags: {
-      name: "login",
-      resultFieldName: "token",
-      behavior: ["-queryField mutationField -typeField", "-filter -order"]
+      omit: true,
+      behavior: extensions7.tags.behavior
     }
-  },
-  description: undefined
-};
-const extensions18 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "d",
-    name: "jwt_token"
-  },
-  tags: {
-    behavior: ["-insert", "-update", "-delete"]
   }
 };
-const uniques8 = [];
-const resourceConfig_jwt_token = {
-  executor: executor_mainPgExecutor,
-  name: "jwt_token",
-  identifier: "main.d.jwt_token",
-  from: jwtTokenCodec.sqlType,
-  codec: jwtTokenCodec,
-  uniques: uniques8,
-  isVirtual: true,
-  description: undefined,
-  extensions: extensions18
-};
-const extensions19 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "d",
-    name: "person_full_name"
-  },
-  tags: {
-    fieldName: "name",
-    behavior: ["-queryField -mutationField typeField", "-filter -order", "+queryField"],
-    arg0variant: "nodeId"
-  }
-};
-const parts13 = ["d", "person_full_name"];
-const sqlIdent4 = sql.identifier(...parts13);
-const fromCallback2 = (...args) => sql`${sqlIdent4}(${sqlFromArgDigests(args)})`;
-const parameters2 = [{
-  name: "n",
-  required: true,
-  notNull: false,
-  codec: personCodec,
-  extensions: {
-    variant: "nodeId"
-  }
-}];
-const parts14 = ["d", "search_posts"];
-const sqlIdent5 = sql.identifier(...parts14);
-const options_returnPostsMatching = {
-  name: "returnPostsMatching",
-  identifier: "main.d.search_posts(text)",
-  from(...args) {
-    return sql`${sqlIdent5}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "search",
-    required: true,
-    notNull: false,
-    codec: TYPES.text
-  }],
-  returnsArray: false,
-  returnsSetof: true,
-  isMutation: false,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "d",
-      name: "search_posts"
-    },
-    tags: {
-      name: "returnPostsMatching",
-      behavior: ["queryField -mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const extensions20 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "d",
-    name: "person"
-  },
-  tags: {}
-};
+const sqlIdent3 = sql.identifier("d", "authenticate");
+const sqlIdent4 = sql.identifier("d", "person_full_name");
+const sqlIdent5 = sql.identifier("d", "search_posts");
 const uniques9 = [{
   isPrimary: true,
   attributes: ["id"],
@@ -889,7 +637,15 @@ const registryConfig_pgResources_person_person = {
   uniques: uniques9,
   isVirtual: false,
   description: undefined,
-  extensions: extensions20
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "person"
+    },
+    tags: {}
+  }
 };
 const registry = makeRegistry({
   pgCodecs: Object.assign(Object.create(null), {
@@ -920,20 +676,82 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: false,
-      extensions: extensions10,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "d",
+          name: "original_function"
+        },
+        tags: {
+          name: "renamed_function",
+          behavior: ["queryField -mutationField -typeField", "-filter -order"]
+        }
+      },
       description: undefined
     },
-    getflamble: PgResource.functionResourceOptions(resourceConfig_flamble, options_getflamble),
+    getflamble: PgResource.functionResourceOptions({
+      executor: executor_mainPgExecutor,
+      name: "flamble",
+      identifier: "main.d.flibble",
+      from: flambleCodec.sqlType,
+      codec: flambleCodec,
+      uniques: [],
+      isVirtual: true,
+      description: undefined,
+      extensions: {
+        description: undefined,
+        pg: {
+          serviceName: "main",
+          schemaName: "d",
+          name: "flibble"
+        },
+        tags: {
+          name: "flamble",
+          behavior: ["-insert", "-update", "-delete"]
+        }
+      }
+    }, {
+      name: "getflamble",
+      identifier: "main.d.getflamble()",
+      from(...args) {
+        return sql`${sqlIdent2}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsArray: false,
+      returnsSetof: true,
+      isMutation: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "d",
+          name: "getflamble"
+        },
+        tags: {
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
     renamed_table: {
       executor: executor_mainPgExecutor,
       name: "renamed_table",
       identifier: "main.d.original_table",
       from: renamed_tableCodec.sqlType,
       codec: renamed_tableCodec,
-      uniques: uniques2,
+      uniques: [],
       isVirtual: false,
       description: undefined,
-      extensions: extensions12
+      extensions: {
+        description: undefined,
+        pg: {
+          serviceName: "main",
+          schemaName: "d",
+          name: "original_table"
+        },
+        tags: {
+          name: "renamed_table"
+        }
+      }
     },
     films: {
       executor: executor_mainPgExecutor,
@@ -941,30 +759,144 @@ const registry = makeRegistry({
       identifier: "main.d.films",
       from: filmsCodec.sqlType,
       codec: filmsCodec,
-      uniques: uniques3,
+      uniques: [{
+        isPrimary: true,
+        attributes: ["code"],
+        description: undefined,
+        extensions: {
+          tags: Object.create(null)
+        }
+      }],
       isVirtual: false,
       description: undefined,
-      extensions: extensions13
+      extensions: {
+        description: undefined,
+        pg: {
+          serviceName: "main",
+          schemaName: "d",
+          name: "films"
+        },
+        tags: {
+          omit: "*",
+          behavior: extensions3.tags.behavior
+        }
+      }
     },
     studios: registryConfig_pgResources_studios_studios,
     post: registryConfig_pgResources_post_post,
     tv_episodes: registryConfig_pgResources_tv_episodes_tv_episodes,
     tv_shows: registryConfig_pgResources_tv_shows_tv_shows,
-    login: PgResource.functionResourceOptions(resourceConfig_jwt_token, options_login),
+    login: PgResource.functionResourceOptions({
+      executor: executor_mainPgExecutor,
+      name: "jwt_token",
+      identifier: "main.d.jwt_token",
+      from: jwtTokenCodec.sqlType,
+      codec: jwtTokenCodec,
+      uniques: [],
+      isVirtual: true,
+      description: undefined,
+      extensions: {
+        description: undefined,
+        pg: {
+          serviceName: "main",
+          schemaName: "d",
+          name: "jwt_token"
+        },
+        tags: {
+          behavior: ["-insert", "-update", "-delete"]
+        }
+      }
+    }, {
+      name: "login",
+      identifier: "main.d.authenticate(int4)",
+      from(...args) {
+        return sql`${sqlIdent3}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "a",
+        required: true,
+        notNull: false,
+        codec: TYPES.int
+      }],
+      returnsArray: false,
+      returnsSetof: false,
+      isMutation: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "d",
+          name: "authenticate"
+        },
+        tags: {
+          name: "login",
+          resultFieldName: "token",
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
     person_full_name: {
       executor: executor_mainPgExecutor,
       name: "person_full_name",
       identifier: "main.d.person_full_name(d.person)",
-      from: fromCallback2,
-      parameters: parameters2,
+      from(...args) {
+        return sql`${sqlIdent4}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "n",
+        required: true,
+        notNull: false,
+        codec: personCodec,
+        extensions: {
+          variant: "nodeId"
+        }
+      }],
       isUnique: !false,
       codec: TYPES.varchar,
       uniques: [],
       isMutation: false,
-      extensions: extensions19,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "d",
+          name: "person_full_name"
+        },
+        tags: {
+          fieldName: "name",
+          behavior: ["-queryField -mutationField typeField", "-filter -order", "+queryField"],
+          arg0variant: "nodeId"
+        }
+      },
       description: undefined
     },
-    returnPostsMatching: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, options_returnPostsMatching),
+    returnPostsMatching: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, {
+      name: "returnPostsMatching",
+      identifier: "main.d.search_posts(text)",
+      from(...args) {
+        return sql`${sqlIdent5}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "search",
+        required: true,
+        notNull: false,
+        codec: TYPES.text
+      }],
+      returnsArray: false,
+      returnsSetof: true,
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "d",
+          name: "search_posts"
+        },
+        tags: {
+          name: "returnPostsMatching",
+          behavior: ["queryField -mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
     person: registryConfig_pgResources_person_person
   }),
   pgRelations: Object.assign(Object.create(null), {
@@ -1337,25 +1269,6 @@ const getSelectPlanFromParentAndArgs = ($root, args, _info) => {
   const selectArgs = makeArgs3(args);
   return resource_returnPostsMatchingPgResource.execute(selectArgs);
 };
-function Query_returnPostsMatchingPlan($parent, args, info) {
-  const $select = getSelectPlanFromParentAndArgs($parent, args, info);
-  return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
-}
-function Query_returnPostsMatching_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_returnPostsMatching_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_returnPostsMatching_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_returnPostsMatching_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_returnPostsMatching_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const fetcher = (handler => {
   const fn = $nodeId => {
     const $decoded = lambda($nodeId, specForHandler(handler));
@@ -1389,21 +1302,6 @@ const fetcher4 = (handler => {
   return fn;
 })(nodeIdHandlerByTypeName.Person);
 const resource_renamed_tablePgResource = registry.pgResources["renamed_table"];
-function Query_allRenamedTables_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allRenamedTables_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allRenamedTables_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allRenamedTables_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allRenamedTables_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const applyOrderToPlan = ($select, $value, TableOrderByType) => {
   const val = $value.eval();
   if (val == null) {
@@ -1422,66 +1320,6 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
     plan($select);
   });
 };
-function Query_allStudios_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allStudios_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allStudios_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allStudios_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allStudios_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allPosts_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allPosts_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allPosts_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allPosts_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allPosts_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allTvEpisodes_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allTvEpisodes_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allTvEpisodes_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allTvEpisodes_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allTvEpisodes_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allPeople_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allPeople_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allPeople_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allPeople_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allPeople_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
 }
@@ -1530,77 +1368,6 @@ const makeArgs4 = (args, path = []) => {
   }
   return selectArgs;
 };
-function Person_posts_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Person_posts_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Person_posts_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Person_posts_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Person_posts_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function PostsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function PostsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function PostsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function PageInfo_hasNextPagePlan($pageInfo) {
-  return $pageInfo.hasNextPage();
-}
-function PageInfo_hasPreviousPagePlan($pageInfo) {
-  return $pageInfo.hasPreviousPage();
-}
-function RenamedTablesConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function RenamedTablesConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function RenamedTablesConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function StudiosConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function StudiosConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function StudiosConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function TvEpisodesConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function TvEpisodesConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function TvEpisodesConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function PeopleConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function PeopleConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function PeopleConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
 const argDetailsSimple5 = [];
 const makeArgs5 = (args, path = []) => {
   const selectArgs = [];
@@ -1647,9 +1414,6 @@ const makeArgs5 = (args, path = []) => {
   return selectArgs;
 };
 const resource_getflamblePgResource = registry.pgResources["getflamble"];
-function Mutation_getflamble_input_applyPlan(_, $object) {
-  return $object;
-}
 const argDetailsSimple6 = [{
   graphqlArgName: "a",
   postgresArgName: "a",
@@ -1702,354 +1466,38 @@ const makeArgs6 = (args, path = []) => {
   return selectArgs;
 };
 const resource_loginPgResource = registry.pgResources["login"];
-function Mutation_login_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createRenamedTable_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createStudio_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createPost_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createTvEpisode_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createPerson_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Studio, $nodeId);
 };
-function Mutation_updateStudio_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateStudioById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs2 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Post, $nodeId);
 };
-function Mutation_updatePost_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updatePostById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs3 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.TvEpisode, $nodeId);
 };
-function Mutation_updateTvEpisode_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateTvEpisodeByCode_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs4 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Person, $nodeId);
 };
-function Mutation_updatePerson_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updatePersonById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs5 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Studio, $nodeId);
 };
-function Mutation_deleteStudio_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteStudioById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs6 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Post, $nodeId);
 };
-function Mutation_deletePost_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deletePostById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs7 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.TvEpisode, $nodeId);
 };
-function Mutation_deleteTvEpisode_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteTvEpisodeByCode_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs8 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Person, $nodeId);
 };
-function Mutation_deletePerson_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deletePersonById_input_applyPlan(_, $object) {
-  return $object;
-}
-function GetflamblePayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function GetflamblePayload_queryPlan() {
-  return rootValue();
-}
-function GetflambleInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function LoginPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function LoginPayload_queryPlan() {
-  return rootValue();
-}
-function LoginInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateRenamedTablePayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateRenamedTablePayload_renamedTablePlan($object) {
-  return $object.get("result");
-}
-function CreateRenamedTablePayload_queryPlan() {
-  return rootValue();
-}
-function CreateRenamedTableInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateRenamedTableInput_renamedTable_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateStudioPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateStudioPayload_studioPlan($object) {
-  return $object.get("result");
-}
-function CreateStudioPayload_queryPlan() {
-  return rootValue();
-}
-function CreateStudioInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateStudioInput_studio_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreatePostPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreatePostPayload_postPlan($object) {
-  return $object.get("result");
-}
-function CreatePostPayload_queryPlan() {
-  return rootValue();
-}
-function CreatePostInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreatePostInput_post_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateTvEpisodePayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateTvEpisodePayload_tvEpisodePlan($object) {
-  return $object.get("result");
-}
-function CreateTvEpisodePayload_queryPlan() {
-  return rootValue();
-}
-function CreateTvEpisodeInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateTvEpisodeInput_tvEpisode_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreatePersonPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreatePersonPayload_personPlan($object) {
-  return $object.get("result");
-}
-function CreatePersonPayload_queryPlan() {
-  return rootValue();
-}
-function CreatePersonInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreatePersonInput_person_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateStudioPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateStudioPayload_studioPlan($object) {
-  return $object.get("result");
-}
-function UpdateStudioPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateStudioInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateStudioInput_studioPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateStudioByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateStudioByIdInput_studioPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdatePostPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdatePostPayload_postPlan($object) {
-  return $object.get("result");
-}
-function UpdatePostPayload_queryPlan() {
-  return rootValue();
-}
-function UpdatePostInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdatePostInput_postPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdatePostByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdatePostByIdInput_postPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateTvEpisodePayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateTvEpisodePayload_tvEpisodePlan($object) {
-  return $object.get("result");
-}
-function UpdateTvEpisodePayload_queryPlan() {
-  return rootValue();
-}
-function UpdateTvEpisodeInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateTvEpisodeInput_tvEpisodePatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateTvEpisodeByCodeInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateTvEpisodeByCodeInput_tvEpisodePatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdatePersonPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdatePersonPayload_personPlan($object) {
-  return $object.get("result");
-}
-function UpdatePersonPayload_queryPlan() {
-  return rootValue();
-}
-function UpdatePersonInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdatePersonInput_personPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdatePersonByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdatePersonByIdInput_personPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function DeleteStudioPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteStudioPayload_studioPlan($object) {
-  return $object.get("result");
-}
-function DeleteStudioPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteStudioInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteStudioByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeletePostPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeletePostPayload_postPlan($object) {
-  return $object.get("result");
-}
-function DeletePostPayload_queryPlan() {
-  return rootValue();
-}
-function DeletePostInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeletePostByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteTvEpisodePayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteTvEpisodePayload_tvEpisodePlan($object) {
-  return $object.get("result");
-}
-function DeleteTvEpisodePayload_queryPlan() {
-  return rootValue();
-}
-function DeleteTvEpisodeInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteTvEpisodeByCodeInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeletePersonPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeletePersonPayload_personPlan($object) {
-  return $object.get("result");
-}
-function DeletePersonPayload_queryPlan() {
-  return rootValue();
-}
-function DeletePersonInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeletePersonByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -3572,7 +3020,9 @@ export const plans = {
     __assertStep() {
       return true;
     },
-    query: Query_queryPlan,
+    query() {
+      return rootValue();
+    },
     nodeId($parent) {
       const specifier = handler.plan($parent);
       return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
@@ -3639,28 +3089,41 @@ export const plans = {
       }
     },
     returnPostsMatching: {
-      plan: Query_returnPostsMatchingPlan,
+      plan($parent, args, info) {
+        const $select = getSelectPlanFromParentAndArgs($parent, args, info);
+        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+      },
       args: {
         search: undefined,
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_returnPostsMatching_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_returnPostsMatching_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_returnPostsMatching_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_returnPostsMatching_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_returnPostsMatching_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         }
       }
     },
@@ -3707,23 +3170,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRenamedTables_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRenamedTables_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRenamedTables_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRenamedTables_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allRenamedTables_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -3750,23 +3223,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allStudios_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allStudios_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allStudios_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allStudios_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allStudios_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -3793,23 +3276,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPosts_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPosts_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPosts_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPosts_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPosts_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -3836,23 +3329,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allTvEpisodes_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allTvEpisodes_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allTvEpisodes_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allTvEpisodes_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allTvEpisodes_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -3879,23 +3382,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPeople_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPeople_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPeople_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPeople_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPeople_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -4027,23 +3540,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_posts_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_posts_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_posts_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_posts_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Person_posts_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -4066,9 +3589,16 @@ export const plans = {
   },
   PostsConnection: {
     __assertStep: ConnectionStep,
-    nodes: PostsConnection_nodesPlan,
-    edges: PostsConnection_edgesPlan,
-    pageInfo: PostsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -4084,8 +3614,12 @@ export const plans = {
   },
   PageInfo: {
     __assertStep: assertPageInfoCapableStep,
-    hasNextPage: PageInfo_hasNextPagePlan,
-    hasPreviousPage: PageInfo_hasPreviousPagePlan,
+    hasNextPage($pageInfo) {
+      return $pageInfo.hasNextPage();
+    },
+    hasPreviousPage($pageInfo) {
+      return $pageInfo.hasPreviousPage();
+    },
     startCursor($pageInfo) {
       return $pageInfo.startCursor();
     },
@@ -4321,9 +3855,16 @@ export const plans = {
   },
   RenamedTablesConnection: {
     __assertStep: ConnectionStep,
-    nodes: RenamedTablesConnection_nodesPlan,
-    edges: RenamedTablesConnection_edgesPlan,
-    pageInfo: RenamedTablesConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -4409,9 +3950,16 @@ export const plans = {
   },
   StudiosConnection: {
     __assertStep: ConnectionStep,
-    nodes: StudiosConnection_nodesPlan,
-    edges: StudiosConnection_edgesPlan,
-    pageInfo: StudiosConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -4580,9 +4128,16 @@ export const plans = {
   },
   TvEpisodesConnection: {
     __assertStep: ConnectionStep,
-    nodes: TvEpisodesConnection_nodesPlan,
-    edges: TvEpisodesConnection_edgesPlan,
-    pageInfo: TvEpisodesConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -4808,9 +4363,16 @@ export const plans = {
   },
   PeopleConnection: {
     __assertStep: ConnectionStep,
-    nodes: PeopleConnection_nodesPlan,
-    edges: PeopleConnection_edgesPlan,
-    pageInfo: PeopleConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -5275,7 +4837,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_getflamble_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5290,7 +4854,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_login_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5305,7 +4871,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createRenamedTable_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5320,7 +4888,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createStudio_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5335,7 +4905,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createPost_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5350,7 +4922,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createTvEpisode_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5365,7 +4939,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createPerson_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5379,7 +4955,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateStudio_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5395,7 +4973,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateStudioById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5409,7 +4989,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updatePost_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5425,7 +5007,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updatePostById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5439,7 +5023,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateTvEpisode_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5455,7 +5041,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateTvEpisodeByCode_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5469,7 +5057,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updatePerson_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5485,7 +5075,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updatePersonById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5499,7 +5091,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteStudio_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5515,7 +5109,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteStudioById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5529,7 +5125,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deletePost_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5545,7 +5143,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deletePostById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5559,7 +5159,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteTvEpisode_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5575,7 +5177,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteTvEpisodeByCode_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5589,7 +5193,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deletePerson_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -5605,18 +5211,24 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deletePersonById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     }
   },
   GetflamblePayload: {
     __assertStep: ObjectStep,
-    clientMutationId: GetflamblePayload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     flambles($object) {
       return $object.get("result");
     },
-    query: GetflamblePayload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   Flamble: {
     __assertStep: assertPgClassSingleStep,
@@ -5626,17 +5238,23 @@ export const plans = {
   },
   GetflambleInput: {
     clientMutationId: {
-      applyPlan: GetflambleInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
   LoginPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: LoginPayload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     token($object) {
       return $object.get("result");
     },
-    query: LoginPayload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   JwtToken: {
     __assertStep: assertPgClassSingleStep,
@@ -5652,24 +5270,37 @@ export const plans = {
   },
   LoginInput: {
     clientMutationId: {
-      applyPlan: LoginInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     a: undefined
   },
   CreateRenamedTablePayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateRenamedTablePayload_clientMutationIdPlan,
-    renamedTable: CreateRenamedTablePayload_renamedTablePlan,
-    query: CreateRenamedTablePayload_queryPlan
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    renamedTable($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    }
   },
   CreateRenamedTableInput: {
     clientMutationId: {
-      applyPlan: CreateRenamedTableInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     renamedTable: {
-      applyPlan: CreateRenamedTableInput_renamedTable_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -5684,9 +5315,15 @@ export const plans = {
   },
   CreateStudioPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateStudioPayload_clientMutationIdPlan,
-    studio: CreateStudioPayload_studioPlan,
-    query: CreateStudioPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    studio($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     studioEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -5721,11 +5358,16 @@ export const plans = {
   },
   CreateStudioInput: {
     clientMutationId: {
-      applyPlan: CreateStudioInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     studio: {
-      applyPlan: CreateStudioInput_studio_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -5747,9 +5389,15 @@ export const plans = {
   },
   CreatePostPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreatePostPayload_clientMutationIdPlan,
-    post: CreatePostPayload_postPlan,
-    query: CreatePostPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    post($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     postEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -5789,11 +5437,16 @@ export const plans = {
   },
   CreatePostInput: {
     clientMutationId: {
-      applyPlan: CreatePostInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     post: {
-      applyPlan: CreatePostInput_post_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -5822,9 +5475,15 @@ export const plans = {
   },
   CreateTvEpisodePayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateTvEpisodePayload_clientMutationIdPlan,
-    tvEpisode: CreateTvEpisodePayload_tvEpisodePlan,
-    query: CreateTvEpisodePayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    tvEpisode($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     tvEpisodeEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -5859,11 +5518,16 @@ export const plans = {
   },
   CreateTvEpisodeInput: {
     clientMutationId: {
-      applyPlan: CreateTvEpisodeInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     tvEpisode: {
-      applyPlan: CreateTvEpisodeInput_tvEpisode_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -5892,9 +5556,15 @@ export const plans = {
   },
   CreatePersonPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreatePersonPayload_clientMutationIdPlan,
-    person: CreatePersonPayload_personPlan,
-    query: CreatePersonPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    person($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     personEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -5929,11 +5599,16 @@ export const plans = {
   },
   CreatePersonInput: {
     clientMutationId: {
-      applyPlan: CreatePersonInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     person: {
-      applyPlan: CreatePersonInput_person_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -5983,9 +5658,15 @@ export const plans = {
   },
   UpdateStudioPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateStudioPayload_clientMutationIdPlan,
-    studio: UpdateStudioPayload_studioPlan,
-    query: UpdateStudioPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    studio($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     studioEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -6020,11 +5701,16 @@ export const plans = {
   },
   UpdateStudioInput: {
     clientMutationId: {
-      applyPlan: UpdateStudioInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     studioPatch: {
-      applyPlan: UpdateStudioInput_studioPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   StudioPatch: {
@@ -6045,18 +5731,29 @@ export const plans = {
   },
   UpdateStudioByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateStudioByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     studioPatch: {
-      applyPlan: UpdateStudioByIdInput_studioPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdatePostPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdatePostPayload_clientMutationIdPlan,
-    post: UpdatePostPayload_postPlan,
-    query: UpdatePostPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    post($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     postEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -6096,11 +5793,16 @@ export const plans = {
   },
   UpdatePostInput: {
     clientMutationId: {
-      applyPlan: UpdatePostInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     postPatch: {
-      applyPlan: UpdatePostInput_postPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   PostPatch: {
@@ -6128,18 +5830,29 @@ export const plans = {
   },
   UpdatePostByIdInput: {
     clientMutationId: {
-      applyPlan: UpdatePostByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     postPatch: {
-      applyPlan: UpdatePostByIdInput_postPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateTvEpisodePayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateTvEpisodePayload_clientMutationIdPlan,
-    tvEpisode: UpdateTvEpisodePayload_tvEpisodePlan,
-    query: UpdateTvEpisodePayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    tvEpisode($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     tvEpisodeEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -6174,11 +5887,16 @@ export const plans = {
   },
   UpdateTvEpisodeInput: {
     clientMutationId: {
-      applyPlan: UpdateTvEpisodeInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     tvEpisodePatch: {
-      applyPlan: UpdateTvEpisodeInput_tvEpisodePatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   TvEpisodePatch: {
@@ -6206,18 +5924,29 @@ export const plans = {
   },
   UpdateTvEpisodeByCodeInput: {
     clientMutationId: {
-      applyPlan: UpdateTvEpisodeByCodeInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     code: undefined,
     tvEpisodePatch: {
-      applyPlan: UpdateTvEpisodeByCodeInput_tvEpisodePatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdatePersonPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdatePersonPayload_clientMutationIdPlan,
-    person: UpdatePersonPayload_personPlan,
-    query: UpdatePersonPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    person($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     personEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -6252,11 +5981,16 @@ export const plans = {
   },
   UpdatePersonInput: {
     clientMutationId: {
-      applyPlan: UpdatePersonInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     personPatch: {
-      applyPlan: UpdatePersonInput_personPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   PersonPatch: {
@@ -6305,23 +6039,34 @@ export const plans = {
   },
   UpdatePersonByIdInput: {
     clientMutationId: {
-      applyPlan: UpdatePersonByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     personPatch: {
-      applyPlan: UpdatePersonByIdInput_personPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   DeleteStudioPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteStudioPayload_clientMutationIdPlan,
-    studio: DeleteStudioPayload_studioPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    studio($object) {
+      return $object.get("result");
+    },
     deletedStudioId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Studio.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeleteStudioPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     studioEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -6356,26 +6101,36 @@ export const plans = {
   },
   DeleteStudioInput: {
     clientMutationId: {
-      applyPlan: DeleteStudioInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteStudioByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteStudioByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   },
   DeletePostPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeletePostPayload_clientMutationIdPlan,
-    post: DeletePostPayload_postPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    post($object) {
+      return $object.get("result");
+    },
     deletedPostId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Post.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeletePostPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     postEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -6415,26 +6170,36 @@ export const plans = {
   },
   DeletePostInput: {
     clientMutationId: {
-      applyPlan: DeletePostInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeletePostByIdInput: {
     clientMutationId: {
-      applyPlan: DeletePostByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   },
   DeleteTvEpisodePayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteTvEpisodePayload_clientMutationIdPlan,
-    tvEpisode: DeleteTvEpisodePayload_tvEpisodePlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    tvEpisode($object) {
+      return $object.get("result");
+    },
     deletedTvEpisodeId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.TvEpisode.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeleteTvEpisodePayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     tvEpisodeEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -6469,26 +6234,36 @@ export const plans = {
   },
   DeleteTvEpisodeInput: {
     clientMutationId: {
-      applyPlan: DeleteTvEpisodeInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteTvEpisodeByCodeInput: {
     clientMutationId: {
-      applyPlan: DeleteTvEpisodeByCodeInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     code: undefined
   },
   DeletePersonPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeletePersonPayload_clientMutationIdPlan,
-    person: DeletePersonPayload_personPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    person($object) {
+      return $object.get("result");
+    },
     deletedPersonId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Person.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeletePersonPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     personEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -6523,13 +6298,17 @@ export const plans = {
   },
   DeletePersonInput: {
     clientMutationId: {
-      applyPlan: DeletePersonInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeletePersonByIdInput: {
     clientMutationId: {
-      applyPlan: DeletePersonByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   }

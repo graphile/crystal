@@ -2,9 +2,6 @@ import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, as
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
-function Query_queryPlan() {
-  return rootValue();
-}
 const handler = {
   typeName: "Query",
   codec: {
@@ -29,30 +26,26 @@ const handler = {
     return constant`query`;
   }
 };
-function base64JSONDecode(value) {
-  return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-}
-function base64JSONEncode(value) {
-  return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-}
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode: base64JSONEncode,
-  decode: base64JSONDecode
+  encode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  },
+  decode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }
 };
-function pipeStringDecode(value) {
-  return typeof value === "string" ? value.split("|") : null;
-}
-function pipeStringEncode(value) {
-  return Array.isArray(value) ? value.join("|") : null;
-}
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode: pipeStringEncode,
-    decode: pipeStringDecode
+    encode(value) {
+      return Array.isArray(value) ? value.join("|") : null;
+    },
+    decode(value) {
+      return typeof value === "string" ? value.split("|") : null;
+    }
   }
 });
 const geomAttributes = Object.assign(Object.create(null), {
@@ -148,10 +141,9 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const geomIdentifier = sql.identifier(...["geometry", "geom"]);
-const geomCodecSpec = {
+const geomCodec = recordCodec({
   name: "geom",
-  identifier: geomIdentifier,
+  identifier: sql.identifier("geometry", "geom"),
   attributes: geomAttributes,
   description: undefined,
   extensions: {
@@ -164,17 +156,7 @@ const geomCodecSpec = {
     tags: Object.create(null)
   },
   executor: executor_mainPgExecutor
-};
-const geomCodec = recordCodec(geomCodecSpec);
-const extensions2 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "geometry",
-    name: "geom"
-  },
-  tags: {}
-};
+});
 const uniques = [{
   isPrimary: true,
   attributes: ["id"],
@@ -208,7 +190,15 @@ const pgResource_geomPgResource = makeRegistry({
       uniques,
       isVirtual: false,
       description: undefined,
-      extensions: extensions2
+      extensions: {
+        description: undefined,
+        pg: {
+          serviceName: "main",
+          schemaName: "geometry",
+          name: "geom"
+        },
+        tags: {}
+      }
     }
   }),
   pgRelations: Object.create(null)
@@ -261,21 +251,6 @@ const fetcher = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.Geom);
-function Query_allGeoms_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allGeoms_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allGeoms_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allGeoms_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allGeoms_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const applyOrderToPlan = ($select, $value, TableOrderByType) => {
   const val = $value.eval();
   if (val == null) {
@@ -294,99 +269,14 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
     plan($select);
   });
 };
-function GeomsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function GeomsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function GeomsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function PageInfo_hasNextPagePlan($pageInfo) {
-  return $pageInfo.hasNextPage();
-}
-function PageInfo_hasPreviousPagePlan($pageInfo) {
-  return $pageInfo.hasPreviousPage();
-}
-function Mutation_createGeom_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Geom, $nodeId);
 };
-function Mutation_updateGeom_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateGeomById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs2 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Geom, $nodeId);
 };
-function Mutation_deleteGeom_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteGeomById_input_applyPlan(_, $object) {
-  return $object;
-}
-function CreateGeomPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateGeomPayload_geomPlan($object) {
-  return $object.get("result");
-}
-function CreateGeomPayload_queryPlan() {
-  return rootValue();
-}
-function CreateGeomInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateGeomInput_geom_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateGeomPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateGeomPayload_geomPlan($object) {
-  return $object.get("result");
-}
-function UpdateGeomPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateGeomInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateGeomInput_geomPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateGeomByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateGeomByIdInput_geomPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function DeleteGeomPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteGeomPayload_geomPlan($object) {
-  return $object.get("result");
-}
-function DeleteGeomPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteGeomInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteGeomByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -871,7 +761,9 @@ export const plans = {
     __assertStep() {
       return true;
     },
-    query: Query_queryPlan,
+    query() {
+      return rootValue();
+    },
     nodeId($parent) {
       const specifier = handler.plan($parent);
       return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
@@ -910,23 +802,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allGeoms_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allGeoms_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allGeoms_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allGeoms_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allGeoms_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -990,9 +892,16 @@ export const plans = {
   Circle: {},
   GeomsConnection: {
     __assertStep: ConnectionStep,
-    nodes: GeomsConnection_nodesPlan,
-    edges: GeomsConnection_edgesPlan,
-    pageInfo: GeomsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -1008,8 +917,12 @@ export const plans = {
   },
   PageInfo: {
     __assertStep: assertPageInfoCapableStep,
-    hasNextPage: PageInfo_hasNextPagePlan,
-    hasPreviousPage: PageInfo_hasPreviousPagePlan,
+    hasNextPage($pageInfo) {
+      return $pageInfo.hasNextPage();
+    },
+    hasPreviousPage($pageInfo) {
+      return $pageInfo.hasPreviousPage();
+    },
     startCursor($pageInfo) {
       return $pageInfo.startCursor();
     },
@@ -1609,7 +1522,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createGeom_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -1623,7 +1538,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateGeom_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -1639,7 +1556,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateGeomById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -1653,7 +1572,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteGeom_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -1669,16 +1590,24 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteGeomById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     }
   },
   CreateGeomPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateGeomPayload_clientMutationIdPlan,
-    geom: CreateGeomPayload_geomPlan,
-    query: CreateGeomPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    geom($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     geomEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -1713,11 +1642,16 @@ export const plans = {
   },
   CreateGeomInput: {
     clientMutationId: {
-      applyPlan: CreateGeomInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     geom: {
-      applyPlan: CreateGeomInput_geom_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -1788,9 +1722,15 @@ export const plans = {
   },
   UpdateGeomPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateGeomPayload_clientMutationIdPlan,
-    geom: UpdateGeomPayload_geomPlan,
-    query: UpdateGeomPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    geom($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     geomEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -1825,11 +1765,16 @@ export const plans = {
   },
   UpdateGeomInput: {
     clientMutationId: {
-      applyPlan: UpdateGeomInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     geomPatch: {
-      applyPlan: UpdateGeomInput_geomPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   GeomPatch: {
@@ -1899,23 +1844,34 @@ export const plans = {
   },
   UpdateGeomByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateGeomByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     geomPatch: {
-      applyPlan: UpdateGeomByIdInput_geomPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   DeleteGeomPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteGeomPayload_clientMutationIdPlan,
-    geom: DeleteGeomPayload_geomPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    geom($object) {
+      return $object.get("result");
+    },
     deletedGeomId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Geom.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeleteGeomPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     geomEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -1950,13 +1906,17 @@ export const plans = {
   },
   DeleteGeomInput: {
     clientMutationId: {
-      applyPlan: DeleteGeomInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteGeomByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteGeomByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   }

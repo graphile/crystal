@@ -2,9 +2,6 @@ import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, as
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
-function Query_queryPlan() {
-  return rootValue();
-}
 const handler = {
   typeName: "Query",
   codec: {
@@ -29,30 +26,26 @@ const handler = {
     return constant`query`;
   }
 };
-function base64JSONDecode(value) {
-  return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-}
-function base64JSONEncode(value) {
-  return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-}
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode: base64JSONEncode,
-  decode: base64JSONDecode
+  encode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  },
+  decode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }
 };
-function pipeStringDecode(value) {
-  return typeof value === "string" ? value.split("|") : null;
-}
-function pipeStringEncode(value) {
-  return Array.isArray(value) ? value.join("|") : null;
-}
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode: pipeStringEncode,
-    decode: pipeStringDecode
+    encode(value) {
+      return Array.isArray(value) ? value.join("|") : null;
+    },
+    decode(value) {
+      return typeof value === "string" ? value.split("|") : null;
+    }
   }
 });
 const fileAttributes = Object.assign(Object.create(null), {
@@ -85,10 +78,9 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const fileIdentifier = sql.identifier(...["inheritence", "file"]);
-const fileCodecSpec = {
+const fileCodec = recordCodec({
   name: "file",
-  identifier: fileIdentifier,
+  identifier: sql.identifier("inheritence", "file"),
   attributes: fileAttributes,
   description: undefined,
   extensions: {
@@ -101,8 +93,7 @@ const fileCodecSpec = {
     tags: Object.create(null)
   },
   executor: executor_mainPgExecutor
-};
-const fileCodec = recordCodec(fileCodecSpec);
+});
 const userAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -123,26 +114,22 @@ const userAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions2 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "inheritence",
-    name: "user"
-  },
-  tags: Object.create(null)
-};
-const parts2 = ["inheritence", "user"];
-const userIdentifier = sql.identifier(...parts2);
-const userCodecSpec = {
+const userCodec = recordCodec({
   name: "user",
-  identifier: userIdentifier,
+  identifier: sql.identifier("inheritence", "user"),
   attributes: userAttributes,
   description: undefined,
-  extensions: extensions2,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "inheritence",
+      name: "user"
+    },
+    tags: Object.create(null)
+  },
   executor: executor_mainPgExecutor
-};
-const userCodec = recordCodec(userCodecSpec);
+});
 const userFileAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -172,35 +159,22 @@ const userFileAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions3 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "inheritence",
-    name: "user_file"
-  },
-  tags: Object.create(null)
-};
-const parts3 = ["inheritence", "user_file"];
-const userFileIdentifier = sql.identifier(...parts3);
-const userFileCodecSpec = {
+const userFileCodec = recordCodec({
   name: "userFile",
-  identifier: userFileIdentifier,
+  identifier: sql.identifier("inheritence", "user_file"),
   attributes: userFileAttributes,
   description: undefined,
-  extensions: extensions3,
-  executor: executor_mainPgExecutor
-};
-const userFileCodec = recordCodec(userFileCodecSpec);
-const extensions4 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "inheritence",
-    name: "file"
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "inheritence",
+      name: "user_file"
+    },
+    tags: Object.create(null)
   },
-  tags: {}
-};
+  executor: executor_mainPgExecutor
+});
 const uniques = [{
   isPrimary: true,
   attributes: ["id"],
@@ -209,15 +183,6 @@ const uniques = [{
     tags: Object.create(null)
   }
 }];
-const extensions5 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "inheritence",
-    name: "user"
-  },
-  tags: {}
-};
 const uniques2 = [{
   isPrimary: true,
   attributes: ["id"],
@@ -235,16 +200,15 @@ const registryConfig_pgResources_user_user = {
   uniques: uniques2,
   isVirtual: false,
   description: undefined,
-  extensions: extensions5
-};
-const extensions6 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "inheritence",
-    name: "user_file"
-  },
-  tags: {}
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "inheritence",
+      name: "user"
+    },
+    tags: {}
+  }
 };
 const uniques3 = [{
   isPrimary: true,
@@ -263,7 +227,15 @@ const registryConfig_pgResources_user_file_user_file = {
   uniques: uniques3,
   isVirtual: false,
   description: undefined,
-  extensions: extensions6
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "inheritence",
+      name: "user_file"
+    },
+    tags: {}
+  }
 };
 const registry = makeRegistry({
   pgCodecs: Object.assign(Object.create(null), {
@@ -285,7 +257,15 @@ const registry = makeRegistry({
       uniques,
       isVirtual: false,
       description: undefined,
-      extensions: extensions4
+      extensions: {
+        description: undefined,
+        pg: {
+          serviceName: "main",
+          schemaName: "inheritence",
+          name: "file"
+        },
+        tags: {}
+      }
     },
     user: registryConfig_pgResources_user_user,
     user_file: registryConfig_pgResources_user_file_user_file
@@ -432,21 +412,6 @@ const fetcher3 = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.UserFile);
-function Query_allFiles_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allFiles_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allFiles_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allFiles_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allFiles_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const applyOrderToPlan = ($select, $value, TableOrderByType) => {
   const val = $value.eval();
   if (val == null) {
@@ -465,318 +430,30 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
     plan($select);
   });
 };
-function Query_allUsers_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allUsers_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allUsers_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allUsers_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allUsers_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allUserFiles_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allUserFiles_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allUserFiles_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allUserFiles_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allUserFiles_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function User_userFilesByUserId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function User_userFilesByUserId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function User_userFilesByUserId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function User_userFilesByUserId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function User_userFilesByUserId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function UserFilesConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function UserFilesConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function UserFilesConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function PageInfo_hasNextPagePlan($pageInfo) {
-  return $pageInfo.hasNextPage();
-}
-function PageInfo_hasPreviousPagePlan($pageInfo) {
-  return $pageInfo.hasPreviousPage();
-}
-function FilesConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function FilesConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function FilesConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function UsersConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function UsersConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function UsersConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function Mutation_createFile_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createUser_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createUserFile_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.File, $nodeId);
 };
-function Mutation_updateFile_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateFileById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs2 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.User, $nodeId);
 };
-function Mutation_updateUser_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateUserById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs3 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.UserFile, $nodeId);
 };
-function Mutation_updateUserFile_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateUserFileById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs4 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.File, $nodeId);
 };
-function Mutation_deleteFile_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteFileById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs5 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.User, $nodeId);
 };
-function Mutation_deleteUser_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteUserById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs6 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.UserFile, $nodeId);
 };
-function Mutation_deleteUserFile_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteUserFileById_input_applyPlan(_, $object) {
-  return $object;
-}
-function CreateFilePayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateFilePayload_filePlan($object) {
-  return $object.get("result");
-}
-function CreateFilePayload_queryPlan() {
-  return rootValue();
-}
-function CreateFileInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateFileInput_file_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateUserPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateUserPayload_userPlan($object) {
-  return $object.get("result");
-}
-function CreateUserPayload_queryPlan() {
-  return rootValue();
-}
-function CreateUserInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateUserInput_user_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateUserFilePayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateUserFilePayload_userFilePlan($object) {
-  return $object.get("result");
-}
-function CreateUserFilePayload_queryPlan() {
-  return rootValue();
-}
-function CreateUserFileInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateUserFileInput_userFile_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateFilePayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateFilePayload_filePlan($object) {
-  return $object.get("result");
-}
-function UpdateFilePayload_queryPlan() {
-  return rootValue();
-}
-function UpdateFileInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateFileInput_filePatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateFileByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateFileByIdInput_filePatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateUserPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateUserPayload_userPlan($object) {
-  return $object.get("result");
-}
-function UpdateUserPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateUserInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateUserInput_userPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateUserByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateUserByIdInput_userPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateUserFilePayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateUserFilePayload_userFilePlan($object) {
-  return $object.get("result");
-}
-function UpdateUserFilePayload_queryPlan() {
-  return rootValue();
-}
-function UpdateUserFileInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateUserFileInput_userFilePatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateUserFileByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateUserFileByIdInput_userFilePatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function DeleteFilePayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteFilePayload_filePlan($object) {
-  return $object.get("result");
-}
-function DeleteFilePayload_queryPlan() {
-  return rootValue();
-}
-function DeleteFileInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteFileByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteUserPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteUserPayload_userPlan($object) {
-  return $object.get("result");
-}
-function DeleteUserPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteUserInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteUserByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteUserFilePayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteUserFilePayload_userFilePlan($object) {
-  return $object.get("result");
-}
-function DeleteUserFilePayload_queryPlan() {
-  return rootValue();
-}
-function DeleteUserFileInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteUserFileByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -1745,7 +1422,9 @@ export const plans = {
     __assertStep() {
       return true;
     },
-    query: Query_queryPlan,
+    query() {
+      return rootValue();
+    },
     nodeId($parent) {
       const specifier = handler.plan($parent);
       return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
@@ -1822,23 +1501,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allFiles_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allFiles_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allFiles_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allFiles_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allFiles_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -1865,23 +1554,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUsers_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUsers_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUsers_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUsers_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUsers_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -1908,23 +1607,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUserFiles_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUserFiles_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUserFiles_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUserFiles_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUserFiles_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -1980,23 +1689,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: User_userFilesByUserId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: User_userFilesByUserId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: User_userFilesByUserId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: User_userFilesByUserId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: User_userFilesByUserId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -2019,9 +1738,16 @@ export const plans = {
   },
   UserFilesConnection: {
     __assertStep: ConnectionStep,
-    nodes: UserFilesConnection_nodesPlan,
-    edges: UserFilesConnection_edgesPlan,
-    pageInfo: UserFilesConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -2058,8 +1784,12 @@ export const plans = {
   },
   PageInfo: {
     __assertStep: assertPageInfoCapableStep,
-    hasNextPage: PageInfo_hasNextPagePlan,
-    hasPreviousPage: PageInfo_hasPreviousPagePlan,
+    hasNextPage($pageInfo) {
+      return $pageInfo.hasNextPage();
+    },
+    hasPreviousPage($pageInfo) {
+      return $pageInfo.hasPreviousPage();
+    },
     startCursor($pageInfo) {
       return $pageInfo.startCursor();
     },
@@ -2279,9 +2009,16 @@ export const plans = {
   },
   FilesConnection: {
     __assertStep: ConnectionStep,
-    nodes: FilesConnection_nodesPlan,
-    edges: FilesConnection_edgesPlan,
-    pageInfo: FilesConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -2450,9 +2187,16 @@ export const plans = {
   },
   UsersConnection: {
     __assertStep: ConnectionStep,
-    nodes: UsersConnection_nodesPlan,
-    edges: UsersConnection_edgesPlan,
-    pageInfo: UsersConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -2632,7 +2376,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createFile_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2647,7 +2393,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createUser_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2662,7 +2410,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createUserFile_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2676,7 +2426,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateFile_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2692,7 +2444,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateFileById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2706,7 +2460,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateUser_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2722,7 +2478,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateUserById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2736,7 +2494,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateUserFile_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2752,7 +2512,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateUserFileById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2766,7 +2528,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteFile_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2782,7 +2546,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteFileById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2796,7 +2562,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteUser_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2812,7 +2580,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteUserById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2826,7 +2596,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteUserFile_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2842,16 +2614,24 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteUserFileById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     }
   },
   CreateFilePayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateFilePayload_clientMutationIdPlan,
-    file: CreateFilePayload_filePlan,
-    query: CreateFilePayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    file($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     fileEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -2886,11 +2666,16 @@ export const plans = {
   },
   CreateFileInput: {
     clientMutationId: {
-      applyPlan: CreateFileInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     file: {
-      applyPlan: CreateFileInput_file_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -2912,9 +2697,15 @@ export const plans = {
   },
   CreateUserPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateUserPayload_clientMutationIdPlan,
-    user: CreateUserPayload_userPlan,
-    query: CreateUserPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    user($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     userEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -2949,11 +2740,16 @@ export const plans = {
   },
   CreateUserInput: {
     clientMutationId: {
-      applyPlan: CreateUserInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     user: {
-      applyPlan: CreateUserInput_user_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -2975,9 +2771,15 @@ export const plans = {
   },
   CreateUserFilePayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateUserFilePayload_clientMutationIdPlan,
-    userFile: CreateUserFilePayload_userFilePlan,
-    query: CreateUserFilePayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    userFile($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     userFileEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -3017,11 +2819,16 @@ export const plans = {
   },
   CreateUserFileInput: {
     clientMutationId: {
-      applyPlan: CreateUserFileInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     userFile: {
-      applyPlan: CreateUserFileInput_userFile_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -3050,9 +2857,15 @@ export const plans = {
   },
   UpdateFilePayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateFilePayload_clientMutationIdPlan,
-    file: UpdateFilePayload_filePlan,
-    query: UpdateFilePayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    file($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     fileEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -3087,11 +2900,16 @@ export const plans = {
   },
   UpdateFileInput: {
     clientMutationId: {
-      applyPlan: UpdateFileInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     filePatch: {
-      applyPlan: UpdateFileInput_filePatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   FilePatch: {
@@ -3112,18 +2930,29 @@ export const plans = {
   },
   UpdateFileByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateFileByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     filePatch: {
-      applyPlan: UpdateFileByIdInput_filePatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateUserPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateUserPayload_clientMutationIdPlan,
-    user: UpdateUserPayload_userPlan,
-    query: UpdateUserPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    user($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     userEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -3158,11 +2987,16 @@ export const plans = {
   },
   UpdateUserInput: {
     clientMutationId: {
-      applyPlan: UpdateUserInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     userPatch: {
-      applyPlan: UpdateUserInput_userPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UserPatch: {
@@ -3183,18 +3017,29 @@ export const plans = {
   },
   UpdateUserByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateUserByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     userPatch: {
-      applyPlan: UpdateUserByIdInput_userPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateUserFilePayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateUserFilePayload_clientMutationIdPlan,
-    userFile: UpdateUserFilePayload_userFilePlan,
-    query: UpdateUserFilePayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    userFile($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     userFileEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -3234,11 +3079,16 @@ export const plans = {
   },
   UpdateUserFileInput: {
     clientMutationId: {
-      applyPlan: UpdateUserFileInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     userFilePatch: {
-      applyPlan: UpdateUserFileInput_userFilePatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UserFilePatch: {
@@ -3266,23 +3116,34 @@ export const plans = {
   },
   UpdateUserFileByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateUserFileByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     userFilePatch: {
-      applyPlan: UpdateUserFileByIdInput_userFilePatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   DeleteFilePayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteFilePayload_clientMutationIdPlan,
-    file: DeleteFilePayload_filePlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    file($object) {
+      return $object.get("result");
+    },
     deletedFileId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.File.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeleteFilePayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     fileEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -3317,26 +3178,36 @@ export const plans = {
   },
   DeleteFileInput: {
     clientMutationId: {
-      applyPlan: DeleteFileInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteFileByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteFileByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   },
   DeleteUserPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteUserPayload_clientMutationIdPlan,
-    user: DeleteUserPayload_userPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    user($object) {
+      return $object.get("result");
+    },
     deletedUserId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.User.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeleteUserPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     userEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -3371,26 +3242,36 @@ export const plans = {
   },
   DeleteUserInput: {
     clientMutationId: {
-      applyPlan: DeleteUserInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteUserByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteUserByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   },
   DeleteUserFilePayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteUserFilePayload_clientMutationIdPlan,
-    userFile: DeleteUserFilePayload_userFilePlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    userFile($object) {
+      return $object.get("result");
+    },
     deletedUserFileId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.UserFile.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeleteUserFilePayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     userFileEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -3430,13 +3311,17 @@ export const plans = {
   },
   DeleteUserFileInput: {
     clientMutationId: {
-      applyPlan: DeleteUserFileInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteUserFileByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteUserFileByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   }

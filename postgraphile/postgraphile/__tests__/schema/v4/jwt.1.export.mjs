@@ -4,9 +4,6 @@ import { valueFromASTUntyped } from "graphql";
 import jsonwebtoken from "jsonwebtoken";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
-function Query_queryPlan() {
-  return rootValue();
-}
 const handler = {
   typeName: "Query",
   codec: {
@@ -31,34 +28,29 @@ const handler = {
     return constant`query`;
   }
 };
-function base64JSONDecode(value) {
-  return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-}
-function base64JSONEncode(value) {
-  return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-}
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode: base64JSONEncode,
-  decode: base64JSONDecode
+  encode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  },
+  decode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }
 };
-function pipeStringDecode(value) {
-  return typeof value === "string" ? value.split("|") : null;
-}
-function pipeStringEncode(value) {
-  return Array.isArray(value) ? value.join("|") : null;
-}
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode: pipeStringEncode,
-    decode: pipeStringDecode
+    encode(value) {
+      return Array.isArray(value) ? value.join("|") : null;
+    },
+    decode(value) {
+      return typeof value === "string" ? value.split("|") : null;
+    }
   }
 });
-const guidIdentifier = sql.identifier(...["b", "guid"]);
-const guidCodec = domainOfCodec(TYPES.varchar, "guid", guidIdentifier, {
+const guidCodec = domainOfCodec(TYPES.varchar, "guid", sql.identifier("b", "guid"), {
   description: undefined,
   extensions: {
     pg: {
@@ -118,526 +110,465 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const extensions2 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "updatable_view"
-  },
-  tags: Object.assign(Object.create(null), {
-    uniqueKey: "x",
-    unique: "x|@behavior -single -update -delete"
-  })
-};
-const parts2 = ["b", "updatable_view"];
-const updatableViewIdentifier = sql.identifier(...parts2);
-const updatableViewCodecSpec = {
+const updatableViewCodec = recordCodec({
   name: "updatableView",
-  identifier: updatableViewIdentifier,
+  identifier: sql.identifier("b", "updatable_view"),
   attributes: updatableViewAttributes,
   description: "YOYOYO!!",
-  extensions: extensions2,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "updatable_view"
+    },
+    tags: Object.assign(Object.create(null), {
+      uniqueKey: "x",
+      unique: "x|@behavior -single -update -delete"
+    })
+  },
   executor: executor_mainPgExecutor
-};
-const updatableViewCodec = recordCodec(updatableViewCodecSpec);
-const jwtTokenAttributes = Object.assign(Object.create(null), {
-  role: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  exp: {
-    description: undefined,
-    codec: TYPES.bigint,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  a: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  b: {
-    description: undefined,
-    codec: TYPES.numeric,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  c: {
-    description: undefined,
-    codec: TYPES.bigint,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
 });
-const extensions3 = {
-  isTableLike: false,
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "jwt_token"
-  },
-  tags: Object.assign(Object.create(null), {
-    behavior: ["-table", "jwt"]
-  })
-};
-const parts3 = ["b", "jwt_token"];
-const jwtTokenIdentifier = sql.identifier(...parts3);
-const jwtTokenCodecSpec = {
+const jwtTokenCodec = recordCodec({
   name: "jwtToken",
-  identifier: jwtTokenIdentifier,
-  attributes: jwtTokenAttributes,
+  identifier: sql.identifier("b", "jwt_token"),
+  attributes: Object.assign(Object.create(null), {
+    role: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    exp: {
+      description: undefined,
+      codec: TYPES.bigint,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    a: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    b: {
+      description: undefined,
+      codec: TYPES.numeric,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    c: {
+      description: undefined,
+      codec: TYPES.bigint,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
-  extensions: extensions3,
-  executor: executor_mainPgExecutor
-};
-const jwtTokenCodec = recordCodec(jwtTokenCodecSpec);
-const uuidArrayCodecExtensions = {
-  pg: {
-    serviceName: "main",
-    schemaName: "pg_catalog",
-    name: "_uuid"
+  extensions: {
+    isTableLike: false,
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "jwt_token"
+    },
+    tags: Object.assign(Object.create(null), {
+      behavior: ["-table", "jwt"]
+    })
   },
-  tags: Object.create(null)
-};
+  executor: executor_mainPgExecutor
+});
 const uuidArrayCodec = listOfCodec(TYPES.uuid, {
-  extensions: uuidArrayCodecExtensions,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_uuid"
+    },
+    tags: Object.create(null)
+  },
   typeDelim: ",",
   description: undefined,
   name: "uuidArray"
 });
-const authPayloadAttributes = Object.assign(Object.create(null), {
-  jwt: {
-    description: undefined,
-    codec: jwtTokenCodec,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  admin: {
-    description: undefined,
-    codec: TYPES.boolean,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const extensions4 = {
-  isTableLike: false,
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "auth_payload"
-  },
-  tags: Object.assign(Object.create(null), {
-    foreignKey: "(id) references c.person"
-  })
-};
-const parts4 = ["b", "auth_payload"];
-const authPayloadIdentifier = sql.identifier(...parts4);
-const authPayloadCodecSpec = {
+const authPayloadCodec = recordCodec({
   name: "authPayload",
-  identifier: authPayloadIdentifier,
-  attributes: authPayloadAttributes,
+  identifier: sql.identifier("b", "auth_payload"),
+  attributes: Object.assign(Object.create(null), {
+    jwt: {
+      description: undefined,
+      codec: jwtTokenCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    admin: {
+      description: undefined,
+      codec: TYPES.boolean,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
-  extensions: extensions4,
-  executor: executor_mainPgExecutor
-};
-const authPayloadCodec = recordCodec(authPayloadCodecSpec);
-const extensions5 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "color"
+  extensions: {
+    isTableLike: false,
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "auth_payload"
+    },
+    tags: Object.assign(Object.create(null), {
+      foreignKey: "(id) references c.person"
+    })
   },
-  tags: Object.create(null)
-};
-const parts5 = ["b", "color"];
+  executor: executor_mainPgExecutor
+});
 const colorCodec = enumCodec({
   name: "color",
-  identifier: sql.identifier(...parts5),
+  identifier: sql.identifier("b", "color"),
   values: ["red", "green", "blue"],
   description: undefined,
-  extensions: extensions5
-});
-const enumLabels2 = ["FOO_BAR", "BAR_FOO", "BAZ_QUX", "0_BAR"];
-const extensions6 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "enum_caps"
-  },
-  tags: Object.create(null)
-};
-const parts6 = ["b", "enum_caps"];
-const sqlIdent2 = sql.identifier(...parts6);
-const enumCapsCodec = enumCodec({
-  name: "enumCaps",
-  identifier: sqlIdent2,
-  values: enumLabels2,
-  description: undefined,
-  extensions: extensions6
-});
-const enumLabels3 = ["", "one", "two"];
-const extensions7 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "enum_with_empty_string"
-  },
-  tags: Object.create(null)
-};
-const parts7 = ["b", "enum_with_empty_string"];
-const sqlIdent3 = sql.identifier(...parts7);
-const enumWithEmptyStringCodec = enumCodec({
-  name: "enumWithEmptyString",
-  identifier: sqlIdent3,
-  values: enumLabels3,
-  description: undefined,
-  extensions: extensions7
-});
-const compoundTypeAttributes = Object.assign(Object.create(null), {
-  a: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  b: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  c: {
-    description: undefined,
-    codec: colorCodec,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  d: {
-    description: undefined,
-    codec: TYPES.uuid,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  e: {
-    description: undefined,
-    codec: enumCapsCodec,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  f: {
-    description: undefined,
-    codec: enumWithEmptyStringCodec,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  g: {
-    description: undefined,
-    codec: TYPES.interval,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  foo_bar: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "color"
+    },
+    tags: Object.create(null)
   }
 });
-const extensions8 = {
-  isTableLike: false,
-  pg: {
-    serviceName: "main",
-    schemaName: "c",
-    name: "compound_type"
-  },
-  tags: Object.create(null)
-};
-const parts8 = ["c", "compound_type"];
-const compoundTypeIdentifier = sql.identifier(...parts8);
-const compoundTypeCodecSpec = {
+const enumCapsCodec = enumCodec({
+  name: "enumCaps",
+  identifier: sql.identifier("b", "enum_caps"),
+  values: ["FOO_BAR", "BAR_FOO", "BAZ_QUX", "0_BAR"],
+  description: undefined,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "enum_caps"
+    },
+    tags: Object.create(null)
+  }
+});
+const enumWithEmptyStringCodec = enumCodec({
+  name: "enumWithEmptyString",
+  identifier: sql.identifier("b", "enum_with_empty_string"),
+  values: ["", "one", "two"],
+  description: undefined,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "enum_with_empty_string"
+    },
+    tags: Object.create(null)
+  }
+});
+const compoundTypeCodec = recordCodec({
   name: "compoundType",
-  identifier: compoundTypeIdentifier,
-  attributes: compoundTypeAttributes,
+  identifier: sql.identifier("c", "compound_type"),
+  attributes: Object.assign(Object.create(null), {
+    a: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    b: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    c: {
+      description: undefined,
+      codec: colorCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    d: {
+      description: undefined,
+      codec: TYPES.uuid,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    e: {
+      description: undefined,
+      codec: enumCapsCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    f: {
+      description: undefined,
+      codec: enumWithEmptyStringCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    g: {
+      description: undefined,
+      codec: TYPES.interval,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    foo_bar: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: "Awesome feature!",
-  extensions: extensions8,
-  executor: executor_mainPgExecutor
-};
-const compoundTypeCodec = recordCodec(compoundTypeCodecSpec);
-const colorArrayCodecExtensions = {
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "_color"
+  extensions: {
+    isTableLike: false,
+    pg: {
+      serviceName: "main",
+      schemaName: "c",
+      name: "compound_type"
+    },
+    tags: Object.create(null)
   },
-  tags: Object.create(null)
-};
+  executor: executor_mainPgExecutor
+});
 const colorArrayCodec = listOfCodec(colorCodec, {
-  extensions: colorArrayCodecExtensions,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "_color"
+    },
+    tags: Object.create(null)
+  },
   typeDelim: ",",
   description: undefined,
   name: "colorArray"
 });
-const extensions9 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "a",
-    name: "an_int"
-  },
-  tags: Object.create(null)
-};
-const parts9 = ["a", "an_int"];
-const anIntIdentifier = sql.identifier(...parts9);
-const anIntCodec = domainOfCodec(TYPES.int, "anInt", anIntIdentifier, {
+const anIntCodec = domainOfCodec(TYPES.int, "anInt", sql.identifier("a", "an_int"), {
   description: undefined,
-  extensions: extensions9,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "a",
+      name: "an_int"
+    },
+    tags: Object.create(null)
+  },
   notNull: false
 });
-const extensions10 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "another_int"
-  },
-  tags: Object.create(null)
-};
-const parts10 = ["b", "another_int"];
-const anotherIntIdentifier = sql.identifier(...parts10);
-const anotherIntCodec = domainOfCodec(anIntCodec, "anotherInt", anotherIntIdentifier, {
+const anotherIntCodec = domainOfCodec(anIntCodec, "anotherInt", sql.identifier("b", "another_int"), {
   description: undefined,
-  extensions: extensions10,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "another_int"
+    },
+    tags: Object.create(null)
+  },
   notNull: false
 });
-const textArrayCodecExtensions = {
-  pg: {
-    serviceName: "main",
-    schemaName: "pg_catalog",
-    name: "_text"
-  },
-  tags: Object.create(null)
-};
 const textArrayCodec = listOfCodec(TYPES.text, {
-  extensions: textArrayCodecExtensions,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_text"
+    },
+    tags: Object.create(null)
+  },
   typeDelim: ",",
   description: undefined,
   name: "textArray"
 });
-const extensions11 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "pg_catalog",
-    name: "numrange"
-  },
-  tags: Object.create(null)
-};
-const parts11 = ["pg_catalog", "numrange"];
-const sqlIdent4 = sql.identifier(...parts11);
-const numrangeCodec = rangeOfCodec(TYPES.numeric, "numrange", sqlIdent4, {
+const numrangeCodec = rangeOfCodec(TYPES.numeric, "numrange", sql.identifier("pg_catalog", "numrange"), {
   description: "range of numerics",
-  extensions: extensions11
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "numrange"
+    },
+    tags: Object.create(null)
+  }
 });
-const extensions12 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "pg_catalog",
-    name: "daterange"
-  },
-  tags: Object.create(null)
-};
-const parts12 = ["pg_catalog", "daterange"];
-const sqlIdent5 = sql.identifier(...parts12);
-const daterangeCodec = rangeOfCodec(TYPES.date, "daterange", sqlIdent5, {
+const daterangeCodec = rangeOfCodec(TYPES.date, "daterange", sql.identifier("pg_catalog", "daterange"), {
   description: "range of dates",
-  extensions: extensions12
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "daterange"
+    },
+    tags: Object.create(null)
+  }
 });
-const extensions13 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "a",
-    name: "an_int_range"
-  },
-  tags: Object.create(null)
-};
-const parts13 = ["a", "an_int_range"];
-const sqlIdent6 = sql.identifier(...parts13);
-const anIntRangeCodec = rangeOfCodec(anIntCodec, "anIntRange", sqlIdent6, {
+const anIntRangeCodec = rangeOfCodec(anIntCodec, "anIntRange", sql.identifier("a", "an_int_range"), {
   description: undefined,
-  extensions: extensions13
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "a",
+      name: "an_int_range"
+    },
+    tags: Object.create(null)
+  }
 });
-const intervalArrayCodecExtensions = {
-  pg: {
-    serviceName: "main",
-    schemaName: "pg_catalog",
-    name: "_interval"
-  },
-  tags: Object.create(null)
-};
 const intervalArrayCodec = listOfCodec(TYPES.interval, {
-  extensions: intervalArrayCodecExtensions,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_interval"
+    },
+    tags: Object.create(null)
+  },
   typeDelim: ",",
   description: undefined,
   name: "intervalArray"
 });
-const nestedCompoundTypeAttributes = Object.assign(Object.create(null), {
-  a: {
-    description: undefined,
-    codec: compoundTypeCodec,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  b: {
-    description: undefined,
-    codec: compoundTypeCodec,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  baz_buz: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const extensions14 = {
-  isTableLike: false,
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "nested_compound_type"
-  },
-  tags: Object.create(null)
-};
-const parts14 = ["b", "nested_compound_type"];
-const nestedCompoundTypeIdentifier = sql.identifier(...parts14);
-const nestedCompoundTypeCodecSpec = {
+const nestedCompoundTypeCodec = recordCodec({
   name: "nestedCompoundType",
-  identifier: nestedCompoundTypeIdentifier,
-  attributes: nestedCompoundTypeAttributes,
+  identifier: sql.identifier("b", "nested_compound_type"),
+  attributes: Object.assign(Object.create(null), {
+    a: {
+      description: undefined,
+      codec: compoundTypeCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    b: {
+      description: undefined,
+      codec: compoundTypeCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    baz_buz: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
-  extensions: extensions14,
-  executor: executor_mainPgExecutor
-};
-const nestedCompoundTypeCodec = recordCodec(nestedCompoundTypeCodecSpec);
-const extensions15 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "c",
-    name: "text_array_domain"
+  extensions: {
+    isTableLike: false,
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "nested_compound_type"
+    },
+    tags: Object.create(null)
   },
-  tags: Object.create(null)
-};
-const parts15 = ["c", "text_array_domain"];
-const textArrayDomainIdentifier = sql.identifier(...parts15);
-const textArrayDomainCodec = domainOfCodec(textArrayCodec, "textArrayDomain", textArrayDomainIdentifier, {
+  executor: executor_mainPgExecutor
+});
+const textArrayDomainCodec = domainOfCodec(textArrayCodec, "textArrayDomain", sql.identifier("c", "text_array_domain"), {
   description: undefined,
-  extensions: extensions15,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "c",
+      name: "text_array_domain"
+    },
+    tags: Object.create(null)
+  },
   notNull: false
 });
-const extensions16 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "c",
-    name: "int8_array_domain"
-  },
-  tags: Object.create(null)
-};
-const int8ArrayCodecExtensions = {
-  pg: {
-    serviceName: "main",
-    schemaName: "pg_catalog",
-    name: "_int8"
-  },
-  tags: Object.create(null)
-};
 const int8ArrayCodec = listOfCodec(TYPES.bigint, {
-  extensions: int8ArrayCodecExtensions,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_int8"
+    },
+    tags: Object.create(null)
+  },
   typeDelim: ",",
   description: undefined,
   name: "int8Array"
 });
-const parts16 = ["c", "int8_array_domain"];
-const int8ArrayDomainIdentifier = sql.identifier(...parts16);
-const int8ArrayDomainCodec = domainOfCodec(int8ArrayCodec, "int8ArrayDomain", int8ArrayDomainIdentifier, {
+const int8ArrayDomainCodec = domainOfCodec(int8ArrayCodec, "int8ArrayDomain", sql.identifier("c", "int8_array_domain"), {
   description: undefined,
-  extensions: extensions16,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "c",
+      name: "int8_array_domain"
+    },
+    tags: Object.create(null)
+  },
   notNull: false
 });
-const byteaArrayCodecExtensions = {
-  pg: {
-    serviceName: "main",
-    schemaName: "pg_catalog",
-    name: "_bytea"
-  },
-  tags: Object.create(null)
-};
 const byteaArrayCodec = listOfCodec(TYPES.bytea, {
-  extensions: byteaArrayCodecExtensions,
+  extensions: {
+    pg: {
+      serviceName: "main",
+      schemaName: "pg_catalog",
+      name: "_bytea"
+    },
+    tags: Object.create(null)
+  },
   typeDelim: ",",
   description: undefined,
   name: "byteaArray"
@@ -1109,594 +1040,62 @@ const extensions17 = {
     foreignKey: ["(smallint) references a.post", "(id) references a.post"]
   })
 };
-const parts17 = ["b", "types"];
-const typesIdentifier = sql.identifier(...parts17);
-const typesCodecSpec = {
+const typesCodec = recordCodec({
   name: "types",
-  identifier: typesIdentifier,
+  identifier: sql.identifier("b", "types"),
   attributes: typesAttributes,
   description: undefined,
   extensions: extensions17,
   executor: executor_mainPgExecutor
-};
-const typesCodec = recordCodec(typesCodecSpec);
-const jwtTokenArrayCodecExtensions = {
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "_jwt_token"
-  },
-  tags: Object.create(null)
-};
-const compoundTypeArrayCodecExtensions = {
-  pg: {
-    serviceName: "main",
-    schemaName: "c",
-    name: "_compound_type"
-  },
-  tags: Object.create(null)
-};
-const typesArrayCodecExtensions = {
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "_types"
-  },
-  tags: Object.create(null)
-};
-const extensions18 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "not_null_url"
-  },
-  tags: Object.create(null)
-};
-const parts18 = ["b", "not_null_url"];
-const notNullUrlIdentifier = sql.identifier(...parts18);
-const notNullUrlCodec = domainOfCodec(TYPES.varchar, "notNullUrl", notNullUrlIdentifier, {
-  description: undefined,
-  extensions: extensions18,
-  notNull: true
 });
-const wrappedUrlAttributes = Object.assign(Object.create(null), {
-  url: {
-    description: undefined,
-    codec: notNullUrlCodec,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const extensions19 = {
-  isTableLike: false,
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "wrapped_url"
-  },
-  tags: Object.create(null)
-};
-const parts19 = ["b", "wrapped_url"];
-const wrappedUrlIdentifier = sql.identifier(...parts19);
-const wrappedUrlCodecSpec = {
-  name: "wrappedUrl",
-  identifier: wrappedUrlIdentifier,
-  attributes: wrappedUrlAttributes,
+const notNullUrlCodec = domainOfCodec(TYPES.varchar, "notNullUrl", sql.identifier("b", "not_null_url"), {
   description: undefined,
-  extensions: extensions19,
-  executor: executor_mainPgExecutor
-};
-const extensions20 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "mult_1"
-  },
-  tags: {
-    behavior: ["-queryField mutationField -typeField", "-filter -order"]
-  }
-};
-const parts20 = ["b", "mult_1"];
-const sqlIdent7 = sql.identifier(...parts20);
-const extensions21 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "mult_2"
-  },
-  tags: {
-    behavior: ["-queryField mutationField -typeField", "-filter -order"]
-  }
-};
-const parts21 = ["b", "mult_2"];
-const sqlIdent8 = sql.identifier(...parts21);
-const fromCallback2 = (...args) => sql`${sqlIdent8}(${sqlFromArgDigests(args)})`;
-const parameters2 = [{
-  name: null,
-  required: true,
-  notNull: false,
-  codec: TYPES.int
-}, {
-  name: null,
-  required: true,
-  notNull: false,
-  codec: TYPES.int
-}];
-const extensions22 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "mult_3"
-  },
-  tags: {
-    behavior: ["-queryField mutationField -typeField", "-filter -order"]
-  }
-};
-const parts22 = ["b", "mult_3"];
-const sqlIdent9 = sql.identifier(...parts22);
-const fromCallback3 = (...args) => sql`${sqlIdent9}(${sqlFromArgDigests(args)})`;
-const parameters3 = [{
-  name: null,
-  required: true,
-  notNull: true,
-  codec: TYPES.int
-}, {
-  name: null,
-  required: true,
-  notNull: true,
-  codec: TYPES.int
-}];
-const extensions23 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "mult_4"
-  },
-  tags: {
-    behavior: ["-queryField mutationField -typeField", "-filter -order"]
-  }
-};
-const parts23 = ["b", "mult_4"];
-const sqlIdent10 = sql.identifier(...parts23);
-const fromCallback4 = (...args) => sql`${sqlIdent10}(${sqlFromArgDigests(args)})`;
-const parameters4 = [{
-  name: null,
-  required: true,
-  notNull: true,
-  codec: TYPES.int
-}, {
-  name: null,
-  required: true,
-  notNull: true,
-  codec: TYPES.int
-}];
-const extensions24 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "guid_fn"
-  },
-  tags: {
-    behavior: ["-queryField mutationField -typeField", "-filter -order"]
-  }
-};
-const parts24 = ["b", "guid_fn"];
-const sqlIdent11 = sql.identifier(...parts24);
-const fromCallback5 = (...args) => sql`${sqlIdent11}(${sqlFromArgDigests(args)})`;
-const parameters5 = [{
-  name: "g",
-  required: true,
-  notNull: false,
-  codec: guidCodec
-}];
-const extensions25 = {
-  description: "YOYOYO!!",
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "updatable_view"
-  },
-  tags: {
-    uniqueKey: "x",
-    unique: "x|@behavior -single -update -delete"
-  }
-};
-const parts25 = ["b", "authenticate_fail"];
-const sqlIdent12 = sql.identifier(...parts25);
-const options_authenticate_fail = {
-  name: "authenticate_fail",
-  identifier: "main.b.authenticate_fail()",
-  from(...args) {
-    return sql`${sqlIdent12}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [],
-  returnsArray: false,
-  returnsSetof: false,
-  isMutation: true,
   extensions: {
     pg: {
       serviceName: "main",
       schemaName: "b",
-      name: "authenticate_fail"
+      name: "not_null_url"
     },
-    tags: {
-      behavior: ["-queryField mutationField -typeField", "-filter -order"]
-    }
+    tags: Object.create(null)
   },
-  description: undefined
-};
-const extensions26 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "jwt_token"
-  },
-  tags: {
-    behavior: ["-insert", "-update", "-delete"]
-  }
-};
-const uniques2 = [];
+  notNull: true
+});
+const sqlIdent7 = sql.identifier("b", "mult_1");
+const sqlIdent8 = sql.identifier("b", "mult_2");
+const sqlIdent9 = sql.identifier("b", "mult_3");
+const sqlIdent10 = sql.identifier("b", "mult_4");
+const sqlIdent11 = sql.identifier("b", "guid_fn");
+const sqlIdent12 = sql.identifier("b", "authenticate_fail");
 const resourceConfig_jwt_token = {
   executor: executor_mainPgExecutor,
   name: "jwt_token",
   identifier: "main.b.jwt_token",
   from: jwtTokenCodec.sqlType,
   codec: jwtTokenCodec,
-  uniques: uniques2,
+  uniques: [],
   isVirtual: true,
   description: undefined,
-  extensions: extensions26
-};
-const parts26 = ["b", "authenticate"];
-const sqlIdent13 = sql.identifier(...parts26);
-const options_authenticate = {
-  name: "authenticate",
-  identifier: "main.b.authenticate(int4,numeric,int8)",
-  from(...args) {
-    return sql`${sqlIdent13}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "a",
-    required: true,
-    notNull: false,
-    codec: TYPES.int
-  }, {
-    name: "b",
-    required: true,
-    notNull: false,
-    codec: TYPES.numeric
-  }, {
-    name: "c",
-    required: true,
-    notNull: false,
-    codec: TYPES.bigint
-  }],
-  returnsArray: false,
-  returnsSetof: false,
-  isMutation: true,
   extensions: {
+    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "b",
-      name: "authenticate"
+      name: "jwt_token"
     },
     tags: {
-      behavior: ["-queryField mutationField -typeField", "-filter -order"]
+      behavior: ["-insert", "-update", "-delete"]
     }
-  },
-  description: undefined
-};
-const extensions27 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "list_bde_mutation"
-  },
-  tags: {
-    behavior: ["-queryField mutationField -typeField", "-filter -order"]
   }
 };
-const parts27 = ["b", "list_bde_mutation"];
-const sqlIdent14 = sql.identifier(...parts27);
-const fromCallback6 = (...args) => sql`${sqlIdent14}(${sqlFromArgDigests(args)})`;
-const parameters6 = [{
-  name: "b",
-  required: true,
-  notNull: false,
-  codec: textArrayCodec
-}, {
-  name: "d",
-  required: true,
-  notNull: false,
-  codec: TYPES.text
-}, {
-  name: "e",
-  required: true,
-  notNull: false,
-  codec: TYPES.text
-}];
-const parts28 = ["b", "authenticate_many"];
-const sqlIdent15 = sql.identifier(...parts28);
-const options_authenticate_many = {
-  name: "authenticate_many",
-  identifier: "main.b.authenticate_many(int4,numeric,int8)",
-  from(...args) {
-    return sql`${sqlIdent15}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "a",
-    required: true,
-    notNull: false,
-    codec: TYPES.int
-  }, {
-    name: "b",
-    required: true,
-    notNull: false,
-    codec: TYPES.numeric
-  }, {
-    name: "c",
-    required: true,
-    notNull: false,
-    codec: TYPES.bigint
-  }],
-  returnsArray: true,
-  returnsSetof: false,
-  isMutation: true,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "authenticate_many"
-    },
-    tags: {
-      behavior: ["-queryField mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const parts29 = ["b", "authenticate_payload"];
-const sqlIdent16 = sql.identifier(...parts29);
-const options_authenticate_payload = {
-  name: "authenticate_payload",
-  identifier: "main.b.authenticate_payload(int4,numeric,int8)",
-  from(...args) {
-    return sql`${sqlIdent16}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "a",
-    required: true,
-    notNull: false,
-    codec: TYPES.int
-  }, {
-    name: "b",
-    required: true,
-    notNull: false,
-    codec: TYPES.numeric
-  }, {
-    name: "c",
-    required: true,
-    notNull: false,
-    codec: TYPES.bigint
-  }],
-  returnsArray: false,
-  returnsSetof: false,
-  isMutation: true,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "authenticate_payload"
-    },
-    tags: {
-      behavior: ["-queryField mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const extensions28 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "auth_payload"
-  },
-  tags: {
-    foreignKey: "(id) references c.person",
-    behavior: ["-insert", "-update", "-delete"]
-  }
-};
-const uniques3 = [];
-const resourceConfig_auth_payload = {
-  executor: executor_mainPgExecutor,
-  name: "auth_payload",
-  identifier: "main.b.auth_payload",
-  from: authPayloadCodec.sqlType,
-  codec: authPayloadCodec,
-  uniques: uniques3,
-  isVirtual: true,
-  description: undefined,
-  extensions: extensions28
-};
-const parts30 = ["b", "compound_type_mutation"];
-const sqlIdent17 = sql.identifier(...parts30);
-const options_compound_type_mutation = {
-  name: "compound_type_mutation",
-  identifier: "main.b.compound_type_mutation(c.compound_type)",
-  from(...args) {
-    return sql`${sqlIdent17}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "object",
-    required: true,
-    notNull: false,
-    codec: compoundTypeCodec
-  }],
-  returnsArray: false,
-  returnsSetof: false,
-  isMutation: true,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "compound_type_mutation"
-    },
-    tags: {
-      behavior: ["-queryField mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const resourceConfig = {
-  codec: compoundTypeCodec,
-  executor: executor_mainPgExecutor
-};
-const parts31 = ["b", "compound_type_query"];
-const sqlIdent18 = sql.identifier(...parts31);
-const options_compound_type_query = {
-  name: "compound_type_query",
-  identifier: "main.b.compound_type_query(c.compound_type)",
-  from(...args) {
-    return sql`${sqlIdent18}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "object",
-    required: true,
-    notNull: false,
-    codec: compoundTypeCodec
-  }],
-  returnsArray: false,
-  returnsSetof: false,
-  isMutation: false,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "compound_type_query"
-    },
-    tags: {
-      behavior: ["queryField -mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const resourceConfig2 = {
-  codec: compoundTypeCodec,
-  executor: executor_mainPgExecutor
-};
-const parts32 = ["b", "compound_type_set_mutation"];
-const sqlIdent19 = sql.identifier(...parts32);
-const options_compound_type_set_mutation = {
-  name: "compound_type_set_mutation",
-  identifier: "main.b.compound_type_set_mutation(c.compound_type)",
-  from(...args) {
-    return sql`${sqlIdent19}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "object",
-    required: true,
-    notNull: false,
-    codec: compoundTypeCodec
-  }],
-  returnsArray: false,
-  returnsSetof: true,
-  isMutation: true,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "compound_type_set_mutation"
-    },
-    tags: {
-      behavior: ["-queryField mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const resourceConfig3 = {
-  codec: compoundTypeCodec,
-  executor: executor_mainPgExecutor
-};
-const parts33 = ["b", "compound_type_array_mutation"];
-const sqlIdent20 = sql.identifier(...parts33);
-const options_compound_type_array_mutation = {
-  name: "compound_type_array_mutation",
-  identifier: "main.b.compound_type_array_mutation(c.compound_type)",
-  from(...args) {
-    return sql`${sqlIdent20}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "object",
-    required: true,
-    notNull: false,
-    codec: compoundTypeCodec
-  }],
-  returnsArray: true,
-  returnsSetof: false,
-  isMutation: true,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "compound_type_array_mutation"
-    },
-    tags: {
-      behavior: ["-queryField mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const resourceConfig4 = {
-  codec: compoundTypeCodec,
-  executor: executor_mainPgExecutor
-};
-const parts34 = ["b", "compound_type_array_query"];
-const sqlIdent21 = sql.identifier(...parts34);
-const options_compound_type_array_query = {
-  name: "compound_type_array_query",
-  identifier: "main.b.compound_type_array_query(c.compound_type)",
-  from(...args) {
-    return sql`${sqlIdent21}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "object",
-    required: true,
-    notNull: false,
-    codec: compoundTypeCodec
-  }],
-  returnsArray: true,
-  returnsSetof: false,
-  isMutation: false,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "compound_type_array_query"
-    },
-    tags: {
-      behavior: ["queryField -mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const resourceConfig5 = {
-  codec: compoundTypeCodec,
-  executor: executor_mainPgExecutor
-};
-const extensions29 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "types"
-  },
-  tags: {
-    foreignKey: extensions17.tags.foreignKey
-  }
-};
+const sqlIdent13 = sql.identifier("b", "authenticate");
+const sqlIdent14 = sql.identifier("b", "list_bde_mutation");
+const sqlIdent15 = sql.identifier("b", "authenticate_many");
+const sqlIdent16 = sql.identifier("b", "authenticate_payload");
+const sqlIdent17 = sql.identifier("b", "compound_type_mutation");
+const sqlIdent18 = sql.identifier("b", "compound_type_query");
+const sqlIdent19 = sql.identifier("b", "compound_type_set_mutation");
+const sqlIdent20 = sql.identifier("b", "compound_type_array_mutation");
+const sqlIdent21 = sql.identifier("b", "compound_type_array_query");
 const uniques4 = [{
   isPrimary: true,
   attributes: ["id"],
@@ -1714,162 +1113,24 @@ const registryConfig_pgResources_types_types = {
   uniques: uniques4,
   isVirtual: false,
   description: undefined,
-  extensions: extensions29
-};
-const parts35 = ["b", "type_function_connection"];
-const sqlIdent22 = sql.identifier(...parts35);
-const options_type_function_connection = {
-  name: "type_function_connection",
-  identifier: "main.b.type_function_connection()",
-  from(...args) {
-    return sql`${sqlIdent22}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [],
-  returnsArray: false,
-  returnsSetof: true,
-  isMutation: false,
   extensions: {
+    description: undefined,
     pg: {
       serviceName: "main",
       schemaName: "b",
-      name: "type_function_connection"
+      name: "types"
     },
     tags: {
-      behavior: ["queryField -mutationField -typeField", "-filter -order"]
+      foreignKey: extensions17.tags.foreignKey
     }
-  },
-  description: undefined
+  }
 };
-const parts36 = ["b", "type_function_connection_mutation"];
-const sqlIdent23 = sql.identifier(...parts36);
-const options_type_function_connection_mutation = {
-  name: "type_function_connection_mutation",
-  identifier: "main.b.type_function_connection_mutation()",
-  from(...args) {
-    return sql`${sqlIdent23}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [],
-  returnsArray: false,
-  returnsSetof: true,
-  isMutation: true,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "type_function_connection_mutation"
-    },
-    tags: {
-      behavior: ["-queryField mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const parts37 = ["b", "type_function"];
-const sqlIdent24 = sql.identifier(...parts37);
-const options_type_function = {
-  name: "type_function",
-  identifier: "main.b.type_function(int4)",
-  from(...args) {
-    return sql`${sqlIdent24}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "id",
-    required: true,
-    notNull: false,
-    codec: TYPES.int
-  }],
-  returnsArray: false,
-  returnsSetof: false,
-  isMutation: false,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "type_function"
-    },
-    tags: {
-      behavior: ["queryField -mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const parts38 = ["b", "type_function_mutation"];
-const sqlIdent25 = sql.identifier(...parts38);
-const options_type_function_mutation = {
-  name: "type_function_mutation",
-  identifier: "main.b.type_function_mutation(int4)",
-  from(...args) {
-    return sql`${sqlIdent25}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [{
-    name: "id",
-    required: true,
-    notNull: false,
-    codec: TYPES.int
-  }],
-  returnsArray: false,
-  returnsSetof: false,
-  isMutation: true,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "type_function_mutation"
-    },
-    tags: {
-      behavior: ["-queryField mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const parts39 = ["b", "type_function_list"];
-const sqlIdent26 = sql.identifier(...parts39);
-const options_type_function_list = {
-  name: "type_function_list",
-  identifier: "main.b.type_function_list()",
-  from(...args) {
-    return sql`${sqlIdent26}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [],
-  returnsArray: true,
-  returnsSetof: false,
-  isMutation: false,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "type_function_list"
-    },
-    tags: {
-      behavior: ["queryField -mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
-const parts40 = ["b", "type_function_list_mutation"];
-const sqlIdent27 = sql.identifier(...parts40);
-const options_type_function_list_mutation = {
-  name: "type_function_list_mutation",
-  identifier: "main.b.type_function_list_mutation()",
-  from(...args) {
-    return sql`${sqlIdent27}(${sqlFromArgDigests(args)})`;
-  },
-  parameters: [],
-  returnsArray: true,
-  returnsSetof: false,
-  isMutation: true,
-  extensions: {
-    pg: {
-      serviceName: "main",
-      schemaName: "b",
-      name: "type_function_list_mutation"
-    },
-    tags: {
-      behavior: ["-queryField mutationField -typeField", "-filter -order"]
-    }
-  },
-  description: undefined
-};
+const sqlIdent22 = sql.identifier("b", "type_function_connection");
+const sqlIdent23 = sql.identifier("b", "type_function_connection_mutation");
+const sqlIdent24 = sql.identifier("b", "type_function");
+const sqlIdent25 = sql.identifier("b", "type_function_mutation");
+const sqlIdent26 = sql.identifier("b", "type_function_list");
+const sqlIdent27 = sql.identifier("b", "type_function_list_mutation");
 const registry = makeRegistry({
   pgCodecs: Object.assign(Object.create(null), {
     int4: TYPES.int,
@@ -1928,26 +1189,72 @@ const registry = makeRegistry({
     "ltree[]": typesAttributes_ltree_array_codec_ltree_,
     bpchar: TYPES.bpchar,
     jwtTokenArray: listOfCodec(jwtTokenCodec, {
-      extensions: jwtTokenArrayCodecExtensions,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "_jwt_token"
+        },
+        tags: Object.create(null)
+      },
       typeDelim: ",",
       description: undefined,
       name: "jwtTokenArray"
     }),
     compoundTypeArray: listOfCodec(compoundTypeCodec, {
-      extensions: compoundTypeArrayCodecExtensions,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "_compound_type"
+        },
+        tags: Object.create(null)
+      },
       typeDelim: ",",
       description: undefined,
       name: "compoundTypeArray"
     }),
     typesArray: listOfCodec(typesCodec, {
-      extensions: typesArrayCodecExtensions,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "_types"
+        },
+        tags: Object.create(null)
+      },
       typeDelim: ",",
       description: undefined,
       name: "typesArray"
     }),
     notNullUrl: notNullUrlCodec,
     int8Array: int8ArrayCodec,
-    wrappedUrl: recordCodec(wrappedUrlCodecSpec)
+    wrappedUrl: recordCodec({
+      name: "wrappedUrl",
+      identifier: sql.identifier("b", "wrapped_url"),
+      attributes: Object.assign(Object.create(null), {
+        url: {
+          description: undefined,
+          codec: notNullUrlCodec,
+          notNull: true,
+          hasDefault: false,
+          extensions: {
+            tags: {}
+          }
+        }
+      }),
+      description: undefined,
+      extensions: {
+        isTableLike: false,
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "wrapped_url"
+        },
+        tags: Object.create(null)
+      },
+      executor: executor_mainPgExecutor
+    })
   }),
   pgResources: Object.assign(Object.create(null), {
     mult_1: {
@@ -1972,59 +1279,147 @@ const registry = makeRegistry({
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions20,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "mult_1"
+        },
+        tags: {
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
       description: undefined
     },
     mult_2: {
       executor: executor_mainPgExecutor,
       name: "mult_2",
       identifier: "main.b.mult_2(int4,int4)",
-      from: fromCallback2,
-      parameters: parameters2,
+      from(...args) {
+        return sql`${sqlIdent8}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: null,
+        required: true,
+        notNull: false,
+        codec: TYPES.int
+      }, {
+        name: null,
+        required: true,
+        notNull: false,
+        codec: TYPES.int
+      }],
       isUnique: !false,
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions21,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "mult_2"
+        },
+        tags: {
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
       description: undefined
     },
     mult_3: {
       executor: executor_mainPgExecutor,
       name: "mult_3",
       identifier: "main.b.mult_3(int4,int4)",
-      from: fromCallback3,
-      parameters: parameters3,
+      from(...args) {
+        return sql`${sqlIdent9}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: null,
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: null,
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }],
       isUnique: !false,
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions22,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "mult_3"
+        },
+        tags: {
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
       description: undefined
     },
     mult_4: {
       executor: executor_mainPgExecutor,
       name: "mult_4",
       identifier: "main.b.mult_4(int4,int4)",
-      from: fromCallback4,
-      parameters: parameters4,
+      from(...args) {
+        return sql`${sqlIdent10}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: null,
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: null,
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }],
       isUnique: !false,
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions23,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "mult_4"
+        },
+        tags: {
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
       description: undefined
     },
     guid_fn: {
       executor: executor_mainPgExecutor,
       name: "guid_fn",
       identifier: "main.b.guid_fn(b.guid)",
-      from: fromCallback5,
-      parameters: parameters5,
+      from(...args) {
+        return sql`${sqlIdent11}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "g",
+        required: true,
+        notNull: false,
+        codec: guidCodec
+      }],
       isUnique: !false,
       codec: guidCodec,
       uniques: [],
       isMutation: true,
-      extensions: extensions24,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "guid_fn"
+        },
+        tags: {
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
       description: undefined
     },
     updatable_view: {
@@ -2045,37 +1440,505 @@ const registry = makeRegistry({
       }],
       isVirtual: false,
       description: "YOYOYO!!",
-      extensions: extensions25
+      extensions: {
+        description: "YOYOYO!!",
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "updatable_view"
+        },
+        tags: {
+          uniqueKey: "x",
+          unique: "x|@behavior -single -update -delete"
+        }
+      }
     },
-    authenticate_fail: PgResource.functionResourceOptions(resourceConfig_jwt_token, options_authenticate_fail),
-    authenticate: PgResource.functionResourceOptions(resourceConfig_jwt_token, options_authenticate),
+    authenticate_fail: PgResource.functionResourceOptions(resourceConfig_jwt_token, {
+      name: "authenticate_fail",
+      identifier: "main.b.authenticate_fail()",
+      from(...args) {
+        return sql`${sqlIdent12}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsArray: false,
+      returnsSetof: false,
+      isMutation: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "authenticate_fail"
+        },
+        tags: {
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
+    authenticate: PgResource.functionResourceOptions(resourceConfig_jwt_token, {
+      name: "authenticate",
+      identifier: "main.b.authenticate(int4,numeric,int8)",
+      from(...args) {
+        return sql`${sqlIdent13}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "a",
+        required: true,
+        notNull: false,
+        codec: TYPES.int
+      }, {
+        name: "b",
+        required: true,
+        notNull: false,
+        codec: TYPES.numeric
+      }, {
+        name: "c",
+        required: true,
+        notNull: false,
+        codec: TYPES.bigint
+      }],
+      returnsArray: false,
+      returnsSetof: false,
+      isMutation: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "authenticate"
+        },
+        tags: {
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
     list_bde_mutation: {
       executor: executor_mainPgExecutor,
       name: "list_bde_mutation",
       identifier: "main.b.list_bde_mutation(_text,text,text)",
-      from: fromCallback6,
-      parameters: parameters6,
+      from(...args) {
+        return sql`${sqlIdent14}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "b",
+        required: true,
+        notNull: false,
+        codec: textArrayCodec
+      }, {
+        name: "d",
+        required: true,
+        notNull: false,
+        codec: TYPES.text
+      }, {
+        name: "e",
+        required: true,
+        notNull: false,
+        codec: TYPES.text
+      }],
       isUnique: !false,
       codec: uuidArrayCodec,
       uniques: [],
       isMutation: true,
-      extensions: extensions27,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "list_bde_mutation"
+        },
+        tags: {
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
       description: undefined
     },
-    authenticate_many: PgResource.functionResourceOptions(resourceConfig_jwt_token, options_authenticate_many),
-    authenticate_payload: PgResource.functionResourceOptions(resourceConfig_auth_payload, options_authenticate_payload),
-    compound_type_mutation: PgResource.functionResourceOptions(resourceConfig, options_compound_type_mutation),
-    compound_type_query: PgResource.functionResourceOptions(resourceConfig2, options_compound_type_query),
-    compound_type_set_mutation: PgResource.functionResourceOptions(resourceConfig3, options_compound_type_set_mutation),
-    compound_type_array_mutation: PgResource.functionResourceOptions(resourceConfig4, options_compound_type_array_mutation),
-    compound_type_array_query: PgResource.functionResourceOptions(resourceConfig5, options_compound_type_array_query),
+    authenticate_many: PgResource.functionResourceOptions(resourceConfig_jwt_token, {
+      name: "authenticate_many",
+      identifier: "main.b.authenticate_many(int4,numeric,int8)",
+      from(...args) {
+        return sql`${sqlIdent15}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "a",
+        required: true,
+        notNull: false,
+        codec: TYPES.int
+      }, {
+        name: "b",
+        required: true,
+        notNull: false,
+        codec: TYPES.numeric
+      }, {
+        name: "c",
+        required: true,
+        notNull: false,
+        codec: TYPES.bigint
+      }],
+      returnsArray: true,
+      returnsSetof: false,
+      isMutation: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "authenticate_many"
+        },
+        tags: {
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
+    authenticate_payload: PgResource.functionResourceOptions({
+      executor: executor_mainPgExecutor,
+      name: "auth_payload",
+      identifier: "main.b.auth_payload",
+      from: authPayloadCodec.sqlType,
+      codec: authPayloadCodec,
+      uniques: [],
+      isVirtual: true,
+      description: undefined,
+      extensions: {
+        description: undefined,
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "auth_payload"
+        },
+        tags: {
+          foreignKey: "(id) references c.person",
+          behavior: ["-insert", "-update", "-delete"]
+        }
+      }
+    }, {
+      name: "authenticate_payload",
+      identifier: "main.b.authenticate_payload(int4,numeric,int8)",
+      from(...args) {
+        return sql`${sqlIdent16}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "a",
+        required: true,
+        notNull: false,
+        codec: TYPES.int
+      }, {
+        name: "b",
+        required: true,
+        notNull: false,
+        codec: TYPES.numeric
+      }, {
+        name: "c",
+        required: true,
+        notNull: false,
+        codec: TYPES.bigint
+      }],
+      returnsArray: false,
+      returnsSetof: false,
+      isMutation: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "authenticate_payload"
+        },
+        tags: {
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
+    compound_type_mutation: PgResource.functionResourceOptions({
+      codec: compoundTypeCodec,
+      executor: executor_mainPgExecutor
+    }, {
+      name: "compound_type_mutation",
+      identifier: "main.b.compound_type_mutation(c.compound_type)",
+      from(...args) {
+        return sql`${sqlIdent17}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "object",
+        required: true,
+        notNull: false,
+        codec: compoundTypeCodec
+      }],
+      returnsArray: false,
+      returnsSetof: false,
+      isMutation: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "compound_type_mutation"
+        },
+        tags: {
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
+    compound_type_query: PgResource.functionResourceOptions({
+      codec: compoundTypeCodec,
+      executor: executor_mainPgExecutor
+    }, {
+      name: "compound_type_query",
+      identifier: "main.b.compound_type_query(c.compound_type)",
+      from(...args) {
+        return sql`${sqlIdent18}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "object",
+        required: true,
+        notNull: false,
+        codec: compoundTypeCodec
+      }],
+      returnsArray: false,
+      returnsSetof: false,
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "compound_type_query"
+        },
+        tags: {
+          behavior: ["queryField -mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
+    compound_type_set_mutation: PgResource.functionResourceOptions({
+      codec: compoundTypeCodec,
+      executor: executor_mainPgExecutor
+    }, {
+      name: "compound_type_set_mutation",
+      identifier: "main.b.compound_type_set_mutation(c.compound_type)",
+      from(...args) {
+        return sql`${sqlIdent19}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "object",
+        required: true,
+        notNull: false,
+        codec: compoundTypeCodec
+      }],
+      returnsArray: false,
+      returnsSetof: true,
+      isMutation: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "compound_type_set_mutation"
+        },
+        tags: {
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
+    compound_type_array_mutation: PgResource.functionResourceOptions({
+      codec: compoundTypeCodec,
+      executor: executor_mainPgExecutor
+    }, {
+      name: "compound_type_array_mutation",
+      identifier: "main.b.compound_type_array_mutation(c.compound_type)",
+      from(...args) {
+        return sql`${sqlIdent20}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "object",
+        required: true,
+        notNull: false,
+        codec: compoundTypeCodec
+      }],
+      returnsArray: true,
+      returnsSetof: false,
+      isMutation: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "compound_type_array_mutation"
+        },
+        tags: {
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
+    compound_type_array_query: PgResource.functionResourceOptions({
+      codec: compoundTypeCodec,
+      executor: executor_mainPgExecutor
+    }, {
+      name: "compound_type_array_query",
+      identifier: "main.b.compound_type_array_query(c.compound_type)",
+      from(...args) {
+        return sql`${sqlIdent21}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "object",
+        required: true,
+        notNull: false,
+        codec: compoundTypeCodec
+      }],
+      returnsArray: true,
+      returnsSetof: false,
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "compound_type_array_query"
+        },
+        tags: {
+          behavior: ["queryField -mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
     types: registryConfig_pgResources_types_types,
-    type_function_connection: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, options_type_function_connection),
-    type_function_connection_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, options_type_function_connection_mutation),
-    type_function: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, options_type_function),
-    type_function_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, options_type_function_mutation),
-    type_function_list: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, options_type_function_list),
-    type_function_list_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, options_type_function_list_mutation)
+    type_function_connection: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+      name: "type_function_connection",
+      identifier: "main.b.type_function_connection()",
+      from(...args) {
+        return sql`${sqlIdent22}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsArray: false,
+      returnsSetof: true,
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "type_function_connection"
+        },
+        tags: {
+          behavior: ["queryField -mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
+    type_function_connection_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+      name: "type_function_connection_mutation",
+      identifier: "main.b.type_function_connection_mutation()",
+      from(...args) {
+        return sql`${sqlIdent23}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsArray: false,
+      returnsSetof: true,
+      isMutation: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "type_function_connection_mutation"
+        },
+        tags: {
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
+    type_function: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+      name: "type_function",
+      identifier: "main.b.type_function(int4)",
+      from(...args) {
+        return sql`${sqlIdent24}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "id",
+        required: true,
+        notNull: false,
+        codec: TYPES.int
+      }],
+      returnsArray: false,
+      returnsSetof: false,
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "type_function"
+        },
+        tags: {
+          behavior: ["queryField -mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
+    type_function_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+      name: "type_function_mutation",
+      identifier: "main.b.type_function_mutation(int4)",
+      from(...args) {
+        return sql`${sqlIdent25}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "id",
+        required: true,
+        notNull: false,
+        codec: TYPES.int
+      }],
+      returnsArray: false,
+      returnsSetof: false,
+      isMutation: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "type_function_mutation"
+        },
+        tags: {
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
+    type_function_list: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+      name: "type_function_list",
+      identifier: "main.b.type_function_list()",
+      from(...args) {
+        return sql`${sqlIdent26}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsArray: true,
+      returnsSetof: false,
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "type_function_list"
+        },
+        tags: {
+          behavior: ["queryField -mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    }),
+    type_function_list_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_types_types, {
+      name: "type_function_list_mutation",
+      identifier: "main.b.type_function_list_mutation()",
+      from(...args) {
+        return sql`${sqlIdent27}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [],
+      returnsArray: true,
+      returnsSetof: false,
+      isMutation: true,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "b",
+          name: "type_function_list_mutation"
+        },
+        tags: {
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
+      description: undefined
+    })
   }),
   pgRelations: Object.create(null)
 });
@@ -2256,25 +2119,6 @@ const getSelectPlanFromParentAndArgs = ($root, args, _info) => {
   const selectArgs = makeArgs3(args);
   return resource_type_function_connectionPgResource.execute(selectArgs);
 };
-function Query_typeFunctionConnectionPlan($parent, args, info) {
-  const $select = getSelectPlanFromParentAndArgs($parent, args, info);
-  return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
-}
-function Query_typeFunctionConnection_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_typeFunctionConnection_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_typeFunctionConnection_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_typeFunctionConnection_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_typeFunctionConnection_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const argDetailsSimple4 = [{
   graphqlArgName: "id",
   postgresArgName: "id",
@@ -2400,21 +2244,6 @@ const fetcher = (handler => {
   return fn;
 })(nodeIdHandlerByTypeName.Type);
 const resource_updatable_viewPgResource = registry.pgResources["updatable_view"];
-function Query_allUpdatableViews_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allUpdatableViews_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allUpdatableViews_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allUpdatableViews_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allUpdatableViews_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const applyOrderToPlan = ($select, $value, TableOrderByType) => {
   const val = $value.eval();
   if (val == null) {
@@ -2433,67 +2262,8 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
     plan($select);
   });
 };
-function Query_allTypes_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allTypes_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allTypes_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allTypes_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allTypes_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const resource_frmcdc_compoundTypePgResource = registry.pgResources["frmcdc_compoundType"];
 const resource_frmcdc_nestedCompoundTypePgResource = registry.pgResources["frmcdc_nestedCompoundType"];
-function Interval_secondsPlan($r) {
-  return access($r, ["seconds"]);
-}
-function Interval_minutesPlan($r) {
-  return access($r, ["minutes"]);
-}
-function Interval_hoursPlan($r) {
-  return access($r, ["hours"]);
-}
-function Interval_daysPlan($r) {
-  return access($r, ["days"]);
-}
-function Interval_monthsPlan($r) {
-  return access($r, ["months"]);
-}
-function Interval_yearsPlan($r) {
-  return access($r, ["years"]);
-}
-function TypesConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function TypesConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function TypesConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function PageInfo_hasNextPagePlan($pageInfo) {
-  return $pageInfo.hasNextPage();
-}
-function PageInfo_hasPreviousPagePlan($pageInfo) {
-  return $pageInfo.hasPreviousPage();
-}
-function UpdatableViewsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function UpdatableViewsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function UpdatableViewsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
 const argDetailsSimple6 = [{
   graphqlArgName: "arg0",
   postgresArgName: null,
@@ -2552,9 +2322,6 @@ const makeArgs6 = (args, path = []) => {
   return selectArgs;
 };
 const resource_mult_1PgResource = registry.pgResources["mult_1"];
-function Mutation_mult1_input_applyPlan(_, $object) {
-  return $object;
-}
 const argDetailsSimple7 = [{
   graphqlArgName: "arg0",
   postgresArgName: null,
@@ -2613,9 +2380,6 @@ const makeArgs7 = (args, path = []) => {
   return selectArgs;
 };
 const resource_mult_2PgResource = registry.pgResources["mult_2"];
-function Mutation_mult2_input_applyPlan(_, $object) {
-  return $object;
-}
 const argDetailsSimple8 = [{
   graphqlArgName: "arg0",
   postgresArgName: null,
@@ -2674,9 +2438,6 @@ const makeArgs8 = (args, path = []) => {
   return selectArgs;
 };
 const resource_mult_3PgResource = registry.pgResources["mult_3"];
-function Mutation_mult3_input_applyPlan(_, $object) {
-  return $object;
-}
 const argDetailsSimple9 = [{
   graphqlArgName: "arg0",
   postgresArgName: null,
@@ -2735,9 +2496,6 @@ const makeArgs9 = (args, path = []) => {
   return selectArgs;
 };
 const resource_mult_4PgResource = registry.pgResources["mult_4"];
-function Mutation_mult4_input_applyPlan(_, $object) {
-  return $object;
-}
 const argDetailsSimple10 = [{
   graphqlArgName: "g",
   postgresArgName: "g",
@@ -2790,9 +2548,6 @@ const makeArgs10 = (args, path = []) => {
   return selectArgs;
 };
 const resource_guid_fnPgResource = registry.pgResources["guid_fn"];
-function Mutation_guidFn_input_applyPlan(_, $object) {
-  return $object;
-}
 const argDetailsSimple11 = [];
 const makeArgs11 = (args, path = []) => {
   const selectArgs = [];
@@ -2839,9 +2594,6 @@ const makeArgs11 = (args, path = []) => {
   return selectArgs;
 };
 const resource_authenticate_failPgResource = registry.pgResources["authenticate_fail"];
-function Mutation_authenticateFail_input_applyPlan(_, $object) {
-  return $object;
-}
 const argDetailsSimple12 = [{
   graphqlArgName: "a",
   postgresArgName: "a",
@@ -2906,9 +2658,6 @@ const makeArgs12 = (args, path = []) => {
   return selectArgs;
 };
 const resource_authenticatePgResource = registry.pgResources["authenticate"];
-function Mutation_authenticate_input_applyPlan(_, $object) {
-  return $object;
-}
 const argDetailsSimple13 = [{
   graphqlArgName: "b",
   postgresArgName: "b",
@@ -2973,9 +2722,6 @@ const makeArgs13 = (args, path = []) => {
   return selectArgs;
 };
 const resource_list_bde_mutationPgResource = registry.pgResources["list_bde_mutation"];
-function Mutation_listBdeMutation_input_applyPlan(_, $object) {
-  return $object;
-}
 const argDetailsSimple14 = [{
   graphqlArgName: "a",
   postgresArgName: "a",
@@ -3040,9 +2786,6 @@ const makeArgs14 = (args, path = []) => {
   return selectArgs;
 };
 const resource_authenticate_manyPgResource = registry.pgResources["authenticate_many"];
-function Mutation_authenticateMany_input_applyPlan(_, $object) {
-  return $object;
-}
 const argDetailsSimple15 = [{
   graphqlArgName: "a",
   postgresArgName: "a",
@@ -3107,9 +2850,6 @@ const makeArgs15 = (args, path = []) => {
   return selectArgs;
 };
 const resource_authenticate_payloadPgResource = registry.pgResources["authenticate_payload"];
-function Mutation_authenticatePayload_input_applyPlan(_, $object) {
-  return $object;
-}
 const argDetailsSimple16 = [{
   graphqlArgName: "object",
   postgresArgName: "object",
@@ -3162,9 +2902,6 @@ const makeArgs16 = (args, path = []) => {
   return selectArgs;
 };
 const resource_compound_type_mutationPgResource = registry.pgResources["compound_type_mutation"];
-function Mutation_compoundTypeMutation_input_applyPlan(_, $object) {
-  return $object;
-}
 const argDetailsSimple17 = [{
   graphqlArgName: "object",
   postgresArgName: "object",
@@ -3217,9 +2954,6 @@ const makeArgs17 = (args, path = []) => {
   return selectArgs;
 };
 const resource_compound_type_set_mutationPgResource = registry.pgResources["compound_type_set_mutation"];
-function Mutation_compoundTypeSetMutation_input_applyPlan(_, $object) {
-  return $object;
-}
 const argDetailsSimple18 = [{
   graphqlArgName: "object",
   postgresArgName: "object",
@@ -3272,9 +3006,6 @@ const makeArgs18 = (args, path = []) => {
   return selectArgs;
 };
 const resource_compound_type_array_mutationPgResource = registry.pgResources["compound_type_array_mutation"];
-function Mutation_compoundTypeArrayMutation_input_applyPlan(_, $object) {
-  return $object;
-}
 const argDetailsSimple19 = [];
 const makeArgs19 = (args, path = []) => {
   const selectArgs = [];
@@ -3321,9 +3052,6 @@ const makeArgs19 = (args, path = []) => {
   return selectArgs;
 };
 const resource_type_function_connection_mutationPgResource = registry.pgResources["type_function_connection_mutation"];
-function Mutation_typeFunctionConnectionMutation_input_applyPlan(_, $object) {
-  return $object;
-}
 const argDetailsSimple20 = [{
   graphqlArgName: "id",
   postgresArgName: "id",
@@ -3376,9 +3104,6 @@ const makeArgs20 = (args, path = []) => {
   return selectArgs;
 };
 const resource_type_function_mutationPgResource = registry.pgResources["type_function_mutation"];
-function Mutation_typeFunctionMutation_input_applyPlan(_, $object) {
-  return $object;
-}
 const argDetailsSimple21 = [];
 const makeArgs21 = (args, path = []) => {
   const selectArgs = [];
@@ -3425,258 +3150,19 @@ const makeArgs21 = (args, path = []) => {
   return selectArgs;
 };
 const resource_type_function_list_mutationPgResource = registry.pgResources["type_function_list_mutation"];
-function Mutation_typeFunctionListMutation_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createUpdatableView_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createType_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Type, $nodeId);
 };
-function Mutation_updateType_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateTypeById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs2 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Type, $nodeId);
 };
-function Mutation_deleteType_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteTypeById_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mult1Payload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function Mult1Payload_queryPlan() {
-  return rootValue();
-}
-function Mult1Input_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function Mult2Payload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function Mult2Payload_queryPlan() {
-  return rootValue();
-}
-function Mult2Input_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function Mult3Payload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function Mult3Payload_queryPlan() {
-  return rootValue();
-}
-function Mult3Input_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function Mult4Payload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function Mult4Payload_queryPlan() {
-  return rootValue();
-}
-function Mult4Input_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function GuidFnPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function GuidFnPayload_queryPlan() {
-  return rootValue();
-}
-function GuidFnInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function AuthenticateFailPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function AuthenticateFailPayload_queryPlan() {
-  return rootValue();
-}
-function JwtTokenPlan($in) {
-  const $record = $in;
-  return $record.record();
-}
 const attributeNames = ["role", "exp", "a", "b", "c"];
 function JwtTokenParseValue(value) {
   return value;
 }
-function AuthenticateFailInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function AuthenticatePayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function AuthenticatePayload_queryPlan() {
-  return rootValue();
-}
-function AuthenticateInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function ListBdeMutationPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function ListBdeMutationPayload_queryPlan() {
-  return rootValue();
-}
-function ListBdeMutationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function AuthenticateManyPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function AuthenticateManyPayload_queryPlan() {
-  return rootValue();
-}
-function AuthenticateManyInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function AuthenticatePayloadPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function AuthenticatePayloadPayload_queryPlan() {
-  return rootValue();
-}
 const resource_frmcdc_jwtTokenPgResource = registry.pgResources["frmcdc_jwtToken"];
-function AuthenticatePayloadInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CompoundTypeMutationPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function CompoundTypeMutationPayload_queryPlan() {
-  return rootValue();
-}
-function CompoundTypeMutationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CompoundTypeSetMutationPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function CompoundTypeSetMutationPayload_queryPlan() {
-  return rootValue();
-}
-function CompoundTypeSetMutationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CompoundTypeArrayMutationPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function CompoundTypeArrayMutationPayload_queryPlan() {
-  return rootValue();
-}
-function CompoundTypeArrayMutationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function TypeFunctionConnectionMutationPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function TypeFunctionConnectionMutationPayload_queryPlan() {
-  return rootValue();
-}
-function TypeFunctionConnectionMutationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function TypeFunctionMutationPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function TypeFunctionMutationPayload_queryPlan() {
-  return rootValue();
-}
-function TypeFunctionMutationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function TypeFunctionListMutationPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function TypeFunctionListMutationPayload_queryPlan() {
-  return rootValue();
-}
-function TypeFunctionListMutationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateUpdatableViewPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateUpdatableViewPayload_updatableViewPlan($object) {
-  return $object.get("result");
-}
-function CreateUpdatableViewPayload_queryPlan() {
-  return rootValue();
-}
-function CreateUpdatableViewInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateUpdatableViewInput_updatableView_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateTypePayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateTypePayload_typePlan($object) {
-  return $object.get("result");
-}
-function CreateTypePayload_queryPlan() {
-  return rootValue();
-}
-function CreateTypeInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateTypeInput_type_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateTypePayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateTypePayload_typePlan($object) {
-  return $object.get("result");
-}
-function UpdateTypePayload_queryPlan() {
-  return rootValue();
-}
-function UpdateTypeInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateTypeInput_typePatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateTypeByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateTypeByIdInput_typePatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function DeleteTypePayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteTypePayload_typePlan($object) {
-  return $object.get("result");
-}
-function DeleteTypePayload_queryPlan() {
-  return rootValue();
-}
-function DeleteTypeInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteTypeByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -5381,7 +4867,9 @@ export const plans = {
     __assertStep() {
       return true;
     },
-    query: Query_queryPlan,
+    query() {
+      return rootValue();
+    },
     nodeId($parent) {
       const specifier = handler.plan($parent);
       return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
@@ -5423,27 +4911,40 @@ export const plans = {
       }
     },
     typeFunctionConnection: {
-      plan: Query_typeFunctionConnectionPlan,
+      plan($parent, args, info) {
+        const $select = getSelectPlanFromParentAndArgs($parent, args, info);
+        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+      },
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_typeFunctionConnection_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_typeFunctionConnection_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_typeFunctionConnection_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_typeFunctionConnection_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_typeFunctionConnection_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         }
       }
     },
@@ -5476,23 +4977,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUpdatableViews_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUpdatableViews_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUpdatableViews_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUpdatableViews_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUpdatableViews_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -5519,23 +5030,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allTypes_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allTypes_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allTypes_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allTypes_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allTypes_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -5753,12 +5274,24 @@ export const plans = {
   AnIntRangeBound: {},
   Interval: {
     __assertStep: assertExecutableStep,
-    seconds: Interval_secondsPlan,
-    minutes: Interval_minutesPlan,
-    hours: Interval_hoursPlan,
-    days: Interval_daysPlan,
-    months: Interval_monthsPlan,
-    years: Interval_yearsPlan
+    seconds($r) {
+      return access($r, ["seconds"]);
+    },
+    minutes($r) {
+      return access($r, ["minutes"]);
+    },
+    hours($r) {
+      return access($r, ["hours"]);
+    },
+    days($r) {
+      return access($r, ["days"]);
+    },
+    months($r) {
+      return access($r, ["months"]);
+    },
+    years($r) {
+      return access($r, ["years"]);
+    }
   },
   CompoundType: {
     __assertStep: assertPgClassSingleStep,
@@ -5896,9 +5429,16 @@ export const plans = {
   },
   TypesConnection: {
     __assertStep: ConnectionStep,
-    nodes: TypesConnection_nodesPlan,
-    edges: TypesConnection_edgesPlan,
-    pageInfo: TypesConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -5914,8 +5454,12 @@ export const plans = {
   },
   PageInfo: {
     __assertStep: assertPageInfoCapableStep,
-    hasNextPage: PageInfo_hasNextPagePlan,
-    hasPreviousPage: PageInfo_hasPreviousPagePlan,
+    hasNextPage($pageInfo) {
+      return $pageInfo.hasNextPage();
+    },
+    hasPreviousPage($pageInfo) {
+      return $pageInfo.hasPreviousPage();
+    },
     startCursor($pageInfo) {
       return $pageInfo.startCursor();
     },
@@ -5925,9 +5469,16 @@ export const plans = {
   },
   UpdatableViewsConnection: {
     __assertStep: ConnectionStep,
-    nodes: UpdatableViewsConnection_nodesPlan,
-    edges: UpdatableViewsConnection_edgesPlan,
-    pageInfo: UpdatableViewsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -8633,7 +8184,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_mult1_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8648,7 +8201,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_mult2_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8663,7 +8218,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_mult3_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8678,7 +8235,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_mult4_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8693,7 +8252,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_guidFn_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8708,7 +8269,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_authenticateFail_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8723,7 +8286,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_authenticate_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8738,7 +8303,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_listBdeMutation_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8753,7 +8320,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_authenticateMany_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8768,7 +8337,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_authenticatePayload_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8783,7 +8354,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_compoundTypeMutation_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8798,7 +8371,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_compoundTypeSetMutation_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8813,7 +8388,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_compoundTypeArrayMutation_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8828,7 +8405,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_typeFunctionConnectionMutation_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8843,7 +8422,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_typeFunctionMutation_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8858,7 +8439,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_typeFunctionListMutation_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8873,7 +8456,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createUpdatableView_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8888,7 +8473,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createType_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8902,7 +8489,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateType_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8918,7 +8507,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateTypeById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8932,7 +8523,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteType_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -8948,22 +8541,30 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteTypeById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     }
   },
   Mult1Payload: {
     __assertStep: ObjectStep,
-    clientMutationId: Mult1Payload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     integer($object) {
       return $object.get("result");
     },
-    query: Mult1Payload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   Mult1Input: {
     clientMutationId: {
-      applyPlan: Mult1Input_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     arg0: undefined,
@@ -8971,15 +8572,21 @@ export const plans = {
   },
   Mult2Payload: {
     __assertStep: ObjectStep,
-    clientMutationId: Mult2Payload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     integer($object) {
       return $object.get("result");
     },
-    query: Mult2Payload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   Mult2Input: {
     clientMutationId: {
-      applyPlan: Mult2Input_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     arg0: undefined,
@@ -8987,15 +8594,21 @@ export const plans = {
   },
   Mult3Payload: {
     __assertStep: ObjectStep,
-    clientMutationId: Mult3Payload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     integer($object) {
       return $object.get("result");
     },
-    query: Mult3Payload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   Mult3Input: {
     clientMutationId: {
-      applyPlan: Mult3Input_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     arg0: undefined,
@@ -9003,15 +8616,21 @@ export const plans = {
   },
   Mult4Payload: {
     __assertStep: ObjectStep,
-    clientMutationId: Mult4Payload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     integer($object) {
       return $object.get("result");
     },
-    query: Mult4Payload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   Mult4Input: {
     clientMutationId: {
-      applyPlan: Mult4Input_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     arg0: undefined,
@@ -9019,26 +8638,36 @@ export const plans = {
   },
   GuidFnPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: GuidFnPayload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     guid($object) {
       return $object.get("result");
     },
-    query: GuidFnPayload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   GuidFnInput: {
     clientMutationId: {
-      applyPlan: GuidFnInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     g: undefined
   },
   AuthenticateFailPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: AuthenticateFailPayload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     jwtToken($object) {
       return $object.get("result");
     },
-    query: AuthenticateFailPayload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   JwtToken: {
     serialize(value) {
@@ -9063,25 +8692,36 @@ export const plans = {
     parseLiteral(node, variables) {
       return JwtTokenParseValue(valueFromASTUntyped(node, variables));
     },
-    plan: JwtTokenPlan
+    plan($in) {
+      const $record = $in;
+      return $record.record();
+    }
   },
   AuthenticateFailInput: {
     clientMutationId: {
-      applyPlan: AuthenticateFailInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
   AuthenticatePayload: {
     __assertStep: ObjectStep,
-    clientMutationId: AuthenticatePayload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     jwtToken($object) {
       return $object.get("result");
     },
-    query: AuthenticatePayload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   AuthenticateInput: {
     clientMutationId: {
-      applyPlan: AuthenticateInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     a: undefined,
@@ -9090,15 +8730,21 @@ export const plans = {
   },
   ListBdeMutationPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: ListBdeMutationPayload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     uuids($object) {
       return $object.get("result");
     },
-    query: ListBdeMutationPayload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   ListBdeMutationInput: {
     clientMutationId: {
-      applyPlan: ListBdeMutationInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     b: undefined,
@@ -9107,15 +8753,21 @@ export const plans = {
   },
   AuthenticateManyPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: AuthenticateManyPayload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     jwtTokens($object) {
       return $object.get("result");
     },
-    query: AuthenticateManyPayload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   AuthenticateManyInput: {
     clientMutationId: {
-      applyPlan: AuthenticateManyInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     a: undefined,
@@ -9124,11 +8776,15 @@ export const plans = {
   },
   AuthenticatePayloadPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: AuthenticatePayloadPayload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     authPayload($object) {
       return $object.get("result");
     },
-    query: AuthenticatePayloadPayload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   AuthPayload: {
     __assertStep: assertPgClassSingleStep,
@@ -9150,7 +8806,9 @@ export const plans = {
   },
   AuthenticatePayloadInput: {
     clientMutationId: {
-      applyPlan: AuthenticatePayloadInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     a: undefined,
@@ -9159,70 +8817,98 @@ export const plans = {
   },
   CompoundTypeMutationPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: CompoundTypeMutationPayload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     compoundType($object) {
       return $object.get("result");
     },
-    query: CompoundTypeMutationPayload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   CompoundTypeMutationInput: {
     clientMutationId: {
-      applyPlan: CompoundTypeMutationInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     object: undefined
   },
   CompoundTypeSetMutationPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: CompoundTypeSetMutationPayload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     compoundTypes($object) {
       return $object.get("result");
     },
-    query: CompoundTypeSetMutationPayload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   CompoundTypeSetMutationInput: {
     clientMutationId: {
-      applyPlan: CompoundTypeSetMutationInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     object: undefined
   },
   CompoundTypeArrayMutationPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: CompoundTypeArrayMutationPayload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     compoundTypes($object) {
       return $object.get("result");
     },
-    query: CompoundTypeArrayMutationPayload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   CompoundTypeArrayMutationInput: {
     clientMutationId: {
-      applyPlan: CompoundTypeArrayMutationInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     object: undefined
   },
   TypeFunctionConnectionMutationPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: TypeFunctionConnectionMutationPayload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     types($object) {
       return $object.get("result");
     },
-    query: TypeFunctionConnectionMutationPayload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   TypeFunctionConnectionMutationInput: {
     clientMutationId: {
-      applyPlan: TypeFunctionConnectionMutationInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
   TypeFunctionMutationPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: TypeFunctionMutationPayload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     type($object) {
       return $object.get("result");
     },
-    query: TypeFunctionMutationPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     typeEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -9257,38 +8943,57 @@ export const plans = {
   },
   TypeFunctionMutationInput: {
     clientMutationId: {
-      applyPlan: TypeFunctionMutationInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     id: undefined
   },
   TypeFunctionListMutationPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: TypeFunctionListMutationPayload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     types($object) {
       return $object.get("result");
     },
-    query: TypeFunctionListMutationPayload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   TypeFunctionListMutationInput: {
     clientMutationId: {
-      applyPlan: TypeFunctionListMutationInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
   CreateUpdatableViewPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateUpdatableViewPayload_clientMutationIdPlan,
-    updatableView: CreateUpdatableViewPayload_updatableViewPlan,
-    query: CreateUpdatableViewPayload_queryPlan
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    updatableView($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    }
   },
   CreateUpdatableViewInput: {
     clientMutationId: {
-      applyPlan: CreateUpdatableViewInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     updatableView: {
-      applyPlan: CreateUpdatableViewInput_updatableView_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -9324,9 +9029,15 @@ export const plans = {
   },
   CreateTypePayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateTypePayload_clientMutationIdPlan,
-    type: CreateTypePayload_typePlan,
-    query: CreateTypePayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    type($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     typeEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -9361,11 +9072,16 @@ export const plans = {
   },
   CreateTypeInput: {
     clientMutationId: {
-      applyPlan: CreateTypeInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     type: {
-      applyPlan: CreateTypeInput_type_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -9716,9 +9432,15 @@ export const plans = {
   },
   UpdateTypePayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateTypePayload_clientMutationIdPlan,
-    type: UpdateTypePayload_typePlan,
-    query: UpdateTypePayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    type($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     typeEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -9753,11 +9475,16 @@ export const plans = {
   },
   UpdateTypeInput: {
     clientMutationId: {
-      applyPlan: UpdateTypeInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     typePatch: {
-      applyPlan: UpdateTypeInput_typePatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   TypePatch: {
@@ -10107,23 +9834,34 @@ export const plans = {
   },
   UpdateTypeByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateTypeByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     typePatch: {
-      applyPlan: UpdateTypeByIdInput_typePatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   DeleteTypePayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteTypePayload_clientMutationIdPlan,
-    type: DeleteTypePayload_typePlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    type($object) {
+      return $object.get("result");
+    },
     deletedTypeId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Type.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeleteTypePayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     typeEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -10158,13 +9896,17 @@ export const plans = {
   },
   DeleteTypeInput: {
     clientMutationId: {
-      applyPlan: DeleteTypeInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteTypeByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteTypeByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   }

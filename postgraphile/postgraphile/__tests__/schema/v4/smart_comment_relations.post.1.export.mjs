@@ -2,9 +2,6 @@ import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, as
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
-function Query_queryPlan() {
-  return rootValue();
-}
 const handler = {
   typeName: "Query",
   codec: {
@@ -29,40 +26,25 @@ const handler = {
     return constant`query`;
   }
 };
-function base64JSONDecode(value) {
-  return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-}
-function base64JSONEncode(value) {
-  return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-}
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode: base64JSONEncode,
-  decode: base64JSONDecode
+  encode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  },
+  decode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }
 };
-function pipeStringDecode(value) {
-  return typeof value === "string" ? value.split("|") : null;
-}
-function pipeStringEncode(value) {
-  return Array.isArray(value) ? value.join("|") : null;
-}
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode: pipeStringEncode,
-    decode: pipeStringDecode
-  }
-});
-const post_tableAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
+    encode(value) {
+      return Array.isArray(value) ? value.join("|") : null;
+    },
+    decode(value) {
+      return typeof value === "string" ? value.split("|") : null;
     }
   }
 });
@@ -89,16 +71,24 @@ const extensions = {
     behavior: ["-*"]
   })
 };
-const post_tableIdentifier = sql.identifier(...["smart_comment_relations", "post"]);
-const post_tableCodecSpec = {
+const post_tableCodec = recordCodec({
   name: "post_table",
-  identifier: post_tableIdentifier,
-  attributes: post_tableAttributes,
+  identifier: sql.identifier("smart_comment_relations", "post"),
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions,
   executor: executor_mainPgExecutor
-};
-const post_tableCodec = recordCodec(post_tableCodecSpec);
+});
 const postsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -110,48 +100,24 @@ const postsAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions2 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "smart_comment_relations",
-    name: "post_view"
-  },
-  tags: Object.assign(Object.create(null), {
-    name: "posts",
-    primaryKey: "id"
-  })
-};
-const parts2 = ["smart_comment_relations", "post_view"];
-const postsIdentifier = sql.identifier(...parts2);
-const postsCodecSpec = {
+const postsCodec = recordCodec({
   name: "posts",
-  identifier: postsIdentifier,
+  identifier: sql.identifier("smart_comment_relations", "post_view"),
   attributes: postsAttributes,
   description: undefined,
-  extensions: extensions2,
-  executor: executor_mainPgExecutor
-};
-const postsCodec = recordCodec(postsCodecSpec);
-const offer_tableAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "post_view"
+    },
+    tags: Object.assign(Object.create(null), {
+      name: "posts",
+      primaryKey: "id"
+    })
   },
-  post_id: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
+  executor: executor_mainPgExecutor
 });
 const extensions3 = {
   isTableLike: true,
@@ -166,17 +132,33 @@ const extensions3 = {
     behavior: ["-*"]
   })
 };
-const parts3 = ["smart_comment_relations", "offer"];
-const offer_tableIdentifier = sql.identifier(...parts3);
-const offer_tableCodecSpec = {
+const offer_tableCodec = recordCodec({
   name: "offer_table",
-  identifier: offer_tableIdentifier,
-  attributes: offer_tableAttributes,
+  identifier: sql.identifier("smart_comment_relations", "offer"),
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    post_id: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: extensions3,
   executor: executor_mainPgExecutor
-};
-const offer_tableCodec = recordCodec(offer_tableCodecSpec);
+});
 const offersAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -197,30 +179,26 @@ const offersAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions4 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "smart_comment_relations",
-    name: "offer_view"
-  },
-  tags: Object.assign(Object.create(null), {
-    name: "offers",
-    primaryKey: "id",
-    foreignKey: "(post_id) references post"
-  })
-};
-const parts4 = ["smart_comment_relations", "offer_view"];
-const offersIdentifier = sql.identifier(...parts4);
-const offersCodecSpec = {
+const offersCodec = recordCodec({
   name: "offers",
-  identifier: offersIdentifier,
+  identifier: sql.identifier("smart_comment_relations", "offer_view"),
   attributes: offersAttributes,
   description: undefined,
-  extensions: extensions4,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "offer_view"
+    },
+    tags: Object.assign(Object.create(null), {
+      name: "offers",
+      primaryKey: "id",
+      foreignKey: "(post_id) references post"
+    })
+  },
   executor: executor_mainPgExecutor
-};
-const offersCodec = recordCodec(offersCodecSpec);
+});
 const streetsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -241,28 +219,24 @@ const streetsAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions5 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "smart_comment_relations",
-    name: "streets"
-  },
-  tags: Object.assign(Object.create(null), {
-    unique: "name"
-  })
-};
-const parts5 = ["smart_comment_relations", "streets"];
-const streetsIdentifier = sql.identifier(...parts5);
-const streetsCodecSpec = {
+const streetsCodec = recordCodec({
   name: "streets",
-  identifier: streetsIdentifier,
+  identifier: sql.identifier("smart_comment_relations", "streets"),
   attributes: streetsAttributes,
   description: undefined,
-  extensions: extensions5,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "streets"
+    },
+    tags: Object.assign(Object.create(null), {
+      unique: "name"
+    })
+  },
   executor: executor_mainPgExecutor
-};
-const streetsCodec = recordCodec(streetsCodecSpec);
+});
 const propertiesAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -292,26 +266,22 @@ const propertiesAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions6 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "smart_comment_relations",
-    name: "properties"
-  },
-  tags: Object.create(null)
-};
-const parts6 = ["smart_comment_relations", "properties"];
-const propertiesIdentifier = sql.identifier(...parts6);
-const propertiesCodecSpec = {
+const propertiesCodec = recordCodec({
   name: "properties",
-  identifier: propertiesIdentifier,
+  identifier: sql.identifier("smart_comment_relations", "properties"),
   attributes: propertiesAttributes,
   description: undefined,
-  extensions: extensions6,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "properties"
+    },
+    tags: Object.create(null)
+  },
   executor: executor_mainPgExecutor
-};
-const propertiesCodec = recordCodec(propertiesCodecSpec);
+});
 const streetPropertyAttributes = Object.assign(Object.create(null), {
   str_id: {
     description: undefined,
@@ -341,26 +311,22 @@ const streetPropertyAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions7 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "smart_comment_relations",
-    name: "street_property"
-  },
-  tags: Object.create(null)
-};
-const parts7 = ["smart_comment_relations", "street_property"];
-const streetPropertyIdentifier = sql.identifier(...parts7);
-const streetPropertyCodecSpec = {
+const streetPropertyCodec = recordCodec({
   name: "streetProperty",
-  identifier: streetPropertyIdentifier,
+  identifier: sql.identifier("smart_comment_relations", "street_property"),
   attributes: streetPropertyAttributes,
   description: undefined,
-  extensions: extensions7,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "street_property"
+    },
+    tags: Object.create(null)
+  },
   executor: executor_mainPgExecutor
-};
-const streetPropertyCodec = recordCodec(streetPropertyCodecSpec);
+});
 const housesAttributes = Object.assign(Object.create(null), {
   building_name: {
     description: undefined,
@@ -442,17 +408,14 @@ const extensions8 = {
     foreignKey: ["(street_id) references smart_comment_relations.streets", "(building_id) references smart_comment_relations.buildings (id)", "(property_id) references properties", "(street_id, property_id) references street_property (str_id, prop_id)"]
   })
 };
-const parts8 = ["smart_comment_relations", "houses"];
-const housesIdentifier = sql.identifier(...parts8);
-const housesCodecSpec = {
+const housesCodec = recordCodec({
   name: "houses",
-  identifier: housesIdentifier,
+  identifier: sql.identifier("smart_comment_relations", "houses"),
   attributes: housesAttributes,
   description: undefined,
   extensions: extensions8,
   executor: executor_mainPgExecutor
-};
-const housesCodec = recordCodec(housesCodecSpec);
+});
 const buildingsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
@@ -500,41 +463,24 @@ const buildingsAttributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions9 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "smart_comment_relations",
-    name: "buildings"
-  },
-  tags: Object.assign(Object.create(null), {
-    foreignKey: "(name) references streets (name)|@fieldName namedAfterStreet|@foreignFieldName buildingsNamedAfterStreet|@foreignSimpleFieldName buildingsNamedAfterStreetList"
-  })
-};
-const parts9 = ["smart_comment_relations", "buildings"];
-const buildingsIdentifier = sql.identifier(...parts9);
-const buildingsCodecSpec = {
+const buildingsCodec = recordCodec({
   name: "buildings",
-  identifier: buildingsIdentifier,
+  identifier: sql.identifier("smart_comment_relations", "buildings"),
   attributes: buildingsAttributes,
   description: undefined,
-  extensions: extensions9,
-  executor: executor_mainPgExecutor
-};
-const buildingsCodec = recordCodec(buildingsCodecSpec);
-const extensions10 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "smart_comment_relations",
-    name: "post"
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "buildings"
+    },
+    tags: Object.assign(Object.create(null), {
+      foreignKey: "(name) references streets (name)|@fieldName namedAfterStreet|@foreignFieldName buildingsNamedAfterStreet|@foreignSimpleFieldName buildingsNamedAfterStreetList"
+    })
   },
-  tags: {
-    name: "post_table",
-    omit: true,
-    behavior: extensions.tags.behavior
-  }
-};
+  executor: executor_mainPgExecutor
+});
 const registryConfig_pgResources_post_table_post_table = {
   executor: executor_mainPgExecutor,
   name: "post_table",
@@ -551,42 +497,21 @@ const registryConfig_pgResources_post_table_post_table = {
   }],
   isVirtual: false,
   description: undefined,
-  extensions: extensions10
-};
-const extensions11 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "smart_comment_relations",
-    name: "post_view"
-  },
-  tags: {
-    name: "posts",
-    primaryKey: "id"
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "post"
+    },
+    tags: {
+      name: "post_table",
+      omit: true,
+      behavior: extensions.tags.behavior
+    }
   }
 };
 const uniques2 = [{
-  isPrimary: true,
-  attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: Object.create(null)
-  }
-}];
-const extensions12 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "smart_comment_relations",
-    name: "offer"
-  },
-  tags: {
-    name: "offer_table",
-    omit: true,
-    behavior: extensions3.tags.behavior
-  }
-};
-const uniques3 = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -600,22 +525,28 @@ const registryConfig_pgResources_offer_table_offer_table = {
   identifier: "main.smart_comment_relations.offer",
   from: offer_tableCodec.sqlType,
   codec: offer_tableCodec,
-  uniques: uniques3,
+  uniques: [{
+    isPrimary: true,
+    attributes: ["id"],
+    description: undefined,
+    extensions: {
+      tags: Object.create(null)
+    }
+  }],
   isVirtual: false,
   description: undefined,
-  extensions: extensions12
-};
-const extensions13 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "smart_comment_relations",
-    name: "offer_view"
-  },
-  tags: {
-    name: "offers",
-    primaryKey: "id",
-    foreignKey: "(post_id) references post"
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "offer"
+    },
+    tags: {
+      name: "offer_table",
+      omit: true,
+      behavior: extensions3.tags.behavior
+    }
   }
 };
 const uniques4 = [{
@@ -635,17 +566,18 @@ const registryConfig_pgResources_offers_offers = {
   uniques: uniques4,
   isVirtual: false,
   description: undefined,
-  extensions: extensions13
-};
-const extensions14 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "smart_comment_relations",
-    name: "streets"
-  },
-  tags: {
-    unique: "name"
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "offer_view"
+    },
+    tags: {
+      name: "offers",
+      primaryKey: "id",
+      foreignKey: "(post_id) references post"
+    }
   }
 };
 const uniques5 = [{
@@ -672,16 +604,17 @@ const registryConfig_pgResources_streets_streets = {
   uniques: uniques5,
   isVirtual: false,
   description: undefined,
-  extensions: extensions14
-};
-const extensions15 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "smart_comment_relations",
-    name: "properties"
-  },
-  tags: {}
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "streets"
+    },
+    tags: {
+      unique: "name"
+    }
+  }
 };
 const uniques6 = [{
   isPrimary: true,
@@ -700,16 +633,15 @@ const registryConfig_pgResources_properties_properties = {
   uniques: uniques6,
   isVirtual: false,
   description: undefined,
-  extensions: extensions15
-};
-const extensions16 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "smart_comment_relations",
-    name: "street_property"
-  },
-  tags: {}
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "properties"
+    },
+    tags: {}
+  }
 };
 const uniques7 = [{
   isPrimary: true,
@@ -728,19 +660,14 @@ const registryConfig_pgResources_street_property_street_property = {
   uniques: uniques7,
   isVirtual: false,
   description: undefined,
-  extensions: extensions16
-};
-const extensions17 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "smart_comment_relations",
-    name: "houses"
-  },
-  tags: {
-    primaryKey: "street_id,property_id",
-    foreignKey: extensions8.tags.foreignKey,
-    behavior: ["-insert", "-update", "-delete"]
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "street_property"
+    },
+    tags: {}
   }
 };
 const uniques8 = [{
@@ -760,17 +687,18 @@ const registryConfig_pgResources_houses_houses = {
   uniques: uniques8,
   isVirtual: false,
   description: undefined,
-  extensions: extensions17
-};
-const extensions18 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "smart_comment_relations",
-    name: "buildings"
-  },
-  tags: {
-    foreignKey: "(name) references streets (name)|@fieldName namedAfterStreet|@foreignFieldName buildingsNamedAfterStreet|@foreignSimpleFieldName buildingsNamedAfterStreetList"
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "houses"
+    },
+    tags: {
+      primaryKey: "street_id,property_id",
+      foreignKey: extensions8.tags.foreignKey,
+      behavior: ["-insert", "-update", "-delete"]
+    }
   }
 };
 const uniques9 = [{
@@ -790,7 +718,17 @@ const registryConfig_pgResources_buildings_buildings = {
   uniques: uniques9,
   isVirtual: false,
   description: undefined,
-  extensions: extensions18
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "buildings"
+    },
+    tags: {
+      foreignKey: "(name) references streets (name)|@fieldName namedAfterStreet|@foreignFieldName buildingsNamedAfterStreet|@foreignSimpleFieldName buildingsNamedAfterStreetList"
+    }
+  }
 };
 const registry = makeRegistry({
   pgCodecs: Object.assign(Object.create(null), {
@@ -820,7 +758,18 @@ const registry = makeRegistry({
       uniques: uniques2,
       isVirtual: false,
       description: undefined,
-      extensions: extensions11
+      extensions: {
+        description: undefined,
+        pg: {
+          serviceName: "main",
+          schemaName: "smart_comment_relations",
+          name: "post_view"
+        },
+        tags: {
+          name: "posts",
+          primaryKey: "id"
+        }
+      }
     },
     offer_table: registryConfig_pgResources_offer_table_offer_table,
     offers: registryConfig_pgResources_offers_offers,
@@ -1404,21 +1353,6 @@ const fetcher7 = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.Building);
-function Query_allPosts_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allPosts_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allPosts_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allPosts_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allPosts_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const applyOrderToPlan = ($select, $value, TableOrderByType) => {
   const val = $value.eval();
   if (val == null) {
@@ -1437,770 +1371,54 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
     plan($select);
   });
 };
-function Query_allOffers_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allOffers_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allOffers_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allOffers_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allOffers_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allStreets_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allStreets_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allStreets_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allStreets_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allStreets_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allProperties_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allProperties_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allProperties_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allProperties_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allProperties_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allStreetProperties_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allStreetProperties_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allStreetProperties_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allStreetProperties_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allStreetProperties_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allHouses_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allHouses_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allHouses_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allHouses_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allHouses_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Query_allBuildings_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allBuildings_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allBuildings_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allBuildings_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allBuildings_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Street_propertiesByStreetId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Street_propertiesByStreetId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Street_propertiesByStreetId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Street_propertiesByStreetId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Street_propertiesByStreetId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Street_streetPropertiesByStrId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Street_streetPropertiesByStrId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Street_streetPropertiesByStrId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Street_streetPropertiesByStrId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Street_streetPropertiesByStrId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Street_buildingsNamedAfterStreet_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Street_buildingsNamedAfterStreet_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Street_buildingsNamedAfterStreet_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Street_buildingsNamedAfterStreet_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Street_buildingsNamedAfterStreet_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Street_housesByStreetId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Street_housesByStreetId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Street_housesByStreetId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Street_housesByStreetId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Street_housesByStreetId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function PropertiesConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function PropertiesConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function PropertiesConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function Property_streetPropertiesByPropId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Property_streetPropertiesByPropId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Property_streetPropertiesByPropId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Property_streetPropertiesByPropId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Property_streetPropertiesByPropId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Property_buildingsByPropertyId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Property_buildingsByPropertyId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Property_buildingsByPropertyId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Property_buildingsByPropertyId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Property_buildingsByPropertyId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function Property_housesByPropertyId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Property_housesByPropertyId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Property_housesByPropertyId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Property_housesByPropertyId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Property_housesByPropertyId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function StreetPropertiesConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function StreetPropertiesConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function StreetPropertiesConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function Building_housesByBuildingId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Building_housesByBuildingId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Building_housesByBuildingId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Building_housesByBuildingId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Building_housesByBuildingId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function HousesConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function HousesConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function HousesConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function PageInfo_hasNextPagePlan($pageInfo) {
-  return $pageInfo.hasNextPage();
-}
-function PageInfo_hasPreviousPagePlan($pageInfo) {
-  return $pageInfo.hasPreviousPage();
-}
-function BuildingsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function BuildingsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function BuildingsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function PostsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function PostsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function PostsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function OffersConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function OffersConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function OffersConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function StreetsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function StreetsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function StreetsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function Mutation_createPost_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createOffer_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createStreet_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createProperty_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createStreetProperty_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createBuilding_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Post, $nodeId);
 };
-function Mutation_updatePost_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updatePostById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs2 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Offer, $nodeId);
 };
-function Mutation_updateOffer_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateOfferById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs3 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Street, $nodeId);
 };
-function Mutation_updateStreet_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateStreetById_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateStreetByName_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs4 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Property, $nodeId);
 };
-function Mutation_updateProperty_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updatePropertyById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs5 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.StreetProperty, $nodeId);
 };
-function Mutation_updateStreetProperty_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateStreetPropertyByStrIdAndPropId_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs6 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Building, $nodeId);
 };
-function Mutation_updateBuilding_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateBuildingById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs7 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Post, $nodeId);
 };
-function Mutation_deletePost_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deletePostById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs8 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Offer, $nodeId);
 };
-function Mutation_deleteOffer_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteOfferById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs9 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Street, $nodeId);
 };
-function Mutation_deleteStreet_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteStreetById_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteStreetByName_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs10 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Property, $nodeId);
 };
-function Mutation_deleteProperty_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deletePropertyById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs11 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.StreetProperty, $nodeId);
 };
-function Mutation_deleteStreetProperty_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteStreetPropertyByStrIdAndPropId_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs12 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Building, $nodeId);
 };
-function Mutation_deleteBuilding_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteBuildingById_input_applyPlan(_, $object) {
-  return $object;
-}
-function CreatePostPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreatePostPayload_postPlan($object) {
-  return $object.get("result");
-}
-function CreatePostPayload_queryPlan() {
-  return rootValue();
-}
-function CreatePostInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreatePostInput_post_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateOfferPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateOfferPayload_offerPlan($object) {
-  return $object.get("result");
-}
-function CreateOfferPayload_queryPlan() {
-  return rootValue();
-}
-function CreateOfferInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateOfferInput_offer_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateStreetPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateStreetPayload_streetPlan($object) {
-  return $object.get("result");
-}
-function CreateStreetPayload_queryPlan() {
-  return rootValue();
-}
-function CreateStreetInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateStreetInput_street_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreatePropertyPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreatePropertyPayload_propertyPlan($object) {
-  return $object.get("result");
-}
-function CreatePropertyPayload_queryPlan() {
-  return rootValue();
-}
-function CreatePropertyInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreatePropertyInput_property_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateStreetPropertyPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateStreetPropertyPayload_streetPropertyPlan($object) {
-  return $object.get("result");
-}
-function CreateStreetPropertyPayload_queryPlan() {
-  return rootValue();
-}
-function CreateStreetPropertyInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateStreetPropertyInput_streetProperty_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateBuildingPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateBuildingPayload_buildingPlan($object) {
-  return $object.get("result");
-}
-function CreateBuildingPayload_queryPlan() {
-  return rootValue();
-}
-function CreateBuildingInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateBuildingInput_building_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdatePostPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdatePostPayload_postPlan($object) {
-  return $object.get("result");
-}
-function UpdatePostPayload_queryPlan() {
-  return rootValue();
-}
-function UpdatePostInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdatePostInput_postPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdatePostByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdatePostByIdInput_postPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateOfferPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateOfferPayload_offerPlan($object) {
-  return $object.get("result");
-}
-function UpdateOfferPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateOfferInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateOfferInput_offerPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateOfferByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateOfferByIdInput_offerPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateStreetPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateStreetPayload_streetPlan($object) {
-  return $object.get("result");
-}
-function UpdateStreetPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateStreetInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateStreetInput_streetPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateStreetByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateStreetByIdInput_streetPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateStreetByNameInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateStreetByNameInput_streetPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdatePropertyPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdatePropertyPayload_propertyPlan($object) {
-  return $object.get("result");
-}
-function UpdatePropertyPayload_queryPlan() {
-  return rootValue();
-}
-function UpdatePropertyInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdatePropertyInput_propertyPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdatePropertyByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdatePropertyByIdInput_propertyPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateStreetPropertyPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateStreetPropertyPayload_streetPropertyPlan($object) {
-  return $object.get("result");
-}
-function UpdateStreetPropertyPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateStreetPropertyInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateStreetPropertyInput_streetPropertyPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateStreetPropertyByStrIdAndPropIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateStreetPropertyByStrIdAndPropIdInput_streetPropertyPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateBuildingPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateBuildingPayload_buildingPlan($object) {
-  return $object.get("result");
-}
-function UpdateBuildingPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateBuildingInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateBuildingInput_buildingPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateBuildingByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateBuildingByIdInput_buildingPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function DeletePostPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeletePostPayload_postPlan($object) {
-  return $object.get("result");
-}
-function DeletePostPayload_queryPlan() {
-  return rootValue();
-}
-function DeletePostInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeletePostByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteOfferPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteOfferPayload_offerPlan($object) {
-  return $object.get("result");
-}
-function DeleteOfferPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteOfferInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteOfferByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteStreetPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteStreetPayload_streetPlan($object) {
-  return $object.get("result");
-}
-function DeleteStreetPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteStreetInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteStreetByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteStreetByNameInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeletePropertyPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeletePropertyPayload_propertyPlan($object) {
-  return $object.get("result");
-}
-function DeletePropertyPayload_queryPlan() {
-  return rootValue();
-}
-function DeletePropertyInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeletePropertyByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteStreetPropertyPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteStreetPropertyPayload_streetPropertyPlan($object) {
-  return $object.get("result");
-}
-function DeleteStreetPropertyPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteStreetPropertyInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteStreetPropertyByStrIdAndPropIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteBuildingPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteBuildingPayload_buildingPlan($object) {
-  return $object.get("result");
-}
-function DeleteBuildingPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteBuildingInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteBuildingByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -4505,7 +3723,9 @@ export const plans = {
     __assertStep() {
       return true;
     },
-    query: Query_queryPlan,
+    query() {
+      return rootValue();
+    },
     nodeId($parent) {
       const specifier = handler.plan($parent);
       return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
@@ -4672,23 +3892,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPosts_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPosts_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPosts_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPosts_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPosts_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -4715,23 +3945,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allOffers_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allOffers_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allOffers_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allOffers_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allOffers_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -4758,23 +3998,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allStreets_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allStreets_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allStreets_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allStreets_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allStreets_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -4801,23 +4051,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allProperties_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allProperties_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allProperties_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allProperties_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allProperties_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -4844,23 +4104,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allStreetProperties_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allStreetProperties_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allStreetProperties_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allStreetProperties_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allStreetProperties_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -4887,23 +4157,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allHouses_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allHouses_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allHouses_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allHouses_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allHouses_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -4930,23 +4210,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allBuildings_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allBuildings_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allBuildings_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allBuildings_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allBuildings_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -5012,23 +4302,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_propertiesByStreetId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_propertiesByStreetId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_propertiesByStreetId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_propertiesByStreetId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_propertiesByStreetId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -5058,23 +4358,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_streetPropertiesByStrId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_streetPropertiesByStrId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_streetPropertiesByStrId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_streetPropertiesByStrId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_streetPropertiesByStrId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -5104,23 +4414,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_buildingsNamedAfterStreet_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_buildingsNamedAfterStreet_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_buildingsNamedAfterStreet_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_buildingsNamedAfterStreet_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_buildingsNamedAfterStreet_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -5150,23 +4470,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_housesByStreetId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_housesByStreetId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_housesByStreetId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_housesByStreetId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Street_housesByStreetId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -5189,9 +4519,16 @@ export const plans = {
   },
   PropertiesConnection: {
     __assertStep: ConnectionStep,
-    nodes: PropertiesConnection_nodesPlan,
-    edges: PropertiesConnection_edgesPlan,
-    pageInfo: PropertiesConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -5226,23 +4563,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Property_streetPropertiesByPropId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Property_streetPropertiesByPropId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Property_streetPropertiesByPropId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Property_streetPropertiesByPropId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Property_streetPropertiesByPropId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -5272,23 +4619,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Property_buildingsByPropertyId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Property_buildingsByPropertyId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Property_buildingsByPropertyId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Property_buildingsByPropertyId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Property_buildingsByPropertyId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -5318,23 +4675,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Property_housesByPropertyId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Property_housesByPropertyId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Property_housesByPropertyId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Property_housesByPropertyId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Property_housesByPropertyId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -5357,9 +4724,16 @@ export const plans = {
   },
   StreetPropertiesConnection: {
     __assertStep: ConnectionStep,
-    nodes: StreetPropertiesConnection_nodesPlan,
-    edges: StreetPropertiesConnection_edgesPlan,
-    pageInfo: StreetPropertiesConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -5486,23 +4860,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Building_housesByBuildingId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Building_housesByBuildingId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Building_housesByBuildingId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Building_housesByBuildingId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Building_housesByBuildingId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -5525,9 +4909,16 @@ export const plans = {
   },
   HousesConnection: {
     __assertStep: ConnectionStep,
-    nodes: HousesConnection_nodesPlan,
-    edges: HousesConnection_edgesPlan,
-    pageInfo: HousesConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -5543,8 +4934,12 @@ export const plans = {
   },
   PageInfo: {
     __assertStep: assertPageInfoCapableStep,
-    hasNextPage: PageInfo_hasNextPagePlan,
-    hasPreviousPage: PageInfo_hasPreviousPagePlan,
+    hasNextPage($pageInfo) {
+      return $pageInfo.hasNextPage();
+    },
+    hasPreviousPage($pageInfo) {
+      return $pageInfo.hasPreviousPage();
+    },
     startCursor($pageInfo) {
       return $pageInfo.startCursor();
     },
@@ -6211,9 +5606,16 @@ export const plans = {
   },
   BuildingsConnection: {
     __assertStep: ConnectionStep,
-    nodes: BuildingsConnection_nodesPlan,
-    edges: BuildingsConnection_edgesPlan,
-    pageInfo: BuildingsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -6772,9 +6174,16 @@ export const plans = {
   },
   PostsConnection: {
     __assertStep: ConnectionStep,
-    nodes: PostsConnection_nodesPlan,
-    edges: PostsConnection_edgesPlan,
-    pageInfo: PostsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -6886,9 +6295,16 @@ export const plans = {
   },
   OffersConnection: {
     __assertStep: ConnectionStep,
-    nodes: OffersConnection_nodesPlan,
-    edges: OffersConnection_edgesPlan,
-    pageInfo: OffersConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -7057,9 +6473,16 @@ export const plans = {
   },
   StreetsConnection: {
     __assertStep: ConnectionStep,
-    nodes: StreetsConnection_nodesPlan,
-    edges: StreetsConnection_edgesPlan,
-    pageInfo: StreetsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -7239,7 +6662,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createPost_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7254,7 +6679,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createOffer_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7269,7 +6696,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createStreet_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7284,7 +6713,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createProperty_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7299,7 +6730,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createStreetProperty_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7314,7 +6747,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createBuilding_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7328,7 +6763,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updatePost_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7344,7 +6781,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updatePostById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7358,7 +6797,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateOffer_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7374,7 +6815,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateOfferById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7388,7 +6831,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateStreet_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7404,7 +6849,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateStreetById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7420,7 +6867,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateStreetByName_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7434,7 +6883,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateProperty_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7450,7 +6901,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updatePropertyById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7464,7 +6917,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateStreetProperty_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7481,7 +6936,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateStreetPropertyByStrIdAndPropId_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7495,7 +6952,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateBuilding_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7511,7 +6970,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateBuildingById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7525,7 +6986,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deletePost_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7541,7 +7004,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deletePostById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7555,7 +7020,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteOffer_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7571,7 +7038,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteOfferById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7585,7 +7054,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteStreet_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7601,7 +7072,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteStreetById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7617,7 +7090,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteStreetByName_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7631,7 +7106,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteProperty_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7647,7 +7124,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deletePropertyById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7661,7 +7140,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteStreetProperty_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7678,7 +7159,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteStreetPropertyByStrIdAndPropId_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7692,7 +7175,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteBuilding_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -7708,16 +7193,24 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteBuildingById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     }
   },
   CreatePostPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreatePostPayload_clientMutationIdPlan,
-    post: CreatePostPayload_postPlan,
-    query: CreatePostPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    post($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     postEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -7752,11 +7245,16 @@ export const plans = {
   },
   CreatePostInput: {
     clientMutationId: {
-      applyPlan: CreatePostInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     post: {
-      applyPlan: CreatePostInput_post_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -7771,9 +7269,15 @@ export const plans = {
   },
   CreateOfferPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateOfferPayload_clientMutationIdPlan,
-    offer: CreateOfferPayload_offerPlan,
-    query: CreateOfferPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    offer($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     offerEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -7808,11 +7312,16 @@ export const plans = {
   },
   CreateOfferInput: {
     clientMutationId: {
-      applyPlan: CreateOfferInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     offer: {
-      applyPlan: CreateOfferInput_offer_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -7834,9 +7343,15 @@ export const plans = {
   },
   CreateStreetPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateStreetPayload_clientMutationIdPlan,
-    street: CreateStreetPayload_streetPlan,
-    query: CreateStreetPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    street($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     streetEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -7871,11 +7386,16 @@ export const plans = {
   },
   CreateStreetInput: {
     clientMutationId: {
-      applyPlan: CreateStreetInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     street: {
-      applyPlan: CreateStreetInput_street_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -7897,9 +7417,15 @@ export const plans = {
   },
   CreatePropertyPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreatePropertyPayload_clientMutationIdPlan,
-    property: CreatePropertyPayload_propertyPlan,
-    query: CreatePropertyPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    property($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     propertyEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -7939,11 +7465,16 @@ export const plans = {
   },
   CreatePropertyInput: {
     clientMutationId: {
-      applyPlan: CreatePropertyInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     property: {
-      applyPlan: CreatePropertyInput_property_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -7972,9 +7503,15 @@ export const plans = {
   },
   CreateStreetPropertyPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateStreetPropertyPayload_clientMutationIdPlan,
-    streetProperty: CreateStreetPropertyPayload_streetPropertyPlan,
-    query: CreateStreetPropertyPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    streetProperty($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     streetPropertyEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -8019,11 +7556,16 @@ export const plans = {
   },
   CreateStreetPropertyInput: {
     clientMutationId: {
-      applyPlan: CreateStreetPropertyInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     streetProperty: {
-      applyPlan: CreateStreetPropertyInput_streetProperty_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -8052,9 +7594,15 @@ export const plans = {
   },
   CreateBuildingPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateBuildingPayload_clientMutationIdPlan,
-    building: CreateBuildingPayload_buildingPlan,
-    query: CreateBuildingPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    building($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     buildingEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -8099,11 +7647,16 @@ export const plans = {
   },
   CreateBuildingInput: {
     clientMutationId: {
-      applyPlan: CreateBuildingInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     building: {
-      applyPlan: CreateBuildingInput_building_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -8146,9 +7699,15 @@ export const plans = {
   },
   UpdatePostPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdatePostPayload_clientMutationIdPlan,
-    post: UpdatePostPayload_postPlan,
-    query: UpdatePostPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    post($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     postEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -8183,11 +7742,16 @@ export const plans = {
   },
   UpdatePostInput: {
     clientMutationId: {
-      applyPlan: UpdatePostInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     postPatch: {
-      applyPlan: UpdatePostInput_postPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   PostPatch: {
@@ -8201,18 +7765,29 @@ export const plans = {
   },
   UpdatePostByIdInput: {
     clientMutationId: {
-      applyPlan: UpdatePostByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     postPatch: {
-      applyPlan: UpdatePostByIdInput_postPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateOfferPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateOfferPayload_clientMutationIdPlan,
-    offer: UpdateOfferPayload_offerPlan,
-    query: UpdateOfferPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    offer($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     offerEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -8247,11 +7822,16 @@ export const plans = {
   },
   UpdateOfferInput: {
     clientMutationId: {
-      applyPlan: UpdateOfferInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     offerPatch: {
-      applyPlan: UpdateOfferInput_offerPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   OfferPatch: {
@@ -8272,18 +7852,29 @@ export const plans = {
   },
   UpdateOfferByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateOfferByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     offerPatch: {
-      applyPlan: UpdateOfferByIdInput_offerPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateStreetPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateStreetPayload_clientMutationIdPlan,
-    street: UpdateStreetPayload_streetPlan,
-    query: UpdateStreetPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    street($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     streetEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -8318,11 +7909,16 @@ export const plans = {
   },
   UpdateStreetInput: {
     clientMutationId: {
-      applyPlan: UpdateStreetInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     streetPatch: {
-      applyPlan: UpdateStreetInput_streetPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   StreetPatch: {
@@ -8343,27 +7939,43 @@ export const plans = {
   },
   UpdateStreetByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateStreetByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     streetPatch: {
-      applyPlan: UpdateStreetByIdInput_streetPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateStreetByNameInput: {
     clientMutationId: {
-      applyPlan: UpdateStreetByNameInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     name: undefined,
     streetPatch: {
-      applyPlan: UpdateStreetByNameInput_streetPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdatePropertyPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdatePropertyPayload_clientMutationIdPlan,
-    property: UpdatePropertyPayload_propertyPlan,
-    query: UpdatePropertyPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    property($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     propertyEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -8403,11 +8015,16 @@ export const plans = {
   },
   UpdatePropertyInput: {
     clientMutationId: {
-      applyPlan: UpdatePropertyInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     propertyPatch: {
-      applyPlan: UpdatePropertyInput_propertyPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   PropertyPatch: {
@@ -8435,18 +8052,29 @@ export const plans = {
   },
   UpdatePropertyByIdInput: {
     clientMutationId: {
-      applyPlan: UpdatePropertyByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     propertyPatch: {
-      applyPlan: UpdatePropertyByIdInput_propertyPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateStreetPropertyPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateStreetPropertyPayload_clientMutationIdPlan,
-    streetProperty: UpdateStreetPropertyPayload_streetPropertyPlan,
-    query: UpdateStreetPropertyPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    streetProperty($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     streetPropertyEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -8491,11 +8119,16 @@ export const plans = {
   },
   UpdateStreetPropertyInput: {
     clientMutationId: {
-      applyPlan: UpdateStreetPropertyInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     streetPropertyPatch: {
-      applyPlan: UpdateStreetPropertyInput_streetPropertyPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   StreetPropertyPatch: {
@@ -8523,19 +8156,30 @@ export const plans = {
   },
   UpdateStreetPropertyByStrIdAndPropIdInput: {
     clientMutationId: {
-      applyPlan: UpdateStreetPropertyByStrIdAndPropIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     strId: undefined,
     propId: undefined,
     streetPropertyPatch: {
-      applyPlan: UpdateStreetPropertyByStrIdAndPropIdInput_streetPropertyPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateBuildingPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateBuildingPayload_clientMutationIdPlan,
-    building: UpdateBuildingPayload_buildingPlan,
-    query: UpdateBuildingPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    building($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     buildingEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -8580,11 +8224,16 @@ export const plans = {
   },
   UpdateBuildingInput: {
     clientMutationId: {
-      applyPlan: UpdateBuildingInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     buildingPatch: {
-      applyPlan: UpdateBuildingInput_buildingPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   BuildingPatch: {
@@ -8626,23 +8275,34 @@ export const plans = {
   },
   UpdateBuildingByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateBuildingByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     buildingPatch: {
-      applyPlan: UpdateBuildingByIdInput_buildingPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   DeletePostPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeletePostPayload_clientMutationIdPlan,
-    post: DeletePostPayload_postPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    post($object) {
+      return $object.get("result");
+    },
     deletedPostViewId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Post.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeletePostPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     postEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -8677,26 +8337,36 @@ export const plans = {
   },
   DeletePostInput: {
     clientMutationId: {
-      applyPlan: DeletePostInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeletePostByIdInput: {
     clientMutationId: {
-      applyPlan: DeletePostByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   },
   DeleteOfferPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteOfferPayload_clientMutationIdPlan,
-    offer: DeleteOfferPayload_offerPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    offer($object) {
+      return $object.get("result");
+    },
     deletedOfferViewId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Offer.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeleteOfferPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     offerEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -8731,26 +8401,36 @@ export const plans = {
   },
   DeleteOfferInput: {
     clientMutationId: {
-      applyPlan: DeleteOfferInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteOfferByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteOfferByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   },
   DeleteStreetPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteStreetPayload_clientMutationIdPlan,
-    street: DeleteStreetPayload_streetPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    street($object) {
+      return $object.get("result");
+    },
     deletedStreetId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Street.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeleteStreetPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     streetEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -8785,32 +8465,44 @@ export const plans = {
   },
   DeleteStreetInput: {
     clientMutationId: {
-      applyPlan: DeleteStreetInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteStreetByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteStreetByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   },
   DeleteStreetByNameInput: {
     clientMutationId: {
-      applyPlan: DeleteStreetByNameInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     name: undefined
   },
   DeletePropertyPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeletePropertyPayload_clientMutationIdPlan,
-    property: DeletePropertyPayload_propertyPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    property($object) {
+      return $object.get("result");
+    },
     deletedPropertyId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Property.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeletePropertyPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     propertyEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -8850,26 +8542,36 @@ export const plans = {
   },
   DeletePropertyInput: {
     clientMutationId: {
-      applyPlan: DeletePropertyInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeletePropertyByIdInput: {
     clientMutationId: {
-      applyPlan: DeletePropertyByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   },
   DeleteStreetPropertyPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteStreetPropertyPayload_clientMutationIdPlan,
-    streetProperty: DeleteStreetPropertyPayload_streetPropertyPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    streetProperty($object) {
+      return $object.get("result");
+    },
     deletedStreetPropertyId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.StreetProperty.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeleteStreetPropertyPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     streetPropertyEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -8914,27 +8616,37 @@ export const plans = {
   },
   DeleteStreetPropertyInput: {
     clientMutationId: {
-      applyPlan: DeleteStreetPropertyInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteStreetPropertyByStrIdAndPropIdInput: {
     clientMutationId: {
-      applyPlan: DeleteStreetPropertyByStrIdAndPropIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     strId: undefined,
     propId: undefined
   },
   DeleteBuildingPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteBuildingPayload_clientMutationIdPlan,
-    building: DeleteBuildingPayload_buildingPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    building($object) {
+      return $object.get("result");
+    },
     deletedBuildingId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Building.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeleteBuildingPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     buildingEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -8979,13 +8691,17 @@ export const plans = {
   },
   DeleteBuildingInput: {
     clientMutationId: {
-      applyPlan: DeleteBuildingInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteBuildingByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteBuildingByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   }
