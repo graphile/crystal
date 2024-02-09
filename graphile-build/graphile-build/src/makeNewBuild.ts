@@ -23,7 +23,12 @@ import * as semver from "semver";
 
 import extend, { indent } from "./extend.js";
 import type SchemaBuilder from "./SchemaBuilder.js";
-import { EXPORTABLE, stringTypeSpec, wrapDescription } from "./utils.js";
+import {
+  EXPORTABLE,
+  exportNameHint,
+  stringTypeSpec,
+  wrapDescription,
+} from "./utils.js";
 import { version } from "./version.js";
 
 const BUILTINS = ["Int", "Float", "Boolean", "ID", "String"];
@@ -140,6 +145,7 @@ export default function makeNewBuild(
     },
 
     EXPORTABLE,
+    exportNameHint,
     grafast,
     graphql,
 

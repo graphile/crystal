@@ -315,6 +315,7 @@ declare global {
         args: [...TScope],
         nameHint?: string,
       ): T;
+      exportNameHint(obj: any, nameHint: string): void;
 
       /**
        * Use `build.grafast` rather than importing `grafast` directly to try

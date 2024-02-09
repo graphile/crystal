@@ -28,6 +28,14 @@ export function EXPORTABLE<T, TScope extends any[]>(
   return fn;
 }
 
+export function exportNameHint(obj: any, nameHint: string): void {
+  if ((typeof obj === "object" && obj != null) || typeof obj === "function") {
+    if (!obj.$exporter$name) {
+      obj.$exporter$name = nameHint;
+    }
+  }
+}
+
 /**
  * Loops over all the given `keys` and binds the method of that name on `obj`
  * to `obj` so that destructuring `build`/etc won't relate in broken `this`
