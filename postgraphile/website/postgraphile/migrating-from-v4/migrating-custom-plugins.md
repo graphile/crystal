@@ -48,13 +48,6 @@ Many of the types need to be converted, here's a few:
 Graphile Build no longer has a look-ahead engine, instead it uses Gra*fast*
 plans. (You should familiarize yourself with [Gra*fast*'s documentation](https://grafast.org/grafast/).)
 
-:::info
-
-During the early access period you'll need to enter `helping2test` to get into
-the above website. You are helping to test, right?
-
-:::
-
 That means all of the APIs that related to "data generators" and the
 `QueryBuilder` and similar no longer exist:
 

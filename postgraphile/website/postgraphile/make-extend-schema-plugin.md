@@ -281,13 +281,6 @@ You should read [the Gra*fast* introduction](https://grafast.org/grafast/) and
 the [page on "plan resolvers"](https://grafast.org/grafast/plan-resolvers)
 before reading further here.
 
-:::info
-
-During the early access period you'll need to enter `helping2test` to get into
-the above website. You are helping to test, right?
-
-:::
-
 Gra*fast* operate based on "steps", instances of step classes, returned from
 "plan resolvers". Though there are many different step classes, most will
 accept as input any other step, no matter the class.
@@ -436,9 +429,6 @@ adaptor you're using wishes to expose. [Read more about Postgres adaptors in
 the @dataplan/pg
 documentation](https://grafast.org/grafast/step-library/dataplan-pg/adaptors).
 
-During the early access period you'll need to enter `helping2test` to get into
-the above website. You are helping to test, right?
-
 :::
 
 ### The executor
@@ -572,13 +562,6 @@ We'll retrieve the `price_in_us_cents` value from the database, and then use
 the [`loadOne`
 step](https://grafast.org/grafast/step-library/standard-steps/loadOne) to
 batch-convert these values from USD to AUD:
-
-:::info
-
-During the early access period you'll need to enter `helping2test` to get into
-the above website. You are helping to test, right?
-
-:::
 
 ```js
 import { makeExtendSchemaPlugin, gql } from "postgraphile/utils";
