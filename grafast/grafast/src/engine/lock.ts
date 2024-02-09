@@ -17,34 +17,45 @@ function isLocked(
 export function lock($step: ExecutableStep): void {
   if (!isLocked($step)) {
     const { optimize, finalize, deduplicate, deduplicatedWith } = $step;
-    $step.optimize = optimizeLocked;
-    $step.finalize = finalizeLocked;
-    $step.deduplicate = deduplicateLocked;
-    $step.deduplicatedWith = deduplicatedWithLocked;
+    if (optimize) {
+      $step.optimize = optimizeLocked;
+    }
+    if (typeof finalize === "function") {
+      $step.finalize = finalizeLocked;
+    }
+    if (deduplicate) {
+      $step.deduplicate = deduplicateLocked;
+    }
+    if (deduplicatedWith) {
+      $step.deduplicatedWith = deduplicatedWithLocked;
+    }
     $step[$$unlock] = () => {
       $step[$$unlock] = undefined;
-      if ($step.optimize !== optimizeLocked) {
+      if (optimize && $step.optimize !== optimizeLocked) {
         console.warn(
           `Warning: ${$step}'s optimize method changed whilst locked`,
         );
       } else {
         $step.optimize = optimize;
       }
-      if ($step.finalize !== finalizeLocked) {
+      if (typeof finalize === "function" && $step.finalize !== finalizeLocked) {
         console.warn(
           `Warning: ${$step}'s finalize method changed whilst locked`,
         );
       } else {
         $step.finalize = finalize;
       }
-      if ($step.deduplicate !== deduplicateLocked) {
+      if (deduplicate && $step.deduplicate !== deduplicateLocked) {
         console.warn(
           `Warning: ${$step}'s deduplicate method changed whilst locked`,
         );
       } else {
         $step.deduplicate = deduplicate;
       }
-      if ($step.deduplicatedWith !== deduplicatedWithLocked) {
+      if (
+        deduplicatedWith &&
+        $step.deduplicatedWith !== deduplicatedWithLocked
+      ) {
         console.warn(
           `Warning: ${$step}'s deduplicatedWith method changed whilst locked`,
         );

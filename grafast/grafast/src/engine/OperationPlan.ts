@@ -2116,7 +2116,6 @@ export class OperationPlan {
 
     let replacementStep: ExecutableStep = step;
     try {
-      const wasLocked = isDev && unlock(step);
       replacementStep = withGlobalLayerPlan(
         step.layerPlan,
         step.polymorphicPaths,
@@ -2124,7 +2123,6 @@ export class OperationPlan {
         this,
         step,
       );
-      if (wasLocked) lock(step);
     } catch (e) {
       console.error(
         `Error occurred during ${actionDescription}; whilst processing ${step} in ${order} mode an error occurred:`,
@@ -2223,16 +2221,6 @@ export class OperationPlan {
       // validated once "plan" is finished, so no need to do it here for that
       // phase.
       this.validateSteps(previousStepCount);
-    }
-
-    if (isDev) {
-      // Unlock all the steps
-      for (let i = 0; i < this.stepTracker.stepCount; i++) {
-        const step = this.stepTracker.getStepById(i, true);
-        if (step && step.id === i) {
-          unlock(step);
-        }
-      }
     }
   }
 
@@ -3004,10 +2992,12 @@ export class OperationPlan {
         this.optimizeMeta.set(step.optimizeMetaKey, meta);
       }
     }
+    const wasLocked = isDev && unlock(step);
     const replacementStep = step.optimize({
       ...stepOptions,
       meta,
     });
+    if (wasLocked) lock(step);
     if (!replacementStep) {
       throw new Error(
         `Bug in ${step}'s class: the 'optimize' method must return a step. Hint: did you forget 'return this;'?`,
@@ -3072,7 +3062,9 @@ export class OperationPlan {
       "No modifier steps expected when performing finalizeSteps",
     );
     for (const step of this.stepTracker.activeSteps) {
+      const wasLocked = isDev && unlock(step);
       step.finalize();
+      if (wasLocked) lock(step);
       assertFinalized(step);
       if (isDev && this.stepTracker.stepCount !== initialStepCount) {
         throw new Error(
