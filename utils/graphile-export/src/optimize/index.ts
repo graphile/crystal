@@ -1,4 +1,6 @@
 // import generate from "@babel/generator";
+import generate from "@babel/generator";
+import { parse } from "@babel/parser";
 import traverse, { NodePath } from "@babel/traverse";
 import * as t from "@babel/types";
 
@@ -36,7 +38,10 @@ function isSimpleParam(param: t.Node): param is t.Identifier {
   return t.isIdentifier(param);
 }
 
-export const optimize = (ast: t.File, runs = 1): t.File => {
+export const optimize = (inAst: t.File, runs = 1): t.File => {
+  let ast = inAst;
+  // Reset the full AST
+  ast = parse(generate(ast).code, { sourceType: "module" });
   traverse(ast, {
     VariableDeclaration: {
       enter(path) {
@@ -236,6 +241,8 @@ export const optimize = (ast: t.File, runs = 1): t.File => {
       },
     },
   });
+
+  ast = parse(generate(ast).code, { sourceType: "module" });
 
   // convert `plan: function plan() {...}` to `plan() { ... }`
   traverse(ast, {
