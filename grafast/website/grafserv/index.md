@@ -36,6 +36,7 @@ const preset = {
     graphiql: true,
     graphiqlPath: "/",
     websockets: true,
+    maxRequestLength: 100000,
   },
 };
 ```
