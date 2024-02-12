@@ -1,0 +1,16 @@
+/**
+ * CSS files with the .module.css suffix will be treated as CSS modules
+ * and scoped locally.
+ */
+
+.pricingTable {
+  overflow-x: visible;
+  overflow-y: visible;
+}
+
+.pricingTable :global(.fa-circle-check) {
+  color: var(--ifm-color-primary-dark);
+}
+.pricingTable :global(.fa-circle-xmark) {
+  color: rgb(255, 71, 81);
+}

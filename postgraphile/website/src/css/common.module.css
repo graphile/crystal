@@ -29,11 +29,6 @@
   font-weight: normal;
 }
 
-table:global(.pricing-table) {
-  overflow-x: visible;
-  overflow-y: visible;
-}
-
 /* Tooltip container */
 .tooltipped {
   position: relative;
