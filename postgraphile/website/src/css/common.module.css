@@ -28,3 +28,50 @@
 .tagline {
   font-weight: normal;
 }
+
+table:global(.pricing-table) {
+  overflow-x: visible;
+  overflow-y: visible;
+}
+
+/* Tooltip container */
+.tooltipped {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.tooltipped > .tooltiptext {
+  display: block;
+  visibility: hidden;
+  width: 120px;
+  background-color: var(--ifm-color-primary-lightest);
+  border: 2px solid var(--ifm-color-primary-lighter);
+  color: black;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+}
+
+.tooltipped:hover > .tooltiptext {
+  visibility: visible;
+  top: -5px;
+  right: 105%;
+}
+
+.tooltipped > .tooltiptext::after {
+  content: " ";
+  position: absolute;
+  top: 50%;
+  left: 100%; /* To the right of the tooltip */
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent transparent
+    var(--ifm-color-primary-lighter);
+}
