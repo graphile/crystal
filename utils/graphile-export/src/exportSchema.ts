@@ -118,7 +118,9 @@ function getNameForThing(
   locationHint: string,
   baseNameHint: string,
 ): string {
-  if (typeof thing === "function") {
+  if (thing.$exporter$name) {
+    return thing.$exporter$name;
+  } else if (typeof thing === "function") {
     if (baseNameHint) {
       return baseNameHint;
     }
@@ -130,7 +132,10 @@ function getNameForThing(
   } else {
     const thingConstructor = thing.constructor;
     const thingConstructorNameRaw =
-      thingConstructor?.name ?? thingConstructor?.displayName ?? null;
+      thingConstructor?.$exporter$name ??
+      thingConstructor?.name ??
+      thingConstructor?.displayName ??
+      null;
     const thingConstructorName = ["Array", "Object", "Set", "Map"].includes(
       thingConstructorNameRaw,
     )
@@ -191,6 +196,7 @@ type AnyFunction = {
 type ExportedFromFactory<T, TTuple extends any[]> = T & {
   $exporter$args: [...TTuple];
   $exporter$factory: (...args: TTuple) => T;
+  $exporter$name: string | undefined;
 };
 
 function isExportedFromFactory<T, TTuple extends any[]>(

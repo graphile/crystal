@@ -2,9 +2,6 @@ import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, as
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
-function Query_queryPlan() {
-  return rootValue();
-}
 const handler = {
   typeName: "Query",
   codec: {
@@ -29,33 +26,29 @@ const handler = {
     return constant`query`;
   }
 };
-function base64JSONDecode(value) {
-  return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-}
-function base64JSONEncode(value) {
-  return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-}
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode: base64JSONEncode,
-  decode: base64JSONDecode
+  encode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  },
+  decode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }
 };
-function pipeStringDecode(value) {
-  return typeof value === "string" ? value.split("|") : null;
-}
-function pipeStringEncode(value) {
-  return Array.isArray(value) ? value.join("|") : null;
-}
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode: pipeStringEncode,
-    decode: pipeStringDecode
+    encode(value) {
+      return Array.isArray(value) ? value.join("|") : null;
+    },
+    decode(value) {
+      return typeof value === "string" ? value.split("|") : null;
+    }
   }
 });
-const attributes = Object.assign(Object.create(null), {
+const networkAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -93,7 +86,7 @@ const attributes = Object.assign(Object.create(null), {
     }
   }
 });
-const executor_mainPgExecutor = new PgExecutor({
+const executor = new PgExecutor({
   name: "main",
   context() {
     const ctx = context();
@@ -103,10 +96,10 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const spec_network = {
+const networkCodec = recordCodec({
   name: "network",
-  identifier: sql.identifier(...["network_types", "network"]),
-  attributes,
+  identifier: sql.identifier("network_types", "network"),
+  attributes: networkAttributes,
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -117,19 +110,9 @@ const spec_network = {
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
-};
-const registryConfig_pgCodecs_network_network = recordCodec(spec_network);
-const extensions2 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "network_types",
-    name: "network"
-  },
-  tags: {}
-};
-const uniques = [{
+  executor
+});
+const networkUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -144,21 +127,29 @@ const pgResource_networkPgResource = makeRegistry({
     bpchar: TYPES.bpchar,
     int4: TYPES.int,
     inet: TYPES.inet,
-    network: registryConfig_pgCodecs_network_network,
+    network: networkCodec,
     cidr: TYPES.cidr,
     macaddr: TYPES.macaddr
   }),
   pgResources: Object.assign(Object.create(null), {
     network: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "network",
       identifier: "main.network_types.network",
-      from: registryConfig_pgCodecs_network_network.sqlType,
-      codec: registryConfig_pgCodecs_network_network,
-      uniques,
+      from: networkCodec.sqlType,
+      codec: networkCodec,
+      uniques: networkUniques,
       isVirtual: false,
       description: undefined,
-      extensions: extensions2
+      extensions: {
+        description: undefined,
+        pg: {
+          serviceName: "main",
+          schemaName: "network_types",
+          name: "network"
+        },
+        tags: {}
+      }
     }
   }),
   pgRelations: Object.create(null)
@@ -211,21 +202,6 @@ const fetcher = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.Network);
-function Query_allNetworks_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allNetworks_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allNetworks_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allNetworks_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allNetworks_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const applyOrderToPlan = ($select, $value, TableOrderByType) => {
   const val = $value.eval();
   if (val == null) {
@@ -244,99 +220,14 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
     plan($select);
   });
 };
-function NetworksConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function NetworksConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function NetworksConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function PageInfo_hasNextPagePlan($pageInfo) {
-  return $pageInfo.hasNextPage();
-}
-function PageInfo_hasPreviousPagePlan($pageInfo) {
-  return $pageInfo.hasPreviousPage();
-}
-function Mutation_createNetwork_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Network, $nodeId);
 };
-function Mutation_updateNetwork_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateNetworkById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs2 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Network, $nodeId);
 };
-function Mutation_deleteNetwork_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteNetworkById_input_applyPlan(_, $object) {
-  return $object;
-}
-function CreateNetworkPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateNetworkPayload_networkPlan($object) {
-  return $object.get("result");
-}
-function CreateNetworkPayload_queryPlan() {
-  return rootValue();
-}
-function CreateNetworkInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateNetworkInput_network_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateNetworkPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateNetworkPayload_networkPlan($object) {
-  return $object.get("result");
-}
-function UpdateNetworkPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateNetworkInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateNetworkInput_networkPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateNetworkByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateNetworkByIdInput_networkPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function DeleteNetworkPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteNetworkPayload_networkPlan($object) {
-  return $object.get("result");
-}
-function DeleteNetworkPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteNetworkInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteNetworkByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -700,7 +591,9 @@ export const plans = {
     __assertStep() {
       return true;
     },
-    query: Query_queryPlan,
+    query() {
+      return rootValue();
+    },
     nodeId($parent) {
       const specifier = handler.plan($parent);
       return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
@@ -739,23 +632,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allNetworks_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allNetworks_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allNetworks_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allNetworks_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allNetworks_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -797,9 +700,16 @@ export const plans = {
   },
   NetworksConnection: {
     __assertStep: ConnectionStep,
-    nodes: NetworksConnection_nodesPlan,
-    edges: NetworksConnection_edgesPlan,
-    pageInfo: NetworksConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -815,8 +725,12 @@ export const plans = {
   },
   PageInfo: {
     __assertStep: assertPageInfoCapableStep,
-    hasNextPage: PageInfo_hasNextPagePlan,
-    hasPreviousPage: PageInfo_hasPreviousPagePlan,
+    hasNextPage($pageInfo) {
+      return $pageInfo.hasNextPage();
+    },
+    hasPreviousPage($pageInfo) {
+      return $pageInfo.hasPreviousPage();
+    },
     startCursor($pageInfo) {
       return $pageInfo.startCursor();
     },
@@ -830,8 +744,8 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_network_network.attributes[attributeName];
+        networkUniques[0].attributes.forEach(attributeName => {
+          const attribute = networkCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -846,8 +760,8 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_network_network.attributes[attributeName];
+        networkUniques[0].attributes.forEach(attributeName => {
+          const attribute = networkCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -1013,7 +927,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), networkAttributes.id.codec)}`;
             }
           });
         }
@@ -1036,7 +950,7 @@ export const plans = {
             type: "attribute",
             attribute: "inet",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.inet.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), networkAttributes.inet.codec)}`;
             }
           });
         }
@@ -1059,7 +973,7 @@ export const plans = {
             type: "attribute",
             attribute: "cidr",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.cidr.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), networkAttributes.cidr.codec)}`;
             }
           });
         }
@@ -1082,7 +996,7 @@ export const plans = {
             type: "attribute",
             attribute: "macaddr",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.macaddr.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), networkAttributes.macaddr.codec)}`;
             }
           });
         }
@@ -1104,7 +1018,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createNetwork_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -1118,7 +1034,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateNetwork_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -1134,7 +1052,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateNetworkById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -1148,7 +1068,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteNetwork_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -1164,16 +1086,24 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteNetworkById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     }
   },
   CreateNetworkPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateNetworkPayload_clientMutationIdPlan,
-    network: CreateNetworkPayload_networkPlan,
-    query: CreateNetworkPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    network($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     networkEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -1184,7 +1114,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = networkUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -1208,11 +1138,16 @@ export const plans = {
   },
   CreateNetworkInput: {
     clientMutationId: {
-      applyPlan: CreateNetworkInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     network: {
-      applyPlan: CreateNetworkInput_network_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -1248,9 +1183,15 @@ export const plans = {
   },
   UpdateNetworkPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateNetworkPayload_clientMutationIdPlan,
-    network: UpdateNetworkPayload_networkPlan,
-    query: UpdateNetworkPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    network($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     networkEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -1261,7 +1202,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = networkUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -1285,11 +1226,16 @@ export const plans = {
   },
   UpdateNetworkInput: {
     clientMutationId: {
-      applyPlan: UpdateNetworkInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     networkPatch: {
-      applyPlan: UpdateNetworkInput_networkPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   NetworkPatch: {
@@ -1324,23 +1270,34 @@ export const plans = {
   },
   UpdateNetworkByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateNetworkByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     networkPatch: {
-      applyPlan: UpdateNetworkByIdInput_networkPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   DeleteNetworkPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteNetworkPayload_clientMutationIdPlan,
-    network: DeleteNetworkPayload_networkPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    network($object) {
+      return $object.get("result");
+    },
     deletedNetworkId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Network.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeleteNetworkPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     networkEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -1351,7 +1308,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = networkUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -1375,13 +1332,17 @@ export const plans = {
   },
   DeleteNetworkInput: {
     clientMutationId: {
-      applyPlan: DeleteNetworkInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteNetworkByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteNetworkByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   }

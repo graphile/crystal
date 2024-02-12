@@ -473,3 +473,16 @@ export const resolveResourceRefPath = (
   }
   return result;
 };
+
+export function exportNameHint(obj: any, nameHint: string): void {
+  if ((typeof obj === "object" && obj != null) || typeof obj === "function") {
+    if (!("$exporter$name" in obj)) {
+      Object.defineProperty(obj, "$exporter$name", {
+        writable: true,
+        value: nameHint,
+      });
+    } else if (!obj.$exporter$name) {
+      obj.$exporter$name = nameHint;
+    }
+  }
+}

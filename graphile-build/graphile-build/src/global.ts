@@ -313,7 +313,9 @@ declare global {
       EXPORTABLE<T, TScope extends any[]>(
         factory: (...args: TScope) => T,
         args: [...TScope],
+        nameHint?: string,
       ): T;
+      exportNameHint(obj: any, nameHint: string): void;
 
       /**
        * Use `build.grafast` rather than importing `grafast` directly to try

@@ -12,6 +12,7 @@ import plz from "pluralize";
 export function EXPORTABLE<T, TScope extends any[]>(
   factory: (...args: TScope) => T,
   args: [...TScope],
+  nameHint?: string,
 ): T {
   const fn: T = factory(...args);
   if (
@@ -21,9 +22,23 @@ export function EXPORTABLE<T, TScope extends any[]>(
     Object.defineProperties(fn, {
       $exporter$args: { value: args },
       $exporter$factory: { value: factory },
+      $exporter$name: { writable: true, value: nameHint },
     });
   }
   return fn;
+}
+
+export function exportNameHint(obj: any, nameHint: string): void {
+  if ((typeof obj === "object" && obj != null) || typeof obj === "function") {
+    if (!("$exporter$name" in obj)) {
+      Object.defineProperty(obj, "$exporter$name", {
+        writable: true,
+        value: nameHint,
+      });
+    } else if (!obj.$exporter$name) {
+      obj.$exporter$name = nameHint;
+    }
+  }
 }
 
 /**

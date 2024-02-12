@@ -2,9 +2,6 @@ import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, as
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
-function Query_queryPlan() {
-  return rootValue();
-}
 const handler = {
   typeName: "Query",
   codec: {
@@ -29,33 +26,29 @@ const handler = {
     return constant`query`;
   }
 };
-function base64JSONDecode(value) {
-  return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-}
-function base64JSONEncode(value) {
-  return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-}
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode: base64JSONEncode,
-  decode: base64JSONDecode
+  encode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  },
+  decode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }
 };
-function pipeStringDecode(value) {
-  return typeof value === "string" ? value.split("|") : null;
-}
-function pipeStringEncode(value) {
-  return Array.isArray(value) ? value.join("|") : null;
-}
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode: pipeStringEncode,
-    decode: pipeStringDecode
+    encode(value) {
+      return Array.isArray(value) ? value.join("|") : null;
+    },
+    decode(value) {
+      return typeof value === "string" ? value.split("|") : null;
+    }
   }
 });
-const executor_mainPgExecutor = new PgExecutor({
+const executor = new PgExecutor({
   name: "main",
   context() {
     const ctx = context();
@@ -78,9 +71,9 @@ const extensions = {
     behavior: ["-*"]
   })
 };
-const spec_abcd = {
+const abcdCodec = recordCodec({
   name: "abcd",
-  identifier: sql.identifier(...["enum_tables", "abcd"]),
+  identifier: sql.identifier("enum_tables", "abcd"),
   attributes: Object.assign(Object.create(null), {
     letter: {
       description: undefined,
@@ -105,28 +98,7 @@ const spec_abcd = {
   }),
   description: undefined,
   extensions,
-  executor: executor_mainPgExecutor
-};
-const registryConfig_pgCodecs_abcd_abcd = recordCodec(spec_abcd);
-const attributes2 = Object.assign(Object.create(null), {
-  letter: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  description: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
+  executor
 });
 const extensions2 = {
   isTableLike: true,
@@ -142,36 +114,32 @@ const extensions2 = {
     behavior: ["-*"]
   })
 };
-const parts2 = ["enum_tables", "abcd_view"];
-const sqlIdent2 = sql.identifier(...parts2);
-const spec_abcdView = {
+const abcdViewCodec = recordCodec({
   name: "abcdView",
-  identifier: sqlIdent2,
-  attributes: attributes2,
+  identifier: sql.identifier("enum_tables", "abcd_view"),
+  attributes: Object.assign(Object.create(null), {
+    letter: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    description: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: extensions2,
-  executor: executor_mainPgExecutor
-};
-const registryConfig_pgCodecs_abcdView_abcdView = recordCodec(spec_abcdView);
-const attributes3 = Object.assign(Object.create(null), {
-  value: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  description: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
+  executor
 });
 const extensions3 = {
   isTableLike: true,
@@ -185,24 +153,34 @@ const extensions3 = {
     behavior: ["-*"]
   })
 };
-const parts3 = ["enum_tables", "simple_enum"];
-const sqlIdent3 = sql.identifier(...parts3);
-const spec_simpleEnum = {
+const simpleEnumCodec = recordCodec({
   name: "simpleEnum",
-  identifier: sqlIdent3,
-  attributes: attributes3,
+  identifier: sql.identifier("enum_tables", "simple_enum"),
+  attributes: Object.assign(Object.create(null), {
+    value: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    description: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: extensions3,
-  executor: executor_mainPgExecutor
-};
-const registryConfig_pgCodecs_simpleEnum_simpleEnum = recordCodec(spec_simpleEnum);
-const extensions4 = {
-  isEnumTableEnum: true,
-  tags: {
-    name: "LetterAToD"
-  }
-};
-const attributes_letter_codec_LetterAToDEnum = enumCodec({
+  executor
+});
+const letterDescriptionsAttributes_letter_codec_LetterAToDEnum = enumCodec({
   name: "LetterAToDEnum",
   identifier: TYPES.text.sqlType,
   values: [{
@@ -218,34 +196,37 @@ const attributes_letter_codec_LetterAToDEnum = enumCodec({
     value: "D",
     description: "The letter D"
   }],
-  extensions: extensions4
-});
-const extensions5 = {
-  isEnumTableEnum: true,
-  tags: {
-    name: "LetterAToDViaView"
+  extensions: {
+    isEnumTableEnum: true,
+    tags: {
+      name: "LetterAToD"
+    }
   }
-};
-const values2 = [{
-  value: "A",
-  description: "The letter A"
-}, {
-  value: "B",
-  description: "The letter B"
-}, {
-  value: "C",
-  description: "The letter C"
-}, {
-  value: "D",
-  description: "The letter D"
-}];
-const attributes_letter_via_view_codec_LetterAToDViaViewEnum = enumCodec({
+});
+const letterDescriptionsAttributes_letter_via_view_codec_LetterAToDViaViewEnum = enumCodec({
   name: "LetterAToDViaViewEnum",
   identifier: TYPES.text.sqlType,
-  values: values2,
-  extensions: extensions5
+  values: [{
+    value: "A",
+    description: "The letter A"
+  }, {
+    value: "B",
+    description: "The letter B"
+  }, {
+    value: "C",
+    description: "The letter C"
+  }, {
+    value: "D",
+    description: "The letter D"
+  }],
+  extensions: {
+    isEnumTableEnum: true,
+    tags: {
+      name: "LetterAToDViaView"
+    }
+  }
 });
-const attributes4 = Object.assign(Object.create(null), {
+const letterDescriptionsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -257,7 +238,7 @@ const attributes4 = Object.assign(Object.create(null), {
   },
   letter: {
     description: undefined,
-    codec: attributes_letter_codec_LetterAToDEnum,
+    codec: letterDescriptionsAttributes_letter_codec_LetterAToDEnum,
     notNull: true,
     hasDefault: false,
     extensions: {
@@ -266,7 +247,7 @@ const attributes4 = Object.assign(Object.create(null), {
   },
   letter_via_view: {
     description: undefined,
-    codec: attributes_letter_via_view_codec_LetterAToDViaViewEnum,
+    codec: letterDescriptionsAttributes_letter_via_view_codec_LetterAToDViaViewEnum,
     notNull: true,
     hasDefault: false,
     extensions: {
@@ -283,129 +264,117 @@ const attributes4 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions6 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "enum_tables",
-    name: "letter_descriptions"
-  },
-  tags: Object.assign(Object.create(null), {
-    foreignKey: "(letter_via_view) references enum_tables.abcd_view"
-  })
-};
-const parts4 = ["enum_tables", "letter_descriptions"];
-const sqlIdent4 = sql.identifier(...parts4);
-const spec_letterDescriptions = {
+const letterDescriptionsCodec = recordCodec({
   name: "letterDescriptions",
-  identifier: sqlIdent4,
-  attributes: attributes4,
+  identifier: sql.identifier("enum_tables", "letter_descriptions"),
+  attributes: letterDescriptionsAttributes,
   description: undefined,
-  extensions: extensions6,
-  executor: executor_mainPgExecutor
-};
-const registryConfig_pgCodecs_letterDescriptions_letterDescriptions = recordCodec(spec_letterDescriptions);
-const extensions7 = {
-  isEnumTableEnum: true,
-  tags: {
-    name: "EnumTheFirst"
-  }
-};
-const values3 = [{
-  value: "a1",
-  description: "Desc A1"
-}, {
-  value: "a2",
-  description: "Desc A2"
-}, {
-  value: "a3",
-  description: "Desc A3"
-}, {
-  value: "a4",
-  description: "Desc A4"
-}];
-const attributes_enum_1_codec_EnumTheFirstEnum = enumCodec({
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "letter_descriptions"
+    },
+    tags: Object.assign(Object.create(null), {
+      foreignKey: "(letter_via_view) references enum_tables.abcd_view"
+    })
+  },
+  executor
+});
+const referencingTableAttributes_enum_1_codec_EnumTheFirstEnum = enumCodec({
   name: "EnumTheFirstEnum",
   identifier: TYPES.text.sqlType,
-  values: values3,
-  extensions: extensions7
-});
-const extensions8 = {
-  isEnumTableEnum: true,
-  tags: {
-    name: "EnumTheSecond"
+  values: [{
+    value: "a1",
+    description: "Desc A1"
+  }, {
+    value: "a2",
+    description: "Desc A2"
+  }, {
+    value: "a3",
+    description: "Desc A3"
+  }, {
+    value: "a4",
+    description: "Desc A4"
+  }],
+  extensions: {
+    isEnumTableEnum: true,
+    tags: {
+      name: "EnumTheFirst"
+    }
   }
-};
-const values4 = [{
-  value: "b1",
-  description: "Desc B1"
-}, {
-  value: "b2",
-  description: "Desc B2"
-}, {
-  value: "b3",
-  description: "Desc B3"
-}, {
-  value: "b4",
-  description: "Desc B4"
-}];
-const attributes_enum_2_codec_EnumTheSecondEnum = enumCodec({
+});
+const referencingTableAttributes_enum_2_codec_EnumTheSecondEnum = enumCodec({
   name: "EnumTheSecondEnum",
   identifier: TYPES.varchar.sqlType,
-  values: values4,
-  extensions: extensions8
-});
-const extensions9 = {
-  isEnumTableEnum: true,
-  tags: {
-    name: "LotsOfEnumsEnum3"
+  values: [{
+    value: "b1",
+    description: "Desc B1"
+  }, {
+    value: "b2",
+    description: "Desc B2"
+  }, {
+    value: "b3",
+    description: "Desc B3"
+  }, {
+    value: "b4",
+    description: "Desc B4"
+  }],
+  extensions: {
+    isEnumTableEnum: true,
+    tags: {
+      name: "EnumTheSecond"
+    }
   }
-};
-const values5 = [{
-  value: "c1",
-  description: "Desc C1"
-}, {
-  value: "c2",
-  description: "Desc C2"
-}, {
-  value: "c3",
-  description: "Desc C3"
-}, {
-  value: "c4",
-  description: "Desc C4"
-}];
-const attributes_enum_3_codec_LotsOfEnumsEnum3Enum = enumCodec({
+});
+const referencingTableAttributes_enum_3_codec_LotsOfEnumsEnum3Enum = enumCodec({
   name: "LotsOfEnumsEnum3Enum",
   identifier: TYPES.bpchar.sqlType,
-  values: values5,
-  extensions: extensions9
-});
-const extensions10 = {
-  isEnumTableEnum: true,
-  tags: {
-    name: "SimpleEnum"
+  values: [{
+    value: "c1",
+    description: "Desc C1"
+  }, {
+    value: "c2",
+    description: "Desc C2"
+  }, {
+    value: "c3",
+    description: "Desc C3"
+  }, {
+    value: "c4",
+    description: "Desc C4"
+  }],
+  extensions: {
+    isEnumTableEnum: true,
+    tags: {
+      name: "LotsOfEnumsEnum3"
+    }
   }
-};
-const values6 = [{
-  value: "Foo",
-  description: "The first metasyntactic variable"
-}, {
-  value: "Bar",
-  description: null
-}, {
-  value: "Baz",
-  description: "The third metasyntactic variable, very similar to its predecessor"
-}, {
-  value: "Qux",
-  description: null
-}];
-const attributes_simple_enum_codec_SimpleEnumEnum = enumCodec({
+});
+const referencingTableAttributes_simple_enum_codec_SimpleEnumEnum = enumCodec({
   name: "SimpleEnumEnum",
   identifier: TYPES.text.sqlType,
-  values: values6,
-  extensions: extensions10
+  values: [{
+    value: "Foo",
+    description: "The first metasyntactic variable"
+  }, {
+    value: "Bar",
+    description: null
+  }, {
+    value: "Baz",
+    description: "The third metasyntactic variable, very similar to its predecessor"
+  }, {
+    value: "Qux",
+    description: null
+  }],
+  extensions: {
+    isEnumTableEnum: true,
+    tags: {
+      name: "SimpleEnum"
+    }
+  }
 });
-const attributes5 = Object.assign(Object.create(null), {
+const referencingTableAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -417,7 +386,7 @@ const attributes5 = Object.assign(Object.create(null), {
   },
   enum_1: {
     description: undefined,
-    codec: attributes_enum_1_codec_EnumTheFirstEnum,
+    codec: referencingTableAttributes_enum_1_codec_EnumTheFirstEnum,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -426,7 +395,7 @@ const attributes5 = Object.assign(Object.create(null), {
   },
   enum_2: {
     description: undefined,
-    codec: attributes_enum_2_codec_EnumTheSecondEnum,
+    codec: referencingTableAttributes_enum_2_codec_EnumTheSecondEnum,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -435,7 +404,7 @@ const attributes5 = Object.assign(Object.create(null), {
   },
   enum_3: {
     description: undefined,
-    codec: attributes_enum_3_codec_LotsOfEnumsEnum3Enum,
+    codec: referencingTableAttributes_enum_3_codec_LotsOfEnumsEnum3Enum,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -444,7 +413,7 @@ const attributes5 = Object.assign(Object.create(null), {
   },
   simple_enum: {
     description: undefined,
-    codec: attributes_simple_enum_codec_SimpleEnumEnum,
+    codec: referencingTableAttributes_simple_enum_codec_SimpleEnumEnum,
     notNull: false,
     hasDefault: false,
     extensions: {
@@ -452,81 +421,21 @@ const attributes5 = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions11 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "enum_tables",
-    name: "referencing_table"
-  },
-  tags: Object.create(null)
-};
-const parts5 = ["enum_tables", "referencing_table"];
-const sqlIdent5 = sql.identifier(...parts5);
-const spec_referencingTable = {
+const referencingTableCodec = recordCodec({
   name: "referencingTable",
-  identifier: sqlIdent5,
-  attributes: attributes5,
+  identifier: sql.identifier("enum_tables", "referencing_table"),
+  attributes: referencingTableAttributes,
   description: undefined,
-  extensions: extensions11,
-  executor: executor_mainPgExecutor
-};
-const registryConfig_pgCodecs_referencingTable_referencingTable = recordCodec(spec_referencingTable);
-const attributes6 = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "referencing_table"
+    },
+    tags: Object.create(null)
   },
-  enum_1: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  enum_2: {
-    description: undefined,
-    codec: TYPES.varchar,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  enum_3: {
-    description: undefined,
-    codec: TYPES.bpchar,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  enum_4: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  description: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
+  executor
 });
 const extensions12 = {
   isTableLike: true,
@@ -540,36 +449,75 @@ const extensions12 = {
     behavior: ["-*"]
   })
 };
-const parts6 = ["enum_tables", "lots_of_enums"];
-const sqlIdent6 = sql.identifier(...parts6);
-const spec_lotsOfEnums = {
+const lotsOfEnumsCodec = recordCodec({
   name: "lotsOfEnums",
-  identifier: sqlIdent6,
-  attributes: attributes6,
+  identifier: sql.identifier("enum_tables", "lots_of_enums"),
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    enum_1: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    enum_2: {
+      description: undefined,
+      codec: TYPES.varchar,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    enum_3: {
+      description: undefined,
+      codec: TYPES.bpchar,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    enum_4: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    description: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: extensions12,
-  executor: executor_mainPgExecutor
-};
-const registryConfig_pgCodecs_lotsOfEnums_lotsOfEnums = recordCodec(spec_lotsOfEnums);
-const extensions13 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "enum_tables",
-    name: "abcd"
-  },
-  tags: {
-    enum: true,
-    enumName: "LetterAToD",
-    behavior: extensions.tags.behavior
-  }
-};
+  executor
+});
 const registryConfig_pgResources_abcd_abcd = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "abcd",
   identifier: "main.enum_tables.abcd",
-  from: registryConfig_pgCodecs_abcd_abcd.sqlType,
-  codec: registryConfig_pgCodecs_abcd_abcd,
+  from: abcdCodec.sqlType,
+  codec: abcdCodec,
   uniques: [{
     isPrimary: true,
     attributes: ["letter"],
@@ -580,96 +528,82 @@ const registryConfig_pgResources_abcd_abcd = {
   }],
   isVirtual: false,
   description: undefined,
-  extensions: extensions13
-};
-const extensions14 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "enum_tables",
-    name: "abcd_view"
-  },
-  tags: {
-    primaryKey: "letter",
-    enum: true,
-    enumName: "LetterAToDViaView",
-    behavior: extensions2.tags.behavior
-  }
-};
-const uniques2 = [{
-  isPrimary: true,
-  attributes: ["letter"],
-  description: undefined,
   extensions: {
-    tags: Object.create(null)
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "abcd"
+    },
+    tags: {
+      enum: true,
+      enumName: "LetterAToD",
+      behavior: extensions.tags.behavior
+    }
   }
-}];
+};
 const registryConfig_pgResources_abcd_view_abcd_view = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "abcd_view",
   identifier: "main.enum_tables.abcd_view",
-  from: registryConfig_pgCodecs_abcdView_abcdView.sqlType,
-  codec: registryConfig_pgCodecs_abcdView_abcdView,
-  uniques: uniques2,
+  from: abcdViewCodec.sqlType,
+  codec: abcdViewCodec,
+  uniques: [{
+    isPrimary: true,
+    attributes: ["letter"],
+    description: undefined,
+    extensions: {
+      tags: Object.create(null)
+    }
+  }],
   isVirtual: false,
-  description: undefined,
-  extensions: extensions14
-};
-const extensions15 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "enum_tables",
-    name: "simple_enum"
-  },
-  tags: {
-    enum: true,
-    behavior: extensions3.tags.behavior
-  }
-};
-const uniques3 = [{
-  isPrimary: true,
-  attributes: ["value"],
   description: undefined,
   extensions: {
-    tags: Object.create(null)
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "abcd_view"
+    },
+    tags: {
+      primaryKey: "letter",
+      enum: true,
+      enumName: "LetterAToDViaView",
+      behavior: extensions2.tags.behavior
+    }
   }
-}];
+};
 const registryConfig_pgResources_simple_enum_simple_enum = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "simple_enum",
   identifier: "main.enum_tables.simple_enum",
-  from: registryConfig_pgCodecs_simpleEnum_simpleEnum.sqlType,
-  codec: registryConfig_pgCodecs_simpleEnum_simpleEnum,
-  uniques: uniques3,
+  from: simpleEnumCodec.sqlType,
+  codec: simpleEnumCodec,
+  uniques: [{
+    isPrimary: true,
+    attributes: ["value"],
+    description: undefined,
+    extensions: {
+      tags: Object.create(null)
+    }
+  }],
   isVirtual: false,
   description: undefined,
-  extensions: extensions15
-};
-const extensions16 = {
-  pg: {
-    serviceName: "main",
-    schemaName: "enum_tables",
-    name: "referencing_table_mutation"
-  },
-  tags: {
-    behavior: ["-queryField mutationField -typeField", "-filter -order"]
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "simple_enum"
+    },
+    tags: {
+      enum: true,
+      behavior: extensions3.tags.behavior
+    }
   }
 };
-const parts7 = ["enum_tables", "referencing_table_mutation"];
-const sqlIdent7 = sql.identifier(...parts7);
-const extensions17 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "enum_tables",
-    name: "letter_descriptions"
-  },
-  tags: {
-    foreignKey: "(letter_via_view) references enum_tables.abcd_view"
-  }
-};
-const uniques4 = [{
+const referencing_table_mutationFunctionIdentifer = sql.identifier("enum_tables", "referencing_table_mutation");
+const letter_descriptionsUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -692,26 +626,27 @@ const uniques4 = [{
   }
 }];
 const registryConfig_pgResources_letter_descriptions_letter_descriptions = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "letter_descriptions",
   identifier: "main.enum_tables.letter_descriptions",
-  from: registryConfig_pgCodecs_letterDescriptions_letterDescriptions.sqlType,
-  codec: registryConfig_pgCodecs_letterDescriptions_letterDescriptions,
-  uniques: uniques4,
+  from: letterDescriptionsCodec.sqlType,
+  codec: letterDescriptionsCodec,
+  uniques: letter_descriptionsUniques,
   isVirtual: false,
   description: undefined,
-  extensions: extensions17
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "letter_descriptions"
+    },
+    tags: {
+      foreignKey: "(letter_via_view) references enum_tables.abcd_view"
+    }
+  }
 };
-const extensions18 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "enum_tables",
-    name: "referencing_table"
-  },
-  tags: {}
-};
-const uniques5 = [{
+const referencing_tableUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -720,101 +655,107 @@ const uniques5 = [{
   }
 }];
 const registryConfig_pgResources_referencing_table_referencing_table = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "referencing_table",
   identifier: "main.enum_tables.referencing_table",
-  from: registryConfig_pgCodecs_referencingTable_referencingTable.sqlType,
-  codec: registryConfig_pgCodecs_referencingTable_referencingTable,
-  uniques: uniques5,
+  from: referencingTableCodec.sqlType,
+  codec: referencingTableCodec,
+  uniques: referencing_tableUniques,
   isVirtual: false,
   description: undefined,
-  extensions: extensions18
-};
-const extensions19 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "enum_tables",
-    name: "lots_of_enums"
-  },
-  tags: {
-    omit: true,
-    behavior: extensions12.tags.behavior
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "referencing_table"
+    },
+    tags: {}
   }
 };
-const uniques6 = [{
-  isPrimary: true,
-  attributes: ["id"],
-  description: undefined,
-  extensions: {
-    tags: Object.create(null)
-  }
-}, {
-  isPrimary: false,
-  attributes: ["enum_1"],
-  description: undefined,
-  extensions: {
-    tags: Object.assign(Object.create(null), {
-      enum: true,
-      enumName: "EnumTheFirst"
-    })
-  }
-}, {
-  isPrimary: false,
-  attributes: ["enum_2"],
-  description: undefined,
-  extensions: {
-    tags: Object.assign(Object.create(null), {
-      enum: true,
-      enumName: "EnumTheSecond"
-    })
-  }
-}, {
-  isPrimary: false,
-  attributes: ["enum_3"],
-  description: undefined,
-  extensions: {
-    tags: Object.assign(Object.create(null), {
-      enum: true
-    })
-  }
-}, {
-  isPrimary: false,
-  attributes: ["enum_4"],
-  description: undefined,
-  extensions: {
-    tags: Object.assign(Object.create(null), {
-      enum: true
-    })
-  }
-}];
 const registryConfig_pgResources_lots_of_enums_lots_of_enums = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "lots_of_enums",
   identifier: "main.enum_tables.lots_of_enums",
-  from: registryConfig_pgCodecs_lotsOfEnums_lotsOfEnums.sqlType,
-  codec: registryConfig_pgCodecs_lotsOfEnums_lotsOfEnums,
-  uniques: uniques6,
+  from: lotsOfEnumsCodec.sqlType,
+  codec: lotsOfEnumsCodec,
+  uniques: [{
+    isPrimary: true,
+    attributes: ["id"],
+    description: undefined,
+    extensions: {
+      tags: Object.create(null)
+    }
+  }, {
+    isPrimary: false,
+    attributes: ["enum_1"],
+    description: undefined,
+    extensions: {
+      tags: Object.assign(Object.create(null), {
+        enum: true,
+        enumName: "EnumTheFirst"
+      })
+    }
+  }, {
+    isPrimary: false,
+    attributes: ["enum_2"],
+    description: undefined,
+    extensions: {
+      tags: Object.assign(Object.create(null), {
+        enum: true,
+        enumName: "EnumTheSecond"
+      })
+    }
+  }, {
+    isPrimary: false,
+    attributes: ["enum_3"],
+    description: undefined,
+    extensions: {
+      tags: Object.assign(Object.create(null), {
+        enum: true
+      })
+    }
+  }, {
+    isPrimary: false,
+    attributes: ["enum_4"],
+    description: undefined,
+    extensions: {
+      tags: Object.assign(Object.create(null), {
+        enum: true
+      })
+    }
+  }],
   isVirtual: false,
   description: undefined,
-  extensions: extensions19
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "lots_of_enums"
+    },
+    tags: {
+      omit: true,
+      behavior: extensions12.tags.behavior
+    }
+  }
 };
 const registry = makeRegistry({
   pgCodecs: Object.assign(Object.create(null), {
-    abcd: registryConfig_pgCodecs_abcd_abcd,
+    abcd: abcdCodec,
     text: TYPES.text,
-    abcdView: registryConfig_pgCodecs_abcdView_abcdView,
-    simpleEnum: registryConfig_pgCodecs_simpleEnum_simpleEnum,
+    abcdView: abcdViewCodec,
+    simpleEnum: simpleEnumCodec,
     int4: TYPES.int,
-    letterDescriptions: registryConfig_pgCodecs_letterDescriptions_letterDescriptions,
-    LetterAToDEnum: attributes_letter_codec_LetterAToDEnum,
-    LetterAToDViaViewEnum: attributes_letter_via_view_codec_LetterAToDViaViewEnum,
-    referencingTable: registryConfig_pgCodecs_referencingTable_referencingTable,
-    EnumTheFirstEnum: attributes_enum_1_codec_EnumTheFirstEnum,
-    EnumTheSecondEnum: attributes_enum_2_codec_EnumTheSecondEnum,
-    LotsOfEnumsEnum3Enum: attributes_enum_3_codec_LotsOfEnumsEnum3Enum,
-    SimpleEnumEnum: attributes_simple_enum_codec_SimpleEnumEnum,
-    lotsOfEnums: registryConfig_pgCodecs_lotsOfEnums_lotsOfEnums,
+    letterDescriptions: letterDescriptionsCodec,
+    LetterAToDEnum: letterDescriptionsAttributes_letter_codec_LetterAToDEnum,
+    LetterAToDViaViewEnum: letterDescriptionsAttributes_letter_via_view_codec_LetterAToDViaViewEnum,
+    referencingTable: referencingTableCodec,
+    EnumTheFirstEnum: referencingTableAttributes_enum_1_codec_EnumTheFirstEnum,
+    EnumTheSecondEnum: referencingTableAttributes_enum_2_codec_EnumTheSecondEnum,
+    LotsOfEnumsEnum3Enum: referencingTableAttributes_enum_3_codec_LotsOfEnumsEnum3Enum,
+    SimpleEnumEnum: referencingTableAttributes_simple_enum_codec_SimpleEnumEnum,
+    lotsOfEnums: lotsOfEnumsCodec,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar
   }),
@@ -823,23 +764,32 @@ const registry = makeRegistry({
     abcd_view: registryConfig_pgResources_abcd_view_abcd_view,
     simple_enum: registryConfig_pgResources_simple_enum_simple_enum,
     referencing_table_mutation: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "referencing_table_mutation",
       identifier: "main.enum_tables.referencing_table_mutation(enum_tables.referencing_table)",
       from(...args) {
-        return sql`${sqlIdent7}(${sqlFromArgDigests(args)})`;
+        return sql`${referencing_table_mutationFunctionIdentifer}(${sqlFromArgDigests(args)})`;
       },
       parameters: [{
         name: "t",
         required: true,
         notNull: false,
-        codec: registryConfig_pgCodecs_referencingTable_referencingTable
+        codec: referencingTableCodec
       }],
       isUnique: !false,
       codec: TYPES.int,
       uniques: [],
       isMutation: true,
-      extensions: extensions16,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "enum_tables",
+          name: "referencing_table_mutation"
+        },
+        tags: {
+          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+        }
+      },
       description: undefined
     },
     letter_descriptions: registryConfig_pgResources_letter_descriptions_letter_descriptions,
@@ -849,7 +799,7 @@ const registry = makeRegistry({
   pgRelations: Object.assign(Object.create(null), {
     abcd: Object.assign(Object.create(null), {
       letterDescriptionsByTheirLetter: {
-        localCodec: registryConfig_pgCodecs_abcd_abcd,
+        localCodec: abcdCodec,
         remoteResourceOptions: registryConfig_pgResources_letter_descriptions_letter_descriptions,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["letter"],
@@ -866,7 +816,7 @@ const registry = makeRegistry({
     }),
     abcdView: Object.assign(Object.create(null), {
       letterDescriptionsByTheirLetterViaView: {
-        localCodec: registryConfig_pgCodecs_abcdView_abcdView,
+        localCodec: abcdViewCodec,
         remoteResourceOptions: registryConfig_pgResources_letter_descriptions_letter_descriptions,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["letter"],
@@ -883,7 +833,7 @@ const registry = makeRegistry({
     }),
     letterDescriptions: Object.assign(Object.create(null), {
       abcdViewByMyLetterViaView: {
-        localCodec: registryConfig_pgCodecs_letterDescriptions_letterDescriptions,
+        localCodec: letterDescriptionsCodec,
         remoteResourceOptions: registryConfig_pgResources_abcd_view_abcd_view,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["letter_via_view"],
@@ -898,7 +848,7 @@ const registry = makeRegistry({
         }
       },
       abcdByMyLetter: {
-        localCodec: registryConfig_pgCodecs_letterDescriptions_letterDescriptions,
+        localCodec: letterDescriptionsCodec,
         remoteResourceOptions: registryConfig_pgResources_abcd_abcd,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["letter"],
@@ -915,7 +865,7 @@ const registry = makeRegistry({
     }),
     lotsOfEnums: Object.assign(Object.create(null), {
       referencingTablesByTheirEnum1: {
-        localCodec: registryConfig_pgCodecs_lotsOfEnums_lotsOfEnums,
+        localCodec: lotsOfEnumsCodec,
         remoteResourceOptions: registryConfig_pgResources_referencing_table_referencing_table,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["enum_1"],
@@ -930,7 +880,7 @@ const registry = makeRegistry({
         }
       },
       referencingTablesByTheirEnum2: {
-        localCodec: registryConfig_pgCodecs_lotsOfEnums_lotsOfEnums,
+        localCodec: lotsOfEnumsCodec,
         remoteResourceOptions: registryConfig_pgResources_referencing_table_referencing_table,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["enum_2"],
@@ -945,7 +895,7 @@ const registry = makeRegistry({
         }
       },
       referencingTablesByTheirEnum3: {
-        localCodec: registryConfig_pgCodecs_lotsOfEnums_lotsOfEnums,
+        localCodec: lotsOfEnumsCodec,
         remoteResourceOptions: registryConfig_pgResources_referencing_table_referencing_table,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["enum_3"],
@@ -962,7 +912,7 @@ const registry = makeRegistry({
     }),
     referencingTable: Object.assign(Object.create(null), {
       lotsOfEnumsByMyEnum1: {
-        localCodec: registryConfig_pgCodecs_referencingTable_referencingTable,
+        localCodec: referencingTableCodec,
         remoteResourceOptions: registryConfig_pgResources_lots_of_enums_lots_of_enums,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["enum_1"],
@@ -977,7 +927,7 @@ const registry = makeRegistry({
         }
       },
       lotsOfEnumsByMyEnum2: {
-        localCodec: registryConfig_pgCodecs_referencingTable_referencingTable,
+        localCodec: referencingTableCodec,
         remoteResourceOptions: registryConfig_pgResources_lots_of_enums_lots_of_enums,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["enum_2"],
@@ -992,7 +942,7 @@ const registry = makeRegistry({
         }
       },
       lotsOfEnumsByMyEnum3: {
-        localCodec: registryConfig_pgCodecs_referencingTable_referencingTable,
+        localCodec: referencingTableCodec,
         remoteResourceOptions: registryConfig_pgResources_lots_of_enums_lots_of_enums,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["enum_3"],
@@ -1007,7 +957,7 @@ const registry = makeRegistry({
         }
       },
       simpleEnumByMySimpleEnum: {
-        localCodec: registryConfig_pgCodecs_referencingTable_referencingTable,
+        localCodec: referencingTableCodec,
         remoteResourceOptions: registryConfig_pgResources_simple_enum_simple_enum,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["simple_enum"],
@@ -1024,7 +974,7 @@ const registry = makeRegistry({
     }),
     simpleEnum: Object.assign(Object.create(null), {
       referencingTablesByTheirSimpleEnum: {
-        localCodec: registryConfig_pgCodecs_simpleEnum_simpleEnum,
+        localCodec: simpleEnumCodec,
         remoteResourceOptions: registryConfig_pgResources_referencing_table_referencing_table,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["value"],
@@ -1118,21 +1068,6 @@ const fetcher2 = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.ReferencingTable);
-function Query_allLetterDescriptions_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allLetterDescriptions_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allLetterDescriptions_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allLetterDescriptions_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allLetterDescriptions_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const applyOrderToPlan = ($select, $value, TableOrderByType) => {
   const val = $value.eval();
   if (val == null) {
@@ -1151,51 +1086,10 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
     plan($select);
   });
 };
-function Query_allReferencingTables_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allReferencingTables_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allReferencingTables_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allReferencingTables_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allReferencingTables_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function LetterDescriptionsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function LetterDescriptionsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function LetterDescriptionsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function PageInfo_hasNextPagePlan($pageInfo) {
-  return $pageInfo.hasNextPage();
-}
-function PageInfo_hasPreviousPagePlan($pageInfo) {
-  return $pageInfo.hasPreviousPage();
-}
-function ReferencingTablesConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function ReferencingTablesConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function ReferencingTablesConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
 const argDetailsSimple = [{
   graphqlArgName: "t",
   postgresArgName: "t",
-  pgCodec: registryConfig_pgCodecs_referencingTable_referencingTable,
+  pgCodec: referencingTableCodec,
   required: true,
   fetcher: null
 }];
@@ -1244,204 +1138,22 @@ const makeArgs = (args, path = []) => {
   return selectArgs;
 };
 const resource_referencing_table_mutationPgResource = registry.pgResources["referencing_table_mutation"];
-function Mutation_referencingTableMutation_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createLetterDescription_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createReferencingTable_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.LetterDescription, $nodeId);
 };
-function Mutation_updateLetterDescription_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateLetterDescriptionById_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateLetterDescriptionByLetter_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateLetterDescriptionByLetterViaView_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs2 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.ReferencingTable, $nodeId);
 };
-function Mutation_updateReferencingTable_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateReferencingTableById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs3 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.LetterDescription, $nodeId);
 };
-function Mutation_deleteLetterDescription_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteLetterDescriptionById_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteLetterDescriptionByLetter_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteLetterDescriptionByLetterViaView_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs4 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.ReferencingTable, $nodeId);
 };
-function Mutation_deleteReferencingTable_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteReferencingTableById_input_applyPlan(_, $object) {
-  return $object;
-}
-function ReferencingTableMutationPayload_clientMutationIdPlan($object) {
-  return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-}
-function ReferencingTableMutationPayload_queryPlan() {
-  return rootValue();
-}
-function ReferencingTableMutationInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateLetterDescriptionPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateLetterDescriptionPayload_letterDescriptionPlan($object) {
-  return $object.get("result");
-}
-function CreateLetterDescriptionPayload_queryPlan() {
-  return rootValue();
-}
-function CreateLetterDescriptionInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateLetterDescriptionInput_letterDescription_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateReferencingTablePayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateReferencingTablePayload_referencingTablePlan($object) {
-  return $object.get("result");
-}
-function CreateReferencingTablePayload_queryPlan() {
-  return rootValue();
-}
-function CreateReferencingTableInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateReferencingTableInput_referencingTable_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateLetterDescriptionPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateLetterDescriptionPayload_letterDescriptionPlan($object) {
-  return $object.get("result");
-}
-function UpdateLetterDescriptionPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateLetterDescriptionInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateLetterDescriptionInput_letterDescriptionPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateLetterDescriptionByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateLetterDescriptionByIdInput_letterDescriptionPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateLetterDescriptionByLetterInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateLetterDescriptionByLetterInput_letterDescriptionPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateLetterDescriptionByLetterViaViewInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateLetterDescriptionByLetterViaViewInput_letterDescriptionPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateReferencingTablePayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateReferencingTablePayload_referencingTablePlan($object) {
-  return $object.get("result");
-}
-function UpdateReferencingTablePayload_queryPlan() {
-  return rootValue();
-}
-function UpdateReferencingTableInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateReferencingTableInput_referencingTablePatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateReferencingTableByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateReferencingTableByIdInput_referencingTablePatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function DeleteLetterDescriptionPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteLetterDescriptionPayload_letterDescriptionPlan($object) {
-  return $object.get("result");
-}
-function DeleteLetterDescriptionPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteLetterDescriptionInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteLetterDescriptionByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteLetterDescriptionByLetterInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteLetterDescriptionByLetterViaViewInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteReferencingTablePayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteReferencingTablePayload_referencingTablePlan($object) {
-  return $object.get("result");
-}
-function DeleteReferencingTablePayload_queryPlan() {
-  return rootValue();
-}
-function DeleteReferencingTableInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteReferencingTableByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -2329,7 +2041,9 @@ export const plans = {
     __assertStep() {
       return true;
     },
-    query: Query_queryPlan,
+    query() {
+      return rootValue();
+    },
     nodeId($parent) {
       const specifier = handler.plan($parent);
       return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
@@ -2407,23 +2121,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allLetterDescriptions_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allLetterDescriptions_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allLetterDescriptions_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allLetterDescriptions_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allLetterDescriptions_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -2450,23 +2174,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allReferencingTables_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allReferencingTables_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allReferencingTables_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allReferencingTables_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allReferencingTables_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -2586,9 +2320,16 @@ export const plans = {
   },
   LetterDescriptionsConnection: {
     __assertStep: ConnectionStep,
-    nodes: LetterDescriptionsConnection_nodesPlan,
-    edges: LetterDescriptionsConnection_edgesPlan,
-    pageInfo: LetterDescriptionsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -2604,8 +2345,12 @@ export const plans = {
   },
   PageInfo: {
     __assertStep: assertPageInfoCapableStep,
-    hasNextPage: PageInfo_hasNextPagePlan,
-    hasPreviousPage: PageInfo_hasPreviousPagePlan,
+    hasNextPage($pageInfo) {
+      return $pageInfo.hasNextPage();
+    },
+    hasPreviousPage($pageInfo) {
+      return $pageInfo.hasPreviousPage();
+    },
     startCursor($pageInfo) {
       return $pageInfo.startCursor();
     },
@@ -2619,8 +2364,8 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques4[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_letterDescriptions_letterDescriptions.attributes[attributeName];
+        letter_descriptionsUniques[0].attributes.forEach(attributeName => {
+          const attribute = letterDescriptionsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -2635,8 +2380,8 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques4[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_letterDescriptions_letterDescriptions.attributes[attributeName];
+        letter_descriptionsUniques[0].attributes.forEach(attributeName => {
+          const attribute = letterDescriptionsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -2802,7 +2547,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes4.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), letterDescriptionsAttributes.id.codec)}`;
             }
           });
         }
@@ -2825,7 +2570,7 @@ export const plans = {
             type: "attribute",
             attribute: "letter",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes4.letter.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), letterDescriptionsAttributes.letter.codec)}`;
             }
           });
         }
@@ -2848,7 +2593,7 @@ export const plans = {
             type: "attribute",
             attribute: "letter_via_view",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes4.letter_via_view.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), letterDescriptionsAttributes.letter_via_view.codec)}`;
             }
           });
         }
@@ -2871,7 +2616,7 @@ export const plans = {
             type: "attribute",
             attribute: "description",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes4.description.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), letterDescriptionsAttributes.description.codec)}`;
             }
           });
         }
@@ -2882,9 +2627,16 @@ export const plans = {
   },
   ReferencingTablesConnection: {
     __assertStep: ConnectionStep,
-    nodes: ReferencingTablesConnection_nodesPlan,
-    edges: ReferencingTablesConnection_edgesPlan,
-    pageInfo: ReferencingTablesConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -2904,8 +2656,8 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques5[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_referencingTable_referencingTable.attributes[attributeName];
+        referencing_tableUniques[0].attributes.forEach(attributeName => {
+          const attribute = referencingTableCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -2920,8 +2672,8 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques5[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_referencingTable_referencingTable.attributes[attributeName];
+        referencing_tableUniques[0].attributes.forEach(attributeName => {
+          const attribute = referencingTableCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -3121,7 +2873,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes5.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), referencingTableAttributes.id.codec)}`;
             }
           });
         }
@@ -3144,7 +2896,7 @@ export const plans = {
             type: "attribute",
             attribute: "enum_1",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes5.enum_1.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), referencingTableAttributes.enum_1.codec)}`;
             }
           });
         }
@@ -3167,7 +2919,7 @@ export const plans = {
             type: "attribute",
             attribute: "enum_2",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes5.enum_2.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), referencingTableAttributes.enum_2.codec)}`;
             }
           });
         }
@@ -3190,7 +2942,7 @@ export const plans = {
             type: "attribute",
             attribute: "enum_3",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes5.enum_3.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), referencingTableAttributes.enum_3.codec)}`;
             }
           });
         }
@@ -3213,7 +2965,7 @@ export const plans = {
             type: "attribute",
             attribute: "simple_enum",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes5.simple_enum.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), referencingTableAttributes.simple_enum.codec)}`;
             }
           });
         }
@@ -3235,7 +2987,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_referencingTableMutation_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -3250,7 +3004,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createLetterDescription_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -3265,7 +3021,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createReferencingTable_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -3279,7 +3037,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateLetterDescription_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -3295,7 +3055,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateLetterDescriptionById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -3311,7 +3073,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateLetterDescriptionByLetter_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -3327,7 +3091,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateLetterDescriptionByLetterViaView_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -3341,7 +3107,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateReferencingTable_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -3357,7 +3125,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateReferencingTableById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -3371,7 +3141,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteLetterDescription_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -3387,7 +3159,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteLetterDescriptionById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -3403,7 +3177,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteLetterDescriptionByLetter_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -3419,7 +3195,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteLetterDescriptionByLetterViaView_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -3433,7 +3211,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteReferencingTable_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -3449,22 +3229,30 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteReferencingTableById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     }
   },
   ReferencingTableMutationPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: ReferencingTableMutationPayload_clientMutationIdPlan,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
     integer($object) {
       return $object.get("result");
     },
-    query: ReferencingTableMutationPayload_queryPlan
+    query() {
+      return rootValue();
+    }
   },
   ReferencingTableMutationInput: {
     clientMutationId: {
-      applyPlan: ReferencingTableMutationInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     t: undefined
@@ -3508,9 +3296,15 @@ export const plans = {
   },
   CreateLetterDescriptionPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateLetterDescriptionPayload_clientMutationIdPlan,
-    letterDescription: CreateLetterDescriptionPayload_letterDescriptionPlan,
-    query: CreateLetterDescriptionPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    letterDescription($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     letterDescriptionEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -3521,7 +3315,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = letter_descriptionsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -3545,11 +3339,16 @@ export const plans = {
   },
   CreateLetterDescriptionInput: {
     clientMutationId: {
-      applyPlan: CreateLetterDescriptionInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     letterDescription: {
-      applyPlan: CreateLetterDescriptionInput_letterDescription_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -3585,9 +3384,15 @@ export const plans = {
   },
   CreateReferencingTablePayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateReferencingTablePayload_clientMutationIdPlan,
-    referencingTable: CreateReferencingTablePayload_referencingTablePlan,
-    query: CreateReferencingTablePayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    referencingTable($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     referencingTableEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -3598,7 +3403,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques5[0].attributes.reduce((memo, attributeName) => {
+            const spec = referencing_tableUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -3622,19 +3427,30 @@ export const plans = {
   },
   CreateReferencingTableInput: {
     clientMutationId: {
-      applyPlan: CreateReferencingTableInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     referencingTable: {
-      applyPlan: CreateReferencingTableInput_referencingTable_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
   UpdateLetterDescriptionPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateLetterDescriptionPayload_clientMutationIdPlan,
-    letterDescription: UpdateLetterDescriptionPayload_letterDescriptionPlan,
-    query: UpdateLetterDescriptionPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    letterDescription($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     letterDescriptionEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -3645,7 +3461,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = letter_descriptionsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -3669,11 +3485,16 @@ export const plans = {
   },
   UpdateLetterDescriptionInput: {
     clientMutationId: {
-      applyPlan: UpdateLetterDescriptionInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     letterDescriptionPatch: {
-      applyPlan: UpdateLetterDescriptionInput_letterDescriptionPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   LetterDescriptionPatch: {
@@ -3708,36 +3529,57 @@ export const plans = {
   },
   UpdateLetterDescriptionByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateLetterDescriptionByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     letterDescriptionPatch: {
-      applyPlan: UpdateLetterDescriptionByIdInput_letterDescriptionPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateLetterDescriptionByLetterInput: {
     clientMutationId: {
-      applyPlan: UpdateLetterDescriptionByLetterInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     letter: undefined,
     letterDescriptionPatch: {
-      applyPlan: UpdateLetterDescriptionByLetterInput_letterDescriptionPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateLetterDescriptionByLetterViaViewInput: {
     clientMutationId: {
-      applyPlan: UpdateLetterDescriptionByLetterViaViewInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     letterViaView: undefined,
     letterDescriptionPatch: {
-      applyPlan: UpdateLetterDescriptionByLetterViaViewInput_letterDescriptionPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateReferencingTablePayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateReferencingTablePayload_clientMutationIdPlan,
-    referencingTable: UpdateReferencingTablePayload_referencingTablePlan,
-    query: UpdateReferencingTablePayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    referencingTable($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     referencingTableEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -3748,7 +3590,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques5[0].attributes.reduce((memo, attributeName) => {
+            const spec = referencing_tableUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -3772,11 +3614,16 @@ export const plans = {
   },
   UpdateReferencingTableInput: {
     clientMutationId: {
-      applyPlan: UpdateReferencingTableInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     referencingTablePatch: {
-      applyPlan: UpdateReferencingTableInput_referencingTablePatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   ReferencingTablePatch: {
@@ -3818,23 +3665,34 @@ export const plans = {
   },
   UpdateReferencingTableByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateReferencingTableByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     referencingTablePatch: {
-      applyPlan: UpdateReferencingTableByIdInput_referencingTablePatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   DeleteLetterDescriptionPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteLetterDescriptionPayload_clientMutationIdPlan,
-    letterDescription: DeleteLetterDescriptionPayload_letterDescriptionPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    letterDescription($object) {
+      return $object.get("result");
+    },
     deletedLetterDescriptionId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.LetterDescription.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeleteLetterDescriptionPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     letterDescriptionEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -3845,7 +3703,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques4[0].attributes.reduce((memo, attributeName) => {
+            const spec = letter_descriptionsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -3869,38 +3727,52 @@ export const plans = {
   },
   DeleteLetterDescriptionInput: {
     clientMutationId: {
-      applyPlan: DeleteLetterDescriptionInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteLetterDescriptionByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteLetterDescriptionByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   },
   DeleteLetterDescriptionByLetterInput: {
     clientMutationId: {
-      applyPlan: DeleteLetterDescriptionByLetterInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     letter: undefined
   },
   DeleteLetterDescriptionByLetterViaViewInput: {
     clientMutationId: {
-      applyPlan: DeleteLetterDescriptionByLetterViaViewInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     letterViaView: undefined
   },
   DeleteReferencingTablePayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteReferencingTablePayload_clientMutationIdPlan,
-    referencingTable: DeleteReferencingTablePayload_referencingTablePlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    referencingTable($object) {
+      return $object.get("result");
+    },
     deletedReferencingTableId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.ReferencingTable.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeleteReferencingTablePayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     referencingTableEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -3911,7 +3783,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques5[0].attributes.reduce((memo, attributeName) => {
+            const spec = referencing_tableUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -3935,13 +3807,17 @@ export const plans = {
   },
   DeleteReferencingTableInput: {
     clientMutationId: {
-      applyPlan: DeleteReferencingTableInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteReferencingTableByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteReferencingTableByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   }

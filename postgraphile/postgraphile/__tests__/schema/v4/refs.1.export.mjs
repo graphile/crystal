@@ -2,9 +2,6 @@ import { PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleSte
 import { ConnectionStep, SafeError, access, assertEdgeCapableStep, assertPageInfoCapableStep, connection, constant, context, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
-function Query_queryPlan() {
-  return rootValue();
-}
 const handler = {
   typeName: "Query",
   codec: {
@@ -29,33 +26,29 @@ const handler = {
     return constant`query`;
   }
 };
-function base64JSONDecode(value) {
-  return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-}
-function base64JSONEncode(value) {
-  return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-}
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode: base64JSONEncode,
-  decode: base64JSONDecode
+  encode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  },
+  decode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }
 };
-function pipeStringDecode(value) {
-  return typeof value === "string" ? value.split("|") : null;
-}
-function pipeStringEncode(value) {
-  return Array.isArray(value) ? value.join("|") : null;
-}
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode: pipeStringEncode,
-    decode: pipeStringDecode
+    encode(value) {
+      return Array.isArray(value) ? value.join("|") : null;
+    },
+    decode(value) {
+      return typeof value === "string" ? value.split("|") : null;
+    }
   }
 });
-const attributes_object_Object_ = Object.assign(Object.create(null), {
+const peopleAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -75,7 +68,7 @@ const attributes_object_Object_ = Object.assign(Object.create(null), {
     }
   }
 });
-const executor_mainPgExecutor = new PgExecutor({
+const executor = new PgExecutor({
   name: "main",
   context() {
     const ctx = context();
@@ -85,10 +78,10 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const spec_people = {
+const peopleCodec = recordCodec({
   name: "people",
-  identifier: sql.identifier(...["refs", "people"]),
-  attributes: attributes_object_Object_,
+  identifier: sql.identifier("refs", "people"),
+  attributes: peopleAttributes,
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -99,10 +92,9 @@ const spec_people = {
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
-};
-const registryConfig_pgCodecs_people_people = recordCodec(spec_people);
-const attributes = Object.assign(Object.create(null), {
+  executor
+});
+const postsAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -125,51 +117,38 @@ const attributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions2 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "refs",
-    name: "posts"
-  },
-  tags: Object.assign(Object.create(null), {
-    ref: "author via:(user_id)->people(id) singular"
-  }),
-  refDefinitions: Object.assign(Object.create(null), {
-    author: {
-      singular: true,
-      graphqlType: undefined,
-      sourceGraphqlType: undefined,
-      extensions: {
-        via: "(user_id)->people(id)",
-        tags: {
-          behavior: undefined
+const postsCodec = recordCodec({
+  name: "posts",
+  identifier: sql.identifier("refs", "posts"),
+  attributes: postsAttributes,
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "refs",
+      name: "posts"
+    },
+    tags: Object.assign(Object.create(null), {
+      ref: "author via:(user_id)->people(id) singular"
+    }),
+    refDefinitions: Object.assign(Object.create(null), {
+      author: {
+        singular: true,
+        graphqlType: undefined,
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: "(user_id)->people(id)",
+          tags: {
+            behavior: undefined
+          }
         }
       }
-    }
-  })
-};
-const parts2 = ["refs", "posts"];
-const sqlIdent2 = sql.identifier(...parts2);
-const spec_posts = {
-  name: "posts",
-  identifier: sqlIdent2,
-  attributes,
-  description: undefined,
-  extensions: extensions2,
-  executor: executor_mainPgExecutor
-};
-const registryConfig_pgCodecs_posts_posts = recordCodec(spec_posts);
-const extensions3 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "refs",
-    name: "people"
+    })
   },
-  tags: {}
-};
-const uniques = [{
+  executor
+});
+const peopleUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -178,28 +157,25 @@ const uniques = [{
   }
 }];
 const registryConfig_pgResources_people_people = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "people",
   identifier: "main.refs.people",
-  from: registryConfig_pgCodecs_people_people.sqlType,
-  codec: registryConfig_pgCodecs_people_people,
-  uniques,
+  from: peopleCodec.sqlType,
+  codec: peopleCodec,
+  uniques: peopleUniques,
   isVirtual: false,
   description: undefined,
-  extensions: extensions3
-};
-const extensions4 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "refs",
-    name: "posts"
-  },
-  tags: {
-    ref: "author via:(user_id)->people(id) singular"
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "refs",
+      name: "people"
+    },
+    tags: {}
   }
 };
-const uniques2 = [{
+const postsUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -208,15 +184,25 @@ const uniques2 = [{
   }
 }];
 const registryConfig_pgResources_posts_posts = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "posts",
   identifier: "main.refs.posts",
-  from: registryConfig_pgCodecs_posts_posts.sqlType,
-  codec: registryConfig_pgCodecs_posts_posts,
-  uniques: uniques2,
+  from: postsCodec.sqlType,
+  codec: postsCodec,
+  uniques: postsUniques,
   isVirtual: false,
   description: undefined,
-  extensions: extensions4
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "refs",
+      name: "posts"
+    },
+    tags: {
+      ref: "author via:(user_id)->people(id) singular"
+    }
+  }
 };
 const registry = makeRegistry({
   pgCodecs: Object.assign(Object.create(null), {
@@ -224,8 +210,8 @@ const registry = makeRegistry({
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
     int4: TYPES.int,
-    people: registryConfig_pgCodecs_people_people,
-    posts: registryConfig_pgCodecs_posts_posts
+    people: peopleCodec,
+    posts: postsCodec
   }),
   pgResources: Object.assign(Object.create(null), {
     people: registryConfig_pgResources_people_people,
@@ -234,7 +220,7 @@ const registry = makeRegistry({
   pgRelations: Object.assign(Object.create(null), {
     people: Object.assign(Object.create(null), {
       postsByTheirUserId: {
-        localCodec: registryConfig_pgCodecs_people_people,
+        localCodec: peopleCodec,
         remoteResourceOptions: registryConfig_pgResources_posts_posts,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -252,7 +238,7 @@ const registry = makeRegistry({
     }),
     posts: Object.assign(Object.create(null), {
       peopleByMyUserId: {
-        localCodec: registryConfig_pgCodecs_posts_posts,
+        localCodec: postsCodec,
         remoteResourceOptions: registryConfig_pgResources_people_people,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["user_id"],
@@ -347,21 +333,6 @@ const fetcher2 = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.Post);
-function Query_allPeople_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allPeople_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allPeople_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allPeople_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allPeople_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const applyOrderToPlan = ($select, $value, TableOrderByType) => {
   const val = $value.eval();
   if (val == null) {
@@ -380,47 +351,6 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
     plan($select);
   });
 };
-function Query_allPosts_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allPosts_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allPosts_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allPosts_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allPosts_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function PeopleConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function PeopleConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function PeopleConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function PageInfo_hasNextPagePlan($pageInfo) {
-  return $pageInfo.hasNextPage();
-}
-function PageInfo_hasPreviousPagePlan($pageInfo) {
-  return $pageInfo.hasPreviousPage();
-}
-function PostsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function PostsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function PostsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -658,7 +588,9 @@ export const plans = {
     __assertStep() {
       return true;
     },
-    query: Query_queryPlan,
+    query() {
+      return rootValue();
+    },
     nodeId($parent) {
       const specifier = handler.plan($parent);
       return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
@@ -716,23 +648,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPeople_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPeople_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPeople_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPeople_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPeople_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -759,23 +701,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPosts_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPosts_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPosts_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPosts_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allPosts_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -826,9 +778,16 @@ export const plans = {
   },
   PeopleConnection: {
     __assertStep: ConnectionStep,
-    nodes: PeopleConnection_nodesPlan,
-    edges: PeopleConnection_edgesPlan,
-    pageInfo: PeopleConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -844,8 +803,12 @@ export const plans = {
   },
   PageInfo: {
     __assertStep: assertPageInfoCapableStep,
-    hasNextPage: PageInfo_hasNextPagePlan,
-    hasPreviousPage: PageInfo_hasPreviousPagePlan,
+    hasNextPage($pageInfo) {
+      return $pageInfo.hasNextPage();
+    },
+    hasPreviousPage($pageInfo) {
+      return $pageInfo.hasPreviousPage();
+    },
     startCursor($pageInfo) {
       return $pageInfo.startCursor();
     },
@@ -859,8 +822,8 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_people_people.attributes[attributeName];
+        peopleUniques[0].attributes.forEach(attributeName => {
+          const attribute = peopleCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -875,8 +838,8 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_people_people.attributes[attributeName];
+        peopleUniques[0].attributes.forEach(attributeName => {
+          const attribute = peopleCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -974,7 +937,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), peopleAttributes.id.codec)}`;
             }
           });
         }
@@ -997,7 +960,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), peopleAttributes.name.codec)}`;
             }
           });
         }
@@ -1008,9 +971,16 @@ export const plans = {
   },
   PostsConnection: {
     __assertStep: ConnectionStep,
-    nodes: PostsConnection_nodesPlan,
-    edges: PostsConnection_edgesPlan,
-    pageInfo: PostsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -1030,8 +1000,8 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques2[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_posts_posts.attributes[attributeName];
+        postsUniques[0].attributes.forEach(attributeName => {
+          const attribute = postsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -1046,8 +1016,8 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques2[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_posts_posts.attributes[attributeName];
+        postsUniques[0].attributes.forEach(attributeName => {
+          const attribute = postsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -1111,7 +1081,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), postsAttributes.id.codec)}`;
             }
           });
         }

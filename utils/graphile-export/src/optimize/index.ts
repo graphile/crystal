@@ -1,4 +1,6 @@
 // import generate from "@babel/generator";
+import generate from "@babel/generator";
+import { parse } from "@babel/parser";
 import traverse, { NodePath } from "@babel/traverse";
 import * as t from "@babel/types";
 
@@ -36,7 +38,10 @@ function isSimpleParam(param: t.Node): param is t.Identifier {
   return t.isIdentifier(param);
 }
 
-export const optimize = (ast: t.File, runs = 1): t.File => {
+export const optimize = (inAst: t.File, runs = 1): t.File => {
+  let ast = inAst;
+  // Reset the full AST
+  ast = parse(generate(ast).code, { sourceType: "module" });
   traverse(ast, {
     VariableDeclaration: {
       enter(path) {
@@ -237,7 +242,10 @@ export const optimize = (ast: t.File, runs = 1): t.File => {
     },
   });
 
+  ast = parse(generate(ast).code, { sourceType: "module" });
+
   // convert `plan: function plan() {...}` to `plan() { ... }`
+  // convert `fn(...["a", "b"])` to `fn("a", "b")`
   traverse(ast, {
     ObjectProperty(path) {
       if (!t.isIdentifier(path.node.key)) {
@@ -279,6 +287,21 @@ export const optimize = (ast: t.File, runs = 1): t.File => {
         ),
       );
     },
+    CallExpression(path) {
+      path.node.arguments;
+      const argsPath = path.get("arguments");
+      if (argsPath.length === 1) {
+        const argPath = argsPath[0];
+        if (t.isSpreadElement(argPath.node)) {
+          const spreadPath = argPath as NodePath<t.SpreadElement>;
+          if (t.isArrayExpression(spreadPath.node.argument)) {
+            argPath.replaceWithMultiple(
+              spreadPath.node.argument.elements.filter(isNotNullish),
+            );
+          }
+        }
+      }
+    },
   });
 
   if (runs < 2) {
@@ -287,3 +310,7 @@ export const optimize = (ast: t.File, runs = 1): t.File => {
 
   return ast;
 };
+
+function isNotNullish<T>(o: T | null | undefined): o is T {
+  return o != null;
+}

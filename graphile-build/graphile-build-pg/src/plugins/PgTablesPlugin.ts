@@ -10,7 +10,7 @@ import { object } from "grafast";
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
 
-import { addBehaviorToTags } from "../utils.js";
+import { addBehaviorToTags, exportNameHint } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
@@ -431,6 +431,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             serviceName,
             pgClass,
           });
+          exportNameHint(uniques, `${name}Uniques`);
           const identifier = `${serviceName}.${namespace.nspname}.${pgClass.relname}`;
 
           const { tags, description } = pgClass.getTagsAndDescription();

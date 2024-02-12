@@ -14,6 +14,7 @@ import type {
   ScalarPlanResolver,
 } from "./interfaces.js";
 import type { ExecutableStep } from "./step.js";
+import { exportNameHint } from "./utils.js";
 
 const {
   buildASTSchema,
@@ -140,6 +141,7 @@ export function makeGrafastSchema(details: {
       const fields = type.getFields();
       for (const [fieldName, fieldSpec] of Object.entries(objSpec)) {
         if (fieldName === "__assertStep") {
+          exportNameHint(fieldSpec, `${typeName}_assertStep`);
           (
             type.extensions as graphql.GraphQLObjectTypeExtensions<any, any>
           ).grafast = { assertStep: fieldSpec as any };
@@ -159,6 +161,7 @@ export function makeGrafastSchema(details: {
         }
 
         if (typeof fieldSpec === "function") {
+          exportNameHint(fieldSpec, `${typeName}_${fieldName}_plan`);
           // it's a plan
           (field.extensions as any).grafast = {
             plan: fieldSpec,
@@ -169,15 +172,28 @@ export function makeGrafastSchema(details: {
             Object.create(null);
           (field.extensions as any).grafast = grafastExtensions;
           if (typeof fieldSpec.resolve === "function") {
+            exportNameHint(
+              fieldSpec.resolve,
+              `${typeName}_${fieldName}_resolve`,
+            );
             field.resolve = fieldSpec.resolve;
           }
           if (typeof fieldSpec.subscribe === "function") {
+            exportNameHint(
+              fieldSpec.subscribe,
+              `${typeName}_${fieldName}_subscribe`,
+            );
             field.subscribe = fieldSpec.subscribe;
           }
           if (typeof fieldSpec.plan === "function") {
+            exportNameHint(fieldSpec.plan, `${typeName}_${fieldName}_plan`);
             grafastExtensions!.plan = fieldSpec.plan;
           }
           if (typeof fieldSpec.subscribePlan === "function") {
+            exportNameHint(
+              fieldSpec.subscribePlan,
+              `${typeName}_${fieldName}_subscribePlan`,
+            );
             grafastExtensions!.subscribePlan = fieldSpec.subscribePlan;
           }
 
@@ -196,6 +212,16 @@ export function makeGrafastSchema(details: {
                   `Invalid configuration for plans.${typeName}.${fieldName}.args.${argName} - saw a function, but expected an object with 'inputPlan' (optional) and 'applyPlan' (optional) plans`,
                 );
               } else {
+                if (argSpec) {
+                  exportNameHint(
+                    argSpec.applyPlan,
+                    `${typeName}_${fieldName}_${argName}_applyPlan`,
+                  );
+                  exportNameHint(
+                    argSpec.inputPlan,
+                    `${typeName}_${fieldName}_${argName}_inputPlan`,
+                  );
+                }
                 const grafastExtensions: Grafast.ArgumentExtensions =
                   Object.create(null);
                 (arg.extensions as any).grafast = grafastExtensions;
@@ -227,6 +253,16 @@ export function makeGrafastSchema(details: {
             `Expected input object type '${typeName}' field '${fieldName}' to be an object, but found a function. We don't know if this should be the 'inputPlan' or 'applyPlan' - please supply an object.`,
           );
         } else {
+          if (fieldSpec) {
+            exportNameHint(
+              fieldSpec.inputPlan,
+              `${typeName}_${fieldName}_inputPlan`,
+            );
+            exportNameHint(
+              fieldSpec.applyPlan,
+              `${typeName}_${fieldName}_applyPlan`,
+            );
+          }
           // it's a spec
           const grafastExtensions: Grafast.InputFieldExtensions =
             Object.create(null);
@@ -240,6 +276,7 @@ export function makeGrafastSchema(details: {
       }
       const polySpec = spec as InterfaceOrUnionPlans;
       if (polySpec.__resolveType) {
+        exportNameHint(polySpec.__resolveType, `${typeName}_resolveType`);
         type.resolveType = polySpec.__resolveType;
       }
     } else if (isScalarType(type)) {
@@ -248,15 +285,19 @@ export function makeGrafastSchema(details: {
       }
       const scalarSpec = spec as ScalarPlans;
       if (typeof scalarSpec.serialize === "function") {
+        exportNameHint(scalarSpec.serialize, `${typeName}_serialize`);
         type.serialize = scalarSpec.serialize;
       }
       if (typeof scalarSpec.parseValue === "function") {
+        exportNameHint(scalarSpec.parseValue, `${typeName}_parseValue`);
         type.parseValue = scalarSpec.parseValue;
       }
       if (typeof scalarSpec.parseLiteral === "function") {
+        exportNameHint(scalarSpec.parseLiteral, `${typeName}_parseLiteral`);
         type.parseLiteral = scalarSpec.parseLiteral;
       }
       if (typeof scalarSpec.plan === "function") {
+        exportNameHint(scalarSpec.plan, `${typeName}_plan`);
         (type.extensions as any).grafast = { plan: scalarSpec.plan };
       }
     } else if (isEnumType(type)) {
@@ -275,6 +316,10 @@ export function makeGrafastSchema(details: {
           continue;
         }
         if (typeof enumValueSpec === "function") {
+          exportNameHint(
+            enumValueSpec,
+            `${typeName}_${enumValueName}_applyPlan`,
+          );
           // It's a plan
           (enumValue.extensions as any).grafast = {
             applyPlan: enumValueSpec,
@@ -282,6 +327,10 @@ export function makeGrafastSchema(details: {
         } else if (typeof enumValueSpec === "object" && enumValueSpec != null) {
           // It's a full spec
           if (enumValueSpec.applyPlan) {
+            exportNameHint(
+              enumValueSpec.applyPlan,
+              `${typeName}_${enumValueName}_applyPlan`,
+            );
             (enumValue.extensions as any).grafast = {
               applyPlan: enumValueSpec.applyPlan,
             } as Grafast.EnumValueExtensions;

@@ -1065,9 +1065,14 @@ export function makeExtendSchemaPlugin(
           const possiblePlan = (
             plans[Self.name] as Maybe<ObjectPlan<any, any>>
           )?.[fieldName];
+          build.exportNameHint(possiblePlan, `${Self.name}_${fieldName}_plan`);
           const possibleResolver = (
             resolvers[Self.name] as Maybe<ObjectResolver>
           )?.[fieldName];
+          build.exportNameHint(
+            possibleResolver,
+            `${Self.name}_${fieldName}_resolver`,
+          );
           if (possiblePlan && possibleResolver) {
             throw new Error(
               `You must set only plans.${Self.name}.${fieldName} or resolvers.${Self.name}.${fieldName} - not both!`,

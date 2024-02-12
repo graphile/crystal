@@ -21,7 +21,7 @@ import {
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { PgAttribute, PgClass, PgType } from "pg-introspection";
 
-import { addBehaviorToTags } from "../utils.js";
+import { addBehaviorToTags, exportNameHint } from "../utils.js";
 import { version } from "../version.js";
 
 interface State {
@@ -416,6 +416,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           const executor =
             info.helpers.pgIntrospection.getExecutorForService(serviceName);
           const sqlIdent = info.helpers.pgBasics.identifier(nspName, className);
+          exportNameHint(sqlIdent, `${codecName}Identifier`);
+          exportNameHint(attributes, `${codecName}Attributes`);
           const spec: PgRecordTypeCodecSpec<any, any> = EXPORTABLE(
             (
               attributes,
@@ -440,6 +442,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               extensions,
               sqlIdent,
             ],
+            `${codecName}CodecSpec`,
           );
           await info.process("pgCodecs_recordType_spec", {
             serviceName,
@@ -450,6 +453,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           const codec = EXPORTABLE(
             (recordCodec, spec) => recordCodec(spec),
             [recordCodec, spec],
+            `${spec.name}Codec`,
           );
           await info.process("pgCodecs_PgCodec", {
             pgCodec: codec,
@@ -637,6 +641,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               extensions,
               sqlIdent,
             ],
+            `${codecName}Codec`,
           );
           return;
         }
@@ -714,6 +719,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               rangeOfCodec,
               sqlIdent,
             ],
+            `${codecName}Codec`,
           );
           return;
         }
@@ -762,6 +768,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               namespaceName,
               typeName,
             );
+            exportNameHint(sqlIdent, `${codecName}Identifier`);
             event.pgCodec = EXPORTABLE(
               (
                 codecName,
@@ -786,6 +793,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 notNull,
                 sqlIdent,
               ],
+              `${codecName}Codec`,
             );
             return;
           }
@@ -828,6 +836,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 pgType: type,
                 serviceName,
               });
+              exportNameHint(extensions, `${name}CodecExtensions`);
               event.pgCodec = EXPORTABLE(
                 (
                   description,
@@ -851,6 +860,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                   name,
                   typeDelim,
                 ],
+                `${name}Codec`,
               );
               return;
             }

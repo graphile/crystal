@@ -2,9 +2,6 @@ import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, as
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
-function Query_queryPlan() {
-  return rootValue();
-}
 const handler = {
   typeName: "Query",
   codec: {
@@ -29,33 +26,29 @@ const handler = {
     return constant`query`;
   }
 };
-function base64JSONDecode(value) {
-  return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-}
-function base64JSONEncode(value) {
-  return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-}
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode: base64JSONEncode,
-  decode: base64JSONDecode
+  encode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  },
+  decode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }
 };
-function pipeStringDecode(value) {
-  return typeof value === "string" ? value.split("|") : null;
-}
-function pipeStringEncode(value) {
-  return Array.isArray(value) ? value.join("|") : null;
-}
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode: pipeStringEncode,
-    decode: pipeStringDecode
+    encode(value) {
+      return Array.isArray(value) ? value.join("|") : null;
+    },
+    decode(value) {
+      return typeof value === "string" ? value.split("|") : null;
+    }
   }
 });
-const attributes_object_Object_ = Object.assign(Object.create(null), {
+const usersAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -75,7 +68,7 @@ const attributes_object_Object_ = Object.assign(Object.create(null), {
     }
   }
 });
-const executor_mainPgExecutor = new PgExecutor({
+const executor = new PgExecutor({
   name: "main",
   context() {
     const ctx = context();
@@ -85,10 +78,10 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const spec_users = {
+const usersCodec = recordCodec({
   name: "users",
-  identifier: sql.identifier(...["partitions", "users"]),
-  attributes: attributes_object_Object_,
+  identifier: sql.identifier("partitions", "users"),
+  attributes: usersAttributes,
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -99,10 +92,9 @@ const spec_users = {
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
-};
-const registryConfig_pgCodecs_users_users = recordCodec(spec_users);
-const attributes = Object.assign(Object.create(null), {
+  executor
+});
+const measurementsAttributes = Object.assign(Object.create(null), {
   timestamp: {
     description: undefined,
     codec: TYPES.timestamptz,
@@ -140,36 +132,23 @@ const attributes = Object.assign(Object.create(null), {
     }
   }
 });
-const extensions2 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "partitions",
-    name: "measurements"
-  },
-  tags: Object.create(null)
-};
-const parts2 = ["partitions", "measurements"];
-const sqlIdent2 = sql.identifier(...parts2);
-const spec_measurements = {
+const measurementsCodec = recordCodec({
   name: "measurements",
-  identifier: sqlIdent2,
-  attributes,
+  identifier: sql.identifier("partitions", "measurements"),
+  attributes: measurementsAttributes,
   description: undefined,
-  extensions: extensions2,
-  executor: executor_mainPgExecutor
-};
-const registryConfig_pgCodecs_measurements_measurements = recordCodec(spec_measurements);
-const extensions3 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "partitions",
-    name: "users"
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "partitions",
+      name: "measurements"
+    },
+    tags: Object.create(null)
   },
-  tags: {}
-};
-const uniques = [{
+  executor
+});
+const usersUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -178,26 +157,25 @@ const uniques = [{
   }
 }];
 const registryConfig_pgResources_users_users = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "users",
   identifier: "main.partitions.users",
-  from: registryConfig_pgCodecs_users_users.sqlType,
-  codec: registryConfig_pgCodecs_users_users,
-  uniques,
+  from: usersCodec.sqlType,
+  codec: usersCodec,
+  uniques: usersUniques,
   isVirtual: false,
   description: undefined,
-  extensions: extensions3
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "partitions",
+      name: "users"
+    },
+    tags: {}
+  }
 };
-const extensions4 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "partitions",
-    name: "measurements"
-  },
-  tags: {}
-};
-const uniques2 = [{
+const measurementsUniques = [{
   isPrimary: true,
   attributes: ["timestamp", "key"],
   description: undefined,
@@ -206,26 +184,34 @@ const uniques2 = [{
   }
 }];
 const registryConfig_pgResources_measurements_measurements = {
-  executor: executor_mainPgExecutor,
+  executor,
   name: "measurements",
   identifier: "main.partitions.measurements",
-  from: registryConfig_pgCodecs_measurements_measurements.sqlType,
-  codec: registryConfig_pgCodecs_measurements_measurements,
-  uniques: uniques2,
+  from: measurementsCodec.sqlType,
+  codec: measurementsCodec,
+  uniques: measurementsUniques,
   isVirtual: false,
   description: undefined,
-  extensions: extensions4
+  extensions: {
+    description: undefined,
+    pg: {
+      serviceName: "main",
+      schemaName: "partitions",
+      name: "measurements"
+    },
+    tags: {}
+  }
 };
 const registry = makeRegistry({
   pgCodecs: Object.assign(Object.create(null), {
-    users: registryConfig_pgCodecs_users_users,
+    users: usersCodec,
     int4: TYPES.int,
     text: TYPES.text,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
     timestamptz: TYPES.timestamptz,
     float8: TYPES.float,
-    measurements: registryConfig_pgCodecs_measurements_measurements
+    measurements: measurementsCodec
   }),
   pgResources: Object.assign(Object.create(null), {
     users: registryConfig_pgResources_users_users,
@@ -234,7 +220,7 @@ const registry = makeRegistry({
   pgRelations: Object.assign(Object.create(null), {
     measurements: Object.assign(Object.create(null), {
       usersByMyUserId: {
-        localCodec: registryConfig_pgCodecs_measurements_measurements,
+        localCodec: measurementsCodec,
         remoteResourceOptions: registryConfig_pgResources_users_users,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["user_id"],
@@ -251,7 +237,7 @@ const registry = makeRegistry({
     }),
     users: Object.assign(Object.create(null), {
       measurementsByTheirUserId: {
-        localCodec: registryConfig_pgCodecs_users_users,
+        localCodec: usersCodec,
         remoteResourceOptions: registryConfig_pgResources_measurements_measurements,
         localCodecPolymorphicTypes: undefined,
         localAttributes: ["id"],
@@ -346,21 +332,6 @@ const fetcher2 = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.Measurement);
-function Query_allUsers_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allUsers_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allUsers_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allUsers_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allUsers_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const applyOrderToPlan = ($select, $value, TableOrderByType) => {
   const val = $value.eval();
   if (val == null) {
@@ -379,216 +350,22 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
     plan($select);
   });
 };
-function Query_allMeasurements_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allMeasurements_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allMeasurements_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allMeasurements_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allMeasurements_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function User_measurementsByUserId_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function User_measurementsByUserId_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function User_measurementsByUserId_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function User_measurementsByUserId_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function User_measurementsByUserId_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
-function MeasurementsConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function MeasurementsConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function MeasurementsConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function PageInfo_hasNextPagePlan($pageInfo) {
-  return $pageInfo.hasNextPage();
-}
-function PageInfo_hasPreviousPagePlan($pageInfo) {
-  return $pageInfo.hasPreviousPage();
-}
-function UsersConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function UsersConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function UsersConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function Mutation_createUser_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_createMeasurement_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.User, $nodeId);
 };
-function Mutation_updateUser_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateUserById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs2 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Measurement, $nodeId);
 };
-function Mutation_updateMeasurement_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_updateMeasurementByTimestampAndKey_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs3 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.User, $nodeId);
 };
-function Mutation_deleteUser_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteUserById_input_applyPlan(_, $object) {
-  return $object;
-}
 const specFromArgs4 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Measurement, $nodeId);
 };
-function Mutation_deleteMeasurement_input_applyPlan(_, $object) {
-  return $object;
-}
-function Mutation_deleteMeasurementByTimestampAndKey_input_applyPlan(_, $object) {
-  return $object;
-}
-function CreateUserPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateUserPayload_userPlan($object) {
-  return $object.get("result");
-}
-function CreateUserPayload_queryPlan() {
-  return rootValue();
-}
-function CreateUserInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateUserInput_user_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function CreateMeasurementPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function CreateMeasurementPayload_measurementPlan($object) {
-  return $object.get("result");
-}
-function CreateMeasurementPayload_queryPlan() {
-  return rootValue();
-}
-function CreateMeasurementInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function CreateMeasurementInput_measurement_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateUserPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateUserPayload_userPlan($object) {
-  return $object.get("result");
-}
-function UpdateUserPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateUserInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateUserInput_userPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateUserByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateUserByIdInput_userPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateMeasurementPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function UpdateMeasurementPayload_measurementPlan($object) {
-  return $object.get("result");
-}
-function UpdateMeasurementPayload_queryPlan() {
-  return rootValue();
-}
-function UpdateMeasurementInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateMeasurementInput_measurementPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function UpdateMeasurementByTimestampAndKeyInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function UpdateMeasurementByTimestampAndKeyInput_measurementPatch_applyPlan($object) {
-  const $record = $object.getStepForKey("result");
-  return $record.setPlan();
-}
-function DeleteUserPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteUserPayload_userPlan($object) {
-  return $object.get("result");
-}
-function DeleteUserPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteUserInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteUserByIdInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteMeasurementPayload_clientMutationIdPlan($mutation) {
-  return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
-}
-function DeleteMeasurementPayload_measurementPlan($object) {
-  return $object.get("result");
-}
-function DeleteMeasurementPayload_queryPlan() {
-  return rootValue();
-}
-function DeleteMeasurementInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
-function DeleteMeasurementByTimestampAndKeyInput_clientMutationId_applyPlan($input, val) {
-  $input.set("clientMutationId", val.get());
-}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -1293,7 +1070,9 @@ export const plans = {
     __assertStep() {
       return true;
     },
-    query: Query_queryPlan,
+    query() {
+      return rootValue();
+    },
     nodeId($parent) {
       const specifier = handler.plan($parent);
       return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
@@ -1353,23 +1132,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUsers_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUsers_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUsers_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUsers_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allUsers_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -1396,23 +1185,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allMeasurements_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allMeasurements_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allMeasurements_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allMeasurements_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allMeasurements_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -1455,23 +1254,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: User_measurementsByUserId_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: User_measurementsByUserId_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: User_measurementsByUserId_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: User_measurementsByUserId_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: User_measurementsByUserId_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -1494,9 +1303,16 @@ export const plans = {
   },
   MeasurementsConnection: {
     __assertStep: ConnectionStep,
-    nodes: MeasurementsConnection_nodesPlan,
-    edges: MeasurementsConnection_edgesPlan,
-    pageInfo: MeasurementsConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -1536,8 +1352,12 @@ export const plans = {
   },
   PageInfo: {
     __assertStep: assertPageInfoCapableStep,
-    hasNextPage: PageInfo_hasNextPagePlan,
-    hasPreviousPage: PageInfo_hasPreviousPagePlan,
+    hasNextPage($pageInfo) {
+      return $pageInfo.hasNextPage();
+    },
+    hasPreviousPage($pageInfo) {
+      return $pageInfo.hasPreviousPage();
+    },
     startCursor($pageInfo) {
       return $pageInfo.startCursor();
     },
@@ -1551,8 +1371,8 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques2[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_measurements_measurements.attributes[attributeName];
+        measurementsUniques[0].attributes.forEach(attributeName => {
+          const attribute = measurementsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -1567,8 +1387,8 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques2[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_measurements_measurements.attributes[attributeName];
+        measurementsUniques[0].attributes.forEach(attributeName => {
+          const attribute = measurementsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -1734,7 +1554,7 @@ export const plans = {
             type: "attribute",
             attribute: "timestamp",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.timestamp.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), measurementsAttributes.timestamp.codec)}`;
             }
           });
         }
@@ -1757,7 +1577,7 @@ export const plans = {
             type: "attribute",
             attribute: "key",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.key.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), measurementsAttributes.key.codec)}`;
             }
           });
         }
@@ -1780,7 +1600,7 @@ export const plans = {
             type: "attribute",
             attribute: "value",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.value.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), measurementsAttributes.value.codec)}`;
             }
           });
         }
@@ -1803,7 +1623,7 @@ export const plans = {
             type: "attribute",
             attribute: "user_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.user_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), measurementsAttributes.user_id.codec)}`;
             }
           });
         }
@@ -1814,9 +1634,16 @@ export const plans = {
   },
   UsersConnection: {
     __assertStep: ConnectionStep,
-    nodes: UsersConnection_nodesPlan,
-    edges: UsersConnection_edgesPlan,
-    pageInfo: UsersConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -1836,8 +1663,8 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_users_users.attributes[attributeName];
+        usersUniques[0].attributes.forEach(attributeName => {
+          const attribute = usersCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -1852,8 +1679,8 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_users_users.attributes[attributeName];
+        usersUniques[0].attributes.forEach(attributeName => {
+          const attribute = usersCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -1951,7 +1778,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), usersAttributes.id.codec)}`;
             }
           });
         }
@@ -1974,7 +1801,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes_object_Object_.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), usersAttributes.name.codec)}`;
             }
           });
         }
@@ -1996,7 +1823,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createUser_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2011,7 +1840,9 @@ export const plans = {
       args: {
         input: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Mutation_createMeasurement_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2025,7 +1856,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateUser_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2041,7 +1874,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateUserById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2055,7 +1890,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateMeasurement_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2072,7 +1909,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_updateMeasurementByTimestampAndKey_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2086,7 +1925,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteUser_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2102,7 +1943,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteUserById_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2116,7 +1959,9 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteMeasurement_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     },
@@ -2133,16 +1978,24 @@ export const plans = {
       },
       args: {
         input: {
-          applyPlan: Mutation_deleteMeasurementByTimestampAndKey_input_applyPlan
+          applyPlan(_, $object) {
+            return $object;
+          }
         }
       }
     }
   },
   CreateUserPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateUserPayload_clientMutationIdPlan,
-    user: CreateUserPayload_userPlan,
-    query: CreateUserPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    user($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     userEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -2153,7 +2006,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = usersUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -2177,11 +2030,16 @@ export const plans = {
   },
   CreateUserInput: {
     clientMutationId: {
-      applyPlan: CreateUserInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     user: {
-      applyPlan: CreateUserInput_user_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -2203,9 +2061,15 @@ export const plans = {
   },
   CreateMeasurementPayload: {
     __assertStep: assertExecutableStep,
-    clientMutationId: CreateMeasurementPayload_clientMutationIdPlan,
-    measurement: CreateMeasurementPayload_measurementPlan,
-    query: CreateMeasurementPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    measurement($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     measurementEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -2216,7 +2080,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques2[0].attributes.reduce((memo, attributeName) => {
+            const spec = measurementsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -2245,11 +2109,16 @@ export const plans = {
   },
   CreateMeasurementInput: {
     clientMutationId: {
-      applyPlan: CreateMeasurementInput_clientMutationId_applyPlan,
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
       autoApplyAfterParentApplyPlan: true
     },
     measurement: {
-      applyPlan: CreateMeasurementInput_measurement_applyPlan,
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
@@ -2285,9 +2154,15 @@ export const plans = {
   },
   UpdateUserPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateUserPayload_clientMutationIdPlan,
-    user: UpdateUserPayload_userPlan,
-    query: UpdateUserPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    user($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     userEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -2298,7 +2173,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = usersUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -2322,11 +2197,16 @@ export const plans = {
   },
   UpdateUserInput: {
     clientMutationId: {
-      applyPlan: UpdateUserInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     userPatch: {
-      applyPlan: UpdateUserInput_userPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UserPatch: {
@@ -2347,18 +2227,29 @@ export const plans = {
   },
   UpdateUserByIdInput: {
     clientMutationId: {
-      applyPlan: UpdateUserByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined,
     userPatch: {
-      applyPlan: UpdateUserByIdInput_userPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   UpdateMeasurementPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: UpdateMeasurementPayload_clientMutationIdPlan,
-    measurement: UpdateMeasurementPayload_measurementPlan,
-    query: UpdateMeasurementPayload_queryPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    measurement($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
     measurementEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -2369,7 +2260,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques2[0].attributes.reduce((memo, attributeName) => {
+            const spec = measurementsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -2398,11 +2289,16 @@ export const plans = {
   },
   UpdateMeasurementInput: {
     clientMutationId: {
-      applyPlan: UpdateMeasurementInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined,
     measurementPatch: {
-      applyPlan: UpdateMeasurementInput_measurementPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   MeasurementPatch: {
@@ -2437,24 +2333,35 @@ export const plans = {
   },
   UpdateMeasurementByTimestampAndKeyInput: {
     clientMutationId: {
-      applyPlan: UpdateMeasurementByTimestampAndKeyInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     timestamp: undefined,
     key: undefined,
     measurementPatch: {
-      applyPlan: UpdateMeasurementByTimestampAndKeyInput_measurementPatch_applyPlan
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      }
     }
   },
   DeleteUserPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteUserPayload_clientMutationIdPlan,
-    user: DeleteUserPayload_userPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    user($object) {
+      return $object.get("result");
+    },
     deletedUserId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.User.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeleteUserPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     userEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -2465,7 +2372,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques[0].attributes.reduce((memo, attributeName) => {
+            const spec = usersUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -2489,26 +2396,36 @@ export const plans = {
   },
   DeleteUserInput: {
     clientMutationId: {
-      applyPlan: DeleteUserInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteUserByIdInput: {
     clientMutationId: {
-      applyPlan: DeleteUserByIdInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     id: undefined
   },
   DeleteMeasurementPayload: {
     __assertStep: ObjectStep,
-    clientMutationId: DeleteMeasurementPayload_clientMutationIdPlan,
-    measurement: DeleteMeasurementPayload_measurementPlan,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    measurement($object) {
+      return $object.get("result");
+    },
     deletedMeasurementId($object) {
       const $record = $object.getStepForKey("result");
       const specifier = nodeIdHandlerByTypeName.Measurement.plan($record);
       return lambda(specifier, nodeIdCodecs_base64JSON_base64JSON.encode);
     },
-    query: DeleteMeasurementPayload_queryPlan,
+    query() {
+      return rootValue();
+    },
     measurementEdge: {
       plan($mutation, args, info) {
         const $result = $mutation.getStepForKey("result", true);
@@ -2519,7 +2436,7 @@ export const plans = {
           if ($result instanceof PgDeleteSingleStep) {
             return pgSelectFromRecord($result.resource, $result.record());
           } else {
-            const spec = uniques2[0].attributes.reduce((memo, attributeName) => {
+            const spec = measurementsUniques[0].attributes.reduce((memo, attributeName) => {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
@@ -2548,13 +2465,17 @@ export const plans = {
   },
   DeleteMeasurementInput: {
     clientMutationId: {
-      applyPlan: DeleteMeasurementInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     nodeId: undefined
   },
   DeleteMeasurementByTimestampAndKeyInput: {
     clientMutationId: {
-      applyPlan: DeleteMeasurementByTimestampAndKeyInput_clientMutationId_applyPlan
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      }
     },
     timestamp: undefined,
     key: undefined

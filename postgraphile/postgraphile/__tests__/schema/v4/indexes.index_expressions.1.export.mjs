@@ -2,9 +2,6 @@ import { PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleSte
 import { ConnectionStep, SafeError, access, assertEdgeCapableStep, assertPageInfoCapableStep, connection, constant, context, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
-function Query_queryPlan() {
-  return rootValue();
-}
 const handler = {
   typeName: "Query",
   codec: {
@@ -29,33 +26,29 @@ const handler = {
     return constant`query`;
   }
 };
-function base64JSONDecode(value) {
-  return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-}
-function base64JSONEncode(value) {
-  return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-}
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode: base64JSONEncode,
-  decode: base64JSONDecode
+  encode(value) {
+    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+  },
+  decode(value) {
+    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+  }
 };
-function pipeStringDecode(value) {
-  return typeof value === "string" ? value.split("|") : null;
-}
-function pipeStringEncode(value) {
-  return Array.isArray(value) ? value.join("|") : null;
-}
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode: pipeStringEncode,
-    decode: pipeStringDecode
+    encode(value) {
+      return Array.isArray(value) ? value.join("|") : null;
+    },
+    decode(value) {
+      return typeof value === "string" ? value.split("|") : null;
+    }
   }
 });
-const attributes = Object.assign(Object.create(null), {
+const employeeAttributes = Object.assign(Object.create(null), {
   id: {
     description: undefined,
     codec: TYPES.int,
@@ -84,7 +77,7 @@ const attributes = Object.assign(Object.create(null), {
     }
   }
 });
-const executor_mainPgExecutor = new PgExecutor({
+const executor = new PgExecutor({
   name: "main",
   context() {
     const ctx = context();
@@ -94,10 +87,10 @@ const executor_mainPgExecutor = new PgExecutor({
     });
   }
 });
-const spec_employee = {
+const employeeCodec = recordCodec({
   name: "employee",
-  identifier: sql.identifier(...["index_expressions", "employee"]),
-  attributes,
+  identifier: sql.identifier("index_expressions", "employee"),
+  attributes: employeeAttributes,
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -108,19 +101,9 @@ const spec_employee = {
     },
     tags: Object.create(null)
   },
-  executor: executor_mainPgExecutor
-};
-const registryConfig_pgCodecs_employee_employee = recordCodec(spec_employee);
-const extensions2 = {
-  description: undefined,
-  pg: {
-    serviceName: "main",
-    schemaName: "index_expressions",
-    name: "employee"
-  },
-  tags: {}
-};
-const uniques = [{
+  executor
+});
+const employeeUniques = [{
   isPrimary: true,
   attributes: ["id"],
   description: undefined,
@@ -134,19 +117,27 @@ const pgResource_employeePgResource = makeRegistry({
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
     int4: TYPES.int,
-    employee: registryConfig_pgCodecs_employee_employee
+    employee: employeeCodec
   }),
   pgResources: Object.assign(Object.create(null), {
     employee: {
-      executor: executor_mainPgExecutor,
+      executor,
       name: "employee",
       identifier: "main.index_expressions.employee",
-      from: registryConfig_pgCodecs_employee_employee.sqlType,
-      codec: registryConfig_pgCodecs_employee_employee,
-      uniques,
+      from: employeeCodec.sqlType,
+      codec: employeeCodec,
+      uniques: employeeUniques,
       isVirtual: false,
       description: undefined,
-      extensions: extensions2
+      extensions: {
+        description: undefined,
+        pg: {
+          serviceName: "main",
+          schemaName: "index_expressions",
+          name: "employee"
+        },
+        tags: {}
+      }
     }
   }),
   pgRelations: Object.create(null)
@@ -199,21 +190,6 @@ const fetcher = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.Employee);
-function Query_allEmployees_first_applyPlan(_, $connection, arg) {
-  $connection.setFirst(arg.getRaw());
-}
-function Query_allEmployees_last_applyPlan(_, $connection, val) {
-  $connection.setLast(val.getRaw());
-}
-function Query_allEmployees_offset_applyPlan(_, $connection, val) {
-  $connection.setOffset(val.getRaw());
-}
-function Query_allEmployees_before_applyPlan(_, $connection, val) {
-  $connection.setBefore(val.getRaw());
-}
-function Query_allEmployees_after_applyPlan(_, $connection, val) {
-  $connection.setAfter(val.getRaw());
-}
 const applyOrderToPlan = ($select, $value, TableOrderByType) => {
   const val = $value.eval();
   if (val == null) {
@@ -232,22 +208,6 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
     plan($select);
   });
 };
-function EmployeesConnection_nodesPlan($connection) {
-  return $connection.nodes();
-}
-function EmployeesConnection_edgesPlan($connection) {
-  return $connection.edges();
-}
-function EmployeesConnection_pageInfoPlan($connection) {
-  // TYPES: why is this a TypeScript issue without the 'any'?
-  return $connection.pageInfo();
-}
-function PageInfo_hasNextPagePlan($pageInfo) {
-  return $pageInfo.hasNextPage();
-}
-function PageInfo_hasPreviousPagePlan($pageInfo) {
-  return $pageInfo.hasPreviousPage();
-}
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
   """
@@ -400,7 +360,9 @@ export const plans = {
     __assertStep() {
       return true;
     },
-    query: Query_queryPlan,
+    query() {
+      return rootValue();
+    },
     nodeId($parent) {
       const specifier = handler.plan($parent);
       return lambda(specifier, nodeIdCodecs[handler.codec.name].encode);
@@ -439,23 +401,33 @@ export const plans = {
       args: {
         first: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allEmployees_first_applyPlan
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
         },
         last: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allEmployees_last_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
         },
         offset: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allEmployees_offset_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
         },
         before: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allEmployees_before_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
         },
         after: {
           autoApplyAfterParentPlan: true,
-          applyPlan: Query_allEmployees_after_applyPlan
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
         },
         orderBy: {
           autoApplyAfterParentPlan: true,
@@ -494,9 +466,16 @@ export const plans = {
   },
   EmployeesConnection: {
     __assertStep: ConnectionStep,
-    nodes: EmployeesConnection_nodesPlan,
-    edges: EmployeesConnection_edgesPlan,
-    pageInfo: EmployeesConnection_pageInfoPlan,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
@@ -512,8 +491,12 @@ export const plans = {
   },
   PageInfo: {
     __assertStep: assertPageInfoCapableStep,
-    hasNextPage: PageInfo_hasNextPagePlan,
-    hasPreviousPage: PageInfo_hasPreviousPagePlan,
+    hasNextPage($pageInfo) {
+      return $pageInfo.hasNextPage();
+    },
+    hasPreviousPage($pageInfo) {
+      return $pageInfo.hasPreviousPage();
+    },
     startCursor($pageInfo) {
       return $pageInfo.startCursor();
     },
@@ -527,8 +510,8 @@ export const plans = {
     },
     PRIMARY_KEY_ASC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_employee_employee.attributes[attributeName];
+        employeeUniques[0].attributes.forEach(attributeName => {
+          const attribute = employeeCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -543,8 +526,8 @@ export const plans = {
     },
     PRIMARY_KEY_DESC: {
       applyPlan(step) {
-        uniques[0].attributes.forEach(attributeName => {
-          const attribute = registryConfig_pgCodecs_employee_employee.attributes[attributeName];
+        employeeUniques[0].attributes.forEach(attributeName => {
+          const attribute = employeeCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
             fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
@@ -676,7 +659,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), employeeAttributes.id.codec)}`;
             }
           });
         }
@@ -699,7 +682,7 @@ export const plans = {
             type: "attribute",
             attribute: "first_name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.first_name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), employeeAttributes.first_name.codec)}`;
             }
           });
         }
@@ -722,7 +705,7 @@ export const plans = {
             type: "attribute",
             attribute: "last_name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), attributes.last_name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), employeeAttributes.last_name.codec)}`;
             }
           });
         }

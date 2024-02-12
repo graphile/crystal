@@ -21,7 +21,7 @@ import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { PgProc, PgProcArgument } from "pg-introspection";
 import sql from "pg-sql2";
 
-import { addBehaviorToTags } from "../utils.js";
+import { addBehaviorToTags, exportNameHint } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
@@ -410,6 +410,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             namespaceName,
             procName,
           );
+          exportNameHint(sqlIdent, `${procName}FunctionIdentifer`);
           const fromCallback = EXPORTABLE(
             (sql, sqlFromArgDigests, sqlIdent) =>
               (...args: PgSelectArgumentDigest[]) =>

@@ -46,7 +46,7 @@ undefined
 
 When you do so, the `add` function is augmented with the properties
 `$exporter$factory` and `$exporter$args` that represent the first and second
-arguments to the `EXPORTABLE(factory, args)` function respectively.
+arguments to the `EXPORTABLE(factory, args, nameHint)` function respectively.
 
 The function still works as before:
 
@@ -157,6 +157,7 @@ into your code:
 export function EXPORTABLE<T, TScope extends any[]>(
   factory: (...args: TScope) => T,
   args: [...TScope],
+  nameHint?: string,
 ): T {
   const fn: T = factory(...args);
   if (
@@ -166,6 +167,7 @@ export function EXPORTABLE<T, TScope extends any[]>(
     Object.defineProperties(fn, {
       $exporter$args: { value: args },
       $exporter$factory: { value: factory },
+      $exporter$name: { writable: true, value: nameHint },
     });
   }
   return fn;
@@ -175,7 +177,7 @@ export function EXPORTABLE<T, TScope extends any[]>(
 (Or, if you're using plain JavaScript:
 
 ```js
-export function EXPORTABLE(factory, args) {
+export function EXPORTABLE(factory, args, nameHint) {
   const fn = factory(...args);
   if (
     ((typeof fn === "object" && fn !== null) || typeof fn === "function") &&
@@ -184,6 +186,7 @@ export function EXPORTABLE(factory, args) {
     Object.defineProperties(fn, {
       $exporter$args: { value: args },
       $exporter$factory: { value: factory },
+      $exporter$name: { writable: true, value: nameHint },
     });
   }
   return fn;
