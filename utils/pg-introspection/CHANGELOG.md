@@ -1,5 +1,15 @@
 # pg-introspection
 
+## 0.0.1-beta.7
+
+### Patch Changes
+
+- [#1943](https://github.com/graphile/crystal/pull/1943)
+  [`46d8289b4`](https://github.com/graphile/crystal/commit/46d8289b44ab10aea1ff3d2915184650d6896b81)
+  Thanks [@benjie](https://github.com/benjie)! - `pg-introspection` now exports
+  `reservedWords` which are a list of reserved keywords in PostgreSQL (in
+  uppercase; though SQL is case insensitive).
+
 ## 0.0.1-beta.6
 
 ### Patch Changes

@@ -1,5 +1,38 @@
 # @dataplan/pg
 
+## 0.0.1-beta.17
+
+### Patch Changes
+
+- [#1945](https://github.com/graphile/crystal/pull/1945)
+  [`9f85c614d`](https://github.com/graphile/crystal/commit/9f85c614d48dc745c5fed15333dbb75af7fddc88)
+  Thanks [@benjie](https://github.com/benjie)! - Mark `ExecutableStep::getDep`
+  as `protected` to avoid abuse.
+
+- [#1955](https://github.com/graphile/crystal/pull/1955)
+  [`6c6be29f1`](https://github.com/graphile/crystal/commit/6c6be29f12b24782c926b2bc62ed2ede09ac05de)
+  Thanks [@benjie](https://github.com/benjie)! - Steps are now prevented from
+  calling other steps' lifecycle methods. GRAPHILE_ENV is actively encouraged,
+  and falls back to NODE_ENV.
+
+- [#1944](https://github.com/graphile/crystal/pull/1944)
+  [`6c80c44b7`](https://github.com/graphile/crystal/commit/6c80c44b76a5eb30cc2b1555ba81a4b6236f4300)
+  Thanks [@benjie](https://github.com/benjie)! - Fix accidental double-encoding
+  of values on their way to postgres.
+
+- [#1958](https://github.com/graphile/crystal/pull/1958)
+  [`8315e8d01`](https://github.com/graphile/crystal/commit/8315e8d01c118cebc4ebbc53a2f264b958b252ad)
+  Thanks [@benjie](https://github.com/benjie)! - EXPORTABLE now accepts a third
+  argument, `nameHint`, which is used to hint what variable name to use for the
+  given value. Used this in `graphile-export` along with some fixes and
+  optimizations to improve the exports further.
+- Updated dependencies
+  [[`9f85c614d`](https://github.com/graphile/crystal/commit/9f85c614d48dc745c5fed15333dbb75af7fddc88),
+  [`6c6be29f1`](https://github.com/graphile/crystal/commit/6c6be29f12b24782c926b2bc62ed2ede09ac05de),
+  [`8315e8d01`](https://github.com/graphile/crystal/commit/8315e8d01c118cebc4ebbc53a2f264b958b252ad)]:
+  - grafast@0.1.1-beta.6
+  - @dataplan/json@0.0.1-beta.15
+
 ## 0.0.1-beta.16
 
 ### Patch Changes

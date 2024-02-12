@@ -1,5 +1,16 @@
 # tamedevil
 
+## 0.0.0-beta.6
+
+### Patch Changes
+
+- [#1958](https://github.com/graphile/crystal/pull/1958)
+  [`8315e8d01`](https://github.com/graphile/crystal/commit/8315e8d01c118cebc4ebbc53a2f264b958b252ad)
+  Thanks [@benjie](https://github.com/benjie)! - EXPORTABLE now accepts a third
+  argument, `nameHint`, which is used to hint what variable name to use for the
+  given value. Used this in `graphile-export` along with some fixes and
+  optimizations to improve the exports further.
+
 ## 0.0.0-beta.5
 
 ### Patch Changes

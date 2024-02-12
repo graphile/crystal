@@ -1,5 +1,54 @@
 # postgraphile
 
+## 5.0.0-beta.21
+
+### Patch Changes
+
+- [#1955](https://github.com/graphile/crystal/pull/1955)
+  [`6c6be29f1`](https://github.com/graphile/crystal/commit/6c6be29f12b24782c926b2bc62ed2ede09ac05de)
+  Thanks [@benjie](https://github.com/benjie)! - Steps are now prevented from
+  calling other steps' lifecycle methods. GRAPHILE_ENV is actively encouraged,
+  and falls back to NODE_ENV.
+
+- [#1944](https://github.com/graphile/crystal/pull/1944)
+  [`6c80c44b7`](https://github.com/graphile/crystal/commit/6c80c44b76a5eb30cc2b1555ba81a4b6236f4300)
+  Thanks [@benjie](https://github.com/benjie)! - Fix accidental double-encoding
+  of values on their way to postgres.
+
+- [#1949](https://github.com/graphile/crystal/pull/1949)
+  [`179d25b09`](https://github.com/graphile/crystal/commit/179d25b09bb3272eeef564067b8e512d8de0112f)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for registering
+  PgCodecs via plugins, add support for ltree type, improve error messages, no
+  longer need to set a gather namespace to use cache/state.
+
+- [#1958](https://github.com/graphile/crystal/pull/1958)
+  [`8315e8d01`](https://github.com/graphile/crystal/commit/8315e8d01c118cebc4ebbc53a2f264b958b252ad)
+  Thanks [@benjie](https://github.com/benjie)! - EXPORTABLE now accepts a third
+  argument, `nameHint`, which is used to hint what variable name to use for the
+  given value. Used this in `graphile-export` along with some fixes and
+  optimizations to improve the exports further.
+
+- [#1946](https://github.com/graphile/crystal/pull/1946)
+  [`9d53dde72`](https://github.com/graphile/crystal/commit/9d53dde726b7304962e921b88a159649e49156e5)
+  Thanks [@benjie](https://github.com/benjie)! - Exporting a schema now performs
+  ESLint 'no-use-before-define' check to catch even more invalid export
+  conditions. Fix `registerNodeIdCodec` calls caught by this.
+- Updated dependencies
+  [[`9f85c614d`](https://github.com/graphile/crystal/commit/9f85c614d48dc745c5fed15333dbb75af7fddc88),
+  [`6c6be29f1`](https://github.com/graphile/crystal/commit/6c6be29f12b24782c926b2bc62ed2ede09ac05de),
+  [`6c80c44b7`](https://github.com/graphile/crystal/commit/6c80c44b76a5eb30cc2b1555ba81a4b6236f4300),
+  [`179d25b09`](https://github.com/graphile/crystal/commit/179d25b09bb3272eeef564067b8e512d8de0112f),
+  [`8315e8d01`](https://github.com/graphile/crystal/commit/8315e8d01c118cebc4ebbc53a2f264b958b252ad),
+  [`9d53dde72`](https://github.com/graphile/crystal/commit/9d53dde726b7304962e921b88a159649e49156e5)]:
+  - @dataplan/pg@0.0.1-beta.17
+  - grafast@0.1.1-beta.6
+  - graphile-build-pg@5.0.0-beta.20
+  - graphile-build@5.0.0-beta.16
+  - graphile-utils@5.0.0-beta.20
+  - tamedevil@0.0.0-beta.6
+  - @dataplan/json@0.0.1-beta.15
+  - grafserv@0.1.1-beta.8
+
 ## 5.0.0-beta.20
 
 ### Patch Changes
