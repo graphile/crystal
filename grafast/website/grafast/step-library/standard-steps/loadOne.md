@@ -195,7 +195,7 @@ const $last4 = loadOne(list([$isAdmin, $stripeId]), getLast4FromStripeIfAdmin);
 ```
 
 The first argument to the `getLast4FromStripeIfAdmin` callback will then be an
-array of all the tuples of values from these plans: `ReadonlyArray<[isAdmin:
+array of all the tuples of values from these plans: `ReadonlyArray<readonly [isAdmin:
 boolean, stripeId: string]>`. The callback might look something like:
 
 ```ts
