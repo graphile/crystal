@@ -531,3 +531,96 @@ discounted consultancy rates.
 </table>
 
 ##### <sup className={styles.footnote}>‡</sup> These features integrate deeply with PostGraphile and have been optimised for its nuances by the maintainer. If you wish to build and maintain protections yourself rather than using the Pro plugin, refer to [Running in Production](https://graphile.org/postgraphile/production/) for information on how you might go about doing this. Purchasing the Pro plugin helps fund ongoing development and maintenance on the open source PostGraphile project.
+
+### PostGraphile V4 Core and PostGraphile V5 are OSS under the MIT license
+
+PostGraphile V4 Core is sufficient for many peoples needs; it's the only version
+that existed for the first 2 years of the project and many people are running it
+with great success in production. No features in PostGraphile V4 Core have been
+removed or obscured, and it continues to be maintained. PostGraphile V5 is also
+open source under the MIT License and continues to be advanced and enhanced.
+
+Development and maintenance of PostGraphile V5 is ongoing, supported by
+contributions from the community, [professional services](https://graphile.org/support/) contracts and
+[GitHub Sponsors](/sponsor/).
+
+### PostGraphile Pro is a commercial plugin for those who wish to scale with PostGraphile V4
+
+The Pro plugin enhances PostGraphile V4 with additional features and is loaded
+through the standard [server plugin interface](/postgraphile/current/plugins/).
+
+The Pro plugin contains features that are particularly useful to businesses
+wishing to scale their solution out using database read-replicas or protect the
+generated GraphQL API from expensive queries which may be issued by untrusted
+third parties. (Typically if the intended clients to your GraphQL API are
+first-party only then you would use a GraphQL query whitelist (e.g. persisted
+queries) for this purpose; although the Pro features can still be helpful to
+dissuade your developers from building expensive queries!)
+
+### Does the license cover my production cluster?
+
+The [Pro plugin EULA](https://store.graphile.com/eulas/postgraphile-pro/) states
+you may:
+
+> use up to four Production Instances and up to 100 Development Instances of the
+> Software
+
+This is enough to cover a small cluster of 4 PostGraphile servers. If you will
+be running a larger cluster than this, please
+[get in touch](mailto:team@graphile.org?subject=Large%20cluster) for custom
+licensing.
+
+### How many licenses do I need to cover my multiple development/testing stages?
+
+The [Pro plugin EULA](https://store.graphile.com/eulas/postgraphile-pro/) states
+you may:
+
+> use up to four Production Instances and up to 100 Development Instances of the
+> Software
+
+"Development Instance" is defined as "an Instance that is used to support
+development, testing or deployment of a Production Instance", which covers
+standard development, staging, QA and similar environments.
+
+If you have larger needs than this, please
+[get in touch](mailto:team@graphile.org?subject=Large%20cluster) for custom
+licensing.
+
+### Where are the @graphile/pro docs/changelog?
+
+You can read the
+[@graphile/pro README on npm](https://www.npmjs.com/package/@graphile/pro).
+There's also a lot more information in the
+[Production Considerations](/postgraphile/current/production) page on this website.
+
+### Is the fulfillment of the license key automated?
+
+Yes, license keys are issued automatically by our store software upon completion
+of the payment process. Sponsors can use their GitHub Sponsors account to log in to the store.
+
+### Do license keys "phone home"?
+
+No, license keys are static and contain all the necessary claims, not dissimilar
+to JWTs. Our software does not "phone home."
+
+You are not permitted to use the software once the EULA terminates (e.g. if you
+stop paying). We trust you, and want to minimize your maintenance burden, so the
+automated keys expire after one year rather than one month. You will be able to
+issue new keys via the store when your key is near to expiry. Please do not
+abuse our trust.
+
+### Does the Pro License come with direct support?
+
+No. We run community support through our
+[Discord Server](https://discord.gg/graphile) where anyone can ask and answer
+questions about PostGraphile and the Graphile suite of tools. Sponsors receive
+priority support from our maintainers within our Discord Server. Sponsors on the "Private Advisor" tier or
+above can enter a complimentary Development Support contract and receive support
+through their company Slack/GitHub organization. Prices start at $1,500 a month, with no minimum
+term. More information can be found at the [Development Support page](https://graphile.org/support/)
+or you can [get in contract](mailto:info@graphile.org?subject=Private%20Advisor%20tier%20question).
+
+### I'm an enterprise user and need X, Y and Z
+
+Please [get in touch](mailto:team@graphile.org?subject=Enterprise%20enquiry) and
+we'll be happy to help!
