@@ -1,7 +1,12 @@
+---
+title: "Get PostGraphile Pro"
+hide_table_of_contents: true
+---
+
 import styles from "@site/src/css/common.module.css";
 import pricingStyles from "./pricing.module.css";
 
-# Get PostGraphile Pro
+## Get PostGraphile Pro
 
 PostGraphile V4 Core is free and open-source, and is sufficient for many peoples needs.
 PostGraphile Pro is a commercial plugin for PostGraphile V4 Core, with additional features which can
@@ -17,32 +22,46 @@ license by itself. However, this does not come with any other benefit such as pr
 discounted consultancy rates.
 
 <table className={pricingStyles.pricingTable}>
-  <thead>
+<thead>
 
 <tr>
-  <th></th>
+  <th rowspan="2"></th>
   <th>
-    <span class="f3 fab fa-github"></span> Core
+    <Icon icon="fa-brands fa-github"/> Core
   </th>
   <th>
-    <span class="plan-pro">
-      <span class="first-letter">p</span>
+    <span className={styles.proTag}>
+      <span className={styles.firstLetter}>p</span>
     </span>{" "}
     License Only
   </th>
-  <th>Production Sponsor</th>
-  <th>Private Advisor Sponsor</th>
+  <th><span className={styles.sponTag}><span className={styles.firstLetter}>s</span></span>{" "}Production Sponsor</th>
+  <th><span className={styles.sponTag}><span className={styles.firstLetter}>s</span></span>{" "}Private Advisor Sponsor</th>
 </tr>
-
+<tr>
+  <th>
+    <span className={styles.tooltipped}>
+    OSS projects, not-for-profits
+    <span class={styles.tooltiptext}>Also, hobbyists, pre-revenue start-ups, and any other use 
+    where the Pro features are either not needed or can be re-implemented by your team
+    </span>
+    </span>
+  </th>
+  <th>Small businesses</th>
+  <th>Small and medium businesses</th>
+  <th>Enterprises</th>
+</tr>
 </thead>
+
 <tbody>
+
 <tr>
   <th>
     <span className={styles.tooltipped}>
       Instant GraphQL API
-      <span class={styles.tooltiptext}>Queries and mutations</span></span>
-      &nbsp;and automatic CRUD mutations
-    
+      <span class={styles.tooltiptext}>Queries and mutations</span>
+    </span>
+    &nbsp;and automatic CRUD mutations
   </th>
   <td>
     <Icon icon="fa-solid fa-circle-check" size="lg" />
@@ -358,7 +377,9 @@ discounted consultancy rates.
 </tr>
 
 <tr>
-  <th>Company logo featured on website</th>
+  <th>
+    Logo featured on <a href="https://graphile.org/sponsor">graphile.org</a>
+  </th>
   <td>
     <Icon icon="fa-solid fa-circle-xmark" size="lg" />
   </td>
@@ -374,7 +395,7 @@ discounted consultancy rates.
 </tr>
 
 <tr>
-  <th>Company logo featured on project readme</th>
+  <th>Logo featured in project</th>
   <td>
     <Icon icon="fa-solid fa-circle-xmark" size="lg" />
   </td>
@@ -398,9 +419,9 @@ discounted consultancy rates.
     <Icon icon="fa-solid fa-circle-xmark" size="lg" />
   </td>
   <td>
-    Discounted <a href="https://benjie.dev/book">video call</a> rate
+    Discounted <a href="https://benjie.dev/book">video calls</a>
   </td>
-  <td>Discounted consultancy rate</td>
+  <td>Discounted consultancy packages</td>
 </tr>
 
 <tr>
@@ -451,6 +472,7 @@ discounted consultancy rates.
 </tr>
 
   </tbody>
+  
   <tfoot>
 
 <tr>

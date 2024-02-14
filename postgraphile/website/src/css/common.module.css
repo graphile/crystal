@@ -33,14 +33,18 @@
 .tooltipped {
   position: relative;
   display: inline-block;
-  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+  text-decoration: underline dotted 2px var(--ifm-color-primary-dark);
+}
+
+[data-theme="dark"] .tooltipped {
+  text-decoration: underline dotted var(--ifm-color-primary-lighter);
 }
 
 /* Tooltip text */
 .tooltipped > .tooltiptext {
   display: block;
   visibility: hidden;
-  width: 120px;
+  width: 220px;
   background-color: var(--ifm-color-primary-lightest);
   border: 2px solid var(--ifm-color-primary-lighter);
   color: black;
@@ -69,4 +73,29 @@
   border-style: solid;
   border-color: transparent transparent transparent
     var(--ifm-color-primary-lighter);
+}
+
+.proTag,
+.sponTag {
+  color: white !important;
+  font-size: 0.65rem;
+  border-radius: 1em;
+  padding: 0.2em 0.7em 0.3em;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1rem;
+  font-weight: bold;
+}
+
+.proTag {
+  background-color: rgb(255, 71, 81) /*#c511c5*/;
+}
+
+.sponTag {
+  background-color: var(--ifm-color-primary);
+}
+
+.firstLetter {
+  text-transform: uppercase;
+  font-weight: bold;
 }

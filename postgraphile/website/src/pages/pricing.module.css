@@ -11,6 +11,58 @@
 .pricingTable :global(.fa-circle-check) {
   color: var(--ifm-color-primary-dark);
 }
+
+[data-theme="dark"] .pricingTable :global(.fa-circle-check) {
+  color: var(--ifm-color-primary-light);
+}
+
 .pricingTable :global(.fa-circle-xmark) {
   color: rgb(255, 71, 81);
+}
+
+.pricingTable thead tr,
+.pricingTable thead th {
+  background-color: white;
+  border: none;
+}
+
+.pricingTable thead tr:first-child,
+.pricingTable thead tr:first-child th {
+  font-size: 1.2rem;
+  padding-bottom: 0;
+}
+
+.pricingTable thead tr:last-child,
+.pricingTable thead tr:last-child th {
+  font-style: italic;
+  font-size: 0.9rem;
+  padding-top: 0;
+  color: var(--ifm-color-primary-darker);
+  border-bottom: 3px solid var(--ifm-color-primary-darker) /*#a51b1b*/;
+}
+
+.pricingTable tbody th,
+.pricingTable tfoot th {
+  text-align: right;
+}
+.pricingTable tbody td,
+.pricingTable tfoot td {
+  text-align: center;
+}
+
+.pricingTable tbody td,
+.pricingTable tbody th {
+  border: none;
+  border-bottom: 1px solid var(--ifm-color-primary-darker);
+  background-color: white;
+}
+
+.pricingTable td,
+.pricingTable th {
+  width: 20%;
+}
+
+.pricingTable tbody tr:last-child th,
+.pricingTable tbody tr:last-child td {
+  border-bottom: none;
 }
