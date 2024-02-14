@@ -4,6 +4,8 @@ path: /postgraphile/plugins/
 title: Server Plugins
 ---
 
+import styles from "@site/src/css/common.module.css";
+
 Stability: experimental, may change in **semver minor** versions.
 
 _NOTE: This page relates to changing how the PostGraphile HTTP server and CLI
@@ -33,7 +35,7 @@ There are also a couple of first-party plugins that may be purchased on the
 
 - ~~`@graphile/supporter`~~ - all features now OSS via `@graphile/pg-pubsub`
   plugin
-- `@graphile/pro` [PRO] - includes protections that can be mounted in front of
+- `@graphile/pro` <span className={styles.proTag}><span className={styles.firstLetter}>P</span>ro</span>&nbsp;<span className={styles.sponTag}><span className={styles.firstLetter}>S</span>pon</span> - includes protections that can be mounted in front of
   PostGraphile to protect it from malicious actors
 
 To use these premium plugins you will need a `GRAPHILE_LICENSE` environmental

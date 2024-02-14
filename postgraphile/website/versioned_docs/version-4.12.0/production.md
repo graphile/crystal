@@ -4,6 +4,8 @@ path: /postgraphile/production/
 title: Production Considerations
 ---
 
+import styles from "@site/src/css/common.module.css";
+
 When it comes time to deploy your PostGraphile application to production,
 there's a few things you'll want to think about including topics such as
 logging, security and stability. This article outlines some of the issues you
@@ -258,7 +260,7 @@ operations to read replicas (clones of your primary database)
   will perform any writes or not: if it's a `query` then it's read-only, if it's
   a `mutation` then it may perform writes.
 
-Using `--read-only-connection <string>` [PRO] you may give PostGraphile a
+Using `--read-only-connection <string>` <span className={styles.proTag}><span className={styles.firstLetter}>P</span>ro</span>&nbsp;<span className={styles.sponTag}><span className={styles.firstLetter}>S</span>pon</span> you may give PostGraphile a
 separate connection string to use for queries, to compliment the connection
 string passed via `--connection` which will now be used only for mutations.
 
@@ -274,12 +276,12 @@ instead.)
 It's unlikely that you want users to request `allUsers` and receive back
 literally all of the users in the database. More likely you want users to use
 cursor-based pagination over this connection with `first` / `after`. The Pro
-Plugin introduces the `--default-pagination-cap [int]` [PRO] option (library
+Plugin introduces the `--default-pagination-cap [int]` <span className={styles.proTag}><span className={styles.firstLetter}>P</span>ro</span>&nbsp;<span className={styles.sponTag}><span className={styles.firstLetter}>S</span>pon</span> option (library
 option: `defaultPaginationCap`) which enables you to enforce a pagination cap on
 all connections. Whatever number you pass will be used as the pagination cap
 (allowing requests smaller or equal to this cap to go through, and blocking
 those above it), but you can override it on a table-by-table basis using
-[smart comments](./smart-comments/) - in this case the `@paginationCap`[PRO]
+[smart comments](./smart-comments/) - in this case the `@paginationCap`<span className={styles.proTag}><span className={styles.firstLetter}>P</span>ro</span>&nbsp;<span className={styles.sponTag}><span className={styles.firstLetter}>S</span>pon</span>
 smart comment.
 
 ```sql
@@ -300,7 +302,7 @@ validation.
 The most powerful way of preventing DOS is to limit the cost of GraphQL queries
 that may be executed against your GraphQL server. The Pro Plugin contains a
 early implementation of this technique with heuristically estimated costs. You
-may enable a cost limit with `--graphql-cost-limit [int]` [PRO] and the
+may enable a cost limit with `--graphql-cost-limit [int]` <span className={styles.proTag}><span className={styles.firstLetter}>P</span>ro</span>&nbsp;<span className={styles.sponTag}><span className={styles.firstLetter}>S</span>pon</span> and the
 calculated cost of any GraphQL queries will be made available on `meta` field in
 the GraphQL payload.
 
