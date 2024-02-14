@@ -3,6 +3,8 @@ title: "Get PostGraphile Pro"
 hide_table_of_contents: true
 ---
 
+import clsx from "clsx";
+
 import styles from "@site/src/css/common.module.css";
 import pricingStyles from "./pricing.module.css";
 
@@ -36,7 +38,7 @@ discounted consultancy rates.
     License Only
   </th>
   <th><span className={styles.sponTag}><span className={styles.firstLetter}>s</span></span>{" "}Production Sponsor</th>
-  <th><span className={styles.sponTag}><span className={styles.firstLetter}>s</span></span>{" "}Private Advisor Sponsor</th>
+  <th><span className={styles.sponTag}><span className={styles.firstLetter}>s</span></span>{" "}Private Advisor Tier</th>
 </tr>
 <tr>
   <th>
@@ -290,7 +292,7 @@ discounted consultancy rates.
 
 <tr>
   <th>
-    Integrated<sup>‡</sup> GraphQL query cost limit
+    Integrated<sup className={styles.footnote}>‡</sup> GraphQL query cost limit
   </th>
   <td>
     <Icon icon="fa-solid fa-circle-xmark" size="lg" />
@@ -308,7 +310,7 @@ discounted consultancy rates.
 
 <tr>
   <th>
-    Integrated<sup>‡</sup> limits on pagination
+    Integrated<sup className={styles.footnote}>‡</sup> limits on pagination
   </th>
   <td>
     <Icon icon="fa-solid fa-circle-xmark" size="lg" />
@@ -326,7 +328,8 @@ discounted consultancy rates.
 
 <tr>
   <th>
-    Integrated<sup>‡</sup> GraphQL query depth limits
+    Integrated<sup className={styles.footnote}>‡</sup> GraphQL query depth
+    limits
   </th>
   <td>
     <Icon icon="fa-solid fa-circle-xmark" size="lg" />
@@ -446,17 +449,21 @@ discounted consultancy rates.
     <strong>
       <a href="/sponsor/">Crowd-funded</a>
     </strong>
-    <span class="note">Please give back</span>
+    <br />
+    <span className={styles.note}>
+      <span className={styles.small}>Please give back</span>
+    </span>
   </td>
   <td>
     <strong>
-      <small>
+      <span className={styles.small}>
         <s>$100/mo</s> USD
-      </small>{" "}
+      </span>{" "}
       $25<small>/mo exc. VAT</small>
     </strong>
-    <span class="note">
-      <small>EUR €25/mo, GBP £20/mo</small>
+    <br />
+    <span className={styles.note}>
+      <span className={styles.small}>EUR €25/mo, GBP £20/mo</span>
     </span>
   </td>
   <td>From $100/mo USD</td>
@@ -467,8 +474,16 @@ discounted consultancy rates.
   <th>Purchase</th>
   <td>&mdash;</td>
   <td>Credit/Debit Card</td>
-  <td>Via sponsorship or annual invoicing</td>
-  <td>Via sponsorship or bespoke invoicing</td>
+  <td>
+    via sponsorship or
+    <br />
+    annual invoicing
+  </td>
+  <td>
+    via sponsorship or
+    <br />
+    bespoke invoicing
+  </td>
 </tr>
 
   </tbody>
@@ -478,21 +493,36 @@ discounted consultancy rates.
 <tr>
   <th></th>
   <td>
-    <a class="button--solid" href="/sponsor/">
+    <a
+      className={clsx("button button--primary", pricingStyles.primaryButton)}
+      href="/sponsor/"
+    >
       Sponsor development
     </a>
   </td>
   <td>
-    <a class="button--solid" href="https://store.graphile.com">
-      Buy <span class="fas fa-external-link-square-alt"></span>
+    <a
+      className={clsx("button button--outline", pricingStyles.outlineButton)}
+      href="https://store.graphile.com"
+    >
+      Buy
     </a>
   </td>
   <td>
-    <a href="https://github.com/sponsors/benjie">GitHub Sponsors</a>
+    <a
+      className={clsx("button button--primary", pricingStyles.primaryButton)}
+      href="https://github.com/sponsors/benjie"
+    >
+      GitHub Sponsors
+    </a>
   </td>
   <td>
-    Get in contact or{" "}
-    <a href="https://github.com/sponsors/benjie">GitHub Sponsors</a>
+    <a
+      className={clsx("button button--outline", pricingStyles.outlineButton)}
+      href="mailto:info@graphile.org?subject=Private%20Advisor%20tier%20question"
+    >
+      Get in contact
+    </a>
   </td>
 </tr>
 
@@ -500,4 +530,4 @@ discounted consultancy rates.
 
 </table>
 
-##### <sup>‡</sup> These features integrate deeply with PostGraphile and have been optimised for its nuances by the maintainer. If you wish to build and maintain protections yourself rather than using the Pro plugin, refer to [Running in Production](https://graphile.org/postgraphile/production/) for information on how you might go about doing this. Purchasing the Pro plugin helps fund ongoing development and maintenance on the open source PostGraphile project.
+##### <sup className={styles.footnote}>‡</sup> These features integrate deeply with PostGraphile and have been optimised for its nuances by the maintainer. If you wish to build and maintain protections yourself rather than using the Pro plugin, refer to [Running in Production](https://graphile.org/postgraphile/production/) for information on how you might go about doing this. Purchasing the Pro plugin helps fund ongoing development and maintenance on the open source PostGraphile project.

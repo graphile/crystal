@@ -3,6 +3,29 @@
  * and scoped locally.
  */
 
+.primaryButton,
+.outlineButton {
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  border-radius: 7px;
+  border: 1px solid var(--ifm-color-primary);
+  letter-spacing: 0.1rem;
+}
+
+.outlineButton {
+  color: var(--ifm-color-primary);
+}
+
+.primaryButton:hover {
+  background-color: var(--ifm-color-primary-dark);
+  border: 1px solid var(--ifm-color-primary-dark);
+}
+
+.outlineButton:hover {
+  color: var(--ifm-color-primary-dark);
+  border: 1px solid var(--ifm-color-primary-dark);
+}
+
 .pricingTable {
   overflow-x: visible;
   overflow-y: visible;
@@ -21,7 +44,9 @@
 }
 
 .pricingTable thead tr,
-.pricingTable thead th {
+.pricingTable thead th,
+.pricingTable tfoot td,
+.pricingTable tfoot th {
   background-color: white;
   border: none;
 }
@@ -35,9 +60,9 @@
 .pricingTable thead tr:last-child,
 .pricingTable thead tr:last-child th {
   font-style: italic;
+  color: var(--ifm-color-primary-darker);
   font-size: 0.9rem;
   padding-top: 0;
-  color: var(--ifm-color-primary-darker);
   border-bottom: 3px solid var(--ifm-color-primary-darker) /*#a51b1b*/;
 }
 
@@ -65,4 +90,8 @@
 .pricingTable tbody tr:last-child th,
 .pricingTable tbody tr:last-child td {
   border-bottom: none;
+}
+
+.pricingTable tfoot tr {
+  border-top: 1px solid var(--ifm-color-primary-darker);
 }

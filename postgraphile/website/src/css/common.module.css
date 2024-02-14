@@ -25,6 +25,20 @@
   font-weight: normal;
 }
 
+.footnote {
+  color: var(--ifm-color-primary-dark);
+  font-size: 0.75rem;
+}
+
+.note {
+  font-style: italic;
+  color: var(--ifm-color-primary-darker);
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
 .tagline {
   font-weight: normal;
 }
