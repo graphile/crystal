@@ -31,20 +31,26 @@
   overflow-y: visible;
 }
 
-.pricingTable :global(.fa-circle-check),
+.pricingTable :global(.fa-circle-check) {
+  color: var(--ifm-color-primary-dark);
+}
+
 .pricingTable :global(.fa-discord),
 .pricingTable :global(.fa-github),
 .pricingTable :global(.fa-slack),
 .pricingTable :global(.fa-square-phone-flip) {
-  color: var(--ifm-color-primary-dark);
+  color: black;
 }
 
-[data-theme="dark"] .pricingTable :global(.fa-circle-check),
+[data-theme="dark"] .pricingTable :global(.fa-circle-check) {
+  color: var(--ifm-color-primary-light);
+}
+
 [data-theme="dark"] .pricingTable :global(.fa-discord),
 [data-theme="dark"] .pricingTable :global(.fa-github),
 [data-theme="dark"] .pricingTable :global(.fa-slack),
 [data-theme="dark"] .pricingTable :global(.fa-square-phone-flip) {
-  color: var(--ifm-color-primary-light);
+  color: white;
 }
 
 .pricingTable :global(.fa-circle-xmark) {
@@ -57,6 +63,12 @@
 .pricingTable tfoot th {
   background-color: white;
   border: none;
+}
+[data-theme="dark"] .pricingTable thead tr,
+[data-theme="dark"] .pricingTable thead th,
+[data-theme="dark"] .pricingTable tfoot td,
+[data-theme="dark"] .pricingTable tfoot th {
+  background-color: var(--ifm-background-color);
 }
 
 .pricingTable thead tr:first-child,
@@ -74,6 +86,11 @@
   border-bottom: 3px solid var(--ifm-color-primary-darker) /*#a51b1b*/;
 }
 
+[data-theme="dark"] .pricingTable thead tr:last-child,
+[data-theme="dark"] .pricingTable thead tr:last-child th {
+  color: var(--ifm-color-primary-light);
+}
+
 .pricingTable tbody th,
 .pricingTable tfoot th {
   text-align: right;
@@ -88,6 +105,11 @@
   border: none;
   border-bottom: 1px solid var(--ifm-color-primary-darker);
   background-color: white;
+}
+
+[data-theme="dark"] .pricingTable tbody td,
+[data-theme="dark"] .pricingTable tbody th {
+  background-color: var(--ifm-background-color);
 }
 
 .pricingTable td,
@@ -126,6 +148,7 @@
         display: block;
         width: auto;
         text-align: center;
+        background-color: white;
       }
     }
     tbody,
@@ -166,6 +189,17 @@
     }
     .showMobile {
       display: contents;
+    }
+  }
+  [data-theme="dark"] .pricingTable {
+    tbody,
+    thead,
+    tfoot {
+      td,
+      th,
+      tr {
+        background-color: var(--ifm-background-color);
+      }
     }
   }
   .showFull {

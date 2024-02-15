@@ -42,6 +42,12 @@
   color: var(--ifm-color-primary-darker);
 }
 
+[data-theme="dark"] .note,
+[data-theme="dark"] .footnote,
+[data-theme="dark"] .footnoteText {
+  color: var(--ifm-color-primary-light);
+}
+
 .small {
   font-size: 0.75rem;
 }
@@ -78,6 +84,11 @@
   z-index: 10;
 }
 
+[data-theme="dark"] .tooltiptext {
+  background-color: var(--ifm-color-primary-light);
+  border: 2px solid var(--ifm-color-primary-dark);
+}
+
 .tooltipped:hover > .tooltiptext {
   visibility: visible;
   top: -5px;
@@ -96,6 +107,11 @@
     var(--ifm-color-primary-lighter);
 }
 
+[data-theme="dark"] .tooltiptext::after {
+  border-color: transparent transparent transparent
+    var(--ifm-color-primary-dark);
+}
+
 .proTag,
 .sponTag {
   color: white !important;
@@ -109,11 +125,11 @@
 }
 
 .proTag {
-  background-color: rgb(255, 71, 81) /*#c511c5*/;
+  background-color: rgb(255, 71, 81);
 }
 
 .sponTag {
-  background-color: var(--ifm-color-primary);
+  background-color: #298aff;
 }
 
 .firstLetter {
