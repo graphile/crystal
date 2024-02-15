@@ -30,6 +30,13 @@
   font-size: 0.75rem;
 }
 
+.footnoteText {
+  color: var(--ifm-color-primary-darkest);
+  font-size: 0.8rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
 .note {
   font-style: italic;
   color: var(--ifm-color-primary-darker);

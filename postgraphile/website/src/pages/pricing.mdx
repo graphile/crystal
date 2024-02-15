@@ -19,9 +19,37 @@ Businesses which use PostGraphile should explore sponsorship as the first option
 Pro, as sponsorship also helps to fund development and maintenance of the Graphile suite, as well
 as enabling us to advance the software they rely on.
 
-For businesses which are not capable of engaging in the sponsorship model, there is an option to purchase the
-license by itself. However, this does not come with any other benefit such as priority support or
-discounted consultancy rates.
+<p className={pricingStyles.showFull}>
+  For businesses which are not capable of engaging in the sponsorship model,
+  there is an option to purchase the license by itself. However, this does not
+  come with any other benefit such as priority support or discounted consultancy
+  rates.
+</p>
+
+### Feature comparison
+
+<p className={pricingStyles.showMobile}>
+  There are several tiers of sponsorship available; The &ldquo;Production
+  Sponsor&rdquo; tier (<strong>Sponsor+</strong>) is suitable for many small and
+  medium businesses while the &ldquo;Private Advisor Tier&rdquo; (
+  <strong>Enterprise</strong>) gives access to a complimentary{" "}
+  <a href="https://www.graphile.org/support/">Development Support </a> contract
+  and discounted consultancy packages, perfect for enterprises and those who
+  need bespoke advice and support on their project.
+</p>
+
+<p className={pricingStyles.showFull}>
+  Below, we have listed the differences between PostGraphile V4 Core, purchasing
+  the license by itself, and sponsoring Graphile. There are several tiers of
+  sponsorship available; The &ldquo;Production Sponsor&rdquo; tier is suitable
+  for many small and medium businesses with some perks such as free access to
+  the database tool <a href="https://pgrita.com">pgRITA </a> and discounted
+  consultancy calls. The &ldquo;Private Advisor Tier&rdquo; gives access to a
+  complimentary{" "}
+  <a href="https://www.graphile.org/support/">Development Support </a> contract
+  and discounted consultancy packages, perfect for enterprises and those who
+  need bespoke advice and support on their project.
+</p>
 
 <table className={pricingStyles.pricingTable}>
 <thead>
@@ -504,45 +532,29 @@ discounted consultancy rates.
     <strong>
       $100<small>/mo USD</small>
     </strong>
+    <br />
+    <span className={clsx(styles.note, pricingStyles.showFull)}>
+      <span className={styles.small}>GitHub Sponsors or annual invoicing</span>
+    </span>
   </td>
   <td>
     <span className={styles.small}>From</span>{" "}
     <strong>
       $1,500<small>/mo USD</small>
     </strong>
+    <br />
+    <span className={clsx(styles.note, pricingStyles.showFull)}>
+      <span className={styles.small}>GitHub Sponsors or bespoke invoicing</span>
+    </span>
   </td>
 </tr>
-
-<tr>
-  <th>Purchase</th>
-  <td>&mdash;</td>
-  <td>Credit/Debit Card</td>
-  <td>
-    via sponsorship or
-    <br />
-    annual invoicing
-  </td>
-  <td>
-    via sponsorship or
-    <br />
-    bespoke invoicing
-  </td>
-</tr>
-
-  </tbody>
+</tbody>
   
-  <tfoot>
+<tfoot>
 
 <tr>
   <th></th>
-  <td>
-    <a
-      className={clsx("button button--primary", pricingStyles.primaryButton)}
-      href="/sponsor/"
-    >
-      Sponsor development
-    </a>
-  </td>
+  <td></td>
   <td>
     <a
       className={clsx("button button--outline", pricingStyles.outlineButton)}
@@ -569,11 +581,20 @@ discounted consultancy rates.
   </td>
 </tr>
 
-  </tfoot>
+</tfoot>
 
 </table>
 
-##### <sup className={styles.footnote}>‡</sup> These features integrate deeply with PostGraphile and have been optimised for its nuances by the maintainer. If you wish to build and maintain protections yourself rather than using the Pro plugin, refer to [Running in Production](https://graphile.org/postgraphile/production/) for information on how you might go about doing this. Purchasing the Pro plugin helps fund ongoing development and maintenance on the open source PostGraphile project.
+<div className={styles.footnoteText}>
+  <strong>
+    <sup>‡</sup>
+  </strong>{" "}
+  These features integrate deeply with PostGraphile V4 and have been optimized
+  for its nuances by the maintainer. If you wish to build and maintain
+  protections yourself rather than using the Pro plugin, refer to{" "}
+  <a href="/postgraphile/current/production/">Production Considerations</a> for
+  information on how you might go about doing this.
+</div>
 
 ### PostGraphile V4 Core and PostGraphile V5 are OSS under the MIT license
 
@@ -596,7 +617,7 @@ The Pro plugin contains features that are particularly useful to businesses
 wishing to scale their solution out using database read-replicas or protect the
 generated GraphQL API from expensive queries which may be issued by untrusted
 third parties. (Typically if the intended clients to your GraphQL API are
-first-party only then you would use a GraphQL query whitelist (e.g. persisted
+first-party only then you would use a GraphQL query allowlist (e.g. persisted
 queries) for this purpose; although the Pro features can still be helpful to
 dissuade your developers from building expensive queries!)
 

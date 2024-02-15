@@ -168,4 +168,10 @@
       display: contents;
     }
   }
+  .showFull {
+    display: none;
+  }
+  .showMobile {
+    display: contents;
+  }
 }
