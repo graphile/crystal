@@ -146,6 +146,11 @@ const config = {
             position: "right",
           },
           {
+            to: "pricing",
+            label: "Go Pro",
+            position: "right",
+          },
+          {
             type: "docsVersionDropdown",
             position: "left",
             // dropdownItemsAfter: [{ to: "/versions", label: "All versions" }],
