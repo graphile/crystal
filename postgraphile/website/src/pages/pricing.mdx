@@ -422,17 +422,50 @@ discounted consultancy rates.
     <Icon icon="fa-solid fa-circle-xmark" size="lg" />
   </td>
   <td>
-    Discounted <a href="https://benjie.dev/book">video calls</a>
+    <span className={pricingStyles.showFull}>
+      Discounted <a href="https://benjie.dev/book">video calls</a>
+    </span>
+    <span className={pricingStyles.showMobile}>
+      <Icon icon="fa-solid fa-square-phone-flip" size="lg" />
+    </span>
   </td>
-  <td>Discounted consultancy packages</td>
+  <td>
+    <span className={pricingStyles.showFull}>
+      Discounted consultancy packages
+    </span>
+    <span className={pricingStyles.showMobile}>
+      <Icon icon="fa-solid fa-circle-check" size="lg" />
+    </span>
+  </td>
 </tr>
 
 <tr>
   <th>Support</th>
-  <td>via community Discord</td>
-  <td>via community Discord</td>
-  <td>Priority support via community Discord</td>
-  <td>via your company Slack / Discord / GitHub; video call support</td>
+  <td>
+    <span className={pricingStyles.showFull}>via community Discord</span>
+    <span className={pricingStyles.showMobile}>Community support</span>
+  </td>
+  <td>
+    <span className={pricingStyles.showFull}>via community Discord</span>
+    <span className={pricingStyles.showMobile}>Community support</span>
+  </td>
+  <td>
+    <span className={pricingStyles.showFull}>
+      Priority support via community Discord
+    </span>
+    <span className={pricingStyles.showMobile}>Community support</span>
+  </td>
+  <td>
+    Within your own company
+    <br />
+    <Icon icon="fa-brands fa-github" size="lg" />
+    &nbsp;
+    <Icon icon="fa-brands fa-discord" size="lg" />
+    &nbsp;
+    <Icon icon="fa-brands fa-slack" size="lg" />
+    &nbsp;
+    <Icon icon="fa-solid fa-square-phone-flip" size="lg" />
+  </td>
 </tr>
 
 <tr>
@@ -450,24 +483,34 @@ discounted consultancy rates.
       <a href="/sponsor/">Crowd-funded</a>
     </strong>
     <br />
-    <span className={styles.note}>
+    <span className={(styles.note, pricingStyles.showFull)}>
       <span className={styles.small}>Please give back</span>
     </span>
   </td>
   <td>
     <strong>
-      <span className={styles.small}>
-        <s>$100/mo</s> USD
+      <span className={clsx(styles.small, pricingStyles.showFull)}>
+        <s>$100/mo</s>
       </span>{" "}
-      $25<small>/mo exc. VAT</small>
+      $25<small>/mo USD +VAT</small>
     </strong>
     <br />
-    <span className={styles.note}>
+    <span className={clsx(styles.note, pricingStyles.showFull)}>
       <span className={styles.small}>EUR €25/mo, GBP £20/mo</span>
     </span>
   </td>
-  <td>From $100/mo USD</td>
-  <td>From $1,500/mo USD</td>
+  <td>
+    <span className={styles.small}>From</span>{" "}
+    <strong>
+      $100<small>/mo USD</small>
+    </strong>
+  </td>
+  <td>
+    <span className={styles.small}>From</span>{" "}
+    <strong>
+      $1,500<small>/mo USD</small>
+    </strong>
+  </td>
 </tr>
 
 <tr>

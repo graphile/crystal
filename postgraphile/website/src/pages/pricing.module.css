@@ -31,11 +31,19 @@
   overflow-y: visible;
 }
 
-.pricingTable :global(.fa-circle-check) {
+.pricingTable :global(.fa-circle-check),
+.pricingTable :global(.fa-discord),
+.pricingTable :global(.fa-github),
+.pricingTable :global(.fa-slack),
+.pricingTable :global(.fa-square-phone-flip) {
   color: var(--ifm-color-primary-dark);
 }
 
-[data-theme="dark"] .pricingTable :global(.fa-circle-check) {
+[data-theme="dark"] .pricingTable :global(.fa-circle-check),
+[data-theme="dark"] .pricingTable :global(.fa-discord),
+[data-theme="dark"] .pricingTable :global(.fa-github),
+[data-theme="dark"] .pricingTable :global(.fa-slack),
+[data-theme="dark"] .pricingTable :global(.fa-square-phone-flip) {
   color: var(--ifm-color-primary-light);
 }
 
@@ -94,4 +102,70 @@
 
 .pricingTable tfoot tr {
   border-top: 1px solid var(--ifm-color-primary-darker);
+}
+
+.showFull {
+  display: contents;
+}
+
+.showMobile {
+  display: none;
+}
+
+@media screen and (max-width: 926px) {
+  .pricingTable {
+    thead {
+      display: none;
+    }
+    tbody,
+    thead,
+    tfoot {
+      td,
+      th,
+      tr {
+        display: block;
+        width: auto;
+        text-align: center;
+      }
+    }
+    tbody,
+    tfoot {
+      tr {
+        padding: 1rem 0.5rem;
+      }
+      td,
+      th {
+        padding: 0;
+        margin: 0.5rem 0 0 0;
+        position: relative;
+        padding-left: 40%;
+      }
+      td::before {
+        content: "Placeholder";
+        position: absolute;
+        left: 0.5rem;
+        top: 0;
+        font-variant: small-caps;
+        font-size: 1.2em;
+      }
+      td:nth-of-type(1)::before {
+        content: "Core";
+      }
+      td:nth-of-type(2)::before {
+        content: "Pro";
+      }
+      td:nth-of-type(3)::before {
+        content: "Sponsor+";
+      }
+      td:nth-of-type(4)::before {
+        content: "Enterprise";
+      }
+    }
+    .showFull {
+      display: none;
+    }
+    .showMobile {
+      display: contents;
+    }
+  }
 }
