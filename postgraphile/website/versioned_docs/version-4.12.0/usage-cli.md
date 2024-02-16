@@ -4,7 +4,8 @@ path: /postgraphile/usage-cli/
 title: Command Line Interface
 ---
 
-import styles from "@site/src/css/common.module.css";
+import Pro from "@site/src/components/Pro";
+import Spon from "@site/src/components/Spon";
 
 The easiest way to get up and running with PostGraphile is to use the Command
 Line Interface.
@@ -279,21 +280,21 @@ paid "supporter" plugin, but now fully free and open source - please consider
 
 - `-S`, `--simple-subscriptions` add simple subscription support
 - `--subscription-authorization-function [fn]` PG function to call to check user
-  is allowed to subscribe
+  is allowed to subscribe.
 
 The following features and not part of PostGraphile core, but are available from
 the Pro plugin - see [Go Pro!](/pricing/) for more information.
 
-- `--read-only-connection <string>` <span className={styles.proTag}><span className={styles.firstLetter}>P</span>ro</span>&nbsp;<span className={styles.sponTag}><span className={styles.firstLetter}>S</span>pon</span> ⚡️[experimental] a PostgreSQL
+- `--read-only-connection <string>` <Pro /> <Spon /> ⚡️[experimental] a PostgreSQL
   connection string to use for read-only queries (i.e. not mutations)
-- `--default-pagination-cap [int]`<span className={styles.proTag}><span className={styles.firstLetter}>P</span>ro</span>&nbsp;<span className={styles.sponTag}><span className={styles.firstLetter}>S</span>pon</span> ⚡️[experimental] Ensures all
+- `--default-pagination-cap [int]` <Pro /> <Spon /> ⚡️[experimental] Ensures all
   connections have first/last specified and are no large than this value
   (default: 50), set to -1 to disable; override via smart comment
   `@paginationCap 50`
-- `--graphql-depth-limit [int]` <span className={styles.proTag}><span className={styles.firstLetter}>P</span>ro</span>&nbsp;<span className={styles.sponTag}><span className={styles.firstLetter}>S</span>pon</span> ⚡️[experimental] Validates GraphQL
+- `--graphql-depth-limit [int]` <Pro /> <Spon /> ⚡️[experimental] Validates GraphQL
   queries cannot be deeper than the specified int (default: 16), set to -1 to
   disable
-- `--graphql-cost-limit [int]` <span className={styles.proTag}><span className={styles.firstLetter}>P</span>ro</span>&nbsp;<span className={styles.sponTag}><span className={styles.firstLetter}>S</span>pon</span> ⚡️[experimental] Only allows queries with
+- `--graphql-cost-limit [int]` <Pro /> <Spon /> ⚡️[experimental] Only allows queries with
   a computed cost below the specified int (default: 1000), set to -1 to disable
 
 ### RC file options

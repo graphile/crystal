@@ -5,7 +5,8 @@ title: Live Queries
 draft: true
 ---
 
-import styles from "@site/src/css/common.module.css";
+import Pro from "@site/src/components/Pro";
+import Spon from "@site/src/components/Spon";
 
 :::caution
 
@@ -271,7 +272,7 @@ Optimisation steps you can take currently:
 - Move the logical decoding system to a dedicated server
 - Add more `liveConditions` to queries to filter rows the user may not see so
   that they do not trigger live updates for that user (TODO: document this!)
-- Use read replicas <span className={styles.proTag}><span className={styles.firstLetter}>P</span>ro</span>&nbsp;<span className={styles.sponTag}><span className={styles.firstLetter}>S</span>pon</span>
+- Use read replicas <Pro /> <Spon />
 
 We do not currently recommend live queries for very large deployments - if
 you're expecting tens of thousands of concurrent users it's going to be

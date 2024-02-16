@@ -4,7 +4,8 @@ path: /postgraphile/production/
 title: Production Considerations
 ---
 
-import styles from "@site/src/css/common.module.css";
+import Pro from "@site/src/components/Pro";
+import Spon from "@site/src/components/Spon";
 
 When it comes time to deploy your PostGraphile application to production,
 there's a few things you'll want to think about including topics such as
@@ -236,11 +237,15 @@ you wish arbitrary third parties to be able to send queries to your API without
 the queries being pre-approved and without the risk of bringing your servers to
 their knees.
 
-**You are highly encouraged to purchase the [Pro Plugin [PRO]](/pricing/), which
-implements these protections in a deeply integrated and PostGraphile optimised
-way, and has the added benefit of helping sustain development and maintenance on
-the project.** You can read the
+:::info
+
+You are highly encouraged to purchase the [Pro Plugin](/pricing/) <Pro />, which
+implements these protections in a deeply-integrated and PostGraphile-optimized
+way. Sponsors <Spon /> also have access to the Pro Plugin and have the added benefit
+of helping sustain development and maintenance on the project. You can read the
 [@graphile/pro README on npm](https://www.npmjs.com/package/@graphile/pro).
+
+:::
 
 The following details how the Pro Plugin addresses these issues, including hints
 on how you might go about solving the issues for yourself. Many of these
@@ -260,7 +265,7 @@ operations to read replicas (clones of your primary database)
   will perform any writes or not: if it's a `query` then it's read-only, if it's
   a `mutation` then it may perform writes.
 
-Using `--read-only-connection <string>` <span className={styles.proTag}><span className={styles.firstLetter}>P</span>ro</span>&nbsp;<span className={styles.sponTag}><span className={styles.firstLetter}>S</span>pon</span> you may give PostGraphile a
+Using `--read-only-connection <string>` <Pro /> <Spon /> you may give PostGraphile a
 separate connection string to use for queries, to compliment the connection
 string passed via `--connection` which will now be used only for mutations.
 
@@ -276,13 +281,13 @@ instead.)
 It's unlikely that you want users to request `allUsers` and receive back
 literally all of the users in the database. More likely you want users to use
 cursor-based pagination over this connection with `first` / `after`. The Pro
-Plugin introduces the `--default-pagination-cap [int]` <span className={styles.proTag}><span className={styles.firstLetter}>P</span>ro</span>&nbsp;<span className={styles.sponTag}><span className={styles.firstLetter}>S</span>pon</span> option (library
+Plugin introduces the `--default-pagination-cap [int]` <Pro /> <Spon /> option (library
 option: `defaultPaginationCap`) which enables you to enforce a pagination cap on
 all connections. Whatever number you pass will be used as the pagination cap
 (allowing requests smaller or equal to this cap to go through, and blocking
 those above it), but you can override it on a table-by-table basis using
-[smart comments](./smart-comments/) - in this case the `@paginationCap`<span className={styles.proTag}><span className={styles.firstLetter}>P</span>ro</span>&nbsp;<span className={styles.sponTag}><span className={styles.firstLetter}>S</span>pon</span>
-smart comment.
+[smart comments](./smart-comments/) - in this case the `@paginationCap`<Pro /> <Spon />
+Smart Comment.
 
 ```sql
 comment on table users is
@@ -302,7 +307,7 @@ validation.
 The most powerful way of preventing DOS is to limit the cost of GraphQL queries
 that may be executed against your GraphQL server. The Pro Plugin contains a
 early implementation of this technique with heuristically estimated costs. You
-may enable a cost limit with `--graphql-cost-limit [int]` <span className={styles.proTag}><span className={styles.firstLetter}>P</span>ro</span>&nbsp;<span className={styles.sponTag}><span className={styles.firstLetter}>S</span>pon</span> and the
+may enable a cost limit with `--graphql-cost-limit [int]` <Pro /> <Spon /> and the
 calculated cost of any GraphQL queries will be made available on `meta` field in
 the GraphQL payload.
 

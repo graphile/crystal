@@ -124,6 +124,14 @@
   font-weight: bold;
 }
 
+.proTag a,
+.proTag a:visited,
+.sponTag a,
+.sponTag a:visited {
+  color: white !important;
+  text-decoration: none !important;
+}
+
 .proTag {
   background-color: rgb(255, 71, 81);
 }
