@@ -395,8 +395,9 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   public finalize() {
     if (typeof (this as any).isSyncAndSafe !== "boolean") {
       // Take a guess
-      const isAsync = this.execute.constructor.name === "AsyncFunction";
-      if (isAsync) {
+      if (!isDev) {
+        this.isSyncAndSafe = false;
+      } else if (this.execute.constructor.name === "AsyncFunction") {
         this.isSyncAndSafe = false;
       } else {
         console.warn(
