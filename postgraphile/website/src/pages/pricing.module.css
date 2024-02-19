@@ -1,0 +1,211 @@
+/**
+ * CSS files with the .module.css suffix will be treated as CSS modules
+ * and scoped locally.
+ */
+
+.primaryButton,
+.outlineButton {
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  border-radius: 7px;
+  border: 1px solid var(--ifm-color-primary);
+  letter-spacing: 0.1rem;
+}
+
+.outlineButton {
+  color: var(--ifm-color-primary);
+}
+
+.primaryButton:hover {
+  background-color: var(--ifm-color-primary-dark);
+  border: 1px solid var(--ifm-color-primary-dark);
+}
+
+.outlineButton:hover {
+  color: var(--ifm-color-primary-dark);
+  border: 1px solid var(--ifm-color-primary-dark);
+}
+
+.pricingTable {
+  overflow-x: visible;
+  overflow-y: visible;
+}
+
+.pricingTable :global(.fa-circle-check) {
+  color: var(--ifm-color-primary-dark);
+}
+
+.pricingTable :global(.fa-discord),
+.pricingTable :global(.fa-github),
+.pricingTable :global(.fa-slack),
+.pricingTable :global(.fa-square-phone-flip) {
+  color: black;
+}
+
+[data-theme="dark"] .pricingTable :global(.fa-circle-check) {
+  color: var(--ifm-color-primary-light);
+}
+
+[data-theme="dark"] .pricingTable :global(.fa-discord),
+[data-theme="dark"] .pricingTable :global(.fa-github),
+[data-theme="dark"] .pricingTable :global(.fa-slack),
+[data-theme="dark"] .pricingTable :global(.fa-square-phone-flip) {
+  color: white;
+}
+
+.pricingTable :global(.fa-circle-xmark) {
+  color: rgb(255, 71, 81);
+}
+
+.pricingTable thead tr,
+.pricingTable thead th,
+.pricingTable tfoot td,
+.pricingTable tfoot th {
+  background-color: white;
+  border: none;
+}
+[data-theme="dark"] .pricingTable thead tr,
+[data-theme="dark"] .pricingTable thead th,
+[data-theme="dark"] .pricingTable tfoot td,
+[data-theme="dark"] .pricingTable tfoot th {
+  background-color: var(--ifm-background-color);
+}
+
+.pricingTable thead tr:first-child,
+.pricingTable thead tr:first-child th {
+  font-size: 1.2rem;
+  padding-bottom: 0;
+}
+
+.pricingTable thead tr:last-child,
+.pricingTable thead tr:last-child th {
+  font-style: italic;
+  color: var(--ifm-color-primary-darker);
+  font-size: 0.9rem;
+  padding-top: 0;
+  border-bottom: 3px solid var(--ifm-color-primary-darker) /*#a51b1b*/;
+}
+
+[data-theme="dark"] .pricingTable thead tr:last-child,
+[data-theme="dark"] .pricingTable thead tr:last-child th {
+  color: var(--ifm-color-primary-light);
+}
+
+.pricingTable tbody th,
+.pricingTable tfoot th {
+  text-align: right;
+}
+.pricingTable tbody td,
+.pricingTable tfoot td {
+  text-align: center;
+}
+
+.pricingTable tbody td,
+.pricingTable tbody th {
+  border: none;
+  border-bottom: 1px solid var(--ifm-color-primary-darker);
+  background-color: white;
+}
+
+[data-theme="dark"] .pricingTable tbody td,
+[data-theme="dark"] .pricingTable tbody th {
+  background-color: var(--ifm-background-color);
+}
+
+.pricingTable td,
+.pricingTable th {
+  width: 20%;
+}
+
+.pricingTable tbody tr:last-child th,
+.pricingTable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.pricingTable tfoot tr {
+  border-top: 1px solid var(--ifm-color-primary-darker);
+}
+
+.showFull {
+  display: contents;
+}
+
+.showMobile {
+  display: none;
+}
+
+@media screen and (max-width: 926px) {
+  .pricingTable {
+    thead {
+      display: none;
+    }
+    tbody,
+    thead,
+    tfoot {
+      td,
+      th,
+      tr {
+        display: block;
+        width: auto;
+        text-align: center;
+        background-color: white;
+      }
+    }
+    tbody,
+    tfoot {
+      tr {
+        padding: 1rem 0.5rem;
+      }
+      td,
+      th {
+        padding: 0;
+        margin: 0.5rem 0 0 0;
+        position: relative;
+        padding-left: 40%;
+      }
+      td::before {
+        content: "Placeholder";
+        position: absolute;
+        left: 0.5rem;
+        top: 0;
+        font-variant: small-caps;
+        font-size: 1.2em;
+      }
+      td:nth-of-type(1)::before {
+        content: "Core";
+      }
+      td:nth-of-type(2)::before {
+        content: "Pro";
+      }
+      td:nth-of-type(3)::before {
+        content: "Sponsor+";
+      }
+      td:nth-of-type(4)::before {
+        content: "Enterprise";
+      }
+    }
+    .showFull {
+      display: none;
+    }
+    .showMobile {
+      display: contents;
+    }
+  }
+  [data-theme="dark"] .pricingTable {
+    tbody,
+    thead,
+    tfoot {
+      td,
+      th,
+      tr {
+        background-color: var(--ifm-background-color);
+      }
+    }
+  }
+  .showFull {
+    display: none;
+  }
+  .showMobile {
+    display: contents;
+  }
+}

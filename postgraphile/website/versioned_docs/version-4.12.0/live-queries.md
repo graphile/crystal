@@ -4,6 +4,9 @@ path: /postgraphile/live-queries/
 title: Live Queries
 ---
 
+import Pro from "@site/src/components/Pro";
+import Spon from "@site/src/components/Spon";
+
 <p class='intro'>
 A “live query” monitors the query a user provides and gives the client an updated version whenever the query would return a different result.
 </p>
@@ -261,7 +264,7 @@ Optimisation steps you can take currently:
 - Move the logical decoding system to a dedicated server
 - Add more `liveConditions` to queries to filter rows the user may not see so
   that they do not trigger live updates for that user (TODO: document this!)
-- Use read replicas [PRO]
+- Use read replicas <Pro /> <Spon />
 
 We do not currently recommend live queries for very large deployments - if
 you're expecting tens of thousands of concurrent users it's going to be

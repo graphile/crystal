@@ -25,6 +25,122 @@
   font-weight: normal;
 }
 
+.footnote {
+  color: var(--ifm-color-primary-dark);
+  font-size: 0.75rem;
+}
+
+.footnoteText {
+  color: var(--ifm-color-primary-darkest);
+  font-size: 0.8rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+}
+
+.note {
+  font-style: italic;
+  color: var(--ifm-color-primary-darker);
+}
+
+[data-theme="dark"] .note,
+[data-theme="dark"] .footnote,
+[data-theme="dark"] .footnoteText {
+  color: var(--ifm-color-primary-light);
+}
+
+.small {
+  font-size: 0.75rem;
+}
+
 .tagline {
   font-weight: normal;
+}
+
+/* Tooltip container */
+.tooltipped {
+  position: relative;
+  display: inline-block;
+  text-decoration: underline dotted 2px var(--ifm-color-primary-dark);
+}
+
+[data-theme="dark"] .tooltipped {
+  text-decoration: underline dotted var(--ifm-color-primary-lighter);
+}
+
+/* Tooltip text */
+.tooltipped > .tooltiptext {
+  display: block;
+  visibility: hidden;
+  width: 220px;
+  background-color: var(--ifm-color-primary-lightest);
+  border: 2px solid var(--ifm-color-primary-lighter);
+  color: black;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 10;
+}
+
+[data-theme="dark"] .tooltiptext {
+  background-color: var(--ifm-color-primary-light);
+  border: 2px solid var(--ifm-color-primary-dark);
+}
+
+.tooltipped:hover > .tooltiptext {
+  visibility: visible;
+  top: -5px;
+  right: 105%;
+}
+
+.tooltipped > .tooltiptext::after {
+  content: " ";
+  position: absolute;
+  top: 50%;
+  left: 100%; /* To the right of the tooltip */
+  margin-top: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent transparent
+    var(--ifm-color-primary-lighter);
+}
+
+[data-theme="dark"] .tooltiptext::after {
+  border-color: transparent transparent transparent
+    var(--ifm-color-primary-dark);
+}
+
+.proTag,
+.sponTag {
+  color: white !important;
+  font-size: 0.65rem;
+  border-radius: 1em;
+  padding: 0.2em 0.7em 0.3em;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1rem;
+  font-weight: bold;
+}
+
+.proTag a,
+.proTag a:visited,
+.sponTag a,
+.sponTag a:visited {
+  color: white !important;
+  text-decoration: none !important;
+}
+
+.proTag {
+  background-color: rgb(255, 71, 81);
+}
+
+.sponTag {
+  background-color: #298aff;
+}
+
+.firstLetter {
+  text-transform: uppercase;
+  font-weight: bold;
 }

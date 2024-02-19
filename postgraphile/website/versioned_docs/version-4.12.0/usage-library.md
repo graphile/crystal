@@ -5,6 +5,9 @@ title: PostGraphile as a Library
 fullTitle: Using PostGraphile as a Library
 ---
 
+import Pro from "@site/src/components/Pro";
+import Spon from "@site/src/components/Spon";
+
 Library mode is the most popular way of running PostGraphile; it gives more
 power than using the CLI (see [CLI usage](./usage-cli/)), but is much easier to
 setup and more fully featured than [Schema-only Usage](./usage-schema/).
@@ -538,19 +541,19 @@ The following options are not part of PostGraphile core, but are available from
 the Pro plugin - see [Go Pro!](/pricing/) for more information.
 
 - **`options`**:
-  - `readOnlyConnection` [PRO] ⚡️[experimental] set this to a PostgreSQL
+  - `readOnlyConnection` <Pro /> <Spon /> ⚡️[experimental] set this to a PostgreSQL
     connection string to use for read-only queries (i.e. not mutations)
-  - `defaultPaginationCap` [PRO] ⚡️[experimental] integer, ensure all
+  - `defaultPaginationCap` <Pro /> <Spon /> ⚡️[experimental] integer, ensure all
     connections have first/last specified and are no large than this value
     (default: 50), set to -1 to disable; override via smart comment
     `@paginationCap 50`
-  - `graphqlDepthLimit` [PRO] ⚡️[experimental] integer, validate GraphQL
+  - `graphqlDepthLimit`<Pro /> <Spon /> ⚡️[experimental] integer, validate GraphQL
     queries are no deeper than the specified int (default: 16), set to -1 to
     disable
-  - `graphqlCostLimit` [PRO] ⚡️[experimental] integer, only allows queries with
+  - `graphqlCostLimit` <Pro /> <Spon /> ⚡️[experimental] integer, only allows queries with
     a computed cost below the specified int (default: 1000), set to -1 to
     disable
-  - `exposeGraphQLCost` [PRO] boolean, if true (default) then the calculated
+  - `exposeGraphQLCost` <Pro /> <Spon /> boolean, if true (default) then the calculated
     query cost will be exposed on the resulting payload
 
 ### Exposing HTTP request data to PostgreSQL
