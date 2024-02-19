@@ -11,6 +11,7 @@ import type {
 import {
   currentLayerPlan,
   currentPolymorphicPaths,
+  isGlobalDependency,
   withGlobalLayerPlan,
 } from "./engine/lib/withGlobalLayerPlan.js";
 import { $$unlock } from "./engine/lock.js";
@@ -174,6 +175,8 @@ export abstract class BaseStep {
   public destroy(): void {}
 }
 
+const $$warnings = Symbol("warnings");
+
 /**
  * Executable plans are the plans associated with leaves on the GraphQL tree,
  * they must be able to execute to return values.
@@ -184,6 +187,12 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
 
   /** @internal */
   [$$unlock]: undefined | (() => void) = undefined;
+
+  [$$warnings]: {
+    globalDeps: boolean;
+  } = {
+    globalDeps: false,
+  };
 
   /**
    * Setting this true is a performance optimisation, but it comes with strong
@@ -210,15 +219,29 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   public isSyncAndSafe!: boolean;
 
   /**
-   * The plan this plan will need data from in order to execute.
+   * The steps this step will need data from in order to execute.
    */
   protected readonly dependencies: ReadonlyArray<ExecutableStep>;
+
+  /**
+   * The _global_ steps this step will need data from in order to execute.
+   */
+  protected readonly globalDependencies: ReadonlyArray<ExecutableStep>;
 
   /**
    * Just for mermaid
    * @internal
    */
   public readonly dependents: ReadonlyArray<{
+    step: ExecutableStep;
+    dependencyIndex: number;
+  }>;
+
+  /**
+   * Just for mermaid
+   * @internal
+   */
+  public readonly globalDependents: ReadonlyArray<{
     step: ExecutableStep;
     dependencyIndex: number;
   }>;
@@ -273,7 +296,9 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   constructor() {
     super();
     this.dependencies = [];
+    this.globalDependencies = [];
     this.dependents = [];
+    this.globalDependents = [];
     this.isOptimized = false;
     this.allowMultipleOptimizations = false;
     this._stepOptions = { stream: null };
@@ -350,6 +375,12 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
           `Attempted to add '${step}' (${step.layerPlan}) as a dependency of '${this}' (${this.layerPlan}), but we cannot because that LayerPlan isn't an ancestor`,
         );
       }
+      if (isGlobalDependency(step) && !this[$$warnings].globalDeps) {
+        this[$$warnings].globalDeps = true;
+        console.error(
+          `${this} called this.addDependency(${step}); but the target step should instead be added as a global dependency via 'this.addGlobalDependency'. Adding as a regular dependency will typically result in more expensive execution; see: https://err.red/ggd`,
+        );
+      }
     }
 
     // When copying dependencies between classes, we might not want to
@@ -363,6 +394,10 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     }
 
     return this.operationPlan.stepTracker.addStepDependency(this, step);
+  }
+
+  protected addGlobalDependency(step: ExecutableStep) {
+    return this.operationPlan.stepTracker.addStepGlobalDependency(this, step);
   }
 
   /**

@@ -925,7 +925,10 @@ export function isTypePlanned(
  * @internal
  */
 export type Sudo<T> = T extends ExecutableStep<any>
-  ? T & { dependencies: ReadonlyArray<ExecutableStep> }
+  ? T & {
+      dependencies: ReadonlyArray<ExecutableStep>;
+      globalDependencies: ReadonlyArray<ExecutableStep>;
+    }
   : T;
 
 /**

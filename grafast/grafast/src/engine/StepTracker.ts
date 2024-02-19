@@ -297,6 +297,39 @@ export class StepTracker {
     return dependencyIndex;
   }
 
+  public isGlobalDependency($dependency: ExecutableStep) {
+    return $dependency.layerPlan.id === 0;
+  }
+
+  public addStepGlobalDependency(
+    $dependent: ExecutableStep,
+    $dependency: ExecutableStep,
+  ): number {
+    if (!this.activeSteps.has($dependent)) {
+      throw new Error(
+        `Cannot add ${$dependency} as a global dependency of ${$dependent}; the latter is deleted!`,
+      );
+    }
+    if (!this.activeSteps.has($dependency)) {
+      throw new Error(
+        `Cannot add ${$dependency} as a global dependency of ${$dependent}; the former is deleted!`,
+      );
+    }
+    if (!this.isGlobalDependency($dependency)) {
+      throw new Error(
+        `${$dependent} tried to add global dependency on ${$dependency}, but that step cannot be a global dependency.`,
+      );
+    }
+    this.stepsWithNoDependencies.delete($dependent);
+    const dependencyIndex =
+      writeableArray(sudo($dependent).globalDependencies).push($dependency) - 1;
+    writeableArray($dependency.globalDependents).push({
+      step: $dependent,
+      dependencyIndex,
+    });
+    return dependencyIndex;
+  }
+
   public setOutputPlanRootStep(
     outputPlan: OutputPlan,
     $dependency: ExecutableStep,

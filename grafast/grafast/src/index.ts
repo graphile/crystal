@@ -33,6 +33,7 @@ debugFactory.formatters.c = grafastPrint;
 import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
+import { isGlobalDependency } from "./engine/lib/withGlobalLayerPlan.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
 import {
   GrafastError,
@@ -338,6 +339,7 @@ export {
   InterfaceOrUnionPlans,
   isDev,
   isExecutableStep,
+  isGlobalDependency,
   isGrafastError,
   isListCapableStep,
   isListLikeStep,
@@ -548,6 +550,7 @@ exportAsMany("grafast", {
   LoadStep,
   isSafeError,
   SafeError,
+  isGlobalDependency,
 });
 
 export { hookArgs } from "./args.js";

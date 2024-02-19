@@ -1,3 +1,4 @@
+import type { ExecutableStep } from "../..";
 import type { LayerPlan } from "../LayerPlan";
 
 let globalData_layerPlan: LayerPlan | undefined = undefined;
@@ -44,4 +45,8 @@ export function currentPolymorphicPaths(): ReadonlySet<string> | null {
     );
   }
   return globalData_polymorphicPaths;
+}
+
+export function isGlobalDependency($step: ExecutableStep): boolean {
+  return currentLayerPlan().operationPlan.stepTracker.isGlobalDependency($step);
 }
