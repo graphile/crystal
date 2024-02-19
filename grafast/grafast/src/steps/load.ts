@@ -171,6 +171,8 @@ export class LoadStep<
   /* implements ListCapableStep<TItem, LoadedRecordStep<TItem, TParams>> */
   static $$export = { moduleName: "grafast", exportName: "LoadStep" };
 
+  public isSyncAndSafe = false;
+
   loadOptions: LoadOptions<TItem, TParams> | null = null;
   loadOptionsKey = "";
 
