@@ -2074,6 +2074,24 @@ export class OperationPlan {
           }
         }
       }
+      for (let i = 0; i < step.globalDependents.length; i++) {
+        const entry = step.globalDependents[i];
+        const { step: $processFirst } = entry;
+        if (!processed.has($processFirst)) {
+          this.processStep(
+            actionDescription,
+            order,
+            isReadonly,
+            callback,
+            processed,
+            $processFirst,
+          );
+          if (step.globalDependents[i] !== entry) {
+            // The world has change; go back to the start
+            i = -1;
+          }
+        }
+      }
       const subroutineLayerPlan = step[$$subroutine];
       if (subroutineLayerPlan !== null) {
         const $root = subroutineLayerPlan.rootStep;
@@ -2092,6 +2110,18 @@ export class OperationPlan {
       // used for: hoist
 
       for (const $processFirst of sudo(step).dependencies) {
+        if (!processed.has($processFirst)) {
+          this.processStep(
+            actionDescription,
+            order,
+            isReadonly,
+            callback,
+            processed,
+            $processFirst,
+          );
+        }
+      }
+      for (const $processFirst of sudo(step).globalDependencies) {
         if (!processed.has($processFirst)) {
           this.processStep(
             actionDescription,
@@ -2229,12 +2259,14 @@ export class OperationPlan {
 
     const {
       dependencies: deps,
+      globalDependencies: globalDeps,
       layerPlan: layerPlan,
       constructor: stepConstructor,
     } = sudo(step);
     const dependencyCount = deps.length;
+    const globalDependencyCount = globalDeps.length;
 
-    if (dependencyCount === 0) {
+    if (dependencyCount === 0 && globalDependencyCount === 0) {
       let allPeers: ExecutableStep[] | null = null;
       for (const possiblyPeer of this.stepTracker.stepsWithNoDependencies) {
         if (
@@ -2251,7 +2283,7 @@ export class OperationPlan {
         }
       }
       return allPeers === null ? EMPTY_ARRAY : allPeers;
-    } else if (dependencyCount === 1) {
+    } else if (dependencyCount === 1 && globalDependencyCount === 0) {
       // Optimized form for steps that have one dependency (extremely common!)
 
       const { ancestry, deferBoundaryDepth } = layerPlan;
@@ -2289,6 +2321,7 @@ export class OperationPlan {
         }
       }
       return allPeers === null ? EMPTY_ARRAY : allPeers;
+      // OPTIM: else if globalDependencyCount === 1 && dependencyCount === 0
     } else {
       const { ancestry, deferBoundaryDepth } = layerPlan;
       /**
@@ -2299,6 +2332,10 @@ export class OperationPlan {
        * - do not pass a "deferred" layer plan
        *
        * Compatible layer plans are no less deep than minDepth.
+       *
+       * NOTE: global dependencies currently come from layer plan 0, so they
+       * cannot be traversed past nor can they be deferred, so we don't need to
+       * factor them in.
        */
       let minDepth = deferBoundaryDepth;
       const possiblePeers: ExecutableStep[] = [];
@@ -2352,6 +2389,11 @@ export class OperationPlan {
             continue outerloop;
           }
         }
+        for (let i = 0; i < globalDependencyCount - 1; i++) {
+          if (globalDeps[i] !== sudo(possiblyPeer).globalDependencies[i]) {
+            continue outerloop;
+          }
+        }
         if (allPeers === null) {
           allPeers = [possiblyPeer];
         } else {
@@ -2372,6 +2414,9 @@ export class OperationPlan {
     if (step[$$subroutine] !== null) {
       // Don't hoist steps that are the parent of a subroutine
       // PERF: we _should_ be able to hoist, but care must be taken. Currently it causes test failures.
+      return true;
+    }
+    if (step.globalDependents.length > 0) {
       return true;
     }
     return false;
@@ -2441,7 +2486,11 @@ export class OperationPlan {
       case "nullableBoundary": {
         // Safe to hoist _unless_ it depends on the root step of the nullableBoundary.
         const $root = step.layerPlan.reason.parentStep!;
-        if (sudo(step).dependencies.includes($root)) {
+        const sstep = sudo(step);
+        if (
+          sstep.dependencies.includes($root) ||
+          sstep.globalDependencies.includes($root)
+        ) {
           return;
         } else {
           break;
@@ -2862,6 +2911,11 @@ export class OperationPlan {
         this.deduplicateStepsProcess(processed, start, dep);
       }
     }
+    for (const dep of sudo(step).globalDependencies) {
+      if (dep.id >= start && !processed.has(dep)) {
+        this.deduplicateStepsProcess(processed, start, dep);
+      }
+    }
     withGlobalLayerPlan(
       step.layerPlan,
       step.polymorphicPaths,
@@ -3142,6 +3196,19 @@ export class OperationPlan {
             rest.push(dep);
           }
         }
+        for (const dep of sudo(step).globalDependencies) {
+          if (dep.layerPlan !== layerPlan) {
+            continue;
+          }
+          if (processed.has(dep)) {
+            continue;
+          }
+          if (dep.hasSideEffects) {
+            sideEffectDeps.push(dep);
+          } else {
+            rest.push(dep);
+          }
+        }
 
         // Call any side effects we're dependent on
         for (const sideEffectDep of sideEffectDeps) {
@@ -3168,6 +3235,11 @@ export class OperationPlan {
 
       const readyToExecute = (step: ExecutableStep): boolean => {
         for (const dep of sudo(step).dependencies) {
+          if (dep.layerPlan === layerPlan && pending.has(dep)) {
+            return false;
+          }
+        }
+        for (const dep of sudo(step).globalDependencies) {
           if (dep.layerPlan === layerPlan && pending.has(dep)) {
             return false;
           }
@@ -3344,6 +3416,7 @@ export class OperationPlan {
         metaString: metaString ? stripAnsi(metaString) : metaString,
         bucketId: step.layerPlan.id,
         dependencyIds: sudo(step).dependencies.map((d) => d.id),
+        globalDependencyIds: sudo(step).globalDependencies.map((d) => d.id),
         polymorphicPaths: step.polymorphicPaths
           ? [...step.polymorphicPaths]
           : undefined,
@@ -3442,6 +3515,12 @@ export class OperationPlan {
             if (!known.includes(dep.layerPlan)) {
               // Naughty naughty
               (subroutineStep as any).addDependency(dep);
+            }
+          }
+          for (const dep of sudo(step).globalDependencies) {
+            if (!known.includes(dep.layerPlan)) {
+              // Naughty naughty
+              (subroutineStep as any).addGlobalDependency(dep);
             }
           }
         }

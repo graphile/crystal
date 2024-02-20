@@ -247,6 +247,11 @@ export class StepTracker {
           handle(dependent.step);
         }
       }
+      for (const dependent of step.globalDependents) {
+        if (dependent.step.layerPlan === layerPlan) {
+          handle(dependent.step);
+        }
+      }
       this.eradicate(step);
     };
     for (const step of this.activeSteps) {
@@ -441,6 +446,23 @@ export class StepTracker {
     }
 
     {
+      // Transfer step globalDependents of $original to $replacement
+      const globalDependents = $original.globalDependents;
+      if (globalDependents.length > 0) {
+        const replacementGlobalDependents = writeableArray(
+          $replacement.globalDependents,
+        );
+        for (const globalDependent of globalDependents) {
+          writeableArray(sudo(globalDependent.step).globalDependencies)[
+            globalDependent.dependencyIndex
+          ] = $replacement;
+          replacementGlobalDependents.push(globalDependent);
+        }
+        ($original.globalDependents as any) = [];
+      }
+    }
+
+    {
       // Convert root step of output plans from $original to $replacement
       const outputPlans = this.outputPlansByRootStep.get($original);
       if (outputPlans?.size) {
@@ -530,6 +552,7 @@ export class StepTracker {
    */
   private isNotNeeded($step: ExecutableStep): boolean {
     if ($step.dependents.length !== 0) return false;
+    if ($step.globalDependents.length !== 0) return false;
     if ($step.hasSideEffects) return false;
     const s1 = this.outputPlansByRootStep.get($step);
     if (s1 && s1.size !== 0) return false;
@@ -558,6 +581,11 @@ export class StepTracker {
       }
       if (toRemove.has(step)) {
         for (const dependent of step.dependents) {
+          if (dependent.step.id >= count) {
+            remove(dependent.step);
+          }
+        }
+        for (const dependent of step.globalDependents) {
           if (dependent.step.id >= count) {
             remove(dependent.step);
           }
@@ -616,6 +644,26 @@ export class StepTracker {
       }
     }
 
+    // Since this step is being removed, it doesn't need its globalDependencies any more
+    const oldGlobalDependencies = sudo($original).globalDependencies;
+    for (const $dependency of oldGlobalDependencies) {
+      // $dependency is no longer a globalDependent of $original, since we're getting
+      // rid of $original
+      ($dependency.globalDependents as any) =
+        $dependency.globalDependents.filter(
+          (globalDependent) => globalDependent.step !== $original,
+        );
+
+      // If we've done our first tree-shake, let's keep it tidy in here.
+      if (
+        this.operationPlan.phase !== "plan" &&
+        this.isNotNeeded($dependency)
+      ) {
+        // Nothing depends on $dependency and it has no side effects - we can get rid of it!
+        this.eradicate($dependency);
+      }
+    }
+
     // Ensure nothing depends on this step - steps, layer plans, output plans.
     // This should already be the case, so we just do it in dev as a
     // consistency check.
@@ -623,6 +671,13 @@ export class StepTracker {
       if ($original.dependents.length > 0) {
         throw new Error(
           `${$original} eradicated, but it is needed by ${$original.dependents.map(
+            (d) => d.step,
+          )}`,
+        );
+      }
+      if ($original.globalDependents.length > 0) {
+        throw new Error(
+          `${$original} eradicated, but it is needed by ${$original.globalDependents.map(
             (d) => d.step,
           )}`,
         );

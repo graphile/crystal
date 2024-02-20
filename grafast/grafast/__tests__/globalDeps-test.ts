@@ -11,6 +11,7 @@ import type {
   PromiseOrDirect,
 } from "../dist/index.js";
 import {
+  access,
   arrayOfLength,
   constant,
   context,
@@ -28,13 +29,24 @@ declare global {
   }
 }
 
-function query<T>(db: sqlite3.Database, sql: string, values: any[]) {
+function query<T>(db: sqlite3.Database, sql: string, values: any[] = []) {
   return new Promise<T[]>((resolve, reject) => {
     return db.all<T>(sql, values, function (err, rows) {
       if (err) {
         reject(err);
       } else {
         resolve(rows);
+      }
+    });
+  });
+}
+function run(db: sqlite3.Database, sql: string, values: any[] = []) {
+  return new Promise<void>((resolve, reject) => {
+    return db.run(sql, values, function (err) {
+      if (err) {
+        reject(err);
+      } else {
+        resolve();
       }
     });
   });
@@ -109,19 +121,23 @@ and (
     : ``
 }
 ${otherConditions.length ? `and (${otherConditions.join(")\nand (")})` : ``}
-order by ${orderBy}
+${orderBy ? `order by ${orderBy}` : ""}
 `;
-    const json: any[] = [];
-    for (let i = 0; i < count; i++) {
-      const obj = Object.fromEntries(
-        Object.entries(this.depIdByIdentifier).map(([col, depId]) => [
-          col,
-          values[depId][i],
-        ]),
-      );
-      json.push(obj);
+    const sqlValues: any[] = [];
+    if (identifierCols.length > 0) {
+      const json: any[] = [];
+      for (let i = 0; i < count; i++) {
+        const obj = Object.fromEntries(
+          Object.entries(this.depIdByIdentifier).map(([col, depId]) => [
+            col,
+            values[depId][i],
+          ]),
+        );
+        json.push(obj);
+      }
+      sqlValues.push(JSON.stringify(json));
     }
-    const dbResults = await query<T>(db, sql, [JSON.stringify(json)]);
+    const dbResults = await query<T>(db, sql, sqlValues);
     const results: T[][] = [];
     for (let i = 0; i < count; i++) {
       // This could be more optimal by leveraging they're already in order
@@ -132,6 +148,9 @@ order by ${orderBy}
       });
     }
     return results;
+  }
+  listItem($item: ExecutableStep) {
+    return access($item);
   }
 }
 
@@ -175,25 +194,36 @@ function getRecords(
   return new GetRecordsStep(tableName, identifiers);
 }
 
-function makeDb() {
+async function withDb<T>(callback: (db: sqlite3.Database) => Promise<T>) {
   const db = new sqlite3.Database(":memory:");
-  db.run(`
-drop table if exists pets;
-drop table if exists people;
-create table people (
+  try {
+    await run(db, `drop table if exists pets;`);
+    await run(db, `drop table if exists people;`);
+    await run(
+      db,
+      `create table people (
     id serial primary key,
     name text
-);
-create table pets (
+);`,
+    );
+    await run(
+      db,
+      `create table pets (
     id serial primary key,
     name text,
     owner_id int
-);
-insert into people (id, name) values
+);`,
+    );
+    await run(
+      db,
+      `insert into people (id, name) values
   (1, 'Alice'),
   (2, 'Fred'),
-  (3, 'Kat');
-insert into pets (id, owner_id, name) values
+  (3, 'Kat');`,
+    );
+    await run(
+      db,
+      `insert into pets (id, owner_id, name) values
   (1, 1, 'Animal 1'),
   (2, 1, 'Animal 2'),
   (3, 1, 'Animal 3'),
@@ -202,55 +232,59 @@ insert into pets (id, owner_id, name) values
   (6, 3, 'Cat 1'),
   (7, 3, 'Cat 2'),
   (8, 3, 'Cat 3');
-`);
-  return db;
+`,
+    );
+    return await callback(db);
+  } finally {
+    db.close();
+  }
 }
 
-it("works", async () => {
-  const schema = makeSchema();
-  const source = /* GraphQL */ `
-    query Q {
-      allPeople {
-        name
-        pets {
+it("works", () =>
+  withDb(async (db) => {
+    const schema = makeSchema();
+    const source = /* GraphQL */ `
+      query Q {
+        allPeople {
           name
+          pets {
+            name
+          }
         }
       }
-    }
-  `;
-  const variableValues = {};
-  const db = makeDb();
-  const result = (await grafast(
-    {
-      schema,
-      source,
-      variableValues,
-      contextValue: {
-        db,
-      },
-    },
-    {},
-    {},
-  )) as ExecutionResult;
-  expect(result.errors).to.be.undefined;
-  expect(result.data).to.deep.equal({
-    allPeople: [
+    `;
+    const variableValues = {};
+    const result = (await grafast(
       {
-        name: "Alice",
-        pets: [
-          { name: "Animal 1" },
-          { name: "Animal 2" },
-          { name: "Animal 3" },
-        ],
+        schema,
+        source,
+        variableValues,
+        contextValue: {
+          db,
+        },
       },
-      {
-        name: "Fred",
-        pets: [{ name: "Fox 1" }, { name: "Fox 2" }],
-      },
-      {
-        name: "Kat",
-        pets: [{ name: "Cat 1" }, { name: "Cat 2" }, { name: "Cat 3" }],
-      },
-    ],
-  });
-});
+      {},
+      {},
+    )) as ExecutionResult;
+    expect(result.errors).to.be.undefined;
+    expect(result.data).to.deep.equal({
+      allPeople: [
+        {
+          name: "Alice",
+          pets: [
+            { name: "Animal 1" },
+            { name: "Animal 2" },
+            { name: "Animal 3" },
+          ],
+        },
+        {
+          name: "Fred",
+          pets: [{ name: "Fox 1" }, { name: "Fox 2" }],
+        },
+        {
+          name: "Kat",
+          pets: [{ name: "Cat 1" }, { name: "Cat 2" }, { name: "Cat 3" }],
+        },
+      ],
+    });
+  }));

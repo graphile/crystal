@@ -8,6 +8,7 @@ export interface GrafastPlanStepJSONv1 {
   metaString: string | null;
   bucketId: string | number;
   dependencyIds: ReadonlyArray<string | number>;
+  globalDependencyIds: ReadonlyArray<string | number>;
   polymorphicPaths: readonly string[] | undefined;
   isSyncAndSafe: boolean | undefined;
   supportsUnbatched: boolean | undefined;
