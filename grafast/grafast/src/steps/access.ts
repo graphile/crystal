@@ -231,12 +231,12 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
  */
 export function access<TData>(
   parentPlan: ExecutableStep<unknown>,
-  path: (string | number | symbol)[] | string | number | symbol,
+  path?: (string | number | symbol)[] | string | number | symbol,
   fallback?: any,
 ): AccessStep<TData> {
   return new AccessStep<TData>(
     parentPlan,
-    Array.isArray(path) ? path : [path],
+    Array.isArray(path) ? path : path != null ? [path] : [],
     fallback,
   );
 }
