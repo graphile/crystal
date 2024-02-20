@@ -758,6 +758,8 @@ export type ExecutionEventMap = {
 export type ExecutionEventEmitter = TypedEventEmitter<ExecutionEventMap>;
 
 export interface ExecutionExtra {
+  /** The results for the `addGlobalDependency` dependencies the step used */
+  globals: Record<string | number, any>;
   /** The `performance.now()` at which your step should stop executing */
   stopTime: number | null;
   /** If you have set a `metaKey` on your step, the relevant meta object which you can write into (e.g. for caching) */

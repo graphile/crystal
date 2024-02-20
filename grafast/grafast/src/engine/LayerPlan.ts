@@ -372,6 +372,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   public newBucket(parentBucket: Bucket): Bucket | null {
     const copyStepIds = this.copyStepIds;
     const store: Bucket["store"] = new Map();
+    const globalStore = parentBucket.globalStore;
     const polymorphicPathList: (string | null)[] =
       this.reason.type === "mutationField"
         ? (parentBucket.polymorphicPathList as string[])
@@ -616,6 +617,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           layerPlan: this,
           size,
           store,
+          globalStore,
           // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
           hasErrors: parentBucket.hasErrors,
           polymorphicPathList,

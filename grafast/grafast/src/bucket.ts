@@ -91,6 +91,11 @@ export interface Bucket {
   store: Map<number, any[]>;
 
   /**
+   * For "global dependencies", we only need to store the value once per step id.
+   */
+  globalStore: Map<number, any>;
+
+  /**
    * Set this true when the bucket is fully executed.
    *
    * Initialize it to false.

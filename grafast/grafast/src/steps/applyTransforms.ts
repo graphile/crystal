@@ -84,6 +84,7 @@ export class ApplyTransformsStep extends ExecutableStep {
     const copyStepIds = childLayerPlan.copyStepIds;
 
     const store: Bucket["store"] = new Map();
+    const globalStore = bucket.globalStore;
     const polymorphicPathList: (string | null)[] = [];
     const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [];
     const map: Map<number, number[]> = new Map();
@@ -148,6 +149,7 @@ export class ApplyTransformsStep extends ExecutableStep {
           layerPlan: childLayerPlan,
           size,
           store,
+          globalStore,
           hasErrors: bucket.hasErrors,
           polymorphicPathList,
           iterators,

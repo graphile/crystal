@@ -42,7 +42,7 @@ function query<T>(db: sqlite3.Database, sql: string, values: any[]) {
 
 class GetRecordsStep<T extends Record<string, any>> extends ExecutableStep {
   depIdByIdentifier: Record<string, number>;
-  dbDepId: number;
+  dbDepId: string | number;
   constructor(
     private tableName: string,
     identifiers: Record<string, ExecutableStep> = Object.create(null),
@@ -58,7 +58,7 @@ class GetRecordsStep<T extends Record<string, any>> extends ExecutableStep {
   }
 
   // Global Dep Id
-  private firstGDI: number;
+  private firstGDI: string | number;
   setFirst($first: ExecutableStep) {
     this.firstGDI = this.addGlobalDependency($first);
   }

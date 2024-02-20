@@ -396,7 +396,12 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     return this.operationPlan.stepTracker.addStepDependency(this, step);
   }
 
-  protected addGlobalDependency(step: ExecutableStep) {
+  /**
+   * Adds "global" dependencies; in `execute(count, values, extra)` you'll
+   * be able to access the value via `extra.globals[key]` where `key` is the
+   * return value of this function.
+   */
+  protected addGlobalDependency(step: ExecutableStep): string | number {
     return this.operationPlan.stepTracker.addStepGlobalDependency(this, step);
   }
 

@@ -293,9 +293,6 @@ function executePreemptive(
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
-  // PERF: batch this method so it can process multiple GraphQL requests in parallel
-
-  // TODO: when we batch, we need to change `rootBucketIndex` and `size`, and make sure that we only batch where `executionTimeout` is the same.
   const rootBucketIndex = 0;
   const size = 1;
 
@@ -307,17 +304,24 @@ function executePreemptive(
   const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [new Set()];
 
   const store: Bucket["store"] = new Map();
+  const globalStore = new Map();
   store.set(-1, requestIndex);
+  globalStore.set(-1, requestIndex[0]);
   store.set(operationPlan.rootLayerPlan.rootStep!.id, requestIndex);
+  globalStore.set(operationPlan.rootLayerPlan.rootStep!.id, requestIndex[0]);
   store.set(operationPlan.variableValuesStep.id, vars);
+  globalStore.set(operationPlan.variableValuesStep.id, vars[0]);
   store.set(operationPlan.contextStep.id, ctxs);
+  globalStore.set(operationPlan.contextStep.id, ctxs[0]);
   store.set(operationPlan.rootValueStep.id, rvs);
+  globalStore.set(operationPlan.rootValueStep.id, rvs[0]);
 
   const rootBucket = newBucket(
     {
       layerPlan: operationPlan.rootLayerPlan,
       size,
       store,
+      globalStore,
       hasErrors: false,
       polymorphicPathList,
       iterators,
@@ -348,6 +352,7 @@ function executePreemptive(
     const layerPlan = subscriptionLayerPlan!;
     // PERF: we could consider batching this.
     const store: Bucket["store"] = new Map();
+    const globalStore = rootBucket.globalStore;
     const subscriptionBucketIndex = 0;
 
     for (const depId of layerPlan.copyStepIds) {
@@ -364,6 +369,7 @@ function executePreemptive(
       {
         layerPlan,
         store,
+        globalStore,
         hasErrors: rootBucket.hasErrors,
         polymorphicPathList: [POLYMORPHIC_ROOT_PATH],
         iterators: [new Set()],
@@ -732,6 +738,7 @@ async function processStream(
   const _processQueue = (entries: ResultTuple[]) => {
     const size = entries.length;
     const store: Bucket["store"] = new Map();
+    const globalStore = spec.bucket.globalStore;
     const polymorphicPathList: (string | null)[] = [];
     const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [];
 
@@ -789,6 +796,7 @@ async function processStream(
         layerPlan: directLayerPlanChild,
         size,
         store,
+        globalStore,
         hasErrors: false,
         polymorphicPathList,
         iterators,
@@ -917,6 +925,10 @@ function processSingleDeferred(
 ) {
   const size = specs.length;
   const store: Bucket["store"] = new Map();
+
+  // HACK: when we re-write stream/defer this needs fixing.
+  const globalStore = specs[0][1].bucket.globalStore;
+
   const polymorphicPathList: (string | null)[] = [];
   const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [];
 
@@ -950,6 +962,7 @@ function processSingleDeferred(
       layerPlan: outputPlan.layerPlan,
       size,
       store,
+      globalStore,
       hasErrors: false,
       polymorphicPathList,
       iterators,

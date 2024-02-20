@@ -100,8 +100,10 @@ export function executeBucket(
     metaByMetaKey,
     size,
     store,
+    globalStore,
     layerPlan: { phases, children: childLayerPlans },
   } = bucket;
+  const isGlobal = bucket.layerPlan.id === 0;
 
   const phaseCount = phases.length;
 
@@ -268,6 +270,9 @@ export function executeBucket(
         resultIndex: number,
         value: unknown,
       ) => {
+        if (isGlobal) {
+          bucket.globalStore.set(finishedStep.id, value);
+        }
         let proto: any;
         if (
           // Fast-lane for non-objects
@@ -412,6 +417,12 @@ export function executeBucket(
                   settledResult.reason,
                   finishedStep.id,
                 );
+                if (isGlobal) {
+                  bucket.globalStore.set(
+                    finishedStep.id,
+                    storeEntry[dataIndex],
+                  );
+                }
               }
             }
             if (bucket.hasErrors && sideEffectSteps) {
@@ -441,6 +452,9 @@ export function executeBucket(
                 ),
                 finishedStep.id,
               );
+              if (isGlobal) {
+                bucket.globalStore.set(finishedStep.id, storeEntry[dataIndex]);
+              }
             }
           });
       } else {
@@ -474,6 +488,7 @@ export function executeBucket(
         const meta =
           step.metaKey !== undefined ? metaByMetaKey[step.metaKey] : undefined;
         extras[allStepsIndex] = {
+          globals: [],
           stopTime,
           meta,
           eventEmitter,
@@ -505,6 +520,9 @@ export function executeBucket(
                 ] as UnbatchedExecutableStep;
                 const storeEntry = bucket.store.get(step.id)!;
                 storeEntry[dataIndex] = depVal;
+                if (isGlobal) {
+                  bucket.globalStore.set(step.id, depVal);
+                }
               }
               continue outerLoop;
             }
@@ -522,21 +540,40 @@ export function executeBucket(
           const storeEntry = bucket.store.get(step.id)!;
           try {
             const deps: any = [];
+            const extra = extras[allStepsIndex];
             for (const $dep of step.dependencies) {
               const depVal = bucket.store.get($dep.id)![dataIndex];
               if (bucket.hasErrors && isGrafastError(depVal)) {
                 storeEntry[dataIndex] = depVal;
+                if (isGlobal) {
+                  bucket.globalStore.set(step.id, depVal);
+                }
                 continue stepLoop;
               }
               deps.push(depVal);
             }
-            storeEntry[dataIndex] = step.unbatchedExecute(
-              extras[allStepsIndex],
-              ...deps,
-            );
+            for (const $dep of step.globalDependencies) {
+              const depVal = bucket.globalStore.get($dep.id);
+              if (bucket.hasErrors && isGrafastError(depVal)) {
+                storeEntry[dataIndex] = depVal;
+                if (isGlobal) {
+                  bucket.globalStore.set(step.id, depVal);
+                }
+                continue stepLoop;
+              }
+              extra.globals.push(depVal);
+            }
+
+            storeEntry[dataIndex] = step.unbatchedExecute(extra, ...deps);
+            if (isGlobal) {
+              bucket.globalStore.set(step.id, storeEntry[dataIndex]);
+            }
           } catch (e) {
             bucket.hasErrors = true;
             storeEntry[dataIndex] = newGrafastError(e, step.id);
+            if (isGlobal) {
+              bucket.globalStore.set(step.id, storeEntry[dataIndex]);
+            }
           }
         }
       }
@@ -712,6 +749,7 @@ export function executeBucket(
       const meta =
         step.metaKey !== undefined ? metaByMetaKey[step.metaKey] : undefined;
       const extra: ExecutionExtra = {
+        globals: [],
         stopTime,
         meta,
         eventEmitter,
@@ -746,6 +784,13 @@ export function executeBucket(
               }
             }
           }
+        }
+      }
+      const globalDepCount = sstep.globalDependencies.length;
+      if (globalDepCount > 0) {
+        for (let i = 0, l = globalDepCount; i < l; i++) {
+          const $dep = sstep.globalDependencies[i];
+          extra.globals[i] = globalStore.get($dep.id)!;
         }
       }
       if (
@@ -868,6 +913,7 @@ export function newBucket(
     Bucket,
     | "layerPlan"
     | "store"
+    | "globalStore"
     | "size"
     | "hasErrors"
     | "polymorphicPathList"
@@ -925,6 +971,7 @@ export function newBucket(
     // Copy from spec
     layerPlan: spec.layerPlan,
     store: spec.store,
+    globalStore: spec.globalStore,
     size: spec.size,
     hasErrors: spec.hasErrors,
     polymorphicPathList: spec.polymorphicPathList,
