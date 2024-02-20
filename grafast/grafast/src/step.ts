@@ -312,7 +312,13 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   }
 
   public toString(): string {
-    const meta = this.toStringMeta();
+    let meta;
+    try {
+      // If we log out too early, the meta function might fail.
+      meta = this.toStringMeta();
+    } catch (e) {
+      // Ignore
+    }
     return chalk.bold.blue(
       `${this.constructor.name.replace(/Step$/, "")}${
         this.layerPlan.id === 0 ? "" : chalk.grey(`{${this.layerPlan.id}}`)
