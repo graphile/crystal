@@ -222,7 +222,7 @@ export class LoadStep<
       );
     }
   }
-  listItem($item: __ItemStep<this>) {
+  listItem($item: __ItemStep<TItem>) {
     return new LoadedRecordStep<TItem, TParams>(
       $item,
       false,

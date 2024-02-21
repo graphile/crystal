@@ -33,6 +33,7 @@ debugFactory.formatters.c = grafastPrint;
 import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
+import { isUnaryStep } from "./engine/lib/withGlobalLayerPlan.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
 import {
   GrafastError,
@@ -97,6 +98,7 @@ import {
   StepOptimizeOptions,
   StepStreamOptions,
   TypedEventEmitter,
+  UnbatchedExecutionExtra,
 } from "./interfaces.js";
 import { polymorphicWrap } from "./polymorphic.js";
 import {
@@ -346,6 +348,7 @@ export {
   isPromiseLike,
   isSafeError,
   isStreamableStep,
+  isUnaryStep,
   JSONArray,
   JSONObject,
   JSONValue,
@@ -436,6 +439,7 @@ export {
   trackedRootValue,
   TypedEventEmitter,
   UnbatchedExecutableStep,
+  UnbatchedExecutionExtra,
 };
 
 exportAsMany("grafast", {
@@ -548,6 +552,7 @@ exportAsMany("grafast", {
   LoadStep,
   isSafeError,
   SafeError,
+  isUnaryStep,
 });
 
 export { hookArgs } from "./args.js";

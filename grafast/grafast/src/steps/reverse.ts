@@ -1,7 +1,7 @@
 import type {
-  ExecutionExtra,
   GrafastResultsList,
   GrafastValuesList,
+  UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
@@ -48,7 +48,7 @@ export class ReverseStep<TData> extends UnbatchedExecutableStep<
     return values[0].map((arr) => (arr == null ? arr : reverseArray(arr)));
   }
 
-  unbatchedExecute(_extra: ExecutionExtra, arr: TData[]): TData[] {
+  unbatchedExecute(_extra: UnbatchedExecutionExtra, arr: TData[]): TData[] {
     return arr == null ? arr : reverseArray(arr);
   }
 

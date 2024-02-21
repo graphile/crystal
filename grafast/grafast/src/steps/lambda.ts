@@ -1,6 +1,6 @@
 import type {
-  ExecutionExtra,
   PromiseOrDirect,
+  UnbatchedExecutionExtra,
   UnwrapPlanTuple,
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
@@ -47,7 +47,10 @@ export class LambdaStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
     return peers.filter((peer) => peer.fn === this.fn);
   }
 
-  unbatchedExecute(_extra: ExecutionExtra, value: TIn): PromiseOrDirect<TOut> {
+  unbatchedExecute(
+    _extra: UnbatchedExecutionExtra,
+    value: TIn,
+  ): PromiseOrDirect<TOut> {
     return this.fn(value);
   }
 }

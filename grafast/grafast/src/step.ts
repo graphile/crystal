@@ -26,10 +26,12 @@ import type {
   PromiseOrDirect,
   StepOptimizeOptions,
   StepOptions,
+  UnbatchedExecutionExtra,
 } from "./interfaces.js";
 import { $$subroutine } from "./interfaces.js";
 import type { __ItemStep } from "./steps/index.js";
 import { __ListTransformStep } from "./steps/index.js";
+import { arrayOfLength } from "./utils.js";
 
 /**
  * @internal
@@ -121,6 +123,10 @@ export abstract class BaseStep {
   public [$$subroutine]: LayerPlan<LayerPlanReasonSubroutine> | null = null;
   public isArgumentsFinalized: boolean;
   public isFinalized: boolean;
+  /** @internal */
+  public _isUnary: boolean;
+  /** @internal */
+  public _isUnaryLocked: boolean;
   public debug: boolean;
 
   // ENHANCE: change hasSideEffects to getter/setter, forbid setting after a
@@ -139,6 +145,8 @@ export abstract class BaseStep {
     const layerPlan = currentLayerPlan();
     this.layerPlan = layerPlan;
     this.operationPlan = layerPlan.operationPlan;
+    this._isUnary = true;
+    this._isUnaryLocked = false;
   }
 
   public toString(): string {
@@ -347,6 +355,11 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
         )}'`,
       );
     }
+    if (this._isUnaryLocked && this._isUnary && !step._isUnary) {
+      throw new Error(
+        `${this} is a unary step, so cannot add non-unary step ${step} as a dependency`,
+      );
+    }
     if (isDev) {
       // Check that we can actually add this as a dependency
       if (!this.layerPlan.ancestry.includes(step.layerPlan)) {
@@ -369,6 +382,15 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     }
 
     return this.operationPlan.stepTracker.addStepDependency(this, step);
+  }
+
+  /**
+   * Adds "unary" dependencies; in `execute(count, values, extra)` you'll
+   * be able to access the value via `extra.unaries[key]` where `key` is the
+   * return value of this function.
+   */
+  protected addUnaryDependency(step: ExecutableStep): string | number {
+    return this.operationPlan.stepTracker.addStepUnaryDependency(this, step);
   }
 
   /**
@@ -451,7 +473,23 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     count;
     values;
     extra;
-    throw new Error(`${this} has not implemented an 'execute' method`);
+    throw new Error(
+      `${this} has not implemented an 'executeV2' or 'execute' method`,
+    );
+  }
+
+  // This executeV2 method implements backwards compatibility with the old
+  // execute method; you should instead override this in your own step
+  // classes.
+  executeV2(
+    count: number,
+    values: ReadonlyArray<GrafastValuesList<any> | null>,
+    extra: ExecutionExtra,
+  ): PromiseOrDirect<GrafastResultsList<TData>> {
+    const backfilledValues = values.map((v, i) =>
+      v === null ? arrayOfLength(count, extra.unaries[i]) : v,
+    );
+    return this.execute(count, backfilledValues, extra);
   }
 
   public destroy(): void {
@@ -590,7 +628,7 @@ export abstract class UnbatchedExecutableStep<
   }
 
   abstract unbatchedExecute(
-    extra: ExecutionExtra,
+    extra: UnbatchedExecutionExtra,
     ...tuple: any[]
   ): PromiseOrDirect<TData>;
 }
@@ -673,11 +711,27 @@ export type StreamableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
     },
   ): PromiseOrDirect<GrafastResultStreamList<TData>>;
 };
+export type StreamV2ableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
+  streamV2(
+    count: number,
+    values: ReadonlyArray<GrafastValuesList<any> | null>,
+    extra: ExecutionExtra,
+    streamOptions: {
+      initialCount: number;
+    },
+  ): PromiseOrDirect<GrafastResultStreamList<TData>>;
+};
 
 export function isStreamableStep<TData>(
   plan: ExecutableStep<ReadonlyArray<TData>>,
 ): plan is StreamableStep<TData> {
   return typeof (plan as StreamableStep<TData>).stream === "function";
+}
+
+export function isStreamV2ableStep<TData>(
+  plan: ExecutableStep<ReadonlyArray<TData>>,
+): plan is StreamV2ableStep<TData> {
+  return typeof (plan as StreamV2ableStep<TData>).streamV2 === "function";
 }
 
 export type PolymorphicStep = ExecutableStep & {

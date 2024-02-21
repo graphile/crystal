@@ -1,5 +1,5 @@
 import type { GrafastResultsList, GrafastValuesList } from "../index.js";
-import type { ExecutionExtra } from "../interfaces.js";
+import type { UnbatchedExecutionExtra } from "../interfaces.js";
 import { $$proxy } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
@@ -35,7 +35,7 @@ export class ProxyStep<T> extends UnbatchedExecutableStep<T> {
   ): GrafastResultsList<T> {
     return values[0];
   }
-  unbatchedExecute(_extra: ExecutionExtra, value: T): T {
+  unbatchedExecute(_extra: UnbatchedExecutionExtra, value: T): T {
     return value;
   }
   // Do not proxy stream requests

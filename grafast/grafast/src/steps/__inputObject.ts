@@ -3,9 +3,9 @@ import te from "tamedevil";
 
 import { inputStep } from "../input.js";
 import type {
-  ExecutionExtra,
   InputStep,
   NotVariableValueNode,
+  UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { defaultValueToValueNode } from "../utils.js";
@@ -102,7 +102,7 @@ export class __InputObjectStep<
     super.finalize();
   }
 
-  unbatchedExecute(_extra: ExecutionExtra, ...values: any[]) {
+  unbatchedExecute(_extra: UnbatchedExecutionExtra, ...values: any[]) {
     const resultValues = Object.create(null);
     for (const inputFieldName in this.inputFields) {
       const dependencyIndex = this.inputFields[inputFieldName].dependencyIndex;

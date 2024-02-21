@@ -1,6 +1,6 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { expect } from "chai";
-import type { AsyncExecutionResult, ExecutionResult } from "graphql";
+import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 import sqlite3 from "sqlite3";
 
@@ -66,6 +66,16 @@ class GetRecordsStep<T extends Record<string, any>> extends ExecutableStep {
     );
   }
 
+  toStringMeta(): string | null {
+    const entries = Object.entries(this.depIdByIdentifier);
+    return (
+      this.tableName +
+      (entries.length > 0
+        ? `{${entries.map(([k, v]) => `${k}=${this.getDep(v)}`).join(",")}}`
+        : "")
+    );
+  }
+
   // Unary Dep Id
   private firstUDI: string | number;
   setFirst($first: ExecutableStep) {
@@ -127,7 +137,7 @@ ${orderBy ? `order by ${orderBy}` : ""}
         const obj = Object.fromEntries(
           Object.entries(this.depIdByIdentifier).map(([col, depId]) => [
             col,
-            values[depId][i],
+            values[depId] ? values[depId][i] : extra.unaries[depId],
           ]),
         );
         json.push(obj);
@@ -136,11 +146,14 @@ ${orderBy ? `order by ${orderBy}` : ""}
     }
     const dbResults = await query<T>(db, sql, sqlValues);
     const results: T[][] = [];
+    const entries = Object.entries(this.depIdByIdentifier);
     for (let i = 0; i < count; i++) {
       // This could be more optimal by leveraging they're already in order
       results[i] = dbResults.filter((r) => {
-        return Object.entries(this.depIdByIdentifier).every(
-          ([col, depId]) => r[col] === values[depId][i],
+        return entries.every(
+          ([col, depId]) =>
+            r[col] ===
+            (values[depId] ? values[depId][i] : extra.unaries[depId]),
         );
       });
     }

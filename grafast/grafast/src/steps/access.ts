@@ -4,7 +4,7 @@ import type { TE } from "tamedevil";
 import te from "tamedevil";
 
 import { inspect } from "../inspect.js";
-import type { ExecutionExtra } from "../interfaces.js";
+import type { ExecutionExtra, UnbatchedExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 
@@ -204,7 +204,7 @@ export class AccessStep<TData> extends UnbatchedExecutableStep<TData> {
     super.finalize();
   }
 
-  unbatchedExecute(_extra: ExecutionExtra, ..._values: any[]): any {
+  unbatchedExecute(_extra: UnbatchedExecutionExtra, ..._values: any[]): any {
     throw new Error(
       `${this}: should have had unbatchedExecute method replaced`,
     );

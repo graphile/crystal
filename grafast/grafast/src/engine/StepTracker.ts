@@ -294,7 +294,30 @@ export class StepTracker {
       step: $dependent,
       dependencyIndex,
     });
+    if (!$dependency._isUnary) {
+      if ($dependent._isUnary) {
+        if ($dependent._isUnaryLocked) {
+          throw new Error(
+            `Attempted to add non-unary step ${$dependency} as a dependency of ${$dependent}; but the latter is unary, so it cannot depend on batch steps`,
+          );
+        }
+        $dependent._isUnary = false;
+      }
+    }
     return dependencyIndex;
+  }
+
+  public addStepUnaryDependency(
+    $dependent: ExecutableStep,
+    $dependency: ExecutableStep,
+  ): number {
+    if (!$dependency._isUnary) {
+      throw new Error(
+        `${$dependent} attempted to create a unary step dependency on ${$dependency}, but that step is not unary. You may use \`.addDependency()\` instead of \`.addUnaryDependency()\`.`,
+      );
+    }
+    $dependency._isUnaryLocked = true;
+    return this.addStepDependency($dependent, $dependency);
   }
 
   public setOutputPlanRootStep(

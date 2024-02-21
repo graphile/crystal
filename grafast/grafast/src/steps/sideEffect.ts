@@ -1,6 +1,6 @@
 import type {
-  ExecutionExtra,
   PromiseOrDirect,
+  UnbatchedExecutionExtra,
   UnwrapPlanTuple,
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
@@ -32,7 +32,10 @@ export class SideEffectStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
     return (this.fn as any).displayName || this.fn.name;
   }
 
-  unbatchedExecute(_extra: ExecutionExtra, value: TIn): PromiseOrDirect<TOut> {
+  unbatchedExecute(
+    _extra: UnbatchedExecutionExtra,
+    value: TIn,
+  ): PromiseOrDirect<TOut> {
     return this.fn(value);
   }
 }

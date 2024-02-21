@@ -14,6 +14,7 @@ import type {
   GrafastResultsList,
   GrafastResultStreamList,
   GrafastValuesList,
+  UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { polymorphicWrap } from "../polymorphic.js";
 import type { PolymorphicStep } from "../step.js";
@@ -112,7 +113,7 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
   }
 
   unbatchedExecute(
-    _extra: ExecutionExtra,
+    _extra: UnbatchedExecutionExtra,
     source: any,
     args: any,
     context: any,

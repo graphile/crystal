@@ -1,4 +1,4 @@
-import type { ExecutionExtra } from "grafast";
+import type { UnbatchedExecutionExtra } from "grafast";
 import { UnbatchedExecutableStep } from "grafast";
 
 import { PgSelectSingleStep } from "./pgSelectSingle.js";
@@ -40,7 +40,10 @@ export class PgCursorStep<
     return plan as TStep;
   }
 
-  unbatchedExecute(_extra: ExecutionExtra, v: any[] | null): string | null {
+  unbatchedExecute(
+    _extra: UnbatchedExecutionExtra,
+    v: any[] | null,
+  ): string | null {
     return v == null || v!.every((v) => v == null)
       ? null
       : Buffer.from(JSON.stringify([this.digest, ...v]), "utf8").toString(

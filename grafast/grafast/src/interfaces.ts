@@ -757,7 +757,7 @@ export type ExecutionEventMap = {
 
 export type ExecutionEventEmitter = TypedEventEmitter<ExecutionEventMap>;
 
-export interface ExecutionExtra {
+export interface ExecutionExtraBase {
   /** The `performance.now()` at which your step should stop executing */
   stopTime: number | null;
   /** If you have set a `metaKey` on your step, the relevant meta object which you can write into (e.g. for caching) */
@@ -771,6 +771,11 @@ export interface ExecutionExtra {
   /** @internal */
   _requestContext: RequestTools;
 }
+export interface ExecutionExtra extends ExecutionExtraBase {
+  /** The results for the unary dependencies the step used */
+  unaries: Record<string | number, any>;
+}
+export interface UnbatchedExecutionExtra extends ExecutionExtraBase {}
 
 export interface LocationDetails {
   node: ASTNode | readonly ASTNode[];

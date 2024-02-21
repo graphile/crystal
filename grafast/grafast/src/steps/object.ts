@@ -2,7 +2,11 @@
 
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
-import type { ExecutionExtra, StepOptimizeOptions } from "../interfaces.js";
+import type {
+  ExecutionExtra,
+  StepOptimizeOptions,
+  UnbatchedExecutionExtra,
+} from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { constant, ConstantStep } from "./constant.js";
@@ -223,7 +227,7 @@ ${inner}
     return result;
   }
 
-  unbatchedExecute(_extra: ExecutionExtra, ..._values: any[]): any {
+  unbatchedExecute(_extra: UnbatchedExecutionExtra, ..._values: any[]): any {
     throw new Error(`${this} didn't finalize? No unbatchedExecute method.`);
   }
 

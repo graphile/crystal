@@ -204,9 +204,10 @@ export class __ListTransformStep<
     const bucket = extra._bucket;
 
     const childLayerPlan = this.subroutineLayer;
-    const copyStepIds = childLayerPlan.copyStepIds;
+    const { copyUnaryStepIds, copyBatchStepIds, rootStep } = childLayerPlan;
 
     const store: Bucket["store"] = new Map();
+    const unaryStore = new Map();
     const polymorphicPathList: (string | null)[] = [];
     const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [];
     const map: Map<number, number[]> = new Map();
@@ -223,14 +224,24 @@ export class __ListTransformStep<
     }
     store.set(itemStepId, []);
 
-    // Prepare store with an empty list for each copyPlanId
-    for (const planId of copyStepIds) {
-      store.set(planId, []);
-      if (!bucket.store.has(planId)) {
+    for (const stepId of copyUnaryStepIds) {
+      unaryStore.set(stepId, bucket.unaryStore.get(stepId));
+      if (isDev && !bucket.unaryStore.has(stepId)) {
         throw new Error(
-          `GrafastInternalError<14f2b4c6-f951-44d6-ad6b-2eace3330b84>: plan '${planId}' (${this.operationPlan.dangerouslyGetStep(
-            planId,
-          )}) listed in copyStepIds but not available in parent bucket for ${this}`,
+          `GrafastInternalError<2be5c2c6-a7f8-4002-93a0-6ace5a89a962>: unary step '${stepId}' (${this.operationPlan.dangerouslyGetStep(
+            stepId,
+          )}) listed in copyUnaryStepIds but not available in parent bucket for ${this}`,
+        );
+      }
+    }
+    // Prepare store with an empty list for each copyPlanId
+    for (const stepId of copyBatchStepIds) {
+      store.set(stepId, []);
+      if (isDev && !bucket.store.has(stepId)) {
+        throw new Error(
+          `GrafastInternalError<26f20f5a-a38a-4f0d-8889-f04bc56d95b3>: step '${stepId}' (${this.operationPlan.dangerouslyGetStep(
+            stepId,
+          )}) listed in copyBatchStepIds but not available in parent bucket for ${this}`,
         );
       }
     }
@@ -257,7 +268,7 @@ export class __ListTransformStep<
           // so we need to ensure any streams are cleaned up.
           iterators[newIndex] = bucket.iterators[originalIndex];
           store.get(itemStepId)![newIndex] = list[j];
-          for (const planId of copyStepIds) {
+          for (const planId of copyBatchStepIds) {
             store.get(planId)![newIndex] =
               bucket.store.get(planId)![originalIndex];
           }
@@ -271,6 +282,7 @@ export class __ListTransformStep<
           layerPlan: childLayerPlan,
           size,
           store,
+          unaryStore,
           hasErrors: bucket.hasErrors,
           polymorphicPathList,
           iterators,
@@ -280,7 +292,7 @@ export class __ListTransformStep<
       await executeBucket(childBucket, extra._requestContext);
     }
 
-    const depResults = store.get(childLayerPlan.rootStep!.id)!;
+    const depResults = store.get(rootStep!.id)!;
 
     return listValues.map((list: any, originalIndex: number) => {
       if (list == null) {

@@ -1,4 +1,8 @@
-import type { EdgeCapableStep, ExecutableStep, ExecutionExtra } from "grafast";
+import type {
+  EdgeCapableStep,
+  ExecutableStep,
+  UnbatchedExecutionExtra,
+} from "grafast";
 import {
   exportAs,
   list,
@@ -581,7 +585,7 @@ export class PgSelectSingleStep<
   handlePolymorphism?: (result: any) => any;
 
   unbatchedExecute(
-    _extra: ExecutionExtra,
+    _extra: UnbatchedExecutionExtra,
     result: ObjectFromPgCodecAttributes<GetPgResourceAttributes<TResource>>,
   ): unknown[] {
     if (result == null) {

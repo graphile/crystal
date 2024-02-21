@@ -1,7 +1,7 @@
 import type {
-  ExecutionExtra,
   GrafastResultsList,
   GrafastValuesList,
+  UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
@@ -32,7 +32,7 @@ export class FirstStep<TData> extends UnbatchedExecutableStep<TData> {
     return result;
   }
 
-  unbatchedExecute(_extra: ExecutionExtra, list: any[]) {
+  unbatchedExecute(_extra: UnbatchedExecutionExtra, list: any[]) {
     return list?.[0];
   }
 

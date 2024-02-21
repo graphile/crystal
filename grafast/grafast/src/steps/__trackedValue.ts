@@ -16,9 +16,9 @@ import {
 import type { Constraint } from "../constraints.js";
 import { __ListTransformStep } from "../index.js";
 import type {
-  ExecutionExtra,
   GrafastResultsList,
   GrafastValuesList,
+  UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import type { __ValueStep } from "./__value.js";
@@ -159,7 +159,7 @@ export class __TrackedValueStep<
     return values[0];
   }
 
-  unbatchedExecute(_extra: ExecutionExtra, v: TData): TData {
+  unbatchedExecute(_extra: UnbatchedExecutionExtra, v: TData): TData {
     return v;
   }
 

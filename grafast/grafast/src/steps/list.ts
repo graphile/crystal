@@ -1,6 +1,6 @@
 import type {
-  ExecutionExtra,
   StepOptimizeOptions,
+  UnbatchedExecutionExtra,
   UnwrapPlanTuple,
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
@@ -41,7 +41,7 @@ export class ListStep<
   }
 
   unbatchedExecute(
-    _extra: ExecutionExtra,
+    _extra: UnbatchedExecutionExtra,
     ...values: any[] //UnwrapPlanTuple<TPlanTuple>,
   ): UnwrapPlanTuple<TPlanTuple> {
     return values as any;
