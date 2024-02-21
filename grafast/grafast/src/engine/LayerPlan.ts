@@ -369,7 +369,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
   public finalize(): void {
     if (
-      this.reason.type === "nullableBoundary" ||
+      // this.reason.type === "nullableBoundary" ||
       this.reason.type === "listItem"
     ) {
       const u = this.copyUnaryStepIds.length;
@@ -522,7 +522,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           );
         }
         // Item steps are **NOT** unary
-        store.set(itemStepId, []);
+        const itemStepIdList: any[] = [];
+        store.set(itemStepId, itemStepIdList);
 
         for (const stepId of copyUnaryStepIds) {
           unaryStore.set(stepId, parentBucket.unaryStore.get(stepId));
@@ -547,7 +548,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             for (let j = 0, l = list.length; j < l; j++) {
               const newIndex = size++;
               newIndexes.push(newIndex);
-              store.get(itemStepId)![newIndex] = list[j];
+              itemStepIdList[newIndex] = list[j];
 
               polymorphicPathList[newIndex] =
                 parentBucket.polymorphicPathList[originalIndex];
@@ -743,6 +744,7 @@ ${inner}
       layerPlan: this,
       size,
       store,
+      unaryStore,
       // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
       hasErrors: parentBucket.hasErrors,
       polymorphicPathList,
@@ -756,7 +758,7 @@ ${inner}
     return null;
   }
 })`;
-  te.debug(expr);
+  // te.debug(expr);
   return expr;
 }
 
@@ -767,6 +769,9 @@ function newBucketFactoryInnerExpression(
   reasonType: "nullableBoundary" | "listItem",
 ) {
   if (reasonType === "nullableBoundary") {
+    if (Math.random() < 2) {
+      throw new Error("This code no longer works since we added unary steps.");
+    }
     // PERF: if parent bucket has no nulls/errors in itemStepId
     // then we can just copy everything wholesale rather than building
     // new arrays and looping.
@@ -840,7 +845,7 @@ ${te.join(copyBlocks, "")}
       const te_i = te.lit(i);
       blocks.push(
         te`\
-  unaryStore.set(copyUnaryStepIds[${te_i}], parentBucket.store.get(copyUnaryStepIds[${te_i}]));
+  unaryStore.set(copyUnaryStepIds[${te_i}], parentBucket.unaryStore.get(copyUnaryStepIds[${te_i}]));
   `,
       );
     }
@@ -863,7 +868,11 @@ ${te.join(copyBlocks, "")}
       signature,
       reasonType,
       te`\
-  const listStepStore = parentBucket.store.get(this.reason.parentStep.id);
+  const listStepId = this.reason.parentStep.id;
+  const listStepStore =
+    this.reason.parentStep._isUnary
+      ? [parentBucket.unaryStore.get(listStepId)]
+      : parentBucket.store.get(listStepId);
 
   const itemStepIdList = [];
   store.set(this.rootStep.id, itemStepIdList);
