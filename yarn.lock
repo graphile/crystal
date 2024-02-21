@@ -13081,9 +13081,9 @@ __metadata:
   linkType: hard
 
 "ip@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "ip@npm:2.0.0"
-  checksum: 42a7cf251b844d98a4c3373d06997b991cd1a7f8a5d43bcf2b4f610517d39c5504f6eb3e73e77f5c1453ac766690e82dab28a8a05a49a6fd7d4a40fad93640e9
+  version: 2.0.1
+  resolution: "ip@npm:2.0.1"
+  checksum: 51403c085639daf2835beb94f880ef3c7598e5dd602c1db8c3c4b22a561d9c2de7057a075c29df8327b5429f9a35b9f6d5347b94b5c7018e8032a96d64c0bd28
   languageName: node
   linkType: hard
 
