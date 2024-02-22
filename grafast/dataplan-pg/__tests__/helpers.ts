@@ -569,5 +569,9 @@ export const assertErrorsMatch = async (
 ): Promise<void> => {
   const { errors: errors1 } = await result1;
   const { errors: errors2 } = await result2;
-  expect(errors2).toEqual(errors1);
+  const toJSON = (obj) =>
+    typeof obj.toJSON === "function" ? obj.toJSON() : obj;
+  const jsonified1 = errors1 ? errors1.map(toJSON) : errors1;
+  const jsonified2 = errors2 ? errors2.map(toJSON) : errors2;
+  expect(jsonified1).toEqual(jsonified2);
 };
