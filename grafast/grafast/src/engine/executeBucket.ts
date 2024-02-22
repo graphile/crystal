@@ -414,7 +414,8 @@ export function executeBucket(
       for (const allStepsIndex of indexesToProcess) {
         const step = _allSteps[allStepsIndex];
         const result = results[allStepsIndex]!;
-        for (let dataIndex = 0; dataIndex < size; dataIndex++) {
+        const count = step._isUnary ? 1 : size;
+        for (let dataIndex = 0; dataIndex < count; dataIndex++) {
           const val = result[dataIndex];
           if (step.isSyncAndSafe || !isPromiseLike(val)) {
             success(step, bucket, dataIndex, val);
