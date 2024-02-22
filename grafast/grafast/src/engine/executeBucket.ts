@@ -233,7 +233,8 @@ export function executeBucket(
         const result = results[allStepsIndex];
         const finishedStep = _allSteps[allStepsIndex];
         const resultLength = result?.length;
-        if (resultLength !== size) {
+        const expectedSize = finishedStep._isUnary ? 1 : size;
+        if (resultLength !== expectedSize) {
           if (!Array.isArray(result)) {
             throw new Error(
               `Result from ${finishedStep} should be an array, instead received ${inspect(
@@ -243,11 +244,13 @@ export function executeBucket(
             );
           }
           throw new Error(
-            `Result array from ${finishedStep} should have length ${size}, instead it had length ${result.length}`,
+            `Result array from ${finishedStep} should have length ${expectedSize}${
+              finishedStep._isUnary ? " (because it's unary)" : ""
+            }, instead it had length ${result.length}`,
           );
         }
         if (finishedStep._isUnary) {
-          bucket.unaryStore.set(finishedStep.id, null); // TODO: what placeholder value should we use?
+          // Handled later
         } else {
           bucket.store.set(finishedStep.id, arrayOfLength(size));
         }
@@ -668,6 +671,11 @@ export function executeBucket(
     dependencies: Array<ReadonlyArray<any> | null>,
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
+    if (isDev && step._isUnary && size !== 1) {
+      throw new Error(
+        `GrafastInternalError<84a6cdfa-e8fe-4dea-85fe-9426a6a78027>: ${step} is a unary step, but we're attempting to pass it ${size} (!= 1) values`,
+      );
+    }
     if (step._stepOptions.stream && isStreamV2ableStep(step)) {
       return step.streamV2(size, dependencies, extra, step._stepOptions.stream);
     } else if (step._stepOptions.stream && isStreamableStep(step)) {
@@ -810,7 +818,7 @@ export function executeBucket(
         return mergeErrorsBackIn(resultWithoutErrors, errors, size);
       }
     } else {
-      return reallyExecuteStepWithNoErrors(size, step, dependencies, extra);
+      return reallyExecuteStepWithNoErrors(newSize, step, dependencies, extra);
     }
   }
 
@@ -909,7 +917,12 @@ export function executeBucket(
               bucket.polymorphicPathList,
               extra,
             )
-          : reallyExecuteStepWithNoErrors(size, step, dependencies, extra);
+          : reallyExecuteStepWithNoErrors(
+              step._isUnary ? 1 : size,
+              step,
+              dependencies,
+              extra,
+            );
       if (isPromiseLike(result)) {
         return result.then(null, (error) => {
           // bucket.hasErrors = true;

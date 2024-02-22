@@ -950,7 +950,7 @@ function processSingleDeferred(
     for (const spec of specs) {
       if (spec[1].bucket !== firstBucket) {
         throw new Error(
-          `GrafastInternalError<>: sorry, it seems the unary dependencies feature broke our incremental delivery support. This incremental delivery is going to be fully rewritten at some point anyway, so we recommend you avoid using it for now (the spec itself has changed since we implemented it).`,
+          `GrafastInternalError<c277422e-adb7-4b07-861e-acab931fc01a>: sorry, it seems the unary dependencies feature broke our incremental delivery support. This incremental delivery is going to be fully rewritten at some point anyway, so we recommend you avoid using it for now (the spec itself has changed since we implemented it).`,
         );
       }
     }

@@ -91,15 +91,18 @@ export class ApplyTransformsStep extends ExecutableStep {
     let size = 0;
 
     // ENHANCE: do this better!
-    const itemStepId = this.operationPlan.dangerouslyGetStep(
-      this.itemStepId,
-    ).id;
+    const itemStep = this.operationPlan.dangerouslyGetStep(this.itemStepId);
+    const itemStepId = itemStep.id;
     if (itemStepId == null) {
       throw new Error(
         "GrafastInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
       );
     }
-    store.set(itemStepId, []);
+    if (itemStep._isUnary) {
+      // Handled later
+    } else {
+      store.set(itemStepId, []);
+    }
 
     for (const stepId of copyUnaryStepIds) {
       unaryStore.set(stepId, bucket.unaryStore.get(stepId));
@@ -144,7 +147,11 @@ export class ApplyTransformsStep extends ExecutableStep {
           // Copying across the iterators because we do NOT call outputBucket,
           // so we need to ensure any streams are cleaned up.
           iterators[newIndex] = bucket.iterators[originalIndex];
-          store.get(itemStepId)![newIndex] = list[j];
+          if (itemStep._isUnary) {
+            unaryStore.set(itemStepId, list[j]);
+          } else {
+            store.get(itemStepId)![newIndex] = list[j];
+          }
           for (const stepId of copyBatchStepIds) {
             store.get(stepId)![newIndex] =
               bucket.store.get(stepId)![originalIndex];
@@ -169,7 +176,9 @@ export class ApplyTransformsStep extends ExecutableStep {
       await executeBucket(childBucket, extra._requestContext);
     }
 
-    const depResults = store.get(rootStep!.id)!;
+    const [depResults, unaryResult] = rootStep?._isUnary
+      ? [null, unaryStore.get(rootStep.id)]
+      : [store.get(rootStep!.id)!, null];
 
     return listValues.map((list: any, originalIndex: number) => {
       if (list == null) {
@@ -184,7 +193,7 @@ export class ApplyTransformsStep extends ExecutableStep {
         return null;
       }
       const values = indexes.map((idx) => {
-        const val = depResults[idx];
+        const val = depResults === null ? unaryResult : depResults[idx];
         if (val instanceof Error) {
           throw val;
         }

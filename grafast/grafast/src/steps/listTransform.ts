@@ -214,15 +214,18 @@ export class __ListTransformStep<
     let size = 0;
 
     // ENHANCE: do this better!
-    const itemStepId = this.operationPlan.dangerouslyGetStep(
-      this.itemStepId,
-    ).id;
+    const itemStep = this.operationPlan.dangerouslyGetStep(this.itemStepId)!;
+    const itemStepId = itemStep.id;
     if (itemStepId == null) {
       throw new Error(
         "GrafastInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
       );
     }
-    store.set(itemStepId, []);
+    if (itemStep._isUnary) {
+      // handled later
+    } else {
+      store.set(itemStepId, []);
+    }
 
     for (const stepId of copyUnaryStepIds) {
       unaryStore.set(stepId, bucket.unaryStore.get(stepId));
@@ -267,7 +270,11 @@ export class __ListTransformStep<
           // Copying across the iterators because we do NOT call outputBucket,
           // so we need to ensure any streams are cleaned up.
           iterators[newIndex] = bucket.iterators[originalIndex];
-          store.get(itemStepId)![newIndex] = list[j];
+          if (itemStep._isUnary) {
+            unaryStore.set(itemStepId, list[j]);
+          } else {
+            store.get(itemStepId)![newIndex] = list[j];
+          }
           for (const planId of copyBatchStepIds) {
             store.get(planId)![newIndex] =
               bucket.store.get(planId)![originalIndex];
@@ -292,7 +299,9 @@ export class __ListTransformStep<
       await executeBucket(childBucket, extra._requestContext);
     }
 
-    const depResults = store.get(rootStep!.id)!;
+    const [depResults, unaryResult] = rootStep?._isUnary
+      ? [null, unaryStore.get(rootStep!.id)]
+      : [store.get(rootStep!.id)!, null];
 
     return listValues.map((list: any, originalIndex: number) => {
       if (list == null) {
@@ -306,7 +315,9 @@ export class __ListTransformStep<
         );
         return null;
       }
-      const values = indexes.map((idx) => depResults[idx]);
+      const values = indexes.map((idx) =>
+        depResults === null ? unaryResult : depResults[idx],
+      );
       if (isDev) {
         assert.strictEqual(
           list.length,
