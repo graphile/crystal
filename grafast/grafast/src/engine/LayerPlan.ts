@@ -516,15 +516,19 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           );
         }
 
-        const itemStepId = this.rootStep?.id;
-        if (itemStepId == null) {
+        if (this.rootStep == null) {
           throw new Error(
             "GrafastInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
           );
         }
+        const itemStepId = this.rootStep.id;
         // Item steps are **NOT** unary
         const itemStepIdList: any[] = [];
-        store.set(itemStepId, itemStepIdList);
+        if (this.rootStep._isUnary) {
+          // handled later
+        } else {
+          store.set(itemStepId, itemStepIdList);
+        }
 
         for (const stepId of copyUnaryStepIds) {
           unaryStore.set(stepId, parentBucket.unaryStore.get(stepId));
@@ -549,7 +553,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             for (let j = 0, l = list.length; j < l; j++) {
               const newIndex = size++;
               newIndexes.push(newIndex);
-              itemStepIdList[newIndex] = list[j];
+              if (this.rootStep._isUnary) {
+                unaryStore.set(itemStepId, list[j]);
+              } else {
+                itemStepIdList[newIndex] = list[j];
+              }
 
               polymorphicPathList[newIndex] =
                 parentBucket.polymorphicPathList[originalIndex];

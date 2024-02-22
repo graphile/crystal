@@ -483,13 +483,18 @@ export function executeBucket(
               const { s: allStepsIndex, i: dataIndex } =
                 pendingPromiseIndexes![i];
               const finishedStep = _allSteps[allStepsIndex];
-              const storeEntry = bucket.store.get(finishedStep.id)!;
-              storeEntry[dataIndex] = newGrafastError(
+              const error = newGrafastError(
                 new Error(
                   `GrafastInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
                 ),
                 finishedStep.id,
               );
+              if (finishedStep._isUnary) {
+                bucket.unaryStore.set(finishedStep.id, error);
+              } else {
+                const storeEntry = bucket.store.get(finishedStep.id)!;
+                storeEntry[dataIndex] = error;
+              }
             }
           });
       } else {
@@ -529,7 +534,11 @@ export function executeBucket(
           _bucket: bucket,
           _requestContext: requestContext,
         };
-        bucket.store.set(step.id, arrayOfLength(size));
+        if (step._isUnary) {
+          // Handled later
+        } else {
+          bucket.store.set(step.id, arrayOfLength(size));
+        }
       }
       outerLoop: for (let dataIndex = 0; dataIndex < size; dataIndex++) {
         if (sideEffectStepsWithErrors) {
@@ -537,7 +546,9 @@ export function executeBucket(
           for (const dep of sideEffectStepsWithErrors[
             currentPolymorphicPath ?? NO_POLY_PATH
           ]) {
-            const depVal = bucket.store.get(dep.id)![dataIndex];
+            const depVal = dep._isUnary
+              ? bucket.unaryStore.get(dep.id)
+              : bucket.store.get(dep.id)![dataIndex];
             if (
               depVal === POLY_SKIPPED ||
               (isDev && depVal?.$$error === POLY_SKIPPED)
@@ -552,8 +563,12 @@ export function executeBucket(
                 const step = _allSteps[
                   allStepsIndex
                 ] as UnbatchedExecutableStep;
-                const storeEntry = bucket.store.get(step.id)!;
-                storeEntry[dataIndex] = depVal;
+                if (step._isUnary) {
+                  bucket.unaryStore.set(step.id, depVal);
+                } else {
+                  const storeEntry = bucket.store.get(step.id)!;
+                  storeEntry[dataIndex] = depVal;
+                }
               }
               continue outerLoop;
             }

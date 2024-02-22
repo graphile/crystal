@@ -353,7 +353,11 @@ function executePreemptive(
       store.set(depId, []);
     }
 
-    store.set(rootStep!.id, [payload]);
+    if (rootStep!._isUnary) {
+      unaryStore.set(rootStep!.id, payload);
+    } else {
+      store.set(rootStep!.id, [payload]);
+    }
     for (const depId of layerPlan.copyBatchStepIds) {
       store.get(depId)![subscriptionBucketIndex] =
         rootBucket.store.get(depId)![rootBucketIndex];
@@ -379,9 +383,11 @@ function executePreemptive(
         subscriptionBucketIndex,
         requestContext,
         [],
-        rootBucket.store.get(operationPlan.variableValuesStep.id)![
-          rootBucketIndex
-        ],
+        operationPlan.variableValuesStep._isUnary
+          ? rootBucket.unaryStore.get(operationPlan.variableValuesStep.id)
+          : rootBucket.store.get(operationPlan.variableValuesStep.id)![
+              rootBucketIndex
+            ],
         outputDataAsString,
       );
       return finalize(
@@ -402,11 +408,14 @@ function executePreemptive(
     // Later we'll need to loop
 
     // If it's a subscription we need to use the stream
-    const rootValueList =
+    const bucketRootValue =
       rootBucket.layerPlan.rootStep!.id != null
-        ? rootBucket.store.get(rootBucket.layerPlan.rootStep!.id)
+        ? rootBucket.layerPlan.rootStep!._isUnary
+          ? rootBucket.unaryStore.get(rootBucket.layerPlan.rootStep!.id)
+          : rootBucket.store.get(rootBucket.layerPlan.rootStep!.id)![
+              rootBucketIndex
+            ]
         : null;
-    const bucketRootValue = rootValueList?.[rootBucketIndex];
     if (isGrafastError(bucketRootValue)) {
       releaseUnusedIterators(rootBucket, rootBucketIndex, null);
       // Something major went wrong!
@@ -747,7 +756,11 @@ async function processStream(
 
     const listItemStepId = directLayerPlanChild.rootStep!.id;
     const listItemStepIdList: any[] = [];
-    store.set(listItemStepId, listItemStepIdList);
+    if (directLayerPlanChild.rootStep?._isUnary) {
+      // handled later
+    } else {
+      store.set(listItemStepId, listItemStepIdList);
+    }
 
     for (const copyStepId of directLayerPlanChild.copyUnaryStepIds) {
       unaryStore.set(copyStepId, spec.bucket.unaryStore.get(copyStepId));
@@ -759,7 +772,12 @@ async function processStream(
     let bucketIndex = 0;
     for (const entry of entries) {
       const [result] = entry;
-      listItemStepIdList[bucketIndex] = result;
+      if (directLayerPlanChild.rootStep?._isUnary) {
+        assert.ok(bucketIndex === 0, "Unary step should only have one index");
+        unaryStore.set(listItemStepId, result);
+      } else {
+        listItemStepIdList[bucketIndex] = result;
+      }
 
       polymorphicPathList[bucketIndex] =
         spec.bucket.polymorphicPathList[spec.bucketIndex];
