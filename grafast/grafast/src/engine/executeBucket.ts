@@ -269,19 +269,14 @@ export function executeBucket(
           }>
         | undefined;
 
+      // TODO: it seems that if this throws an error it results in a permanent
+      // hang of defers? In the mean time... Don't throw any errors here!
       const success = (
         finishedStep: ExecutableStep,
         bucket: Bucket,
         resultIndex: number,
         value: unknown,
       ) => {
-        if (isDev && finishedStep._isUnary && resultIndex !== 0) {
-          throw new Error(
-            `GrafastInternalError<631aafcc-c40c-4fe2-948e-3f06298eb40c>: A unary step must have exactly one result, but ${finishedStep}'s ${resultIndex}th value is ${inspect(
-              value,
-            )}`,
-          );
-        }
         let proto: any;
         if (
           // Fast-lane for non-objects
