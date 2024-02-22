@@ -408,10 +408,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         const hasNoNullsOrErrors = false;
 
         if (this.rootStep._isUnary) {
-          assert.ok(
-            parentBucket.size == 1,
-            "GrafastInternalError<8c26e449-26ad-4192-b95d-170c59a024a4>: unary step must be in bucket of size 1 (otherwise it's not unary...)",
-          );
+          if (parentBucket.size !== 1) {
+            throw new Error(
+              `GrafastInternalError<8c26e449-26ad-4192-b95d-170c59a024a4>: unary step '${this.rootStep}' must be in bucket of size 1 (otherwise it's not unary...), but bucket for ${parentBucket.layerPlan} has size ${parentBucket.size}`,
+            );
+          }
           size = 1;
           unaryStore.set(itemStepId, parentBucket.unaryStore.get(itemStepId));
           for (const stepId of copyUnaryStepIds) {
