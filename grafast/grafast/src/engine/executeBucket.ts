@@ -275,26 +275,25 @@ export function executeBucket(
         resultIndex: number,
         value: unknown,
       ) => {
-        if (finishedStep._isUnary) {
-          if (resultIndex !== 0) {
-            throw new Error(
-              `GrafastInternalError<631aafcc-c40c-4fe2-948e-3f06298eb40c>: A unary step must have exactly one result, but ${finishedStep}'s ${resultIndex}th value is ${inspect(
-                value,
-              )}`,
-            );
-          }
-          // TODO: handle streams/etc
-          bucket.unaryStore.set(finishedStep.id, value);
-          return;
+        if (isDev && finishedStep._isUnary && resultIndex !== 0) {
+          throw new Error(
+            `GrafastInternalError<631aafcc-c40c-4fe2-948e-3f06298eb40c>: A unary step must have exactly one result, but ${finishedStep}'s ${resultIndex}th value is ${inspect(
+              value,
+            )}`,
+          );
         }
-        const finalResult = bucket.store.get(finishedStep.id)!;
         let proto: any;
         if (
           // Fast-lane for non-objects
           typeof value !== "object" ||
           value === null
         ) {
-          finalResult[resultIndex] = value;
+          if (finishedStep._isUnary) {
+            bucket.unaryStore.set(finishedStep.id, value);
+          } else {
+            const finalResult = bucket.store.get(finishedStep.id)!;
+            finalResult[resultIndex] = value;
+          }
           return;
         }
         let valueIsAsyncIterable;
@@ -326,7 +325,12 @@ export function executeBucket(
             // Optimization - defer everything
             const arr: StreamMaybeMoreableArray<any> = [];
             arr[$$streamMore] = iterator;
-            finalResult[resultIndex] = arr;
+            if (finishedStep._isUnary) {
+              bucket.unaryStore.set(finishedStep.id, arr);
+            } else {
+              const finalResult = bucket.store.get(finishedStep.id)!;
+              finalResult[resultIndex] = arr;
+            }
           } else {
             // Evaluate the first initialCount entries, rest is streamed.
             const promise = (async () => {
@@ -345,11 +349,11 @@ export function executeBucket(
                   | Promise<IteratorResult<any, any>>
                   | IteratorResult<any, any>;
                 while ((resultPromise = iterator.next())) {
-                  const finalResult = await resultPromise;
-                  if (finalResult.done) {
+                  const resolvedResult = await resultPromise;
+                  if (resolvedResult.done) {
                     break;
                   }
-                  arr.push(await finalResult.value);
+                  arr.push(await resolvedResult.value);
                   if (++valuesSeen >= initialCount) {
                     // This is safe to do in the `while` since we checked
                     // the `0` entries condition in the optimization
@@ -359,10 +363,21 @@ export function executeBucket(
                   }
                 }
 
-                finalResult[resultIndex] = arr;
+                if (finishedStep._isUnary) {
+                  bucket.unaryStore.set(finishedStep.id, arr);
+                } else {
+                  const finalResult = bucket.store.get(finishedStep.id)!;
+                  finalResult[resultIndex] = arr;
+                }
               } catch (e) {
                 bucket.hasErrors = true;
-                finalResult[resultIndex] = newGrafastError(e, finishedStep.id);
+                const error = newGrafastError(e, finishedStep.id);
+                if (finishedStep._isUnary) {
+                  bucket.unaryStore.set(finishedStep.id, error);
+                } else {
+                  const finalResult = bucket.store.get(finishedStep.id)!;
+                  finalResult[resultIndex] = error;
+                }
               }
             })();
             if (!promises) {
@@ -375,14 +390,29 @@ export function executeBucket(
           (proto = Object.getPrototypeOf(value)) === null ||
           proto === Object.prototype
         ) {
-          finalResult[resultIndex] = value;
+          if (finishedStep._isUnary) {
+            bucket.unaryStore.set(finishedStep.id, value);
+          } else {
+            const finalResult = bucket.store.get(finishedStep.id)!;
+            finalResult[resultIndex] = value;
+          }
         } else if (value instanceof Error) {
           const e =
             $$error in value ? value : newGrafastError(value, finishedStep.id);
-          finalResult[resultIndex] = e;
+          if (finishedStep._isUnary) {
+            bucket.unaryStore.set(finishedStep.id, e);
+          } else {
+            const finalResult = bucket.store.get(finishedStep.id)!;
+            finalResult[resultIndex] = e;
+          }
           bucket.hasErrors = true;
         } else {
-          finalResult[resultIndex] = value;
+          if (finishedStep._isUnary) {
+            bucket.unaryStore.set(finishedStep.id, value);
+          } else {
+            const finalResult = bucket.store.get(finishedStep.id)!;
+            finalResult[resultIndex] = value;
+          }
         }
       };
 
