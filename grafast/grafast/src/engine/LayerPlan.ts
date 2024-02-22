@@ -408,36 +408,34 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         const hasNoNullsOrErrors = false;
 
         if (this.rootStep._isUnary) {
-          if (parentBucket.size !== 1) {
+          const fieldValue = parentBucket.unaryStore.get(itemStepId);
+          if (fieldValue == null) {
+            size = 0;
+          } else {
+            size = parentBucket.size;
+            unaryStore.set(itemStepId, fieldValue);
+            for (const stepId of copyUnaryStepIds) {
+              unaryStore.set(stepId, parentBucket.unaryStore.get(stepId)!);
+            }
+            for (const stepId of copyBatchStepIds) {
+              store.set(stepId, parentBucket.store.get(stepId)!);
+            }
+            for (let i = 0; i < size; i++) {
+              map.set(i, i);
+              polymorphicPathList[i] = parentBucket.polymorphicPathList[i];
+              iterators[i] = parentBucket.iterators[i];
+            }
+          }
+        } else if (hasNoNullsOrErrors) {
+          const nullableStepStore = parentBucket.store.get(itemStepId);
+          if (!nullableStepStore) {
             throw new Error(
-              `GrafastInternalError<8c26e449-26ad-4192-b95d-170c59a024a4>: unary step '${this.rootStep}' must be in bucket of size 1 (otherwise it's not unary...), but bucket for ${parentBucket.layerPlan} has size ${parentBucket.size}`,
+              `GrafastInternalError<017dc8bf-1db1-4983-a41e-e69c6652e4c7>: could not find entry '${itemStepId}' (${parentBucket.layerPlan.operationPlan.dangerouslyGetStep(
+                itemStepId,
+              )}) in store for ${parentBucket.layerPlan}`,
             );
           }
-          size = 1;
-          unaryStore.set(itemStepId, parentBucket.unaryStore.get(itemStepId));
-          for (const stepId of copyUnaryStepIds) {
-            unaryStore.set(stepId, parentBucket.unaryStore.get(stepId)!);
-          }
-          for (const stepId of copyBatchStepIds) {
-            store.set(stepId, parentBucket.store.get(stepId)!);
-          }
-          map.set(0, 0);
-          polymorphicPathList[0] = parentBucket.polymorphicPathList[0];
-          iterators[0] = parentBucket.iterators[0];
-        } else if (hasNoNullsOrErrors) {
-          if (this.rootStep._isUnary) {
-            unaryStore.set(itemStepId, parentBucket.unaryStore.get(itemStepId));
-          } else {
-            const nullableStepStore = parentBucket.store.get(itemStepId);
-            if (!nullableStepStore) {
-              throw new Error(
-                `GrafastInternalError<017dc8bf-1db1-4983-a41e-e69c6652e4c7>: could not find entry '${itemStepId}' (${parentBucket.layerPlan.operationPlan.dangerouslyGetStep(
-                  itemStepId,
-                )}) in store for ${parentBucket.layerPlan}`,
-              );
-            }
-            store.set(itemStepId, nullableStepStore);
-          }
+          store.set(itemStepId, nullableStepStore);
           for (const stepId of copyUnaryStepIds) {
             unaryStore.set(stepId, parentBucket.unaryStore.get(stepId)!);
           }
