@@ -82,10 +82,10 @@ graph TD
     Bucket1("Bucket 1 (subscription)<br />Deps: 20, 5<br /><br />ROOT __Item{1}ᐸ10ᐳ[11]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item11,JSONParse12 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 12, 20<br /><br />ROOT JSONParse{1}ᐸ11ᐳ[12]<br />1: <br />ᐳ: Access[14], Access[16], Lambda[15]<br />2: PgSelect[17]<br />ᐳ: First[21], PgSelectSingle[22]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 20, 12<br /><br />ROOT JSONParse{1}ᐸ11ᐳ[12]<br />1: <br />ᐳ: Access[14], Access[16], Lambda[15]<br />2: PgSelect[17]<br />ᐳ: First[21], PgSelectSingle[22]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,Access14,Lambda15,Access16,PgSelect17,First21,PgSelectSingle22 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 20<br /><br />ROOT PgSelectSingle{2}ᐸmessagesᐳ[22]<br />1: <br />ᐳ: 23, 24, 25, 26, 27, 38<br />2: PgSelect[28], PgSelect[39]<br />ᐳ: 32, 33, 43, 44"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 22<br /><br />ROOT PgSelectSingle{2}ᐸmessagesᐳ[22]<br />1: <br />ᐳ: 23, 24, 25, 26, 27, 38<br />2: PgSelect[28], PgSelect[39]<br />ᐳ: 32, 33, 43, 44"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgSelect28,First32,PgSelectSingle33,PgClassExpression38,PgSelect39,First43,PgSelectSingle44 bucket3
     Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 33, 27<br /><br />ROOT PgSelectSingle{3}ᐸforumsᐳ[33]"):::bucket
