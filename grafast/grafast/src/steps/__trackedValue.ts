@@ -18,7 +18,6 @@ import { __ListTransformStep, arrayOfLength } from "../index.js";
 import type {
   ExecutionDetails,
   GrafastResultsList,
-  GrafastValuesList,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";

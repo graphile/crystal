@@ -1,7 +1,6 @@
 import type {
   ExecutionDetails,
   GrafastResultsList,
-  GrafastValuesList,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";

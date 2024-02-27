@@ -2,9 +2,7 @@ import type { GraphQLObjectType } from "graphql";
 
 import type {
   ExecutionDetails,
-  ExecutionExtra,
   GrafastResultsList,
-  GrafastValuesList,
   PromiseOrDirect,
 } from "../index.js";
 import { polymorphicWrap } from "../index.js";

@@ -3,7 +3,6 @@ import type {
   AccessStep,
   ExecutionDetails,
   GrafastResultsList,
-  GrafastValuesList,
   PromiseOrDirect,
 } from "grafast";
 import { access, ExecutableStep, exportAs } from "grafast";

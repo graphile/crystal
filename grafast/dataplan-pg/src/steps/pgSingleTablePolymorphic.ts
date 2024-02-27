@@ -1,7 +1,6 @@
 import type {
   ExecutionDetails,
   GrafastResultsList,
-  GrafastValuesList,
   PolymorphicData,
   PolymorphicStep,
   PromiseOrDirect,

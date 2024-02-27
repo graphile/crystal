@@ -27,6 +27,7 @@ export class FirstStep<TData> extends UnbatchedExecutableStep<TData> {
   }: ExecutionDetails<[TData[]]>): GrafastResultsList<TData> {
     const result: Array<TData> = [];
     for (let i = 0; i < count; i++) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
       result[i] = values0 === null ? unaries0?.[0]! : values0[i]?.[0];
     }
     return result;

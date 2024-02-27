@@ -1,9 +1,7 @@
 import type { __ItemStep, Deferred, ExecutionDetails } from "../index.js";
 import { defer } from "../index.js";
 import type {
-  ExecutionExtra,
   GrafastResultsList,
-  GrafastValuesList,
   Maybe,
   PromiseOrDirect,
 } from "../interfaces.js";

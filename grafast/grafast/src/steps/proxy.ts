@@ -1,13 +1,12 @@
-import {
-  arrayOfLength,
-  type ExecutionDetails,
-  type GrafastResultsList,
-  type GrafastValuesList,
-} from "../index.js";
-import type { UnbatchedExecutionExtra } from "../interfaces.js";
+import type {
+  ExecutionDetails,
+  GrafastResultsList,
+  UnbatchedExecutionExtra,
+} from "../interfaces.js";
 import { $$proxy } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
+import { arrayOfLength } from "../utils.js";
 
 /**
  * @experimental

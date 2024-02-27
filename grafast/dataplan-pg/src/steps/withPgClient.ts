@@ -1,8 +1,4 @@
-import type {
-  ExecutionDetails,
-  GrafastResultsList,
-  GrafastValuesList,
-} from "grafast";
+import type { ExecutionDetails, GrafastResultsList } from "grafast";
 import { constant, ExecutableStep } from "grafast";
 
 import type { PgClient, PgExecutor, WithPgClient } from "../executor";

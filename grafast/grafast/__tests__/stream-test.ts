@@ -15,7 +15,7 @@ import {
   lambda,
   makeGrafastSchema,
 } from "../dist/index.js";
-import { StreamDetails } from "../dist/interfaces.js";
+import type { StreamDetails } from "../dist/interfaces.js";
 
 class SyncListCallbackStep<
   TIn,
