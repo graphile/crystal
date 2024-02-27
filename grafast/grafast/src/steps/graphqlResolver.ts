@@ -185,18 +185,20 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
     return data;
   }
 
-  async stream(
-    count: number,
-    values: ReadonlyArray<GrafastValuesList<any>>,
-    extra: ExecutionExtra,
-  ): Promise<GrafastResultStreamList<any>> {
+  async streamV2({
+    count,
+    values,
+    unaries,
+    extra,
+  }: ExecutionDetails): Promise<GrafastResultStreamList<any>> {
     const results = [];
     const depCount = this.dependencies.length;
     for (let i = 0; i < count; i++) {
       try {
         const tuple = [];
         for (let j = 0; j < depCount; j++) {
-          tuple[j] = values[j][i];
+          const depValue = values[j];
+          tuple[j] = depValue === null ? unaries[j] : depValue[i];
         }
         results[i] = (this.unbatchedStream as any)(extra, ...tuple);
       } catch (e) {

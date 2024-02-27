@@ -38,15 +38,24 @@ class SyncListCallbackStep<
     }
     return result;
   }
-  async stream(_count: number, [val]: [Array<TIn>]) {
+  async streamV2({
+    count,
+    values: [values0],
+    unaries: [unaries0],
+  }: ExecutionDetails<[TIn]>) {
     await sleep(0);
     const { callback } = this;
-    return val.map((entry) =>
-      (async function* () {
-        const data = await callback(entry);
-        yield* data;
-      })(),
-    );
+    const results: any[] = [];
+    for (let i = 0; i < count; i++) {
+      const entry = values0 === null ? unaries0! : values0[i];
+      results.push(
+        (async function* () {
+          const data = await callback(entry);
+          yield* data;
+        })(),
+      );
+    }
+    return results;
   }
 }
 

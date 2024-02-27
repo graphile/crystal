@@ -12,6 +12,7 @@ import {
   lambda,
   makeGrafastSchema,
 } from "../dist/index.js";
+import type { StreamDetails } from "../dist/interfaces.js";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -40,23 +41,32 @@ class SyncListCallbackStep<
     }
     return result;
   }
-  async stream(_count: number, [val]: [Array<TIn>]) {
+  async streamV2({
+    count,
+    values: [values0],
+    unaries: [unaries0],
+  }: StreamDetails<[TIn]>) {
     await sleep(0);
     const { callback, setStreaming } = this;
-    return val.map((entry) => {
+    const results: any[] = [];
+    for (let i = 0; i < count; i++) {
+      const entry = values0 === null ? unaries0! : values0[i];
       setStreaming(true);
 
-      return (async function* () {
-        try {
-          const data = await callback(entry);
-          for (const item of data) {
-            yield item;
+      results.push(
+        (async function* () {
+          try {
+            const data = await callback(entry);
+            for (const item of data) {
+              yield item;
+            }
+          } finally {
+            setStreaming(false);
           }
-        } finally {
-          setStreaming(false);
-        }
-      })();
-    });
+        })(),
+      );
+    }
+    return results;
   }
 }
 

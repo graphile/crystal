@@ -3,16 +3,14 @@ import debugFactory from "debug";
 import type {
   ConnectionCapableStep,
   ExecutionDetails,
-  ExecutionExtra,
   GrafastResultsList,
   GrafastResultStreamList,
-  GrafastValuesList,
   InputStep,
   LambdaStep,
   PromiseOrDirect,
   StepOptimizeOptions,
   StepStreamOptions,
-  StreamableStep,
+  StreamV2ableStep,
 } from "grafast";
 import {
   __InputListStep,
@@ -275,7 +273,7 @@ export class PgSelectStep<
     ReadonlyArray<unknown[] /* a tuple based on what is selected at runtime */>
   >
   implements
-    StreamableStep<unknown[]>,
+    StreamV2ableStep<unknown[]>,
     ConnectionCapableStep<
       PgSelectSingleStep<TResource>,
       PgSelectParsedCursorStep
@@ -1297,11 +1295,12 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   /**
    * Like `execute`, but stream the results via async iterables.
    */
-  async stream(
-    _count: number,
-    values: ReadonlyArray<GrafastValuesList<any>>,
-    { eventEmitter }: ExecutionExtra,
-  ): Promise<GrafastResultStreamList<unknown[]>> {
+  async streamV2({
+    count,
+    values,
+    unaries,
+    extra: { eventEmitter },
+  }: ExecutionDetails): Promise<GrafastResultStreamList<unknown[]>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot stream PgSelectStep before finalizing it.");
     }
@@ -1322,54 +1321,66 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       throw new Error("declare query must exist for stream");
     }
 
-    const initialFetchResult = text
+    const contextValues = values[this.contextId];
+    const contextUnary = unaries[this.contextId];
+    const specs: PgExecutorInput<any>[] | null = text ? [] : null;
+    if (text) {
+      for (let i = 0; i < count; i++) {
+        const context =
+          contextValues === null ? contextUnary : contextValues[i];
+        specs!.push({
+          // The context is how we'd handle different connections with different claims
+          context,
+          queryValues:
+            identifierIndex != null
+              ? this.queryValues.map(({ dependencyIndex, codec }) => {
+                  const depValues = values[dependencyIndex];
+                  const val =
+                    depValues === null
+                      ? unaries[dependencyIndex]
+                      : depValues[i];
+                  return val == null ? null : codec.toPg(val);
+                })
+              : EMPTY_ARRAY,
+        });
+      }
+    }
+    const initialFetchResult = specs
       ? (
-          await this.resource.executeWithoutCache(
-            values[this.contextId].map((context, i) => {
-              return {
-                // The context is how we'd handle different connections with different claims
-                context,
-                queryValues:
-                  identifierIndex != null
-                    ? this.queryValues.map(({ dependencyIndex, codec }) => {
-                        const val = values[dependencyIndex][i];
-                        return val == null ? null : codec.toPg(val);
-                      })
-                    : EMPTY_ARRAY,
-              };
-            }),
-            {
-              text,
-              rawSqlValues,
-              identifierIndex,
-              eventEmitter,
-            },
-          )
+          await this.resource.executeWithoutCache(specs, {
+            text,
+            rawSqlValues,
+            identifierIndex,
+            eventEmitter,
+          })
         ).values
       : null;
 
+    const streamSpecs: PgExecutorInput<any>[] = [];
+    for (let i = 0; i < count; i++) {
+      const context = contextValues === null ? contextUnary : contextValues[i];
+
+      streamSpecs.push({
+        // The context is how we'd handle different connections with different claims
+        context,
+        queryValues:
+          identifierIndex != null
+            ? this.queryValues.map(({ dependencyIndex, codec }) => {
+                const depValues = values[dependencyIndex];
+                const val =
+                  depValues === null ? unaries[dependencyIndex] : depValues[i];
+                return val == null ? val : codec.toPg(val);
+              })
+            : EMPTY_ARRAY,
+      });
+    }
     const streams = (
-      await this.resource.executeStream(
-        values[this.contextId].map((context, i) => {
-          return {
-            // The context is how we'd handle different connections with different claims
-            context,
-            queryValues:
-              identifierIndex != null
-                ? this.queryValues.map(({ dependencyIndex, codec }) => {
-                    const val = values[dependencyIndex][i];
-                    return val == null ? val : codec.toPg(val);
-                  })
-                : EMPTY_ARRAY,
-          };
-        }),
-        {
-          text: textForDeclare,
-          rawSqlValues: rawSqlValuesForDeclare,
-          identifierIndex,
-          eventEmitter,
-        },
-      )
+      await this.resource.executeStream(streamSpecs, {
+        text: textForDeclare,
+        rawSqlValues: rawSqlValuesForDeclare,
+        identifierIndex,
+        eventEmitter,
+      })
     ).streams;
 
     if (initialFetchResult) {
