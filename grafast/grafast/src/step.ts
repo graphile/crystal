@@ -18,6 +18,7 @@ import type { OperationPlan } from "./engine/OperationPlan.js";
 import { getDebug } from "./global.js";
 import { inspect } from "./inspect.js";
 import type {
+  ExecutionDetails,
   ExecutionExtra,
   GrafastResultsList,
   GrafastResultStreamList,
@@ -26,6 +27,7 @@ import type {
   PromiseOrDirect,
   StepOptimizeOptions,
   StepOptions,
+  StreamDetails,
   UnbatchedExecutionExtra,
 } from "./interfaces.js";
 import { $$subroutine } from "./interfaces.js";
@@ -389,7 +391,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * be able to access the value via `extra.unaries[key]` where `key` is the
    * return value of this function.
    */
-  protected addUnaryDependency(step: ExecutableStep): string | number {
+  protected addUnaryDependency(step: ExecutableStep): number {
     return this.operationPlan.stepTracker.addStepUnaryDependency(this, step);
   }
 
@@ -481,13 +483,14 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   // This executeV2 method implements backwards compatibility with the old
   // execute method; you should instead override this in your own step
   // classes.
-  executeV2(
-    count: number,
-    values: ReadonlyArray<GrafastValuesList<any> | null>,
-    extra: ExecutionExtra,
-  ): PromiseOrDirect<GrafastResultsList<TData>> {
+  executeV2({
+    count,
+    values,
+    unaries,
+    extra,
+  }: ExecutionDetails): PromiseOrDirect<GrafastResultsList<TData>> {
     const backfilledValues = values.map((v, i) =>
-      v === null ? arrayOfLength(count, extra.unaries[i]) : v,
+      v === null ? arrayOfLength(count, unaries[i]) : v,
     );
     return this.execute(count, backfilledValues, extra);
   }
@@ -713,12 +716,7 @@ export type StreamableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
 };
 export type StreamV2ableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
   streamV2(
-    count: number,
-    values: ReadonlyArray<GrafastValuesList<any> | null>,
-    extra: ExecutionExtra,
-    streamOptions: {
-      initialCount: number;
-    },
+    details: StreamDetails,
   ): PromiseOrDirect<GrafastResultStreamList<TData>>;
 };
 

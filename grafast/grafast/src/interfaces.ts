@@ -771,11 +771,23 @@ export interface ExecutionExtraBase {
   /** @internal */
   _requestContext: RequestTools;
 }
-export interface ExecutionExtra extends ExecutionExtraBase {
-  /** The results for the unary dependencies the step used */
-  unaries: any[];
-}
+export interface ExecutionExtra extends ExecutionExtraBase {}
 export interface UnbatchedExecutionExtra extends ExecutionExtraBase {}
+
+export interface ExecutionDetails<TDeps extends [...any[]] = [...any[]]> {
+  count: number;
+  values: {
+    [DepIdx in keyof TDeps]: ReadonlyArray<TDeps[DepIdx]> | null;
+  } & { length: TDeps["length"] };
+  unaries: {
+    [DepIdx in keyof TDeps]: null | TDeps[DepIdx];
+  } & { length: TDeps["length"] };
+  extra: ExecutionExtra;
+}
+export interface StreamDetails<TDeps extends [...any[]] = [...any[]]>
+  extends ExecutionDetails<TDeps> {
+  streamOptions: StepStreamOptions;
+}
 
 export interface LocationDetails {
   node: ASTNode | readonly ASTNode[];

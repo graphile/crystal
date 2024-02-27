@@ -666,31 +666,34 @@ export function executeBucket(
   // Function definitions below here
 
   function executeOrStream(
-    size: number,
+    count: number,
     step: ExecutableStep,
-    dependencies: Array<ReadonlyArray<any> | null>,
+    values: Array<ReadonlyArray<any> | null>,
+    unaries: Array<any | null>,
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
-    if (isDev && step._isUnary && size !== 1) {
+    if (isDev && step._isUnary && count !== 1) {
       throw new Error(
-        `GrafastInternalError<84a6cdfa-e8fe-4dea-85fe-9426a6a78027>: ${step} is a unary step, but we're attempting to pass it ${size} (!= 1) values`,
+        `GrafastInternalError<84a6cdfa-e8fe-4dea-85fe-9426a6a78027>: ${step} is a unary step, but we're attempting to pass it ${count} (!= 1) values`,
       );
     }
-    if (step._stepOptions.stream && isStreamV2ableStep(step)) {
-      return step.streamV2(size, dependencies, extra, step._stepOptions.stream);
-    } else if (step._stepOptions.stream && isStreamableStep(step)) {
-      // Backwards compatibility
-      const backfilledValues = dependencies.map((v, i) =>
-        v === null ? arrayOfLength(size, extra.unaries[i]) : v,
-      );
-      return step.stream(
-        size,
-        backfilledValues,
+    const streamOptions = step._stepOptions.stream;
+    if (streamOptions && isStreamV2ableStep(step)) {
+      return step.streamV2({
+        count,
+        values,
+        unaries,
         extra,
-        step._stepOptions.stream,
+        streamOptions,
+      });
+    } else if (streamOptions && isStreamableStep(step)) {
+      // Backwards compatibility
+      const backfilledValues = values.map((v, i) =>
+        v === null ? arrayOfLength(count, unaries[i]) : v,
       );
+      return step.stream(count, backfilledValues, extra, streamOptions);
     } else {
-      return step.executeV2(size, dependencies, extra);
+      return step.executeV2({ count, values, unaries, extra });
     }
   }
 
@@ -703,6 +706,7 @@ export function executeBucket(
   function reallyExecuteStepWithErrorsOrSelective(
     step: ExecutableStep,
     dependenciesIncludingSideEffects: Array<ReadonlyArray<any> | null>,
+    unariesIncludingSideEffects: Array<any | null>,
     polymorphicPathList: readonly (string | null)[],
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
@@ -722,7 +726,7 @@ export function executeBucket(
         : dependenciesIncludingSideEffects
     ) as (any[] | null)[];
 
-    // OPTIM: if extra.unaries.some(isGrafastError) then shortcut execution because everything fails
+    // OPTIM: if unariesIncludingSideEffects.some(isGrafastError) then shortcut execution because everything fails
 
     // for (let index = 0, l = polymorphicPathList.length; index < l; index++) {
     for (let index = 0; index < size; index++) {
@@ -757,7 +761,7 @@ export function executeBucket(
           i++
         ) {
           const depList = dependenciesIncludingSideEffects[i];
-          const v = depList ? depList[index] : extra.unaries[i];
+          const v = depList ? depList[index] : unariesIncludingSideEffects[i];
           if (isGrafastError(v)) {
             indexError = v;
             break;
@@ -796,9 +800,9 @@ export function executeBucket(
     }
 
     // Trim the side-effect dependencies back out again
-    if (sideEffectStepsWithErrors) {
-      extra.unaries = extra.unaries.slice(0, legitDepsCount);
-    }
+    const unaries = sideEffectStepsWithErrors
+      ? unariesIncludingSideEffects.slice(0, legitDepsCount)
+      : unariesIncludingSideEffects;
 
     if (newSize === 0) {
       // Everything is errors; we can skip execution
@@ -808,6 +812,7 @@ export function executeBucket(
         newSize,
         step,
         dependencies,
+        unaries,
         extra,
       );
       if (isPromiseLike(resultWithoutErrors)) {
@@ -818,7 +823,13 @@ export function executeBucket(
         return mergeErrorsBackIn(resultWithoutErrors, errors, size);
       }
     } else {
-      return reallyExecuteStepWithNoErrors(newSize, step, dependencies, extra);
+      return reallyExecuteStepWithNoErrors(
+        newSize,
+        step,
+        dependencies,
+        unaries,
+        extra,
+      );
     }
   }
 
@@ -833,7 +844,6 @@ export function executeBucket(
         step.metaKey !== undefined ? metaByMetaKey[step.metaKey] : undefined;
       const unaries: Array<any | null> = [];
       const extra: ExecutionExtra = {
-        unaries,
         stopTime,
         meta,
         eventEmitter,
@@ -914,6 +924,7 @@ export function executeBucket(
           ? reallyExecuteStepWithErrorsOrSelective(
               step,
               dependencies,
+              unaries,
               bucket.polymorphicPathList,
               extra,
             )
@@ -921,6 +932,7 @@ export function executeBucket(
               step._isUnary ? 1 : size,
               step,
               dependencies,
+              unaries,
               extra,
             );
       if (isPromiseLike(result)) {
