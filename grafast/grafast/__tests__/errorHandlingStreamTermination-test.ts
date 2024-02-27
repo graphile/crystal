@@ -3,7 +3,7 @@ import { expect } from "chai";
 import type { AsyncExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type { PromiseOrDirect } from "../dist/index.js";
+import type { ExecutionDetails, PromiseOrDirect } from "../dist/index.js";
 import {
   constant,
   ExecutableStep,
@@ -28,8 +28,17 @@ class SyncListCallbackStep<
     super();
     this.addDependency($dep);
   }
-  execute(_count: number, [val]: [Array<TIn>]): Array<PromiseOrDirect<TOut>> {
-    return val.map((entry) => this.callback(entry));
+  executeV2({
+    count,
+    values: [values0],
+    unaries: [unary0],
+  }: ExecutionDetails<[TIn]>): Array<PromiseOrDirect<TOut>> {
+    let result: PromiseOrDirect<TOut>[] = [];
+    for (let i = 0; i < count; i++) {
+      const entry = values0 !== null ? values0[i] : unary0!;
+      result.push(this.callback(entry));
+    }
+    return result;
   }
   async stream(_count: number, [val]: [Array<TIn>]) {
     await sleep(0);

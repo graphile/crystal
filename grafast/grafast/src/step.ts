@@ -489,6 +489,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     unaries,
     extra,
   }: ExecutionDetails): PromiseOrDirect<GrafastResultsList<TData>> {
+    // TODO: warn that this class should implement executeV2 instead
     const backfilledValues = values.map((v, i) =>
       v === null ? arrayOfLength(count, unaries[i]) : v,
     );

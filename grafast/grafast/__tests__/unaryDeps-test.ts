@@ -5,6 +5,7 @@ import { it } from "mocha";
 import sqlite3 from "sqlite3";
 
 import type {
+  ExecutionDetails,
   ExecutionExtra,
   GrafastResultsList,
   GrafastValuesList,
@@ -82,13 +83,13 @@ class GetRecordsStep<T extends Record<string, any>> extends ExecutableStep {
     this.firstUDI = this.addUnaryDependency($first);
   }
 
-  async executeV2(
-    count: number,
-    values: GrafastValuesList<any>,
-    extra: ExecutionExtra,
-  ): Promise<GrafastResultsList<any>> {
-    const db = extra.unaries[this.dbDepId] as sqlite3.Database;
-    const first = this.firstUDI != null ? extra.unaries[this.firstUDI] : null;
+  async executeV2({
+    count,
+    values,
+    unaries,
+  }: ExecutionDetails): Promise<GrafastResultsList<any>> {
+    const db = unaries[this.dbDepId] as sqlite3.Database;
+    const first = this.firstUDI != null ? unaries[this.firstUDI] : null;
 
     const identifierCols = Object.keys(this.depIdByIdentifier);
 
@@ -137,7 +138,7 @@ ${orderBy ? `order by ${orderBy}` : ""}
         const obj = Object.fromEntries(
           Object.entries(this.depIdByIdentifier).map(([col, depId]) => [
             col,
-            values[depId] ? values[depId][i] : extra.unaries[depId],
+            values[depId] ? values[depId][i] : unaries[depId],
           ]),
         );
         json.push(obj);
@@ -152,8 +153,7 @@ ${orderBy ? `order by ${orderBy}` : ""}
       results[i] = dbResults.filter((r) => {
         return entries.every(
           ([col, depId]) =>
-            r[col] ===
-            (values[depId] ? values[depId][i] : extra.unaries[depId]),
+            r[col] === (values[depId] ? values[depId][i] : unaries[depId]),
         );
       });
     }
