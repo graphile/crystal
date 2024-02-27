@@ -15,6 +15,7 @@ import {
   lambda,
   makeGrafastSchema,
 } from "../dist/index.js";
+import { StreamDetails } from "../dist/interfaces.js";
 
 class SyncListCallbackStep<
   TIn,
@@ -40,14 +41,23 @@ class SyncListCallbackStep<
     }
     return result;
   }
-  stream(_count: number, [val]: [Array<TIn>]) {
+  streamV2({
+    count,
+    values: [values0],
+    unaries: [unaries0],
+  }: StreamDetails<[TIn]>) {
     const { callback } = this;
-    return val.map((entry) =>
-      (async function* () {
-        const data = await callback(entry);
-        yield* data;
-      })(),
-    );
+    let results: any[] = [];
+    for (let i = 0; i < count; i++) {
+      const entry = values0 === null ? unaries0! : values0[i];
+      results.push(
+        (async function* () {
+          const data = await callback(entry);
+          yield* data;
+        })(),
+      );
+    }
+    return results;
   }
 }
 

@@ -774,7 +774,9 @@ export interface ExecutionExtraBase {
 export interface ExecutionExtra extends ExecutionExtraBase {}
 export interface UnbatchedExecutionExtra extends ExecutionExtraBase {}
 
-export interface ExecutionDetails<TDeps extends [...any[]] = [...any[]]> {
+export interface ExecutionDetails<
+  TDeps extends readonly [...any[]] = readonly [...any[]],
+> {
   count: number;
   values: {
     [DepIdx in keyof TDeps]: GrafastValuesList<TDeps[DepIdx]> | null;
@@ -784,8 +786,9 @@ export interface ExecutionDetails<TDeps extends [...any[]] = [...any[]]> {
   } & { length: TDeps["length"] };
   extra: ExecutionExtra;
 }
-export interface StreamDetails<TDeps extends [...any[]] = [...any[]]>
-  extends ExecutionDetails<TDeps> {
+export interface StreamDetails<
+  TDeps extends readonly [...any[]] = readonly [...any[]],
+> extends ExecutionDetails<TDeps> {
   streamOptions: StepStreamOptions;
 }
 
@@ -817,7 +820,6 @@ export interface GrafastArgs extends GraphQLArgs {
   resolvedPreset?: GraphileConfig.ResolvedPreset;
   requestContext?: Partial<Grafast.RequestContext>;
 }
-
 export type Maybe<T> = T | null | undefined;
 
 export * from "./planJSONInterfaces.js";

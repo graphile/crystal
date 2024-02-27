@@ -3,9 +3,9 @@ import { SafeError } from "../index.js";
 import type {
   GrafastResultStreamList,
   GrafastSubscriber,
-  GrafastValuesList,
+  StreamDetails,
 } from "../interfaces.js";
-import type { StreamableStep } from "../step.js";
+import type { StreamV2ableStep } from "../step.js";
 import { ExecutableStep, isExecutableStep } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 import { constant } from "./constant.js";
@@ -21,7 +21,7 @@ export class ListenStep<
     TPayloadStep extends ExecutableStep,
   >
   extends ExecutableStep<TTopics[TTopic]>
-  implements StreamableStep<TTopics[TTopic]>
+  implements StreamV2ableStep<TTopics[TTopic]>
 {
   static $$export = {
     moduleName: "grafast",
@@ -63,18 +63,20 @@ export class ListenStep<
     throw new Error("ListenStep cannot be executed, it can only be streamed");
   }
 
-  stream(
-    count: number,
-    values: readonly [
-      GrafastValuesList<GrafastSubscriber<TTopics>>,
-      GrafastValuesList<TTopic>,
-    ],
-  ): GrafastResultStreamList<TTopics[TTopic]> {
-    const pubsubs = values[this.pubsubDep as 0];
-    const topics = values[this.topicDep as 1];
+  streamV2({
+    count,
+    values,
+    unaries,
+  }: StreamDetails<
+    readonly [GrafastSubscriber<TTopics>, TTopic]
+  >): GrafastResultStreamList<TTopics[TTopic]> {
+    const pubsubValues = values[this.pubsubDep as 0];
+    const pubsubUnary = unaries[this.pubsubDep as 0];
+    const topicValues = values[this.topicDep as 1];
+    const topicUnary = unaries[this.topicDep as 1];
     const result = [];
     for (let i = 0; i < count; i++) {
-      const pubsub = pubsubs[i];
+      const pubsub = pubsubValues === null ? pubsubUnary : pubsubValues[i];
       if (!pubsub) {
         throw new SafeError(
           "Subscription not supported",
@@ -87,7 +89,7 @@ export class ListenStep<
             : {},
         );
       }
-      const topic = topics[i];
+      const topic = topicValues === null ? topicUnary! : topicValues[i];
       result[i] = pubsub.subscribe(topic);
     }
     return result;
