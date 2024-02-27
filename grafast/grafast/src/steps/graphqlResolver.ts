@@ -7,7 +7,7 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
-import type { __ItemStep, ObjectStep } from "../index.js";
+import type { __ItemStep, ExecutionDetails, ObjectStep } from "../index.js";
 import { context, SafeError } from "../index.js";
 import type {
   ExecutionExtra,
@@ -312,45 +312,56 @@ export class GraphQLItemHandler
     return data.map((data) => dcr(data, context, resolveInfo));
   }
 
-  execute(
-    _count: number,
-    values: [GrafastValuesList<any>],
-  ): GrafastResultsList<any> {
+  executeV2({
+    count,
+    values: [values0],
+    unaries: [unaries0],
+  }: ExecutionDetails<
+    [Awaited<ReturnType<typeof dcr>>]
+  >): GrafastResultsList<any> {
     if (this.abstractType !== undefined) {
-      return values[0].map((data) => {
+      const results: any[] = [];
+      for (let i = 0; i < count; i++) {
+        const data = values0 !== null ? values0[i] : unaries0;
         if (data == null) {
-          return data;
-        }
-        if (isPromiseLike(data.data)) {
-          return data.data.then((resolvedData: unknown) =>
-            this.polymorphicWrapData(
-              resolvedData,
-              data.context,
-              data.resolveInfo,
+          results.push(data);
+        } else if (isPromiseLike(data.data)) {
+          results.push(
+            data.data.then((resolvedData: unknown) =>
+              this.polymorphicWrapData(
+                resolvedData,
+                data.context,
+                data.resolveInfo,
+              ),
             ),
           );
         } else {
-          return this.polymorphicWrapData(
-            data.data,
-            data.context,
-            data.resolveInfo,
+          results.push(
+            this.polymorphicWrapData(data.data, data.context, data.resolveInfo),
           );
         }
-      });
+      }
+      return results;
     } else if (this.nullableInnerType != null) {
-      return values[0].map((d) => {
+      const results: any[] = [];
+      for (let i = 0; i < count; i++) {
+        const d = values0 !== null ? values0[i] : unaries0;
         if (d == null) {
-          return null;
-        }
-        const { data, context, resolveInfo } = d;
-        if (isPromiseLike(data)) {
-          return data.then((data) =>
-            this.wrapListData(data, context, resolveInfo),
-          );
+          results.push(null);
         } else {
-          return this.wrapListData(data, context, resolveInfo);
+          const { data, context, resolveInfo } = d;
+          if (isPromiseLike(data)) {
+            results.push(
+              data.then((data) =>
+                this.wrapListData(data, context, resolveInfo),
+              ),
+            );
+          } else {
+            results.push(this.wrapListData(data, context, resolveInfo));
+          }
         }
-      });
+      }
+      return results;
     } else {
       throw new Error(
         `GrafastInternalError<6a3ed701-6b53-41e6-9a64-fbea57c76ae7>: has to be abstract or list`,

@@ -32,7 +32,7 @@ export class __ValueStep<TData> extends ExecutableStep<TData> {
     }
   }
 
-  execute(): never {
+  executeV2(): never {
     // This is still an "executable plan"; we just side-step execution internally.
     throw new Error(
       `GrafastInternalError<7696a514-f452-4d47-92d3-85aeb5b23f48>: ${this} is a __ValueStep and thus must never execute`,

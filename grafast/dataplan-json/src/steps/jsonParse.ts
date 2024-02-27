@@ -1,6 +1,7 @@
 import chalk from "chalk";
 import type {
   AccessStep,
+  ExecutionDetails,
   GrafastResultsList,
   GrafastValuesList,
   PromiseOrDirect,
@@ -53,14 +54,14 @@ export class JSONParseStep<
     return access(this, [index]);
   }
 
-  execute(
-    count: number,
-    values: [GrafastValuesList<string>],
-  ): GrafastResultsList<TJSON> {
+  executeV2({
+    count,
+    values: [values0],
+    unaries: [unaries0],
+  }: ExecutionDetails<[string]>): GrafastResultsList<TJSON> {
     const result: Array<PromiseOrDirect<TJSON>> = []; // new Array(count);
-    const list = values[0];
     for (let i = 0; i < count; i++) {
-      const v = list[i];
+      const v = values0 !== null ? values0[i] : unaries0!;
       if (typeof v === "string") {
         try {
           result[i] = JSON.parse(v);

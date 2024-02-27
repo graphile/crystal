@@ -3,6 +3,7 @@
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import type {
+  ExecutionDetails,
   ExecutionExtra,
   StepOptimizeOptions,
   UnbatchedExecutionExtra,
@@ -215,14 +216,20 @@ ${inner}
     return super.finalize();
   }
 
-  execute(
-    count: number,
-    values: Array<Array<DataFromPlans<TPlans>[keyof TPlans]>>,
-    extra: ExecutionExtra,
-  ): Array<DataFromPlans<TPlans>> {
+  executeV2({
+    count,
+    values,
+    unaries,
+    extra,
+  }: ExecutionDetails<Array<DataFromPlans<TPlans>[keyof TPlans]>>): Array<
+    DataFromPlans<TPlans>
+  > {
     const result: Array<DataFromPlans<TPlans>> = [];
     for (let i = 0; i < count; i++) {
-      result[i] = this.unbatchedExecute!(extra, ...values.map((v) => v[i]));
+      result[i] = this.unbatchedExecute!(
+        extra,
+        ...values.map((v, depIndex) => (v === null ? unaries[depIndex] : v[i])),
+      );
     }
     return result;
   }

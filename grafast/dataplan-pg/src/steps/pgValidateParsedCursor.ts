@@ -1,4 +1,8 @@
-import type { GrafastResultsList, GrafastValuesList } from "grafast";
+import type {
+  ExecutionDetails,
+  GrafastResultsList,
+  GrafastValuesList,
+} from "grafast";
 import { ExecutableStep, isDev, SafeError } from "grafast";
 
 /**
@@ -37,42 +41,52 @@ export class PgValidateParsedCursorStep extends ExecutableStep<undefined> {
     );
   }
 
-  execute(
-    _count: number,
-    values: [GrafastValuesList<string | null>],
-  ): GrafastResultsList<undefined> {
-    const parsedCursors = values[0];
-    return parsedCursors.map((decoded) => {
+  executeV2({
+    count,
+    values: [values0],
+    unaries: [unaries0],
+  }: ExecutionDetails<[string | null]>): GrafastResultsList<undefined> {
+    const results: any[] = [];
+    for (let i = 0; i < count; i++) {
+      const decoded = values0 === null ? unaries0 : values0[i];
       if (!decoded) {
-        return;
-      }
-      try {
-        const [cursorDigest, ...cursorParts] = decoded;
-        if (!cursorDigest || cursorDigest !== this.digest) {
-          throw new Error(
-            `Invalid cursor digest - '${cursorDigest}' !== '${this.digest}'`,
-          );
-        }
-        if (cursorDigest === "natural") {
-          if (cursorParts.length !== 1 || typeof cursorParts[0] !== "number") {
-            throw new Error(`Invalid 'natural' cursor value - ${cursorParts}`);
+        results.push(undefined);
+      } else {
+        try {
+          const [cursorDigest, ...cursorParts] = decoded;
+          if (!cursorDigest || cursorDigest !== this.digest) {
+            throw new Error(
+              `Invalid cursor digest - '${cursorDigest}' !== '${this.digest}'`,
+            );
           }
-        } else if (cursorParts.length !== this.orderCount) {
-          throw new Error(
-            `Invalid cursor length - ${cursorParts.length} !== ${this.orderCount}`,
+          if (cursorDigest === "natural") {
+            if (
+              cursorParts.length !== 1 ||
+              typeof cursorParts[0] !== "number"
+            ) {
+              throw new Error(
+                `Invalid 'natural' cursor value - ${cursorParts}`,
+              );
+            }
+          } else if (cursorParts.length !== this.orderCount) {
+            throw new Error(
+              `Invalid cursor length - ${cursorParts.length} !== ${this.orderCount}`,
+            );
+          }
+          results.push(undefined);
+        } catch (e) {
+          if (isDev) {
+            console.error("Invalid cursor:");
+            console.error(e);
+          }
+          // TODO: we should push this error to `results`; but doing so would make it not syncAndSafe.
+          throw new SafeError(
+            `Invalid '${this.beforeOrAfter}' cursor - a cursor is only valid within a specific ordering, if you change the order then you'll need different cursors.`,
           );
         }
-        return undefined;
-      } catch (e) {
-        if (isDev) {
-          console.error("Invalid cursor:");
-          console.error(e);
-        }
-        throw new SafeError(
-          `Invalid '${this.beforeOrAfter}' cursor - a cursor is only valid within a specific ordering, if you change the order then you'll need different cursors.`,
-        );
       }
-    });
+    }
+    return results;
   }
 }
 

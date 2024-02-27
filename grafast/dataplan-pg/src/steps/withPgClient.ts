@@ -1,4 +1,8 @@
-import type { GrafastResultsList, GrafastValuesList } from "grafast";
+import type {
+  ExecutionDetails,
+  GrafastResultsList,
+  GrafastValuesList,
+} from "grafast";
 import { constant, ExecutableStep } from "grafast";
 
 import type { PgClient, PgExecutor, WithPgClient } from "../executor";
@@ -52,19 +56,27 @@ export class WithPgClientStep<
     this.dataId = this.addDependency($data);
   }
 
-  execute(
-    _count: number,
-    values: [
-      GrafastValuesList<{ pgSettings: any; withPgClient: WithPgClient }>,
-      GrafastValuesList<TData>,
-    ],
-  ): GrafastResultsList<TResult> {
-    const contexts = values[this.contextId as 0];
-    const datas = values[this.dataId as 1];
-    return contexts.map(async ({ pgSettings, withPgClient }, i) => {
-      const data = datas[i];
-      return withPgClient(pgSettings, (client) => this.callback(client, data));
-    });
+  executeV2({
+    count,
+    values,
+    unaries,
+  }: ExecutionDetails<
+    [{ pgSettings: any; withPgClient: WithPgClient }, TData]
+  >): GrafastResultsList<TResult> {
+    const contextValues = values[this.contextId as 0];
+    const unaryContext = unaries[this.contextId as 0];
+    const dataValues = values[this.dataId as 1];
+    const dataUnary = unaries[this.dataId as 1];
+    const promises: Promise<any>[] = [];
+    for (let i = 0; i < count; i++) {
+      const context = contextValues === null ? unaryContext! : contextValues[i];
+      const data = dataValues === null ? dataUnary! : dataValues[i];
+      const { withPgClient, pgSettings } = context;
+      promises.push(
+        withPgClient(pgSettings, (client) => this.callback(client, data)),
+      );
+    }
+    return promises;
   }
 }
 

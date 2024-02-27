@@ -3,6 +3,7 @@ import chalk from "chalk";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import type {
+  ExecutionDetails,
   GrafastResultsList,
   GrafastValuesList,
   UnbatchedExecutionExtra,
@@ -99,11 +100,16 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
     super.finalize();
   }
 
-  execute(
-    _count: number,
-    values: GrafastValuesList<any[]>,
-  ): GrafastResultsList<any> {
-    return values[0].map(this.mapper);
+  executeV2({
+    count,
+    values: [values0],
+    unaries: [unaries0],
+  }: ExecutionDetails): GrafastResultsList<any> {
+    const results: any[] = [];
+    for (let i = 0; i < count; i++) {
+      results.push(this.mapper(values0 === null ? unaries0 : values0[i]));
+    }
+    return results;
   }
 
   unbatchedExecute(_extra: UnbatchedExecutionExtra, value: any): any {

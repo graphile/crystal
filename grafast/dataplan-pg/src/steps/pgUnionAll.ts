@@ -5,6 +5,7 @@ import type {
   ConnectionCapableStep,
   ConnectionStep,
   EdgeCapableStep,
+  ExecutionDetails,
   ExecutionExtra,
   GrafastResultsList,
   GrafastValuesList,
@@ -15,6 +16,7 @@ import type {
 import {
   __ItemStep,
   access,
+  arrayOfLength,
   constant,
   ExecutableStep,
   exportAs,
@@ -323,18 +325,21 @@ export class PgUnionAllSingleStep
     return sqlExpr`${fragment}`;
   }
 
-  execute(
-    _count: number,
-    values: [GrafastValuesList<any>],
-  ): GrafastResultsList<any> {
+  executeV2({
+    count,
+    values: [values0],
+    unaries: [unaries0],
+  }: ExecutionDetails): GrafastResultsList<any> {
     if (this.typeKey !== null) {
       const typeKey = this.typeKey;
-      return values[0].map((v) => {
-        const type = v[typeKey];
-        return polymorphicWrap(type, v);
-      });
+      return values0 === null
+        ? arrayOfLength(count, polymorphicWrap(unaries0[typeKey], unaries0))
+        : values0.map((v) => {
+            const type = v[typeKey];
+            return polymorphicWrap(type, v);
+          });
     } else {
-      return values[0];
+      return values0 === null ? arrayOfLength(count, unaries0) : values0;
     }
   }
 }

@@ -1,5 +1,5 @@
 import { inspect } from "../inspect.js";
-import type { GrafastResultsList } from "../interfaces.js";
+import type { ExecutionDetails, GrafastResultsList } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 
@@ -32,7 +32,7 @@ export class ConstantStep<TData> extends UnbatchedExecutableStep<TData> {
     return peers.filter((p) => p.data === this.data);
   }
 
-  execute(count: number): GrafastResultsList<TData> {
+  executeV2({ count }: ExecutionDetails): GrafastResultsList<TData> {
     return arrayOfLength(count, this.data);
   }
 

@@ -1,6 +1,7 @@
 import type { GraphQLObjectType } from "graphql";
 
 import type {
+  ExecutionDetails,
   ExecutionExtra,
   GrafastResultsList,
   GrafastValuesList,
@@ -72,15 +73,14 @@ export class PolymorphicBranchStep<TStep extends ExecutableStep>
     }
   }
 
-  execute(
-    count: number,
-    values: ReadonlyArray<GrafastValuesList<any>>,
-    _extra: ExecutionExtra,
-  ): PromiseOrDirect<GrafastResultsList<any>> {
+  executeV2({
+    count,
+    values: [values0],
+    unaries: [unaries0],
+  }: ExecutionDetails): PromiseOrDirect<GrafastResultsList<any>> {
     const results: any[] = [];
-    const objects = values[0];
     for (let i = 0; i < count; i++) {
-      const obj = objects[i];
+      const obj = values0 !== null ? values0[i] : unaries0!;
       let match: string | null = null;
       if (obj != null) {
         for (const typeName of this.typeNames) {

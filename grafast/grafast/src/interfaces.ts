@@ -777,7 +777,7 @@ export interface UnbatchedExecutionExtra extends ExecutionExtraBase {}
 export interface ExecutionDetails<TDeps extends [...any[]] = [...any[]]> {
   count: number;
   values: {
-    [DepIdx in keyof TDeps]: ReadonlyArray<TDeps[DepIdx]> | null;
+    [DepIdx in keyof TDeps]: GrafastValuesList<TDeps[DepIdx]> | null;
   } & { length: TDeps["length"] };
   unaries: {
     [DepIdx in keyof TDeps]: null | TDeps[DepIdx];

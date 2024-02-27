@@ -3,7 +3,7 @@ import { expect } from "chai";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type { PromiseOrDirect } from "../dist/index.js";
+import type { ExecutionDetails, PromiseOrDirect } from "../dist/index.js";
 import {
   arrayOfLength,
   constant,
@@ -60,8 +60,8 @@ class BadFinalizeStep extends ExecutableStep {
     $parent.finalize();
     return this;
   }
-  execute(l: number) {
-    return arrayOfLength(l, 42);
+  executeV2({ count }: ExecutionDetails) {
+    return arrayOfLength(count, 42);
   }
 }
 

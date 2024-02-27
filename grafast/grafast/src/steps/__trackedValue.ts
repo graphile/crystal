@@ -14,8 +14,9 @@ import {
 } from "graphql";
 
 import type { Constraint } from "../constraints.js";
-import { __ListTransformStep } from "../index.js";
+import { __ListTransformStep, arrayOfLength } from "../index.js";
 import type {
+  ExecutionDetails,
   GrafastResultsList,
   GrafastValuesList,
   UnbatchedExecutionExtra,
@@ -151,12 +152,13 @@ export class __TrackedValueStep<
     }
   }
 
-  execute(
-    _count: number,
-    values: [GrafastValuesList<TData>],
-  ): GrafastResultsList<TData> {
+  executeV2({
+    count,
+    values: [values0],
+    unaries: [unaries0],
+  }: ExecutionDetails<[TData]>): GrafastResultsList<TData> {
     // We have only one dependency, return the value of that.
-    return values[0];
+    return values0 === null ? arrayOfLength(count, unaries0) : values0;
   }
 
   unbatchedExecute(_extra: UnbatchedExecutionExtra, v: TData): TData {

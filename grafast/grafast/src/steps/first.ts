@@ -1,6 +1,6 @@
 import type {
+  ExecutionDetails,
   GrafastResultsList,
-  GrafastValuesList,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
@@ -20,14 +20,14 @@ export class FirstStep<TData> extends UnbatchedExecutableStep<TData> {
     this.addDependency(parentPlan);
   }
 
-  execute(
-    count: number,
-    values: GrafastValuesList<[ReadonlyArray<TData>]>,
-  ): GrafastResultsList<TData> {
+  executeV2({
+    count,
+    values: [values0],
+    unaries: [unaries0],
+  }: ExecutionDetails<[TData[]]>): GrafastResultsList<TData> {
     const result: Array<TData> = [];
-    const dep = values[0];
     for (let i = 0; i < count; i++) {
-      result[i] = dep[i]?.[0];
+      result[i] = values0 === null ? unaries0?.[0]! : values0[i]?.[0];
     }
     return result;
   }

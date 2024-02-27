@@ -1,5 +1,5 @@
 import { inspect } from "../inspect.js";
-import type { GrafastResultsList } from "../interfaces.js";
+import type { ExecutionDetails, GrafastResultsList } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 
@@ -20,7 +20,7 @@ export class ErrorStep<
     this.error = error;
   }
 
-  execute(count: number): GrafastResultsList<any> {
+  executeV2({ count }: ExecutionDetails): GrafastResultsList<any> {
     return arrayOfLength(count, this.error);
   }
   unbatchedExecute(): any {

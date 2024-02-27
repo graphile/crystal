@@ -1,4 +1,5 @@
 import type {
+  ExecutionDetails,
   GrafastResultsList,
   GrafastValuesList,
   UnbatchedExecutionExtra,
@@ -41,11 +42,17 @@ export class ReverseStep<TData> extends UnbatchedExecutableStep<
     this.addDependency(plan);
   }
 
-  execute(
-    _count: number,
-    values: [GrafastValuesList<TData[]>],
-  ): GrafastResultsList<TData[]> {
-    return values[0].map((arr) => (arr == null ? arr : reverseArray(arr)));
+  executeV2({
+    count,
+    values: [values0],
+    unaries: [unaries0],
+  }: ExecutionDetails<[TData[]]>): GrafastResultsList<TData[]> {
+    const results: any[] = [];
+    for (let i = 0; i < count; i++) {
+      const arr = values0 === null ? unaries0 : values0[i];
+      results.push(arr == null ? arr : reverseArray(arr));
+    }
+    return results;
   }
 
   unbatchedExecute(_extra: UnbatchedExecutionExtra, arr: TData[]): TData[] {

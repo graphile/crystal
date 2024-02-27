@@ -1,4 +1,5 @@
 import type {
+  ExecutionDetails,
   StepOptimizeOptions,
   UnbatchedExecutionExtra,
   UnwrapPlanTuple,
@@ -29,13 +30,14 @@ export class ListStep<
     return this.dependencies.map(($dep) => $dep.id).join(",");
   }
 
-  execute(
-    count: number,
-    values: any[][], //Array<UnwrapPlanTuple<TPlanTuple>>,
+  executeV2(
+    { count, values, unaries }: ExecutionDetails, //UnwrapPlanTuple<TPlanTuple>,
   ): Array<UnwrapPlanTuple<TPlanTuple>> {
     const result: any[] = [];
     for (let i = 0; i < count; i++) {
-      result[i] = values.map((list) => list[i]);
+      result[i] = values.map((list, depIndex) =>
+        list === null ? unaries[depIndex] : list[i],
+      );
     }
     return result;
   }

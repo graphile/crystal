@@ -511,7 +511,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   }
 }
 
-function _buildOptimizedExecuteExpression(
+function _buildOptimizedExecuteV2Expression(
   depCount: number,
   isSyncAndSafe: boolean,
 ) {
@@ -533,18 +533,29 @@ function _buildOptimizedExecuteExpression(
     }
   };
   return te`\
-(function execute(count, values, extra) {
-  const [
-${te.join(
-  depIndexes.map((i) => te`    ${te.identifier(`list${i}`)},\n`),
-  "",
-)}\
-  ] = values;
+(function execute({
+  count,
+  values: [${te.join(
+    depIndexes.map((i) => te.identifier(`list${i}`)),
+    ", ",
+  )}\
+  ],
+  unaries: [${te.join(
+    depIndexes.map((i) => te.identifier(`val${i}`)),
+    ", ",
+  )}],
+  extra,
+}) {
   const results = [];
   for (let i = 0; i < count; i++) {
 ${tryOrNot(te`\
     results[i] = this.unbatchedExecute(extra, ${te.join(
-      depIndexes.map((depIndex) => te`${te.identifier(`list${depIndex}`)}[i]`),
+      depIndexes.map(
+        (depIndex) =>
+          te`${te.identifier(`list${depIndex}`)} === null ? ${te.identifier(
+            `val${depIndex}`,
+          )} : ${te.identifier(`list${depIndex}`)}[i]`,
+      ),
       ", ",
     )});\
 `)}
@@ -559,18 +570,21 @@ const safeCache: any[] = [];
 te.batch(() => {
   for (let i = 0; i <= MAX_DEPENDENCIES_TO_CACHE; i++) {
     const depCount = i;
-    const unsafeExpression = _buildOptimizedExecuteExpression(depCount, false);
+    const unsafeExpression = _buildOptimizedExecuteV2Expression(
+      depCount,
+      false,
+    );
     te.runInBatch(unsafeExpression, (fn) => {
       unsafeCache[depCount] = fn;
     });
-    const safeExpression = _buildOptimizedExecuteExpression(depCount, true);
+    const safeExpression = _buildOptimizedExecuteV2Expression(depCount, true);
     te.runInBatch(safeExpression, (fn) => {
       safeCache[depCount] = fn;
     });
   }
 });
 
-function buildOptimizedExecute(
+function buildOptimizedExecuteV2(
   depCount: number,
   isSyncAndSafe: boolean,
   callback: (fn: any) => void,
@@ -583,7 +597,10 @@ function buildOptimizedExecute(
   }
 
   // Build it
-  const expression = _buildOptimizedExecuteExpression(depCount, isSyncAndSafe);
+  const expression = _buildOptimizedExecuteV2Expression(
+    depCount,
+    isSyncAndSafe,
+  );
   te.runInBatch<any>(expression, (fn) => {
     callback(fn);
   });
@@ -600,29 +617,32 @@ export abstract class UnbatchedExecutableStep<
   finalize() {
     // If they've not replaced 'execute', use our optimized form
     if (this.execute === UnbatchedExecutableStep.prototype.execute) {
-      buildOptimizedExecute(
+      buildOptimizedExecuteV2(
         this.dependencies.length,
         this.isSyncAndSafe,
         (fn) => {
-          this.execute = fn;
+          this.executeV2 = fn;
         },
       );
     }
     super.finalize();
   }
 
-  execute(
-    count: number,
-    values: ReadonlyArray<GrafastValuesList<any>>,
-    extra: ExecutionExtra,
-  ): PromiseOrDirect<GrafastResultsList<TData>> {
+  executeV2({
+    count,
+    values,
+    unaries,
+    extra,
+  }: ExecutionDetails): PromiseOrDirect<GrafastResultsList<TData>> {
     console.warn(
       `${this} didn't call 'super.finalize()' in the finalize method.`,
     );
     const results = [];
     for (let i = 0; i < count; i++) {
       try {
-        const tuple = values.map((list) => list[i]);
+        const tuple = values.map((list, depIndex) =>
+          list === null ? unaries[depIndex] : list[i],
+        );
         results[i] = this.unbatchedExecute(extra, ...tuple);
       } catch (e) {
         results[i] = e instanceof Error ? (e as never) : Promise.reject(e);

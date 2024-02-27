@@ -1,4 +1,4 @@
-import type { __ItemStep, Deferred } from "../index.js";
+import type { __ItemStep, Deferred, ExecutionDetails } from "../index.js";
 import { defer } from "../index.js";
 import type {
   ExecutionExtra,
@@ -8,7 +8,7 @@ import type {
   PromiseOrDirect,
 } from "../interfaces.js";
 import { ExecutableStep, isListLikeStep, isObjectLikeStep } from "../step.js";
-import { canonicalJSONStringify } from "../utils.js";
+import { arrayOfLength, canonicalJSONStringify } from "../utils.js";
 import { access } from "./access.js";
 
 export interface LoadOptions<TItem, TParams extends Record<string, any>> {
@@ -154,11 +154,12 @@ export class LoadedRecordStep<
     return this.getDep(0);
   }
   // This'll never be called, due to `optimize` above.
-  execute(
-    _count: number,
-    [records]: [GrafastValuesList<TItem>],
-  ): GrafastResultsList<TItem> {
-    return records;
+  executeV2({
+    count,
+    values: [values0],
+    unaries: [unaries0],
+  }: ExecutionDetails<[TItem]>): GrafastResultsList<TItem> {
+    return values0 === null ? arrayOfLength(count, unaries0) : values0;
   }
 }
 
@@ -286,11 +287,14 @@ export class LoadStep<
     super.finalize();
   }
 
-  execute(
-    count: number,
-    [specs]: [GrafastValuesList<TSpec>],
-    extra: ExecutionExtra,
-  ): PromiseOrDirect<GrafastResultsList<Maybe<TData>>> {
+  executeV2({
+    count,
+    values: [values0],
+    unaries: [unaries0],
+    extra,
+  }: ExecutionDetails<[TSpec]>): PromiseOrDirect<
+    GrafastResultsList<Maybe<TData>>
+  > {
     const meta = extra.meta as LoadMeta;
     let cache = meta.cache;
     if (!cache) {
@@ -301,7 +305,7 @@ export class LoadStep<
 
     const results: Array<PromiseOrDirect<Maybe<TData>>> = [];
     for (let i = 0; i < count; i++) {
-      const spec = specs[i];
+      const spec = values0 === null ? unaries0! : values0[i];
       if (cache.has(spec)) {
         results.push(cache.get(spec)!);
       } else {
