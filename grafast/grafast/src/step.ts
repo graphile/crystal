@@ -615,11 +615,11 @@ export abstract class UnbatchedExecutableStep<
   };
 
   finalize() {
-    // If they've not replaced 'execute', use our optimized form
     if (
       this.executeV2 === UnbatchedExecutableStep.prototype.executeV2 &&
       this.execute === UnbatchedExecutableStep.prototype.execute
     ) {
+      // If they've not replaced 'execute', use our optimized form
       buildOptimizedExecuteV2(
         this.dependencies.length,
         this.isSyncAndSafe,
@@ -627,11 +627,12 @@ export abstract class UnbatchedExecutableStep<
           this.executeV2 = fn;
         },
       );
-    } else {
-      // TODO: only warn once per class
-      console.warn(
-        `It appears that you've replaced the execute or executeV2 method of ${this}; but since this is an UnbatchedExecuteableStep you should only replace unbatchedExecute`,
-      );
+    } else if (
+      this.executeV2 === UnbatchedExecutableStep.prototype.executeV2 &&
+      this.execute !== UnbatchedExecutableStep.prototype.execute
+    ) {
+      // They've overridden `execute` so we should call that rather than using our optimized executeV2
+      this.executeV2 = ExecutableStep.prototype.executeV2;
     }
     super.finalize();
   }
