@@ -340,7 +340,7 @@ function executePreemptive(
     index: number,
   ): PromiseOrDirect<ExecutionResult | AsyncGenerator<AsyncExecutionResult>> {
     const layerPlan = subscriptionLayerPlan!;
-    const { copyUnaryStepIds, copyBatchStepIds, rootStep } = layerPlan;
+    const { rootStep } = layerPlan;
     // PERF: we could consider batching this.
     const store: Bucket["store"] = new Map();
     const unaryStore = new Map();
