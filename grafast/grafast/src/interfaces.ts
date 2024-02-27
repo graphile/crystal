@@ -773,7 +773,7 @@ export interface ExecutionExtraBase {
 }
 export interface ExecutionExtra extends ExecutionExtraBase {
   /** The results for the unary dependencies the step used */
-  unaries: Record<string | number, any>;
+  unaries: any[];
 }
 export interface UnbatchedExecutionExtra extends ExecutionExtraBase {}
 
