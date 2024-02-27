@@ -6,7 +6,7 @@ import type { LayerPlanReasonSubroutine } from "../engine/LayerPlan.js";
 import { LayerPlan } from "../engine/LayerPlan.js";
 import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
 import type { GrafastError } from "../error.js";
-import type { ConnectionCapableStep } from "../index.js";
+import type { ConnectionCapableStep, ExecutionDetails } from "../index.js";
 import type {
   ExecutionExtra,
   GrafastResultsList,
@@ -196,11 +196,14 @@ export class __ListTransformStep<
     return this;
   }
 
-  async execute(
-    _count: number,
-    values: [GrafastValuesList<any[] | null | undefined | GrafastError>],
-    extra: ExecutionExtra,
-  ): Promise<GrafastResultsList<TMemo>> {
+  async executeV2({
+    count,
+    values,
+    unaries,
+    extra,
+  }: ExecutionDetails<[any[] | null | undefined | GrafastError]>): Promise<
+    GrafastResultsList<TMemo>
+  > {
     const bucket = extra._bucket;
 
     const childLayerPlan = this.subroutineLayer;
@@ -249,16 +252,14 @@ export class __ListTransformStep<
       }
     }
 
-    const listValues = values[this.listStepDepId];
+    const listStepValues = values[this.listStepDepId];
+    const listStepUnary = unaries[this.listStepDepId];
 
     // We'll typically be creating more listItem bucket entries than we
     // have parent buckets, so we must "multiply up" the store entries.
-    for (
-      let originalIndex = 0;
-      originalIndex < listValues.length;
-      originalIndex++
-    ) {
-      const list = listValues[originalIndex];
+    for (let originalIndex = 0; originalIndex < count; originalIndex++) {
+      const list =
+        listStepValues === null ? listStepUnary : listStepValues[originalIndex];
       if (Array.isArray(list)) {
         const newIndexes: number[] = [];
         map.set(originalIndex, newIndexes);
@@ -303,9 +304,14 @@ export class __ListTransformStep<
       ? [null, unaryStore.get(rootStep!.id)]
       : [store.get(rootStep!.id)!, null];
 
-    return listValues.map((list: any, originalIndex: number) => {
+    const results: any[] = [];
+    for (let originalIndex = 0; originalIndex < count; originalIndex++) {
+      const list =
+        listStepValues === null ? listStepUnary : listStepValues[originalIndex];
+
       if (list == null) {
-        return list;
+        results.push(list);
+        continue;
       }
       const indexes = map.get(originalIndex);
       if (!Array.isArray(list) || !Array.isArray(indexes)) {
@@ -313,7 +319,8 @@ export class __ListTransformStep<
         console.warn(
           `Either list or values was not an array when processing ${this}`,
         );
-        return null;
+        results.push(null);
+        continue;
       }
       const values = indexes.map((idx) =>
         depResults === null ? unaryResult : depResults[idx],
@@ -334,8 +341,9 @@ export class __ListTransformStep<
       const finalResult = this.finalizeCallback
         ? this.finalizeCallback(reduceResult)
         : reduceResult;
-      return finalResult;
-    });
+      results.push(finalResult);
+    }
+    return results;
   }
 }
 

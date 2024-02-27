@@ -1,4 +1,5 @@
 import type {
+  ExecutionDetails,
   GrafastResultsList,
   GrafastValuesList,
   SetterStep,
@@ -304,41 +305,54 @@ export class PgUpdateSingleStep<
    * NOTE: we don't know what the values being fed in are, we must feed them to
    * the plans stored in this.identifiers to get actual values we can use.
    */
-  async execute(
-    _count: number,
-    values: Array<GrafastValuesList<any>>,
-  ): Promise<GrafastResultsList<any>> {
+  async executeV2({
+    count,
+    values,
+    unaries,
+  }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
     const { text, rawSqlValues, queryValueDetailsBySymbol } =
       this.finalizeResults;
+    const contextValues = values[this.contextId];
+    const contextUnary = unaries[this.contextId];
 
     // We must execute each mutation on its own, but we can at least do so in
     // parallel. Note we return a list of promises, each may reject or resolve
     // without causing the others to reject.
-    return values[this.contextId].map(async (context, i) => {
-      const sqlValues = queryValueDetailsBySymbol.size
-        ? rawSqlValues.map((v) => {
-            if (typeof v === "symbol") {
-              const details = queryValueDetailsBySymbol.get(v);
-              if (!details) {
-                throw new Error(`Saw unexpected symbol '${inspect(v)}'`);
-              }
-              const val = values[details.depId][i];
-              return val == null ? null : details.processor(val);
-            } else {
-              return v;
-            }
-          })
-        : rawSqlValues;
-      const { rows, rowCount } = await this.resource.executeMutation({
-        context,
-        text,
-        values: sqlValues,
-      });
-      return rows[0] ?? (rowCount === 0 ? null : Object.create(null));
-    });
+    const promises: Promise<any>[] = [];
+    for (let i = 0; i < count; i++) {
+      promises.push(
+        (async () => {
+          const context =
+            contextValues === null ? contextUnary! : contextValues[i];
+          const sqlValues = queryValueDetailsBySymbol.size
+            ? rawSqlValues.map((v) => {
+                if (typeof v === "symbol") {
+                  const details = queryValueDetailsBySymbol.get(v);
+                  if (!details) {
+                    throw new Error(`Saw unexpected symbol '${inspect(v)}'`);
+                  }
+                  const depValues = values[details.depId];
+                  const val =
+                    depValues === null ? unaries[details.depId] : depValues[i];
+                  return val == null ? null : details.processor(val);
+                } else {
+                  return v;
+                }
+              })
+            : rawSqlValues;
+          const { rows, rowCount } = await this.resource.executeMutation({
+            context,
+            text,
+            values: sqlValues,
+          });
+          return rows[0] ?? (rowCount === 0 ? null : Object.create(null));
+        })(),
+      );
+    }
+    return promises;
   }
 
   public finalize(): void {
@@ -464,5 +478,4 @@ export function pgUpdateSingle<
 ): PgUpdateSingleStep<TResource> {
   return new PgUpdateSingleStep(resource, getBy, attributes);
 }
-
 exportAs("@dataplan/pg", pgUpdateSingle, "pgUpdateSingle");

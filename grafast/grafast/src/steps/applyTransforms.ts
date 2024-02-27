@@ -7,6 +7,7 @@ import { LayerPlan } from "../engine/LayerPlan.js";
 import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
 import type { GrafastError } from "../error.js";
 import type {
+  ExecutionDetails,
   ExecutionExtra,
   GrafastResultsList,
   GrafastValuesList,
@@ -73,11 +74,14 @@ export class ApplyTransformsStep extends ExecutableStep {
     this.operationPlan.finishSubroutine(this, this.subroutineLayer);
   }
 
-  async execute(
-    _count: number,
-    values: [GrafastValuesList<any[] | null | undefined | GrafastError>],
-    extra: ExecutionExtra,
-  ): Promise<GrafastResultsList<any[]>> {
+  async executeV2({
+    count,
+    values: [values0],
+    unaries: [unaries0],
+    extra,
+  }: ExecutionDetails<[any[] | null | undefined | GrafastError]>): Promise<
+    GrafastResultsList<any[]>
+  > {
     const bucket = extra._bucket;
 
     const childLayerPlan = this.subroutineLayer;
@@ -126,16 +130,10 @@ export class ApplyTransformsStep extends ExecutableStep {
       }
     }
 
-    const listValues = values[0];
-
     // We'll typically be creating more listItem bucket entries than we
     // have parent buckets, so we must "multiply up" the store entries.
-    for (
-      let originalIndex = 0;
-      originalIndex < listValues.length;
-      originalIndex++
-    ) {
-      const list = listValues[originalIndex];
+    for (let originalIndex = 0; originalIndex < count; originalIndex++) {
+      const list = values0 === null ? unaries0! : values0[originalIndex];
       if (Array.isArray(list)) {
         const newIndexes: number[] = [];
         map.set(originalIndex, newIndexes);
@@ -180,9 +178,12 @@ export class ApplyTransformsStep extends ExecutableStep {
       ? [null, unaryStore.get(rootStep.id)]
       : [store.get(rootStep!.id)!, null];
 
-    return listValues.map((list: any, originalIndex: number) => {
+    const results: any[] = [];
+    for (let originalIndex = 0; originalIndex < count; originalIndex++) {
+      const list = values0 === null ? unaries0! : values0[originalIndex];
       if (list == null) {
-        return list;
+        results.push(list);
+        continue;
       }
       const indexes = map.get(originalIndex);
       if (!Array.isArray(list) || !Array.isArray(indexes)) {
@@ -190,7 +191,8 @@ export class ApplyTransformsStep extends ExecutableStep {
         console.warn(
           `Either list or values was not an array when processing ${this}`,
         );
-        return null;
+        results.push(null);
+        continue;
       }
       const values = indexes.map((idx) => {
         const val = depResults === null ? unaryResult : depResults[idx];
@@ -206,8 +208,9 @@ export class ApplyTransformsStep extends ExecutableStep {
           "GrafastInternalError<43cb302e-673b-4881-8c4c-f2d00fe5a3d7>: The list and values length must match for a ApplyTransformsStep",
         );
       }
-      return values;
-    });
+      results.push(values);
+    }
+    return results;
   }
 }
 

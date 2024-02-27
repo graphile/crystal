@@ -1,4 +1,5 @@
 import type {
+  ExecutionDetails,
   GrafastResultsList,
   GrafastValuesList,
   PromiseOrDirect,
@@ -245,10 +246,11 @@ export class PgDeleteSingleStep<
    * NOTE: we don't know what the values being fed in are, we must feed them to
    * the plans stored in this.identifiers to get actual values we can use.
    */
-  async execute(
-    count: number,
-    values: Array<GrafastValuesList<any>>,
-  ): Promise<GrafastResultsList<any>> {
+  async executeV2({
+    count,
+    values,
+    unaries,
+  }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
@@ -259,9 +261,10 @@ export class PgDeleteSingleStep<
     // parallel. Note we return a list of promises, each may reject or resolve
     // without causing the others to reject.
     const result: Array<PromiseOrDirect<any>> = [];
-    const list = values[this.contextId];
+    const listValues = values[this.contextId];
+    const listUnary = unaries[this.contextId];
     for (let i = 0; i < count; i++) {
-      const context = list[i];
+      const context = listValues === null ? listUnary : listValues[i];
       const sqlValues = queryValueDetailsBySymbol.size
         ? rawSqlValues.map((v) => {
             if (typeof v === "symbol") {
@@ -269,7 +272,9 @@ export class PgDeleteSingleStep<
               if (!details) {
                 throw new Error(`Saw unexpected symbol '${inspect(v)}'`);
               }
-              const val = values[details.depId][i];
+              const depValues = values[details.depId];
+              const val =
+                depValues === null ? unaries[details.depId] : depValues[i];
               return val == null ? null : details.processor(val);
             } else {
               return v;
@@ -392,5 +397,4 @@ export function pgDeleteSingle<
 ): PgDeleteSingleStep<TResource> {
   return new PgDeleteSingleStep(resource, getBy);
 }
-
 exportAs("@dataplan/pg", pgDeleteSingle, "pgDeleteSingle");

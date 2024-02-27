@@ -2,6 +2,7 @@ import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
   ConnectionCapableStep,
+  ExecutionDetails,
   ExecutionExtra,
   GrafastResultsList,
   GrafastResultStreamList,
@@ -46,6 +47,7 @@ import sql, { $$symbolToIdentifier, arraysMatch } from "pg-sql2";
 import type { PgCodecAttributes } from "../codecs.js";
 import { listOfCodec, TYPES } from "../codecs.js";
 import type { PgResource, PgResourceUnique } from "../datasource.js";
+import type { PgExecutorInput } from "../executor.js";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
@@ -1209,11 +1211,12 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
    * NOTE: we don't know what the values being fed in are, we must feed them to
    * the plans stored in this.identifiers to get actual values we can use.
    */
-  async execute(
-    count: number,
-    values: Array<GrafastValuesList<any>>,
-    { eventEmitter }: ExecutionExtra,
-  ): Promise<GrafastResultsList<ReadonlyArray<unknown[]>>> {
+  async executeV2({
+    count,
+    values,
+    unaries,
+    extra: { eventEmitter },
+  }: ExecutionDetails): Promise<GrafastResultsList<ReadonlyArray<unknown[]>>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
@@ -1229,32 +1232,36 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       name,
       nameForSingle,
     } = this.finalizeResults;
+    const contextValues = values[this.contextId];
+    const contextUnary = unaries[this.contextId];
 
-    const executionResult = await this.resource.executeWithCache(
-      values[this.contextId].map((context, i) => {
-        return {
-          // The context is how we'd handle different connections with different claims
-          context,
-          queryValues:
-            identifierIndex != null
-              ? this.queryValues.map(({ dependencyIndex, codec }) => {
-                  const val = values[dependencyIndex][i];
-                  return val == null ? null : codec.toPg(val);
-                })
-              : EMPTY_ARRAY,
-        };
-      }),
-      {
-        text,
-        textForSingle,
-        rawSqlValues,
-        identifierIndex,
-        name,
-        nameForSingle,
-        eventEmitter,
-        useTransaction: this.mode === "mutation",
-      },
-    );
+    const specs: Array<PgExecutorInput<any>> = [];
+    for (let i = 0; i < count; i++) {
+      const context = contextValues === null ? contextUnary : contextValues[i];
+      specs.push({
+        // The context is how we'd handle different connections with different claims
+        context,
+        queryValues:
+          identifierIndex != null
+            ? this.queryValues.map(({ dependencyIndex, codec }) => {
+                const depValues = values[dependencyIndex];
+                const val =
+                  depValues === null ? unaries[dependencyIndex] : depValues[i];
+                return val == null ? null : codec.toPg(val);
+              })
+            : EMPTY_ARRAY,
+      });
+    }
+    const executionResult = await this.resource.executeWithCache(specs, {
+      text,
+      textForSingle,
+      rawSqlValues,
+      identifierIndex,
+      name,
+      nameForSingle,
+      eventEmitter,
+      useTransaction: this.mode === "mutation",
+    });
     // debugExecute("%s; result: %c", this, executionResult);
 
     return executionResult.values.map((allVals) => {

@@ -30,8 +30,8 @@ class SomeStep extends ExecutableStep {
   finalize(): void {
     super.finalize();
   }
-  async execute(l: number) {
-    return arrayOfLength(l, 42);
+  async executeV2({ count }: ExecutionDetails) {
+    return arrayOfLength(count, 42);
   }
 }
 
@@ -45,8 +45,8 @@ class BadOptimizeStep extends ExecutableStep {
     $parent.optimize?.({ meta: {}, stream: null });
     return this;
   }
-  async execute(l: number) {
-    return arrayOfLength(l, 42);
+  async executeV2({ count }: ExecutionDetails) {
+    return arrayOfLength(count, 42);
   }
 }
 

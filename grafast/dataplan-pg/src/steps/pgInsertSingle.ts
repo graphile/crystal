@@ -1,4 +1,5 @@
 import type {
+  ExecutionDetails,
   GrafastResultsList,
   GrafastValuesList,
   PromiseOrDirect,
@@ -281,10 +282,11 @@ export class PgInsertSingleStep<
    * NOTE: we don't know what the values being fed in are, we must feed them to
    * the plans stored in this.identifiers to get actual values we can use.
    */
-  async execute(
-    count: number,
-    values: Array<GrafastValuesList<any>>,
-  ): Promise<GrafastResultsList<any>> {
+  async executeV2({
+    count,
+    values,
+    unaries,
+  }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
@@ -296,7 +298,9 @@ export class PgInsertSingleStep<
     // without causing the others to reject.
     const result: Array<PromiseOrDirect<any>> = [];
     for (let i = 0; i < count; i++) {
-      const value = values.map((v) => v[i]);
+      const value = values.map((v, depId) =>
+        v === null ? unaries[depId] : v[i],
+      );
       const sqlValues = queryValueDetailsBySymbol.size
         ? rawSqlValues.map((v) => {
             if (typeof v === "symbol") {
@@ -423,5 +427,4 @@ export function pgInsertSingle<
 ): PgInsertSingleStep<TResource> {
   return new PgInsertSingleStep(resource, attributes);
 }
-
 exportAs("@dataplan/pg", pgInsertSingle, "pgInsertSingle");

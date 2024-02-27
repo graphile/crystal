@@ -35,7 +35,7 @@ import { $$symbolToIdentifier, sql } from "pg-sql2";
 import type { PgCodecAttributes } from "../codecs.js";
 import { TYPES } from "../codecs.js";
 import type { PgResource, PgResourceUnique } from "../datasource.js";
-import type { PgExecutor } from "../executor.js";
+import type { PgExecutor, PgExecutorInput } from "../executor.js";
 import type { PgCodecRefPath, PgCodecRelation, PgGroupSpec } from "../index.js";
 import type {
   PgCodec,
@@ -1930,48 +1930,54 @@ ${lateralText};`;
   }
 
   // Be careful if we add streaming - ensure `shouldReverseOrder` is fine.
-  async execute(
-    _count: number,
-    values: Array<GrafastValuesList<any>>,
-    { eventEmitter }: ExecutionExtra,
-  ): Promise<GrafastValuesList<any>> {
+  async executeV2({
+    count,
+    values,
+    unaries,
+    extra: { eventEmitter },
+  }: ExecutionDetails): Promise<GrafastValuesList<any>> {
     const { text, rawSqlValues, identifierIndex, shouldReverseOrder, name } =
       this.finalizeResults!;
 
-    const contexts = values[this.contextId];
-    if (!contexts) {
+    const contextValues = values[this.contextId];
+    const contextUnary = unaries[this.contextId];
+    if (contextValues === undefined) {
       throw new Error("We have no context dependency?");
     }
 
-    const executionResult = await this.executor.executeWithCache(
-      contexts.map((context, i) => {
-        return {
-          // The context is how we'd handle different connections with different claims
-          context,
-          queryValues:
-            identifierIndex != null
-              ? this.queryValues.map(
-                  ({ dependencyIndex, codec, alreadyEncoded }) => {
-                    const val = values[dependencyIndex][i];
-                    return val == null
-                      ? null
-                      : alreadyEncoded
-                      ? val
-                      : codec.toPg(val);
-                  },
-                )
-              : EMPTY_ARRAY,
-        };
-      }),
-      {
-        text,
-        rawSqlValues,
-        identifierIndex,
-        name,
-        eventEmitter,
-        useTransaction: false,
-      },
-    );
+    const specs: Array<PgExecutorInput<any>> = [];
+    for (let i = 0; i < count; i++) {
+      const context = contextValues === null ? contextUnary : contextValues[i];
+      specs.push({
+        // The context is how we'd handle different connections with different claims
+        context,
+        queryValues:
+          identifierIndex != null
+            ? this.queryValues.map(
+                ({ dependencyIndex, codec, alreadyEncoded }) => {
+                  const depValues = values[dependencyIndex];
+                  const val =
+                    depValues === null
+                      ? unaries[dependencyIndex]
+                      : depValues[i];
+                  return val == null
+                    ? null
+                    : alreadyEncoded
+                    ? val
+                    : codec.toPg(val);
+                },
+              )
+            : EMPTY_ARRAY,
+      });
+    }
+    const executionResult = await this.executor.executeWithCache(specs, {
+      text,
+      rawSqlValues,
+      identifierIndex,
+      name,
+      eventEmitter,
+      useTransaction: false,
+    });
     // debugExecute("%s; result: %c", this, executionResult);
 
     return executionResult.values.map((allVals) => {
