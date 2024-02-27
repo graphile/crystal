@@ -505,7 +505,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     this.deduplicatedWith = throwDestroyed;
     this.optimize = throwDestroyed;
     this.finalize = throwDestroyed;
-    this.execute = throwDestroyed;
+    this.executeV2 = throwDestroyed;
 
     super.destroy();
   }
@@ -616,13 +616,21 @@ export abstract class UnbatchedExecutableStep<
 
   finalize() {
     // If they've not replaced 'execute', use our optimized form
-    if (this.execute === UnbatchedExecutableStep.prototype.execute) {
+    if (
+      this.executeV2 === UnbatchedExecutableStep.prototype.executeV2 &&
+      this.execute === UnbatchedExecutableStep.prototype.execute
+    ) {
       buildOptimizedExecuteV2(
         this.dependencies.length,
         this.isSyncAndSafe,
         (fn) => {
           this.executeV2 = fn;
         },
+      );
+    } else {
+      // TODO: only warn once per class
+      console.warn(
+        `It appears that you've replaced the execute or executeV2 method of ${this}; but since this is an UnbatchedExecuteableStep you should only replace unbatchedExecute`,
       );
     }
     super.finalize();
