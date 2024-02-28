@@ -23,12 +23,12 @@ export class FirstStep<TData> extends UnbatchedExecutableStep<TData> {
   executeV2({
     count,
     values: [values0],
-    unaries: [unaries0],
   }: ExecutionDetails<[TData[]]>): GrafastResultsList<TData> {
     const result: Array<TData> = [];
     for (let i = 0; i < count; i++) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
-      result[i] = values0 === null ? unaries0?.[0]! : values0[i]?.[0];
+      result[i] = values0.isBatch
+        ? values0.entries[i]?.[0]
+        : values0.value?.[0];
     }
     return result;
   }

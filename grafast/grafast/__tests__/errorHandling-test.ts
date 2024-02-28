@@ -29,25 +29,20 @@ class SyncListCallbackStep<
   executeV2({
     count,
     values: [values0],
-    unaries: [unaries0],
   }: ExecutionDetails<[TIn]>): Array<PromiseOrDirect<TOut>> {
     let result: PromiseOrDirect<TOut>[] = [];
     for (let i = 0; i < count; i++) {
-      const entry = values0 !== null ? values0[i] : unaries0!;
+      const entry = values0.at(i);
       result.push(this.callback(entry));
     }
     return result;
   }
-  async streamV2({
-    count,
-    values: [values0],
-    unaries: [unaries0],
-  }: ExecutionDetails<[TIn]>) {
+  async streamV2({ count, values: [values0] }: ExecutionDetails<[TIn]>) {
     await sleep(0);
     const { callback } = this;
     const results: any[] = [];
     for (let i = 0; i < count; i++) {
-      const entry = values0 === null ? unaries0! : values0[i];
+      const entry = values0.at(i);
       results.push(
         (async function* () {
           const data = await callback(entry);

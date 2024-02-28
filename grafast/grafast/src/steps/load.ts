@@ -155,9 +155,10 @@ export class LoadedRecordStep<
   executeV2({
     count,
     values: [values0],
-    unaries: [unaries0],
   }: ExecutionDetails<[TItem]>): GrafastResultsList<TItem> {
-    return values0 === null ? arrayOfLength(count, unaries0) : values0;
+    return values0.isBatch
+      ? values0.entries
+      : arrayOfLength(count, values0.value);
   }
 }
 
@@ -288,7 +289,6 @@ export class LoadStep<
   executeV2({
     count,
     values: [values0],
-    unaries: [unaries0],
     extra,
   }: ExecutionDetails<[TSpec]>): PromiseOrDirect<
     GrafastResultsList<Maybe<TData>>
@@ -303,7 +303,7 @@ export class LoadStep<
 
     const results: Array<PromiseOrDirect<Maybe<TData>>> = [];
     for (let i = 0; i < count; i++) {
-      const spec = values0 === null ? unaries0! : values0[i];
+      const spec = values0.at(i);
       if (cache.has(spec)) {
         results.push(cache.get(spec)!);
       } else {

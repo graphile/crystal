@@ -285,7 +285,6 @@ export class PgInsertSingleStep<
   async executeV2({
     count,
     values,
-    unaries,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
@@ -298,9 +297,7 @@ export class PgInsertSingleStep<
     // without causing the others to reject.
     const result: Array<PromiseOrDirect<any>> = [];
     for (let i = 0; i < count; i++) {
-      const value = values.map((v, depId) =>
-        v === null ? unaries[depId] : v[i],
-      );
+      const value = values.map((v) => v.at(i));
       const sqlValues = queryValueDetailsBySymbol.size
         ? rawSqlValues.map((v) => {
             if (typeof v === "symbol") {

@@ -249,7 +249,6 @@ export class PgDeleteSingleStep<
   async executeV2({
     count,
     values,
-    unaries,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
@@ -261,10 +260,9 @@ export class PgDeleteSingleStep<
     // parallel. Note we return a list of promises, each may reject or resolve
     // without causing the others to reject.
     const result: Array<PromiseOrDirect<any>> = [];
-    const listValues = values[this.contextId];
-    const listUnary = unaries[this.contextId];
+    const contextDep = values[this.contextId];
     for (let i = 0; i < count; i++) {
-      const context = listValues === null ? listUnary : listValues[i];
+      const context = contextDep.at(i);
       const sqlValues = queryValueDetailsBySymbol.size
         ? rawSqlValues.map((v) => {
             if (typeof v === "symbol") {
@@ -272,9 +270,7 @@ export class PgDeleteSingleStep<
               if (!details) {
                 throw new Error(`Saw unexpected symbol '${inspect(v)}'`);
               }
-              const depValues = values[details.depId];
-              const val =
-                depValues === null ? unaries[details.depId] : depValues[i];
+              const val = values[details.depId].at(i);
               return val == null ? null : details.processor(val);
             } else {
               return v;

@@ -102,11 +102,10 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
   executeV2({
     count,
     values: [values0],
-    unaries: [unaries0],
   }: ExecutionDetails): GrafastResultsList<any> {
     const results: any[] = [];
     for (let i = 0; i < count; i++) {
-      results.push(this.mapper(values0 === null ? unaries0 : values0[i]));
+      results.push(this.mapper(values0.at(i)));
     }
     return results;
   }

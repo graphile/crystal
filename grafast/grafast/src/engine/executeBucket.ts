@@ -13,6 +13,7 @@ import {
 import { inspect } from "../inspect.js";
 import type {
   ExecutionExtra,
+  ExecutionValue,
   GrafastResultsList,
   GrafastResultStreamList,
   PromiseOrDirect,
@@ -668,8 +669,7 @@ export function executeBucket(
   function executeOrStream(
     count: number,
     step: ExecutableStep,
-    values: Array<ReadonlyArray<any> | null>,
-    unaries: Array<any | null>,
+    values: Array<ExecutionValue>,
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
     if (isDev && step._isUnary && count !== 1) {
@@ -682,18 +682,17 @@ export function executeBucket(
       return step.streamV2({
         count,
         values,
-        unaries,
         extra,
         streamOptions,
       });
     } else if (streamOptions && isStreamableStep(step)) {
       // Backwards compatibility
       const backfilledValues = values.map((v, i) =>
-        v === null ? arrayOfLength(count, unaries[i]) : v,
+        v.isBatch ? v.entries : arrayOfLength(count, v.value),
       );
       return step.stream(count, backfilledValues, extra, streamOptions);
     } else {
-      return step.executeV2({ count, values, unaries, extra });
+      return step.executeV2({ count, values, extra });
     }
   }
 
@@ -705,8 +704,7 @@ export function executeBucket(
    */
   function reallyExecuteStepWithErrorsOrSelective(
     step: ExecutableStep,
-    dependenciesIncludingSideEffects: Array<ReadonlyArray<any> | null>,
-    unariesIncludingSideEffects: Array<any | null>,
+    dependenciesIncludingSideEffects: Array<ExecutionValue>,
     polymorphicPathList: readonly (string | null)[],
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
@@ -720,11 +718,9 @@ export function executeBucket(
     let newSize = 0;
     const stepPolymorphicPaths = step.polymorphicPaths;
     const legitDepsCount = sudo(step).dependencies.length;
-    let dependencies = (
-      sideEffectStepsWithErrors
-        ? dependenciesIncludingSideEffects.slice(0, legitDepsCount)
-        : dependenciesIncludingSideEffects
-    ) as (any[] | null)[];
+    let dependencies = sideEffectStepsWithErrors
+      ? dependenciesIncludingSideEffects.slice(0, legitDepsCount)
+      : dependenciesIncludingSideEffects;
 
     // OPTIM: if unariesIncludingSideEffects.some(isGrafastError) then shortcut execution because everything fails
 
@@ -760,8 +756,7 @@ export function executeBucket(
           i < l;
           i++
         ) {
-          const depList = dependenciesIncludingSideEffects[i];
-          const v = depList ? depList[index] : unariesIncludingSideEffects[i];
+          const v = dependenciesIncludingSideEffects[i].at(index);
           if (isGrafastError(v)) {
             indexError = v;
             break;
@@ -775,7 +770,9 @@ export function executeBucket(
           foundErrors = true;
           // Clone up until this point, make mutable, don't add self
           dependencies = dependencies.map((depList) =>
-            depList ? depList.slice(0, index) : depList,
+            depList.isBatch
+              ? batchExecutionValue(depList.entries.slice(0, index))
+              : depList,
           );
         }
         errors[index] = indexError;
@@ -789,20 +786,14 @@ export function executeBucket(
             depListIndex++
           ) {
             const depList = dependencies[depListIndex];
-            if (depList) {
-              depList.push(
-                dependenciesIncludingSideEffects[depListIndex]![index],
-              );
+            if (depList.isBatch) {
+              const depVal = dependenciesIncludingSideEffects[depListIndex];
+              (depList.entries as any[]).push(depVal.at(index));
             }
           }
         }
       }
     }
-
-    // Trim the side-effect dependencies back out again
-    const unaries = sideEffectStepsWithErrors
-      ? unariesIncludingSideEffects.slice(0, legitDepsCount)
-      : unariesIncludingSideEffects;
 
     if (newSize === 0) {
       // Everything is errors; we can skip execution
@@ -812,7 +803,6 @@ export function executeBucket(
         newSize,
         step,
         dependencies,
-        unaries,
         extra,
       );
       if (isPromiseLike(resultWithoutErrors)) {
@@ -823,13 +813,7 @@ export function executeBucket(
         return mergeErrorsBackIn(resultWithoutErrors, errors, size);
       }
     } else {
-      return reallyExecuteStepWithNoErrors(
-        newSize,
-        step,
-        dependencies,
-        unaries,
-        extra,
-      );
+      return reallyExecuteStepWithNoErrors(newSize, step, dependencies, extra);
     }
   }
 
@@ -842,7 +826,6 @@ export function executeBucket(
     try {
       const meta =
         step.metaKey !== undefined ? metaByMetaKey[step.metaKey] : undefined;
-      const unaries: Array<any | null> = [];
       const extra: ExecutionExtra = {
         stopTime,
         meta,
@@ -850,18 +833,16 @@ export function executeBucket(
         _bucket: bucket,
         _requestContext: requestContext,
       };
-      const dependencies: Array<ReadonlyArray<any> | null> = [];
+      const dependencies: Array<ExecutionValue> = [];
       const sstep = sudo(step);
       const depCount = sstep.dependencies.length;
       if (depCount > 0 || sideEffectStepsWithErrors !== null) {
         for (let i = 0, l = depCount; i < l; i++) {
           const $dep = sstep.dependencies[i];
           if ($dep._isUnary) {
-            dependencies[i] = null;
-            unaries[i] = unaryStore.get($dep.id);
+            dependencies[i] = unaryExecutionValue(unaryStore.get($dep.id));
           } else {
-            dependencies[i] = store.get($dep.id)!;
-            unaries[i] = null;
+            dependencies[i] = batchExecutionValue(store.get($dep.id)!);
           }
         }
         if (sideEffectStepsWithErrors !== null) {
@@ -872,16 +853,10 @@ export function executeBucket(
                   const sideEffectStoreEntry = unaryStore.get(
                     sideEffectStep.id,
                   )!;
-                  if (!unaries.includes(sideEffectStoreEntry)) {
-                    dependencies.push(null);
-                    unaries.push(sideEffectStoreEntry);
-                  }
+                  dependencies.push(unaryExecutionValue(sideEffectStoreEntry));
                 } else {
                   const sideEffectStoreEntry = store.get(sideEffectStep.id)!;
-                  if (!dependencies.includes(sideEffectStoreEntry)) {
-                    dependencies.push(sideEffectStoreEntry);
-                    unaries.push(null);
-                  }
+                  dependencies.push(batchExecutionValue(sideEffectStoreEntry));
                 }
               }
             }
@@ -891,16 +866,10 @@ export function executeBucket(
             ]) {
               if (sideEffectStep._isUnary) {
                 const sideEffectStoreEntry = unaryStore.get(sideEffectStep.id)!;
-                if (!unaries.includes(sideEffectStoreEntry)) {
-                  dependencies.push(null);
-                  unaries.push(sideEffectStoreEntry);
-                }
+                dependencies.push(unaryExecutionValue(sideEffectStoreEntry));
               } else {
                 const sideEffectStoreEntry = store.get(sideEffectStep.id)!;
-                if (!dependencies.includes(sideEffectStoreEntry)) {
-                  dependencies.push(sideEffectStoreEntry);
-                  unaries.push(null);
-                }
+                dependencies.push(batchExecutionValue(sideEffectStoreEntry));
               }
             }
           }
@@ -924,7 +893,6 @@ export function executeBucket(
           ? reallyExecuteStepWithErrorsOrSelective(
               step,
               dependencies,
-              unaries,
               bucket.polymorphicPathList,
               extra,
             )
@@ -932,7 +900,6 @@ export function executeBucket(
               step._isUnary ? 1 : size,
               step,
               dependencies,
-              unaries,
               extra,
             );
       if (isPromiseLike(result)) {
@@ -1099,5 +1066,25 @@ export function newBucket(
     metaByMetaKey,
     isComplete: false,
     children: Object.create(null),
+  };
+}
+
+function batchExecutionValue<TData>(entries: TData[]): ExecutionValue<TData> {
+  return {
+    isBatch: true,
+    entries,
+    at(i) {
+      return entries[i];
+    },
+  };
+}
+
+function unaryExecutionValue<TData>(value: TData): ExecutionValue<TData> {
+  return {
+    isBatch: false,
+    value,
+    at() {
+      return value;
+    },
   };
 }

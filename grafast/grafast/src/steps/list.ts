@@ -31,13 +31,11 @@ export class ListStep<
   }
 
   executeV2(
-    { count, values, unaries }: ExecutionDetails, //UnwrapPlanTuple<TPlanTuple>,
+    { count, values }: ExecutionDetails, //UnwrapPlanTuple<TPlanTuple>,
   ): Array<UnwrapPlanTuple<TPlanTuple>> {
     const result: any[] = [];
     for (let i = 0; i < count; i++) {
-      result[i] = values.map((list, depIndex) =>
-        list === null ? unaries[depIndex] : list[i],
-      );
+      result[i] = values.map((value) => value.at(i));
     }
     return result;
   }

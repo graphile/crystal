@@ -44,11 +44,10 @@ export class ReverseStep<TData> extends UnbatchedExecutableStep<
   executeV2({
     count,
     values: [values0],
-    unaries: [unaries0],
   }: ExecutionDetails<[TData[]]>): GrafastResultsList<TData[]> {
     const results: any[] = [];
     for (let i = 0; i < count; i++) {
-      const arr = values0 === null ? unaries0 : values0[i];
+      const arr = values0.at(i);
       results.push(arr == null ? arr : reverseArray(arr));
     }
     return results;

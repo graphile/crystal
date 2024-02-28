@@ -55,18 +55,15 @@ export class WithPgClientStep<
   executeV2({
     count,
     values,
-    unaries,
   }: ExecutionDetails<
     [{ pgSettings: any; withPgClient: WithPgClient }, TData]
   >): GrafastResultsList<TResult> {
-    const contextValues = values[this.contextId as 0];
-    const unaryContext = unaries[this.contextId as 0];
-    const dataValues = values[this.dataId as 1];
-    const dataUnary = unaries[this.dataId as 1];
+    const contextDep = values[this.contextId as 0];
+    const dataDep = values[this.dataId as 1];
     const promises: Promise<any>[] = [];
     for (let i = 0; i < count; i++) {
-      const context = contextValues === null ? unaryContext! : contextValues[i];
-      const data = dataValues === null ? dataUnary! : dataValues[i];
+      const context = contextDep.at(i);
+      const data = dataDep.at(i);
       const { withPgClient, pgSettings } = context;
       promises.push(
         withPgClient(pgSettings, (client) => this.callback(client, data)),

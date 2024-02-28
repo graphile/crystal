@@ -39,12 +39,13 @@ export class PgValidateParsedCursorStep extends ExecutableStep<undefined> {
 
   executeV2({
     count,
-    values: [values0],
-    unaries: [unaries0],
+    values: [parsedCursorDep],
   }: ExecutionDetails<[string | null]>): GrafastResultsList<undefined> {
     const results: any[] = [];
     for (let i = 0; i < count; i++) {
-      const decoded = values0 === null ? unaries0 : values0[i];
+      const decoded = parsedCursorDep.isBatch
+        ? parsedCursorDep.entries[i]
+        : parsedCursorDep.value;
       if (!decoded) {
         results.push(undefined);
       } else {

@@ -188,7 +188,6 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
   async streamV2({
     count,
     values,
-    unaries,
     extra,
   }: ExecutionDetails): Promise<GrafastResultStreamList<any>> {
     const results = [];
@@ -197,8 +196,7 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
       try {
         const tuple = [];
         for (let j = 0; j < depCount; j++) {
-          const depValue = values[j];
-          tuple[j] = depValue === null ? unaries[j] : depValue[i];
+          tuple[j] = values[j].at(i);
         }
         results[i] = (this.unbatchedStream as any)(extra, ...tuple);
       } catch (e) {
@@ -317,14 +315,13 @@ export class GraphQLItemHandler
   executeV2({
     count,
     values: [values0],
-    unaries: [unaries0],
   }: ExecutionDetails<
     [Awaited<ReturnType<typeof dcr>>]
   >): GrafastResultsList<any> {
     if (this.abstractType !== undefined) {
       const results: any[] = [];
       for (let i = 0; i < count; i++) {
-        const data = values0 !== null ? values0[i] : unaries0;
+        const data = values0.at(i);
         if (data == null) {
           results.push(data);
         } else if (isPromiseLike(data.data)) {
@@ -347,7 +344,7 @@ export class GraphQLItemHandler
     } else if (this.nullableInnerType != null) {
       const results: any[] = [];
       for (let i = 0; i < count; i++) {
-        const d = values0 !== null ? values0[i] : unaries0;
+        const d = values0.at(i);
         if (d == null) {
           results.push(null);
         } else {

@@ -74,11 +74,10 @@ export class PolymorphicBranchStep<TStep extends ExecutableStep>
   executeV2({
     count,
     values: [values0],
-    unaries: [unaries0],
   }: ExecutionDetails): PromiseOrDirect<GrafastResultsList<any>> {
     const results: any[] = [];
     for (let i = 0; i < count; i++) {
-      const obj = values0 !== null ? values0[i] : unaries0!;
+      const obj = values0.at(i);
       let match: string | null = null;
       if (obj != null) {
         for (const typeName of this.typeNames) {

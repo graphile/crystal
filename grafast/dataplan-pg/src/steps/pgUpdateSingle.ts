@@ -308,15 +308,13 @@ export class PgUpdateSingleStep<
   async executeV2({
     count,
     values,
-    unaries,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
     const { text, rawSqlValues, queryValueDetailsBySymbol } =
       this.finalizeResults;
-    const contextValues = values[this.contextId];
-    const contextUnary = unaries[this.contextId];
+    const contextDep = values[this.contextId];
 
     // We must execute each mutation on its own, but we can at least do so in
     // parallel. Note we return a list of promises, each may reject or resolve
@@ -325,8 +323,7 @@ export class PgUpdateSingleStep<
     for (let i = 0; i < count; i++) {
       promises.push(
         (async () => {
-          const context =
-            contextValues === null ? contextUnary! : contextValues[i];
+          const context = contextDep.at(i);
           const sqlValues = queryValueDetailsBySymbol.size
             ? rawSqlValues.map((v) => {
                 if (typeof v === "symbol") {
@@ -334,9 +331,7 @@ export class PgUpdateSingleStep<
                   if (!details) {
                     throw new Error(`Saw unexpected symbol '${inspect(v)}'`);
                   }
-                  const depValues = values[details.depId];
-                  const val =
-                    depValues === null ? unaries[details.depId] : depValues[i];
+                  const val = values[details.depId].at(i);
                   return val == null ? null : details.processor(val);
                 } else {
                   return v;

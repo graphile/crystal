@@ -774,16 +774,25 @@ export interface ExecutionExtraBase {
 export interface ExecutionExtra extends ExecutionExtraBase {}
 export interface UnbatchedExecutionExtra extends ExecutionExtraBase {}
 
+export type ExecutionValue<TData = any> =
+  | {
+      isBatch: true;
+      entries: ReadonlyArray<TData>;
+      value?: never;
+      at(i: number): TData;
+    }
+  | { isBatch: false; value: TData; entries?: never; at(i: number): TData };
+
 export interface ExecutionDetails<
   TDeps extends readonly [...any[]] = readonly [...any[]],
 > {
   count: number;
   values: {
-    [DepIdx in keyof TDeps]: GrafastValuesList<TDeps[DepIdx]> | null;
-  } & { length: TDeps["length"] };
-  unaries: {
-    [DepIdx in keyof TDeps]: null | TDeps[DepIdx];
-  } & { length: TDeps["length"] };
+    [DepIdx in keyof TDeps]: ExecutionValue<TDeps[DepIdx]>;
+  } & {
+    length: TDeps["length"];
+    map: ReadonlyArray<ExecutionValue<TDeps[number]>>["map"];
+  };
   extra: ExecutionExtra;
 }
 export interface StreamDetails<

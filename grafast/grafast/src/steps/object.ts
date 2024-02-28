@@ -219,17 +219,13 @@ ${inner}
   executeV2({
     count,
     values,
-    unaries,
     extra,
   }: ExecutionDetails<Array<DataFromPlans<TPlans>[keyof TPlans]>>): Array<
     DataFromPlans<TPlans>
   > {
     const result: Array<DataFromPlans<TPlans>> = [];
     for (let i = 0; i < count; i++) {
-      result[i] = this.unbatchedExecute!(
-        extra,
-        ...values.map((v, depIndex) => (v === null ? unaries[depIndex] : v[i])),
-      );
+      result[i] = this.unbatchedExecute!(extra, ...values.map((v) => v.at(i)));
     }
     return result;
   }

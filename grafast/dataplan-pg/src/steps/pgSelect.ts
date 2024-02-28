@@ -1212,7 +1212,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   async executeV2({
     count,
     values,
-    unaries,
     extra: { eventEmitter },
   }: ExecutionDetails): Promise<GrafastResultsList<ReadonlyArray<unknown[]>>> {
     if (!this.finalizeResults) {
@@ -1230,21 +1229,18 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       name,
       nameForSingle,
     } = this.finalizeResults;
-    const contextValues = values[this.contextId];
-    const contextUnary = unaries[this.contextId];
+    const contextDep = values[this.contextId];
 
     const specs: Array<PgExecutorInput<any>> = [];
     for (let i = 0; i < count; i++) {
-      const context = contextValues === null ? contextUnary : contextValues[i];
+      const context = contextDep.at(i);
       specs.push({
         // The context is how we'd handle different connections with different claims
         context,
         queryValues:
           identifierIndex != null
             ? this.queryValues.map(({ dependencyIndex, codec }) => {
-                const depValues = values[dependencyIndex];
-                const val =
-                  depValues === null ? unaries[dependencyIndex] : depValues[i];
+                const val = values[dependencyIndex].at(i);
                 return val == null ? null : codec.toPg(val);
               })
             : EMPTY_ARRAY,
@@ -1298,7 +1294,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   async streamV2({
     count,
     values,
-    unaries,
     extra: { eventEmitter },
   }: ExecutionDetails): Promise<GrafastResultStreamList<unknown[]>> {
     if (!this.finalizeResults) {
@@ -1321,24 +1316,18 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       throw new Error("declare query must exist for stream");
     }
 
-    const contextValues = values[this.contextId];
-    const contextUnary = unaries[this.contextId];
+    const contextDep = values[this.contextId];
     const specs: PgExecutorInput<any>[] | null = text ? [] : null;
     if (text) {
       for (let i = 0; i < count; i++) {
-        const context =
-          contextValues === null ? contextUnary : contextValues[i];
+        const context = contextDep.at(i);
         specs!.push({
           // The context is how we'd handle different connections with different claims
           context,
           queryValues:
             identifierIndex != null
               ? this.queryValues.map(({ dependencyIndex, codec }) => {
-                  const depValues = values[dependencyIndex];
-                  const val =
-                    depValues === null
-                      ? unaries[dependencyIndex]
-                      : depValues[i];
+                  const val = values[dependencyIndex].at(i);
                   return val == null ? null : codec.toPg(val);
                 })
               : EMPTY_ARRAY,
@@ -1358,7 +1347,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
 
     const streamSpecs: PgExecutorInput<any>[] = [];
     for (let i = 0; i < count; i++) {
-      const context = contextValues === null ? contextUnary : contextValues[i];
+      const context = contextDep.at(i);
 
       streamSpecs.push({
         // The context is how we'd handle different connections with different claims
@@ -1366,9 +1355,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         queryValues:
           identifierIndex != null
             ? this.queryValues.map(({ dependencyIndex, codec }) => {
-                const depValues = values[dependencyIndex];
-                const val =
-                  depValues === null ? unaries[dependencyIndex] : depValues[i];
+                const val = values[dependencyIndex].at(i);
                 return val == null ? val : codec.toPg(val);
               })
             : EMPTY_ARRAY,

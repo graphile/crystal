@@ -55,12 +55,11 @@ export class JSONParseStep<
 
   executeV2({
     count,
-    values: [values0],
-    unaries: [unaries0],
+    values: [stringDep],
   }: ExecutionDetails<[string]>): GrafastResultsList<TJSON> {
     const result: Array<PromiseOrDirect<TJSON>> = []; // new Array(count);
     for (let i = 0; i < count; i++) {
-      const v = values0 !== null ? values0[i] : unaries0!;
+      const v = stringDep.at(i);
       if (typeof v === "string") {
         try {
           result[i] = JSON.parse(v);

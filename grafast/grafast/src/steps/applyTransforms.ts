@@ -77,7 +77,6 @@ export class ApplyTransformsStep extends ExecutableStep {
   async executeV2({
     count,
     values: [values0],
-    unaries: [unaries0],
     extra,
   }: ExecutionDetails<[any[] | null | undefined | GrafastError]>): Promise<
     GrafastResultsList<any[]>
@@ -133,7 +132,9 @@ export class ApplyTransformsStep extends ExecutableStep {
     // We'll typically be creating more listItem bucket entries than we
     // have parent buckets, so we must "multiply up" the store entries.
     for (let originalIndex = 0; originalIndex < count; originalIndex++) {
-      const list = values0 === null ? unaries0! : values0[originalIndex];
+      const list = values0.isBatch
+        ? values0.entries[originalIndex]
+        : values0.value;
       if (Array.isArray(list)) {
         const newIndexes: number[] = [];
         map.set(originalIndex, newIndexes);
@@ -180,7 +181,9 @@ export class ApplyTransformsStep extends ExecutableStep {
 
     const results: any[] = [];
     for (let originalIndex = 0; originalIndex < count; originalIndex++) {
-      const list = values0 === null ? unaries0! : values0[originalIndex];
+      const list = values0.isBatch
+        ? values0.entries[originalIndex]
+        : values0.value;
       if (list == null) {
         results.push(list);
         continue;

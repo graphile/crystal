@@ -59,7 +59,6 @@ export class PgSingleTablePolymorphicStep<
   executeV2({
     count,
     values,
-    unaries,
   }: ExecutionDetails): GrafastResultsList<PolymorphicData<
     string,
     ReadonlyArray<unknown[]>
@@ -67,10 +66,9 @@ export class PgSingleTablePolymorphicStep<
     const result: Array<
       PromiseOrDirect<PolymorphicData<string, ReadonlyArray<unknown[]>> | null>
     > = [];
-    const valuesList = values[this.typeStepId];
-    const unaryList = unaries[this.typeStepId];
+    const valuesDep = values[this.typeStepId];
     for (let i = 0; i < count; i++) {
-      const v = valuesList === null ? unaryList : valuesList[i];
+      const v = valuesDep.at(i);
       result[i] = v ? polymorphicWrap(v) : null;
     }
     return result;

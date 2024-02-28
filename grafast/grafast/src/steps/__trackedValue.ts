@@ -154,10 +154,11 @@ export class __TrackedValueStep<
   executeV2({
     count,
     values: [values0],
-    unaries: [unaries0],
   }: ExecutionDetails<[TData]>): GrafastResultsList<TData> {
     // We have only one dependency, return the value of that.
-    return values0 === null ? arrayOfLength(count, unaries0) : values0;
+    return values0.isBatch
+      ? values0.entries
+      : arrayOfLength(count, values0.value);
   }
 
   unbatchedExecute(_extra: UnbatchedExecutionExtra, v: TData): TData {

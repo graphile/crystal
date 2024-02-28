@@ -52,7 +52,7 @@ function run(db: sqlite3.Database, sql: string, values: any[] = []) {
 
 class GetRecordsStep<T extends Record<string, any>> extends ExecutableStep {
   depIdByIdentifier: Record<string, number>;
-  dbDepId: string | number;
+  dbDepId: number;
   constructor(
     private tableName: string,
     identifiers: Record<string, ExecutableStep> = Object.create(null),
@@ -86,10 +86,9 @@ class GetRecordsStep<T extends Record<string, any>> extends ExecutableStep {
   async executeV2({
     count,
     values,
-    unaries,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
-    const db = unaries[this.dbDepId] as sqlite3.Database;
-    const first = this.firstUDI != null ? unaries[this.firstUDI] : null;
+    const db = values[this.dbDepId].value as sqlite3.Database;
+    const first = this.firstUDI != null ? values[this.firstUDI].value : null;
 
     const identifierCols = Object.keys(this.depIdByIdentifier);
 
@@ -138,7 +137,7 @@ ${orderBy ? `order by ${orderBy}` : ""}
         const obj = Object.fromEntries(
           Object.entries(this.depIdByIdentifier).map(([col, depId]) => [
             col,
-            values[depId] ? values[depId][i] : unaries[depId],
+            values[depId].at(i),
           ]),
         );
         json.push(obj);
@@ -151,10 +150,7 @@ ${orderBy ? `order by ${orderBy}` : ""}
     for (let i = 0; i < count; i++) {
       // This could be more optimal by leveraging they're already in order
       results[i] = dbResults.filter((r) => {
-        return entries.every(
-          ([col, depId]) =>
-            r[col] === (values[depId] ? values[depId][i] : unaries[depId]),
-        );
+        return entries.every(([col, depId]) => r[col] === values[depId].at(i));
       });
     }
     return results;

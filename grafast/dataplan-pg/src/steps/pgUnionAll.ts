@@ -328,18 +328,22 @@ export class PgUnionAllSingleStep
   executeV2({
     count,
     values: [values0],
-    unaries: [unaries0],
   }: ExecutionDetails): GrafastResultsList<any> {
     if (this.typeKey !== null) {
       const typeKey = this.typeKey;
-      return values0 === null
-        ? arrayOfLength(count, polymorphicWrap(unaries0[typeKey], unaries0))
-        : values0.map((v) => {
+      return values0.isBatch
+        ? values0.entries.map((v) => {
             const type = v[typeKey];
             return polymorphicWrap(type, v);
-          });
+          })
+        : arrayOfLength(
+            count,
+            polymorphicWrap(values0.value[typeKey], values0.value),
+          );
     } else {
-      return values0 === null ? arrayOfLength(count, unaries0) : values0;
+      return values0.isBatch
+        ? values0.entries
+        : arrayOfLength(count, values0.value);
     }
   }
 }
@@ -1933,21 +1937,19 @@ ${lateralText};`;
   async executeV2({
     count,
     values,
-    unaries,
     extra: { eventEmitter },
   }: ExecutionDetails): Promise<GrafastValuesList<any>> {
     const { text, rawSqlValues, identifierIndex, shouldReverseOrder, name } =
       this.finalizeResults!;
 
-    const contextValues = values[this.contextId];
-    const contextUnary = unaries[this.contextId];
-    if (contextValues === undefined) {
+    const contextDep = values[this.contextId];
+    if (contextDep === undefined) {
       throw new Error("We have no context dependency?");
     }
 
     const specs: Array<PgExecutorInput<any>> = [];
     for (let i = 0; i < count; i++) {
-      const context = contextValues === null ? contextUnary : contextValues[i];
+      const context = contextDep.at(i);
       specs.push({
         // The context is how we'd handle different connections with different claims
         context,
@@ -1955,11 +1957,7 @@ ${lateralText};`;
           identifierIndex != null
             ? this.queryValues.map(
                 ({ dependencyIndex, codec, alreadyEncoded }) => {
-                  const depValues = values[dependencyIndex];
-                  const val =
-                    depValues === null
-                      ? unaries[dependencyIndex]
-                      : depValues[i];
+                  const val = values[dependencyIndex].at(i);
                   return val == null
                     ? null
                     : alreadyEncoded

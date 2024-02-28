@@ -199,7 +199,6 @@ export class __ListTransformStep<
   async executeV2({
     count,
     values,
-    unaries,
     extra,
   }: ExecutionDetails<[any[] | null | undefined | GrafastError]>): Promise<
     GrafastResultsList<TMemo>
@@ -252,14 +251,14 @@ export class __ListTransformStep<
       }
     }
 
-    const listStepValues = values[this.listStepDepId];
-    const listStepUnary = unaries[this.listStepDepId];
+    const listStepValue = values[this.listStepDepId];
 
     // We'll typically be creating more listItem bucket entries than we
     // have parent buckets, so we must "multiply up" the store entries.
     for (let originalIndex = 0; originalIndex < count; originalIndex++) {
-      const list =
-        listStepValues === null ? listStepUnary : listStepValues[originalIndex];
+      const list = listStepValue.isBatch
+        ? listStepValue.entries[originalIndex]
+        : listStepValue.value;
       if (Array.isArray(list)) {
         const newIndexes: number[] = [];
         map.set(originalIndex, newIndexes);
@@ -306,8 +305,9 @@ export class __ListTransformStep<
 
     const results: any[] = [];
     for (let originalIndex = 0; originalIndex < count; originalIndex++) {
-      const list =
-        listStepValues === null ? listStepUnary : listStepValues[originalIndex];
+      const list = listStepValue.isBatch
+        ? listStepValue.entries[originalIndex]
+        : listStepValue.value;
 
       if (list == null) {
         results.push(list);

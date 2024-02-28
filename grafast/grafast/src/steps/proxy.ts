@@ -36,9 +36,10 @@ export class ProxyStep<T> extends UnbatchedExecutableStep<T> {
   executeV2({
     count,
     values: [values0],
-    unaries: [unaries0],
   }: ExecutionDetails<[T]>): GrafastResultsList<T> {
-    return values0 === null ? arrayOfLength(count, unaries0) : values0;
+    return values0.isBatch
+      ? values0.entries
+      : arrayOfLength(count, values0.value);
   }
   unbatchedExecute(_extra: UnbatchedExecutionExtra, value: T): T {
     return value;

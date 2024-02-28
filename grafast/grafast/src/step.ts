@@ -387,9 +387,10 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   }
 
   /**
-   * Adds "unary" dependencies; in `execute(count, values, extra)` you'll
-   * be able to access the value via `extra.unaries[key]` where `key` is the
-   * return value of this function.
+   * Adds "unary" dependencies; in `executeV2({count, values})` you'll receive a
+   * `values[index]` (where `index` is the return value of this function) with
+   * `isBatch = false` so you can use the `values[index].value` property
+   * directly.
    */
   protected addUnaryDependency(step: ExecutableStep): number {
     return this.operationPlan.stepTracker.addStepUnaryDependency(this, step);
@@ -486,12 +487,11 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   executeV2({
     count,
     values,
-    unaries,
     extra,
   }: ExecutionDetails): PromiseOrDirect<GrafastResultsList<TData>> {
     // TODO: warn that this class should implement executeV2 instead
     const backfilledValues = values.map((v, i) =>
-      v === null ? arrayOfLength(count, unaries[i]) : v,
+      v.isBatch ? v.entries[i] : arrayOfLength(count, v.value),
     );
     return this.execute(count, backfilledValues, extra);
   }
@@ -515,9 +515,9 @@ function _buildOptimizedExecuteV2Expression(
   depCount: number,
   isSyncAndSafe: boolean,
 ) {
-  const depIndexes = [];
+  const identifiers: TE[] = [];
   for (let i = 0; i < depCount; i++) {
-    depIndexes.push(i);
+    identifiers.push(te.identifier(`value${i}`));
   }
   const tryOrNot = (inFrag: TE): TE => {
     if (isSyncAndSafe) {
@@ -535,27 +535,14 @@ function _buildOptimizedExecuteV2Expression(
   return te`\
 (function execute({
   count,
-  values: [${te.join(
-    depIndexes.map((i) => te.identifier(`list${i}`)),
-    ", ",
-  )}\
-  ],
-  unaries: [${te.join(
-    depIndexes.map((i) => te.identifier(`val${i}`)),
-    ", ",
-  )}],
+  values: [${te.join(identifiers, ", ")}],
   extra,
 }) {
   const results = [];
   for (let i = 0; i < count; i++) {
 ${tryOrNot(te`\
     results[i] = this.unbatchedExecute(extra, ${te.join(
-      depIndexes.map(
-        (depIndex) =>
-          te`${te.identifier(`list${depIndex}`)} === null ? ${te.identifier(
-            `val${depIndex}`,
-          )} : ${te.identifier(`list${depIndex}`)}[i]`,
-      ),
+      identifiers.map((identifier) => te`${identifier}.at(i)`),
       ", ",
     )});\
 `)}
@@ -640,7 +627,6 @@ export abstract class UnbatchedExecutableStep<
   executeV2({
     count,
     values,
-    unaries,
     extra,
   }: ExecutionDetails): PromiseOrDirect<GrafastResultsList<TData>> {
     console.warn(
@@ -649,9 +635,7 @@ export abstract class UnbatchedExecutableStep<
     const results = [];
     for (let i = 0; i < count; i++) {
       try {
-        const tuple = values.map((list, depIndex) =>
-          list === null ? unaries[depIndex] : list[i],
-        );
+        const tuple = values.map((list) => list.at(i));
         results[i] = this.unbatchedExecute(extra, ...tuple);
       } catch (e) {
         results[i] = e instanceof Error ? (e as never) : Promise.reject(e);

@@ -66,17 +66,16 @@ export class ListenStep<
   streamV2({
     count,
     values,
-    unaries,
   }: StreamDetails<
     readonly [GrafastSubscriber<TTopics>, TTopic]
   >): GrafastResultStreamList<TTopics[TTopic]> {
-    const pubsubValues = values[this.pubsubDep as 0];
-    const pubsubUnary = unaries[this.pubsubDep as 0];
-    const topicValues = values[this.topicDep as 1];
-    const topicUnary = unaries[this.topicDep as 1];
+    const pubsubValue = values[this.pubsubDep as 0];
+    const topicValue = values[this.topicDep as 1];
     const result = [];
     for (let i = 0; i < count; i++) {
-      const pubsub = pubsubValues === null ? pubsubUnary : pubsubValues[i];
+      const pubsub = pubsubValue.isBatch
+        ? pubsubValue.entries[i]
+        : pubsubValue.value;
       if (!pubsub) {
         throw new SafeError(
           "Subscription not supported",
@@ -89,7 +88,9 @@ export class ListenStep<
             : {},
         );
       }
-      const topic = topicValues === null ? topicUnary! : topicValues[i];
+      const topic = topicValue.isBatch
+        ? topicValue.entries[i]
+        : topicValue.value;
       result[i] = pubsub.subscribe(topic);
     }
     return result;
