@@ -13,7 +13,6 @@ import type {
   ExecutionExtra,
   GrafastResultsList,
   GrafastResultStreamList,
-  GrafastValuesList,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { polymorphicWrap } from "../polymorphic.js";

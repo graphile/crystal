@@ -1,7 +1,6 @@
 import type {
   ExecutionDetails,
   GrafastResultsList,
-  GrafastValuesList,
   PromiseOrDirect,
 } from "grafast";
 import { ExecutableStep, exportAs, isDev, SafeError } from "grafast";

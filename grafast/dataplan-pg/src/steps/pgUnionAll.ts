@@ -6,7 +6,6 @@ import type {
   ConnectionStep,
   EdgeCapableStep,
   ExecutionDetails,
-  ExecutionExtra,
   GrafastResultsList,
   GrafastValuesList,
   InputStep,

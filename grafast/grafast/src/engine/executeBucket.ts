@@ -687,7 +687,7 @@ export function executeBucket(
       });
     } else if (streamOptions && isStreamableStep(step)) {
       // Backwards compatibility
-      const backfilledValues = values.map((v, i) =>
+      const backfilledValues = values.map((v) =>
         v.isBatch ? v.entries : arrayOfLength(count, v.value),
       );
       return step.stream(count, backfilledValues, extra, streamOptions);
