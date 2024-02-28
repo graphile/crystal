@@ -776,12 +776,17 @@ export interface UnbatchedExecutionExtra extends ExecutionExtraBase {}
 
 export type ExecutionValue<TData = any> =
   | {
+      at(i: number): TData;
       isBatch: true;
       entries: ReadonlyArray<TData>;
       value?: never;
-      at(i: number): TData;
     }
-  | { isBatch: false; value: TData; entries?: never; at(i: number): TData };
+  | {
+      at(i: number): TData;
+      isBatch: false;
+      value: TData;
+      entries?: never;
+    };
 
 export interface ExecutionDetails<
   TDeps extends readonly [...any[]] = readonly [...any[]],

@@ -1,6 +1,7 @@
 ---
 sidebar_position: 1
 title: "Grafast Introduction"
+toc_max_heading_level: 4
 ---
 
 import Mermaid from "@theme/Mermaid";
@@ -9,7 +10,7 @@ import mermaidPlan from "../examples/users-and-friends/plan-simplified.mermaid?r
 # <grafast /> introduction
 
 The GraphQL specification describes how a GraphQL operation should be executed,
-talking in terms of layer-by-layer resolution of data using "resolvers." But
+talking in terms of layer–by–layer resolution of data using "resolvers." But
 critical to note is this sentence from the beginning of the specification:
 
 > _Conformance requirements [...] can be fulfilled [...] in any way as long as
@@ -19,8 +20,8 @@ critical to note is this sentence from the beginning of the specification:
 Resolvers are relatively straightforward to understand, but when implemented
 naively can very quickly result in serious performance issues. [DataLoader][] is
 one of the approaches suggested to solve the "N+1 problem," but this is only the
-most egregious performance issue that a naive GraphQL schema may face - there
-are others such as server-side over-fetching and under-fetching and related
+most egregious performance issue that a naive GraphQL schema may face — there
+are others such as server–side over–fetching and under–fetching and related
 issues that can really build up as your schemas and operations get more complex.
 
 &ZeroWidthSpace;<grafast /> was designed from the ground up to eliminate these issues and more
@@ -31,7 +32,7 @@ and unlocks the potential for significant optimizations not previously
 achievable without a herculean effort.
 
 Please note that <grafast /> is not tied to any particular storage or business
-logic layer - any valid GraphQL schema could be implemented with <grafast />,
+logic layer — any valid GraphQL schema could be implemented with <grafast />,
 and a <grafast /> schema can query any data source, service, or business logic
 that Node.js can query.
 
@@ -44,7 +45,7 @@ execution algorithm in a language other than JavaScript, please get in touch!
 
 :::
 
-## Planning
+## Plan resolvers
 
 _This is just an overview, for full documentation see
 [Plan Resolvers](./plan-resolvers)._
@@ -123,19 +124,37 @@ const planResolvers = {
 ```
 
 As you can see, the shape of the logic is quite similar, but the <grafast />
-plan resolvers are synchronous since their job isn't to get the data to use,
-but instead to outline the steps required to get the data. For example, since
-the `User.friends` Gra*fast* plan resolver cannot explicitly loop through the
-data (it hasn't been fetched yet!), it uses an [`each`
-step](/grafast/step-library/standard-steps/each) to detail which steps to take
-for each item made available later.
+plan resolvers are synchronous. <grafast /> operates in two phases: planning
+(synchronous) and execution (asynchronous); plan resolvers are called during
+the planning phase.
 
-:::tip
+The job of a plan resolver is not to retrieve data, it's to detail the
+**steps** necessary to retrieve it. Plan resolvers do not have access to any
+runtime data, they must describe what to do for arbitrary future data. For
+example, the `User.friends` Gra*fast* plan resolver cannot loop through the
+runtime data with a `map` function as in the resolver example (since there is
+not yet any data to loop over), instead it describes the plan to do so using an
+[`each` step](/grafast/step-library/standard-steps/each), detailing what to do
+with each item made available later.
+
+
+:::tip The dollar convention
 
 By convention, when a variable represents a <grafast /> step, the variable will
-be named starting with a `$`.
+be named starting with a `$` (dollar symbol).
 
 :::
+
+## Steps
+
+Steps are the basic building blocks of a <grafast /> plan; they are instances
+of a step class, constructed via the function calls in the plan resolver. Step
+classes describe how to perform a specific action and help plan how to perform
+the action more efficiently via the **lifecycle methods**. <grafast /> provides
+optimized built–in steps for common needs; it's common that you can get started
+using just these, but as you go about optimizing your schema further it's
+expected that you will build your own step classes, in the same way that you'd
+build DataLoaders in a resolver–based GraphQL API.
 
 If we were to make a request to the above <grafast /> schema with the following
 query:
@@ -158,6 +177,196 @@ of this operation plan is:
 
 <Mermaid chart={mermaidPlan} />
 
+Each node in this diagram represents a **step** in the operation plan, and the
+arrows show how the data flows between these steps.
+
+:::tip Plans can be reused for multiple requests
+
+When the same operation is seen again its existing plan can (generally) be
+reused; this is why, to get the very best performance from <grafast />, you
+should use static GraphQL documents and pass variables at run–time.
+
+:::
+
+### Batched execution
+
+The main concern of most steps is execution. In <grafast /> all execution is
+batched, so each of the nodes in the operation plan will execute at most once
+during a GraphQL query or mutation — this is one of the major differences when
+compared to traditional GraphQL execution.
+
+When it comes time to execute an operation plan, <grafast /> will automatically
+populate the steps whose names begin with `__` (e.g. the context and variable
+values) and then will begin the process of executing each step
+once all of its dependencies are ready, continuing until all steps are
+complete.
+
+At planning time a step can add a dependency on another step via `const depId =
+this.addDependency($otherStep);`. This `depId` is the index in the **values
+tuple** that the step can use at execution time to retrieve the associated
+values.
+
+When a step executes, its `executeV2` method is passed the **execution
+details** which includes:
+
+- `count` — the size of the batch to be executed
+- `values` — the **values tuple**, the values for each of the dependencies the
+  step added
+
+:::note Why `executeV2`?
+
+`executeV2` is our second signature for step execution; the old `execute`
+method is still supported but is less efficient.
+
+:::
+
+The `executeV2` method must return a list (or a promise to a list) of length
+`count`, where each entry in this list relates to the corresponding entries in
+`values` — this should be at least a little familiar to anyone who has written
+a DataLoader before.
+
+<!--
+
+Each entry, `dep`, in the values tuple may be either a batched
+entry (representing `count` entries) or a unary entry (representing exactly one
+value); either way, the Nth value can be retrieved via `dep.at(N)`.
+
+-->
+
+When a plan starts executing it always starts with a batch size (`count`) of 1;
+but many things may affect this batch size for later steps — for example when
+processing the items in a list, the batch must grow to contain each item (via
+the `__Item` step). <grafast /> handles all of these complexities for you
+internally, so you don't generally need to think about them.
+
+#### Unary steps
+
+A "unary step" is a regular step which the system has determined will always
+represent exactly one value. The system steps which represent request–level
+data (e.g. context, variable and argument values) are always unary steps, and
+&ZeroWidthSpace;<grafast /> will automatically determine which other steps are also unary
+steps.
+
+<!-- For any execution value `dep` in the values tuple, `dep.at(i)` is equivalent to
+`dep.isBatch ? dep.entries[i] : dep.value`.
+
+ Since we know that the value of a unary step will be the same
+for every entry in the batch no matter the batch size, so we can access it via
+`dep.value` directly without having to look it up by index. -->
+
+Sometimes you'll want to ensure that one or more of the steps your step class
+depends on will have exactly one value at runtime; to do so, you can use
+`this.addUnaryDependency($step)` rather than `this.addDependency($step)`.
+This
+ensures that the given dependency will always be a unary step, and is primarily
+useful when a parameter to a remote service request needs to be the same for
+all entries in the batch; typically this will be the case for ordering,
+pagination and access control. For example if you're retrieving the first N
+pets from each of your friends you might want to add `limit N` to an SQL query
+— by adding the N as a unary dependency you can guarantee that there will be
+exactly one value of N for each execution, and can construct the SQL query
+accordingly (see `limitSQL` in the example below).
+
+#### SQL example
+
+Here's a step class which retrieves records matching a given column (i.e.
+`WHERE columnName = $columnValue`) from a given table in an SQL database.
+Optionally, you may request to limit to the first `$first` results.
+
+```ts
+export class RecordsByColumnStep extends ExecutableStep {
+  constructor(tableName, columnName, $columnValue) {
+    super();
+    this.tableName = tableName;
+    this.columnName = columnName;
+    this.columnValueDepIdx = this.addDependency($columnValue);
+  }
+
+  setFirst($first) {
+    this.firstDepId = this.addUnaryDependency($first);
+  }
+
+  async executeV2({ count, values }) {
+    // Retrieve the values for the `$columnValue` dependency
+    const columnValueDep = values[this.columnValueDepIdx];
+
+    // We may or may not have added a `$first` limit:
+    const firstDep =
+      this.firstDepId !== undefined ? values[this.firstDepId] : undefined;
+
+    // firstDep, if it exists, is definitely a unary dep (!firstDep.isBatch), so
+    // we can retrieve its value directly:
+    const first = firstDep ? parseInt(firstDep.value, 10) : null;
+
+    // Create a `LIMIT` clause in our SQL if the user specified a `$first` limit:
+    const limitSQL = Number.isFinite(first) ? `limit ${first}` : ``;
+
+    // Create placeholders for each entry in our batch in the SQL:
+    const placeholders = Array.from({ length: count }, () => "?");
+    const placeholderValues = Array.from({ length: count }, (_, i) =>
+      // The value from `$columnValue` for this index `i` in the batch
+      columnValueDep.at(i),
+    );
+
+    // Build the SQL query to execute:
+    const sql = `\
+      select *
+      from ${this.tableName}
+      where ${this.columnName} in (${placeholders.join(", ")})
+      ${limitSQL}
+    `;
+
+    // Execute the SQL query once for all values in the batch:
+    const rows = await executeSQL(sql, placeholderValues);
+
+    // Figure out which rows relate to which batched inputs:
+    return Array.from({ length: count }, (_, i) =>
+      rows.filter((row) => row[this.columnName] === columnValueDep.at(i)),
+    );
+  }
+}
+
+function petsByOwnerId($ownerId) {
+  return new RecordsByColumnStep("pets", "owner_id", $ownerId);
+}
+```
+
+Notice that there's only a single `await` call in this step's execute method,
+and we already know the step is only executed once per request; compare
+this single asynchronous action with the number of promises that would need
+to be created were you to use `DataLoader` instead.
+
+:::info Not just databases!
+
+The `executeV2` method is just JavaScript; it can
+talk to absolutely any data source that Node.js itself can talk to. Though the
+example shows SQL you could replace the `executeSQL()` call with `fetch()` or
+any other arbitrary JavaScript function to achieve your goals.
+
+:::
+
+:::note Simplified example
+
+The code above was written to be a simple example; though it works ([see full
+solution using
+it](https://github.com/graphile/crystal/blob/main/grafast/website/grafast/index.example.mjs)),
+it's not nearly as good as it could be — for example it does not track the
+columns accessed so that only these columns are retrieved, nor does it use
+lifecycle methods to determine more optimal ways of executing.
+
+(Another thing: it passes the `tableName` and `columnName` values directly into
+SQL — it would be safer to use an `escapeIdentifier()` call around these.)
+
+
+:::
+
+### Step lifecycle
+
+The [**execution plan**](/grafast/operation-plan#execution-plan) diagram you
+saw above is the final form of the plan, there were many intermediate states
+that it will have gone through in order to reach this most optimal form, made
+possible by <grafast />'s lifecycle methods.
+
 :::info
 
 If you want to explore this example more, please see the
@@ -168,20 +377,10 @@ For more information about understanding plan diagrams please see
 
 :::
 
-When the same operation is seen again its existing plan can (generally) be
-reused; this is why, to get the very best performance from <grafast />, you
-should use static GraphQL documents and pass variables at run-time.
-
-The [**execution plan**](/grafast/operation-plan#execution-plan) diagram you
-see above is the final form of the plan, there were many intermediate states
-that it will have gone through in order to reach this most optimal form, made
-possible by <grafast />'s plan lifecycle.
-
-## Plan lifecycle
 
 _This is just an overview, for full documentation see [lifecycle][lifecycle]._
 
-All plan lifecycle methods are optional, and due to the always-batched nature
+All plan lifecycle methods are optional, and due to the always–batched nature
 of <grafast /> plans you can get good performance without using any of them
 (performance generally on a par with reliable usage of DataLoader). However, if
 you leverage lifecycle methods your performance can go from "good" to
@@ -212,19 +411,19 @@ optimal code paths deeper in the plan tree).
 Purpose one is that optimize lets a step "talk" to its ancestors, typically to
 tell them about data that will be needed so that they may fetch it proactively.
 This should not change the observed behavior of the ancestor (e.g. you should
-not use it to apply filters to an ancestor - this may contradict the GraphQL
+not use it to apply filters to an ancestor — this may contradict the GraphQL
 specification!) but it can be used to ask the ancestor to fetch additional
 data.
 
 The second purpose is that optimize can be used to replace the step being
-optimized with an alternative (presumably more-optimal) step. This may result
+optimized with an alternative (presumably more–optimal) step. This may result
 in multiple steps being dropped from the plan graph due to "tree shaking." This
 might be used when the step has told an ancestor to fetch additional data and
 the step can then replace itself with a simple "access" step. It can also be
-used to dispose of plan-only steps that have meaning at planning time but have
-no execution-time behaviors.
+used to dispose of plan–only steps that have meaning at planning time but have
+no execution–time behaviors.
 
-In the "friends" example above, this was used to change the DataLoader-style
+In the "friends" example above, this was used to change the DataLoader–style
 `select * from ...` query to a more optimal `select id, full_name from ...`
 query. In more advanced plans (for example those made available through
 [@dataplan/pg][]), optimize can go much further, for example inlining its data

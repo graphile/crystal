@@ -16,15 +16,22 @@ to use; but when these aren't enough you are encouraged to write your own (or
 pull down third party step classes from npm or similar).
 
 Step classes extend the `ExecutableStep` class, the only required method to
-define is `execute`, but you may also implement the various lifecycle methods,
+define is `executeV2`, but you may also implement the various lifecycle methods,
 or add methods of your own to make it easier for you to write [plan
 resolvers][].
+
+:::info
+
+Earlier versions of <grafast /> used an `execute` method; we're still backwards
+compatible with that, but you should use `executeV2` for all future work.
+
+:::
 
 <!-- prettier-ignore -->
 ```ts
 /** XKCD-221 step class @ref https://xkcd.com/221/ */
 class GetRandomNumberStep extends ExecutableStep {
-  execute(count) {
+  executeV2({ count }) {
     return new Array(count).fill(4); // chosen by fair dice roll.
                                      // guaranteed to be random.
   }
@@ -35,7 +42,7 @@ function getRandomNumber() {
 }
 ```
 
-:::tip
+:::tip Use prefixes on custom fields/methods.
 
 If you add any custom fields or methods to your step classes we recommend that
 you prefix them with your initials or organization name to avoid naming
@@ -43,7 +50,7 @@ conflicts occurring.
 
 :::
 
-:::tip
+:::warning Don't subclass steps.
 
 Don't subclass steps, this will make things very confusing for you. Always
 inherit directly from `ExecutableStep`.
@@ -60,7 +67,7 @@ as part of `ExecutableStep`.
 When your step requires another step's value in order to execute (which is the
 case for the majority of steps!) it must add a dependency via the
 `this.addDependency($otherStep)` method. This method will return a number,
-which is the index in the execute values tuple that represents this step.
+which is the index in the `executeV2` values tuple that represents this step.
 
 It's common to do this in the constructor, but it can be done at other stages
 too, for example during the optimize phase a step's descendent might ask it to
@@ -78,7 +85,7 @@ class AddStep extends ExecutableStep {
   }
 ```
 
-:::warning
+:::warning Steps are ethemeral, never store a reference to a step.
 
 You must never store a reference to another step directly (or indirectly) in
 your step class. Steps come and go at quite a rate during planning - being
@@ -92,6 +99,34 @@ with that `id` at a later time; if it exists it may be different to the step you
 remember, but it should serve the same purpose. However, it may have been
 deleted due to tree shaking - if this causes a problem, then maybe that step
 should have been a dependency after all?
+
+:::
+
+### addUnaryDependency
+
+Sometimes you'll want to ensure that one or more of the steps your step class
+depends on will have exactly one value at runtime; to do so, you can use
+`this.addUnaryDependency($step)` rather than `this.addDependency($step)`. This
+asserts that the given dependency is a **unary step** (a regular step which the
+system has determined will always represent exactly one value) and is primarily
+useful when a parameter to a remote service request needs to be the same for
+all entries in the batch; typically this will be the case for ordering,
+pagination and access control.
+
+:::warning Use with caution.
+
+`this.addUnaryDependency($step)` will raise an error during planning if the
+given `$step` is not unary, so you should be very careful using it. If in
+doubt, use `this.addDependency($step)` instead.
+
+The system steps which represent request–level data (e.g. context, variable and
+argument values) are always unary steps, and &ZeroWidthSpace;<grafast /> will
+automatically determine which other steps are also unary steps.
+
+It's generally intended for `addUnaryDependency` to be used for arguments and
+their derivatives; it can also be used with `context`-derived values, but there
+is complexity when it comes to mutations since `context` is mutable (whereas
+input values are not).
 
 :::
 
@@ -133,56 +168,75 @@ that would occur between the triangular brackets).
 
 ## Lifecycle methods
 
-### execute
+### executeV2
 
 ```ts
-execute(
-  count: number,
-  values: ReadonlyArray<GrafastValuesList>,
-  extra: ExecutionExtra,
-): PromiseOrDirect<GrafastResultsList>
+executeV2(details: ExecutionDetails): PromiseOrDirect<GrafastResultsList>
 ```
 
-Execute is the one method that your step class must define, and it has very
+```ts
+// These are simplified types
+interface ExecutionDetails {
+  count: number;
+  values: [...ExecutionValue[]];
+  extra: ExecutionExtra;
+}
+
+type ExecutionValue<TData> =
+  | { at(i: number): TData; isBatch: true; entries: ReadonlyArray<TData> }
+  | { at(i: number): TData; isBatch: false; value: TData };
+
+type GrafastResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
+```
+
+`executeV2` is the one method that your step class must define, and it has very
 strict rules.
 
-The first argument to the execute method, `count`, indicates how many values
-will be fed into your execute method, and the length of the list that the
-method must return.
+It is passed one argument, the "execution details", which is an object containing:
 
-The second argument to the execute method, `values`, will be an n-tuple (a
-tuple with `n` entries), where `n` is the number of dependencies the step has.
-Each of the entries in the tuple will be a list of length `count`, and
-contains the data that relates to the corresponding dependency. The order of
-the entries in these lists is significant - the N'th entry in each list
-corresponds with the N'th entry in each of the other lists.
+- `count` — the size of the batch being processed (and thus the length of the list that must be returned)
+- `values` — the "values tuple", an n-tuple (a tuple with `n` entries), where
+  `n` is the number of dependencies the step has. Each of the entries in the
+  tuple will be an "execution value" containing the data that relates to the
+  corresponding dependency
+- `extra` — currently experimental, use it at your own risk (and see the source
+  for documentation)
 
-The third argument is currently experimental, use it at your own risk (and see
-the source for documentation).
+An "execution value", `dep`, is an object containing the data for a given
+dependency. It will either be a "batch" value (`dep.isBatch === true`) in which
+case `dep.entries` will be an array containing `count` entries (the order of
+which is significant), or it will be a "unary" value (`dep.isBatch === false`)
+in which case `dep.value` will be the common value for this dependency across
+all entries in the batch. Either way, `dep.at(i)` will return the value for
+this dependency corresponding with the i'th entry in the batch (`dep.at(i)` is
+equivalent to `dep.isBatch ? dep.entries[i] : dep.value`).
 
 Execute must return a list (or a promise to a list) of size `count`, where the
-N'th entry in this list corresponds with the N'th entries in each of the
-`values` tuple's lists.
+i'th entry in this list corresponds to the `dep.at(i)` value for each `dep` in
+the "values tuple". The result of `executeV2` may or may not be a promise, and
+each entry in the resulting list may or may not be a promise.
 
-:::danger
+:::warning If your step has no dependencies
 
 If the step has no dependencies then `values` will be a 0-tuple (an empty
 tuple), so in situations where this is possible you _must_ use `count` to
-determine how many results to return.
+determine how many results to return; e.g.:
+
+```ts
+return Array.from({ length: count }, () => 42);
+```
 
 :::
 
 :::info
 
-You might wonder why the `values` input is a tuple of lists, rather than a list
-of tuples. The reason comes down to efficiency, by using a tuple of lists, <grafast />
-only needs to build one new array (the tuple), and into that array it can
-insert the results from previous execute methods unmodified. Were it to provide
-a list of tuples instead then it would need to build N+1 new arrays, where N
-was the number of values being processed, which can easily be in the thousands.
-
-The result of execute may or may not be a promise, and each entry in the
-resulting list may or may not be a promise.
+You might wonder why the `values` input is a tuple of execution values, rather
+than a list of tuples. The reason comes down to efficiency, by using a tuple of
+execution values, <grafast /> only needs to build one new array (the tuple),
+and into that array it can insert the results from previously executed steps
+unmodified. Were it to provide a list of tuples instead then it would need to
+build N+1 new arrays, where N was the number of values being processed, which
+can easily be in the thousands.
 
 :::
 
@@ -191,51 +245,54 @@ resulting list may or may not be a promise.
 If you want one of your entries to throw an error, but the others shouldn't,
 then an easy way to achieve this is to set the corresponding entry in the
 results list to `Promise.reject(new Error(...))`. You can do this even if you
-don't use promises for any of the other values.
+don't use promises for any of the other values, and even if your `executeV2`
+method is not marked as `async`. You **must not** do this if you have marked
+your step class with `isSyncAndSafe = true`.
 
 :::
 
 #### Example
 
 In the [getting started][] guide we built an `AddStep` step class that adds two
-numbers together. It's execute method looked like this:
+numbers together. It's `executeV2` method looked like this:
 
 ```ts
-  execute(count, [allA, allB]) {
-    const results = [];
-    for (let i = 0; i < count; i++) {
-      // `allA` and `allB` have the same length, which is `count`, and the
-      // entries at the same index in each list relate to each other.
-      const a = allA[i];
-      const b = allB[i];
-      results.push(a + b);
-    }
-    return results;
+  executeV2({ count, values: [aDep, bDep] }) {
+    return Array.from({ length: count }, (_, i) => {
+      const a = aDep.at(i);
+      const b = bDep.at(i);
+      return a + b;
+    });
   }
 ```
 
 Imagine at runtime <grafast /> needed to execute this operation for three
-(`count = 3`) pairs of values: `[1, 2]`, `[3, 4]` and `[5, 6]`. Since <grafast
-/> batches everything the values for `$a` would be `allA = [1, 3, 5]` and the
-values for `$b` would be `allB = [2, 4, 6]`. The execute method then returns
-the same number of results in the same order: `[3, 7, 11]`.
+(`count = 3`) pairs of values: `[1, 2]`, `[3, 4]` and `[5, 6]`. The values for
+`$a` would be `aDep.values = [1, 3, 5]` and the values for `$b` would be
+`bDep.values = [2, 4, 6]`. The execute method then returns the same number of
+results in the same order: `[3, 7, 11]`.
 
-### stream
+### streamV2
 
 _This method is optional._
 
 ```ts
-stream(
-  count: number,
-  values: ReadonlyArray<GrafastValuesList>,
-  extra: ExecutionExtra,
-  streamOptions: {
-    initialCount: number;
-  },
-): PromiseOrDirect<GrafastResultStreamList>
+streamV2(details: StreamDetails): PromiseOrDirect<GrafastResultStreamList>
 ```
 
-TODO: document stream. (It's like execute, except it returns a list of async iterators.)
+```ts
+interface StreamDetails extends ExecutionDetails {
+  streamOptions: {
+    initialCount: number;
+  };
+}
+
+type GrafastResultStreamList<T> = ReadonlyArray<
+  PromiseOrDirect<AsyncIterable<PromiseOrDirect<T>> | null>
+>;
+```
+
+TODO: document streamV2. (It's like executeV2, except it returns a list of async iterators.)
 
 ### deduplicate
 
@@ -390,6 +447,35 @@ should use the `optimize` method to do so.
 
 :::
 
+### execute
+
+**Deprecated**! Use [`executeV2`](#executev2) instead. Existing `execute`
+methods should continue to work.
+
+```ts
+execute(
+  count: number,
+  values: ReadonlyArray<GrafastValuesList>,
+  extra: ExecutionExtra,
+): PromiseOrDirect<GrafastResultsList>
+```
+
+### stream
+
+**Deprecated**! Use [`streamV2`](#streamv2) instead. Existing `stream` methods
+should continue to work.
+
+```ts
+stream(
+  count: number,
+  values: ReadonlyArray<GrafastValuesList>,
+  extra: ExecutionExtra,
+  streamOptions: {
+    initialCount: number;
+  },
+): PromiseOrDirect<GrafastResultStreamList>
+```
+
 ## Other properties
 
 ### id
@@ -449,7 +535,7 @@ This is set `true` after the step has been optimized.
 
 Set this true if your plan's optimize method can be called a second time.
 
-:::warning
+:::warning Your dependencies may change classes!
 
 In this situation it's likely that your dependencies (or their dependencies)
 will not be what you expect them to be (e.g. a `PgSelectSingleStep` might
@@ -471,7 +557,7 @@ of the class. You can even set it to a shared value between multiple step
 classes (a "family" of step classes) should that make sense. By default no
 `metaKey` is set, and your class will therefore have no `meta` object.
 
-:::tip
+:::tip Inspiration
 
 The `loadMany` and `loadOne` standard steps make use of this key to optimize
 value caching, you may want to look at them for more inspiration.

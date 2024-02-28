@@ -1069,22 +1069,24 @@ export function newBucket(
   };
 }
 
+// TODO: memoize?
 function batchExecutionValue<TData>(entries: TData[]): ExecutionValue<TData> {
   return {
-    isBatch: true,
-    entries,
     at(i) {
       return entries[i];
     },
+    isBatch: true,
+    entries,
   };
 }
 
+// TODO: memoize?
 function unaryExecutionValue<TData>(value: TData): ExecutionValue<TData> {
   return {
-    isBatch: false,
-    value,
     at() {
       return value;
     },
+    isBatch: false,
+    value,
   };
 }

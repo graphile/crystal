@@ -4,12 +4,7 @@ import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 import sqlite3 from "sqlite3";
 
-import type {
-  ExecutionDetails,
-  ExecutionExtra,
-  GrafastResultsList,
-  GrafastValuesList,
-} from "../dist/index.js";
+import type { ExecutionDetails, GrafastResultsList } from "../dist/index.js";
 import {
   access,
   context,
