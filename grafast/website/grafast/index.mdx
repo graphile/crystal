@@ -137,7 +137,6 @@ not yet any data to loop over), instead it describes the plan to do so using an
 [`each` step](/grafast/step-library/standard-steps/each), detailing what to do
 with each item made available later.
 
-
 :::tip The dollar convention
 
 By convention, when a variable represents a <grafast /> step, the variable will
@@ -225,14 +224,6 @@ The `executeV2` method must return a list (or a promise to a list) of length
 `values` — this should be at least a little familiar to anyone who has written
 a DataLoader before.
 
-<!--
-
-Each entry, `dep`, in the values tuple may be either a batched
-entry (representing `count` entries) or a unary entry (representing exactly one
-value); either way, the Nth value can be retrieved via `dep.at(N)`.
-
--->
-
 When a plan starts executing it always starts with a batch size (`count`) of 1;
 but many things may affect this batch size for later steps — for example when
 processing the items in a list, the batch must grow to contain each item (via
@@ -246,13 +237,6 @@ represent exactly one value. The system steps which represent request–level
 data (e.g. context, variable and argument values) are always unary steps, and
 &ZeroWidthSpace;<grafast /> will automatically determine which other steps are also unary
 steps.
-
-<!-- For any execution value `dep` in the values tuple, `dep.at(i)` is equivalent to
-`dep.isBatch ? dep.entries[i] : dep.value`.
-
- Since we know that the value of a unary step will be the same
-for every entry in the batch no matter the batch size, so we can access it via
-`dep.value` directly without having to look it up by index. -->
 
 Sometimes you'll want to ensure that one or more of the steps your step class
 depends on will have exactly one value at runtime; to do so, you can use
@@ -357,7 +341,6 @@ lifecycle methods to determine more optimal ways of executing.
 (Another thing: it passes the `tableName` and `columnName` values directly into
 SQL — it would be safer to use an `escapeIdentifier()` call around these.)
 
-
 :::
 
 ### Step lifecycle
@@ -376,7 +359,6 @@ For more information about understanding plan diagrams please see
 [Plan Diagrams](/grafast/plan-diagrams).
 
 :::
-
 
 _This is just an overview, for full documentation see [lifecycle][lifecycle]._
 
