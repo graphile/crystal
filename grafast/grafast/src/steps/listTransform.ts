@@ -193,7 +193,8 @@ export class __ListTransformStep<
   }
 
   async executeV2({
-    count,
+    indexForEach,
+    indexMap,
     values,
     extra,
   }: ExecutionDetails<[any[] | null | undefined | GrafastError]>): Promise<
@@ -251,7 +252,7 @@ export class __ListTransformStep<
 
     // We'll typically be creating more listItem bucket entries than we
     // have parent buckets, so we must "multiply up" the store entries.
-    for (let originalIndex = 0; originalIndex < count; originalIndex++) {
+    indexForEach((originalIndex) => {
       const list = listStepValue.isBatch
         ? listStepValue.entries[originalIndex]
         : listStepValue.value;
@@ -277,7 +278,7 @@ export class __ListTransformStep<
           }
         }
       }
-    }
+    });
 
     if (size > 0) {
       const childBucket = newBucket(
@@ -299,15 +300,13 @@ export class __ListTransformStep<
       ? [null, unaryStore.get(rootStep!.id)]
       : [store.get(rootStep!.id)!, null];
 
-    const results: any[] = [];
-    for (let originalIndex = 0; originalIndex < count; originalIndex++) {
+    return indexMap((originalIndex) => {
       const list = listStepValue.isBatch
         ? listStepValue.entries[originalIndex]
         : listStepValue.value;
 
       if (list == null) {
-        results.push(list);
-        continue;
+        return list;
       }
       const indexes = map.get(originalIndex);
       if (!Array.isArray(list) || !Array.isArray(indexes)) {
@@ -315,8 +314,7 @@ export class __ListTransformStep<
         console.warn(
           `Either list or values was not an array when processing ${this}`,
         );
-        results.push(null);
-        continue;
+        return null;
       }
       const values = indexes.map((idx) =>
         depResults === null ? unaryResult : depResults[idx],
@@ -337,9 +335,8 @@ export class __ListTransformStep<
       const finalResult = this.finalizeCallback
         ? this.finalizeCallback(reduceResult)
         : reduceResult;
-      results.push(finalResult);
-    }
-    return results;
+      return finalResult;
+    });
   }
 }
 

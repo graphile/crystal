@@ -625,23 +625,21 @@ export abstract class UnbatchedExecutableStep<
   }
 
   executeV2({
-    count,
+    indexMap,
     values,
     extra,
   }: ExecutionDetails): PromiseOrDirect<GrafastResultsList<TData>> {
     console.warn(
       `${this} didn't call 'super.finalize()' in the finalize method.`,
     );
-    const results = [];
-    for (let i = 0; i < count; i++) {
+    return indexMap((i) => {
       try {
         const tuple = values.map((list) => list.at(i));
-        results[i] = this.unbatchedExecute(extra, ...tuple);
+        return this.unbatchedExecute(extra, ...tuple);
       } catch (e) {
-        results[i] = e instanceof Error ? (e as never) : Promise.reject(e);
+        return e instanceof Error ? (e as never) : Promise.reject(e);
       }
-    }
-    return results;
+    });
   }
 
   abstract unbatchedExecute(

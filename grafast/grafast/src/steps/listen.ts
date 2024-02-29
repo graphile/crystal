@@ -64,15 +64,14 @@ export class ListenStep<
   }
 
   streamV2({
-    count,
+    indexMap,
     values,
   }: StreamDetails<
     readonly [GrafastSubscriber<TTopics>, TTopic]
   >): GrafastResultStreamList<TTopics[TTopic]> {
     const pubsubValue = values[this.pubsubDep as 0];
     const topicValue = values[this.topicDep as 1];
-    const result = [];
-    for (let i = 0; i < count; i++) {
+    return indexMap((i) => {
       const pubsub = pubsubValue.isBatch
         ? pubsubValue.entries[i]
         : pubsubValue.value;
@@ -91,9 +90,8 @@ export class ListenStep<
       const topic = topicValue.isBatch
         ? topicValue.entries[i]
         : topicValue.value;
-      result[i] = pubsub.subscribe(topic);
-    }
-    return result;
+      return pubsub.subscribe(topic);
+    });
   }
 }
 

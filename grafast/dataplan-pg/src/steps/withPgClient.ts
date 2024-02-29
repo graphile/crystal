@@ -60,16 +60,12 @@ export class WithPgClientStep<
   >): GrafastResultsList<TResult> {
     const contextDep = values[this.contextId as 0];
     const dataDep = values[this.dataId as 1];
-    const promises: Promise<any>[] = [];
-    for (let i = 0; i < count; i++) {
+    return Array.from({ length: count }, (_, i) => {
       const context = contextDep.at(i);
       const data = dataDep.at(i);
       const { withPgClient, pgSettings } = context;
-      promises.push(
-        withPgClient(pgSettings, (client) => this.callback(client, data)),
-      );
-    }
-    return promises;
+      return withPgClient(pgSettings, (client) => this.callback(client, data));
+    });
   }
 }
 

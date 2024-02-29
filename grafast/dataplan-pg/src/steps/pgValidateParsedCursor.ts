@@ -38,16 +38,15 @@ export class PgValidateParsedCursorStep extends ExecutableStep<undefined> {
   }
 
   executeV2({
-    count,
+    indexMap,
     values: [parsedCursorDep],
   }: ExecutionDetails<[string | null]>): GrafastResultsList<undefined> {
-    const results: any[] = [];
-    for (let i = 0; i < count; i++) {
+    return indexMap((i) => {
       const decoded = parsedCursorDep.isBatch
         ? parsedCursorDep.entries[i]
         : parsedCursorDep.value;
       if (!decoded) {
-        results.push(undefined);
+        return undefined;
       } else {
         try {
           const [cursorDigest, ...cursorParts] = decoded;
@@ -70,7 +69,7 @@ export class PgValidateParsedCursorStep extends ExecutableStep<undefined> {
               `Invalid cursor length - ${cursorParts.length} !== ${this.orderCount}`,
             );
           }
-          results.push(undefined);
+          return undefined;
         } catch (e) {
           if (isDev) {
             console.error("Invalid cursor:");
@@ -82,8 +81,7 @@ export class PgValidateParsedCursorStep extends ExecutableStep<undefined> {
           );
         }
       }
-    }
-    return results;
+    });
   }
 }
 

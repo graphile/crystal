@@ -1210,6 +1210,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
    * the plans stored in this.identifiers to get actual values we can use.
    */
   async executeV2({
+    indexMap,
     count,
     values,
     extra: { eventEmitter },
@@ -1231,10 +1232,9 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     } = this.finalizeResults;
     const contextDep = values[this.contextId];
 
-    const specs: Array<PgExecutorInput<any>> = [];
-    for (let i = 0; i < count; i++) {
+    const specs = indexMap<PgExecutorInput<any>>((i) => {
       const context = contextDep.at(i);
-      specs.push({
+      return {
         // The context is how we'd handle different connections with different claims
         context,
         queryValues:
@@ -1244,8 +1244,8 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
                 return val == null ? null : codec.toPg(val);
               })
             : EMPTY_ARRAY,
-      });
-    }
+      };
+    });
     const executionResult = await this.resource.executeWithCache(specs, {
       text,
       textForSingle,
@@ -1292,7 +1292,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
    * Like `execute`, but stream the results via async iterables.
    */
   async streamV2({
-    count,
+    indexMap,
     values,
     extra: { eventEmitter },
   }: ExecutionDetails): Promise<GrafastResultStreamList<unknown[]>> {
@@ -1317,11 +1317,11 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     }
 
     const contextDep = values[this.contextId];
-    const specs: PgExecutorInput<any>[] | null = text ? [] : null;
+    let specs: readonly PgExecutorInput<any>[] | null = null;
     if (text) {
-      for (let i = 0; i < count; i++) {
+      specs = indexMap((i) => {
         const context = contextDep.at(i);
-        specs!.push({
+        return {
           // The context is how we'd handle different connections with different claims
           context,
           queryValues:
@@ -1331,8 +1331,8 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
                   return val == null ? null : codec.toPg(val);
                 })
               : EMPTY_ARRAY,
-        });
-      }
+        };
+      });
     }
     const initialFetchResult = specs
       ? (
@@ -1345,11 +1345,10 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
         ).values
       : null;
 
-    const streamSpecs: PgExecutorInput<any>[] = [];
-    for (let i = 0; i < count; i++) {
+    const streamSpecs = indexMap<PgExecutorInput<any>>((i) => {
       const context = contextDep.at(i);
 
-      streamSpecs.push({
+      return {
         // The context is how we'd handle different connections with different claims
         context,
         queryValues:
@@ -1359,8 +1358,8 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
                 return val == null ? val : codec.toPg(val);
               })
             : EMPTY_ARRAY,
-      });
-    }
+      };
+    });
     const streams = (
       await this.resource.executeStream(streamSpecs, {
         text: textForDeclare,

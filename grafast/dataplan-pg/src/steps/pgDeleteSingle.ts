@@ -246,7 +246,7 @@ export class PgDeleteSingleStep<
    * the plans stored in this.identifiers to get actual values we can use.
    */
   async executeV2({
-    count,
+    indexMap,
     values,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     if (!this.finalizeResults) {
@@ -258,9 +258,8 @@ export class PgDeleteSingleStep<
     // We must execute each mutation on its own, but we can at least do so in
     // parallel. Note we return a list of promises, each may reject or resolve
     // without causing the others to reject.
-    const result: Array<PromiseOrDirect<any>> = [];
     const contextDep = values[this.contextId];
-    for (let i = 0; i < count; i++) {
+    return indexMap<PromiseOrDirect<any>>(async (i) => {
       const context = contextDep.at(i);
       const sqlValues = queryValueDetailsBySymbol.size
         ? rawSqlValues.map((v) => {
@@ -276,24 +275,22 @@ export class PgDeleteSingleStep<
             }
           })
         : rawSqlValues;
-      const promise = this.resource.executeMutation({
+      const { rows, rowCount } = await this.resource.executeMutation({
         context,
         text,
         values: sqlValues,
       });
-      result[i] = promise.then(
-        ({ rows, rowCount }) =>
-          rows[0] ??
-          (rowCount === 0
-            ? Promise.reject(
-                new Error(
-                  `No values were deleted in collection '${this.resource.name}' because no values you can delete were found matching these criteria.`,
-                ),
-              )
-            : Object.create(null)),
+      return (
+        rows[0] ??
+        (rowCount === 0
+          ? Promise.reject(
+              new Error(
+                `No values were deleted in collection '${this.resource.name}' because no values you can delete were found matching these criteria.`,
+              ),
+            )
+          : Object.create(null))
       );
-    }
-    return result;
+    });
   }
 
   public finalize(): void {

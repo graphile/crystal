@@ -788,10 +788,15 @@ export type ExecutionValue<TData = any> =
       entries?: never;
     };
 
+export type IndexMap = <T>(callback: (i: number) => T) => ReadonlyArray<T>;
+export type IndexForEach = (callback: (i: number) => any) => void;
+
 export interface ExecutionDetails<
   TDeps extends readonly [...any[]] = readonly [...any[]],
 > {
   count: number;
+  indexMap: IndexMap;
+  indexForEach: IndexForEach;
   values: {
     [DepIdx in keyof TDeps]: ExecutionValue<TDeps[DepIdx]>;
   } & {

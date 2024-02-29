@@ -21,16 +21,10 @@ export class FirstStep<TData> extends UnbatchedExecutableStep<TData> {
   }
 
   executeV2({
-    count,
+    indexMap,
     values: [values0],
   }: ExecutionDetails<[TData[]]>): GrafastResultsList<TData> {
-    const result: Array<TData> = [];
-    for (let i = 0; i < count; i++) {
-      result[i] = values0.isBatch
-        ? values0.entries[i]?.[0]
-        : values0.value?.[0];
-    }
-    return result;
+    return indexMap((i) => values0.at(i)?.[0]);
   }
 
   unbatchedExecute(_extra: UnbatchedExecutionExtra, list: any[]) {

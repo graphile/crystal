@@ -30,38 +30,29 @@ class SyncListCallbackStep<
     this.addDependency($dep);
   }
   executeV2({
-    count,
+    indexMap,
     values: [values0],
-  }: ExecutionDetails<[TIn]>): Array<PromiseOrDirect<TOut>> {
-    let result: PromiseOrDirect<TOut>[] = [];
-    for (let i = 0; i < count; i++) {
-      const entry = values0.at(i);
-      result.push(this.callback(entry));
-    }
-    return result;
+  }: ExecutionDetails<[TIn]>): ReadonlyArray<PromiseOrDirect<TOut>> {
+    return indexMap((i) => this.callback(values0.at(i)));
   }
-  async streamV2({ count, values: [values0] }: StreamDetails<[TIn]>) {
+  async streamV2({ indexMap, values: [values0] }: StreamDetails<[TIn]>) {
     await sleep(0);
     const { callback, setStreaming } = this;
-    const results: any[] = [];
-    for (let i = 0; i < count; i++) {
+    return indexMap((i) => {
       const entry = values0.at(i);
       setStreaming(true);
 
-      results.push(
-        (async function* () {
-          try {
-            const data = await callback(entry);
-            for (const item of data) {
-              yield item;
-            }
-          } finally {
-            setStreaming(false);
+      return (async function* () {
+        try {
+          const data = await callback(entry);
+          for (const item of data) {
+            yield item;
           }
-        })(),
-      );
-    }
-    return results;
+        } finally {
+          setStreaming(false);
+        }
+      })();
+    });
   }
 }
 

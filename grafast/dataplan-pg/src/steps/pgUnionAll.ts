@@ -1934,7 +1934,7 @@ ${lateralText};`;
 
   // Be careful if we add streaming - ensure `shouldReverseOrder` is fine.
   async executeV2({
-    count,
+    indexMap,
     values,
     extra: { eventEmitter },
   }: ExecutionDetails): Promise<GrafastValuesList<any>> {
@@ -1946,10 +1946,9 @@ ${lateralText};`;
       throw new Error("We have no context dependency?");
     }
 
-    const specs: Array<PgExecutorInput<any>> = [];
-    for (let i = 0; i < count; i++) {
+    const specs = indexMap<PgExecutorInput<any>>((i) => {
       const context = contextDep.at(i);
-      specs.push({
+      return {
         // The context is how we'd handle different connections with different claims
         context,
         queryValues:
@@ -1965,8 +1964,8 @@ ${lateralText};`;
                 },
               )
             : EMPTY_ARRAY,
-      });
-    }
+      };
+    });
     const executionResult = await this.executor.executeWithCache(specs, {
       text,
       rawSqlValues,

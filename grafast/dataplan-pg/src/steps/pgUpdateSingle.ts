@@ -314,35 +314,29 @@ export class PgUpdateSingleStep<
     // We must execute each mutation on its own, but we can at least do so in
     // parallel. Note we return a list of promises, each may reject or resolve
     // without causing the others to reject.
-    const promises: Promise<any>[] = [];
-    for (let i = 0; i < count; i++) {
-      promises.push(
-        (async () => {
-          const context = contextDep.at(i);
-          const sqlValues = queryValueDetailsBySymbol.size
-            ? rawSqlValues.map((v) => {
-                if (typeof v === "symbol") {
-                  const details = queryValueDetailsBySymbol.get(v);
-                  if (!details) {
-                    throw new Error(`Saw unexpected symbol '${inspect(v)}'`);
-                  }
-                  const val = values[details.depId].at(i);
-                  return val == null ? null : details.processor(val);
-                } else {
-                  return v;
-                }
-              })
-            : rawSqlValues;
-          const { rows, rowCount } = await this.resource.executeMutation({
-            context,
-            text,
-            values: sqlValues,
-          });
-          return rows[0] ?? (rowCount === 0 ? null : Object.create(null));
-        })(),
-      );
-    }
-    return promises;
+    return Array.from({ length: count }, async (_, i) => {
+      const context = contextDep.at(i);
+      const sqlValues = queryValueDetailsBySymbol.size
+        ? rawSqlValues.map((v) => {
+            if (typeof v === "symbol") {
+              const details = queryValueDetailsBySymbol.get(v);
+              if (!details) {
+                throw new Error(`Saw unexpected symbol '${inspect(v)}'`);
+              }
+              const val = values[details.depId].at(i);
+              return val == null ? null : details.processor(val);
+            } else {
+              return v;
+            }
+          })
+        : rawSqlValues;
+      const { rows, rowCount } = await this.resource.executeMutation({
+        context,
+        text,
+        values: sqlValues,
+      });
+      return rows[0] ?? (rowCount === 0 ? null : Object.create(null));
+    });
   }
 
   public finalize(): void {

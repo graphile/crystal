@@ -16,6 +16,8 @@ import type {
   ExecutionValue,
   GrafastResultsList,
   GrafastResultStreamList,
+  IndexForEach,
+  IndexMap,
   PromiseOrDirect,
   StreamMaybeMoreableArray,
   UnbatchedExecutionExtra,
@@ -680,6 +682,8 @@ export function executeBucket(
     const streamOptions = step._stepOptions.stream;
     if (streamOptions && isStreamV2ableStep(step)) {
       return step.streamV2({
+        indexMap: makeIndexMap(count),
+        indexForEach: makeIndexForEach(count),
         count,
         values,
         extra,
@@ -692,7 +696,13 @@ export function executeBucket(
       );
       return step.stream(count, backfilledValues, extra, streamOptions);
     } else {
-      return step.executeV2({ count, values, extra });
+      return step.executeV2({
+        indexMap: makeIndexMap(count),
+        indexForEach: makeIndexForEach(count),
+        count,
+        values,
+        extra,
+      });
     }
   }
 
@@ -1089,4 +1099,39 @@ function unaryExecutionValue<TData>(value: TData): ExecutionValue<TData> {
     isBatch: false,
     value,
   };
+}
+
+const indexMapCache = new Map<number, IndexMap>();
+function makeIndexMap(count: number) {
+  const existing = indexMapCache.get(count);
+  if (existing !== undefined) {
+    return existing;
+  }
+  const result: IndexMap = (callback) => {
+    const results = [];
+    for (let i = 0; i < count; i++) {
+      results.push(callback(i));
+    }
+    return results;
+  };
+  if (count <= 100) {
+    indexMapCache.set(count, result);
+  }
+  return result;
+}
+const indexForEachCache = new Map<number, IndexForEach>();
+function makeIndexForEach(count: number) {
+  const existing = indexForEachCache.get(count);
+  if (existing !== undefined) {
+    return existing;
+  }
+  const result: IndexForEach = (callback) => {
+    for (let i = 0; i < count; i++) {
+      callback(i);
+    }
+  };
+  if (count <= 100) {
+    indexForEachCache.set(count, result);
+  }
+  return result;
 }

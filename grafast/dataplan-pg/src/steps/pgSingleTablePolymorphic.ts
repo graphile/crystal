@@ -57,21 +57,19 @@ export class PgSingleTablePolymorphicStep<
   }
 
   executeV2({
-    count,
+    indexMap,
     values,
   }: ExecutionDetails): GrafastResultsList<PolymorphicData<
     string,
     ReadonlyArray<unknown[]>
   > | null> {
-    const result: Array<
-      PromiseOrDirect<PolymorphicData<string, ReadonlyArray<unknown[]>> | null>
-    > = [];
     const valuesDep = values[this.typeStepId];
-    for (let i = 0; i < count; i++) {
+    return indexMap<
+      PromiseOrDirect<PolymorphicData<string, ReadonlyArray<unknown[]>> | null>
+    >((i) => {
       const v = valuesDep.at(i);
-      result[i] = v ? polymorphicWrap(v) : null;
-    }
-    return result;
+      return v ? polymorphicWrap(v) : null;
+    });
   }
 }
 

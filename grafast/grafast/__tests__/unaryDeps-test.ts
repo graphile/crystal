@@ -79,7 +79,7 @@ class GetRecordsStep<T extends Record<string, any>> extends ExecutableStep {
   }
 
   async executeV2({
-    count,
+    indexMap,
     values,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     const db = values[this.dbDepId].value as sqlite3.Database;
@@ -127,28 +127,25 @@ ${orderBy ? `order by ${orderBy}` : ""}
 `;
     const sqlValues: any[] = [];
     if (identifierCols.length > 0) {
-      const json: any[] = [];
-      for (let i = 0; i < count; i++) {
+      const json = indexMap((i) => {
         const obj = Object.fromEntries(
           Object.entries(this.depIdByIdentifier).map(([col, depId]) => [
             col,
             values[depId].at(i),
           ]),
         );
-        json.push(obj);
-      }
+        return obj;
+      });
       sqlValues.push(JSON.stringify(json));
     }
     const dbResults = await query<T>(db, sql, sqlValues);
-    const results: T[][] = [];
     const entries = Object.entries(this.depIdByIdentifier);
-    for (let i = 0; i < count; i++) {
+    return indexMap<T[]>((i) => {
       // This could be more optimal by leveraging they're already in order
-      results[i] = dbResults.filter((r) => {
+      return dbResults.filter((r) => {
         return entries.every(([col, depId]) => r[col] === values[depId].at(i));
       });
-    }
-    return results;
+    });
   }
   listItem($item: ExecutableStep) {
     return access($item);

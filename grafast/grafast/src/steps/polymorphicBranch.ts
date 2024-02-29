@@ -72,11 +72,10 @@ export class PolymorphicBranchStep<TStep extends ExecutableStep>
   }
 
   executeV2({
-    count,
+    indexMap,
     values: [values0],
   }: ExecutionDetails): PromiseOrDirect<GrafastResultsList<any>> {
-    const results: any[] = [];
-    for (let i = 0; i < count; i++) {
+    return indexMap((i) => {
       const obj = values0.at(i);
       let match: string | null = null;
       if (obj != null) {
@@ -87,9 +86,8 @@ export class PolymorphicBranchStep<TStep extends ExecutableStep>
           }
         }
       }
-      results[i] = match !== null ? polymorphicWrap(match, obj) : null;
-    }
-    return results;
+      return match !== null ? polymorphicWrap(match, obj) : null;
+    });
   }
 }
 

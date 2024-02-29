@@ -54,22 +54,21 @@ export class JSONParseStep<
   }
 
   executeV2({
-    count,
+    indexMap,
     values: [stringDep],
   }: ExecutionDetails<[string]>): GrafastResultsList<TJSON> {
-    const result: Array<PromiseOrDirect<TJSON>> = []; // new Array(count);
-    for (let i = 0; i < count; i++) {
+    return indexMap<PromiseOrDirect<TJSON>>((i) => {
       const v = stringDep.at(i);
       if (typeof v === "string") {
         try {
-          result[i] = JSON.parse(v);
+          return JSON.parse(v);
         } catch (e) {
-          result[i] = Promise.reject(e);
+          return Promise.reject(e);
         }
       } else if (v == null) {
-        result[i] = null as any;
+        return null as any;
       } else {
-        result[i] = Promise.reject(
+        return Promise.reject(
           new Error(
             `JSONParseStep: expected string to parse, but received ${
               Array.isArray(v) ? "array" : typeof v
@@ -77,8 +76,7 @@ export class JSONParseStep<
           ),
         );
       }
-    }
-    return result;
+    });
   }
 }
 
