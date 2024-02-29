@@ -53,14 +53,14 @@ export class WithPgClientStep<
   }
 
   executeV2({
-    count,
+    indexMap,
     values,
   }: ExecutionDetails<
     [{ pgSettings: any; withPgClient: WithPgClient }, TData]
   >): GrafastResultsList<TResult> {
     const contextDep = values[this.contextId as 0];
     const dataDep = values[this.dataId as 1];
-    return Array.from({ length: count }, (_, i) => {
+    return indexMap((i) => {
       const context = contextDep.at(i);
       const data = dataDep.at(i);
       const { withPgClient, pgSettings } = context;

@@ -211,6 +211,8 @@ details** which includes:
 - `count` — the size of the batch to be executed
 - `values` — the **values tuple**, the values for each of the dependencies the
   step added
+- `indexMap(callback)` — method returning an array by calling `callback(i)` for
+  each index `i` in the batch (from `0` to `count-1`)
 
 :::note Why `executeV2`?
 
@@ -270,7 +272,7 @@ export class RecordsByColumnStep extends ExecutableStep {
     this.firstDepId = this.addUnaryDependency($first);
   }
 
-  async executeV2({ count, values }) {
+  async executeV2({ indexMap, values }) {
     // Retrieve the values for the `$columnValue` dependency
     const columnValueDep = values[this.columnValueDepIdx];
 
@@ -286,11 +288,9 @@ export class RecordsByColumnStep extends ExecutableStep {
     const limitSQL = Number.isFinite(first) ? `limit ${first}` : ``;
 
     // Create placeholders for each entry in our batch in the SQL:
-    const placeholders = Array.from({ length: count }, () => "?");
-    const placeholderValues = Array.from({ length: count }, (_, i) =>
-      // The value from `$columnValue` for this index `i` in the batch
-      columnValueDep.at(i),
-    );
+    const placeholders = indexMap(() => "?");
+    // The value from `$columnValue` for each index `i` in the batch
+    const columnValues = indexMap((i) => columnValueDep.at(i));
 
     // Build the SQL query to execute:
     const sql = `\
@@ -301,11 +301,11 @@ export class RecordsByColumnStep extends ExecutableStep {
     `;
 
     // Execute the SQL query once for all values in the batch:
-    const rows = await executeSQL(sql, placeholderValues);
+    const rows = await executeSQL(sql, columnValues);
 
     // Figure out which rows relate to which batched inputs:
-    return Array.from({ length: count }, (_, i) =>
-      rows.filter((row) => row[this.columnName] === columnValueDep.at(i)),
+    return indexMap((i) =>
+      rows.filter((row) => row[this.columnName] === columnValues[i]),
     );
   }
 }

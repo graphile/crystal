@@ -179,6 +179,8 @@ executeV2(details: ExecutionDetails): PromiseOrDirect<GrafastResultsList>
 interface ExecutionDetails {
   count: number;
   values: [...ExecutionValue[]];
+  indexMap<T>(callback: (i: number) => T): ReadonlyArray<T>;
+  indexForEach(callback: (i: number) => any): void;
   extra: ExecutionExtra;
 }
 
@@ -199,6 +201,11 @@ It is passed one argument, the "execution details", which is an object containin
   `n` is the number of dependencies the step has. Each of the entries in the
   tuple will be an "execution value" containing the data that relates to the
   corresponding dependency
+- `indexMap(callback)` - a helper function that builds an array of length
+  `count` by calling `callback` for each index in the batch (from `0` to
+  `count-1`); equivalent to `Array.from({ length: count }, (_, i) => callback(i))`
+- `indexForEach(callback)` - a helper function that calls `callback` for each
+  index in the batch (from `0` to `count-1`) but does not return anything
 - `extra` — currently experimental, use it at your own risk (and see the source
   for documentation)
 
@@ -257,8 +264,8 @@ In the [getting started][] guide we built an `AddStep` step class that adds two
 numbers together. It's `executeV2` method looked like this:
 
 ```ts
-  executeV2({ count, values: [aDep, bDep] }) {
-    return Array.from({ length: count }, (_, i) => {
+  executeV2({ indexMap, values: [aDep, bDep] }) {
+    return indexMap((i) => {
       const a = aDep.at(i);
       const b = bDep.at(i);
       return a + b;
@@ -268,9 +275,9 @@ numbers together. It's `executeV2` method looked like this:
 
 Imagine at runtime <grafast /> needed to execute this operation for three
 (`count = 3`) pairs of values: `[1, 2]`, `[3, 4]` and `[5, 6]`. The values for
-`$a` would be `aDep.values = [1, 3, 5]` and the values for `$b` would be
-`bDep.values = [2, 4, 6]`. The execute method then returns the same number of
-results in the same order: `[3, 7, 11]`.
+`$a` accessible through `aDep.get(i)` would be `[1, 3, 5]` and the values for
+`$b` accessible through `bDep` would be `[2, 4, 6]`. The execute method then
+returns the same number of results in the same order: `[3, 7, 11]`.
 
 ### streamV2
 

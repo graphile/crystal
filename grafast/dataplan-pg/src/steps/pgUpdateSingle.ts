@@ -301,7 +301,7 @@ export class PgUpdateSingleStep<
    * the plans stored in this.identifiers to get actual values we can use.
    */
   async executeV2({
-    count,
+    indexMap,
     values,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     if (!this.finalizeResults) {
@@ -314,7 +314,7 @@ export class PgUpdateSingleStep<
     // We must execute each mutation on its own, but we can at least do so in
     // parallel. Note we return a list of promises, each may reject or resolve
     // without causing the others to reject.
-    return Array.from({ length: count }, async (_, i) => {
+    return indexMap(async (i) => {
       const context = contextDep.at(i);
       const sqlValues = queryValueDetailsBySymbol.size
         ? rawSqlValues.map((v) => {
