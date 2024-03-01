@@ -14,6 +14,7 @@ import type {
   ModifierStep,
   UnbatchedExecutableStep,
 } from "../step";
+import { arrayOfLength } from "../utils.js";
 import { newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
@@ -505,7 +506,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       case "listItem": {
         const listStepId = this.reason.parentStep.id;
         const listStepStore = this.reason.parentStep._isUnary
-          ? [parentBucket.unaryStore.get(listStepId)]
+          ? arrayOfLength(
+              parentBucket.size,
+              parentBucket.unaryStore.get(listStepId),
+            )
           : parentBucket.store.get(listStepId);
         if (!listStepStore) {
           throw new Error(
@@ -589,7 +593,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       case "polymorphic": {
         const polymorphicPlanId = this.reason.parentStep.id;
         const polymorphicPlanStore = this.reason.parentStep._isUnary
-          ? [parentBucket.unaryStore.get(polymorphicPlanId)]
+          ? arrayOfLength(
+              parentBucket.size,
+              parentBucket.unaryStore.get(polymorphicPlanId),
+            )
           : parentBucket.store.get(polymorphicPlanId);
         if (!polymorphicPlanStore) {
           throw new Error(
@@ -723,6 +730,7 @@ const te_parentBucketDotPolymorphicPathList = te`parentBucket.polymorphicPathLis
 const te_parentBucketDotIterators = te`parentBucket.iterators`;
 const te_emptyArray = te`[]`;
 const ref_newBucket = te.ref(newBucket, "newBucket");
+const ref_arrayOfLength = te.ref(arrayOfLength, "arrayOfLength");
 
 function makeNewBucketExpression(
   signature: string,
@@ -879,7 +887,7 @@ ${te.join(copyBlocks, "")}
   const listStepId = this.reason.parentStep.id;
   const listStepStore =
     this.reason.parentStep._isUnary
-      ? [parentBucket.unaryStore.get(listStepId)]
+      ? ${ref_arrayOfLength}(parentBucket.size, parentBucket.unaryStore.get(listStepId))
       : parentBucket.store.get(listStepId);
 
   const itemStepIdList = [];
