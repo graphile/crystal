@@ -3,6 +3,7 @@ import type { GraphQLError } from "graphql";
 import * as assert from "../assert.js";
 import type { Bucket, RequestTools } from "../bucket.js";
 import { isDev } from "../dev.js";
+import { inspect } from "../inspect.js";
 import type { JSONValue } from "../interfaces.js";
 import type { OutputPlan } from "./OutputPlan.js";
 
@@ -91,6 +92,33 @@ export interface SubsequentStreamSpec {
   label: string | undefined;
   stream: AsyncIterator<any> | Iterator<any>;
   startIndex: number;
+}
+
+function indent(level: number, string: string) {
+  return " ".repeat(level) + string.replace(/\n/g, `\n${" ".repeat(level)}`);
+}
+
+function recursivePrintBucket(bucket: Bucket, indentLevel = 0): string {
+  return indent(
+    indentLevel,
+    `Bucket for ${bucket.layerPlan} (size = ${bucket.size}):
+  Store:
+${indent(4, inspect(bucket.store, { colors: true }))}
+  Unary store:
+${indent(4, inspect(bucket.unaryStore, { colors: true }))}
+  Children:
+${Object.entries(bucket.children)
+  .map(([id, { bucket }]) => indent(4, recursivePrintBucket(bucket)))
+  .join("\n")}`,
+  );
+}
+
+export function debugOutputPlanWithBucket(
+  outputPlan: OutputPlan,
+  bucket: Bucket,
+) {
+  console.log(`Executing ${outputPlan.print()} with data:`);
+  console.log(recursivePrintBucket(bucket));
 }
 
 /**
