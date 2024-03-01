@@ -107,8 +107,12 @@ export class ConnectionStep<
   private _beforeDepId: number | null | undefined = undefined;
   private _afterDepId: number | null | undefined = undefined;
 
-  /** The node plan */
+  // TODO: I'm seriously concerned that this allows capturing steps in a closure
+  // and that these steps might, in some circumstances, no longer be valid when
+  // it times to use them. We need to ensure this is handled gracefully.
+  /** Plan for data to associate with the edge */
   public readonly edgeDataPlan?: ($item: TItemStep) => TEdgeDataStep;
+  /** The node plan */
   public readonly itemPlan?: ($item: TItemStep) => TNodeStep;
   public readonly cursorPlan?: (
     $item: TItemStep,
