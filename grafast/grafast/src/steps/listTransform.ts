@@ -204,6 +204,9 @@ export class __ListTransformStep<
 
     const childLayerPlan = this.subroutineLayer;
     const { copyUnaryStepIds, copyBatchStepIds, rootStep } = childLayerPlan;
+    if (rootStep === null) {
+      throw new Error(`rootStep of ${childLayerPlan} must not be null.`);
+    }
 
     const store: Bucket["store"] = new Map();
     const unaryStore = new Map();
@@ -294,9 +297,9 @@ export class __ListTransformStep<
       await executeBucket(childBucket, extra._requestContext);
     }
 
-    const [depResults, unaryResult] = rootStep?._isUnary
-      ? [null, unaryStore.get(rootStep!.id)]
-      : [store.get(rootStep!.id)!, null];
+    const [depResults, unaryResult] = rootStep._isUnary
+      ? [null, unaryStore.get(rootStep.id)]
+      : [store.get(rootStep.id)!, null];
 
     return indexMap((originalIndex) => {
       const list = listStepValue.at(originalIndex);
