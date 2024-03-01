@@ -226,11 +226,12 @@ each entry in the resulting list may or may not be a promise.
 :::warning If your step has no dependencies
 
 If the step has no dependencies then `values` will be a 0-tuple (an empty
-tuple), so in situations where this is possible you _must_ use `count` to
-determine how many results to return; e.g.:
+tuple), but that doesn't mean the batch is empty or has size one, `count` may
+be any positive integer. It's therefore recommended that you use `indexMap` to
+generate your results in the vast majority of cases:
 
 ```ts
-return Array.from({ length: count }, () => 42);
+return indexMap((i) => 42);
 ```
 
 :::
@@ -275,9 +276,10 @@ numbers together. It's `executeV2` method looked like this:
 
 Imagine at runtime <grafast /> needed to execute this operation for three
 (`count = 3`) pairs of values: `[1, 2]`, `[3, 4]` and `[5, 6]`. The values for
-`$a` accessible through `aDep.get(i)` would be `[1, 3, 5]` and the values for
-`$b` accessible through `bDep` would be `[2, 4, 6]`. The execute method then
-returns the same number of results in the same order: `[3, 7, 11]`.
+`$a` accessible through `aDep.get(i)` would be `1`, `3` and `5`; and the values
+for `$b` accessible through `bDep.get(i)` would be `2`, `4` and `6`. The
+execute method then returns the same number of results in the same order: `[3,
+7, 11]`.
 
 ### streamV2
 
