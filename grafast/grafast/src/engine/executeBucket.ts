@@ -718,8 +718,9 @@ export function executeBucket(
     polymorphicPathList: readonly (string | null)[],
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
+    const expectedSize = step._isUnary ? 1 : size;
     const errors: { [index: number]: GrafastError | undefined } =
-      arrayOfLength(size);
+      arrayOfLength(expectedSize);
 
     /** If there's errors, we must manipulate the arrays being passed into the step execution */
     let foundErrors = false;
@@ -735,7 +736,7 @@ export function executeBucket(
     // OPTIM: if unariesIncludingSideEffects.some(isGrafastError) then shortcut execution because everything fails
 
     // for (let index = 0, l = polymorphicPathList.length; index < l; index++) {
-    for (let index = 0; index < size; index++) {
+    for (let index = 0; index < expectedSize; index++) {
       let indexError: GrafastError | null = null;
       const polymorphicPath = polymorphicPathList[index];
       if (
@@ -817,12 +818,18 @@ export function executeBucket(
       );
       if (isPromiseLike(resultWithoutErrors)) {
         return resultWithoutErrors.then((r) =>
-          mergeErrorsBackIn(r, errors, size),
+          mergeErrorsBackIn(r, errors, expectedSize),
         );
       } else {
-        return mergeErrorsBackIn(resultWithoutErrors, errors, size);
+        return mergeErrorsBackIn(resultWithoutErrors, errors, expectedSize);
       }
     } else {
+      if (isDev) {
+        assert.ok(
+          newSize === expectedSize,
+          "GrafastInternalError<47fca4ab-069c-428f-8374-267479c7fd27>: Expected newSize to equal expectedSize",
+        );
+      }
       return reallyExecuteStepWithNoErrors(newSize, step, dependencies, extra);
     }
   }
