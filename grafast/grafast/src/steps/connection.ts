@@ -294,6 +294,17 @@ export class ConnectionStep<
     });
   }
 
+  public get(fieldName: string) {
+    switch (fieldName) {
+      case "edges":
+        return this.edges();
+      case "nodes":
+        return this.nodes();
+      case "pageInfo":
+        return this.pageInfo();
+    }
+  }
+
   public edges(): ExecutableStep {
     if (this.cursorPlan || this.itemPlan || this.edgeDataPlan) {
       return each(this.cloneSubplanWithPagination(), ($intermediate) =>
@@ -424,6 +435,15 @@ export class EdgeStep<
       this.cursorDepId = null;
     }
     this.connectionDepId = this.addDependency($connection);
+  }
+
+  public get(fieldName: string) {
+    switch (fieldName) {
+      case "node":
+        return this.node();
+      case "cursor":
+        return this.cursor();
+    }
   }
 
   private getConnectionStep(): ConnectionStep<
