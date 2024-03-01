@@ -89,7 +89,7 @@ export class ConnectionStep<
   TItemStep extends ExecutableStep,
   TCursorStep extends ExecutableStep,
   TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
-  TEdgeStep extends ExecutableStep = TItemStep,
+  TEdgeDataStep extends ExecutableStep = TItemStep,
   TNodeStep extends ExecutableStep = ExecutableStep,
 > extends UnbatchedExecutableStep<unknown> {
   static $$export = {
@@ -108,7 +108,7 @@ export class ConnectionStep<
   private _afterDepId: number | null | undefined = undefined;
 
   /** The node plan */
-  public readonly edgePlan?: ($item: TItemStep) => TEdgeStep;
+  public readonly edgeDataPlan?: ($item: TItemStep) => TEdgeDataStep;
   public readonly itemPlan?: ($item: TItemStep) => TNodeStep;
   public readonly cursorPlan?: (
     $item: TItemStep,
@@ -117,11 +117,11 @@ export class ConnectionStep<
   // TYPES: if subplan is `ConnectionCapableStep<EdgeCapableStep<any>>` then `nodePlan`/`cursorPlan` aren't needed; otherwise `cursorPlan` is required.
   constructor(
     subplan: TStep,
-    config: ConnectionConfig<TItemStep, TEdgeStep, TNodeStep> = {},
+    config: ConnectionConfig<TItemStep, TEdgeDataStep, TNodeStep> = {},
   ) {
     super();
-    const { edgePlan, nodePlan, cursorPlan } = config;
-    this.edgePlan = edgePlan;
+    const { edgeDataPlan, nodePlan, cursorPlan } = config;
+    this.edgeDataPlan = edgeDataPlan;
     this.itemPlan = nodePlan;
     this.cursorPlan = cursorPlan;
     if (!cursorPlan) {
@@ -295,13 +295,9 @@ export class ConnectionStep<
   }
 
   public edges(): ExecutableStep {
-    if (this.cursorPlan || this.itemPlan || this.edgePlan) {
+    if (this.cursorPlan || this.itemPlan || this.edgeDataPlan) {
       return each(this.cloneSubplanWithPagination(), ($intermediate) =>
-        this.wrapEdge(
-          this.edgePlan
-            ? this.edgePlan($intermediate as any)
-            : ($intermediate as any),
-        ),
+        this.wrapEdge($intermediate as any),
       );
     } else {
       // Assuming the subplan is an EdgeCapableStep
@@ -321,7 +317,7 @@ export class ConnectionStep<
 
   public wrapEdge(
     $edge: TItemStep,
-  ): EdgeStep<TItemStep, TCursorStep, TStep, TNodeStep> {
+  ): EdgeStep<TItemStep, TCursorStep, TStep, TEdgeDataStep, TNodeStep> {
     return new EdgeStep(this, $edge);
   }
 
@@ -375,7 +371,7 @@ export class EdgeStep<
     TItemStep extends ExecutableStep,
     TCursorStep extends ExecutableStep,
     TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
-    TEdgeStep extends ExecutableStep = TItemStep,
+    TEdgeDataStep extends ExecutableStep = TItemStep,
     TNodeStep extends ExecutableStep = ExecutableStep,
   >
   extends UnbatchedExecutableStep
@@ -396,7 +392,7 @@ export class EdgeStep<
       TItemStep,
       TCursorStep,
       TStep,
-      TEdgeStep,
+      TEdgeDataStep,
       TNodeStep
     >,
     $item: TItemStep,
@@ -441,6 +437,11 @@ export class EdgeStep<
 
   private getItemStep(): TItemStep {
     return this.getDep(0) as any;
+  }
+
+  public data(): TEdgeDataStep {
+    const $item = this.getItemStep();
+    return this.getConnectionStep().edgeDataPlan?.($item) ?? ($item as any);
   }
 
   node(): TNodeStep {
@@ -488,11 +489,11 @@ let warned = false;
 
 interface ConnectionConfig<
   TItemStep extends ExecutableStep,
-  TEdgeStep extends ExecutableStep = TItemStep,
+  TEdgeDataStep extends ExecutableStep = TItemStep,
   TNodeStep extends ExecutableStep = ExecutableStep,
 > {
   nodePlan?: ($item: TItemStep) => TNodeStep;
-  edgePlan?: ($item: TItemStep) => TEdgeStep;
+  edgeDataPlan?: ($item: TItemStep) => TEdgeDataStep;
   cursorPlan?: ($item: TItemStep) => ExecutableStep<string | null>;
 }
 
@@ -504,12 +505,12 @@ export function connection<
   TItemStep extends ExecutableStep,
   TCursorStep extends ExecutableStep,
   TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
-  TEdgeStep extends ExecutableStep = TItemStep,
+  TEdgeDataStep extends ExecutableStep = TItemStep,
   TNodeStep extends ExecutableStep = ExecutableStep,
 >(
   step: TStep,
-  config?: ConnectionConfig<TItemStep, TEdgeStep, TNodeStep>,
-): ConnectionStep<TItemStep, TCursorStep, TStep, TEdgeStep, TNodeStep> {
+  config?: ConnectionConfig<TItemStep, TEdgeDataStep, TNodeStep>,
+): ConnectionStep<TItemStep, TCursorStep, TStep, TEdgeDataStep, TNodeStep> {
   if (typeof config === "function") {
     if (!warned) {
       warned = true;
