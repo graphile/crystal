@@ -173,9 +173,7 @@ export class ApplyTransformsStep extends ExecutableStep {
       : [store.get(rootStep!.id)!, null];
 
     return indexMap((originalIndex) => {
-      const list = values0.isBatch
-        ? values0.entries[originalIndex]
-        : values0.value;
+      const list = values0.at(originalIndex);
       if (list == null) {
         return list;
       }

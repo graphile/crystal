@@ -23,7 +23,7 @@ export class FirstStep<TData> extends UnbatchedExecutableStep<TData> {
   executeV2({
     indexMap,
     values: [values0],
-  }: ExecutionDetails<[TData[]]>): GrafastResultsList<TData> {
+  }: ExecutionDetails<[ReadonlyArray<TData>]>): GrafastResultsList<TData> {
     return indexMap((i) => values0.at(i)?.[0]);
   }
 
