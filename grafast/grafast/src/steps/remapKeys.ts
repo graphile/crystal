@@ -100,12 +100,12 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
   }
 
   executeV2({
-    indexMap,
+    count,
     values: [values0],
   }: ExecutionDetails): GrafastResultsList<any> {
     return values0.isBatch
       ? values0.entries.map(this.mapper)
-      : indexMap((i) => this.mapper(values0.value));
+      : new Array(count).fill(this.mapper(values0.value));
   }
 
   unbatchedExecute(_extra: UnbatchedExecutionExtra, value: any): any {
