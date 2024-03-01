@@ -106,17 +106,23 @@ export class ConnectionStep<
   private _beforeDepId: number | null | undefined = undefined;
   private _afterDepId: number | null | undefined = undefined;
 
-  // TYPES: if subplan is `ConnectionCapableStep<EdgeCapableStep<any>>` then `itemPlan`/`cursorPlan` aren't needed; otherwise `cursorPlan` is required.
+  /** The node plan */
+  public readonly itemPlan?: ($item: TItemStep) => TNodeStep;
+  public readonly cursorPlan?: (
+    $item: TItemStep,
+  ) => ExecutableStep<string | null> | undefined;
+
+  // TYPES: if subplan is `ConnectionCapableStep<EdgeCapableStep<any>>` then `nodePlan`/`cursorPlan` aren't needed; otherwise `cursorPlan` is required.
   constructor(
     subplan: TStep,
-    public readonly itemPlan?: ($item: TItemStep) => TNodeStep,
-    public readonly cursorPlan?: (
-      $item: TItemStep,
-    ) => ExecutableStep<string | null> | undefined,
+    config: ConnectionConfig<TItemStep, TCursorStep, TNodeStep> = {},
   ) {
     super();
+    const { nodePlan, cursorPlan } = config;
+    this.itemPlan = nodePlan;
+    this.cursorPlan = cursorPlan;
     if (!cursorPlan) {
-      // ENHANCE: Assert that the `itemPlan` has a `.cursor()` method.
+      // ENHANCE: Assert that the `nodePlan` has a `.cursor()` method.
     }
     // This is a _soft_ reference to the plan; we're not adding it as a
     // dependency since we do not actually need it to execute; it's our
@@ -464,6 +470,17 @@ export class EdgeStep<
   }
 }
 
+let warned = false;
+
+interface ConnectionConfig<
+  TItemStep extends ExecutableStep,
+  TCursorStep extends ExecutableStep,
+  TNodeStep extends ExecutableStep = ExecutableStep,
+> {
+  nodePlan?: ($item: TItemStep) => TNodeStep;
+  cursorPlan?: ($item: TItemStep) => ExecutableStep<string | null>;
+}
+
 /**
  * Wraps a collection fetch to provide the utilities for working with GraphQL
  * cursor connections.
@@ -475,8 +492,21 @@ export function connection<
   TNodeStep extends ExecutableStep = ExecutableStep,
 >(
   step: TStep,
-  itemPlan?: ($item: TItemStep) => TNodeStep,
-  cursorPlan?: ($item: TItemStep) => ExecutableStep<string | null>,
+  config?: ConnectionConfig<TItemStep, TCursorStep, TNodeStep>,
 ): ConnectionStep<TItemStep, TCursorStep, TStep, TNodeStep> {
-  return new ConnectionStep(step, itemPlan, cursorPlan);
+  if (typeof config === "function") {
+    if (!warned) {
+      warned = true;
+      console.warn(
+        `The call signature for connection() has changed, arguments after the first argument should be specified via a config object`,
+      );
+    }
+    return connection(step, {
+      // eslint-disable-next-line prefer-rest-params
+      nodePlan: arguments[1] as any,
+      // eslint-disable-next-line prefer-rest-params
+      cursorPlan: arguments[2] as any,
+    });
+  }
+  return new ConnectionStep(step, config);
 }
