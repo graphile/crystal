@@ -42,9 +42,7 @@ export class PgValidateParsedCursorStep extends ExecutableStep<undefined> {
     values: [parsedCursorDep],
   }: ExecutionDetails<[string | null]>): GrafastResultsList<undefined> {
     return indexMap((i) => {
-      const decoded = parsedCursorDep.isBatch
-        ? parsedCursorDep.entries[i]
-        : parsedCursorDep.value;
+      const decoded = parsedCursorDep.at(i);
       if (!decoded) {
         return undefined;
       } else {

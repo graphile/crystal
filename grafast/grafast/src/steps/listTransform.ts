@@ -253,9 +253,7 @@ export class __ListTransformStep<
     // We'll typically be creating more listItem bucket entries than we
     // have parent buckets, so we must "multiply up" the store entries.
     indexForEach((originalIndex) => {
-      const list = listStepValue.isBatch
-        ? listStepValue.entries[originalIndex]
-        : listStepValue.value;
+      const list = listStepValue.at(originalIndex);
       if (Array.isArray(list)) {
         const newIndexes: number[] = [];
         map.set(originalIndex, newIndexes);
@@ -301,10 +299,7 @@ export class __ListTransformStep<
       : [store.get(rootStep!.id)!, null];
 
     return indexMap((originalIndex) => {
-      const list = listStepValue.isBatch
-        ? listStepValue.entries[originalIndex]
-        : listStepValue.value;
-
+      const list = listStepValue.at(originalIndex);
       if (list == null) {
         return list;
       }

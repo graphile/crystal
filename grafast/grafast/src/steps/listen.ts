@@ -72,9 +72,7 @@ export class ListenStep<
     const pubsubValue = values[this.pubsubDep as 0];
     const topicValue = values[this.topicDep as 1];
     return indexMap((i) => {
-      const pubsub = pubsubValue.isBatch
-        ? pubsubValue.entries[i]
-        : pubsubValue.value;
+      const pubsub = pubsubValue.at(i);
       if (!pubsub) {
         throw new SafeError(
           "Subscription not supported",
@@ -87,9 +85,7 @@ export class ListenStep<
             : {},
         );
       }
-      const topic = topicValue.isBatch
-        ? topicValue.entries[i]
-        : topicValue.value;
+      const topic = topicValue.at(i);
       return pubsub.subscribe(topic);
     });
   }
