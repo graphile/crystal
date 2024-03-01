@@ -3351,6 +3351,7 @@ export class OperationPlan {
         id: step.id,
         stepClass: step.constructor.name,
         metaString: metaString ? stripAnsi(metaString) : metaString,
+        isUnary: step._isUnary,
         bucketId: step.layerPlan.id,
         dependencyIds: sudo(step).dependencies.map((d) => d.id),
         polymorphicPaths: step.polymorphicPaths

@@ -6,6 +6,7 @@ export interface GrafastPlanStepJSONv1 {
   id: string | number;
   stepClass: string;
   metaString: string | null;
+  isUnary: boolean;
   bucketId: string | number;
   dependencyIds: ReadonlyArray<string | number>;
   polymorphicPaths: readonly string[] | undefined;
