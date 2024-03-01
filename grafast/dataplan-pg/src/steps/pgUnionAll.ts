@@ -5,7 +5,7 @@ import type {
   ConnectionCapableStep,
   ConnectionStep,
   EdgeCapableStep,
-  ExecutionExtra,
+  ExecutionDetails,
   GrafastResultsList,
   GrafastValuesList,
   InputStep,
@@ -15,6 +15,7 @@ import type {
 import {
   __ItemStep,
   access,
+  arrayOfLength,
   constant,
   ExecutableStep,
   exportAs,
@@ -33,7 +34,7 @@ import { $$symbolToIdentifier, sql } from "pg-sql2";
 import type { PgCodecAttributes } from "../codecs.js";
 import { TYPES } from "../codecs.js";
 import type { PgResource, PgResourceUnique } from "../datasource.js";
-import type { PgExecutor } from "../executor.js";
+import type { PgExecutor, PgExecutorInput } from "../executor.js";
 import type { PgCodecRefPath, PgCodecRelation, PgGroupSpec } from "../index.js";
 import type {
   PgCodec,
@@ -323,18 +324,25 @@ export class PgUnionAllSingleStep
     return sqlExpr`${fragment}`;
   }
 
-  execute(
-    _count: number,
-    values: [GrafastValuesList<any>],
-  ): GrafastResultsList<any> {
+  executeV2({
+    count,
+    values: [values0],
+  }: ExecutionDetails): GrafastResultsList<any> {
     if (this.typeKey !== null) {
       const typeKey = this.typeKey;
-      return values[0].map((v) => {
-        const type = v[typeKey];
-        return polymorphicWrap(type, v);
-      });
+      return values0.isBatch
+        ? values0.entries.map((v) => {
+            const type = v[typeKey];
+            return polymorphicWrap(type, v);
+          })
+        : arrayOfLength(
+            count,
+            polymorphicWrap(values0.value[typeKey], values0.value),
+          );
     } else {
-      return values[0];
+      return values0.isBatch
+        ? values0.entries
+        : arrayOfLength(count, values0.value);
     }
   }
 }
@@ -1925,48 +1933,47 @@ ${lateralText};`;
   }
 
   // Be careful if we add streaming - ensure `shouldReverseOrder` is fine.
-  async execute(
-    _count: number,
-    values: Array<GrafastValuesList<any>>,
-    { eventEmitter }: ExecutionExtra,
-  ): Promise<GrafastValuesList<any>> {
+  async executeV2({
+    indexMap,
+    values,
+    extra: { eventEmitter },
+  }: ExecutionDetails): Promise<GrafastValuesList<any>> {
     const { text, rawSqlValues, identifierIndex, shouldReverseOrder, name } =
       this.finalizeResults!;
 
-    const contexts = values[this.contextId];
-    if (!contexts) {
+    const contextDep = values[this.contextId];
+    if (contextDep === undefined) {
       throw new Error("We have no context dependency?");
     }
 
-    const executionResult = await this.executor.executeWithCache(
-      contexts.map((context, i) => {
-        return {
-          // The context is how we'd handle different connections with different claims
-          context,
-          queryValues:
-            identifierIndex != null
-              ? this.queryValues.map(
-                  ({ dependencyIndex, codec, alreadyEncoded }) => {
-                    const val = values[dependencyIndex][i];
-                    return val == null
-                      ? null
-                      : alreadyEncoded
-                      ? val
-                      : codec.toPg(val);
-                  },
-                )
-              : EMPTY_ARRAY,
-        };
-      }),
-      {
-        text,
-        rawSqlValues,
-        identifierIndex,
-        name,
-        eventEmitter,
-        useTransaction: false,
-      },
-    );
+    const specs = indexMap<PgExecutorInput<any>>((i) => {
+      const context = contextDep.at(i);
+      return {
+        // The context is how we'd handle different connections with different claims
+        context,
+        queryValues:
+          identifierIndex != null
+            ? this.queryValues.map(
+                ({ dependencyIndex, codec, alreadyEncoded }) => {
+                  const val = values[dependencyIndex].at(i);
+                  return val == null
+                    ? null
+                    : alreadyEncoded
+                    ? val
+                    : codec.toPg(val);
+                },
+              )
+            : EMPTY_ARRAY,
+      };
+    });
+    const executionResult = await this.executor.executeWithCache(specs, {
+      text,
+      rawSqlValues,
+      identifierIndex,
+      name,
+      eventEmitter,
+      useTransaction: false,
+    });
     // debugExecute("%s; result: %c", this, executionResult);
 
     return executionResult.values.map((allVals) => {

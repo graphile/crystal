@@ -1,6 +1,6 @@
 import type {
+  ExecutionDetails,
   GrafastResultsList,
-  GrafastValuesList,
   PolymorphicData,
   PolymorphicStep,
   PromiseOrDirect,
@@ -56,22 +56,20 @@ export class PgSingleTablePolymorphicStep<
     return this.rowPlan();
   }
 
-  execute(
-    count: number,
-    values: Array<GrafastValuesList<any>>,
-  ): GrafastResultsList<PolymorphicData<
+  executeV2({
+    indexMap,
+    values,
+  }: ExecutionDetails): GrafastResultsList<PolymorphicData<
     string,
     ReadonlyArray<unknown[]>
   > | null> {
-    const result: Array<
+    const valuesDep = values[this.typeStepId];
+    return indexMap<
       PromiseOrDirect<PolymorphicData<string, ReadonlyArray<unknown[]>> | null>
-    > = [];
-    const list = values[this.typeStepId];
-    for (let i = 0; i < count; i++) {
-      const v = list[i];
-      result[i] = v ? polymorphicWrap(v) : null;
-    }
-    return result;
+    >((i) => {
+      const v = valuesDep.at(i);
+      return v ? polymorphicWrap(v) : null;
+    });
   }
 }
 

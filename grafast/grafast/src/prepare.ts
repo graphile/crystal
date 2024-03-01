@@ -293,31 +293,25 @@ function executePreemptive(
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
-  // PERF: batch this method so it can process multiple GraphQL requests in parallel
-
-  // TODO: when we batch, we need to change `rootBucketIndex` and `size`, and make sure that we only batch where `executionTimeout` is the same.
   const rootBucketIndex = 0;
   const size = 1;
 
-  const requestIndex = [0];
-  const vars = [variableValues];
-  const ctxs = [context];
-  const rvs = [rootValue];
   const polymorphicPathList = [POLYMORPHIC_ROOT_PATH];
   const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [new Set()];
 
   const store: Bucket["store"] = new Map();
-  store.set(-1, requestIndex);
-  store.set(operationPlan.rootLayerPlan.rootStep!.id, requestIndex);
-  store.set(operationPlan.variableValuesStep.id, vars);
-  store.set(operationPlan.contextStep.id, ctxs);
-  store.set(operationPlan.rootValueStep.id, rvs);
+  const unaryStore = new Map();
+  unaryStore.set(operationPlan.rootLayerPlan.rootStep!.id, 0);
+  unaryStore.set(operationPlan.variableValuesStep.id, variableValues);
+  unaryStore.set(operationPlan.contextStep.id, context);
+  unaryStore.set(operationPlan.rootValueStep.id, rootValue);
 
   const rootBucket = newBucket(
     {
       layerPlan: operationPlan.rootLayerPlan,
       size,
       store,
+      unaryStore,
       hasErrors: false,
       polymorphicPathList,
       iterators,
@@ -346,16 +340,25 @@ function executePreemptive(
     index: number,
   ): PromiseOrDirect<ExecutionResult | AsyncGenerator<AsyncExecutionResult>> {
     const layerPlan = subscriptionLayerPlan!;
+    const { rootStep } = layerPlan;
     // PERF: we could consider batching this.
     const store: Bucket["store"] = new Map();
+    const unaryStore = new Map();
     const subscriptionBucketIndex = 0;
 
-    for (const depId of layerPlan.copyStepIds) {
+    for (const depId of layerPlan.copyUnaryStepIds) {
+      unaryStore.set(depId, rootBucket.unaryStore.get(depId));
+    }
+    for (const depId of layerPlan.copyBatchStepIds) {
       store.set(depId, []);
     }
 
-    store.set(layerPlan.rootStep!.id, [payload]);
-    for (const depId of layerPlan.copyStepIds) {
+    if (rootStep!._isUnary) {
+      unaryStore.set(rootStep!.id, payload);
+    } else {
+      store.set(rootStep!.id, [payload]);
+    }
+    for (const depId of layerPlan.copyBatchStepIds) {
       store.get(depId)![subscriptionBucketIndex] =
         rootBucket.store.get(depId)![rootBucketIndex];
     }
@@ -364,6 +367,7 @@ function executePreemptive(
       {
         layerPlan,
         store,
+        unaryStore,
         hasErrors: rootBucket.hasErrors,
         polymorphicPathList: [POLYMORPHIC_ROOT_PATH],
         iterators: [new Set()],
@@ -379,9 +383,11 @@ function executePreemptive(
         subscriptionBucketIndex,
         requestContext,
         [],
-        rootBucket.store.get(operationPlan.variableValuesStep.id)![
-          rootBucketIndex
-        ],
+        operationPlan.variableValuesStep._isUnary
+          ? rootBucket.unaryStore.get(operationPlan.variableValuesStep.id)
+          : rootBucket.store.get(operationPlan.variableValuesStep.id)![
+              rootBucketIndex
+            ],
         outputDataAsString,
       );
       return finalize(
@@ -402,11 +408,14 @@ function executePreemptive(
     // Later we'll need to loop
 
     // If it's a subscription we need to use the stream
-    const rootValueList =
+    const bucketRootValue =
       rootBucket.layerPlan.rootStep!.id != null
-        ? rootBucket.store.get(rootBucket.layerPlan.rootStep!.id)
+        ? rootBucket.layerPlan.rootStep!._isUnary
+          ? rootBucket.unaryStore.get(rootBucket.layerPlan.rootStep!.id)
+          : rootBucket.store.get(rootBucket.layerPlan.rootStep!.id)![
+              rootBucketIndex
+            ]
         : null;
-    const bucketRootValue = rootValueList?.[rootBucketIndex];
     if (isGrafastError(bucketRootValue)) {
       releaseUnusedIterators(rootBucket, rootBucketIndex, null);
       // Something major went wrong!
@@ -504,9 +513,7 @@ function executePreemptive(
       rootBucketIndex,
       requestContext,
       [],
-      rootBucket.store.get(operationPlan.variableValuesStep.id)![
-        rootBucketIndex
-      ],
+      rootBucket.unaryStore.get(operationPlan.variableValuesStep.id),
       outputDataAsString,
     );
     return finalize(
@@ -732,6 +739,7 @@ async function processStream(
   const _processQueue = (entries: ResultTuple[]) => {
     const size = entries.length;
     const store: Bucket["store"] = new Map();
+    const unaryStore = new Map();
     const polymorphicPathList: (string | null)[] = [];
     const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [];
 
@@ -748,29 +756,41 @@ async function processStream(
 
     const listItemStepId = directLayerPlanChild.rootStep!.id;
     const listItemStepIdList: any[] = [];
-    store.set(listItemStepId, listItemStepIdList);
+    if (directLayerPlanChild.rootStep?._isUnary) {
+      // handled later
+    } else {
+      store.set(listItemStepId, listItemStepIdList);
+    }
 
-    for (const copyPlanId of directLayerPlanChild.copyStepIds) {
-      store.set(copyPlanId, []);
+    for (const copyStepId of directLayerPlanChild.copyUnaryStepIds) {
+      unaryStore.set(copyStepId, spec.bucket.unaryStore.get(copyStepId));
+    }
+    for (const copyStepId of directLayerPlanChild.copyBatchStepIds) {
+      store.set(copyStepId, []);
     }
 
     let bucketIndex = 0;
     for (const entry of entries) {
       const [result] = entry;
-      listItemStepIdList[bucketIndex] = result;
+      if (directLayerPlanChild.rootStep?._isUnary) {
+        assert.ok(bucketIndex === 0, "Unary step should only have one index");
+        unaryStore.set(listItemStepId, result);
+      } else {
+        listItemStepIdList[bucketIndex] = result;
+      }
 
       polymorphicPathList[bucketIndex] =
         spec.bucket.polymorphicPathList[spec.bucketIndex];
       iterators[bucketIndex] = new Set();
-      for (const copyPlanId of directLayerPlanChild.copyStepIds) {
-        const list = spec.bucket.store.get(copyPlanId);
+      for (const copyStepId of directLayerPlanChild.copyBatchStepIds) {
+        const list = spec.bucket.store.get(copyStepId);
         if (!list) {
           throw new Error(
-            `GrafastInternalError<2db7b749-399f-486b-bd12-7ca337b937e4>: ${spec.bucket.layerPlan} doesn't seem to include ${copyPlanId} (required by ${directLayerPlanChild} via ${spec.outputPlan})`,
+            `GrafastInternalError<2db7b749-399f-486b-bd12-7ca337b937e4>: ${spec.bucket.layerPlan} doesn't seem to include ${copyStepId} (required by ${directLayerPlanChild} via ${spec.outputPlan})`,
           );
         }
         // PERF: optimize away these .get calls
-        store.get(copyPlanId)![bucketIndex] = list[spec.bucketIndex];
+        store.get(copyStepId)![bucketIndex] = list[spec.bucketIndex];
       }
       // PERF: we should be able to optimize this
       bucketIndex++;
@@ -789,6 +809,7 @@ async function processStream(
         layerPlan: directLayerPlanChild,
         size,
         store,
+        unaryStore,
         hasErrors: false,
         polymorphicPathList,
         iterators,
@@ -917,11 +938,29 @@ function processSingleDeferred(
 ) {
   const size = specs.length;
   const store: Bucket["store"] = new Map();
+
+  const unaryStore = new Map();
+
   const polymorphicPathList: (string | null)[] = [];
   const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [];
 
-  for (const copyPlanId of outputPlan.layerPlan.copyStepIds) {
-    store.set(copyPlanId, []);
+  // HACK: when we re-write stream/defer this needs fixing.
+  const firstBucket = specs[0][1].bucket;
+  if (isDev) {
+    for (const spec of specs) {
+      if (spec[1].bucket !== firstBucket) {
+        throw new Error(
+          `GrafastInternalError<c277422e-adb7-4b07-861e-acab931fc01a>: sorry, it seems the unary dependencies feature broke our incremental delivery support. This incremental delivery is going to be fully rewritten at some point anyway, so we recommend you avoid using it for now (the spec itself has changed since we implemented it).`,
+        );
+      }
+    }
+  }
+
+  for (const copyStepId of outputPlan.layerPlan.copyUnaryStepIds) {
+    unaryStore.set(copyStepId, firstBucket.unaryStore.get(copyStepId));
+  }
+  for (const copyStepId of outputPlan.layerPlan.copyBatchStepIds) {
+    store.set(copyStepId, []);
   }
 
   let bucketIndex = 0;
@@ -929,9 +968,9 @@ function processSingleDeferred(
     polymorphicPathList[bucketIndex] =
       spec.bucket.polymorphicPathList[spec.bucketIndex];
     iterators[bucketIndex] = new Set();
-    for (const copyPlanId of outputPlan.layerPlan.copyStepIds) {
-      store.get(copyPlanId)![bucketIndex] =
-        spec.bucket.store.get(copyPlanId)![spec.bucketIndex];
+    for (const copyStepId of outputPlan.layerPlan.copyBatchStepIds) {
+      store.get(copyStepId)![bucketIndex] =
+        spec.bucket.store.get(copyStepId)![spec.bucketIndex];
     }
     // PERF: we should be able to optimize this
     bucketIndex++;
@@ -950,6 +989,7 @@ function processSingleDeferred(
       layerPlan: outputPlan.layerPlan,
       size,
       store,
+      unaryStore,
       hasErrors: false,
       polymorphicPathList,
       iterators,

@@ -13,14 +13,18 @@ import {
 import { inspect } from "../inspect.js";
 import type {
   ExecutionExtra,
+  ExecutionValue,
   GrafastResultsList,
   GrafastResultStreamList,
+  IndexForEach,
+  IndexMap,
   PromiseOrDirect,
   StreamMaybeMoreableArray,
+  UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { $$streamMore, $$timeout } from "../interfaces.js";
 import type { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
-import { isStreamableStep } from "../step.js";
+import { isStreamableStep, isStreamV2ableStep } from "../step.js";
 import { __ItemStep } from "../steps/__item.js";
 import { __ValueStep } from "../steps/__value.js";
 import { timeSource } from "../timeSource.js";
@@ -71,14 +75,15 @@ function mergeErrorsBackIn(
   resultCount: number,
 ): any[] {
   const finalResults: any[] = [];
+  /** The index within `results`, which is shorter than `resultCount` */
   let resultIndex = 0;
 
-  for (let i = 0; i < resultCount; i++) {
-    const error = errors[i];
+  for (let finalIndex = 0; finalIndex < resultCount; finalIndex++) {
+    const error = errors[finalIndex];
     if (error !== undefined) {
-      finalResults[i] = error;
+      finalResults[finalIndex] = error;
     } else {
-      finalResults[i] = results[resultIndex++];
+      finalResults[finalIndex] = results[resultIndex++];
     }
   }
   return finalResults;
@@ -100,6 +105,7 @@ export function executeBucket(
     metaByMetaKey,
     size,
     store,
+    unaryStore,
     layerPlan: { phases, children: childLayerPlans },
   } = bucket;
 
@@ -230,7 +236,8 @@ export function executeBucket(
         const result = results[allStepsIndex];
         const finishedStep = _allSteps[allStepsIndex];
         const resultLength = result?.length;
-        if (resultLength !== size) {
+        const expectedSize = finishedStep._isUnary ? 1 : size;
+        if (resultLength !== expectedSize) {
           if (!Array.isArray(result)) {
             throw new Error(
               `Result from ${finishedStep} should be an array, instead received ${inspect(
@@ -240,10 +247,16 @@ export function executeBucket(
             );
           }
           throw new Error(
-            `Result array from ${finishedStep} should have length ${size}, instead it had length ${result.length}`,
+            `Result array from ${finishedStep} should have length ${expectedSize}${
+              finishedStep._isUnary ? " (because it's unary)" : ""
+            }, instead it had length ${result.length}`,
           );
         }
-        bucket.store.set(finishedStep.id, arrayOfLength(size));
+        if (finishedStep._isUnary) {
+          // Handled later
+        } else {
+          bucket.store.set(finishedStep.id, arrayOfLength(size));
+        }
       }
 
       // Need to complete promises, check for errors, etc.
@@ -262,9 +275,11 @@ export function executeBucket(
           }>
         | undefined;
 
+      // TODO: it seems that if this throws an error it results in a permanent
+      // hang of defers? In the mean time... Don't throw any errors here!
       const success = (
         finishedStep: ExecutableStep,
-        finalResult: any[],
+        bucket: Bucket,
         resultIndex: number,
         value: unknown,
       ) => {
@@ -274,7 +289,12 @@ export function executeBucket(
           typeof value !== "object" ||
           value === null
         ) {
-          finalResult[resultIndex] = value;
+          if (finishedStep._isUnary) {
+            bucket.unaryStore.set(finishedStep.id, value);
+          } else {
+            const finalResult = bucket.store.get(finishedStep.id)!;
+            finalResult[resultIndex] = value;
+          }
           return;
         }
         let valueIsAsyncIterable;
@@ -306,7 +326,12 @@ export function executeBucket(
             // Optimization - defer everything
             const arr: StreamMaybeMoreableArray<any> = [];
             arr[$$streamMore] = iterator;
-            finalResult[resultIndex] = arr;
+            if (finishedStep._isUnary) {
+              bucket.unaryStore.set(finishedStep.id, arr);
+            } else {
+              const finalResult = bucket.store.get(finishedStep.id)!;
+              finalResult[resultIndex] = arr;
+            }
           } else {
             // Evaluate the first initialCount entries, rest is streamed.
             const promise = (async () => {
@@ -325,11 +350,11 @@ export function executeBucket(
                   | Promise<IteratorResult<any, any>>
                   | IteratorResult<any, any>;
                 while ((resultPromise = iterator.next())) {
-                  const finalResult = await resultPromise;
-                  if (finalResult.done) {
+                  const resolvedResult = await resultPromise;
+                  if (resolvedResult.done) {
                     break;
                   }
-                  arr.push(await finalResult.value);
+                  arr.push(await resolvedResult.value);
                   if (++valuesSeen >= initialCount) {
                     // This is safe to do in the `while` since we checked
                     // the `0` entries condition in the optimization
@@ -339,10 +364,21 @@ export function executeBucket(
                   }
                 }
 
-                finalResult[resultIndex] = arr;
+                if (finishedStep._isUnary) {
+                  bucket.unaryStore.set(finishedStep.id, arr);
+                } else {
+                  const finalResult = bucket.store.get(finishedStep.id)!;
+                  finalResult[resultIndex] = arr;
+                }
               } catch (e) {
                 bucket.hasErrors = true;
-                finalResult[resultIndex] = newGrafastError(e, finishedStep.id);
+                const error = newGrafastError(e, finishedStep.id);
+                if (finishedStep._isUnary) {
+                  bucket.unaryStore.set(finishedStep.id, error);
+                } else {
+                  const finalResult = bucket.store.get(finishedStep.id)!;
+                  finalResult[resultIndex] = error;
+                }
               }
             })();
             if (!promises) {
@@ -355,25 +391,40 @@ export function executeBucket(
           (proto = Object.getPrototypeOf(value)) === null ||
           proto === Object.prototype
         ) {
-          finalResult[resultIndex] = value;
+          if (finishedStep._isUnary) {
+            bucket.unaryStore.set(finishedStep.id, value);
+          } else {
+            const finalResult = bucket.store.get(finishedStep.id)!;
+            finalResult[resultIndex] = value;
+          }
         } else if (value instanceof Error) {
           const e =
             $$error in value ? value : newGrafastError(value, finishedStep.id);
-          finalResult[resultIndex] = e;
+          if (finishedStep._isUnary) {
+            bucket.unaryStore.set(finishedStep.id, e);
+          } else {
+            const finalResult = bucket.store.get(finishedStep.id)!;
+            finalResult[resultIndex] = e;
+          }
           bucket.hasErrors = true;
         } else {
-          finalResult[resultIndex] = value;
+          if (finishedStep._isUnary) {
+            bucket.unaryStore.set(finishedStep.id, value);
+          } else {
+            const finalResult = bucket.store.get(finishedStep.id)!;
+            finalResult[resultIndex] = value;
+          }
         }
       };
 
       for (const allStepsIndex of indexesToProcess) {
         const step = _allSteps[allStepsIndex];
         const result = results[allStepsIndex]!;
-        const storeEntry = bucket.store.get(step.id)!;
-        for (let dataIndex = 0; dataIndex < size; dataIndex++) {
+        const count = step._isUnary ? 1 : size;
+        for (let dataIndex = 0; dataIndex < count; dataIndex++) {
           const val = result[dataIndex];
           if (step.isSyncAndSafe || !isPromiseLike(val)) {
-            success(step, storeEntry, dataIndex, val);
+            success(step, bucket, dataIndex, val);
           } else {
             if (!pendingPromises) {
               pendingPromises = [val];
@@ -398,20 +449,20 @@ export function executeBucket(
               const { s: allStepsIndex, i: dataIndex } =
                 pendingPromiseIndexes![i];
               const finishedStep = _allSteps[allStepsIndex];
-              const storeEntry = bucket.store.get(finishedStep.id)!;
               if (settledResult.status === "fulfilled") {
-                success(
-                  finishedStep,
-                  storeEntry,
-                  dataIndex,
-                  settledResult.value,
-                );
+                success(finishedStep, bucket, dataIndex, settledResult.value);
               } else {
                 bucket.hasErrors = true;
-                storeEntry[dataIndex] = newGrafastError(
+                const error = newGrafastError(
                   settledResult.reason,
                   finishedStep.id,
                 );
+                if (finishedStep._isUnary) {
+                  bucket.unaryStore.set(finishedStep.id, error);
+                } else {
+                  const storeEntry = bucket.store.get(finishedStep.id)!;
+                  storeEntry[dataIndex] = error;
+                }
               }
             }
             if (bucket.hasErrors && sideEffectSteps) {
@@ -434,13 +485,18 @@ export function executeBucket(
               const { s: allStepsIndex, i: dataIndex } =
                 pendingPromiseIndexes![i];
               const finishedStep = _allSteps[allStepsIndex];
-              const storeEntry = bucket.store.get(finishedStep.id)!;
-              storeEntry[dataIndex] = newGrafastError(
+              const error = newGrafastError(
                 new Error(
                   `GrafastInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
                 ),
                 finishedStep.id,
               );
+              if (finishedStep._isUnary) {
+                bucket.unaryStore.set(finishedStep.id, error);
+              } else {
+                const storeEntry = bucket.store.get(finishedStep.id)!;
+                storeEntry[dataIndex] = error;
+              }
             }
           });
       } else {
@@ -464,7 +520,7 @@ export function executeBucket(
         return next();
       }
       const allStepsLength = _allSteps.length;
-      const extras: ExecutionExtra[] = [];
+      const extras: UnbatchedExecutionExtra[] = [];
       for (
         let allStepsIndex = executedLength;
         allStepsIndex < allStepsLength;
@@ -480,7 +536,11 @@ export function executeBucket(
           _bucket: bucket,
           _requestContext: requestContext,
         };
-        bucket.store.set(step.id, arrayOfLength(size));
+        if (step._isUnary) {
+          // Handled later
+        } else {
+          bucket.store.set(step.id, arrayOfLength(size));
+        }
       }
       outerLoop: for (let dataIndex = 0; dataIndex < size; dataIndex++) {
         if (sideEffectStepsWithErrors) {
@@ -488,7 +548,9 @@ export function executeBucket(
           for (const dep of sideEffectStepsWithErrors[
             currentPolymorphicPath ?? NO_POLY_PATH
           ]) {
-            const depVal = bucket.store.get(dep.id)![dataIndex];
+            const depVal = dep._isUnary
+              ? bucket.unaryStore.get(dep.id)
+              : bucket.store.get(dep.id)![dataIndex];
             if (
               depVal === POLY_SKIPPED ||
               (isDev && depVal?.$$error === POLY_SKIPPED)
@@ -503,8 +565,12 @@ export function executeBucket(
                 const step = _allSteps[
                   allStepsIndex
                 ] as UnbatchedExecutableStep;
-                const storeEntry = bucket.store.get(step.id)!;
-                storeEntry[dataIndex] = depVal;
+                if (step._isUnary) {
+                  bucket.unaryStore.set(step.id, depVal);
+                } else {
+                  const storeEntry = bucket.store.get(step.id)!;
+                  storeEntry[dataIndex] = depVal;
+                }
               }
               continue outerLoop;
             }
@@ -519,24 +585,40 @@ export function executeBucket(
           const step = sudo(
             _allSteps[allStepsIndex] as UnbatchedExecutableStep,
           );
-          const storeEntry = bucket.store.get(step.id)!;
           try {
             const deps: any = [];
+            const extra = extras[allStepsIndex];
             for (const $dep of step.dependencies) {
-              const depVal = bucket.store.get($dep.id)![dataIndex];
+              const depVal = $dep._isUnary
+                ? bucket.unaryStore.get($dep.id)
+                : bucket.store.get($dep.id)![dataIndex];
               if (bucket.hasErrors && isGrafastError(depVal)) {
-                storeEntry[dataIndex] = depVal;
+                if (step._isUnary) {
+                  bucket.unaryStore.set(step.id, depVal);
+                } else {
+                  const storeEntry = bucket.store.get(step.id)!;
+                  storeEntry[dataIndex] = depVal;
+                }
                 continue stepLoop;
               }
               deps.push(depVal);
             }
-            storeEntry[dataIndex] = step.unbatchedExecute(
-              extras[allStepsIndex],
-              ...deps,
-            );
+            const stepResult = step.unbatchedExecute(extra, ...deps);
+            if (step._isUnary) {
+              bucket.unaryStore.set(step.id, stepResult);
+            } else {
+              const storeEntry = bucket.store.get(step.id)!;
+              storeEntry[dataIndex] = stepResult;
+            }
           } catch (e) {
             bucket.hasErrors = true;
-            storeEntry[dataIndex] = newGrafastError(e, step.id);
+            const error = newGrafastError(e, step.id);
+            if (step._isUnary) {
+              bucket.unaryStore.set(step.id, error);
+            } else {
+              const storeEntry = bucket.store.get(step.id)!;
+              storeEntry[dataIndex] = error;
+            }
           }
         }
       }
@@ -587,14 +669,40 @@ export function executeBucket(
   // Function definitions below here
 
   function executeOrStream(
+    count: number,
     step: ExecutableStep,
-    dependencies: ReadonlyArray<any>[],
+    values: Array<ExecutionValue>,
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
-    if (step._stepOptions.stream && isStreamableStep(step)) {
-      return step.stream(size, dependencies, extra, step._stepOptions.stream);
+    if (isDev && step._isUnary && count !== 1) {
+      throw new Error(
+        `GrafastInternalError<84a6cdfa-e8fe-4dea-85fe-9426a6a78027>: ${step} is a unary step, but we're attempting to pass it ${count} (!= 1) values`,
+      );
+    }
+    const streamOptions = step._stepOptions.stream;
+    if (streamOptions && isStreamV2ableStep(step)) {
+      return step.streamV2({
+        indexMap: makeIndexMap(count),
+        indexForEach: makeIndexForEach(count),
+        count,
+        values,
+        extra,
+        streamOptions,
+      });
+    } else if (streamOptions && isStreamableStep(step)) {
+      // Backwards compatibility
+      const backfilledValues = values.map((v) =>
+        v.isBatch ? v.entries : arrayOfLength(count, v.value),
+      );
+      return step.stream(count, backfilledValues, extra, streamOptions);
     } else {
-      return step.execute(size, dependencies, extra);
+      return step.executeV2({
+        indexMap: makeIndexMap(count),
+        indexForEach: makeIndexForEach(count),
+        count,
+        values,
+        extra,
+      });
     }
   }
 
@@ -606,27 +714,34 @@ export function executeBucket(
    */
   function reallyExecuteStepWithErrorsOrSelective(
     step: ExecutableStep,
-    dependenciesIncludingSideEffects: ReadonlyArray<any>[],
+    dependenciesIncludingSideEffects: Array<ExecutionValue>,
     polymorphicPathList: readonly (string | null)[],
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
     const errors: { [index: number]: GrafastError | undefined } =
-      Object.create(null);
+      arrayOfLength(size);
 
     /** If there's errors, we must manipulate the arrays being passed into the step execution */
     let foundErrors = false;
 
     /** If all we see is errors, there's no need to execute! */
-    let needsNoExecution = true;
+    let newSize = 0;
     const stepPolymorphicPaths = step.polymorphicPaths;
+    const legitDepsCount = sudo(step).dependencies.length;
+    let dependencies = sideEffectStepsWithErrors
+      ? dependenciesIncludingSideEffects.slice(0, legitDepsCount)
+      : dependenciesIncludingSideEffects;
 
-    for (let index = 0, l = polymorphicPathList.length; index < l; index++) {
+    // OPTIM: if unariesIncludingSideEffects.some(isGrafastError) then shortcut execution because everything fails
+
+    // for (let index = 0, l = polymorphicPathList.length; index < l; index++) {
+    for (let index = 0; index < size; index++) {
+      let indexError: GrafastError | null = null;
       const polymorphicPath = polymorphicPathList[index];
       if (
         stepPolymorphicPaths !== null &&
         !stepPolymorphicPaths.has(polymorphicPath as string)
       ) {
-        foundErrors = true;
         const e =
           isDev && DEBUG_POLYMORPHISM
             ? Object.assign(
@@ -644,61 +759,71 @@ export function executeBucket(
               )
             : POLY_SKIPPED;
 
-        errors[index] = e;
+        indexError = e;
       } else if (extra._bucket.hasErrors) {
-        let noError = true;
-        for (const depList of dependenciesIncludingSideEffects) {
-          const v = depList[index];
+        for (
+          let i = 0, l = dependenciesIncludingSideEffects.length;
+          i < l;
+          i++
+        ) {
+          const v = dependenciesIncludingSideEffects[i].at(index);
           if (isGrafastError(v)) {
-            if (!errors[index]) {
-              noError = false;
-              foundErrors = true;
-              errors[index] = v;
-              break;
+            indexError = v;
+            break;
+          }
+        }
+      } else {
+        // All good
+      }
+      if (indexError) {
+        if (!foundErrors) {
+          foundErrors = true;
+          // Clone up until this point, make mutable, don't add self
+          dependencies = dependencies.map((depList) =>
+            depList.isBatch
+              ? batchExecutionValue(depList.entries.slice(0, index))
+              : depList,
+          );
+        }
+        errors[index] = indexError;
+      } else {
+        newSize++;
+        if (foundErrors) {
+          // dependenciesWithoutErrors has limited content; add this non-error value
+          for (
+            let depListIndex = 0;
+            depListIndex < legitDepsCount;
+            depListIndex++
+          ) {
+            const depList = dependencies[depListIndex];
+            if (depList.isBatch) {
+              const depVal = dependenciesIncludingSideEffects[depListIndex];
+              (depList.entries as any[]).push(depVal.at(index));
             }
           }
         }
-        if (noError) {
-          needsNoExecution = false;
-        }
-      } else {
-        needsNoExecution = false;
       }
     }
 
-    // Trim the side-effect dependencies back out again
-    const dependencies = sideEffectStepsWithErrors
-      ? dependenciesIncludingSideEffects.slice(
-          0,
-          sudo(step).dependencies.length,
-        )
-      : dependenciesIncludingSideEffects;
-
-    if (needsNoExecution) {
+    if (newSize === 0) {
       // Everything is errors; we can skip execution
       return Object.values(errors);
     } else if (foundErrors) {
-      const dependenciesWithoutErrors = dependencies.map((depList) =>
-        depList.filter((_, index) => !errors[index]),
-      );
       const resultWithoutErrors = executeOrStream(
+        newSize,
         step,
-        dependenciesWithoutErrors,
+        dependencies,
         extra,
       );
       if (isPromiseLike(resultWithoutErrors)) {
         return resultWithoutErrors.then((r) =>
-          mergeErrorsBackIn(r, errors, dependencies[0].length),
+          mergeErrorsBackIn(r, errors, size),
         );
       } else {
-        return mergeErrorsBackIn(
-          resultWithoutErrors,
-          errors,
-          dependencies[0].length,
-        );
+        return mergeErrorsBackIn(resultWithoutErrors, errors, size);
       }
     } else {
-      return reallyExecuteStepWithNoErrors(step, dependencies, extra);
+      return reallyExecuteStepWithNoErrors(newSize, step, dependencies, extra);
     }
   }
 
@@ -718,21 +843,30 @@ export function executeBucket(
         _bucket: bucket,
         _requestContext: requestContext,
       };
-      const dependencies: ReadonlyArray<any>[] = [];
+      const dependencies: Array<ExecutionValue> = [];
       const sstep = sudo(step);
       const depCount = sstep.dependencies.length;
       if (depCount > 0 || sideEffectStepsWithErrors !== null) {
         for (let i = 0, l = depCount; i < l; i++) {
           const $dep = sstep.dependencies[i];
-          dependencies[i] = store.get($dep.id)!;
+          if ($dep._isUnary) {
+            dependencies[i] = unaryExecutionValue(unaryStore.get($dep.id));
+          } else {
+            dependencies[i] = batchExecutionValue(store.get($dep.id)!);
+          }
         }
         if (sideEffectStepsWithErrors !== null) {
           if (sstep.polymorphicPaths) {
             for (const path of sstep.polymorphicPaths) {
               for (const sideEffectStep of sideEffectStepsWithErrors[path]) {
-                const sideEffectStoreEntry = store.get(sideEffectStep.id)!;
-                if (!dependencies.includes(sideEffectStoreEntry)) {
-                  dependencies.push(sideEffectStoreEntry);
+                if (sideEffectStep._isUnary) {
+                  const sideEffectStoreEntry = unaryStore.get(
+                    sideEffectStep.id,
+                  )!;
+                  dependencies.push(unaryExecutionValue(sideEffectStoreEntry));
+                } else {
+                  const sideEffectStoreEntry = store.get(sideEffectStep.id)!;
+                  dependencies.push(batchExecutionValue(sideEffectStoreEntry));
                 }
               }
             }
@@ -740,9 +874,12 @@ export function executeBucket(
             for (const sideEffectStep of sideEffectStepsWithErrors[
               NO_POLY_PATH
             ]) {
-              const sideEffectStoreEntry = store.get(sideEffectStep.id)!;
-              if (!dependencies.includes(sideEffectStoreEntry)) {
-                dependencies.push(sideEffectStoreEntry);
+              if (sideEffectStep._isUnary) {
+                const sideEffectStoreEntry = unaryStore.get(sideEffectStep.id)!;
+                dependencies.push(unaryExecutionValue(sideEffectStoreEntry));
+              } else {
+                const sideEffectStoreEntry = store.get(sideEffectStep.id)!;
+                dependencies.push(batchExecutionValue(sideEffectStoreEntry));
               }
             }
           }
@@ -769,7 +906,12 @@ export function executeBucket(
               bucket.polymorphicPathList,
               extra,
             )
-          : reallyExecuteStepWithNoErrors(step, dependencies, extra);
+          : reallyExecuteStepWithNoErrors(
+              step._isUnary ? 1 : size,
+              step,
+              dependencies,
+              extra,
+            );
       if (isPromiseLike(result)) {
         return result.then(null, (error) => {
           // bucket.hasErrors = true;
@@ -868,6 +1010,7 @@ export function newBucket(
     Bucket,
     | "layerPlan"
     | "store"
+    | "unaryStore"
     | "size"
     | "hasErrors"
     | "polymorphicPathList"
@@ -925,13 +1068,70 @@ export function newBucket(
     // Copy from spec
     layerPlan: spec.layerPlan,
     store: spec.store,
+    unaryStore: spec.unaryStore,
     size: spec.size,
     hasErrors: spec.hasErrors,
     polymorphicPathList: spec.polymorphicPathList,
     iterators: spec.iterators,
     metaByMetaKey,
-
     isComplete: false,
     children: Object.create(null),
   };
+}
+
+// TODO: memoize?
+function batchExecutionValue<TData>(entries: TData[]): ExecutionValue<TData> {
+  return {
+    at(i) {
+      return entries[i];
+    },
+    isBatch: true,
+    entries,
+  };
+}
+
+// TODO: memoize?
+function unaryExecutionValue<TData>(value: TData): ExecutionValue<TData> {
+  return {
+    at() {
+      return value;
+    },
+    isBatch: false,
+    value,
+  };
+}
+
+const indexMapCache = new Map<number, IndexMap>();
+function makeIndexMap(count: number) {
+  const existing = indexMapCache.get(count);
+  if (existing !== undefined) {
+    return existing;
+  }
+  const result: IndexMap = (callback) => {
+    const results = [];
+    for (let i = 0; i < count; i++) {
+      results.push(callback(i));
+    }
+    return results;
+  };
+  if (count <= 100) {
+    indexMapCache.set(count, result);
+  }
+  return result;
+}
+const indexForEachCache = new Map<number, IndexForEach>();
+function makeIndexForEach(count: number) {
+  const existing = indexForEachCache.get(count);
+  if (existing !== undefined) {
+    return existing;
+  }
+  const result: IndexForEach = (callback) => {
+    for (let i = 0; i < count; i++) {
+      callback(i);
+    }
+  };
+  if (count <= 100) {
+    indexForEachCache.set(count, result);
+  }
+  return result;
 }

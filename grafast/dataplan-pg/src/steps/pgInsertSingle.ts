@@ -1,6 +1,6 @@
 import type {
+  ExecutionDetails,
   GrafastResultsList,
-  GrafastValuesList,
   PromiseOrDirect,
   SetterCapableStep,
   SetterStep,
@@ -281,10 +281,10 @@ export class PgInsertSingleStep<
    * NOTE: we don't know what the values being fed in are, we must feed them to
    * the plans stored in this.identifiers to get actual values we can use.
    */
-  async execute(
-    count: number,
-    values: Array<GrafastValuesList<any>>,
-  ): Promise<GrafastResultsList<any>> {
+  async executeV2({
+    indexMap,
+    values,
+  }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
@@ -294,9 +294,8 @@ export class PgInsertSingleStep<
     // We must execute each mutation on its own, but we can at least do so in
     // parallel. Note we return a list of promises, each may reject or resolve
     // without causing the others to reject.
-    const result: Array<PromiseOrDirect<any>> = [];
-    for (let i = 0; i < count; i++) {
-      const value = values.map((v) => v[i]);
+    return indexMap<PromiseOrDirect<any>>(async (i) => {
+      const value = values.map((v) => v.at(i));
       const sqlValues = queryValueDetailsBySymbol.size
         ? rawSqlValues.map((v) => {
             if (typeof v === "symbol") {
@@ -311,14 +310,13 @@ export class PgInsertSingleStep<
             }
           })
         : rawSqlValues;
-      const promise = this.resource.executeMutation({
+      const { rows } = await this.resource.executeMutation({
         context: value[this.contextId],
         text,
         values: sqlValues,
       });
-      result[i] = promise.then(({ rows }) => rows[0] ?? Object.create(null));
-    }
-    return result;
+      return rows[0] ?? Object.create(null);
+    });
   }
 
   public finalize(): void {
@@ -423,5 +421,4 @@ export function pgInsertSingle<
 ): PgInsertSingleStep<TResource> {
   return new PgInsertSingleStep(resource, attributes);
 }
-
 exportAs("@dataplan/pg", pgInsertSingle, "pgInsertSingle");

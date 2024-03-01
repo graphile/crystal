@@ -2,16 +2,15 @@ import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
   ConnectionCapableStep,
-  ExecutionExtra,
+  ExecutionDetails,
   GrafastResultsList,
   GrafastResultStreamList,
-  GrafastValuesList,
   InputStep,
   LambdaStep,
   PromiseOrDirect,
   StepOptimizeOptions,
   StepStreamOptions,
-  StreamableStep,
+  StreamV2ableStep,
 } from "grafast";
 import {
   __InputListStep,
@@ -46,6 +45,7 @@ import sql, { $$symbolToIdentifier, arraysMatch } from "pg-sql2";
 import type { PgCodecAttributes } from "../codecs.js";
 import { listOfCodec, TYPES } from "../codecs.js";
 import type { PgResource, PgResourceUnique } from "../datasource.js";
+import type { PgExecutorInput } from "../executor.js";
 import type {
   GetPgResourceAttributes,
   GetPgResourceCodec,
@@ -273,7 +273,7 @@ export class PgSelectStep<
     ReadonlyArray<unknown[] /* a tuple based on what is selected at runtime */>
   >
   implements
-    StreamableStep<unknown[]>,
+    StreamV2ableStep<unknown[]>,
     ConnectionCapableStep<
       PgSelectSingleStep<TResource>,
       PgSelectParsedCursorStep
@@ -1209,11 +1209,12 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
    * NOTE: we don't know what the values being fed in are, we must feed them to
    * the plans stored in this.identifiers to get actual values we can use.
    */
-  async execute(
-    count: number,
-    values: Array<GrafastValuesList<any>>,
-    { eventEmitter }: ExecutionExtra,
-  ): Promise<GrafastResultsList<ReadonlyArray<unknown[]>>> {
+  async executeV2({
+    indexMap,
+    count,
+    values,
+    extra: { eventEmitter },
+  }: ExecutionDetails): Promise<GrafastResultsList<ReadonlyArray<unknown[]>>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
@@ -1229,32 +1230,32 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       name,
       nameForSingle,
     } = this.finalizeResults;
+    const contextDep = values[this.contextId];
 
-    const executionResult = await this.resource.executeWithCache(
-      values[this.contextId].map((context, i) => {
-        return {
-          // The context is how we'd handle different connections with different claims
-          context,
-          queryValues:
-            identifierIndex != null
-              ? this.queryValues.map(({ dependencyIndex, codec }) => {
-                  const val = values[dependencyIndex][i];
-                  return val == null ? null : codec.toPg(val);
-                })
-              : EMPTY_ARRAY,
-        };
-      }),
-      {
-        text,
-        textForSingle,
-        rawSqlValues,
-        identifierIndex,
-        name,
-        nameForSingle,
-        eventEmitter,
-        useTransaction: this.mode === "mutation",
-      },
-    );
+    const specs = indexMap<PgExecutorInput<any>>((i) => {
+      const context = contextDep.at(i);
+      return {
+        // The context is how we'd handle different connections with different claims
+        context,
+        queryValues:
+          identifierIndex != null
+            ? this.queryValues.map(({ dependencyIndex, codec }) => {
+                const val = values[dependencyIndex].at(i);
+                return val == null ? null : codec.toPg(val);
+              })
+            : EMPTY_ARRAY,
+      };
+    });
+    const executionResult = await this.resource.executeWithCache(specs, {
+      text,
+      textForSingle,
+      rawSqlValues,
+      identifierIndex,
+      name,
+      nameForSingle,
+      eventEmitter,
+      useTransaction: this.mode === "mutation",
+    });
     // debugExecute("%s; result: %c", this, executionResult);
 
     return executionResult.values.map((allVals) => {
@@ -1290,11 +1291,11 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   /**
    * Like `execute`, but stream the results via async iterables.
    */
-  async stream(
-    _count: number,
-    values: ReadonlyArray<GrafastValuesList<any>>,
-    { eventEmitter }: ExecutionExtra,
-  ): Promise<GrafastResultStreamList<unknown[]>> {
+  async streamV2({
+    indexMap,
+    values,
+    extra: { eventEmitter },
+  }: ExecutionDetails): Promise<GrafastResultStreamList<unknown[]>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot stream PgSelectStep before finalizing it.");
     }
@@ -1315,54 +1316,57 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
       throw new Error("declare query must exist for stream");
     }
 
-    const initialFetchResult = text
+    const contextDep = values[this.contextId];
+    let specs: readonly PgExecutorInput<any>[] | null = null;
+    if (text) {
+      specs = indexMap((i) => {
+        const context = contextDep.at(i);
+        return {
+          // The context is how we'd handle different connections with different claims
+          context,
+          queryValues:
+            identifierIndex != null
+              ? this.queryValues.map(({ dependencyIndex, codec }) => {
+                  const val = values[dependencyIndex].at(i);
+                  return val == null ? null : codec.toPg(val);
+                })
+              : EMPTY_ARRAY,
+        };
+      });
+    }
+    const initialFetchResult = specs
       ? (
-          await this.resource.executeWithoutCache(
-            values[this.contextId].map((context, i) => {
-              return {
-                // The context is how we'd handle different connections with different claims
-                context,
-                queryValues:
-                  identifierIndex != null
-                    ? this.queryValues.map(({ dependencyIndex, codec }) => {
-                        const val = values[dependencyIndex][i];
-                        return val == null ? null : codec.toPg(val);
-                      })
-                    : EMPTY_ARRAY,
-              };
-            }),
-            {
-              text,
-              rawSqlValues,
-              identifierIndex,
-              eventEmitter,
-            },
-          )
+          await this.resource.executeWithoutCache(specs, {
+            text,
+            rawSqlValues,
+            identifierIndex,
+            eventEmitter,
+          })
         ).values
       : null;
 
+    const streamSpecs = indexMap<PgExecutorInput<any>>((i) => {
+      const context = contextDep.at(i);
+
+      return {
+        // The context is how we'd handle different connections with different claims
+        context,
+        queryValues:
+          identifierIndex != null
+            ? this.queryValues.map(({ dependencyIndex, codec }) => {
+                const val = values[dependencyIndex].at(i);
+                return val == null ? val : codec.toPg(val);
+              })
+            : EMPTY_ARRAY,
+      };
+    });
     const streams = (
-      await this.resource.executeStream(
-        values[this.contextId].map((context, i) => {
-          return {
-            // The context is how we'd handle different connections with different claims
-            context,
-            queryValues:
-              identifierIndex != null
-                ? this.queryValues.map(({ dependencyIndex, codec }) => {
-                    const val = values[dependencyIndex][i];
-                    return val == null ? val : codec.toPg(val);
-                  })
-                : EMPTY_ARRAY,
-          };
-        }),
-        {
-          text: textForDeclare,
-          rawSqlValues: rawSqlValuesForDeclare,
-          identifierIndex,
-          eventEmitter,
-        },
-      )
+      await this.resource.executeStream(streamSpecs, {
+        text: textForDeclare,
+        rawSqlValues: rawSqlValuesForDeclare,
+        identifierIndex,
+        eventEmitter,
+      })
     ).streams;
 
     if (initialFetchResult) {

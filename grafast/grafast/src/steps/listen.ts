@@ -3,9 +3,9 @@ import { SafeError } from "../index.js";
 import type {
   GrafastResultStreamList,
   GrafastSubscriber,
-  GrafastValuesList,
+  StreamDetails,
 } from "../interfaces.js";
-import type { StreamableStep } from "../step.js";
+import type { StreamV2ableStep } from "../step.js";
 import { ExecutableStep, isExecutableStep } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 import { constant } from "./constant.js";
@@ -21,7 +21,7 @@ export class ListenStep<
     TPayloadStep extends ExecutableStep,
   >
   extends ExecutableStep<TTopics[TTopic]>
-  implements StreamableStep<TTopics[TTopic]>
+  implements StreamV2ableStep<TTopics[TTopic]>
 {
   static $$export = {
     moduleName: "grafast",
@@ -59,22 +59,20 @@ export class ListenStep<
     this.topicDep = this.addDependency($topic);
   }
 
-  execute(): never {
+  executeV2(): never {
     throw new Error("ListenStep cannot be executed, it can only be streamed");
   }
 
-  stream(
-    count: number,
-    values: readonly [
-      GrafastValuesList<GrafastSubscriber<TTopics>>,
-      GrafastValuesList<TTopic>,
-    ],
-  ): GrafastResultStreamList<TTopics[TTopic]> {
-    const pubsubs = values[this.pubsubDep as 0];
-    const topics = values[this.topicDep as 1];
-    const result = [];
-    for (let i = 0; i < count; i++) {
-      const pubsub = pubsubs[i];
+  streamV2({
+    indexMap,
+    values,
+  }: StreamDetails<
+    readonly [GrafastSubscriber<TTopics>, TTopic]
+  >): GrafastResultStreamList<TTopics[TTopic]> {
+    const pubsubValue = values[this.pubsubDep as 0];
+    const topicValue = values[this.topicDep as 1];
+    return indexMap((i) => {
+      const pubsub = pubsubValue.at(i);
       if (!pubsub) {
         throw new SafeError(
           "Subscription not supported",
@@ -87,10 +85,9 @@ export class ListenStep<
             : {},
         );
       }
-      const topic = topics[i];
-      result[i] = pubsub.subscribe(topic);
-    }
-    return result;
+      const topic = topicValue.at(i);
+      return pubsub.subscribe(topic);
+    });
   }
 }
 

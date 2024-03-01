@@ -28,6 +28,8 @@ export class __ItemStep<TData> extends UnbatchedExecutableStep<TData> {
   ) {
     super();
     this.addDependency(parentPlan);
+    this._isUnary = false;
+    this._isUnaryLocked = true;
   }
 
   toStringMeta(): string {
@@ -47,7 +49,7 @@ export class __ItemStep<TData> extends UnbatchedExecutableStep<TData> {
     return this.getDep(0);
   }
 
-  execute(): never {
+  executeV2(): never {
     throw new Error("__ItemStep must never execute");
   }
   unbatchedExecute(): never {

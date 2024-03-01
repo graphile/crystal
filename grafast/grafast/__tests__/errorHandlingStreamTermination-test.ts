@@ -3,7 +3,7 @@ import { expect } from "chai";
 import type { AsyncExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type { PromiseOrDirect } from "../dist/index.js";
+import type { ExecutionDetails, PromiseOrDirect } from "../dist/index.js";
 import {
   constant,
   ExecutableStep,
@@ -12,6 +12,7 @@ import {
   lambda,
   makeGrafastSchema,
 } from "../dist/index.js";
+import type { StreamDetails } from "../dist/interfaces.js";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -28,13 +29,17 @@ class SyncListCallbackStep<
     super();
     this.addDependency($dep);
   }
-  execute(_count: number, [val]: [Array<TIn>]): Array<PromiseOrDirect<TOut>> {
-    return val.map((entry) => this.callback(entry));
+  executeV2({
+    indexMap,
+    values: [values0],
+  }: ExecutionDetails<[TIn]>): ReadonlyArray<PromiseOrDirect<TOut>> {
+    return indexMap((i) => this.callback(values0.at(i)));
   }
-  async stream(_count: number, [val]: [Array<TIn>]) {
+  async streamV2({ indexMap, values: [values0] }: StreamDetails<[TIn]>) {
     await sleep(0);
     const { callback, setStreaming } = this;
-    return val.map((entry) => {
+    return indexMap((i) => {
+      const entry = values0.at(i);
       setStreaming(true);
 
       return (async function* () {

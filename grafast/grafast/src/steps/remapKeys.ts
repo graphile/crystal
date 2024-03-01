@@ -3,9 +3,9 @@ import chalk from "chalk";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import type {
-  ExecutionExtra,
+  ExecutionDetails,
   GrafastResultsList,
-  GrafastValuesList,
+  UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
@@ -99,14 +99,16 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
     super.finalize();
   }
 
-  execute(
-    _count: number,
-    values: GrafastValuesList<any[]>,
-  ): GrafastResultsList<any> {
-    return values[0].map(this.mapper);
+  executeV2({
+    count,
+    values: [values0],
+  }: ExecutionDetails): GrafastResultsList<any> {
+    return values0.isBatch
+      ? values0.entries.map(this.mapper)
+      : new Array(count).fill(this.mapper(values0.value));
   }
 
-  unbatchedExecute(_extra: ExecutionExtra, value: any): any {
+  unbatchedExecute(_extra: UnbatchedExecutionExtra, value: any): any {
     return this.mapper(value);
   }
 

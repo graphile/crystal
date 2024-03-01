@@ -6,11 +6,7 @@ import type { LayerPlanReasonSubroutine } from "../engine/LayerPlan.js";
 import { LayerPlan } from "../engine/LayerPlan.js";
 import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
 import type { GrafastError } from "../error.js";
-import type {
-  ExecutionExtra,
-  GrafastResultsList,
-  GrafastValuesList,
-} from "../interfaces.js";
+import type { ExecutionDetails, GrafastResultsList } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
 import { ExecutableStep, isListCapableStep } from "../step.js";
 import { __ItemStep } from "./__item.js";
@@ -73,55 +69,65 @@ export class ApplyTransformsStep extends ExecutableStep {
     this.operationPlan.finishSubroutine(this, this.subroutineLayer);
   }
 
-  async execute(
-    _count: number,
-    values: [GrafastValuesList<any[] | null | undefined | GrafastError>],
-    extra: ExecutionExtra,
-  ): Promise<GrafastResultsList<any[]>> {
+  async executeV2({
+    indexMap,
+    values: [values0],
+    extra,
+  }: ExecutionDetails<[any[] | null | undefined | GrafastError]>): Promise<
+    GrafastResultsList<any[] | null | undefined>
+  > {
     const bucket = extra._bucket;
 
     const childLayerPlan = this.subroutineLayer;
-    const copyStepIds = childLayerPlan.copyStepIds;
+    const { copyBatchStepIds, copyUnaryStepIds, rootStep } = childLayerPlan;
 
     const store: Bucket["store"] = new Map();
+    const unaryStore = new Map();
     const polymorphicPathList: (string | null)[] = [];
     const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [];
     const map: Map<number, number[]> = new Map();
     let size = 0;
 
     // ENHANCE: do this better!
-    const itemStepId = this.operationPlan.dangerouslyGetStep(
-      this.itemStepId,
-    ).id;
+    const itemStep = this.operationPlan.dangerouslyGetStep(this.itemStepId);
+    const itemStepId = itemStep.id;
     if (itemStepId == null) {
       throw new Error(
         "GrafastInternalError<b3a2bff9-15c6-47e2-aa82-19c862324f1a>: listItem layer plan has no rootStepId",
       );
     }
-    store.set(itemStepId, []);
+    if (itemStep._isUnary) {
+      // Handled later
+    } else {
+      store.set(itemStepId, []);
+    }
 
-    // Prepare store with an empty list for each copyPlanId
-    for (const planId of copyStepIds) {
-      store.set(planId, []);
-      if (!bucket.store.has(planId)) {
+    for (const stepId of copyUnaryStepIds) {
+      unaryStore.set(stepId, bucket.unaryStore.get(stepId));
+      if (isDev && !bucket.unaryStore.has(stepId)) {
         throw new Error(
-          `GrafastInternalError<14f2b4c6-f951-44d6-ad6b-2eace3330b84>: plan '${planId}' (${this.operationPlan.dangerouslyGetStep(
-            planId,
-          )}) listed in copyStepIds but not available in parent bucket for ${this}`,
+          `GrafastInternalError<68675bbd-bc15-4c4a-902a-61c0de616325>: unary step '${stepId}' (${this.operationPlan.dangerouslyGetStep(
+            stepId,
+          )}) listed in copyUnaryStepIds but not available in parent bucket for ${this}`,
+        );
+      }
+    }
+    // Prepare store with an empty list for each copyBatchPlanId
+    for (const stepId of copyBatchStepIds) {
+      store.set(stepId, []);
+      if (isDev && !bucket.store.has(stepId)) {
+        throw new Error(
+          `GrafastInternalError<14f2b4c6-f951-44d6-ad6b-2eace3330b84>: step '${stepId}' (${this.operationPlan.dangerouslyGetStep(
+            stepId,
+          )}) listed in copyBatchStepIds but not available in parent bucket for ${this}`,
         );
       }
     }
 
-    const listValues = values[0];
-
     // We'll typically be creating more listItem bucket entries than we
     // have parent buckets, so we must "multiply up" the store entries.
-    for (
-      let originalIndex = 0;
-      originalIndex < listValues.length;
-      originalIndex++
-    ) {
-      const list = listValues[originalIndex];
+    indexMap((originalIndex) => {
+      const list = values0.at(originalIndex);
       if (Array.isArray(list)) {
         const newIndexes: number[] = [];
         map.set(originalIndex, newIndexes);
@@ -133,14 +139,18 @@ export class ApplyTransformsStep extends ExecutableStep {
           // Copying across the iterators because we do NOT call outputBucket,
           // so we need to ensure any streams are cleaned up.
           iterators[newIndex] = bucket.iterators[originalIndex];
-          store.get(itemStepId)![newIndex] = list[j];
-          for (const planId of copyStepIds) {
-            store.get(planId)![newIndex] =
-              bucket.store.get(planId)![originalIndex];
+          if (itemStep._isUnary) {
+            unaryStore.set(itemStepId, list[j]);
+          } else {
+            store.get(itemStepId)![newIndex] = list[j];
+          }
+          for (const stepId of copyBatchStepIds) {
+            store.get(stepId)![newIndex] =
+              bucket.store.get(stepId)![originalIndex];
           }
         }
       }
-    }
+    });
 
     if (size > 0) {
       const childBucket = newBucket(
@@ -148,6 +158,7 @@ export class ApplyTransformsStep extends ExecutableStep {
           layerPlan: childLayerPlan,
           size,
           store,
+          unaryStore,
           hasErrors: bucket.hasErrors,
           polymorphicPathList,
           iterators,
@@ -157,9 +168,12 @@ export class ApplyTransformsStep extends ExecutableStep {
       await executeBucket(childBucket, extra._requestContext);
     }
 
-    const depResults = store.get(childLayerPlan.rootStep!.id)!;
+    const [depResults, unaryResult] = rootStep?._isUnary
+      ? [null, unaryStore.get(rootStep.id)]
+      : [store.get(rootStep!.id)!, null];
 
-    return listValues.map((list: any, originalIndex: number) => {
+    return indexMap((originalIndex) => {
+      const list = values0.at(originalIndex);
       if (list == null) {
         return list;
       }
@@ -172,7 +186,7 @@ export class ApplyTransformsStep extends ExecutableStep {
         return null;
       }
       const values = indexes.map((idx) => {
-        const val = depResults[idx];
+        const val = depResults === null ? unaryResult : depResults[idx];
         if (val instanceof Error) {
           throw val;
         }

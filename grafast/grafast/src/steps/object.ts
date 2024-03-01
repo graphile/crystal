@@ -2,7 +2,12 @@
 
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
-import type { ExecutionExtra, StepOptimizeOptions } from "../interfaces.js";
+import type {
+  ExecutionDetails,
+  ExecutionExtra,
+  StepOptimizeOptions,
+  UnbatchedExecutionExtra,
+} from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { constant, ConstantStep } from "./constant.js";
@@ -211,19 +216,19 @@ ${inner}
     return super.finalize();
   }
 
-  execute(
-    count: number,
-    values: Array<Array<DataFromPlans<TPlans>[keyof TPlans]>>,
-    extra: ExecutionExtra,
-  ): Array<DataFromPlans<TPlans>> {
-    const result: Array<DataFromPlans<TPlans>> = [];
-    for (let i = 0; i < count; i++) {
-      result[i] = this.unbatchedExecute!(extra, ...values.map((v) => v[i]));
-    }
-    return result;
+  executeV2({
+    indexMap,
+    values,
+    extra,
+  }: ExecutionDetails<
+    Array<DataFromPlans<TPlans>[keyof TPlans]>
+  >): ReadonlyArray<DataFromPlans<TPlans>> {
+    return indexMap((i) =>
+      this.unbatchedExecute!(extra, ...values.map((v) => v.at(i))),
+    );
   }
 
-  unbatchedExecute(_extra: ExecutionExtra, ..._values: any[]): any {
+  unbatchedExecute(_extra: UnbatchedExecutionExtra, ..._values: any[]): any {
     throw new Error(`${this} didn't finalize? No unbatchedExecute method.`);
   }
 

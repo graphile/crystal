@@ -1,7 +1,7 @@
 import type {
-  ExecutionExtra,
+  ExecutionDetails,
   GrafastResultsList,
-  GrafastValuesList,
+  UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
@@ -41,14 +41,17 @@ export class ReverseStep<TData> extends UnbatchedExecutableStep<
     this.addDependency(plan);
   }
 
-  execute(
-    _count: number,
-    values: [GrafastValuesList<TData[]>],
-  ): GrafastResultsList<TData[]> {
-    return values[0].map((arr) => (arr == null ? arr : reverseArray(arr)));
+  executeV2({
+    indexMap,
+    values: [values0],
+  }: ExecutionDetails<[TData[]]>): GrafastResultsList<TData[]> {
+    return indexMap((i) => {
+      const arr = values0.at(i);
+      return arr == null ? arr : reverseArray(arr);
+    });
   }
 
-  unbatchedExecute(_extra: ExecutionExtra, arr: TData[]): TData[] {
+  unbatchedExecute(_extra: UnbatchedExecutionExtra, arr: TData[]): TData[] {
     return arr == null ? arr : reverseArray(arr);
   }
 

@@ -24,7 +24,9 @@ function exportAs<T>(thing: T, exportName: string) {
 export const $$symbolToIdentifier = Symbol("symbolToIdentifier");
 
 const isDev =
-  typeof process !== "undefined" && process.env.GRAPHILE_ENV === "development";
+  typeof process !== "undefined" &&
+  (process.env.GRAPHILE_ENV === "development" ||
+    process.env.GRAPHILE_ENV === "test");
 
 /**
  * Represents raw SQL, the text will be output verbatim into the compiled query.

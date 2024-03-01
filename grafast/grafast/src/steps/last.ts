@@ -1,4 +1,4 @@
-import type { ExecutionExtra } from "../interfaces.js";
+import type { UnbatchedExecutionExtra } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { ListStep } from "./list.js";
@@ -17,7 +17,7 @@ export class LastStep<TData> extends UnbatchedExecutableStep<TData> {
   }
 
   unbatchedExecute = (
-    _extra: ExecutionExtra,
+    _extra: UnbatchedExecutionExtra,
     list: ReadonlyArray<TData>,
   ): TData => {
     return list?.[list?.length - 1];

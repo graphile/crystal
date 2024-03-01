@@ -33,6 +33,7 @@ debugFactory.formatters.c = grafastPrint;
 import { defer, Deferred } from "./deferred.js";
 // Handy for debugging
 import { isDev, noop } from "./dev.js";
+import { isUnaryStep } from "./engine/lib/withGlobalLayerPlan.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
 import {
   GrafastError,
@@ -65,6 +66,7 @@ import {
   EnumValueApplyPlanResolver,
   EventCallback,
   EventMapKey,
+  ExecutionDetails,
   ExecutionEventEmitter,
   ExecutionEventMap,
   ExecutionExtra,
@@ -97,6 +99,7 @@ import {
   StepOptimizeOptions,
   StepStreamOptions,
   TypedEventEmitter,
+  UnbatchedExecutionExtra,
 } from "./interfaces.js";
 import { polymorphicWrap } from "./polymorphic.js";
 import {
@@ -111,12 +114,14 @@ import {
   isModifierStep,
   isObjectLikeStep,
   isStreamableStep,
+  isStreamV2ableStep,
   ListCapableStep,
   ListLikeStep,
   ModifierStep,
   ObjectLikeStep,
   PolymorphicStep,
   StreamableStep,
+  StreamV2ableStep,
   UnbatchedExecutableStep,
 } from "./step.js";
 import {
@@ -289,6 +294,7 @@ export {
   EventMapKey,
   ExecutableStep,
   execute,
+  ExecutionDetails,
   ExecutionEventEmitter,
   ExecutionEventMap,
   ExecutionExtra,
@@ -346,6 +352,8 @@ export {
   isPromiseLike,
   isSafeError,
   isStreamableStep,
+  isStreamV2ableStep,
+  isUnaryStep,
   JSONArray,
   JSONObject,
   JSONValue,
@@ -429,6 +437,7 @@ export {
   stepsAreInSamePhase,
   StepStreamOptions,
   StreamableStep,
+  StreamV2ableStep,
   stringifyPayload,
   stripAnsi,
   subscribe,
@@ -436,6 +445,7 @@ export {
   trackedRootValue,
   TypedEventEmitter,
   UnbatchedExecutableStep,
+  UnbatchedExecutionExtra,
 };
 
 exportAsMany("grafast", {
@@ -462,6 +472,7 @@ exportAsMany("grafast", {
   isObjectLikeStep,
   isListLikeStep,
   isStreamableStep,
+  isStreamV2ableStep,
   __ItemStep,
   __ListTransformStep,
   __TrackedValueStep,
@@ -548,6 +559,7 @@ exportAsMany("grafast", {
   LoadStep,
   isSafeError,
   SafeError,
+  isUnaryStep,
 });
 
 export { hookArgs } from "./args.js";

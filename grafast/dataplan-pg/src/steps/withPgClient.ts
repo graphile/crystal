@@ -1,4 +1,4 @@
-import type { GrafastResultsList, GrafastValuesList } from "grafast";
+import type { ExecutionDetails, GrafastResultsList } from "grafast";
 import { constant, ExecutableStep } from "grafast";
 
 import type { PgClient, PgExecutor, WithPgClient } from "../executor";
@@ -52,17 +52,18 @@ export class WithPgClientStep<
     this.dataId = this.addDependency($data);
   }
 
-  execute(
-    _count: number,
-    values: [
-      GrafastValuesList<{ pgSettings: any; withPgClient: WithPgClient }>,
-      GrafastValuesList<TData>,
-    ],
-  ): GrafastResultsList<TResult> {
-    const contexts = values[this.contextId as 0];
-    const datas = values[this.dataId as 1];
-    return contexts.map(async ({ pgSettings, withPgClient }, i) => {
-      const data = datas[i];
+  executeV2({
+    indexMap,
+    values,
+  }: ExecutionDetails<
+    [{ pgSettings: any; withPgClient: WithPgClient }, TData]
+  >): GrafastResultsList<TResult> {
+    const contextDep = values[this.contextId as 0];
+    const dataDep = values[this.dataId as 1];
+    return indexMap((i) => {
+      const context = contextDep.at(i);
+      const data = dataDep.at(i);
+      const { withPgClient, pgSettings } = context;
       return withPgClient(pgSettings, (client) => this.callback(client, data));
     });
   }

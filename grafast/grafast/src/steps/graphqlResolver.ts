@@ -7,13 +7,13 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
-import type { __ItemStep, ObjectStep } from "../index.js";
+import type { __ItemStep, ExecutionDetails, ObjectStep } from "../index.js";
 import { context, SafeError } from "../index.js";
 import type {
   ExecutionExtra,
   GrafastResultsList,
   GrafastResultStreamList,
-  GrafastValuesList,
+  UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { polymorphicWrap } from "../polymorphic.js";
 import type { PolymorphicStep } from "../step.js";
@@ -112,7 +112,7 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
   }
 
   unbatchedExecute(
-    _extra: ExecutionExtra,
+    _extra: UnbatchedExecutionExtra,
     source: any,
     args: any,
     context: any,
@@ -180,25 +180,23 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
     return data;
   }
 
-  async stream(
-    count: number,
-    values: ReadonlyArray<GrafastValuesList<any>>,
-    extra: ExecutionExtra,
-  ): Promise<GrafastResultStreamList<any>> {
-    const results = [];
+  async streamV2({
+    indexMap,
+    values,
+    extra,
+  }: ExecutionDetails): Promise<GrafastResultStreamList<any>> {
     const depCount = this.dependencies.length;
-    for (let i = 0; i < count; i++) {
+    return indexMap((i) => {
       try {
         const tuple = [];
         for (let j = 0; j < depCount; j++) {
-          tuple[j] = values[j][i];
+          tuple[j] = values[j].at(i);
         }
-        results[i] = (this.unbatchedStream as any)(extra, ...tuple);
+        return (this.unbatchedStream as any)(extra, ...tuple);
       } catch (e) {
-        results[i] = e instanceof Error ? (e as never) : Promise.reject(e);
+        return e instanceof Error ? (e as never) : Promise.reject(e);
       }
-    }
-    return results;
+    });
   }
 }
 
@@ -307,16 +305,18 @@ export class GraphQLItemHandler
     return data.map((data) => dcr(data, context, resolveInfo));
   }
 
-  execute(
-    _count: number,
-    values: [GrafastValuesList<any>],
-  ): GrafastResultsList<any> {
+  executeV2({
+    indexMap,
+    values: [values0],
+  }: ExecutionDetails<
+    [Awaited<ReturnType<typeof dcr>>]
+  >): GrafastResultsList<any> {
     if (this.abstractType !== undefined) {
-      return values[0].map((data) => {
+      return indexMap((i) => {
+        const data = values0.at(i);
         if (data == null) {
           return data;
-        }
-        if (isPromiseLike(data.data)) {
+        } else if (isPromiseLike(data.data)) {
           return data.data.then((resolvedData: unknown) =>
             this.polymorphicWrapData(
               resolvedData,
@@ -333,17 +333,19 @@ export class GraphQLItemHandler
         }
       });
     } else if (this.nullableInnerType != null) {
-      return values[0].map((d) => {
+      return indexMap((i) => {
+        const d = values0.at(i);
         if (d == null) {
           return null;
-        }
-        const { data, context, resolveInfo } = d;
-        if (isPromiseLike(data)) {
-          return data.then((data) =>
-            this.wrapListData(data, context, resolveInfo),
-          );
         } else {
-          return this.wrapListData(data, context, resolveInfo);
+          const { data, context, resolveInfo } = d;
+          if (isPromiseLike(data)) {
+            return data.then((data) =>
+              this.wrapListData(data, context, resolveInfo),
+            );
+          } else {
+            return this.wrapListData(data, context, resolveInfo);
+          }
         }
       });
     } else {

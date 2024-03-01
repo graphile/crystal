@@ -143,6 +143,21 @@ function isTE(node: unknown): node is TE {
   );
 }
 
+function debug(expression: TE) {
+  const result = te.compile(expression);
+  const argNames = Object.keys(result.refs);
+  const fn = newFunction(...argNames, result.string);
+  const string = fn.toString();
+  const lines = string.split(/\r?\n/);
+  const maxLineLength = String(lines.length).length;
+  const output = lines.map(
+    (line, i) => `${String(i + 1).padStart(maxLineLength, " ")}: ${line}`,
+  );
+  console.log(`Outputting expression from tamedevil:`);
+  console.dir(result.refs);
+  console.log(output.join("\n"));
+}
+
 /**
  * If the given node is a valid TE node it will be returned, otherwise an error
  * will be thrown.
@@ -1122,6 +1137,7 @@ export {
   /** @deprecated Use safeKeyOrThrow instead */
   safeKeyOrThrow as dangerousKey,
   dangerouslyIncludeRawCode,
+  debug,
   run as eval,
   get,
   identifier,
@@ -1184,6 +1200,7 @@ export interface TamedEvil {
   undefined: TE;
   blank: TE;
   isTE: typeof isTE;
+  debug: typeof debug;
   dangerouslyIncludeRawCode: typeof dangerouslyIncludeRawCode;
 }
 
@@ -1216,6 +1233,7 @@ const attributes = {
   undefined: undefinedNode,
   blank: blankNode,
   isTE,
+  debug,
   dangerouslyIncludeRawCode,
 };
 

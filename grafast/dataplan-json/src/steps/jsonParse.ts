@@ -1,8 +1,8 @@
 import chalk from "chalk";
 import type {
   AccessStep,
+  ExecutionDetails,
   GrafastResultsList,
-  GrafastValuesList,
   PromiseOrDirect,
 } from "grafast";
 import { access, ExecutableStep, exportAs } from "grafast";
@@ -53,24 +53,22 @@ export class JSONParseStep<
     return access(this, [index]);
   }
 
-  execute(
-    count: number,
-    values: [GrafastValuesList<string>],
-  ): GrafastResultsList<TJSON> {
-    const result: Array<PromiseOrDirect<TJSON>> = []; // new Array(count);
-    const list = values[0];
-    for (let i = 0; i < count; i++) {
-      const v = list[i];
+  executeV2({
+    indexMap,
+    values: [stringDep],
+  }: ExecutionDetails<[string]>): GrafastResultsList<TJSON> {
+    return indexMap<PromiseOrDirect<TJSON>>((i) => {
+      const v = stringDep.at(i);
       if (typeof v === "string") {
         try {
-          result[i] = JSON.parse(v);
+          return JSON.parse(v);
         } catch (e) {
-          result[i] = Promise.reject(e);
+          return Promise.reject(e);
         }
       } else if (v == null) {
-        result[i] = null as any;
+        return null as any;
       } else {
-        result[i] = Promise.reject(
+        return Promise.reject(
           new Error(
             `JSONParseStep: expected string to parse, but received ${
               Array.isArray(v) ? "array" : typeof v
@@ -78,8 +76,7 @@ export class JSONParseStep<
           ),
         );
       }
-    }
-    return result;
+    });
   }
 }
 

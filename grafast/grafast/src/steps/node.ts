@@ -4,9 +4,9 @@ import { isDev } from "../dev.js";
 import { inspect } from "../inspect.js";
 import type {
   AnyInputStep,
-  ExecutionExtra,
   NodeIdHandler,
   PolymorphicData,
+  UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { polymorphicWrap } from "../polymorphic.js";
 import type { ExecutableStep, PolymorphicStep } from "../step.js";
@@ -74,7 +74,7 @@ export class NodeStep
   }
 
   unbatchedExecute = (
-    _extra: ExecutionExtra,
+    _extra: UnbatchedExecutionExtra,
     specifier: any,
   ): PolymorphicData<string, ReadonlyArray<any>> | null => {
     const typeName = specifier

@@ -1,6 +1,6 @@
 import type {
+  ExecutionDetails,
   GrafastResultsList,
-  GrafastValuesList,
   PromiseOrDirect,
 } from "grafast";
 import { ExecutableStep, exportAs, isDev, SafeError } from "grafast";
@@ -245,10 +245,10 @@ export class PgDeleteSingleStep<
    * NOTE: we don't know what the values being fed in are, we must feed them to
    * the plans stored in this.identifiers to get actual values we can use.
    */
-  async execute(
-    count: number,
-    values: Array<GrafastValuesList<any>>,
-  ): Promise<GrafastResultsList<any>> {
+  async executeV2({
+    indexMap,
+    values,
+  }: ExecutionDetails): Promise<GrafastResultsList<any>> {
     if (!this.finalizeResults) {
       throw new Error("Cannot execute PgSelectStep before finalizing it.");
     }
@@ -258,10 +258,9 @@ export class PgDeleteSingleStep<
     // We must execute each mutation on its own, but we can at least do so in
     // parallel. Note we return a list of promises, each may reject or resolve
     // without causing the others to reject.
-    const result: Array<PromiseOrDirect<any>> = [];
-    const list = values[this.contextId];
-    for (let i = 0; i < count; i++) {
-      const context = list[i];
+    const contextDep = values[this.contextId];
+    return indexMap<PromiseOrDirect<any>>(async (i) => {
+      const context = contextDep.at(i);
       const sqlValues = queryValueDetailsBySymbol.size
         ? rawSqlValues.map((v) => {
             if (typeof v === "symbol") {
@@ -269,31 +268,29 @@ export class PgDeleteSingleStep<
               if (!details) {
                 throw new Error(`Saw unexpected symbol '${inspect(v)}'`);
               }
-              const val = values[details.depId][i];
+              const val = values[details.depId].at(i);
               return val == null ? null : details.processor(val);
             } else {
               return v;
             }
           })
         : rawSqlValues;
-      const promise = this.resource.executeMutation({
+      const { rows, rowCount } = await this.resource.executeMutation({
         context,
         text,
         values: sqlValues,
       });
-      result[i] = promise.then(
-        ({ rows, rowCount }) =>
-          rows[0] ??
-          (rowCount === 0
-            ? Promise.reject(
-                new Error(
-                  `No values were deleted in collection '${this.resource.name}' because no values you can delete were found matching these criteria.`,
-                ),
-              )
-            : Object.create(null)),
+      return (
+        rows[0] ??
+        (rowCount === 0
+          ? Promise.reject(
+              new Error(
+                `No values were deleted in collection '${this.resource.name}' because no values you can delete were found matching these criteria.`,
+              ),
+            )
+          : Object.create(null))
       );
-    }
-    return result;
+    });
   }
 
   public finalize(): void {
@@ -392,5 +389,4 @@ export function pgDeleteSingle<
 ): PgDeleteSingleStep<TResource> {
   return new PgDeleteSingleStep(resource, getBy);
 }
-
 exportAs("@dataplan/pg", pgDeleteSingle, "pgDeleteSingle");

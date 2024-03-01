@@ -188,16 +188,16 @@ graph TD
     Bucket2("Bucket 2 (listItem)<br />Deps: 19<br /><br />ROOT __Item{2}ᐸ22ᐳ[23]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item23,PgUnionAllSingle24 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 24, 19<br /><br />ROOT PgUnionAllSingle{2}[24]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 19, 24<br /><br />ROOT PgUnionAllSingle{2}[24]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgCursor25,Access32,Access33,Access34,List35 bucket3
-    Bucket4("Bucket 4 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 34, 19, 24<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br />1: JSONParse[37], JSONParse[49]<br />ᐳ: Access[38], Access[50]<br />2: PgSelect[39], PgSelect[51]<br />ᐳ: 43, 44, 45, 46, 47, 55, 56, 57, 58, 59, 60"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 19, 34, 24<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br />1: JSONParse[37], JSONParse[49]<br />ᐳ: Access[38], Access[50]<br />2: PgSelect[39], PgSelect[51]<br />ᐳ: 43, 44, 45, 46, 47, 55, 56, 57, 58, 59, 60"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,JSONParse37,Access38,PgSelect39,First43,PgSelectSingle44,PgClassExpression45,PgClassExpression46,PgClassExpression47,JSONParse49,Access50,PgSelect51,First55,PgSelectSingle56,PgClassExpression57,PgClassExpression58,PgClassExpression59,PgClassExpression60 bucket4
     Bucket5("Bucket 5 (listItem)<br />Deps: 19<br /><br />ROOT __Item{5}ᐸ103ᐳ[107]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,__Item107,PgUnionAllSingle108,Access109 bucket5
-    Bucket6("Bucket 6 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 109, 19, 108<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br />1: JSONParse[110], JSONParse[122]<br />ᐳ: Access[111], Access[123]<br />2: PgSelect[112], PgSelect[124]<br />ᐳ: 116, 117, 118, 119, 120, 128, 129, 130, 131, 132, 133"):::bucket
+    Bucket6("Bucket 6 (polymorphic)<br />FirstPartyVulnerability,ThirdPartyVulnerability<br />Deps: 19, 109, 108<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability<br />1: JSONParse[110], JSONParse[122]<br />ᐳ: Access[111], Access[123]<br />2: PgSelect[112], PgSelect[124]<br />ᐳ: 116, 117, 118, 119, 120, 128, 129, 130, 131, 132, 133"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6,JSONParse110,Access111,PgSelect112,First116,PgSelectSingle117,PgClassExpression118,PgClassExpression119,PgClassExpression120,JSONParse122,Access123,PgSelect124,First128,PgSelectSingle129,PgClassExpression130,PgClassExpression131,PgClassExpression132,PgClassExpression133 bucket6
     Bucket0 --> Bucket1 & Bucket5

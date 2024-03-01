@@ -1,4 +1,4 @@
-import type { ExecutionExtra } from "grafast";
+import type { UnbatchedExecutionExtra } from "grafast";
 import { access, exportAs, UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
 import sql from "pg-sql2";
@@ -226,7 +226,7 @@ export class PgClassExpressionStep<
     return this;
   }
 
-  public unbatchedExecute(_extra: ExecutionExtra, v: any): any {
+  public unbatchedExecute(_extra: UnbatchedExecutionExtra, v: any): any {
     if (v == null) {
       return null;
     }

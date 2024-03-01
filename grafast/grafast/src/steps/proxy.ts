@@ -1,8 +1,12 @@
-import type { GrafastResultsList, GrafastValuesList } from "../index.js";
-import type { ExecutionExtra } from "../interfaces.js";
+import type {
+  ExecutionDetails,
+  GrafastResultsList,
+  UnbatchedExecutionExtra,
+} from "../interfaces.js";
 import { $$proxy } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
+import { arrayOfLength } from "../utils.js";
 
 /**
  * @experimental
@@ -29,13 +33,15 @@ export class ProxyStep<T> extends UnbatchedExecutableStep<T> {
   public addDependency(step: ExecutableStep): number {
     return super.addDependency(step);
   }
-  execute(
-    _count: number,
-    values: [GrafastValuesList<T>],
-  ): GrafastResultsList<T> {
-    return values[0];
+  executeV2({
+    count,
+    values: [values0],
+  }: ExecutionDetails<[T]>): GrafastResultsList<T> {
+    return values0.isBatch
+      ? values0.entries
+      : arrayOfLength(count, values0.value);
   }
-  unbatchedExecute(_extra: ExecutionExtra, value: T): T {
+  unbatchedExecute(_extra: UnbatchedExecutionExtra, value: T): T {
     return value;
   }
   // Do not proxy stream requests

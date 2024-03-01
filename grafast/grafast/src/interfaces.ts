@@ -757,7 +757,7 @@ export type ExecutionEventMap = {
 
 export type ExecutionEventEmitter = TypedEventEmitter<ExecutionEventMap>;
 
-export interface ExecutionExtra {
+export interface ExecutionExtraBase {
   /** The `performance.now()` at which your step should stop executing */
   stopTime: number | null;
   /** If you have set a `metaKey` on your step, the relevant meta object which you can write into (e.g. for caching) */
@@ -770,6 +770,45 @@ export interface ExecutionExtra {
   _bucket: Bucket;
   /** @internal */
   _requestContext: RequestTools;
+}
+export interface ExecutionExtra extends ExecutionExtraBase {}
+export interface UnbatchedExecutionExtra extends ExecutionExtraBase {}
+
+export type ExecutionValue<TData = any> =
+  | {
+      at(i: number): TData;
+      isBatch: true;
+      entries: ReadonlyArray<TData>;
+      value?: never;
+    }
+  | {
+      at(i: number): TData;
+      isBatch: false;
+      value: TData;
+      entries?: never;
+    };
+
+export type IndexMap = <T>(callback: (i: number) => T) => ReadonlyArray<T>;
+export type IndexForEach = (callback: (i: number) => any) => void;
+
+export interface ExecutionDetails<
+  TDeps extends readonly [...any[]] = readonly [...any[]],
+> {
+  count: number;
+  indexMap: IndexMap;
+  indexForEach: IndexForEach;
+  values: {
+    [DepIdx in keyof TDeps]: ExecutionValue<TDeps[DepIdx]>;
+  } & {
+    length: TDeps["length"];
+    map: ReadonlyArray<ExecutionValue<TDeps[number]>>["map"];
+  };
+  extra: ExecutionExtra;
+}
+export interface StreamDetails<
+  TDeps extends readonly [...any[]] = readonly [...any[]],
+> extends ExecutionDetails<TDeps> {
+  streamOptions: StepStreamOptions;
 }
 
 export interface LocationDetails {
@@ -800,7 +839,6 @@ export interface GrafastArgs extends GraphQLArgs {
   resolvedPreset?: GraphileConfig.ResolvedPreset;
   requestContext?: Partial<Grafast.RequestContext>;
 }
-
 export type Maybe<T> = T | null | undefined;
 
 export * from "./planJSONInterfaces.js";

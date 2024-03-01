@@ -1,4 +1,4 @@
-import type { ExecutableStep, ExecutionExtra } from "grafast";
+import type { ExecutableStep, UnbatchedExecutionExtra } from "grafast";
 import { UnbatchedExecutableStep } from "grafast";
 
 import type { PgCodec } from "../interfaces.js";
@@ -28,7 +28,7 @@ export class ToPgStep extends UnbatchedExecutableStep<any> {
     return peers.filter((peer) => peer.codec === this.codec);
   }
 
-  unbatchedExecute(_extra: ExecutionExtra, v: any) {
+  unbatchedExecute(_extra: UnbatchedExecutionExtra, v: any) {
     return v == null ? null : this.codec.toPg(v);
   }
 }

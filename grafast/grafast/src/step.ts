@@ -18,6 +18,7 @@ import type { OperationPlan } from "./engine/OperationPlan.js";
 import { getDebug } from "./global.js";
 import { inspect } from "./inspect.js";
 import type {
+  ExecutionDetails,
   ExecutionExtra,
   GrafastResultsList,
   GrafastResultStreamList,
@@ -26,10 +27,13 @@ import type {
   PromiseOrDirect,
   StepOptimizeOptions,
   StepOptions,
+  StreamDetails,
+  UnbatchedExecutionExtra,
 } from "./interfaces.js";
 import { $$subroutine } from "./interfaces.js";
 import type { __ItemStep } from "./steps/index.js";
 import { __ListTransformStep } from "./steps/index.js";
+import { arrayOfLength } from "./utils.js";
 
 /**
  * @internal
@@ -121,6 +125,10 @@ export abstract class BaseStep {
   public [$$subroutine]: LayerPlan<LayerPlanReasonSubroutine> | null = null;
   public isArgumentsFinalized: boolean;
   public isFinalized: boolean;
+  /** @internal */
+  public _isUnary: boolean;
+  /** @internal */
+  public _isUnaryLocked: boolean;
   public debug: boolean;
 
   // ENHANCE: change hasSideEffects to getter/setter, forbid setting after a
@@ -139,6 +147,8 @@ export abstract class BaseStep {
     const layerPlan = currentLayerPlan();
     this.layerPlan = layerPlan;
     this.operationPlan = layerPlan.operationPlan;
+    this._isUnary = true;
+    this._isUnaryLocked = false;
   }
 
   public toString(): string {
@@ -312,7 +322,13 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   }
 
   public toString(): string {
-    const meta = this.toStringMeta();
+    let meta;
+    try {
+      // If we log out too early, the meta function might fail.
+      meta = this.toStringMeta();
+    } catch (e) {
+      // Ignore
+    }
     return chalk.bold.blue(
       `${this.constructor.name.replace(/Step$/, "")}${
         this.layerPlan.id === 0 ? "" : chalk.grey(`{${this.layerPlan.id}}`)
@@ -341,6 +357,11 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
         )}'`,
       );
     }
+    if (this._isUnaryLocked && this._isUnary && !step._isUnary) {
+      throw new Error(
+        `${this} is a unary step, so cannot add non-unary step ${step} as a dependency`,
+      );
+    }
     if (isDev) {
       // Check that we can actually add this as a dependency
       if (!this.layerPlan.ancestry.includes(step.layerPlan)) {
@@ -363,6 +384,16 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     }
 
     return this.operationPlan.stepTracker.addStepDependency(this, step);
+  }
+
+  /**
+   * Adds "unary" dependencies; in `executeV2({count, values})` you'll receive a
+   * `values[index]` (where `index` is the return value of this function) with
+   * `isBatch = false` so you can use the `values[index].value` property
+   * directly.
+   */
+  protected addUnaryDependency(step: ExecutableStep): number {
+    return this.operationPlan.stepTracker.addStepUnaryDependency(this, step);
   }
 
   /**
@@ -445,7 +476,24 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     count;
     values;
     extra;
-    throw new Error(`${this} has not implemented an 'execute' method`);
+    throw new Error(
+      `${this} has not implemented an 'executeV2' or 'execute' method`,
+    );
+  }
+
+  // This executeV2 method implements backwards compatibility with the old
+  // execute method; you should instead override this in your own step
+  // classes.
+  executeV2({
+    count,
+    values,
+    extra,
+  }: ExecutionDetails): PromiseOrDirect<GrafastResultsList<TData>> {
+    // TODO: warn that this class should implement executeV2 instead
+    const backfilledValues = values.map((v, i) =>
+      v.isBatch ? v.entries[i] : arrayOfLength(count, v.value),
+    );
+    return this.execute(count, backfilledValues, extra);
   }
 
   public destroy(): void {
@@ -457,19 +505,19 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     this.deduplicatedWith = throwDestroyed;
     this.optimize = throwDestroyed;
     this.finalize = throwDestroyed;
-    this.execute = throwDestroyed;
+    this.executeV2 = throwDestroyed;
 
     super.destroy();
   }
 }
 
-function _buildOptimizedExecuteExpression(
+function _buildOptimizedExecuteV2Expression(
   depCount: number,
   isSyncAndSafe: boolean,
 ) {
-  const depIndexes = [];
+  const identifiers: TE[] = [];
   for (let i = 0; i < depCount; i++) {
-    depIndexes.push(i);
+    identifiers.push(te.identifier(`value${i}`));
   }
   const tryOrNot = (inFrag: TE): TE => {
     if (isSyncAndSafe) {
@@ -485,18 +533,16 @@ function _buildOptimizedExecuteExpression(
     }
   };
   return te`\
-(function execute(count, values, extra) {
-  const [
-${te.join(
-  depIndexes.map((i) => te`    ${te.identifier(`list${i}`)},\n`),
-  "",
-)}\
-  ] = values;
+(function execute({
+  count,
+  values: [${te.join(identifiers, ", ")}],
+  extra,
+}) {
   const results = [];
   for (let i = 0; i < count; i++) {
 ${tryOrNot(te`\
     results[i] = this.unbatchedExecute(extra, ${te.join(
-      depIndexes.map((depIndex) => te`${te.identifier(`list${depIndex}`)}[i]`),
+      identifiers.map((identifier) => te`${identifier}.at(i)`),
       ", ",
     )});\
 `)}
@@ -511,18 +557,21 @@ const safeCache: any[] = [];
 te.batch(() => {
   for (let i = 0; i <= MAX_DEPENDENCIES_TO_CACHE; i++) {
     const depCount = i;
-    const unsafeExpression = _buildOptimizedExecuteExpression(depCount, false);
+    const unsafeExpression = _buildOptimizedExecuteV2Expression(
+      depCount,
+      false,
+    );
     te.runInBatch(unsafeExpression, (fn) => {
       unsafeCache[depCount] = fn;
     });
-    const safeExpression = _buildOptimizedExecuteExpression(depCount, true);
+    const safeExpression = _buildOptimizedExecuteV2Expression(depCount, true);
     te.runInBatch(safeExpression, (fn) => {
       safeCache[depCount] = fn;
     });
   }
 });
 
-function buildOptimizedExecute(
+function buildOptimizedExecuteV2(
   depCount: number,
   isSyncAndSafe: boolean,
   callback: (fn: any) => void,
@@ -535,7 +584,10 @@ function buildOptimizedExecute(
   }
 
   // Build it
-  const expression = _buildOptimizedExecuteExpression(depCount, isSyncAndSafe);
+  const expression = _buildOptimizedExecuteV2Expression(
+    depCount,
+    isSyncAndSafe,
+  );
   te.runInBatch<any>(expression, (fn) => {
     callback(fn);
   });
@@ -550,41 +602,48 @@ export abstract class UnbatchedExecutableStep<
   };
 
   finalize() {
-    // If they've not replaced 'execute', use our optimized form
-    if (this.execute === UnbatchedExecutableStep.prototype.execute) {
-      buildOptimizedExecute(
+    if (
+      this.executeV2 === UnbatchedExecutableStep.prototype.executeV2 &&
+      this.execute === UnbatchedExecutableStep.prototype.execute
+    ) {
+      // If they've not replaced 'execute', use our optimized form
+      buildOptimizedExecuteV2(
         this.dependencies.length,
         this.isSyncAndSafe,
         (fn) => {
-          this.execute = fn;
+          this.executeV2 = fn;
         },
       );
+    } else if (
+      this.executeV2 === UnbatchedExecutableStep.prototype.executeV2 &&
+      this.execute !== UnbatchedExecutableStep.prototype.execute
+    ) {
+      // They've overridden `execute` so we should call that rather than using our optimized executeV2
+      this.executeV2 = ExecutableStep.prototype.executeV2;
     }
     super.finalize();
   }
 
-  execute(
-    count: number,
-    values: ReadonlyArray<GrafastValuesList<any>>,
-    extra: ExecutionExtra,
-  ): PromiseOrDirect<GrafastResultsList<TData>> {
+  executeV2({
+    indexMap,
+    values,
+    extra,
+  }: ExecutionDetails): PromiseOrDirect<GrafastResultsList<TData>> {
     console.warn(
       `${this} didn't call 'super.finalize()' in the finalize method.`,
     );
-    const results = [];
-    for (let i = 0; i < count; i++) {
+    return indexMap((i) => {
       try {
-        const tuple = values.map((list) => list[i]);
-        results[i] = this.unbatchedExecute(extra, ...tuple);
+        const tuple = values.map((list) => list.at(i));
+        return this.unbatchedExecute(extra, ...tuple);
       } catch (e) {
-        results[i] = e instanceof Error ? (e as never) : Promise.reject(e);
+        return e instanceof Error ? (e as never) : Promise.reject(e);
       }
-    }
-    return results;
+    });
   }
 
   abstract unbatchedExecute(
-    extra: ExecutionExtra,
+    extra: UnbatchedExecutionExtra,
     ...tuple: any[]
   ): PromiseOrDirect<TData>;
 }
@@ -667,11 +726,22 @@ export type StreamableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
     },
   ): PromiseOrDirect<GrafastResultStreamList<TData>>;
 };
+export type StreamV2ableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
+  streamV2(
+    details: StreamDetails,
+  ): PromiseOrDirect<GrafastResultStreamList<TData>>;
+};
 
 export function isStreamableStep<TData>(
   plan: ExecutableStep<ReadonlyArray<TData>>,
 ): plan is StreamableStep<TData> {
   return typeof (plan as StreamableStep<TData>).stream === "function";
+}
+
+export function isStreamV2ableStep<TData>(
+  plan: ExecutableStep<ReadonlyArray<TData>>,
+): plan is StreamV2ableStep<TData> {
+  return typeof (plan as StreamV2ableStep<TData>).streamV2 === "function";
 }
 
 export type PolymorphicStep = ExecutableStep & {

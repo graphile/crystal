@@ -3,7 +3,7 @@ import { expect } from "chai";
 import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type { PromiseOrDirect } from "../dist/index.js";
+import type { ExecutionDetails, PromiseOrDirect } from "../dist/index.js";
 import {
   arrayOfLength,
   constant,
@@ -30,8 +30,8 @@ class SomeStep extends ExecutableStep {
   finalize(): void {
     super.finalize();
   }
-  async execute(l: number) {
-    return arrayOfLength(l, 42);
+  async executeV2({ count }: ExecutionDetails) {
+    return arrayOfLength(count, 42);
   }
 }
 
@@ -45,8 +45,8 @@ class BadOptimizeStep extends ExecutableStep {
     $parent.optimize?.({ meta: {}, stream: null });
     return this;
   }
-  async execute(l: number) {
-    return arrayOfLength(l, 42);
+  async executeV2({ count }: ExecutionDetails) {
+    return arrayOfLength(count, 42);
   }
 }
 
@@ -60,8 +60,8 @@ class BadFinalizeStep extends ExecutableStep {
     $parent.finalize();
     return this;
   }
-  execute(l: number) {
-    return arrayOfLength(l, 42);
+  executeV2({ count }: ExecutionDetails) {
+    return arrayOfLength(count, 42);
   }
 }
 

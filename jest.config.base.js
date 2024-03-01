@@ -1,5 +1,5 @@
 if (!("GRAPHILE_ENV" in process.env)) {
-  process.env.GRAPHILE_ENV = "development";
+  process.env.GRAPHILE_ENV = "test";
 }
 module.exports = (dir) => {
   const packageJson = require(`${dir}/package.json`);

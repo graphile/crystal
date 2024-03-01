@@ -3079,17 +3079,26 @@ export class OperationPlan {
       let currentLayerPlan: LayerPlan | null = layerPlan;
 
       while (dep.layerPlan !== currentLayerPlan) {
-        if (currentLayerPlan.copyStepIds.includes(dep.id)) {
+        if (
+          currentLayerPlan.copyBatchStepIds.includes(dep.id) ||
+          currentLayerPlan.copyUnaryStepIds.includes(dep.id)
+        ) {
           break;
         }
-        if (isDev && this.stepTracker.getStepById(dep.id) !== dep) {
+        const targetStep = this.stepTracker.getStepById(dep.id);
+        if (isDev && targetStep !== dep) {
           throw new Error(
             `GrafastInternalError<b291b110-396a-4c9c-814a-5466af3c50e8>: Plan mismatch; are we using a replaced step? Step ID: ${
               dep.id
             }; step: ${dep}; stepById: ${this.stepTracker.getStepById(dep.id)}`,
           );
         }
-        currentLayerPlan.copyStepIds.push(dep.id);
+        if (targetStep._isUnary) {
+          targetStep._isUnaryLocked = true;
+          currentLayerPlan.copyUnaryStepIds.push(dep.id);
+        } else {
+          currentLayerPlan.copyBatchStepIds.push(dep.id);
+        }
         currentLayerPlan = currentLayerPlan.parentLayerPlan;
         if (!currentLayerPlan) {
           throw new Error(
@@ -3416,7 +3425,7 @@ export class OperationPlan {
       return {
         id: lp.id,
         reason: printBucketReason(lp.reason),
-        copyStepIds: lp.copyStepIds,
+        copyStepIds: [...lp.copyUnaryStepIds, ...lp.copyBatchStepIds],
         phases: lp.phases.map(printPhase),
         steps: lp.steps.map(printStep),
         children: lp.children.map(printBucket),

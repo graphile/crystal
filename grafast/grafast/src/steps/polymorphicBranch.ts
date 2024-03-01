@@ -1,9 +1,8 @@
 import type { GraphQLObjectType } from "graphql";
 
 import type {
-  ExecutionExtra,
+  ExecutionDetails,
   GrafastResultsList,
-  GrafastValuesList,
   PromiseOrDirect,
 } from "../index.js";
 import { polymorphicWrap } from "../index.js";
@@ -72,15 +71,12 @@ export class PolymorphicBranchStep<TStep extends ExecutableStep>
     }
   }
 
-  execute(
-    count: number,
-    values: ReadonlyArray<GrafastValuesList<any>>,
-    _extra: ExecutionExtra,
-  ): PromiseOrDirect<GrafastResultsList<any>> {
-    const results: any[] = [];
-    const objects = values[0];
-    for (let i = 0; i < count; i++) {
-      const obj = objects[i];
+  executeV2({
+    indexMap,
+    values: [values0],
+  }: ExecutionDetails): PromiseOrDirect<GrafastResultsList<any>> {
+    return indexMap((i) => {
+      const obj = values0.at(i);
       let match: string | null = null;
       if (obj != null) {
         for (const typeName of this.typeNames) {
@@ -90,9 +86,8 @@ export class PolymorphicBranchStep<TStep extends ExecutableStep>
           }
         }
       }
-      results[i] = match !== null ? polymorphicWrap(match, obj) : null;
-    }
-    return results;
+      return match !== null ? polymorphicWrap(match, obj) : null;
+    });
   }
 }
 

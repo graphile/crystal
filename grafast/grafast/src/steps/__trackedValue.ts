@@ -14,11 +14,11 @@ import {
 } from "graphql";
 
 import type { Constraint } from "../constraints.js";
-import { __ListTransformStep } from "../index.js";
+import { __ListTransformStep, arrayOfLength } from "../index.js";
 import type {
-  ExecutionExtra,
+  ExecutionDetails,
   GrafastResultsList,
-  GrafastValuesList,
+  UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import type { __ValueStep } from "./__value.js";
@@ -151,15 +151,17 @@ export class __TrackedValueStep<
     }
   }
 
-  execute(
-    _count: number,
-    values: [GrafastValuesList<TData>],
-  ): GrafastResultsList<TData> {
+  executeV2({
+    count,
+    values: [values0],
+  }: ExecutionDetails<[TData]>): GrafastResultsList<TData> {
     // We have only one dependency, return the value of that.
-    return values[0];
+    return values0.isBatch
+      ? values0.entries
+      : arrayOfLength(count, values0.value);
   }
 
-  unbatchedExecute(_extra: ExecutionExtra, v: TData): TData {
+  unbatchedExecute(_extra: UnbatchedExecutionExtra, v: TData): TData {
     return v;
   }
 

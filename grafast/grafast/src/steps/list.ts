@@ -1,6 +1,7 @@
 import type {
-  ExecutionExtra,
+  ExecutionDetails,
   StepOptimizeOptions,
+  UnbatchedExecutionExtra,
   UnwrapPlanTuple,
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
@@ -29,19 +30,16 @@ export class ListStep<
     return this.dependencies.map(($dep) => $dep.id).join(",");
   }
 
-  execute(
-    count: number,
-    values: any[][], //Array<UnwrapPlanTuple<TPlanTuple>>,
-  ): Array<UnwrapPlanTuple<TPlanTuple>> {
-    const result: any[] = [];
-    for (let i = 0; i < count; i++) {
-      result[i] = values.map((list) => list[i]);
-    }
-    return result;
+  executeV2(
+    { indexMap, values }: ExecutionDetails, //UnwrapPlanTuple<TPlanTuple>,
+  ) {
+    return indexMap(
+      (i) => values.map((value) => value.at(i)) as UnwrapPlanTuple<TPlanTuple>,
+    );
   }
 
   unbatchedExecute(
-    _extra: ExecutionExtra,
+    _extra: UnbatchedExecutionExtra,
     ...values: any[] //UnwrapPlanTuple<TPlanTuple>,
   ): UnwrapPlanTuple<TPlanTuple> {
     return values as any;

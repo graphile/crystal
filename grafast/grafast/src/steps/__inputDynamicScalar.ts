@@ -7,7 +7,7 @@ import type {
 import * as graphql from "graphql";
 
 import { SafeError } from "../error.js";
-import type { ExecutionExtra } from "../interfaces.js";
+import type { UnbatchedExecutionExtra } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import type { __TrackedValueStep } from "./__trackedValue.js";
 
@@ -122,7 +122,7 @@ export class __InputDynamicScalarStep<
   }
 
   unbatchedExecute = (
-    _extra: ExecutionExtra,
+    _extra: UnbatchedExecutionExtra,
     ...variableValues: any[]
   ): TLeaf => {
     const converted = this.valueFromValues(variableValues);

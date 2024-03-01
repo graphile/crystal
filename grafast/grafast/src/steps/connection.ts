@@ -1,8 +1,8 @@
 import * as assert from "../assert.js";
 import type {
-  ExecutionExtra,
   GrafastResultsList,
   InputStep,
+  UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
@@ -452,7 +452,11 @@ export class EdgeStep<
     }
   }
 
-  unbatchedExecute(_extra: ExecutionExtra, record: any, cursor: any): any {
+  unbatchedExecute(
+    _extra: UnbatchedExecutionExtra,
+    record: any,
+    cursor: any,
+  ): any {
     // Handle nulls; everything else comes from the child plans
     return record == null && (this.cursorDepId == null || cursor == null)
       ? null

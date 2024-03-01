@@ -1,8 +1,8 @@
 import type {
   ExecutableStep,
-  ExecutionExtra,
   PolymorphicData,
   PolymorphicStep,
+  UnbatchedExecutionExtra,
 } from "grafast";
 import {
   exportAs,
@@ -123,7 +123,7 @@ export class PgPolymorphicStep<
   }
 
   unbatchedExecute(
-    _extra: ExecutionExtra,
+    _extra: UnbatchedExecutionExtra,
     _item: any,
     specifier: any,
   ): PolymorphicData<string> | null {
