@@ -12,7 +12,7 @@
     "watch": "yarn build && tsc -b --watch",
     "clean": "( jest --clearCache || true ) && rm -Rf {utils,grafast,graphile-build,postgraphile}/*/{dist,bundle,tsconfig.tsbuildinfo,tsconfig.build.tsbuildinfo}",
     "changeset:version": "yarn changeset version && node scripts/postversion.mjs",
-    "docs:gen": "yarn typedoc .",
+    "typedoc:gen": "yarn typedoc .",
     "w": "yarn workspace",
     "postgraphile": "cd postgraphile/postgraphile && node dist/cli-run.js",
     "-----": "-----",
