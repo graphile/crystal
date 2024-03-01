@@ -3497,16 +3497,10 @@ export class OperationPlan {
 function makeDefaultPlan(fieldName: string) {
   return (
     $step: ExecutableStep & { get?: (field: string) => ExecutableStep },
-  ) => {
-    if (typeof $step.get === "function") {
-      return $step.get(fieldName);
-    }
-    const fn = ($step as any)[fieldName];
-    if (typeof fn === "function" && fn.length === 0) {
-      return fn.call($step);
-    }
-    return access($step, [fieldName]);
-  };
+  ) =>
+    typeof $step.get === "function"
+      ? $step.get(fieldName)
+      : access($step, [fieldName]);
 }
 
 function makeMetaByMetaKeysFactory(
