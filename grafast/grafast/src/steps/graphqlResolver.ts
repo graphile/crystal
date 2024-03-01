@@ -41,11 +41,7 @@ function dcr(
   if (data == null) {
     return data;
   }
-  if (Array.isArray(data) && data.some(isPromiseLike)) {
-    return Promise.all(data).then((data) => ({ data, context, resolveInfo }));
-  } else {
-    return { data, context, resolveInfo };
-  }
+  return { data, context, resolveInfo };
 }
 
 /**
