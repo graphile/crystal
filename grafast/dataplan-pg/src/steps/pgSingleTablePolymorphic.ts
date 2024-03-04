@@ -56,7 +56,7 @@ export class PgSingleTablePolymorphicStep<
     return this.rowPlan();
   }
 
-  executeV2({
+  execute({
     indexMap,
     values,
   }: ExecutionDetails): GrafastResultsList<PolymorphicData<

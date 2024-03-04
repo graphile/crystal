@@ -78,7 +78,7 @@ class GetRecordsStep<T extends Record<string, any>> extends ExecutableStep {
     this.firstUDI = this.addUnaryDependency($first);
   }
 
-  async executeV2({
+  async execute({
     indexMap,
     values,
   }: ExecutionDetails): Promise<GrafastResultsList<any>> {

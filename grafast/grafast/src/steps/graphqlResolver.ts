@@ -305,7 +305,7 @@ export class GraphQLItemHandler
     return data.map((data) => dcr(data, context, resolveInfo));
   }
 
-  executeV2({
+  execute({
     indexMap,
     values: [values0],
   }: ExecutionDetails<

@@ -1209,7 +1209,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
    * NOTE: we don't know what the values being fed in are, we must feed them to
    * the plans stored in this.identifiers to get actual values we can use.
    */
-  async executeV2({
+  async execute({
     indexMap,
     count,
     values,

@@ -20,7 +20,7 @@ export class FirstStep<TData> extends UnbatchedExecutableStep<TData> {
     this.addDependency(parentPlan);
   }
 
-  executeV2({
+  execute({
     indexMap,
     values: [values0],
   }: ExecutionDetails<[ReadonlyArray<TData>]>): GrafastResultsList<TData> {

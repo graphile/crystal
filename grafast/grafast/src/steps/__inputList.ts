@@ -78,7 +78,7 @@ export class __InputListStep<
     }
   }
 
-  executeV2(): any[] {
+  execute(): any[] {
     throw new Error(
       "__InputListStep should never execute; it should have been optimized away.",
     );

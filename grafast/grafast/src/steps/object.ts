@@ -216,7 +216,7 @@ ${inner}
     return super.finalize();
   }
 
-  executeV2({
+  execute({
     indexMap,
     values,
     extra,

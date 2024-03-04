@@ -33,7 +33,7 @@ export class ProxyStep<T> extends UnbatchedExecutableStep<T> {
   public addDependency(step: ExecutableStep): number {
     return super.addDependency(step);
   }
-  executeV2({
+  execute({
     count,
     values: [values0],
   }: ExecutionDetails<[T]>): GrafastResultsList<T> {

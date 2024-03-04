@@ -696,7 +696,7 @@ export function executeBucket(
       );
       return step.stream(count, backfilledValues, extra, streamOptions);
     } else {
-      return step.executeV2({
+      return step.execute({
         indexMap: makeIndexMap(count),
         indexForEach: makeIndexForEach(count),
         count,

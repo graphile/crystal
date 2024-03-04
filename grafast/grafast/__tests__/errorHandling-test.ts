@@ -26,7 +26,7 @@ class SyncListCallbackStep<
     super();
     this.addDependency($dep);
   }
-  executeV2({
+  execute({
     indexMap,
     values: [values0],
   }: ExecutionDetails<[TIn]>): ReadonlyArray<PromiseOrDirect<TOut>> {

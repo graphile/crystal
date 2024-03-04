@@ -41,7 +41,7 @@ export class ReverseStep<TData> extends UnbatchedExecutableStep<
     this.addDependency(plan);
   }
 
-  executeV2({
+  execute({
     indexMap,
     values: [values0],
   }: ExecutionDetails<[TData[]]>): GrafastResultsList<TData[]> {

@@ -69,7 +69,7 @@ export class ApplyTransformsStep extends ExecutableStep {
     this.operationPlan.finishSubroutine(this, this.subroutineLayer);
   }
 
-  async executeV2({
+  async execute({
     indexMap,
     values: [values0],
     extra,

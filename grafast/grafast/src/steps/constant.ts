@@ -32,7 +32,7 @@ export class ConstantStep<TData> extends UnbatchedExecutableStep<TData> {
     return peers.filter((p) => p.data === this.data);
   }
 
-  executeV2({ count }: ExecutionDetails): GrafastResultsList<TData> {
+  execute({ count }: ExecutionDetails): GrafastResultsList<TData> {
     return arrayOfLength(count, this.data);
   }
 

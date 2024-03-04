@@ -1,5 +1,6 @@
 import * as assert from "../assert.js";
 import type {
+  ExecutionDetails,
   GrafastResultsList,
   InputStep,
   UnbatchedExecutionExtra,
@@ -327,7 +328,9 @@ export class ConnectionStep<
   }
   */
 
-  public execute(count: number): GrafastResultsList<Record<string, never>> {
+  public execute({
+    count,
+  }: ExecutionDetails): GrafastResultsList<Record<string, never>> {
     // Fake execution; data actually comes from the child plans
     return arrayOfLength(count, EMPTY_OBJECT);
   }

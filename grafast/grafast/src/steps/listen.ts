@@ -59,7 +59,7 @@ export class ListenStep<
     this.topicDep = this.addDependency($topic);
   }
 
-  executeV2(): never {
+  execute(): never {
     throw new Error("ListenStep cannot be executed, it can only be streamed");
   }
 
