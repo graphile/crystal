@@ -689,22 +689,7 @@ export function isListLikeStep<
 }
 
 export type StreamableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
-  /**
-   * If this plan supports streaming then it should implement this method. It's
-   * basically the same as `execute` except it returns a list of result streams
-   * rather than a list of results.
-   */
   stream(
-    count: number,
-    values: ReadonlyArray<GrafastValuesList<any>>,
-    extra: ExecutionExtra,
-    streamOptions: {
-      initialCount: number;
-    },
-  ): PromiseOrDirect<GrafastResultStreamList<TData>>;
-};
-export type StreamV2ableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
-  streamV2(
     details: StreamDetails,
   ): PromiseOrDirect<GrafastResultStreamList<TData>>;
 };
@@ -713,12 +698,6 @@ export function isStreamableStep<TData>(
   plan: ExecutableStep<ReadonlyArray<TData>>,
 ): plan is StreamableStep<TData> {
   return typeof (plan as StreamableStep<TData>).stream === "function";
-}
-
-export function isStreamV2ableStep<TData>(
-  plan: ExecutableStep<ReadonlyArray<TData>>,
-): plan is StreamV2ableStep<TData> {
-  return typeof (plan as StreamV2ableStep<TData>).streamV2 === "function";
 }
 
 export type PolymorphicStep = ExecutableStep & {

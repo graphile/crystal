@@ -180,7 +180,7 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
     return data;
   }
 
-  async streamV2({
+  async stream({
     indexMap,
     values,
     extra,

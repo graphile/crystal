@@ -24,7 +24,7 @@ import type {
 } from "../interfaces.js";
 import { $$streamMore, $$timeout } from "../interfaces.js";
 import type { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
-import { isStreamableStep, isStreamV2ableStep } from "../step.js";
+import { isStreamableStep } from "../step.js";
 import { __ItemStep } from "../steps/__item.js";
 import { __ValueStep } from "../steps/__value.js";
 import { timeSource } from "../timeSource.js";
@@ -680,8 +680,13 @@ export function executeBucket(
       );
     }
     const streamOptions = step._stepOptions.stream;
-    if (streamOptions && isStreamV2ableStep(step)) {
-      return step.streamV2({
+    if (streamOptions && isStreamableStep(step)) {
+      if (step.stream.length > 1) {
+        throw new Error(
+          `${step} is using a legacy form of 'stream' which accepts multiple arguments, please see https://err.red/gev2`,
+        );
+      }
+      return step.stream({
         indexMap: makeIndexMap(count),
         indexForEach: makeIndexForEach(count),
         count,
@@ -689,13 +694,12 @@ export function executeBucket(
         extra,
         streamOptions,
       });
-    } else if (streamOptions && isStreamableStep(step)) {
-      // Backwards compatibility
-      const backfilledValues = values.map((v) =>
-        v.isBatch ? v.entries : arrayOfLength(count, v.value),
-      );
-      return step.stream(count, backfilledValues, extra, streamOptions);
     } else {
+      if (step.execute.length > 1) {
+        throw new Error(
+          `${step} is using a legacy form of 'execute' which accepts multiple arguments, please see https://err.red/gev2`,
+        );
+      }
       return step.execute({
         indexMap: makeIndexMap(count),
         indexForEach: makeIndexForEach(count),

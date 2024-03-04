@@ -274,12 +274,12 @@ for `$b` accessible through `bDep.get(i)` would be `2`, `4` and `6`. The
 execute method then returns the same number of results in the same order: `[3,
 7, 11]`.
 
-### streamV2
+### stream
 
 _This method is optional._
 
 ```ts
-streamV2(details: StreamDetails): PromiseOrDirect<GrafastResultStreamList>
+stream(details: StreamDetails): PromiseOrDirect<GrafastResultStreamList>
 ```
 
 ```ts
@@ -294,7 +294,7 @@ type GrafastResultStreamList<T> = ReadonlyArray<
 >;
 ```
 
-TODO: document streamV2. (It's like execute, except it returns a list of async iterators.)
+TODO: document stream. (It's like execute, except it returns a list of async iterators.)
 
 ### deduplicate
 

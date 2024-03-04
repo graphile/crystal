@@ -32,7 +32,7 @@ class SyncListCallbackStep<
   }: ExecutionDetails<[TIn]>): ReadonlyArray<PromiseOrDirect<TOut>> {
     return indexMap((i) => this.callback(values0.at(i)));
   }
-  async streamV2({ indexMap, values: [values0] }: ExecutionDetails<[TIn]>) {
+  async stream({ indexMap, values: [values0] }: ExecutionDetails<[TIn]>) {
     await sleep(0);
     const { callback } = this;
     return indexMap((i) => {
