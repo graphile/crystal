@@ -19,10 +19,8 @@ import { getDebug } from "./global.js";
 import { inspect } from "./inspect.js";
 import type {
   ExecutionDetails,
-  ExecutionExtra,
   GrafastResultsList,
   GrafastResultStreamList,
-  GrafastValuesList,
   JSONValue,
   PromiseOrDirect,
   StepOptimizeOptions,
@@ -33,7 +31,6 @@ import type {
 import { $$subroutine } from "./interfaces.js";
 import type { __ItemStep } from "./steps/index.js";
 import { __ListTransformStep } from "./steps/index.js";
-import { arrayOfLength } from "./utils.js";
 
 /**
  * @internal
@@ -461,9 +458,9 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * - `indexForEach`: as `indexMap`, but without the array result.
    * - `meta`: [experimental]
    *
-   * `execute must return a list with `count` entries, where each value
-   * in the list relates to the result of executing this plan for the
-   * corresponding entry in each of the entries in the `values` tuple.
+   * `execute` must return a list with `count` entries, where each value in the
+   * list relates to the result of executing this plan for the corresponding
+   * entry in each of the entries in the `values` tuple.
    *
    * IMPORTANT: it is up to the execute function to cache/memoize results as
    * appropriate for performance, this can be done via the `meta` object.
