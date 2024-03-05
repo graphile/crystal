@@ -9,7 +9,15 @@ lateral (
     __messages_identifiers__.idx as "4"
   from app_public.messages as __messages__
   left outer join app_public.forums as __forums__
-  on (__messages__."forum_id"::"uuid" = __forums__."id")
+  on (
+    (
+      __messages__."forum_id"::"uuid" = __forums__."id"
+    ) and (
+      /* WHERE becoming ON */ (
+        true /* authorization checks */
+      )
+    )
+  )
   where
     (
       true /* authorization checks */

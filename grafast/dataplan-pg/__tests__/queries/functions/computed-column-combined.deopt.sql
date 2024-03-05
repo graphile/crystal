@@ -41,10 +41,10 @@ lateral (
     __users_most_recent_forum__,
     __users_most_recent_forum_identifiers__."id1"
   ) as __forums_unique_author_count__(v)
-  on TRUE
-  where (
+  on (
+  /* WHERE becoming ON */ (
     true /* authorization checks */
-  )
+  ))
 ) as __users_most_recent_forum_result__;
 
 select __forums_featured_messages_result__.*

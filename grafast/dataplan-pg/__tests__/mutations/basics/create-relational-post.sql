@@ -20,11 +20,30 @@ lateral (
     __relational_posts_identifiers__.idx as "8"
   from interfaces_and_unions.relational_posts as __relational_posts__
   left outer join interfaces_and_unions.relational_items as __relational_items__
-  on (__relational_posts__."id"::"int4" = __relational_items__."id")
+  on (
+    (
+      __relational_posts__."id"::"int4" = __relational_items__."id"
+    ) and (
+      /* WHERE becoming ON */ (
+        true /* authorization checks */
+      )
+    )
+  )
   left outer join interfaces_and_unions.people as __people__
-  on (__relational_items__."author_id"::"int4" = __people__."person_id")
+  on (
+    (
+      __relational_items__."author_id"::"int4" = __people__."person_id"
+    ) and (
+      /* WHERE becoming ON */ (
+        true /* authorization checks */
+      )
+    )
+  )
   left outer join interfaces_and_unions.relational_posts_title_lower(__relational_posts__) as __relational_posts_title_lower__(v)
-  on TRUE
+  on (
+  /* WHERE becoming ON */ (
+    true /* authorization checks */
+  ))
   where
     (
       true /* authorization checks */

@@ -19,7 +19,15 @@ lateral (
     __relational_posts_identifiers__.idx as "4"
   from interfaces_and_unions.relational_posts as __relational_posts__
   left outer join interfaces_and_unions.relational_items as __relational_items__
-  on (__relational_posts__."id"::"int4" = __relational_items__."id")
+  on (
+    (
+      __relational_posts__."id"::"int4" = __relational_items__."id"
+    ) and (
+      /* WHERE becoming ON */ (
+        true /* authorization checks */
+      )
+    )
+  )
   where
     (
       true /* authorization checks */

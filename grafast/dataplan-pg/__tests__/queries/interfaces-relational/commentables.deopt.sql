@@ -21,7 +21,15 @@ lateral (
     __relational_posts_identifiers__.idx as "7"
   from interfaces_and_unions.relational_posts as __relational_posts__
   left outer join interfaces_and_unions.relational_items as __relational_items__
-  on (__relational_posts__."id"::"int4" = __relational_items__."id")
+  on (
+    (
+      __relational_posts__."id"::"int4" = __relational_items__."id"
+    ) and (
+      /* WHERE becoming ON */ (
+        true /* authorization checks */
+      )
+    )
+  )
   where
     (
       true /* authorization checks */
@@ -42,7 +50,15 @@ lateral (
     __relational_checklists_identifiers__.idx as "5"
   from interfaces_and_unions.relational_checklists as __relational_checklists__
   left outer join interfaces_and_unions.relational_items as __relational_items__
-  on (__relational_checklists__."id"::"int4" = __relational_items__."id")
+  on (
+    (
+      __relational_checklists__."id"::"int4" = __relational_items__."id"
+    ) and (
+      /* WHERE becoming ON */ (
+        true /* authorization checks */
+      )
+    )
+  )
   where
     (
       true /* authorization checks */
@@ -64,7 +80,15 @@ lateral (
     __relational_checklist_items_identifiers__.idx as "6"
   from interfaces_and_unions.relational_checklist_items as __relational_checklist_items__
   left outer join interfaces_and_unions.relational_items as __relational_items__
-  on (__relational_checklist_items__."id"::"int4" = __relational_items__."id")
+  on (
+    (
+      __relational_checklist_items__."id"::"int4" = __relational_items__."id"
+    ) and (
+      /* WHERE becoming ON */ (
+        true /* authorization checks */
+      )
+    )
+  )
   where
     (
       true /* authorization checks */

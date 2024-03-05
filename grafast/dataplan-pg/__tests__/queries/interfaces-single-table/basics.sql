@@ -13,9 +13,9 @@ select
     from interfaces_and_unions.single_table_items as __single_table_items__
     where
       (
-        __people__."person_id"::"int4" = __single_table_items__."author_id"
-      ) and (
         true /* authorization checks */
+      ) and (
+        __people__."person_id"::"int4" = __single_table_items__."author_id"
       )
     order by __single_table_items__."id" asc
   ) s) as "1"

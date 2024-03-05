@@ -13,9 +13,25 @@ lateral (
         __users_2."gravatar_url" as "5"
       from app_public.messages as __messages__
       left outer join app_public.users as __users__
-      on (__messages__."author_id"::"uuid" = __users__."id")
+      on (
+        (
+          __messages__."author_id"::"uuid" = __users__."id"
+        ) and (
+          /* WHERE becoming ON */ (
+            true /* authorization checks */
+          )
+        )
+      )
       left outer join app_public.users as __users_2
-      on (__messages__."author_id"::"uuid" = __users_2."id")
+      on (
+        (
+          __messages__."author_id"::"uuid" = __users_2."id"
+        ) and (
+          /* WHERE becoming ON */ (
+            true /* authorization checks */
+          )
+        )
+      )
       where
         (
           __messages__.featured = __forums_identifiers__."id0"

@@ -12,17 +12,26 @@ lateral (
     __forums__,
     __forums_identifiers__."id1"
   ) as __forums_unique_author_count__(v)
-  on TRUE
+  on (
+  /* WHERE becoming ON */ (
+    true /* authorization checks */
+  ))
   left outer join app_public.forums_unique_author_count(
     __forums__,
     __forums_identifiers__."id2"
   ) as __forums_unique_author_count_2(v)
-  on TRUE
+  on (
+  /* WHERE becoming ON */ (
+    true /* authorization checks */
+  ))
   left outer join app_public.forums_unique_author_count(
     __forums__,
     __forums_identifiers__."id3"
   ) as __forums_unique_author_count_3(v)
-  on TRUE
+  on (
+  /* WHERE becoming ON */ (
+    true /* authorization checks */
+  ))
   where
     (
       true /* authorization checks */
