@@ -389,6 +389,7 @@ export function makeExampleSchema(
               notNull: true,
             },
           ],
+          selectAuth: null,
         });
 
       const featuredMessagesResourceOptions =

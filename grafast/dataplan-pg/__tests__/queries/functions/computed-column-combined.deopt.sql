@@ -45,9 +45,6 @@ lateral (
   /* WHERE becoming ON */ (
     true /* authorization checks */
   ))
-  where (
-    true /* authorization checks */
-  )
 ) as __users_most_recent_forum_result__;
 
 select __forums_featured_messages_result__.*

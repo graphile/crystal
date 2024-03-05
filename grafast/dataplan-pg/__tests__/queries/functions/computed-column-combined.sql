@@ -23,10 +23,7 @@ lateral (
     true /* authorization checks */
   ))
   left outer join app_public.users_most_recent_forum(__forums_random_user__) as __users_most_recent_forum__
-  on (
-  /* WHERE becoming ON */ (
-    true /* authorization checks */
-  ))
+  on TRUE
   left outer join app_public.forums_unique_author_count(
     __users_most_recent_forum__,
     __forums_identifiers__."id1"

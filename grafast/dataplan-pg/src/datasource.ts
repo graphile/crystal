@@ -179,9 +179,9 @@ export interface PgResourceOptions<
   executor: PgExecutor;
 
   // TODO: auth should also apply to insert, update and delete, maybe via insertAuth, updateAuth, etc
-  selectAuth?: (
-    $step: PgSelectStep<PgResource<any, any, any, any, any>>,
-  ) => void;
+  selectAuth?:
+    | (($step: PgSelectStep<PgResource<any, any, any, any, any>>) => void)
+    | null;
 
   name: TName;
   identifier?: string;
@@ -233,9 +233,9 @@ export interface PgFunctionResourceOptions<
   uniques?: TUniques;
   extensions?: PgResourceExtensions;
   isMutation?: boolean;
-  selectAuth?: (
-    $step: PgSelectStep<PgResource<any, any, any, any, any>>,
-  ) => void;
+  selectAuth?:
+    | (($step: PgSelectStep<PgResource<any, any, any, any, any>>) => void)
+    | null;
   description?: string;
 }
 
@@ -261,9 +261,9 @@ export class PgResource<
   public readonly identifier: string;
   public readonly from: SQL | ((...args: PgSelectArgumentDigest[]) => SQL);
   public readonly uniques: TUniques;
-  private selectAuth?: (
-    $step: PgSelectStep<PgResource<any, any, any, any, any>>,
-  ) => void;
+  private selectAuth?:
+    | (($step: PgSelectStep<PgResource<any, any, any, any, any>>) => void)
+    | null;
 
   // TODO: make a public interface for this information
   /**
@@ -427,7 +427,7 @@ export class PgResource<
       TNewParameters
     >,
   ): PgResourceOptions<TNewName, TCodec, TNewUniques, TNewParameters> {
-    const { codec, executor, selectAuth } = baseOptions;
+    const { codec, executor, selectAuth: originalSelectAuth } = baseOptions;
     const {
       name,
       identifier,
@@ -441,6 +441,10 @@ export class PgResource<
       selectAuth: overrideSelectAuth,
       description,
     } = overrideOptions;
+    const selectAuth =
+      overrideSelectAuth === null
+        ? null
+        : overrideSelectAuth ?? originalSelectAuth;
     if (!returnsArray) {
       // This is the easy case
       return {
@@ -454,7 +458,7 @@ export class PgResource<
         extensions,
         isUnique: !returnsSetof,
         isMutation: Boolean(isMutation),
-        selectAuth: overrideSelectAuth ?? selectAuth,
+        selectAuth,
         description,
       };
     } else if (!returnsSetof) {
@@ -477,7 +481,7 @@ export class PgResource<
         extensions,
         isUnique: false, // set now, not unique
         isMutation: Boolean(isMutation),
-        selectAuth: overrideSelectAuth ?? selectAuth,
+        selectAuth,
         isList: true,
         description,
       };
@@ -506,7 +510,7 @@ export class PgResource<
         isUnique: false, // set now, not unique
         sqlPartitionByIndex,
         isMutation: Boolean(isMutation),
-        selectAuth: overrideSelectAuth ?? selectAuth,
+        selectAuth,
         description,
       };
     }
