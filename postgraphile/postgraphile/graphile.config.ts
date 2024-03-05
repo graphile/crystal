@@ -231,13 +231,16 @@ const preset: GraphileConfig.Preset = {
         `,
         plans: {
           Query: {
-            throw() {
-              return error(
-                new Error(
-                  "You've requested the 'throw' field... which throws!",
-                ),
-              );
-            },
+            throw: EXPORTABLE(
+              (error) => () => {
+                return error(
+                  new Error(
+                    "You've requested the 'throw' field... which throws!",
+                  ),
+                );
+              },
+              [error],
+            ),
           },
           Person: {
             greet: EXPORTABLE(
