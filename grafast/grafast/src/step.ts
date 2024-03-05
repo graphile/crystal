@@ -19,10 +19,8 @@ import { getDebug } from "./global.js";
 import { inspect } from "./inspect.js";
 import type {
   ExecutionDetails,
-  ExecutionExtra,
   GrafastResultsList,
   GrafastResultStreamList,
-  GrafastValuesList,
   JSONValue,
   PromiseOrDirect,
   StepOptimizeOptions,
@@ -33,7 +31,6 @@ import type {
 import { $$subroutine } from "./interfaces.js";
 import type { __ItemStep } from "./steps/index.js";
 import { __ListTransformStep } from "./steps/index.js";
-import { arrayOfLength } from "./utils.js";
 
 /**
  * @internal
@@ -387,7 +384,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   }
 
   /**
-   * Adds "unary" dependencies; in `executeV2({count, values})` you'll receive a
+   * Adds "unary" dependencies; in `execute({count, values})` you'll receive a
    * `values[index]` (where `index` is the return value of this function) with
    * `isBatch = false` so you can use the `values[index].value` property
    * directly.
@@ -449,14 +446,21 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   }
 
   /**
-   * This function will be called with a `values` list: an array of entries for
-   * each incoming grafast object, where each entry in the array is a list of
-   * the values retrieved from executing the plans in `this.dependencies` for
-   * that grafast object.
+   * This function will be called with 'execution details', an object containing:
    *
-   * It must return a list with the same length as `values`, where each value
-   * in the list relates to the result of executing this plan for the
-   * corresponding entry in the `values` list.
+   * - `count`: the number of entries in the batch that's being executed
+   * - `values`: a tuple representing the runtime values of the steps
+   *   dependencies; each value in the tuple is an object, either a batch object
+   *   containing a list of size `count` containing the values, or a unary
+   *   object containing the single value common to all entries.
+   * - `indexMap`: helper function to map over each index from `0` to `count-1`,
+   *   returning the resulting array.
+   * - `indexForEach`: as `indexMap`, but without the array result.
+   * - `meta`: [experimental]
+   *
+   * `execute` must return a list with `count` entries, where each value in the
+   * list relates to the result of executing this plan for the corresponding
+   * entry in each of the entries in the `values` tuple.
    *
    * IMPORTANT: it is up to the execute function to cache/memoize results as
    * appropriate for performance, this can be done via the `meta` object.
@@ -466,34 +470,13 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * add attributes to meta for each purpose (e.g. use `meta.cache` for
    * memoizing results) so that you can expand your usage of meta in future.
    */
-  /* abstract */ execute(
-    count: number,
-    values: ReadonlyArray<GrafastValuesList<any>>,
-    // EXPERIMENTAL
-    extra: ExecutionExtra,
+  /* abstract */
+  execute(
+    details: ExecutionDetails,
   ): PromiseOrDirect<GrafastResultsList<TData>> {
     // ESLint/TS: ignore not used.
-    count;
-    values;
-    extra;
-    throw new Error(
-      `${this} has not implemented an 'executeV2' or 'execute' method`,
-    );
-  }
-
-  // This executeV2 method implements backwards compatibility with the old
-  // execute method; you should instead override this in your own step
-  // classes.
-  executeV2({
-    count,
-    values,
-    extra,
-  }: ExecutionDetails): PromiseOrDirect<GrafastResultsList<TData>> {
-    // TODO: warn that this class should implement executeV2 instead
-    const backfilledValues = values.map((v, i) =>
-      v.isBatch ? v.entries[i] : arrayOfLength(count, v.value),
-    );
-    return this.execute(count, backfilledValues, extra);
+    details;
+    throw new Error(`${this} has not implemented an 'execute' method`);
   }
 
   public destroy(): void {
@@ -505,7 +488,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     this.deduplicatedWith = throwDestroyed;
     this.optimize = throwDestroyed;
     this.finalize = throwDestroyed;
-    this.executeV2 = throwDestroyed;
+    this.execute = throwDestroyed;
 
     super.destroy();
   }
@@ -571,7 +554,7 @@ te.batch(() => {
   }
 });
 
-function buildOptimizedExecuteV2(
+function buildOptimizedExecute(
   depCount: number,
   isSyncAndSafe: boolean,
   callback: (fn: any) => void,
@@ -602,29 +585,20 @@ export abstract class UnbatchedExecutableStep<
   };
 
   finalize() {
-    if (
-      this.executeV2 === UnbatchedExecutableStep.prototype.executeV2 &&
-      this.execute === UnbatchedExecutableStep.prototype.execute
-    ) {
+    if (this.execute === UnbatchedExecutableStep.prototype.execute) {
       // If they've not replaced 'execute', use our optimized form
-      buildOptimizedExecuteV2(
+      buildOptimizedExecute(
         this.dependencies.length,
         this.isSyncAndSafe,
         (fn) => {
-          this.executeV2 = fn;
+          this.execute = fn;
         },
       );
-    } else if (
-      this.executeV2 === UnbatchedExecutableStep.prototype.executeV2 &&
-      this.execute !== UnbatchedExecutableStep.prototype.execute
-    ) {
-      // They've overridden `execute` so we should call that rather than using our optimized executeV2
-      this.executeV2 = ExecutableStep.prototype.executeV2;
     }
     super.finalize();
   }
 
-  executeV2({
+  execute({
     indexMap,
     values,
     extra,
@@ -712,22 +686,7 @@ export function isListLikeStep<
 }
 
 export type StreamableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
-  /**
-   * If this plan supports streaming then it should implement this method. It's
-   * basically the same as `execute` except it returns a list of result streams
-   * rather than a list of results.
-   */
   stream(
-    count: number,
-    values: ReadonlyArray<GrafastValuesList<any>>,
-    extra: ExecutionExtra,
-    streamOptions: {
-      initialCount: number;
-    },
-  ): PromiseOrDirect<GrafastResultStreamList<TData>>;
-};
-export type StreamV2ableStep<TData> = ExecutableStep<ReadonlyArray<TData>> & {
-  streamV2(
     details: StreamDetails,
   ): PromiseOrDirect<GrafastResultStreamList<TData>>;
 };
@@ -736,12 +695,6 @@ export function isStreamableStep<TData>(
   plan: ExecutableStep<ReadonlyArray<TData>>,
 ): plan is StreamableStep<TData> {
   return typeof (plan as StreamableStep<TData>).stream === "function";
-}
-
-export function isStreamV2ableStep<TData>(
-  plan: ExecutableStep<ReadonlyArray<TData>>,
-): plan is StreamV2ableStep<TData> {
-  return typeof (plan as StreamV2ableStep<TData>).streamV2 === "function";
 }
 
 export type PolymorphicStep = ExecutableStep & {

@@ -16,22 +16,15 @@ to use; but when these aren't enough you are encouraged to write your own (or
 pull down third party step classes from npm or similar).
 
 Step classes extend the `ExecutableStep` class, the only required method to
-define is `executeV2`, but you may also implement the various lifecycle methods,
+define is `execute`, but you may also implement the various lifecycle methods,
 or add methods of your own to make it easier for you to write [plan
 resolvers][].
-
-:::info
-
-Earlier versions of <grafast /> used an `execute` method; we're still backwards
-compatible with that, but you should use `executeV2` for all future work.
-
-:::
 
 <!-- prettier-ignore -->
 ```ts
 /** XKCD-221 step class @ref https://xkcd.com/221/ */
 class GetRandomNumberStep extends ExecutableStep {
-  executeV2({ count }) {
+  execute({ count }) {
     return new Array(count).fill(4); // chosen by fair dice roll.
                                      // guaranteed to be random.
   }
@@ -67,7 +60,7 @@ as part of `ExecutableStep`.
 When your step requires another step's value in order to execute (which is the
 case for the majority of steps!) it must add a dependency via the
 `this.addDependency($otherStep)` method. This method will return a number,
-which is the index in the `executeV2` values tuple that represents this step.
+which is the index in the `execute` values tuple that represents this step.
 
 It's common to do this in the constructor, but it can be done at other stages
 too, for example during the optimize phase a step's descendent might ask it to
@@ -168,10 +161,10 @@ that would occur between the triangular brackets).
 
 ## Lifecycle methods
 
-### executeV2
+### execute
 
 ```ts
-executeV2(details: ExecutionDetails): PromiseOrDirect<GrafastResultsList>
+execute(details: ExecutionDetails): PromiseOrDirect<GrafastResultsList>
 ```
 
 ```ts
@@ -191,7 +184,7 @@ type ExecutionValue<TData> =
 type GrafastResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
 ```
 
-`executeV2` is the one method that your step class must define, and it has very
+`execute` is the one method that your step class must define, and it has very
 strict rules.
 
 It is passed one argument, the "execution details", which is an object containing:
@@ -220,7 +213,7 @@ equivalent to `dep.isBatch ? dep.entries[i] : dep.value`).
 
 Execute must return a list (or a promise to a list) of size `count`, where the
 i'th entry in this list corresponds to the `dep.at(i)` value for each `dep` in
-the "values tuple". The result of `executeV2` may or may not be a promise, and
+the "values tuple". The result of `execute` may or may not be a promise, and
 each entry in the resulting list may or may not be a promise.
 
 :::warning If your step has no dependencies
@@ -253,7 +246,7 @@ can easily be in the thousands.
 If you want one of your entries to throw an error, but the others shouldn't,
 then an easy way to achieve this is to set the corresponding entry in the
 results list to `Promise.reject(new Error(...))`. You can do this even if you
-don't use promises for any of the other values, and even if your `executeV2`
+don't use promises for any of the other values, and even if your `execute`
 method is not marked as `async`. You **must not** do this if you have marked
 your step class with `isSyncAndSafe = true`.
 
@@ -262,10 +255,10 @@ your step class with `isSyncAndSafe = true`.
 #### Example
 
 In the [getting started][] guide we built an `AddStep` step class that adds two
-numbers together. It's `executeV2` method looked like this:
+numbers together. It's `execute` method looked like this:
 
 ```ts
-  executeV2({ indexMap, values: [aDep, bDep] }) {
+  execute({ indexMap, values: [aDep, bDep] }) {
     return indexMap((i) => {
       const a = aDep.at(i);
       const b = bDep.at(i);
@@ -281,12 +274,12 @@ for `$b` accessible through `bDep.get(i)` would be `2`, `4` and `6`. The
 execute method then returns the same number of results in the same order: `[3,
 7, 11]`.
 
-### streamV2
+### stream
 
 _This method is optional._
 
 ```ts
-streamV2(details: StreamDetails): PromiseOrDirect<GrafastResultStreamList>
+stream(details: StreamDetails): PromiseOrDirect<GrafastResultStreamList>
 ```
 
 ```ts
@@ -301,7 +294,7 @@ type GrafastResultStreamList<T> = ReadonlyArray<
 >;
 ```
 
-TODO: document streamV2. (It's like executeV2, except it returns a list of async iterators.)
+TODO: document stream. (It's like execute, except it returns a list of async iterators.)
 
 ### deduplicate
 
@@ -455,35 +448,6 @@ during `optimize`! If the step needs to communicate with its ancestors it
 should use the `optimize` method to do so.
 
 :::
-
-### execute
-
-**Deprecated**! Use [`executeV2`](#executev2) instead. Existing `execute`
-methods should continue to work.
-
-```ts
-execute(
-  count: number,
-  values: ReadonlyArray<GrafastValuesList>,
-  extra: ExecutionExtra,
-): PromiseOrDirect<GrafastResultsList>
-```
-
-### stream
-
-**Deprecated**! Use [`streamV2`](#streamv2) instead. Existing `stream` methods
-should continue to work.
-
-```ts
-stream(
-  count: number,
-  values: ReadonlyArray<GrafastValuesList>,
-  extra: ExecutionExtra,
-  streamOptions: {
-    initialCount: number;
-  },
-): PromiseOrDirect<GrafastResultStreamList>
-```
 
 ## Other properties
 

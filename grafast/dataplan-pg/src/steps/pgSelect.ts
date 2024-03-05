@@ -10,7 +10,7 @@ import type {
   PromiseOrDirect,
   StepOptimizeOptions,
   StepStreamOptions,
-  StreamV2ableStep,
+  StreamableStep,
 } from "grafast";
 import {
   __InputListStep,
@@ -273,7 +273,7 @@ export class PgSelectStep<
     ReadonlyArray<unknown[] /* a tuple based on what is selected at runtime */>
   >
   implements
-    StreamV2ableStep<unknown[]>,
+    StreamableStep<unknown[]>,
     ConnectionCapableStep<
       PgSelectSingleStep<TResource>,
       PgSelectParsedCursorStep
@@ -1209,7 +1209,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
    * NOTE: we don't know what the values being fed in are, we must feed them to
    * the plans stored in this.identifiers to get actual values we can use.
    */
-  async executeV2({
+  async execute({
     indexMap,
     count,
     values,
@@ -1291,7 +1291,7 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
   /**
    * Like `execute`, but stream the results via async iterables.
    */
-  async streamV2({
+  async stream({
     indexMap,
     values,
     extra: { eventEmitter },

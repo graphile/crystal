@@ -180,7 +180,7 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
     return data;
   }
 
-  async streamV2({
+  async stream({
     indexMap,
     values,
     extra,
@@ -305,7 +305,7 @@ export class GraphQLItemHandler
     return data.map((data) => dcr(data, context, resolveInfo));
   }
 
-  executeV2({
+  execute({
     indexMap,
     values: [values0],
   }: ExecutionDetails<

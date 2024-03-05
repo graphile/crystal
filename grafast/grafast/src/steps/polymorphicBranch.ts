@@ -71,7 +71,7 @@ export class PolymorphicBranchStep<TStep extends ExecutableStep>
     }
   }
 
-  executeV2({
+  execute({
     indexMap,
     values: [values0],
   }: ExecutionDetails): PromiseOrDirect<GrafastResultsList<any>> {

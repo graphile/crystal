@@ -152,7 +152,7 @@ export class LoadedRecordStep<
     return this.getDep(0);
   }
   // This'll never be called, due to `optimize` above.
-  executeV2({
+  execute({
     count,
     values: [values0],
   }: ExecutionDetails<[TItem]>): GrafastResultsList<TItem> {
@@ -286,7 +286,7 @@ export class LoadStep<
     super.finalize();
   }
 
-  executeV2({
+  execute({
     count,
     values: [values0],
     extra,

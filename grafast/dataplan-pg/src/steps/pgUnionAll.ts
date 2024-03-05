@@ -324,7 +324,7 @@ export class PgUnionAllSingleStep
     return sqlExpr`${fragment}`;
   }
 
-  executeV2({
+  execute({
     count,
     values: [values0],
   }: ExecutionDetails): GrafastResultsList<any> {
@@ -1933,7 +1933,7 @@ ${lateralText};`;
   }
 
   // Be careful if we add streaming - ensure `shouldReverseOrder` is fine.
-  async executeV2({
+  async execute({
     indexMap,
     values,
     extra: { eventEmitter },

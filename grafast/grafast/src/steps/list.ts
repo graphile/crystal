@@ -30,7 +30,7 @@ export class ListStep<
     return this.dependencies.map(($dep) => $dep.id).join(",");
   }
 
-  executeV2(
+  execute(
     { indexMap, values }: ExecutionDetails, //UnwrapPlanTuple<TPlanTuple>,
   ) {
     return indexMap(

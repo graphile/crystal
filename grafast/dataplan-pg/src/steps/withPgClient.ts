@@ -52,7 +52,7 @@ export class WithPgClientStep<
     this.dataId = this.addDependency($data);
   }
 
-  executeV2({
+  execute({
     indexMap,
     values,
   }: ExecutionDetails<

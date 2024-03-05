@@ -37,7 +37,7 @@ export class PgValidateParsedCursorStep extends ExecutableStep<undefined> {
     );
   }
 
-  executeV2({
+  execute({
     indexMap,
     values: [parsedCursorDep],
   }: ExecutionDetails<[string | null]>): GrafastResultsList<undefined> {

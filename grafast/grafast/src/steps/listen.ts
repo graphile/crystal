@@ -5,7 +5,7 @@ import type {
   GrafastSubscriber,
   StreamDetails,
 } from "../interfaces.js";
-import type { StreamV2ableStep } from "../step.js";
+import type { StreamableStep } from "../step.js";
 import { ExecutableStep, isExecutableStep } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 import { constant } from "./constant.js";
@@ -21,7 +21,7 @@ export class ListenStep<
     TPayloadStep extends ExecutableStep,
   >
   extends ExecutableStep<TTopics[TTopic]>
-  implements StreamV2ableStep<TTopics[TTopic]>
+  implements StreamableStep<TTopics[TTopic]>
 {
   static $$export = {
     moduleName: "grafast",
@@ -59,11 +59,11 @@ export class ListenStep<
     this.topicDep = this.addDependency($topic);
   }
 
-  executeV2(): never {
+  execute(): never {
     throw new Error("ListenStep cannot be executed, it can only be streamed");
   }
 
-  streamV2({
+  stream({
     indexMap,
     values,
   }: StreamDetails<

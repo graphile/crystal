@@ -1,0 +1,78 @@
+# Execute and Stream V2 Migration
+
+In March 2024, Gra*fast* gained support for ["unary"
+steps](https://github.com/graphile/crystal/pull/1973). This was critical for
+making Gra*fast* easier to integrate with other data sources that aren't as
+capable as Postgres (and let's be honest, what other data sources are as
+capable as Postgres?) but unfortunately it meant that we had to account for
+singular values coming into `execute` methods. At first we added an `executeV2`
+but this was really ugly and annoying to explain, so since we're still in beta
+we made the hard decision to break this API, and replace `execute`.
+
+## Quick fix
+
+If you just want what you had before to start working again, you can change
+each of your `execute` methods:
+
+1. `execute` now only accepts one argument; destructure `count`, `values`
+   (as `newValues`) and `extra` from this argument.
+2. `newValues` is a tuple of objects rather than arrays; to convert it back to
+   the legacy form (a tuple of arrays): map over each entry, `dep`, in
+   `newValues` and:
+   - if it's a batch entry (`dep.isBatch === true`):
+     - use the `dep.entries` property
+   - otherwise:
+     - use an array of length `count`, where each entry in the array is `dep.value`.
+
+Here's an example diff of applying this change to your code:
+
+```diff
+- async execute(count: number, values: any[][], extra: ExecutionExtra) {
++ async execute({ count, values: newValues, extra }: ExecutionDetails) {
++   const values = newValues.map((dep) =>
++     dep.isBatch ? dep.entries : new Array(count).fill(dep.value)
++   );
+```
+
+Once done, your functions should work as they did before.
+
+## Better fix
+
+The above is not the most efficient way of using the new system though (since
+it requires creating a new array for each unary dependency in each step);
+instead you should map over each incoming index via `indexMap` and use the
+`dep.at(i)` method rather than `dep[i]` array syntax to access the value at
+each index.
+
+**Before**:
+
+```ts
+function execute(count: number, values: ReadonlyArray<[number, number]>) {
+  const [allA, allB] = values;
+  const results: number[] = [];
+  for (let i = 0; i < count; i++) {
+    const a = allA[i];
+    const b = allB[i];
+    results.push(a + b);
+  }
+  return results;
+}
+```
+
+**After**:
+
+```ts
+function execute({ indexMap, values }: ExecutionDetails<[number, number]>) {
+  const [allA, allB] = values;
+  return indexMap((i) => {
+    const a = allA.at(i);
+    const b = allB.at(i);
+    return a + b;
+  });
+}
+```
+
+## `stream`
+
+`stream` goes through the same transition as `execute`, except the type of the
+`details` variable is `StreamDetails` rather than `ExecutionDetails`.

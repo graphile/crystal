@@ -53,7 +53,7 @@ export class JSONParseStep<
     return access(this, [index]);
   }
 
-  executeV2({
+  execute({
     indexMap,
     values: [stringDep],
   }: ExecutionDetails<[string]>): GrafastResultsList<TJSON> {

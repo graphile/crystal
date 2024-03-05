@@ -151,7 +151,7 @@ export class __TrackedValueStep<
     }
   }
 
-  executeV2({
+  execute({
     count,
     values: [values0],
   }: ExecutionDetails<[TData]>): GrafastResultsList<TData> {

@@ -20,7 +20,7 @@ export class ErrorStep<
     this.error = error;
   }
 
-  executeV2({ count }: ExecutionDetails): GrafastResultsList<any> {
+  execute({ count }: ExecutionDetails): GrafastResultsList<any> {
     return arrayOfLength(count, this.error);
   }
   unbatchedExecute(): any {

@@ -178,7 +178,7 @@ The building blocks of an operation plan are "steps." Steps are instances of
 "step classes," and <grafast /> makes available a modest range of [standard steps][]
 that you can use; but when these aren't enough you can write your own.
 Step classes extend the `ExecutableStep` class. The only required method to
-define is `executeV2`, however most steps will also have a `constructor` in which
+define is `execute`, however most steps will also have a `constructor` in which
 they accept their arguments (some of which may be dependencies) and may also
 have the various lifecycle methods.
 
@@ -195,7 +195,7 @@ class AddStep extends ExecutableStep {
     this.addDependency($b);
   }
 
-  executeV2({ indexMap, values: [aDep, bDep] }) {
+  execute({ indexMap, values: [aDep, bDep] }) {
     return indexMap((i) => {
       const a = aDep.at(i);
       const b = bDep.at(i);

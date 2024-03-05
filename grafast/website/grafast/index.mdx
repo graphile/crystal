@@ -225,7 +225,7 @@ this.addDependency($otherStep);`. This `depId` is the index in the **values
 tuple** that the step can use at execution time to retrieve the associated
 values.
 
-When a step executes, its `executeV2` method is passed the **execution
+When a step executes, its `execute` method is passed the **execution
 details** which includes:
 
 - `count` — the size of the batch to be executed
@@ -234,14 +234,7 @@ details** which includes:
 - `indexMap(callback)` — method returning an array by calling `callback(i)` for
   each index `i` in the batch (from `0` to `count-1`)
 
-:::note Why `executeV2`?
-
-`executeV2` is our second signature for step execution; the old `execute`
-method is still supported but is less efficient.
-
-:::
-
-The `executeV2` method must return a list (or a promise to a list) of length
+The `execute` method must return a list (or a promise to a list) of length
 `count`, where each entry in this list relates to the corresponding entries in
 `values` — this should be at least a little familiar to anyone who has written
 a DataLoader before.
@@ -292,7 +285,7 @@ export class RecordsByColumnStep extends ExecutableStep {
     this.firstDepId = this.addUnaryDependency($first);
   }
 
-  async executeV2({ indexMap, values }) {
+  async execute({ indexMap, values }) {
     // Retrieve the values for the `$columnValue` dependency
     const columnValueDep = values[this.columnValueDepIdx];
 
@@ -342,7 +335,7 @@ to be created were you to use `DataLoader` instead.
 
 :::info Not just databases!
 
-The `executeV2` method is just JavaScript; it can
+The `execute` method is just JavaScript; it can
 talk to absolutely any data source that Node.js itself can talk to. Though the
 example shows SQL you could replace the `executeSQL()` call with `fetch()` or
 any other arbitrary JavaScript function to achieve your goals.

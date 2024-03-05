@@ -151,7 +151,7 @@ export class PgPageInfoStep<
     return $rows.row(last($rows)).cursor();
   }
 
-  executeV2({ count }: ExecutionDetails): GrafastResultsList<object> {
+  execute({ count }: ExecutionDetails): GrafastResultsList<object> {
     return new Array(count).fill(EMPTY_OBJECT);
   }
 

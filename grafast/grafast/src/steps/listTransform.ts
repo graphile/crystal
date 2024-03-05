@@ -192,7 +192,7 @@ export class __ListTransformStep<
     return this;
   }
 
-  async executeV2({
+  async execute({
     indexForEach,
     indexMap,
     values,

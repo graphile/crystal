@@ -29,13 +29,13 @@ class SyncListCallbackStep<
     super();
     this.addDependency($dep);
   }
-  executeV2({
+  execute({
     indexMap,
     values: [values0],
   }: ExecutionDetails<[TIn]>): ReadonlyArray<PromiseOrDirect<TOut>> {
     return indexMap((i) => this.callback(values0.at(i)));
   }
-  streamV2({ indexMap, values: [values0] }: StreamDetails<[TIn]>) {
+  stream({ indexMap, values: [values0] }: StreamDetails<[TIn]>) {
     const { callback } = this;
     return indexMap((i) => {
       const entry = values0.at(i);

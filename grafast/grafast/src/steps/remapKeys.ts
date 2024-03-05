@@ -99,7 +99,7 @@ export class RemapKeysStep extends UnbatchedExecutableStep {
     super.finalize();
   }
 
-  executeV2({
+  execute({
     count,
     values: [values0],
   }: ExecutionDetails): GrafastResultsList<any> {

@@ -49,7 +49,7 @@ export class __ItemStep<TData> extends UnbatchedExecutableStep<TData> {
     return this.getDep(0);
   }
 
-  executeV2(): never {
+  execute(): never {
     throw new Error("__ItemStep must never execute");
   }
   unbatchedExecute(): never {
