@@ -360,7 +360,7 @@ const preset: GraphileConfig.Preset = {
           },
           PersonRelatedArmEdge: {
             isTheirs: EXPORTABLE(
-              (lambda) =>
+              (aEqualsB, lambda) =>
                 (
                   $edge: EdgeStep<
                     any,
@@ -378,12 +378,9 @@ const preset: GraphileConfig.Preset = {
                   const $armPersonId = $arm.get("person_id");
                   const $person = $obj.get("person");
                   const $personId = $person.get("id");
-                  return lambda(
-                    [$personId, $armPersonId],
-                    ([personId, armPersonId]) => personId === armPersonId,
-                  );
+                  return lambda([$personId, $armPersonId], aEqualsB);
                 },
-              [lambda],
+              [aEqualsB, lambda],
             ),
           },
         },
@@ -464,4 +461,7 @@ const preset: GraphileConfig.Preset = {
   ],
 }; /* satisfies GraphileConfig.Preset */
 
+function aEqualsB([a, b]: readonly [a: any, b: any]) {
+  return a === b;
+}
 export default preset;

@@ -9,6 +9,16 @@ import mermaidPlan from "../examples/users-and-friends/plan-simplified.mermaid?r
 
 # <grafast /> introduction
 
+:::info
+
+This introduction to Grafast assumes that you have a basic understanding of
+GraphQL, including the concept of resolvers. We highly recommend that you read
+[Introduction to GraphQL](https://graphql.org/learn/), and in particular
+[GraphQL Execution](https://graphql.org/learn/execution/), before reading this
+document.
+
+:::
+
 The GraphQL specification describes how a GraphQL operation should be executed,
 talking in terms of layer–by–layer resolution of data using "resolvers." But
 critical to note is this sentence from the beginning of the specification:
@@ -128,6 +138,14 @@ plan resolvers are synchronous. <grafast /> operates in two phases: planning
 (synchronous) and execution (asynchronous); plan resolvers are called during
 the planning phase.
 
+:::info See the working example
+
+If you want to explore the two code blocks above, and see them in context
+including their dependencies, please see the ["users and friends"
+example](https://github.com/graphile/crystal/tree/main/grafast/website/examples/users-and-friends).
+
+:::
+
 The job of a plan resolver is not to retrieve data, it's to detail the
 **steps** necessary to retrieve it. Plan resolvers do not have access to any
 runtime data, they must describe what to do for arbitrary future data. For
@@ -191,8 +209,10 @@ should use static GraphQL documents and pass variables at run–time.
 
 The main concern of most steps is execution. In <grafast /> all execution is
 batched, so each of the nodes in the operation plan will execute at most once
-during a GraphQL query or mutation — this is one of the major differences when
-compared to traditional GraphQL execution.
+during a GraphQL query or mutation. This is one of the major differences when
+compared to traditional GraphQL execution; with traditional resolvers
+processing happens in a layer–by–layer, item–by–item approach, requiring
+workarounds such as `DataLoader` to help reduce instances of the N+1 problem.
 
 When it comes time to execute an operation plan, <grafast /> will automatically
 populate the steps whose names begin with `__` (e.g. the context and variable
@@ -352,11 +372,11 @@ possible by <grafast />'s lifecycle methods.
 
 :::info
 
-If you want to explore this example more, please see the
-["users and friends" example](https://github.com/graphile/crystal/tree/main/grafast/website/examples/users-and-friends).
-
 For more information about understanding plan diagrams please see
 [Plan Diagrams](/grafast/plan-diagrams).
+
+For a fully working implementation of the above schema, please see the
+["users and friends" example](https://github.com/graphile/crystal/tree/main/grafast/website/examples/users-and-friends).
 
 :::
 

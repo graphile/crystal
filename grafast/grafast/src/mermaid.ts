@@ -321,6 +321,10 @@ export function planToMermaid(
       }
     }
   }
+  const isUnary = (step: GrafastPlanStepJSONv1): boolean => step.isUnary;
+  graph.push(`\
+    classDef unary fill:#fafffa,borderWidth:8px
+    class ${sortedSteps.filter(isUnary).map(planId)} unary`);
   if (!concise && !skipBuckets) graph.push("    end");
 
   const graphString = graph.join("\n");
