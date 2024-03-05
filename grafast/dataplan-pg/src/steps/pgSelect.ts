@@ -1813,10 +1813,6 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
     sql: SQL;
     extraSelectIndexes: number[];
   } {
-    if (!this.isTrusted) {
-      this.resource.applyAuthorizationChecksToPlan(this);
-    }
-
     const reverse = this.shouldReverseOrder();
 
     const { sql: select, extraSelectIndexes } = this.buildSelect(options);
@@ -2187,6 +2183,11 @@ ${lateralText};`;
   }
 
   deduplicate(peers: PgSelectStep<any>[]): PgSelectStep<TResource>[] {
+    if (!this.isTrusted) {
+      this.resource.applyAuthorizationChecksToPlan(this);
+      this.isTrusted = true;
+    }
+
     this.locker.lockAllParameters();
     return peers.filter(($p): $p is PgSelectStep<TResource> => {
       if ($p === this) {
