@@ -24071,7 +24071,12 @@ export const plans = {
     allSingleTables: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs($parent, args, info);
-        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+        return connection($select, {
+          // nodePlan: ($item) => $item,
+          cursorPlan($item) {
+            return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+          }
+        });
       },
       args: {
         first: {

@@ -111,13 +111,11 @@ select
       (select json_agg(s) from (
         select
           __person_friends_2."person_full_name" as "0",
-          "c"."person_first_name"(__person_friends_2) as "1",
-          __person_friends_2."id"::text as "2"
+          "c"."person_first_name"(__person_friends_2) as "1"
         from "c"."person_friends"(__person_friends__) as __person_friends_2
         limit 1
       ) s) as "1",
-      "c"."person_first_name"(__person_friends__) as "2",
-      __person_friends__."id"::text as "3"
+      "c"."person_first_name"(__person_friends__) as "2"
     from "c"."person_friends"(__person__) as __person_friends__
   ) s) as "1",
   __person_first_post__."id"::text as "2",

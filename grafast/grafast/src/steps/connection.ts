@@ -89,6 +89,7 @@ export class ConnectionStep<
   TItemStep extends ExecutableStep,
   TCursorStep extends ExecutableStep,
   TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
+  TEdgeDataStep extends ExecutableStep = TItemStep,
   TNodeStep extends ExecutableStep = ExecutableStep,
 > extends UnbatchedExecutableStep<unknown> {
   static $$export = {
@@ -106,17 +107,29 @@ export class ConnectionStep<
   private _beforeDepId: number | null | undefined = undefined;
   private _afterDepId: number | null | undefined = undefined;
 
-  // TYPES: if subplan is `ConnectionCapableStep<EdgeCapableStep<any>>` then `itemPlan`/`cursorPlan` aren't needed; otherwise `cursorPlan` is required.
+  // TODO: I'm seriously concerned that this allows capturing steps in a closure
+  // and that these steps might, in some circumstances, no longer be valid when
+  // it times to use them. We need to ensure this is handled gracefully.
+  /** Plan for data to associate with the edge */
+  public readonly edgeDataPlan?: ($item: TItemStep) => TEdgeDataStep;
+  /** The node plan */
+  public readonly itemPlan?: ($item: TItemStep) => TNodeStep;
+  public readonly cursorPlan?: (
+    $item: TItemStep,
+  ) => ExecutableStep<string | null> | undefined;
+
+  // TYPES: if subplan is `ConnectionCapableStep<EdgeCapableStep<any>>` then `nodePlan`/`cursorPlan` aren't needed; otherwise `cursorPlan` is required.
   constructor(
     subplan: TStep,
-    public readonly itemPlan?: ($item: TItemStep) => TNodeStep,
-    public readonly cursorPlan?: (
-      $item: TItemStep,
-    ) => ExecutableStep<string | null> | undefined,
+    config: ConnectionConfig<TItemStep, TEdgeDataStep, TNodeStep> = {},
   ) {
     super();
+    const { edgeDataPlan, nodePlan, cursorPlan } = config;
+    this.edgeDataPlan = edgeDataPlan;
+    this.itemPlan = nodePlan;
+    this.cursorPlan = cursorPlan;
     if (!cursorPlan) {
-      // ENHANCE: Assert that the `itemPlan` has a `.cursor()` method.
+      // ENHANCE: Assert that the `nodePlan` has a `.cursor()` method.
     }
     // This is a _soft_ reference to the plan; we're not adding it as a
     // dependency since we do not actually need it to execute; it's our
@@ -285,8 +298,19 @@ export class ConnectionStep<
     });
   }
 
+  public get(fieldName: string) {
+    switch (fieldName) {
+      case "edges":
+        return this.edges();
+      case "nodes":
+        return this.nodes();
+      case "pageInfo":
+        return this.pageInfo();
+    }
+  }
+
   public edges(): ExecutableStep {
-    if (this.cursorPlan || this.itemPlan) {
+    if (this.cursorPlan || this.itemPlan || this.edgeDataPlan) {
       return each(this.cloneSubplanWithPagination(), ($intermediate) =>
         this.wrapEdge($intermediate as any),
       );
@@ -308,7 +332,7 @@ export class ConnectionStep<
 
   public wrapEdge(
     $edge: TItemStep,
-  ): EdgeStep<TItemStep, TCursorStep, TStep, TNodeStep> {
+  ): EdgeStep<TItemStep, TCursorStep, TStep, TEdgeDataStep, TNodeStep> {
     return new EdgeStep(this, $edge);
   }
 
@@ -362,6 +386,7 @@ export class EdgeStep<
     TItemStep extends ExecutableStep,
     TCursorStep extends ExecutableStep,
     TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
+    TEdgeDataStep extends ExecutableStep = TItemStep,
     TNodeStep extends ExecutableStep = ExecutableStep,
   >
   extends UnbatchedExecutableStep
@@ -378,7 +403,13 @@ export class EdgeStep<
   private needCursor = false;
 
   constructor(
-    $connection: ConnectionStep<TItemStep, TCursorStep, TStep, TNodeStep>,
+    $connection: ConnectionStep<
+      TItemStep,
+      TCursorStep,
+      TStep,
+      TEdgeDataStep,
+      TNodeStep
+    >,
     $item: TItemStep,
     private skipCursor = false,
   ) {
@@ -410,6 +441,15 @@ export class EdgeStep<
     this.connectionDepId = this.addDependency($connection);
   }
 
+  public get(fieldName: string) {
+    switch (fieldName) {
+      case "node":
+        return this.node();
+      case "cursor":
+        return this.cursor();
+    }
+  }
+
   private getConnectionStep(): ConnectionStep<
     TItemStep,
     TCursorStep,
@@ -421,6 +461,11 @@ export class EdgeStep<
 
   private getItemStep(): TItemStep {
     return this.getDep(0) as any;
+  }
+
+  public data(): TEdgeDataStep {
+    const $item = this.getItemStep();
+    return this.getConnectionStep().edgeDataPlan?.($item) ?? ($item as any);
   }
 
   node(): TNodeStep {
@@ -464,6 +509,18 @@ export class EdgeStep<
   }
 }
 
+let warned = false;
+
+interface ConnectionConfig<
+  TItemStep extends ExecutableStep,
+  TEdgeDataStep extends ExecutableStep = TItemStep,
+  TNodeStep extends ExecutableStep = ExecutableStep,
+> {
+  nodePlan?: ($item: TItemStep) => TNodeStep;
+  edgeDataPlan?: ($item: TItemStep) => TEdgeDataStep;
+  cursorPlan?: ($item: TItemStep) => ExecutableStep<string | null>;
+}
+
 /**
  * Wraps a collection fetch to provide the utilities for working with GraphQL
  * cursor connections.
@@ -472,11 +529,25 @@ export function connection<
   TItemStep extends ExecutableStep,
   TCursorStep extends ExecutableStep,
   TStep extends ConnectionCapableStep<TItemStep, TCursorStep>,
+  TEdgeDataStep extends ExecutableStep = TItemStep,
   TNodeStep extends ExecutableStep = ExecutableStep,
 >(
   step: TStep,
-  itemPlan?: ($item: TItemStep) => TNodeStep,
-  cursorPlan?: ($item: TItemStep) => ExecutableStep<string | null>,
-): ConnectionStep<TItemStep, TCursorStep, TStep, TNodeStep> {
-  return new ConnectionStep(step, itemPlan, cursorPlan);
+  config?: ConnectionConfig<TItemStep, TEdgeDataStep, TNodeStep>,
+): ConnectionStep<TItemStep, TCursorStep, TStep, TEdgeDataStep, TNodeStep> {
+  if (typeof config === "function") {
+    if (!warned) {
+      warned = true;
+      console.warn(
+        `The call signature for connection() has changed, arguments after the first argument should be specified via a config object`,
+      );
+    }
+    return connection(step, {
+      // eslint-disable-next-line prefer-rest-params
+      nodePlan: arguments[1] as any,
+      // eslint-disable-next-line prefer-rest-params
+      cursorPlan: arguments[2] as any,
+    });
+  }
+  return new ConnectionStep(step, config);
 }

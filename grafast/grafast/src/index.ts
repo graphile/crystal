@@ -484,6 +484,7 @@ exportAsMany("grafast", {
   assertEdgeCapableStep,
   assertPageInfoCapableStep,
   ConnectionStep,
+  EdgeStep,
   constant,
   ConstantStep,
   context,

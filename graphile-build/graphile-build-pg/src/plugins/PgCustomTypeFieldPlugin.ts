@@ -1196,14 +1196,13 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                                         args,
                                         info,
                                       ) as PgSelectStep;
-                                    return connection(
-                                      $select,
-                                      ($item) => $item,
-                                      ($item: any) =>
+                                    return connection($select, {
+                                      // nodePlan: ($item) => $item,
+                                      cursorPlan: ($item: any) =>
                                         $item.getParentStep
                                           ? $item.getParentStep().cursor()
                                           : $item.cursor(),
-                                    );
+                                    });
                                   },
                                 [connection, getSelectPlanFromParentAndArgs],
                               ),

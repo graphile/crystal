@@ -8,7 +8,17 @@ import * as jsonwebtoken from "jsonwebtoken";
 import type {} from "postgraphile";
 import { jsonParse } from "postgraphile/@dataplan/json";
 import { makePgService } from "postgraphile/adaptors/pg";
-import { constant, context, listen, object } from "postgraphile/grafast";
+import type { EdgeStep, ObjectStep } from "postgraphile/grafast";
+import {
+  connection,
+  constant,
+  context,
+  error,
+  lambda,
+  listen,
+  object,
+} from "postgraphile/grafast";
+import { defaultMaskError } from "postgraphile/grafserv";
 import type {} from "postgraphile/grafserv/node";
 import { defaultHTMLParts } from "postgraphile/grafserv/ruru/server";
 import { StreamDeferPlugin } from "postgraphile/graphile-build";
@@ -215,8 +225,23 @@ const preset: GraphileConfig.Preset = {
             ): String
             query: Query
           }
+          extend type Query {
+            throw: Int
+          }
         `,
         plans: {
+          Query: {
+            throw: EXPORTABLE(
+              (error) => () => {
+                return error(
+                  new Error(
+                    "You've requested the 'throw' field... which throws!",
+                  ),
+                );
+              },
+              [error],
+            ),
+          },
           Person: {
             greet: EXPORTABLE(
               (TYPES, sql) =>
@@ -303,6 +328,67 @@ const preset: GraphileConfig.Preset = {
     NonNullRelationsPlugin,
     RuruQueryParamsPlugin,
     RuruQueryParamsUpdatePlugin,
+    makeExtendSchemaPlugin((build) => {
+      const { left_arm } = build.input.pgRegistry.pgResources;
+      return {
+        typeDefs: gql`
+          extend type Person {
+            allArms: PersonRelatedArmConnection
+          }
+          type PersonRelatedArmConnection {
+            edges: [PersonRelatedArmEdge]
+          }
+          type PersonRelatedArmEdge {
+            node: LeftArm
+            isTheirs: Boolean
+          }
+        `,
+        plans: {
+          Person: {
+            allArms: EXPORTABLE(
+              (connection, left_arm, object) => ($person) => {
+                const $arms = left_arm.find();
+
+                return connection($arms, {
+                  edgeDataPlan($arm) {
+                    return object({ arm: $arm, person: $person });
+                  },
+                });
+              },
+              [connection, left_arm, object],
+            ),
+          },
+          PersonRelatedArmEdge: {
+            isTheirs: EXPORTABLE(
+              (lambda) =>
+                (
+                  $edge: EdgeStep<
+                    any,
+                    any,
+                    any,
+                    ObjectStep<{
+                      arm: PgSelectSingleStep;
+                      person: PgSelectSingleStep;
+                    }>,
+                    any
+                  >,
+                ) => {
+                  const $obj = $edge.data();
+                  const $arm = $obj.get("arm");
+                  const $armPersonId = $arm.get("person_id");
+                  const $person = $obj.get("person");
+                  const $personId = $person.get("id");
+                  return lambda(
+                    [$personId, $armPersonId],
+                    ([personId, armPersonId]) => personId === armPersonId,
+                  );
+                },
+              [lambda],
+            ),
+          },
+        },
+      };
+    }),
   ],
   extends: [
     PostGraphileAmberPreset,
@@ -343,6 +429,14 @@ const preset: GraphileConfig.Preset = {
     graphqlOverGET: true,
     persistedOperationsDirectory: `${process.cwd()}/.persisted_operations`,
     allowUnpersistedOperation: true,
+    maskError(error) {
+      const masked = defaultMaskError(error);
+      const stack = error.originalError?.stack;
+      if (typeof stack === "string") {
+        masked.extensions.stack = stack.split(/\n/);
+      }
+      return masked;
+    },
   },
   grafast: {
     context(requestContext, args) {

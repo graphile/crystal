@@ -26273,7 +26273,12 @@ export const plans = {
     funcOutSetof: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs($parent, args, info);
-        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+        return connection($select, {
+          // nodePlan: ($item) => $item,
+          cursorPlan($item) {
+            return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+          }
+        });
       },
       args: {
         first: {
@@ -26319,7 +26324,12 @@ export const plans = {
     queryIntervalSet: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs2($parent, args, info);
-        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+        return connection($select, {
+          // nodePlan: ($item) => $item,
+          cursorPlan($item) {
+            return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+          }
+        });
       },
       args: {
         first: {
@@ -26357,7 +26367,12 @@ export const plans = {
     staticBigInteger: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs3($parent, args, info);
-        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+        return connection($select, {
+          // nodePlan: ($item) => $item,
+          cursorPlan($item) {
+            return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+          }
+        });
       },
       args: {
         first: {
@@ -26404,7 +26419,12 @@ export const plans = {
     funcReturnsTableOneCol: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs4($parent, args, info);
-        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+        return connection($select, {
+          // nodePlan: ($item) => $item,
+          cursorPlan($item) {
+            return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+          }
+        });
       },
       args: {
         i: undefined,
@@ -26515,7 +26535,12 @@ export const plans = {
     funcOutOutSetof: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs5($parent, args, info);
-        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+        return connection($select, {
+          // nodePlan: ($item) => $item,
+          cursorPlan($item) {
+            return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+          }
+        });
       },
       args: {
         first: {
@@ -26636,7 +26661,12 @@ export const plans = {
     funcReturnsTableMultiCol: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs6($parent, args, info);
-        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+        return connection($select, {
+          // nodePlan: ($item) => $item,
+          cursorPlan($item) {
+            return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+          }
+        });
       },
       args: {
         i: undefined,
@@ -26675,7 +26705,12 @@ export const plans = {
     intSetQuery: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs7($parent, args, info);
-        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+        return connection($select, {
+          // nodePlan: ($item) => $item,
+          cursorPlan($item) {
+            return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+          }
+        });
       },
       args: {
         x: undefined,
@@ -26762,7 +26797,12 @@ export const plans = {
     compoundTypeSetQuery: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs8($parent, args, info);
-        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+        return connection($select, {
+          // nodePlan: ($item) => $item,
+          cursorPlan($item) {
+            return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+          }
+        });
       },
       args: {
         first: {
@@ -26846,7 +26886,12 @@ export const plans = {
     funcOutComplexSetof: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs9($parent, args, info);
-        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+        return connection($select, {
+          // nodePlan: ($item) => $item,
+          cursorPlan($item) {
+            return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+          }
+        });
       },
       args: {
         a: undefined,
@@ -26886,7 +26931,12 @@ export const plans = {
     badlyBehavedFunction: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs10($parent, args, info);
-        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+        return connection($select, {
+          // nodePlan: ($item) => $item,
+          cursorPlan($item) {
+            return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+          }
+        });
       },
       args: {
         first: {
@@ -26928,7 +26978,12 @@ export const plans = {
     funcOutTableSetof: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs11($parent, args, info);
-        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+        return connection($select, {
+          // nodePlan: ($item) => $item,
+          cursorPlan($item) {
+            return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+          }
+        });
       },
       args: {
         first: {
@@ -26966,7 +27021,12 @@ export const plans = {
     tableSetQuery: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs12($parent, args, info);
-        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+        return connection($select, {
+          // nodePlan: ($item) => $item,
+          cursorPlan($item) {
+            return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+          }
+        });
       },
       args: {
         first: {
@@ -27020,7 +27080,12 @@ export const plans = {
     tableSetQueryPlpgsql: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs13($parent, args, info);
-        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+        return connection($select, {
+          // nodePlan: ($item) => $item,
+          cursorPlan($item) {
+            return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+          }
+        });
       },
       args: {
         first: {
@@ -27058,7 +27123,12 @@ export const plans = {
     typeFunctionConnection: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs14($parent, args, info);
-        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+        return connection($select, {
+          // nodePlan: ($item) => $item,
+          cursorPlan($item) {
+            return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+          }
+        });
       },
       args: {
         first: {
@@ -29087,7 +29157,12 @@ export const plans = {
     friends: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs15($parent, args, info);
-        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+        return connection($select, {
+          // nodePlan: ($item) => $item,
+          cursorPlan($item) {
+            return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+          }
+        });
       },
       args: {
         first: {
@@ -29134,7 +29209,12 @@ export const plans = {
     typeFunctionConnection: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs16($parent, args, info);
-        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+        return connection($select, {
+          // nodePlan: ($item) => $item,
+          cursorPlan($item) {
+            return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+          }
+        });
       },
       args: {
         first: {
@@ -29691,7 +29771,12 @@ export const plans = {
     computedIntervalSet: {
       plan($parent, args, info) {
         const $select = getSelectPlanFromParentAndArgs17($parent, args, info);
-        return connection($select, $item => $item, $item => $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor());
+        return connection($select, {
+          // nodePlan: ($item) => $item,
+          cursorPlan($item) {
+            return $item.getParentStep ? $item.getParentStep().cursor() : $item.cursor();
+          }
+        });
       },
       args: {
         first: {
