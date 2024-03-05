@@ -108,7 +108,7 @@ ${indent(4, inspect(bucket.store, { colors: true }))}
 ${indent(4, inspect(bucket.unaryStore, { colors: true }))}
   Children:
 ${Object.entries(bucket.children)
-  .map(([id, { bucket }]) => indent(4, recursivePrintBucket(bucket)))
+  .map(([_id, { bucket }]) => indent(4, recursivePrintBucket(bucket)))
   .join("\n")}`,
   );
 }
