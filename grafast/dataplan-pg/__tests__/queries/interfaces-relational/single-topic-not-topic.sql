@@ -14,7 +14,15 @@ lateral (
     __relational_topics_identifiers__.idx as "9"
   from interfaces_and_unions.relational_topics as __relational_topics__
   left outer join interfaces_and_unions.relational_items as __relational_items__
-  on (__relational_topics__."id"::"int4" = __relational_items__."id")
+  on (
+    (
+      __relational_topics__."id"::"int4" = __relational_items__."id"
+    ) and (
+      /* WHERE becoming ON */ (
+        true /* authorization checks */
+      )
+    )
+  )
   where
     (
       true /* authorization checks */

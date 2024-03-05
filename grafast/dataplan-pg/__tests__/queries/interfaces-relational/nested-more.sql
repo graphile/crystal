@@ -15,9 +15,9 @@ select
     from interfaces_and_unions.relational_items as __relational_items__
     where
       (
-        __people__."person_id"::"int4" = __relational_items__."author_id"
-      ) and (
         true /* authorization checks */
+      ) and (
+        __people__."person_id"::"int4" = __relational_items__."author_id"
       )
     order by __relational_items__."id" asc
   ) s) as "1"

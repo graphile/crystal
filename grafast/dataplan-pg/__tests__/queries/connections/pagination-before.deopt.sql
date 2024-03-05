@@ -21,9 +21,9 @@ lateral (
     (
       __messages__.archived_at is null
     ) and (
-      __messages__."id" < __messages_identifiers__."id0"
-    ) and (
       true /* authorization checks */
+    ) and (
+      __messages__."id" < __messages_identifiers__."id0"
     )
   order by __messages__."id" asc
   limit 4

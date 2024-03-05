@@ -13,9 +13,9 @@ lateral (
       from interfaces_and_unions.person_bookmarks as __person_bookmarks__
       where
         (
-          __people__."person_id"::"int4" = __person_bookmarks__."person_id"
-        ) and (
           true /* authorization checks */
+        ) and (
+          __people__."person_id"::"int4" = __person_bookmarks__."person_id"
         )
       order by __person_bookmarks__."id" asc
     ) s) as "0",

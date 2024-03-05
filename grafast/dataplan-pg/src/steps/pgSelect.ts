@@ -2614,10 +2614,6 @@ ${lateralText};`;
               sql`/* WHERE becoming ON */`,
               this.conditions,
             );
-            if (where != sql.blank) {
-              // TODO: test this!
-              console.warn(`This method of joining is untested!`);
-            }
             const conditions = [
               ...this.identifierMatches.map((identifierMatch, i) => {
                 const { dependencyIndex, codec } = this.queryValues[i];

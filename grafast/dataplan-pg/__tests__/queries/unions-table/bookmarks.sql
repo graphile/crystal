@@ -12,12 +12,20 @@ lateral (
         ((__person_bookmarks__."bookmarked_entity")."comment_id")::text as "5"
       from interfaces_and_unions.person_bookmarks as __person_bookmarks__
       left outer join interfaces_and_unions.people as __people__
-      on (__person_bookmarks__."person_id"::"int4" = __people__."person_id")
+      on (
+        (
+          __person_bookmarks__."person_id"::"int4" = __people__."person_id"
+        ) and (
+          /* WHERE becoming ON */ (
+            true /* authorization checks */
+          )
+        )
+      )
       where
         (
-          __people_2."person_id"::"int4" = __person_bookmarks__."person_id"
-        ) and (
           true /* authorization checks */
+        ) and (
+          __people_2."person_id"::"int4" = __person_bookmarks__."person_id"
         )
       order by __person_bookmarks__."id" asc
     ) s) as "0",
@@ -43,7 +51,15 @@ lateral (
     __posts_identifiers__.idx as "3"
   from interfaces_and_unions.posts as __posts__
   left outer join interfaces_and_unions.people as __people__
-  on (__posts__."author_id"::"int4" = __people__."person_id")
+  on (
+    (
+      __posts__."author_id"::"int4" = __people__."person_id"
+    ) and (
+      /* WHERE becoming ON */ (
+        true /* authorization checks */
+      )
+    )
+  )
   where
     (
       true /* authorization checks */
@@ -63,9 +79,25 @@ lateral (
     __comments_identifiers__.idx as "4"
   from interfaces_and_unions.comments as __comments__
   left outer join interfaces_and_unions.people as __people__
-  on (__comments__."author_id"::"int4" = __people__."person_id")
+  on (
+    (
+      __comments__."author_id"::"int4" = __people__."person_id"
+    ) and (
+      /* WHERE becoming ON */ (
+        true /* authorization checks */
+      )
+    )
+  )
   left outer join interfaces_and_unions.posts as __posts__
-  on (__comments__."post_id"::"int4" = __posts__."post_id")
+  on (
+    (
+      __comments__."post_id"::"int4" = __posts__."post_id"
+    ) and (
+      /* WHERE becoming ON */ (
+        true /* authorization checks */
+      )
+    )
+  )
   where
     (
       true /* authorization checks */
