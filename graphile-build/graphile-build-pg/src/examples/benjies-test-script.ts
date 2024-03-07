@@ -13,6 +13,7 @@ import { pathToFileURL } from "node:url";
 import { inspect } from "node:util";
 
 import { getWithPgClientFromPgService } from "@dataplan/pg";
+import { createWithPgClient, makePgService } from "@dataplan/pg/adaptors/pg";
 import { envelop, useExtendContext, useSchema } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
@@ -61,7 +62,7 @@ pool.on("error", (e) => {
           schemas: ["a", "b", "c"],
           pgSettingsKey: "pgSettings",
           withPgClientKey: "withPgClient",
-          adaptor: "@dataplan/pg/adaptors/pg",
+          adaptor: { createWithPgClient, makePgService },
           adaptorSettings: {
             pool,
           },

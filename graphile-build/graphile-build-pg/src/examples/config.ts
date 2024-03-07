@@ -7,6 +7,7 @@
 import "graphile-config";
 
 import { getWithPgClientFromPgService } from "@dataplan/pg";
+import { createWithPgClient, makePgService } from "@dataplan/pg/adaptors/pg";
 import {
   defaultPreset as graphileBuildPreset,
   QueryQueryPlugin,
@@ -65,7 +66,7 @@ export async function makeSharedPresetAndClient(pool: Pool) {
         schemas: DATABASE_SCHEMAS,
         pgSettingsKey: "pgSettings",
         withPgClientKey: "withPgClient",
-        adaptor: "@dataplan/pg/adaptors/pg",
+        adaptor: { createWithPgClient, makePgService },
         adaptorSettings: {
           pool,
         },

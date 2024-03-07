@@ -1,4 +1,5 @@
 // It's helpful to see the full error stack
+
 Error.stackTraceLimit = Infinity;
 
 if (process.env.DEBUG) {
@@ -10,7 +11,7 @@ import "graphile-config";
 import "graphile-build-pg";
 
 import type { PgClientQuery } from "@dataplan/pg";
-import { PgSubscriber } from "@dataplan/pg/adaptors/pg";
+import { createWithPgClient, PgSubscriber } from "@dataplan/pg/adaptors/pg";
 import { promises as fsp } from "fs";
 import { mkdir, mkdtemp, rmdir, unlink } from "fs/promises";
 import {
@@ -291,7 +292,7 @@ export async function runTestQuery(
     plugins: [StreamDeferPlugin],
     pgServices: [
       {
-        adaptor: "@dataplan/pg/adaptors/pg",
+        adaptor: { createWithPgClient },
         name: "main",
         withPgClientKey: "withPgClient",
         pgSettingsKey: "pgSettings",
@@ -317,7 +318,7 @@ export async function runTestQuery(
         adaptorSettings: {
           connectionString,
         },
-      } as GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg">,
+      } as GraphileConfig.PgServiceConfiguration,
     ],
     schema: {
       pgForbidSetofFunctionsToReturnNull:
