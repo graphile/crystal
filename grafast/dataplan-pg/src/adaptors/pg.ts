@@ -414,7 +414,7 @@ export function createWithPgClient(
 }
 
 // This is here as a TypeScript assertion, to ensure we conform to PgAdaptor
-const _testValidAdaptor: PgAdaptor<"@dataplan/pg/adaptors/pg">["createWithPgClient"] =
+const _testValidAdaptor: PgAdaptor<PgAdaptorOptions>["createWithPgClient"] =
   createWithPgClient;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -766,7 +766,7 @@ export function makePgService(
     pgSettings,
     pgSettingsForIntrospection,
     pgSubscriber,
-    adaptor: "@dataplan/pg/adaptors/pg",
+    adaptor: { createWithPgClient, makePgService },
     adaptorSettings: {
       pool,
       superuserConnectionString,

@@ -2,7 +2,6 @@ import { createServer } from "node:http";
 import { pathToFileURL } from "node:url";
 import { inspect } from "node:util";
 
-import type { MakePgServiceOptions } from "@dataplan/pg";
 import { grafserv } from "grafserv/node";
 import { resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
@@ -186,16 +185,10 @@ export async function run(args: ArgsFromOptions<typeof options>) {
     }
     const schemas = rawSchema?.split(",") ?? ["public"];
     const adaptor =
-      preset.pgServices?.[0]?.adaptor ?? "@dataplan/pg/adaptors/pg";
+      preset.pgServices?.[0]?.adaptor ??
+      (await import("@dataplan/pg/adaptors/pg"));
 
-    const importSpecifier = adaptor.match(/^([a-z]:|\.\/|\/)/i)
-      ? pathToFileURL(adaptor).href
-      : adaptor;
-
-    const mod = await import(importSpecifier);
-    const makePgService = (mod.makePgService ?? mod.default?.makePgService) as (
-      options: MakePgServiceOptions,
-    ) => GraphileConfig.PgServiceConfiguration;
+    const makePgService = adaptor.makePgService;
     if (typeof makePgService !== "function") {
       throw new Error(
         `Loaded adaptor '${adaptor}' but it does not export a 'makePgService' helper`,

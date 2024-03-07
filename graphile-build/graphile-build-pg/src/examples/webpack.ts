@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 
+import { createWithPgClient, makePgService } from "@dataplan/pg/adaptors/pg";
 import {
   buildInflection,
   buildSchema,
@@ -44,7 +45,7 @@ async function main() {
           schemas: ["public"],
           pgSettingsKey: "pgSettings",
           withPgClientKey: "withPgClient",
-          adaptor: "@dataplan/pg/adaptors/pg",
+          adaptor: { createWithPgClient, makePgService },
           adaptorSettings: {
             pool,
           },
