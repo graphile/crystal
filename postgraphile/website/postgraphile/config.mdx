@@ -309,8 +309,8 @@ nitty-gritty: each entry in the list is an object with the following keys (only
 - `name: string` - an arbitrary unique name for this config; please keep it
   alphanumeric! Don't set this unless you have more than one pgService; see
   warning below.
-- `adaptor: string` - the name of the module to use as the postgres adaptor;
-  e.g. `@dataplan/pg/adaptors/pg` for the `pg` module
+- `adaptor: PgAdaptor` - the module to use as the postgres adaptor; e.g. the
+  result of `import(@dataplan/pg/adaptors/pg)` for the `pg` module
 - `adaptorSettings` - options to pass to the adaptor, these are different for
   each adaptor (see [`adaptorSettings`](#adaptorsettings) below)
 - `schemas: string[]` - an array of PostgreSQL schema names to use
@@ -338,6 +338,7 @@ nitty-gritty: each entry in the list is an object with the following keys (only
 
 ```js title="Example manual configuration"
 import * as pg from "pg";
+import * as PgAdaptor from "@dataplan/pg/adaptors/pg";
 
 const pgServices = [
   {
@@ -345,7 +346,7 @@ const pgServices = [
     schemas: ["app_public"],
     pgSettingsKey: "pgSettings",
     withPgClientKey: "withPgClient",
-    adaptor: "@dataplan/pg/adaptors/pg",
+    adaptor: PgAdaptor,
     adaptorSettings: {
       pool: new pg.Pool({ connectionString: process.env.DATABASE_URL }),
       // superuserConnectionString: process.env.SUPERUSER_DATABASE_URL,

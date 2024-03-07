@@ -1,4 +1,5 @@
 // It's helpful to see the full error stack
+
 Error.stackTraceLimit = Infinity;
 
 if (process.env.DEBUG) {
@@ -15,7 +16,7 @@ import type {
   PgClientResult,
   WithPgClient,
 } from "@dataplan/pg";
-import { PgSubscriber } from "@dataplan/pg/adaptors/pg";
+import { createWithPgClient, PgSubscriber } from "@dataplan/pg/adaptors/pg";
 import { promises as fsp } from "fs";
 import {
   $$bypassGraphQL,
@@ -237,7 +238,7 @@ export async function runTestQuery(
     plugins: [StreamDeferPlugin],
     pgServices: [
       {
-        adaptor: "@dataplan/pg/adaptors/pg",
+        adaptor: { createWithPgClient },
         name: "main",
         withPgClientKey: "withPgClient",
         pgSettingsKey: "pgSettings",
@@ -263,7 +264,7 @@ export async function runTestQuery(
         adaptorSettings: {
           connectionString,
         },
-      } as GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg">,
+      } as GraphileConfig.PgServiceConfiguration,
     ],
     schema: {
       pgForbidSetofFunctionsToReturnNull:
