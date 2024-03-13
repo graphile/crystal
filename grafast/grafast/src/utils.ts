@@ -964,9 +964,16 @@ export function stepAMayDependOnStepB(
   $a: ExecutableStep,
   $b: ExecutableStep,
 ): boolean {
-  return (
-    $a.layerPlan.ancestry.includes($b.layerPlan) && !stepADependsOnStepB($b, $a)
-  );
+  if ($a.isFinalized) {
+    return false;
+  }
+  if ($a._isUnaryLocked && $a._isUnary && !$b._isUnary) {
+    return false;
+  }
+  if (!$a.layerPlan.ancestry.includes($b.layerPlan)) {
+    return false;
+  }
+  return !stepADependsOnStepB($b, $a);
 }
 
 /**

@@ -2,6 +2,7 @@ import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
   ConnectionCapableStep,
+  ConnectionStep,
   ExecutionDetails,
   GrafastResultsList,
   GrafastResultStreamList,
@@ -21,7 +22,6 @@ import {
   access,
   applyTransforms,
   arrayOfLength,
-  ConnectionStep,
   constant,
   ConstantStep,
   ExecutableStep,
@@ -2468,6 +2468,8 @@ ${lateralText};`;
     // identical we should omit the later copies and have them link back to the
     // earliest version (resolve this in `execute` via mapping).
 
+    const otherDeps: ExecutableStep[] = [];
+
     if (
       !this.isInliningForbidden &&
       !this.hasSideEffects &&
@@ -2478,6 +2480,7 @@ ${lateralText};`;
       // Inline ourself into our parent if we can.
       let t: PgSelectStep<PgResource> | null | undefined = undefined;
       let p: ExecutableStep | undefined = undefined;
+      // Scan through the dependencies to find a suitable ancestor step to merge with
       for (
         let dependencyIndex = 0, l = this.dependencies.length;
         dependencyIndex < l;
@@ -2489,15 +2492,7 @@ ${lateralText};`;
           continue;
         }
         const dep = this.getDep(dependencyIndex);
-        if (dep instanceof __TrackedValueStep) {
-          // This has come from a variable, context or rootValue, therefore
-          // it's shared and thus safe.
-        } else if (isStaticInputStep(dep)) {
-          // This has come from a hard-coded input in the document, therefore
-          // it's shared and thus safe.
-        } else if (dep instanceof ConnectionStep) {
-          // We only have this to detect errors, it's an empty object. Safe.
-        } else if (dep instanceof PgClassExpressionStep) {
+        if (dep instanceof PgClassExpressionStep) {
           const t2Parent = dep.getParentStep();
           if (!(t2Parent instanceof PgSelectSingleStep)) {
             continue;
@@ -2551,15 +2546,10 @@ ${lateralText};`;
             break;
           }
         } else {
-          debugPlanVerbose(
-            "Refusing to optimise %c due to dependency %c",
-            this,
-            dep,
-          );
-          t = null;
-          break;
+          otherDeps.push(dep);
         }
       }
+      // Check the contexts are the same
       if (t != null && p != null) {
         const myContext = this.getDep(this.contextId);
         const tsContext = t.getDep(t.contextId);
@@ -2573,6 +2563,23 @@ ${lateralText};`;
             t,
           );
           t = null;
+        }
+      }
+      // Check the dependencies can be moved across to `t`
+      if (t != null && p != null) {
+        for (const dep of otherDeps) {
+          if (t.canAddDependency(dep)) {
+            // All good; just move the dependency over
+          } else {
+            debugPlanVerbose(
+              "Refusing to optimise %c due to dependency %c which cannot be added as a dependency of %c",
+              this,
+              dep,
+              t,
+            );
+            t = null;
+            break;
+          }
         }
       }
       if (t != null && p != null) {

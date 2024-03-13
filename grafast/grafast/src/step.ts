@@ -31,6 +31,7 @@ import type {
 import { $$subroutine } from "./interfaces.js";
 import type { __ItemStep } from "./steps/index.js";
 import { __ListTransformStep } from "./steps/index.js";
+import { stepAMayDependOnStepB } from "./utils.js";
 
 /**
  * @internal
@@ -336,6 +337,10 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
         },
       )}]`,
     );
+  }
+
+  protected canAddDependency(step: ExecutableStep): boolean {
+    return stepAMayDependOnStepB(this, step);
   }
 
   protected addDependency(
