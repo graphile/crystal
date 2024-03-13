@@ -194,11 +194,11 @@ export class LoadStep<
   constructor(
     $spec: ExecutableStep<TSpec>,
     $unarySpec: ExecutableStep<TUnarySpec> | null,
-    private load: LoadCallback<TSpec, TItem, TData, TParams, TUnarySpec>,
-    private ioEquivalence?:
+    private ioEquivalence:
       | null
       | string
       | { [key in keyof TSpec]?: string | null },
+    private load: LoadCallback<TSpec, TItem, TData, TParams, TUnarySpec>,
   ) {
     super();
     this.addDependency($spec);
@@ -434,7 +434,7 @@ function load<
   ioEquivalence: null | string | { [key in keyof TSpec]?: string | null },
   loadCallback: LoadCallback<TSpec, TItem, TData, TParams, TUnarySpec>,
 ) {
-  return new LoadStep($spec, $unarySpec, loadCallback, ioEquivalence);
+  return new LoadStep($spec, $unarySpec, ioEquivalence, loadCallback);
 }
 
 export function loadMany<
