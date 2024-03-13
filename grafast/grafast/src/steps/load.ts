@@ -657,7 +657,7 @@ export function loadOne<
       $spec,
       null,
       loadCallbackOrIoEquivalenceOrUnarySpec,
-      loadCallbackOrIoEquivalenceOrUnarySpec as LoadOneCallback<
+      loadCallbackOrIoEquivalence as LoadOneCallback<
         TSpec,
         TItem,
         TParams,
