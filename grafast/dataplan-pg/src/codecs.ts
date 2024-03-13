@@ -442,7 +442,7 @@ export function recordCodec<
     name,
     sqlType: identifier,
     isAnonymous,
-    ...makeRecordCodecToFrom(attributes),
+    ...makeRecordCodecToFrom(name, attributes),
     attributes,
     polymorphism,
     description,
@@ -453,6 +453,7 @@ export function recordCodec<
 exportAs("@dataplan/pg", recordCodec, "recordCodec");
 
 function makeRecordCodecToFrom<TAttributes extends PgCodecAttributes>(
+  name: string,
   attributes: TAttributes,
 ): Pick<PgCodec, "fromPg" | "toPg" | "castFromPg" | "listCastFromPg"> {
   const attributeDefs = realAttributeDefs(attributes);
@@ -473,8 +474,11 @@ function makeRecordCodecToFrom<TAttributes extends PgCodecAttributes>(
     return {
       castFromPg,
       listCastFromPg(frag) {
+        const identifier = sql.identifier(Symbol(name));
         return sql`(${sql.indent(
-          sql`select array_agg(${castFromPg(sql`t`)})\nfrom unnest(${frag}) t`,
+          sql`select array_agg(${castFromPg(
+            identifier,
+          )})\nfrom unnest(${frag}) ${identifier}`,
         )})::text`;
       },
       fromPg: makeSQLValueToRecord(attributes, true),
@@ -674,7 +678,20 @@ export function listOfCodec<
     description,
     extensions,
     arrayOfCodec: innerCodec,
-    castFromPg: innerCodec.listCastFromPg,
+    ...(innerCodec.listCastFromPg
+      ? {
+          castFromPg: innerCodec.listCastFromPg,
+          listCastFromPg(frag) {
+            const identifier = sql.identifier(Symbol(`${name}_item`));
+            return sql`(${sql.indent(
+              sql`select array_agg(${innerCodec.listCastFromPg!.call(
+                this,
+                identifier,
+              )})\nfrom unnest(${frag}) ${identifier}`,
+            )})::text`;
+          },
+        }
+      : null),
     executor: innerCodec.executor,
   };
 
@@ -814,10 +831,11 @@ export function rangeOfCodec<
       ? {
           castFromPg,
           listCastFromPg(frag) {
+            const identifier = sql.identifier(Symbol(name));
             return sql`(${sql.indent(
               sql`select array_agg(${castFromPg(
-                sql`t`,
-              )})\nfrom unnest(${frag}) t`,
+                identifier,
+              )})\nfrom unnest(${frag}) ${identifier}`,
             )})::text`;
           },
         }
@@ -931,11 +949,12 @@ const viaDateFormat = (format: string, prefix: SQL = sql.blank): Cast => {
   return {
     castFromPg,
     listCastFromPg(frag) {
+      const identifier = sql.identifier(Symbol("entry"));
       return sql`(${sql.indent(
         sql`select array_agg(${castFromPg.call(
           this,
-          sql`t`,
-        )})\nfrom unnest(${frag}) t`,
+          identifier,
+        )})\nfrom unnest(${frag}) ${identifier}`,
       )})::text`;
     },
   };
