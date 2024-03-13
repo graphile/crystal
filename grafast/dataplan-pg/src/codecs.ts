@@ -465,7 +465,7 @@ function makeRecordCodecToFrom<TAttributes extends PgCodecAttributes>(
           if (attr.codec.castFromPg) {
             return attr.codec.castFromPg(expr);
           } else {
-            return expr;
+            return sql`(${expr})::text`;
           }
         }),
         ", ",
