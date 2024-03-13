@@ -455,10 +455,11 @@ exportAs("@dataplan/pg", recordCodec, "recordCodec");
 function makeRecordCodecToFrom<TAttributes extends PgCodecAttributes>(
   attributes: TAttributes,
 ): Pick<PgCodec, "fromPg" | "toPg" | "castFromPg" | "listCastFromPg"> {
-  if (Object.values(attributes).some((attr) => attr.codec.castFromPg)) {
+  const attributeDefs = realAttributeDefs(attributes);
+  if (attributeDefs.some(([_attrName, attr]) => attr.codec.castFromPg)) {
     const castFromPg = (fragment: SQL) => {
       return sql`json_build_array(${sql.join(
-        Object.entries(attributes).map(([attrName, attr]) => {
+        attributeDefs.map(([attrName, attr]) => {
           const expr = sql`(${fragment}.${sql.identifier(attrName)})`;
           if (attr.codec.castFromPg) {
             return attr.codec.castFromPg(expr);
