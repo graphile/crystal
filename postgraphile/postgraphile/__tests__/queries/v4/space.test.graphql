@@ -1,0 +1,21 @@
+## expect(errors).toBeFalsy();
+#> schema: ["space"]
+#> subscriptions: true
+query {
+  allSpacecrafts {
+    nodes {
+      id
+      name
+      eta(to: { id: "1", type: MOBILE }) {
+        start {
+          value
+          inclusive
+        }
+        end {
+          value
+          inclusive
+        }
+      }
+    }
+  }
+}
