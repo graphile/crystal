@@ -25,7 +25,7 @@ select
   ("c"."compound_type_computed_field"(__frmcdc_compound_type_6))::text as "23",
   (not (__frmcdc_compound_type_6 is null))::text as "24",
   (not (__frmcdc_nested_compound_type_2 is null))::text as "25",
-  __types__."compound_type"::text as "26"
+  case when (__types__."compound_type") is not distinct from null then null::text else json_build_array((((__types__."compound_type")."a"))::text, ((__types__."compound_type")."b"), (((__types__."compound_type")."c"))::text, ((__types__."compound_type")."d"), (((__types__."compound_type")."e"))::text, (((__types__."compound_type")."f"))::text, to_char(((__types__."compound_type")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__types__."compound_type")."foo_bar"))::text)::text end as "26"
 from "b"."types" as __types__
 left outer join lateral (select (__types__."compound_type").*) as __frmcdc_compound_type__
 on TRUE
@@ -56,7 +56,10 @@ lateral (
       __post_identifiers__."id9"
     ) as "1",
     __post_2."id"::text as "2",
-    __post_3::text as "3",
+    case when (__post_3) is not distinct from null then null::text else json_build_array((((__post_3)."id"))::text, ((__post_3)."headline"), ((__post_3)."body"), (((__post_3)."author_id"))::text, (((__post_3)."enums"))::text, (
+      select array_agg(case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end)
+      from unnest(((__post_3)."comptypes")) __comptype__
+    )::text)::text end as "3",
     __post_3."id"::text as "4",
     (select json_agg(s) from (
       select
@@ -91,8 +94,8 @@ lateral (
     ) as "12",
     ("a"."post_computed_text_array"(__post__))::text as "13",
     (
-      select array_agg(to_char(t, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
-      from unnest("a"."post_computed_interval_array"(__post__)) t
+      select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
+      from unnest("a"."post_computed_interval_array"(__post__)) __entry__
     )::text as "14",
     __post_identifiers__.idx as "15"
   from "a"."post" as __post__

@@ -8,7 +8,7 @@ insert into "c"."person" as __person__ ("person_full_name", "aliases", "about", 
   __person__."aliases"::text as "2",
   __person__."about" as "3",
   __person__."email" as "4",
-  __person__."site"::text as "5";
+  case when (__person__."site") is not distinct from null then null::text else json_build_array(((__person__."site")."url"))::text end as "5";
 
 commit; /*fake*/
 

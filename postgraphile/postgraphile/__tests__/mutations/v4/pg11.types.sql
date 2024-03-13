@@ -3,7 +3,7 @@ update "pg11"."types" as __types__ set "regrole" = $1::"regrole", "regnamespace"
   __types__."regrole"::text as "1",
   __types__."regnamespace"::text as "2",
   __types__."bigint_domain_array_domain"::text as "3",
-  __types__."domain_constrained_compound_type"::text as "4";
+  case when (__types__."domain_constrained_compound_type") is not distinct from null then null::text else json_build_array((((__types__."domain_constrained_compound_type")."a"))::text, ((__types__."domain_constrained_compound_type")."b"), (((__types__."domain_constrained_compound_type")."c"))::text, ((__types__."domain_constrained_compound_type")."d"), (((__types__."domain_constrained_compound_type")."e"))::text, (((__types__."domain_constrained_compound_type")."f"))::text, to_char(((__types__."domain_constrained_compound_type")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__types__."domain_constrained_compound_type")."foo_bar"))::text)::text end as "4";
 
 select __frmcdc_domain_constrained_compound_type_result__.*
 from (select 0 as idx, $1::"pg11"."domain_constrained_compound_type" as "id0") as __frmcdc_domain_constrained_compound_type_identifier__,
@@ -26,7 +26,7 @@ insert into "pg11"."types" as __types__ ("regrole", "regnamespace", "bigint_doma
   __types__."regrole"::text as "1",
   __types__."regnamespace"::text as "2",
   __types__."bigint_domain_array_domain"::text as "3",
-  __types__."domain_constrained_compound_type"::text as "4";
+  case when (__types__."domain_constrained_compound_type") is not distinct from null then null::text else json_build_array((((__types__."domain_constrained_compound_type")."a"))::text, ((__types__."domain_constrained_compound_type")."b"), (((__types__."domain_constrained_compound_type")."c"))::text, ((__types__."domain_constrained_compound_type")."d"), (((__types__."domain_constrained_compound_type")."e"))::text, (((__types__."domain_constrained_compound_type")."f"))::text, to_char(((__types__."domain_constrained_compound_type")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__types__."domain_constrained_compound_type")."foo_bar"))::text)::text end as "4";
 
 select __frmcdc_domain_constrained_compound_type_result__.*
 from (select 0 as idx, $1::"pg11"."domain_constrained_compound_type" as "id0") as __frmcdc_domain_constrained_compound_type_identifier__,

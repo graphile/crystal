@@ -1,0 +1,146 @@
+{
+  allSpacecrafts: {
+    nodes: [
+      {
+        id: "1",
+        name: "1",
+        eta: {
+          start: {
+            value: "2024-03-11T00:00:00.000000",
+            inclusive: true,
+          },
+          end: {
+            value: "2024-03-12T00:00:00.000000",
+            inclusive: false,
+          },
+        },
+      },
+      {
+        id: "2",
+        name: "2",
+        eta: {
+          start: {
+            value: "2024-03-10T00:00:00.000000",
+            inclusive: true,
+          },
+          end: {
+            value: "2024-03-11T00:00:00.000000",
+            inclusive: false,
+          },
+        },
+      },
+      {
+        id: "3",
+        name: "3",
+        eta: {
+          start: {
+            value: "2024-03-09T00:00:00.000000",
+            inclusive: true,
+          },
+          end: {
+            value: "2024-03-10T00:00:00.000000",
+            inclusive: false,
+          },
+        },
+      },
+      {
+        id: "4",
+        name: "4",
+        eta: {
+          start: {
+            value: "2024-03-08T00:00:00.000000",
+            inclusive: true,
+          },
+          end: {
+            value: "2024-03-09T00:00:00.000000",
+            inclusive: false,
+          },
+        },
+      },
+      {
+        id: "5",
+        name: "5",
+        eta: {
+          start: {
+            value: "2024-03-07T00:00:00.000000",
+            inclusive: true,
+          },
+          end: {
+            value: "2024-03-08T00:00:00.000000",
+            inclusive: false,
+          },
+        },
+      },
+      {
+        id: "6",
+        name: "6",
+        eta: {
+          start: {
+            value: "2024-03-06T00:00:00.000000",
+            inclusive: true,
+          },
+          end: {
+            value: "2024-03-07T00:00:00.000000",
+            inclusive: false,
+          },
+        },
+      },
+      {
+        id: "7",
+        name: "7",
+        eta: {
+          start: {
+            value: "2024-03-05T00:00:00.000000",
+            inclusive: true,
+          },
+          end: {
+            value: "2024-03-06T00:00:00.000000",
+            inclusive: false,
+          },
+        },
+      },
+      {
+        id: "8",
+        name: "8",
+        eta: {
+          start: {
+            value: "2024-03-04T00:00:00.000000",
+            inclusive: true,
+          },
+          end: {
+            value: "2024-03-05T00:00:00.000000",
+            inclusive: false,
+          },
+        },
+      },
+      {
+        id: "9",
+        name: "9",
+        eta: {
+          start: {
+            value: "2024-03-03T00:00:00.000000",
+            inclusive: true,
+          },
+          end: {
+            value: "2024-03-04T00:00:00.000000",
+            inclusive: false,
+          },
+        },
+      },
+      {
+        id: "10",
+        name: "10",
+        eta: {
+          start: {
+            value: "2024-03-02T00:00:00.000000",
+            inclusive: true,
+          },
+          end: {
+            value: "2024-03-03T00:00:00.000000",
+            inclusive: false,
+          },
+        },
+      },
+    ],
+  },
+}

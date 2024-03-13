@@ -919,3 +919,13 @@ insert into composite_domains.posts (user_id, content, thread_content, created_a
     ]::composite_domains.user_update_content[],
   '2023-09-29T09:13:28.571996-04:00'
   );
+
+truncate space.spacecraft restart identity;
+truncate space.temp_pad restart identity;
+truncate space.static_pad restart identity;
+truncate space.mobile_pad restart identity;
+
+insert into space.mobile_pad(name) select i::text from generate_series(1, 10) i;
+insert into space.static_pad(name) select i::text from generate_series(1, 10) i;
+insert into space.temp_pad(name) select i::text from generate_series(1, 10) i;
+insert into space.spacecraft(name, return_to_earth) select i::text, tsrange((date_trunc('day', now()) - (i+1) * interval '1 day')::timestamp, (date_trunc('day', now()) - (i) * interval '1 day')::timestamp, '[)') from generate_series(1, 10) i;
