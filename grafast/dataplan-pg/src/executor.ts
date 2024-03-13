@@ -184,7 +184,7 @@ export class PgExecutor<TSettings = any> {
     const shouldExplain = debugExplain.enabled;
     const explainAnalyzeSafe = shouldExplain && /^\s*select/i.test(text);
     let explain: string | undefined = undefined;
-    if (shouldExplain) {
+    if (shouldExplain && !error) {
       const explainResult = await client.query<{ 0: string }>({
         text: `EXPLAIN (${
           explainAnalyzeSafe ? "ANALYZE, " : ""
@@ -260,7 +260,11 @@ ${duration}
         error ? error : rowResults,
         LOOK_UP,
         explain ??
-          `(Use 'DEBUG="@dataplan/pg:PgExecutor:explain"' to enable explain)`,
+          (shouldExplain
+            ? `(Explain disabled ${
+                error ? "due to error" : "due to unknown reason"
+              })`
+            : `(Use 'DEBUG="@dataplan/pg:PgExecutor:explain"' to enable explain)`),
       );
     }
     if (publish !== undefined) {
