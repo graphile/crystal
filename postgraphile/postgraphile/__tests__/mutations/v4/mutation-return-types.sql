@@ -28,8 +28,8 @@ from (select 0 as idx, $1::"int4" as "id0", $2::"text" as "id1") as __mutation_o
 lateral (
   select
     __mutation_out_complex__."x"::text as "0",
-    __mutation_out_complex__."y"::text as "1",
-    __mutation_out_complex__."z"::text as "2",
+    case when (__mutation_out_complex__."y") is not distinct from null then null::text else json_build_array((((__mutation_out_complex__."y")."a"))::text, ((__mutation_out_complex__."y")."b"), (((__mutation_out_complex__."y")."c"))::text, ((__mutation_out_complex__."y")."d"), (((__mutation_out_complex__."y")."e"))::text, (((__mutation_out_complex__."y")."f"))::text, to_char(((__mutation_out_complex__."y")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__mutation_out_complex__."y")."foo_bar"))::text)::text end as "1",
+    case when (__mutation_out_complex__."z") is not distinct from null then null::text else json_build_array((((__mutation_out_complex__."z")."id"))::text, ((__mutation_out_complex__."z")."person_full_name"), (((__mutation_out_complex__."z")."aliases"))::text, ((__mutation_out_complex__."z")."about"), ((__mutation_out_complex__."z")."email"), case when (((__mutation_out_complex__."z")."site")) is not distinct from null then null::text else json_build_array(((((__mutation_out_complex__."z")."site"))."url"))::text end, (((__mutation_out_complex__."z")."config"))::text, (((__mutation_out_complex__."z")."last_login_from_ip"))::text, (((__mutation_out_complex__."z")."last_login_from_subnet"))::text, (((__mutation_out_complex__."z")."user_mac"))::text, to_char(((__mutation_out_complex__."z")."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "2",
     (not (__mutation_out_complex__ is null))::text as "3",
     __mutation_out_complex_identifiers__.idx as "4"
   from "c"."mutation_out_complex"(
@@ -74,8 +74,8 @@ from (select 0 as idx, $1::"int4" as "id0", $2::"text" as "id1") as __mutation_o
 lateral (
   select
     __mutation_out_complex_setof__."x"::text as "0",
-    __mutation_out_complex_setof__."y"::text as "1",
-    __mutation_out_complex_setof__."z"::text as "2",
+    case when (__mutation_out_complex_setof__."y") is not distinct from null then null::text else json_build_array((((__mutation_out_complex_setof__."y")."a"))::text, ((__mutation_out_complex_setof__."y")."b"), (((__mutation_out_complex_setof__."y")."c"))::text, ((__mutation_out_complex_setof__."y")."d"), (((__mutation_out_complex_setof__."y")."e"))::text, (((__mutation_out_complex_setof__."y")."f"))::text, to_char(((__mutation_out_complex_setof__."y")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__mutation_out_complex_setof__."y")."foo_bar"))::text)::text end as "1",
+    case when (__mutation_out_complex_setof__."z") is not distinct from null then null::text else json_build_array((((__mutation_out_complex_setof__."z")."id"))::text, ((__mutation_out_complex_setof__."z")."person_full_name"), (((__mutation_out_complex_setof__."z")."aliases"))::text, ((__mutation_out_complex_setof__."z")."about"), ((__mutation_out_complex_setof__."z")."email"), case when (((__mutation_out_complex_setof__."z")."site")) is not distinct from null then null::text else json_build_array(((((__mutation_out_complex_setof__."z")."site"))."url"))::text end, (((__mutation_out_complex_setof__."z")."config"))::text, (((__mutation_out_complex_setof__."z")."last_login_from_ip"))::text, (((__mutation_out_complex_setof__."z")."last_login_from_subnet"))::text, (((__mutation_out_complex_setof__."z")."user_mac"))::text, to_char(((__mutation_out_complex_setof__."z")."created_at"), 'YYYY-MM-DD"T"HH24:MI:SS.US'::text))::text end as "2",
     (not (__mutation_out_complex_setof__ is null))::text as "3",
     __mutation_out_complex_setof_identifiers__.idx as "4"
   from "c"."mutation_out_complex_setof"(
@@ -126,7 +126,7 @@ from (select 0 as idx, $1::"int4" as "id0") as __mutation_out_out_compound_type_
 lateral (
   select
     __mutation_out_out_compound_type__."o1"::text as "0",
-    __mutation_out_out_compound_type__."o2"::text as "1",
+    case when (__mutation_out_out_compound_type__."o2") is not distinct from null then null::text else json_build_array((((__mutation_out_out_compound_type__."o2")."a"))::text, ((__mutation_out_out_compound_type__."o2")."b"), (((__mutation_out_out_compound_type__."o2")."c"))::text, ((__mutation_out_out_compound_type__."o2")."d"), (((__mutation_out_out_compound_type__."o2")."e"))::text, (((__mutation_out_out_compound_type__."o2")."f"))::text, to_char(((__mutation_out_out_compound_type__."o2")."g"), 'YYYY_MM_DD_HH24_MI_SS.US'::text), (((__mutation_out_out_compound_type__."o2")."foo_bar"))::text)::text end as "1",
     (not (__mutation_out_out_compound_type__ is null))::text as "2",
     __mutation_out_out_compound_type_identifiers__.idx as "3"
   from "c"."mutation_out_out_compound_type"(__mutation_out_out_compound_type_identifiers__."id0") as __mutation_out_out_compound_type__
