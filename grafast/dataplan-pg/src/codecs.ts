@@ -367,17 +367,19 @@ export type ObjectFromPgCodecAttributes<TAttributes extends PgCodecAttributes> =
 /**
  * Takes a list of attributes and returns a mapping function that takes a
  * PostgreSQL record string value (e.g. `(1,2,"hi")`) and turns it into a
- * JavaScript object.
+ * JavaScript object. If `asJSON` is true, then instead of a record string value,
+ * we expect a JSON array value (typically due to casting).
  *
  * @see {@link https://www.postgresql.org/docs/current/rowtypes.html#id-1.5.7.24.6}
  */
 function makeSQLValueToRecord<TAttributes extends PgCodecAttributes>(
   attributes: TAttributes,
+  asJSON = false,
 ): (value: string) => ObjectFromPgCodecAttributes<TAttributes> {
   const attributeDefs = realAttributeDefs(attributes);
   const attributeCount = attributeDefs.length;
   return (value) => {
-    const tuple = recordStringToTuple(value);
+    const tuple = asJSON ? JSON.parse(value) : recordStringToTuple(value);
     const record = Object.create(null);
     for (let i = 0; i < attributeCount; i++) {
       const [attributeName, spec] = attributeDefs[i];
@@ -440,8 +442,7 @@ export function recordCodec<
     name,
     sqlType: identifier,
     isAnonymous,
-    fromPg: makeSQLValueToRecord(attributes),
-    toPg: makeRecordToSQLRawValue(attributes),
+    ...makeRecordCodecToFrom(attributes),
     attributes,
     polymorphism,
     description,
@@ -450,6 +451,41 @@ export function recordCodec<
   };
 }
 exportAs("@dataplan/pg", recordCodec, "recordCodec");
+
+function makeRecordCodecToFrom<TAttributes extends PgCodecAttributes>(
+  attributes: TAttributes,
+): Pick<PgCodec, "fromPg" | "toPg" | "castFromPg" | "listCastFromPg"> {
+  if (Object.values(attributes).some((attr) => attr.codec.castFromPg)) {
+    const castFromPg = (fragment: SQL) => {
+      return sql`json_build_array(${sql.join(
+        Object.entries(attributes).map(([attrName, attr]) => {
+          const expr = sql`(${fragment}.${sql.identifier(attrName)})`;
+          if (attr.codec.castFromPg) {
+            return attr.codec.castFromPg(expr);
+          } else {
+            return expr;
+          }
+        }),
+        ", ",
+      )})::text`;
+    };
+    return {
+      castFromPg,
+      listCastFromPg(frag) {
+        return sql`(${sql.indent(
+          sql`select array_agg(${castFromPg(sql`t`)})\nfrom unnest(${frag}) t`,
+        )})::text`;
+      },
+      fromPg: makeSQLValueToRecord(attributes, true),
+      toPg: makeRecordToSQLRawValue(attributes),
+    };
+  } else {
+    return {
+      fromPg: makeSQLValueToRecord(attributes),
+      toPg: makeRecordToSQLRawValue(attributes),
+    };
+  }
+}
 
 export type PgEnumCodecSpec<TName extends string, TValue extends string> = {
   name: TName;
