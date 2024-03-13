@@ -46,7 +46,7 @@ on TRUE
 order by __types__."id" asc;
 
 select __post_result__.*
-from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"text" as "id2", $4::"int4" as "id3", $5::"int4" as "id4", $6::"text" as "id5", $7::"int4" as "id6", $8::"text" as "id7", $9::"int4" as "id8", $10::"text" as "id9") as __post_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"text" as "id2", $4::"int4" as "id3", $5::"int4" as "id4", $6::"text" as "id5", $7::"int4" as "id6", $8::"text" as "id7", $9::"int4" as "id8", $10::"text" as "id9", $11::"c"."compound_type" as "id10") as __post_identifiers__,
 lateral (
   select
     __post__."headline" as "0",
@@ -56,48 +56,59 @@ lateral (
       __post_identifiers__."id9"
     ) as "1",
     __post_2."id"::text as "2",
-    case when (__post_3) is not distinct from null then null::text else json_build_array((((__post_3)."id"))::text, ((__post_3)."headline"), ((__post_3)."body"), (((__post_3)."author_id"))::text, (((__post_3)."enums"))::text, (
-      select array_agg(case when (__comptype__) is not distinct from null then null::text else json_build_array(to_char(((__comptype__)."schedule"), 'YYYY-MM-DD"T"HH24:MI:SS.USTZH:TZM'::text), (((__comptype__)."is_optimised"))::text)::text end)
-      from unnest(((__post_3)."comptypes")) __comptype__
-    )::text)::text end as "3",
-    __post_3."id"::text as "4",
+    (select json_agg(s) from (
+      select
+        __post_computed_compound_type_array__."a"::text as "0",
+        __post_computed_compound_type_array__."b" as "1",
+        __post_computed_compound_type_array__."c"::text as "2",
+        __post_computed_compound_type_array__."d" as "3",
+        __post_computed_compound_type_array__."e"::text as "4",
+        __post_computed_compound_type_array__."f"::text as "5",
+        to_char(__post_computed_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
+        __post_computed_compound_type_array__."foo_bar"::text as "7",
+        (not (__post_computed_compound_type_array__ is null))::text as "8"
+      from unnest("a"."post_computed_compound_type_array"(
+        __post_3,
+        __post_identifiers__."id10"
+      )) as __post_computed_compound_type_array__
+    ) s) as "3",
     (select json_agg(s) from (
       select
         to_char(__post_computed_interval_set__.v, 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "0",
         (row_number() over (partition by 1))::text as "1"
       from "a"."post_computed_interval_set"(__post__) as __post_computed_interval_set__(v)
-    ) s) as "5",
-    "a"."post_headline_trimmed"(__post__) as "6",
+    ) s) as "4",
+    "a"."post_headline_trimmed"(__post__) as "5",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id0"
-    ) as "7",
+    ) as "6",
     "a"."post_headline_trimmed"(
       __post__,
       __post_identifiers__."id1",
       __post_identifiers__."id2"
-    ) as "8",
-    "a"."post_headline_trimmed_strict"(__post__) as "9",
+    ) as "7",
+    "a"."post_headline_trimmed_strict"(__post__) as "8",
     "a"."post_headline_trimmed_strict"(
       __post__,
       __post_identifiers__."id3"
-    ) as "10",
+    ) as "9",
     "a"."post_headline_trimmed_strict"(
       __post__,
       __post_identifiers__."id4",
       __post_identifiers__."id5"
-    ) as "11",
+    ) as "10",
     "a"."post_headline_trimmed_no_defaults"(
       __post__,
       __post_identifiers__."id6",
       __post_identifiers__."id7"
-    ) as "12",
-    ("a"."post_computed_text_array"(__post__))::text as "13",
+    ) as "11",
+    ("a"."post_computed_text_array"(__post__))::text as "12",
     (
       select array_agg(to_char(__entry__, 'YYYY_MM_DD_HH24_MI_SS.US'::text))
       from unnest("a"."post_computed_interval_array"(__post__)) __entry__
-    )::text as "14",
-    __post_identifiers__.idx as "15"
+    )::text as "13",
+    __post_identifiers__.idx as "14"
   from "a"."post" as __post__
   left outer join lateral (select (__post__).*) as __post_2
   on TRUE
@@ -134,23 +145,3 @@ select
   __edge_case__."wont_cast_easy"::text as "1",
   "c"."edge_case_computed"(__edge_case__) as "2"
 from "c"."edge_case" as __edge_case__;
-
-select __post_computed_compound_type_array_result__.*
-from (select ids.ordinality - 1 as idx, (ids.value->>0)::"a"."post" as "id0", (ids.value->>1)::"c"."compound_type" as "id1" from json_array_elements($1::json) with ordinality as ids) as __post_computed_compound_type_array_identifiers__,
-lateral (
-  select
-    __post_computed_compound_type_array__."a"::text as "0",
-    __post_computed_compound_type_array__."b" as "1",
-    __post_computed_compound_type_array__."c"::text as "2",
-    __post_computed_compound_type_array__."d" as "3",
-    __post_computed_compound_type_array__."e"::text as "4",
-    __post_computed_compound_type_array__."f"::text as "5",
-    to_char(__post_computed_compound_type_array__."g", 'YYYY_MM_DD_HH24_MI_SS.US'::text) as "6",
-    __post_computed_compound_type_array__."foo_bar"::text as "7",
-    (not (__post_computed_compound_type_array__ is null))::text as "8",
-    __post_computed_compound_type_array_identifiers__.idx as "9"
-  from unnest("a"."post_computed_compound_type_array"(
-    __post_computed_compound_type_array_identifiers__."id0",
-    __post_computed_compound_type_array_identifiers__."id1"
-  )) as __post_computed_compound_type_array__
-) as __post_computed_compound_type_array_result__;
