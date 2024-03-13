@@ -460,7 +460,7 @@ function makeRecordCodecToFrom<TAttributes extends PgCodecAttributes>(
     const castFromPg = (fragment: SQL) => {
       return sql`json_build_array(${sql.join(
         attributeDefs.map(([attrName, attr]) => {
-          const expr = sql`(${fragment}.${sql.identifier(attrName)})`;
+          const expr = sql`((${fragment}).${sql.identifier(attrName)})`;
           if (attr.codec.castFromPg) {
             return attr.codec.castFromPg(expr);
           } else {
