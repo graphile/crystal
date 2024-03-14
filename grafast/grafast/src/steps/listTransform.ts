@@ -277,10 +277,11 @@ export class __ListTransformStep<
             (ev.entries as any[])[newIndex] = list[j];
           }
           for (const planId of copyStepIds) {
-            const ev = bucket.store.get(planId)!;
+            const ev = store.get(planId)!;
             if (ev.isBatch) {
-              (store.get(planId)!.entries as any[])[newIndex] =
-                ev.at(originalIndex);
+              (ev.entries as any[])[newIndex] = bucket.store
+                .get(planId)!
+                .at(originalIndex);
             }
           }
         }

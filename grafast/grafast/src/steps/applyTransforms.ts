@@ -143,9 +143,12 @@ export class ApplyTransformsStep extends ExecutableStep {
             (ev.entries as any[])[newIndex] = list[j];
           }
           for (const stepId of copyStepIds) {
-            const ev = bucket.store.get(stepId)!;
-            (store.get(stepId)!.entries as any[])[newIndex] =
-              ev.at(originalIndex);
+            const ev = store.get(stepId)!;
+            if (ev.isBatch) {
+              (ev.entries as any[])[newIndex] = bucket.store
+                .get(stepId)!
+                .at(originalIndex);
+            }
           }
         }
       }

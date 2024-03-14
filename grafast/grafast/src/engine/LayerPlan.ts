@@ -13,7 +13,11 @@ import type {
   ModifierStep,
   UnbatchedExecutableStep,
 } from "../step";
-import { batchExecutionValue, newBucket } from "./executeBucket.js";
+import {
+  batchExecutionValue,
+  newBucket,
+  unaryExecutionValue,
+} from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
 /*
@@ -507,11 +511,16 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         }
         const itemStepId = this.rootStep.id;
         // Item steps are **NOT** unary
-        const itemStepIdList: any[] = [];
+        const itemStepIdList: any[] | null = this.rootStep._isUnary ? null : [];
         if (this.rootStep._isUnary) {
           // handled later
+          const list = listStepStore.at(0);
+          store.set(
+            itemStepId,
+            unaryExecutionValue(Array.isArray(list) ? list[0] : list),
+          );
         } else {
-          store.set(itemStepId, batchExecutionValue(itemStepIdList));
+          store.set(itemStepId, batchExecutionValue(itemStepIdList!));
         }
 
         for (const stepId of copyStepIds) {
@@ -539,9 +548,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             for (let j = 0, l = list.length; j < l; j++) {
               const newIndex = size++;
               newIndexes.push(newIndex);
-              if (this.rootStep._isUnary) {
-                store.set(itemStepId, list[j]);
-              } else {
+              if (itemStepIdList !== null) {
                 itemStepIdList[newIndex] = list[j];
               }
 
@@ -549,10 +556,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                 parentBucket.polymorphicPathList[originalIndex];
               iterators[newIndex] = parentBucket.iterators[originalIndex];
               for (const stepId of copyStepIds) {
-                const ev = parentBucket.store.get(stepId)!;
+                const ev = store.get(stepId)!;
                 if (ev.isBatch) {
-                  (store.get(stepId)!.entries as any[])[newIndex] =
-                    ev.at(originalIndex);
+                  (ev.entries as any[])[newIndex] = parentBucket.store
+                    .get(stepId)!
+                    .at(originalIndex);
                 }
               }
             }
@@ -634,11 +642,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           polymorphicPathList[newIndex] = newPolymorphicPath;
           iterators[newIndex] = parentBucket.iterators[originalIndex];
           for (const planId of copyStepIds) {
-            const ev = parentBucket.store.get(planId)!;
-
+            const ev = store.get(planId)!;
             if (ev.isBatch) {
-              (store.get(planId)!.entries as any[])[newIndex] =
-                ev.at(originalIndex);
+              (ev.entries as any[])[newIndex] = parentBucket.store
+                .get(planId)!
+                .at(originalIndex);
             }
           }
         }
