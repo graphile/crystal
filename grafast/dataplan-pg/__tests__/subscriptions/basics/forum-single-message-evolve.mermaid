@@ -76,7 +76,7 @@ graph TD
     Bucket1("Bucket 1 (subscription)<br />Deps: 3, 5<br /><br />ROOT __Item{1}ᐸ10ᐳ[11]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item11,JSONParse12,Access18,Access19,Object20 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 20, 12<br /><br />ROOT JSONParse{1}ᐸ11ᐳ[12]<br />1: <br />ᐳ: Access[14], Access[16], Lambda[15]<br />2: PgSelect[17]<br />ᐳ: First[21], PgSelectSingle[22]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 12, 20<br /><br />ROOT JSONParse{1}ᐸ11ᐳ[12]<br />1: <br />ᐳ: Access[14], Access[16], Lambda[15]<br />2: PgSelect[17]<br />ᐳ: First[21], PgSelectSingle[22]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,Access14,Lambda15,Access16,PgSelect17,First21,PgSelectSingle22 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgSelectSingle{2}ᐸmessagesᐳ[22]"):::bucket

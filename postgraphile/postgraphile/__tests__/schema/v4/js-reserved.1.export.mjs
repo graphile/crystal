@@ -6980,7 +6980,7 @@ export const plans = {
           const attribute = machineCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "ASC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -6996,7 +6996,7 @@ export const plans = {
           const attribute = machineCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "DESC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -7215,7 +7215,7 @@ export const plans = {
           const attribute = relationalItemsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "ASC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -7231,7 +7231,7 @@ export const plans = {
           const attribute = relationalItemsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "DESC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -9212,7 +9212,7 @@ export const plans = {
           const attribute = relationalTopicsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "ASC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -9228,7 +9228,7 @@ export const plans = {
           const attribute = relationalTopicsCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "DESC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -9504,7 +9504,7 @@ export const plans = {
           const attribute = __proto__Codec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "ASC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -9520,7 +9520,7 @@ export const plans = {
           const attribute = __proto__Codec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "DESC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -9739,7 +9739,7 @@ export const plans = {
           const attribute = buildingCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "ASC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -9755,7 +9755,7 @@ export const plans = {
           const attribute = buildingCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "DESC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -9974,7 +9974,7 @@ export const plans = {
           const attribute = constructorCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "ASC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -9990,7 +9990,7 @@ export const plans = {
           const attribute = constructorCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "DESC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -10209,7 +10209,7 @@ export const plans = {
           const attribute = cropCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "ASC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -10225,7 +10225,7 @@ export const plans = {
           const attribute = cropCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "DESC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -10444,7 +10444,7 @@ export const plans = {
           const attribute = materialCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "ASC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -10460,7 +10460,7 @@ export const plans = {
           const attribute = materialCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "DESC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -10679,7 +10679,7 @@ export const plans = {
           const attribute = nullCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "ASC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -10695,7 +10695,7 @@ export const plans = {
           const attribute = nullCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "DESC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -10914,7 +10914,7 @@ export const plans = {
           const attribute = projectCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "ASC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -10930,7 +10930,7 @@ export const plans = {
           const attribute = projectCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "DESC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -11149,7 +11149,7 @@ export const plans = {
           const attribute = relationalStatusCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "ASC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -11165,7 +11165,7 @@ export const plans = {
           const attribute = relationalStatusCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "DESC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -11498,7 +11498,7 @@ export const plans = {
           const attribute = yieldCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "ASC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -11514,7 +11514,7 @@ export const plans = {
           const attribute = yieldCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "DESC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -11733,7 +11733,7 @@ export const plans = {
           const attribute = reservedCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "ASC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
@@ -11749,7 +11749,7 @@ export const plans = {
           const attribute = reservedCodec.attributes[attributeName];
           step.orderBy({
             codec: attribute.codec,
-            fragment: sql`${step.alias}.${sql.identifier(attributeName)}`,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
             direction: "DESC",
             ...(undefined != null ? {
               nulls: undefined ? "LAST" : "FIRST"
