@@ -1852,12 +1852,38 @@ export async function exportSchemaAsString(
     exportSchemaGraphQLJS(schemaExportDetails);
   }
 
+  return exportFile(file);
+}
+
+function exportFile(file: CodegenFile) {
   const ast = file.toAST();
 
   const optimizedAst = optimize(ast);
 
   const { code } = reallyGenerate(optimizedAst, {});
   return { code };
+}
+
+export async function exportValueAsString(
+  name: string,
+  value: any,
+  options: ExportOptions,
+): Promise<{ code: string }> {
+  const file = new CodegenFile(options);
+
+  const exportName = file.makeVariable(name);
+
+  const valueAST = convertToIdentifierViaAST(file, value, name, name);
+
+  file.addStatements(
+    t.exportNamedDeclaration(
+      t.variableDeclaration("const", [
+        t.variableDeclarator(exportName, valueAST),
+      ]),
+    ),
+  );
+
+  return exportFile(file);
 }
 
 async function loadESLint() {
