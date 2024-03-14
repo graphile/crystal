@@ -1,7 +1,7 @@
 import type { ExecutionDetails, GrafastResultsList, SetterStep } from "grafast";
 import { ExecutableStep, exportAs, isDev, SafeError, setter } from "grafast";
-import type { SQL, SQLRawValue } from "pg-sql2";
-import sql from "pg-sql2";
+import type { SQL, SQLRawValue, SQLable } from "pg-sql2";
+import sql, { $$toSQL } from "pg-sql2";
 
 import type { PgCodecAttribute } from "../codecs.js";
 import type { PgResource, PgResourceUnique } from "../index.js";
@@ -36,8 +36,11 @@ interface PgUpdatePlanFinalizeResults {
  * Update a single row identified by the 'getBy' argument.
  */
 export class PgUpdateSingleStep<
-  TResource extends PgResource<any, any, any, any, any> = PgResource,
-> extends ExecutableStep<unknown[]> {
+    TResource extends PgResource<any, any, any, any, any> = PgResource,
+  >
+  extends ExecutableStep<unknown[]>
+  implements SQLable
+{
   static $$export = {
     moduleName: "@dataplan/pg",
     exportName: "PgUpdateSingleStep",
@@ -442,6 +445,9 @@ export class PgUpdateSingleStep<
     }
 
     super.finalize();
+  }
+  [$$toSQL]() {
+    return this.alias;
   }
 }
 

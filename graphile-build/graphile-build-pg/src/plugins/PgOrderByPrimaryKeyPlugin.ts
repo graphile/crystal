@@ -69,7 +69,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                           const attribute = pgCodec.attributes[attributeName];
                           step.orderBy({
                             codec: attribute.codec,
-                            fragment: sql`${step.alias}.${sql.identifier(
+                            fragment: sql`${step}.${sql.identifier(
                               attributeName,
                             )}`,
                             direction: "ASC",
@@ -97,7 +97,7 @@ export const PgOrderByPrimaryKeyPlugin: GraphileConfig.Plugin = {
                           const attribute = pgCodec.attributes[attributeName];
                           step.orderBy({
                             codec: attribute.codec,
-                            fragment: sql`${step.alias}.${sql.identifier(
+                            fragment: sql`${step}.${sql.identifier(
                               attributeName,
                             )}`,
                             direction: "DESC",

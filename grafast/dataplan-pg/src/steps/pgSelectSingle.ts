@@ -10,8 +10,8 @@ import {
   UnbatchedExecutableStep,
 } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
-import type { SQL } from "pg-sql2";
-import sql from "pg-sql2";
+import type { SQL, SQLable } from "pg-sql2";
+import sql, { $$toSQL } from "pg-sql2";
 
 import type {
   ObjectFromPgCodecAttributes,
@@ -79,7 +79,8 @@ export class PgSelectSingleStep<
         ? UCodec
         : never
     >,
-    EdgeCapableStep<any>
+    EdgeCapableStep<any>,
+    SQLable
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -550,9 +551,7 @@ export class PgSelectSingleStep<
           attribute: { codec },
           attr,
         } = nonNullAttribute;
-        const expression = sql`${this.getClassStep().alias}.${sql.identifier(
-          attr,
-        )}`;
+        const expression = sql`${this}.${sql.identifier(attr)}`;
         this.nullCheckAttributeIndex = this.getClassStep().selectAndReturnIndex(
           codec.castFromPg
             ? codec.castFromPg(expression)
@@ -605,6 +604,10 @@ export class PgSelectSingleStep<
       }
     }
     return this.handlePolymorphism ? this.handlePolymorphism(result) : result;
+  }
+
+  [$$toSQL]() {
+    return this.getClassStep().alias;
   }
 }
 
