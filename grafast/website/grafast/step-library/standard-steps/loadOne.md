@@ -1,3 +1,7 @@
+---
+toc_max_heading_level: 4
+---
+
 import Mermaid from "@theme/Mermaid";
 
 # loadOne
@@ -110,7 +114,7 @@ stateDiagram
 
 ## Usage
 
-Usage:
+### Basic usage
 
 ```ts
 const $userId = $post.get("author_id");
@@ -118,12 +122,12 @@ const $user = loadOne($userId, batchGetUserById);
 // OR: const $user = loadOne($userId, 'id', batchGetUserById);
 ```
 
-`loadOne` accepts two or three arguments. The first is the step that specifies which
-records to load, the last is the callback function called with these specs
-responsible for loading them.
+`loadOne` accepts two to four arguments. The first is the step that specifies
+which records to load (the _specifier step_), the last is the callback function called with these
+specs responsible for loading them.
 
 The callback function is called with two arguments, the first is a list of the
-values from the specifier step and the second is options that may affect the
+values from the _specifier step_ and the second is options that may affect the
 fetching of the records.
 
 :::tip
@@ -134,7 +138,8 @@ defined inline. This will allow LoadOneStep to optimise calls to this function.
 
 :::
 
-Optionally a middle argument can indicate the input/output equivalence - this can be:
+Optionally a penultimate argument (2nd of 3 arguments, or 3rd of 4 arguments)
+can indicate the input/output equivalence - this can be:
 
 - `null` to indicate no input/output equivalence
 - a string to indicate that the same named property on the output is equivalent
@@ -152,6 +157,13 @@ const $member = loadOne(
   ["organization_id", "user_id"],
   batchGetMemberByOrganizationIdAndUserId,
 );
+
+// - batchGetMemberByOrganizationIdAndUserId will be called with a list of
+//   2-tuples, the first value in each tuple being the organizationId and the
+//   second the userId.
+// - Due to the io equivalence (2nd argument):
+//   - `$member.get("organization_id")` will return `$organizationId` directly
+//   - `$member.get("user_id")` will return `$userId` directly
 ```
 
 ```ts title="Example for an object step"
@@ -160,9 +172,17 @@ const $member = loadOne(
   { oid: "organization_id", uid: "user_id" },
   batchGetMemberByOrganizationIdAndUserId,
 );
+
+// - batchGetMemberByOrganizationIdAndUserId will be called with a list of
+//   objects; each object will have the key `oid` set to an organization id,
+//   and the key `uid` set to the user ID.
+// - Due to the io equivalence (2nd argument):
+//   - `$member.get("organization_id")` will return the step used for `oid`
+//     (i.e. `$organizationId`) directly
+//   - Similarly `$member.get("user_id")` will return `$userId` directly
 ```
 
-## Example callback
+#### Example callback
 
 An example of the callback function might be:
 
@@ -183,10 +203,48 @@ async function batchGetUserById(ids, { attributes }) {
 }
 ```
 
+### Advanced usage
+
+```ts
+const $userId = $post.get("author_id");
+const $dbClient = context().get("dbClient");
+const $user = loadOne($userId, $dbClient, "id", batchGetUserFromDbById);
+// OR: const $user = loadOne($userId, $dbClient, batchGetUserFromDbById);
+```
+
+In addition to the forms seen in "Basic usage" above, you can pass a second
+step to `loadOne`. This second step must be a [**unary
+step**](../../step-classes.md#addUnaryDependency), meaning that it must represent
+exactly one value across the entire request (not a batch of values like most
+steps). Since we know it will have exactly one value, we can pass it into the
+callback as a single value and our callback will be able to use it directly
+without having to perform any manual grouping.
+
+This unary dependency is useful for fixed values (for example, those from
+GraphQL field arguments) and values on the GraphQL context such as clients to
+various APIs and other data sources.
+
+#### Example callback (advanced)
+
+An example of the callback function might be:
+
+```ts
+async function batchGetUserFromDbById(ids, { attributes, unary }) {
+  const dbClient = unary;
+
+  const rows = await dbClient.query(
+    sql`SELECT id, ${columnsToSql(attributes)} FROM users WHERE id = ANY($1);`,
+    [ids],
+  );
+
+  return ids.map((id) => rows.find((row) => row.id === id));
+}
+```
+
 ## Multiple steps
 
-The [`list()`](./list) step can be used if you need to pass the value of more
-than one step into your callback:
+The [`list()`](./list) or [`object()`](./object) step can be used if you need
+to pass the value of more than one step into your callback:
 
 ```ts
 const $isAdmin = $user.get("admin");
@@ -214,5 +272,7 @@ async function getLast4FromStripeIfAdmin(tuples) {
   });
 }
 ```
+
+This technique can also be used with the unary step in advanced usage.
 
 [dataloader]: https://github.com/graphql/dataloader
