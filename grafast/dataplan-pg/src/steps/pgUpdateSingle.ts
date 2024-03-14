@@ -1,6 +1,6 @@
 import type { ExecutionDetails, GrafastResultsList, SetterStep } from "grafast";
 import { ExecutableStep, exportAs, isDev, SafeError, setter } from "grafast";
-import type { SQL, SQLRawValue, SQLable } from "pg-sql2";
+import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
 import sql, { $$toSQL } from "pg-sql2";
 
 import type { PgCodecAttribute } from "../codecs.js";
