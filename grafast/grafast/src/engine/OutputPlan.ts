@@ -829,7 +829,7 @@ function makeExecutorExpression<TAsString extends boolean>(
   mutablePath,
   bucket,
   bucketIndex,
-  rawBucketRootValue = this.rootStep._isUnary ? bucket.unaryStore.get(this.rootStep.id) : bucket.store.get(this.rootStep.id)[bucketIndex]
+  rawBucketRootValue = bucket.store.get(this.rootStep.id).at(bucketIndex)
 ) {
   const bucketRootValue = this.processRoot !== null ? this.processRoot(rawBucketRootValue) : rawBucketRootValue;
 ${preamble}\

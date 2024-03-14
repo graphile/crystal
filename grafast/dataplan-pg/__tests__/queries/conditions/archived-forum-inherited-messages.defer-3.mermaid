@@ -79,13 +79,13 @@ graph TD
     Bucket1("Bucket 1 (listItem)<br />Deps: 28, 14<br /><br />ROOT __Item{1}ᐸ11ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item15,PgSelectSingle16 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 28, 14, 16<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]"):::bucket
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 28, 14<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,PgClassExpression17,PgClassExpression23,PgClassExpression29 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 28, 14, 23, 29<br /><br />ROOT Connectionᐸ24ᐳ[28]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3 bucket3
-    Bucket4("Bucket 4 (defer)<br />Deps: 14, 28, 23, 29"):::bucket
+    Bucket4("Bucket 4 (defer)<br />Deps: 14, 23, 29, 28"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,PgSelect30 bucket4
     Bucket5("Bucket 5 (listItem)<br />ROOT __Item{5}ᐸ30ᐳ[31]"):::bucket
@@ -97,7 +97,7 @@ graph TD
     Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 40<br /><br />ROOT PgSelectSingle{6}ᐸusersᐳ[40]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,PgClassExpression41,PgClassExpression42 bucket7
-    Bucket8("Bucket 8 (defer)<br />Deps: 14, 28, 23, 29"):::bucket
+    Bucket8("Bucket 8 (defer)<br />Deps: 14, 23, 29, 28"):::bucket
     classDef bucket8 stroke:#dda0dd
     class Bucket8,PgSelect43 bucket8
     Bucket9("Bucket 9 (listItem)<br />ROOT __Item{9}ᐸ43ᐳ[44]"):::bucket
