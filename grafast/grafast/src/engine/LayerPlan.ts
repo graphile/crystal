@@ -788,7 +788,7 @@ function newBucketFactoryInnerExpression(
       copyBlocks.push(
         te`\
       if(${te_target}.isBatch) {
-        ${te_target}.entries[newIndex] = ${te_source}[originalIndex];
+        ${te_target}.entries[newIndex] = ${te_source}.at(originalIndex);
       }
 `,
       );
@@ -844,7 +844,7 @@ ${te.join(copyBlocks, "")}
       );
       copyBlocks.push(te`\
         if (${te_target}.isBatch) {
-          ${te_target}.entries[newIndex] = ${te_source}[originalIndex];
+          ${te_target}.entries[newIndex] = ${te_source}.at(originalIndex);
         }
         `);
     }
