@@ -40,7 +40,7 @@ import {
   stepsAreInSamePhase,
 } from "grafast";
 import type { SQL, SQLRawValue } from "pg-sql2";
-import sql, { $$symbolToIdentifier, arraysMatch } from "pg-sql2";
+import sql, { $$symbolToIdentifier, $$toSQL, arraysMatch } from "pg-sql2";
 
 import type { PgCodecAttributes } from "../codecs.js";
 import { listOfCodec, TYPES } from "../codecs.js";
@@ -2854,6 +2854,10 @@ ${lateralText};`;
     const $single = new PgSelectSingleStep(this, itemPlan);
     const isScalar = !this.resource.codec.attributes;
     return (isScalar ? $single.getSelfNamed() : $single) as any;
+  }
+
+  [$$toSQL]() {
+    return this.alias;
   }
 
   // --------------------

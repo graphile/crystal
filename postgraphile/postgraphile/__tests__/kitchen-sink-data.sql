@@ -928,4 +928,4 @@ truncate space.mobile_pad restart identity;
 insert into space.mobile_pad(name) select i::text from generate_series(1, 10) i;
 insert into space.static_pad(name) select i::text from generate_series(1, 10) i;
 insert into space.temp_pad(name) select i::text from generate_series(1, 10) i;
-insert into space.spacecraft(name, return_to_earth) select i::text, tsrange((date_trunc('day', now()) - (i+1) * interval '1 day')::timestamp, (date_trunc('day', now()) - (i) * interval '1 day')::timestamp, '[)') from generate_series(1, 10) i;
+insert into space.spacecraft(name, return_to_earth) select i::text, tsrange((date_trunc('day', '2024-03-13T12:00:00Z'::timestamptz) - (i+1) * interval '1 day')::timestamp, (date_trunc('day', '2024-03-13T12:00:00Z'::timestamptz) - (i) * interval '1 day')::timestamp, '[)') from generate_series(1, 10) i;

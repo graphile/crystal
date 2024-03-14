@@ -6,8 +6,8 @@ import type {
   SetterStep,
 } from "grafast";
 import { ExecutableStep, exportAs, isDev, setter } from "grafast";
-import type { SQL, SQLRawValue } from "pg-sql2";
-import sql from "pg-sql2";
+import type { SQL, SQLable, SQLRawValue } from "pg-sql2";
+import sql, { $$toSQL } from "pg-sql2";
 
 import type { PgCodecAttribute } from "../codecs.js";
 import type { PgResource } from "../index.js";
@@ -52,7 +52,8 @@ export class PgInsertSingleStep<
     SetterCapableStep<{
       [key in keyof GetPgResourceAttributes<TResource> &
         string]: ExecutableStep;
-    }>
+    }>,
+    SQLable
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -403,6 +404,9 @@ export class PgInsertSingleStep<
     }
 
     super.finalize();
+  }
+  [$$toSQL]() {
+    return this.alias;
   }
 }
 

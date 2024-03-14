@@ -250,9 +250,8 @@ const preset: GraphileConfig.Preset = {
                     $greeting,
                     TYPES.text,
                   );
-                  const alias = $user.getClassStep().alias;
                   return $user.select(
-                    sql`${placeholderSql} || ', ' || ${alias}.name`,
+                    sql`${placeholderSql} || ', ' || ${$user}.name`,
                     TYPES.text,
                   );
                 },

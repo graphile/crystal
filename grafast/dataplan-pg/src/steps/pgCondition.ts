@@ -1,7 +1,7 @@
 import type { BaseStep, ExecutableStep } from "grafast";
 import { ModifierStep } from "grafast";
-import type { SQL } from "pg-sql2";
-import { sql } from "pg-sql2";
+import type { SQL, SQLable } from "pg-sql2";
+import { $$toSQL, sql } from "pg-sql2";
 
 import { TYPES } from "../index.js";
 import type { PgCodec } from "../interfaces.js";
@@ -55,7 +55,7 @@ export class PgConditionStep<
       PgConditionCapableParentStep = PgConditionCapableParentStep,
   >
   extends ModifierStep<TParentStep>
-  implements PgConditionCapableParentStep
+  implements PgConditionCapableParentStep, SQLable
 {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -212,6 +212,9 @@ where ${sqlCondition}`})`;
         }
       }
     }
+  }
+  [$$toSQL]() {
+    return this.alias;
   }
 }
 

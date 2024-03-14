@@ -1988,7 +1988,7 @@ export function makeExampleSchema(
               (TYPES, sql) => (step: PgSelectStep<typeof messageResource>) => {
                 step.orderBy({
                   codec: TYPES.text,
-                  fragment: sql`${step.alias}.body`,
+                  fragment: sql`${step}.body`,
                   direction: "ASC",
                 });
               },
@@ -2004,7 +2004,7 @@ export function makeExampleSchema(
               (TYPES, sql) => (step: PgSelectStep<typeof messageResource>) => {
                 step.orderBy({
                   codec: TYPES.text,
-                  fragment: sql`${step.alias}.body`,
+                  fragment: sql`${step}.body`,
                   direction: "DESC",
                 });
               },
@@ -2218,7 +2218,7 @@ export function makeExampleSchema(
             if ($value.evalIs("YES")) {
               // No restriction
             } else if ($value.evalIs("EXCLUSIVELY")) {
-              $messages.where(sql`${$messages.alias}.archived_at is not null`);
+              $messages.where(sql`${$messages}.archived_at is not null`);
             } else if (
               $value.evalIs("INHERIT") &&
               // INHERIT only works if the parent has an archived_at attribute.
@@ -2234,7 +2234,7 @@ export function makeExampleSchema(
                 )} is null)`,
               );
             } else {
-              $messages.where(sql`${$messages.alias}.archived_at is null`);
+              $messages.where(sql`${$messages}.archived_at is null`);
             }
           },
         [PgSelectSingleStep, TYPES, getClassStep, sql],
@@ -2256,10 +2256,10 @@ export function makeExampleSchema(
             function plan($condition: PgConditionStep<any>, val) {
               const $value = val.getRaw();
               if ($value.evalIs(null)) {
-                $condition.where(sql`${$condition.alias}.featured is null`);
+                $condition.where(sql`${$condition}.featured is null`);
               } else {
                 $condition.where(
-                  sql`${$condition.alias}.featured = ${$condition.placeholder(
+                  sql`${$condition}.featured = ${$condition.placeholder(
                     $value,
                     TYPES.boolean,
                   )}`,
@@ -2338,7 +2338,7 @@ export function makeExampleSchema(
               } else {
                 const plan = new BooleanFilterStep(
                   $messageFilter,
-                  sql`${$messageFilter.alias}.featured`,
+                  sql`${$messageFilter}.featured`,
                 );
                 arg.apply(plan);
               }
@@ -2362,10 +2362,10 @@ export function makeExampleSchema(
             function plan($condition: PgConditionStep<any>, arg) {
               const $value = arg.getRaw();
               if ($value.evalIs(null)) {
-                $condition.where(sql`${$condition.alias}.name is null`);
+                $condition.where(sql`${$condition}.name is null`);
               } else {
                 $condition.where(
-                  sql`${$condition.alias}.name = ${$condition.placeholder(
+                  sql`${$condition}.name = ${$condition.placeholder(
                     $value,
                     TYPES.text,
                   )}`,

@@ -4,6 +4,9 @@ import { inspect } from "util";
 
 import { $$type } from "./thereCanBeOnlyOne.js";
 
+/** Use this to enable coercing objects to SQL to make composing SQL fragments more ergonomic */
+export const $$toSQL = Symbol("toSQL");
+
 function exportAs<T>(thing: T, exportName: string) {
   const existingExport = (thing as any).$$export;
   if (existingExport) {
@@ -311,12 +314,28 @@ function isSQL(node: unknown): node is SQL {
   );
 }
 
+export interface SQLable {
+  [$$type]?: never;
+  [$$toSQL](): SQL;
+}
+
+function isSQLable(value: any): value is SQLable {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof value[$$toSQL] === "function"
+  );
+}
+
 function enforceValidNode(node: SQLQuery, where?: string): SQLQuery;
 function enforceValidNode(node: SQLNode, where?: string): SQLNode;
-function enforceValidNode(node: SQL, where?: string): SQL;
+function enforceValidNode(node: SQL | SQLable, where?: string): SQL;
 function enforceValidNode(node: unknown, where?: string): SQL {
   if (isSQL(node)) {
     return node;
+  }
+  if (isSQLable(node)) {
+    return enforceValidNode(node[$$toSQL](), where);
   }
   throw new Error(
     `[pg-sql2] Invalid expression. Expected an SQL item${
@@ -535,7 +554,7 @@ const CACHE_SIMPLE_FRAGMENTS = new Map<string, SQLRawNode>();
  */
 const sqlBase = function sql(
   strings: TemplateStringsArray,
-  ...values: Array<SQL>
+  ...values: Array<SQL | SQLable>
 ): SQL {
   if (!Array.isArray(strings) || !strings.raw) {
     throw new Error(
@@ -558,7 +577,7 @@ const sqlBase = function sql(
 
   // Special case sql`${...}` - just return the node directly
   if (stringsLength === 2 && strings[0] === "" && strings[1] === "") {
-    return values[0];
+    return enforceValidNode(values[0]);
   }
 
   const items: Array<SQLNode> = [];
@@ -570,7 +589,7 @@ const sqlBase = function sql(
       const rawVal = values[i];
       const valid: SQL =
         rawVal[$$type] !== undefined
-          ? rawVal
+          ? (rawVal as SQL)
           : enforceValidNode(rawVal, `template literal placeholder ${i}`);
       if (valid[$$type] === "RAW") {
         currentText += valid.t;
@@ -1206,7 +1225,7 @@ export {
 };
 
 export interface PgSQL {
-  (strings: TemplateStringsArray, ...values: Array<SQL>): SQL;
+  (strings: TemplateStringsArray, ...values: Array<SQL | SQLable>): SQL;
   escapeSqlIdentifier: typeof escapeSqlIdentifier;
   compile: typeof compile;
   isEquivalent: typeof isEquivalent;
