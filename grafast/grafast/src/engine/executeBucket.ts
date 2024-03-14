@@ -105,7 +105,6 @@ export function executeBucket(
     metaByMetaKey,
     size,
     store,
-    unaryStore,
     layerPlan: { phases, children: childLayerPlans },
   } = bucket;
 
@@ -255,7 +254,10 @@ export function executeBucket(
         if (finishedStep._isUnary) {
           // Handled later
         } else {
-          bucket.store.set(finishedStep.id, arrayOfLength(size));
+          bucket.store.set(
+            finishedStep.id,
+            batchExecutionValue(arrayOfLength(size)),
+          );
         }
       }
 
@@ -290,10 +292,10 @@ export function executeBucket(
           value === null
         ) {
           if (finishedStep._isUnary) {
-            bucket.unaryStore.set(finishedStep.id, value);
+            bucket.store.set(finishedStep.id, unaryExecutionValue(value));
           } else {
             const finalResult = bucket.store.get(finishedStep.id)!;
-            finalResult[resultIndex] = value;
+            (finalResult.entries as any[])[resultIndex] = value;
           }
           return;
         }
@@ -327,10 +329,10 @@ export function executeBucket(
             const arr: StreamMaybeMoreableArray<any> = [];
             arr[$$streamMore] = iterator;
             if (finishedStep._isUnary) {
-              bucket.unaryStore.set(finishedStep.id, arr);
+              bucket.store.set(finishedStep.id, unaryExecutionValue(arr));
             } else {
               const finalResult = bucket.store.get(finishedStep.id)!;
-              finalResult[resultIndex] = arr;
+              (finalResult.entries as any[])[resultIndex] = arr;
             }
           } else {
             // Evaluate the first initialCount entries, rest is streamed.
@@ -365,19 +367,19 @@ export function executeBucket(
                 }
 
                 if (finishedStep._isUnary) {
-                  bucket.unaryStore.set(finishedStep.id, arr);
+                  bucket.store.set(finishedStep.id, unaryExecutionValue(arr));
                 } else {
                   const finalResult = bucket.store.get(finishedStep.id)!;
-                  finalResult[resultIndex] = arr;
+                  (finalResult.entries as any[])[resultIndex] = arr;
                 }
               } catch (e) {
                 bucket.hasErrors = true;
                 const error = newGrafastError(e, finishedStep.id);
                 if (finishedStep._isUnary) {
-                  bucket.unaryStore.set(finishedStep.id, error);
+                  bucket.store.set(finishedStep.id, unaryExecutionValue(error));
                 } else {
                   const finalResult = bucket.store.get(finishedStep.id)!;
-                  finalResult[resultIndex] = error;
+                  (finalResult.entries as any[])[resultIndex] = error;
                 }
               }
             })();
@@ -392,27 +394,27 @@ export function executeBucket(
           proto === Object.prototype
         ) {
           if (finishedStep._isUnary) {
-            bucket.unaryStore.set(finishedStep.id, value);
+            bucket.store.set(finishedStep.id, unaryExecutionValue(value));
           } else {
             const finalResult = bucket.store.get(finishedStep.id)!;
-            finalResult[resultIndex] = value;
+            (finalResult.entries as any[])[resultIndex] = value;
           }
         } else if (value instanceof Error) {
           const e =
             $$error in value ? value : newGrafastError(value, finishedStep.id);
           if (finishedStep._isUnary) {
-            bucket.unaryStore.set(finishedStep.id, e);
+            bucket.store.set(finishedStep.id, unaryExecutionValue(e));
           } else {
             const finalResult = bucket.store.get(finishedStep.id)!;
-            finalResult[resultIndex] = e;
+            (finalResult.entries as any[])[resultIndex] = e;
           }
           bucket.hasErrors = true;
         } else {
           if (finishedStep._isUnary) {
-            bucket.unaryStore.set(finishedStep.id, value);
+            bucket.store.set(finishedStep.id, unaryExecutionValue(value));
           } else {
             const finalResult = bucket.store.get(finishedStep.id)!;
-            finalResult[resultIndex] = value;
+            (finalResult.entries as any[])[resultIndex] = value;
           }
         }
       };
@@ -458,10 +460,10 @@ export function executeBucket(
                   finishedStep.id,
                 );
                 if (finishedStep._isUnary) {
-                  bucket.unaryStore.set(finishedStep.id, error);
+                  bucket.store.set(finishedStep.id, unaryExecutionValue(error));
                 } else {
                   const storeEntry = bucket.store.get(finishedStep.id)!;
-                  storeEntry[dataIndex] = error;
+                  (storeEntry.entries as any[])[dataIndex] = error;
                 }
               }
             }
@@ -492,10 +494,10 @@ export function executeBucket(
                 finishedStep.id,
               );
               if (finishedStep._isUnary) {
-                bucket.unaryStore.set(finishedStep.id, error);
+                bucket.store.set(finishedStep.id, unaryExecutionValue(error));
               } else {
                 const storeEntry = bucket.store.get(finishedStep.id)!;
-                storeEntry[dataIndex] = error;
+                (storeEntry.entries as any[])[dataIndex] = error;
               }
             }
           });
@@ -539,7 +541,7 @@ export function executeBucket(
         if (step._isUnary) {
           // Handled later
         } else {
-          bucket.store.set(step.id, arrayOfLength(size));
+          bucket.store.set(step.id, batchExecutionValue(arrayOfLength(size)));
         }
       }
       outerLoop: for (let dataIndex = 0; dataIndex < size; dataIndex++) {
@@ -548,9 +550,8 @@ export function executeBucket(
           for (const dep of sideEffectStepsWithErrors[
             currentPolymorphicPath ?? NO_POLY_PATH
           ]) {
-            const depVal = dep._isUnary
-              ? bucket.unaryStore.get(dep.id)
-              : bucket.store.get(dep.id)![dataIndex];
+            const depExecutionValue = bucket.store.get(dep.id)!;
+            const depVal = depExecutionValue.at(dataIndex);
             if (
               depVal === POLY_SKIPPED ||
               (isDev && depVal?.$$error === POLY_SKIPPED)
@@ -566,10 +567,10 @@ export function executeBucket(
                   allStepsIndex
                 ] as UnbatchedExecutableStep;
                 if (step._isUnary) {
-                  bucket.unaryStore.set(step.id, depVal);
+                  bucket.store.set(step.id, depExecutionValue);
                 } else {
                   const storeEntry = bucket.store.get(step.id)!;
-                  storeEntry[dataIndex] = depVal;
+                  (storeEntry.entries as any[])[dataIndex] = depVal;
                 }
               }
               continue outerLoop;
@@ -589,15 +590,14 @@ export function executeBucket(
             const deps: any = [];
             const extra = extras[allStepsIndex];
             for (const $dep of step.dependencies) {
-              const depVal = $dep._isUnary
-                ? bucket.unaryStore.get($dep.id)
-                : bucket.store.get($dep.id)![dataIndex];
+              const depExecutionVal = bucket.store.get($dep.id)!;
+              const depVal = depExecutionVal.at(dataIndex);
               if (bucket.hasErrors && isGrafastError(depVal)) {
                 if (step._isUnary) {
-                  bucket.unaryStore.set(step.id, depVal);
+                  bucket.store.set(step.id, depExecutionVal);
                 } else {
                   const storeEntry = bucket.store.get(step.id)!;
-                  storeEntry[dataIndex] = depVal;
+                  (storeEntry.entries as any[])[dataIndex] = depVal;
                 }
                 continue stepLoop;
               }
@@ -605,19 +605,19 @@ export function executeBucket(
             }
             const stepResult = step.unbatchedExecute(extra, ...deps);
             if (step._isUnary) {
-              bucket.unaryStore.set(step.id, stepResult);
+              bucket.store.set(step.id, unaryExecutionValue(stepResult));
             } else {
               const storeEntry = bucket.store.get(step.id)!;
-              storeEntry[dataIndex] = stepResult;
+              (storeEntry.entries as any[])[dataIndex] = stepResult;
             }
           } catch (e) {
             bucket.hasErrors = true;
             const error = newGrafastError(e, step.id);
             if (step._isUnary) {
-              bucket.unaryStore.set(step.id, error);
+              bucket.store.set(step.id, unaryExecutionValue(error));
             } else {
               const storeEntry = bucket.store.get(step.id)!;
-              storeEntry[dataIndex] = error;
+              (storeEntry.entries as any[])[dataIndex] = error;
             }
           }
         }
@@ -860,38 +860,23 @@ export function executeBucket(
       if (depCount > 0 || sideEffectStepsWithErrors !== null) {
         for (let i = 0, l = depCount; i < l; i++) {
           const $dep = sstep.dependencies[i];
-          if ($dep._isUnary) {
-            dependencies[i] = unaryExecutionValue(unaryStore.get($dep.id));
-          } else {
-            dependencies[i] = batchExecutionValue(store.get($dep.id)!);
-          }
+          const executionValue = store.get($dep.id)!;
+          dependencies[i] = executionValue;
         }
         if (sideEffectStepsWithErrors !== null) {
           if (sstep.polymorphicPaths) {
             for (const path of sstep.polymorphicPaths) {
               for (const sideEffectStep of sideEffectStepsWithErrors[path]) {
-                if (sideEffectStep._isUnary) {
-                  const sideEffectStoreEntry = unaryStore.get(
-                    sideEffectStep.id,
-                  )!;
-                  dependencies.push(unaryExecutionValue(sideEffectStoreEntry));
-                } else {
-                  const sideEffectStoreEntry = store.get(sideEffectStep.id)!;
-                  dependencies.push(batchExecutionValue(sideEffectStoreEntry));
-                }
+                const sideEffectStoreEntry = store.get(sideEffectStep.id)!;
+                dependencies.push(sideEffectStoreEntry);
               }
             }
           } else {
             for (const sideEffectStep of sideEffectStepsWithErrors[
               NO_POLY_PATH
             ]) {
-              if (sideEffectStep._isUnary) {
-                const sideEffectStoreEntry = unaryStore.get(sideEffectStep.id)!;
-                dependencies.push(unaryExecutionValue(sideEffectStoreEntry));
-              } else {
-                const sideEffectStoreEntry = store.get(sideEffectStep.id)!;
-                dependencies.push(batchExecutionValue(sideEffectStoreEntry));
-              }
+              const sideEffectStoreEntry = store.get(sideEffectStep.id)!;
+              dependencies.push(sideEffectStoreEntry);
             }
           }
         }
@@ -1021,7 +1006,6 @@ export function newBucket(
     Bucket,
     | "layerPlan"
     | "store"
-    | "unaryStore"
     | "size"
     | "hasErrors"
     | "polymorphicPathList"
@@ -1053,14 +1037,16 @@ export function newBucket(
     */
     for (const [key, list] of spec.store.entries()) {
       assert.ok(
-        Array.isArray(list),
-        `Store entry for step '${key}' for layerPlan '${spec.layerPlan.id}' should be a list`,
+        typeof list.isBatch === "boolean",
+        `Store entry for step '${key}' for layerPlan '${spec.layerPlan.id}' should be an ExecutionValue`,
       );
-      assert.strictEqual(
-        list.length,
-        spec.size,
-        `Store entry for step '${key}' for layerPlan '${spec.layerPlan.id}' should have same length as bucket`,
-      );
+      if (list.isBatch) {
+        assert.strictEqual(
+          list.entries.length,
+          spec.size,
+          `Store entry for step '${key}' for layerPlan '${spec.layerPlan.id}' should have same length as bucket`,
+        );
+      }
     }
     if (!spec.iterators) {
       throw new Error(`newBucket called but no iterators array was specified`);
@@ -1079,7 +1065,6 @@ export function newBucket(
     // Copy from spec
     layerPlan: spec.layerPlan,
     store: spec.store,
-    unaryStore: spec.unaryStore,
     size: spec.size,
     hasErrors: spec.hasErrors,
     polymorphicPathList: spec.polymorphicPathList,
@@ -1091,7 +1076,9 @@ export function newBucket(
 }
 
 // TODO: memoize?
-function batchExecutionValue<TData>(entries: TData[]): ExecutionValue<TData> {
+export function batchExecutionValue<TData>(
+  entries: TData[],
+): ExecutionValue<TData> {
   return {
     at(i) {
       return entries[i];
@@ -1102,7 +1089,9 @@ function batchExecutionValue<TData>(entries: TData[]): ExecutionValue<TData> {
 }
 
 // TODO: memoize?
-function unaryExecutionValue<TData>(value: TData): ExecutionValue<TData> {
+export function unaryExecutionValue<TData>(
+  value: TData,
+): ExecutionValue<TData> {
   return {
     at() {
       return value;

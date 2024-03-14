@@ -4,7 +4,6 @@ import te from "tamedevil";
 
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
-import { isDev } from "../dev.js";
 import type { GrafastError } from "../error.js";
 import { isGrafastError } from "../error.js";
 import { inspect } from "../inspect.js";
@@ -14,8 +13,7 @@ import type {
   ModifierStep,
   UnbatchedExecutableStep,
 } from "../step";
-import { arrayOfLength } from "../utils.js";
-import { newBucket } from "./executeBucket.js";
+import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
 /*
@@ -232,19 +230,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   /**
    * Which steps the results for which are available in a parent bucket need to
    * be "copied across" to this bucket because steps in this bucket still
-   * reference them? Batch steps only.
+   * reference them?
    *
    * @internal
    */
-  public copyBatchStepIds: number[] = [];
-  /**
-   * Which steps the results for which are available in a parent bucket need to
-   * be "copied across" to this bucket because steps in this bucket still
-   * reference them? Unary steps only.
-   *
-   * @internal
-   */
-  public copyUnaryStepIds: number[] = [];
+  public copyStepIds: number[] = [];
 
   /** @internal */
   public children: LayerPlan[] = [];
@@ -333,9 +323,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       this.reason.type === "polymorphic"
         ? `{${this.reason.typeNames.join(",")}}`
         : "";
-    const deps =
-      (this.copyUnaryStepIds.length > 0 ? `/${this.copyUnaryStepIds}` : "") +
-      (this.copyBatchStepIds.length > 0 ? `%${this.copyBatchStepIds}` : "");
+    const deps = this.copyStepIds.length > 0 ? `/${this.copyStepIds}` : "";
     return `LayerPlan<${this.id}${chain}?${this.reason.type}${reasonExtra}!${
       this.rootStep?.id ?? "x"
     }${deps}>`;
@@ -373,18 +361,16 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       // this.reason.type === "nullableBoundary" ||
       this.reason.type === "listItem"
     ) {
-      const u = this.copyUnaryStepIds.length;
-      const b = this.copyBatchStepIds.length;
-      const signature = `${this.reason.type[0]}_${u}_${b}`;
-      withNewBucketFactory(signature, u, b, this.reason.type, (fn) => {
-        this.newBucket = fn(this.copyUnaryStepIds, this.copyBatchStepIds);
+      const u = this.copyStepIds.length;
+      const signature = `${this.reason.type[0]}_${u}`;
+      withNewBucketFactory(signature, u, this.reason.type, (fn) => {
+        this.newBucket = fn(this.copyStepIds);
       });
     }
   }
 
   public newBucket(parentBucket: Bucket): Bucket | null {
-    const { copyUnaryStepIds, copyBatchStepIds } = this;
-    const unaryStore = new Map();
+    const { copyStepIds } = this;
     const store: Bucket["store"] = new Map();
     const polymorphicPathList: (string | null)[] =
       this.reason.type === "mutationField"
@@ -409,16 +395,13 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         const hasNoNullsOrErrors = false;
 
         if (this.rootStep._isUnary) {
-          const fieldValue = parentBucket.unaryStore.get(itemStepId);
-          if (fieldValue == null) {
+          const fieldValue = parentBucket.store.get(itemStepId)!;
+          if (fieldValue.value == null) {
             size = 0;
           } else {
             size = parentBucket.size;
-            unaryStore.set(itemStepId, fieldValue);
-            for (const stepId of copyUnaryStepIds) {
-              unaryStore.set(stepId, parentBucket.unaryStore.get(stepId)!);
-            }
-            for (const stepId of copyBatchStepIds) {
+            store.set(itemStepId, fieldValue);
+            for (const stepId of copyStepIds) {
               store.set(stepId, parentBucket.store.get(stepId)!);
             }
             for (let i = 0; i < size; i++) {
@@ -437,10 +420,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             );
           }
           store.set(itemStepId, nullableStepStore);
-          for (const stepId of copyUnaryStepIds) {
-            unaryStore.set(stepId, parentBucket.unaryStore.get(stepId)!);
-          }
-          for (const stepId of copyBatchStepIds) {
+          for (const stepId of copyStepIds) {
             store.set(stepId, parentBucket.store.get(stepId)!);
           }
           for (
@@ -456,14 +436,16 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           }
         } else {
           const itemStepIdList: any[] = [];
-          store.set(itemStepId, itemStepIdList);
+          store.set(itemStepId, batchExecutionValue(itemStepIdList));
 
-          for (const stepId of copyUnaryStepIds) {
-            unaryStore.set(stepId, parentBucket.unaryStore.get(stepId));
-          }
-          // Prepare store with an empty list for each copyPlanId
-          for (const stepId of copyBatchStepIds) {
-            store.set(stepId, []);
+          for (const stepId of copyStepIds) {
+            const ev = parentBucket.store.get(stepId)!;
+            if (ev.isBatch) {
+              // Prepare store with an empty list for each copyPlanId
+              store.set(stepId, batchExecutionValue([]));
+            } else {
+              store.set(stepId, ev);
+            }
           }
 
           const nullableStepStore = parentBucket.store.get(itemStepId);
@@ -484,7 +466,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             originalIndex++
           ) {
             const fieldValue: any[] | null | undefined | GrafastError =
-              nullableStepStore[originalIndex];
+              nullableStepStore.at(originalIndex);
             if (fieldValue != null) {
               const newIndex = size++;
               map.set(originalIndex, newIndex);
@@ -493,9 +475,13 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               polymorphicPathList[newIndex] =
                 parentBucket.polymorphicPathList[originalIndex];
               iterators[newIndex] = parentBucket.iterators[originalIndex];
-              for (const stepId of copyBatchStepIds) {
-                store.get(stepId)![newIndex] =
-                  parentBucket.store.get(stepId)![originalIndex];
+              for (const stepId of copyStepIds) {
+                const ev = store.get(stepId)!;
+                if (ev.isBatch) {
+                  (ev.entries as any[])[newIndex] = parentBucket.store
+                    .get(stepId)!
+                    .at(originalIndex);
+                }
               }
             }
           }
@@ -505,12 +491,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       }
       case "listItem": {
         const listStepId = this.reason.parentStep.id;
-        const listStepStore = this.reason.parentStep._isUnary
-          ? arrayOfLength(
-              parentBucket.size,
-              parentBucket.unaryStore.get(listStepId),
-            )
-          : parentBucket.store.get(listStepId);
+        const listStepStore = parentBucket.store.get(listStepId);
         if (!listStepStore) {
           throw new Error(
             `GrafastInternalError<314865b0-f7e8-4e81-b966-56e5a0de562e>: could not find entry '${listStepId}' (${parentBucket.layerPlan.operationPlan.dangerouslyGetStep(
@@ -530,15 +511,17 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         if (this.rootStep._isUnary) {
           // handled later
         } else {
-          store.set(itemStepId, itemStepIdList);
+          store.set(itemStepId, batchExecutionValue(itemStepIdList));
         }
 
-        for (const stepId of copyUnaryStepIds) {
-          unaryStore.set(stepId, parentBucket.unaryStore.get(stepId));
-        }
-        // Prepare store with an empty list for each copyPlanId
-        for (const stepId of copyBatchStepIds) {
-          store.set(stepId, []);
+        for (const stepId of copyStepIds) {
+          const ev = parentBucket.store.get(stepId)!;
+          if (ev.isBatch) {
+            // Prepare store with an empty list for each copyPlanId
+            store.set(stepId, batchExecutionValue([]));
+          } else {
+            store.set(stepId, ev);
+          }
         }
 
         // We'll typically be creating more listItem bucket entries than we
@@ -549,7 +532,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           originalIndex++
         ) {
           const list: any[] | null | undefined | GrafastError =
-            listStepStore[originalIndex];
+            listStepStore.at(originalIndex);
           if (Array.isArray(list)) {
             const newIndexes: number[] = [];
             map.set(originalIndex, newIndexes);
@@ -557,7 +540,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               const newIndex = size++;
               newIndexes.push(newIndex);
               if (this.rootStep._isUnary) {
-                unaryStore.set(itemStepId, list[j]);
+                store.set(itemStepId, list[j]);
               } else {
                 itemStepIdList[newIndex] = list[j];
               }
@@ -565,9 +548,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               polymorphicPathList[newIndex] =
                 parentBucket.polymorphicPathList[originalIndex];
               iterators[newIndex] = parentBucket.iterators[originalIndex];
-              for (const stepId of copyBatchStepIds) {
-                store.get(stepId)![newIndex] =
-                  parentBucket.store.get(stepId)![originalIndex];
+              for (const stepId of copyStepIds) {
+                const ev = parentBucket.store.get(stepId)!;
+                if (ev.isBatch) {
+                  (store.get(stepId)!.entries as any[])[newIndex] =
+                    ev.at(originalIndex);
+                }
               }
             }
           }
@@ -581,10 +567,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         for (let i = 0; i < parentBucket.size; i++) {
           map.set(i, i);
         }
-        for (const stepId of copyUnaryStepIds) {
-          unaryStore.set(stepId, parentBucket.unaryStore.get(stepId)!);
-        }
-        for (const stepId of copyBatchStepIds) {
+        for (const stepId of copyStepIds) {
           store.set(stepId, parentBucket.store.get(stepId)!);
         }
 
@@ -592,12 +575,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
       }
       case "polymorphic": {
         const polymorphicPlanId = this.reason.parentStep.id;
-        const polymorphicPlanStore = this.reason.parentStep._isUnary
-          ? arrayOfLength(
-              parentBucket.size,
-              parentBucket.unaryStore.get(polymorphicPlanId),
-            )
-          : parentBucket.store.get(polymorphicPlanId);
+        const polymorphicPlanStore = parentBucket.store.get(polymorphicPlanId);
         if (!polymorphicPlanStore) {
           throw new Error(
             `GrafastInternalError<af1417c6-752b-466e-af7e-cfc35724c3bc>: Entry for '${parentBucket.layerPlan.operationPlan.dangerouslyGetStep(
@@ -610,12 +588,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         // they may end up being null, but that's okay)
         const targetTypeNames = this.reason.typeNames;
 
-        for (const stepId of copyUnaryStepIds) {
-          unaryStore.set(stepId, parentBucket.unaryStore.get(stepId));
-        }
-        for (const stepId of copyBatchStepIds) {
-          store.set(stepId, []);
-          if (isDev && !parentBucket.store.has(stepId)) {
+        for (const stepId of copyStepIds) {
+          const ev = parentBucket.store.get(stepId);
+          if (!ev) {
             throw new Error(
               `GrafastInternalError<548f0d84-4556-4189-8655-fb16aa3345a6>: new bucket for ${this} wants to copy ${this.operationPlan.dangerouslyGetStep(
                 stepId,
@@ -624,6 +599,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               } doesn't contain that plan`,
             );
           }
+          if (ev.isBatch) {
+            store.set(stepId, batchExecutionValue([]));
+          } else {
+            store.set(stepId, ev);
+          }
         }
 
         for (
@@ -631,7 +611,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           originalIndex < parentBucket.size;
           originalIndex++
         ) {
-          const value = polymorphicPlanStore[originalIndex];
+          const value = polymorphicPlanStore.at(originalIndex);
           if (value == null) {
             continue;
           }
@@ -653,9 +633,13 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
 
           polymorphicPathList[newIndex] = newPolymorphicPath;
           iterators[newIndex] = parentBucket.iterators[originalIndex];
-          for (const planId of copyBatchStepIds) {
-            store.get(planId)![newIndex] =
-              parentBucket.store.get(planId)![originalIndex];
+          for (const planId of copyStepIds) {
+            const ev = parentBucket.store.get(planId)!;
+
+            if (ev.isBatch) {
+              (store.get(planId)!.entries as any[])[newIndex] =
+                ev.at(originalIndex);
+            }
           }
         }
 
@@ -694,7 +678,6 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           layerPlan: this,
           size,
           store,
-          unaryStore,
           // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
           hasErrors: parentBucket.hasErrors,
           polymorphicPathList,
@@ -714,10 +697,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   }
 }
 
-type Factory = (
-  copyUnaryStepIds: number[],
-  copyBatchStepIds: number[],
-) => typeof LayerPlan.prototype.newBucket;
+type Factory = (copyStepIds: number[]) => typeof LayerPlan.prototype.newBucket;
 
 const makeNewBucketCache = new LRU<string, Factory>({
   maxLength: 1000,
@@ -730,7 +710,7 @@ const te_parentBucketDotPolymorphicPathList = te`parentBucket.polymorphicPathLis
 const te_parentBucketDotIterators = te`parentBucket.iterators`;
 const te_emptyArray = te`[]`;
 const ref_newBucket = te.ref(newBucket, "newBucket");
-const ref_arrayOfLength = te.ref(arrayOfLength, "arrayOfLength");
+const ref_batchExecutionValue = te.ref(batchExecutionValue);
 
 function makeNewBucketExpression(
   signature: string,
@@ -739,7 +719,6 @@ function makeNewBucketExpression(
 ): TE {
   const expr = te`\
 (function ${te.identifier(`newBucket_${signature}`)}(parentBucket) {
-  const unaryStore = new Map();
   const store = new Map();
   const polymorphicPathList = ${
     reasonType === "mutationField"
@@ -760,7 +739,6 @@ ${inner}
       layerPlan: this,
       size,
       store,
-      unaryStore,
       // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
       hasErrors: parentBucket.hasErrors,
       polymorphicPathList,
@@ -780,8 +758,7 @@ ${inner}
 
 function newBucketFactoryInnerExpression(
   signature: string,
-  unaryCopyCount: number,
-  batchCopyCount: number,
+  copyCount: number,
   reasonType: "nullableBoundary" | "listItem",
 ) {
   if (reasonType === "nullableBoundary") {
@@ -794,28 +771,22 @@ function newBucketFactoryInnerExpression(
 
     const blocks: TE[] = [];
     const copyBlocks: TE[] = [];
-    for (let i = 0; i < unaryCopyCount; i++) {
-      const te_i = te.lit(i);
-      blocks.push(
-        te`\
-  unaryStore.set(copyUnaryStepIds[${te_i}], parentBucket.unaryStore.get(copyUnaryStepIds[${te_i}]));
-`,
-      );
-    }
-    for (let i = 0; i < batchCopyCount; i++) {
+    for (let i = 0; i < copyCount; i++) {
       const te_source = te.identifier(`source${i}`);
       const te_target = te.identifier(`target${i}`);
       const te_i = te.lit(i);
       blocks.push(
         te`\
-  const ${te_source} = parentBucket.store.get(copyBatchStepIds[${te_i}]);
-  const ${te_target} = [];
-  store.set(copyBatchStepIds[${te_i}], ${te_target});
+  const ${te_source} = parentBucket.store.get(copyStepIds[${te_i}]);
+  const ${te_target} = ${te_source}.isBatch ? ${ref_batchExecutionValue}([]) : ${te_source};
+  store.set(copyStepIds[${te_i}], ${te_target});
 `,
       );
       copyBlocks.push(
         te`\
-      ${te_target}[newIndex] = ${te_source}[originalIndex];
+      if(${te_target}.isBatch) {
+        ${te_target}.entries[newIndex] = ${te_source}[originalIndex];
+      }
 `,
       );
     }
@@ -828,7 +799,7 @@ function newBucketFactoryInnerExpression(
   const nullableStepStore = parentBucket.store.get(itemStepId);
 
   const itemStepIdList = [];
-  store.set(itemStepId, itemStepIdList);
+  store.set(itemStepId, ${ref_batchExecutionValue}(itemStepIdList));
 
   // Prepare store with an empty list for each copyPlanId
 ${te.join(blocks, "")}
@@ -841,7 +812,7 @@ ${te.join(blocks, "")}
     originalIndex < parentBucket.size;
     originalIndex++
   ) {
-    const fieldValue = nullableStepStore[originalIndex];
+    const fieldValue = nullableStepStore.at(originalIndex);
     if (fieldValue != null) {
       const newIndex = size++;
       map.set(originalIndex, newIndex);
@@ -857,27 +828,21 @@ ${te.join(copyBlocks, "")}
   } else if (reasonType === "listItem") {
     const blocks: TE[] = [];
     const copyBlocks: TE[] = [];
-    for (let i = 0; i < unaryCopyCount; i++) {
-      const te_i = te.lit(i);
-      blocks.push(
-        te`\
-  unaryStore.set(copyUnaryStepIds[${te_i}], parentBucket.unaryStore.get(copyUnaryStepIds[${te_i}]));
-  `,
-      );
-    }
-    for (let i = 0; i < batchCopyCount; i++) {
+    for (let i = 0; i < copyCount; i++) {
       const te_source = te.identifier(`source${i}`);
       const te_target = te.identifier(`target${i}`);
       const te_i = te.lit(i);
       blocks.push(
         te`\
-  const ${te_source} = parentBucket.store.get(copyBatchStepIds[${te_i}]);
-  const ${te_target} = [];
-  store.set(copyBatchStepIds[${te_i}], ${te_target});
+  const ${te_source} = parentBucket.store.get(copyStepIds[${te_i}]);
+  const ${te_target} = ${te_source}.isBatch ? ${ref_batchExecutionValue}([]) : ${te_source};
+  store.set(copyStepIds[${te_i}], ${te_target});
   `,
       );
       copyBlocks.push(te`\
-        ${te_target}[newIndex] = ${te_source}[originalIndex];
+        if (${te_target}.isBatch) {
+          ${te_target}.entries[newIndex] = ${te_source}[originalIndex];
+        }
         `);
     }
     return makeNewBucketExpression(
@@ -885,13 +850,10 @@ ${te.join(copyBlocks, "")}
       reasonType,
       te`\
   const listStepId = this.reason.parentStep.id;
-  const listStepStore =
-    this.reason.parentStep._isUnary
-      ? ${ref_arrayOfLength}(parentBucket.size, parentBucket.unaryStore.get(listStepId))
-      : parentBucket.store.get(listStepId);
+  const listStepStore = parentBucket.store.get(listStepId);
 
   const itemStepIdList = [];
-  store.set(this.rootStep.id, itemStepIdList);
+  store.set(this.rootStep.id, ${ref_batchExecutionValue}(itemStepIdList));
 
   // Prepare store with an empty list for each copyPlanId
   ${te.join(blocks, "")}
@@ -903,7 +865,7 @@ ${te.join(copyBlocks, "")}
     originalIndex < parentBucket.size;
     originalIndex++
   ) {
-    const list = listStepStore[originalIndex];
+    const list = listStepStore.at(originalIndex);
     if (Array.isArray(list)) {
       const newIndexes = [];
       map.set(originalIndex, newIndexes);
@@ -929,8 +891,7 @@ ${te.join(copyBlocks, "")}
 
 function withNewBucketFactory(
   signature: string,
-  unaryCopyCount: number,
-  batchCopyCount: number,
+  copyCount: number,
   reasonType: "nullableBoundary" | "listItem",
   callback: (factory: Factory) => void,
 ) {
@@ -949,15 +910,14 @@ function withNewBucketFactory(
 
   const executorExpression = newBucketFactoryInnerExpression(
     signature,
-    unaryCopyCount,
-    batchCopyCount,
+    copyCount,
     reasonType,
   );
 
   const factoryExpression = te`\
 function ${te.identifier(
     `layerPlanNewBucketFactory_${signature}`,
-  )}(copyUnaryStepIds, copyBatchStepIds) {
+  )}(copyStepIds) {
   return ${executorExpression};
 }`;
   te.runInBatch<Factory>(factoryExpression, (factory) => {

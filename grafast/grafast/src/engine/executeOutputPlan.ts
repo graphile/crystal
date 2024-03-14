@@ -104,8 +104,6 @@ function recursivePrintBucket(bucket: Bucket, indentLevel = 0): string {
     `Bucket for ${bucket.layerPlan} (size = ${bucket.size}):
   Store:
 ${indent(4, inspect(bucket.store, { colors: true }))}
-  Unary store:
-${indent(4, inspect(bucket.unaryStore, { colors: true }))}
   Children:
 ${Object.entries(bucket.children)
   .map(([_id, { bucket }]) => indent(4, recursivePrintBucket(bucket)))
