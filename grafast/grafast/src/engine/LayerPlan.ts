@@ -710,7 +710,10 @@ const te_parentBucketDotPolymorphicPathList = te`parentBucket.polymorphicPathLis
 const te_parentBucketDotIterators = te`parentBucket.iterators`;
 const te_emptyArray = te`[]`;
 const ref_newBucket = te.ref(newBucket, "newBucket");
-const ref_batchExecutionValue = te.ref(batchExecutionValue);
+const ref_batchExecutionValue = te.ref(
+  batchExecutionValue,
+  "batchExecutionValue",
+);
 
 function makeNewBucketExpression(
   signature: string,
