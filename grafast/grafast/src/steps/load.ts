@@ -317,7 +317,7 @@ export class LoadStep<
       meta.cache = cache;
     }
     const batch = new Map<TSpec, number[]>();
-    const unary = values1 && values1.isBatch ? values1.value : undefined;
+    const unary = values1?.isBatch === false ? values1.value : undefined;
 
     const results: Array<PromiseOrDirect<Maybe<TData>>> = [];
     for (let i = 0; i < count; i++) {

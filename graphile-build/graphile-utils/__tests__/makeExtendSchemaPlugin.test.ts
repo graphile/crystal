@@ -174,3 +174,88 @@ it("enables overriding scope", async () => {
   const f = t.getFields().favouritePets;
   expect(f.args.length).toBe(0);
 });
+
+it("supports unary steps in loadOne", async () => {
+  const preset: GraphileConfig.Preset = {
+    extends: [PostGraphileAmberPreset],
+    plugins: [
+      makeExtendSchemaPlugin((build) => {
+        const { loadOne } = build.grafast;
+        const { users } = build.input.pgRegistry.pgResources;
+        return {
+          typeDefs: gql`
+            extend type User {
+              uppercaseName: String
+            }
+          `,
+          plans: {
+            User: {
+              uppercaseName($user) {
+                const $name = $user.get("name");
+                const $executorContext = users.executor.context();
+                return loadOne(
+                  $name,
+                  $executorContext,
+                  async (names, { unary: executorContext }) => {
+                    const { withPgClient, pgSettings } = executorContext;
+                    const { rows } = await withPgClient(pgSettings, (client) =>
+                      client.query<{ i: string; upper_name: string }>({
+                        text: "select (i - 1)::text as i, upper(name) as upper_name from json_array_elements_text($1::json) with ordinality as el(name, i)",
+                        values: [JSON.stringify(names)],
+                      }),
+                    );
+                    return names.map(
+                      (_, i) => rows.find((r) => r.i === String(i))?.upper_name,
+                    );
+                  },
+                );
+              },
+            },
+          },
+        };
+      }),
+    ],
+    pgServices: [
+      makePgService({
+        pool: pgPool!,
+        schemas: ["graphile_utils"],
+      }),
+    ],
+  };
+  const { schema, resolvedPreset } = await makeSchema(preset);
+  const result = await grafast({
+    schema,
+    resolvedPreset,
+    requestContext: {},
+    source: /* GraphQL */ `
+      {
+        allUsers(first: 3) {
+          nodes {
+            name
+            uppercaseName
+          }
+        }
+      }
+    `,
+  });
+  expect(result).toEqual({
+    data: {
+      allUsers: {
+        nodes: [
+          {
+            name: "Alice",
+            uppercaseName: "ALICE",
+          },
+          {
+            name: "Bob",
+            uppercaseName: "BOB",
+          },
+          {
+            name: "Caroline",
+            uppercaseName: "CAROLINE",
+          },
+        ],
+      },
+    },
+  });
+});
