@@ -76,6 +76,11 @@ These global defaults can still be overridden by each entity, so they're a
 good way of making wide ranging "default" behaviors without locking yourself in
 too hard.
 
+For example, if you want to run postgraphile with all behaviors disabled by default,
+you can start your defaultBehavior string with `-*`. This would allow you to take the
+approach of requiring intentional engineer decisions on how database schema additions
+are reflected in your GraphQL schema.
+
 :::info
 
 If you're authoring a preset that is not the final configuration for a schema
