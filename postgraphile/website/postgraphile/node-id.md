@@ -42,11 +42,11 @@ const IdPlugin: GraphileConfig.Plugin = {
 ```
 
 Like the `postgraphile/presets/relay` preset, the `postgraphile/presets/amber`
-preset also uses the field name `id` for the unique identifier and renames `id`
-columns in database tables to `rowId` via the NodePlugin and PgAttributesPlugin
-respectively. If you're using the amber preset and want to revert to using
-`nodeId` for the unique identifier and `id` for any `id` columns in your database,
-you can add something like the following plugin:
+preset also uses the field name `id` for the unique identifier with the
+`NodePlugin` and renames `id` columns in database tables to `rowId` with the
+PgAttributesPlugin respectively. If you're using the amber preset and want to
+revert to using `nodeId` for the unique identifier and `id` for any `id` columns
+in your database, you can add something like the following plugin:
 
 ```ts
 const RevertToNodeIdPlugin: GraphileConfig.Plugin = {
