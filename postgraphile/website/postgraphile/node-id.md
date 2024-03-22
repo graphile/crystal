@@ -41,6 +41,32 @@ const IdPlugin: GraphileConfig.Plugin = {
 };
 ```
 
+Like the `postgraphile/presets/relay` preset, the `postgraphile/presets/amber`
+preset also uses the field name `id` for the unique identifier and renames `id`
+columns in database tables to `rowId` via the NodePlugin and PgAttributesPlugin
+respectively. If you're using the amber preset and want to revert to using
+`nodeId` for the unique identifier and `id` for any `id` columns in your database,
+you can add something like the following plugin:
+
+```ts
+const RevertToNodeIdPlugin: GraphileConfig.Plugin = {
+    name: 'RevertToNodeIdPlugin',
+    version: '1.0.0',
+    inflection: {
+        replace: {
+            nodeIdFieldName: (): string => 'nodeId',
+            attribute: (previous: any, options: any, details: any) => {
+                const name = previous!.call(this, details)
+                if (name === 'rowId') {
+                    return 'id'
+                }
+                return name
+            },
+        },
+    },
+}
+```
+
 One common use case for the `nodeId` (or `id`) field is as the cache key for
 your client library, e.g. with Apollo Client's `dataIdFromObject`:
 
