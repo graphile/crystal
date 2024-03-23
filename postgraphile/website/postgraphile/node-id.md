@@ -64,8 +64,9 @@ export const client = new ApolloClient({
 
 ### Disabling the Global Object Identifier
 
-You can disable the global object identifier throughout your API by disabling
-`NodePlugin`:
+The global object identifier is added by the amber preset. If you use the amber
+preset but you want to disable the global object identifier throughout your API,
+you can do so by disabling `NodePlugin`:
 
 ```ts title="graphile.config.mjs"
 export default {
@@ -114,7 +115,7 @@ ID is stable for the same object, when new objects are created there is no guara
 that their new ID will conform to the same encoding.
 
 That said, it is generally easy to extract details from PostGraphile's globally
-unique IDs. Take for example the Unique ID `WyJQb3N0IiwxXQ==`. By base64 decoding
+unique IDs. Take for example the unique ID `WyJQb3N0IiwxXQ==`. By base64 decoding
 this value, we can see the data in it is `["Post",1]`. This states that it is for
 the `Post` GraphQL type, and the associated primary key value is `1`. (If you are
 using the V4 preset then `nodeId`s will use the table name (or a derivative thereof)
