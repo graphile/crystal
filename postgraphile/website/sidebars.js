@@ -94,6 +94,7 @@ const sidebars = {
     "background-tasks",
     "reserved-keywords",
     "debugging",
+    "customization-summary",
     {
       type: "html",
       value: "<h4>CUSTOMIZING</h4>",
