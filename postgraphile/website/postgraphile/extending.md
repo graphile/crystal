@@ -12,6 +12,30 @@ or using the raw plugin interface available from Graphile Build.
 _If you're looking for an easy way to remove/rename things, check out
 [smart tags](./smart-tags/)._
 
+### Inflection example
+
+Here's an example of a simple plugin which uses the ["inflection"
+system](./inflection) to rename the `full_name` database column to be output as
+`name` in GraphQL:
+
+```js
+/** @type {GraphileConfig.Plugin} */
+const FullNameToNamePlugin = {
+  name: "FullNameToNamePlugin",
+  inflection: {
+    replace: {
+      attribute(previous, options, details) {
+        if (details.attributeName === "full_name") {
+          return "name";
+        } else {
+          return previous ? previous(details) : details.attributeName;
+        }
+      },
+    },
+  },
+};
+```
+
 ### Writing Plugins
 
 We've created a number of plugin helpers for common tasks:

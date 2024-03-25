@@ -33,8 +33,7 @@ const sidebars = {
     "performance",
     "requirements",
     "required-knowledge",
-    "behavior",
-    "exporting-schema",
+    "customization-summary",
     {
       type: "html",
       value: "<h4>OPERATION</h4>",
@@ -81,6 +80,7 @@ const sidebars = {
     "refs",
     "aggregates",
     "postgresql-indexes",
+    "behavior",
     "security",
     {
       type: "category",
@@ -92,9 +92,9 @@ const sidebars = {
       items: ["subscriptions", "live-queries"],
     },
     "background-tasks",
+    "exporting-schema",
     "reserved-keywords",
     "debugging",
-    "customization-summary",
     {
       type: "html",
       value: "<h4>CUSTOMIZING</h4>",
