@@ -19,28 +19,30 @@ the amber preset renames that attribute to `rowId`. If you want to use the amber
 preset but you do not like this behavior, you have several options:
 
 1. You can use the `postgraphile/presets/relay` preset which makes several changes
-    including removing `rowId` entirely.
+   including removing `rowId` entirely.
 2. You can use a V4 preset that mimics the behavior and settings of PostGraphile V4
-    which used `nodeId` to represent the unique identifier.
+   which used `nodeId` to represent the unique identifier.
 3. You can create your plugin similar to the following:
 
 ```ts
 const IdToNodeIdPlugin: GraphileConfig.Plugin = {
-    name: 'IdToNodeIdPlugin',
-    version: '1.0.0',
-    inflection: {
-        replace: {
-            nodeIdFieldName(){ return 'nodeId'; },
-            attribute(previous, options, details) {
-                const name = previous!.call(this, details)
-                if (name === 'rowId') {
-                    return 'id'
-                }
-                return name
-            },
-        },
+  name: "IdToNodeIdPlugin",
+  version: "1.0.0",
+  inflection: {
+    replace: {
+      nodeIdFieldName() {
+        return "nodeId";
+      },
+      attribute(previous, options, details) {
+        const name = previous!.call(this, details);
+        if (name === "rowId") {
+          return "id";
+        }
+        return name;
+      },
     },
-}
+  },
+};
 ```
 
 One common use case for the unique `id` field is as the cache key for your client
