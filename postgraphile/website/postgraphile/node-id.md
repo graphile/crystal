@@ -30,7 +30,7 @@ const IdToNodeIdPlugin: GraphileConfig.Plugin = {
     version: '1.0.0',
     inflection: {
         replace: {
-            nodeIdFieldName: (): string => 'nodeId',
+            nodeIdFieldName(){ return 'nodeId'; },
             attribute(previous, options, details) {
                 const name = previous!.call(this, details)
                 if (name === 'rowId') {
