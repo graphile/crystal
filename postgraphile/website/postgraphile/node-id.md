@@ -20,18 +20,18 @@ preset but you do not like this behavior, you have several options:
 
 1. You can use the `postgraphile/presets/relay` preset which makes several changes
     including removing `rowId` entirely.
-2. You can use a V4 preset that mimics the behavior and settings of Postgraphile V4
+2. You can use a V4 preset that mimics the behavior and settings of PostGraphile V4
     which used `nodeId` to represent the unique identifier.
 3. You can create your plugin similar to the following:
 
 ```ts
-const RevertToNodeIdPlugin: GraphileConfig.Plugin = {
-    name: 'RevertToNodeIdPlugin',
+const IdToNodeIdPlugin: GraphileConfig.Plugin = {
+    name: 'IdToNodeIdPlugin',
     version: '1.0.0',
     inflection: {
         replace: {
             nodeIdFieldName: (): string => 'nodeId',
-            attribute: (previous: any, options: any, details: any) => {
+            attribute(previous, options, details) {
                 const name = previous!.call(this, details)
                 if (name === 'rowId') {
                     return 'id'
@@ -54,6 +54,8 @@ import { InMemoryCache } from "apollo-cache-inmemory";
 const cache = new InMemoryCache({
   // highlight-next-line
   dataIdFromObject: (object) => object.id || null,
+  // Or if you renamed 'id' to 'nodeId' then:
+  //   dataIdFromObject: (object) => object.nodeId || null,
 });
 
 export const client = new ApolloClient({
