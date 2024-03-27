@@ -11,7 +11,8 @@ import "graphile-config";
 import "graphile-build-pg";
 
 import type { PgClientQuery } from "@dataplan/pg";
-import { createWithPgClient, PgSubscriber } from "@dataplan/pg/adaptors/pg";
+import { PgSubscriber } from "@dataplan/pg/adaptors/pg";
+import * as PGAdaptor from "@dataplan/pg/adaptors/pg";
 import { promises as fsp } from "fs";
 import { mkdir, mkdtemp, rmdir, unlink } from "fs/promises";
 import {
@@ -292,7 +293,7 @@ export async function runTestQuery(
     plugins: [StreamDeferPlugin],
     pgServices: [
       {
-        adaptor: { createWithPgClient },
+        adaptor: PGAdaptor,
         name: "main",
         withPgClientKey: "withPgClient",
         pgSettingsKey: "pgSettings",
@@ -310,15 +311,15 @@ export async function runTestQuery(
                 search_path,
               })
             : search_path
-            ? {
+            ? () => ({
                 search_path,
-              }
+              })
             : undefined,
         schemas: schemas,
         adaptorSettings: {
           connectionString,
         },
-      } as GraphileConfig.PgServiceConfiguration,
+      } satisfies GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg">,
     ],
     schema: {
       pgForbidSetofFunctionsToReturnNull:

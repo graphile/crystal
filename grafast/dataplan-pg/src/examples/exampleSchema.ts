@@ -70,6 +70,7 @@ import { inspect } from "util";
 
 import type {
   GetPgResourceRelations,
+  PgClient,
   PgCodecAttribute,
   PgCodecAttributeVia,
   PgConditionStep,
@@ -4853,7 +4854,7 @@ export function makeExampleSchema(
 
   const MultipleActionsPayload = newObjectTypeBuilder<
     OurGraphQLContext,
-    WithPgClientStep
+    WithPgClientStep<PgClient>
   >(WithPgClientStep)({
     name: "MultipleActionsPayload",
     fields: {

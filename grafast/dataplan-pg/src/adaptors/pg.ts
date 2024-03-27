@@ -417,7 +417,7 @@ export function createWithPgClient(
 }
 
 // This is here as a TypeScript assertion, to ensure we conform to PgAdaptor
-const _testValidAdaptor: PgAdaptor<PgAdaptorSettings>["createWithPgClient"] =
+const _testValidAdaptor: PgAdaptor<"@dataplan/pg/adaptors/pg">["createWithPgClient"] =
   createWithPgClient;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -718,8 +718,8 @@ declare global {
 }
 
 export function makePgService(
-  options: MakePgServiceOptions<PgAdaptorSettings> & { pool?: pg.Pool },
-): GraphileConfig.PgServiceConfiguration<PgAdaptorSettings> {
+  options: MakePgServiceOptions & { pool?: pg.Pool },
+): GraphileConfig.PgServiceConfiguration {
   const {
     name = "main",
     connectionString,
@@ -760,7 +760,7 @@ export function makePgService(
     pgSubscriber = new PgSubscriber(pool);
     releasers.push(() => pgSubscriber!.release?.());
   }
-  const service: GraphileConfig.PgServiceConfiguration<PgAdaptorSettings> = {
+  const service: GraphileConfig.PgServiceConfiguration = {
     name,
     schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
     withPgClientKey: withPgClientKey as any,

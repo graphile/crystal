@@ -1,19 +1,26 @@
 import type * as pg from "pg";
 
-import type { PgClient, WithPgClient } from "./executor.ts";
+import type { PgClient, WithPgClient } from "./executor";
 import type { MakePgServiceOptions } from "./interfaces";
 
 type PromiseOrDirect<T> = T | PromiseLike<T>;
 
 /** @experimental */
-export interface PgAdaptor<TAdaptorSettings> {
+export interface PgAdaptor<
+  TAdaptor extends
+    keyof GraphileConfig.PgAdaptors = keyof GraphileConfig.PgAdaptors,
+> {
   createWithPgClient: (
-    adaptorSettings: TAdaptorSettings | undefined,
+    adaptorSettings:
+      | GraphileConfig.PgAdaptors[TAdaptor]["adaptorSettings"]
+      | undefined,
     variant?: "SUPERUSER" | null,
-  ) => PromiseOrDirect<WithPgClient>;
+  ) => PromiseOrDirect<
+    WithPgClient<GraphileConfig.PgAdaptors[TAdaptor]["client"]>
+  >;
   makePgService: (
-    options: MakePgServiceOptions<TAdaptorSettings> & { pool?: pg.Pool },
-  ) => GraphileConfig.PgServiceConfiguration<TAdaptorSettings>;
+    options: MakePgServiceOptions & { pool?: pg.Pool },
+  ) => GraphileConfig.PgServiceConfiguration;
 }
 
 /**
@@ -28,12 +35,12 @@ export function isPromiseLike<T>(
 const isTest = process.env.NODE_ENV === "test";
 
 interface PgClientBySourceCacheValue {
-  withPgClient: WithPgClient;
+  withPgClient: WithPgClient<any>;
   retainers: number;
 }
 
 const withPgClientDetailsByConfigCache = new Map<
-  GraphileConfig.PgServiceConfiguration<any>,
+  GraphileConfig.PgServiceConfiguration,
   PromiseOrDirect<PgClientBySourceCacheValue>
 >();
 
@@ -41,9 +48,9 @@ const withPgClientDetailsByConfigCache = new Map<
  * Get or build the 'withPgClient' callback function for a given database
  * config, caching it to make future lookups faster.
  */
-export function getWithPgClientFromPgService<TAdaptorOptions>(
-  config: GraphileConfig.PgServiceConfiguration<TAdaptorOptions>,
-): PromiseOrDirect<WithPgClient> {
+export function getWithPgClientFromPgService<TPgClient extends PgClient>(
+  config: GraphileConfig.PgServiceConfiguration,
+): PromiseOrDirect<WithPgClient<TPgClient>> {
   const existing = withPgClientDetailsByConfigCache.get(config);
   if (existing) {
     if (isPromiseLike(existing)) {
@@ -103,8 +110,8 @@ export function getWithPgClientFromPgService<TAdaptorOptions>(
   }
 }
 
-export async function withPgClientFromPgService<T, TAdaptorSettings>(
-  config: GraphileConfig.PgServiceConfiguration<TAdaptorSettings>,
+export async function withPgClientFromPgService<T>(
+  config: GraphileConfig.PgServiceConfiguration,
   pgSettings: { [key: string]: string } | null,
   callback: (client: PgClient) => T | Promise<T>,
 ): Promise<T> {
@@ -120,8 +127,8 @@ export async function withPgClientFromPgService<T, TAdaptorSettings>(
 }
 
 // We don't cache superuser withPgClients
-export async function withSuperuserPgClientFromPgService<T, TAdaptorSettings>(
-  config: GraphileConfig.PgServiceConfiguration<TAdaptorSettings>,
+export async function withSuperuserPgClientFromPgService<T>(
+  config: GraphileConfig.PgServiceConfiguration,
   pgSettings: { [key: string]: string } | null,
   callback: (client: PgClient) => T | Promise<T>,
 ): Promise<T> {
