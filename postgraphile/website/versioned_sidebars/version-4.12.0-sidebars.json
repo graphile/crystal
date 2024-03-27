@@ -95,6 +95,7 @@
       "value": "<h4>CUSTOMISING</h4>",
       "defaultStyle": false
     },
+    "customization-summary",
     {
       "type": "category",
       "label": "Smart Tags",
