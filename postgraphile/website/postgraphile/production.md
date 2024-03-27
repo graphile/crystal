@@ -1,7 +1,7 @@
 ---
 layout: page
 path: /postgraphile/production/
-title: Production Considerations
+title: Production considerations
 ---
 
 When it comes time to deploy your PostGraphile application to production,

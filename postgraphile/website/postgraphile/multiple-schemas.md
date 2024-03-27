@@ -1,7 +1,7 @@
 ---
 layout: page
 path: /postgraphile/multiple-schemas/
-title: Multiple GraphQL Schemas with PostGraphile
+title: Multiple GraphQL schemas with PostGraphile
 ---
 
 Each PostGraphile instance only creates a single GraphQL schema ─ you don't get
