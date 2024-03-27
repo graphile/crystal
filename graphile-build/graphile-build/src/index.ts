@@ -742,7 +742,12 @@ declare global {
       replace?: {
         [key in keyof GraphileBuild.Inflection]?: (
           this: GraphileBuild.Inflection,
-          previous: GraphileBuild.Inflection[key] | undefined,
+          previous:
+            | // This is specifically so the `this` argument is removed
+            ((
+                ...args: Parameters<GraphileBuild.Inflection[key]>
+              ) => ReturnType<GraphileBuild.Inflection[key]>)
+            | undefined,
           options: ResolvedPreset,
           ...args: Parameters<GraphileBuild.Inflection[key]>
         ) => ReturnType<GraphileBuild.Inflection[key]>;
