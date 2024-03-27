@@ -28,7 +28,7 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
         return "id";
       },
       attribute(previous, options, details) {
-        const name = previous!.call(this, details);
+        const name = previous!(details);
         if (name === "id") return "rowId";
         return name;
       },

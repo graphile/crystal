@@ -69,7 +69,7 @@ function fixCapitalisedPlural(
   _preset: GraphileConfig.ResolvedPreset,
   str: string,
 ) {
-  const original = previous!.call(this, str);
+  const original = previous!(str);
   return original.replace(/[0-9]S(?=[A-Z]|$)/g, (match) => match.toLowerCase());
 }
 
@@ -86,7 +86,7 @@ function fixChangePlural(
   const prefix = str.substring(0, index);
   const word = str.substring(index, suffixIndex);
   const suffix = str.substring(suffixIndex);
-  return `${prefix}${previous!.call(this, word)}${suffix}`;
+  return `${prefix}${previous!(word)}${suffix}`;
 }
 
 // Users can add 'listSuffix === "omit"`/`"include"` smart tags, this handles
@@ -227,9 +227,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
       },
 
       patchField(previous, options, fieldName) {
-        return options.schema?.pgSimplifyPatch
-          ? "patch"
-          : previous!.call(this, fieldName);
+        return options.schema?.pgSimplifyPatch ? "patch" : previous!(fieldName);
       },
 
       connectionField(_prev, options, baseName) {
@@ -255,7 +253,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
               ),
             );
           } else {
-            return previous!.call(this, resource);
+            return previous!(resource);
           }
         });
       },
@@ -271,7 +269,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
               ),
             );
           } else {
-            return previous!.call(this, resource);
+            return previous!(resource);
           }
         });
       },
@@ -285,7 +283,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
               ),
             );
           } else {
-            return previous!.call(this, codec);
+            return previous!(codec);
           }
         });
       },
@@ -299,7 +297,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
               ),
             );
           } else {
-            return previous!.call(this, codec);
+            return previous!(codec);
           }
         });
       },
@@ -331,7 +329,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             `${this._singularizedCodecName(relation.remoteResource.codec)}`,
           );
         }
-        return previous!.call(this, details);
+        return previous!(details);
       },
 
       singleRelationBackwards(previous, _options, details) {
@@ -383,7 +381,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             `${this._singularizedCodecName(relation.remoteResource.codec)}`,
           );
         }
-        return previous!.call(this, details);
+        return previous!(details);
       },
 
       _manyRelation(previous, _options, details) {
@@ -427,7 +425,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             )}`,
           );
         }
-        return previous!.call(this, details);
+        return previous!(details);
       },
 
       manyRelationConnection(previous, _options, details) {
@@ -436,9 +434,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         const listSuffix =
           relation.extensions?.tags?.listSuffix ??
           relation.remoteResource.extensions?.tags?.listSuffix;
-        return overrideListSuffix(listSuffix, () =>
-          previous!.call(this, details),
-        );
+        return overrideListSuffix(listSuffix, () => previous!(details));
       },
 
       manyRelationList(previous, _options, details) {
@@ -447,40 +443,30 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
         const listSuffix =
           relation.extensions?.tags?.listSuffix ??
           relation.remoteResource.extensions?.tags?.listSuffix;
-        return overrideListSuffix(listSuffix, () =>
-          previous!.call(this, details),
-        );
+        return overrideListSuffix(listSuffix, () => previous!(details));
       },
       customQueryConnectionField(previous, _options, details) {
         const listSuffix = details.resource.extensions?.tags?.listSuffix;
-        return overrideListSuffix(listSuffix, () =>
-          previous!.call(this, details),
-        );
+        return overrideListSuffix(listSuffix, () => previous!(details));
       },
       customQueryListField(previous, _options, details) {
         const listSuffix = details.resource.extensions?.tags?.listSuffix;
-        return overrideListSuffix(listSuffix, () =>
-          previous!.call(this, details),
-        );
+        return overrideListSuffix(listSuffix, () => previous!(details));
       },
       computedAttributeConnectionField(previous, _options, details) {
         const listSuffix = details.resource.extensions?.tags?.listSuffix;
-        return overrideListSuffix(listSuffix, () =>
-          previous!.call(this, details),
-        );
+        return overrideListSuffix(listSuffix, () => previous!(details));
       },
       computedAttributeListField(previous, _options, details) {
         const listSuffix = details.resource.extensions?.tags?.listSuffix;
-        return overrideListSuffix(listSuffix, () =>
-          previous!.call(this, details),
-        );
+        return overrideListSuffix(listSuffix, () => previous!(details));
       },
 
       nodeById(previous, options, typeName) {
         if (options.schema?.pgShortPk) {
           return this.camelCase(`${typeName}-by-${this.nodeIdFieldName()}`);
         } else {
-          return previous!.call(this, typeName);
+          return previous!(typeName);
         }
       },
       rowByUnique(previous, options, details) {
@@ -492,7 +478,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
           // Primary key, shorten!
           return this.camelCase(this._singularizedCodecName(resource.codec));
         } else {
-          return previous!.call(this, details);
+          return previous!(details);
         }
       },
 
@@ -506,7 +492,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             `update-${this._singularizedCodecName(resource.codec)}`,
           );
         } else {
-          return previous!.call(this, details);
+          return previous!(details);
         }
       },
       deleteByKeysField(previous, options, details) {
@@ -520,7 +506,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             `delete-${this._singularizedCodecName(resource.codec)}`,
           );
         } else {
-          return previous!.call(this, details);
+          return previous!(details);
         }
       },
       updateByKeysInputType(previous, options, details) {
@@ -536,7 +522,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             `update-${this._singularizedCodecName(resource.codec)}-input`,
           );
         } else {
-          return previous!.call(this, details);
+          return previous!(details);
         }
       },
       deleteByKeysInputType(previous, options, details) {
@@ -552,7 +538,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             `delete-${this._singularizedCodecName(resource.codec)}-input`,
           );
         } else {
-          return previous!.call(this, details);
+          return previous!(details);
         }
       },
       updateNodeField(previous, options, details) {
@@ -563,7 +549,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             )}-by-${this.nodeIdFieldName()}`,
           );
         } else {
-          return previous!.call(this, details);
+          return previous!(details);
         }
       },
       deleteNodeField(previous, options, details) {
@@ -574,7 +560,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             )}-by-${this.nodeIdFieldName()}`,
           );
         } else {
-          return previous!.call(this, details);
+          return previous!(details);
         }
       },
       updateNodeInputType(previous, options, details) {
@@ -585,7 +571,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             )}-by-${this.nodeIdFieldName()}-input`,
           );
         } else {
-          return previous!.call(this, details);
+          return previous!(details);
         }
       },
       deleteNodeInputType(previous, options, details) {
@@ -596,7 +582,7 @@ const PgSimplifyInflectionPlugin: GraphileConfig.Plugin = {
             )}-by-${this.nodeIdFieldName()}-input`,
           );
         } else {
-          return previous!.call(this, details);
+          return previous!(details);
         }
       },
     },
