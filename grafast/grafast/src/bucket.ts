@@ -2,7 +2,7 @@
 
 import type { LayerPlan } from "./engine/LayerPlan";
 import type { MetaByMetaKey } from "./engine/OperationPlan";
-import type { ExecutionEventEmitter } from "./interfaces.js";
+import type { ExecutionEventEmitter, ExecutionValue } from "./interfaces.js";
 
 /**
  * @internal
@@ -82,18 +82,14 @@ export interface Bucket {
   metaByMetaKey: MetaByMetaKey;
 
   /**
-   * Every entry in the store is a list with the same length as the bucket has
-   * `size`.
+   * Every entry in the store is an execution value. If the execution value is a
+   * batch, then it represents a list with the same length the bucket has
+   * (`size`).
    *
    * The entry for '-1' is the request indexes, so we can associate the results
    * back to the request that triggered them.
    */
-  store: Map<number, any[]>;
-
-  /**
-   * For "unary dependencies", we only need to store the value once per step id.
-   */
-  unaryStore: Map<number, any>;
+  store: Map<number, ExecutionValue>;
 
   /**
    * Set this true when the bucket is fully executed.

@@ -1,3 +1,7 @@
+---
+toc_max_heading_level: 4
+---
+
 import Mermaid from "@theme/Mermaid";
 
 # loadMany
@@ -111,17 +115,19 @@ stateDiagram
 
 ## Usage
 
+### Basic usage
+
 ```ts
 const $userId = $user.get("id");
 const $friendships = loadMany($userId, getFriendshipsByUserIds);
 ```
 
-`loadMany` accepts two or three arguments, the first is the step that specifies
-which records to load, and the last is the callback function called with these
-specs responsible for loading them.
+`loadMany` accepts two to four arguments, the first is the step that specifies
+which records to load (the _specifier step_), and the last is the callback
+function called with these specs responsible for loading them.
 
 The callback function is called with two arguments, the first is a list of the
-values from the specifier step and the second is options that may affect the
+values from the _specifier step_ and the second is options that may affect the
 fetching of the records.
 
 :::tip
@@ -145,7 +151,8 @@ const friendshipsByUserIdCallback = (ids, { attributes }) => {
 
 [dataloader]: https://github.com/graphql/dataloader
 
-Optionally a middle argument can indicate the input/output equivalence - this can be:
+Optionally a penultimate argument (2nd of 3 arguments, or 3rd of 4 arguments)
+can indicate the input/output equivalence - this can be:
 
 - `null` to indicate no input/output equivalence
 - a string to indicate that the same named property on the output is equivalent
@@ -173,10 +180,30 @@ const $posts = loadMany(
 );
 ```
 
+### Advanced usage
+
+```ts
+const $userId = $user.get("id");
+const $dbClient = context().get("dbClient");
+const $friendships = loadMany($userId, $dbClient, getFriendshipsByUserIds);
+```
+
+In addition to the forms seen in "Basic usage" above, you can pass a second
+step to `loadMany`. This second step must be a [**unary
+step**](../../step-classes.md#addUnaryDependency), meaning that it must represent
+exactly one value across the entire request (not a batch of values like most
+steps). Since we know it will have exactly one value, we can pass it into the
+callback as a single value and our callback will be able to use it directly
+without having to perform any manual grouping.
+
+This unary dependency is useful for fixed values (for example, those from
+GraphQL field arguments) and values on the GraphQL context such as clients to
+various APIs and other data sources.
+
 ## Multiple steps
 
-The [`list()`](./list) step can be used if you need to pass the value of more
-than one step into your callback:
+The [`list()`](./list) or [`object()`](./object) step can be used if you need
+to pass the value of more than one step into your callback:
 
 ```ts
 const $result = loadMany(list([$a, $b, $c]), callback);

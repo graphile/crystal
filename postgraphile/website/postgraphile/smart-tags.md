@@ -1,7 +1,7 @@
 ---
 layout: page
 path: /postgraphile/smart-tags/
-title: Smart Tags
+title: Smart tags
 ---
 
 You can customise your PostGraphile GraphQL schema by tagging tables, columns,

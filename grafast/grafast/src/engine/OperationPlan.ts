@@ -3079,10 +3079,7 @@ export class OperationPlan {
       let currentLayerPlan: LayerPlan | null = layerPlan;
 
       while (dep.layerPlan !== currentLayerPlan) {
-        if (
-          currentLayerPlan.copyBatchStepIds.includes(dep.id) ||
-          currentLayerPlan.copyUnaryStepIds.includes(dep.id)
-        ) {
+        if (currentLayerPlan.copyStepIds.includes(dep.id)) {
           break;
         }
         const targetStep = this.stepTracker.getStepById(dep.id);
@@ -3095,10 +3092,8 @@ export class OperationPlan {
         }
         if (targetStep._isUnary) {
           targetStep._isUnaryLocked = true;
-          currentLayerPlan.copyUnaryStepIds.push(dep.id);
-        } else {
-          currentLayerPlan.copyBatchStepIds.push(dep.id);
         }
+        currentLayerPlan.copyStepIds.push(dep.id);
         currentLayerPlan = currentLayerPlan.parentLayerPlan;
         if (!currentLayerPlan) {
           throw new Error(
@@ -3426,7 +3421,7 @@ export class OperationPlan {
       return {
         id: lp.id,
         reason: printBucketReason(lp.reason),
-        copyStepIds: [...lp.copyUnaryStepIds, ...lp.copyBatchStepIds],
+        copyStepIds: lp.copyStepIds,
         phases: lp.phases.map(printPhase),
         steps: lp.steps.map(printStep),
         children: lp.children.map(printBucket),

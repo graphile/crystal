@@ -11333,12 +11333,12 @@ __metadata:
   linkType: hard
 
 "follow-redirects@npm:^1.0.0, follow-redirects@npm:^1.14.7":
-  version: 1.15.4
-  resolution: "follow-redirects@npm:1.15.4"
+  version: 1.15.6
+  resolution: "follow-redirects@npm:1.15.6"
   peerDependenciesMeta:
     debug:
       optional: true
-  checksum: b7b59fd5204cf823dac5007bd05c4c04e61930a22ace1d4e5027cfd04ba354130cc8b5645a3af8e48da59e5a219d76eeb124c294bf8e6f50ffef16e7ce7ec205
+  checksum: 6c901e5591f99ed82e3a7af8ad8cc95b751967128cf98206bbd72fc91b5f7f6abb241f57d5b600a8373b59a3d4a954d151d4eacf56134d5bd2d6630b0ba080ce
   languageName: node
   linkType: hard
 
@@ -22004,8 +22004,8 @@ __metadata:
   linkType: hard
 
 "webpack-dev-middleware@npm:^5.3.1":
-  version: 5.3.3
-  resolution: "webpack-dev-middleware@npm:5.3.3"
+  version: 5.3.4
+  resolution: "webpack-dev-middleware@npm:5.3.4"
   dependencies:
     colorette: "npm:^2.0.10"
     memfs: "npm:^3.4.3"
@@ -22014,7 +22014,7 @@ __metadata:
     schema-utils: "npm:^4.0.0"
   peerDependencies:
     webpack: ^4.0.0 || ^5.0.0
-  checksum: 0e0b79101a6ae02710d3b4c4d6bd6b9cbd656b7bf3e4e8d47bb11686bdccebef0d970940f6b13124cb17acf85c369b01b85f8134ed0a128e6c10eac7829ef56b
+  checksum: cbd95740c9967c7e92c21585fa710c110641befa81ad0a832437347d9c1fea1302daf016931fb2e9da1cd79a6940aab51a2a557346ce0220c0394918ceb6566d
   languageName: node
   linkType: hard
 

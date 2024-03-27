@@ -73,7 +73,7 @@ graph TD
     Bucket2("Bucket 2 (listItem)<br />Deps: 20<br /><br />ROOT __Item{2}ᐸ17ᐳ[18]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item18,PgSelectSingle19 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 20, 19<br /><br />ROOT PgSelectSingle{2}ᐸbadly_behaved_functionᐳ[19]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 19, 20<br /><br />ROOT PgSelectSingle{2}ᐸbadly_behaved_functionᐳ[19]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression21,List22,Lambda23,PgClassExpression26 bucket3
     Bucket4("Bucket 4 (subroutine)<br />ROOT PgSelectSingle{4}ᐸbadly_behaved_functionᐳ[30]"):::bucket
@@ -82,10 +82,10 @@ graph TD
     Bucket5("Bucket 5 (listItem)<br />Deps: 16, 20<br /><br />ROOT __Item{5}ᐸ28ᐳ[31]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5,__Item31,PgSelectSingle32,Edge33,PgCursor34,PgClassExpression35,List36 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 20, 33, 32, 34<br /><br />ROOT Edge{5}[33]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 33, 32, 20, 34<br /><br />ROOT Edge{5}[33]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6 bucket6
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 20, 32<br /><br />ROOT PgSelectSingle{5}ᐸbadly_behaved_functionᐳ[32]"):::bucket
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 32, 20<br /><br />ROOT PgSelectSingle{5}ᐸbadly_behaved_functionᐳ[32]"):::bucket
     classDef bucket7 stroke:#808000
     class Bucket7,PgClassExpression38,List39,Lambda40,PgClassExpression43 bucket7
     Bucket0 --> Bucket1

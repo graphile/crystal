@@ -1,7 +1,7 @@
 ---
 layout: page
 path: /postgraphile/postgresql-schema-design/
-title: PostgreSQL Schema Design
+title: PostgreSQL schema design
 ---
 
 The Postgres database is rich with features well beyond that of any other

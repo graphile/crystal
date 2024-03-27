@@ -1,7 +1,7 @@
 ---
 layout: page
 path: /postgraphile/plugins/
-title: Server Plugins
+title: Server plugins
 ---
 
 _NOTE: This page relates to changing how the PostGraphile HTTP server
