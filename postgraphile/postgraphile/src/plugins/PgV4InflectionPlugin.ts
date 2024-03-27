@@ -24,7 +24,7 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
         return `${databasePrefix}${schemaPrefix}`;
       },
       enumValue(previous, options, value, codec) {
-        const oldValue = previous!.call(this, value, codec);
+        const oldValue = previous!(value, codec);
         return this.coerceToGraphQLName(this.constantCase(oldValue));
       },
       _attributeName(previous, options, details) {
@@ -45,7 +45,7 @@ export const PgV4InflectionPlugin: GraphileConfig.Plugin = {
         ) {
           return `arg${attribute.extensions.argIndex + 1}`;
         }
-        return previous!.call(this, details);
+        return previous!(details);
       },
       functionMutationResultFieldName(previous, options, details) {
         const { resource, returnGraphQLTypeName } = details;

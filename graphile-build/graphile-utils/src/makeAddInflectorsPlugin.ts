@@ -26,7 +26,7 @@ export const MyInflectorPlugin: GraphileConfig.Plugin = {
         ...args
       ) {
         if (name === "Query") return "RootQuery";
-        return previous.call(this, ...args);
+        return previous(...args);
       }
     }
   }

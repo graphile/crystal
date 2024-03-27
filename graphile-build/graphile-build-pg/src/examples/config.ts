@@ -45,7 +45,7 @@ const EnumManglingPlugin: GraphileConfig.Plugin = {
     replace: {
       // Help make enums more forgiving
       enumValue(previous, options, value, codec) {
-        const base = previous?.call(this, value, codec) ?? value;
+        const base = previous?.(value, codec) ?? value;
         return base
           .replace(/[^A-Za-z0-9_]+/g, "_")
           .replace(/^__+/, "_")
