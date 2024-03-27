@@ -1,5 +1,6 @@
 /* eslint-disable no-restricted-syntax */
 
+import { makePgService } from "@dataplan/pg/adaptors/pg";
 import {
   buildInflection,
   buildSchema,
@@ -39,16 +40,13 @@ async function main() {
       plugins: [QueryQueryPlugin, SwallowErrorsPlugin],
       pgServices: [
         // Configuration of our main (and only) Postgres database
-        {
+        makePgService({
           name: "main",
           schemas: ["public"],
           pgSettingsKey: "pgSettings",
           withPgClientKey: "withPgClient",
-          adaptor: "@dataplan/pg/adaptors/pg",
-          adaptorSettings: {
-            pool,
-          },
-        },
+          pool,
+        }),
       ],
       gather: {},
       schema: {

@@ -354,7 +354,7 @@ export function makeWithPgClientViaPgClientAlreadyInTransaction(
   return withPgClient;
 }
 
-export interface PgAdaptorOptions {
+export interface PgAdaptorSettings {
   /** ONLY FOR USE IN TESTS! */
   poolClient?: pg.PoolClient;
   /** ONLY FOR USE IN TESTS! */
@@ -374,8 +374,11 @@ export interface PgAdaptorOptions {
   superuserConnectionString?: string;
 }
 
+/** @deprecated Use PgAdaptorSettings instead. */
+export type PgAdaptorOptions = PgAdaptorSettings;
+
 export function createWithPgClient(
-  options: PgAdaptorOptions = Object.create(null),
+  options: PgAdaptorSettings = Object.create(null),
   variant?: "SUPERUSER" | string | null,
 ): WithPgClient<NodePostgresPgClient> {
   if (variant === "SUPERUSER") {
@@ -414,7 +417,7 @@ export function createWithPgClient(
 }
 
 // This is here as a TypeScript assertion, to ensure we conform to PgAdaptor
-const _testValidAdaptor: PgAdaptor<"@dataplan/pg/adaptors/pg">["createWithPgClient"] =
+const _testValidAdaptor: PgAdaptor<PgAdaptorSettings, NodePostgresPgClient>["createWithPgClient"] =
   createWithPgClient;
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -715,8 +718,8 @@ declare global {
 }
 
 export function makePgService(
-  options: MakePgServiceOptions & { pool?: pg.Pool },
-): GraphileConfig.PgServiceConfiguration {
+  options: MakePgServiceOptions<PgAdaptorSettings, NodePostgresPgClient> & { pool?: pg.Pool },
+): GraphileConfig.PgServiceConfiguration<PgAdaptorSettings, NodePostgresPgClient> {
   const {
     name = "main",
     connectionString,
@@ -757,7 +760,7 @@ export function makePgService(
     pgSubscriber = new PgSubscriber(pool);
     releasers.push(() => pgSubscriber!.release?.());
   }
-  const service: GraphileConfig.PgServiceConfiguration = {
+  const service: GraphileConfig.PgServiceConfiguration<PgAdaptorSettings, NodePostgresPgClient> = {
     name,
     schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
     withPgClientKey: withPgClientKey as any,
@@ -766,7 +769,7 @@ export function makePgService(
     pgSettings,
     pgSettingsForIntrospection,
     pgSubscriber,
-    adaptor: "@dataplan/pg/adaptors/pg",
+    adaptor: { createWithPgClient },
     adaptorSettings: {
       pool,
       superuserConnectionString,

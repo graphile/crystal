@@ -7,6 +7,7 @@
 import "graphile-config";
 
 import { getWithPgClientFromPgService } from "@dataplan/pg";
+import { makePgService } from "@dataplan/pg/adaptors/pg";
 import {
   defaultPreset as graphileBuildPreset,
   QueryQueryPlugin,
@@ -60,16 +61,13 @@ export async function makeSharedPresetAndClient(pool: Pool) {
     extends: [graphileBuildPreset, graphileBuildPgPreset],
     plugins: [QueryQueryPlugin, SwallowErrorsPlugin, EnumManglingPlugin],
     pgServices: [
-      {
+      makePgService({
         name: "main",
         schemas: DATABASE_SCHEMAS,
         pgSettingsKey: "pgSettings",
         withPgClientKey: "withPgClient",
-        adaptor: "@dataplan/pg/adaptors/pg",
-        adaptorSettings: {
-          pool,
-        },
-      },
+        pool,
+      }),
     ],
     gather: {
       // pgJwtTypes: "jwt_token",

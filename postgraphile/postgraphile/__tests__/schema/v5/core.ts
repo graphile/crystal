@@ -1,3 +1,4 @@
+import { createWithPgClient } from "@dataplan/pg/adaptors/pg";
 import { writeFile } from "fs/promises";
 import type { PromiseOrDirect } from "grafast";
 import type { GraphQLSchema } from "grafast/graphql";
@@ -42,7 +43,7 @@ export const test =
         plugins: [StripOidsPlugin],
         pgServices: [
           {
-            adaptor: "@dataplan/pg/adaptors/pg",
+            adaptor: { createWithPgClient },
             name: "main",
             withPgClientKey: "withPgClient",
             pgSettingsKey: "pgSettings",
@@ -52,7 +53,7 @@ export const test =
             adaptorSettings: {
               poolClient: client,
             },
-          } as any, //GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg">,
+          } as GraphileConfig.PgServiceConfiguration,
         ],
         schema: {
           ...graphileBuildOptions,
