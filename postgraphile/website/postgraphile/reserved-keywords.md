@@ -1,7 +1,7 @@
 ---
 layout: page
 path: /postgraphile/reserved-keywords/
-title: Reserved Keywords / Table Names
+title: Reserved keywords and table names
 ---
 
 Some table, column, function and argument names can cause issues with

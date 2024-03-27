@@ -1,7 +1,7 @@
 ---
 layout: page
 path: /postgraphile/required-knowledge/
-title: Required Knowledge
+title: Required knowledge
 toc_max_heading_level: 4
 ---
 
