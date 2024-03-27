@@ -426,15 +426,15 @@ export { version } from "./version.js";
 
 declare global {
   namespace GraphileConfig {
-    interface PgServiceConfiguration<TAdaptorSettings> {
+    interface PgServiceConfiguration<TAdaptorSettings, TPgClient extends PgClient> {
       name: string;
       schemas?: string[];
 
-      adaptor: PgAdaptor<TAdaptorSettings>;
+      adaptor: PgAdaptor<TAdaptorSettings, TPgClient>;
       adaptorSettings?: TAdaptorSettings;
 
       /** The key on 'context' where the withPgClient function will be sourced */
-      withPgClientKey: KeysOfType<Grafast.Context & object, WithPgClient>;
+      withPgClientKey: KeysOfType<Grafast.Context & object, WithPgClient<TPgClient>>;
 
       /** Return settings to set in the session */
       pgSettings?: (
@@ -467,7 +467,7 @@ declare global {
     }
 
     interface Preset {
-      pgServices?: ReadonlyArray<PgServiceConfiguration<unknown>>;
+      pgServices?: ReadonlyArray<PgServiceConfiguration<unknown, PgClient>>;
     }
   }
   namespace DataplanPg {

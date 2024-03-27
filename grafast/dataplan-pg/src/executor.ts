@@ -73,10 +73,10 @@ export interface PgClientResult<TData> {
  */
 export interface PgClient {
   query<TData>(opts: PgClientQuery): Promise<PgClientResult<TData>>;
-  withTransaction<T>(callback: (client: PgClient) => Promise<T>): Promise<T>;
+  withTransaction<T>(callback: (client: this) => Promise<T>): Promise<T>;
 }
 
-export interface WithPgClient<TPgClient extends PgClient = PgClient> {
+export interface WithPgClient<TPgClient extends PgClient> {
   <T>(
     pgSettings: { [key: string]: string } | null,
     callback: (client: TPgClient) => T | Promise<T>,

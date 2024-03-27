@@ -1,4 +1,4 @@
-import type { KeysOfType, WithPgClient } from "@dataplan/pg";
+import type { KeysOfType, PgClient, WithPgClient } from "@dataplan/pg";
 import {
   PgExecutor,
   withPgClientFromPgService,
@@ -66,7 +66,7 @@ declare global {
         getIntrospection(): PromiseOrDirect<IntrospectionResults>;
         getService(serviceName: string): Promise<{
           introspection: Introspection;
-          pgService: GraphileConfig.PgServiceConfiguration<unknown>;
+          pgService: GraphileConfig.PgServiceConfiguration<unknown, PgClient>;
         }>;
         getExecutorForService(serviceName: string): PgExecutor;
 

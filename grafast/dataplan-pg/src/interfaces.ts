@@ -9,7 +9,7 @@ import type {
   PgResourceParameter,
   PgResourceUnique,
 } from "./datasource.js";
-import type { PgExecutor } from "./executor.js";
+import type { PgClient, PgExecutor} from "./executor.js";
 import type { PgDeleteSingleStep } from "./steps/pgDeleteSingle.js";
 import type { PgInsertSingleStep } from "./steps/pgInsertSingle.js";
 import type { PgSelectSingleStep } from "./steps/pgSelectSingle.js";
@@ -415,10 +415,10 @@ export type KeysOfType<TObject, TValueType> = {
   [key in keyof TObject]: TObject[key] extends TValueType ? key : never;
 }[keyof TObject];
 
-export interface MakePgServiceOptions<TAdaptorSettings>
+export interface MakePgServiceOptions<TAdaptorSettings, TPgClient extends PgClient>
   extends Partial<
     Pick<
-      GraphileConfig.PgServiceConfiguration<TAdaptorSettings>,
+      GraphileConfig.PgServiceConfiguration<TAdaptorSettings, TPgClient>,
       | "name"
       | "pgSettings"
       | "pgSettingsForIntrospection"
