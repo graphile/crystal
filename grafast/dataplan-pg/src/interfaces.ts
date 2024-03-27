@@ -415,10 +415,10 @@ export type KeysOfType<TObject, TValueType> = {
   [key in keyof TObject]: TObject[key] extends TValueType ? key : never;
 }[keyof TObject];
 
-export interface MakePgServiceOptions
+export interface MakePgServiceOptions<TAdaptorSettings>
   extends Partial<
     Pick<
-      GraphileConfig.PgServiceConfiguration,
+      GraphileConfig.PgServiceConfiguration<TAdaptorSettings>,
       | "name"
       | "pgSettings"
       | "pgSettingsForIntrospection"

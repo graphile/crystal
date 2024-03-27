@@ -12,8 +12,8 @@ export interface PgAdaptor<TAdaptorSettings> {
     variant?: "SUPERUSER" | null,
   ) => PromiseOrDirect<WithPgClient>;
   makePgService: (
-    options: MakePgServiceOptions & { pool?: pg.Pool },
-  ) => GraphileConfig.PgServiceConfiguration;
+    options: MakePgServiceOptions<TAdaptorSettings> & { pool?: pg.Pool },
+  ) => GraphileConfig.PgServiceConfiguration<TAdaptorSettings>;
 }
 
 /**
@@ -41,8 +41,8 @@ const withPgClientDetailsByConfigCache = new Map<
  * Get or build the 'withPgClient' callback function for a given database
  * config, caching it to make future lookups faster.
  */
-export function getWithPgClientFromPgService(
-  config: GraphileConfig.PgServiceConfiguration,
+export function getWithPgClientFromPgService<TAdaptorOptions>(
+  config: GraphileConfig.PgServiceConfiguration<TAdaptorOptions>,
 ): PromiseOrDirect<WithPgClient> {
   const existing = withPgClientDetailsByConfigCache.get(config);
   if (existing) {
@@ -103,8 +103,8 @@ export function getWithPgClientFromPgService(
   }
 }
 
-export async function withPgClientFromPgService<T>(
-  config: GraphileConfig.PgServiceConfiguration,
+export async function withPgClientFromPgService<T, TAdaptorSettings>(
+  config: GraphileConfig.PgServiceConfiguration<TAdaptorSettings>,
   pgSettings: { [key: string]: string } | null,
   callback: (client: PgClient) => T | Promise<T>,
 ): Promise<T> {
@@ -120,8 +120,8 @@ export async function withPgClientFromPgService<T>(
 }
 
 // We don't cache superuser withPgClients
-export async function withSuperuserPgClientFromPgService<T>(
-  config: GraphileConfig.PgServiceConfiguration,
+export async function withSuperuserPgClientFromPgService<T, TAdaptorSettings>(
+  config: GraphileConfig.PgServiceConfiguration<TAdaptorSettings>,
   pgSettings: { [key: string]: string } | null,
   callback: (client: PgClient) => T | Promise<T>,
 ): Promise<T> {
