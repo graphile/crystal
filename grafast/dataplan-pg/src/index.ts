@@ -1,7 +1,6 @@
 import type { GrafastSubscriber } from "grafast";
 import { exportAsMany } from "grafast";
 
-import type { PgAdaptorOptions } from "./adaptors/pg.js";
 import {
   domainOfCodec,
   enumCodec,
@@ -427,12 +426,12 @@ export { version } from "./version.js";
 
 declare global {
   namespace GraphileConfig {
-    interface PgServiceConfiguration<TAdaptorOptions = PgAdaptorOptions> {
+    interface PgServiceConfiguration<TAdaptorSettings> {
       name: string;
       schemas?: string[];
 
-      adaptor: PgAdaptor<TAdaptorOptions>;
-      adaptorSettings?: TAdaptorOptions;
+      adaptor: PgAdaptor<TAdaptorSettings>;
+      adaptorSettings?: TAdaptorSettings;
 
       /** The key on 'context' where the withPgClient function will be sourced */
       withPgClientKey: KeysOfType<Grafast.Context & object, WithPgClient>;
@@ -468,7 +467,7 @@ declare global {
     }
 
     interface Preset {
-      pgServices?: ReadonlyArray<PgServiceConfiguration>;
+      pgServices?: ReadonlyArray<PgServiceConfiguration<unknown>>;
     }
   }
   namespace DataplanPg {
