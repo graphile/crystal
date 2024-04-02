@@ -366,6 +366,8 @@ directly to test your application.
 
 #### Topic prefix
 
+**Note**: _this section only applies to "simple subscriptions."_
+
 All topics requested from GraphQL are automatically prefixed with
 `postgraphile:`\* to avoid leaking other topics your application may be using
 
@@ -477,6 +479,8 @@ Resulting in this GraphQL payload:
 
 #### Subscription security
 
+**Note**: _this section only applies to "simple subscriptions."_
+
 By default, any user may subscribe to any topic, whether logged in or not, and
 they will remain subscribed until they close the connection themselves. This can
 cause a number of security issues; so we give you a method to implement security
@@ -535,6 +539,8 @@ terminated.
 
 #### Naming your topics
 
+**Note**: _this section only applies to "simple subscriptions."_
+
 You might want to make the topic a combination of things, for example the
 subject type and identifier - e.g. 'channel:123'. If you do this then your
 function could determine which subject the user is attempting to subscribe to,
@@ -543,6 +549,8 @@ that will be published to in the event the user is kicked from the channel, e.g.
 `'channel:123:kick:987'` (assuming '987' is the id of the current user).
 
 #### Example walk-through
+
+**Note**: _this section only applies to "simple subscriptions."_
 
 First, set up a `.postgraphilerc.js` containing the following:
 

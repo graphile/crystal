@@ -21,7 +21,7 @@ This guide uses the [`express`](https://www.npmjs.com/package/express) HTTP
 framework and supporting Node packages authored and maintained by Auth0:
 
 - [`express-jwt`](https://github.com/auth0/express-jwt) - _Middleware that
-  validates a JWT and copies its contents to `req.user`_
+  validates a JWT and copies its contents to `req.auth`_
 - [`jwks-rsa`](https://github.com/auth0/node-jwks-rsa) - _A library to retrieve
   RSA public keys from a JWKS (JSON Web Key Set) endpoint_
 
@@ -144,8 +144,8 @@ app.use(
   postgraphile(process.env.DATABASE_URL, process.env.DB_SCHEMA, {
     pgSettings: (req) => {
       const settings = {};
-      if (req.user) {
-        settings["user.permissions"] = req.user.scopes;
+      if (req.auth) {
+        settings["user.permissions"] = req.auth.scopes;
       }
       return settings;
     },

@@ -36,8 +36,8 @@ There are also a couple of first-party plugins that may be purchased on the
 
 - ~~`@graphile/supporter`~~ - all features now OSS via `@graphile/pg-pubsub`
   plugin
-- `@graphile/pro` <Pro /> <Spon /> - includes protections that can be mounted in front of
-  PostGraphile to protect it from malicious actors
+- `@graphile/pro` <Pro />&nbsp;<Spon /> - includes protections that can be mounted
+  in front of PostGraphile to protect it from malicious actors
 
 To use these premium plugins you will need a `GRAPHILE_LICENSE` environmental
 variable to be present, as in these examples:

@@ -91,8 +91,8 @@ for <tt>postgraphile@4.12.3</tt>.
 
 - **`pgConfig`**: An object or string that will be passed to the [`pg`][]
   library and used to connect to a PostgreSQL backend. If you already have a
-  client or pool instance, when using this function you may also pass a `pg`
-  client or a `pg-pool` instance directly instead of a config.
+  pool client or a pool instance, when using this function you may pass that
+  pool client or a `pg-pool` instance directly instead of a config.
 - **`schemaName`**: A string which specifies the PostgreSQL schema that
   PostGraphile will use to create a GraphQL schema. The default schema is the
   `public` schema. May be an array for multiple schemas.

@@ -141,6 +141,16 @@ comment on column my_schema.my_table.my_column is
   E'@deprecated Use myOtherColumn instead.';
 ```
 
+#### @hasDefault
+
+You can indicate that a column has a default - be that implemented via a
+trigger, or maybe as an instead of insert rule - so the field will be nullable
+in create\* mutations.
+
+```sql
+comment on column my_schema.my_table.my_column is E'@hasDefault';
+```
+
 #### @name
 
 You can add a smart tag to an entity to rename that entity. For tables, columns,

@@ -127,7 +127,7 @@ comment on function my_function(arg_type_1, arg_type_2) is
 ### Adding smart tags to fake constraints
 
 If you need to apply any smart comments to a fake constraint, you cannot use
-newlines (`\n`) because they will be interpretted as separate smart comments on
+newlines (`\n`) because they will be interpreted as separate smart comments on
 the original entity. We've added a workaround for this: you can use the pipe
 (`|`) symbol to assign smart comments to the fake constraint, for example to
 rename the fake constraint:

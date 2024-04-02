@@ -265,7 +265,7 @@ operations to read replicas (clones of your primary database)
   will perform any writes or not: if it's a `query` then it's read-only, if it's
   a `mutation` then it may perform writes.
 
-Using `--read-only-connection <string>` <Pro /> <Spon /> you may give PostGraphile a
+Using `--read-only-connection <string>` <Pro />&nbsp;<Spon /> you may give PostGraphile a
 separate connection string to use for queries, to compliment the connection
 string passed via `--connection` which will now be used only for mutations.
 
@@ -281,12 +281,12 @@ instead.)
 It's unlikely that you want users to request `allUsers` and receive back
 literally all of the users in the database. More likely you want users to use
 cursor-based pagination over this connection with `first` / `after`. The Pro
-Plugin introduces the `--default-pagination-cap [int]` <Pro /> <Spon /> option (library
+Plugin introduces the `--default-pagination-cap [int]` <Pro />&nbsp;<Spon /> option (library
 option: `defaultPaginationCap`) which enables you to enforce a pagination cap on
 all connections. Whatever number you pass will be used as the pagination cap
 (allowing requests smaller or equal to this cap to go through, and blocking
 those above it), but you can override it on a table-by-table basis using
-[smart comments](./smart-comments/) - in this case the `@paginationCap`<Pro /> <Spon />
+[smart comments](./smart-comments/) - in this case the `@paginationCap`<Pro />&nbsp;<Spon />
 Smart Comment.
 
 ```sql
@@ -298,7 +298,7 @@ comment on table users is
 
 Most GraphQL queries tend to be only a few levels deep, queries like the deep
 one at the top of this article are generally not required. You may use
-`--graphql-depth-limit [int]` [PRO] to limit the depth of any GraphQL queries
+`--graphql-depth-limit [int]` <Pro />&nbsp;<Spon /> to limit the depth of any GraphQL queries
 that hit PostGraphile - any deeper than this will be discarded during query
 validation.
 
@@ -307,7 +307,7 @@ validation.
 The most powerful way of preventing DOS is to limit the cost of GraphQL queries
 that may be executed against your GraphQL server. The Pro Plugin contains a
 early implementation of this technique with heuristically estimated costs. You
-may enable a cost limit with `--graphql-cost-limit [int]` <Pro /> <Spon /> and the
+may enable a cost limit with `--graphql-cost-limit [int]` <Pro />&nbsp;<Spon /> and the
 calculated cost of any GraphQL queries will be made available on `meta` field in
 the GraphQL payload.
 
