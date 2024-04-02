@@ -45,7 +45,7 @@ const config = {
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl,
           versions: {
-            "4.12.0": {
+            "4.x": {
               path: "current",
             },
           },
