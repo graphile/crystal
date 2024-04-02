@@ -77,14 +77,14 @@ you can run PostGraphile with no (or minimal) CLI flags.
   <equivalent>{`{ pgServices: [makePgService({ schemas: ['...'] })] }`}</equivalent>
   a comma-separated list of PostgreSQL schemas to be introspected.
 - `--watch` (alias: `-w`)
-  <equivalent>{`{ server: { watch: true } }`}</equivalent>
+  <equivalent>{`{ grafserv: { watch: true } }`}</equivalent>
   automatically updates your GraphQL schema when your database schema changes (NOTE:
   requires DB superuser to install <code>postgraphile_watch</code> schema)
 - `--host <string>` (alias: `-n`)
-  <equivalent>{`{ server: { host: 'localhost' } }`}</equivalent>
+  <equivalent>{`{ grafserv: { host: 'localhost' } }`}</equivalent>
   the hostname to be used. Defaults to <code>localhost</code>
 - `--port <number>` (alias: `-p`)
-  <equivalent>{`{ server: { port: 5678 } }`}</equivalent>
+  <equivalent>{`{ grafserv: { port: 5678 } }`}</equivalent>
   the port to be used. Defaults to 5678
 
 ## `pgl` vs `postgraphile`
