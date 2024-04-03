@@ -482,9 +482,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               for (const stepId of copyStepIds) {
                 const ev = store.get(stepId)!;
                 if (ev.isBatch) {
-                  (ev.entries as any[])[newIndex] = parentBucket.store
-                    .get(stepId)!
-                    .at(originalIndex);
+                  const orig = parentBucket.store.get(stepId)!;
+                  ev._setResult(
+                    newIndex,
+                    orig.at(originalIndex),
+                    orig._flagsAt(originalIndex),
+                  );
                 }
               }
             }
@@ -558,9 +561,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               for (const stepId of copyStepIds) {
                 const ev = store.get(stepId)!;
                 if (ev.isBatch) {
-                  (ev.entries as any[])[newIndex] = parentBucket.store
-                    .get(stepId)!
-                    .at(originalIndex);
+                  const orig = parentBucket.store.get(stepId)!;
+                  ev._setResult(
+                    newIndex,
+                    orig.at(originalIndex),
+                    orig._flagsAt(originalIndex),
+                  );
                 }
               }
             }
@@ -644,9 +650,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           for (const planId of copyStepIds) {
             const ev = store.get(planId)!;
             if (ev.isBatch) {
-              (ev.entries as any[])[newIndex] = parentBucket.store
-                .get(planId)!
-                .at(originalIndex);
+              const orig = parentBucket.store.get(planId)!;
+              ev._setResult(
+                newIndex,
+                orig.at(originalIndex),
+                orig._flagsAt(originalIndex),
+              );
             }
           }
         }
@@ -687,7 +696,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           size,
           store,
           // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
-          hasNonZeroStatus: parentBucket.hasNonZeroStatus,
+          flagUnion: parentBucket.flagUnion,
           polymorphicPathList,
           iterators,
         },
@@ -751,7 +760,7 @@ ${inner}
       size,
       store,
       // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
-      hasNonZeroStatus: parentBucket.hasNonZeroStatus,
+      flagUnion: parentBucket.flagUnion,
       polymorphicPathList,
       iterators,
     }, parentBucket.metaByMetaKey);

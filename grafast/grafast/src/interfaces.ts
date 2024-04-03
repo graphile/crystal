@@ -779,32 +779,43 @@ export interface UnbatchedExecutionExtra extends ExecutionExtraBase {}
  * - 0: normal execution value
  * - 1: errored
  * - 2: inhibited
- * - 4: polymorphic (?)
+ * - 4: polymorphic skipped
  * - 8: ...
  *
  * @internal
  */
-export type ExecutionEntryState = number & { readonly __flag?: unique symbol };
+export type ExecutionEntryFlags = number & { readonly __flag?: unique symbol };
 
 export type ExecutionValue<TData = any> =
-  | {
-      at(i: number): TData;
-      isBatch: true;
-      entries: ReadonlyArray<TData>;
-      value?: never;
-      /* @internal */
-      _entryStates: ReadonlyArray<ExecutionEntryState>;
-      _entryStateAt(i: number): ExecutionEntryState;
-    }
-  | {
-      at(i: number): TData;
-      isBatch: false;
-      value: TData;
-      entries?: never;
-      /* @internal */
-      _entryState: ExecutionEntryState;
-      _entryStateAt(i: number): ExecutionEntryState;
-    };
+  | BatchExecutionValue<TData>
+  | UnaryExecutionValue<TData>;
+
+interface ExecutionValueBase<TData = any> {
+  at(i: number): TData;
+  isBatch: boolean;
+  /** @internal */
+  _flagsAt(i: number): ExecutionEntryFlags;
+  /** bitwise OR of all the entry states @internal */
+  _getStateUnion(): ExecutionEntryFlags;
+  /** @internal */
+  _setResult(i: number, value: TData, flags: ExecutionEntryFlags): void;
+}
+export interface BatchExecutionValue<TData = any>
+  extends ExecutionValueBase<TData> {
+  isBatch: true;
+  entries: ReadonlyArray<TData>;
+  value?: never;
+  /** @internal */
+  readonly _flags: Array<ExecutionEntryFlags>;
+}
+export interface UnaryExecutionValue<TData = any>
+  extends ExecutionValueBase<TData> {
+  isBatch: false;
+  value: TData;
+  entries?: never;
+  /** @internal */
+  _entryFlags: ExecutionEntryFlags;
+}
 
 export type IndexMap = <T>(callback: (i: number) => T) => ReadonlyArray<T>;
 export type IndexForEach = (callback: (i: number) => any) => void;

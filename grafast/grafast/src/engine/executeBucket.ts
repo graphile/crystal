@@ -12,7 +12,8 @@ import {
 } from "../error.js";
 import { inspect } from "../inspect.js";
 import type {
-  ExecutionEntryState,
+  BatchExecutionValue,
+  ExecutionEntryFlags,
   ExecutionExtra,
   ExecutionValue,
   GrafastResultsList,
@@ -36,6 +37,11 @@ const DEBUG_POLYMORPHISM = false;
 
 /** Path to use when there's no polymorphic paths. */
 const NO_POLY_PATH = "";
+
+export const FLAG_NORMAL: ExecutionEntryFlags = 0;
+export const FLAG_ERROR: ExecutionEntryFlags = 1 << 0;
+export const FLAG_INHIBITED: ExecutionEntryFlags = 1 << 1;
+export const FLAG_POLY_SKIPPED: ExecutionEntryFlags = 1 << 2;
 
 // TODO: the handling of polymorphism via POLY_SKIPPED is distasteful. Find a
 // better approach.
@@ -155,7 +161,9 @@ export function executeBucket(
           const result = arrayOfLength(bucket.size, r);
           results[normalStepIndex] = result;
           indexesPendingLoopOver.push(normalStepIndex);
-          bucket.hasNonZeroStatus = true;
+
+          // TODO: I believe we can remove this line?
+          bucket.flagUnion |= FLAG_ERROR;
         }
       }
     } else if (phase.normalSteps !== undefined) {
@@ -193,7 +201,9 @@ export function executeBucket(
           const result = arrayOfLength(bucket.size, r);
           results[normalStepIndex] = result;
           indexesPendingLoopOver.push(normalStepIndex);
-          bucket.hasNonZeroStatus = true;
+
+          // TODO: I believe we can remove this line?
+          bucket.flagUnion |= FLAG_ERROR;
         }
       }
     }
@@ -292,12 +302,7 @@ export function executeBucket(
           typeof value !== "object" ||
           value === null
         ) {
-          if (finishedStep._isUnary) {
-            bucket.store.set(finishedStep.id, unaryExecutionValue(value));
-          } else {
-            const finalResult = bucket.store.get(finishedStep.id)!;
-            (finalResult.entries as any[])[resultIndex] = value;
-          }
+          bucket.setResult(finishedStep, resultIndex, value, 0);
           return;
         }
         let valueIsAsyncIterable;
@@ -329,12 +334,7 @@ export function executeBucket(
             // Optimization - defer everything
             const arr: StreamMaybeMoreableArray<any> = [];
             arr[$$streamMore] = iterator;
-            if (finishedStep._isUnary) {
-              bucket.store.set(finishedStep.id, unaryExecutionValue(arr));
-            } else {
-              const finalResult = bucket.store.get(finishedStep.id)!;
-              (finalResult.entries as any[])[resultIndex] = arr;
-            }
+            bucket.setResult(finishedStep, resultIndex, arr, 0);
           } else {
             // Evaluate the first initialCount entries, rest is streamed.
             const promise = (async () => {
@@ -367,21 +367,10 @@ export function executeBucket(
                   }
                 }
 
-                if (finishedStep._isUnary) {
-                  bucket.store.set(finishedStep.id, unaryExecutionValue(arr));
-                } else {
-                  const finalResult = bucket.store.get(finishedStep.id)!;
-                  (finalResult.entries as any[])[resultIndex] = arr;
-                }
+                bucket.setResult(finishedStep, resultIndex, arr, 0);
               } catch (e) {
-                bucket.hasNonZeroStatus = true;
                 const error = newGrafastError(e, finishedStep.id);
-                if (finishedStep._isUnary) {
-                  bucket.store.set(finishedStep.id, unaryExecutionValue(error));
-                } else {
-                  const finalResult = bucket.store.get(finishedStep.id)!;
-                  (finalResult.entries as any[])[resultIndex] = error;
-                }
+                bucket.setResult(finishedStep, resultIndex, error, FLAG_ERROR);
               }
             })();
             if (!promises) {
@@ -394,29 +383,13 @@ export function executeBucket(
           (proto = Object.getPrototypeOf(value)) === null ||
           proto === Object.prototype
         ) {
-          if (finishedStep._isUnary) {
-            bucket.store.set(finishedStep.id, unaryExecutionValue(value));
-          } else {
-            const finalResult = bucket.store.get(finishedStep.id)!;
-            (finalResult.entries as any[])[resultIndex] = value;
-          }
+          bucket.setResult(finishedStep, resultIndex, value, 0);
         } else if (value instanceof Error) {
           const e =
             $$error in value ? value : newGrafastError(value, finishedStep.id);
-          if (finishedStep._isUnary) {
-            bucket.store.set(finishedStep.id, unaryExecutionValue(e));
-          } else {
-            const finalResult = bucket.store.get(finishedStep.id)!;
-            (finalResult.entries as any[])[resultIndex] = e;
-          }
-          bucket.hasNonZeroStatus = true;
+          bucket.setResult(finishedStep, resultIndex, e, FLAG_ERROR);
         } else {
-          if (finishedStep._isUnary) {
-            bucket.store.set(finishedStep.id, unaryExecutionValue(value));
-          } else {
-            const finalResult = bucket.store.get(finishedStep.id)!;
-            (finalResult.entries as any[])[resultIndex] = value;
-          }
+          bucket.setResult(finishedStep, resultIndex, value, 0);
         }
       };
 
@@ -455,20 +428,17 @@ export function executeBucket(
               if (settledResult.status === "fulfilled") {
                 success(finishedStep, bucket, dataIndex, settledResult.value);
               } else {
-                bucket.hasNonZeroStatus = true;
                 const error = newGrafastError(
                   settledResult.reason,
                   finishedStep.id,
                 );
-                if (finishedStep._isUnary) {
-                  bucket.store.set(finishedStep.id, unaryExecutionValue(error));
-                } else {
-                  const storeEntry = bucket.store.get(finishedStep.id)!;
-                  (storeEntry.entries as any[])[dataIndex] = error;
-                }
+                bucket.setResult(finishedStep, dataIndex, error, FLAG_ERROR);
               }
             }
-            if (bucket.hasNonZeroStatus && sideEffectSteps) {
+            if (
+              (bucket.flagUnion & FLAG_ERROR) === FLAG_ERROR &&
+              sideEffectSteps
+            ) {
               handleSideEffectSteps();
             }
             return promises ? Promise.all(promises) : undefined;
@@ -479,7 +449,7 @@ export function executeBucket(
               `GrafastInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: this error should never occur! Please file an issue against grafast. Details: ${e}`,
             );
 
-            bucket.hasNonZeroStatus = true;
+            bucket.flagUnion |= FLAG_ERROR;
             for (
               let i = 0, pendingPromisesLength = pendingPromises!.length;
               i < pendingPromisesLength;
@@ -494,16 +464,11 @@ export function executeBucket(
                 ),
                 finishedStep.id,
               );
-              if (finishedStep._isUnary) {
-                bucket.store.set(finishedStep.id, unaryExecutionValue(error));
-              } else {
-                const storeEntry = bucket.store.get(finishedStep.id)!;
-                (storeEntry.entries as any[])[dataIndex] = error;
-              }
+              bucket.setResult(finishedStep, dataIndex, error, FLAG_ERROR);
             }
           });
       } else {
-        if (bucket.hasNonZeroStatus && sideEffectSteps) {
+        if ((bucket.flagUnion & FLAG_ERROR) === FLAG_ERROR && sideEffectSteps) {
           handleSideEffectSteps();
         }
         return promises ? Promise.all(promises) : undefined;
@@ -552,13 +517,10 @@ export function executeBucket(
             currentPolymorphicPath ?? NO_POLY_PATH
           ]) {
             const depExecutionValue = bucket.store.get(dep.id)!;
-            const depVal = depExecutionValue.at(dataIndex);
-            if (
-              depVal === POLY_SKIPPED ||
-              (isDev && depVal?.$$error === POLY_SKIPPED)
-            ) {
+            const depFlags = depExecutionValue._flagsAt(dataIndex);
+            if ((depFlags & FLAG_POLY_SKIPPED) === FLAG_POLY_SKIPPED) {
               /* noop */
-            } else if (isGrafastError(depVal)) {
+            } else if ((depFlags & FLAG_ERROR) === FLAG_ERROR) {
               for (
                 let allStepsIndex = executedLength;
                 allStepsIndex < allStepsLength;
@@ -568,10 +530,12 @@ export function executeBucket(
                   allStepsIndex
                 ] as UnbatchedExecutableStep;
                 if (step._isUnary) {
+                  // COPY the unary value
                   bucket.store.set(step.id, depExecutionValue);
+                  bucket.flagUnion |= depFlags;
                 } else {
-                  const storeEntry = bucket.store.get(step.id)!;
-                  (storeEntry.entries as any[])[dataIndex] = depVal;
+                  const depVal = depExecutionValue.at(dataIndex);
+                  bucket.setResult(step, dataIndex, depVal, depFlags);
                 }
               }
               continue outerLoop;
@@ -593,33 +557,29 @@ export function executeBucket(
             for (const $dep of step.dependencies) {
               const depExecutionVal = bucket.store.get($dep.id)!;
               const depVal = depExecutionVal.at(dataIndex);
-              if (bucket.hasNonZeroStatus && isGrafastError(depVal)) {
+              // if (bucket.hasNonZeroStatus && isGrafastError(depVal)) {
+              if (
+                (bucket.flagUnion & FLAG_ERROR) === FLAG_ERROR &&
+                (depExecutionVal._flagsAt(dataIndex) & FLAG_ERROR) ===
+                  FLAG_ERROR
+              ) {
                 if (step._isUnary) {
+                  // COPY the unary value
                   bucket.store.set(step.id, depExecutionVal);
                 } else {
-                  const storeEntry = bucket.store.get(step.id)!;
-                  (storeEntry.entries as any[])[dataIndex] = depVal;
+                  bucket.setResult(step, dataIndex, depVal, FLAG_ERROR);
                 }
                 continue stepLoop;
               }
               deps.push(depVal);
             }
             const stepResult = step.unbatchedExecute(extra, ...deps);
-            if (step._isUnary) {
-              bucket.store.set(step.id, unaryExecutionValue(stepResult));
-            } else {
-              const storeEntry = bucket.store.get(step.id)!;
-              (storeEntry.entries as any[])[dataIndex] = stepResult;
-            }
+            // TODO: what if stepResult is _returned_ error?
+            bucket.setResult(step, dataIndex, stepResult, FLAG_NORMAL);
           } catch (e) {
-            bucket.hasNonZeroStatus = true;
+            console.dir(e);
             const error = newGrafastError(e, step.id);
-            if (step._isUnary) {
-              bucket.store.set(step.id, unaryExecutionValue(error));
-            } else {
-              const storeEntry = bucket.store.get(step.id)!;
-              (storeEntry.entries as any[])[dataIndex] = error;
-            }
+            bucket.setResult(step, dataIndex, error, FLAG_ERROR);
           }
         }
       }
@@ -724,8 +684,10 @@ export function executeBucket(
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
     const expectedSize = step._isUnary ? 1 : size;
-    const errors: { [index: number]: GrafastError | undefined } =
-      arrayOfLength(expectedSize);
+    const errors: { [index: number]: GrafastError | undefined } = arrayOfLength(
+      expectedSize,
+      undefined,
+    );
 
     /** If there's errors, we must manipulate the arrays being passed into the step execution */
     let foundErrors = false;
@@ -743,10 +705,9 @@ export function executeBucket(
     // for (let index = 0, l = polymorphicPathList.length; index < l; index++) {
     for (let index = 0; index < expectedSize; index++) {
       let indexError: GrafastError | null = null;
-      const polymorphicPath = polymorphicPathList[index];
       if (
         stepPolymorphicPaths !== null &&
-        !stepPolymorphicPaths.has(polymorphicPath as string)
+        !stepPolymorphicPaths.has(polymorphicPathList[index] as string)
       ) {
         const e =
           isDev && DEBUG_POLYMORPHISM
@@ -757,7 +718,7 @@ export function executeBucket(
                       step.id
                     } (polymorphicPaths ${[
                       ...stepPolymorphicPaths,
-                    ]}) has no match for '${polymorphicPath}'`,
+                    ]}) has no match for '${polymorphicPathList[index]}'`,
                   ),
                   step.id,
                 ),
@@ -766,14 +727,15 @@ export function executeBucket(
             : POLY_SKIPPED;
 
         indexError = e;
-      } else if (extra._bucket.hasNonZeroStatus) {
+      } else if ((extra._bucket.flagUnion & FLAG_ERROR) === FLAG_ERROR) {
         for (
           let i = 0, l = dependenciesIncludingSideEffects.length;
           i < l;
           i++
         ) {
-          const v = dependenciesIncludingSideEffects[i].at(index);
-          if (isGrafastError(v)) {
+          const flags = dependenciesIncludingSideEffects[i]._flagsAt(index);
+          if ((flags & FLAG_ERROR) === FLAG_ERROR) {
+            const v = dependenciesIncludingSideEffects[i].at(index);
             indexError = v;
             break;
           }
@@ -805,6 +767,7 @@ export function executeBucket(
             if (depList.isBatch) {
               const depVal = dependenciesIncludingSideEffects[depListIndex];
               (depList.entries as any[]).push(depVal.at(index));
+              depList._flags.push(depVal._flagsAt(index));
             }
           }
         }
@@ -895,8 +858,11 @@ export function executeBucket(
         step.layerPlan.reason.type === "polymorphic" &&
         step.polymorphicPaths!.size !==
           step.layerPlan.reason.polymorphicPaths.size;
+      const hasNonZeroStatus =
+        bucket.flagUnion !== 0 &&
+        dependencies.some((d) => d._getStateUnion() !== 0);
       const result =
-        bucket.hasNonZeroStatus || isSelectiveStep
+        hasNonZeroStatus || isSelectiveStep
           ? reallyExecuteStepWithErrorsOrSelective(
               step,
               dependencies,
@@ -911,14 +877,18 @@ export function executeBucket(
             );
       if (isPromiseLike(result)) {
         return result.then(null, (error) => {
-          // bucket.hasNonZeroStatus = true;
+          // Don't need to do this here, it will be done where the
+          // ExecutionValue is created:
+          //   bucket.hasNonZeroStatus = true;
           return arrayOfLength(size, error);
         });
       } else {
         return result;
       }
     } catch (error) {
-      // bucket.hasNonZeroStatus = true;
+      // Don't need to do this here, it will be done where the
+      // ExecutionValue is created:
+      //   bucket.hasNonZeroStatus = true;
       return arrayOfLength(size, error);
     }
   }
@@ -1008,7 +978,7 @@ export function newBucket(
     | "layerPlan"
     | "store"
     | "size"
-    | "hasNonZeroStatus"
+    | "flagUnion"
     | "polymorphicPathList"
     | "iterators"
   >,
@@ -1062,34 +1032,81 @@ export function newBucket(
       ? // Reset the metaByMetaKey
         spec.layerPlan.operationPlan.makeMetaByMetaKey()
       : parentMetaByMetaKey;
+  // Copy from spec
+  const { layerPlan, store, size, flagUnion, polymorphicPathList, iterators } =
+    spec;
+  const children = Object.create(null);
   return {
-    // Copy from spec
-    layerPlan: spec.layerPlan,
-    store: spec.store,
-    size: spec.size,
-    hasNonZeroStatus: spec.hasNonZeroStatus,
-    polymorphicPathList: spec.polymorphicPathList,
-    iterators: spec.iterators,
+    toString: bucketToString,
+    layerPlan,
+    store,
+    size,
+    flagUnion,
+    polymorphicPathList,
+    iterators,
     metaByMetaKey,
     isComplete: false,
-    children: Object.create(null),
+    children,
+    setResult(step, index, value, flags) {
+      const stepId = step.id;
+      if (index >= size) {
+        throw new Error(
+          `GrafastInternalError<9465db89-cc9d-415c-97e7-57bb19ddebe0>: attempt to write to out of bounds index ${index} for bucket of size ${size} for step ${step}`,
+        );
+      }
+      if (flags !== 0) {
+        this.flagUnion |= flags;
+      }
+      if (step._isUnary) {
+        if (isDev && store.has(stepId)) {
+          console.error(
+            `GrafastInternalWarning<603e635f-af46-4feb-abb1-bac184bf7ef2>: value for step ${step} has already been stored to bucket ${layerPlan}; overwriting.`,
+          );
+        }
+        const ev = unaryExecutionValue(value, flags);
+        store.set(stepId, ev);
+      } else {
+        const storeEntry = store.get(stepId);
+        if (!storeEntry || !storeEntry.isBatch) {
+          throw new Error(
+            `GrafastInternalError<8149fd32-b543-409b-96bb-b5b3059607d5>: value for step ${step} expected to be a batch value, but is null or non-batch`,
+          );
+        }
+        storeEntry._setResult(index, value, flags);
+      }
+    },
   };
+}
+
+function bucketToString(this: Bucket) {
+  return `Bucket<${this.layerPlan}>`;
 }
 
 // TODO: memoize?
 export function batchExecutionValue<TData>(
   entries: TData[],
-  _entryStates: ExecutionEntryState[] = arrayOfLength(entries.length, 0),
+  _flags: ExecutionEntryFlags[] = arrayOfLength(entries.length, 0),
 ): ExecutionValue<TData> {
+  let cachedStateUnion: ExecutionEntryFlags | null = null;
   return {
     at(i) {
       return entries[i];
     },
     isBatch: true,
     entries,
-    _entryStates,
-    _entryStateAt(i) {
-      return _entryStates[i];
+    _flags,
+    _flagsAt(i) {
+      return _flags[i];
+    },
+    _getStateUnion() {
+      if (cachedStateUnion === null) {
+        cachedStateUnion = _flags.reduce((memo, a) => memo | a, 0);
+      }
+      return cachedStateUnion;
+    },
+    _setResult(i, value, flags) {
+      entries[i] = value;
+      _flags[i] = flags;
     },
   };
 }
@@ -1097,7 +1114,7 @@ export function batchExecutionValue<TData>(
 // TODO: memoize?
 export function unaryExecutionValue<TData>(
   value: TData,
-  _entryState: ExecutionEntryState = 0,
+  _entryFlags: ExecutionEntryFlags = 0,
 ): ExecutionValue<TData> {
   return {
     at() {
@@ -1105,9 +1122,19 @@ export function unaryExecutionValue<TData>(
     },
     isBatch: false,
     value,
-    _entryState,
-    _entryStateAt() {
-      return this._entryState;
+    _entryFlags,
+    _flagsAt() {
+      return this._entryFlags;
+    },
+    _getStateUnion() {
+      return this._entryFlags;
+    },
+    _setResult(i, value, flags) {
+      if (i !== 0) {
+        throw new Error(`Unary step only expects one result`);
+      }
+      this.value = value;
+      this._entryFlags = flags;
     },
   };
 }

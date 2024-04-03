@@ -1,8 +1,13 @@
 // import type { GraphQLScalarType } from "graphql";
 
+import type { ExecutableStep } from ".";
 import type { LayerPlan } from "./engine/LayerPlan";
 import type { MetaByMetaKey } from "./engine/OperationPlan";
-import type { ExecutionEventEmitter, ExecutionValue } from "./interfaces.js";
+import type {
+  ExecutionEntryFlags,
+  ExecutionEventEmitter,
+  ExecutionValue,
+} from "./interfaces.js";
 
 /**
  * @internal
@@ -45,6 +50,9 @@ export interface RequestTools {
  * @internal
  */
 export interface Bucket {
+  /** @interal */
+  toString?(): string;
+
   /**
    * The LayerPlan definition this bucket adheres to
    */
@@ -91,6 +99,13 @@ export interface Bucket {
    */
   store: Map<number, ExecutionValue>;
 
+  setResult(
+    step: ExecutableStep,
+    index: number,
+    value: any,
+    flags: ExecutionEntryFlags,
+  ): void;
+
   /**
    * Set this true when the bucket is fully executed.
    *
@@ -99,12 +114,12 @@ export interface Bucket {
   isComplete: boolean;
 
   /**
-   * If an error/inhibit/etc occurred at any stage we need to drop down to more
-   * careful (and slower) handling.
+   * A union of all the ExecutionEntryStates in this bucket. Generally, if it's
+   * non-zero then we need to perform careful (and slower) handling.
    *
-   * Initialize it to false.
+   * Initialize it to 0.
    */
-  hasNonZeroStatus: boolean;
+  flagUnion: ExecutionEntryFlags;
 
   /**
    * The child buckets of this bucket.
