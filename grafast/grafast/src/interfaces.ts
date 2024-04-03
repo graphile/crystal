@@ -773,6 +773,18 @@ export interface ExecutionExtraBase {
 }
 export interface ExecutionExtra extends ExecutionExtraBase {}
 export interface UnbatchedExecutionExtra extends ExecutionExtraBase {}
+/**
+ * A bitwise number representing a number of flags:
+ *
+ * - 0: normal execution value
+ * - 1: errored
+ * - 2: inhibited
+ * - 4: polymorphic (?)
+ * - 8: ...
+ *
+ * @internal
+ */
+export type ExecutionEntryState = number & { readonly __flag?: unique symbol };
 
 export type ExecutionValue<TData = any> =
   | {
@@ -780,12 +792,18 @@ export type ExecutionValue<TData = any> =
       isBatch: true;
       entries: ReadonlyArray<TData>;
       value?: never;
+      /* @internal */
+      _entryStates: ReadonlyArray<ExecutionEntryState>;
+      _entryStateAt(i: number): ExecutionEntryState;
     }
   | {
       at(i: number): TData;
       isBatch: false;
       value: TData;
       entries?: never;
+      /* @internal */
+      _entryState: ExecutionEntryState;
+      _entryStateAt(i: number): ExecutionEntryState;
     };
 
 export type IndexMap = <T>(callback: (i: number) => T) => ReadonlyArray<T>;

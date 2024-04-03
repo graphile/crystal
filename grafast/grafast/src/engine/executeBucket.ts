@@ -12,6 +12,7 @@ import {
 } from "../error.js";
 import { inspect } from "../inspect.js";
 import type {
+  ExecutionEntryState,
   ExecutionExtra,
   ExecutionValue,
   GrafastResultsList,
@@ -1078,6 +1079,7 @@ export function newBucket(
 // TODO: memoize?
 export function batchExecutionValue<TData>(
   entries: TData[],
+  _entryStates: ExecutionEntryState[] = arrayOfLength(entries.length, 0),
 ): ExecutionValue<TData> {
   return {
     at(i) {
@@ -1085,12 +1087,17 @@ export function batchExecutionValue<TData>(
     },
     isBatch: true,
     entries,
+    _entryStates,
+    _entryStateAt(i) {
+      return _entryStates[i];
+    },
   };
 }
 
 // TODO: memoize?
 export function unaryExecutionValue<TData>(
   value: TData,
+  _entryState: ExecutionEntryState = 0,
 ): ExecutionValue<TData> {
   return {
     at() {
@@ -1098,6 +1105,10 @@ export function unaryExecutionValue<TData>(
     },
     isBatch: false,
     value,
+    _entryState,
+    _entryStateAt() {
+      return this._entryState;
+    },
   };
 }
 
