@@ -799,6 +799,11 @@ interface ExecutionValueBase<TData = any> {
   _getStateUnion(): ExecutionEntryFlags;
   /** @internal */
   _setResult(i: number, value: TData, flags: ExecutionEntryFlags): void;
+  _copyResult(
+    targetIndex: number,
+    source: ExecutionValue,
+    sourceIndex: number,
+  ): void;
 }
 export interface BatchExecutionValue<TData = any>
   extends ExecutionValueBase<TData> {

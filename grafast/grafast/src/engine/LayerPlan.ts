@@ -483,11 +483,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                 const ev = store.get(stepId)!;
                 if (ev.isBatch) {
                   const orig = parentBucket.store.get(stepId)!;
-                  ev._setResult(
-                    newIndex,
-                    orig.at(originalIndex),
-                    orig._flagsAt(originalIndex),
-                  );
+                  ev._copyResult(newIndex, orig, originalIndex);
                 }
               }
             }
@@ -562,11 +558,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
                 const ev = store.get(stepId)!;
                 if (ev.isBatch) {
                   const orig = parentBucket.store.get(stepId)!;
-                  ev._setResult(
-                    newIndex,
-                    orig.at(originalIndex),
-                    orig._flagsAt(originalIndex),
-                  );
+                  ev._copyResult(newIndex, orig, originalIndex);
                 }
               }
             }
@@ -651,11 +643,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             const ev = store.get(planId)!;
             if (ev.isBatch) {
               const orig = parentBucket.store.get(planId)!;
-              ev._setResult(
-                newIndex,
-                orig.at(originalIndex),
-                orig._flagsAt(originalIndex),
-              );
+              ev._copyResult(newIndex, orig, originalIndex);
             }
           }
         }

@@ -22,6 +22,7 @@ import type {
   IndexMap,
   PromiseOrDirect,
   StreamMaybeMoreableArray,
+  UnaryExecutionValue,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import { $$streamMore, $$timeout } from "../interfaces.js";
@@ -1089,26 +1090,55 @@ export function batchExecutionValue<TData>(
 ): ExecutionValue<TData> {
   let cachedStateUnion: ExecutionEntryFlags | null = null;
   return {
-    at(i) {
-      return entries[i];
-    },
+    at: batchEntriesAt,
     isBatch: true,
     entries,
     _flags,
-    _flagsAt(i) {
-      return _flags[i];
-    },
+    _flagsAt: batchFlagsAt,
     _getStateUnion() {
       if (cachedStateUnion === null) {
-        cachedStateUnion = _flags.reduce((memo, a) => memo | a, 0);
+        cachedStateUnion = _flags.reduce(bitwiseOr, 0);
       }
       return cachedStateUnion;
     },
-    _setResult(i, value, flags) {
-      entries[i] = value;
-      _flags[i] = flags;
-    },
+    _setResult: batchSetResult,
+    _copyResult,
   };
+}
+
+function batchEntriesAt(this: BatchExecutionValue, i: number) {
+  return this.entries[i];
+}
+
+function batchFlagsAt(this: BatchExecutionValue, i: number) {
+  return this._flags[i];
+}
+
+function batchSetResult(
+  this: BatchExecutionValue,
+  i: number,
+  value: any,
+  flags: ExecutionEntryFlags,
+) {
+  (this.entries as any[])[i] = value;
+  this._flags[i] = flags;
+}
+
+function bitwiseOr(memo: number, a: number) {
+  return memo | a;
+}
+
+function _copyResult(
+  this: ExecutionValue,
+  targetIndex: number,
+  source: ExecutionValue,
+  sourceIndex: number,
+): void {
+  this._setResult(
+    targetIndex,
+    source.at(sourceIndex),
+    source._flagsAt(sourceIndex),
+  );
 }
 
 // TODO: memoize?
@@ -1117,26 +1147,40 @@ export function unaryExecutionValue<TData>(
   _entryFlags: ExecutionEntryFlags = 0,
 ): ExecutionValue<TData> {
   return {
-    at() {
-      return value;
-    },
+    at: unaryAt,
     isBatch: false,
     value,
     _entryFlags,
-    _flagsAt() {
-      return this._entryFlags;
-    },
-    _getStateUnion() {
-      return this._entryFlags;
-    },
-    _setResult(i, value, flags) {
-      if (i !== 0) {
-        throw new Error(`Unary step only expects one result`);
-      }
-      this.value = value;
-      this._entryFlags = flags;
-    },
+    _flagsAt: unaryFlagsAt,
+    _getStateUnion: unaryGetStateUnion,
+    _setResult: unarySetResult,
+    _copyResult,
   };
+}
+
+function unaryAt(this: UnaryExecutionValue) {
+  return this.value;
+}
+
+function unaryFlagsAt(this: UnaryExecutionValue) {
+  return this._entryFlags;
+}
+
+function unaryGetStateUnion(this: UnaryExecutionValue) {
+  return this._entryFlags;
+}
+
+function unarySetResult(
+  this: UnaryExecutionValue,
+  i: number,
+  value: any,
+  flags: any,
+) {
+  if (i !== 0) {
+    throw new Error(`Unary step only expects one result`);
+  }
+  this.value = value;
+  this._entryFlags = flags;
 }
 
 const indexMapCache = new Map<number, IndexMap>();
