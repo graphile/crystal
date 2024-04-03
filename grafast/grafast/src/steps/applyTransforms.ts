@@ -160,7 +160,7 @@ export class ApplyTransformsStep extends ExecutableStep {
           layerPlan: childLayerPlan,
           size,
           store,
-          hasErrors: bucket.hasErrors,
+          hasNonZeroStatus: bucket.hasNonZeroStatus,
           polymorphicPathList,
           iterators,
         },

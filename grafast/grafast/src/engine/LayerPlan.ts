@@ -687,7 +687,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           size,
           store,
           // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
-          hasErrors: parentBucket.hasErrors,
+          hasNonZeroStatus: parentBucket.hasNonZeroStatus,
           polymorphicPathList,
           iterators,
         },
@@ -751,7 +751,7 @@ ${inner}
       size,
       store,
       // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
-      hasErrors: parentBucket.hasErrors,
+      hasNonZeroStatus: parentBucket.hasNonZeroStatus,
       polymorphicPathList,
       iterators,
     }, parentBucket.metaByMetaKey);

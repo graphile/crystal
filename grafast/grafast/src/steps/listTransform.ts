@@ -294,7 +294,7 @@ export class __ListTransformStep<
           layerPlan: childLayerPlan,
           size,
           store,
-          hasErrors: bucket.hasErrors,
+          hasNonZeroStatus: bucket.hasNonZeroStatus,
           polymorphicPathList,
           iterators,
         },

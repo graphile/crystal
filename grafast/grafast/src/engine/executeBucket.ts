@@ -155,7 +155,7 @@ export function executeBucket(
           const result = arrayOfLength(bucket.size, r);
           results[normalStepIndex] = result;
           indexesPendingLoopOver.push(normalStepIndex);
-          bucket.hasErrors = true;
+          bucket.hasNonZeroStatus = true;
         }
       }
     } else if (phase.normalSteps !== undefined) {
@@ -193,7 +193,7 @@ export function executeBucket(
           const result = arrayOfLength(bucket.size, r);
           results[normalStepIndex] = result;
           indexesPendingLoopOver.push(normalStepIndex);
-          bucket.hasErrors = true;
+          bucket.hasNonZeroStatus = true;
         }
       }
     }
@@ -374,7 +374,7 @@ export function executeBucket(
                   (finalResult.entries as any[])[resultIndex] = arr;
                 }
               } catch (e) {
-                bucket.hasErrors = true;
+                bucket.hasNonZeroStatus = true;
                 const error = newGrafastError(e, finishedStep.id);
                 if (finishedStep._isUnary) {
                   bucket.store.set(finishedStep.id, unaryExecutionValue(error));
@@ -409,7 +409,7 @@ export function executeBucket(
             const finalResult = bucket.store.get(finishedStep.id)!;
             (finalResult.entries as any[])[resultIndex] = e;
           }
-          bucket.hasErrors = true;
+          bucket.hasNonZeroStatus = true;
         } else {
           if (finishedStep._isUnary) {
             bucket.store.set(finishedStep.id, unaryExecutionValue(value));
@@ -455,7 +455,7 @@ export function executeBucket(
               if (settledResult.status === "fulfilled") {
                 success(finishedStep, bucket, dataIndex, settledResult.value);
               } else {
-                bucket.hasErrors = true;
+                bucket.hasNonZeroStatus = true;
                 const error = newGrafastError(
                   settledResult.reason,
                   finishedStep.id,
@@ -468,7 +468,7 @@ export function executeBucket(
                 }
               }
             }
-            if (bucket.hasErrors && sideEffectSteps) {
+            if (bucket.hasNonZeroStatus && sideEffectSteps) {
               handleSideEffectSteps();
             }
             return promises ? Promise.all(promises) : undefined;
@@ -479,7 +479,7 @@ export function executeBucket(
               `GrafastInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: this error should never occur! Please file an issue against grafast. Details: ${e}`,
             );
 
-            bucket.hasErrors = true;
+            bucket.hasNonZeroStatus = true;
             for (
               let i = 0, pendingPromisesLength = pendingPromises!.length;
               i < pendingPromisesLength;
@@ -503,7 +503,7 @@ export function executeBucket(
             }
           });
       } else {
-        if (bucket.hasErrors && sideEffectSteps) {
+        if (bucket.hasNonZeroStatus && sideEffectSteps) {
           handleSideEffectSteps();
         }
         return promises ? Promise.all(promises) : undefined;
@@ -593,7 +593,7 @@ export function executeBucket(
             for (const $dep of step.dependencies) {
               const depExecutionVal = bucket.store.get($dep.id)!;
               const depVal = depExecutionVal.at(dataIndex);
-              if (bucket.hasErrors && isGrafastError(depVal)) {
+              if (bucket.hasNonZeroStatus && isGrafastError(depVal)) {
                 if (step._isUnary) {
                   bucket.store.set(step.id, depExecutionVal);
                 } else {
@@ -612,7 +612,7 @@ export function executeBucket(
               (storeEntry.entries as any[])[dataIndex] = stepResult;
             }
           } catch (e) {
-            bucket.hasErrors = true;
+            bucket.hasNonZeroStatus = true;
             const error = newGrafastError(e, step.id);
             if (step._isUnary) {
               bucket.store.set(step.id, unaryExecutionValue(error));
@@ -766,7 +766,7 @@ export function executeBucket(
             : POLY_SKIPPED;
 
         indexError = e;
-      } else if (extra._bucket.hasErrors) {
+      } else if (extra._bucket.hasNonZeroStatus) {
         for (
           let i = 0, l = dependenciesIncludingSideEffects.length;
           i < l;
@@ -896,7 +896,7 @@ export function executeBucket(
         step.polymorphicPaths!.size !==
           step.layerPlan.reason.polymorphicPaths.size;
       const result =
-        bucket.hasErrors || isSelectiveStep
+        bucket.hasNonZeroStatus || isSelectiveStep
           ? reallyExecuteStepWithErrorsOrSelective(
               step,
               dependencies,
@@ -911,14 +911,14 @@ export function executeBucket(
             );
       if (isPromiseLike(result)) {
         return result.then(null, (error) => {
-          // bucket.hasErrors = true;
+          // bucket.hasNonZeroStatus = true;
           return arrayOfLength(size, error);
         });
       } else {
         return result;
       }
     } catch (error) {
-      // bucket.hasErrors = true;
+      // bucket.hasNonZeroStatus = true;
       return arrayOfLength(size, error);
     }
   }
@@ -1008,7 +1008,7 @@ export function newBucket(
     | "layerPlan"
     | "store"
     | "size"
-    | "hasErrors"
+    | "hasNonZeroStatus"
     | "polymorphicPathList"
     | "iterators"
   >,
@@ -1067,7 +1067,7 @@ export function newBucket(
     layerPlan: spec.layerPlan,
     store: spec.store,
     size: spec.size,
-    hasErrors: spec.hasErrors,
+    hasNonZeroStatus: spec.hasNonZeroStatus,
     polymorphicPathList: spec.polymorphicPathList,
     iterators: spec.iterators,
     metaByMetaKey,
