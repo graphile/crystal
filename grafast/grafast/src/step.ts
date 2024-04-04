@@ -20,6 +20,7 @@ import { inspect } from "./inspect.js";
 import type {
   AddStepDependencyOptions,
   ExecutionDetails,
+  ExecutionEntryFlags,
   GrafastResultsList,
   GrafastResultStreamList,
   JSONValue,
@@ -222,6 +223,11 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * The plan this plan will need data from in order to execute.
    */
   protected readonly dependencies: ReadonlyArray<ExecutableStep>;
+  /**
+   * What execution entry flags we'll accept for the given indexed dependency
+   * (default = FLAG_NULL)
+   */
+  protected readonly dependencyFlags: ReadonlyArray<ExecutionEntryFlags>;
 
   /**
    * Just for mermaid
@@ -282,6 +288,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   constructor() {
     super();
     this.dependencies = [];
+    this.dependencyFlags = [];
     this.dependents = [];
     this.isOptimized = false;
     this.allowMultipleOptimizations = false;

@@ -29,6 +29,7 @@ import { SafeError } from "./error.js";
 import { inspect } from "./inspect.js";
 import type {
   BaseGraphQLArguments,
+  ExecutionEntryFlags,
   GrafastFieldConfig,
   GrafastInputFieldConfig,
   InputStep,
@@ -925,7 +926,10 @@ export function isTypePlanned(
  * @internal
  */
 export type Sudo<T> = T extends ExecutableStep<any>
-  ? T & { dependencies: ReadonlyArray<ExecutableStep> }
+  ? T & {
+      dependencies: ReadonlyArray<ExecutableStep>;
+      dependencyFlags: ReadonlyArray<ExecutionEntryFlags>;
+    }
   : T;
 
 /**

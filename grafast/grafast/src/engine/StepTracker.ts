@@ -2,7 +2,7 @@ import { isDev } from "../dev.js";
 import type { OperationPlan } from "../index.js";
 import { inspect } from "../inspect.js";
 import type { AddStepDependencyOptions } from "../interfaces.js";
-import { $$subroutine } from "../interfaces.js";
+import { $$subroutine, FLAG_NULL } from "../interfaces.js";
 import { ExecutableStep } from "../step";
 import { sudo } from "../utils.js";
 import type {
@@ -12,6 +12,9 @@ import type {
 } from "./LayerPlan";
 import { lock } from "./lock.js";
 import type { OutputPlan } from "./OutputPlan";
+
+/** By default, accept null values as an input */
+const DEFAULT_ACCEPT_FLAGS = FLAG_NULL;
 
 /**
  * We want everything else to treat things like `dependencies` as read only,
@@ -302,15 +305,6 @@ export class StepTracker {
         )}'`,
       );
     }
-    if (
-      $dependent._isUnaryLocked &&
-      $dependent._isUnary &&
-      !$dependency._isUnary
-    ) {
-      throw new Error(
-        `${$dependent} is a unary step, so cannot add non-unary step ${$dependency} as a dependency`,
-      );
-    }
     if (isDev) {
       // Check that we can actually add this as a dependency
       if (!$dependent.layerPlan.ancestry.includes($dependency.layerPlan)) {
@@ -323,7 +317,10 @@ export class StepTracker {
     }
 
     const dependentDependencies = writeableArray(sudo($dependent).dependencies);
-    const { skipDeduplication } = options;
+    const dependentDependencyFlags = writeableArray(
+      sudo($dependent).dependencyFlags,
+    );
+    const { skipDeduplication, acceptFlags } = options;
     // When copying dependencies between classes, we might not want to
     // deduplicate because we might refer to the dependency by its index. As
     // such, we should only dedupe by default but allow opting out.
@@ -334,22 +331,26 @@ export class StepTracker {
         return existingIndex;
       }
     }
+
+    if (!$dependency._isUnary && $dependent._isUnary) {
+      if ($dependent._isUnaryLocked) {
+        throw new Error(
+          `Attempted to add non-unary step ${$dependency} as a dependency of ${$dependent}; but the latter is unary, so it cannot depend on batch steps`,
+        );
+      }
+      $dependent._isUnary = false;
+    }
+
     this.stepsWithNoDependencies.delete($dependent);
     const dependencyIndex = dependentDependencies.push($dependency) - 1;
+    dependentDependencyFlags[dependencyIndex] =
+      acceptFlags ?? DEFAULT_ACCEPT_FLAGS;
+
     writeableArray($dependency.dependents).push({
       step: $dependent,
       dependencyIndex,
     });
-    if (!$dependency._isUnary) {
-      if ($dependent._isUnary) {
-        if ($dependent._isUnaryLocked) {
-          throw new Error(
-            `Attempted to add non-unary step ${$dependency} as a dependency of ${$dependent}; but the latter is unary, so it cannot depend on batch steps`,
-          );
-        }
-        $dependent._isUnary = false;
-      }
-    }
+
     return dependencyIndex;
   }
 
