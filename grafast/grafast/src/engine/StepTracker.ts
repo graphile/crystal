@@ -1,7 +1,9 @@
 import { isDev } from "../dev.js";
 import type { OperationPlan } from "../index.js";
+import { inspect } from "../inspect.js";
+import type { AddStepDependencyOptions } from "../interfaces.js";
 import { $$subroutine } from "../interfaces.js";
-import type { ExecutableStep } from "../step";
+import { ExecutableStep } from "../step";
 import { sudo } from "../utils.js";
 import type {
   LayerPlan,
@@ -276,6 +278,7 @@ export class StepTracker {
   public addStepDependency(
     $dependent: ExecutableStep,
     $dependency: ExecutableStep,
+    options: AddStepDependencyOptions = {},
   ): number {
     if (!this.activeSteps.has($dependent)) {
       throw new Error(
@@ -287,9 +290,52 @@ export class StepTracker {
         `Cannot add ${$dependency} as a dependency of ${$dependent}; the former is deleted!`,
       );
     }
+    if ($dependent.isFinalized) {
+      throw new Error(
+        "You cannot add a dependency after the step is finalized.",
+      );
+    }
+    if (!($dependency instanceof ExecutableStep)) {
+      throw new Error(
+        `Error occurred when adding dependency for '${$dependent}', value passed was not a step, it was '${inspect(
+          $dependency,
+        )}'`,
+      );
+    }
+    if (
+      $dependent._isUnaryLocked &&
+      $dependent._isUnary &&
+      !$dependency._isUnary
+    ) {
+      throw new Error(
+        `${$dependent} is a unary step, so cannot add non-unary step ${$dependency} as a dependency`,
+      );
+    }
+    if (isDev) {
+      // Check that we can actually add this as a dependency
+      if (!$dependent.layerPlan.ancestry.includes($dependency.layerPlan)) {
+        throw new Error(
+          //console.error(
+          // This is not a GrafastInternalError
+          `Attempted to add '${$dependency}' (${$dependency.layerPlan}) as a dependency of '${$dependent}' (${$dependent.layerPlan}), but we cannot because that LayerPlan isn't an ancestor`,
+        );
+      }
+    }
+
+    const dependentDependencies = writeableArray(sudo($dependent).dependencies);
+    const { skipDeduplication } = options;
+    // When copying dependencies between classes, we might not want to
+    // deduplicate because we might refer to the dependency by its index. As
+    // such, we should only dedupe by default but allow opting out.
+    // TODO: change this to `!skipDeduplication`
+    if (skipDeduplication === false) {
+      const existingIndex = dependentDependencies.indexOf($dependency);
+      if (existingIndex >= 0) {
+        return existingIndex;
+      }
+    }
     this.stepsWithNoDependencies.delete($dependent);
-    const dependencyIndex =
-      writeableArray(sudo($dependent).dependencies).push($dependency) - 1;
+    const dependencyIndex = dependentDependencies.push($dependency) - 1;
     writeableArray($dependency.dependents).push({
       step: $dependent,
       dependencyIndex,
@@ -310,6 +356,7 @@ export class StepTracker {
   public addStepUnaryDependency(
     $dependent: ExecutableStep,
     $dependency: ExecutableStep,
+    options: AddStepDependencyOptions = {},
   ): number {
     if (!$dependency._isUnary) {
       throw new Error(
@@ -317,7 +364,7 @@ export class StepTracker {
       );
     }
     $dependency._isUnaryLocked = true;
-    return this.addStepDependency($dependent, $dependency);
+    return this.addStepDependency($dependent, $dependency, options);
   }
 
   public setOutputPlanRootStep(

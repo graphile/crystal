@@ -883,3 +883,7 @@ export interface GrafastArgs extends GraphQLArgs {
 export type Maybe<T> = T | null | undefined;
 
 export * from "./planJSONInterfaces.js";
+
+export interface AddStepDependencyOptions {
+  skipDeduplication?: boolean;
+}
