@@ -224,10 +224,10 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    */
   protected readonly dependencies: ReadonlyArray<ExecutableStep>;
   /**
-   * What execution entry flags we'll accept for the given indexed dependency
-   * (default = FLAG_NULL)
+   * What execution entry flags we can't handle for the given indexed dependency
+   * (default = ALL_FLAGS & ~FLAG_NULL)
    */
-  protected readonly dependencyFlags: ReadonlyArray<ExecutionEntryFlags>;
+  protected readonly dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
 
   /**
    * Just for mermaid
@@ -288,7 +288,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   constructor() {
     super();
     this.dependencies = [];
-    this.dependencyFlags = [];
+    this.dependencyForbiddenFlags = [];
     this.dependents = [];
     this.isOptimized = false;
     this.allowMultipleOptimizations = false;

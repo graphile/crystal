@@ -787,11 +787,18 @@ export interface UnbatchedExecutionExtra extends ExecutionExtraBase {}
  * @internal
  */
 export type ExecutionEntryFlags = number & { readonly tsBrand?: unique symbol };
+
 export const FLAG_NONE: ExecutionEntryFlags = 0;
 export const FLAG_ERROR: ExecutionEntryFlags = 1 << 0;
 export const FLAG_NULL: ExecutionEntryFlags = 1 << 1;
 export const FLAG_INHIBITED: ExecutionEntryFlags = 1 << 2;
 export const FLAG_POLY_SKIPPED: ExecutionEntryFlags = 1 << 3;
+
+/** By default, accept null values as an input */
+export const DEFAULT_ACCEPT_FLAGS = FLAG_NULL;
+export const TRAPPABLE_FLAGS = FLAG_ERROR | FLAG_NULL | FLAG_INHIBITED;
+export const ALL_FLAGS =
+  FLAG_ERROR | FLAG_NULL | FLAG_INHIBITED | FLAG_POLY_SKIPPED;
 
 export type ExecutionValue<TData = any> =
   | BatchExecutionValue<TData>

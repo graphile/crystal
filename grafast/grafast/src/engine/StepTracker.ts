@@ -2,7 +2,13 @@ import { isDev } from "../dev.js";
 import type { OperationPlan } from "../index.js";
 import { inspect } from "../inspect.js";
 import type { AddStepDependencyOptions } from "../interfaces.js";
-import { $$subroutine, FLAG_NULL } from "../interfaces.js";
+import {
+  $$subroutine,
+  ALL_FLAGS,
+  DEFAULT_ACCEPT_FLAGS,
+  FLAG_NULL,
+  TRAPPABLE_FLAGS,
+} from "../interfaces.js";
 import { ExecutableStep } from "../step";
 import { sudo } from "../utils.js";
 import type {
@@ -12,9 +18,6 @@ import type {
 } from "./LayerPlan";
 import { lock } from "./lock.js";
 import type { OutputPlan } from "./OutputPlan";
-
-/** By default, accept null values as an input */
-const DEFAULT_ACCEPT_FLAGS = FLAG_NULL;
 
 /**
  * We want everything else to treat things like `dependencies` as read only,
@@ -317,10 +320,10 @@ export class StepTracker {
     }
 
     const dependentDependencies = writeableArray(sudo($dependent).dependencies);
-    const dependentDependencyFlags = writeableArray(
-      sudo($dependent).dependencyFlags,
+    const dependentDependencyForbiddenFlags = writeableArray(
+      sudo($dependent).dependencyForbiddenFlags,
     );
-    const { skipDeduplication, acceptFlags } = options;
+    const { skipDeduplication, acceptFlags = DEFAULT_ACCEPT_FLAGS } = options;
     // When copying dependencies between classes, we might not want to
     // deduplicate because we might refer to the dependency by its index. As
     // such, we should only dedupe by default but allow opting out.
@@ -341,11 +344,11 @@ export class StepTracker {
       $dependent._isUnary = false;
     }
 
+    const forbiddenFlags = ALL_FLAGS & ~(acceptFlags & TRAPPABLE_FLAGS);
+
     this.stepsWithNoDependencies.delete($dependent);
     const dependencyIndex = dependentDependencies.push($dependency) - 1;
-    dependentDependencyFlags[dependencyIndex] =
-      acceptFlags ?? DEFAULT_ACCEPT_FLAGS;
-
+    dependentDependencyForbiddenFlags[dependencyIndex] = forbiddenFlags;
     writeableArray($dependency.dependents).push({
       step: $dependent,
       dependencyIndex,

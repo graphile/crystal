@@ -928,7 +928,7 @@ export function isTypePlanned(
 export type Sudo<T> = T extends ExecutableStep<any>
   ? T & {
       dependencies: ReadonlyArray<ExecutableStep>;
-      dependencyFlags: ReadonlyArray<ExecutionEntryFlags>;
+      dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
     }
   : T;
 
