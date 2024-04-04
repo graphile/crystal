@@ -773,18 +773,25 @@ export interface ExecutionExtraBase {
 }
 export interface ExecutionExtra extends ExecutionExtraBase {}
 export interface UnbatchedExecutionExtra extends ExecutionExtraBase {}
+
 /**
  * A bitwise number representing a number of flags:
  *
  * - 0: normal execution value
- * - 1: errored
- * - 2: inhibited
- * - 4: polymorphic skipped
- * - 8: ...
+ * - 1: errored (trappable)
+ * - 2: null (trappable)
+ * - 4: inhibited (trappable)
+ * - 8: disabled due to polymorphism (untrappable)
+ * - 16: ...
  *
  * @internal
  */
-export type ExecutionEntryFlags = number & { readonly __flag?: unique symbol };
+export type ExecutionEntryFlags = number & { readonly tsBrand?: unique symbol };
+export const FLAG_NONE: ExecutionEntryFlags = 0;
+export const FLAG_ERROR: ExecutionEntryFlags = 1 << 0;
+export const FLAG_NULL: ExecutionEntryFlags = 1 << 1;
+export const FLAG_INHIBITED: ExecutionEntryFlags = 1 << 2;
+export const FLAG_POLY_SKIPPED: ExecutionEntryFlags = 1 << 3;
 
 export type ExecutionValue<TData = any> =
   | BatchExecutionValue<TData>

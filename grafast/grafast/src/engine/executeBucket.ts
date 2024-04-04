@@ -25,7 +25,13 @@ import type {
   UnaryExecutionValue,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
-import { $$streamMore, $$timeout } from "../interfaces.js";
+import {
+  $$streamMore,
+  $$timeout,
+  FLAG_ERROR,
+  FLAG_NONE,
+  FLAG_POLY_SKIPPED,
+} from "../interfaces.js";
 import type { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
 import { isStreamableStep } from "../step.js";
 import { __ItemStep } from "../steps/__item.js";
@@ -38,11 +44,6 @@ const DEBUG_POLYMORPHISM = false;
 
 /** Path to use when there's no polymorphic paths. */
 const NO_POLY_PATH = "";
-
-export const FLAG_NORMAL: ExecutionEntryFlags = 0;
-export const FLAG_ERROR: ExecutionEntryFlags = 1 << 0;
-export const FLAG_INHIBITED: ExecutionEntryFlags = 1 << 1;
-export const FLAG_POLY_SKIPPED: ExecutionEntryFlags = 1 << 2;
 
 // TODO: the handling of polymorphism via POLY_SKIPPED is distasteful. Find a
 // better approach.
@@ -303,7 +304,7 @@ export function executeBucket(
           typeof value !== "object" ||
           value === null
         ) {
-          bucket.setResult(finishedStep, resultIndex, value, 0);
+          bucket.setResult(finishedStep, resultIndex, value, FLAG_NONE);
           return;
         }
         let valueIsAsyncIterable;
@@ -335,7 +336,7 @@ export function executeBucket(
             // Optimization - defer everything
             const arr: StreamMaybeMoreableArray<any> = [];
             arr[$$streamMore] = iterator;
-            bucket.setResult(finishedStep, resultIndex, arr, 0);
+            bucket.setResult(finishedStep, resultIndex, arr, FLAG_NONE);
           } else {
             // Evaluate the first initialCount entries, rest is streamed.
             const promise = (async () => {
@@ -368,7 +369,7 @@ export function executeBucket(
                   }
                 }
 
-                bucket.setResult(finishedStep, resultIndex, arr, 0);
+                bucket.setResult(finishedStep, resultIndex, arr, FLAG_NONE);
               } catch (e) {
                 const error = newGrafastError(e, finishedStep.id);
                 bucket.setResult(finishedStep, resultIndex, error, FLAG_ERROR);
@@ -384,13 +385,13 @@ export function executeBucket(
           (proto = Object.getPrototypeOf(value)) === null ||
           proto === Object.prototype
         ) {
-          bucket.setResult(finishedStep, resultIndex, value, 0);
+          bucket.setResult(finishedStep, resultIndex, value, FLAG_NONE);
         } else if (value instanceof Error) {
           const e =
             $$error in value ? value : newGrafastError(value, finishedStep.id);
           bucket.setResult(finishedStep, resultIndex, e, FLAG_ERROR);
         } else {
-          bucket.setResult(finishedStep, resultIndex, value, 0);
+          bucket.setResult(finishedStep, resultIndex, value, FLAG_NONE);
         }
       };
 
@@ -576,7 +577,7 @@ export function executeBucket(
             }
             const stepResult = step.unbatchedExecute(extra, ...deps);
             // TODO: what if stepResult is _returned_ error?
-            bucket.setResult(step, dataIndex, stepResult, FLAG_NORMAL);
+            bucket.setResult(step, dataIndex, stepResult, FLAG_NONE);
           } catch (e) {
             console.dir(e);
             const error = newGrafastError(e, step.id);
@@ -1097,7 +1098,7 @@ export function batchExecutionValue<TData>(
     _flagsAt: batchFlagsAt,
     _getStateUnion() {
       if (cachedStateUnion === null) {
-        cachedStateUnion = _flags.reduce(bitwiseOr, 0);
+        cachedStateUnion = _flags.reduce(bitwiseOr, FLAG_NONE);
       }
       return cachedStateUnion;
     },
