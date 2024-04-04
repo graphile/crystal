@@ -252,7 +252,7 @@ lot more that can be done to optimise our logical decoding support, so if you
 get to a point where logical decoding performance is an issue, please get in
 touch!
 
-Optimisation steps you can take currently:
+Optimization steps you can take currently:
 
 - Whitelist (or otherwise limit) the live queries that your system may perform
 - Only write small non-overlapping live queries - since the entire query must
@@ -264,11 +264,11 @@ Optimisation steps you can take currently:
 - Move the logical decoding system to a dedicated server
 - Add more `liveConditions` to queries to filter rows the user may not see so
   that they do not trigger live updates for that user (TODO: document this!)
-- Use read replicas <Pro /> <Spon />
+- Use read replicas <Pro />&nbsp;<Spon />
 
 We do not currently recommend live queries for very large deployments - if
 you're expecting tens of thousands of concurrent users it's going to be
-significantly more efficient to use regular [subscriptions](./subscriptions/)
+significantly more efficient to use regular [subscriptions](./subscriptions/).
 
 ### Scaling
 
@@ -294,7 +294,13 @@ to detect all changes. For example `@graphile/subscriptions-lds` can detect
 changes to results queried from tables, but cannot currently detect changes to
 results queried from views and functions. In particular, computed columns are
 not kept up to date (although they are re-calculated whenever a table update
-triggers the subscription). Monitored tables must also use primary keys.
+triggers the subscription).
+
+Monitored tables must also use primary keys. Problems may arise if such key is a
+`bigint` or `bigserial` due to how PostgreSQL serializes these to JSON as a
+number (which is allowed by the JSON spec), but JavaScript's JSON.parse will not
+maintain precision when parsing them, leading to potential divergence. We
+recommend the key to be either a regular `int` or a `uuid`.
 
 ### Amazon RDS
 

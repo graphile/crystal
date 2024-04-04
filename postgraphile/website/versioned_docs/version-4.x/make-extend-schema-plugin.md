@@ -534,6 +534,70 @@ const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin((build) => {
 Note that the `@pgField` directive here is necessary for PostGraphile to "look
 ahead" and determine what to request from the database.
 
+#### Working with arrays via `json_array_elements`
+
+Here's an example of working with a join table, and bulk inserting multiple
+records from a GraphQL list.
+
+```js
+...
+
+typeDefs: gql`
+  input UpdatePersonsThingsInput {
+    personId: UUID!,
+    thingIds: [UUID!]!
+  }
+  type UpdatePersonThingsPayload {
+    personThings: [PersonThing!]
+  }
+  extend type Mutation {
+    updatePersonsThings(input: UpdatePersonsThingsInput!): UpdatePersonsThingsPayload
+  }
+`,
+resolvers: {
+  Mutation: {
+    updatePersonsThings: async (_query, { input: { personId, thingIds } }, { pgClient }, _resolveInfo) => {
+      await pgClient.query("SAVEPOINT graphql_mutation");
+      try {
+        // Ensure proper formatting. This may not be necessary if not modifying the input
+        const elements = JSON.stringify(thingIds.map(thingId => ({ thingId, personId })));
+
+        // Bulk insert
+        const { rows } = await pgClient.query(`
+          INSERT INTO public.persons_things (person_id, thing_id)
+          SELECT
+            (el->>'personId')::uuid,
+            (el->>'thingId')::uuid
+          FROM json_array_elements($1::json) el
+          RETURNING id
+        `, [elements]);
+
+        // Return data for next layer to use
+        return { personThingIds: rows.map(({ id }) => id) };
+      } catch (e) {
+        await pgClient.query("ROLLBACK TO SAVEPOINT graphql_mutation");
+        console.error(e);
+        throw e;
+      } finally {
+        await pgClient.query("RELEASE SAVEPOINT graphql_mutation");
+      }
+    },
+  },
+  UpdatePersonThingsPayload: {
+    personThings: ({ personThingIds }, _args, _context, { graphile: { selectGraphQLResultFromTable } }) => {
+      return selectGraphQLResultFromTable(
+        sql.fragment`public.persons_things`,
+        (tableAlias, queryBuilder) => {
+          queryBuilder.where(
+            sql.fragment`${tableAlias}.id = ANY (${sql.value(personThingIds)}::int[])`
+          );
+        }
+      );
+    }
+  }
+}
+```
+
 ### Mutation Example with Node ID
 
 In this example we'll use a GraphQL Global Object Identifier (aka Node ID) to

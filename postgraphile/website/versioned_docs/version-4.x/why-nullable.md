@@ -192,7 +192,12 @@ GraphQLNonNull-wrapped version of their original type:
 ```js
 module.exports = function NonNullRelationsPlugin(builder) {
   builder.hook("GraphQLObjectType:fields:field", (field, build, context) => {
-    if (!context.scope.isPgForwardRelationField) {
+    if (
+      !context.scope.isPgForwardRelationField ||
+      !context.scope.pgFieldIntrospection?.keyAttributes?.every(
+        (attr) => attr.isNotNull,
+      )
+    ) {
       return field;
     }
     return {

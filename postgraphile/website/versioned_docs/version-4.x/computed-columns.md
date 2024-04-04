@@ -9,7 +9,8 @@ table type, but, unlike an actual column, the value for this field is the result
 of calling a function defined in the PostgreSQL schema. This function will
 automatically be exposed to the resultant GraphQL schema as a field on the type;
 it can accept arguments that influence its result, and may return either a
-scalar, record, list or a set. Sets (denoted by `RETURNS SETOF ...`) are exposed
+scalar, record, [enum](./enums/#functions-returning-table-enums),
+list or a set. Sets (denoted by `RETURNS SETOF ...`) are exposed
 as [connections](./connections/).
 
 _Performance note: we inline these function calls into the original `SELECT`

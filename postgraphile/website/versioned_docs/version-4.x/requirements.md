@@ -27,7 +27,7 @@ experience.
   between the tables. There are plugins to get around this (using smart
   comments) but it's highly recommended that you use PostgreSQL's built in
   relations support.
-- <a name="dont-use-column-based-select-grants"></a> **Don't use column-based
+- **<a name="dont-use-column-based-select-grants"></a>Don't use column-based
   SELECT grants**: column-based grants work well for `INSERT` and `UPDATE`
   (especially when combined with `--no-ignore-rbac`!), but they don't make sense
   for `DELETE` and they cause issues when used with `SELECT`. Quite a few things
