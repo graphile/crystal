@@ -188,15 +188,18 @@ export type GrafastResultStreamList<T> = ReadonlyArray<
 >;
 
 /** @internal */
-export interface ForcedValues {
-  [index: number]:
-    | { flags: ExecutionEntryFlags; value: GrafastError | null }
-    | undefined;
-}
+export type ForcedValues = [
+  flags: {
+    [index: number]: ExecutionEntryFlags | undefined;
+  },
+  results: {
+    [index: number]: GrafastError | null | undefined;
+  },
+];
 
 /** @internal */
 export type GrafastInternalResultsOrStream<T> = [
-  forcedValues: ReadonlyArray<ExecutionEntryFlags>,
+  flags: ReadonlyArray<ExecutionEntryFlags>,
   results: GrafastResultsList<T> | GrafastResultStreamList<T>,
 ];
 

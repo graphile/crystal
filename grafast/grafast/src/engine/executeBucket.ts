@@ -92,9 +92,9 @@ function mergeErrorsBackIn(
   let resultIndex = 0;
 
   for (let finalIndex = 0; finalIndex < resultCount; finalIndex++) {
-    const forcedValue = forcedValues[finalIndex];
-    if (forcedValue !== undefined) {
-      const { flags, value } = forcedValue;
+    const flags = forcedValues[0][finalIndex];
+    if (flags !== undefined) {
+      const value = forcedValues[1][finalIndex];
       finalResults[finalIndex] = value;
       finalFlags[finalIndex] = flags;
     } else {
@@ -713,7 +713,10 @@ export function executeBucket(
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastInternalResultsOrStream<any>> {
     const expectedSize = step._isUnary ? 1 : size;
-    const forcedValues: ForcedValues = arrayOfLength(expectedSize, undefined);
+    const forcedValues: ForcedValues = [
+      arrayOfLength(expectedSize, undefined),
+      arrayOfLength(expectedSize, undefined),
+    ];
 
     /**
      * If there's errors/forbidden values, we must manipulate the arrays being
@@ -802,7 +805,8 @@ export function executeBucket(
               : ev,
           );
         }
-        forcedValues[index] = { flags: indexFlags, value: forceIndexValue };
+        forcedValues[0][index] = indexFlags;
+        forcedValues[1][index] = forceIndexValue;
       } else {
         newSize++;
         if (needsTransform) {
@@ -825,7 +829,7 @@ export function executeBucket(
 
     if (newSize === 0) {
       // Everything is errors; we can skip execution
-      return Object.values(forcedValues);
+      return forcedValues as GrafastInternalResultsOrStream<any>;
     } else if (needsTransform) {
       const resultWithoutErrors = executeOrStream(
         newSize,
