@@ -23,7 +23,7 @@ import type {
 
 import type { Bucket, RequestTools } from "./bucket.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
-import type { SafeError } from "./error.js";
+import type { GrafastError, SafeError } from "./error.js";
 import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type {
@@ -186,6 +186,19 @@ export type GrafastResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
 export type GrafastResultStreamList<T> = ReadonlyArray<
   PromiseOrDirect<AsyncIterable<PromiseOrDirect<T>> | null> | PromiseLike<never>
 >;
+
+/** @internal */
+export interface ForcedValues {
+  [index: number]:
+    | { flags: ExecutionEntryFlags; value: GrafastError | null }
+    | undefined;
+}
+
+/** @internal */
+export type GrafastInternalResultsOrStream<T> = [
+  forcedValues: ReadonlyArray<ExecutionEntryFlags>,
+  results: GrafastResultsList<T> | GrafastResultStreamList<T>,
+];
 
 export type BaseGraphQLRootValue = any;
 export interface BaseGraphQLVariables {

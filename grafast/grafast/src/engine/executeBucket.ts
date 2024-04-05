@@ -16,6 +16,8 @@ import type {
   ExecutionEntryFlags,
   ExecutionExtra,
   ExecutionValue,
+  ForcedValues,
+  GrafastInternalResultsOrStream,
   GrafastResultsList,
   GrafastResultStreamList,
   IndexForEach,
@@ -29,6 +31,7 @@ import {
   $$streamMore,
   $$timeout,
   FLAG_ERROR,
+  FLAG_NULL,
   FLAG_POLY_SKIPPED,
   NO_FLAGS,
 } from "../interfaces.js";
@@ -68,12 +71,6 @@ function noop() {
   /*noop*/
 }
 
-interface ForcedValues {
-  [index: number]:
-    | { flags: ExecutionEntryFlags; value: GrafastError | null }
-    | undefined;
-}
-
 /**
  * Takes a list of `results` (shorter than `resultCount`) and an object with
  * errors and indexes; returns a list of length `resultCount` with the results
@@ -88,20 +85,24 @@ function mergeErrorsBackIn(
   results: ReadonlyArray<any>,
   forcedValues: ForcedValues,
   resultCount: number,
-): any[] {
+): GrafastInternalResultsOrStream<any> {
+  const finalFlags: ExecutionEntryFlags[] = [];
   const finalResults: any[] = [];
   /** The index within `results`, which is shorter than `resultCount` */
   let resultIndex = 0;
 
   for (let finalIndex = 0; finalIndex < resultCount; finalIndex++) {
-    const error = forcedValues[finalIndex];
-    if (error !== undefined) {
-      finalResults[finalIndex] = error;
+    const forcedValue = forcedValues[finalIndex];
+    if (forcedValue !== undefined) {
+      const { flags, value } = forcedValue;
+      finalResults[finalIndex] = value;
+      finalFlags[finalIndex] = flags;
     } else {
       finalResults[finalIndex] = results[resultIndex++];
+      finalFlags[finalIndex] = 0;
     }
   }
-  return finalResults;
+  return [finalFlags, finalResults];
 }
 
 /** @internal */
@@ -111,9 +112,22 @@ export function executeBucket(
 ): PromiseOrDirect<void> {
   /**
    * Execute the step directly; since there's no errors we can pass the
-   * dependencies through verbatim!
+   * dependencies through verbatim.
    */
-  const reallyExecuteStepWithoutFiltering = executeOrStream;
+  function reallyExecuteStepWithoutFiltering(
+    size: number,
+    step: ExecutableStep,
+    dependencies: ReadonlyArray<ExecutionValue>,
+    extra: ExecutionExtra,
+  ): PromiseOrDirect<GrafastInternalResultsOrStream<any>> {
+    const result = executeOrStream(size, step, dependencies, extra);
+    const flags = arrayOfLength(size, NO_FLAGS);
+    if (isPromiseLike(result)) {
+      return result.then((result) => [flags, result]);
+    } else {
+      return [flags, result];
+    }
+  }
 
   const { stopTime, eventEmitter } = requestContext;
   const {
@@ -303,6 +317,7 @@ export function executeBucket(
         bucket: Bucket,
         resultIndex: number,
         value: unknown,
+        flags: ExecutionEntryFlags = value == null ? FLAG_NULL : NO_FLAGS,
       ) => {
         let proto: any;
         if (
@@ -310,7 +325,7 @@ export function executeBucket(
           typeof value !== "object" ||
           value === null
         ) {
-          bucket.setResult(finishedStep, resultIndex, value, NO_FLAGS);
+          bucket.setResult(finishedStep, resultIndex, value, flags);
           return;
         }
         let valueIsAsyncIterable;
@@ -342,7 +357,7 @@ export function executeBucket(
             // Optimization - defer everything
             const arr: StreamMaybeMoreableArray<any> = [];
             arr[$$streamMore] = iterator;
-            bucket.setResult(finishedStep, resultIndex, arr, NO_FLAGS);
+            bucket.setResult(finishedStep, resultIndex, arr, flags);
           } else {
             // Evaluate the first initialCount entries, rest is streamed.
             const promise = (async () => {
@@ -375,10 +390,15 @@ export function executeBucket(
                   }
                 }
 
-                bucket.setResult(finishedStep, resultIndex, arr, NO_FLAGS);
+                bucket.setResult(finishedStep, resultIndex, arr, flags);
               } catch (e) {
                 const error = newGrafastError(e, finishedStep.id);
-                bucket.setResult(finishedStep, resultIndex, error, FLAG_ERROR);
+                bucket.setResult(
+                  finishedStep,
+                  resultIndex,
+                  error,
+                  flags | FLAG_ERROR,
+                );
               }
             })();
             if (!promises) {
@@ -391,13 +411,13 @@ export function executeBucket(
           (proto = Object.getPrototypeOf(value)) === null ||
           proto === Object.prototype
         ) {
-          bucket.setResult(finishedStep, resultIndex, value, NO_FLAGS);
+          bucket.setResult(finishedStep, resultIndex, value, flags);
         } else if (value instanceof Error) {
           const e =
             $$error in value ? value : newGrafastError(value, finishedStep.id);
-          bucket.setResult(finishedStep, resultIndex, e, FLAG_ERROR);
+          bucket.setResult(finishedStep, resultIndex, e, flags | FLAG_ERROR);
         } else {
-          bucket.setResult(finishedStep, resultIndex, value, NO_FLAGS);
+          bucket.setResult(finishedStep, resultIndex, value, flags);
         }
       };
 
@@ -691,7 +711,7 @@ export function executeBucket(
     dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>,
     polymorphicPathList: readonly (string | null)[],
     extra: ExecutionExtra,
-  ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
+  ): PromiseOrDirect<GrafastInternalResultsOrStream<any>> {
     const expectedSize = step._isUnary ? 1 : size;
     const forcedValues: ForcedValues = arrayOfLength(expectedSize, undefined);
 
@@ -845,7 +865,7 @@ export function executeBucket(
    */
   function executeStep(
     step: ExecutableStep,
-  ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
+  ): PromiseOrDirect<GrafastInternalResultsOrStream<any>> {
     try {
       const meta =
         step.metaKey !== undefined ? metaByMetaKey[step.metaKey] : undefined;
@@ -936,7 +956,10 @@ export function executeBucket(
           // Don't need to do this here, it will be done where the
           // ExecutionValue is created:
           //   bucket.hasNonZeroStatus = true;
-          return arrayOfLength(size, error);
+          return [
+            arrayOfLength(size, FLAG_ERROR /* TODO: don't lose other flags */),
+            arrayOfLength(size, error),
+          ];
         });
       } else {
         return result;
@@ -945,7 +968,10 @@ export function executeBucket(
       // Don't need to do this here, it will be done where the
       // ExecutionValue is created:
       //   bucket.hasNonZeroStatus = true;
-      return arrayOfLength(size, error);
+      return [
+        arrayOfLength(size, FLAG_ERROR /* TODO: don't lose other flags */),
+        arrayOfLength(size, error),
+      ];
     }
   }
 
