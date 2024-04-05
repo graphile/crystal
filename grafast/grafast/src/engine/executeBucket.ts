@@ -158,13 +158,11 @@ export function executeBucket(
     let indexesPendingLoopOver: Array<number> = [];
 
     let executePromises:
-      | PromiseLike<GrafastResultsList<any> | GrafastResultStreamList<any>>[]
+      | PromiseLike<GrafastInternalResultsOrStream<any>>[]
       | null = null;
     let sideEffectSteps: null | ExecutableStep[] = null;
     let executePromiseResultIndex: number[] | null = null;
-    const results: Array<
-      GrafastResultsList<any> | GrafastResultStreamList<any> | undefined
-    > = [];
+    const results: Array<GrafastInternalResultsOrStream<any> | undefined> = [];
     if (
       phase.checkTimeout &&
       stopTime !== null &&
@@ -181,7 +179,8 @@ export function executeBucket(
           const step = normalSteps[normalStepIndex].step;
           const r = newGrafastError(timeoutError, step.id);
           const result = arrayOfLength(bucket.size, r);
-          results[normalStepIndex] = result;
+          const flags = arrayOfLength(bucket.size, FLAG_ERROR);
+          results[normalStepIndex] = [flags, result];
           indexesPendingLoopOver.push(normalStepIndex);
 
           // TODO: I believe we can remove this line?
@@ -221,7 +220,8 @@ export function executeBucket(
         } catch (e) {
           const r = newGrafastError(e, step.id);
           const result = arrayOfLength(bucket.size, r);
-          results[normalStepIndex] = result;
+          const flags = arrayOfLength(bucket.size, FLAG_ERROR);
+          results[normalStepIndex] = [flags, result];
           indexesPendingLoopOver.push(normalStepIndex);
 
           // TODO: I believe we can remove this line?
@@ -265,8 +265,12 @@ export function executeBucket(
 
       // Validate executed steps
       for (const allStepsIndex of indexesToProcess) {
-        const result = results[allStepsIndex];
         const finishedStep = _allSteps[allStepsIndex];
+        const internalResult = results[allStepsIndex];
+        if (!internalResult) {
+          throw new Error(`Result from ${finishedStep} should exist`);
+        }
+        const [flags, result] = internalResult;
         const resultLength = result?.length;
         const expectedSize = finishedStep._isUnary ? 1 : size;
         if (resultLength !== expectedSize) {
@@ -317,8 +321,9 @@ export function executeBucket(
         bucket: Bucket,
         resultIndex: number,
         value: unknown,
-        flags: ExecutionEntryFlags = value == null ? FLAG_NULL : NO_FLAGS,
+        inFlags: ExecutionEntryFlags,
       ) => {
+        const flags = value == null ? inFlags & FLAG_NULL : inFlags;
         let proto: any;
         if (
           // Fast-lane for non-objects
@@ -423,12 +428,16 @@ export function executeBucket(
 
       for (const allStepsIndex of indexesToProcess) {
         const step = _allSteps[allStepsIndex];
-        const result = results[allStepsIndex]!;
+        const internalResult = results[allStepsIndex];
+        if (!internalResult) {
+          throw new Error(`Result from ${step} should exist`);
+        }
+        const [flags, result] = internalResult;
         const count = step._isUnary ? 1 : size;
         for (let dataIndex = 0; dataIndex < count; dataIndex++) {
           const val = result[dataIndex];
           if (step.isSyncAndSafe || !isPromiseLike(val)) {
-            success(step, bucket, dataIndex, val);
+            success(step, bucket, dataIndex, val, flags[dataIndex] ?? NO_FLAGS);
           } else {
             if (!pendingPromises) {
               pendingPromises = [val];
@@ -454,7 +463,13 @@ export function executeBucket(
                 pendingPromiseIndexes![i];
               const finishedStep = _allSteps[allStepsIndex];
               if (settledResult.status === "fulfilled") {
-                success(finishedStep, bucket, dataIndex, settledResult.value);
+                success(
+                  finishedStep,
+                  bucket,
+                  dataIndex,
+                  settledResult.value,
+                  NO_FLAGS,
+                );
               } else {
                 const error = newGrafastError(
                   settledResult.reason,
