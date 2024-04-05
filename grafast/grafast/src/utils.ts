@@ -929,6 +929,7 @@ export type Sudo<T> = T extends ExecutableStep<any>
   ? T & {
       dependencies: ReadonlyArray<ExecutableStep>;
       dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
+      defaultForbiddenFlags: ExecutionEntryFlags;
     }
   : T;
 

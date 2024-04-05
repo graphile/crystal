@@ -30,7 +30,11 @@ import type {
   StreamDetails,
   UnbatchedExecutionExtra,
 } from "./interfaces.js";
-import { $$subroutine } from "./interfaces.js";
+import {
+  $$subroutine,
+  DEFAULT_FORBIDDEN_FLAGS,
+  FLAG_ERROR,
+} from "./interfaces.js";
 import type { __ItemStep } from "./steps/index.js";
 import { __ListTransformStep } from "./steps/index.js";
 import { stepAMayDependOnStepB } from "./utils.js";
@@ -220,12 +224,17 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   public isSyncAndSafe!: boolean;
 
   /**
+   * (default = ALL_FLAGS & ~FLAG_NULL)
+   */
+  protected readonly defaultForbiddenFlags: ExecutionEntryFlags =
+    DEFAULT_FORBIDDEN_FLAGS;
+  /**
    * The plan this plan will need data from in order to execute.
    */
   protected readonly dependencies: ReadonlyArray<ExecutableStep>;
   /**
    * What execution entry flags we can't handle for the given indexed dependency
-   * (default = ALL_FLAGS & ~FLAG_NULL)
+   * (default = this.defaultForbiddenFlags)
    */
   protected readonly dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
 

@@ -6,7 +6,6 @@ import {
   $$subroutine,
   ALL_FLAGS,
   DEFAULT_ACCEPT_FLAGS,
-  FLAG_NULL,
   TRAPPABLE_FLAGS,
 } from "../interfaces.js";
 import { ExecutableStep } from "../step";
@@ -282,10 +281,12 @@ export class StepTracker {
   }
 
   public addStepDependency(
-    $dependent: ExecutableStep,
-    $dependency: ExecutableStep,
+    raw$dependent: ExecutableStep,
+    raw$dependency: ExecutableStep,
     options: AddStepDependencyOptions = {},
   ): number {
+    const $dependent = sudo(raw$dependent);
+    const $dependency = sudo(raw$dependency);
     if (!this.activeSteps.has($dependent)) {
       throw new Error(
         `Cannot add ${$dependency} as a dependency of ${$dependent}; the latter is deleted!`,
@@ -319,11 +320,14 @@ export class StepTracker {
       }
     }
 
-    const dependentDependencies = writeableArray(sudo($dependent).dependencies);
+    const dependentDependencies = writeableArray($dependent.dependencies);
     const dependentDependencyForbiddenFlags = writeableArray(
-      sudo($dependent).dependencyForbiddenFlags,
+      $dependent.dependencyForbiddenFlags,
     );
-    const { skipDeduplication, acceptFlags = DEFAULT_ACCEPT_FLAGS } = options;
+    const {
+      skipDeduplication,
+      acceptFlags = $dependent.defaultForbiddenFlags,
+    } = options;
     // When copying dependencies between classes, we might not want to
     // deduplicate because we might refer to the dependency by its index. As
     // such, we should only dedupe by default but allow opting out.

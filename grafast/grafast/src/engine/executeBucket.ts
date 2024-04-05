@@ -29,8 +29,8 @@ import {
   $$streamMore,
   $$timeout,
   FLAG_ERROR,
-  FLAG_NONE,
   FLAG_POLY_SKIPPED,
+  NO_FLAGS,
 } from "../interfaces.js";
 import type { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
 import { isStreamableStep } from "../step.js";
@@ -68,6 +68,12 @@ function noop() {
   /*noop*/
 }
 
+interface ForcedValues {
+  [index: number]:
+    | { flags: ExecutionEntryFlags; value: GrafastError | null }
+    | undefined;
+}
+
 /**
  * Takes a list of `results` (shorter than `resultCount`) and an object with
  * errors and indexes; returns a list of length `resultCount` with the results
@@ -80,7 +86,7 @@ function noop() {
  */
 function mergeErrorsBackIn(
   results: ReadonlyArray<any>,
-  errors: { [index: number]: GrafastError | undefined },
+  forcedValues: ForcedValues,
   resultCount: number,
 ): any[] {
   const finalResults: any[] = [];
@@ -88,7 +94,7 @@ function mergeErrorsBackIn(
   let resultIndex = 0;
 
   for (let finalIndex = 0; finalIndex < resultCount; finalIndex++) {
-    const error = errors[finalIndex];
+    const error = forcedValues[finalIndex];
     if (error !== undefined) {
       finalResults[finalIndex] = error;
     } else {
@@ -107,7 +113,7 @@ export function executeBucket(
    * Execute the step directly; since there's no errors we can pass the
    * dependencies through verbatim!
    */
-  const reallyExecuteStepWithNoErrors = executeOrStream;
+  const reallyExecuteStepWithoutFiltering = executeOrStream;
 
   const { stopTime, eventEmitter } = requestContext;
   const {
@@ -304,7 +310,7 @@ export function executeBucket(
           typeof value !== "object" ||
           value === null
         ) {
-          bucket.setResult(finishedStep, resultIndex, value, FLAG_NONE);
+          bucket.setResult(finishedStep, resultIndex, value, NO_FLAGS);
           return;
         }
         let valueIsAsyncIterable;
@@ -336,7 +342,7 @@ export function executeBucket(
             // Optimization - defer everything
             const arr: StreamMaybeMoreableArray<any> = [];
             arr[$$streamMore] = iterator;
-            bucket.setResult(finishedStep, resultIndex, arr, FLAG_NONE);
+            bucket.setResult(finishedStep, resultIndex, arr, NO_FLAGS);
           } else {
             // Evaluate the first initialCount entries, rest is streamed.
             const promise = (async () => {
@@ -369,7 +375,7 @@ export function executeBucket(
                   }
                 }
 
-                bucket.setResult(finishedStep, resultIndex, arr, FLAG_NONE);
+                bucket.setResult(finishedStep, resultIndex, arr, NO_FLAGS);
               } catch (e) {
                 const error = newGrafastError(e, finishedStep.id);
                 bucket.setResult(finishedStep, resultIndex, error, FLAG_ERROR);
@@ -385,13 +391,13 @@ export function executeBucket(
           (proto = Object.getPrototypeOf(value)) === null ||
           proto === Object.prototype
         ) {
-          bucket.setResult(finishedStep, resultIndex, value, FLAG_NONE);
+          bucket.setResult(finishedStep, resultIndex, value, NO_FLAGS);
         } else if (value instanceof Error) {
           const e =
             $$error in value ? value : newGrafastError(value, finishedStep.id);
           bucket.setResult(finishedStep, resultIndex, e, FLAG_ERROR);
         } else {
-          bucket.setResult(finishedStep, resultIndex, value, FLAG_NONE);
+          bucket.setResult(finishedStep, resultIndex, value, NO_FLAGS);
         }
       };
 
@@ -577,7 +583,7 @@ export function executeBucket(
             }
             const stepResult = step.unbatchedExecute(extra, ...deps);
             // TODO: what if stepResult is _returned_ error?
-            bucket.setResult(step, dataIndex, stepResult, FLAG_NONE);
+            bucket.setResult(step, dataIndex, stepResult, NO_FLAGS);
           } catch (e) {
             console.dir(e);
             const error = newGrafastError(e, step.id);
@@ -634,7 +640,7 @@ export function executeBucket(
   function executeOrStream(
     count: number,
     step: ExecutableStep,
-    values: Array<ExecutionValue>,
+    values: ReadonlyArray<ExecutionValue>,
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
     if (isDev && step._isUnary && count !== 1) {
@@ -679,20 +685,21 @@ export function executeBucket(
    * polymorphicPaths from the input dependencies and then padding the lists
    * back out at the end.
    */
-  function reallyExecuteStepWithErrorsOrSelective(
+  function reallyExecuteStepWithFiltering(
     step: ExecutableStep,
-    dependenciesIncludingSideEffects: Array<ExecutionValue>,
+    dependenciesIncludingSideEffects: ReadonlyArray<ExecutionValue>,
+    dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>,
     polymorphicPathList: readonly (string | null)[],
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastResultsList<any> | GrafastResultStreamList<any>> {
     const expectedSize = step._isUnary ? 1 : size;
-    const errors: { [index: number]: GrafastError | undefined } = arrayOfLength(
-      expectedSize,
-      undefined,
-    );
+    const forcedValues: ForcedValues = arrayOfLength(expectedSize, undefined);
 
-    /** If there's errors, we must manipulate the arrays being passed into the step execution */
-    let foundErrors = false;
+    /**
+     * If there's errors/forbidden values, we must manipulate the arrays being
+     * passed into the step execution
+     */
+    let needsTransform = false;
 
     /** If all we see is errors, there's no need to execute! */
     let newSize = 0;
@@ -706,11 +713,13 @@ export function executeBucket(
 
     // for (let index = 0, l = polymorphicPathList.length; index < l; index++) {
     for (let index = 0; index < expectedSize; index++) {
-      let indexError: GrafastError | null = null;
+      let forceIndexValue: GrafastError | null | undefined = undefined;
+      let indexFlags: ExecutionEntryFlags = NO_FLAGS;
       if (
         stepPolymorphicPaths !== null &&
         !stepPolymorphicPaths.has(polymorphicPathList[index] as string)
       ) {
+        /*
         const e =
           isDev && DEBUG_POLYMORPHISM
             ? Object.assign(
@@ -727,38 +736,56 @@ export function executeBucket(
                 { $$error: POLY_SKIPPED },
               )
             : POLY_SKIPPED;
-
         indexError = e;
-      } else if ((extra._bucket.flagUnion & FLAG_ERROR) === FLAG_ERROR) {
+        */
+        indexFlags |= FLAG_POLY_SKIPPED;
+        forceIndexValue = null;
+      } else if (extra._bucket.flagUnion !== NO_FLAGS) {
         for (
           let i = 0, l = dependenciesIncludingSideEffects.length;
           i < l;
           i++
         ) {
-          const flags = dependenciesIncludingSideEffects[i]._flagsAt(index);
-          if ((flags & FLAG_ERROR) === FLAG_ERROR) {
-            const v = dependenciesIncludingSideEffects[i].at(index);
-            indexError = v;
+          const dep = dependenciesIncludingSideEffects[i];
+          const forbiddenFlags = dependencyForbiddenFlags[i];
+          const flags = dep._flagsAt(index);
+          const disallowedFlags = flags & forbiddenFlags;
+          if (disallowedFlags !== NO_FLAGS) {
+            indexFlags |= disallowedFlags;
+            if (!forceIndexValue) {
+              if (flags & FLAG_ERROR) {
+                const v = dep.at(index);
+                // TODO: no need for GrafastError?
+                forceIndexValue = v as GrafastError;
+              } else {
+                forceIndexValue = null;
+              }
+            } else {
+              // First error wins, ignore this second error.
+            }
             break;
           }
         }
       } else {
         // All good
       }
-      if (indexError) {
-        if (!foundErrors) {
-          foundErrors = true;
+      if (forceIndexValue !== undefined) {
+        if (!needsTransform) {
+          needsTransform = true;
           // Clone up until this point, make mutable, don't add self
-          dependencies = dependencies.map((depList) =>
-            depList.isBatch
-              ? batchExecutionValue(depList.entries.slice(0, index))
-              : depList,
+          dependencies = dependencies.map((ev) =>
+            ev.isBatch
+              ? // TODO: move this creation to happen once the full list is
+                // already built, ideally we shouldn't be mutating an execution
+                // value later.
+                batchExecutionValue(ev.entries.slice(0, index))
+              : ev,
           );
         }
-        errors[index] = indexError;
+        forcedValues[index] = { flags: indexFlags, value: forceIndexValue };
       } else {
         newSize++;
-        if (foundErrors) {
+        if (needsTransform) {
           // dependenciesWithoutErrors has limited content; add this non-error value
           for (
             let depListIndex = 0;
@@ -778,8 +805,8 @@ export function executeBucket(
 
     if (newSize === 0) {
       // Everything is errors; we can skip execution
-      return Object.values(errors);
-    } else if (foundErrors) {
+      return Object.values(forcedValues);
+    } else if (needsTransform) {
       const resultWithoutErrors = executeOrStream(
         newSize,
         step,
@@ -788,10 +815,14 @@ export function executeBucket(
       );
       if (isPromiseLike(resultWithoutErrors)) {
         return resultWithoutErrors.then((r) =>
-          mergeErrorsBackIn(r, errors, expectedSize),
+          mergeErrorsBackIn(r, forcedValues, expectedSize),
         );
       } else {
-        return mergeErrorsBackIn(resultWithoutErrors, errors, expectedSize);
+        return mergeErrorsBackIn(
+          resultWithoutErrors,
+          forcedValues,
+          expectedSize,
+        );
       }
     } else {
       if (isDev) {
@@ -800,7 +831,12 @@ export function executeBucket(
           "GrafastInternalError<47fca4ab-069c-428f-8374-267479c7fd27>: Expected newSize to equal expectedSize",
         );
       }
-      return reallyExecuteStepWithNoErrors(newSize, step, dependencies, extra);
+      return reallyExecuteStepWithoutFiltering(
+        newSize,
+        step,
+        dependencies,
+        extra,
+      );
     }
   }
 
@@ -820,29 +856,47 @@ export function executeBucket(
         _bucket: bucket,
         _requestContext: requestContext,
       };
-      const dependencies: Array<ExecutionValue> = [];
+      /** Only mutate this inside `addDependency` */
+      const _rawDependencies: Array<ExecutionValue> = [];
+      const _rawForbiddenFlags: Array<ExecutionEntryFlags> = [];
+      const dependencies: ReadonlyArray<ExecutionValue> = _rawDependencies;
+      let needsFiltering = false;
+      const defaultForbiddenFlags = sudo(step).defaultForbiddenFlags;
+      const addDependency = (
+        step: ExecutableStep,
+        forbiddenFlags: ExecutionEntryFlags,
+      ) => {
+        const executionValue = store.get(step.id)!;
+        _rawDependencies.push(executionValue);
+        _rawForbiddenFlags.push(forbiddenFlags);
+        if (!needsFiltering && (bucket.flagUnion & forbiddenFlags) !== 0) {
+          const flags = executionValue._getStateUnion();
+          needsFiltering = (flags & forbiddenFlags) !== 0;
+        }
+      };
       const sstep = sudo(step);
       const depCount = sstep.dependencies.length;
       if (depCount > 0 || sideEffectStepsWithErrors !== null) {
         for (let i = 0, l = depCount; i < l; i++) {
           const $dep = sstep.dependencies[i];
-          const executionValue = store.get($dep.id)!;
-          dependencies[i] = executionValue;
+          addDependency($dep, sstep.dependencyForbiddenFlags[i]);
+          // const executionValue = store.get($dep.id)!;
+          // dependencies[i] = executionValue;
         }
         if (sideEffectStepsWithErrors !== null) {
           if (sstep.polymorphicPaths) {
             for (const path of sstep.polymorphicPaths) {
               for (const sideEffectStep of sideEffectStepsWithErrors[path]) {
-                const sideEffectStoreEntry = store.get(sideEffectStep.id)!;
-                dependencies.push(sideEffectStoreEntry);
+                // TODO: revisit this, feels like we might be adding the same
+                // effect multiple times if it matches multiple paths.
+                addDependency(sideEffectStep, defaultForbiddenFlags);
               }
             }
           } else {
             for (const sideEffectStep of sideEffectStepsWithErrors[
               NO_POLY_PATH
             ]) {
-              const sideEffectStoreEntry = store.get(sideEffectStep.id)!;
-              dependencies.push(sideEffectStoreEntry);
+              addDependency(sideEffectStep, defaultForbiddenFlags);
             }
           }
         }
@@ -856,27 +910,27 @@ export function executeBucket(
           `GrafastInternalError<c33328fe-6758-4699-8ac6-7be41ce58bfb>: a step without polymorphic paths cannot belong to a polymorphic bucket`,
         );
       }
-      const isSelectiveStep =
-        step.layerPlan.reason.type === "polymorphic" &&
-        step.polymorphicPaths!.size !==
-          step.layerPlan.reason.polymorphicPaths.size;
-      const hasNonZeroStatus =
-        bucket.flagUnion !== 0 &&
-        dependencies.some((d) => d._getStateUnion() !== 0);
-      const result =
-        hasNonZeroStatus || isSelectiveStep
-          ? reallyExecuteStepWithErrorsOrSelective(
-              step,
-              dependencies,
-              bucket.polymorphicPathList,
-              extra,
-            )
-          : reallyExecuteStepWithNoErrors(
-              step._isUnary ? 1 : size,
-              step,
-              dependencies,
-              extra,
-            );
+      if (!needsFiltering) {
+        const isSelectiveStep =
+          step.layerPlan.reason.type === "polymorphic" &&
+          step.polymorphicPaths!.size !==
+            step.layerPlan.reason.polymorphicPaths.size;
+        needsFiltering ||= isSelectiveStep;
+      }
+      const result = needsFiltering
+        ? reallyExecuteStepWithFiltering(
+            step,
+            dependencies,
+            _rawForbiddenFlags,
+            bucket.polymorphicPathList,
+            extra,
+          )
+        : reallyExecuteStepWithoutFiltering(
+            step._isUnary ? 1 : size,
+            step,
+            dependencies,
+            extra,
+          );
       if (isPromiseLike(result)) {
         return result.then(null, (error) => {
           // Don't need to do this here, it will be done where the
@@ -1098,7 +1152,7 @@ export function batchExecutionValue<TData>(
     _flagsAt: batchFlagsAt,
     _getStateUnion() {
       if (cachedStateUnion === null) {
-        cachedStateUnion = _flags.reduce(bitwiseOr, FLAG_NONE);
+        cachedStateUnion = _flags.reduce(bitwiseOr, NO_FLAGS);
       }
       return cachedStateUnion;
     },
