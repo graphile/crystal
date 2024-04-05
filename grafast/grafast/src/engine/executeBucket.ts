@@ -321,16 +321,20 @@ export function executeBucket(
         bucket: Bucket,
         resultIndex: number,
         value: unknown,
-        inFlags: ExecutionEntryFlags,
+        flags: ExecutionEntryFlags,
       ) => {
-        const flags = value == null ? inFlags & FLAG_NULL : inFlags;
         let proto: any;
         if (
           // Fast-lane for non-objects
           typeof value !== "object" ||
           value === null
         ) {
-          bucket.setResult(finishedStep, resultIndex, value, flags);
+          bucket.setResult(
+            finishedStep,
+            resultIndex,
+            value,
+            value == null ? flags | FLAG_NULL : flags,
+          );
           return;
         }
         let valueIsAsyncIterable;

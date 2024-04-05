@@ -818,6 +818,8 @@ export const TRAPPABLE_FLAGS: ExecutionEntryFlags =
   FLAG_ERROR | FLAG_NULL | FLAG_INHIBITED;
 export const DEFAULT_FORBIDDEN_FLAGS: ExecutionEntryFlags =
   ALL_FLAGS & ~DEFAULT_ACCEPT_FLAGS;
+export const FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS: ExecutionEntryFlags =
+  FLAG_ERROR | FLAG_NULL | FLAG_POLY_SKIPPED | FLAG_INHIBITED;
 
 export type ExecutionValue<TData = any> =
   | BatchExecutionValue<TData>
