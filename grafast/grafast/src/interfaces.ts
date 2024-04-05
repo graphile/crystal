@@ -819,7 +819,11 @@ export const TRAPPABLE_FLAGS: ExecutionEntryFlags =
 export const DEFAULT_FORBIDDEN_FLAGS: ExecutionEntryFlags =
   ALL_FLAGS & ~DEFAULT_ACCEPT_FLAGS;
 export const FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS: ExecutionEntryFlags =
-  FLAG_ERROR | FLAG_NULL | FLAG_POLY_SKIPPED | FLAG_INHIBITED;
+  FLAG_NULL | FLAG_POLY_SKIPPED;
+// TODO: make `FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS = FLAG_ERROR | FLAG_NULL | FLAG_POLY_SKIPPED | FLAG_INHIBITED;`
+// Currently this isn't enabled because the bucket has to exist for the output
+// plan to throw the error; really the root should be evaluated before
+// descending into the output plan rather than as part of descending?
 
 export type ExecutionValue<TData = any> =
   | BatchExecutionValue<TData>

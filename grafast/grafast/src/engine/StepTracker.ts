@@ -326,7 +326,7 @@ export class StepTracker {
     );
     const {
       skipDeduplication,
-      acceptFlags = $dependent.defaultForbiddenFlags,
+      acceptFlags = ALL_FLAGS & ~$dependent.defaultForbiddenFlags,
     } = options;
     // When copying dependencies between classes, we might not want to
     // deduplicate because we might refer to the dependency by its index. As
