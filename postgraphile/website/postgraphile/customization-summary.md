@@ -159,59 +159,62 @@ away the boilerplate so that you cah achieve your goals more rapidly:
 
 Alternatively, read more about writing your own [schema plugins](./extending).
 
-<!-- NOTE: V5 currently doesn't have plugins that are focuss -->
+## Common Tasks
 
-<!--
-### Schema Plug-ins Allow Broad API Customization
+### Adding New Root-Level Query Fields
 
-You can use Javascript logic and type definitions to alter any part of your API,
-both to modify or ommit PostGraphile-generated fields, or to create your own, by
-using a schema plug-in. [Learn more about makeExtendSchemaPlugin](makeExtendSchemaPlugin).
+Options for creating new root-level query fields include:
 
-### Resolver Plug-Ins Change What Fields Return
+- create a database table (best for fields with new data)
+- create a database view (best for fields of derived data)
+- create a [custom query function](./custom-queries) (best when additional SQL logic is needed)
+- use a [schema plugin](./extending), eg. [make-extend-schema-plugin](make-extend-schema-plugin) (best when Javascript logic is needed)
 
-By generating a resolver plug-in you can modify what specific API fields return,
-after the query results are returned, but before they are exposeed. This lets
-you hide fields, rename them, reformat their values, etc.
-[Learn more about the makeWrapResolversPlugin](make-wrap-resolvers-plugin).
+### Adding New Query Sub-Fields
 
-### Add Inflectors Plug-Ins Allow Complex Renaming
+Options for adding new sub-fields vary depending on their root-level field:
 
-You can use a plug-in and Javascript logic to do more complex renaming of fields
-(both root and nested). [Learn more about the Make Add Inflectors
-plug-in](make-add-inflectors-plugin)
+#### Table-based Root-Level Fields
 
-### The Simplify Inflection Plug-in Simplifies Your Whole API
+- alter the table to add columns (best for fields with new data)
+- alter the table to add new constraints (best for relationship fields)
+- add [computed column functions](./computed-columns) (best for derived data)
 
-By default, PostGrahile's generated field names are verbose. You can simplify
-all fields in your API, turning (for instance) `User.postsByAuthorId` into
-`User.posts`, by including a plug-in.
-[Learn More about the Simplify Inflection plug-in](https://github.com/graphile/pg-simplify-inflector).
+#### View-based Root-Level Fields
 
-### Excluding Default Plug-Ins
+- alter the view to add columns (best for derived data)
+- add ["virtual constraints"](./smart-tags#virtual-constraints) (best for relationship fields)
 
-Rarely, you may wish to exclude a class of fields (for instance, removing all
-computed columns) by removing built-in PostGraphile plugins (eg. the
-`PgComputedColumnsPlugin`). [Learn more about removing default
-plug-ins](extending-raw#removing-things-from-the-schema).
+#### Function-based Root-Level Fields
 
-### Custom Javascript Plug-in
+- alter the function to return additional values
 
-You can also write completely custom Javaascript plug-ins, for instance if you
-want to remove a more complex set of fields from your API.
-[Learn more about removing fields with custom plug-ins](extending-raw#removing-things-from-the-schema).
- -->
+All root-level query fields can also add new sub-fields by using a
+[schema plugin](./extending), eg.
+[make-extend-schema-plugin](make-extend-schema-plugin) (best when Javascript
+logic is needed).
 
-<!-- Use makeAddPgTableConditionPlugin
-Use @omit's filter to choose which things get filtering
-Use @filterable on functions to enable filtering
-Use Matt's filter plugin
-Create custom query / computed column database functions
-Use plugins such as pg-omit-archived
-etc -->
+### Adding New Mutations
 
-<!--
-## Mutation Fields
+Options for adding new mutations include:
 
-#### TODO
--->
+- add new tables to create mutations for altering their data
+- add a [custom mutation](custom-mutations) function (best for for SQL-only logic)
+- use a [schema plugin](./extending), eg. [make-extend-schema-plugin](make-extend-schema-plugin) (best when Javascript logic is needed)
+
+### Renaming Fields (Query or Mutation)
+
+To rename any field, simply rename the database object that it is based on. To
+rename that field in the API _without_ renaming it in the database, add a
+`@name` [smart tag](smart-tags).
+
+### Removing Fields (Query or Mutation)
+
+To remove any query field mutation entirely, simply remove the corresponding
+object from your database. To prevent a field from appearing in the API
+_without_ removing it from the database, add an `@omit` [smart tag](smart-tags).
+
+### Adding Documentation (Query or Mutation)
+
+Any type of field can have its API documentation (eg. for GraphiQL) customized
+by adding [smart comments](smart-comments).
