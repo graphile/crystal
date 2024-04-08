@@ -16,6 +16,7 @@ import { UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 
 export class __FlagStep<TData> extends UnbatchedExecutableStep<TData> {
+  isSyncAndSafe = false;
   constructor(
     $step: ExecutableStep,
     acceptFlags: ExecutionEntryFlags,
