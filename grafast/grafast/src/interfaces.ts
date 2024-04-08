@@ -920,4 +920,5 @@ export interface AddStepDependencyOptions {
   skipDeduplication?: boolean;
   /** @defaultValue `FLAG_NULL` */
   acceptFlags?: ExecutionEntryFlags;
+  onReject?: null | GrafastError | undefined;
 }

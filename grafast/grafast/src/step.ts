@@ -15,6 +15,7 @@ import {
 } from "./engine/lib/withGlobalLayerPlan.js";
 import { $$unlock } from "./engine/lock.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
+import type { GrafastError } from "./error.js";
 import { getDebug } from "./global.js";
 import { inspect } from "./inspect.js";
 import type {
@@ -233,6 +234,9 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * (default = this.defaultForbiddenFlags)
    */
   protected readonly dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
+  protected readonly dependencyOnReject: ReadonlyArray<
+    GrafastError | null | undefined
+  >;
 
   /**
    * Just for mermaid
@@ -294,6 +298,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     super();
     this.dependencies = [];
     this.dependencyForbiddenFlags = [];
+    this.dependencyOnReject = [];
     this.dependents = [];
     this.isOptimized = false;
     this.allowMultipleOptimizations = false;
