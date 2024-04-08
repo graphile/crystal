@@ -8,7 +8,7 @@ import type {
   PgSelectSingleStep,
 } from "@dataplan/pg";
 import type { ListStep } from "grafast";
-import { access, constant, list } from "grafast";
+import { access, constant, inhibitOnNull, list } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
@@ -166,23 +166,25 @@ return function (list, constant) {
               ? // eslint-disable-next-line graphile-export/exhaustive-deps
                 EXPORTABLE(
                   te.run`\
-return function (access) {
+return function (access, inhibitOnNull) {
   return $list => ({ ${te.join(
     pk.map(
       (attributeName, index) =>
-        te`${te.safeKeyOrThrow(attributeName)}: access($list, [${te.lit(
-          index + 1,
-        )}])`,
+        te`${te.safeKeyOrThrow(
+          attributeName,
+        )}: inhibitOnNull(access($list, [${te.lit(index + 1)}]))`,
     ),
     ", ",
   )} });
 }` as any,
-                  [access],
+                  [access, inhibitOnNull],
                 )
               : EXPORTABLE(
                   (access, pk) => ($list: ListStep<any[]>) => {
                     const spec = pk.reduce((memo, attribute, index) => {
-                      memo[attribute] = access($list, [index + 1]);
+                      memo[attribute] = inhibitOnNull(
+                        access($list, [index + 1]),
+                      );
                       return memo;
                     }, Object.create(null));
                     return spec;
