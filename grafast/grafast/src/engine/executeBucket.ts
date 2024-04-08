@@ -4,12 +4,7 @@ import * as assert from "../assert.js";
 import type { Bucket, RequestTools } from "../bucket.js";
 import { isDev } from "../dev.js";
 import type { GrafastError } from "../error.js";
-import {
-  $$error,
-  isGrafastError,
-  newGrafastError,
-  SafeError,
-} from "../error.js";
+import { $$error, newGrafastError, SafeError } from "../error.js";
 import { inspect } from "../inspect.js";
 import type {
   BatchExecutionValue,
@@ -43,22 +38,8 @@ import { timeSource } from "../timeSource.js";
 import { arrayOfLength, isPromiseLike, sudo } from "../utils.js";
 import type { MetaByMetaKey } from "./OperationPlan.js";
 
-const DEBUG_POLYMORPHISM = false;
-
 /** Path to use when there's no polymorphic paths. */
 const NO_POLY_PATH = "";
-
-// TODO: the handling of polymorphism via POLY_SKIPPED is distasteful. Find a
-// better approach.
-
-// An error that indicates this entry was skipped because it didn't match
-// polymorphicPath.
-const POLY_SKIPPED = newGrafastError(
-  new Error(
-    "GrafastInternalError<757b99f9-cb4d-4141-895d-8c687b2048fd>: Polymorphic skipped; you should never see this",
-  ),
-  null,
-);
 
 const timeoutError = Object.freeze(
   new SafeError(
@@ -761,25 +742,6 @@ export function executeBucket(
         stepPolymorphicPaths !== null &&
         !stepPolymorphicPaths.has(polymorphicPathList[index] as string)
       ) {
-        /*
-        const e =
-          isDev && DEBUG_POLYMORPHISM
-            ? Object.assign(
-                newGrafastError(
-                  new Error(
-                    `GrafastInternalError<00d52055-06b0-4b25-abeb-311b800ea284>: step ${
-                      step.id
-                    } (polymorphicPaths ${[
-                      ...stepPolymorphicPaths,
-                    ]}) has no match for '${polymorphicPathList[index]}'`,
-                  ),
-                  step.id,
-                ),
-                { $$error: POLY_SKIPPED },
-              )
-            : POLY_SKIPPED;
-        indexError = e;
-        */
         indexFlags |= FLAG_POLY_SKIPPED;
         forceIndexValue = null;
       } else if (extra._bucket.flagUnion !== NO_FLAGS) {
