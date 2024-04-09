@@ -422,7 +422,14 @@ export function executeBucket(
         for (let dataIndex = 0; dataIndex < count; dataIndex++) {
           const val = result[dataIndex];
           if (step.isSyncAndSafe || !isPromiseLike(val)) {
-            success(step, bucket, dataIndex, val, flags[dataIndex] ?? NO_FLAGS);
+            if (flags[dataIndex] == null) {
+              throw new Error(
+                `GraphileInternalError<75df71bb-0f76-4a98-9664-9167d502296a>: result for ${step} has no flag at index ${dataIndex} (value = ${inspect(
+                  val,
+                )})`,
+              );
+            }
+            success(step, bucket, dataIndex, val, flags[dataIndex]);
           } else {
             if (!pendingPromises) {
               pendingPromises = [val];
