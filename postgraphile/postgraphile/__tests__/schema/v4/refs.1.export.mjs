@@ -1,5 +1,5 @@
 import { PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, makeRegistry, recordCodec } from "@dataplan/pg";
-import { ConnectionStep, SafeError, access, assertEdgeCapableStep, assertPageInfoCapableStep, connection, constant, context, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue } from "grafast";
+import { ConnectionStep, SafeError, access, assertEdgeCapableStep, assertPageInfoCapableStep, connection, constant, context, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
 const handler = {
@@ -269,7 +269,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -288,7 +288,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {

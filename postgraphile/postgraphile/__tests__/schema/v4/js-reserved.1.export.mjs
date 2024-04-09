@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgSelectSingleStep, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
 const handler_codec_base64JSON = {
@@ -1440,7 +1440,7 @@ const handler = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -1483,7 +1483,7 @@ const handler2 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -1533,7 +1533,7 @@ const handler3 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -1558,7 +1558,7 @@ const handler4 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -1604,7 +1604,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       const spec = __proto__Uniques[0].attributes.reduce((memo, attribute, index) => {
-        memo[attribute] = access($list, [index + 1]);
+        memo[attribute] = inhibitOnNull(access($list, [index + 1]));
         return memo;
       }, Object.create(null));
       return spec;
@@ -1626,7 +1626,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -1645,7 +1645,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -1665,7 +1665,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -1684,7 +1684,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -1703,7 +1703,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -1723,7 +1723,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -1742,7 +1742,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
