@@ -609,8 +609,18 @@ export function executeBucket(
               deps.push(depVal);
             }
             const stepResult = step.unbatchedExecute(extra, ...deps);
-            // TODO: what if stepResult is _returned_ error?
-            bucket.setResult(step, dataIndex, stepResult, NO_FLAGS);
+            // TODO: what if stepResult is _returned_ error (as opposed to
+            // thrown)?
+            // NOTE: we are in `runSyncSteps` so this step is guaranteed to
+            // be "isSyncAndSafe". As such, we don't need to worry about it
+            // returning an error (unsafe) or a promise (async), we only
+            // need to check if it's null.
+            bucket.setResult(
+              step,
+              dataIndex,
+              stepResult,
+              stepResult == null ? FLAG_NULL : NO_FLAGS,
+            );
           } catch (e) {
             console.dir(e);
             const error = newGrafastError(e, step.id);
