@@ -2,8 +2,14 @@ import { isDev } from "../dev.js";
 import type { OperationPlan } from "../index.js";
 import { inspect } from "../inspect.js";
 import type { AddStepDependencyOptions } from "../interfaces.js";
-import { $$subroutine, ALL_FLAGS, TRAPPABLE_FLAGS } from "../interfaces.js";
+import {
+  $$subroutine,
+  ALL_FLAGS,
+  DEFAULT_ACCEPT_FLAGS,
+  TRAPPABLE_FLAGS,
+} from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
+import { __FlagStep } from "../steps/__flag.js";
 import { sudo } from "../utils.js";
 import type {
   LayerPlan,
@@ -282,6 +288,26 @@ export class StepTracker {
   ): number {
     const $dependent = sudo(raw$dependent);
     const $dependency = sudo(raw$dependency);
+    if ($dependency instanceof __FlagStep) {
+      // See if we can inline this
+      const $flagSource = $dependency.dependencies[0];
+      const forbiddenFlags = $dependency.dependencyForbiddenFlags[0];
+      const onReject = $dependency.dependencyOnReject[0];
+      const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
+      if (
+        (options.onReject === undefined || options.onReject === onReject) &&
+        (options.acceptFlags === undefined ||
+          options.acceptFlags === DEFAULT_ACCEPT_FLAGS ||
+          options.acceptFlags === acceptFlags)
+      ) {
+        // We can inline it: tweak flags and try again
+        return this.addStepDependency(raw$dependent, $flagSource, {
+          ...options,
+          acceptFlags,
+          onReject,
+        });
+      }
+    }
     if (!this.activeSteps.has($dependent)) {
       throw new Error(
         `Cannot add ${$dependency} as a dependency of ${$dependent}; the latter is deleted!`,

@@ -12,7 +12,7 @@ import {
   TRAPPABLE_FLAGS,
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import { $$deepDepSkip, UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 
 export class __FlagStep<TData> extends UnbatchedExecutableStep<TData> {
@@ -24,6 +24,12 @@ export class __FlagStep<TData> extends UnbatchedExecutableStep<TData> {
   ) {
     super();
     this.addDependency($step, { acceptFlags, onReject });
+  }
+  getParentStep(): ExecutableStep {
+    return this.getDep(0);
+  }
+  [$$deepDepSkip](): ExecutableStep {
+    return this.getDep(0);
   }
   execute({
     values: [input],
