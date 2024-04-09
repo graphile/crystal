@@ -14,20 +14,18 @@ graph TD
     Access35{{"Access[35∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access34 & Access35 --> Object36
     PgSelect50[["PgSelect[50∈0]<br />ᐸpersonᐳ"]]:::plan
-    __Flag49[["__Flag[49∈0]"]]:::unbatchedplan
-    Object36 & __Flag49 --> PgSelect50
+    Access48{{"Access[48∈0]<br />ᐸ47.1ᐳ"}}:::plan
+    Object36 & Access48 --> PgSelect50
     PgSelect89[["PgSelect[89∈0]<br />ᐸpersonᐳ"]]:::plan
-    __Flag88[["__Flag[88∈0]"]]:::unbatchedplan
-    Object36 & __Flag88 --> PgSelect89
+    Access87{{"Access[87∈0]<br />ᐸ86.1ᐳ"}}:::plan
+    Object36 & Access87 --> PgSelect89
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access34
     __Value3 --> Access35
     Lambda47{{"Lambda[47∈0]<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
     Constant97{{"Constant[97∈0]<br />ᐸ'WyJwZW9wbGUiLDZd'ᐳ"}}:::plan
     Constant97 --> Lambda47
-    Access48{{"Access[48∈0]<br />ᐸ47.1ᐳ"}}:::plan
     Lambda47 --> Access48
-    Access48 --> __Flag49
     First54{{"First[54∈0]"}}:::plan
     PgSelect50 --> First54
     PgSelectSingle55{{"PgSelectSingle[55∈0]<br />ᐸpersonᐳ"}}:::plan
@@ -35,9 +33,7 @@ graph TD
     Lambda86{{"Lambda[86∈0]<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
     Constant99{{"Constant[99∈0]<br />ᐸ'WyJwb3N0cyIsM10='ᐳ"}}:::plan
     Constant99 --> Lambda86
-    Access87{{"Access[87∈0]<br />ᐸ86.1ᐳ"}}:::plan
     Lambda86 --> Access87
-    Access87 --> __Flag88
     First93{{"First[93∈0]"}}:::plan
     PgSelect89 --> First93
     PgSelectSingle94{{"PgSelectSingle[94∈0]<br />ᐸpersonᐳ"}}:::plan
@@ -86,9 +82,9 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/v4/nodeId-earlyExit"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 34, 35, 37, 76, 97, 99, 36, 47, 48, 86, 87<br />2: __Flag[49], __Flag[88]<br />3: PgSelect[50], PgSelect[89]<br />ᐳ: 54, 55, 93, 94"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 34, 35, 37, 76, 97, 99, 36, 47, 48, 86, 87<br />2: PgSelect[50], PgSelect[89]<br />ᐳ: 54, 55, 93, 94"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access34,Access35,Object36,Connection37,Lambda47,Access48,__Flag49,PgSelect50,First54,PgSelectSingle55,Connection76,Lambda86,Access87,__Flag88,PgSelect89,First93,PgSelectSingle94,Constant97,Constant99 bucket0
+    class Bucket0,__Value0,__Value3,__Value5,Access34,Access35,Object36,Connection37,Lambda47,Access48,PgSelect50,First54,PgSelectSingle55,Connection76,Lambda86,Access87,PgSelect89,First93,PgSelectSingle94,Constant97,Constant99 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 36, 37<br /><br />ROOT Connectionᐸ33ᐳ[37]<br />1: <br />ᐳ: Constant[41], Constant[96]<br />2: PgSelect[38]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect38,Constant41,Constant96 bucket1
@@ -119,5 +115,5 @@ graph TD
     Bucket5 --> Bucket6
     Bucket6 --> Bucket7
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object36,PgSelect50,PgSelect89,Access34,Access35,Lambda47,Access48,__Flag49,First54,PgSelectSingle55,Lambda86,Access87,__Flag88,First93,PgSelectSingle94,__Value0,__Value3,__Value5,Connection37,Connection76,Constant97,Constant99,PgSelect38,Constant41,Constant96,PgClassExpression56,PgSelect77,Constant80,Constant98,PgClassExpression95 unary
+    class Object36,PgSelect50,PgSelect89,Access34,Access35,Lambda47,Access48,First54,PgSelectSingle55,Lambda86,Access87,First93,PgSelectSingle94,__Value0,__Value3,__Value5,Connection37,Connection76,Constant97,Constant99,PgSelect38,Constant41,Constant96,PgClassExpression56,PgSelect77,Constant80,Constant98,PgClassExpression95 unary
     end
