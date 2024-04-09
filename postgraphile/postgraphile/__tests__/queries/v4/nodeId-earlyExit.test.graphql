@@ -1,0 +1,26 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a", "c"]
+#> subscriptions: true
+#> classicIds: true
+
+query ($debug: Boolean! = true) {
+  allPeople(condition: { name: "Twenty Seventwo" }) @include(if: $debug) {
+    nodes {
+      id
+      name
+    }
+  }
+  person(id: "WyJwZW9wbGUiLDZd") @include(if: $debug) {
+    name
+  }
+  allPosts(condition: { headline: "Is that a cooking show?" })
+    @include(if: $debug) {
+    nodes {
+      id
+      headline
+    }
+  }
+  postIdUsedToFetchPerson: person(id: "WyJwb3N0cyIsM10=") {
+    name
+  }
+}
