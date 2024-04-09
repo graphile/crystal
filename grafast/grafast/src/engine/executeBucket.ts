@@ -251,7 +251,7 @@ export function executeBucket(
         if (!internalResult) {
           throw new Error(`Result from ${finishedStep} should exist`);
         }
-        const [flags, result] = internalResult;
+        const [_flags, result] = internalResult;
         const resultLength = result?.length;
         const expectedSize = finishedStep._isUnary ? 1 : size;
         if (resultLength !== expectedSize) {

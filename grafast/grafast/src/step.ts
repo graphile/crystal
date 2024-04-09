@@ -30,11 +30,7 @@ import type {
   StreamDetails,
   UnbatchedExecutionExtra,
 } from "./interfaces.js";
-import {
-  $$subroutine,
-  DEFAULT_FORBIDDEN_FLAGS,
-  FLAG_ERROR,
-} from "./interfaces.js";
+import { $$subroutine, DEFAULT_FORBIDDEN_FLAGS } from "./interfaces.js";
 import type { __ItemStep } from "./steps/index.js";
 import { __ListTransformStep } from "./steps/index.js";
 import { stepAMayDependOnStepB } from "./utils.js";

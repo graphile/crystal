@@ -2,21 +2,16 @@ import { isDev } from "../dev.js";
 import type { OperationPlan } from "../index.js";
 import { inspect } from "../inspect.js";
 import type { AddStepDependencyOptions } from "../interfaces.js";
-import {
-  $$subroutine,
-  ALL_FLAGS,
-  DEFAULT_ACCEPT_FLAGS,
-  TRAPPABLE_FLAGS,
-} from "../interfaces.js";
-import { ExecutableStep } from "../step";
+import { $$subroutine, ALL_FLAGS, TRAPPABLE_FLAGS } from "../interfaces.js";
+import { ExecutableStep } from "../step.js";
 import { sudo } from "../utils.js";
 import type {
   LayerPlan,
   LayerPlanReasonSubroutine,
   LayerPlanReasonsWithParentStep,
-} from "./LayerPlan";
+} from "./LayerPlan.js";
 import { lock } from "./lock.js";
-import type { OutputPlan } from "./OutputPlan";
+import type { OutputPlan } from "./OutputPlan.js";
 
 /**
  * We want everything else to treat things like `dependencies` as read only,

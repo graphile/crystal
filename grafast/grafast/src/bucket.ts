@@ -50,7 +50,7 @@ export interface RequestTools {
  * @internal
  */
 export interface Bucket {
-  /** @interal */
+  /** @internal */
   toString?(): string;
 
   /**

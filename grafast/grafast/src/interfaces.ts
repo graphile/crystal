@@ -918,6 +918,6 @@ export * from "./planJSONInterfaces.js";
 
 export interface AddStepDependencyOptions {
   skipDeduplication?: boolean;
-  /** @default {FLAG_NULL} */
+  /** @defaultValue `FLAG_NULL` */
   acceptFlags?: ExecutionEntryFlags;
 }
