@@ -140,14 +140,18 @@ export class ApplyTransformsStep extends ExecutableStep {
           iterators[newIndex] = bucket.iterators[originalIndex];
           const ev = store.get(itemStepId)!;
           if (ev.isBatch) {
-            (ev.entries as any[])[newIndex] = list[j];
+            // TODO: check for error?
+            ev._setResult(newIndex, list[j], 0);
           }
-          for (const stepId of copyStepIds) {
-            const ev = store.get(stepId)!;
+          for (const copyStepId of copyStepIds) {
+            const ev = store.get(copyStepId)!;
             if (ev.isBatch) {
-              (ev.entries as any[])[newIndex] = bucket.store
-                .get(stepId)!
-                .at(originalIndex);
+              const orig = bucket.store.get(copyStepId)!;
+              ev._setResult(
+                newIndex,
+                orig.at(originalIndex),
+                orig._flagsAt(originalIndex),
+              );
             }
           }
         }
@@ -160,7 +164,7 @@ export class ApplyTransformsStep extends ExecutableStep {
           layerPlan: childLayerPlan,
           size,
           store,
-          hasErrors: bucket.hasErrors,
+          flagUnion: bucket.flagUnion,
           polymorphicPathList,
           iterators,
         },

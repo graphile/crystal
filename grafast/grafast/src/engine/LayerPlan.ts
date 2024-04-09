@@ -7,6 +7,11 @@ import type { Bucket } from "../bucket.js";
 import type { GrafastError } from "../error.js";
 import { isGrafastError } from "../error.js";
 import { inspect } from "../inspect.js";
+import type { UnaryExecutionValue } from "../interfaces.js";
+import {
+  FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS,
+  NO_FLAGS,
+} from "../interfaces.js";
 import { resolveType } from "../polymorphic.js";
 import type {
   ExecutableStep,
@@ -399,8 +404,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         const hasNoNullsOrErrors = false;
 
         if (this.rootStep._isUnary) {
-          const fieldValue = parentBucket.store.get(itemStepId)!;
-          if (fieldValue.value == null) {
+          const fieldValue = parentBucket.store.get(
+            itemStepId,
+          )! as UnaryExecutionValue;
+          const forbiddenFlags =
+            fieldValue._entryFlags & FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS;
+          if (forbiddenFlags !== NO_FLAGS) {
             size = 0;
           } else {
             size = parentBucket.size;
@@ -482,9 +491,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               for (const stepId of copyStepIds) {
                 const ev = store.get(stepId)!;
                 if (ev.isBatch) {
-                  (ev.entries as any[])[newIndex] = parentBucket.store
-                    .get(stepId)!
-                    .at(originalIndex);
+                  const orig = parentBucket.store.get(stepId)!;
+                  ev._copyResult(newIndex, orig, originalIndex);
                 }
               }
             }
@@ -558,9 +566,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
               for (const stepId of copyStepIds) {
                 const ev = store.get(stepId)!;
                 if (ev.isBatch) {
-                  (ev.entries as any[])[newIndex] = parentBucket.store
-                    .get(stepId)!
-                    .at(originalIndex);
+                  const orig = parentBucket.store.get(stepId)!;
+                  ev._copyResult(newIndex, orig, originalIndex);
                 }
               }
             }
@@ -644,9 +651,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           for (const planId of copyStepIds) {
             const ev = store.get(planId)!;
             if (ev.isBatch) {
-              (ev.entries as any[])[newIndex] = parentBucket.store
-                .get(planId)!
-                .at(originalIndex);
+              const orig = parentBucket.store.get(planId)!;
+              ev._copyResult(newIndex, orig, originalIndex);
             }
           }
         }
@@ -687,7 +693,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           size,
           store,
           // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
-          hasErrors: parentBucket.hasErrors,
+          flagUnion: parentBucket.flagUnion,
           polymorphicPathList,
           iterators,
         },
@@ -751,7 +757,7 @@ ${inner}
       size,
       store,
       // PERF: not necessarily, if we don't copy the errors, we don't have the errors.
-      hasErrors: parentBucket.hasErrors,
+      flagUnion: parentBucket.flagUnion,
       polymorphicPathList,
       iterators,
     }, parentBucket.metaByMetaKey);

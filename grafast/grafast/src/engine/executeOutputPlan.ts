@@ -129,6 +129,7 @@ export function executeOutputPlan(
   bucketIndex: number,
   outputDataAsString: boolean,
 ): JSONValue {
+  // debugOutputPlanWithBucket(outputPlan, bucket);
   if (isDev) {
     assert.strictEqual(
       bucket.isComplete,

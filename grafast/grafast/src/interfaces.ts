@@ -23,7 +23,7 @@ import type {
 
 import type { Bucket, RequestTools } from "./bucket.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
-import type { SafeError } from "./error.js";
+import type { GrafastError, SafeError } from "./error.js";
 import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type {
@@ -186,6 +186,22 @@ export type GrafastResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
 export type GrafastResultStreamList<T> = ReadonlyArray<
   PromiseOrDirect<AsyncIterable<PromiseOrDirect<T>> | null> | PromiseLike<never>
 >;
+
+/** @internal */
+export type ForcedValues = [
+  flags: {
+    [index: number]: ExecutionEntryFlags | undefined;
+  },
+  results: {
+    [index: number]: GrafastError | null | undefined;
+  },
+];
+
+/** @internal */
+export type GrafastInternalResultsOrStream<T> = [
+  flags: ReadonlyArray<ExecutionEntryFlags>,
+  results: GrafastResultsList<T> | GrafastResultStreamList<T>,
+];
 
 export type BaseGraphQLRootValue = any;
 export interface BaseGraphQLVariables {
@@ -774,19 +790,76 @@ export interface ExecutionExtraBase {
 export interface ExecutionExtra extends ExecutionExtraBase {}
 export interface UnbatchedExecutionExtra extends ExecutionExtraBase {}
 
+/**
+ * A bitwise number representing a number of flags:
+ *
+ * - 0: normal execution value
+ * - 1: errored (trappable)
+ * - 2: null (trappable)
+ * - 4: inhibited (trappable)
+ * - 8: disabled due to polymorphism (untrappable)
+ * - 16: ...
+ *
+ * @internal
+ */
+export type ExecutionEntryFlags = number & { readonly tsBrand?: unique symbol };
+
+export const FLAG_ERROR: ExecutionEntryFlags = 1 << 0;
+export const FLAG_NULL: ExecutionEntryFlags = 1 << 1;
+export const FLAG_INHIBITED: ExecutionEntryFlags = 1 << 2;
+export const FLAG_POLY_SKIPPED: ExecutionEntryFlags = 1 << 3;
+
+export const NO_FLAGS: ExecutionEntryFlags = 0;
+export const ALL_FLAGS: ExecutionEntryFlags =
+  FLAG_ERROR | FLAG_NULL | FLAG_INHIBITED | FLAG_POLY_SKIPPED;
+/** By default, accept null values as an input */
+export const DEFAULT_ACCEPT_FLAGS: ExecutionEntryFlags = FLAG_NULL;
+export const TRAPPABLE_FLAGS: ExecutionEntryFlags =
+  FLAG_ERROR | FLAG_NULL | FLAG_INHIBITED;
+export const DEFAULT_FORBIDDEN_FLAGS: ExecutionEntryFlags =
+  ALL_FLAGS & ~DEFAULT_ACCEPT_FLAGS;
+export const FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS: ExecutionEntryFlags =
+  FLAG_NULL | FLAG_POLY_SKIPPED;
+// TODO: make `FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS = FLAG_ERROR | FLAG_NULL | FLAG_POLY_SKIPPED | FLAG_INHIBITED;`
+// Currently this isn't enabled because the bucket has to exist for the output
+// plan to throw the error; really the root should be evaluated before
+// descending into the output plan rather than as part of descending?
+
 export type ExecutionValue<TData = any> =
-  | {
-      at(i: number): TData;
-      isBatch: true;
-      entries: ReadonlyArray<TData>;
-      value?: never;
-    }
-  | {
-      at(i: number): TData;
-      isBatch: false;
-      value: TData;
-      entries?: never;
-    };
+  | BatchExecutionValue<TData>
+  | UnaryExecutionValue<TData>;
+
+interface ExecutionValueBase<TData = any> {
+  at(i: number): TData;
+  isBatch: boolean;
+  /** @internal */
+  _flagsAt(i: number): ExecutionEntryFlags;
+  /** bitwise OR of all the entry states @internal */
+  _getStateUnion(): ExecutionEntryFlags;
+  /** @internal */
+  _setResult(i: number, value: TData, flags: ExecutionEntryFlags): void;
+  _copyResult(
+    targetIndex: number,
+    source: ExecutionValue,
+    sourceIndex: number,
+  ): void;
+}
+export interface BatchExecutionValue<TData = any>
+  extends ExecutionValueBase<TData> {
+  isBatch: true;
+  entries: ReadonlyArray<TData>;
+  value?: never;
+  /** @internal */
+  readonly _flags: Array<ExecutionEntryFlags>;
+}
+export interface UnaryExecutionValue<TData = any>
+  extends ExecutionValueBase<TData> {
+  isBatch: false;
+  value: TData;
+  entries?: never;
+  /** @internal */
+  _entryFlags: ExecutionEntryFlags;
+}
 
 export type IndexMap = <T>(callback: (i: number) => T) => ReadonlyArray<T>;
 export type IndexForEach = (callback: (i: number) => any) => void;
@@ -842,3 +915,9 @@ export interface GrafastArgs extends GraphQLArgs {
 export type Maybe<T> = T | null | undefined;
 
 export * from "./planJSONInterfaces.js";
+
+export interface AddStepDependencyOptions {
+  skipDeduplication?: boolean;
+  /** @defaultValue `FLAG_NULL` */
+  acceptFlags?: ExecutionEntryFlags;
+}

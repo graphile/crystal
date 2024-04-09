@@ -274,14 +274,17 @@ export class __ListTransformStep<
           iterators[newIndex] = bucket.iterators[originalIndex];
           const ev = store.get(itemStepId)!;
           if (ev.isBatch) {
-            (ev.entries as any[])[newIndex] = list[j];
+            ev._setResult(newIndex, list[j], 0);
           }
           for (const planId of copyStepIds) {
             const ev = store.get(planId)!;
             if (ev.isBatch) {
-              (ev.entries as any[])[newIndex] = bucket.store
-                .get(planId)!
-                .at(originalIndex);
+              const orig = bucket.store.get(planId)!;
+              ev._setResult(
+                newIndex,
+                orig.at(originalIndex),
+                orig._flagsAt(originalIndex),
+              );
             }
           }
         }
@@ -294,7 +297,7 @@ export class __ListTransformStep<
           layerPlan: childLayerPlan,
           size,
           store,
-          hasErrors: bucket.hasErrors,
+          flagUnion: bucket.flagUnion,
           polymorphicPathList,
           iterators,
         },

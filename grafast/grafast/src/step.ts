@@ -18,7 +18,9 @@ import type { OperationPlan } from "./engine/OperationPlan.js";
 import { getDebug } from "./global.js";
 import { inspect } from "./inspect.js";
 import type {
+  AddStepDependencyOptions,
   ExecutionDetails,
+  ExecutionEntryFlags,
   GrafastResultsList,
   GrafastResultStreamList,
   JSONValue,
@@ -28,7 +30,7 @@ import type {
   StreamDetails,
   UnbatchedExecutionExtra,
 } from "./interfaces.js";
-import { $$subroutine } from "./interfaces.js";
+import { $$subroutine, DEFAULT_FORBIDDEN_FLAGS } from "./interfaces.js";
 import type { __ItemStep } from "./steps/index.js";
 import { __ListTransformStep } from "./steps/index.js";
 import { stepAMayDependOnStepB } from "./utils.js";
@@ -218,9 +220,19 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   public isSyncAndSafe!: boolean;
 
   /**
+   * (default = ALL_FLAGS & ~FLAG_NULL)
+   */
+  protected readonly defaultForbiddenFlags: ExecutionEntryFlags =
+    DEFAULT_FORBIDDEN_FLAGS;
+  /**
    * The plan this plan will need data from in order to execute.
    */
   protected readonly dependencies: ReadonlyArray<ExecutableStep>;
+  /**
+   * What execution entry flags we can't handle for the given indexed dependency
+   * (default = this.defaultForbiddenFlags)
+   */
+  protected readonly dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
 
   /**
    * Just for mermaid
@@ -281,6 +293,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   constructor() {
     super();
     this.dependencies = [];
+    this.dependencyForbiddenFlags = [];
     this.dependents = [];
     this.isOptimized = false;
     this.allowMultipleOptimizations = false;
@@ -345,47 +358,17 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
 
   protected addDependency(
     step: ExecutableStep,
-    skipDeduplication = false,
+    skipDeduplicationOrOptions: boolean | AddStepDependencyOptions = false,
   ): number {
-    if (this.isFinalized) {
-      throw new Error(
-        "You cannot add a dependency after the step is finalized.",
-      );
-    }
-    if (!(step instanceof ExecutableStep)) {
-      throw new Error(
-        `Error occurred when adding dependency for '${this}', value passed was not a step, it was '${inspect(
-          step,
-        )}'`,
-      );
-    }
-    if (this._isUnaryLocked && this._isUnary && !step._isUnary) {
-      throw new Error(
-        `${this} is a unary step, so cannot add non-unary step ${step} as a dependency`,
-      );
-    }
-    if (isDev) {
-      // Check that we can actually add this as a dependency
-      if (!this.layerPlan.ancestry.includes(step.layerPlan)) {
-        throw new Error(
-          //console.error(
-          // This is not a GrafastInternalError
-          `Attempted to add '${step}' (${step.layerPlan}) as a dependency of '${this}' (${this.layerPlan}), but we cannot because that LayerPlan isn't an ancestor`,
-        );
-      }
-    }
-
-    // When copying dependencies between classes, we might not want to
-    // deduplicate because we might refer to the dependency by its index. As
-    // such, we should only dedupe by default but allow opting out.
-    if (!skipDeduplication) {
-      const existingIndex = this.dependencies.indexOf(step);
-      if (existingIndex >= 0) {
-        return existingIndex;
-      }
-    }
-
-    return this.operationPlan.stepTracker.addStepDependency(this, step);
+    const options: AddStepDependencyOptions =
+      typeof skipDeduplicationOrOptions === "boolean"
+        ? { skipDeduplication: skipDeduplicationOrOptions }
+        : skipDeduplicationOrOptions;
+    return this.operationPlan.stepTracker.addStepDependency(
+      this,
+      step,
+      options,
+    );
   }
 
   /**
@@ -394,8 +377,15 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * `isBatch = false` so you can use the `values[index].value` property
    * directly.
    */
-  protected addUnaryDependency(step: ExecutableStep): number {
-    return this.operationPlan.stepTracker.addStepUnaryDependency(this, step);
+  protected addUnaryDependency(
+    step: ExecutableStep,
+    options: AddStepDependencyOptions = {},
+  ): number {
+    return this.operationPlan.stepTracker.addStepUnaryDependency(
+      this,
+      step,
+      options,
+    );
   }
 
   /**
