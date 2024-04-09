@@ -1075,7 +1075,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           inflection,
           options: { pgForbidSetofFunctionsToReturnNull },
           setGraphQLTypeForPgCodec,
-          grafast: { list, constant, access },
+          grafast: { list, constant, access, inhibitOnNull },
         } = build;
         const unionsToRegister = new Map<string, PgCodec[]>();
         for (const codec of build.pgCodecMetaLookup.keys()) {
@@ -1240,33 +1240,34 @@ return function (list, constant) {
                           ? // eslint-disable-next-line graphile-export/exhaustive-deps
                             EXPORTABLE(
                               te.run`\
-return function (access) {
+return function (access, inhibitOnNull) {
   return $list => ({ ${te.join(
     pk.map(
       (attributeName, index) =>
-        te`${te.safeKeyOrThrow(attributeName)}: access($list, [${te.lit(
-          index + 1,
-        )}])`,
+        te`${te.safeKeyOrThrow(
+          attributeName,
+        )}: inhibitOnNull(access($list, [${te.lit(index + 1)}]))`,
     ),
     ", ",
   )} });
 }` as any,
-                              [access],
+                              [access, inhibitOnNull],
                             )
                           : EXPORTABLE(
-                              (access, pk) => ($list: ListStep<any[]>) => {
-                                const spec = pk.reduce(
-                                  (memo, attribute, index) => {
-                                    memo[attribute] = access($list, [
-                                      index + 1,
-                                    ]);
-                                    return memo;
-                                  },
-                                  Object.create(null),
-                                );
-                                return spec;
-                              },
-                              [access, pk],
+                              (access, inhibitOnNull, pk) =>
+                                ($list: ListStep<any[]>) => {
+                                  const spec = pk.reduce(
+                                    (memo, attribute, index) => {
+                                      memo[attribute] = inhibitOnNull(
+                                        access($list, [index + 1]),
+                                      );
+                                      return memo;
+                                    },
+                                    Object.create(null),
+                                  );
+                                  return spec;
+                                },
+                              [access, inhibitOnNull, pk],
                             ),
                         get: EXPORTABLE(
                           (resource) => (spec: any) => resource.get(spec),

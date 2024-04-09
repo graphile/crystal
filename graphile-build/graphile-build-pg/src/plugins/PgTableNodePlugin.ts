@@ -8,7 +8,6 @@ import type {
   PgSelectSingleStep,
 } from "@dataplan/pg";
 import type { ListStep } from "grafast";
-import { access, constant, inhibitOnNull, list } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
@@ -65,6 +64,9 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
         if (!build.registerNodeIdHandler) {
           return _;
         }
+        const {
+          grafast: { access, constant, inhibitOnNull, list },
+        } = build;
         const tableResources = Object.values(
           build.input.pgRegistry.pgResources,
         ).filter((resource) => {
@@ -80,14 +82,17 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
           );
         });
 
-        const resourcesByCodec = new Map<PgCodec, PgResource[]>();
+        const resourcesByCodec = new Map<
+          PgCodec,
+          PgResource<any, any, any>[]
+        >();
         for (const resource of tableResources) {
-          let list = resourcesByCodec.get(resource.codec);
-          if (!list) {
-            list = [];
-            resourcesByCodec.set(resource.codec, list);
+          let resourcesList = resourcesByCodec.get(resource.codec);
+          if (!resourcesList) {
+            resourcesList = [];
+            resourcesByCodec.set(resource.codec, resourcesList);
           }
-          list.push(resource);
+          resourcesList.push(resource);
         }
 
         for (const [codec, resources] of resourcesByCodec.entries()) {
@@ -180,7 +185,7 @@ return function (access, inhibitOnNull) {
                   [access, inhibitOnNull],
                 )
               : EXPORTABLE(
-                  (access, pk) => ($list: ListStep<any[]>) => {
+                  (access, inhibitOnNull, pk) => ($list: ListStep<any[]>) => {
                     const spec = pk.reduce((memo, attribute, index) => {
                       memo[attribute] = inhibitOnNull(
                         access($list, [index + 1]),
@@ -189,7 +194,7 @@ return function (access, inhibitOnNull) {
                     }, Object.create(null));
                     return spec;
                   },
-                  [access, pk],
+                  [access, inhibitOnNull, pk],
                 ),
             get: EXPORTABLE(
               (pgResource) => (spec: any) => pgResource.get(spec),
