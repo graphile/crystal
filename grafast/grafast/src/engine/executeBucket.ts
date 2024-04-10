@@ -29,6 +29,7 @@ import {
   FLAG_INHIBITED,
   FLAG_NULL,
   FLAG_POLY_SKIPPED,
+  FLAG_STOPPED,
   NO_FLAGS,
 } from "../interfaces.js";
 import type { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
@@ -985,7 +986,7 @@ export function executeBucket(
           // ExecutionValue is created:
           //   bucket.hasNonZeroStatus = true;
           return [
-            arrayOfLength(size, FLAG_ERROR /* TODO: don't lose other flags */),
+            arrayOfLength(size, FLAG_ERROR | FLAG_STOPPED),
             arrayOfLength(size, error),
           ];
         });
@@ -997,7 +998,7 @@ export function executeBucket(
       // ExecutionValue is created:
       //   bucket.hasNonZeroStatus = true;
       return [
-        arrayOfLength(size, FLAG_ERROR /* TODO: don't lose other flags */),
+        arrayOfLength(size, FLAG_ERROR | FLAG_STOPPED),
         arrayOfLength(size, error),
       ];
     }
