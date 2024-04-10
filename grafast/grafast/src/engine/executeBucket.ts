@@ -26,8 +26,10 @@ import {
   $$streamMore,
   $$timeout,
   FLAG_ERROR,
+  FLAG_INHIBITED,
   FLAG_NULL,
   FLAG_POLY_SKIPPED,
+  FLAG_STOPPED,
   NO_FLAGS,
 } from "../interfaces.js";
 import type { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
@@ -592,15 +594,18 @@ export function executeBucket(
             for (const $dep of step.dependencies) {
               const depExecutionVal = bucket.store.get($dep.id)!;
               const depVal = depExecutionVal.at(dataIndex);
+              let depFlags;
               // if (bucket.hasNonZeroStatus && isGrafastError(depVal)) {
               if (
                 (bucket.flagUnion & FLAG_ERROR) === FLAG_ERROR &&
-                (depExecutionVal._flagsAt(dataIndex) & FLAG_ERROR) ===
+                ((depFlags = depExecutionVal._flagsAt(dataIndex)) &
+                  FLAG_ERROR) ===
                   FLAG_ERROR
               ) {
                 if (step._isUnary) {
                   // COPY the unary value
                   bucket.store.set(step.id, depExecutionVal);
+                  bucket.flagUnion |= depFlags;
                 } else {
                   bucket.setResult(step, dataIndex, depVal, FLAG_ERROR);
                 }
@@ -622,7 +627,6 @@ export function executeBucket(
               stepResult == null ? FLAG_NULL : NO_FLAGS,
             );
           } catch (e) {
-            console.dir(e);
             const error = newGrafastError(e, step.id);
             bucket.setResult(step, dataIndex, error, FLAG_ERROR);
           }
@@ -726,6 +730,7 @@ export function executeBucket(
     step: ExecutableStep,
     dependenciesIncludingSideEffects: ReadonlyArray<ExecutionValue>,
     dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>,
+    dependencyOnReject: ReadonlyArray<GrafastError | null | undefined>,
     polymorphicPathList: readonly (string | null)[],
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastInternalResultsOrStream<any>> {
@@ -754,6 +759,7 @@ export function executeBucket(
     // for (let index = 0, l = polymorphicPathList.length; index < l; index++) {
     for (let index = 0; index < expectedSize; index++) {
       let forceIndexValue: GrafastError | null | undefined = undefined;
+      let rejectValue: GrafastError | null | undefined = undefined;
       let indexFlags: ExecutionEntryFlags = NO_FLAGS;
       if (
         stepPolymorphicPaths !== null &&
@@ -769,10 +775,20 @@ export function executeBucket(
         ) {
           const dep = dependenciesIncludingSideEffects[i];
           const forbiddenFlags = dependencyForbiddenFlags[i];
+          const onReject = dependencyOnReject[i];
           const flags = dep._flagsAt(index);
           const disallowedFlags = flags & forbiddenFlags;
           if (disallowedFlags !== NO_FLAGS) {
             indexFlags |= disallowedFlags;
+            // If there's a reject behavior and we're FRESHLY rejected (weren't
+            // already inhibited), use that as a fallback.
+            // TODO: validate this.
+            // If dep is inhibited and we don't allow inhibited, copy through (null or error).
+            // If dep is inhibited and we do allow inhibited, but we're disallowed, use our onReject.
+            // If dep is not inhibited, but we're disallowed, use our onReject.
+            if (onReject && (disallowedFlags & FLAG_INHIBITED) === NO_FLAGS) {
+              rejectValue ||= onReject;
+            }
             if (!forceIndexValue) {
               if (flags & FLAG_ERROR) {
                 const v = dep.at(index);
@@ -802,6 +818,11 @@ export function executeBucket(
                 batchExecutionValue(ev.entries.slice(0, index))
               : ev,
           );
+        }
+        indexFlags |= FLAG_INHIBITED;
+        if (forceIndexValue == null && rejectValue != null) {
+          indexFlags |= FLAG_ERROR;
+          forceIndexValue = rejectValue;
         }
         forcedValues[0][index] = indexFlags;
         forcedValues[1][index] = forceIndexValue;
@@ -881,16 +902,19 @@ export function executeBucket(
       /** Only mutate this inside `addDependency` */
       const _rawDependencies: Array<ExecutionValue> = [];
       const _rawForbiddenFlags: Array<ExecutionEntryFlags> = [];
+      const _rawOnReject: Array<GrafastError | null | undefined> = [];
       const dependencies: ReadonlyArray<ExecutionValue> = _rawDependencies;
       let needsFiltering = false;
       const defaultForbiddenFlags = sudo(step).defaultForbiddenFlags;
       const addDependency = (
         step: ExecutableStep,
         forbiddenFlags: ExecutionEntryFlags,
+        onReject: GrafastError | null | undefined,
       ) => {
         const executionValue = store.get(step.id)!;
         _rawDependencies.push(executionValue);
         _rawForbiddenFlags.push(forbiddenFlags);
+        _rawOnReject.push(onReject);
         if (!needsFiltering && (bucket.flagUnion & forbiddenFlags) !== 0) {
           const flags = executionValue._getStateUnion();
           needsFiltering = (flags & forbiddenFlags) !== 0;
@@ -901,9 +925,11 @@ export function executeBucket(
       if (depCount > 0 || sideEffectStepsWithErrors !== null) {
         for (let i = 0, l = depCount; i < l; i++) {
           const $dep = sstep.dependencies[i];
-          addDependency($dep, sstep.dependencyForbiddenFlags[i]);
-          // const executionValue = store.get($dep.id)!;
-          // dependencies[i] = executionValue;
+          addDependency(
+            $dep,
+            sstep.dependencyForbiddenFlags[i],
+            sstep.dependencyOnReject[i],
+          );
         }
         if (sideEffectStepsWithErrors !== null) {
           if (sstep.polymorphicPaths) {
@@ -911,14 +937,14 @@ export function executeBucket(
               for (const sideEffectStep of sideEffectStepsWithErrors[path]) {
                 // TODO: revisit this, feels like we might be adding the same
                 // effect multiple times if it matches multiple paths.
-                addDependency(sideEffectStep, defaultForbiddenFlags);
+                addDependency(sideEffectStep, defaultForbiddenFlags, undefined);
               }
             }
           } else {
             for (const sideEffectStep of sideEffectStepsWithErrors[
               NO_POLY_PATH
             ]) {
-              addDependency(sideEffectStep, defaultForbiddenFlags);
+              addDependency(sideEffectStep, defaultForbiddenFlags, undefined);
             }
           }
         }
@@ -944,6 +970,7 @@ export function executeBucket(
             step,
             dependencies,
             _rawForbiddenFlags,
+            _rawOnReject,
             bucket.polymorphicPathList,
             extra,
           )
@@ -959,7 +986,7 @@ export function executeBucket(
           // ExecutionValue is created:
           //   bucket.hasNonZeroStatus = true;
           return [
-            arrayOfLength(size, FLAG_ERROR /* TODO: don't lose other flags */),
+            arrayOfLength(size, FLAG_ERROR | FLAG_STOPPED),
             arrayOfLength(size, error),
           ];
         });
@@ -971,7 +998,7 @@ export function executeBucket(
       // ExecutionValue is created:
       //   bucket.hasNonZeroStatus = true;
       return [
-        arrayOfLength(size, FLAG_ERROR /* TODO: don't lose other flags */),
+        arrayOfLength(size, FLAG_ERROR | FLAG_STOPPED),
         arrayOfLength(size, error),
       ];
     }

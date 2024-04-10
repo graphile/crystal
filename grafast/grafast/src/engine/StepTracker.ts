@@ -4,6 +4,7 @@ import { inspect } from "../inspect.js";
 import type { AddStepDependencyOptions } from "../interfaces.js";
 import { $$subroutine, ALL_FLAGS, TRAPPABLE_FLAGS } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
+import { __FlagStep } from "../steps/__flag.js";
 import { sudo } from "../utils.js";
 import type {
   LayerPlan,
@@ -282,6 +283,19 @@ export class StepTracker {
   ): number {
     const $dependent = sudo(raw$dependent);
     const $dependency = sudo(raw$dependency);
+    if ($dependency instanceof __FlagStep) {
+      // See if we can inline this
+      const inlineDetails = $dependency.inline(options);
+      if (inlineDetails !== null) {
+        // We can inline it: tweak flags and try again
+        const { $source, acceptFlags, onReject } = inlineDetails;
+        return this.addStepDependency($dependent, $source, {
+          ...options,
+          acceptFlags,
+          onReject,
+        });
+      }
+    }
     if (!this.activeSteps.has($dependent)) {
       throw new Error(
         `Cannot add ${$dependency} as a dependency of ${$dependent}; the latter is deleted!`,
@@ -319,9 +333,13 @@ export class StepTracker {
     const dependentDependencyForbiddenFlags = writeableArray(
       $dependent.dependencyForbiddenFlags,
     );
+    const dependentDependencyOnReject = writeableArray(
+      $dependent.dependencyOnReject,
+    );
     const {
       skipDeduplication,
       acceptFlags = ALL_FLAGS & ~$dependent.defaultForbiddenFlags,
+      onReject,
     } = options;
     // When copying dependencies between classes, we might not want to
     // deduplicate because we might refer to the dependency by its index. As
@@ -348,6 +366,7 @@ export class StepTracker {
     this.stepsWithNoDependencies.delete($dependent);
     const dependencyIndex = dependentDependencies.push($dependency) - 1;
     dependentDependencyForbiddenFlags[dependencyIndex] = forbiddenFlags;
+    dependentDependencyOnReject[dependencyIndex] = onReject;
     writeableArray($dependency.dependents).push({
       step: $dependent,
       dependencyIndex,

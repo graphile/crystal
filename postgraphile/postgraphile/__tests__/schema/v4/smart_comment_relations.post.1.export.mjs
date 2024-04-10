@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
 const handler = {
@@ -1152,7 +1152,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -1171,7 +1171,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -1190,7 +1190,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -1209,7 +1209,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -1228,8 +1228,8 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        str_id: access($list, [1]),
-        prop_id: access($list, [2])
+        str_id: inhibitOnNull(access($list, [1])),
+        prop_id: inhibitOnNull(access($list, [2]))
       };
     },
     get(spec) {
@@ -1248,8 +1248,8 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        street_id: access($list, [1]),
-        property_id: access($list, [2])
+        street_id: inhibitOnNull(access($list, [1])),
+        property_id: inhibitOnNull(access($list, [2]))
       };
     },
     get(spec) {
@@ -1268,7 +1268,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {

@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUnionAll, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeDecodeNodeId, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeDecodeNodeId, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
 const handler_codec_base64JSON = {
@@ -4103,7 +4103,7 @@ const handler = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4164,7 +4164,7 @@ const handler2 = {
   },
   getSpec($list) {
     return {
-      person_id: access($list, [1])
+      person_id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4223,7 +4223,7 @@ const handler3 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4280,7 +4280,7 @@ const handler4 = {
   },
   getSpec($list) {
     return {
-      organization_id: access($list, [1])
+      organization_id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4299,7 +4299,7 @@ const handler5 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4411,7 +4411,7 @@ const handler6 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4522,7 +4522,7 @@ const handler7 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4542,8 +4542,8 @@ const handler8 = {
   },
   getSpec($list) {
     return {
-      parent_id: access($list, [1]),
-      child_id: access($list, [2])
+      parent_id: inhibitOnNull(access($list, [1])),
+      child_id: inhibitOnNull(access($list, [2]))
     };
   },
   get(spec) {
@@ -4562,7 +4562,7 @@ const handler9 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4581,8 +4581,8 @@ const handler10 = {
   },
   getSpec($list) {
     return {
-      parent_id: access($list, [1]),
-      child_id: access($list, [2])
+      parent_id: inhibitOnNull(access($list, [1])),
+      child_id: inhibitOnNull(access($list, [2]))
     };
   },
   get(spec) {
@@ -4601,7 +4601,7 @@ const handler11 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4621,7 +4621,7 @@ const handler12 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4640,7 +4640,7 @@ const handler13 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4659,7 +4659,7 @@ const handler14 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4678,7 +4678,7 @@ const handler15 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4698,7 +4698,7 @@ const handler16 = {
   },
   getSpec($list) {
     return {
-      topic_item_id: access($list, [1])
+      topic_item_id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4721,7 +4721,7 @@ const handler17 = {
   },
   getSpec($list) {
     return {
-      post_item_id: access($list, [1])
+      post_item_id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4740,7 +4740,7 @@ const handler18 = {
   },
   getSpec($list) {
     return {
-      divider_item_id: access($list, [1])
+      divider_item_id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4759,7 +4759,7 @@ const handler19 = {
   },
   getSpec($list) {
     return {
-      checklist_item_id: access($list, [1])
+      checklist_item_id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4778,7 +4778,7 @@ const handler20 = {
   },
   getSpec($list) {
     return {
-      checklist_item_item_id: access($list, [1])
+      checklist_item_item_id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4833,7 +4833,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -4852,7 +4852,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
