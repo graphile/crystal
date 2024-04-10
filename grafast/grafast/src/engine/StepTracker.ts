@@ -286,14 +286,7 @@ export class StepTracker {
       // See if we can inline this
       const inlineDetails = $dependency.inline(options);
       if (inlineDetails !== null) {
-        // We can inline it: tweak flags and try again
-        const { $source, acceptFlags, onReject } = inlineDetails;
-        return this.addStepDependency($dependent, {
-          ...options,
-          step: $source,
-          acceptFlags,
-          onReject,
-        });
+        return this.addStepDependency($dependent, inlineDetails);
       }
     }
     if (!this.activeSteps.has($dependent)) {

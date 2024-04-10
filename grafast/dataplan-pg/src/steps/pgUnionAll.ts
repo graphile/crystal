@@ -549,7 +549,7 @@ export class PgUnionAllStep<
 
       cloneFrom.dependencies.forEach((planId, idx) => {
         const myIdx = this.addDependency({
-          step: cloneFrom.getDep(idx),
+          ...cloneFrom.getDepOptions(idx),
           skipDeduplication: true,
         });
         if (myIdx !== idx) {

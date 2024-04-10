@@ -34,6 +34,8 @@ import type {
 import {
   $$deepDepSkip,
   $$subroutine,
+  ALL_FLAGS,
+  DEFAULT_ACCEPT_FLAGS,
   DEFAULT_FORBIDDEN_FLAGS,
 } from "./interfaces.js";
 import { __FlagStep } from "./steps/__flag.js";
@@ -317,8 +319,26 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     return this.layerPlan.getStep(id, this);
   }
 
+  protected getDepOptions(depId: number): AddDependencyOptions {
+    const step = this.dependencies[depId];
+    const forbiddenFlags = this.dependencyForbiddenFlags[depId];
+    const onReject = this.dependencyOnReject[depId];
+    const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
+    return { step, acceptFlags, onReject };
+  }
+
   protected getDep(depId: number): ExecutableStep {
-    return this.dependencies[depId];
+    const { step, acceptFlags, onReject } = this.getDepOptions(depId);
+    if (acceptFlags === DEFAULT_ACCEPT_FLAGS && onReject == null) {
+      return step;
+    } else {
+      // Return a __FlagStep around options.step so that all the options are preserved.
+      return new __FlagStep(
+        step,
+        acceptFlags ?? DEFAULT_ACCEPT_FLAGS,
+        onReject,
+      );
+    }
   }
 
   /**
