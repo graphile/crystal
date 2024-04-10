@@ -1,0 +1,18 @@
+{
+  allPosts: {
+    nodes: [
+      {
+        author: {
+          id: "WyJwZW9wbGUiLDNd",
+        },
+        body: "Hello world",
+      },
+      {
+        author: {
+          id: "WyJwZW9wbGUiLDNd",
+        },
+        body: "Hi Bob!",
+      },
+    ],
+  },
+}

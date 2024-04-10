@@ -1,0 +1,13 @@
+## expect(errors).toBeFalsy()
+#> schema: ["d"]
+#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+{
+  allPosts(condition: { author: "WyJwZW9wbGUiLDNd" }) {
+    nodes {
+      author {
+        id
+      }
+      body
+    }
+  }
+}

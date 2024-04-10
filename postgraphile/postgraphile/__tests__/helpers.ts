@@ -278,7 +278,11 @@ export async function runTestQuery(
     },
   };
 
-  if (path.includes("/v4") || path.includes("/polymorphic")) {
+  if (
+    path.includes("/v4") ||
+    path.includes("/polymorphic") ||
+    path.includes("/relay")
+  ) {
     applyV4Stuff(preset, config);
   }
 

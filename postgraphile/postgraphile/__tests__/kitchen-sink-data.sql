@@ -74,6 +74,9 @@ delete from js_reserved.reserved cascade;
 delete from partitions.measurements cascade;
 delete from partitions.users cascade;
 
+delete from d.post cascade;
+delete from d.person cascade;
+
 alter table b.types enable trigger user;
 
 alter sequence inheritence.file_id_seq restart with 1;
@@ -288,9 +291,15 @@ insert into c.null_test_record (id, nullable_text, nullable_int, non_null_text) 
 
 -- Begin tests for smart comments
 
-insert into d.person (id, first_name, last_name) values
+insert into d.person
+  (id, first_name, last_name) values
   (1, 'John', 'Smith'),
-  (2, 'Sara', 'Smith');
+  (2, 'Sara', 'Smith'),
+  (3, 'Alice', 'Alicesson'),
+  (4, 'Bob', 'Bobsson'),
+  (5, 'Carl', 'Carlsson');
+
+alter sequence d.person_id_seq restart with 10;
 
 update d.person set
   col_no_create = col_no_create || id::text,
@@ -301,7 +310,15 @@ update d.person set
   col_no_create_update_order_filter = col_no_create_update_order_filter || id::text,
   col_no_anything = col_no_anything || id::text;
 
-alter sequence d.person_id_seq restart with 10;
+insert into d.post
+  (id, body, author_id) values
+  (1, 'Hello world', 3),
+  (2, 'Hi Alice!', 4),
+  (3, 'Hi Bob!', 3),
+  (4, 'Message from deleted user', null);
+
+alter sequence d.post_id_seq restart with 1000;
+
 
 
 -- Begin data for smart_comment_relations
@@ -929,3 +946,4 @@ insert into space.mobile_pad(name) select i::text from generate_series(1, 10) i;
 insert into space.static_pad(name) select i::text from generate_series(1, 10) i;
 insert into space.temp_pad(name) select i::text from generate_series(1, 10) i;
 insert into space.spacecraft(name, return_to_earth) select i::text, tsrange((date_trunc('day', '2024-03-13T12:00:00Z'::timestamptz) - (i+1) * interval '1 day')::timestamp, (date_trunc('day', '2024-03-13T12:00:00Z'::timestamptz) - (i) * interval '1 day')::timestamp, '[)') from generate_series(1, 10) i;
+
