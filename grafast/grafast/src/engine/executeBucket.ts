@@ -626,7 +626,6 @@ export function executeBucket(
               stepResult == null ? FLAG_NULL : NO_FLAGS,
             );
           } catch (e) {
-            console.dir(e);
             const error = newGrafastError(e, step.id);
             bucket.setResult(step, dataIndex, error, FLAG_ERROR);
           }
