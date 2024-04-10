@@ -2,7 +2,15 @@
 #> schema: ["d"]
 #> extends: ["postgraphile/presets/relay:PgRelayPreset"]
 {
-  allPosts(condition: { author: "WyJwZW9wbGUiLDNd" }) {
+  alicesPosts: allPosts(condition: { author: "WyJwZW9wbGUiLDNd" }) {
+    nodes {
+      author {
+        id
+      }
+      body
+    }
+  }
+  postsWithNoAuthor: allPosts(condition: { author: null }) {
     nodes {
       author {
         id

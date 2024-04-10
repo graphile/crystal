@@ -1,5 +1,5 @@
 {
-  allPosts: {
+  alicesPosts: {
     nodes: [
       {
         author: {
@@ -12,6 +12,14 @@
           id: "WyJwZW9wbGUiLDNd",
         },
         body: "Hi Bob!",
+      },
+    ],
+  },
+  postsWithNoAuthor: {
+    nodes: [
+      {
+        author: null,
+        body: "Message from deleted user",
       },
     ],
   },
