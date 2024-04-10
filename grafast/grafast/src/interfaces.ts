@@ -840,6 +840,7 @@ interface ExecutionValueBase<TData = any> {
   _getStateUnion(): ExecutionEntryFlags;
   /** @internal */
   _setResult(i: number, value: TData, flags: ExecutionEntryFlags): void;
+  /** @internal */
   _copyResult(
     targetIndex: number,
     source: ExecutionValue,
