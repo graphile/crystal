@@ -168,7 +168,7 @@ export function recursivePrintBucket(bucket: Bucket, indentLevel = 0): string {
     indentLevel,
     `Bucket for ${bucket.layerPlan} (size = ${bucket.size}):
   Store:
-${indent(4, printStore(bucket.store))}
+${indent(4, printStore(bucket))}
   Children:
 ${Object.entries(bucket.children)
   .map(([_id, { bucket }]) => indent(4, recursivePrintBucket(bucket)))
@@ -192,11 +192,13 @@ function indentIfMultiline(string: string): string {
   }
 }
 
-export function printStore(store: Bucket["store"]): string {
+export function printStore(bucket: Bucket): string {
   const output: string[] = [];
-  for (const [key, val] of store) {
+  for (const [key, val] of bucket.store) {
     const printKey = String(key).padStart(3, " ");
-    if (val.isBatch) {
+    if (bucket.layerPlan.copyStepIds.includes(key)) {
+      output.push(`${printKey} (copy)`);
+    } else if (val.isBatch) {
       output.push(
         `${printKey} (BATCH):${indent(
           2,
