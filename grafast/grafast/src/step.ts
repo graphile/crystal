@@ -35,12 +35,9 @@ import {
   $$deepDepSkip,
   $$subroutine,
   ALL_FLAGS,
-  DEFAULT_ACCEPT_FLAGS,
   DEFAULT_FORBIDDEN_FLAGS,
 } from "./interfaces.js";
-import { __FlagStep } from "./steps/__flag.js";
 import type { __ItemStep } from "./steps/index.js";
-import { __ListTransformStep } from "./steps/index.js";
 import { stepAMayDependOnStepB } from "./utils.js";
 
 /**
@@ -328,17 +325,10 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   }
 
   protected getDep(depId: number): ExecutableStep {
-    const { step, acceptFlags, onReject } = this.getDepOptions(depId);
-    if (acceptFlags === DEFAULT_ACCEPT_FLAGS && onReject == null) {
-      return step;
-    } else {
-      // Return a __FlagStep around options.step so that all the options are preserved.
-      return new __FlagStep(
-        step,
-        acceptFlags ?? DEFAULT_ACCEPT_FLAGS,
-        onReject,
-      );
-    }
+    // This gets replaced when `__FlagStep` is loaded. Were we on ESM we could
+    // just put the code here, but since we're not we have to avoid the
+    // circular dependency.
+    throw new Error(`Grafast failed to load correctly`);
   }
 
   /**

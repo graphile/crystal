@@ -14,8 +14,7 @@ import {
   FLAG_NULL,
   TRAPPABLE_FLAGS,
 } from "../interfaces.js";
-import type { ExecutableStep } from "../step.js";
-import { UnbatchedExecutableStep } from "../step.js";
+import { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 
 export class __FlagStep<TData> extends UnbatchedExecutableStep<TData> {
@@ -91,3 +90,17 @@ export function assertNotNull($step: ExecutableStep, message: string) {
 export function trap($step: ExecutableStep, acceptFlags: ExecutionEntryFlags) {
   return new __FlagStep($step, acceptFlags & TRAPPABLE_FLAGS);
 }
+
+// Have to overwrite the getDep method due to circular dependency
+(ExecutableStep.prototype as any).getDep = function (
+  this: ExecutableStep,
+  depId: number,
+) {
+  const { step, acceptFlags, onReject } = this.getDepOptions(depId);
+  if (acceptFlags === DEFAULT_ACCEPT_FLAGS && onReject == null) {
+    return step;
+  } else {
+    // Return a __FlagStep around options.step so that all the options are preserved.
+    return new __FlagStep(step, acceptFlags ?? DEFAULT_ACCEPT_FLAGS, onReject);
+  }
+};
