@@ -366,7 +366,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   ): number {
     const options: AddDependencyOptions =
       stepOrOptions instanceof ExecutableStep
-        ? { step: stepOrOptions }
+        ? { step: stepOrOptions, skipDeduplication: false }
         : stepOrOptions;
     return this.operationPlan.stepTracker.addStepDependency(this, options);
   }
