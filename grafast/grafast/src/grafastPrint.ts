@@ -1,5 +1,8 @@
 import chalk from "chalk";
 
+import type { Bucket } from "./bucket.js";
+import { bucketToString } from "./engine/executeBucket.js";
+import { OutputPlan } from "./engine/OutputPlan.js";
 import { inspect } from "./inspect.js";
 import { ExecutableStep } from "./step.js";
 import { stripAnsi } from "./stripAnsi.js";
@@ -91,6 +94,9 @@ export function _grafastPrint(
     }
     return `Map{${pairs.join(", ")}}`;
   }
+  if (isBucket(symbol)) {
+    return recursivePrintBucket(symbol);
+  }
   if (typeof symbol === "object" && symbol) {
     if (symbol instanceof Error) {
       return chalk.red(
@@ -100,6 +106,9 @@ export function _grafastPrint(
             .substring(0, 30) + "..."
         }>`,
       );
+    }
+    if (symbol instanceof OutputPlan) {
+      return symbol.print();
     }
     if (
       ![null, Object.prototype, sharedNull].includes(
@@ -129,6 +138,14 @@ export function _grafastPrint(
   return grafastPrintSymbol(symbol);
 }
 
+function isBucket(thing: any): thing is Bucket {
+  return (
+    typeof thing === "object" &&
+    thing !== null &&
+    thing.toString === bucketToString
+  );
+}
+
 function _grafastSymbolDescription(symbol: symbol): string {
   if (!symbol.description) {
     return chalk.green("Symbol()");
@@ -140,6 +157,73 @@ function _grafastSymbolDescription(symbol: symbol): string {
   } else {
     return chalk.cyan(`$$${symbol.description}`);
   }
+}
+
+function indent(level: number, string: string) {
+  return " ".repeat(level) + string.replace(/\n/g, `\n${" ".repeat(level)}`);
+}
+
+export function recursivePrintBucket(bucket: Bucket, indentLevel = 0): string {
+  return indent(
+    indentLevel,
+    `Bucket for ${bucket.layerPlan} (size = ${bucket.size}):
+  Store:
+${indent(4, printStore(bucket.store))}
+  Children:
+${Object.entries(bucket.children)
+  .map(([_id, { bucket }]) => indent(4, recursivePrintBucket(bucket)))
+  .join("\n")}`,
+  );
+}
+
+const PRINT_STORE_INSPECT_OPTIONS = {
+  colors: true,
+  depth: 0,
+  showHidden: false,
+  maxArrayLength: 5,
+  maxStringLength: 50,
+};
+
+function indentIfMultiline(string: string): string {
+  if (string.includes("\n")) {
+    return indent(4, "\n" + string);
+  } else {
+    return string;
+  }
+}
+
+export function printStore(store: Bucket["store"]): string {
+  const output: string[] = [];
+  for (const [key, val] of store) {
+    const printKey = String(key).padStart(3, " ");
+    if (val.isBatch) {
+      output.push(
+        `${printKey} (BATCH):${indent(
+          2,
+          val.entries
+            .map(
+              (e, i) =>
+                `${String(i).padStart(3, " ")}: flags=${String(
+                  val._flagsAt(i),
+                ).padStart(2, " ")} value=${indentIfMultiline(
+                  inspect(val.at(i), PRINT_STORE_INSPECT_OPTIONS),
+                )}`,
+            )
+            .join("\n"),
+        )}`,
+      );
+    } else {
+      output.push(
+        `${printKey} (UNARY/${String(val._entryFlags).padStart(
+          2,
+          " ",
+        )}): ${indentIfMultiline(
+          inspect(val.value, PRINT_STORE_INSPECT_OPTIONS),
+        )}`,
+      );
+    }
+  }
+  return output.join("\n") || "EMPTY";
 }
 
 export function grafastColor(text: string, n: number): string {

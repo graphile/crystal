@@ -1189,7 +1189,7 @@ export function newBucket(
   };
 }
 
-function bucketToString(this: Bucket) {
+export function bucketToString(this: Bucket) {
   return `Bucket<${this.layerPlan}>`;
 }
 

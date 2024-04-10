@@ -1,4 +1,7 @@
-export let inspect: (obj: any, options?: { colors: boolean }) => string;
+export let inspect: (
+  obj: any,
+  options?: { colors?: boolean; depth?: number },
+) => string;
 
 try {
   inspect = require("util").inspect;
