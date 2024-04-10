@@ -31,15 +31,16 @@ import type {
   StreamDetails,
   UnbatchedExecutionExtra,
 } from "./interfaces.js";
-import { $$subroutine, DEFAULT_FORBIDDEN_FLAGS } from "./interfaces.js";
+import {
+  $$deepDepSkip,
+  $$subroutine,
+  DEFAULT_FORBIDDEN_FLAGS,
+} from "./interfaces.js";
+import { __FlagStep } from "./steps/__flag.js";
 import type { __ItemStep } from "./steps/index.js";
 import { __ListTransformStep } from "./steps/index.js";
 import { stepAMayDependOnStepB } from "./utils.js";
 
-/**
- * @internal
- */
-export const $$deepDepSkip = Symbol("deepDepSkip_experimental");
 /**
  * This indicates that a step never executes (e.g. __ItemStep and __ValueStep)
  * and thus when executed skips direct to reallyCompletedStep.

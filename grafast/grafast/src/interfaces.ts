@@ -926,3 +926,7 @@ export interface AddDependencyOptions {
   acceptFlags?: ExecutionEntryFlags;
   onReject?: null | GrafastError | undefined;
 }
+/**
+ * @internal
+ */
+export const $$deepDepSkip = Symbol("deepDepSkip_experimental");

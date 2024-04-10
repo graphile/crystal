@@ -8,13 +8,14 @@ import type {
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import {
+  $$deepDepSkip,
   ALL_FLAGS,
   DEFAULT_ACCEPT_FLAGS,
   FLAG_NULL,
   TRAPPABLE_FLAGS,
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
-import { $$deepDepSkip, UnbatchedExecutableStep } from "../step.js";
+import { UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
 
 export class __FlagStep<TData> extends UnbatchedExecutableStep<TData> {
