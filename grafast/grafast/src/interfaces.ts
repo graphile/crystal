@@ -919,7 +919,8 @@ export type Maybe<T> = T | null | undefined;
 
 export * from "./planJSONInterfaces.js";
 
-export interface AddStepDependencyOptions {
+export interface AddDependencyOptions {
+  step: ExecutableStep;
   skipDeduplication?: boolean;
   /** @defaultValue `FLAG_NULL` */
   acceptFlags?: ExecutionEntryFlags;

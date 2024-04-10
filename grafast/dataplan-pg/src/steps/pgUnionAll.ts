@@ -548,7 +548,10 @@ export class PgUnionAllStep<
         : undefined;
 
       cloneFrom.dependencies.forEach((planId, idx) => {
-        const myIdx = this.addDependency(cloneFrom.getDep(idx), true);
+        const myIdx = this.addDependency({
+          step: cloneFrom.getDep(idx),
+          skipDeduplication: true,
+        });
         if (myIdx !== idx) {
           throw new Error(
             `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,

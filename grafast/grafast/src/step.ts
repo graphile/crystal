@@ -19,7 +19,7 @@ import type { GrafastError } from "./error.js";
 import { getDebug } from "./global.js";
 import { inspect } from "./inspect.js";
 import type {
-  AddStepDependencyOptions,
+  AddDependencyOptions,
   ExecutionDetails,
   ExecutionEntryFlags,
   GrafastResultsList,
@@ -362,18 +362,13 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   }
 
   protected addDependency(
-    step: ExecutableStep,
-    skipDeduplicationOrOptions: boolean | AddStepDependencyOptions = false,
+    stepOrOptions: ExecutableStep | AddDependencyOptions,
   ): number {
-    const options: AddStepDependencyOptions =
-      typeof skipDeduplicationOrOptions === "boolean"
-        ? { skipDeduplication: skipDeduplicationOrOptions }
-        : skipDeduplicationOrOptions;
-    return this.operationPlan.stepTracker.addStepDependency(
-      this,
-      step,
-      options,
-    );
+    const options: AddDependencyOptions =
+      stepOrOptions instanceof ExecutableStep
+        ? { step: stepOrOptions }
+        : stepOrOptions;
+    return this.operationPlan.stepTracker.addStepDependency(this, options);
   }
 
   /**
@@ -383,14 +378,13 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * directly.
    */
   protected addUnaryDependency(
-    step: ExecutableStep,
-    options: AddStepDependencyOptions = {},
+    stepOrOptions: ExecutableStep | AddDependencyOptions,
   ): number {
-    return this.operationPlan.stepTracker.addStepUnaryDependency(
-      this,
-      step,
-      options,
-    );
+    const options: AddDependencyOptions =
+      stepOrOptions instanceof ExecutableStep
+        ? { step: stepOrOptions }
+        : stepOrOptions;
+    return this.operationPlan.stepTracker.addStepUnaryDependency(this, options);
   }
 
   /**

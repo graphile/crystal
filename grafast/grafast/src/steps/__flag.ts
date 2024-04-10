@@ -1,7 +1,7 @@
 import type { GrafastError } from "../error.js";
 import { newGrafastError } from "../error.js";
 import type {
-  AddStepDependencyOptions,
+  AddDependencyOptions,
   ExecutionDetails,
   ExecutionEntryFlags,
   GrafastResultsList,
@@ -20,12 +20,12 @@ import { arrayOfLength } from "../utils.js";
 export class __FlagStep<TData> extends UnbatchedExecutableStep<TData> {
   isSyncAndSafe = false;
   constructor(
-    $step: ExecutableStep,
+    step: ExecutableStep,
     acceptFlags: ExecutionEntryFlags,
     onReject?: GrafastError | null,
   ) {
     super();
-    this.addDependency($step, { acceptFlags, onReject });
+    this.addDependency({ step, acceptFlags, onReject });
   }
   getParentStep(): ExecutableStep {
     return this.getDep(0);
@@ -34,7 +34,7 @@ export class __FlagStep<TData> extends UnbatchedExecutableStep<TData> {
     return this.getDep(0);
   }
   /** Return inlining instructions if we can be inlined. @internal */
-  inline(options: AddStepDependencyOptions) {
+  inline(options: AddDependencyOptions) {
     const $source = this.dependencies[0];
     const forbiddenFlags = this.dependencyForbiddenFlags[0];
     const onReject = this.dependencyOnReject[0];
