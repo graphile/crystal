@@ -593,15 +593,18 @@ export function executeBucket(
             for (const $dep of step.dependencies) {
               const depExecutionVal = bucket.store.get($dep.id)!;
               const depVal = depExecutionVal.at(dataIndex);
+              let depFlags;
               // if (bucket.hasNonZeroStatus && isGrafastError(depVal)) {
               if (
                 (bucket.flagUnion & FLAG_ERROR) === FLAG_ERROR &&
-                (depExecutionVal._flagsAt(dataIndex) & FLAG_ERROR) ===
+                ((depFlags = depExecutionVal._flagsAt(dataIndex)) &
+                  FLAG_ERROR) ===
                   FLAG_ERROR
               ) {
                 if (step._isUnary) {
                   // COPY the unary value
                   bucket.store.set(step.id, depExecutionVal);
+                  bucket.flagUnion |= depFlags;
                 } else {
                   bucket.setResult(step, dataIndex, depVal, FLAG_ERROR);
                 }
