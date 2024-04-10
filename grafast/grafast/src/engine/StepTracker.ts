@@ -2,12 +2,7 @@ import { isDev } from "../dev.js";
 import type { OperationPlan } from "../index.js";
 import { inspect } from "../inspect.js";
 import type { AddStepDependencyOptions } from "../interfaces.js";
-import {
-  $$subroutine,
-  ALL_FLAGS,
-  DEFAULT_ACCEPT_FLAGS,
-  TRAPPABLE_FLAGS,
-} from "../interfaces.js";
+import { $$subroutine, ALL_FLAGS, TRAPPABLE_FLAGS } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import { __FlagStep } from "../steps/__flag.js";
 import { sudo } from "../utils.js";
