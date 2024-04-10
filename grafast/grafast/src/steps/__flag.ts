@@ -1,12 +1,14 @@
 import type { GrafastError } from "../error.js";
 import { newGrafastError } from "../error.js";
 import type {
+  AddStepDependencyOptions,
   ExecutionDetails,
   ExecutionEntryFlags,
   GrafastResultsList,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import {
+  ALL_FLAGS,
   DEFAULT_ACCEPT_FLAGS,
   FLAG_NULL,
   TRAPPABLE_FLAGS,
@@ -30,6 +32,22 @@ export class __FlagStep<TData> extends UnbatchedExecutableStep<TData> {
   }
   [$$deepDepSkip](): ExecutableStep {
     return this.getDep(0);
+  }
+  /** Return inlining instructions if we can be inlined. @internal */
+  inline(options: AddStepDependencyOptions) {
+    const $source = this.dependencies[0];
+    const forbiddenFlags = this.dependencyForbiddenFlags[0];
+    const onReject = this.dependencyOnReject[0];
+    const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
+    if (
+      (options.onReject === undefined || options.onReject === onReject) &&
+      (options.acceptFlags === undefined ||
+        options.acceptFlags === DEFAULT_ACCEPT_FLAGS ||
+        options.acceptFlags === acceptFlags)
+    ) {
+      return { $source, acceptFlags, onReject };
+    }
+    return null;
   }
   execute({
     values: [input],

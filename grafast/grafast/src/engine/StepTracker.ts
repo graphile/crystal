@@ -290,18 +290,11 @@ export class StepTracker {
     const $dependency = sudo(raw$dependency);
     if ($dependency instanceof __FlagStep) {
       // See if we can inline this
-      const $flagSource = $dependency.dependencies[0];
-      const forbiddenFlags = $dependency.dependencyForbiddenFlags[0];
-      const onReject = $dependency.dependencyOnReject[0];
-      const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
-      if (
-        (options.onReject === undefined || options.onReject === onReject) &&
-        (options.acceptFlags === undefined ||
-          options.acceptFlags === DEFAULT_ACCEPT_FLAGS ||
-          options.acceptFlags === acceptFlags)
-      ) {
+      const inlineDetails = $dependency.inline(options);
+      if (inlineDetails !== null) {
         // We can inline it: tweak flags and try again
-        return this.addStepDependency(raw$dependent, $flagSource, {
+        const { $source, acceptFlags, onReject } = inlineDetails;
+        return this.addStepDependency($dependent, $source, {
           ...options,
           acceptFlags,
           onReject,
