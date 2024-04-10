@@ -929,8 +929,6 @@ export function executeBucket(
             sstep.dependencyForbiddenFlags[i],
             sstep.dependencyOnReject[i],
           );
-          // const executionValue = store.get($dep.id)!;
-          // dependencies[i] = executionValue;
         }
         if (sideEffectStepsWithErrors !== null) {
           if (sstep.polymorphicPaths) {
