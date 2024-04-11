@@ -27,7 +27,7 @@ lateral (
   left outer join "polymorphic"."single_table_items" as __single_table_items_2
   on (__single_table_item_relations__."parent_id"::"int4" = __single_table_items_2."id")
   where (
-    __single_table_item_relations__."child_id" = __single_table_item_relations_identifiers__."id0"
+    ((__single_table_item_relations_identifiers__."id0" is null and __single_table_item_relations__."child_id" is null) or (__single_table_item_relations_identifiers__."id0" is not null and __single_table_item_relations__."child_id" = __single_table_item_relations_identifiers__."id0"))
   )
   order by __single_table_item_relations__."id" asc
 ) as __single_table_item_relations_result__;
@@ -48,7 +48,7 @@ lateral (
   left outer join "polymorphic"."relational_items" as __relational_items_2
   on (__relational_item_relations__."parent_id"::"int4" = __relational_items_2."id")
   where (
-    __relational_item_relations__."child_id" = __relational_item_relations_identifiers__."id0"
+    ((__relational_item_relations_identifiers__."id0" is null and __relational_item_relations__."child_id" is null) or (__relational_item_relations_identifiers__."id0" is not null and __relational_item_relations__."child_id" = __relational_item_relations_identifiers__."id0"))
   )
   order by __relational_item_relations__."id" asc
 ) as __relational_item_relations_result__;
