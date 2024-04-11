@@ -165,6 +165,9 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                       // ENHANCE: if the remote columns are the primary keys
                       // then there's no need to actually fetch the record
                       // (unless we want to check it exists).
+                      // ENHANCE: we know nodeId will always be unary, so we
+                      // could optimize this SQL at execution time when we know
+                      // if it is null or not.
                       applyPlan: isPgCondition
                         ? EXPORTABLE(
                             (
@@ -208,10 +211,6 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                     type: "attribute",
                                     attribute: localName,
                                     callback: (expression) =>
-                                      // TODO: we know nodeId will always be
-                                      // unary, so we could optimize this SQL at
-                                      // execution time when we know if it is
-                                      // null or not.
                                       sql`((${sqlRemoteValue} is null and ${expression} is null) or (${sqlRemoteValue} is not null and ${expression} = ${sqlRemoteValue}))`,
                                   });
                                 }
