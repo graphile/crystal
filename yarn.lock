@@ -4004,7 +4004,7 @@ __metadata:
     glob: "npm:^10.3.4"
     grafast: "workspace:^"
     graphile-config: "workspace:^"
-    graphql: "npm:^16.1.0-experimental-stream-defer.6"
+    graphql: "npm:^16.8.1"
     nodemon: "npm:^3.0.1"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.6.2"
@@ -11994,7 +11994,7 @@ __metadata:
   peerDependencies:
     "@envelop/core": ^3.0.4
     graphile-config: "workspace:^"
-    graphql: ^16.1.0-experimental-stream-defer.6
+    graphql: ^16.8.1
     tamedevil: "workspace:^"
   peerDependenciesMeta:
     "@envelop/core":
@@ -12132,7 +12132,7 @@ __metadata:
   peerDependencies:
     grafast: "workspace:^"
     graphile-config: "workspace:^"
-    graphql: ^16.1.0-experimental-stream-defer.6
+    graphql: ^16.8.1
   languageName: unknown
   linkType: soft
 
@@ -12352,10 +12352,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphql@npm:^16.1.0-experimental-stream-defer.6":
-  version: 16.8.0
-  resolution: "graphql@npm:16.8.0"
-  checksum: 93a2e9e0ff33f05bb64c4f46595814549155e88d27e79a266e9493ded10e66afac0d15fdb44804321b2d54bf1ab25530f0817cb61f33cfb2fabd68ad4c627356
+"graphql@npm:^16.8.1":
+  version: 16.8.1
+  resolution: "graphql@npm:16.8.1"
+  checksum: e3a95625d233c1d13c6f1df659f66955f582cb95dddb8407558090376088abcc414f39ed387a549541fca8cee681f3a5976253b6f53a5d47930dd129a5030143
   languageName: node
   linkType: hard
 
@@ -17748,7 +17748,7 @@ __metadata:
     graphile-config: "workspace:^"
     graphile-export: "workspace:^"
     graphile-utils: "workspace:^"
-    graphql: "npm:^16.1.0-experimental-stream-defer.6"
+    graphql: "npm:^16.8.1"
     iterall: "npm:^1.3.0"
     jest: "npm:^29.6.4"
     jsonwebtoken: "npm:^9.0.2"
@@ -17769,7 +17769,7 @@ __metadata:
     graphile-build: "workspace:*"
     graphile-build-pg: "workspace:*"
     graphile-config: "workspace:^"
-    graphql: ^16.1.0-experimental-stream-defer.6
+    graphql: ^16.8.1
     pg: ^8.7.1
     pg-sql2: "workspace:^"
     tamedevil: "workspace:^"
@@ -19246,7 +19246,7 @@ __metadata:
     yargs: "npm:^17.7.2"
   peerDependencies:
     graphile-config: "workspace:^"
-    graphql: ^16.1.0-experimental-stream-defer.6
+    graphql: ^16.8.1
   bin:
     ruru: ./dist/cli-run.js
   languageName: unknown
