@@ -91,9 +91,6 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
       acceptFlags,
     )}, onReject: ${rej}`;
   }
-  getParentStep(): ExecutableStep {
-    return this.getDepOptions(0).step;
-  }
   [$$deepDepSkip](): ExecutableStep {
     return this.getDepOptions(0).step;
   }
