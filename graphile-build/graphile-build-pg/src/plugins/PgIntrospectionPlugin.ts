@@ -359,6 +359,14 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                       ? ctx.get(pgSettingsKey)
                       : constant(null),
                   withPgClient: ctx.get(withPgClientKey),
+                  /* TODO: consider doing:
+                  ```
+                  withPgClient: assertNotNull(
+                    ctx.get(withPgClientKey),
+                    `Server is misconfigured; unable to find '${withPgClientKey}' in context.`,
+                  ),
+                  ```
+                  */
                 } as PgExecutorContextPlans<any>);
               },
             }),
