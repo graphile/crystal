@@ -1,0 +1,44 @@
+## expect(errors).toHaveLength(1)
+## expect(errors[0].message).toEqual("Invalid node identifier for 'Person'")
+## expect(errors[0].path).toEqual(['z_invalidAuthorId', 'nodes'])
+#> schema: ["d"]
+#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+query Q(
+  $alice: ID! = "WyJwZW9wbGUiLDNd"
+  $post3: ID! = "WyJwb3N0cyIsM10="
+  $undefined: ID
+) {
+  allPosts: allPosts(condition: { author: $undefined }) {
+    # Filter doesn't do anything
+    nodes {
+      author {
+        id
+      }
+      body
+    }
+  }
+  alicesPosts: allPosts(condition: { author: $alice }) {
+    nodes {
+      author {
+        id
+      }
+      body
+    }
+  }
+  postsWithNoAuthor: allPosts(condition: { author: null }) {
+    nodes {
+      author {
+        id
+      }
+      body
+    }
+  }
+  z_invalidAuthorId: allPosts(condition: { author: $post3 }) {
+    nodes {
+      author {
+        id
+      }
+      body
+    }
+  }
+}

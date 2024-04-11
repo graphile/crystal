@@ -123,6 +123,7 @@ import {
   UnbatchedExecutableStep,
 } from "./step.js";
 import {
+  __FlagStep,
   __InputListStep,
   __InputObjectStep,
   __InputObjectStepWithDollars,
@@ -140,6 +141,8 @@ import {
   assertEdgeCapableStep,
   assertNotNull,
   assertPageInfoCapableStep,
+  condition,
+  ConditionStep,
   connection,
   ConnectionCapableStep,
   ConnectionStep,
@@ -214,6 +217,9 @@ import {
   trackedContext,
   trackedRootValue,
   trap,
+  TRAP_ERROR,
+  TRAP_ERROR_OR_INHIBITED,
+  TRAP_INHIBITED,
 } from "./steps/index.js";
 import { stringifyPayload } from "./stringifyPayload.js";
 import { stripAnsi } from "./stripAnsi.js";
@@ -242,6 +248,7 @@ import {
 
 export { isAsyncIterable } from "iterall";
 export {
+  __FlagStep,
   __InputListStep,
   __InputObjectStep,
   __InputObjectStepWithDollars,
@@ -276,6 +283,8 @@ export {
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
   BaseStep,
+  condition,
+  ConditionStep,
   connection,
   ConnectionCapableStep,
   ConnectionStep,
@@ -445,6 +454,9 @@ export {
   trackedContext,
   trackedRootValue,
   trap,
+  TRAP_ERROR,
+  TRAP_ERROR_OR_INHIBITED,
+  TRAP_INHIBITED,
   TypedEventEmitter,
   UnbatchedExecutableStep,
   UnbatchedExecutionExtra,
@@ -486,6 +498,8 @@ exportAsMany("grafast", {
   assertPageInfoCapableStep,
   ConnectionStep,
   EdgeStep,
+  condition,
+  ConditionStep,
   constant,
   ConstantStep,
   context,
@@ -495,6 +509,10 @@ exportAsMany("grafast", {
   inhibitOnNull,
   assertNotNull,
   trap,
+  __FlagStep,
+  TRAP_ERROR,
+  TRAP_ERROR_OR_INHIBITED,
+  TRAP_INHIBITED,
   isGrafastError,
   debugPlans,
   each,

@@ -1,7 +1,7 @@
 import { isDev } from "../dev.js";
 import type { OperationPlan } from "../index.js";
 import { inspect } from "../inspect.js";
-import type { AddStepDependencyOptions } from "../interfaces.js";
+import type { AddDependencyOptions } from "../interfaces.js";
 import { $$subroutine, ALL_FLAGS, TRAPPABLE_FLAGS } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import { __FlagStep } from "../steps/__flag.js";
@@ -278,22 +278,15 @@ export class StepTracker {
 
   public addStepDependency(
     raw$dependent: ExecutableStep,
-    raw$dependency: ExecutableStep,
-    options: AddStepDependencyOptions = {},
+    options: AddDependencyOptions,
   ): number {
     const $dependent = sudo(raw$dependent);
-    const $dependency = sudo(raw$dependency);
+    const $dependency = sudo(options.step);
     if ($dependency instanceof __FlagStep) {
       // See if we can inline this
       const inlineDetails = $dependency.inline(options);
       if (inlineDetails !== null) {
-        // We can inline it: tweak flags and try again
-        const { $source, acceptFlags, onReject } = inlineDetails;
-        return this.addStepDependency($dependent, $source, {
-          ...options,
-          acceptFlags,
-          onReject,
-        });
+        return this.addStepDependency($dependent, inlineDetails);
       }
     }
     if (!this.activeSteps.has($dependent)) {
@@ -377,16 +370,16 @@ export class StepTracker {
 
   public addStepUnaryDependency(
     $dependent: ExecutableStep,
-    $dependency: ExecutableStep,
-    options: AddStepDependencyOptions = {},
+    options: AddDependencyOptions,
   ): number {
+    const $dependency = options.step;
     if (!$dependency._isUnary) {
       throw new Error(
         `${$dependent} attempted to create a unary step dependency on ${$dependency}, but that step is not unary. You may use \`.addDependency()\` instead of \`.addUnaryDependency()\`.`,
       );
     }
     $dependency._isUnaryLocked = true;
-    return this.addStepDependency($dependent, $dependency, options);
+    return this.addStepDependency($dependent, options);
   }
 
   public setOutputPlanRootStep(

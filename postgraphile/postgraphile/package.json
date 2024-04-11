@@ -153,9 +153,9 @@
   },
   "bin": "./dist/cli-run.js",
   "scripts": {
-    "test": "yarn test:v4 && yarn test:polymorphic && yarn test:mutations && yarn test:schema && yarn test:schema-exports",
+    "test": "yarn test:v4 && yarn test:polymorphic_etc && yarn test:mutations && yarn test:schema && yarn test:schema-exports",
     "test:v4": "jest -i __tests__/queries/v4",
-    "test:polymorphic": "jest -i __tests__/queries/polymorphic",
+    "test:polymorphic_etc": "jest -i __tests__/queries/polymorphic __tests__/queries/relay",
     "test:mutations": "jest -i __tests__/mutations",
     "test:schema": "jest -i __tests__/schema",
     "test:schema-exports": "node scripts/test-schema-exports.mjs",

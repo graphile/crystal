@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, makeRegistry, pgClassExpression, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertNotNull, assertPageInfoCapableStep, condition, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
 const handler = {
@@ -4205,31 +4205,25 @@ export const plans = {
     },
     author: {
       applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          for (let i = 0, l = registryConfig.pgRelations.post.author.localAttributes.length; i < l; i++) {
-            const localName = registryConfig.pgRelations.post.author.localAttributes[i];
-            $condition.where({
-              type: "attribute",
-              attribute: localName,
-              callback(expression) {
-                return sql`${expression} is null`;
-              }
-            });
-          }
-        } else {
-          const spec = getSpec2(val.get());
-          for (let i = 0, l = registryConfig.pgRelations.post.author.localAttributes.length; i < l; i++) {
-            const localName = registryConfig.pgRelations.post.author.localAttributes[i];
-            const codec = localAttributeCodecs[i];
-            const remoteName = registryConfig.pgRelations.post.author.remoteAttributes[i];
-            $condition.where({
-              type: "attribute",
-              attribute: localName,
-              callback(expression) {
-                return sql`${expression} = ${$condition.placeholder(spec[remoteName], codec)}`;
-              }
-            });
-          }
+        const $nodeId = val.get();
+        const spec = getSpec2($nodeId);
+        for (let i = 0, l = registryConfig.pgRelations.post.author.localAttributes.length; i < l; i++) {
+          const localName = registryConfig.pgRelations.post.author.localAttributes[i];
+          const codec = localAttributeCodecs[i];
+          const remoteName = registryConfig.pgRelations.post.author.remoteAttributes[i];
+          const $rawCol = spec[remoteName];
+          // const $col = nodeIdentifierColumnOrNull($nodeId, spec, 'id')
+          const $col = assertNotNull(trap($rawCol, 4), `Invalid node identifier for '${"Person"}'`, {
+            if: condition("exists", $nodeId)
+          });
+          const sqlRemoteValue = $condition.placeholder($col, codec);
+          $condition.where({
+            type: "attribute",
+            attribute: localName,
+            callback(expression) {
+              return sql`((${sqlRemoteValue} is null and ${expression} is null) or (${sqlRemoteValue} is not null and ${expression} = ${sqlRemoteValue}))`;
+            }
+          });
         }
       },
       autoApplyAfterParentInputPlan: true,
@@ -4560,31 +4554,25 @@ export const plans = {
     },
     tvShowByShowId: {
       applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          for (let i = 0, l = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes.length; i < l; i++) {
-            const localName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes[i];
-            $condition.where({
-              type: "attribute",
-              attribute: localName,
-              callback(expression) {
-                return sql`${expression} is null`;
-              }
-            });
-          }
-        } else {
-          const spec = getSpec3(val.get());
-          for (let i = 0, l = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes.length; i < l; i++) {
-            const localName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes[i];
-            const codec = localAttributeCodecs2[i];
-            const remoteName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.remoteAttributes[i];
-            $condition.where({
-              type: "attribute",
-              attribute: localName,
-              callback(expression) {
-                return sql`${expression} = ${$condition.placeholder(spec[remoteName], codec)}`;
-              }
-            });
-          }
+        const $nodeId = val.get();
+        const spec = getSpec3($nodeId);
+        for (let i = 0, l = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes.length; i < l; i++) {
+          const localName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes[i];
+          const codec = localAttributeCodecs2[i];
+          const remoteName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.remoteAttributes[i];
+          const $rawCol = spec[remoteName];
+          // const $col = nodeIdentifierColumnOrNull($nodeId, spec, 'id')
+          const $col = assertNotNull(trap($rawCol, 4), `Invalid node identifier for '${"TvShow"}'`, {
+            if: condition("exists", $nodeId)
+          });
+          const sqlRemoteValue = $condition.placeholder($col, codec);
+          $condition.where({
+            type: "attribute",
+            attribute: localName,
+            callback(expression) {
+              return sql`((${sqlRemoteValue} is null and ${expression} is null) or (${sqlRemoteValue} is not null and ${expression} = ${sqlRemoteValue}))`;
+            }
+          });
         }
       },
       autoApplyAfterParentInputPlan: true,
@@ -4697,31 +4685,25 @@ export const plans = {
     },
     studioByStudioId: {
       applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          for (let i = 0, l = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes.length; i < l; i++) {
-            const localName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes[i];
-            $condition.where({
-              type: "attribute",
-              attribute: localName,
-              callback(expression) {
-                return sql`${expression} is null`;
-              }
-            });
-          }
-        } else {
-          const spec = getSpec4(val.get());
-          for (let i = 0, l = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes.length; i < l; i++) {
-            const localName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes[i];
-            const codec = localAttributeCodecs3[i];
-            const remoteName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.remoteAttributes[i];
-            $condition.where({
-              type: "attribute",
-              attribute: localName,
-              callback(expression) {
-                return sql`${expression} = ${$condition.placeholder(spec[remoteName], codec)}`;
-              }
-            });
-          }
+        const $nodeId = val.get();
+        const spec = getSpec4($nodeId);
+        for (let i = 0, l = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes.length; i < l; i++) {
+          const localName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes[i];
+          const codec = localAttributeCodecs3[i];
+          const remoteName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.remoteAttributes[i];
+          const $rawCol = spec[remoteName];
+          // const $col = nodeIdentifierColumnOrNull($nodeId, spec, 'id')
+          const $col = assertNotNull(trap($rawCol, 4), `Invalid node identifier for '${"Studio"}'`, {
+            if: condition("exists", $nodeId)
+          });
+          const sqlRemoteValue = $condition.placeholder($col, codec);
+          $condition.where({
+            type: "attribute",
+            attribute: localName,
+            callback(expression) {
+              return sql`((${sqlRemoteValue} is null and ${expression} is null) or (${sqlRemoteValue} is not null and ${expression} = ${sqlRemoteValue}))`;
+            }
+          });
         }
       },
       autoApplyAfterParentInputPlan: true,

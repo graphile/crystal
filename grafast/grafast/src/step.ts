@@ -19,7 +19,7 @@ import type { GrafastError } from "./error.js";
 import { getDebug } from "./global.js";
 import { inspect } from "./inspect.js";
 import type {
-  AddStepDependencyOptions,
+  AddDependencyOptions,
   ExecutionDetails,
   ExecutionEntryFlags,
   GrafastResultsList,
@@ -31,15 +31,15 @@ import type {
   StreamDetails,
   UnbatchedExecutionExtra,
 } from "./interfaces.js";
-import { $$subroutine, DEFAULT_FORBIDDEN_FLAGS } from "./interfaces.js";
+import {
+  $$deepDepSkip,
+  $$subroutine,
+  ALL_FLAGS,
+  DEFAULT_FORBIDDEN_FLAGS,
+} from "./interfaces.js";
 import type { __ItemStep } from "./steps/index.js";
-import { __ListTransformStep } from "./steps/index.js";
 import { stepAMayDependOnStepB } from "./utils.js";
 
-/**
- * @internal
- */
-export const $$deepDepSkip = Symbol("deepDepSkip_experimental");
 /**
  * This indicates that a step never executes (e.g. __ItemStep and __ValueStep)
  * and thus when executed skips direct to reallyCompletedStep.
@@ -316,8 +316,19 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     return this.layerPlan.getStep(id, this);
   }
 
-  protected getDep(depId: number): ExecutableStep {
-    return this.dependencies[depId];
+  protected getDepOptions(depId: number): AddDependencyOptions {
+    const step = this.dependencies[depId];
+    const forbiddenFlags = this.dependencyForbiddenFlags[depId];
+    const onReject = this.dependencyOnReject[depId];
+    const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
+    return { step, acceptFlags, onReject };
+  }
+
+  protected getDep(_depId: number): ExecutableStep {
+    // This gets replaced when `__FlagStep` is loaded. Were we on ESM we could
+    // just put the code here, but since we're not we have to avoid the
+    // circular dependency.
+    throw new Error(`Grafast failed to load correctly`);
   }
 
   /**
@@ -362,18 +373,13 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   }
 
   protected addDependency(
-    step: ExecutableStep,
-    skipDeduplicationOrOptions: boolean | AddStepDependencyOptions = false,
+    stepOrOptions: ExecutableStep | AddDependencyOptions,
   ): number {
-    const options: AddStepDependencyOptions =
-      typeof skipDeduplicationOrOptions === "boolean"
-        ? { skipDeduplication: skipDeduplicationOrOptions }
-        : skipDeduplicationOrOptions;
-    return this.operationPlan.stepTracker.addStepDependency(
-      this,
-      step,
-      options,
-    );
+    const options: AddDependencyOptions =
+      stepOrOptions instanceof ExecutableStep
+        ? { step: stepOrOptions, skipDeduplication: false }
+        : stepOrOptions;
+    return this.operationPlan.stepTracker.addStepDependency(this, options);
   }
 
   /**
@@ -383,14 +389,13 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * directly.
    */
   protected addUnaryDependency(
-    step: ExecutableStep,
-    options: AddStepDependencyOptions = {},
+    stepOrOptions: ExecutableStep | AddDependencyOptions,
   ): number {
-    return this.operationPlan.stepTracker.addStepUnaryDependency(
-      this,
-      step,
-      options,
-    );
+    const options: AddDependencyOptions =
+      stepOrOptions instanceof ExecutableStep
+        ? { step: stepOrOptions }
+        : stepOrOptions;
+    return this.operationPlan.stepTracker.addStepUnaryDependency(this, options);
   }
 
   /**

@@ -166,6 +166,9 @@ export const $$timeout = Symbol("timeout");
 /** For tracking _when_ the timeout happened (because once the JIT has warmed it might not need so long) */
 export const $$ts = Symbol("timestamp");
 
+/** Used as a return value from __FlagStep to force inhibition */
+export const $$inhibit = Symbol("inhibit");
+
 /**
  * When dealing with a polymorphic thing we need to be able to determine what
  * the concrete type of it is, we use the $$concreteType property for that.
@@ -188,20 +191,20 @@ export type GrafastResultStreamList<T> = ReadonlyArray<
 >;
 
 /** @internal */
-export type ForcedValues = [
+export type ForcedValues = {
   flags: {
     [index: number]: ExecutionEntryFlags | undefined;
-  },
+  };
   results: {
     [index: number]: GrafastError | null | undefined;
-  },
-];
+  };
+};
 
 /** @internal */
-export type GrafastInternalResultsOrStream<T> = [
-  flags: ReadonlyArray<ExecutionEntryFlags>,
-  results: GrafastResultsList<T> | GrafastResultStreamList<T>,
-];
+export type GrafastInternalResultsOrStream<T> = {
+  flags: ReadonlyArray<ExecutionEntryFlags>;
+  results: GrafastResultsList<T> | GrafastResultStreamList<T>;
+};
 
 export type BaseGraphQLRootValue = any;
 export interface BaseGraphQLVariables {
@@ -805,24 +808,28 @@ export interface UnbatchedExecutionExtra extends ExecutionExtraBase {}
  */
 export type ExecutionEntryFlags = number & { readonly tsBrand?: unique symbol };
 
-export const NO_FLAGS: ExecutionEntryFlags = 0;
-export const FLAG_ERROR: ExecutionEntryFlags = 1 << 0;
-export const FLAG_NULL: ExecutionEntryFlags = 1 << 1;
-export const FLAG_INHIBITED: ExecutionEntryFlags = 1 << 2;
-export const FLAG_POLY_SKIPPED: ExecutionEntryFlags = 1 << 3;
-export const FLAG_STOPPED: ExecutionEntryFlags = 1 << 4;
-export const ALL_FLAGS: ExecutionEntryFlags =
-  FLAG_ERROR | FLAG_NULL | FLAG_INHIBITED | FLAG_POLY_SKIPPED | FLAG_STOPPED;
+function flag(f: number): ExecutionEntryFlags {
+  return f as ExecutionEntryFlags;
+}
+
+export const NO_FLAGS = flag(0);
+export const FLAG_ERROR = flag(1 << 0);
+export const FLAG_NULL = flag(1 << 1);
+export const FLAG_INHIBITED = flag(1 << 2);
+export const FLAG_POLY_SKIPPED = flag(1 << 3);
+export const FLAG_STOPPED = flag(1 << 4);
+export const ALL_FLAGS = flag(
+  FLAG_ERROR | FLAG_NULL | FLAG_INHIBITED | FLAG_POLY_SKIPPED | FLAG_STOPPED,
+);
 
 /** By default, accept null values as an input */
-export const DEFAULT_ACCEPT_FLAGS: ExecutionEntryFlags = FLAG_NULL;
-export const TRAPPABLE_FLAGS: ExecutionEntryFlags =
-  FLAG_ERROR | FLAG_NULL | FLAG_INHIBITED;
-export const DEFAULT_FORBIDDEN_FLAGS: ExecutionEntryFlags =
-  ALL_FLAGS & ~DEFAULT_ACCEPT_FLAGS;
-export const FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS: ExecutionEntryFlags =
-  FLAG_NULL | FLAG_POLY_SKIPPED;
-// TODO: make `FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS = FLAG_ERROR | FLAG_NULL | FLAG_POLY_SKIPPED | FLAG_INHIBITED | FLAG_STOPPED;`
+export const DEFAULT_ACCEPT_FLAGS = flag(FLAG_NULL);
+export const TRAPPABLE_FLAGS = flag(FLAG_ERROR | FLAG_NULL | FLAG_INHIBITED);
+export const DEFAULT_FORBIDDEN_FLAGS = flag(ALL_FLAGS & ~DEFAULT_ACCEPT_FLAGS);
+export const FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS = flag(
+  FLAG_NULL | FLAG_POLY_SKIPPED,
+);
+// TODO: make `FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS = flag(FLAG_ERROR | FLAG_NULL | FLAG_POLY_SKIPPED | FLAG_INHIBITED | FLAG_STOPPED);`
 // Currently this isn't enabled because the bucket has to exist for the output
 // plan to throw the error; really the root should be evaluated before
 // descending into the output plan rather than as part of descending?
@@ -919,9 +926,14 @@ export type Maybe<T> = T | null | undefined;
 
 export * from "./planJSONInterfaces.js";
 
-export interface AddStepDependencyOptions {
+export interface AddDependencyOptions {
+  step: ExecutableStep;
   skipDeduplication?: boolean;
   /** @defaultValue `FLAG_NULL` */
   acceptFlags?: ExecutionEntryFlags;
   onReject?: null | GrafastError | undefined;
 }
+/**
+ * @internal
+ */
+export const $$deepDepSkip = Symbol("deepDepSkip_experimental");

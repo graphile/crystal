@@ -65,7 +65,7 @@ export class ObjectStep<
     this.metaKey = this.id;
     this.keys = Object.keys(obj);
     for (let i = 0, l = this.keys.length; i < l; i++) {
-      this.addDependency(obj[this.keys[i]], true);
+      this.addDependency({ step: obj[this.keys[i]], skipDeduplication: true });
     }
   }
 
@@ -75,7 +75,7 @@ export class ObjectStep<
    */
   public set<TKey extends keyof TPlans>(key: TKey, plan: TPlans[TKey]): void {
     this.keys.push(key as string);
-    this.addDependency(plan, true);
+    this.addDependency({ step: plan, skipDeduplication: true });
   }
 
   getStepForKey<TKey extends keyof TPlans>(

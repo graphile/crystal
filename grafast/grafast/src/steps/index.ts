@@ -39,7 +39,15 @@ export function debugPlans<T>(callback: () => T): T {
   return result;
 }
 
-export { assertNotNull, inhibitOnNull, trap } from "./__flag.js";
+export {
+  __FlagStep,
+  assertNotNull,
+  inhibitOnNull,
+  trap,
+  TRAP_ERROR,
+  TRAP_ERROR_OR_INHIBITED,
+  TRAP_INHIBITED,
+} from "./__flag.js";
 export { access, AccessStep } from "./access.js";
 export {
   assertEdgeCapableStep,
@@ -94,6 +102,7 @@ export {
 } from "./__trackedValue.js";
 export { __ValueStep } from "./__value.js";
 export { applyTransforms, ApplyTransformsStep } from "./applyTransforms.js";
+export { condition, ConditionStep } from "./condition.js";
 export {
   GraphQLItemHandler,
   graphqlItemHandler,
