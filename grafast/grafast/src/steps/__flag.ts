@@ -26,15 +26,15 @@ export const TRAP_INHIBITED = FLAG_INHIBITED as ExecutionEntryFlags;
 export const TRAP_ERROR_OR_INHIBITED = (FLAG_ERROR |
   FLAG_INHIBITED) as ExecutionEntryFlags;
 
-function digestFlags(flags: ExecutionEntryFlags) {
+function digestAcceptFlags(acceptFlags: ExecutionEntryFlags) {
   const parts: string[] = [];
-  if ((flags & FLAG_NULL) === 0) {
+  if ((acceptFlags & FLAG_NULL) === 0) {
     parts.push("rejectNull");
   }
-  if ((flags & FLAG_ERROR) !== 0) {
+  if ((acceptFlags & FLAG_ERROR) !== 0) {
     parts.push("trapError");
   }
-  if ((flags & FLAG_INHIBITED) !== 0) {
+  if ((acceptFlags & FLAG_INHIBITED) !== 0) {
     parts.push("trapInhibited");
   }
   return parts.join("&");
@@ -86,7 +86,7 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
         : inspect(this.onRejectReturnValue);
     const $if =
       this.ifDep !== null ? this.getDepOptions(this.ifDep).step : null;
-    return `${$if ? `if(${$if.id}): ` : ``}${digestFlags(
+    return `${$if ? `if(${$if.id}): ` : ``}${digestAcceptFlags(
       acceptFlags,
     )}, onReject: ${rej}`;
   }
