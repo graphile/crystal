@@ -3,7 +3,9 @@ import { isGrafastError, newGrafastError, SafeError } from "../error.js";
 import { inspect } from "../inspect.js";
 import type {
   AddDependencyOptions,
+  ExecutionDetails,
   ExecutionEntryFlags,
+  GrafastResultsList,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import {
@@ -17,7 +19,7 @@ import {
   NO_FLAGS,
   TRAPPABLE_FLAGS,
 } from "../interfaces.js";
-import { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
+import { ExecutableStep } from "../step.js";
 
 // PUBLIC FLAGS
 export const TRAP_ERROR = FLAG_ERROR as ExecutionEntryFlags;
@@ -45,15 +47,20 @@ export interface FlagStepOptions {
   if?: ExecutableStep<boolean>;
 }
 
-export class __FlagStep<TData> extends UnbatchedExecutableStep<TData> {
+export class __FlagStep<TData> extends ExecutableStep<TData> {
+  static $$export = {
+    moduleName: /* TODO! */ "./__flag.ts",
+    exportName: "__FlagStep",
+  };
+
   isSyncAndSafe = false;
   private ifDep: number | null = null;
-  private acceptFlags: ExecutionEntryFlags;
+  private forbiddenFlags: ExecutionEntryFlags;
   private onRejectReturnValue: GrafastError | typeof $$inhibit;
   constructor(step: ExecutableStep, options: FlagStepOptions) {
     super();
     const { acceptFlags = DEFAULT_ACCEPT_FLAGS, onReject, if: $cond } = options;
-    this.acceptFlags = acceptFlags;
+    this.forbiddenFlags = ALL_FLAGS & ~(acceptFlags & TRAPPABLE_FLAGS);
     this.onRejectReturnValue = onReject == null ? $$inhibit : onReject;
     if ($cond) {
       this.addDependency(step);
@@ -96,52 +103,54 @@ export class __FlagStep<TData> extends UnbatchedExecutableStep<TData> {
     }
     return null;
   }
-  unbatchedExecute(
-    _extra: UnbatchedExecutionExtra,
-    _value: TData,
-    _cond?: boolean,
-  ): TData {
+  execute(
+    _details: ExecutionDetails<[data: TData, cond?: boolean]>,
+  ): GrafastResultsList<TData> {
     throw new Error(`${this} not finalized?`);
   }
   finalize() {
     if (this.ifDep !== null) {
-      this.unbatchedExecute = this.conditionalUnbatchedExecute;
+      this.execute = this.conditionalExecute;
     } else {
-      this.unbatchedExecute = this.unconditionalUnbatchedExecute;
+      this.execute = this.unconditionalExecute;
     }
     super.finalize();
   }
-  private conditionalUnbatchedExecute(
-    _extra: UnbatchedExecutionExtra,
-    value: any,
-    cond?: boolean,
+  private conditionalExecute(
+    details: ExecutionDetails<[data: TData, cond?: boolean]>,
   ): any {
-    if (cond) {
-      // Perform checks
-      const { acceptFlags, onRejectReturnValue } = this;
-      if ((acceptFlags & FLAG_NULL) === NO_FLAGS && value == null) {
-        return onRejectReturnValue;
+    const dataEv = details.values[0]!;
+    const condEv = details.values[this.ifDep as 1]!;
+    return details.indexMap((i) => {
+      const value = dataEv.at(i);
+      const cond = condEv.at(i);
+      if (cond) {
+        const flags = dataEv._flagsAt(i);
+        // Perform checks
+        const { forbiddenFlags, onRejectReturnValue } = this;
+        if ((forbiddenFlags & flags) === NO_FLAGS) {
+          return value;
+        } else {
+          return onRejectReturnValue;
+        }
+      } else {
+        // Conditional failed, do not apply any checks
+        return value;
       }
-      if (
-        (acceptFlags & FLAG_ERROR) === NO_FLAGS &&
-        (isGrafastError(value) || value instanceof Error)
-      ) {
-        return onRejectReturnValue;
-      }
-      // TODO: detect inhibited. Not currently possible?
-      return value;
-    } else {
-      // Conditional failed, do not apply any checks
-      return value;
-    }
+    });
   }
 
-  // Checks already performed via addDependency
-  private unconditionalUnbatchedExecute(
-    _extra: UnbatchedExecutionExtra,
-    value: any,
+  // Checks already performed via addDependency, just pass everything through.
+  private unconditionalExecute(
+    details: ExecutionDetails<[data: TData, cond?: boolean]>,
   ): any {
-    return value;
+    const ev = details.values[0];
+    if (ev.isBatch) {
+      return ev.entries;
+    } else {
+      const val = ev.value;
+      return details.indexMap((i) => val);
+    }
   }
 }
 
