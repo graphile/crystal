@@ -209,6 +209,33 @@ export function planToMermaid(
   graph.push("    %% plan dependencies");
   const chainByDep: { [depNode: string]: string } = Object.create(null);
 
+  const depDeets = (step: GrafastPlanStepJSONv1, idx: number) => {
+    const forbiddenFlags = step.dependencyForbiddenFlags[idx];
+    const onReject = step.dependencyOnReject[idx];
+    const info: string[] = [];
+    if (forbiddenFlags) {
+      if ((forbiddenFlags & 2) === 2) {
+        info.push("rejectNull");
+      }
+      if ((forbiddenFlags & 1) === 0) {
+        info.push("trapError");
+      }
+      if ((forbiddenFlags & 4) === 0) {
+        info.push("trapInhibited");
+      }
+      if (onReject) {
+        info.push(`onReject=${trim(stripAnsi(onReject))}`);
+      }
+    }
+    const str = info.join(";");
+
+    if (str) {
+      return `|${mermaidEscape(str)}|`;
+    } else {
+      return "";
+    }
+  };
+
   sortedSteps.forEach(
     // This comment is here purely to maintain the previous formatting to reduce a git diff.
     (plan) => {
@@ -228,9 +255,23 @@ export function planToMermaid(
         if (plan.stepClass === "__ItemStep") {
           const [firstDep, ...rest] = depNodes;
           const arrow = plan.extra?.transformStepId == null ? "==>" : "-.->";
-          graph.push(`    ${firstDep} ${arrow} ${planNode}`);
+          graph.push(
+            `    ${firstDep} ${arrow}${depDeets(plan, 0)} ${planNode}`,
+          );
           if (rest.length > 0) {
-            graph.push(`    ${rest.join(" & ")} --> ${planNode}`);
+            const normal: string[] = [];
+            for (let i = 0; i < rest.length; i++) {
+              const r = rest[i];
+              const deets = depDeets(plan, i + 1);
+              if (deets) {
+                graph.push(`    ${r} -->${deets} ${planNode}`);
+              } else {
+                normal.push(r);
+              }
+            }
+            if (normal.length) {
+              graph.push(`    ${normal.join(" & ")} --> ${planNode}`);
+            }
           }
         } else {
           if (
@@ -241,13 +282,30 @@ export function planToMermaid(
             // Try alternating the nodes so they render closer together
             const depNode = depNodes[0];
             if (chainByDep[depNode] === undefined) {
-              graph.push(`    ${depNode} --> ${planNode}`);
+              graph.push(`    ${depNode} -->${depDeets(plan, 0)} ${planNode}`);
             } else {
-              graph.push(`    ${chainByDep[depNode]} o--o ${planNode}`);
+              graph.push(
+                `    ${chainByDep[depNode]} o--o${depDeets(
+                  plan,
+                  0,
+                )} ${planNode}`,
+              );
             }
             chainByDep[depNode] = planNode;
           } else {
-            graph.push(`    ${depNodes.join(" & ")} --> ${planNode}`);
+            const normal: string[] = [];
+            for (let i = 0; i < depNodes.length; i++) {
+              const r = depNodes[i];
+              const deets = depDeets(plan, i + 1);
+              if (deets) {
+                graph.push(`    ${r} -->${deets} ${planNode}`);
+              } else {
+                normal.push(r);
+              }
+            }
+            if (normal.length) {
+              graph.push(`    ${normal.join(" & ")} --> ${planNode}`);
+            }
           }
         }
       }
@@ -373,3 +431,11 @@ function pp(polymorphicPaths: ReadonlyArray<string> | null | undefined) {
 }
 
 export * from "./planJSONInterfaces.js";
+
+function trim(string: string, length = 15): string {
+  if (string.length > length) {
+    return string.substring(0, length - 2) + "…";
+  } else {
+    return string;
+  }
+}

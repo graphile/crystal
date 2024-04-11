@@ -3369,7 +3369,9 @@ export class OperationPlan {
         bucketId: step.layerPlan.id,
         dependencyIds: sstep.dependencies.map((d) => d.id),
         dependencyForbiddenFlags: sstep.dependencyForbiddenFlags.slice(),
-        dependencyOnReject: sstep.dependencyOnReject.map(String),
+        dependencyOnReject: sstep.dependencyOnReject.map((or) =>
+          or ? String(or) : or,
+        ),
         polymorphicPaths: step.polymorphicPaths
           ? [...step.polymorphicPaths]
           : undefined,

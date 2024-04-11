@@ -12,7 +12,7 @@ export interface GrafastPlanStepJSONv1 {
   bucketId: string | number;
   dependencyIds: ReadonlyArray<string | number>;
   dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
-  dependencyOnReject: ReadonlyArray<string>;
+  dependencyOnReject: ReadonlyArray<string | null | undefined>;
   polymorphicPaths: readonly string[] | undefined;
   isSyncAndSafe: boolean | undefined;
   supportsUnbatched: boolean | undefined;
