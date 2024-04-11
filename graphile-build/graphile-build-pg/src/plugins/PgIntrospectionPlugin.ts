@@ -339,6 +339,14 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
           throw new Error(`Database '${serviceName}' not found`);
         }
         const { pgSettingsKey, withPgClientKey } = pgService;
+        /* TODO: consider replacing the `withPgClient` with:
+           ```
+           withPgClient: assertNotNull(
+             ctx.get(withPgClientKey),
+             `Server is misconfigured; unable to find '${withPgClientKey}' in context.`,
+           ),
+           ```
+        */
         const executor = EXPORTABLE(
           (
             PgExecutor,
@@ -359,14 +367,6 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
                       ? ctx.get(pgSettingsKey)
                       : constant(null),
                   withPgClient: ctx.get(withPgClientKey),
-                  /* TODO: consider doing:
-                  ```
-                  withPgClient: assertNotNull(
-                    ctx.get(withPgClientKey),
-                    `Server is misconfigured; unable to find '${withPgClientKey}' in context.`,
-                  ),
-                  ```
-                  */
                 } as PgExecutorContextPlans<any>);
               },
             }),
