@@ -56,7 +56,7 @@ function trim(string: string, length = 15): string {
 
 export class __FlagStep<TData> extends ExecutableStep<TData> {
   static $$export = {
-    moduleName: /* TODO! */ "./__flag.ts",
+    moduleName: "grafast",
     exportName: "__FlagStep",
   };
 

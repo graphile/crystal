@@ -123,6 +123,7 @@ import {
   UnbatchedExecutableStep,
 } from "./step.js";
 import {
+  __FlagStep,
   __InputListStep,
   __InputObjectStep,
   __InputObjectStepWithDollars,
@@ -247,6 +248,7 @@ import {
 
 export { isAsyncIterable } from "iterall";
 export {
+  __FlagStep,
   __InputListStep,
   __InputObjectStep,
   __InputObjectStepWithDollars,
@@ -507,6 +509,7 @@ exportAsMany("grafast", {
   inhibitOnNull,
   assertNotNull,
   trap,
+  __FlagStep,
   TRAP_ERROR,
   TRAP_ERROR_OR_INHIBITED,
   TRAP_INHIBITED,
