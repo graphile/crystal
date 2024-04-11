@@ -12,6 +12,7 @@ import {
   $$inhibit,
   ALL_FLAGS,
   DEFAULT_ACCEPT_FLAGS,
+  DEFAULT_FORBIDDEN_FLAGS,
   FLAG_ERROR,
   FLAG_INHIBITED,
   FLAG_NULL,
@@ -70,7 +71,7 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
     this.forbiddenFlags = ALL_FLAGS & ~acceptFlags;
     this.onRejectReturnValue = onReject == null ? $$inhibit : onReject;
     if ($cond) {
-      this.addDependency(step);
+      this.addDependency({ step, acceptFlags: TRAPPABLE_FLAGS });
       this.ifDep = this.addDependency($cond);
     } else {
       this.addDependency({ step, acceptFlags, onReject });
@@ -154,21 +155,17 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
   ): any {
     const dataEv = details.values[0]!;
     const condEv = details.values[this.ifDep as 1]!;
+    const { forbiddenFlags: thisForbiddenFlags, onRejectReturnValue } = this;
     return details.indexMap((i) => {
-      const value = dataEv.at(i);
       const cond = condEv.at(i);
-      if (cond) {
-        const flags = dataEv._flagsAt(i);
-        // Perform checks
-        const { forbiddenFlags, onRejectReturnValue } = this;
-        if ((forbiddenFlags & flags) === NO_FLAGS) {
-          return value;
-        } else {
-          return onRejectReturnValue;
-        }
+      const forbiddenFlags = cond
+        ? thisForbiddenFlags
+        : DEFAULT_FORBIDDEN_FLAGS;
+      const flags = dataEv._flagsAt(i);
+      if ((forbiddenFlags & flags) === NO_FLAGS) {
+        return dataEv.at(i);
       } else {
-        // Conditional failed, do not apply any checks
-        return value;
+        return onRejectReturnValue;
       }
     });
   }
