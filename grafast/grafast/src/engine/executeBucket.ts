@@ -75,9 +75,9 @@ function mergeErrorsBackIn(
   let resultIndex = 0;
 
   for (let finalIndex = 0; finalIndex < resultCount; finalIndex++) {
-    const flags = forcedValues[0][finalIndex];
+    const flags = forcedValues.flags[finalIndex];
     if (flags !== undefined) {
-      const value = forcedValues[1][finalIndex];
+      const value = forcedValues.results[finalIndex];
       finalResults[finalIndex] = value;
       finalFlags[finalIndex] = flags;
     } else {
@@ -85,7 +85,7 @@ function mergeErrorsBackIn(
       finalFlags[finalIndex] = 0;
     }
   }
-  return [finalFlags, finalResults];
+  return { flags: finalFlags, results: finalResults };
 }
 
 /** @internal */
@@ -103,12 +103,12 @@ export function executeBucket(
     dependencies: ReadonlyArray<ExecutionValue>,
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastInternalResultsOrStream<any>> {
-    const result = executeOrStream(size, step, dependencies, extra);
+    const results = executeOrStream(size, step, dependencies, extra);
     const flags = arrayOfLength(size, NO_FLAGS);
-    if (isPromiseLike(result)) {
-      return result.then((result) => [flags, result]);
+    if (isPromiseLike(results)) {
+      return results.then((results) => ({ flags, results }));
     } else {
-      return [flags, result];
+      return { flags, results };
     }
   }
 
@@ -145,7 +145,8 @@ export function executeBucket(
       | null = null;
     let sideEffectSteps: null | ExecutableStep[] = null;
     let executePromiseResultIndex: number[] | null = null;
-    const results: Array<GrafastInternalResultsOrStream<any> | undefined> = [];
+    const resultList: Array<GrafastInternalResultsOrStream<any> | undefined> =
+      [];
     if (
       phase.checkTimeout &&
       stopTime !== null &&
@@ -161,9 +162,9 @@ export function executeBucket(
         ) {
           const step = normalSteps[normalStepIndex].step;
           const r = newGrafastError(timeoutError, step.id);
-          const result = arrayOfLength(bucket.size, r);
+          const results = arrayOfLength(bucket.size, r);
           const flags = arrayOfLength(bucket.size, FLAG_ERROR);
-          results[normalStepIndex] = [flags, result];
+          resultList[normalStepIndex] = { flags, results };
           indexesPendingLoopOver.push(normalStepIndex);
 
           // TODO: I believe we can remove this line?
@@ -188,7 +189,7 @@ export function executeBucket(
         try {
           const r = executeStep(step);
           if (isPromiseLike(r)) {
-            results[normalStepIndex] = undefined /* will populate shortly */;
+            resultList[normalStepIndex] = undefined /* will populate shortly */;
             if (!executePromises) {
               executePromises = [r];
               executePromiseResultIndex = [normalStepIndex];
@@ -197,14 +198,14 @@ export function executeBucket(
               executePromiseResultIndex![newIndex] = normalStepIndex;
             }
           } else {
-            results[normalStepIndex] = r;
+            resultList[normalStepIndex] = r;
             indexesPendingLoopOver.push(normalStepIndex);
           }
         } catch (e) {
           const r = newGrafastError(e, step.id);
-          const result = arrayOfLength(bucket.size, r);
+          const results = arrayOfLength(bucket.size, r);
           const flags = arrayOfLength(bucket.size, FLAG_ERROR);
-          results[normalStepIndex] = [flags, result];
+          resultList[normalStepIndex] = { flags, results };
           indexesPendingLoopOver.push(normalStepIndex);
 
           // TODO: I believe we can remove this line?
@@ -249,18 +250,18 @@ export function executeBucket(
       // Validate executed steps
       for (const allStepsIndex of indexesToProcess) {
         const finishedStep = _allSteps[allStepsIndex];
-        const internalResult = results[allStepsIndex];
+        const internalResult = resultList[allStepsIndex];
         if (!internalResult) {
           throw new Error(`Result from ${finishedStep} should exist`);
         }
-        const [_flags, result] = internalResult;
-        const resultLength = result?.length;
+        const { /* flags, */ results } = internalResult;
+        const resultLength = results?.length;
         const expectedSize = finishedStep._isUnary ? 1 : size;
         if (resultLength !== expectedSize) {
-          if (!Array.isArray(result)) {
+          if (!Array.isArray(results)) {
             throw new Error(
               `Result from ${finishedStep} should be an array, instead received ${inspect(
-                result,
+                results,
                 { colors: true },
               )}`,
             );
@@ -268,7 +269,7 @@ export function executeBucket(
           throw new Error(
             `Result array from ${finishedStep} should have length ${expectedSize}${
               finishedStep._isUnary ? " (because it's unary)" : ""
-            }, instead it had length ${result.length}`,
+            }, instead it had length ${results.length}`,
           );
         }
         if (finishedStep._isUnary) {
@@ -415,14 +416,14 @@ export function executeBucket(
 
       for (const allStepsIndex of indexesToProcess) {
         const step = _allSteps[allStepsIndex];
-        const internalResult = results[allStepsIndex];
+        const internalResult = resultList[allStepsIndex];
         if (!internalResult) {
           throw new Error(`Result from ${step} should exist`);
         }
-        const [flags, result] = internalResult;
+        const { flags, results } = internalResult;
         const count = step._isUnary ? 1 : size;
         for (let dataIndex = 0; dataIndex < count; dataIndex++) {
-          const val = result[dataIndex];
+          const val = results[dataIndex];
           if (step.isSyncAndSafe || !isPromiseLike(val)) {
             if (flags[dataIndex] == null) {
               throw new Error(
@@ -513,7 +514,7 @@ export function executeBucket(
     };
 
     const runSyncSteps = () => {
-      const executedLength = results.length;
+      const executedLength = resultList.length;
       if (isDev) {
         assert.strictEqual(
           executedLength,
@@ -649,7 +650,7 @@ export function executeBucket(
         const index = executePromiseResultIndex![i];
         processedPromises.push(
           executePromise.then((promiseResult) => {
-            results[index] = promiseResult;
+            resultList[index] = promiseResult;
             indexesPendingLoopOver.push(index);
             // We must loop over the results in the same tick in which the
             // promise resolved.
@@ -735,10 +736,10 @@ export function executeBucket(
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastInternalResultsOrStream<any>> {
     const expectedSize = step._isUnary ? 1 : size;
-    const forcedValues: ForcedValues = [
-      arrayOfLength(expectedSize, undefined),
-      arrayOfLength(expectedSize, undefined),
-    ];
+    const forcedValues: ForcedValues = {
+      flags: arrayOfLength(expectedSize, undefined),
+      results: arrayOfLength(expectedSize, undefined),
+    };
 
     /**
      * If there's errors/forbidden values, we must manipulate the arrays being
@@ -824,8 +825,8 @@ export function executeBucket(
           indexFlags |= FLAG_ERROR;
           forceIndexValue = rejectValue;
         }
-        forcedValues[0][index] = indexFlags;
-        forcedValues[1][index] = forceIndexValue;
+        forcedValues.flags[index] = indexFlags;
+        forcedValues.results[index] = forceIndexValue;
       } else {
         newSize++;
         if (needsTransform) {
@@ -985,10 +986,10 @@ export function executeBucket(
           // Don't need to do this here, it will be done where the
           // ExecutionValue is created:
           //   bucket.hasNonZeroStatus = true;
-          return [
-            arrayOfLength(size, FLAG_ERROR | FLAG_STOPPED),
-            arrayOfLength(size, error),
-          ];
+          return {
+            flags: arrayOfLength(size, FLAG_ERROR | FLAG_STOPPED),
+            results: arrayOfLength(size, error),
+          };
         });
       } else {
         return result;
@@ -997,10 +998,10 @@ export function executeBucket(
       // Don't need to do this here, it will be done where the
       // ExecutionValue is created:
       //   bucket.hasNonZeroStatus = true;
-      return [
-        arrayOfLength(size, FLAG_ERROR | FLAG_STOPPED),
-        arrayOfLength(size, error),
-      ];
+      return {
+        flags: arrayOfLength(size, FLAG_ERROR | FLAG_STOPPED),
+        results: arrayOfLength(size, error),
+      };
     }
   }
 

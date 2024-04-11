@@ -188,20 +188,20 @@ export type GrafastResultStreamList<T> = ReadonlyArray<
 >;
 
 /** @internal */
-export type ForcedValues = [
+export type ForcedValues = {
   flags: {
     [index: number]: ExecutionEntryFlags | undefined;
-  },
+  };
   results: {
     [index: number]: GrafastError | null | undefined;
-  },
-];
+  };
+};
 
 /** @internal */
-export type GrafastInternalResultsOrStream<T> = [
-  flags: ReadonlyArray<ExecutionEntryFlags>,
-  results: GrafastResultsList<T> | GrafastResultStreamList<T>,
-];
+export type GrafastInternalResultsOrStream<T> = {
+  flags: ReadonlyArray<ExecutionEntryFlags>;
+  results: GrafastResultsList<T> | GrafastResultStreamList<T>;
+};
 
 export type BaseGraphQLRootValue = any;
 export interface BaseGraphQLVariables {
