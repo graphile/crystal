@@ -253,7 +253,9 @@ export function executeBucket(
         const finishedStep = _allSteps[allStepsIndex];
         const internalResult = resultList[allStepsIndex];
         if (!internalResult) {
-          throw new Error(`Result from ${finishedStep} should exist`);
+          throw new Error(
+            `GrafastInternalError<166ef53d-b80d-4bea-8b54-803c2694112a>: Result from ${finishedStep} should exist`,
+          );
         }
         const { /* flags, */ results } = internalResult;
         const resultLength = results?.length;
@@ -422,7 +424,9 @@ export function executeBucket(
         const step = _allSteps[allStepsIndex];
         const internalResult = resultList[allStepsIndex];
         if (!internalResult) {
-          throw new Error(`Result from ${step} should exist`);
+          throw new Error(
+            `GrafastInternalError<b82038d6-ca4e-4b55-8ed4-4d7c879f5dc2>: Result from ${step} should exist`,
+          );
         }
         const { flags, results } = internalResult;
         const count = step._isUnary ? 1 : size;
