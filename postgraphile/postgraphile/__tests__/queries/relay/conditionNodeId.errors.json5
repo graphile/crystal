@@ -1,0 +1,15 @@
+[
+  {
+    message: "Invalid node identifier for 'Person'",
+    locations: [
+      {
+        line: 19,
+        column: 5,
+      },
+    ],
+    path: [
+      'z_invalidAuthorId',
+      'nodes',
+    ],
+  },
+]
