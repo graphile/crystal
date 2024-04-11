@@ -1,4 +1,5 @@
-## expect(errors).toBeFalsy()
+## expect(errors).toHaveLength(1)
+## expect(errors[0].message).toEqual("Invalid node identifier for 'Person'")
 #> schema: ["d"]
 #> extends: ["postgraphile/presets/relay:PgRelayPreset"]
 {
@@ -11,6 +12,14 @@
     }
   }
   postsWithNoAuthor: allPosts(condition: { author: null }) {
+    nodes {
+      author {
+        id
+      }
+      body
+    }
+  }
+  z_invalidAuthorId: allPosts(condition: { author: "WyJwb3N0cyIsM10=" }) {
     nodes {
       author {
         id
