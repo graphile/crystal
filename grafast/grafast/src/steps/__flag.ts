@@ -112,6 +112,12 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
       // TODO: this logic could be improved so that more flag checks were
       // inlined, e.g. `trap(inhibitOnNull($foo), TRAP_INHIBIT)` should just
       // become `$foo`.
+      //
+      // However, we must be careful that we don't optimize away flags, e.g.
+      // `trap(inhibitOnNull($foo), TRAP_INHIBIT, { if: $cond })` needs to see
+      // the inhibit flag to know what to do, so in this case we shouldn't be
+      // inlined. This may only apply to __FlagStep and might be something we
+      // want to optimize later.
       options.onReject === undefined ||
       options.onReject === onReject
     ) {
@@ -122,17 +128,6 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
         false
       ) {
         return { step, acceptFlags, onReject };
-      } else if (
-        (options.acceptFlags & FLAG_INHIBITED) === FLAG_INHIBITED &&
-        acceptFlags === NO_FLAGS
-      ) {
-        // If our dependent accepts inhibited and we inhibit on null, no need
-        // for us.
-        return {
-          step,
-          acceptFlags: options.acceptFlags,
-          onReject: options.onReject,
-        };
       }
     }
     return null;
