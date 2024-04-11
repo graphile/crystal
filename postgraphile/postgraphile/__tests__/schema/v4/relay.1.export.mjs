@@ -1,5 +1,5 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, makeRegistry, pgClassExpression, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertNotNull, assertPageInfoCapableStep, compare, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertNotNull, assertPageInfoCapableStep, condition, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB, trap } from "grafast";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
 const handler = {
@@ -4214,7 +4214,7 @@ export const plans = {
           const $rawCol = spec[remoteName];
           // const $col = nodeIdentifierColumnOrNull($nodeId, spec, 'id')
           const $col = assertNotNull(trap($rawCol, 4), `Invalid node identifier for '${"Person"}'`, {
-            if: compare("not null", $nodeId)
+            if: condition("exists", $nodeId)
           });
           const sqlRemoteValue = $condition.placeholder($col, codec);
           $condition.where({
@@ -4569,7 +4569,7 @@ export const plans = {
           const $rawCol = spec[remoteName];
           // const $col = nodeIdentifierColumnOrNull($nodeId, spec, 'id')
           const $col = assertNotNull(trap($rawCol, 4), `Invalid node identifier for '${"TvShow"}'`, {
-            if: compare("not null", $nodeId)
+            if: condition("exists", $nodeId)
           });
           const sqlRemoteValue = $condition.placeholder($col, codec);
           $condition.where({
@@ -4706,7 +4706,7 @@ export const plans = {
           const $rawCol = spec[remoteName];
           // const $col = nodeIdentifierColumnOrNull($nodeId, spec, 'id')
           const $col = assertNotNull(trap($rawCol, 4), `Invalid node identifier for '${"Studio"}'`, {
-            if: compare("not null", $nodeId)
+            if: condition("exists", $nodeId)
           });
           const sqlRemoteValue = $condition.placeholder($col, codec);
           $condition.where({
