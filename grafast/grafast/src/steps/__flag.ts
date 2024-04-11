@@ -1,12 +1,11 @@
 import type { GrafastError } from "../error.js";
-import { isGrafastError, newGrafastError, SafeError } from "../error.js";
+import { newGrafastError, SafeError } from "../error.js";
 import { inspect } from "../inspect.js";
 import type {
   AddDependencyOptions,
   ExecutionDetails,
   ExecutionEntryFlags,
   GrafastResultsList,
-  UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import {
   $$deepDepSkip,
@@ -183,7 +182,7 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
       return ev.entries;
     } else {
       const val = ev.value;
-      return details.indexMap((i) => val);
+      return details.indexMap(() => val);
     }
   }
 }

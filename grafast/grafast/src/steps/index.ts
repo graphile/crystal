@@ -45,8 +45,8 @@ export {
   inhibitOnNull,
   trap,
   TRAP_ERROR,
-  TRAP_INHIBITED,
   TRAP_ERROR_OR_INHIBITED,
+  TRAP_INHIBITED,
 } from "./__flag.js";
 export { access, AccessStep } from "./access.js";
 export {

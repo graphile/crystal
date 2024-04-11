@@ -324,7 +324,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     return { step, acceptFlags, onReject };
   }
 
-  protected getDep(depId: number): ExecutableStep {
+  protected getDep(_depId: number): ExecutableStep {
     // This gets replaced when `__FlagStep` is loaded. Were we on ESM we could
     // just put the code here, but since we're not we have to avoid the
     // circular dependency.

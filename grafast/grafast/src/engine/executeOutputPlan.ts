@@ -4,7 +4,6 @@ import type { GraphQLError } from "graphql";
 import * as assert from "../assert.js";
 import type { Bucket, RequestTools } from "../bucket.js";
 import { isDev } from "../dev.js";
-import { inspect } from "../inspect.js";
 import type { JSONValue } from "../interfaces.js";
 import type { OutputPlan } from "./OutputPlan.js";
 
