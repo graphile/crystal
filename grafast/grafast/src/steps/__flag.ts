@@ -30,21 +30,29 @@ export const TRAP_ERROR_OR_INHIBITED = (FLAG_ERROR |
 function digestFlags(flags: ExecutionEntryFlags) {
   const parts: string[] = [];
   if ((flags & FLAG_NULL) === 0) {
-    parts.push("REJECT_NULL");
+    parts.push("rejectNull");
   }
   if ((flags & FLAG_ERROR) !== 0) {
-    parts.push("ERROR_OK");
+    parts.push("trapError");
   }
   if ((flags & FLAG_INHIBITED) !== 0) {
-    parts.push("INHIBITED_OK");
+    parts.push("trapInhibited");
   }
-  return parts.join(" ");
+  return parts.join("&");
 }
 
 export interface FlagStepOptions {
   acceptFlags?: ExecutionEntryFlags;
   onReject?: GrafastError | null;
   if?: ExecutableStep<boolean>;
+}
+
+function trim(string: string, length = 15): string {
+  if (string.length > length) {
+    return string.substring(0, length - 2) + "…";
+  } else {
+    return string;
+  }
 }
 
 export class __FlagStep<TData> extends ExecutableStep<TData> {
@@ -70,10 +78,18 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
     }
   }
   public toStringMeta(): string | null {
-    const step = this.dependencies[0];
-    const onReject = this.dependencyOnReject[0];
     const acceptFlags = ALL_FLAGS & ~this.forbiddenFlags;
-    return `${step.id} ${digestFlags(acceptFlags)} ${inspect(onReject)}`;
+    const rej =
+      this.onRejectReturnValue === $$inhibit
+        ? `INHIBIT`
+        : this.onRejectReturnValue
+        ? trim(String(this.onRejectReturnValue))
+        : inspect(this.onRejectReturnValue);
+    const $if =
+      this.ifDep !== null ? this.getDepOptions(this.ifDep).step : null;
+    return `${$if ? `if(${$if.id}): ` : ``}${digestFlags(
+      acceptFlags,
+    )}, onReject: ${rej}`;
   }
   getParentStep(): ExecutableStep {
     return this.getDepOptions(0).step;

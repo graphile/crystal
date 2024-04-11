@@ -43,6 +43,15 @@ export class CompareStep extends UnbatchedExecutableStep<boolean> {
       this.addDependency(step2);
     }
   }
+  public toStringMeta(): string | null {
+    if (unaryOperators.includes(this.op as UnaryOperator)) {
+      return `${this.op}`;
+    } else {
+      const $dep1 = this.getDepOptions(0).step;
+      const $dep2 = this.getDepOptions(1).step;
+      return `${$dep1.id} ${this.op} ${$dep2.id}`;
+    }
+  }
 
   finalize() {
     this.unbatchedExecute = this.makeUnbatchedExecute();

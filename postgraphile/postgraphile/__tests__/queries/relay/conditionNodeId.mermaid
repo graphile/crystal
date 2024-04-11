@@ -23,10 +23,10 @@ graph TD
     Connection57{{"Connection[57∈0]<br />ᐸ53ᐳ"}}:::plan
     Connection93{{"Connection[93∈0]<br />ᐸ89ᐳ"}}:::plan
     PgSelect28[["PgSelect[28∈1]<br />ᐸpostᐳ"]]:::plan
-    __Flag27[["__Flag[27∈1]<br />ᐸ24 INHIBITED_OK undefinedᐳ"]]:::plan
+    __Flag27[["__Flag[27∈1]<br />ᐸif(26): rejectNull, onReject: Error: Invali…ᐳ"]]:::plan
     Object20 & __Flag27 & Connection21 --> PgSelect28
-    __Flag24[["__Flag[24∈1]<br />ᐸ23 REJECT_NULL undefinedᐳ"]]:::plan
-    Compare26{{"Compare[26∈1]"}}:::plan
+    __Flag24[["__Flag[24∈1]<br />ᐸrejectNull, onReject: INHIBITᐳ"]]:::plan
+    Compare26{{"Compare[26∈1]<br />ᐸnot nullᐳ"}}:::plan
     __Flag24 & Compare26 --> __Flag27
     Lambda22{{"Lambda[22∈1]<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
     Constant121{{"Constant[121∈1]<br />ᐸ'WyJwZW9wbGUiLDNd'ᐳ"}}:::plan
@@ -50,10 +50,10 @@ graph TD
     Lambda41{{"Lambda[41∈4]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List40 --> Lambda41
     PgSelect64[["PgSelect[64∈5]<br />ᐸpostᐳ"]]:::plan
-    __Flag63[["__Flag[63∈5]<br />ᐸ60 INHIBITED_OK undefinedᐳ"]]:::plan
+    __Flag63[["__Flag[63∈5]<br />ᐸif(62): rejectNull, onReject: Error: Invali…ᐳ"]]:::plan
     Object20 & __Flag63 & Connection57 --> PgSelect64
-    __Flag60[["__Flag[60∈5]<br />ᐸ59 REJECT_NULL undefinedᐳ"]]:::plan
-    Compare62{{"Compare[62∈5]"}}:::plan
+    __Flag60[["__Flag[60∈5]<br />ᐸrejectNull, onReject: INHIBITᐳ"]]:::plan
+    Compare62{{"Compare[62∈5]<br />ᐸnot nullᐳ"}}:::plan
     __Flag60 & Compare62 --> __Flag63
     Lambda58{{"Lambda[58∈5]<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
     Constant122{{"Constant[122∈5]<br />ᐸnullᐳ"}}:::plan
@@ -77,10 +77,10 @@ graph TD
     Lambda77{{"Lambda[77∈8]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List76 --> Lambda77
     PgSelect100[["PgSelect[100∈9]<br />ᐸpostᐳ"]]:::plan
-    __Flag99[["__Flag[99∈9]<br />ᐸ96 INHIBITED_OK undefinedᐳ"]]:::plan
+    __Flag99[["__Flag[99∈9]<br />ᐸif(98): rejectNull, onReject: Error: Invali…ᐳ"]]:::plan
     Object20 & __Flag99 & Connection93 --> PgSelect100
-    __Flag96[["__Flag[96∈9]<br />ᐸ95 REJECT_NULL undefinedᐳ"]]:::plan
-    Compare98{{"Compare[98∈9]"}}:::plan
+    __Flag96[["__Flag[96∈9]<br />ᐸrejectNull, onReject: INHIBITᐳ"]]:::plan
+    Compare98{{"Compare[98∈9]<br />ᐸnot nullᐳ"}}:::plan
     __Flag96 & Compare98 --> __Flag99
     Lambda94{{"Lambda[94∈9]<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
     Constant123{{"Constant[123∈9]<br />ᐸ'WyJwb3N0cyIsM10='ᐳ"}}:::plan
