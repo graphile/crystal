@@ -167,7 +167,19 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                       // (unless we want to check it exists).
                       applyPlan: isPgCondition
                         ? EXPORTABLE(
-                            (TRAP_INHIBITED, assertNotNull, compare, getSpec, localAttributeCodecs, localAttributes, remoteAttributes, sql, trap, typeName) => function plan(
+                            (
+                              TRAP_INHIBITED,
+                              assertNotNull,
+                              compare,
+                              getSpec,
+                              localAttributeCodecs,
+                              localAttributes,
+                              remoteAttributes,
+                              sql,
+                              trap,
+                              typeName,
+                            ) =>
+                              function plan(
                                 $condition: PgConditionStep<PgSelectStep<any>>,
                                 val,
                               ) {
@@ -204,7 +216,18 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                   });
                                 }
                               },
-                            [TRAP_INHIBITED, assertNotNull, compare, getSpec, localAttributeCodecs, localAttributes, remoteAttributes, sql, trap, typeName],
+                            [
+                              TRAP_INHIBITED,
+                              assertNotNull,
+                              compare,
+                              getSpec,
+                              localAttributeCodecs,
+                              localAttributes,
+                              remoteAttributes,
+                              sql,
+                              trap,
+                              typeName,
+                            ],
                           )
                         : EXPORTABLE(
                             (getSpec, localAttributes, remoteAttributes) =>

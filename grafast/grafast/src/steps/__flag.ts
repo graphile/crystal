@@ -1,5 +1,5 @@
 import type { GrafastError } from "../error.js";
-import { isGrafastError, newGrafastError } from "../error.js";
+import { isGrafastError, newGrafastError, SafeError } from "../error.js";
 import { inspect } from "../inspect.js";
 import type {
   AddDependencyOptions,
@@ -168,7 +168,7 @@ export function assertNotNull(
   return new __FlagStep($step, {
     ...options,
     acceptFlags: DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL,
-    onReject: newGrafastError(new Error(message), $step.id),
+    onReject: newGrafastError(new SafeError(message), $step.id),
   });
 }
 
