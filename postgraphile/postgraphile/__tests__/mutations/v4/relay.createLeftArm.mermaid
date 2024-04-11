@@ -25,7 +25,8 @@ graph TD
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Constant39{{"Constant[39∈0]<br />ᐸ0.69ᐳ"}}:::plan
     PgInsertSingle14[["PgInsertSingle[14∈1]<br />ᐸleft_arm(length_in_metres,person_id)ᐳ"]]:::sideeffectplan
-    Object17 & Constant39 & Access20 --> PgInsertSingle14
+    Constant39 -->|rejectNull| PgInsertSingle14
+    Object17 & Access20 --> PgInsertSingle14
     Object18{{"Object[18∈1]<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle14 --> Object18
     List24{{"List[24∈3]<br />ᐸ22,23ᐳ"}}:::plan

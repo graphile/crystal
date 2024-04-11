@@ -21,10 +21,12 @@ graph TD
     Object11 & Constant280 --> PgSelect43
     PgSelect70[["PgSelect[70∈0]<br />ᐸpersonᐳ"]]:::plan
     Access68{{"Access[68∈0]<br />ᐸ67.1ᐳ"}}:::plan
-    Object11 & Access68 --> PgSelect70
+    Object11 -->|rejectNull| PgSelect70
+    Access68 --> PgSelect70
     PgSelect97[["PgSelect[97∈0]<br />ᐸpersonᐳ"]]:::plan
     Access95{{"Access[95∈0]<br />ᐸ94.1ᐳ"}}:::plan
-    Object11 & Access95 --> PgSelect97
+    Object11 -->|rejectNull| PgSelect97
+    Access95 --> PgSelect97
     PgSelect121[["PgSelect[121∈0]<br />ᐸleft_armᐳ"]]:::plan
     Constant283{{"Constant[283∈0]<br />ᐸ42ᐳ"}}:::plan
     Object11 & Constant283 --> PgSelect121

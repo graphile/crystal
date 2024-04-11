@@ -1,3 +1,5 @@
+import type { ExecutionEntryFlags } from "./interfaces";
+
 export interface GrafastPlanJSON {
   version: "v1" | "v2";
 }
@@ -9,6 +11,8 @@ export interface GrafastPlanStepJSONv1 {
   isUnary: boolean;
   bucketId: string | number;
   dependencyIds: ReadonlyArray<string | number>;
+  dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
+  dependencyOnReject: ReadonlyArray<string | null | undefined>;
   polymorphicPaths: readonly string[] | undefined;
   isSyncAndSafe: boolean | undefined;
   supportsUnbatched: boolean | undefined;

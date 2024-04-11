@@ -3360,13 +3360,18 @@ export class OperationPlan {
   generatePlanJSON(): GrafastPlanJSON {
     function printStep(step: ExecutableStep): GrafastPlanStepJSONv1 {
       const metaString = step.toStringMeta();
+      const sstep = sudo(step);
       return {
         id: step.id,
         stepClass: step.constructor.name,
         metaString: metaString ? stripAnsi(metaString) : metaString,
         isUnary: step._isUnary,
         bucketId: step.layerPlan.id,
-        dependencyIds: sudo(step).dependencies.map((d) => d.id),
+        dependencyIds: sstep.dependencies.map((d) => d.id),
+        dependencyForbiddenFlags: sstep.dependencyForbiddenFlags.slice(),
+        dependencyOnReject: sstep.dependencyOnReject.map((or) =>
+          or ? String(or) : or,
+        ),
         polymorphicPaths: step.polymorphicPaths
           ? [...step.polymorphicPaths]
           : undefined,

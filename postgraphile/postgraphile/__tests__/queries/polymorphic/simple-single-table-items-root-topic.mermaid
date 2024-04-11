@@ -15,7 +15,8 @@ graph TD
     Access16 & Access17 --> Object18
     PgSelect107[["PgSelect[107∈0]<br />ᐸsingle_table_itemsᐳ"]]:::plan
     Access105{{"Access[105∈0]<br />ᐸ104.1ᐳ"}}:::plan
-    Object18 & Access105 --> PgSelect107
+    Object18 -->|rejectNull| PgSelect107
+    Access105 --> PgSelect107
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access16
     __Value3 --> Access17
@@ -103,45 +104,65 @@ graph TD
     PgSelect200[["PgSelect[200∈7]<br />ᐸrelational_item_relation_composite_pksᐳ<br />ᐳRelationalItemRelationCompositePk"]]:::plan
     Access377{{"Access[377∈7]<br />ᐸ131.base64JSON.1ᐳ<br />ᐳSingleTableTopic<br />ᐳPerson<br />ᐳLogEntry<br />ᐳOrganization<br />ᐳAwsApplication<br />ᐳGcpApplication<br />ᐳRelationalItemRelation<br />ᐳRelationalItemRelationCompositePk<br />ᐳSingleTableItemRelation<br />ᐳSingleTableItemRelationCompositePk<br />ᐳSingleTablePost<br />ᐳPriority<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem<br />ᐳFirstPartyVulnerability<br />ᐳThirdPartyVulnerability"}}:::plan
     Access378{{"Access[378∈7]<br />ᐸ131.base64JSON.2ᐳ<br />ᐳRelationalItemRelationCompositePk<br />ᐳSingleTableItemRelationCompositePk"}}:::plan
-    Object18 & Access377 & Access378 --> PgSelect200
+    Object18 -->|rejectNull| PgSelect200
+    Access377 -->|rejectNull| PgSelect200
+    Access378 --> PgSelect200
     PgSelect220[["PgSelect[220∈7]<br />ᐸsingle_table_item_relation_composite_pksᐳ<br />ᐳSingleTableItemRelationCompositePk"]]:::plan
-    Object18 & Access377 & Access378 --> PgSelect220
+    Object18 -->|rejectNull| PgSelect220
+    Access377 -->|rejectNull| PgSelect220
+    Access378 --> PgSelect220
     PgSelect135[["PgSelect[135∈7]<br />ᐸsingle_table_itemsᐳ<br />ᐳSingleTableTopic<br />ᐳSingleTablePost<br />ᐳSingleTableDivider<br />ᐳSingleTableChecklist<br />ᐳSingleTableChecklistItem"]]:::plan
-    Object18 & Access377 --> PgSelect135
+    Object18 -->|rejectNull| PgSelect135
+    Access377 --> PgSelect135
     PgSelect144[["PgSelect[144∈7]<br />ᐸpeopleᐳ<br />ᐳPerson"]]:::plan
-    Object18 & Access377 --> PgSelect144
+    Object18 -->|rejectNull| PgSelect144
+    Access377 --> PgSelect144
     PgSelect153[["PgSelect[153∈7]<br />ᐸlog_entriesᐳ<br />ᐳLogEntry"]]:::plan
-    Object18 & Access377 --> PgSelect153
+    Object18 -->|rejectNull| PgSelect153
+    Access377 --> PgSelect153
     PgSelect162[["PgSelect[162∈7]<br />ᐸorganizationsᐳ<br />ᐳOrganization"]]:::plan
-    Object18 & Access377 --> PgSelect162
+    Object18 -->|rejectNull| PgSelect162
+    Access377 --> PgSelect162
     PgSelect171[["PgSelect[171∈7]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication"]]:::plan
-    Object18 & Access377 --> PgSelect171
+    Object18 -->|rejectNull| PgSelect171
+    Access377 --> PgSelect171
     PgSelect180[["PgSelect[180∈7]<br />ᐸgcp_applicationsᐳ<br />ᐳGcpApplication"]]:::plan
-    Object18 & Access377 --> PgSelect180
+    Object18 -->|rejectNull| PgSelect180
+    Access377 --> PgSelect180
     PgSelect189[["PgSelect[189∈7]<br />ᐸrelational_item_relationsᐳ<br />ᐳRelationalItemRelation"]]:::plan
-    Object18 & Access377 --> PgSelect189
+    Object18 -->|rejectNull| PgSelect189
+    Access377 --> PgSelect189
     PgSelect209[["PgSelect[209∈7]<br />ᐸsingle_table_item_relationsᐳ<br />ᐳSingleTableItemRelation"]]:::plan
-    Object18 & Access377 --> PgSelect209
+    Object18 -->|rejectNull| PgSelect209
+    Access377 --> PgSelect209
     PgSelect238[["PgSelect[238∈7]<br />ᐸprioritiesᐳ<br />ᐳPriority"]]:::plan
-    Object18 & Access377 --> PgSelect238
+    Object18 -->|rejectNull| PgSelect238
+    Access377 --> PgSelect238
     List256{{"List[256∈7]<br />ᐸ254,253ᐳ<br />ᐳSingleTableDivider"}}:::plan
     Constant254{{"Constant[254∈7]<br />ᐸ'SingleTableDivider'ᐳ<br />ᐳSingleTableDivider"}}:::plan
     PgClassExpression253{{"PgClassExpression[253∈7]<br />ᐸ__single_t...ems__.”id”ᐳ<br />ᐳSingleTableDivider"}}:::plan
     Constant254 & PgClassExpression253 --> List256
     PgSelect290[["PgSelect[290∈7]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
-    Object18 & Access377 --> PgSelect290
+    Object18 -->|rejectNull| PgSelect290
+    Access377 --> PgSelect290
     PgSelect299[["PgSelect[299∈7]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
-    Object18 & Access377 --> PgSelect299
+    Object18 -->|rejectNull| PgSelect299
+    Access377 --> PgSelect299
     PgSelect308[["PgSelect[308∈7]<br />ᐸrelational_dividersᐳ<br />ᐳRelationalDivider"]]:::plan
-    Object18 & Access377 --> PgSelect308
+    Object18 -->|rejectNull| PgSelect308
+    Access377 --> PgSelect308
     PgSelect317[["PgSelect[317∈7]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalChecklist"]]:::plan
-    Object18 & Access377 --> PgSelect317
+    Object18 -->|rejectNull| PgSelect317
+    Access377 --> PgSelect317
     PgSelect326[["PgSelect[326∈7]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistItem"]]:::plan
-    Object18 & Access377 --> PgSelect326
+    Object18 -->|rejectNull| PgSelect326
+    Access377 --> PgSelect326
     PgSelect336[["PgSelect[336∈7]<br />ᐸfirst_party_vulnerabilitiesᐳ<br />ᐳFirstPartyVulnerability"]]:::plan
-    Object18 & Access377 --> PgSelect336
+    Object18 -->|rejectNull| PgSelect336
+    Access377 --> PgSelect336
     PgSelect345[["PgSelect[345∈7]<br />ᐸthird_party_vulnerabilitiesᐳ<br />ᐳThirdPartyVulnerability"]]:::plan
-    Object18 & Access377 --> PgSelect345
+    Object18 -->|rejectNull| PgSelect345
+    Access377 --> PgSelect345
     First139{{"First[139∈7]"}}:::plan
     PgSelect135 --> First139
     PgSelectSingle140{{"PgSelectSingle[140∈7]<br />ᐸsingle_table_itemsᐳ"}}:::plan

@@ -17,7 +17,9 @@ graph TD
     PgSelect340[["PgSelect[340∈0]<br />ᐸhousesᐳ"]]:::plan
     Access336{{"Access[336∈0]<br />ᐸ335.1ᐳ"}}:::plan
     Access338{{"Access[338∈0]<br />ᐸ335.2ᐳ"}}:::plan
-    Object18 & Access336 & Access338 --> PgSelect340
+    Object18 -->|rejectNull| PgSelect340
+    Access336 -->|rejectNull| PgSelect340
+    Access338 --> PgSelect340
     Access16{{"Access[16∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access17{{"Access[17∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access16 & Access17 --> Object18

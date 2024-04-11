@@ -21,7 +21,8 @@ graph TD
     Object18 & Constant4354 --> PgSelect685
     PgSelect905[["PgSelect[905∈0]<br />ᐸtypesᐳ"]]:::plan
     Access903{{"Access[903∈0]<br />ᐸ902.1ᐳ"}}:::plan
-    Object18 & Access903 --> PgSelect905
+    Object18 -->|rejectNull| PgSelect905
+    Access903 --> PgSelect905
     PgSelect1500[["PgSelect[1500∈0]<br />ᐸtype_functionᐳ"]]:::plan
     Object18 & Constant4354 --> PgSelect1500
     PgSelect3300[["PgSelect[3300∈0]<br />ᐸpostᐳ"]]:::plan
@@ -1362,41 +1363,60 @@ graph TD
     PgSelect1184[["PgSelect[1184∈138]<br />ᐸcompound_keyᐳ<br />ᐳCompoundKey"]]:::plan
     Access4356{{"Access[4356∈138]<br />ᐸ1123.base64JSON.1ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
     Access4357{{"Access[4357∈138]<br />ᐸ1123.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
-    Object18 & Access4356 & Access4357 --> PgSelect1184
+    Object18 -->|rejectNull| PgSelect1184
+    Access4356 -->|rejectNull| PgSelect1184
+    Access4357 --> PgSelect1184
     PgSelect1128[["PgSelect[1128∈138]<br />ᐸinputsᐳ<br />ᐳInput"]]:::plan
-    Object18 & Access4356 --> PgSelect1128
+    Object18 -->|rejectNull| PgSelect1128
+    Access4356 --> PgSelect1128
     PgSelect1137[["PgSelect[1137∈138]<br />ᐸpatchsᐳ<br />ᐳPatch"]]:::plan
-    Object18 & Access4356 --> PgSelect1137
+    Object18 -->|rejectNull| PgSelect1137
+    Access4356 --> PgSelect1137
     PgSelect1146[["PgSelect[1146∈138]<br />ᐸreservedᐳ<br />ᐳReserved"]]:::plan
-    Object18 & Access4356 --> PgSelect1146
+    Object18 -->|rejectNull| PgSelect1146
+    Access4356 --> PgSelect1146
     PgSelect1155[["PgSelect[1155∈138]<br />ᐸreservedPatchsᐳ<br />ᐳReservedPatchRecord"]]:::plan
-    Object18 & Access4356 --> PgSelect1155
+    Object18 -->|rejectNull| PgSelect1155
+    Access4356 --> PgSelect1155
     PgSelect1164[["PgSelect[1164∈138]<br />ᐸreserved_inputᐳ<br />ᐳReservedInputRecord"]]:::plan
-    Object18 & Access4356 --> PgSelect1164
+    Object18 -->|rejectNull| PgSelect1164
+    Access4356 --> PgSelect1164
     PgSelect1173[["PgSelect[1173∈138]<br />ᐸdefault_valueᐳ<br />ᐳDefaultValue"]]:::plan
-    Object18 & Access4356 --> PgSelect1173
+    Object18 -->|rejectNull| PgSelect1173
+    Access4356 --> PgSelect1173
     PgSelect1193[["PgSelect[1193∈138]<br />ᐸpersonᐳ<br />ᐳPerson"]]:::plan
-    Object18 & Access4356 --> PgSelect1193
+    Object18 -->|rejectNull| PgSelect1193
+    Access4356 --> PgSelect1193
     PgSelect1202[["PgSelect[1202∈138]<br />ᐸpostᐳ<br />ᐳPost"]]:::plan
-    Object18 & Access4356 --> PgSelect1202
+    Object18 -->|rejectNull| PgSelect1202
+    Access4356 --> PgSelect1202
     PgSelect1211[["PgSelect[1211∈138]<br />ᐸtypesᐳ<br />ᐳType"]]:::plan
-    Object18 & Access4356 --> PgSelect1211
+    Object18 -->|rejectNull| PgSelect1211
+    Access4356 --> PgSelect1211
     PgSelect1430[["PgSelect[1430∈138]<br />ᐸperson_secretᐳ<br />ᐳPersonSecret"]]:::plan
-    Object18 & Access4356 --> PgSelect1430
+    Object18 -->|rejectNull| PgSelect1430
+    Access4356 --> PgSelect1430
     PgSelect1439[["PgSelect[1439∈138]<br />ᐸleft_armᐳ<br />ᐳLeftArm"]]:::plan
-    Object18 & Access4356 --> PgSelect1439
+    Object18 -->|rejectNull| PgSelect1439
+    Access4356 --> PgSelect1439
     PgSelect1448[["PgSelect[1448∈138]<br />ᐸmy_tableᐳ<br />ᐳMyTable"]]:::plan
-    Object18 & Access4356 --> PgSelect1448
+    Object18 -->|rejectNull| PgSelect1448
+    Access4356 --> PgSelect1448
     PgSelect1457[["PgSelect[1457∈138]<br />ᐸview_tableᐳ<br />ᐳViewTable"]]:::plan
-    Object18 & Access4356 --> PgSelect1457
+    Object18 -->|rejectNull| PgSelect1457
+    Access4356 --> PgSelect1457
     PgSelect1466[["PgSelect[1466∈138]<br />ᐸsimilar_table_1ᐳ<br />ᐳSimilarTable1"]]:::plan
-    Object18 & Access4356 --> PgSelect1466
+    Object18 -->|rejectNull| PgSelect1466
+    Access4356 --> PgSelect1466
     PgSelect1475[["PgSelect[1475∈138]<br />ᐸsimilar_table_2ᐳ<br />ᐳSimilarTable2"]]:::plan
-    Object18 & Access4356 --> PgSelect1475
+    Object18 -->|rejectNull| PgSelect1475
+    Access4356 --> PgSelect1475
     PgSelect1484[["PgSelect[1484∈138]<br />ᐸnull_test_recordᐳ<br />ᐳNullTestRecord"]]:::plan
-    Object18 & Access4356 --> PgSelect1484
+    Object18 -->|rejectNull| PgSelect1484
+    Access4356 --> PgSelect1484
     PgSelect1493[["PgSelect[1493∈138]<br />ᐸissue756ᐳ<br />ᐳIssue756"]]:::plan
-    Object18 & Access4356 --> PgSelect1493
+    Object18 -->|rejectNull| PgSelect1493
+    Access4356 --> PgSelect1493
     First1132{{"First[1132∈138]"}}:::plan
     PgSelect1128 --> First1132
     PgSelectSingle1133{{"PgSelectSingle[1133∈138]<br />ᐸinputsᐳ"}}:::plan

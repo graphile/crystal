@@ -13,33 +13,44 @@ graph TD
     Object18{{"Object[18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Access1632{{"Access[1632∈0]<br />ᐸ1631.1ᐳ"}}:::plan
     Access1634{{"Access[1634∈0]<br />ᐸ1631.2ᐳ"}}:::plan
-    Object18 & Access1632 & Access1634 --> PgSelect1636
+    Object18 -->|rejectNull| PgSelect1636
+    Access1632 -->|rejectNull| PgSelect1636
+    Access1634 --> PgSelect1636
     PgSelect1655[["PgSelect[1655∈0]<br />ᐸcompound_keyᐳ"]]:::plan
     Access1651{{"Access[1651∈0]<br />ᐸ1650.1ᐳ"}}:::plan
     Access1653{{"Access[1653∈0]<br />ᐸ1650.2ᐳ"}}:::plan
-    Object18 & Access1651 & Access1653 --> PgSelect1655
+    Object18 -->|rejectNull| PgSelect1655
+    Access1651 -->|rejectNull| PgSelect1655
+    Access1653 --> PgSelect1655
     PgSelect1674[["PgSelect[1674∈0]<br />ᐸcompound_keyᐳ"]]:::plan
     Access1670{{"Access[1670∈0]<br />ᐸ1669.1ᐳ"}}:::plan
     Access1672{{"Access[1672∈0]<br />ᐸ1669.2ᐳ"}}:::plan
-    Object18 & Access1670 & Access1672 --> PgSelect1674
+    Object18 -->|rejectNull| PgSelect1674
+    Access1670 -->|rejectNull| PgSelect1674
+    Access1672 --> PgSelect1674
     Access16{{"Access[16∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
     Access17{{"Access[17∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
     Access16 & Access17 --> Object18
     PgSelect1586[["PgSelect[1586∈0]<br />ᐸpersonᐳ"]]:::plan
     Access1584{{"Access[1584∈0]<br />ᐸ1583.1ᐳ"}}:::plan
-    Object18 & Access1584 --> PgSelect1586
+    Object18 -->|rejectNull| PgSelect1586
+    Access1584 --> PgSelect1586
     PgSelect1602[["PgSelect[1602∈0]<br />ᐸpersonᐳ"]]:::plan
     Access1600{{"Access[1600∈0]<br />ᐸ1599.1ᐳ"}}:::plan
-    Object18 & Access1600 --> PgSelect1602
+    Object18 -->|rejectNull| PgSelect1602
+    Access1600 --> PgSelect1602
     PgSelect1618[["PgSelect[1618∈0]<br />ᐸpersonᐳ"]]:::plan
     Access1616{{"Access[1616∈0]<br />ᐸ1615.1ᐳ"}}:::plan
-    Object18 & Access1616 --> PgSelect1618
+    Object18 -->|rejectNull| PgSelect1618
+    Access1616 --> PgSelect1618
     PgSelect2201[["PgSelect[2201∈0]<br />ᐸsimilar_table_1ᐳ"]]:::plan
     Access2199{{"Access[2199∈0]<br />ᐸ2198.1ᐳ"}}:::plan
-    Object18 & Access2199 --> PgSelect2201
+    Object18 -->|rejectNull| PgSelect2201
+    Access2199 --> PgSelect2201
     PgSelect2219[["PgSelect[2219∈0]<br />ᐸsimilar_table_2ᐳ"]]:::plan
     Access2217{{"Access[2217∈0]<br />ᐸ2216.1ᐳ"}}:::plan
-    Object18 & Access2217 --> PgSelect2219
+    Object18 -->|rejectNull| PgSelect2219
+    Access2217 --> PgSelect2219
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access16
     __Value3 --> Access17
@@ -179,110 +190,129 @@ graph TD
     PgSelect141[["PgSelect[141∈7]<br />ᐸcompound_keyᐳ<br />ᐳCompoundKey"]]:::plan
     Access2396{{"Access[2396∈7]<br />ᐸ54.base64JSON.1ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
     Access2397{{"Access[2397∈7]<br />ᐸ54.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
-    Object18 & Access2396 & Access2397 --> PgSelect141
+    Object18 -->|rejectNull| PgSelect141
+    Access2396 -->|rejectNull| PgSelect141
+    Access2397 --> PgSelect141
     List150{{"List[150∈7]<br />ᐸ147,148,149ᐳ<br />ᐳCompoundKey"}}:::plan
     Constant147{{"Constant[147∈7]<br />ᐸ'compound_keys'ᐳ<br />ᐳCompoundKey"}}:::plan
     PgClassExpression148{{"PgClassExpression[148∈7]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgClassExpression149{{"PgClassExpression[149∈7]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
     Constant147 & PgClassExpression148 & PgClassExpression149 --> List150
     PgSelect61[["PgSelect[61∈7]<br />ᐸinputsᐳ<br />ᐳInput"]]:::plan
-    Object18 & Access2396 --> PgSelect61
+    Object18 -->|rejectNull| PgSelect61
+    Access2396 --> PgSelect61
     List69{{"List[69∈7]<br />ᐸ67,68ᐳ<br />ᐳInput"}}:::plan
     Constant67{{"Constant[67∈7]<br />ᐸ'inputs'ᐳ<br />ᐳInput"}}:::plan
     PgClassExpression68{{"PgClassExpression[68∈7]<br />ᐸ__inputs__.”id”ᐳ"}}:::plan
     Constant67 & PgClassExpression68 --> List69
     PgSelect74[["PgSelect[74∈7]<br />ᐸpatchsᐳ<br />ᐳPatch"]]:::plan
-    Object18 & Access2396 --> PgSelect74
+    Object18 -->|rejectNull| PgSelect74
+    Access2396 --> PgSelect74
     List82{{"List[82∈7]<br />ᐸ80,81ᐳ<br />ᐳPatch"}}:::plan
     Constant80{{"Constant[80∈7]<br />ᐸ'patchs'ᐳ<br />ᐳPatch"}}:::plan
     PgClassExpression81{{"PgClassExpression[81∈7]<br />ᐸ__patchs__.”id”ᐳ"}}:::plan
     Constant80 & PgClassExpression81 --> List82
     PgSelect87[["PgSelect[87∈7]<br />ᐸreservedᐳ<br />ᐳReserved"]]:::plan
-    Object18 & Access2396 --> PgSelect87
+    Object18 -->|rejectNull| PgSelect87
+    Access2396 --> PgSelect87
     List95{{"List[95∈7]<br />ᐸ93,94ᐳ<br />ᐳReserved"}}:::plan
     Constant93{{"Constant[93∈7]<br />ᐸ'reserveds'ᐳ<br />ᐳReserved"}}:::plan
     PgClassExpression94{{"PgClassExpression[94∈7]<br />ᐸ__reserved__.”id”ᐳ"}}:::plan
     Constant93 & PgClassExpression94 --> List95
     PgSelect100[["PgSelect[100∈7]<br />ᐸreservedPatchsᐳ<br />ᐳReservedPatchRecord"]]:::plan
-    Object18 & Access2396 --> PgSelect100
+    Object18 -->|rejectNull| PgSelect100
+    Access2396 --> PgSelect100
     List108{{"List[108∈7]<br />ᐸ106,107ᐳ<br />ᐳReservedPatchRecord"}}:::plan
     Constant106{{"Constant[106∈7]<br />ᐸ'reservedPatchs'ᐳ<br />ᐳReservedPatchRecord"}}:::plan
     PgClassExpression107{{"PgClassExpression[107∈7]<br />ᐸ__reserved...chs__.”id”ᐳ"}}:::plan
     Constant106 & PgClassExpression107 --> List108
     PgSelect113[["PgSelect[113∈7]<br />ᐸreserved_inputᐳ<br />ᐳReservedInputRecord"]]:::plan
-    Object18 & Access2396 --> PgSelect113
+    Object18 -->|rejectNull| PgSelect113
+    Access2396 --> PgSelect113
     List121{{"List[121∈7]<br />ᐸ119,120ᐳ<br />ᐳReservedInputRecord"}}:::plan
     Constant119{{"Constant[119∈7]<br />ᐸ'reserved_inputs'ᐳ<br />ᐳReservedInputRecord"}}:::plan
     PgClassExpression120{{"PgClassExpression[120∈7]<br />ᐸ__reserved_input__.”id”ᐳ"}}:::plan
     Constant119 & PgClassExpression120 --> List121
     PgSelect126[["PgSelect[126∈7]<br />ᐸdefault_valueᐳ<br />ᐳDefaultValue"]]:::plan
-    Object18 & Access2396 --> PgSelect126
+    Object18 -->|rejectNull| PgSelect126
+    Access2396 --> PgSelect126
     List134{{"List[134∈7]<br />ᐸ132,133ᐳ<br />ᐳDefaultValue"}}:::plan
     Constant132{{"Constant[132∈7]<br />ᐸ'default_values'ᐳ<br />ᐳDefaultValue"}}:::plan
     PgClassExpression133{{"PgClassExpression[133∈7]<br />ᐸ__default_value__.”id”ᐳ"}}:::plan
     Constant132 & PgClassExpression133 --> List134
     PgSelect157[["PgSelect[157∈7]<br />ᐸpersonᐳ<br />ᐳPerson"]]:::plan
-    Object18 & Access2396 --> PgSelect157
+    Object18 -->|rejectNull| PgSelect157
+    Access2396 --> PgSelect157
     List165{{"List[165∈7]<br />ᐸ163,164ᐳ<br />ᐳPerson"}}:::plan
     Constant163{{"Constant[163∈7]<br />ᐸ'people'ᐳ<br />ᐳPerson"}}:::plan
     PgClassExpression164{{"PgClassExpression[164∈7]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     Constant163 & PgClassExpression164 --> List165
     PgSelect172[["PgSelect[172∈7]<br />ᐸpostᐳ<br />ᐳPost"]]:::plan
-    Object18 & Access2396 --> PgSelect172
+    Object18 -->|rejectNull| PgSelect172
+    Access2396 --> PgSelect172
     List180{{"List[180∈7]<br />ᐸ178,179ᐳ<br />ᐳPost"}}:::plan
     Constant178{{"Constant[178∈7]<br />ᐸ'posts'ᐳ<br />ᐳPost"}}:::plan
     PgClassExpression179{{"PgClassExpression[179∈7]<br />ᐸ__post__.”id”ᐳ"}}:::plan
     Constant178 & PgClassExpression179 --> List180
     PgSelect185[["PgSelect[185∈7]<br />ᐸtypesᐳ<br />ᐳType"]]:::plan
-    Object18 & Access2396 --> PgSelect185
+    Object18 -->|rejectNull| PgSelect185
+    Access2396 --> PgSelect185
     List193{{"List[193∈7]<br />ᐸ191,192ᐳ<br />ᐳType"}}:::plan
     Constant191{{"Constant[191∈7]<br />ᐸ'types'ᐳ<br />ᐳType"}}:::plan
     PgClassExpression192{{"PgClassExpression[192∈7]<br />ᐸ__types__.”id”ᐳ"}}:::plan
     Constant191 & PgClassExpression192 --> List193
     PgSelect198[["PgSelect[198∈7]<br />ᐸperson_secretᐳ<br />ᐳPersonSecret"]]:::plan
-    Object18 & Access2396 --> PgSelect198
+    Object18 -->|rejectNull| PgSelect198
+    Access2396 --> PgSelect198
     List206{{"List[206∈7]<br />ᐸ204,205ᐳ<br />ᐳPersonSecret"}}:::plan
     Constant204{{"Constant[204∈7]<br />ᐸ'person_secrets'ᐳ<br />ᐳPersonSecret"}}:::plan
     PgClassExpression205{{"PgClassExpression[205∈7]<br />ᐸ__person_s...person_id”ᐳ"}}:::plan
     Constant204 & PgClassExpression205 --> List206
     PgSelect211[["PgSelect[211∈7]<br />ᐸleft_armᐳ<br />ᐳLeftArm"]]:::plan
-    Object18 & Access2396 --> PgSelect211
+    Object18 -->|rejectNull| PgSelect211
+    Access2396 --> PgSelect211
     List219{{"List[219∈7]<br />ᐸ217,218ᐳ<br />ᐳLeftArm"}}:::plan
     Constant217{{"Constant[217∈7]<br />ᐸ'left_arms'ᐳ<br />ᐳLeftArm"}}:::plan
     PgClassExpression218{{"PgClassExpression[218∈7]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
     Constant217 & PgClassExpression218 --> List219
     PgSelect224[["PgSelect[224∈7]<br />ᐸmy_tableᐳ<br />ᐳMyTable"]]:::plan
-    Object18 & Access2396 --> PgSelect224
+    Object18 -->|rejectNull| PgSelect224
+    Access2396 --> PgSelect224
     List232{{"List[232∈7]<br />ᐸ230,231ᐳ<br />ᐳMyTable"}}:::plan
     Constant230{{"Constant[230∈7]<br />ᐸ'my_tables'ᐳ<br />ᐳMyTable"}}:::plan
     PgClassExpression231{{"PgClassExpression[231∈7]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
     Constant230 & PgClassExpression231 --> List232
     PgSelect237[["PgSelect[237∈7]<br />ᐸview_tableᐳ<br />ᐳViewTable"]]:::plan
-    Object18 & Access2396 --> PgSelect237
+    Object18 -->|rejectNull| PgSelect237
+    Access2396 --> PgSelect237
     List245{{"List[245∈7]<br />ᐸ243,244ᐳ<br />ᐳViewTable"}}:::plan
     Constant243{{"Constant[243∈7]<br />ᐸ'view_tables'ᐳ<br />ᐳViewTable"}}:::plan
     PgClassExpression244{{"PgClassExpression[244∈7]<br />ᐸ__view_table__.”id”ᐳ"}}:::plan
     Constant243 & PgClassExpression244 --> List245
     PgSelect250[["PgSelect[250∈7]<br />ᐸsimilar_table_1ᐳ<br />ᐳSimilarTable1"]]:::plan
-    Object18 & Access2396 --> PgSelect250
+    Object18 -->|rejectNull| PgSelect250
+    Access2396 --> PgSelect250
     List258{{"List[258∈7]<br />ᐸ256,257ᐳ<br />ᐳSimilarTable1"}}:::plan
     Constant256{{"Constant[256∈7]<br />ᐸ'similar_table_1S'ᐳ<br />ᐳSimilarTable1"}}:::plan
     PgClassExpression257{{"PgClassExpression[257∈7]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
     Constant256 & PgClassExpression257 --> List258
     PgSelect267[["PgSelect[267∈7]<br />ᐸsimilar_table_2ᐳ<br />ᐳSimilarTable2"]]:::plan
-    Object18 & Access2396 --> PgSelect267
+    Object18 -->|rejectNull| PgSelect267
+    Access2396 --> PgSelect267
     List275{{"List[275∈7]<br />ᐸ273,274ᐳ<br />ᐳSimilarTable2"}}:::plan
     Constant273{{"Constant[273∈7]<br />ᐸ'similar_table_2S'ᐳ<br />ᐳSimilarTable2"}}:::plan
     PgClassExpression274{{"PgClassExpression[274∈7]<br />ᐸ__similar_...e_2__.”id”ᐳ"}}:::plan
     Constant273 & PgClassExpression274 --> List275
     PgSelect284[["PgSelect[284∈7]<br />ᐸnull_test_recordᐳ<br />ᐳNullTestRecord"]]:::plan
-    Object18 & Access2396 --> PgSelect284
+    Object18 -->|rejectNull| PgSelect284
+    Access2396 --> PgSelect284
     List292{{"List[292∈7]<br />ᐸ290,291ᐳ<br />ᐳNullTestRecord"}}:::plan
     Constant290{{"Constant[290∈7]<br />ᐸ'null_test_records'ᐳ<br />ᐳNullTestRecord"}}:::plan
     PgClassExpression291{{"PgClassExpression[291∈7]<br />ᐸ__null_tes...ord__.”id”ᐳ"}}:::plan
     Constant290 & PgClassExpression291 --> List292
     PgSelect297[["PgSelect[297∈7]<br />ᐸissue756ᐳ<br />ᐳIssue756"]]:::plan
-    Object18 & Access2396 --> PgSelect297
+    Object18 -->|rejectNull| PgSelect297
+    Access2396 --> PgSelect297
     List305{{"List[305∈7]<br />ᐸ303,304ᐳ<br />ᐳIssue756"}}:::plan
     Constant303{{"Constant[303∈7]<br />ᐸ'issue756S'ᐳ<br />ᐳIssue756"}}:::plan
     PgClassExpression304{{"PgClassExpression[304∈7]<br />ᐸ__issue756__.”id”ᐳ"}}:::plan
@@ -436,110 +466,129 @@ graph TD
     PgSelect396[["PgSelect[396∈8]<br />ᐸcompound_keyᐳ<br />ᐳCompoundKey"]]:::plan
     Access2399{{"Access[2399∈8]<br />ᐸ309.base64JSON.1ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
     Access2400{{"Access[2400∈8]<br />ᐸ309.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
-    Object18 & Access2399 & Access2400 --> PgSelect396
+    Object18 -->|rejectNull| PgSelect396
+    Access2399 -->|rejectNull| PgSelect396
+    Access2400 --> PgSelect396
     List405{{"List[405∈8]<br />ᐸ402,403,404ᐳ<br />ᐳCompoundKey"}}:::plan
     Constant402{{"Constant[402∈8]<br />ᐸ'compound_keys'ᐳ<br />ᐳCompoundKey"}}:::plan
     PgClassExpression403{{"PgClassExpression[403∈8]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgClassExpression404{{"PgClassExpression[404∈8]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
     Constant402 & PgClassExpression403 & PgClassExpression404 --> List405
     PgSelect316[["PgSelect[316∈8]<br />ᐸinputsᐳ<br />ᐳInput"]]:::plan
-    Object18 & Access2399 --> PgSelect316
+    Object18 -->|rejectNull| PgSelect316
+    Access2399 --> PgSelect316
     List324{{"List[324∈8]<br />ᐸ322,323ᐳ<br />ᐳInput"}}:::plan
     Constant322{{"Constant[322∈8]<br />ᐸ'inputs'ᐳ<br />ᐳInput"}}:::plan
     PgClassExpression323{{"PgClassExpression[323∈8]<br />ᐸ__inputs__.”id”ᐳ"}}:::plan
     Constant322 & PgClassExpression323 --> List324
     PgSelect329[["PgSelect[329∈8]<br />ᐸpatchsᐳ<br />ᐳPatch"]]:::plan
-    Object18 & Access2399 --> PgSelect329
+    Object18 -->|rejectNull| PgSelect329
+    Access2399 --> PgSelect329
     List337{{"List[337∈8]<br />ᐸ335,336ᐳ<br />ᐳPatch"}}:::plan
     Constant335{{"Constant[335∈8]<br />ᐸ'patchs'ᐳ<br />ᐳPatch"}}:::plan
     PgClassExpression336{{"PgClassExpression[336∈8]<br />ᐸ__patchs__.”id”ᐳ"}}:::plan
     Constant335 & PgClassExpression336 --> List337
     PgSelect342[["PgSelect[342∈8]<br />ᐸreservedᐳ<br />ᐳReserved"]]:::plan
-    Object18 & Access2399 --> PgSelect342
+    Object18 -->|rejectNull| PgSelect342
+    Access2399 --> PgSelect342
     List350{{"List[350∈8]<br />ᐸ348,349ᐳ<br />ᐳReserved"}}:::plan
     Constant348{{"Constant[348∈8]<br />ᐸ'reserveds'ᐳ<br />ᐳReserved"}}:::plan
     PgClassExpression349{{"PgClassExpression[349∈8]<br />ᐸ__reserved__.”id”ᐳ"}}:::plan
     Constant348 & PgClassExpression349 --> List350
     PgSelect355[["PgSelect[355∈8]<br />ᐸreservedPatchsᐳ<br />ᐳReservedPatchRecord"]]:::plan
-    Object18 & Access2399 --> PgSelect355
+    Object18 -->|rejectNull| PgSelect355
+    Access2399 --> PgSelect355
     List363{{"List[363∈8]<br />ᐸ361,362ᐳ<br />ᐳReservedPatchRecord"}}:::plan
     Constant361{{"Constant[361∈8]<br />ᐸ'reservedPatchs'ᐳ<br />ᐳReservedPatchRecord"}}:::plan
     PgClassExpression362{{"PgClassExpression[362∈8]<br />ᐸ__reserved...chs__.”id”ᐳ"}}:::plan
     Constant361 & PgClassExpression362 --> List363
     PgSelect368[["PgSelect[368∈8]<br />ᐸreserved_inputᐳ<br />ᐳReservedInputRecord"]]:::plan
-    Object18 & Access2399 --> PgSelect368
+    Object18 -->|rejectNull| PgSelect368
+    Access2399 --> PgSelect368
     List376{{"List[376∈8]<br />ᐸ374,375ᐳ<br />ᐳReservedInputRecord"}}:::plan
     Constant374{{"Constant[374∈8]<br />ᐸ'reserved_inputs'ᐳ<br />ᐳReservedInputRecord"}}:::plan
     PgClassExpression375{{"PgClassExpression[375∈8]<br />ᐸ__reserved_input__.”id”ᐳ"}}:::plan
     Constant374 & PgClassExpression375 --> List376
     PgSelect381[["PgSelect[381∈8]<br />ᐸdefault_valueᐳ<br />ᐳDefaultValue"]]:::plan
-    Object18 & Access2399 --> PgSelect381
+    Object18 -->|rejectNull| PgSelect381
+    Access2399 --> PgSelect381
     List389{{"List[389∈8]<br />ᐸ387,388ᐳ<br />ᐳDefaultValue"}}:::plan
     Constant387{{"Constant[387∈8]<br />ᐸ'default_values'ᐳ<br />ᐳDefaultValue"}}:::plan
     PgClassExpression388{{"PgClassExpression[388∈8]<br />ᐸ__default_value__.”id”ᐳ"}}:::plan
     Constant387 & PgClassExpression388 --> List389
     PgSelect412[["PgSelect[412∈8]<br />ᐸpersonᐳ<br />ᐳPerson"]]:::plan
-    Object18 & Access2399 --> PgSelect412
+    Object18 -->|rejectNull| PgSelect412
+    Access2399 --> PgSelect412
     List420{{"List[420∈8]<br />ᐸ418,419ᐳ<br />ᐳPerson"}}:::plan
     Constant418{{"Constant[418∈8]<br />ᐸ'people'ᐳ<br />ᐳPerson"}}:::plan
     PgClassExpression419{{"PgClassExpression[419∈8]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     Constant418 & PgClassExpression419 --> List420
     PgSelect427[["PgSelect[427∈8]<br />ᐸpostᐳ<br />ᐳPost"]]:::plan
-    Object18 & Access2399 --> PgSelect427
+    Object18 -->|rejectNull| PgSelect427
+    Access2399 --> PgSelect427
     List435{{"List[435∈8]<br />ᐸ433,434ᐳ<br />ᐳPost"}}:::plan
     Constant433{{"Constant[433∈8]<br />ᐸ'posts'ᐳ<br />ᐳPost"}}:::plan
     PgClassExpression434{{"PgClassExpression[434∈8]<br />ᐸ__post__.”id”ᐳ"}}:::plan
     Constant433 & PgClassExpression434 --> List435
     PgSelect440[["PgSelect[440∈8]<br />ᐸtypesᐳ<br />ᐳType"]]:::plan
-    Object18 & Access2399 --> PgSelect440
+    Object18 -->|rejectNull| PgSelect440
+    Access2399 --> PgSelect440
     List448{{"List[448∈8]<br />ᐸ446,447ᐳ<br />ᐳType"}}:::plan
     Constant446{{"Constant[446∈8]<br />ᐸ'types'ᐳ<br />ᐳType"}}:::plan
     PgClassExpression447{{"PgClassExpression[447∈8]<br />ᐸ__types__.”id”ᐳ"}}:::plan
     Constant446 & PgClassExpression447 --> List448
     PgSelect453[["PgSelect[453∈8]<br />ᐸperson_secretᐳ<br />ᐳPersonSecret"]]:::plan
-    Object18 & Access2399 --> PgSelect453
+    Object18 -->|rejectNull| PgSelect453
+    Access2399 --> PgSelect453
     List461{{"List[461∈8]<br />ᐸ459,460ᐳ<br />ᐳPersonSecret"}}:::plan
     Constant459{{"Constant[459∈8]<br />ᐸ'person_secrets'ᐳ<br />ᐳPersonSecret"}}:::plan
     PgClassExpression460{{"PgClassExpression[460∈8]<br />ᐸ__person_s...person_id”ᐳ"}}:::plan
     Constant459 & PgClassExpression460 --> List461
     PgSelect466[["PgSelect[466∈8]<br />ᐸleft_armᐳ<br />ᐳLeftArm"]]:::plan
-    Object18 & Access2399 --> PgSelect466
+    Object18 -->|rejectNull| PgSelect466
+    Access2399 --> PgSelect466
     List474{{"List[474∈8]<br />ᐸ472,473ᐳ<br />ᐳLeftArm"}}:::plan
     Constant472{{"Constant[472∈8]<br />ᐸ'left_arms'ᐳ<br />ᐳLeftArm"}}:::plan
     PgClassExpression473{{"PgClassExpression[473∈8]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
     Constant472 & PgClassExpression473 --> List474
     PgSelect479[["PgSelect[479∈8]<br />ᐸmy_tableᐳ<br />ᐳMyTable"]]:::plan
-    Object18 & Access2399 --> PgSelect479
+    Object18 -->|rejectNull| PgSelect479
+    Access2399 --> PgSelect479
     List487{{"List[487∈8]<br />ᐸ485,486ᐳ<br />ᐳMyTable"}}:::plan
     Constant485{{"Constant[485∈8]<br />ᐸ'my_tables'ᐳ<br />ᐳMyTable"}}:::plan
     PgClassExpression486{{"PgClassExpression[486∈8]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
     Constant485 & PgClassExpression486 --> List487
     PgSelect492[["PgSelect[492∈8]<br />ᐸview_tableᐳ<br />ᐳViewTable"]]:::plan
-    Object18 & Access2399 --> PgSelect492
+    Object18 -->|rejectNull| PgSelect492
+    Access2399 --> PgSelect492
     List500{{"List[500∈8]<br />ᐸ498,499ᐳ<br />ᐳViewTable"}}:::plan
     Constant498{{"Constant[498∈8]<br />ᐸ'view_tables'ᐳ<br />ᐳViewTable"}}:::plan
     PgClassExpression499{{"PgClassExpression[499∈8]<br />ᐸ__view_table__.”id”ᐳ"}}:::plan
     Constant498 & PgClassExpression499 --> List500
     PgSelect505[["PgSelect[505∈8]<br />ᐸsimilar_table_1ᐳ<br />ᐳSimilarTable1"]]:::plan
-    Object18 & Access2399 --> PgSelect505
+    Object18 -->|rejectNull| PgSelect505
+    Access2399 --> PgSelect505
     List513{{"List[513∈8]<br />ᐸ511,512ᐳ<br />ᐳSimilarTable1"}}:::plan
     Constant511{{"Constant[511∈8]<br />ᐸ'similar_table_1S'ᐳ<br />ᐳSimilarTable1"}}:::plan
     PgClassExpression512{{"PgClassExpression[512∈8]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
     Constant511 & PgClassExpression512 --> List513
     PgSelect522[["PgSelect[522∈8]<br />ᐸsimilar_table_2ᐳ<br />ᐳSimilarTable2"]]:::plan
-    Object18 & Access2399 --> PgSelect522
+    Object18 -->|rejectNull| PgSelect522
+    Access2399 --> PgSelect522
     List530{{"List[530∈8]<br />ᐸ528,529ᐳ<br />ᐳSimilarTable2"}}:::plan
     Constant528{{"Constant[528∈8]<br />ᐸ'similar_table_2S'ᐳ<br />ᐳSimilarTable2"}}:::plan
     PgClassExpression529{{"PgClassExpression[529∈8]<br />ᐸ__similar_...e_2__.”id”ᐳ"}}:::plan
     Constant528 & PgClassExpression529 --> List530
     PgSelect539[["PgSelect[539∈8]<br />ᐸnull_test_recordᐳ<br />ᐳNullTestRecord"]]:::plan
-    Object18 & Access2399 --> PgSelect539
+    Object18 -->|rejectNull| PgSelect539
+    Access2399 --> PgSelect539
     List547{{"List[547∈8]<br />ᐸ545,546ᐳ<br />ᐳNullTestRecord"}}:::plan
     Constant545{{"Constant[545∈8]<br />ᐸ'null_test_records'ᐳ<br />ᐳNullTestRecord"}}:::plan
     PgClassExpression546{{"PgClassExpression[546∈8]<br />ᐸ__null_tes...ord__.”id”ᐳ"}}:::plan
     Constant545 & PgClassExpression546 --> List547
     PgSelect552[["PgSelect[552∈8]<br />ᐸissue756ᐳ<br />ᐳIssue756"]]:::plan
-    Object18 & Access2399 --> PgSelect552
+    Object18 -->|rejectNull| PgSelect552
+    Access2399 --> PgSelect552
     List560{{"List[560∈8]<br />ᐸ558,559ᐳ<br />ᐳIssue756"}}:::plan
     Constant558{{"Constant[558∈8]<br />ᐸ'issue756S'ᐳ<br />ᐳIssue756"}}:::plan
     PgClassExpression559{{"PgClassExpression[559∈8]<br />ᐸ__issue756__.”id”ᐳ"}}:::plan
@@ -693,110 +742,129 @@ graph TD
     PgSelect651[["PgSelect[651∈9]<br />ᐸcompound_keyᐳ<br />ᐳCompoundKey"]]:::plan
     Access2402{{"Access[2402∈9]<br />ᐸ564.base64JSON.1ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
     Access2403{{"Access[2403∈9]<br />ᐸ564.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
-    Object18 & Access2402 & Access2403 --> PgSelect651
+    Object18 -->|rejectNull| PgSelect651
+    Access2402 -->|rejectNull| PgSelect651
+    Access2403 --> PgSelect651
     List660{{"List[660∈9]<br />ᐸ657,658,659ᐳ<br />ᐳCompoundKey"}}:::plan
     Constant657{{"Constant[657∈9]<br />ᐸ'compound_keys'ᐳ<br />ᐳCompoundKey"}}:::plan
     PgClassExpression658{{"PgClassExpression[658∈9]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgClassExpression659{{"PgClassExpression[659∈9]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
     Constant657 & PgClassExpression658 & PgClassExpression659 --> List660
     PgSelect571[["PgSelect[571∈9]<br />ᐸinputsᐳ<br />ᐳInput"]]:::plan
-    Object18 & Access2402 --> PgSelect571
+    Object18 -->|rejectNull| PgSelect571
+    Access2402 --> PgSelect571
     List579{{"List[579∈9]<br />ᐸ577,578ᐳ<br />ᐳInput"}}:::plan
     Constant577{{"Constant[577∈9]<br />ᐸ'inputs'ᐳ<br />ᐳInput"}}:::plan
     PgClassExpression578{{"PgClassExpression[578∈9]<br />ᐸ__inputs__.”id”ᐳ"}}:::plan
     Constant577 & PgClassExpression578 --> List579
     PgSelect584[["PgSelect[584∈9]<br />ᐸpatchsᐳ<br />ᐳPatch"]]:::plan
-    Object18 & Access2402 --> PgSelect584
+    Object18 -->|rejectNull| PgSelect584
+    Access2402 --> PgSelect584
     List592{{"List[592∈9]<br />ᐸ590,591ᐳ<br />ᐳPatch"}}:::plan
     Constant590{{"Constant[590∈9]<br />ᐸ'patchs'ᐳ<br />ᐳPatch"}}:::plan
     PgClassExpression591{{"PgClassExpression[591∈9]<br />ᐸ__patchs__.”id”ᐳ"}}:::plan
     Constant590 & PgClassExpression591 --> List592
     PgSelect597[["PgSelect[597∈9]<br />ᐸreservedᐳ<br />ᐳReserved"]]:::plan
-    Object18 & Access2402 --> PgSelect597
+    Object18 -->|rejectNull| PgSelect597
+    Access2402 --> PgSelect597
     List605{{"List[605∈9]<br />ᐸ603,604ᐳ<br />ᐳReserved"}}:::plan
     Constant603{{"Constant[603∈9]<br />ᐸ'reserveds'ᐳ<br />ᐳReserved"}}:::plan
     PgClassExpression604{{"PgClassExpression[604∈9]<br />ᐸ__reserved__.”id”ᐳ"}}:::plan
     Constant603 & PgClassExpression604 --> List605
     PgSelect610[["PgSelect[610∈9]<br />ᐸreservedPatchsᐳ<br />ᐳReservedPatchRecord"]]:::plan
-    Object18 & Access2402 --> PgSelect610
+    Object18 -->|rejectNull| PgSelect610
+    Access2402 --> PgSelect610
     List618{{"List[618∈9]<br />ᐸ616,617ᐳ<br />ᐳReservedPatchRecord"}}:::plan
     Constant616{{"Constant[616∈9]<br />ᐸ'reservedPatchs'ᐳ<br />ᐳReservedPatchRecord"}}:::plan
     PgClassExpression617{{"PgClassExpression[617∈9]<br />ᐸ__reserved...chs__.”id”ᐳ"}}:::plan
     Constant616 & PgClassExpression617 --> List618
     PgSelect623[["PgSelect[623∈9]<br />ᐸreserved_inputᐳ<br />ᐳReservedInputRecord"]]:::plan
-    Object18 & Access2402 --> PgSelect623
+    Object18 -->|rejectNull| PgSelect623
+    Access2402 --> PgSelect623
     List631{{"List[631∈9]<br />ᐸ629,630ᐳ<br />ᐳReservedInputRecord"}}:::plan
     Constant629{{"Constant[629∈9]<br />ᐸ'reserved_inputs'ᐳ<br />ᐳReservedInputRecord"}}:::plan
     PgClassExpression630{{"PgClassExpression[630∈9]<br />ᐸ__reserved_input__.”id”ᐳ"}}:::plan
     Constant629 & PgClassExpression630 --> List631
     PgSelect636[["PgSelect[636∈9]<br />ᐸdefault_valueᐳ<br />ᐳDefaultValue"]]:::plan
-    Object18 & Access2402 --> PgSelect636
+    Object18 -->|rejectNull| PgSelect636
+    Access2402 --> PgSelect636
     List644{{"List[644∈9]<br />ᐸ642,643ᐳ<br />ᐳDefaultValue"}}:::plan
     Constant642{{"Constant[642∈9]<br />ᐸ'default_values'ᐳ<br />ᐳDefaultValue"}}:::plan
     PgClassExpression643{{"PgClassExpression[643∈9]<br />ᐸ__default_value__.”id”ᐳ"}}:::plan
     Constant642 & PgClassExpression643 --> List644
     PgSelect667[["PgSelect[667∈9]<br />ᐸpersonᐳ<br />ᐳPerson"]]:::plan
-    Object18 & Access2402 --> PgSelect667
+    Object18 -->|rejectNull| PgSelect667
+    Access2402 --> PgSelect667
     List675{{"List[675∈9]<br />ᐸ673,674ᐳ<br />ᐳPerson"}}:::plan
     Constant673{{"Constant[673∈9]<br />ᐸ'people'ᐳ<br />ᐳPerson"}}:::plan
     PgClassExpression674{{"PgClassExpression[674∈9]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     Constant673 & PgClassExpression674 --> List675
     PgSelect682[["PgSelect[682∈9]<br />ᐸpostᐳ<br />ᐳPost"]]:::plan
-    Object18 & Access2402 --> PgSelect682
+    Object18 -->|rejectNull| PgSelect682
+    Access2402 --> PgSelect682
     List690{{"List[690∈9]<br />ᐸ688,689ᐳ<br />ᐳPost"}}:::plan
     Constant688{{"Constant[688∈9]<br />ᐸ'posts'ᐳ<br />ᐳPost"}}:::plan
     PgClassExpression689{{"PgClassExpression[689∈9]<br />ᐸ__post__.”id”ᐳ"}}:::plan
     Constant688 & PgClassExpression689 --> List690
     PgSelect695[["PgSelect[695∈9]<br />ᐸtypesᐳ<br />ᐳType"]]:::plan
-    Object18 & Access2402 --> PgSelect695
+    Object18 -->|rejectNull| PgSelect695
+    Access2402 --> PgSelect695
     List703{{"List[703∈9]<br />ᐸ701,702ᐳ<br />ᐳType"}}:::plan
     Constant701{{"Constant[701∈9]<br />ᐸ'types'ᐳ<br />ᐳType"}}:::plan
     PgClassExpression702{{"PgClassExpression[702∈9]<br />ᐸ__types__.”id”ᐳ"}}:::plan
     Constant701 & PgClassExpression702 --> List703
     PgSelect708[["PgSelect[708∈9]<br />ᐸperson_secretᐳ<br />ᐳPersonSecret"]]:::plan
-    Object18 & Access2402 --> PgSelect708
+    Object18 -->|rejectNull| PgSelect708
+    Access2402 --> PgSelect708
     List716{{"List[716∈9]<br />ᐸ714,715ᐳ<br />ᐳPersonSecret"}}:::plan
     Constant714{{"Constant[714∈9]<br />ᐸ'person_secrets'ᐳ<br />ᐳPersonSecret"}}:::plan
     PgClassExpression715{{"PgClassExpression[715∈9]<br />ᐸ__person_s...person_id”ᐳ"}}:::plan
     Constant714 & PgClassExpression715 --> List716
     PgSelect721[["PgSelect[721∈9]<br />ᐸleft_armᐳ<br />ᐳLeftArm"]]:::plan
-    Object18 & Access2402 --> PgSelect721
+    Object18 -->|rejectNull| PgSelect721
+    Access2402 --> PgSelect721
     List729{{"List[729∈9]<br />ᐸ727,728ᐳ<br />ᐳLeftArm"}}:::plan
     Constant727{{"Constant[727∈9]<br />ᐸ'left_arms'ᐳ<br />ᐳLeftArm"}}:::plan
     PgClassExpression728{{"PgClassExpression[728∈9]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
     Constant727 & PgClassExpression728 --> List729
     PgSelect734[["PgSelect[734∈9]<br />ᐸmy_tableᐳ<br />ᐳMyTable"]]:::plan
-    Object18 & Access2402 --> PgSelect734
+    Object18 -->|rejectNull| PgSelect734
+    Access2402 --> PgSelect734
     List742{{"List[742∈9]<br />ᐸ740,741ᐳ<br />ᐳMyTable"}}:::plan
     Constant740{{"Constant[740∈9]<br />ᐸ'my_tables'ᐳ<br />ᐳMyTable"}}:::plan
     PgClassExpression741{{"PgClassExpression[741∈9]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
     Constant740 & PgClassExpression741 --> List742
     PgSelect747[["PgSelect[747∈9]<br />ᐸview_tableᐳ<br />ᐳViewTable"]]:::plan
-    Object18 & Access2402 --> PgSelect747
+    Object18 -->|rejectNull| PgSelect747
+    Access2402 --> PgSelect747
     List755{{"List[755∈9]<br />ᐸ753,754ᐳ<br />ᐳViewTable"}}:::plan
     Constant753{{"Constant[753∈9]<br />ᐸ'view_tables'ᐳ<br />ᐳViewTable"}}:::plan
     PgClassExpression754{{"PgClassExpression[754∈9]<br />ᐸ__view_table__.”id”ᐳ"}}:::plan
     Constant753 & PgClassExpression754 --> List755
     PgSelect760[["PgSelect[760∈9]<br />ᐸsimilar_table_1ᐳ<br />ᐳSimilarTable1"]]:::plan
-    Object18 & Access2402 --> PgSelect760
+    Object18 -->|rejectNull| PgSelect760
+    Access2402 --> PgSelect760
     List768{{"List[768∈9]<br />ᐸ766,767ᐳ<br />ᐳSimilarTable1"}}:::plan
     Constant766{{"Constant[766∈9]<br />ᐸ'similar_table_1S'ᐳ<br />ᐳSimilarTable1"}}:::plan
     PgClassExpression767{{"PgClassExpression[767∈9]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
     Constant766 & PgClassExpression767 --> List768
     PgSelect777[["PgSelect[777∈9]<br />ᐸsimilar_table_2ᐳ<br />ᐳSimilarTable2"]]:::plan
-    Object18 & Access2402 --> PgSelect777
+    Object18 -->|rejectNull| PgSelect777
+    Access2402 --> PgSelect777
     List785{{"List[785∈9]<br />ᐸ783,784ᐳ<br />ᐳSimilarTable2"}}:::plan
     Constant783{{"Constant[783∈9]<br />ᐸ'similar_table_2S'ᐳ<br />ᐳSimilarTable2"}}:::plan
     PgClassExpression784{{"PgClassExpression[784∈9]<br />ᐸ__similar_...e_2__.”id”ᐳ"}}:::plan
     Constant783 & PgClassExpression784 --> List785
     PgSelect794[["PgSelect[794∈9]<br />ᐸnull_test_recordᐳ<br />ᐳNullTestRecord"]]:::plan
-    Object18 & Access2402 --> PgSelect794
+    Object18 -->|rejectNull| PgSelect794
+    Access2402 --> PgSelect794
     List802{{"List[802∈9]<br />ᐸ800,801ᐳ<br />ᐳNullTestRecord"}}:::plan
     Constant800{{"Constant[800∈9]<br />ᐸ'null_test_records'ᐳ<br />ᐳNullTestRecord"}}:::plan
     PgClassExpression801{{"PgClassExpression[801∈9]<br />ᐸ__null_tes...ord__.”id”ᐳ"}}:::plan
     Constant800 & PgClassExpression801 --> List802
     PgSelect807[["PgSelect[807∈9]<br />ᐸissue756ᐳ<br />ᐳIssue756"]]:::plan
-    Object18 & Access2402 --> PgSelect807
+    Object18 -->|rejectNull| PgSelect807
+    Access2402 --> PgSelect807
     List815{{"List[815∈9]<br />ᐸ813,814ᐳ<br />ᐳIssue756"}}:::plan
     Constant813{{"Constant[813∈9]<br />ᐸ'issue756S'ᐳ<br />ᐳIssue756"}}:::plan
     PgClassExpression814{{"PgClassExpression[814∈9]<br />ᐸ__issue756__.”id”ᐳ"}}:::plan
@@ -950,110 +1018,129 @@ graph TD
     PgSelect906[["PgSelect[906∈10]<br />ᐸcompound_keyᐳ<br />ᐳCompoundKey"]]:::plan
     Access2405{{"Access[2405∈10]<br />ᐸ819.base64JSON.1ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
     Access2406{{"Access[2406∈10]<br />ᐸ819.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
-    Object18 & Access2405 & Access2406 --> PgSelect906
+    Object18 -->|rejectNull| PgSelect906
+    Access2405 -->|rejectNull| PgSelect906
+    Access2406 --> PgSelect906
     List915{{"List[915∈10]<br />ᐸ912,913,914ᐳ<br />ᐳCompoundKey"}}:::plan
     Constant912{{"Constant[912∈10]<br />ᐸ'compound_keys'ᐳ<br />ᐳCompoundKey"}}:::plan
     PgClassExpression913{{"PgClassExpression[913∈10]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgClassExpression914{{"PgClassExpression[914∈10]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
     Constant912 & PgClassExpression913 & PgClassExpression914 --> List915
     PgSelect826[["PgSelect[826∈10]<br />ᐸinputsᐳ<br />ᐳInput"]]:::plan
-    Object18 & Access2405 --> PgSelect826
+    Object18 -->|rejectNull| PgSelect826
+    Access2405 --> PgSelect826
     List834{{"List[834∈10]<br />ᐸ832,833ᐳ<br />ᐳInput"}}:::plan
     Constant832{{"Constant[832∈10]<br />ᐸ'inputs'ᐳ<br />ᐳInput"}}:::plan
     PgClassExpression833{{"PgClassExpression[833∈10]<br />ᐸ__inputs__.”id”ᐳ"}}:::plan
     Constant832 & PgClassExpression833 --> List834
     PgSelect839[["PgSelect[839∈10]<br />ᐸpatchsᐳ<br />ᐳPatch"]]:::plan
-    Object18 & Access2405 --> PgSelect839
+    Object18 -->|rejectNull| PgSelect839
+    Access2405 --> PgSelect839
     List847{{"List[847∈10]<br />ᐸ845,846ᐳ<br />ᐳPatch"}}:::plan
     Constant845{{"Constant[845∈10]<br />ᐸ'patchs'ᐳ<br />ᐳPatch"}}:::plan
     PgClassExpression846{{"PgClassExpression[846∈10]<br />ᐸ__patchs__.”id”ᐳ"}}:::plan
     Constant845 & PgClassExpression846 --> List847
     PgSelect852[["PgSelect[852∈10]<br />ᐸreservedᐳ<br />ᐳReserved"]]:::plan
-    Object18 & Access2405 --> PgSelect852
+    Object18 -->|rejectNull| PgSelect852
+    Access2405 --> PgSelect852
     List860{{"List[860∈10]<br />ᐸ858,859ᐳ<br />ᐳReserved"}}:::plan
     Constant858{{"Constant[858∈10]<br />ᐸ'reserveds'ᐳ<br />ᐳReserved"}}:::plan
     PgClassExpression859{{"PgClassExpression[859∈10]<br />ᐸ__reserved__.”id”ᐳ"}}:::plan
     Constant858 & PgClassExpression859 --> List860
     PgSelect865[["PgSelect[865∈10]<br />ᐸreservedPatchsᐳ<br />ᐳReservedPatchRecord"]]:::plan
-    Object18 & Access2405 --> PgSelect865
+    Object18 -->|rejectNull| PgSelect865
+    Access2405 --> PgSelect865
     List873{{"List[873∈10]<br />ᐸ871,872ᐳ<br />ᐳReservedPatchRecord"}}:::plan
     Constant871{{"Constant[871∈10]<br />ᐸ'reservedPatchs'ᐳ<br />ᐳReservedPatchRecord"}}:::plan
     PgClassExpression872{{"PgClassExpression[872∈10]<br />ᐸ__reserved...chs__.”id”ᐳ"}}:::plan
     Constant871 & PgClassExpression872 --> List873
     PgSelect878[["PgSelect[878∈10]<br />ᐸreserved_inputᐳ<br />ᐳReservedInputRecord"]]:::plan
-    Object18 & Access2405 --> PgSelect878
+    Object18 -->|rejectNull| PgSelect878
+    Access2405 --> PgSelect878
     List886{{"List[886∈10]<br />ᐸ884,885ᐳ<br />ᐳReservedInputRecord"}}:::plan
     Constant884{{"Constant[884∈10]<br />ᐸ'reserved_inputs'ᐳ<br />ᐳReservedInputRecord"}}:::plan
     PgClassExpression885{{"PgClassExpression[885∈10]<br />ᐸ__reserved_input__.”id”ᐳ"}}:::plan
     Constant884 & PgClassExpression885 --> List886
     PgSelect891[["PgSelect[891∈10]<br />ᐸdefault_valueᐳ<br />ᐳDefaultValue"]]:::plan
-    Object18 & Access2405 --> PgSelect891
+    Object18 -->|rejectNull| PgSelect891
+    Access2405 --> PgSelect891
     List899{{"List[899∈10]<br />ᐸ897,898ᐳ<br />ᐳDefaultValue"}}:::plan
     Constant897{{"Constant[897∈10]<br />ᐸ'default_values'ᐳ<br />ᐳDefaultValue"}}:::plan
     PgClassExpression898{{"PgClassExpression[898∈10]<br />ᐸ__default_value__.”id”ᐳ"}}:::plan
     Constant897 & PgClassExpression898 --> List899
     PgSelect922[["PgSelect[922∈10]<br />ᐸpersonᐳ<br />ᐳPerson"]]:::plan
-    Object18 & Access2405 --> PgSelect922
+    Object18 -->|rejectNull| PgSelect922
+    Access2405 --> PgSelect922
     List930{{"List[930∈10]<br />ᐸ928,929ᐳ<br />ᐳPerson"}}:::plan
     Constant928{{"Constant[928∈10]<br />ᐸ'people'ᐳ<br />ᐳPerson"}}:::plan
     PgClassExpression929{{"PgClassExpression[929∈10]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     Constant928 & PgClassExpression929 --> List930
     PgSelect937[["PgSelect[937∈10]<br />ᐸpostᐳ<br />ᐳPost"]]:::plan
-    Object18 & Access2405 --> PgSelect937
+    Object18 -->|rejectNull| PgSelect937
+    Access2405 --> PgSelect937
     List945{{"List[945∈10]<br />ᐸ943,944ᐳ<br />ᐳPost"}}:::plan
     Constant943{{"Constant[943∈10]<br />ᐸ'posts'ᐳ<br />ᐳPost"}}:::plan
     PgClassExpression944{{"PgClassExpression[944∈10]<br />ᐸ__post__.”id”ᐳ"}}:::plan
     Constant943 & PgClassExpression944 --> List945
     PgSelect950[["PgSelect[950∈10]<br />ᐸtypesᐳ<br />ᐳType"]]:::plan
-    Object18 & Access2405 --> PgSelect950
+    Object18 -->|rejectNull| PgSelect950
+    Access2405 --> PgSelect950
     List958{{"List[958∈10]<br />ᐸ956,957ᐳ<br />ᐳType"}}:::plan
     Constant956{{"Constant[956∈10]<br />ᐸ'types'ᐳ<br />ᐳType"}}:::plan
     PgClassExpression957{{"PgClassExpression[957∈10]<br />ᐸ__types__.”id”ᐳ"}}:::plan
     Constant956 & PgClassExpression957 --> List958
     PgSelect963[["PgSelect[963∈10]<br />ᐸperson_secretᐳ<br />ᐳPersonSecret"]]:::plan
-    Object18 & Access2405 --> PgSelect963
+    Object18 -->|rejectNull| PgSelect963
+    Access2405 --> PgSelect963
     List971{{"List[971∈10]<br />ᐸ969,970ᐳ<br />ᐳPersonSecret"}}:::plan
     Constant969{{"Constant[969∈10]<br />ᐸ'person_secrets'ᐳ<br />ᐳPersonSecret"}}:::plan
     PgClassExpression970{{"PgClassExpression[970∈10]<br />ᐸ__person_s...person_id”ᐳ"}}:::plan
     Constant969 & PgClassExpression970 --> List971
     PgSelect976[["PgSelect[976∈10]<br />ᐸleft_armᐳ<br />ᐳLeftArm"]]:::plan
-    Object18 & Access2405 --> PgSelect976
+    Object18 -->|rejectNull| PgSelect976
+    Access2405 --> PgSelect976
     List984{{"List[984∈10]<br />ᐸ982,983ᐳ<br />ᐳLeftArm"}}:::plan
     Constant982{{"Constant[982∈10]<br />ᐸ'left_arms'ᐳ<br />ᐳLeftArm"}}:::plan
     PgClassExpression983{{"PgClassExpression[983∈10]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
     Constant982 & PgClassExpression983 --> List984
     PgSelect989[["PgSelect[989∈10]<br />ᐸmy_tableᐳ<br />ᐳMyTable"]]:::plan
-    Object18 & Access2405 --> PgSelect989
+    Object18 -->|rejectNull| PgSelect989
+    Access2405 --> PgSelect989
     List997{{"List[997∈10]<br />ᐸ995,996ᐳ<br />ᐳMyTable"}}:::plan
     Constant995{{"Constant[995∈10]<br />ᐸ'my_tables'ᐳ<br />ᐳMyTable"}}:::plan
     PgClassExpression996{{"PgClassExpression[996∈10]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
     Constant995 & PgClassExpression996 --> List997
     PgSelect1002[["PgSelect[1002∈10]<br />ᐸview_tableᐳ<br />ᐳViewTable"]]:::plan
-    Object18 & Access2405 --> PgSelect1002
+    Object18 -->|rejectNull| PgSelect1002
+    Access2405 --> PgSelect1002
     List1010{{"List[1010∈10]<br />ᐸ1008,1009ᐳ<br />ᐳViewTable"}}:::plan
     Constant1008{{"Constant[1008∈10]<br />ᐸ'view_tables'ᐳ<br />ᐳViewTable"}}:::plan
     PgClassExpression1009{{"PgClassExpression[1009∈10]<br />ᐸ__view_table__.”id”ᐳ"}}:::plan
     Constant1008 & PgClassExpression1009 --> List1010
     PgSelect1015[["PgSelect[1015∈10]<br />ᐸsimilar_table_1ᐳ<br />ᐳSimilarTable1"]]:::plan
-    Object18 & Access2405 --> PgSelect1015
+    Object18 -->|rejectNull| PgSelect1015
+    Access2405 --> PgSelect1015
     List1023{{"List[1023∈10]<br />ᐸ1021,1022ᐳ<br />ᐳSimilarTable1"}}:::plan
     Constant1021{{"Constant[1021∈10]<br />ᐸ'similar_table_1S'ᐳ<br />ᐳSimilarTable1"}}:::plan
     PgClassExpression1022{{"PgClassExpression[1022∈10]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
     Constant1021 & PgClassExpression1022 --> List1023
     PgSelect1032[["PgSelect[1032∈10]<br />ᐸsimilar_table_2ᐳ<br />ᐳSimilarTable2"]]:::plan
-    Object18 & Access2405 --> PgSelect1032
+    Object18 -->|rejectNull| PgSelect1032
+    Access2405 --> PgSelect1032
     List1040{{"List[1040∈10]<br />ᐸ1038,1039ᐳ<br />ᐳSimilarTable2"}}:::plan
     Constant1038{{"Constant[1038∈10]<br />ᐸ'similar_table_2S'ᐳ<br />ᐳSimilarTable2"}}:::plan
     PgClassExpression1039{{"PgClassExpression[1039∈10]<br />ᐸ__similar_...e_2__.”id”ᐳ"}}:::plan
     Constant1038 & PgClassExpression1039 --> List1040
     PgSelect1049[["PgSelect[1049∈10]<br />ᐸnull_test_recordᐳ<br />ᐳNullTestRecord"]]:::plan
-    Object18 & Access2405 --> PgSelect1049
+    Object18 -->|rejectNull| PgSelect1049
+    Access2405 --> PgSelect1049
     List1057{{"List[1057∈10]<br />ᐸ1055,1056ᐳ<br />ᐳNullTestRecord"}}:::plan
     Constant1055{{"Constant[1055∈10]<br />ᐸ'null_test_records'ᐳ<br />ᐳNullTestRecord"}}:::plan
     PgClassExpression1056{{"PgClassExpression[1056∈10]<br />ᐸ__null_tes...ord__.”id”ᐳ"}}:::plan
     Constant1055 & PgClassExpression1056 --> List1057
     PgSelect1062[["PgSelect[1062∈10]<br />ᐸissue756ᐳ<br />ᐳIssue756"]]:::plan
-    Object18 & Access2405 --> PgSelect1062
+    Object18 -->|rejectNull| PgSelect1062
+    Access2405 --> PgSelect1062
     List1070{{"List[1070∈10]<br />ᐸ1068,1069ᐳ<br />ᐳIssue756"}}:::plan
     Constant1068{{"Constant[1068∈10]<br />ᐸ'issue756S'ᐳ<br />ᐳIssue756"}}:::plan
     PgClassExpression1069{{"PgClassExpression[1069∈10]<br />ᐸ__issue756__.”id”ᐳ"}}:::plan
@@ -1207,110 +1294,129 @@ graph TD
     PgSelect1161[["PgSelect[1161∈11]<br />ᐸcompound_keyᐳ<br />ᐳCompoundKey"]]:::plan
     Access2408{{"Access[2408∈11]<br />ᐸ1074.base64JSON.1ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
     Access2409{{"Access[2409∈11]<br />ᐸ1074.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
-    Object18 & Access2408 & Access2409 --> PgSelect1161
+    Object18 -->|rejectNull| PgSelect1161
+    Access2408 -->|rejectNull| PgSelect1161
+    Access2409 --> PgSelect1161
     List1170{{"List[1170∈11]<br />ᐸ1167,1168,1169ᐳ<br />ᐳCompoundKey"}}:::plan
     Constant1167{{"Constant[1167∈11]<br />ᐸ'compound_keys'ᐳ<br />ᐳCompoundKey"}}:::plan
     PgClassExpression1168{{"PgClassExpression[1168∈11]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgClassExpression1169{{"PgClassExpression[1169∈11]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
     Constant1167 & PgClassExpression1168 & PgClassExpression1169 --> List1170
     PgSelect1081[["PgSelect[1081∈11]<br />ᐸinputsᐳ<br />ᐳInput"]]:::plan
-    Object18 & Access2408 --> PgSelect1081
+    Object18 -->|rejectNull| PgSelect1081
+    Access2408 --> PgSelect1081
     List1089{{"List[1089∈11]<br />ᐸ1087,1088ᐳ<br />ᐳInput"}}:::plan
     Constant1087{{"Constant[1087∈11]<br />ᐸ'inputs'ᐳ<br />ᐳInput"}}:::plan
     PgClassExpression1088{{"PgClassExpression[1088∈11]<br />ᐸ__inputs__.”id”ᐳ"}}:::plan
     Constant1087 & PgClassExpression1088 --> List1089
     PgSelect1094[["PgSelect[1094∈11]<br />ᐸpatchsᐳ<br />ᐳPatch"]]:::plan
-    Object18 & Access2408 --> PgSelect1094
+    Object18 -->|rejectNull| PgSelect1094
+    Access2408 --> PgSelect1094
     List1102{{"List[1102∈11]<br />ᐸ1100,1101ᐳ<br />ᐳPatch"}}:::plan
     Constant1100{{"Constant[1100∈11]<br />ᐸ'patchs'ᐳ<br />ᐳPatch"}}:::plan
     PgClassExpression1101{{"PgClassExpression[1101∈11]<br />ᐸ__patchs__.”id”ᐳ"}}:::plan
     Constant1100 & PgClassExpression1101 --> List1102
     PgSelect1107[["PgSelect[1107∈11]<br />ᐸreservedᐳ<br />ᐳReserved"]]:::plan
-    Object18 & Access2408 --> PgSelect1107
+    Object18 -->|rejectNull| PgSelect1107
+    Access2408 --> PgSelect1107
     List1115{{"List[1115∈11]<br />ᐸ1113,1114ᐳ<br />ᐳReserved"}}:::plan
     Constant1113{{"Constant[1113∈11]<br />ᐸ'reserveds'ᐳ<br />ᐳReserved"}}:::plan
     PgClassExpression1114{{"PgClassExpression[1114∈11]<br />ᐸ__reserved__.”id”ᐳ"}}:::plan
     Constant1113 & PgClassExpression1114 --> List1115
     PgSelect1120[["PgSelect[1120∈11]<br />ᐸreservedPatchsᐳ<br />ᐳReservedPatchRecord"]]:::plan
-    Object18 & Access2408 --> PgSelect1120
+    Object18 -->|rejectNull| PgSelect1120
+    Access2408 --> PgSelect1120
     List1128{{"List[1128∈11]<br />ᐸ1126,1127ᐳ<br />ᐳReservedPatchRecord"}}:::plan
     Constant1126{{"Constant[1126∈11]<br />ᐸ'reservedPatchs'ᐳ<br />ᐳReservedPatchRecord"}}:::plan
     PgClassExpression1127{{"PgClassExpression[1127∈11]<br />ᐸ__reserved...chs__.”id”ᐳ"}}:::plan
     Constant1126 & PgClassExpression1127 --> List1128
     PgSelect1133[["PgSelect[1133∈11]<br />ᐸreserved_inputᐳ<br />ᐳReservedInputRecord"]]:::plan
-    Object18 & Access2408 --> PgSelect1133
+    Object18 -->|rejectNull| PgSelect1133
+    Access2408 --> PgSelect1133
     List1141{{"List[1141∈11]<br />ᐸ1139,1140ᐳ<br />ᐳReservedInputRecord"}}:::plan
     Constant1139{{"Constant[1139∈11]<br />ᐸ'reserved_inputs'ᐳ<br />ᐳReservedInputRecord"}}:::plan
     PgClassExpression1140{{"PgClassExpression[1140∈11]<br />ᐸ__reserved_input__.”id”ᐳ"}}:::plan
     Constant1139 & PgClassExpression1140 --> List1141
     PgSelect1146[["PgSelect[1146∈11]<br />ᐸdefault_valueᐳ<br />ᐳDefaultValue"]]:::plan
-    Object18 & Access2408 --> PgSelect1146
+    Object18 -->|rejectNull| PgSelect1146
+    Access2408 --> PgSelect1146
     List1154{{"List[1154∈11]<br />ᐸ1152,1153ᐳ<br />ᐳDefaultValue"}}:::plan
     Constant1152{{"Constant[1152∈11]<br />ᐸ'default_values'ᐳ<br />ᐳDefaultValue"}}:::plan
     PgClassExpression1153{{"PgClassExpression[1153∈11]<br />ᐸ__default_value__.”id”ᐳ"}}:::plan
     Constant1152 & PgClassExpression1153 --> List1154
     PgSelect1177[["PgSelect[1177∈11]<br />ᐸpersonᐳ<br />ᐳPerson"]]:::plan
-    Object18 & Access2408 --> PgSelect1177
+    Object18 -->|rejectNull| PgSelect1177
+    Access2408 --> PgSelect1177
     List1185{{"List[1185∈11]<br />ᐸ1183,1184ᐳ<br />ᐳPerson"}}:::plan
     Constant1183{{"Constant[1183∈11]<br />ᐸ'people'ᐳ<br />ᐳPerson"}}:::plan
     PgClassExpression1184{{"PgClassExpression[1184∈11]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     Constant1183 & PgClassExpression1184 --> List1185
     PgSelect1192[["PgSelect[1192∈11]<br />ᐸpostᐳ<br />ᐳPost"]]:::plan
-    Object18 & Access2408 --> PgSelect1192
+    Object18 -->|rejectNull| PgSelect1192
+    Access2408 --> PgSelect1192
     List1200{{"List[1200∈11]<br />ᐸ1198,1199ᐳ<br />ᐳPost"}}:::plan
     Constant1198{{"Constant[1198∈11]<br />ᐸ'posts'ᐳ<br />ᐳPost"}}:::plan
     PgClassExpression1199{{"PgClassExpression[1199∈11]<br />ᐸ__post__.”id”ᐳ"}}:::plan
     Constant1198 & PgClassExpression1199 --> List1200
     PgSelect1205[["PgSelect[1205∈11]<br />ᐸtypesᐳ<br />ᐳType"]]:::plan
-    Object18 & Access2408 --> PgSelect1205
+    Object18 -->|rejectNull| PgSelect1205
+    Access2408 --> PgSelect1205
     List1213{{"List[1213∈11]<br />ᐸ1211,1212ᐳ<br />ᐳType"}}:::plan
     Constant1211{{"Constant[1211∈11]<br />ᐸ'types'ᐳ<br />ᐳType"}}:::plan
     PgClassExpression1212{{"PgClassExpression[1212∈11]<br />ᐸ__types__.”id”ᐳ"}}:::plan
     Constant1211 & PgClassExpression1212 --> List1213
     PgSelect1218[["PgSelect[1218∈11]<br />ᐸperson_secretᐳ<br />ᐳPersonSecret"]]:::plan
-    Object18 & Access2408 --> PgSelect1218
+    Object18 -->|rejectNull| PgSelect1218
+    Access2408 --> PgSelect1218
     List1226{{"List[1226∈11]<br />ᐸ1224,1225ᐳ<br />ᐳPersonSecret"}}:::plan
     Constant1224{{"Constant[1224∈11]<br />ᐸ'person_secrets'ᐳ<br />ᐳPersonSecret"}}:::plan
     PgClassExpression1225{{"PgClassExpression[1225∈11]<br />ᐸ__person_s...person_id”ᐳ"}}:::plan
     Constant1224 & PgClassExpression1225 --> List1226
     PgSelect1231[["PgSelect[1231∈11]<br />ᐸleft_armᐳ<br />ᐳLeftArm"]]:::plan
-    Object18 & Access2408 --> PgSelect1231
+    Object18 -->|rejectNull| PgSelect1231
+    Access2408 --> PgSelect1231
     List1239{{"List[1239∈11]<br />ᐸ1237,1238ᐳ<br />ᐳLeftArm"}}:::plan
     Constant1237{{"Constant[1237∈11]<br />ᐸ'left_arms'ᐳ<br />ᐳLeftArm"}}:::plan
     PgClassExpression1238{{"PgClassExpression[1238∈11]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
     Constant1237 & PgClassExpression1238 --> List1239
     PgSelect1244[["PgSelect[1244∈11]<br />ᐸmy_tableᐳ<br />ᐳMyTable"]]:::plan
-    Object18 & Access2408 --> PgSelect1244
+    Object18 -->|rejectNull| PgSelect1244
+    Access2408 --> PgSelect1244
     List1252{{"List[1252∈11]<br />ᐸ1250,1251ᐳ<br />ᐳMyTable"}}:::plan
     Constant1250{{"Constant[1250∈11]<br />ᐸ'my_tables'ᐳ<br />ᐳMyTable"}}:::plan
     PgClassExpression1251{{"PgClassExpression[1251∈11]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
     Constant1250 & PgClassExpression1251 --> List1252
     PgSelect1257[["PgSelect[1257∈11]<br />ᐸview_tableᐳ<br />ᐳViewTable"]]:::plan
-    Object18 & Access2408 --> PgSelect1257
+    Object18 -->|rejectNull| PgSelect1257
+    Access2408 --> PgSelect1257
     List1265{{"List[1265∈11]<br />ᐸ1263,1264ᐳ<br />ᐳViewTable"}}:::plan
     Constant1263{{"Constant[1263∈11]<br />ᐸ'view_tables'ᐳ<br />ᐳViewTable"}}:::plan
     PgClassExpression1264{{"PgClassExpression[1264∈11]<br />ᐸ__view_table__.”id”ᐳ"}}:::plan
     Constant1263 & PgClassExpression1264 --> List1265
     PgSelect1270[["PgSelect[1270∈11]<br />ᐸsimilar_table_1ᐳ<br />ᐳSimilarTable1"]]:::plan
-    Object18 & Access2408 --> PgSelect1270
+    Object18 -->|rejectNull| PgSelect1270
+    Access2408 --> PgSelect1270
     List1278{{"List[1278∈11]<br />ᐸ1276,1277ᐳ<br />ᐳSimilarTable1"}}:::plan
     Constant1276{{"Constant[1276∈11]<br />ᐸ'similar_table_1S'ᐳ<br />ᐳSimilarTable1"}}:::plan
     PgClassExpression1277{{"PgClassExpression[1277∈11]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
     Constant1276 & PgClassExpression1277 --> List1278
     PgSelect1287[["PgSelect[1287∈11]<br />ᐸsimilar_table_2ᐳ<br />ᐳSimilarTable2"]]:::plan
-    Object18 & Access2408 --> PgSelect1287
+    Object18 -->|rejectNull| PgSelect1287
+    Access2408 --> PgSelect1287
     List1295{{"List[1295∈11]<br />ᐸ1293,1294ᐳ<br />ᐳSimilarTable2"}}:::plan
     Constant1293{{"Constant[1293∈11]<br />ᐸ'similar_table_2S'ᐳ<br />ᐳSimilarTable2"}}:::plan
     PgClassExpression1294{{"PgClassExpression[1294∈11]<br />ᐸ__similar_...e_2__.”id”ᐳ"}}:::plan
     Constant1293 & PgClassExpression1294 --> List1295
     PgSelect1304[["PgSelect[1304∈11]<br />ᐸnull_test_recordᐳ<br />ᐳNullTestRecord"]]:::plan
-    Object18 & Access2408 --> PgSelect1304
+    Object18 -->|rejectNull| PgSelect1304
+    Access2408 --> PgSelect1304
     List1312{{"List[1312∈11]<br />ᐸ1310,1311ᐳ<br />ᐳNullTestRecord"}}:::plan
     Constant1310{{"Constant[1310∈11]<br />ᐸ'null_test_records'ᐳ<br />ᐳNullTestRecord"}}:::plan
     PgClassExpression1311{{"PgClassExpression[1311∈11]<br />ᐸ__null_tes...ord__.”id”ᐳ"}}:::plan
     Constant1310 & PgClassExpression1311 --> List1312
     PgSelect1317[["PgSelect[1317∈11]<br />ᐸissue756ᐳ<br />ᐳIssue756"]]:::plan
-    Object18 & Access2408 --> PgSelect1317
+    Object18 -->|rejectNull| PgSelect1317
+    Access2408 --> PgSelect1317
     List1325{{"List[1325∈11]<br />ᐸ1323,1324ᐳ<br />ᐳIssue756"}}:::plan
     Constant1323{{"Constant[1323∈11]<br />ᐸ'issue756S'ᐳ<br />ᐳIssue756"}}:::plan
     PgClassExpression1324{{"PgClassExpression[1324∈11]<br />ᐸ__issue756__.”id”ᐳ"}}:::plan
@@ -1464,110 +1570,129 @@ graph TD
     PgSelect1416[["PgSelect[1416∈12]<br />ᐸcompound_keyᐳ<br />ᐳCompoundKey"]]:::plan
     Access2411{{"Access[2411∈12]<br />ᐸ1329.base64JSON.1ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
     Access2412{{"Access[2412∈12]<br />ᐸ1329.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
-    Object18 & Access2411 & Access2412 --> PgSelect1416
+    Object18 -->|rejectNull| PgSelect1416
+    Access2411 -->|rejectNull| PgSelect1416
+    Access2412 --> PgSelect1416
     List1425{{"List[1425∈12]<br />ᐸ1422,1423,1424ᐳ<br />ᐳCompoundKey"}}:::plan
     Constant1422{{"Constant[1422∈12]<br />ᐸ'compound_keys'ᐳ<br />ᐳCompoundKey"}}:::plan
     PgClassExpression1423{{"PgClassExpression[1423∈12]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgClassExpression1424{{"PgClassExpression[1424∈12]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
     Constant1422 & PgClassExpression1423 & PgClassExpression1424 --> List1425
     PgSelect1336[["PgSelect[1336∈12]<br />ᐸinputsᐳ<br />ᐳInput"]]:::plan
-    Object18 & Access2411 --> PgSelect1336
+    Object18 -->|rejectNull| PgSelect1336
+    Access2411 --> PgSelect1336
     List1344{{"List[1344∈12]<br />ᐸ1342,1343ᐳ<br />ᐳInput"}}:::plan
     Constant1342{{"Constant[1342∈12]<br />ᐸ'inputs'ᐳ<br />ᐳInput"}}:::plan
     PgClassExpression1343{{"PgClassExpression[1343∈12]<br />ᐸ__inputs__.”id”ᐳ"}}:::plan
     Constant1342 & PgClassExpression1343 --> List1344
     PgSelect1349[["PgSelect[1349∈12]<br />ᐸpatchsᐳ<br />ᐳPatch"]]:::plan
-    Object18 & Access2411 --> PgSelect1349
+    Object18 -->|rejectNull| PgSelect1349
+    Access2411 --> PgSelect1349
     List1357{{"List[1357∈12]<br />ᐸ1355,1356ᐳ<br />ᐳPatch"}}:::plan
     Constant1355{{"Constant[1355∈12]<br />ᐸ'patchs'ᐳ<br />ᐳPatch"}}:::plan
     PgClassExpression1356{{"PgClassExpression[1356∈12]<br />ᐸ__patchs__.”id”ᐳ"}}:::plan
     Constant1355 & PgClassExpression1356 --> List1357
     PgSelect1362[["PgSelect[1362∈12]<br />ᐸreservedᐳ<br />ᐳReserved"]]:::plan
-    Object18 & Access2411 --> PgSelect1362
+    Object18 -->|rejectNull| PgSelect1362
+    Access2411 --> PgSelect1362
     List1370{{"List[1370∈12]<br />ᐸ1368,1369ᐳ<br />ᐳReserved"}}:::plan
     Constant1368{{"Constant[1368∈12]<br />ᐸ'reserveds'ᐳ<br />ᐳReserved"}}:::plan
     PgClassExpression1369{{"PgClassExpression[1369∈12]<br />ᐸ__reserved__.”id”ᐳ"}}:::plan
     Constant1368 & PgClassExpression1369 --> List1370
     PgSelect1375[["PgSelect[1375∈12]<br />ᐸreservedPatchsᐳ<br />ᐳReservedPatchRecord"]]:::plan
-    Object18 & Access2411 --> PgSelect1375
+    Object18 -->|rejectNull| PgSelect1375
+    Access2411 --> PgSelect1375
     List1383{{"List[1383∈12]<br />ᐸ1381,1382ᐳ<br />ᐳReservedPatchRecord"}}:::plan
     Constant1381{{"Constant[1381∈12]<br />ᐸ'reservedPatchs'ᐳ<br />ᐳReservedPatchRecord"}}:::plan
     PgClassExpression1382{{"PgClassExpression[1382∈12]<br />ᐸ__reserved...chs__.”id”ᐳ"}}:::plan
     Constant1381 & PgClassExpression1382 --> List1383
     PgSelect1388[["PgSelect[1388∈12]<br />ᐸreserved_inputᐳ<br />ᐳReservedInputRecord"]]:::plan
-    Object18 & Access2411 --> PgSelect1388
+    Object18 -->|rejectNull| PgSelect1388
+    Access2411 --> PgSelect1388
     List1396{{"List[1396∈12]<br />ᐸ1394,1395ᐳ<br />ᐳReservedInputRecord"}}:::plan
     Constant1394{{"Constant[1394∈12]<br />ᐸ'reserved_inputs'ᐳ<br />ᐳReservedInputRecord"}}:::plan
     PgClassExpression1395{{"PgClassExpression[1395∈12]<br />ᐸ__reserved_input__.”id”ᐳ"}}:::plan
     Constant1394 & PgClassExpression1395 --> List1396
     PgSelect1401[["PgSelect[1401∈12]<br />ᐸdefault_valueᐳ<br />ᐳDefaultValue"]]:::plan
-    Object18 & Access2411 --> PgSelect1401
+    Object18 -->|rejectNull| PgSelect1401
+    Access2411 --> PgSelect1401
     List1409{{"List[1409∈12]<br />ᐸ1407,1408ᐳ<br />ᐳDefaultValue"}}:::plan
     Constant1407{{"Constant[1407∈12]<br />ᐸ'default_values'ᐳ<br />ᐳDefaultValue"}}:::plan
     PgClassExpression1408{{"PgClassExpression[1408∈12]<br />ᐸ__default_value__.”id”ᐳ"}}:::plan
     Constant1407 & PgClassExpression1408 --> List1409
     PgSelect1432[["PgSelect[1432∈12]<br />ᐸpersonᐳ<br />ᐳPerson"]]:::plan
-    Object18 & Access2411 --> PgSelect1432
+    Object18 -->|rejectNull| PgSelect1432
+    Access2411 --> PgSelect1432
     List1440{{"List[1440∈12]<br />ᐸ1438,1439ᐳ<br />ᐳPerson"}}:::plan
     Constant1438{{"Constant[1438∈12]<br />ᐸ'people'ᐳ<br />ᐳPerson"}}:::plan
     PgClassExpression1439{{"PgClassExpression[1439∈12]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     Constant1438 & PgClassExpression1439 --> List1440
     PgSelect1447[["PgSelect[1447∈12]<br />ᐸpostᐳ<br />ᐳPost"]]:::plan
-    Object18 & Access2411 --> PgSelect1447
+    Object18 -->|rejectNull| PgSelect1447
+    Access2411 --> PgSelect1447
     List1455{{"List[1455∈12]<br />ᐸ1453,1454ᐳ<br />ᐳPost"}}:::plan
     Constant1453{{"Constant[1453∈12]<br />ᐸ'posts'ᐳ<br />ᐳPost"}}:::plan
     PgClassExpression1454{{"PgClassExpression[1454∈12]<br />ᐸ__post__.”id”ᐳ"}}:::plan
     Constant1453 & PgClassExpression1454 --> List1455
     PgSelect1460[["PgSelect[1460∈12]<br />ᐸtypesᐳ<br />ᐳType"]]:::plan
-    Object18 & Access2411 --> PgSelect1460
+    Object18 -->|rejectNull| PgSelect1460
+    Access2411 --> PgSelect1460
     List1468{{"List[1468∈12]<br />ᐸ1466,1467ᐳ<br />ᐳType"}}:::plan
     Constant1466{{"Constant[1466∈12]<br />ᐸ'types'ᐳ<br />ᐳType"}}:::plan
     PgClassExpression1467{{"PgClassExpression[1467∈12]<br />ᐸ__types__.”id”ᐳ"}}:::plan
     Constant1466 & PgClassExpression1467 --> List1468
     PgSelect1473[["PgSelect[1473∈12]<br />ᐸperson_secretᐳ<br />ᐳPersonSecret"]]:::plan
-    Object18 & Access2411 --> PgSelect1473
+    Object18 -->|rejectNull| PgSelect1473
+    Access2411 --> PgSelect1473
     List1481{{"List[1481∈12]<br />ᐸ1479,1480ᐳ<br />ᐳPersonSecret"}}:::plan
     Constant1479{{"Constant[1479∈12]<br />ᐸ'person_secrets'ᐳ<br />ᐳPersonSecret"}}:::plan
     PgClassExpression1480{{"PgClassExpression[1480∈12]<br />ᐸ__person_s...person_id”ᐳ"}}:::plan
     Constant1479 & PgClassExpression1480 --> List1481
     PgSelect1486[["PgSelect[1486∈12]<br />ᐸleft_armᐳ<br />ᐳLeftArm"]]:::plan
-    Object18 & Access2411 --> PgSelect1486
+    Object18 -->|rejectNull| PgSelect1486
+    Access2411 --> PgSelect1486
     List1494{{"List[1494∈12]<br />ᐸ1492,1493ᐳ<br />ᐳLeftArm"}}:::plan
     Constant1492{{"Constant[1492∈12]<br />ᐸ'left_arms'ᐳ<br />ᐳLeftArm"}}:::plan
     PgClassExpression1493{{"PgClassExpression[1493∈12]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
     Constant1492 & PgClassExpression1493 --> List1494
     PgSelect1499[["PgSelect[1499∈12]<br />ᐸmy_tableᐳ<br />ᐳMyTable"]]:::plan
-    Object18 & Access2411 --> PgSelect1499
+    Object18 -->|rejectNull| PgSelect1499
+    Access2411 --> PgSelect1499
     List1507{{"List[1507∈12]<br />ᐸ1505,1506ᐳ<br />ᐳMyTable"}}:::plan
     Constant1505{{"Constant[1505∈12]<br />ᐸ'my_tables'ᐳ<br />ᐳMyTable"}}:::plan
     PgClassExpression1506{{"PgClassExpression[1506∈12]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
     Constant1505 & PgClassExpression1506 --> List1507
     PgSelect1512[["PgSelect[1512∈12]<br />ᐸview_tableᐳ<br />ᐳViewTable"]]:::plan
-    Object18 & Access2411 --> PgSelect1512
+    Object18 -->|rejectNull| PgSelect1512
+    Access2411 --> PgSelect1512
     List1520{{"List[1520∈12]<br />ᐸ1518,1519ᐳ<br />ᐳViewTable"}}:::plan
     Constant1518{{"Constant[1518∈12]<br />ᐸ'view_tables'ᐳ<br />ᐳViewTable"}}:::plan
     PgClassExpression1519{{"PgClassExpression[1519∈12]<br />ᐸ__view_table__.”id”ᐳ"}}:::plan
     Constant1518 & PgClassExpression1519 --> List1520
     PgSelect1525[["PgSelect[1525∈12]<br />ᐸsimilar_table_1ᐳ<br />ᐳSimilarTable1"]]:::plan
-    Object18 & Access2411 --> PgSelect1525
+    Object18 -->|rejectNull| PgSelect1525
+    Access2411 --> PgSelect1525
     List1533{{"List[1533∈12]<br />ᐸ1531,1532ᐳ<br />ᐳSimilarTable1"}}:::plan
     Constant1531{{"Constant[1531∈12]<br />ᐸ'similar_table_1S'ᐳ<br />ᐳSimilarTable1"}}:::plan
     PgClassExpression1532{{"PgClassExpression[1532∈12]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
     Constant1531 & PgClassExpression1532 --> List1533
     PgSelect1542[["PgSelect[1542∈12]<br />ᐸsimilar_table_2ᐳ<br />ᐳSimilarTable2"]]:::plan
-    Object18 & Access2411 --> PgSelect1542
+    Object18 -->|rejectNull| PgSelect1542
+    Access2411 --> PgSelect1542
     List1550{{"List[1550∈12]<br />ᐸ1548,1549ᐳ<br />ᐳSimilarTable2"}}:::plan
     Constant1548{{"Constant[1548∈12]<br />ᐸ'similar_table_2S'ᐳ<br />ᐳSimilarTable2"}}:::plan
     PgClassExpression1549{{"PgClassExpression[1549∈12]<br />ᐸ__similar_...e_2__.”id”ᐳ"}}:::plan
     Constant1548 & PgClassExpression1549 --> List1550
     PgSelect1559[["PgSelect[1559∈12]<br />ᐸnull_test_recordᐳ<br />ᐳNullTestRecord"]]:::plan
-    Object18 & Access2411 --> PgSelect1559
+    Object18 -->|rejectNull| PgSelect1559
+    Access2411 --> PgSelect1559
     List1567{{"List[1567∈12]<br />ᐸ1565,1566ᐳ<br />ᐳNullTestRecord"}}:::plan
     Constant1565{{"Constant[1565∈12]<br />ᐸ'null_test_records'ᐳ<br />ᐳNullTestRecord"}}:::plan
     PgClassExpression1566{{"PgClassExpression[1566∈12]<br />ᐸ__null_tes...ord__.”id”ᐳ"}}:::plan
     Constant1565 & PgClassExpression1566 --> List1567
     PgSelect1572[["PgSelect[1572∈12]<br />ᐸissue756ᐳ<br />ᐳIssue756"]]:::plan
-    Object18 & Access2411 --> PgSelect1572
+    Object18 -->|rejectNull| PgSelect1572
+    Access2411 --> PgSelect1572
     List1580{{"List[1580∈12]<br />ᐸ1578,1579ᐳ<br />ᐳIssue756"}}:::plan
     Constant1578{{"Constant[1578∈12]<br />ᐸ'issue756S'ᐳ<br />ᐳIssue756"}}:::plan
     PgClassExpression1579{{"PgClassExpression[1579∈12]<br />ᐸ__issue756__.”id”ᐳ"}}:::plan
@@ -1769,110 +1894,129 @@ graph TD
     PgSelect1776[["PgSelect[1776∈19]<br />ᐸcompound_keyᐳ<br />ᐳCompoundKey"]]:::plan
     Access2420{{"Access[2420∈19]<br />ᐸ1689.base64JSON.1ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
     Access2421{{"Access[2421∈19]<br />ᐸ1689.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
-    Object18 & Access2420 & Access2421 --> PgSelect1776
+    Object18 -->|rejectNull| PgSelect1776
+    Access2420 -->|rejectNull| PgSelect1776
+    Access2421 --> PgSelect1776
     List1785{{"List[1785∈19]<br />ᐸ1782,1783,1784ᐳ<br />ᐳCompoundKey"}}:::plan
     Constant1782{{"Constant[1782∈19]<br />ᐸ'compound_keys'ᐳ<br />ᐳCompoundKey"}}:::plan
     PgClassExpression1783{{"PgClassExpression[1783∈19]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgClassExpression1784{{"PgClassExpression[1784∈19]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
     Constant1782 & PgClassExpression1783 & PgClassExpression1784 --> List1785
     PgSelect1696[["PgSelect[1696∈19]<br />ᐸinputsᐳ<br />ᐳInput"]]:::plan
-    Object18 & Access2420 --> PgSelect1696
+    Object18 -->|rejectNull| PgSelect1696
+    Access2420 --> PgSelect1696
     List1704{{"List[1704∈19]<br />ᐸ1702,1703ᐳ<br />ᐳInput"}}:::plan
     Constant1702{{"Constant[1702∈19]<br />ᐸ'inputs'ᐳ<br />ᐳInput"}}:::plan
     PgClassExpression1703{{"PgClassExpression[1703∈19]<br />ᐸ__inputs__.”id”ᐳ"}}:::plan
     Constant1702 & PgClassExpression1703 --> List1704
     PgSelect1709[["PgSelect[1709∈19]<br />ᐸpatchsᐳ<br />ᐳPatch"]]:::plan
-    Object18 & Access2420 --> PgSelect1709
+    Object18 -->|rejectNull| PgSelect1709
+    Access2420 --> PgSelect1709
     List1717{{"List[1717∈19]<br />ᐸ1715,1716ᐳ<br />ᐳPatch"}}:::plan
     Constant1715{{"Constant[1715∈19]<br />ᐸ'patchs'ᐳ<br />ᐳPatch"}}:::plan
     PgClassExpression1716{{"PgClassExpression[1716∈19]<br />ᐸ__patchs__.”id”ᐳ"}}:::plan
     Constant1715 & PgClassExpression1716 --> List1717
     PgSelect1722[["PgSelect[1722∈19]<br />ᐸreservedᐳ<br />ᐳReserved"]]:::plan
-    Object18 & Access2420 --> PgSelect1722
+    Object18 -->|rejectNull| PgSelect1722
+    Access2420 --> PgSelect1722
     List1730{{"List[1730∈19]<br />ᐸ1728,1729ᐳ<br />ᐳReserved"}}:::plan
     Constant1728{{"Constant[1728∈19]<br />ᐸ'reserveds'ᐳ<br />ᐳReserved"}}:::plan
     PgClassExpression1729{{"PgClassExpression[1729∈19]<br />ᐸ__reserved__.”id”ᐳ"}}:::plan
     Constant1728 & PgClassExpression1729 --> List1730
     PgSelect1735[["PgSelect[1735∈19]<br />ᐸreservedPatchsᐳ<br />ᐳReservedPatchRecord"]]:::plan
-    Object18 & Access2420 --> PgSelect1735
+    Object18 -->|rejectNull| PgSelect1735
+    Access2420 --> PgSelect1735
     List1743{{"List[1743∈19]<br />ᐸ1741,1742ᐳ<br />ᐳReservedPatchRecord"}}:::plan
     Constant1741{{"Constant[1741∈19]<br />ᐸ'reservedPatchs'ᐳ<br />ᐳReservedPatchRecord"}}:::plan
     PgClassExpression1742{{"PgClassExpression[1742∈19]<br />ᐸ__reserved...chs__.”id”ᐳ"}}:::plan
     Constant1741 & PgClassExpression1742 --> List1743
     PgSelect1748[["PgSelect[1748∈19]<br />ᐸreserved_inputᐳ<br />ᐳReservedInputRecord"]]:::plan
-    Object18 & Access2420 --> PgSelect1748
+    Object18 -->|rejectNull| PgSelect1748
+    Access2420 --> PgSelect1748
     List1756{{"List[1756∈19]<br />ᐸ1754,1755ᐳ<br />ᐳReservedInputRecord"}}:::plan
     Constant1754{{"Constant[1754∈19]<br />ᐸ'reserved_inputs'ᐳ<br />ᐳReservedInputRecord"}}:::plan
     PgClassExpression1755{{"PgClassExpression[1755∈19]<br />ᐸ__reserved_input__.”id”ᐳ"}}:::plan
     Constant1754 & PgClassExpression1755 --> List1756
     PgSelect1761[["PgSelect[1761∈19]<br />ᐸdefault_valueᐳ<br />ᐳDefaultValue"]]:::plan
-    Object18 & Access2420 --> PgSelect1761
+    Object18 -->|rejectNull| PgSelect1761
+    Access2420 --> PgSelect1761
     List1769{{"List[1769∈19]<br />ᐸ1767,1768ᐳ<br />ᐳDefaultValue"}}:::plan
     Constant1767{{"Constant[1767∈19]<br />ᐸ'default_values'ᐳ<br />ᐳDefaultValue"}}:::plan
     PgClassExpression1768{{"PgClassExpression[1768∈19]<br />ᐸ__default_value__.”id”ᐳ"}}:::plan
     Constant1767 & PgClassExpression1768 --> List1769
     PgSelect1792[["PgSelect[1792∈19]<br />ᐸpersonᐳ<br />ᐳPerson"]]:::plan
-    Object18 & Access2420 --> PgSelect1792
+    Object18 -->|rejectNull| PgSelect1792
+    Access2420 --> PgSelect1792
     List1800{{"List[1800∈19]<br />ᐸ1798,1799ᐳ<br />ᐳPerson"}}:::plan
     Constant1798{{"Constant[1798∈19]<br />ᐸ'people'ᐳ<br />ᐳPerson"}}:::plan
     PgClassExpression1799{{"PgClassExpression[1799∈19]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     Constant1798 & PgClassExpression1799 --> List1800
     PgSelect1807[["PgSelect[1807∈19]<br />ᐸpostᐳ<br />ᐳPost"]]:::plan
-    Object18 & Access2420 --> PgSelect1807
+    Object18 -->|rejectNull| PgSelect1807
+    Access2420 --> PgSelect1807
     List1815{{"List[1815∈19]<br />ᐸ1813,1814ᐳ<br />ᐳPost"}}:::plan
     Constant1813{{"Constant[1813∈19]<br />ᐸ'posts'ᐳ<br />ᐳPost"}}:::plan
     PgClassExpression1814{{"PgClassExpression[1814∈19]<br />ᐸ__post__.”id”ᐳ"}}:::plan
     Constant1813 & PgClassExpression1814 --> List1815
     PgSelect1820[["PgSelect[1820∈19]<br />ᐸtypesᐳ<br />ᐳType"]]:::plan
-    Object18 & Access2420 --> PgSelect1820
+    Object18 -->|rejectNull| PgSelect1820
+    Access2420 --> PgSelect1820
     List1828{{"List[1828∈19]<br />ᐸ1826,1827ᐳ<br />ᐳType"}}:::plan
     Constant1826{{"Constant[1826∈19]<br />ᐸ'types'ᐳ<br />ᐳType"}}:::plan
     PgClassExpression1827{{"PgClassExpression[1827∈19]<br />ᐸ__types__.”id”ᐳ"}}:::plan
     Constant1826 & PgClassExpression1827 --> List1828
     PgSelect1833[["PgSelect[1833∈19]<br />ᐸperson_secretᐳ<br />ᐳPersonSecret"]]:::plan
-    Object18 & Access2420 --> PgSelect1833
+    Object18 -->|rejectNull| PgSelect1833
+    Access2420 --> PgSelect1833
     List1841{{"List[1841∈19]<br />ᐸ1839,1840ᐳ<br />ᐳPersonSecret"}}:::plan
     Constant1839{{"Constant[1839∈19]<br />ᐸ'person_secrets'ᐳ<br />ᐳPersonSecret"}}:::plan
     PgClassExpression1840{{"PgClassExpression[1840∈19]<br />ᐸ__person_s...person_id”ᐳ"}}:::plan
     Constant1839 & PgClassExpression1840 --> List1841
     PgSelect1846[["PgSelect[1846∈19]<br />ᐸleft_armᐳ<br />ᐳLeftArm"]]:::plan
-    Object18 & Access2420 --> PgSelect1846
+    Object18 -->|rejectNull| PgSelect1846
+    Access2420 --> PgSelect1846
     List1854{{"List[1854∈19]<br />ᐸ1852,1853ᐳ<br />ᐳLeftArm"}}:::plan
     Constant1852{{"Constant[1852∈19]<br />ᐸ'left_arms'ᐳ<br />ᐳLeftArm"}}:::plan
     PgClassExpression1853{{"PgClassExpression[1853∈19]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
     Constant1852 & PgClassExpression1853 --> List1854
     PgSelect1859[["PgSelect[1859∈19]<br />ᐸmy_tableᐳ<br />ᐳMyTable"]]:::plan
-    Object18 & Access2420 --> PgSelect1859
+    Object18 -->|rejectNull| PgSelect1859
+    Access2420 --> PgSelect1859
     List1867{{"List[1867∈19]<br />ᐸ1865,1866ᐳ<br />ᐳMyTable"}}:::plan
     Constant1865{{"Constant[1865∈19]<br />ᐸ'my_tables'ᐳ<br />ᐳMyTable"}}:::plan
     PgClassExpression1866{{"PgClassExpression[1866∈19]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
     Constant1865 & PgClassExpression1866 --> List1867
     PgSelect1872[["PgSelect[1872∈19]<br />ᐸview_tableᐳ<br />ᐳViewTable"]]:::plan
-    Object18 & Access2420 --> PgSelect1872
+    Object18 -->|rejectNull| PgSelect1872
+    Access2420 --> PgSelect1872
     List1880{{"List[1880∈19]<br />ᐸ1878,1879ᐳ<br />ᐳViewTable"}}:::plan
     Constant1878{{"Constant[1878∈19]<br />ᐸ'view_tables'ᐳ<br />ᐳViewTable"}}:::plan
     PgClassExpression1879{{"PgClassExpression[1879∈19]<br />ᐸ__view_table__.”id”ᐳ"}}:::plan
     Constant1878 & PgClassExpression1879 --> List1880
     PgSelect1885[["PgSelect[1885∈19]<br />ᐸsimilar_table_1ᐳ<br />ᐳSimilarTable1"]]:::plan
-    Object18 & Access2420 --> PgSelect1885
+    Object18 -->|rejectNull| PgSelect1885
+    Access2420 --> PgSelect1885
     List1893{{"List[1893∈19]<br />ᐸ1891,1892ᐳ<br />ᐳSimilarTable1"}}:::plan
     Constant1891{{"Constant[1891∈19]<br />ᐸ'similar_table_1S'ᐳ<br />ᐳSimilarTable1"}}:::plan
     PgClassExpression1892{{"PgClassExpression[1892∈19]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
     Constant1891 & PgClassExpression1892 --> List1893
     PgSelect1902[["PgSelect[1902∈19]<br />ᐸsimilar_table_2ᐳ<br />ᐳSimilarTable2"]]:::plan
-    Object18 & Access2420 --> PgSelect1902
+    Object18 -->|rejectNull| PgSelect1902
+    Access2420 --> PgSelect1902
     List1910{{"List[1910∈19]<br />ᐸ1908,1909ᐳ<br />ᐳSimilarTable2"}}:::plan
     Constant1908{{"Constant[1908∈19]<br />ᐸ'similar_table_2S'ᐳ<br />ᐳSimilarTable2"}}:::plan
     PgClassExpression1909{{"PgClassExpression[1909∈19]<br />ᐸ__similar_...e_2__.”id”ᐳ"}}:::plan
     Constant1908 & PgClassExpression1909 --> List1910
     PgSelect1919[["PgSelect[1919∈19]<br />ᐸnull_test_recordᐳ<br />ᐳNullTestRecord"]]:::plan
-    Object18 & Access2420 --> PgSelect1919
+    Object18 -->|rejectNull| PgSelect1919
+    Access2420 --> PgSelect1919
     List1927{{"List[1927∈19]<br />ᐸ1925,1926ᐳ<br />ᐳNullTestRecord"}}:::plan
     Constant1925{{"Constant[1925∈19]<br />ᐸ'null_test_records'ᐳ<br />ᐳNullTestRecord"}}:::plan
     PgClassExpression1926{{"PgClassExpression[1926∈19]<br />ᐸ__null_tes...ord__.”id”ᐳ"}}:::plan
     Constant1925 & PgClassExpression1926 --> List1927
     PgSelect1932[["PgSelect[1932∈19]<br />ᐸissue756ᐳ<br />ᐳIssue756"]]:::plan
-    Object18 & Access2420 --> PgSelect1932
+    Object18 -->|rejectNull| PgSelect1932
+    Access2420 --> PgSelect1932
     List1940{{"List[1940∈19]<br />ᐸ1938,1939ᐳ<br />ᐳIssue756"}}:::plan
     Constant1938{{"Constant[1938∈19]<br />ᐸ'issue756S'ᐳ<br />ᐳIssue756"}}:::plan
     PgClassExpression1939{{"PgClassExpression[1939∈19]<br />ᐸ__issue756__.”id”ᐳ"}}:::plan
@@ -2026,110 +2170,129 @@ graph TD
     PgSelect2031[["PgSelect[2031∈20]<br />ᐸcompound_keyᐳ<br />ᐳCompoundKey"]]:::plan
     Access2423{{"Access[2423∈20]<br />ᐸ1944.base64JSON.1ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
     Access2424{{"Access[2424∈20]<br />ᐸ1944.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
-    Object18 & Access2423 & Access2424 --> PgSelect2031
+    Object18 -->|rejectNull| PgSelect2031
+    Access2423 -->|rejectNull| PgSelect2031
+    Access2424 --> PgSelect2031
     List2040{{"List[2040∈20]<br />ᐸ2037,2038,2039ᐳ<br />ᐳCompoundKey"}}:::plan
     Constant2037{{"Constant[2037∈20]<br />ᐸ'compound_keys'ᐳ<br />ᐳCompoundKey"}}:::plan
     PgClassExpression2038{{"PgClassExpression[2038∈20]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
     PgClassExpression2039{{"PgClassExpression[2039∈20]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
     Constant2037 & PgClassExpression2038 & PgClassExpression2039 --> List2040
     PgSelect1951[["PgSelect[1951∈20]<br />ᐸinputsᐳ<br />ᐳInput"]]:::plan
-    Object18 & Access2423 --> PgSelect1951
+    Object18 -->|rejectNull| PgSelect1951
+    Access2423 --> PgSelect1951
     List1959{{"List[1959∈20]<br />ᐸ1957,1958ᐳ<br />ᐳInput"}}:::plan
     Constant1957{{"Constant[1957∈20]<br />ᐸ'inputs'ᐳ<br />ᐳInput"}}:::plan
     PgClassExpression1958{{"PgClassExpression[1958∈20]<br />ᐸ__inputs__.”id”ᐳ"}}:::plan
     Constant1957 & PgClassExpression1958 --> List1959
     PgSelect1964[["PgSelect[1964∈20]<br />ᐸpatchsᐳ<br />ᐳPatch"]]:::plan
-    Object18 & Access2423 --> PgSelect1964
+    Object18 -->|rejectNull| PgSelect1964
+    Access2423 --> PgSelect1964
     List1972{{"List[1972∈20]<br />ᐸ1970,1971ᐳ<br />ᐳPatch"}}:::plan
     Constant1970{{"Constant[1970∈20]<br />ᐸ'patchs'ᐳ<br />ᐳPatch"}}:::plan
     PgClassExpression1971{{"PgClassExpression[1971∈20]<br />ᐸ__patchs__.”id”ᐳ"}}:::plan
     Constant1970 & PgClassExpression1971 --> List1972
     PgSelect1977[["PgSelect[1977∈20]<br />ᐸreservedᐳ<br />ᐳReserved"]]:::plan
-    Object18 & Access2423 --> PgSelect1977
+    Object18 -->|rejectNull| PgSelect1977
+    Access2423 --> PgSelect1977
     List1985{{"List[1985∈20]<br />ᐸ1983,1984ᐳ<br />ᐳReserved"}}:::plan
     Constant1983{{"Constant[1983∈20]<br />ᐸ'reserveds'ᐳ<br />ᐳReserved"}}:::plan
     PgClassExpression1984{{"PgClassExpression[1984∈20]<br />ᐸ__reserved__.”id”ᐳ"}}:::plan
     Constant1983 & PgClassExpression1984 --> List1985
     PgSelect1990[["PgSelect[1990∈20]<br />ᐸreservedPatchsᐳ<br />ᐳReservedPatchRecord"]]:::plan
-    Object18 & Access2423 --> PgSelect1990
+    Object18 -->|rejectNull| PgSelect1990
+    Access2423 --> PgSelect1990
     List1998{{"List[1998∈20]<br />ᐸ1996,1997ᐳ<br />ᐳReservedPatchRecord"}}:::plan
     Constant1996{{"Constant[1996∈20]<br />ᐸ'reservedPatchs'ᐳ<br />ᐳReservedPatchRecord"}}:::plan
     PgClassExpression1997{{"PgClassExpression[1997∈20]<br />ᐸ__reserved...chs__.”id”ᐳ"}}:::plan
     Constant1996 & PgClassExpression1997 --> List1998
     PgSelect2003[["PgSelect[2003∈20]<br />ᐸreserved_inputᐳ<br />ᐳReservedInputRecord"]]:::plan
-    Object18 & Access2423 --> PgSelect2003
+    Object18 -->|rejectNull| PgSelect2003
+    Access2423 --> PgSelect2003
     List2011{{"List[2011∈20]<br />ᐸ2009,2010ᐳ<br />ᐳReservedInputRecord"}}:::plan
     Constant2009{{"Constant[2009∈20]<br />ᐸ'reserved_inputs'ᐳ<br />ᐳReservedInputRecord"}}:::plan
     PgClassExpression2010{{"PgClassExpression[2010∈20]<br />ᐸ__reserved_input__.”id”ᐳ"}}:::plan
     Constant2009 & PgClassExpression2010 --> List2011
     PgSelect2016[["PgSelect[2016∈20]<br />ᐸdefault_valueᐳ<br />ᐳDefaultValue"]]:::plan
-    Object18 & Access2423 --> PgSelect2016
+    Object18 -->|rejectNull| PgSelect2016
+    Access2423 --> PgSelect2016
     List2024{{"List[2024∈20]<br />ᐸ2022,2023ᐳ<br />ᐳDefaultValue"}}:::plan
     Constant2022{{"Constant[2022∈20]<br />ᐸ'default_values'ᐳ<br />ᐳDefaultValue"}}:::plan
     PgClassExpression2023{{"PgClassExpression[2023∈20]<br />ᐸ__default_value__.”id”ᐳ"}}:::plan
     Constant2022 & PgClassExpression2023 --> List2024
     PgSelect2047[["PgSelect[2047∈20]<br />ᐸpersonᐳ<br />ᐳPerson"]]:::plan
-    Object18 & Access2423 --> PgSelect2047
+    Object18 -->|rejectNull| PgSelect2047
+    Access2423 --> PgSelect2047
     List2055{{"List[2055∈20]<br />ᐸ2053,2054ᐳ<br />ᐳPerson"}}:::plan
     Constant2053{{"Constant[2053∈20]<br />ᐸ'people'ᐳ<br />ᐳPerson"}}:::plan
     PgClassExpression2054{{"PgClassExpression[2054∈20]<br />ᐸ__person__.”id”ᐳ"}}:::plan
     Constant2053 & PgClassExpression2054 --> List2055
     PgSelect2062[["PgSelect[2062∈20]<br />ᐸpostᐳ<br />ᐳPost"]]:::plan
-    Object18 & Access2423 --> PgSelect2062
+    Object18 -->|rejectNull| PgSelect2062
+    Access2423 --> PgSelect2062
     List2070{{"List[2070∈20]<br />ᐸ2068,2069ᐳ<br />ᐳPost"}}:::plan
     Constant2068{{"Constant[2068∈20]<br />ᐸ'posts'ᐳ<br />ᐳPost"}}:::plan
     PgClassExpression2069{{"PgClassExpression[2069∈20]<br />ᐸ__post__.”id”ᐳ"}}:::plan
     Constant2068 & PgClassExpression2069 --> List2070
     PgSelect2075[["PgSelect[2075∈20]<br />ᐸtypesᐳ<br />ᐳType"]]:::plan
-    Object18 & Access2423 --> PgSelect2075
+    Object18 -->|rejectNull| PgSelect2075
+    Access2423 --> PgSelect2075
     List2083{{"List[2083∈20]<br />ᐸ2081,2082ᐳ<br />ᐳType"}}:::plan
     Constant2081{{"Constant[2081∈20]<br />ᐸ'types'ᐳ<br />ᐳType"}}:::plan
     PgClassExpression2082{{"PgClassExpression[2082∈20]<br />ᐸ__types__.”id”ᐳ"}}:::plan
     Constant2081 & PgClassExpression2082 --> List2083
     PgSelect2088[["PgSelect[2088∈20]<br />ᐸperson_secretᐳ<br />ᐳPersonSecret"]]:::plan
-    Object18 & Access2423 --> PgSelect2088
+    Object18 -->|rejectNull| PgSelect2088
+    Access2423 --> PgSelect2088
     List2096{{"List[2096∈20]<br />ᐸ2094,2095ᐳ<br />ᐳPersonSecret"}}:::plan
     Constant2094{{"Constant[2094∈20]<br />ᐸ'person_secrets'ᐳ<br />ᐳPersonSecret"}}:::plan
     PgClassExpression2095{{"PgClassExpression[2095∈20]<br />ᐸ__person_s...person_id”ᐳ"}}:::plan
     Constant2094 & PgClassExpression2095 --> List2096
     PgSelect2101[["PgSelect[2101∈20]<br />ᐸleft_armᐳ<br />ᐳLeftArm"]]:::plan
-    Object18 & Access2423 --> PgSelect2101
+    Object18 -->|rejectNull| PgSelect2101
+    Access2423 --> PgSelect2101
     List2109{{"List[2109∈20]<br />ᐸ2107,2108ᐳ<br />ᐳLeftArm"}}:::plan
     Constant2107{{"Constant[2107∈20]<br />ᐸ'left_arms'ᐳ<br />ᐳLeftArm"}}:::plan
     PgClassExpression2108{{"PgClassExpression[2108∈20]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
     Constant2107 & PgClassExpression2108 --> List2109
     PgSelect2114[["PgSelect[2114∈20]<br />ᐸmy_tableᐳ<br />ᐳMyTable"]]:::plan
-    Object18 & Access2423 --> PgSelect2114
+    Object18 -->|rejectNull| PgSelect2114
+    Access2423 --> PgSelect2114
     List2122{{"List[2122∈20]<br />ᐸ2120,2121ᐳ<br />ᐳMyTable"}}:::plan
     Constant2120{{"Constant[2120∈20]<br />ᐸ'my_tables'ᐳ<br />ᐳMyTable"}}:::plan
     PgClassExpression2121{{"PgClassExpression[2121∈20]<br />ᐸ__my_table__.”id”ᐳ"}}:::plan
     Constant2120 & PgClassExpression2121 --> List2122
     PgSelect2127[["PgSelect[2127∈20]<br />ᐸview_tableᐳ<br />ᐳViewTable"]]:::plan
-    Object18 & Access2423 --> PgSelect2127
+    Object18 -->|rejectNull| PgSelect2127
+    Access2423 --> PgSelect2127
     List2135{{"List[2135∈20]<br />ᐸ2133,2134ᐳ<br />ᐳViewTable"}}:::plan
     Constant2133{{"Constant[2133∈20]<br />ᐸ'view_tables'ᐳ<br />ᐳViewTable"}}:::plan
     PgClassExpression2134{{"PgClassExpression[2134∈20]<br />ᐸ__view_table__.”id”ᐳ"}}:::plan
     Constant2133 & PgClassExpression2134 --> List2135
     PgSelect2140[["PgSelect[2140∈20]<br />ᐸsimilar_table_1ᐳ<br />ᐳSimilarTable1"]]:::plan
-    Object18 & Access2423 --> PgSelect2140
+    Object18 -->|rejectNull| PgSelect2140
+    Access2423 --> PgSelect2140
     List2148{{"List[2148∈20]<br />ᐸ2146,2147ᐳ<br />ᐳSimilarTable1"}}:::plan
     Constant2146{{"Constant[2146∈20]<br />ᐸ'similar_table_1S'ᐳ<br />ᐳSimilarTable1"}}:::plan
     PgClassExpression2147{{"PgClassExpression[2147∈20]<br />ᐸ__similar_...e_1__.”id”ᐳ"}}:::plan
     Constant2146 & PgClassExpression2147 --> List2148
     PgSelect2157[["PgSelect[2157∈20]<br />ᐸsimilar_table_2ᐳ<br />ᐳSimilarTable2"]]:::plan
-    Object18 & Access2423 --> PgSelect2157
+    Object18 -->|rejectNull| PgSelect2157
+    Access2423 --> PgSelect2157
     List2165{{"List[2165∈20]<br />ᐸ2163,2164ᐳ<br />ᐳSimilarTable2"}}:::plan
     Constant2163{{"Constant[2163∈20]<br />ᐸ'similar_table_2S'ᐳ<br />ᐳSimilarTable2"}}:::plan
     PgClassExpression2164{{"PgClassExpression[2164∈20]<br />ᐸ__similar_...e_2__.”id”ᐳ"}}:::plan
     Constant2163 & PgClassExpression2164 --> List2165
     PgSelect2174[["PgSelect[2174∈20]<br />ᐸnull_test_recordᐳ<br />ᐳNullTestRecord"]]:::plan
-    Object18 & Access2423 --> PgSelect2174
+    Object18 -->|rejectNull| PgSelect2174
+    Access2423 --> PgSelect2174
     List2182{{"List[2182∈20]<br />ᐸ2180,2181ᐳ<br />ᐳNullTestRecord"}}:::plan
     Constant2180{{"Constant[2180∈20]<br />ᐸ'null_test_records'ᐳ<br />ᐳNullTestRecord"}}:::plan
     PgClassExpression2181{{"PgClassExpression[2181∈20]<br />ᐸ__null_tes...ord__.”id”ᐳ"}}:::plan
     Constant2180 & PgClassExpression2181 --> List2182
     PgSelect2187[["PgSelect[2187∈20]<br />ᐸissue756ᐳ<br />ᐳIssue756"]]:::plan
-    Object18 & Access2423 --> PgSelect2187
+    Object18 -->|rejectNull| PgSelect2187
+    Access2423 --> PgSelect2187
     List2195{{"List[2195∈20]<br />ᐸ2193,2194ᐳ<br />ᐳIssue756"}}:::plan
     Constant2193{{"Constant[2193∈20]<br />ᐸ'issue756S'ᐳ<br />ᐳIssue756"}}:::plan
     PgClassExpression2194{{"PgClassExpression[2194∈20]<br />ᐸ__issue756__.”id”ᐳ"}}:::plan
