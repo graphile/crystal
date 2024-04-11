@@ -166,6 +166,9 @@ export const $$timeout = Symbol("timeout");
 /** For tracking _when_ the timeout happened (because once the JIT has warmed it might not need so long) */
 export const $$ts = Symbol("timestamp");
 
+/** Used as a return value from __FlagStep to force inhibition */
+export const $$inhibit = Symbol("inhibit");
+
 /**
  * When dealing with a polymorphic thing we need to be able to determine what
  * the concrete type of it is, we use the $$concreteType property for that.

@@ -46,6 +46,7 @@ export class CompareStep extends UnbatchedExecutableStep<boolean> {
 
   finalize() {
     this.unbatchedExecute = this.makeUnbatchedExecute();
+    super.finalize();
   }
   private makeUnbatchedExecute() {
     switch (this.op) {

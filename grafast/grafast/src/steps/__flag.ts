@@ -1,24 +1,23 @@
 import type { GrafastError } from "../error.js";
-import { newGrafastError } from "../error.js";
+import { isGrafastError, newGrafastError } from "../error.js";
 import { inspect } from "../inspect.js";
 import type {
   AddDependencyOptions,
-  ExecutionDetails,
   ExecutionEntryFlags,
-  GrafastResultsList,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import {
   $$deepDepSkip,
+  $$inhibit,
   ALL_FLAGS,
   DEFAULT_ACCEPT_FLAGS,
   FLAG_ERROR,
   FLAG_INHIBITED,
   FLAG_NULL,
+  NO_FLAGS,
   TRAPPABLE_FLAGS,
 } from "../interfaces.js";
 import { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
-import { arrayOfLength } from "../utils.js";
 
 // PUBLIC FLAGS
 export const TRAP_ERROR = FLAG_ERROR as ExecutionEntryFlags;
@@ -40,15 +39,28 @@ function digestFlags(flags: ExecutionEntryFlags) {
   return parts.join(" ");
 }
 
+export interface FlagStepOptions {
+  acceptFlags?: ExecutionEntryFlags;
+  onReject?: GrafastError | null;
+  if?: ExecutableStep<boolean>;
+}
+
 export class __FlagStep<TData> extends UnbatchedExecutableStep<TData> {
   isSyncAndSafe = false;
-  constructor(
-    step: ExecutableStep,
-    acceptFlags: ExecutionEntryFlags,
-    onReject?: GrafastError | null,
-  ) {
+  private ifDep: number | null = null;
+  private acceptFlags: ExecutionEntryFlags;
+  private onRejectReturnValue: GrafastError | typeof $$inhibit;
+  constructor(step: ExecutableStep, options: FlagStepOptions) {
     super();
-    this.addDependency({ step, acceptFlags, onReject });
+    const { acceptFlags = DEFAULT_ACCEPT_FLAGS, onReject, if: $cond } = options;
+    this.acceptFlags = acceptFlags;
+    this.onRejectReturnValue = onReject == null ? $$inhibit : onReject;
+    if ($cond) {
+      this.addDependency(step);
+      this.ifDep = this.addDependency($cond);
+    } else {
+      this.addDependency({ step, acceptFlags, onReject });
+    }
   }
   public toStringMeta(): string | null {
     const step = this.dependencies[0];
@@ -67,6 +79,9 @@ export class __FlagStep<TData> extends UnbatchedExecutableStep<TData> {
   inline(
     options: Omit<AddDependencyOptions, "step">,
   ): AddDependencyOptions | null {
+    if (this.ifDep !== null) {
+      return null;
+    }
     const step = this.dependencies[0];
     const forbiddenFlags = this.dependencyForbiddenFlags[0];
     const onReject = this.dependencyOnReject[0];
@@ -81,17 +96,51 @@ export class __FlagStep<TData> extends UnbatchedExecutableStep<TData> {
     }
     return null;
   }
-  execute({
-    values: [input],
-    count,
-  }: ExecutionDetails<[TData]>): GrafastResultsList<TData> {
-    if (input.isBatch) {
-      return input.entries;
+  unbatchedExecute(
+    _extra: UnbatchedExecutionExtra,
+    _value: TData,
+    _cond?: boolean,
+  ): TData {
+    throw new Error(`${this} not finalized?`);
+  }
+  finalize() {
+    if (this.ifDep !== null) {
+      this.unbatchedExecute = this.conditionalUnbatchedExecute;
     } else {
-      return arrayOfLength(count, input.value);
+      this.unbatchedExecute = this.unconditionalUnbatchedExecute;
+    }
+    super.finalize();
+  }
+  private conditionalUnbatchedExecute(
+    _extra: UnbatchedExecutionExtra,
+    value: any,
+    cond?: boolean,
+  ): any {
+    if (cond) {
+      // Perform checks
+      const { acceptFlags, onRejectReturnValue } = this;
+      if ((acceptFlags & FLAG_NULL) === NO_FLAGS && value == null) {
+        return onRejectReturnValue;
+      }
+      if (
+        (acceptFlags & FLAG_ERROR) === NO_FLAGS &&
+        (isGrafastError(value) || value instanceof Error)
+      ) {
+        return onRejectReturnValue;
+      }
+      // TODO: detect inhibited. Not currently possible?
+      return value;
+    } else {
+      // Conditional failed, do not apply any checks
+      return value;
     }
   }
-  unbatchedExecute(_extra: UnbatchedExecutionExtra, value: TData): TData {
+
+  // Checks already performed via addDependency
+  private unconditionalUnbatchedExecute(
+    _extra: UnbatchedExecutionExtra,
+    value: any,
+  ): any {
     return value;
   }
 }
@@ -101,7 +150,9 @@ export class __FlagStep<TData> extends UnbatchedExecutableStep<TData> {
  * since we know they won't exist.
  */
 export function inhibitOnNull($step: ExecutableStep) {
-  return new __FlagStep($step, DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL);
+  return new __FlagStep($step, {
+    acceptFlags: DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL,
+  });
 }
 
 /**
@@ -109,16 +160,22 @@ export function inhibitOnNull($step: ExecutableStep) {
  * that represents a Post instead: throw error to tell user they've sent invalid
  * data.
  */
-export function assertNotNull($step: ExecutableStep, message: string) {
-  return new __FlagStep(
-    $step,
-    DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL,
-    newGrafastError(new Error(message), $step.id),
-  );
+export function assertNotNull(
+  $step: ExecutableStep,
+  message: string,
+  options?: { if?: FlagStepOptions["if"] },
+) {
+  return new __FlagStep($step, {
+    ...options,
+    acceptFlags: DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL,
+    onReject: newGrafastError(new Error(message), $step.id),
+  });
 }
 
 export function trap($step: ExecutableStep, acceptFlags: ExecutionEntryFlags) {
-  return new __FlagStep($step, (acceptFlags & TRAPPABLE_FLAGS) | FLAG_NULL);
+  return new __FlagStep($step, {
+    acceptFlags: (acceptFlags & TRAPPABLE_FLAGS) | FLAG_NULL,
+  });
 }
 
 // Have to overwrite the getDep method due to circular dependency
@@ -131,6 +188,6 @@ export function trap($step: ExecutableStep, acceptFlags: ExecutionEntryFlags) {
     return step;
   } else {
     // Return a __FlagStep around options.step so that all the options are preserved.
-    return new __FlagStep(step, acceptFlags ?? DEFAULT_ACCEPT_FLAGS, onReject);
+    return new __FlagStep(step, { acceptFlags, onReject });
   }
 };

@@ -23,6 +23,7 @@ import type {
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import {
+  $$inhibit,
   $$streamMore,
   $$timeout,
   FLAG_ERROR,
@@ -304,9 +305,12 @@ export function executeBucket(
         finishedStep: ExecutableStep,
         bucket: Bucket,
         resultIndex: number,
-        value: unknown,
-        flags: ExecutionEntryFlags,
+        rawValue: unknown,
+        rawFlags: ExecutionEntryFlags,
       ) => {
+        const value = rawValue === $$inhibit ? null : rawValue;
+        const flags =
+          rawValue === $$inhibit ? rawFlags | FLAG_INHIBITED : rawFlags;
         let proto: any;
         if (
           // Fast-lane for non-objects
@@ -614,19 +618,22 @@ export function executeBucket(
               }
               deps.push(depVal);
             }
-            const stepResult = step.unbatchedExecute(extra, ...deps);
+            const rawStepResult = step.unbatchedExecute(extra, ...deps);
+            const stepResult =
+              rawStepResult === $$inhibit ? null : rawStepResult;
+            const stepFlags =
+              rawStepResult === $$inhibit
+                ? FLAG_NULL | FLAG_INHIBITED
+                : rawStepResult == null
+                ? FLAG_NULL
+                : NO_FLAGS;
             // TODO: what if stepResult is _returned_ error (as opposed to
             // thrown)?
             // NOTE: we are in `runSyncSteps` so this step is guaranteed to
             // be "isSyncAndSafe". As such, we don't need to worry about it
             // returning an error (unsafe) or a promise (async), we only
             // need to check if it's null.
-            bucket.setResult(
-              step,
-              dataIndex,
-              stepResult,
-              stepResult == null ? FLAG_NULL : NO_FLAGS,
-            );
+            bucket.setResult(step, dataIndex, stepResult, stepFlags);
           } catch (e) {
             const error = newGrafastError(e, step.id);
             bucket.setResult(step, dataIndex, error, FLAG_ERROR);

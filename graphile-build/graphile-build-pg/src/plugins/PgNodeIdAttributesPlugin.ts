@@ -9,6 +9,7 @@ import type {
   PgSelectStep,
 } from "@dataplan/pg";
 import type { SetterStep } from "grafast";
+import { assertNotNull, compare, trap, TRAP_INHIBITED } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 
 import { version } from "../version.js";
@@ -166,60 +167,44 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                       // (unless we want to check it exists).
                       applyPlan: isPgCondition
                         ? EXPORTABLE(
-                            (
-                              getSpec,
-                              localAttributeCodecs,
-                              localAttributes,
-                              remoteAttributes,
-                              sql,
-                            ) =>
-                              function plan(
+                            (TRAP_INHIBITED, assertNotNull, compare, getSpec, localAttributeCodecs, localAttributes, remoteAttributes, sql, trap, typeName) => function plan(
                                 $condition: PgConditionStep<PgSelectStep<any>>,
                                 val,
                               ) {
-                                if (val.getRaw().evalIs(null)) {
-                                  for (
-                                    let i = 0, l = localAttributes.length;
-                                    i < l;
-                                    i++
-                                  ) {
-                                    const localName = localAttributes[i];
-                                    $condition.where({
-                                      type: "attribute",
-                                      attribute: localName,
-                                      callback: (expression) =>
-                                        sql`${expression} is null`,
-                                    });
-                                  }
-                                } else {
-                                  const spec = getSpec(val.get());
-                                  for (
-                                    let i = 0, l = localAttributes.length;
-                                    i < l;
-                                    i++
-                                  ) {
-                                    const localName = localAttributes[i];
-                                    const codec = localAttributeCodecs[i];
-                                    const remoteName = remoteAttributes[i];
-                                    $condition.where({
-                                      type: "attribute",
-                                      attribute: localName,
-                                      callback: (expression) =>
-                                        sql`${expression} = ${$condition.placeholder(
-                                          spec[remoteName],
-                                          codec,
-                                        )}`,
-                                    });
-                                  }
+                                const $nodeId = val.get();
+                                const spec = getSpec($nodeId);
+                                for (
+                                  let i = 0, l = localAttributes.length;
+                                  i < l;
+                                  i++
+                                ) {
+                                  const localName = localAttributes[i];
+                                  const codec = localAttributeCodecs[i];
+                                  const remoteName = remoteAttributes[i];
+                                  const $rawCol = spec[remoteName];
+                                  // const $col = nodeIdentifierColumnOrNull($nodeId, spec, 'id')
+                                  const $col = assertNotNull(
+                                    trap($rawCol, TRAP_INHIBITED),
+                                    `Invalid node identifier for '${typeName}'`,
+                                    { if: compare("not null", $nodeId) },
+                                  );
+                                  const sqlRemoteValue = $condition.placeholder(
+                                    $col,
+                                    codec,
+                                  );
+                                  $condition.where({
+                                    type: "attribute",
+                                    attribute: localName,
+                                    callback: (expression) =>
+                                      // TODO: we know nodeId will always be
+                                      // unary, so we could optimize this SQL at
+                                      // execution time when we know if it is
+                                      // null or not.
+                                      sql`((${sqlRemoteValue} is null and ${expression} is null) or (${sqlRemoteValue} is not null and ${expression} = ${sqlRemoteValue}))`,
+                                  });
                                 }
                               },
-                            [
-                              getSpec,
-                              localAttributeCodecs,
-                              localAttributes,
-                              remoteAttributes,
-                              sql,
-                            ],
+                            [TRAP_INHIBITED, assertNotNull, compare, getSpec, localAttributeCodecs, localAttributes, remoteAttributes, sql, trap, typeName],
                           )
                         : EXPORTABLE(
                             (getSpec, localAttributes, remoteAttributes) =>
