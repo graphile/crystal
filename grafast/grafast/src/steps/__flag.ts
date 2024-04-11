@@ -180,8 +180,8 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
  * Example use case: get user by id, but id is null: no need to fetch the user
  * since we know they won't exist.
  */
-export function inhibitOnNull($step: ExecutableStep) {
-  return new __FlagStep($step, {
+export function inhibitOnNull<T>($step: ExecutableStep<T>) {
+  return new __FlagStep<T>($step, {
     acceptFlags: DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL,
   });
 }
@@ -191,20 +191,23 @@ export function inhibitOnNull($step: ExecutableStep) {
  * that represents a Post instead: throw error to tell user they've sent invalid
  * data.
  */
-export function assertNotNull(
-  $step: ExecutableStep,
+export function assertNotNull<T>(
+  $step: ExecutableStep<T>,
   message: string,
   options?: { if?: FlagStepOptions["if"] },
 ) {
-  return new __FlagStep($step, {
+  return new __FlagStep<T>($step, {
     ...options,
     acceptFlags: DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL,
     onReject: newGrafastError(new SafeError(message), $step.id),
   });
 }
 
-export function trap($step: ExecutableStep, acceptFlags: ExecutionEntryFlags) {
-  return new __FlagStep($step, {
+export function trap<T>(
+  $step: ExecutableStep<T>,
+  acceptFlags: ExecutionEntryFlags,
+) {
+  return new __FlagStep<T>($step, {
     acceptFlags: (acceptFlags & TRAPPABLE_FLAGS) | FLAG_NULL,
   });
 }
