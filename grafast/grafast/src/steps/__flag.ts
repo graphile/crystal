@@ -60,7 +60,7 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
   constructor(step: ExecutableStep, options: FlagStepOptions) {
     super();
     const { acceptFlags = DEFAULT_ACCEPT_FLAGS, onReject, if: $cond } = options;
-    this.forbiddenFlags = ALL_FLAGS & ~(acceptFlags & TRAPPABLE_FLAGS);
+    this.forbiddenFlags = ALL_FLAGS & ~acceptFlags;
     this.onRejectReturnValue = onReject == null ? $$inhibit : onReject;
     if ($cond) {
       this.addDependency(step);
@@ -71,9 +71,8 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
   }
   public toStringMeta(): string | null {
     const step = this.dependencies[0];
-    const forbiddenFlags = this.dependencyForbiddenFlags[0];
     const onReject = this.dependencyOnReject[0];
-    const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
+    const acceptFlags = ALL_FLAGS & ~this.forbiddenFlags;
     return `${step.id} ${digestFlags(acceptFlags)} ${inspect(onReject)}`;
   }
   getParentStep(): ExecutableStep {
@@ -94,6 +93,9 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
     const onReject = this.dependencyOnReject[0];
     const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
     if (
+      // TODO: this logic could be improved so that more flag checks were
+      // inlined, e.g. `trap(inhibitOnNull($foo), TRAP_INHIBIT)` should just
+      // become `$foo`.
       (options.onReject === undefined || options.onReject === onReject) &&
       (options.acceptFlags === undefined ||
         options.acceptFlags === DEFAULT_ACCEPT_FLAGS ||
