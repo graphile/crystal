@@ -4221,13 +4221,7 @@ export const plans = {
             type: "attribute",
             attribute: localName,
             callback(expression) {
-              return (
-                // TODO: we know nodeId will always be
-                // unary, so we could optimize this SQL at
-                // execution time when we know if it is
-                // null or not.
-                sql`((${sqlRemoteValue} is null and ${expression} is null) or (${sqlRemoteValue} is not null and ${expression} = ${sqlRemoteValue}))`
-              );
+              return sql`((${sqlRemoteValue} is null and ${expression} is null) or (${sqlRemoteValue} is not null and ${expression} = ${sqlRemoteValue}))`;
             }
           });
         }
@@ -4576,13 +4570,7 @@ export const plans = {
             type: "attribute",
             attribute: localName,
             callback(expression) {
-              return (
-                // TODO: we know nodeId will always be
-                // unary, so we could optimize this SQL at
-                // execution time when we know if it is
-                // null or not.
-                sql`((${sqlRemoteValue} is null and ${expression} is null) or (${sqlRemoteValue} is not null and ${expression} = ${sqlRemoteValue}))`
-              );
+              return sql`((${sqlRemoteValue} is null and ${expression} is null) or (${sqlRemoteValue} is not null and ${expression} = ${sqlRemoteValue}))`;
             }
           });
         }
@@ -4713,13 +4701,7 @@ export const plans = {
             type: "attribute",
             attribute: localName,
             callback(expression) {
-              return (
-                // TODO: we know nodeId will always be
-                // unary, so we could optimize this SQL at
-                // execution time when we know if it is
-                // null or not.
-                sql`((${sqlRemoteValue} is null and ${expression} is null) or (${sqlRemoteValue} is not null and ${expression} = ${sqlRemoteValue}))`
-              );
+              return sql`((${sqlRemoteValue} is null and ${expression} is null) or (${sqlRemoteValue} is not null and ${expression} = ${sqlRemoteValue}))`;
             }
           });
         }
