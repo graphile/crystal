@@ -102,7 +102,7 @@ export {
 } from "./__trackedValue.js";
 export { __ValueStep } from "./__value.js";
 export { applyTransforms, ApplyTransformsStep } from "./applyTransforms.js";
-export { compare, CompareStep } from "./compare.js";
+export { condition, ConditionStep } from "./condition.js";
 export {
   GraphQLItemHandler,
   graphqlItemHandler,

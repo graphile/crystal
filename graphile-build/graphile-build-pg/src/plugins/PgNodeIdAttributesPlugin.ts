@@ -9,7 +9,7 @@ import type {
   PgSelectStep,
 } from "@dataplan/pg";
 import type { SetterStep } from "grafast";
-import { assertNotNull, compare, trap, TRAP_INHIBITED } from "grafast";
+import { assertNotNull, condition, trap, TRAP_INHIBITED } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 
 import { version } from "../version.js";
@@ -170,7 +170,7 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                             (
                               TRAP_INHIBITED,
                               assertNotNull,
-                              compare,
+                              condition,
                               getSpec,
                               localAttributeCodecs,
                               localAttributes,
@@ -198,7 +198,7 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                   const $col = assertNotNull(
                                     trap($rawCol, TRAP_INHIBITED),
                                     `Invalid node identifier for '${typeName}'`,
-                                    { if: compare("not null", $nodeId) },
+                                    { if: condition("not null", $nodeId) },
                                   );
                                   const sqlRemoteValue = $condition.placeholder(
                                     $col,
@@ -219,7 +219,7 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                             [
                               TRAP_INHIBITED,
                               assertNotNull,
-                              compare,
+                              condition,
                               getSpec,
                               localAttributeCodecs,
                               localAttributes,

@@ -7,10 +7,10 @@ const binaryOperators = ["equal", "not equal"] as const;
 type BinaryOperator = (typeof binaryOperators)[number];
 type Operator = UnaryOperator | BinaryOperator;
 
-export class CompareStep extends UnbatchedExecutableStep<boolean> {
+export class ConditionStep extends UnbatchedExecutableStep<boolean> {
   static $$export = {
     moduleName: "grafast",
-    exportName: "CompareStep",
+    exportName: "ConditionStep",
   };
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
@@ -115,14 +115,14 @@ function isNotEqual(
 
 type Step<T = any> = ExecutableStep<T>;
 type $Boolean = ExecutableStep<boolean>;
-function compare(op: "null", step: Step): $Boolean;
-function compare(op: "not null", step: Step): $Boolean;
-function compare(op: "nullish", step: Step): $Boolean;
-function compare(op: "not nullish", step: Step): $Boolean;
-function compare(op: "equal", step1: Step, step2: Step): $Boolean;
-function compare(op: "not equal", step1: Step, step2: Step): $Boolean;
-function compare(op: Operator, step1: Step, step2?: Step): $Boolean {
-  return new CompareStep(op, step1, step2);
+function condition(op: "null", step: Step): $Boolean;
+function condition(op: "not null", step: Step): $Boolean;
+function condition(op: "nullish", step: Step): $Boolean;
+function condition(op: "not nullish", step: Step): $Boolean;
+function condition(op: "equal", step1: Step, step2: Step): $Boolean;
+function condition(op: "not equal", step1: Step, step2: Step): $Boolean;
+function condition(op: Operator, step1: Step, step2?: Step): $Boolean {
+  return new ConditionStep(op, step1, step2);
 }
 
-export { compare };
+export { condition };
