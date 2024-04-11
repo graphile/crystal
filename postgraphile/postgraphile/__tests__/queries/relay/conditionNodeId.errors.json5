@@ -3,7 +3,7 @@
     message: "Invalid node identifier for 'Person'",
     locations: [
       {
-        line: 19,
+        line: 32,
         column: 5,
       },
     ],

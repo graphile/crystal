@@ -1,4 +1,30 @@
 {
+  allPosts: {
+    nodes: [
+      {
+        author: {
+          id: "WyJwZW9wbGUiLDNd",
+        },
+        body: "Hello world",
+      },
+      {
+        author: {
+          id: "WyJwZW9wbGUiLDRd",
+        },
+        body: "Hi Alice!",
+      },
+      {
+        author: {
+          id: "WyJwZW9wbGUiLDNd",
+        },
+        body: "Hi Bob!",
+      },
+      {
+        author: null,
+        body: "Message from deleted user",
+      },
+    ],
+  },
   alicesPosts: {
     nodes: [
       {
