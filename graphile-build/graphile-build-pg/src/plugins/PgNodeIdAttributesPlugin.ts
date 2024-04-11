@@ -198,7 +198,7 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                   const $col = assertNotNull(
                                     trap($rawCol, TRAP_INHIBITED),
                                     `Invalid node identifier for '${typeName}'`,
-                                    { if: condition("not null", $nodeId) },
+                                    { if: condition("exists", $nodeId) },
                                   );
                                   const sqlRemoteValue = $condition.placeholder(
                                     $col,

@@ -1,9 +1,9 @@
 import type { ExecutableStep, UnbatchedExecutionExtra } from "..";
 import { UnbatchedExecutableStep } from "../step.js";
 
-const unaryOperators = ["null", "not null", "nullish", "not nullish"] as const;
+const unaryOperators = ["null", "not null", "exists", "not exists"] as const;
 type UnaryOperator = (typeof unaryOperators)[number];
-const binaryOperators = ["equal", "not equal"] as const;
+const binaryOperators = ["===", "!=="] as const;
 type BinaryOperator = (typeof binaryOperators)[number];
 type Operator = UnaryOperator | BinaryOperator;
 
@@ -63,13 +63,13 @@ export class ConditionStep extends UnbatchedExecutableStep<boolean> {
         return isNull;
       case "not null":
         return isNotNull;
-      case "nullish":
-        return isNullish;
-      case "not nullish":
+      case "exists":
         return isNotNullish;
-      case "equal":
+      case "not exists":
+        return isNullish;
+      case "===":
         return isEqual;
-      case "not equal":
+      case "!==":
         return isNotEqual;
       default: {
         const never: never = this.op;
@@ -117,10 +117,10 @@ type Step<T = any> = ExecutableStep<T>;
 type $Boolean = ExecutableStep<boolean>;
 function condition(op: "null", step: Step): $Boolean;
 function condition(op: "not null", step: Step): $Boolean;
-function condition(op: "nullish", step: Step): $Boolean;
-function condition(op: "not nullish", step: Step): $Boolean;
-function condition(op: "equal", step1: Step, step2: Step): $Boolean;
-function condition(op: "not equal", step1: Step, step2: Step): $Boolean;
+function condition(op: "exists", step: Step): $Boolean;
+function condition(op: "not exists", step: Step): $Boolean;
+function condition(op: "===", step1: Step, step2: Step): $Boolean;
+function condition(op: "!==", step1: Step, step2: Step): $Boolean;
 function condition(op: Operator, step1: Step, step2?: Step): $Boolean {
   return new ConditionStep(op, step1, step2);
 }
