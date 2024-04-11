@@ -58,10 +58,10 @@ export class __FlagStep<TData> extends UnbatchedExecutableStep<TData> {
     return `${step.id} ${digestFlags(acceptFlags)} ${inspect(onReject)}`;
   }
   getParentStep(): ExecutableStep {
-    return this.getDep(0);
+    return this.getDepOptions(0).step;
   }
   [$$deepDepSkip](): ExecutableStep {
-    return this.getDep(0);
+    return this.getDepOptions(0).step;
   }
   /** Return inlining instructions if we can be inlined. @internal */
   inline(
@@ -118,7 +118,7 @@ export function assertNotNull($step: ExecutableStep, message: string) {
 }
 
 export function trap($step: ExecutableStep, acceptFlags: ExecutionEntryFlags) {
-  return new __FlagStep($step, acceptFlags & TRAPPABLE_FLAGS);
+  return new __FlagStep($step, (acceptFlags & TRAPPABLE_FLAGS) | FLAG_NULL);
 }
 
 // Have to overwrite the getDep method due to circular dependency
