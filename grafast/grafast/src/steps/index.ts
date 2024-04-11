@@ -39,7 +39,15 @@ export function debugPlans<T>(callback: () => T): T {
   return result;
 }
 
-export { __FlagStep, assertNotNull, inhibitOnNull, trap } from "./__flag.js";
+export {
+  __FlagStep,
+  assertNotNull,
+  inhibitOnNull,
+  trap,
+  TRAP_ERROR,
+  TRAP_INHIBITED,
+  TRAP_ERROR_OR_INHIBITED,
+} from "./__flag.js";
 export { access, AccessStep } from "./access.js";
 export {
   assertEdgeCapableStep,

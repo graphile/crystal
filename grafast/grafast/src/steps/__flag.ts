@@ -1,5 +1,6 @@
 import type { GrafastError } from "../error.js";
 import { newGrafastError } from "../error.js";
+import { inspect } from "../inspect.js";
 import type {
   AddDependencyOptions,
   ExecutionDetails,
@@ -11,11 +12,33 @@ import {
   $$deepDepSkip,
   ALL_FLAGS,
   DEFAULT_ACCEPT_FLAGS,
+  FLAG_ERROR,
+  FLAG_INHIBITED,
   FLAG_NULL,
   TRAPPABLE_FLAGS,
 } from "../interfaces.js";
 import { ExecutableStep, UnbatchedExecutableStep } from "../step.js";
 import { arrayOfLength } from "../utils.js";
+
+// PUBLIC FLAGS
+export const TRAP_ERROR = FLAG_ERROR as ExecutionEntryFlags;
+export const TRAP_INHIBITED = FLAG_INHIBITED as ExecutionEntryFlags;
+export const TRAP_ERROR_OR_INHIBITED = (FLAG_ERROR |
+  FLAG_INHIBITED) as ExecutionEntryFlags;
+
+function digestFlags(flags: ExecutionEntryFlags) {
+  const parts: string[] = [];
+  if ((flags & FLAG_NULL) === 0) {
+    parts.push("REJECT_NULL");
+  }
+  if ((flags & FLAG_ERROR) !== 0) {
+    parts.push("ERROR_OK");
+  }
+  if ((flags & FLAG_INHIBITED) !== 0) {
+    parts.push("INHIBITED_OK");
+  }
+  return parts.join(" ");
+}
 
 export class __FlagStep<TData> extends UnbatchedExecutableStep<TData> {
   isSyncAndSafe = false;
@@ -26,6 +49,13 @@ export class __FlagStep<TData> extends UnbatchedExecutableStep<TData> {
   ) {
     super();
     this.addDependency({ step, acceptFlags, onReject });
+  }
+  public toStringMeta(): string | null {
+    const step = this.dependencies[0];
+    const forbiddenFlags = this.dependencyForbiddenFlags[0];
+    const onReject = this.dependencyOnReject[0];
+    const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
+    return `${step.id} ${digestFlags(acceptFlags)} ${inspect(onReject)}`;
   }
   getParentStep(): ExecutableStep {
     return this.getDep(0);

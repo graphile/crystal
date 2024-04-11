@@ -216,6 +216,9 @@ import {
   trackedContext,
   trackedRootValue,
   trap,
+  TRAP_ERROR,
+  TRAP_ERROR_OR_INHIBITED,
+  TRAP_INHIBITED,
 } from "./steps/index.js";
 import { stringifyPayload } from "./stringifyPayload.js";
 import { stripAnsi } from "./stripAnsi.js";
@@ -449,6 +452,9 @@ export {
   trackedContext,
   trackedRootValue,
   trap,
+  TRAP_ERROR,
+  TRAP_ERROR_OR_INHIBITED,
+  TRAP_INHIBITED,
   TypedEventEmitter,
   UnbatchedExecutableStep,
   UnbatchedExecutionExtra,
@@ -501,6 +507,9 @@ exportAsMany("grafast", {
   inhibitOnNull,
   assertNotNull,
   trap,
+  TRAP_ERROR,
+  TRAP_ERROR_OR_INHIBITED,
+  TRAP_INHIBITED,
   isGrafastError,
   debugPlans,
   each,
