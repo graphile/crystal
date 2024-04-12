@@ -282,6 +282,8 @@ export class StepTracker {
   ): number {
     const $dependent = sudo(raw$dependent);
     const $dependency = sudo(options.step);
+    /* TODO: move this logic to OperationPlan to happen after optimize phase.
+
     if ($dependency instanceof __FlagStep) {
       // See if we can inline this
       const inlineDetails = $dependency.inline(options);
@@ -289,6 +291,7 @@ export class StepTracker {
         return this.addStepDependency($dependent, inlineDetails);
       }
     }
+    */
     if (!this.activeSteps.has($dependent)) {
       throw new Error(
         `Cannot add ${$dependency} as a dependency of ${$dependent}; the latter is deleted!`,

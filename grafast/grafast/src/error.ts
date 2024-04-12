@@ -85,3 +85,46 @@ export class SafeError<
 export function isSafeError(error: Error): error is SafeError {
   return (error as any)[$$safeError];
 }
+
+export const $$trappedError = Symbol("isTrappedError");
+
+/**
+ * When an error is trapped via `trap()`, we need to make it not an
+ * `Error`-derivative otherwise it will become an error again, so we wrap
+ * it in `TrappedError` instead.
+ */
+export class TrappedError
+  // Does NOT extend Error
+  implements TrappedError
+{
+  public readonly originalError: Error;
+  [$$trappedError] = true;
+  public message: string;
+  private constructor(originalError: Error) {
+    if (originalError instanceof TrappedError) {
+      throw new Error(
+        "GrafastInternalError<29e0a06f-fb3e-40f5-82ec-b47d9d041048>: attempted to wrap a TrappedError with a TrappedError.",
+      );
+    }
+    this.message = originalError?.message;
+    this.originalError = originalError;
+    // TODO: copy other attributes across?
+  }
+}
+
+/**
+ * DO NOT ALLOW CONSTRUCTION OF ERRORS OUTSIDE OF THIS MODULE!
+ *
+ * @internal
+ */
+export function newTrappedError(error: Error): TrappedError {
+  return new (TrappedError as any)(error);
+}
+
+/**
+ * Is the given value a TrappedError? This is the only public API that people
+ * should use for looking at GrafastErrors.
+ */
+export function isTrappedError(value: any): value is TrappedError {
+  return typeof value === "object" && value !== null && $$trappedError in value;
+}

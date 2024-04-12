@@ -1,5 +1,10 @@
 import type { GrafastError } from "../error.js";
-import { newGrafastError, SafeError } from "../error.js";
+import {
+  isGrafastError,
+  newGrafastError,
+  newTrappedError,
+  SafeError,
+} from "../error.js";
 import { inspect } from "../inspect.js";
 import type {
   AddDependencyOptions,
@@ -222,9 +227,16 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
         : DEFAULT_FORBIDDEN_FLAGS;
       const flags = dataEv._flagsAt(i);
       if ((forbiddenFlags & flags) === NO_FLAGS) {
-        if (flags & FLAG_ERROR && this.valueForError !== false) {
+        if (flags & FLAG_ERROR) {
           // Trapped an error
-          return valueForError;
+          if (this.valueForError !== false) {
+            return valueForError;
+          }
+          const value = dataEv.at(i);
+          if (isGrafastError(value)) {
+            return newTrappedError(value.originalError);
+          }
+          return value;
         }
         if (flags & FLAG_INHIBITED && this.valueForInhibited !== false) {
           // Trapped an inhibit
