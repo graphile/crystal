@@ -54,7 +54,7 @@ const TRAP_VALUES = [
   "PASS_THROUGH",
   // "UNDEFINED", // waiting for a need
 ] as const;
-/** @defaultValue {'PASS_THROUGH'} */
+/** @defaultValue `'PASS_THROUGH'` */
 export type TrapValue = (typeof TRAP_VALUES)[number];
 /** `false` means pass-through; all others are literal */
 export type ResolvedTrapValue = false | null | undefined | readonly never[];
