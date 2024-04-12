@@ -125,7 +125,10 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
     this.canBeInlined =
       !$cond &&
       this.valueForInhibited === false &&
-      this.valueForError === false;
+      // Can't PASS_THROUGH errors since they need to be converted into TRAPPED
+      // error.
+      // TODO: should we be handling this in Grafast core?
+      (acceptFlags & FLAG_ERROR) === 0;
     if (!this.canBeInlined) {
       this.addDependency({ step, acceptFlags: TRAPPABLE_FLAGS });
       if ($cond) {

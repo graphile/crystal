@@ -130,8 +130,12 @@ it("enables trapping an error to error", async () => {
   const schema = makeSchema();
   const source = /* GraphQL */ `
     query Q {
-      nonError: errorToError(setNullToError: 2)
-      error: errorToError(setNullToError: null)
+      nonError: errorToError(setNullToError: 2) {
+        message
+      }
+      error: errorToError(setNullToError: null) {
+        message
+      }
     }
   `;
   const variableValues = {};
