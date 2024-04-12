@@ -196,10 +196,10 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
     throw new Error(`${this} not finalized?`);
   }
   finalize() {
-    if (this.ifDep !== null) {
-      this.execute = this.fancyExecute;
-    } else {
+    if (this.canBeInlined) {
       this.execute = this.passThroughExecute;
+    } else {
+      this.execute = this.fancyExecute;
     }
     super.finalize();
   }
