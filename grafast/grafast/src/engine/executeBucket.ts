@@ -831,10 +831,11 @@ export function executeBucket(
               : ev,
           );
         }
-        indexFlags |= FLAG_INHIBITED;
         if (forceIndexValue == null && rejectValue != null) {
           indexFlags |= FLAG_ERROR;
           forceIndexValue = rejectValue;
+        } else {
+          indexFlags |= FLAG_INHIBITED;
         }
         forcedValues.flags[index] = indexFlags;
         forcedValues.results[index] = forceIndexValue;
