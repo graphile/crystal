@@ -19,7 +19,9 @@ import {
   NO_FLAGS,
   TRAPPABLE_FLAGS,
 } from "../interfaces.js";
+import type { ListCapableStep } from "../step.js";
 import { ExecutableStep } from "../step.js";
+import type { __ItemStep } from "./__item.js";
 
 // PUBLIC FLAGS
 export const TRAP_ERROR = FLAG_ERROR as ExecutionEntryFlags;
@@ -41,17 +43,51 @@ function digestAcceptFlags(acceptFlags: ExecutionEntryFlags) {
   return parts.join("&");
 }
 
+const TRAP_VALUES = [
+  "NULL",
+  "EMPTY_LIST",
+  "PASS_THROUGH",
+  // "UNDEFINED", // waiting for a need
+] as const;
+/** @defaultValue {'PASS_THROUGH'} */
+export type TrapValue = (typeof TRAP_VALUES)[number];
+/** `false` means pass-through; all others are literal */
+export type ResolvedTrapValue = false | null | undefined | readonly never[];
 export interface FlagStepOptions {
   acceptFlags?: ExecutionEntryFlags;
   onReject?: GrafastError | null;
   if?: ExecutableStep<boolean>;
+  // Trapping an error might want to result in a null or an empty list.
+  valueForInhibited?: TrapValue;
+  valueForError?: TrapValue;
 }
+
+const EMPTY_LIST = Object.freeze([]);
 
 function trim(string: string, length = 15): string {
   if (string.length > length) {
     return string.substring(0, length - 2) + "…";
   } else {
     return string;
+  }
+}
+
+function resolveTrapValue(tv: TrapValue): ResolvedTrapValue {
+  switch (tv) {
+    case "NULL":
+      return null;
+    case "EMPTY_LIST":
+      return EMPTY_LIST;
+    case "PASS_THROUGH":
+      return false;
+    default: {
+      const never: never = tv;
+      throw new Error(
+        `TrapValue '${never}' not understood; please use one of: ${TRAP_VALUES.join(
+          ", ",
+        )}`,
+      );
+    }
   }
 }
 
@@ -65,14 +101,31 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
   private ifDep: number | null = null;
   private forbiddenFlags: ExecutionEntryFlags;
   private onRejectReturnValue: GrafastError | typeof $$inhibit;
+  private valueForInhibited: ResolvedTrapValue;
+  private valueForError: ResolvedTrapValue;
+  private canBeInlined: boolean;
   constructor(step: ExecutableStep, options: FlagStepOptions) {
     super();
-    const { acceptFlags = DEFAULT_ACCEPT_FLAGS, onReject, if: $cond } = options;
+    const {
+      acceptFlags = DEFAULT_ACCEPT_FLAGS,
+      onReject,
+      if: $cond,
+      valueForInhibited = "PASS_THROUGH",
+      valueForError = "PASS_THROUGH",
+    } = options;
     this.forbiddenFlags = ALL_FLAGS & ~acceptFlags;
     this.onRejectReturnValue = onReject == null ? $$inhibit : onReject;
-    if ($cond) {
+    this.valueForInhibited = resolveTrapValue(valueForInhibited);
+    this.valueForError = resolveTrapValue(valueForError);
+    this.canBeInlined =
+      !$cond &&
+      this.valueForInhibited === false &&
+      this.valueForError === false;
+    if (!this.canBeInlined) {
       this.addDependency({ step, acceptFlags: TRAPPABLE_FLAGS });
-      this.ifDep = this.addDependency($cond);
+      if ($cond) {
+        this.ifDep = this.addDependency($cond);
+      }
     } else {
       this.addDependency({ step, acceptFlags, onReject });
     }
@@ -94,11 +147,19 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
   [$$deepDepSkip](): ExecutableStep {
     return this.getDepOptions(0).step;
   }
+  listItem($item: __ItemStep<this>) {
+    const $dep = this.getDepOptions(0).step as
+      | ExecutableStep<any>
+      | ListCapableStep<any>;
+    return "listItem" in $dep && typeof $dep.listItem === "function"
+      ? $dep.listItem($item)
+      : $item;
+  }
   /** Return inlining instructions if we can be inlined. @internal */
   inline(
     options: Omit<AddDependencyOptions, "step">,
   ): AddDependencyOptions | null {
-    if (this.ifDep !== null) {
+    if (!this.canBeInlined) {
       return null;
     }
     const step = this.dependencies[0];
@@ -136,25 +197,40 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
   }
   finalize() {
     if (this.ifDep !== null) {
-      this.execute = this.conditionalExecute;
+      this.execute = this.fancyExecute;
     } else {
-      this.execute = this.unconditionalExecute;
+      this.execute = this.passThroughExecute;
     }
     super.finalize();
   }
-  private conditionalExecute(
+  private fancyExecute(
     details: ExecutionDetails<[data: TData, cond?: boolean]>,
   ): any {
     const dataEv = details.values[0]!;
-    const condEv = details.values[this.ifDep as 1]!;
-    const { forbiddenFlags: thisForbiddenFlags, onRejectReturnValue } = this;
+    const condEv =
+      this.ifDep === null ? null : details.values[this.ifDep as 1]!;
+    const {
+      forbiddenFlags: thisForbiddenFlags,
+      onRejectReturnValue,
+      valueForError,
+      valueForInhibited,
+    } = this;
     return details.indexMap((i) => {
-      const cond = condEv.at(i);
+      const cond = condEv ? condEv.at(i) : true;
       const forbiddenFlags = cond
         ? thisForbiddenFlags
         : DEFAULT_FORBIDDEN_FLAGS;
       const flags = dataEv._flagsAt(i);
       if ((forbiddenFlags & flags) === NO_FLAGS) {
+        if (flags & FLAG_ERROR && this.valueForError !== false) {
+          // Trapped an error
+          return valueForError;
+        }
+        if (flags & FLAG_INHIBITED && this.valueForInhibited !== false) {
+          // Trapped an inhibit
+          return valueForInhibited;
+        }
+        // Else, assume pass-through
         return dataEv.at(i);
       } else {
         return onRejectReturnValue;
@@ -162,8 +238,8 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
     });
   }
 
-  // Checks already performed via addDependency, just pass everything through.
-  private unconditionalExecute(
+  // Checks already performed via addDependency, just pass everything through. Should have been inlined!
+  private passThroughExecute(
     details: ExecutionDetails<[data: TData, cond?: boolean]>,
   ): any {
     const ev = details.values[0];
@@ -206,8 +282,13 @@ export function assertNotNull<T>(
 export function trap<T>(
   $step: ExecutableStep<T>,
   acceptFlags: ExecutionEntryFlags,
+  options?: {
+    valueForInhibited?: FlagStepOptions["valueForInhibited"];
+    valueForError?: FlagStepOptions["valueForError"];
+  },
 ) {
   return new __FlagStep<T>($step, {
+    ...options,
     acceptFlags: (acceptFlags & TRAPPABLE_FLAGS) | FLAG_NULL,
   });
 }
