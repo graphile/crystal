@@ -1464,8 +1464,8 @@ export class OperationPlan {
             }
           } catch (e) {
             throw new Error(
-              `The step returned by '${path.join(
-                ".",
+              `The step returned by '${path.join(".")}${"[]".repeat(
+                listDepth,
               )}' is not compatible with the GraphQL object type '${
                 nullableFieldType.name
               }': ${e.message}`,
