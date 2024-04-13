@@ -212,6 +212,65 @@ const NonNullRelationsPlugin: GraphileConfig.Plugin = {
   },
 };
 
+const LeftArmPlugin = makeExtendSchemaPlugin((build) => {
+  const { left_arm } = build.input.pgRegistry.pgResources;
+  return {
+    typeDefs: gql`
+      extend type Person {
+        allArms: PersonRelatedArmConnection
+      }
+      type PersonRelatedArmConnection {
+        edges: [PersonRelatedArmEdge]
+      }
+      type PersonRelatedArmEdge {
+        node: LeftArm
+        isTheirs: Boolean
+      }
+    `,
+    plans: {
+      Person: {
+        allArms: EXPORTABLE(
+          (connection, left_arm, object) => ($person) => {
+            const $arms = left_arm.find();
+
+            return connection($arms, {
+              edgeDataPlan($arm) {
+                return object({ arm: $arm, person: $person });
+              },
+            });
+          },
+          [connection, left_arm, object],
+        ),
+      },
+      PersonRelatedArmEdge: {
+        isTheirs: EXPORTABLE(
+          (aEqualsB, lambda) =>
+            (
+              $edge: EdgeStep<
+                any,
+                any,
+                any,
+                ObjectStep<{
+                  arm: PgSelectSingleStep;
+                  person: PgSelectSingleStep;
+                }>,
+                any
+              >,
+            ) => {
+              const $obj = $edge.data();
+              const $arm = $obj.get("arm");
+              const $armPersonId = $arm.get("person_id");
+              const $person = $obj.get("person");
+              const $personId = $person.get("id");
+              return lambda([$personId, $armPersonId], aEqualsB);
+            },
+          [aEqualsB, lambda],
+        ),
+      },
+    },
+  };
+});
+
 const preset: GraphileConfig.Preset = {
   plugins: [
     StreamDeferPlugin,
@@ -327,64 +386,7 @@ const preset: GraphileConfig.Preset = {
     NonNullRelationsPlugin,
     RuruQueryParamsPlugin,
     RuruQueryParamsUpdatePlugin,
-    makeExtendSchemaPlugin((build) => {
-      const { left_arm } = build.input.pgRegistry.pgResources;
-      return {
-        typeDefs: gql`
-          extend type Person {
-            allArms: PersonRelatedArmConnection
-          }
-          type PersonRelatedArmConnection {
-            edges: [PersonRelatedArmEdge]
-          }
-          type PersonRelatedArmEdge {
-            node: LeftArm
-            isTheirs: Boolean
-          }
-        `,
-        plans: {
-          Person: {
-            allArms: EXPORTABLE(
-              (connection, left_arm, object) => ($person) => {
-                const $arms = left_arm.find();
-
-                return connection($arms, {
-                  edgeDataPlan($arm) {
-                    return object({ arm: $arm, person: $person });
-                  },
-                });
-              },
-              [connection, left_arm, object],
-            ),
-          },
-          PersonRelatedArmEdge: {
-            isTheirs: EXPORTABLE(
-              (aEqualsB, lambda) =>
-                (
-                  $edge: EdgeStep<
-                    any,
-                    any,
-                    any,
-                    ObjectStep<{
-                      arm: PgSelectSingleStep;
-                      person: PgSelectSingleStep;
-                    }>,
-                    any
-                  >,
-                ) => {
-                  const $obj = $edge.data();
-                  const $arm = $obj.get("arm");
-                  const $armPersonId = $arm.get("person_id");
-                  const $person = $obj.get("person");
-                  const $personId = $person.get("id");
-                  return lambda([$personId, $armPersonId], aEqualsB);
-                },
-              [aEqualsB, lambda],
-            ),
-          },
-        },
-      };
-    }),
+    ...(false ? [LeftArmPlugin] : []),
   ],
   extends: [
     PostGraphileAmberPreset,
