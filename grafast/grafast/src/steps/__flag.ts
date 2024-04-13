@@ -24,7 +24,6 @@ import {
   NO_FLAGS,
   TRAPPABLE_FLAGS,
 } from "../interfaces.js";
-import type { ListCapableStep } from "../step.js";
 import { ExecutableStep, isListCapableStep } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 

@@ -386,7 +386,7 @@ const preset: GraphileConfig.Preset = {
     NonNullRelationsPlugin,
     RuruQueryParamsPlugin,
     RuruQueryParamsUpdatePlugin,
-    ...(false ? [LeftArmPlugin] : []),
+    ...(Math.random() > 2 ? [LeftArmPlugin] : []),
   ],
   extends: [
     PostGraphileAmberPreset,

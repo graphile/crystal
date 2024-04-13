@@ -58,7 +58,6 @@ import {
   $$ts,
   ALL_FLAGS,
   DEFAULT_ACCEPT_FLAGS,
-  DEFAULT_FORBIDDEN_FLAGS,
 } from "../interfaces.js";
 import type { ApplyAfterModeArg } from "../operationPlan-input.js";
 import { withFieldArgsForArguments } from "../operationPlan-input.js";
