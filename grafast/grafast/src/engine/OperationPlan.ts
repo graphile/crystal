@@ -2499,6 +2499,8 @@ export class OperationPlan {
           // OPTIMIZE: figure out under which circumstances it is safe to hoist here.
           // break;
           return;
+        } else if (step instanceof __FlagStep) {
+          break;
         } else {
           // Plans that rely on external state shouldn't be hoisted because
           // their results may change after a mutation, so the mutation should
