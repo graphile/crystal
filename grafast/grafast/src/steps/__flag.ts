@@ -154,9 +154,9 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
         : inspect(this.onRejectReturnValue);
     const $if =
       this.ifDep !== null ? this.getDepOptions(this.ifDep).step : null;
-    return `${$if ? `if(${$if.id}): ` : ``}${digestAcceptFlags(
-      acceptFlags,
-    )}, onReject: ${rej}`;
+    return `${this.dependencies[0].id}, ${
+      $if ? `if(${$if.id}), ` : ``
+    }${digestAcceptFlags(acceptFlags)}, onReject: ${rej}`;
   }
   [$$deepDepSkip](): ExecutableStep {
     return this.getDepOptions(0).step;
