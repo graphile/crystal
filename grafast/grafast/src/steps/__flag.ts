@@ -143,6 +143,9 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
     } else {
       this.addDependency({ step, acceptFlags, onReject });
     }
+    if (isListCapableStep(step)) {
+      this.listItem = this._listItem;
+    }
   }
   public toStringMeta(): string | null {
     const acceptFlags = ALL_FLAGS & ~this.forbiddenFlags;
@@ -161,7 +164,9 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
   [$$deepDepSkip](): ExecutableStep {
     return this.getDepOptions(0).step;
   }
-  listItem($item: __ItemStep<this>) {
+  listItem?: ($item: __ItemStep<this>) => ExecutableStep;
+  // Copied over listItem if the dependent step is a list capable step
+  _listItem($item: __ItemStep<this>) {
     const $dep = this.dependencies[0];
     return isListCapableStep($dep) ? $dep.listItem($item) : $item;
   }
