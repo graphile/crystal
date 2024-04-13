@@ -247,8 +247,22 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
       const forbiddenFlags = cond
         ? thisForbiddenFlags
         : DEFAULT_FORBIDDEN_FLAGS;
+
+      // Search for "f2b3b1b3" for similar block
       const flags = dataEv._flagsAt(i);
-      if ((forbiddenFlags & flags) === NO_FLAGS) {
+      const disallowedFlags = flags & forbiddenFlags;
+      if (disallowedFlags !== NO_FLAGS) {
+        if (disallowedFlags & FLAG_INHIBITED) {
+          // We were already rejected, maintain this
+          return $$inhibit;
+        } else if (disallowedFlags & FLAG_ERROR) {
+          // We were already rejected, maintain this
+          return dataEv.at(i);
+        } else {
+          // We weren't already inhibited
+          return onRejectReturnValue;
+        }
+      } else {
         if (flags & FLAG_ERROR) {
           // Trapped an error
           if (this.valueForError !== false) {
@@ -266,17 +280,6 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
         }
         // Else, assume pass-through
         return dataEv.at(i);
-      } else {
-        if (flags & FLAG_INHIBITED) {
-          // We were already rejected, maintain this
-          return $$inhibit;
-        } else if (flags & FLAG_ERROR) {
-          // We were already rejected, maintain this
-          return dataEv.at(i);
-        } else {
-          // We weren't already inhibited
-          return onRejectReturnValue;
-        }
       }
     });
   }
