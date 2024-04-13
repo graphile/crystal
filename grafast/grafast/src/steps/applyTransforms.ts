@@ -182,11 +182,8 @@ export class ApplyTransformsStep extends ExecutableStep {
       }
       const indexes = map.get(originalIndex);
       if (!Array.isArray(list) || !Array.isArray(indexes)) {
-        // ERRORS: should this be an error?
-        console.warn(
-          `Either list or values was not an array when processing ${this}`,
-        );
-        return null;
+        // Not a list value; just pass it straight through
+        return list as any;
       }
       const values = indexes.map((idx) => {
         const val = depResults.at(idx);
