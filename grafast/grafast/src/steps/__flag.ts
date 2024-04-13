@@ -198,12 +198,28 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
     }
     return null;
   }
-  execute(
+
+  public deduplicate(
+    _peers: readonly ExecutableStep<any>[],
+  ): readonly ExecutableStep<any>[] {
+    return (_peers as __FlagStep<any>[]).filter((p) => {
+      // ifDep has already been tested by Grafast (it's a dependency)
+      if (p.forbiddenFlags !== this.forbiddenFlags) return false;
+      if (p.onRejectReturnValue !== this.onRejectReturnValue) return false;
+      if (p.valueForInhibited !== this.valueForInhibited) return false;
+      if (p.valueForError !== this.valueForError) return false;
+      if (p.canBeInlined !== this.canBeInlined) return false;
+      return true;
+    });
+  }
+
+  public execute(
     _details: ExecutionDetails<[data: TData, cond?: boolean]>,
   ): GrafastResultsList<TData> {
     throw new Error(`${this} not finalized?`);
   }
-  finalize() {
+
+  public finalize() {
     if (this.canBeInlined) {
       this.execute = this.passThroughExecute;
     } else {
@@ -211,6 +227,7 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
     }
     super.finalize();
   }
+
   private fancyExecute(
     details: ExecutionDetails<[data: TData, cond?: boolean]>,
   ): any {
