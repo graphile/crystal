@@ -26,6 +26,7 @@ import {
 import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
 import type { GrafastPlanJSON, ModifierStep } from "../index.js";
 import {
+  __FlagStep,
   __ItemStep,
   __TrackedValueStep,
   __ValueStep,
@@ -39,6 +40,7 @@ import {
 import { inputStep } from "../input.js";
 import { inspect } from "../inspect.js";
 import type {
+  AddDependencyOptions,
   FieldPlanResolver,
   GrafastPlanBucketJSONv1,
   GrafastPlanBucketPhaseJSONv1,
@@ -49,7 +51,15 @@ import type {
   StepOptions,
   TrackedArguments,
 } from "../interfaces.js";
-import { $$proxy, $$subroutine, $$timeout, $$ts } from "../interfaces.js";
+import {
+  $$proxy,
+  $$subroutine,
+  $$timeout,
+  $$ts,
+  ALL_FLAGS,
+  DEFAULT_ACCEPT_FLAGS,
+  DEFAULT_FORBIDDEN_FLAGS,
+} from "../interfaces.js";
 import type { ApplyAfterModeArg } from "../operationPlan-input.js";
 import { withFieldArgsForArguments } from "../operationPlan-input.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
@@ -66,12 +76,14 @@ import { access } from "../steps/access.js";
 import { constant, ConstantStep } from "../steps/constant.js";
 import { graphqlResolver } from "../steps/graphqlResolver.js";
 import { timeSource } from "../timeSource.js";
+import type { Sudo } from "../utils.js";
 import {
   defaultValueToValueNode,
   findVariableNamesUsed,
   hasItemPlan,
   isTypePlanned,
   sudo,
+  writeableArray,
 } from "../utils.js";
 import type {
   LayerPlanPhase,
@@ -386,6 +398,10 @@ export class OperationPlan {
 
     this.checkTimeout();
     this.lap("optimizeSteps");
+
+    this.inlineSteps();
+    this.checkTimeout();
+    this.lap("inlineSteps");
 
     this.phase = "finalize";
 
@@ -3062,6 +3078,50 @@ export class OperationPlan {
         .slice(0, 10)
         .join(", ")}`,
     );
+  }
+
+  private inlineSteps() {
+    flagLoop: for (const $flag of this.stepTracker.activeSteps) {
+      if ($flag instanceof __FlagStep) {
+        // We're only going to inline one if we can inline all.
+        const toInline: Array<{
+          $dependent: Sudo<ExecutableStep>;
+          dependencyIndex: number;
+          inlineDetails: AddDependencyOptions;
+          dependent: ExecutableStep["dependents"][number];
+        }> = [];
+        for (const dependent of $flag.dependents) {
+          const { step, dependencyIndex } = dependent;
+          const $dependent = sudo(step);
+          const inlineDetails = $flag.inline(
+            $dependent.getDepOptions(dependencyIndex),
+          );
+          if (inlineDetails === null) {
+            continue flagLoop;
+          }
+          toInline.push({
+            $dependent,
+            dependencyIndex,
+            inlineDetails,
+            dependent,
+          });
+        }
+        // All of them pass the check, let's inline them
+        for (const todo of toInline) {
+          const {
+            $dependent,
+            dependencyIndex,
+            inlineDetails: { onReject, acceptFlags = DEFAULT_ACCEPT_FLAGS },
+          } = todo;
+          writeableArray($dependent.dependencyOnReject)[dependencyIndex] =
+            onReject;
+          writeableArray($dependent.dependencyForbiddenFlags)[dependencyIndex] =
+            ALL_FLAGS & ~acceptFlags;
+        }
+        const $flagDep = sudo($flag).dependencies[0];
+        this.stepTracker.replaceStep($flag, $flagDep);
+      }
+    }
   }
 
   /** Finalizes each step */

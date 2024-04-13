@@ -932,6 +932,7 @@ export type Sudo<T> = T extends ExecutableStep<any>
       dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
       dependencyOnReject: ReadonlyArray<GrafastError | null | undefined>;
       defaultForbiddenFlags: ExecutionEntryFlags;
+      getDepOptions: ExecutableStep["getDepOptions"];
     }
   : T;
 
@@ -942,6 +943,17 @@ export type Sudo<T> = T extends ExecutableStep<any>
  */
 export function sudo<T>(obj: T): Sudo<T> {
   return obj as Sudo<T>;
+}
+
+/**
+ * We want everything else to treat things like `dependencies` as read only,
+ * however we ourselves want to be able to write to them, so we can use
+ * writeable for this.
+ *
+ * @internal
+ */
+export function writeableArray<T>(a: ReadonlyArray<T>): Array<T> {
+  return a as any;
 }
 
 export function stepADependsOnStepB(
