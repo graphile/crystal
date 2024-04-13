@@ -25,7 +25,7 @@ import {
   TRAPPABLE_FLAGS,
 } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
-import { ExecutableStep } from "../step.js";
+import { ExecutableStep, isListCapableStep } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 
 // PUBLIC FLAGS
@@ -125,6 +125,7 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
     this.canBeInlined =
       !$cond &&
       this.valueForInhibited === false &&
+      this.valueForError === false &&
       // Can't PASS_THROUGH errors since they need to be converted into TRAPPED
       // error.
       // TODO: should we be handling this in Grafast core?
@@ -136,6 +137,16 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
       }
     } else {
       this.addDependency({ step, acceptFlags, onReject });
+    }
+    if (isListCapableStep(step)) {
+      this.listItem = function listItem($item) {
+        const $dep = this.getDepOptions(0).step as
+          | ExecutableStep<any>
+          | ListCapableStep<any>;
+        return "listItem" in $dep && typeof $dep.listItem === "function"
+          ? $dep.listItem($item)
+          : $item;
+      };
     }
   }
   public toStringMeta(): string | null {
@@ -155,14 +166,7 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
   [$$deepDepSkip](): ExecutableStep {
     return this.getDepOptions(0).step;
   }
-  listItem($item: __ItemStep<this>) {
-    const $dep = this.getDepOptions(0).step as
-      | ExecutableStep<any>
-      | ListCapableStep<any>;
-    return "listItem" in $dep && typeof $dep.listItem === "function"
-      ? $dep.listItem($item)
-      : $item;
-  }
+  listItem?: ($item: __ItemStep<this>) => ExecutableStep;
   /** Return inlining instructions if we can be inlined. @internal */
   inline(
     options: Omit<AddDependencyOptions, "step">,
