@@ -119,13 +119,18 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
       valueForError = "PASS_THROUGH",
     } = options;
     this.forbiddenFlags = ALL_FLAGS & ~acceptFlags;
-    this.onRejectReturnValue = onReject == null ? $$inhibit : onReject;
+    this.onRejectReturnValue =
+      onReject == null
+        ? $$inhibit
+        : isGrafastError(onReject)
+        ? onReject
+        : newGrafastError(onReject, step.id);
     this.valueForInhibited = resolveTrapValue(valueForInhibited);
     this.valueForError = resolveTrapValue(valueForError);
     this.canBeInlined =
       !$cond &&
-      this.valueForInhibited === false &&
-      this.valueForError === false &&
+      valueForInhibited === "PASS_THROUGH" &&
+      valueForError === "PASS_THROUGH" &&
       // Can't PASS_THROUGH errors since they need to be converted into TRAPPED
       // error.
       // TODO: should we be handling this in Grafast core?
@@ -262,7 +267,16 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
         // Else, assume pass-through
         return dataEv.at(i);
       } else {
-        return onRejectReturnValue;
+        if (flags & FLAG_INHIBITED) {
+          // We were already rejected, maintain this
+          return $$inhibit;
+        } else if (flags & FLAG_ERROR) {
+          // We were already rejected, maintain this
+          return dataEv.at(i);
+        } else {
+          // We weren't already inhibited
+          return onRejectReturnValue;
+        }
       }
     });
   }
