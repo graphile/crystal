@@ -1384,7 +1384,7 @@ export class OperationPlan {
       const $item = isListCapableStep($step)
         ? withGlobalLayerPlan(
             $__item.layerPlan,
-            polymorphicPaths,
+            $__item.polymorphicPaths,
             ($step as ListCapableStep<any>).listItem,
             $step,
             $__item,
