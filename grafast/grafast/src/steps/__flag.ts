@@ -138,16 +138,6 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
     } else {
       this.addDependency({ step, acceptFlags, onReject });
     }
-    if (isListCapableStep(step)) {
-      this.listItem = function listItem($item) {
-        const $dep = this.getDepOptions(0).step as
-          | ExecutableStep<any>
-          | ListCapableStep<any>;
-        return "listItem" in $dep && typeof $dep.listItem === "function"
-          ? $dep.listItem($item)
-          : $item;
-      };
-    }
   }
   public toStringMeta(): string | null {
     const acceptFlags = ALL_FLAGS & ~this.forbiddenFlags;
@@ -166,7 +156,10 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
   [$$deepDepSkip](): ExecutableStep {
     return this.getDepOptions(0).step;
   }
-  listItem?: ($item: __ItemStep<this>) => ExecutableStep;
+  listItem($item: __ItemStep<this>) {
+    const $dep = this.dependencies[0];
+    return isListCapableStep($dep) ? $dep.listItem($item) : $item;
+  }
   /** Return inlining instructions if we can be inlined. @internal */
   inline(
     options: Omit<AddDependencyOptions, "step">,
