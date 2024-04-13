@@ -2464,6 +2464,8 @@ export class OperationPlan {
           // have not been able to come up with a counterexample that is
           // unsafe. Should we do so, we should remove this.
           break;
+        } else if (step instanceof __FlagStep) {
+          break;
         } else {
           return;
         }
