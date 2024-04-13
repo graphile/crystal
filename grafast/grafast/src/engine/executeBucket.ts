@@ -600,37 +600,92 @@ export function executeBucket(
           try {
             const deps: any = [];
             const extra = extras[allStepsIndex];
-            for (const $dep of step.dependencies) {
+            let forceIndexValue: GrafastError | null | undefined = undefined;
+            let rejectValue: GrafastError | null | undefined = undefined;
+            let indexFlags: ExecutionEntryFlags = NO_FLAGS;
+            // for (const $dep of step.dependencies) {
+            for (let i = 0, l = step.dependencies.length; i < l; i++) {
+              const $dep = step.dependencies[i];
+              const forbiddenFlags = step.dependencyForbiddenFlags[i];
+              const onReject = step.dependencyOnReject[i];
               const depExecutionVal = bucket.store.get($dep.id)!;
-              const depVal = depExecutionVal.at(dataIndex);
-              let depFlags;
-              // if (bucket.hasNonZeroStatus && isGrafastError(depVal)) {
-              if (
-                (bucket.flagUnion & FLAG_ERROR) === FLAG_ERROR &&
-                ((depFlags = depExecutionVal._flagsAt(dataIndex)) &
-                  FLAG_ERROR) ===
-                  FLAG_ERROR
-              ) {
-                if (step._isUnary) {
-                  // COPY the unary value
-                  bucket.store.set(step.id, depExecutionVal);
-                  bucket.flagUnion |= depFlags;
-                } else {
-                  bucket.setResult(step, dataIndex, depVal, FLAG_ERROR);
+
+              // Search for "f2b3b1b3" for similar block
+              const flags = depExecutionVal._flagsAt(dataIndex);
+              const disallowedFlags = flags & forbiddenFlags;
+              if (disallowedFlags !== NO_FLAGS) {
+                indexFlags |= disallowedFlags;
+                // If there's a reject behavior and we're FRESHLY rejected (weren't
+                // already inhibited), use that as a fallback.
+                // TODO: validate this.
+                // If dep is inhibited and we don't allow inhibited, copy through (null or error).
+                // If dep is inhibited and we do allow inhibited, but we're disallowed, use our onReject.
+                // If dep is not inhibited, but we're disallowed, use our onReject.
+                if (
+                  onReject &&
+                  (disallowedFlags & (FLAG_INHIBITED | FLAG_ERROR)) === NO_FLAGS
+                ) {
+                  rejectValue ||= onReject;
                 }
-                continue stepLoop;
+                if (!forceIndexValue) {
+                  if (flags & FLAG_ERROR) {
+                    const v = depExecutionVal.at(dataIndex);
+                    // TODO: no need for GrafastError?
+                    forceIndexValue = v as GrafastError;
+                  } else {
+                    forceIndexValue = null;
+                  }
+                } else {
+                  // First error wins, ignore this second error.
+                }
+                // End "f2b3b1b3" block
+              } else {
+                const depVal = depExecutionVal.at(dataIndex);
+                let depFlags;
+                // if (bucket.hasNonZeroStatus && isGrafastError(depVal))
+                if (
+                  (bucket.flagUnion & FLAG_ERROR) === FLAG_ERROR &&
+                  ((depFlags = depExecutionVal._flagsAt(dataIndex)) &
+                    FLAG_ERROR) ===
+                    FLAG_ERROR
+                ) {
+                  if (step._isUnary) {
+                    // COPY the unary value
+                    bucket.store.set(step.id, depExecutionVal);
+                    bucket.flagUnion |= depFlags;
+                  } else {
+                    bucket.setResult(step, dataIndex, depVal, FLAG_ERROR);
+                  }
+                  continue stepLoop;
+                }
+                deps.push(depVal);
               }
-              deps.push(depVal);
             }
-            const rawStepResult = step.unbatchedExecute(extra, ...deps);
-            const stepResult =
-              rawStepResult === $$inhibit ? null : rawStepResult;
-            const stepFlags =
-              rawStepResult === $$inhibit
-                ? FLAG_NULL | FLAG_INHIBITED
-                : rawStepResult == null
-                ? FLAG_NULL
-                : NO_FLAGS;
+
+            let stepResult, stepFlags;
+
+            if (forceIndexValue !== undefined) {
+              // Search for "17217999b7a7" for similar block
+              if (forceIndexValue == null && rejectValue != null) {
+                indexFlags |= FLAG_ERROR;
+                forceIndexValue = rejectValue;
+              } else {
+                indexFlags |= FLAG_INHIBITED;
+              }
+              // End "17217999b7a7" block
+
+              stepResult = forceIndexValue;
+              stepFlags = indexFlags;
+            } else {
+              const rawStepResult = step.unbatchedExecute(extra, ...deps);
+              stepResult = rawStepResult === $$inhibit ? null : rawStepResult;
+              stepFlags =
+                rawStepResult === $$inhibit
+                  ? FLAG_NULL | FLAG_INHIBITED
+                  : rawStepResult == null
+                  ? FLAG_NULL
+                  : NO_FLAGS;
+            }
             // TODO: what if stepResult is _returned_ error (as opposed to
             // thrown)?
             // NOTE: we are in `runSyncSteps` so this step is guaranteed to
@@ -769,13 +824,13 @@ export function executeBucket(
     // OPTIM: if unariesIncludingSideEffects.some(isGrafastError) then shortcut execution because everything fails
 
     // for (let index = 0, l = polymorphicPathList.length; index < l; index++) {
-    for (let index = 0; index < expectedSize; index++) {
+    for (let dataIndex = 0; dataIndex < expectedSize; dataIndex++) {
       let forceIndexValue: GrafastError | null | undefined = undefined;
       let rejectValue: GrafastError | null | undefined = undefined;
       let indexFlags: ExecutionEntryFlags = NO_FLAGS;
       if (
         stepPolymorphicPaths !== null &&
-        !stepPolymorphicPaths.has(polymorphicPathList[index] as string)
+        !stepPolymorphicPaths.has(polymorphicPathList[dataIndex] as string)
       ) {
         indexFlags |= FLAG_POLY_SKIPPED;
         forceIndexValue = null;
@@ -785,10 +840,12 @@ export function executeBucket(
           i < l;
           i++
         ) {
-          const dep = dependenciesIncludingSideEffects[i];
+          const depExecutionVal = dependenciesIncludingSideEffects[i];
           const forbiddenFlags = dependencyForbiddenFlags[i];
           const onReject = dependencyOnReject[i];
-          const flags = dep._flagsAt(index);
+
+          // Search for "f2b3b1b3" for similar block
+          const flags = depExecutionVal._flagsAt(dataIndex);
           const disallowedFlags = flags & forbiddenFlags;
           if (disallowedFlags !== NO_FLAGS) {
             indexFlags |= disallowedFlags;
@@ -798,12 +855,15 @@ export function executeBucket(
             // If dep is inhibited and we don't allow inhibited, copy through (null or error).
             // If dep is inhibited and we do allow inhibited, but we're disallowed, use our onReject.
             // If dep is not inhibited, but we're disallowed, use our onReject.
-            if (onReject && (disallowedFlags & FLAG_INHIBITED) === NO_FLAGS) {
+            if (
+              onReject &&
+              (disallowedFlags & (FLAG_INHIBITED | FLAG_ERROR)) === NO_FLAGS
+            ) {
               rejectValue ||= onReject;
             }
             if (!forceIndexValue) {
               if (flags & FLAG_ERROR) {
-                const v = dep.at(index);
+                const v = depExecutionVal.at(dataIndex);
                 // TODO: no need for GrafastError?
                 forceIndexValue = v as GrafastError;
               } else {
@@ -812,12 +872,15 @@ export function executeBucket(
             } else {
               // First error wins, ignore this second error.
             }
+            // End "f2b3b1b3" block
+
             break;
           }
         }
       } else {
         // All good
       }
+
       if (forceIndexValue !== undefined) {
         if (!needsTransform) {
           needsTransform = true;
@@ -827,18 +890,22 @@ export function executeBucket(
               ? // TODO: move this creation to happen once the full list is
                 // already built, ideally we shouldn't be mutating an execution
                 // value later.
-                batchExecutionValue(ev.entries.slice(0, index))
+                batchExecutionValue(ev.entries.slice(0, dataIndex))
               : ev,
           );
         }
+
+        // Search for "17217999b7a7" for similar block
         if (forceIndexValue == null && rejectValue != null) {
           indexFlags |= FLAG_ERROR;
           forceIndexValue = rejectValue;
         } else {
           indexFlags |= FLAG_INHIBITED;
         }
-        forcedValues.flags[index] = indexFlags;
-        forcedValues.results[index] = forceIndexValue;
+        // End "17217999b7a7" block
+
+        forcedValues.flags[dataIndex] = indexFlags;
+        forcedValues.results[dataIndex] = forceIndexValue;
       } else {
         newSize++;
         if (needsTransform) {
@@ -851,8 +918,8 @@ export function executeBucket(
             const depList = dependencies[depListIndex];
             if (depList.isBatch) {
               const depVal = dependenciesIncludingSideEffects[depListIndex];
-              (depList.entries as any[]).push(depVal.at(index));
-              depList._flags.push(depVal._flagsAt(index));
+              (depList.entries as any[]).push(depVal.at(dataIndex));
+              depList._flags.push(depVal._flagsAt(dataIndex));
             }
           }
         }
