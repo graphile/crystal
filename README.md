@@ -33,6 +33,7 @@ you then manage yourself.
 | ➡️ For **PostGraphile V4** see [the `legacy` branch](https://github.com/graphile/crystal/tree/legacy) |
 | ----------------------------------------------------------------------------------------------------- |
 
+
 ## Project summaries
 
 Here's a rough breakdown of the main packages:
@@ -89,6 +90,7 @@ And please give some love to our featured sponsors 🤩:
 <td align="center"><a href="https://stellate.co/"><img src="https://graphile.org/images/sponsors/Stellate.png" width="90" height="90" alt="Stellate" /><br />Stellate</a> *</td>
 </tr><tr>
 <td align="center"><a href="https://gosteelhead.com/"><img src="https://graphile.org/images/sponsors/steelhead.svg" width="90" height="90" alt="Steelhead" /><br />Steelhead</a> *</td>
+<td align="center"><a href="https://www.sylvera.com/"><img src="https://graphile.org/images/sponsors/sylvera.svg" width="90" height="90" alt="Sylvera" /><br />Sylvera</a> *</td>
 </tr></table>
 
 <em>\* Sponsors the entire Graphile suite</em>
