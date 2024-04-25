@@ -66,6 +66,7 @@ And please give some love to our featured sponsors 🤩:
 <td align="center"><a href="https://stellate.co/"><img src="https://graphile.org/images/sponsors/Stellate.png" width="90" height="90" alt="Stellate" /><br />Stellate</a> *</td>
 </tr><tr>
 <td align="center"><a href="https://gosteelhead.com/"><img src="https://graphile.org/images/sponsors/steelhead.svg" width="90" height="90" alt="Steelhead" /><br />Steelhead</a> *</td>
+<td align="center"><a href="https://www.sylvera.com/"><img src="https://graphile.org/images/sponsors/sylvera.svg" width="90" height="90" alt="Sylvera" /><br />Sylvera</a> *</td>
 </tr></table>
 
 <em>\* Sponsors the entire Graphile suite</em>
@@ -176,8 +177,8 @@ yarn add postgraphile
 ```
 
 ```js
-import { createServer } from 'http';
-import postgraphile from 'postgraphile';
+import { createServer } from "http";
+import postgraphile from "postgraphile";
 
 createServer(postgraphile());
 ```
@@ -235,8 +236,10 @@ PostGraphile features include:
 - [Just use the generated GraphQL schema](https://www.graphile.org/postgraphile/usage-schema/)
 
 [procedure documentation]: https://www.graphile.org/postgraphile/procedures/
-[advanced queries documentation]: https://www.graphile.org/postgraphile/custom-queries/
-[row-level-security]: http://www.postgresql.org/docs/current/static/ddl-rowsecurity.html
+[advanced queries documentation]:
+  https://www.graphile.org/postgraphile/custom-queries/
+[row-level-security]:
+  http://www.postgresql.org/docs/current/static/ddl-rowsecurity.html
 
 ## Requirements
 
