@@ -35,7 +35,7 @@ import { defer, Deferred } from "./deferred.js";
 import { isDev, noop } from "./dev.js";
 import { isUnaryStep } from "./engine/lib/withGlobalLayerPlan.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
-import { isSafeError, SafeError } from "./error.js";
+import { $$inhibit, flagError,isSafeError, SafeError } from "./error.js";
 import { execute } from "./execute.js";
 import { grafast, grafastSync } from "./grafastGraphql.js";
 import type {
@@ -257,6 +257,7 @@ export {
   $$eventEmitter,
   $$extensions,
   $$idempotent,
+  $$inhibit,
   $$verbatim,
   access,
   AccessStep,
@@ -314,6 +315,7 @@ export {
   FilterPlanMemo,
   first,
   FirstStep,
+  flagError,
   getEnumValueConfig,
   grafast,
   GrafastArgumentConfig,
@@ -573,6 +575,8 @@ exportAsMany("grafast", {
   LoadedRecordStep,
   LoadStep,
   isSafeError,
+  $$inhibit,
+  flagError,
   SafeError,
   isUnaryStep,
 });
