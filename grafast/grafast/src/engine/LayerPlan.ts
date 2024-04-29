@@ -4,11 +4,12 @@ import te from "tamedevil";
 
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
-import type { GrafastError } from "../error.js";
-import { isGrafastError } from "../error.js";
 import { inspect } from "../inspect.js";
 import type { UnaryExecutionValue } from "../interfaces.js";
 import {
+  FLAG_ERROR,
+  FLAG_INHIBITED,
+  FLAG_NULL,
   FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS,
   NO_FLAGS,
 } from "../interfaces.js";
@@ -478,7 +479,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             originalIndex < parentBucket.size;
             originalIndex++
           ) {
-            const fieldValue: any[] | null | undefined | GrafastError =
+            const fieldValue: any[] | null | undefined | Error =
               nullableStepStore.at(originalIndex);
             if (fieldValue != null) {
               const newIndex = size++;
@@ -548,7 +549,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           originalIndex < parentBucket.size;
           originalIndex++
         ) {
-          const list: any[] | null | undefined | GrafastError =
+          const list: any[] | null | undefined | Error =
             listStepStore.at(originalIndex);
           if (Array.isArray(list)) {
             const newIndexes: number[] = [];
@@ -626,13 +627,14 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           originalIndex < parentBucket.size;
           originalIndex++
         ) {
+          const flags = polymorphicPlanStore._flagsAt(originalIndex);
+          if (
+            (flags & (FLAG_ERROR | FLAG_INHIBITED | FLAG_NULL)) !==
+            NO_FLAGS
+          ) {
+            continue;
+          }
           const value = polymorphicPlanStore.at(originalIndex);
-          if (value == null) {
-            continue;
-          }
-          if (isGrafastError(value)) {
-            continue;
-          }
           const typeName = resolveType(value);
           if (!targetTypeNames.includes(typeName)) {
             continue;

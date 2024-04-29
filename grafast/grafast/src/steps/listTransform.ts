@@ -10,7 +10,6 @@ import {
 import type { LayerPlanReasonSubroutine } from "../engine/LayerPlan.js";
 import { LayerPlan } from "../engine/LayerPlan.js";
 import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
-import type { GrafastError } from "../error.js";
 import type { ConnectionCapableStep, ExecutionDetails } from "../index.js";
 import type { GrafastResultsList } from "../interfaces.js";
 import { $$deepDepSkip } from "../interfaces.js";
@@ -203,7 +202,7 @@ export class __ListTransformStep<
     indexMap,
     values,
     extra,
-  }: ExecutionDetails<[any[] | null | undefined | GrafastError]>): Promise<
+  }: ExecutionDetails<[any[] | null | undefined | Error]>): Promise<
     GrafastResultsList<TMemo>
   > {
     const bucket = extra._bucket;

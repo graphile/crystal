@@ -10,7 +10,6 @@ import {
 import type { LayerPlanReasonSubroutine } from "../engine/LayerPlan.js";
 import { LayerPlan } from "../engine/LayerPlan.js";
 import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
-import type { GrafastError } from "../error.js";
 import type { ExecutionDetails, GrafastResultsList } from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
 import { ExecutableStep, isListCapableStep } from "../step.js";
@@ -78,7 +77,7 @@ export class ApplyTransformsStep extends ExecutableStep {
     indexMap,
     values: [values0],
     extra,
-  }: ExecutionDetails<[any[] | null | undefined | GrafastError]>): Promise<
+  }: ExecutionDetails<[any[] | null | undefined | Error]>): Promise<
     GrafastResultsList<any[] | null | undefined>
   > {
     const bucket = extra._bucket;

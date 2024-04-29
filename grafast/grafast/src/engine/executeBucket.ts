@@ -3,8 +3,7 @@ import { isAsyncIterable, isIterable } from "iterall";
 import * as assert from "../assert.js";
 import type { Bucket, RequestTools } from "../bucket.js";
 import { isDev } from "../dev.js";
-import type { GrafastError } from "../error.js";
-import { $$error, newGrafastError, SafeError } from "../error.js";
+import { isFlaggedValue, SafeError } from "../error.js";
 import { inspect } from "../inspect.js";
 import type {
   BatchExecutionValue,
@@ -23,7 +22,6 @@ import type {
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
 import {
-  $$inhibit,
   $$streamMore,
   $$timeout,
   FLAG_ERROR,
@@ -161,8 +159,7 @@ export function executeBucket(
           normalStepIndex < l;
           normalStepIndex++
         ) {
-          const step = normalSteps[normalStepIndex].step;
-          const r = newGrafastError(timeoutError, step.id);
+          const r = timeoutError;
           const results = arrayOfLength(bucket.size, r);
           const flags = arrayOfLength(bucket.size, FLAG_ERROR);
           resultList[normalStepIndex] = { flags, results };
@@ -203,7 +200,7 @@ export function executeBucket(
             indexesPendingLoopOver.push(normalStepIndex);
           }
         } catch (e) {
-          const r = newGrafastError(e, step.id);
+          const r = e;
           const results = arrayOfLength(bucket.size, r);
           const flags = arrayOfLength(bucket.size, FLAG_ERROR);
           resultList[normalStepIndex] = { flags, results };
@@ -307,26 +304,26 @@ export function executeBucket(
         finishedStep: ExecutableStep,
         bucket: Bucket,
         resultIndex: number,
-        rawValue: unknown,
-        rawFlags: ExecutionEntryFlags,
+        value: unknown,
+        flags: ExecutionEntryFlags,
       ) => {
-        const value = rawValue === $$inhibit ? null : rawValue;
-        const flags =
-          rawValue === $$inhibit ? rawFlags | FLAG_INHIBITED : rawFlags;
-        let proto: any;
-        if (
-          // Fast-lane for non-objects
-          typeof value !== "object" ||
-          value === null
-        ) {
-          bucket.setResult(
-            finishedStep,
-            resultIndex,
-            value,
-            value == null ? flags | FLAG_NULL : flags,
-          );
+        // Fast lanes
+        if (typeof value !== "object") {
+          // non-objects
+          bucket.setResult(finishedStep, resultIndex, value, flags);
+          return;
+        } else if (value === null) {
+          // nulls
+          const finalFlags = flags | FLAG_NULL;
+          bucket.setResult(finishedStep, resultIndex, null, finalFlags);
+          return;
+        } else if (isFlaggedValue(value)) {
+          // flagged values
+          const finalFlags = flags | value.flags;
+          bucket.setResult(finishedStep, resultIndex, value.value, finalFlags);
           return;
         }
+
         let valueIsAsyncIterable;
         if (
           // Are we streaming this? If so, we need an iterable or async
@@ -391,11 +388,10 @@ export function executeBucket(
 
                 bucket.setResult(finishedStep, resultIndex, arr, flags);
               } catch (e) {
-                const error = newGrafastError(e, finishedStep.id);
                 bucket.setResult(
                   finishedStep,
                   resultIndex,
-                  error,
+                  e,
                   flags | FLAG_ERROR,
                 );
               }
@@ -406,15 +402,6 @@ export function executeBucket(
               promises.push(promise);
             }
           }
-        } else if (
-          (proto = Object.getPrototypeOf(value)) === null ||
-          proto === Object.prototype
-        ) {
-          bucket.setResult(finishedStep, resultIndex, value, flags);
-        } else if (value instanceof Error) {
-          const e =
-            $$error in value ? value : newGrafastError(value, finishedStep.id);
-          bucket.setResult(finishedStep, resultIndex, e, flags | FLAG_ERROR);
         } else {
           bucket.setResult(finishedStep, resultIndex, value, flags);
         }
@@ -474,10 +461,7 @@ export function executeBucket(
                   NO_FLAGS,
                 );
               } else {
-                const error = newGrafastError(
-                  settledResult.reason,
-                  finishedStep.id,
-                );
+                const error = settledResult.reason;
                 bucket.setResult(finishedStep, dataIndex, error, FLAG_ERROR);
               }
             }
@@ -504,11 +488,8 @@ export function executeBucket(
               const { s: allStepsIndex, i: dataIndex } =
                 pendingPromiseIndexes![i];
               const finishedStep = _allSteps[allStepsIndex];
-              const error = newGrafastError(
-                new Error(
-                  `GrafastInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
-                ),
-                finishedStep.id,
+              const error = new Error(
+                `GrafastInternalError<1e9731b4-005e-4b0e-bc61-43baa62e6444>: error occurred whilst performing completedStep(${finishedStep.id})`,
               );
               bucket.setResult(finishedStep, dataIndex, error, FLAG_ERROR);
             }
@@ -600,8 +581,8 @@ export function executeBucket(
           try {
             const deps: any = [];
             const extra = extras[allStepsIndex];
-            let forceIndexValue: GrafastError | null | undefined = undefined;
-            let rejectValue: GrafastError | null | undefined = undefined;
+            let forceIndexValue: Error | null | undefined = undefined;
+            let rejectValue: Error | null | undefined = undefined;
             let indexFlags: ExecutionEntryFlags = NO_FLAGS;
             for (let i = 0, l = step.dependencies.length; i < l; i++) {
               const $dep = step.dependencies[i];
@@ -629,8 +610,7 @@ export function executeBucket(
                 if (forceIndexValue == null) {
                   if ((flags & FLAG_ERROR) !== 0) {
                     const v = depExecutionVal.at(dataIndex);
-                    // TODO: no need for GrafastError?
-                    forceIndexValue = v as GrafastError;
+                    forceIndexValue = v;
                   } else {
                     forceIndexValue = null;
                   }
@@ -641,7 +621,6 @@ export function executeBucket(
               } else {
                 const depVal = depExecutionVal.at(dataIndex);
                 let depFlags;
-                // if (bucket.hasNonZeroStatus && isGrafastError(depVal))
                 if (
                   (bucket.flagUnion & FLAG_ERROR) === FLAG_ERROR &&
                   ((depFlags = depExecutionVal._flagsAt(dataIndex)) &
@@ -677,13 +656,13 @@ export function executeBucket(
               stepFlags = indexFlags;
             } else {
               const rawStepResult = step.unbatchedExecute(extra, ...deps);
-              stepResult = rawStepResult === $$inhibit ? null : rawStepResult;
-              stepFlags =
-                rawStepResult === $$inhibit
-                  ? FLAG_NULL | FLAG_INHIBITED
-                  : rawStepResult == null
-                  ? FLAG_NULL
-                  : NO_FLAGS;
+              if (isFlaggedValue(rawStepResult)) {
+                stepResult = rawStepResult.value;
+                stepFlags = rawStepResult.flags;
+              } else {
+                stepResult = rawStepResult;
+                stepFlags = rawStepResult == null ? FLAG_NULL : NO_FLAGS;
+              }
             }
             // TODO: what if stepResult is _returned_ error (as opposed to
             // thrown)?
@@ -693,8 +672,7 @@ export function executeBucket(
             // need to check if it's null.
             bucket.setResult(step, dataIndex, stepResult, stepFlags);
           } catch (e) {
-            const error = newGrafastError(e, step.id);
-            bucket.setResult(step, dataIndex, error, FLAG_ERROR);
+            bucket.setResult(step, dataIndex, e, FLAG_ERROR);
           }
         }
       }
@@ -796,7 +774,7 @@ export function executeBucket(
     step: ExecutableStep,
     dependenciesIncludingSideEffects: ReadonlyArray<ExecutionValue>,
     dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>,
-    dependencyOnReject: ReadonlyArray<GrafastError | null | undefined>,
+    dependencyOnReject: ReadonlyArray<Error | null | undefined>,
     polymorphicPathList: readonly (string | null)[],
     extra: ExecutionExtra,
   ): PromiseOrDirect<GrafastInternalResultsOrStream<any>> {
@@ -824,8 +802,8 @@ export function executeBucket(
 
     // for (let index = 0, l = polymorphicPathList.length; index < l; index++) {
     for (let dataIndex = 0; dataIndex < expectedSize; dataIndex++) {
-      let forceIndexValue: GrafastError | null | undefined = undefined;
-      let rejectValue: GrafastError | null | undefined = undefined;
+      let forceIndexValue: Error | null | undefined = undefined;
+      let rejectValue: Error | null | undefined = undefined;
       let indexFlags: ExecutionEntryFlags = NO_FLAGS;
       if (
         stepPolymorphicPaths !== null &&
@@ -863,8 +841,7 @@ export function executeBucket(
             if (forceIndexValue == null) {
               if ((flags & FLAG_ERROR) !== 0) {
                 const v = depExecutionVal.at(dataIndex);
-                // TODO: no need for GrafastError?
-                forceIndexValue = v as GrafastError;
+                forceIndexValue = v;
               } else {
                 forceIndexValue = null;
               }
@@ -981,14 +958,14 @@ export function executeBucket(
       /** Only mutate this inside `addDependency` */
       const _rawDependencies: Array<ExecutionValue> = [];
       const _rawForbiddenFlags: Array<ExecutionEntryFlags> = [];
-      const _rawOnReject: Array<GrafastError | null | undefined> = [];
+      const _rawOnReject: Array<Error | null | undefined> = [];
       const dependencies: ReadonlyArray<ExecutionValue> = _rawDependencies;
       let needsFiltering = false;
       const defaultForbiddenFlags = sudo(step).defaultForbiddenFlags;
       const addDependency = (
         step: ExecutableStep,
         forbiddenFlags: ExecutionEntryFlags,
-        onReject: GrafastError | null | undefined,
+        onReject: Error | null | undefined,
       ) => {
         const executionValue = store.get(step.id)!;
         _rawDependencies.push(executionValue);

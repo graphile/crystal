@@ -13,11 +13,10 @@ import te, { stringifyJSON, stringifyString } from "tamedevil";
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
 import { isDev } from "../dev.js";
-import { $$error } from "../error.js";
 import { AccessStep } from "../index.js";
 import { inspect } from "../inspect.js";
 import type { JSONValue, LocationDetails } from "../interfaces.js";
-import { $$concreteType, $$streamMore } from "../interfaces.js";
+import { $$concreteType, $$streamMore, FLAG_ERROR } from "../interfaces.js";
 import { isPolymorphicData } from "../polymorphic.js";
 import type { ExecutableStep } from "../step.js";
 import { expressionSymbol } from "../steps/access.js";
@@ -147,7 +146,7 @@ export type OutputPlanKeyValueOutputPlanWithCachedBits =
     layerPlanId: number;
   };
 
-const ref_$$error = te.ref($$error, "$$error");
+const ref_FLAG_ERROR = te.ref(FLAG_ERROR, "FLAG_ERROR");
 const ref_coerceError = te.ref(coerceError, "coerceError");
 const ref_nonNullError = te.ref(nonNullError, "nonNullError");
 const ref_stringifyString = te.ref(stringifyString, "stringifyString");
@@ -829,9 +828,10 @@ function makeExecutorExpression<TAsString extends boolean>(
   mutablePath,
   bucket,
   bucketIndex,
-  rawBucketRootValue = bucket.store.get(this.rootStep.id).at(bucketIndex)
+  rawBucketRootValue = bucket.store.get(this.rootStep.id).at(bucketIndex),
+  bucketRootFlags = bucket.store.get(this.rootStep.id)._flagsAt(bucketIndex)
 ) {
-  const bucketRootValue = this.processRoot !== null ? this.processRoot(rawBucketRootValue) : rawBucketRootValue;
+  const bucketRootValue = this.processRoot !== null ? this.processRoot(rawBucketRootValue, bucketRootFlags) : rawBucketRootValue;
 ${preamble}\
   ${
     skipNullHandling
@@ -842,10 +842,8 @@ ${preamble}\
           asString ? te_nullString : te_null
         };`
   }
-  if (bucketRootValue${
-    skipNullHandling ? te_questionDot : te.blank
-  }[${ref_$$error}]) {
-    throw ${ref_coerceError}(bucketRootValue.originalError, this.locationDetails, mutablePath.slice(1));
+  if (bucketRootFlags & ${ref_FLAG_ERROR}) {
+    throw ${ref_coerceError}(bucketRootValue, this.locationDetails, mutablePath.slice(1));
   }
 ${inner}
 })`;
@@ -883,7 +881,14 @@ function makeExecuteChildPlanCode(
 ) {
   const te_childOutputPlanExecute = te`${childOutputPlan}.${
     asString ? te_executeString : te_execute
-  }(root, mutablePath, ${childBucket}, ${childBucketIndex}, ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined)`;
+  }(
+  root,
+  mutablePath,
+  ${childBucket},
+  ${childBucketIndex},
+  ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined,
+  ${childBucket}.rootStep === this.rootStep ? bucketRootFlags : undefined
+)`;
   // This is the code that changes based on if the field is nullable or not
   if (isNonNull) {
     // No need to catch error

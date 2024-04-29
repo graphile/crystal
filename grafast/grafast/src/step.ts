@@ -15,7 +15,6 @@ import {
 } from "./engine/lib/withGlobalLayerPlan.js";
 import { $$unlock } from "./engine/lock.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
-import type { GrafastError } from "./error.js";
 import { getDebug } from "./global.js";
 import { inspect } from "./inspect.js";
 import type {
@@ -207,7 +206,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * - The `execute` method must be a regular (not async) function
    * - The `execute` method must NEVER return a promise
    * - The values within the list returned from `execute` must NEVER include
-   *   promises or GrafastError objects
+   *   promises or FlaggedValue objects
    * - The result of calling `execute` should not differ after a
    *   `step.hasSideEffects` has executed (i.e. it should be pure, only
    *   dependent on its deps and use no external state)
@@ -235,7 +234,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    */
   protected readonly dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
   protected readonly dependencyOnReject: ReadonlyArray<
-    GrafastError | null | undefined
+    Error | null | undefined
   >;
 
   /**

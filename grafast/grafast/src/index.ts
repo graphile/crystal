@@ -35,12 +35,7 @@ import { defer, Deferred } from "./deferred.js";
 import { isDev, noop } from "./dev.js";
 import { isUnaryStep } from "./engine/lib/withGlobalLayerPlan.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
-import {
-  GrafastError,
-  isGrafastError,
-  isSafeError,
-  SafeError,
-} from "./error.js";
+import { isSafeError, SafeError } from "./error.js";
 import { execute } from "./execute.js";
 import { grafast, grafastSync } from "./grafastGraphql.js";
 import type {
@@ -322,7 +317,6 @@ export {
   getEnumValueConfig,
   grafast,
   GrafastArgumentConfig,
-  GrafastError,
   GrafastFieldConfig,
   GrafastFieldConfigArgumentMap,
   grafast as grafastGraphql,
@@ -356,7 +350,6 @@ export {
   InterfaceOrUnionPlans,
   isDev,
   isExecutableStep,
-  isGrafastError,
   isListCapableStep,
   isListLikeStep,
   isModifierStep,
@@ -513,7 +506,6 @@ exportAsMany("grafast", {
   TRAP_ERROR,
   TRAP_ERROR_OR_INHIBITED,
   TRAP_INHIBITED,
-  isGrafastError,
   debugPlans,
   each,
   error,
