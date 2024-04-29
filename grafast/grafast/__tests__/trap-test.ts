@@ -66,16 +66,14 @@ it("schema works as expected", async () => {
     }
   `;
   const variableValues = {};
-  const result = (await grafast(
-    {
-      schema,
-      source,
-      variableValues,
-      contextValue: {},
-    },
-    {},
-    {},
-  )) as ExecutionResult;
+  const result = (await grafast({
+    schema,
+    source,
+    variableValues,
+    contextValue: {},
+    resolvedPreset: {},
+    requestContext: {},
+  })) as ExecutionResult;
   expect(result.errors).to.exist;
   expect(result.errors).to.have.length(1);
   expect(result.errors![0].path).to.deep.equal(["error"]);
@@ -91,16 +89,14 @@ it("enables trapping an error to null", async () => {
     }
   `;
   const variableValues = {};
-  const result = (await grafast(
-    {
-      schema,
-      source,
-      variableValues,
-      contextValue: {},
-    },
-    {},
-    {},
-  )) as ExecutionResult;
+  const result = (await grafast({
+    schema,
+    source,
+    variableValues,
+    contextValue: {},
+    resolvedPreset: {},
+    requestContext: {},
+  })) as ExecutionResult;
   expect(result.errors).to.not.exist;
   expect(result.data).to.deep.equal({ nonError: 2, error: null });
 });
@@ -113,16 +109,14 @@ it("enables trapping an error to emptyList", async () => {
     }
   `;
   const variableValues = {};
-  const result = (await grafast(
-    {
-      schema,
-      source,
-      variableValues,
-      contextValue: {},
-    },
-    {},
-    {},
-  )) as ExecutionResult;
+  const result = (await grafast({
+    schema,
+    source,
+    variableValues,
+    contextValue: {},
+    resolvedPreset: {},
+    requestContext: {},
+  })) as ExecutionResult;
   expect(result.errors).to.not.exist;
   expect(result.data).to.deep.equal({ nonError: [2], error: [] });
 });
@@ -139,16 +133,14 @@ it("enables trapping an error to error", async () => {
     }
   `;
   const variableValues = {};
-  const result = (await grafast(
-    {
-      schema,
-      source,
-      variableValues,
-      contextValue: {},
-    },
-    {},
-    {},
-  )) as ExecutionResult;
+  const result = (await grafast({
+    schema,
+    source,
+    variableValues,
+    contextValue: {},
+    resolvedPreset: {},
+    requestContext: {},
+  })) as ExecutionResult;
   expect(result.errors).to.not.exist;
   expect(result.data).to.deep.equal({
     nonError: null,
