@@ -656,7 +656,11 @@ export function executeBucket(
               stepFlags = indexFlags;
             } else {
               const rawStepResult = step.unbatchedExecute(extra, ...deps);
-              if (isFlaggedValue(rawStepResult)) {
+              if (
+                typeof rawStepResult === "object" &&
+                rawStepResult !== null &&
+                isFlaggedValue(rawStepResult)
+              ) {
                 stepResult = rawStepResult.value;
                 stepFlags = rawStepResult.flags;
               } else {
