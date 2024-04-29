@@ -603,7 +603,6 @@ export function executeBucket(
             let forceIndexValue: GrafastError | null | undefined = undefined;
             let rejectValue: GrafastError | null | undefined = undefined;
             let indexFlags: ExecutionEntryFlags = NO_FLAGS;
-            // for (const $dep of step.dependencies) {
             for (let i = 0, l = step.dependencies.length; i < l; i++) {
               const $dep = step.dependencies[i];
               const forbiddenFlags = step.dependencyForbiddenFlags[i];
@@ -622,7 +621,7 @@ export function executeBucket(
                 // If dep is inhibited and we do allow inhibited, but we're disallowed, use our onReject.
                 // If dep is not inhibited, but we're disallowed, use our onReject.
                 if (
-                  onReject &&
+                  onReject !== undefined &&
                   (disallowedFlags & (FLAG_INHIBITED | FLAG_ERROR)) === NO_FLAGS
                 ) {
                   rejectValue ||= onReject;
@@ -856,7 +855,7 @@ export function executeBucket(
             // If dep is inhibited and we do allow inhibited, but we're disallowed, use our onReject.
             // If dep is not inhibited, but we're disallowed, use our onReject.
             if (
-              onReject &&
+              onReject !== undefined &&
               (disallowedFlags & (FLAG_INHIBITED | FLAG_ERROR)) === NO_FLAGS
             ) {
               rejectValue ||= onReject;
