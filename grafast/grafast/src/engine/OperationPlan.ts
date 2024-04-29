@@ -3087,17 +3087,23 @@ export class OperationPlan {
     flagLoop: for (const $flag of this.stepTracker.activeSteps) {
       if ($flag instanceof __FlagStep) {
         // We can only inline it if it's not used by an output plan or layer plan
-        const outputPlans = this.stepTracker.outputPlansByRootStep.get($flag);
-        if (outputPlans?.size) {
-          continue;
+        {
+          const usages = this.stepTracker.outputPlansByRootStep.get($flag);
+          if (usages?.size) {
+            continue;
+          }
         }
-        const layerPlans = this.stepTracker.layerPlansByRootStep.get($flag);
-        if (layerPlans?.size) {
-          continue;
+        {
+          const usages = this.stepTracker.layerPlansByRootStep.get($flag);
+          if (usages?.size) {
+            continue;
+          }
         }
-        const layerPlans2 = this.stepTracker.layerPlansByParentStep.get($flag);
-        if (layerPlans2?.size) {
-          continue;
+        {
+          const usages = this.stepTracker.layerPlansByParentStep.get($flag);
+          if (usages?.size) {
+            continue;
+          }
         }
 
         // We're only going to inline one if we can inline all.
