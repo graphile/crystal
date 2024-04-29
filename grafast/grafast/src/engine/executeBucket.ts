@@ -627,7 +627,7 @@ export function executeBucket(
                   rejectValue ||= onReject;
                 }
                 if (forceIndexValue == null) {
-                  if (flags & FLAG_ERROR) {
+                  if ((flags & FLAG_ERROR) !== 0) {
                     const v = depExecutionVal.at(dataIndex);
                     // TODO: no need for GrafastError?
                     forceIndexValue = v as GrafastError;
@@ -861,7 +861,7 @@ export function executeBucket(
               rejectValue ||= onReject;
             }
             if (forceIndexValue == null) {
-              if (flags & FLAG_ERROR) {
+              if ((flags & FLAG_ERROR) !== 0) {
                 const v = depExecutionVal.at(dataIndex);
                 // TODO: no need for GrafastError?
                 forceIndexValue = v as GrafastError;

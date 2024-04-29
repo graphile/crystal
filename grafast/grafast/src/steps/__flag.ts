@@ -267,7 +267,7 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
           return onRejectReturnValue;
         }
       } else {
-        if (flags & FLAG_ERROR) {
+        if ((flags & FLAG_ERROR) !== 0) {
           // Trapped an error
           if (this.valueForError !== false) {
             return valueForError;
@@ -278,7 +278,10 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
           }
           return value;
         }
-        if (flags & FLAG_INHIBITED && this.valueForInhibited !== false) {
+        if (
+          (flags & FLAG_INHIBITED) !== 0 &&
+          this.valueForInhibited !== false
+        ) {
           // Trapped an inhibit
           return valueForInhibited;
         }
