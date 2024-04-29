@@ -7,8 +7,10 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
+import type { FlaggedValue } from "../error.js";
+import { isFlaggedValue } from "../error.js";
 import type { __ItemStep, ExecutionDetails, ObjectStep } from "../index.js";
-import { context, SafeError } from "../index.js";
+import { context, flagError, SafeError } from "../index.js";
 import type {
   ExecutionExtra,
   GrafastResultsList,
@@ -33,13 +35,21 @@ type ResolveInfoBase = Omit<
   "path" | "rootValue" | "variableValues"
 >;
 
+interface DCR {
+  data: unknown;
+  context: unknown;
+  resolveInfo: GraphQLResolveInfo;
+}
+
 function dcr(
   data: unknown, // but not a promise
   context: unknown,
   resolveInfo: GraphQLResolveInfo,
-) {
+): DCR | FlaggedValue | null | undefined {
   if (data == null) {
     return data;
+  } else if (data instanceof Error) {
+    return flagError(data);
   }
   return { data, context, resolveInfo };
 }
@@ -194,7 +204,7 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
         }
         return (this.unbatchedStream as any)(extra, ...tuple);
       } catch (e) {
-        return e instanceof Error ? (e as never) : Promise.reject(e);
+        return flagError(e);
       }
     });
   }
@@ -308,9 +318,7 @@ export class GraphQLItemHandler
   execute({
     indexMap,
     values: [values0],
-  }: ExecutionDetails<
-    [Awaited<ReturnType<typeof dcr>>]
-  >): GrafastResultsList<any> {
+  }: ExecutionDetails<[DCR]>): GrafastResultsList<any> {
     if (this.abstractType !== undefined) {
       return indexMap((i) => {
         const data = values0.at(i);
