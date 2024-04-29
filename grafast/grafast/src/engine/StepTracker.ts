@@ -5,7 +5,7 @@ import type { AddDependencyOptions } from "../interfaces.js";
 import { $$subroutine, ALL_FLAGS, TRAPPABLE_FLAGS } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import { __FlagStep } from "../steps/__flag.js";
-import { sudo } from "../utils.js";
+import { sudo, writeableArray } from "../utils.js";
 import type {
   LayerPlan,
   LayerPlanReasonSubroutine,
@@ -13,17 +13,6 @@ import type {
 } from "./LayerPlan.js";
 import { lock } from "./lock.js";
 import type { OutputPlan } from "./OutputPlan.js";
-
-/**
- * We want everything else to treat things like `dependencies` as read only,
- * however we ourselves want to be able to write to them, so we can use
- * writeable for this.
- *
- * @internal
- */
-function writeableArray<T>(a: ReadonlyArray<T>): Array<T> {
-  return a as any;
-}
 
 /**
  * This class keeps track of all of our steps, and the dependencies between
@@ -282,13 +271,6 @@ export class StepTracker {
   ): number {
     const $dependent = sudo(raw$dependent);
     const $dependency = sudo(options.step);
-    if ($dependency instanceof __FlagStep) {
-      // See if we can inline this
-      const inlineDetails = $dependency.inline(options);
-      if (inlineDetails !== null) {
-        return this.addStepDependency($dependent, inlineDetails);
-      }
-    }
     if (!this.activeSteps.has($dependent)) {
       throw new Error(
         `Cannot add ${$dependency} as a dependency of ${$dependent}; the latter is deleted!`,

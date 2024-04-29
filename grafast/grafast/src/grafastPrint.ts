@@ -199,8 +199,12 @@ export function printStore(bucket: Bucket): string {
     if (bucket.layerPlan.copyStepIds.includes(key)) {
       output.push(`${printKey} (copy)`);
     } else if (val.isBatch) {
+      const step = bucket.layerPlan.operationPlan.stepTracker.getStepById(
+        key,
+        true,
+      );
       output.push(
-        `${printKey} (BATCH):${indent(
+        `${printKey} (BATCH): ${step ?? "-"}\n${indent(
           2,
           val.entries
             .map(
@@ -215,13 +219,14 @@ export function printStore(bucket: Bucket): string {
         )}`,
       );
     } else {
+      const step = bucket.layerPlan.operationPlan.stepTracker.getStepById(
+        key,
+        true,
+      );
       output.push(
-        `${printKey} (UNARY/${String(val._entryFlags).padStart(
-          2,
-          " ",
-        )}): ${indentIfMultiline(
-          inspect(val.value, PRINT_STORE_INSPECT_OPTIONS),
-        )}`,
+        `${printKey} (UNARY/${String(val._entryFlags).padStart(2, " ")}) ${
+          step ?? "-"
+        }\n${indent(4, inspect(val.value, PRINT_STORE_INSPECT_OPTIONS))}`,
       );
     }
   }

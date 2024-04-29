@@ -26,6 +26,7 @@ import {
 import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
 import type { GrafastPlanJSON, ModifierStep } from "../index.js";
 import {
+  __FlagStep,
   __ItemStep,
   __TrackedValueStep,
   __ValueStep,
@@ -39,6 +40,7 @@ import {
 import { inputStep } from "../input.js";
 import { inspect } from "../inspect.js";
 import type {
+  AddDependencyOptions,
   FieldPlanResolver,
   GrafastPlanBucketJSONv1,
   GrafastPlanBucketPhaseJSONv1,
@@ -49,7 +51,14 @@ import type {
   StepOptions,
   TrackedArguments,
 } from "../interfaces.js";
-import { $$proxy, $$subroutine, $$timeout, $$ts } from "../interfaces.js";
+import {
+  $$proxy,
+  $$subroutine,
+  $$timeout,
+  $$ts,
+  ALL_FLAGS,
+  DEFAULT_ACCEPT_FLAGS,
+} from "../interfaces.js";
 import type { ApplyAfterModeArg } from "../operationPlan-input.js";
 import { withFieldArgsForArguments } from "../operationPlan-input.js";
 import type { ListCapableStep, PolymorphicStep } from "../step.js";
@@ -66,12 +75,14 @@ import { access } from "../steps/access.js";
 import { constant, ConstantStep } from "../steps/constant.js";
 import { graphqlResolver } from "../steps/graphqlResolver.js";
 import { timeSource } from "../timeSource.js";
+import type { Sudo } from "../utils.js";
 import {
   defaultValueToValueNode,
   findVariableNamesUsed,
   hasItemPlan,
   isTypePlanned,
   sudo,
+  writeableArray,
 } from "../utils.js";
 import type {
   LayerPlanPhase,
@@ -386,6 +397,10 @@ export class OperationPlan {
 
     this.checkTimeout();
     this.lap("optimizeSteps");
+
+    this.inlineSteps();
+    this.checkTimeout();
+    this.lap("inlineSteps");
 
     this.phase = "finalize";
 
@@ -1368,7 +1383,7 @@ export class OperationPlan {
       const $item = isListCapableStep($step)
         ? withGlobalLayerPlan(
             $__item.layerPlan,
-            polymorphicPaths,
+            $__item.polymorphicPaths,
             ($step as ListCapableStep<any>).listItem,
             $step,
             $__item,
@@ -1464,8 +1479,8 @@ export class OperationPlan {
             }
           } catch (e) {
             throw new Error(
-              `The step returned by '${path.join(
-                ".",
+              `The step returned by '${path.join(".")}${"[]".repeat(
+                listDepth,
               )}' is not compatible with the GraphQL object type '${
                 nullableFieldType.name
               }': ${e.message}`,
@@ -2448,6 +2463,8 @@ export class OperationPlan {
           // have not been able to come up with a counterexample that is
           // unsafe. Should we do so, we should remove this.
           break;
+        } else if (step instanceof __FlagStep) {
+          break;
         } else {
           return;
         }
@@ -2483,6 +2500,8 @@ export class OperationPlan {
           // OPTIMIZE: figure out under which circumstances it is safe to hoist here.
           // break;
           return;
+        } else if (step instanceof __FlagStep) {
+          break;
         } else {
           // Plans that rely on external state shouldn't be hoisted because
           // their results may change after a mutation, so the mutation should
@@ -3062,6 +3081,70 @@ export class OperationPlan {
         .slice(0, 10)
         .join(", ")}`,
     );
+  }
+
+  private inlineSteps() {
+    flagLoop: for (const $flag of this.stepTracker.activeSteps) {
+      if ($flag instanceof __FlagStep) {
+        // We can only inline it if it's not used by an output plan or layer plan
+        {
+          const usages = this.stepTracker.outputPlansByRootStep.get($flag);
+          if (usages?.size) {
+            continue;
+          }
+        }
+        {
+          const usages = this.stepTracker.layerPlansByRootStep.get($flag);
+          if (usages?.size) {
+            continue;
+          }
+        }
+        {
+          const usages = this.stepTracker.layerPlansByParentStep.get($flag);
+          if (usages?.size) {
+            continue;
+          }
+        }
+
+        // We're only going to inline one if we can inline all.
+        const toInline: Array<{
+          $dependent: Sudo<ExecutableStep>;
+          dependencyIndex: number;
+          inlineDetails: AddDependencyOptions;
+          dependent: ExecutableStep["dependents"][number];
+        }> = [];
+        for (const dependent of $flag.dependents) {
+          const { step, dependencyIndex } = dependent;
+          const $dependent = sudo(step);
+          const inlineDetails = $flag.inline(
+            $dependent.getDepOptions(dependencyIndex),
+          );
+          if (inlineDetails === null) {
+            continue flagLoop;
+          }
+          toInline.push({
+            $dependent,
+            dependencyIndex,
+            inlineDetails,
+            dependent,
+          });
+        }
+        // All of them pass the check, let's inline them
+        for (const todo of toInline) {
+          const {
+            $dependent,
+            dependencyIndex,
+            inlineDetails: { onReject, acceptFlags = DEFAULT_ACCEPT_FLAGS },
+          } = todo;
+          writeableArray($dependent.dependencyOnReject)[dependencyIndex] =
+            onReject;
+          writeableArray($dependent.dependencyForbiddenFlags)[dependencyIndex] =
+            ALL_FLAGS & ~acceptFlags;
+        }
+        const $flagDep = sudo($flag).dependencies[0];
+        this.stepTracker.replaceStep($flag, $flagDep);
+      }
+    }
   }
 
   /** Finalizes each step */

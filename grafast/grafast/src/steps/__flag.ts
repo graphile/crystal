@@ -1,5 +1,10 @@
 import type { GrafastError } from "../error.js";
-import { newGrafastError, SafeError } from "../error.js";
+import {
+  isGrafastError,
+  newGrafastError,
+  newTrappedError,
+  SafeError,
+} from "../error.js";
 import { inspect } from "../inspect.js";
 import type {
   AddDependencyOptions,
@@ -19,7 +24,8 @@ import {
   NO_FLAGS,
   TRAPPABLE_FLAGS,
 } from "../interfaces.js";
-import { ExecutableStep } from "../step.js";
+import { ExecutableStep, isListCapableStep } from "../step.js";
+import type { __ItemStep } from "./__item.js";
 
 // PUBLIC FLAGS
 export const TRAP_ERROR = FLAG_ERROR as ExecutionEntryFlags;
@@ -41,17 +47,51 @@ function digestAcceptFlags(acceptFlags: ExecutionEntryFlags) {
   return parts.join("&");
 }
 
+const TRAP_VALUES = [
+  "NULL",
+  "EMPTY_LIST",
+  "PASS_THROUGH",
+  // "UNDEFINED", // waiting for a need
+] as const;
+/** @defaultValue `'PASS_THROUGH'` */
+export type TrapValue = (typeof TRAP_VALUES)[number];
+/** `false` means pass-through; all others are literal */
+export type ResolvedTrapValue = false | null | undefined | readonly never[];
 export interface FlagStepOptions {
   acceptFlags?: ExecutionEntryFlags;
   onReject?: GrafastError | null;
   if?: ExecutableStep<boolean>;
+  // Trapping an error might want to result in a null or an empty list.
+  valueForInhibited?: TrapValue;
+  valueForError?: TrapValue;
 }
+
+const EMPTY_LIST = Object.freeze([]);
 
 function trim(string: string, length = 15): string {
   if (string.length > length) {
     return string.substring(0, length - 2) + "…";
   } else {
     return string;
+  }
+}
+
+function resolveTrapValue(tv: TrapValue): ResolvedTrapValue {
+  switch (tv) {
+    case "NULL":
+      return null;
+    case "EMPTY_LIST":
+      return EMPTY_LIST;
+    case "PASS_THROUGH":
+      return false;
+    default: {
+      const never: never = tv;
+      throw new Error(
+        `TrapValue '${never}' not understood; please use one of: ${TRAP_VALUES.join(
+          ", ",
+        )}`,
+      );
+    }
   }
 }
 
@@ -65,16 +105,45 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
   private ifDep: number | null = null;
   private forbiddenFlags: ExecutionEntryFlags;
   private onRejectReturnValue: GrafastError | typeof $$inhibit;
+  private valueForInhibited: ResolvedTrapValue;
+  private valueForError: ResolvedTrapValue;
+  private canBeInlined: boolean;
   constructor(step: ExecutableStep, options: FlagStepOptions) {
     super();
-    const { acceptFlags = DEFAULT_ACCEPT_FLAGS, onReject, if: $cond } = options;
+    const {
+      acceptFlags = DEFAULT_ACCEPT_FLAGS,
+      onReject,
+      if: $cond,
+      valueForInhibited = "PASS_THROUGH",
+      valueForError = "PASS_THROUGH",
+    } = options;
     this.forbiddenFlags = ALL_FLAGS & ~acceptFlags;
-    this.onRejectReturnValue = onReject == null ? $$inhibit : onReject;
-    if ($cond) {
+    this.onRejectReturnValue =
+      onReject == null
+        ? $$inhibit
+        : isGrafastError(onReject)
+        ? onReject
+        : newGrafastError(onReject, step.id);
+    this.valueForInhibited = resolveTrapValue(valueForInhibited);
+    this.valueForError = resolveTrapValue(valueForError);
+    this.canBeInlined =
+      !$cond &&
+      valueForInhibited === "PASS_THROUGH" &&
+      valueForError === "PASS_THROUGH" &&
+      // Can't PASS_THROUGH errors since they need to be converted into TRAPPED
+      // error.
+      // TODO: should we be handling this in Grafast core?
+      (acceptFlags & FLAG_ERROR) === 0;
+    if (!this.canBeInlined) {
       this.addDependency({ step, acceptFlags: TRAPPABLE_FLAGS });
-      this.ifDep = this.addDependency($cond);
+      if ($cond) {
+        this.ifDep = this.addDependency($cond);
+      }
     } else {
       this.addDependency({ step, acceptFlags, onReject });
+    }
+    if (isListCapableStep(step)) {
+      this.listItem = this._listItem;
     }
   }
   public toStringMeta(): string | null {
@@ -87,18 +156,24 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
         : inspect(this.onRejectReturnValue);
     const $if =
       this.ifDep !== null ? this.getDepOptions(this.ifDep).step : null;
-    return `${$if ? `if(${$if.id}): ` : ``}${digestAcceptFlags(
-      acceptFlags,
-    )}, onReject: ${rej}`;
+    return `${this.dependencies[0].id}, ${
+      $if ? `if(${$if.id}), ` : ``
+    }${digestAcceptFlags(acceptFlags)}, onReject: ${rej}`;
   }
   [$$deepDepSkip](): ExecutableStep {
     return this.getDepOptions(0).step;
+  }
+  listItem?: ($item: __ItemStep<this>) => ExecutableStep;
+  // Copied over listItem if the dependent step is a list capable step
+  _listItem($item: __ItemStep<this>) {
+    const $dep = this.dependencies[0];
+    return isListCapableStep($dep) ? $dep.listItem($item) : $item;
   }
   /** Return inlining instructions if we can be inlined. @internal */
   inline(
     options: Omit<AddDependencyOptions, "step">,
   ): AddDependencyOptions | null {
-    if (this.ifDep !== null) {
+    if (!this.canBeInlined) {
       return null;
     }
     const step = this.dependencies[0];
@@ -129,41 +204,95 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
     }
     return null;
   }
-  execute(
+
+  public deduplicate(
+    _peers: readonly ExecutableStep<any>[],
+  ): readonly ExecutableStep<any>[] {
+    return (_peers as __FlagStep<any>[]).filter((p) => {
+      // ifDep has already been tested by Grafast (it's a dependency)
+      if (p.forbiddenFlags !== this.forbiddenFlags) return false;
+      if (p.onRejectReturnValue !== this.onRejectReturnValue) return false;
+      if (p.valueForInhibited !== this.valueForInhibited) return false;
+      if (p.valueForError !== this.valueForError) return false;
+      if (p.canBeInlined !== this.canBeInlined) return false;
+      return true;
+    });
+  }
+
+  public execute(
     _details: ExecutionDetails<[data: TData, cond?: boolean]>,
   ): GrafastResultsList<TData> {
     throw new Error(`${this} not finalized?`);
   }
-  finalize() {
-    if (this.ifDep !== null) {
-      this.execute = this.conditionalExecute;
+
+  public finalize() {
+    if (this.canBeInlined) {
+      this.execute = this.passThroughExecute;
     } else {
-      this.execute = this.unconditionalExecute;
+      this.execute = this.fancyExecute;
     }
     super.finalize();
   }
-  private conditionalExecute(
+
+  private fancyExecute(
     details: ExecutionDetails<[data: TData, cond?: boolean]>,
   ): any {
     const dataEv = details.values[0]!;
-    const condEv = details.values[this.ifDep as 1]!;
-    const { forbiddenFlags: thisForbiddenFlags, onRejectReturnValue } = this;
+    const condEv =
+      this.ifDep === null ? null : details.values[this.ifDep as 1]!;
+    const {
+      forbiddenFlags: thisForbiddenFlags,
+      onRejectReturnValue,
+      valueForError,
+      valueForInhibited,
+    } = this;
     return details.indexMap((i) => {
-      const cond = condEv.at(i);
+      const cond = condEv ? condEv.at(i) : true;
       const forbiddenFlags = cond
         ? thisForbiddenFlags
         : DEFAULT_FORBIDDEN_FLAGS;
+
+      // Search for "f2b3b1b3" for similar block
       const flags = dataEv._flagsAt(i);
-      if ((forbiddenFlags & flags) === NO_FLAGS) {
-        return dataEv.at(i);
+      const disallowedFlags = flags & forbiddenFlags;
+      if (disallowedFlags !== NO_FLAGS) {
+        if (disallowedFlags & FLAG_INHIBITED) {
+          // We were already rejected, maintain this
+          return $$inhibit;
+        } else if (disallowedFlags & FLAG_ERROR) {
+          // We were already rejected, maintain this
+          return dataEv.at(i);
+        } else {
+          // We weren't already inhibited
+          return onRejectReturnValue;
+        }
       } else {
-        return onRejectReturnValue;
+        if ((flags & FLAG_ERROR) !== 0) {
+          // Trapped an error
+          if (this.valueForError !== false) {
+            return valueForError;
+          }
+          const value = dataEv.at(i);
+          if (isGrafastError(value)) {
+            return newTrappedError(value.originalError);
+          }
+          return value;
+        }
+        if (
+          (flags & FLAG_INHIBITED) !== 0 &&
+          this.valueForInhibited !== false
+        ) {
+          // Trapped an inhibit
+          return valueForInhibited;
+        }
+        // Else, assume pass-through
+        return dataEv.at(i);
       }
     });
   }
 
-  // Checks already performed via addDependency, just pass everything through.
-  private unconditionalExecute(
+  // Checks already performed via addDependency, just pass everything through. Should have been inlined!
+  private passThroughExecute(
     details: ExecutionDetails<[data: TData, cond?: boolean]>,
   ): any {
     const ev = details.values[0];
@@ -206,8 +335,13 @@ export function assertNotNull<T>(
 export function trap<T>(
   $step: ExecutableStep<T>,
   acceptFlags: ExecutionEntryFlags,
+  options?: {
+    valueForInhibited?: FlagStepOptions["valueForInhibited"];
+    valueForError?: FlagStepOptions["valueForError"];
+  },
 ) {
   return new __FlagStep<T>($step, {
+    ...options,
     acceptFlags: (acceptFlags & TRAPPABLE_FLAGS) | FLAG_NULL,
   });
 }
