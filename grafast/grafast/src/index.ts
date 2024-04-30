@@ -11,6 +11,7 @@ import type {
 } from "graphql";
 
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
+import type { DataFromObjectSteps } from "./steps/object.js";
 
 type PromiseOrValue<T> = T | Promise<T>;
 
@@ -35,7 +36,7 @@ import { defer, Deferred } from "./deferred.js";
 import { isDev, noop } from "./dev.js";
 import { isUnaryStep } from "./engine/lib/withGlobalLayerPlan.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
-import { $$inhibit, flagError,isSafeError, SafeError } from "./error.js";
+import { $$inhibit, flagError, isSafeError, SafeError } from "./error.js";
 import { execute } from "./execute.js";
 import { grafast, grafastSync } from "./grafastGraphql.js";
 import type {
@@ -43,6 +44,7 @@ import type {
   $$hooked,
   $$queryCache,
   CacheByOperationEntry,
+  DataFromStep,
   GrafastTimeouts,
   ScalarInputPlanResolver,
 } from "./interfaces.js";
@@ -287,6 +289,8 @@ export {
   constant,
   ConstantStep,
   context,
+  DataFromObjectSteps,
+  DataFromStep,
   debugPlans,
   defer,
   Deferred,

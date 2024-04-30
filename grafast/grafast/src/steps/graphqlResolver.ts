@@ -8,7 +8,6 @@ import type {
 import * as graphql from "graphql";
 
 import type { FlaggedValue } from "../error.js";
-import { isFlaggedValue } from "../error.js";
 import type { __ItemStep, ExecutionDetails, ObjectStep } from "../index.js";
 import { context, flagError, SafeError } from "../index.js";
 import type {
@@ -45,11 +44,18 @@ function dcr(
   data: unknown, // but not a promise
   context: unknown,
   resolveInfo: GraphQLResolveInfo,
-): DCR | FlaggedValue | null | undefined {
+):
+  | DCR
+  | FlaggedValue
+  | null
+  | undefined
+  | PromiseLike<DCR | FlaggedValue | null | undefined> {
   if (data == null) {
     return data;
   } else if (data instanceof Error) {
     return flagError(data);
+  } else if (isPromiseLike(data)) {
+    return data.then((data) => dcr(data, context, resolveInfo));
   }
   return { data, context, resolveInfo };
 }
@@ -147,13 +153,9 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
     );
     const data = this.resolver?.(source, args, context, resolveInfo);
     if (this.returnContextAndResolveInfo) {
-      if (isPromiseLike(data)) {
-        return data.then((data) => dcr(data, context, resolveInfo));
-      } else {
-        return dcr(data, context, resolveInfo);
-      }
+      return dcr(data, context, resolveInfo);
     } else {
-      return data;
+      return flagErrorIfErrorAsync(data);
     }
   }
 
@@ -187,7 +189,8 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
       },
     );
     const data = this.subscriber(source, args, context, resolveInfo);
-    return data;
+    // TODO: should apply flagErrorIfError to each value data yields
+    return flagErrorIfErrorAsync(data);
   }
 
   async stream({
@@ -405,5 +408,17 @@ export function graphqlResolver(
     return graphqlItemHandler($resolverResult, nullableType);
   } else {
     return $resolverResult;
+  }
+}
+
+function flagErrorIfError(data: any) {
+  return data instanceof Error ? flagError(data) : data;
+}
+
+function flagErrorIfErrorAsync(data: any) {
+  if (isPromiseLike(data)) {
+    return data.then(flagErrorIfError);
+  } else {
+    return flagErrorIfError(data);
   }
 }

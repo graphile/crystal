@@ -23,7 +23,7 @@ import type {
 
 import type { Bucket, RequestTools } from "./bucket.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
-import type { SafeError } from "./error.js";
+import type { FlaggedValue, SafeError } from "./error.js";
 import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type {
@@ -182,9 +182,14 @@ export interface IndexByListItemStepId {
 // These values are just to make reading the code a little clearer
 export type GrafastValuesList<T> = ReadonlyArray<T>;
 export type PromiseOrDirect<T> = PromiseLike<T> | T;
-export type GrafastResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
+export type GrafastResultsList<T> = ReadonlyArray<
+  PromiseOrDirect<T | FlaggedValue<Error> | FlaggedValue<null>>
+>;
 export type GrafastResultStreamList<T> = ReadonlyArray<
-  PromiseOrDirect<AsyncIterable<PromiseOrDirect<T>> | null> | PromiseLike<never>
+  | PromiseOrDirect<AsyncIterable<
+      PromiseOrDirect<T | FlaggedValue<Error> | FlaggedValue<null>>
+    > | null>
+  | PromiseLike<never>
 >;
 
 /** @internal */
@@ -934,3 +939,6 @@ export interface AddDependencyOptions {
  * @internal
  */
 export const $$deepDepSkip = Symbol("deepDepSkip_experimental");
+
+export type DataFromStep<TStep extends ExecutableStep> =
+  TStep extends ExecutableStep<infer TData> ? TData : never;

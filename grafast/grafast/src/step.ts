@@ -15,6 +15,7 @@ import {
 } from "./engine/lib/withGlobalLayerPlan.js";
 import { $$unlock } from "./engine/lock.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
+import { flagError } from "./error.js";
 import { getDebug } from "./global.js";
 import { inspect } from "./inspect.js";
 import type {
@@ -46,6 +47,8 @@ import { stepAMayDependOnStepB } from "./utils.js";
  * @internal
  */
 export const $$noExec = Symbol("noExec");
+
+const ref_flagError = te.ref(flagError, "flagError");
 
 function throwDestroyed(this: ExecutableStep): any {
   let message: string;
@@ -514,7 +517,7 @@ function _buildOptimizedExecuteV2Expression(
     try {
   ${te.indent(inFrag)}
     } catch (e) {
-      results[i] = e instanceof Error ? e : Promise.reject(e);
+      results[i] = ${ref_flagError}(e);
     }\
 `;
     }
@@ -615,7 +618,7 @@ export abstract class UnbatchedExecutableStep<
         const tuple = values.map((list) => list.at(i));
         return this.unbatchedExecute(extra, ...tuple);
       } catch (e) {
-        return e instanceof Error ? (e as never) : Promise.reject(e);
+        return flagError(e);
       }
     });
   }

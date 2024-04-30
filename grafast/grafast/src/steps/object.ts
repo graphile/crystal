@@ -3,6 +3,7 @@
 import te, { isSafeObjectPropertyName } from "tamedevil";
 
 import type {
+  DataFromStep,
   ExecutionDetails,
   ExecutionExtra,
   StepOptimizeOptions,
@@ -18,23 +19,22 @@ const EMPTY_OBJECT = Object.freeze(Object.create(null));
 // const debugObjectPlan = debugFactory("grafast:ObjectStep");
 // const debugObjectPlanVerbose = debugObjectPlan.extend("verbose");
 
-type DataFromStep<TStep extends ExecutableStep> = TStep extends ExecutableStep<
-  infer TData
->
-  ? TData
-  : never;
-
-type DataFromPlans<TPlans extends { [key: string]: ExecutableStep }> = {
-  [key in keyof TPlans]: DataFromStep<TPlans[key]>;
+export type DataFromObjectSteps<
+  TSteps extends { [key: string]: ExecutableStep },
+> = {
+  [key in keyof TSteps]: DataFromStep<TSteps[key]>;
 };
-type Results<TPlans extends { [key: string]: ExecutableStep }> = Array<
-  [Array<DataFromPlans<TPlans>[keyof TPlans]>, DataFromPlans<TPlans>]
+type Results<TSteps extends { [key: string]: ExecutableStep }> = Array<
+  [
+    Array<DataFromObjectSteps<TSteps>[keyof TSteps]>,
+    DataFromObjectSteps<TSteps>,
+  ]
 >;
 
 export interface ObjectPlanMeta<
-  TPlans extends { [key: string]: ExecutableStep },
+  TSteps extends { [key: string]: ExecutableStep },
 > {
-  results: Results<TPlans>;
+  results: Results<TSteps>;
 }
 
 /**
@@ -46,7 +46,7 @@ export class ObjectStep<
       [key: string]: ExecutableStep;
     },
   >
-  extends UnbatchedExecutableStep<DataFromPlans<TPlans>>
+  extends UnbatchedExecutableStep<DataFromObjectSteps<TPlans>>
   implements SetterCapableStep<TPlans>
 {
   static $$export = {
@@ -103,8 +103,8 @@ export class ObjectStep<
   /*
   tupleToObject(
     meta: ObjectPlanMeta<TPlans>,
-    ...tuple: Array<DataFromPlans<TPlans>[keyof TPlans]>
-  ): DataFromPlans<TPlans> {
+    ...tuple: Array<DataFromObjectSteps<TPlans>[keyof TPlans]>
+  ): DataFromObjectSteps<TPlans> {
     // Note: `outerloop` is a JavaScript "label". They are not very common.
     // First look for an existing match:
     outerloop: for (let i = 0, l = meta.results.length; i < l; i++) {
@@ -130,7 +130,7 @@ export class ObjectStep<
     const newObj = this.keys.reduce((memo, key, i) => {
       memo[key] = tuple[i];
       return memo;
-    }, {} as Partial<DataFromPlans<TPlans>>) as DataFromPlans<TPlans>;
+    }, {} as Partial<DataFromObjectSteps<TPlans>>) as DataFromObjectSteps<TPlans>;
 
     // Cache newObj so the same tuple values result in the exact same object.
     meta.results.push([tuple, newObj]);
@@ -142,8 +142,8 @@ export class ObjectStep<
     callback: (
       fn: (
         extra: ExecutionExtra,
-        ...tuple: Array<DataFromPlans<TPlans>[keyof TPlans]>
-      ) => DataFromPlans<TPlans>,
+        ...tuple: Array<DataFromObjectSteps<TPlans>[keyof TPlans]>
+      ) => DataFromObjectSteps<TPlans>,
     ) => void,
   ): void {
     if (this.keys.length === 0) {
@@ -221,8 +221,8 @@ ${inner}
     values,
     extra,
   }: ExecutionDetails<
-    Array<DataFromPlans<TPlans>[keyof TPlans]>
-  >): ReadonlyArray<DataFromPlans<TPlans>> {
+    Array<DataFromObjectSteps<TPlans>[keyof TPlans]>
+  >): ReadonlyArray<DataFromObjectSteps<TPlans>> {
     return indexMap((i) =>
       this.unbatchedExecute!(extra, ...values.map((v) => v.at(i))),
     );

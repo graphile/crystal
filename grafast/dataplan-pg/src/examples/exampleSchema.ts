@@ -5076,7 +5076,10 @@ export function makeExampleSchema(
             withPgClientTransaction,
           ) =>
             function plan(_$root, { $input: { $a } }) {
-              const $transactionResult = withPgClientTransaction(
+              const $transactionResult = withPgClientTransaction<
+                { a: number | null | undefined },
+                number[]
+              >(
                 relationalPostsResource.executor,
                 object({
                   a: $a as ExecutableStep<number | null | undefined>,
