@@ -28,7 +28,7 @@ export class GraphQLOperationStep extends ExecutableStep {
     return new GraphQLSelectionSetStep(this, null);
   }
 
-  get(...args: Parameters<GraphQLSelectionSetStep["get"]>): AccessStep<any> {
+  get(...args: Parameters<GraphQLSelectionSetStep["get"]>) {
     return this.rootSelectionSet().get(...args);
   }
 
