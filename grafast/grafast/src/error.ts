@@ -1,3 +1,4 @@
+import { inspect } from "./inspect.js";
 import type { ExecutionEntryFlags } from "./interfaces.js";
 import {
   $$safeError,
@@ -18,6 +19,17 @@ export interface FlaggedValue<TValue = any> {
   flags: ExecutionEntryFlags;
   value: TValue;
   planId: number | null;
+  toString(): string;
+}
+
+function flaggedValueToString(this: FlaggedValue) {
+  if (this.flags & FLAG_ERROR && this.value instanceof Error) {
+    return String(this.value);
+  } else if (this.flags & FLAG_INHIBITED && this.value === null) {
+    return "INHIBIT";
+  } else {
+    return `${this.flags}/${inspect(this.value)}`;
+  }
 }
 
 function flaggedValue<T>(
@@ -25,11 +37,20 @@ function flaggedValue<T>(
   value: any,
   planId: null | number,
 ): FlaggedValue<T> {
+  if (value === null && !(flags & FLAG_NULL)) {
+    throw new Error(`flaggedValue called with null, but not flagged as null.`);
+  }
+  if (value === null && !(flags & FLAG_INHIBITED)) {
+    throw new Error(
+      `flaggedValue called with null, but not flagged as inhibited.`,
+    );
+  }
   return {
     [$$flagged]: true,
     flags,
     value,
     planId,
+    toString: flaggedValueToString,
   };
 }
 

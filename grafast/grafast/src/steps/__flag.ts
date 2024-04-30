@@ -1,5 +1,5 @@
 import type { FlaggedValue } from "../error.js";
-import { $$inhibit, flagError, SafeError } from "../error.js";
+import { $$inhibit, flagError, isFlaggedValue, SafeError } from "../error.js";
 import { inspect } from "../inspect.js";
 import type {
   AddDependencyOptions,
@@ -138,12 +138,9 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
   }
   public toStringMeta(): string | null {
     const acceptFlags = ALL_FLAGS & ~this.forbiddenFlags;
-    const rej =
-      this.onRejectReturnValue === $$inhibit
-        ? `INHIBIT`
-        : this.onRejectReturnValue
-        ? trim(String(this.onRejectReturnValue))
-        : inspect(this.onRejectReturnValue);
+    const rej = this.onRejectReturnValue
+      ? trim(String(this.onRejectReturnValue))
+      : inspect(this.onRejectReturnValue);
     const $if =
       this.ifDep !== null ? this.getDepOptions(this.ifDep).step : null;
     return `${this.dependencies[0].id}, ${
