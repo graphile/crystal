@@ -953,20 +953,17 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                       const $pkValues = lambda(
                         $handlerMatches,
                         (handlerMatches) => {
-                          const match =
-                            // TS knows this in my editor, but not in `tsc` for
-                            // some reason.
-                            (
-                              handlerMatches as DataFromObjectSteps<{
-                                match: LambdaStep<
-                                  {
-                                    [codecName: string]: any;
-                                  } | null,
-                                  boolean
-                                >;
-                                pks: ListStep<any[]>;
-                              }>[]
-                            ).find((pk) => pk.match);
+                          const match = (
+                            handlerMatches as DataFromObjectSteps<{
+                              match: LambdaStep<
+                                {
+                                  [codecName: string]: any;
+                                } | null,
+                                boolean
+                              >;
+                              pks: ListStep<any[]>;
+                            }>[]
+                          ).find((pk) => pk.match);
                           return match?.pks;
                         },
                         true,
