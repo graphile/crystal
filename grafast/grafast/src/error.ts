@@ -6,7 +6,7 @@ import {
   FLAG_NULL,
 } from "./interfaces.js";
 
-export const $$flagged = Symbol("grafastFlaggedValue");
+const $$flagged = Symbol("grafastFlaggedValue");
 
 /**
  * Wrapper for errors to return (rather than throw or reject) from user code.
@@ -34,7 +34,7 @@ function flaggedValue<T>(
 }
 
 export const $$inhibit = flaggedValue<null>(
-  FLAG_NULL & FLAG_INHIBITED,
+  FLAG_NULL | FLAG_INHIBITED,
   null,
   null,
 );
