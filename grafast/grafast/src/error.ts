@@ -77,7 +77,7 @@ export function flagError<TError extends Error = Error>(
  * @internal
  */
 export function isFlaggedValue(value: object): value is FlaggedValue {
-  return value !== null && Object.hasOwn(value, $$flagged);
+  return Object.hasOwn(value, $$flagged);
 }
 
 export class SafeError<
