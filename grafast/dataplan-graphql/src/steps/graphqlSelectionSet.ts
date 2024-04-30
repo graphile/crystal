@@ -1,34 +1,7 @@
 import { ExecutableStep } from "grafast";
 import { GraphQLOperationStep } from "./graphqlOperation.js";
-
-export interface GraphQLDirective {
-  name: string;
-  arguments?: { [key: string]: any };
-}
-
-export interface GraphQLSelectionField {
-  kind: "field";
-  fieldName: string;
-  alias?: string;
-  directives: GraphQLDirective[];
-  // TODO: CCN
-  selections: GraphQLSelection[];
-}
-
-export interface GraphQLSelectionInlineFragment {
-  kind: "inlineFragment";
-  typeSpecifier: string | null;
-  directives: GraphQLDirective[];
-  // TODO: alias?
-  selections: GraphQLSelection[];
-}
-
-export type GraphQLSelection =
-  | GraphQLSelectionField
-  | GraphQLSelectionInlineFragment;
-
-type ArgsObject = { [key: string]: ExecutableStep | ArgsObject | ArgsList };
-type ArgsList = ReadonlyArray<ExecutableStep | ArgsObject | ArgsList>;
+import { GraphQLSelectFieldStep } from "./graphqlSelectField.js";
+import { ArgsObject, GraphQLSelection } from "../interfaces.js";
 
 export class GraphQLSelectionSetStep extends ExecutableStep {
   static $$export = {
@@ -47,6 +20,7 @@ export class GraphQLSelectionSetStep extends ExecutableStep {
     $operation: GraphQLOperationStep,
     // Could be an __ItemStep for lists
     $parent: ExecutableStep | null,
+    private typeName?: string,
   ) {
     super();
     this.operationStepId = $operation.id;
@@ -55,15 +29,19 @@ export class GraphQLSelectionSetStep extends ExecutableStep {
   }
 
   getOperation() {
-    return this.getStep(this.operationStepId);
+    return this.getStep(this.operationStepId) as GraphQLOperationStep;
   }
 
   get(
-    key: name,
-    args?: ArgsObject | null,
-    options?: { alias?: string; directives?: ArgsObject },
+    ...args: ConstructorParameters<typeof GraphQLSelectFieldStep> extends [
+      any,
+      any,
+      ...infer U,
+    ]
+      ? U
+      : never
   ) {
-    return new GraphQLSelectFieldStep(this.getOperation(), this);
+    return new GraphQLSelectFieldStep(this.getOperation(), this, ...args);
   }
 
   optimize() {

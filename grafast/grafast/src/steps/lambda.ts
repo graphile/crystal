@@ -6,6 +6,8 @@ import type { Multistep, UnwrapMultistep } from "../multistep.ts";
 import { multistep } from "../multistep.ts";
 import type { Step } from "../step.ts";
 import { UnbatchedStep } from "../step.ts";
+import type { AccessStep } from "./access.ts";
+import { access } from "./access.ts";
 import { sideEffect } from "./sideEffect.ts";
 
 /**
@@ -54,6 +56,17 @@ export class LambdaStep<TIn, TOut> extends UnbatchedStep<TOut> {
     value: TIn,
   ): PromiseOrDirect<TOut> {
     return this.fn(value);
+  }
+
+  get<TKey extends keyof Exclude<TOut, null | undefined>>(
+    key: TKey,
+  ): AccessStep<Exclude<TOut, null | undefined>[TKey]> {
+    return access(this, key);
+  }
+  at<TIndex extends keyof Exclude<TOut, null | undefined> & number>(
+    index: TIndex,
+  ): AccessStep<Exclude<TOut, null | undefined>[TIndex]> {
+    return access(this, index);
   }
 }
 
