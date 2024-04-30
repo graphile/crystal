@@ -198,7 +198,6 @@ const te_object = te`object`;
 const te_obj = te`obj`;
 const te_data = te`data`;
 const te_commonErrorHandler = te.ref(commonErrorHandler, "handleError");
-const te_questionDot = te`?.`;
 const te_childBucketCBIDC = te`, childBucket, childBucketIndex, directChild`;
 const te_letString = te`let string;`;
 const te_constDataEqualsEmptyArray = te`const data = [];`;

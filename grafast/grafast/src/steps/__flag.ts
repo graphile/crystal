@@ -1,5 +1,5 @@
 import type { FlaggedValue } from "../error.js";
-import { $$inhibit, flagError, isFlaggedValue, SafeError } from "../error.js";
+import { $$inhibit, flagError, SafeError } from "../error.js";
 import { inspect } from "../inspect.js";
 import type {
   AddDependencyOptions,
@@ -15,7 +15,6 @@ import {
   FLAG_ERROR,
   FLAG_INHIBITED,
   FLAG_NULL,
-  NO_FLAGS,
   TRAPPABLE_FLAGS,
 } from "../interfaces.js";
 import { ExecutableStep, isListCapableStep } from "../step.js";
