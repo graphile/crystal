@@ -4,13 +4,15 @@ import {
   lambda,
   context,
   ExecutableStep,
+  LambdaStep,
 } from "grafast";
 import { GraphQLClient, graphqlSchema } from "../steps/graphqlSchema";
-import { graphqlQuery } from "..";
-
+import { graphqlQuery } from "../steps/graphqlOperation";
+import { GraphQLSelectionSetStep } from "../steps/graphqlSelectionSet";
 declare global {
   namespace Grafast {
     interface Context {
+      currentUserId?: string;
       githubClient?: GraphQLClient;
     }
   }
@@ -22,10 +24,12 @@ function githubSchema() {
   return $schema;
 }
 
-function githubUser($id: ExecutableStep) {
+function githubUser($login: ExecutableStep) {
   const $schema = githubSchema();
-  return graphqlQuery($schema).get("user", { login: $id });
+  return graphqlQuery($schema).get("user", { login: $login });
 }
+
+type UserStep = LambdaStep<any, { id: string } | null>;
 
 const schema = makeGrafastSchema({
   typeDefs: /* GraphQL */ `
@@ -49,43 +53,43 @@ const schema = makeGrafastSchema({
   `,
   plans: {
     Query: {
-      currentUser() {
+      currentUser(): UserStep {
         const $userId = context().get("currentUserId");
         // returnIfNx($userId, null);
         // return object({ id: $userId });
         return lambda($userId, (userId) => (userId ? { id: userId } : null));
       },
-      gitHubUserByUsername($username) {
+      gitHubUserByUsername($username: ExecutableStep<string>) {
         return githubUser($username);
       },
     },
     User: {
-      id($user) {
-        const $userId = $user.get("id");
-        return $userId;
+      id($user: UserStep) {
+        const $login = $user.get("id");
+        return $login;
       },
-      name($user) {
-        const $userId = $user.get("id");
-        return githubUser($userId).get("name");
+      name($user: UserStep) {
+        const $login = $user.get("id");
+        return githubUser($login).get("name");
       },
-      githubRepositories() {
-        const $userId = $user.get("id");
-        return githubUser($userId).get("repositories").get("nodes");
+      githubRepositories($user: UserStep) {
+        const $login = $user.get("id");
+        return githubUser($login).get("repositories").get("nodes");
       },
     },
     GitHubRepository: {
-      name($repo) {
+      name($repo: GraphQLSelectionSetStep) {
         return $repo.get("name");
       },
-      issueCount($repo) {
+      issueCount($repo: GraphQLSelectionSetStep) {
         return $repo.get("issues").get("totalCount");
       },
-      owner($repo) {
+      owner($repo: GraphQLSelectionSetStep) {
         return $repo.get("owner").ofType("User");
       },
     },
     GitHubUser: {
-      username($user) {
+      username($user: GraphQLSelectionSetStep) {
         return $user.get("login");
       },
     },
@@ -96,20 +100,29 @@ async function main() {
   await grafast({
     schema,
     source: /* GraphQL */ `
-      {
+      query Q {
         currentUser {
-          id
+          ...User
+        }
+        gitHubUserByUsername(username: "jemgillam") {
+          ...User
+        }
+      }
+      fragment User on User {
+        id
+        name
+        gitHubRepositories {
           name
-          gitHubRepositories {
-            name
-            issueCount
-            owner {
-              username
-            }
+          issueCount
+          owner {
+            username
           }
         }
       }
     `,
+    contextValue: {
+      currentUserId: "benjie",
+    },
   });
 }
 

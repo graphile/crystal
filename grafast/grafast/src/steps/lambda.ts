@@ -5,6 +5,7 @@ import type {
 } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
+import { AccessStep, access } from "./access.js";
 import { list } from "./list.js";
 
 /**
@@ -48,6 +49,17 @@ export class LambdaStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
 
   unbatchedExecute(_extra: ExecutionExtra, value: TIn): PromiseOrDirect<TOut> {
     return this.fn(value);
+  }
+
+  get<TKey extends keyof Exclude<TOut, null | undefined>>(
+    key: TKey,
+  ): AccessStep<Exclude<TOut, null | undefined>[TKey]> {
+    return access(this, key);
+  }
+  at<TIndex extends keyof Exclude<TOut, null | undefined> & number>(
+    index: TIndex,
+  ): AccessStep<Exclude<TOut, null | undefined>[TIndex]> {
+    return access(this, index);
   }
 }
 
