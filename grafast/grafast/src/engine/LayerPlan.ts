@@ -11,7 +11,6 @@ import {
   FLAG_INHIBITED,
   FLAG_NULL,
   FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS,
-  NO_FLAGS,
 } from "../interfaces.js";
 import { resolveType } from "../polymorphic.js";
 import type {
@@ -410,7 +409,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           )! as UnaryExecutionValue;
           const forbiddenFlags =
             fieldValue._entryFlags & FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS;
-          if (forbiddenFlags !== NO_FLAGS) {
+          if (forbiddenFlags) {
             size = 0;
           } else {
             size = parentBucket.size;
@@ -628,10 +627,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           originalIndex++
         ) {
           const flags = polymorphicPlanStore._flagsAt(originalIndex);
-          if (
-            (flags & (FLAG_ERROR | FLAG_INHIBITED | FLAG_NULL)) !==
-            NO_FLAGS
-          ) {
+          if (flags & (FLAG_ERROR | FLAG_INHIBITED | FLAG_NULL)) {
             continue;
           }
           const value = polymorphicPlanStore.at(originalIndex);

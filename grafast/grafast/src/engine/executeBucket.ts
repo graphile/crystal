@@ -593,7 +593,7 @@ export function executeBucket(
               // Search for "f2b3b1b3" for similar block
               const flags = depExecutionVal._flagsAt(dataIndex);
               const disallowedFlags = flags & forbiddenFlags;
-              if (disallowedFlags !== NO_FLAGS) {
+              if (disallowedFlags) {
                 indexFlags |= disallowedFlags;
                 // If there's a reject behavior and we're FRESHLY rejected (weren't
                 // already inhibited), use that as a fallback.
@@ -815,7 +815,7 @@ export function executeBucket(
       ) {
         indexFlags |= FLAG_POLY_SKIPPED;
         forceIndexValue = null;
-      } else if (extra._bucket.flagUnion !== NO_FLAGS) {
+      } else if (extra._bucket.flagUnion) {
         for (
           let i = 0, l = dependenciesIncludingSideEffects.length;
           i < l;
@@ -828,7 +828,7 @@ export function executeBucket(
           // Search for "f2b3b1b3" for similar block
           const flags = depExecutionVal._flagsAt(dataIndex);
           const disallowedFlags = flags & forbiddenFlags;
-          if (disallowedFlags !== NO_FLAGS) {
+          if (disallowedFlags) {
             indexFlags |= disallowedFlags;
             // If there's a reject behavior and we're FRESHLY rejected (weren't
             // already inhibited), use that as a fallback.
