@@ -192,7 +192,6 @@ export class ApplyTransformsStep extends ExecutableStep {
       const values = indexes.map((idx) => {
         const val = depResults.at(idx);
         if (depResults._flagsAt(idx) & FLAG_ERROR) {
-          // throw val;
           return flagError(val);
         }
         return val;
