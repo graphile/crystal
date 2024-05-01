@@ -1,3 +1,4 @@
+import { isDev } from "./dev.js";
 import { inspect } from "./inspect.js";
 import type { ExecutionEntryFlags } from "./interfaces.js";
 import {
@@ -37,13 +38,17 @@ function flaggedValue<T>(
   value: any,
   planId: null | number,
 ): FlaggedValue<T> {
-  if (value === null && !(flags & FLAG_NULL)) {
-    throw new Error(`flaggedValue called with null, but not flagged as null.`);
-  }
-  if (value === null && !(flags & FLAG_INHIBITED)) {
-    throw new Error(
-      `flaggedValue called with null, but not flagged as inhibited.`,
-    );
+  if (isDev) {
+    if (value === null && !(flags & FLAG_NULL)) {
+      throw new Error(
+        `flaggedValue called with null, but not flagged as null.`,
+      );
+    }
+    if (value === null && !(flags & FLAG_INHIBITED)) {
+      throw new Error(
+        `flaggedValue called with null, but not flagged as inhibited.`,
+      );
+    }
   }
   return {
     [$$flagged]: true,
