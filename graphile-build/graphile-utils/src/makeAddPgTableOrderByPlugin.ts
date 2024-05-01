@@ -82,6 +82,12 @@ export type NullsSortMethod =
 export interface OrderByAscDescOptions {
   unique?: boolean;
   nulls?: NullsSortMethod;
+  /**
+   * If this expression/column is nullable, you must set this true otherwise
+   * cursor pagination over null values will break. If `nulls` is specified,
+   * we'll default this to true.
+   */
+  nullable?: boolean;
 }
 
 export function orderByAscDesc(
@@ -93,7 +99,7 @@ export function orderByAscDesc(
     typeof uniqueOrOptions === "boolean"
       ? { unique: uniqueOrOptions }
       : uniqueOrOptions ?? {};
-  const { unique = false, nulls } = options;
+  const { unique = false, nulls, nullable = nulls != null } = options;
 
   if (typeof unique !== "boolean") {
     throw new Error(
@@ -133,38 +139,41 @@ export function orderByAscDesc(
   const ascendingPlan: Plan =
     typeof attributeOrSqlFragment === "string"
       ? EXPORTABLE(
-          (ascendingNulls, attributeOrSqlFragment, unique) =>
+          (ascendingNulls, attributeOrSqlFragment, nullable, unique) =>
             function applyPlan($select) {
               $select.orderBy({
                 nulls: ascendingNulls,
                 attribute: attributeOrSqlFragment,
                 direction: "ASC",
+                nullable,
               });
               if (unique) {
                 $select.setOrderIsUnique();
               }
             },
-          [ascendingNulls, attributeOrSqlFragment, unique],
+          [ascendingNulls, attributeOrSqlFragment, nullable, unique],
         )
       : typeof attributeOrSqlFragment === "function"
       ? EXPORTABLE(
-          (ascendingNulls, attributeOrSqlFragment, unique) =>
+          (ascendingNulls, attributeOrSqlFragment, nullable, unique) =>
             function applyPlan($select) {
               $select.orderBy({
                 nulls: ascendingNulls,
                 ...attributeOrSqlFragment($select),
                 direction: "ASC",
+                nullable,
               } as PgOrderSpec);
               if (unique) {
                 $select.setOrderIsUnique();
               }
             },
-          [ascendingNulls, attributeOrSqlFragment, unique],
+          [ascendingNulls, attributeOrSqlFragment, nullable, unique],
         )
       : ((spec = {
           nulls: ascendingNulls,
           ...attributeOrSqlFragment,
           direction: "ASC",
+          nullable,
         } as PgOrderSpec),
         EXPORTABLE(
           (spec, unique) =>
@@ -179,38 +188,41 @@ export function orderByAscDesc(
   const descendingPlan: Plan =
     typeof attributeOrSqlFragment === "string"
       ? EXPORTABLE(
-          (attributeOrSqlFragment, descendingNulls, unique) =>
+          (attributeOrSqlFragment, descendingNulls, nullable, unique) =>
             function applyPlan($select) {
               $select.orderBy({
                 nulls: descendingNulls,
                 attribute: attributeOrSqlFragment,
                 direction: "DESC",
+                nullable,
               });
               if (unique) {
                 $select.setOrderIsUnique();
               }
             },
-          [attributeOrSqlFragment, descendingNulls, unique],
+          [attributeOrSqlFragment, descendingNulls, nullable, unique],
         )
       : typeof attributeOrSqlFragment === "function"
       ? EXPORTABLE(
-          (attributeOrSqlFragment, descendingNulls, unique) =>
+          (attributeOrSqlFragment, descendingNulls, nullable, unique) =>
             function applyPlan($select) {
               $select.orderBy({
                 nulls: descendingNulls,
                 ...attributeOrSqlFragment($select),
                 direction: "DESC",
+                nullable,
               } as PgOrderSpec);
               if (unique) {
                 $select.setOrderIsUnique();
               }
             },
-          [attributeOrSqlFragment, descendingNulls, unique],
+          [attributeOrSqlFragment, descendingNulls, nullable, unique],
         )
       : ((spec = {
           nulls: descendingNulls,
           ...attributeOrSqlFragment,
           direction: "DESC",
+          nullable,
         } as PgOrderSpec),
         EXPORTABLE(
           (spec, unique) =>
