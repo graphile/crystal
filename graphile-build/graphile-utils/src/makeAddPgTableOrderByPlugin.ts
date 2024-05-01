@@ -82,7 +82,11 @@ export type NullsSortMethod =
 export interface OrderByAscDescOptions {
   unique?: boolean;
   nulls?: NullsSortMethod;
-  /** If this expression/column is nullable, you must set this true otherwise cursor pagination over null values will break */
+  /**
+   * If this expression/column is nullable, you must set this true otherwise
+   * cursor pagination over null values will break. If `nulls` is specified,
+   * we'll default this to true.
+   */
   nullable?: boolean;
 }
 
@@ -95,7 +99,7 @@ export function orderByAscDesc(
     typeof uniqueOrOptions === "boolean"
       ? { unique: uniqueOrOptions }
       : uniqueOrOptions ?? {};
-  const { unique = false, nulls, nullable } = options;
+  const { unique = false, nulls, nullable = nulls != null } = options;
 
   if (typeof unique !== "boolean") {
     throw new Error(
