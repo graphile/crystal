@@ -6,6 +6,7 @@ import type {
   GraphQLResolveInfo,
 } from "graphql";
 import * as graphql from "graphql";
+import { isIterable } from "iterall";
 
 import type { FlaggedValue } from "../error.js";
 import type { __ItemStep, ExecutionDetails, ObjectStep } from "../index.js";
@@ -56,20 +57,21 @@ function dcr(
     return flagError(data);
   } else if (isPromiseLike(data)) {
     return data.then((data) => dcr(data, context, resolveInfo));
-  } else if (
-    // TODO: this should actually be "if is iterable"
-    Array.isArray(data) &&
-    data.some(isPromiseLike)
-  ) {
-    const resolved = Promise.all(
-      data.map((entry) =>
-        isPromiseLike(entry) ? entry.then(null, flagError) : entry,
-      ),
-    );
-    // TODO: this does recursion which is inefficient and also incorrect. We
-    // should only traverse as deep as the GraphQL type has lists.
-    return dcr(resolved, context, resolveInfo);
   }
+  if (isIterable(data)) {
+    const list = Array.isArray(data) ? data : [...data];
+    if (list.some(isPromiseLike)) {
+      const resolved = Promise.all(
+        list.map((entry) =>
+          isPromiseLike(entry) ? entry.then(null, flagError) : entry,
+        ),
+      );
+      // TODO: this does recursion which is inefficient and also incorrect. We
+      // should only traverse as deep as the GraphQL type has lists.
+      return dcr(resolved, context, resolveInfo);
+    }
+  }
+  // TODO: support async iterables
   return { data, context, resolveInfo };
 }
 
