@@ -913,8 +913,6 @@ export class PgSelectStep<
    * Finalizes this instance and returns a mutable clone; useful for
    * connections/etc (e.g. copying `where` conditions but adding more, or
    * pagination, or grouping, aggregates, etc)
-   *
-   * @internal
    */
   clone(mode?: PgSelectMode): PgSelectStep<TResource> {
     return new PgSelectStep(this, mode);
