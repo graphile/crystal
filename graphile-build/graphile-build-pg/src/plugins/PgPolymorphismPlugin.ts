@@ -24,7 +24,13 @@ import type {
   PgSelectSingleStep,
 } from "@dataplan/pg";
 import { assertPgClassSingleStep } from "@dataplan/pg";
-import type { ExecutableStep, ListStep, NodeIdHandler } from "grafast";
+import type {
+  DataFromObjectSteps,
+  ExecutableStep,
+  LambdaStep,
+  ListStep,
+  NodeIdHandler,
+} from "grafast";
 import {
   access,
   arraysMatch,
@@ -947,7 +953,17 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                       const $pkValues = lambda(
                         $handlerMatches,
                         (handlerMatches) => {
-                          const match = handlerMatches.find((pk) => pk.match);
+                          const match = (
+                            handlerMatches as DataFromObjectSteps<{
+                              match: LambdaStep<
+                                {
+                                  [codecName: string]: any;
+                                } | null,
+                                boolean
+                              >;
+                              pks: ListStep<any[]>;
+                            }>[]
+                          ).find((pk) => pk.match);
                           return match?.pks;
                         },
                         true,
@@ -1018,7 +1034,19 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                       const $pkValues = lambda(
                         $handlerMatches,
                         (handlerMatches) => {
-                          const match = handlerMatches.find((pk) => pk.match);
+                          // Explicit typing because TypeScript has lost the
+                          // plot.
+                          const match = (
+                            handlerMatches as DataFromObjectSteps<{
+                              match: LambdaStep<
+                                {
+                                  [codecName: string]: any;
+                                } | null,
+                                boolean
+                              >;
+                              pks: ListStep<any[]>;
+                            }>[]
+                          ).find((pk) => pk.match);
                           return match?.pks;
                         },
                         true,

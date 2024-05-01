@@ -28,7 +28,6 @@ import { executeOutputPlan } from "./engine/executeOutputPlan.js";
 import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
 import type { OutputPlan } from "./engine/OutputPlan.js";
 import { coerceError, getChildBucketAndIndex } from "./engine/OutputPlan.js";
-import { isGrafastError } from "./error.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
 import type { GrafastPlanJSON, OperationPlan } from "./index.js";
 import type {
@@ -38,7 +37,13 @@ import type {
   StreamMaybeMoreableArray,
   StreamMoreableArray,
 } from "./interfaces.js";
-import { $$eventEmitter, $$extensions, $$streamMore } from "./interfaces.js";
+import {
+  $$eventEmitter,
+  $$extensions,
+  $$streamMore,
+  FLAG_ERROR,
+  NO_FLAGS,
+} from "./interfaces.js";
 import { timeSource } from "./timeSource.js";
 import { arrayOfLength, isPromiseLike } from "./utils.js";
 
@@ -404,14 +409,15 @@ function executePreemptive(
     // Later we'll need to loop
 
     // If it's a subscription we need to use the stream
-    const bucketRootValue =
+    const bucketRootEValue =
       rootBucket.layerPlan.rootStep != null &&
       rootBucket.layerPlan.rootStep.id != null
-        ? rootBucket.store
-            .get(rootBucket.layerPlan.rootStep.id)!
-            .at(rootBucketIndex)
+        ? rootBucket.store.get(rootBucket.layerPlan.rootStep.id)!
         : null;
-    if (isGrafastError(bucketRootValue)) {
+    const bucketRootValue = bucketRootEValue?.at(rootBucketIndex);
+    const bucketRootFlags =
+      bucketRootEValue?._flagsAt(rootBucketIndex) ?? NO_FLAGS;
+    if (bucketRootFlags & FLAG_ERROR) {
       releaseUnusedIterators(rootBucket, rootBucketIndex, null);
       // Something major went wrong!
       const errors = [

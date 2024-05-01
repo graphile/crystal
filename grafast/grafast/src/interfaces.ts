@@ -23,7 +23,7 @@ import type {
 
 import type { Bucket, RequestTools } from "./bucket.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
-import type { GrafastError, SafeError } from "./error.js";
+import type { FlaggedValue, SafeError } from "./error.js";
 import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type {
@@ -166,9 +166,6 @@ export const $$timeout = Symbol("timeout");
 /** For tracking _when_ the timeout happened (because once the JIT has warmed it might not need so long) */
 export const $$ts = Symbol("timestamp");
 
-/** Used as a return value from __FlagStep to force inhibition */
-export const $$inhibit = Symbol("inhibit");
-
 /**
  * When dealing with a polymorphic thing we need to be able to determine what
  * the concrete type of it is, we use the $$concreteType property for that.
@@ -185,9 +182,14 @@ export interface IndexByListItemStepId {
 // These values are just to make reading the code a little clearer
 export type GrafastValuesList<T> = ReadonlyArray<T>;
 export type PromiseOrDirect<T> = PromiseLike<T> | T;
-export type GrafastResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
+export type GrafastResultsList<T> = ReadonlyArray<
+  PromiseOrDirect<T | FlaggedValue<Error> | FlaggedValue<null>>
+>;
 export type GrafastResultStreamList<T> = ReadonlyArray<
-  PromiseOrDirect<AsyncIterable<PromiseOrDirect<T>> | null> | PromiseLike<never>
+  | PromiseOrDirect<AsyncIterable<
+      PromiseOrDirect<T | FlaggedValue<Error> | FlaggedValue<null>>
+    > | null>
+  | PromiseLike<never>
 >;
 
 /** @internal */
@@ -196,7 +198,7 @@ export type ForcedValues = {
     [index: number]: ExecutionEntryFlags | undefined;
   };
   results: {
-    [index: number]: GrafastError | null | undefined;
+    [index: number]: Error | null | undefined;
   };
 };
 
@@ -931,9 +933,12 @@ export interface AddDependencyOptions {
   skipDeduplication?: boolean;
   /** @defaultValue `FLAG_NULL` */
   acceptFlags?: ExecutionEntryFlags;
-  onReject?: null | GrafastError | undefined;
+  onReject?: null | Error | undefined;
 }
 /**
  * @internal
  */
 export const $$deepDepSkip = Symbol("deepDepSkip_experimental");
+
+export type DataFromStep<TStep extends ExecutableStep> =
+  TStep extends ExecutableStep<infer TData> ? TData : never;

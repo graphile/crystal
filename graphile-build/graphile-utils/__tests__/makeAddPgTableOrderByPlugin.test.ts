@@ -147,6 +147,9 @@ it('allows creating a "order by" plugin with DEFAULT asc/desc ordering', async (
     userNodesDesc,
   } = await getAscDescData(schemaResult);
 
+  expect(errorsAsc).toBeFalsy();
+  expect(errorsDesc).toBeFalsy();
+
   // by default, the natural order by puts nulls last when using ascending order
   const correctOrderAsc = ["Bob", "Caroline", "Alice"];
   const resultingOrderAsc = getResultingOrderFromUserNodes(userNodesAsc);
@@ -156,7 +159,6 @@ it('allows creating a "order by" plugin with DEFAULT asc/desc ordering', async (
     resultingOrderAsc,
   );
 
-  expect(errorsAsc).toBeFalsy();
   expect(dataAsc).toBeTruthy();
   expect(ascOrdersAreEqual).toBeTruthy();
 
@@ -169,7 +171,6 @@ it('allows creating a "order by" plugin with DEFAULT asc/desc ordering', async (
     resultingOrderDesc,
   );
 
-  expect(errorsDesc).toBeFalsy();
   expect(dataDesc).toBeTruthy();
   expect(descOrdersAreEqual).toBeTruthy();
 });

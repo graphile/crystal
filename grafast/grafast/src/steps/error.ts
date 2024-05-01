@@ -1,3 +1,4 @@
+import { flagError } from "../error.js";
 import { inspect } from "../inspect.js";
 import type { ExecutionDetails, GrafastResultsList } from "../interfaces.js";
 import { UnbatchedExecutableStep } from "../step.js";
@@ -21,10 +22,10 @@ export class ErrorStep<
   }
 
   execute({ count }: ExecutionDetails): GrafastResultsList<any> {
-    return arrayOfLength(count, this.error);
+    return arrayOfLength(count, flagError(this.error));
   }
   unbatchedExecute(): any {
-    return this.error;
+    return flagError(this.error);
   }
 }
 

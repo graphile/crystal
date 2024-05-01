@@ -15,7 +15,7 @@ import {
 } from "./engine/lib/withGlobalLayerPlan.js";
 import { $$unlock } from "./engine/lock.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
-import type { GrafastError } from "./error.js";
+import { flagError } from "./error.js";
 import { getDebug } from "./global.js";
 import { inspect } from "./inspect.js";
 import type {
@@ -47,6 +47,8 @@ import { stepAMayDependOnStepB } from "./utils.js";
  * @internal
  */
 export const $$noExec = Symbol("noExec");
+
+const ref_flagError = te.ref(flagError, "flagError");
 
 function throwDestroyed(this: ExecutableStep): any {
   let message: string;
@@ -207,7 +209,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * - The `execute` method must be a regular (not async) function
    * - The `execute` method must NEVER return a promise
    * - The values within the list returned from `execute` must NEVER include
-   *   promises or GrafastError objects
+   *   promises or FlaggedValue objects
    * - The result of calling `execute` should not differ after a
    *   `step.hasSideEffects` has executed (i.e. it should be pure, only
    *   dependent on its deps and use no external state)
@@ -235,7 +237,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    */
   protected readonly dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
   protected readonly dependencyOnReject: ReadonlyArray<
-    GrafastError | null | undefined
+    Error | null | undefined
   >;
 
   /**
@@ -515,7 +517,7 @@ function _buildOptimizedExecuteV2Expression(
     try {
   ${te.indent(inFrag)}
     } catch (e) {
-      results[i] = e instanceof Error ? e : Promise.reject(e);
+      results[i] = ${ref_flagError}(e);
     }\
 `;
     }
@@ -616,7 +618,7 @@ export abstract class UnbatchedExecutableStep<
         const tuple = values.map((list) => list.at(i));
         return this.unbatchedExecute(extra, ...tuple);
       } catch (e) {
-        return e instanceof Error ? (e as never) : Promise.reject(e);
+        return flagError(e);
       }
     });
   }

@@ -25,7 +25,6 @@ import type { Deferred } from "./deferred.js";
 import { isDev } from "./dev.js";
 import type { LayerPlan } from "./engine/LayerPlan.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
-import type { GrafastError } from "./error.js";
 import { SafeError } from "./error.js";
 import { inspect } from "./inspect.js";
 import type {
@@ -930,7 +929,7 @@ export type Sudo<T> = T extends ExecutableStep<any>
   ? T & {
       dependencies: ReadonlyArray<ExecutableStep>;
       dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
-      dependencyOnReject: ReadonlyArray<GrafastError | null | undefined>;
+      dependencyOnReject: ReadonlyArray<Error | null | undefined>;
       defaultForbiddenFlags: ExecutionEntryFlags;
       getDepOptions: ExecutableStep["getDepOptions"];
     }
