@@ -153,6 +153,13 @@ declare global {
        * safe, and you should still use CSRF protection.
        */
       allowedRequestContentTypes?: readonly RequestContentType[];
+
+      /**
+       * How many documents should we cache the parse and validate result for?
+       *
+       * @defaultValue `500`
+       */
+      parseAndValidateCacheSize?: number;
     }
 
     interface GrafservHooks {

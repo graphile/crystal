@@ -46,12 +46,15 @@ const calculateQueryHash = (queryString: string): string => {
   return lastHash;
 };
 
-export function makeParseAndValidateFunction(schema: GraphQLSchema) {
+export function makeParseAndValidateFunction(
+  schema: GraphQLSchema,
+  resolvedPreset: GraphileConfig.ResolvedPreset,
+) {
   type ParseAndValidateResult =
     | { document: DocumentNode; errors?: undefined }
     | { document?: undefined; errors: readonly graphql.GraphQLError[] };
   const parseAndValidationCache = new LRU<string, ParseAndValidateResult>({
-    maxLength: 500,
+    maxLength: resolvedPreset.grafserv?.parseAndValidateCacheSize ?? 500,
   });
   let lastParseAndValidateQuery: string;
   let lastParseAndValidateResult: ParseAndValidateResult;
@@ -342,12 +345,18 @@ const _makeGraphQLHandlerInternal = (
         );
       }
       latestSchema = _schema;
-      latestParseAndValidate = makeParseAndValidateFunction(latestSchema);
+      latestParseAndValidate = makeParseAndValidateFunction(
+        latestSchema,
+        resolvedPreset,
+      );
       wait = null;
     });
   } else {
     latestSchema = schemaOrPromise;
-    latestParseAndValidate = makeParseAndValidateFunction(latestSchema);
+    latestParseAndValidate = makeParseAndValidateFunction(
+      latestSchema,
+      resolvedPreset,
+    );
   }
 
   const outputDataAsString = dynamicOptions.outputDataAsString;

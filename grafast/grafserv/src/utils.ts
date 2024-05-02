@@ -204,8 +204,10 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
             schemaPrepare = (async () => {
               latestSchema = await schemaOrPromise;
               latestSchemaOrPromise = schemaOrPromise;
-              latestParseAndValidate =
-                makeParseAndValidateFunction(latestSchema);
+              latestParseAndValidate = makeParseAndValidateFunction(
+                latestSchema,
+                resolvedPreset,
+              );
               schemaPrepare = null;
               return true;
             })();
@@ -215,8 +217,10 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
               // No action necessary
             } else {
               latestSchema = schemaOrPromise;
-              latestParseAndValidate =
-                makeParseAndValidateFunction(latestSchema);
+              latestParseAndValidate = makeParseAndValidateFunction(
+                latestSchema,
+                resolvedPreset,
+              );
             }
           }
         }
