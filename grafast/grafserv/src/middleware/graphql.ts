@@ -53,9 +53,13 @@ export function makeParseAndValidateFunction(
   type ParseAndValidateResult =
     | { document: DocumentNode; errors?: undefined }
     | { document?: undefined; errors: readonly graphql.GraphQLError[] };
-  const parseAndValidationCache = new LRU<string, ParseAndValidateResult>({
-    maxLength: resolvedPreset.grafserv?.parseAndValidateCacheSize ?? 500,
-  });
+  const maxLength = resolvedPreset.grafserv?.parseAndValidateCacheSize ?? 500;
+  const parseAndValidationCache =
+    maxLength >= 1
+      ? new LRU<string, ParseAndValidateResult>({
+          maxLength,
+        })
+      : null;
   let lastParseAndValidateQuery: string;
   let lastParseAndValidateResult: ParseAndValidateResult;
   function parseAndValidate(query: string): ParseAndValidateResult {
@@ -64,7 +68,7 @@ export function makeParseAndValidateFunction(
     }
     const hash = query.length > 500 ? calculateQueryHash(query) : query;
 
-    const cached = parseAndValidationCache.get(hash);
+    const cached = parseAndValidationCache?.get(hash);
     if (cached !== undefined) {
       lastParseAndValidateQuery = query;
       lastParseAndValidateResult = cached;
@@ -89,7 +93,7 @@ export function makeParseAndValidateFunction(
           ),
         ],
       };
-      parseAndValidationCache.set(hash, result);
+      parseAndValidationCache?.set(hash, result);
       lastParseAndValidateQuery = query;
       lastParseAndValidateResult = result;
       return result;
@@ -98,7 +102,7 @@ export function makeParseAndValidateFunction(
     const result: ParseAndValidateResult = errors.length
       ? { errors }
       : { document };
-    parseAndValidationCache.set(hash, result);
+    parseAndValidationCache?.set(hash, result);
     lastParseAndValidateQuery = query;
     lastParseAndValidateResult = result;
     return result;
