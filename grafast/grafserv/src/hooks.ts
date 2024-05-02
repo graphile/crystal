@@ -1,8 +1,17 @@
 import { applyHooks, AsyncHooks } from "graphile-config";
 
+// We could use a global WeakMap, but storing directly onto the resolvedPreset
+// should use more traditional garbage collection.
+const $$hooks = Symbol("hooks");
+
 export function getGrafservHooks(
-  resolvedPreset: GraphileConfig.ResolvedPreset,
+  resolvedPreset: GraphileConfig.ResolvedPreset & {
+    [$$hooks]?: AsyncHooks<GraphileConfig.GrafservHooks>;
+  },
 ) {
+  if (resolvedPreset[$$hooks]) {
+    return resolvedPreset[$$hooks];
+  }
   const hooks = new AsyncHooks<GraphileConfig.GrafservHooks>();
   applyHooks(
     resolvedPreset.plugins,
@@ -18,5 +27,10 @@ export function getGrafservHooks(
       );
     },
   );
+  try {
+    resolvedPreset[$$hooks] = hooks;
+  } catch {
+    // Ignore - preset must be readonly
+  }
   return hooks;
 }
