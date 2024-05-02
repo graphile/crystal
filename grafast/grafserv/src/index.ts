@@ -5,6 +5,7 @@ import type { RuruHTMLParts } from "ruru/server";
 
 import type {
   GrafservPluginContext,
+  InitEvent,
   NormalizedRequestDigest,
   ProcessGraphQLRequestBodyEvent,
   RequestContentType,
@@ -163,7 +164,7 @@ declare global {
     }
 
     interface GrafservHooks {
-      init(event: Record<string, never>): PromiseOrDirect<void>;
+      init(event: InitEvent): PromiseOrDirect<void>;
       processGraphQLRequestBody(
         event: ProcessGraphQLRequestBodyEvent,
       ): PromiseOrDirect<void>;

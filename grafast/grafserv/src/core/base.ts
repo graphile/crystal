@@ -1,12 +1,15 @@
 import EventEmitter from "eventemitter3";
 import type { PromiseOrDirect, TypedEventEmitter } from "grafast";
-import { isPromiseLike, stringifyPayload } from "grafast";
+import { defer, isPromiseLike, stringifyPayload } from "grafast";
 import type { GraphQLSchema } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
+import type { AsyncHooks } from "graphile-config";
 import { resolvePresets } from "graphile-config";
 
+import { getGrafservHooks } from "../hooks.js";
 import type {
   BufferResult,
+  DynamicOptions,
   ErrorResult,
   EventStreamEvent,
   GrafservConfig,
@@ -20,8 +23,7 @@ import type {
 } from "../interfaces.js";
 import { mapIterator } from "../mapIterator.js";
 import { makeGraphiQLHandler } from "../middleware/graphiql.js";
-import { makeGraphQLHandler } from "../middleware/graphql.js";
-import type { OptionsFromConfig } from "../options.js";
+import { APPLICATION_JSON, makeGraphQLHandler } from "../middleware/graphql.js";
 import { optionsFromConfig } from "../options.js";
 import { handleErrors, normalizeRequest } from "../utils.js";
 
@@ -30,14 +32,17 @@ const { isSchema, validateSchema } = graphql;
 export class GrafservBase {
   private releaseHandlers: Array<() => PromiseOrDirect<void>> = [];
   private releasing = false;
+  public dynamicOptions: DynamicOptions;
+  public resolvedPreset: GraphileConfig.ResolvedPreset;
   /** @internal */
-  public dynamicOptions!: OptionsFromConfig;
-  public resolvedPreset!: GraphileConfig.ResolvedPreset;
+  public hooks: AsyncHooks<GraphileConfig.GrafservHooks>;
   protected schema: GraphQLSchema | PromiseLike<GraphQLSchema> | null;
   protected schemaError: PromiseLike<GraphQLSchema> | null;
   protected eventEmitter: TypedEventEmitter<{
     "schema:ready": GraphQLSchema;
     "schema:error": any;
+    "dynamicOptions:ready": Record<string, never>;
+    "dynamicOptions:error": any;
   }>;
   private initialized = false;
   public graphqlHandler!: ReturnType<typeof makeGraphQLHandler>;
@@ -45,7 +50,12 @@ export class GrafservBase {
 
   constructor(config: GrafservConfig) {
     this.eventEmitter = new EventEmitter();
-    this.setPreset(config.preset ?? Object.create(null));
+    this.resolvedPreset = config.preset ? resolvePresets([config.preset]) : {};
+    this.dynamicOptions = {
+      validationRules: [...graphql.specifiedRules],
+      ...optionsFromConfig(this.resolvedPreset),
+    };
+    this.hooks = getGrafservHooks(this.resolvedPreset);
     this.schemaError = null;
     this.schema = config.schema;
     if (isPromiseLike(config.schema)) {
@@ -63,14 +73,20 @@ export class GrafservBase {
     } else {
       this.eventEmitter.emit("schema:ready", config.schema);
     }
-    this.initialized = true;
-    this.refreshHandlers();
+    this.graphqlHandler = this.waitForGraphqlHandler;
+    this.graphiqlHandler = this.waitForGraphiqlHandler;
+    this.setPreset(this.resolvedPreset);
   }
 
   private _processRequest(
     inRequest: RequestDigest,
   ): PromiseOrDirect<HandlerResult | null> {
     const request = normalizeRequest(inRequest);
+    if (!this.dynamicOptions) {
+      throw new Error(
+        `GrafservInternalError<1377f225-31b7-4a81-a56e-a28e18a19899>: Attempted to process request prematurely`,
+      );
+    }
     const dynamicOptions = this.dynamicOptions;
     const forceCORS =
       !!this.resolvedPreset.grafserv?.dangerouslyAllowAllCORSRequests &&
@@ -86,7 +102,7 @@ export class GrafservBase {
         request.method === "GET" &&
         request.path === dynamicOptions.graphiqlPath
       ) {
-        if (forceCORS) return optionsResponse(request, this.dynamicOptions);
+        if (forceCORS) return optionsResponse(request, dynamicOptions);
         return this.graphiqlHandler(request);
       }
 
@@ -95,7 +111,7 @@ export class GrafservBase {
         request.method === "GET" &&
         request.path === dynamicOptions.eventStreamPath
       ) {
-        if (forceCORS) return optionsResponse(request, this.dynamicOptions);
+        if (forceCORS) return optionsResponse(request, dynamicOptions);
         const stream = this.makeStream();
         return {
           type: "event-stream",
@@ -181,12 +197,31 @@ export class GrafservBase {
   }
 
   public setPreset(newPreset: GraphileConfig.Preset) {
-    this.resolvedPreset = resolvePresets([newPreset]);
-    const newOptions = optionsFromConfig(this.resolvedPreset);
-    if (this.dynamicOptions !== newOptions) {
-      this.dynamicOptions = newOptions;
-      this.refreshHandlers();
-    }
+    const resolvedPreset = resolvePresets([newPreset]);
+    const hooks = getGrafservHooks(this.resolvedPreset);
+    // Note: this gets directly mutated
+    const dynamicOptions: DynamicOptions = {
+      validationRules: [...graphql.specifiedRules],
+      ...optionsFromConfig(resolvedPreset),
+    };
+    const initResult = hooks.process("init", dynamicOptions);
+    Promise.resolve(initResult).then(
+      () => {
+        // Overwrite all the `this.*` properties at once
+        this.resolvedPreset = resolvedPreset;
+        this.hooks = hooks;
+        this.dynamicOptions = dynamicOptions;
+        this.initialized = true;
+        // ENHANCE: this.graphqlHandler?.release()?
+        this.refreshHandlers();
+        // MUST come after the handlers have been refreshed, otherwise we'll
+        // get infinite loops
+        this.eventEmitter.emit("dynamicOptions:ready", {});
+      },
+      (e) => {
+        this.eventEmitter.emit("dynamicOptions:error", e);
+      },
+    );
   }
 
   public setSchema(newSchema: GraphQLSchema) {
@@ -214,19 +249,108 @@ export class GrafservBase {
 
   private refreshHandlers() {
     if (!this.initialized) {
+      // This will be handled once `setPreset` completes
       return;
     }
-    // ENHANCE: this.graphqlHandler?.release()?
     this.graphqlHandler = makeGraphQLHandler(
       this.resolvedPreset,
+      this.hooks,
       this.dynamicOptions,
       this.schema,
     );
     this.graphiqlHandler = makeGraphiQLHandler(
       this.resolvedPreset,
+      this.hooks,
       this.dynamicOptions,
     );
   }
+
+  waitForGraphqlHandler: ReturnType<typeof makeGraphQLHandler> = function (
+    this: GrafservBase,
+    ...args
+  ) {
+    const [request] = args;
+    const deferred = defer<HandlerResult | null>();
+    const { dynamicOptions } = this;
+    const onReady = () => {
+      this.eventEmitter.off("dynamicOptions:ready", onReady);
+      this.eventEmitter.off("dynamicOptions:error", onError);
+      Promise.resolve()
+        .then(() => this.graphqlHandler(...args))
+        .then(deferred.resolve, deferred.reject);
+    };
+    const onError = (e: any) => {
+      this.eventEmitter.off("dynamicOptions:ready", onReady);
+      this.eventEmitter.off("dynamicOptions:error", onError);
+      const graphqlError = new graphql.GraphQLError(
+        "Unknown error occurred",
+        null,
+        null,
+        null,
+        null,
+        e,
+      );
+      deferred.resolve({
+        type: "graphql",
+        request,
+        dynamicOptions,
+        payload: { errors: [graphqlError] },
+        statusCode:
+          (graphqlError.extensions?.statusCode as number | undefined) ?? 503,
+        // Fall back to application/json; this is when an unexpected error happens
+        // so it shouldn't be hit.
+        contentType: APPLICATION_JSON,
+      });
+    };
+    this.eventEmitter.on("dynamicOptions:ready", onReady);
+    this.eventEmitter.on("dynamicOptions:error", onError);
+    setTimeout(onError, 5000, new Error("Server initialization timed out"));
+    return Promise.resolve(deferred);
+  };
+
+  waitForGraphiqlHandler: ReturnType<typeof makeGraphiQLHandler> = function (
+    this: GrafservBase,
+    ...args
+  ) {
+    const [request] = args;
+    const deferred = defer<HandlerResult>();
+    const { dynamicOptions } = this;
+    const onReady = () => {
+      this.eventEmitter.off("dynamicOptions:ready", onReady);
+      this.eventEmitter.off("dynamicOptions:error", onError);
+      Promise.resolve()
+        .then(() => this.graphiqlHandler(...args))
+        .then(deferred.resolve, deferred.reject);
+    };
+    const onError = (e: any) => {
+      this.eventEmitter.off("dynamicOptions:ready", onReady);
+      this.eventEmitter.off("dynamicOptions:error", onError);
+      const graphqlError = new graphql.GraphQLError(
+        "Unknown error occurred",
+        null,
+        null,
+        null,
+        null,
+        e,
+      );
+      // TODO: this should be an HTML response
+      deferred.resolve({
+        type: "graphql",
+        request,
+        dynamicOptions,
+        payload: { errors: [graphqlError] },
+        statusCode:
+          (graphqlError.extensions?.statusCode as number | undefined) ?? 503,
+        // Fall back to application/json; this is when an unexpected error happens
+        // so it shouldn't be hit.
+        contentType: APPLICATION_JSON,
+      });
+    };
+    this.eventEmitter.on("dynamicOptions:ready", onReady);
+    this.eventEmitter.on("dynamicOptions:error", onError);
+    setTimeout(onError, 5000, new Error("Server initialization timed out"));
+    return Promise.resolve(deferred);
+  };
 
   // TODO: Rename this, or make it a middleware, or something
   public makeStream(): AsyncIterableIterator<SchemaChangeEvent> {

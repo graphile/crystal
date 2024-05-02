@@ -5,6 +5,7 @@ import type {
   AsyncExecutionResult,
   ExecutionResult,
   GraphQLSchema,
+  ValidationRule,
 } from "grafast/graphql";
 import type { Context } from "graphql-ws";
 
@@ -51,6 +52,9 @@ export interface ValidatedGraphQLBody {
 
 export interface GrafservPluginContext {
   resolvedPreset: GraphileConfig.ResolvedPreset;
+}
+export interface InitEvent {
+  validationRules: ValidationRule[];
 }
 export interface ProcessGraphQLRequestBodyEvent {
   body: ParsedGraphQLBody;
@@ -234,3 +238,5 @@ export type Result =
   | JSONResult
   | BufferStreamResult
   | NoContentResult;
+
+export type DynamicOptions = OptionsFromConfig & InitEvent;

@@ -4,7 +4,7 @@ import { makeExampleServer } from "./exampleServer.js";
 
 let server: Awaited<ReturnType<typeof makeExampleServer>> | null = null;
 
-afterAll(() => {
+afterEach(() => {
   server?.release();
 });
 

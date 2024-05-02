@@ -29,8 +29,17 @@ import {
 
 const { GraphQLError } = graphql;
 
-const sleep = (ms: number) =>
-  new Promise<void>((resolve) => setTimeout(resolve, ms));
+export const sleep = (ms: number) => {
+  let _timeout: NodeJS.Timeout;
+  return {
+    promise: new Promise<void>(
+      (resolve) => void (_timeout = setTimeout(resolve, ms)),
+    ),
+    release() {
+      clearTimeout(_timeout);
+    },
+  };
+};
 
 // TODO: remove this ANSI-removal hack!
 export function handleErrors(
@@ -181,13 +190,6 @@ export function httpError(statusCode: number, message: string): SafeError {
 }
 
 export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
-  const {
-    resolvedPreset,
-    dynamicOptions: { maskError },
-  } = instance;
-
-  const hooks = getGrafservHooks(resolvedPreset);
-
   let latestSchema: GraphQLSchema;
   let latestSchemaOrPromise: PromiseOrDirect<GraphQLSchema>;
   let latestParseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
@@ -198,6 +200,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
       try {
         // Get up to date schema, in case we're in watch mode
         const schemaOrPromise = instance.getSchema();
+        const { resolvedPreset, dynamicOptions } = instance;
         if (schemaOrPromise !== latestSchemaOrPromise) {
           if ("then" in schemaOrPromise) {
             latestSchemaOrPromise = schemaOrPromise;
@@ -207,6 +210,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
               latestParseAndValidate = makeParseAndValidateFunction(
                 latestSchema,
                 resolvedPreset,
+                dynamicOptions,
               );
               schemaPrepare = null;
               return true;
@@ -220,15 +224,18 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
               latestParseAndValidate = makeParseAndValidateFunction(
                 latestSchema,
                 resolvedPreset,
+                dynamicOptions,
               );
             }
           }
         }
         if (schemaPrepare !== null) {
+          const sleeper = sleep(dynamicOptions.schemaWaitTime);
           const schemaReady = await Promise.race([
             schemaPrepare,
-            sleep(instance.dynamicOptions.schemaWaitTime),
+            sleeper.promise,
           ]);
+          sleeper.release();
           if (schemaReady !== true) {
             // Handle missing schema
             throw new Error(`Schema isn't ready`);
@@ -238,7 +245,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
         const parseAndValidate = latestParseAndValidate;
 
         const parsedBody = parseGraphQLJSONBody(message.payload);
-        await hooks.process("processGraphQLRequestBody", {
+        await instance.hooks.process("processGraphQLRequestBody", {
           body: parsedBody,
           graphqlWsContext: ctx,
         });
@@ -283,13 +290,13 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
     },
     // TODO: validate that this actually does mask every error
     onError(ctx, message, errors) {
-      return errors.map(maskError);
+      return errors.map(instance.dynamicOptions.maskError);
     },
     async execute(args: ExecutionArgs) {
-      return execute(args, resolvedPreset);
+      return execute(args, instance.resolvedPreset);
     },
     async subscribe(args: ExecutionArgs) {
-      return subscribe(args, resolvedPreset);
+      return subscribe(args, instance.resolvedPreset);
     },
   };
 }

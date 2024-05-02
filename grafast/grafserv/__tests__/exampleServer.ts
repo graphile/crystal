@@ -30,7 +30,8 @@ export async function makeExampleServer(
   });
 
   const serv = grafserv({ schema, preset });
-  const server = createServer(serv.createHandler());
+  const server = createServer();
+  serv.addTo(server);
   const promise = new Promise<void>((resolve, reject) => {
     server.on("listening", () => {
       server.off("error", reject);
@@ -45,9 +46,13 @@ export async function makeExampleServer(
     info.family === "IPv6"
       ? `[${info.address === "::" ? "::1" : info.address}]`
       : info.address
-  }:${info.port}${preset.grafserv.graphqlPath}`;
+  }:${info.port}${preset.grafserv!.graphqlPath}`;
 
-  const release = () => server.close();
+  const release = () => {
+    serv.release();
+    server.close();
+    server.closeAllConnections();
+  };
   return { url, release };
 }
 
