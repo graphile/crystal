@@ -1,6 +1,12 @@
 import EventEmitter from "eventemitter3";
 import type { PromiseOrDirect, TypedEventEmitter } from "grafast";
-import { defer, isPromiseLike, stringifyPayload } from "grafast";
+import {
+  defer,
+  execute,
+  isPromiseLike,
+  stringifyPayload,
+  subscribe,
+} from "grafast";
 import type { GraphQLSchema } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
 import type { AsyncHooks } from "graphile-config";
@@ -23,9 +29,13 @@ import type {
 } from "../interfaces.js";
 import { mapIterator } from "../mapIterator.js";
 import { makeGraphiQLHandler } from "../middleware/graphiql.js";
-import { APPLICATION_JSON, makeGraphQLHandler } from "../middleware/graphql.js";
+import {
+  APPLICATION_JSON,
+  makeGraphQLHandler,
+  makeParseAndValidateFunction,
+} from "../middleware/graphql.js";
 import { optionsFromConfig } from "../options.js";
-import { handleErrors, normalizeRequest } from "../utils.js";
+import { handleErrors, normalizeRequest, sleep } from "../utils.js";
 
 const { isSchema, validateSchema } = graphql;
 
@@ -410,6 +420,87 @@ export class GrafservBase {
       },
     };
   }
+
+  getExecutionStuff = defaultMakeGetExecutionStuff(this);
+}
+
+interface ExecutionStuff {
+  schema: GraphQLSchema;
+  parseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
+  resolvedPreset: GraphileConfig.ResolvedPreset;
+  execute: typeof execute;
+  subscribe: typeof subscribe;
+  contextValue: Record<string, any>;
+}
+
+function defaultMakeGetExecutionStuff(
+  instance: GrafservBase,
+): (ctx: any) => PromiseOrDirect<ExecutionStuff> {
+  let latestSchema: GraphQLSchema;
+  let latestSchemaOrPromise: PromiseOrDirect<GraphQLSchema>;
+  let latestParseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
+  let schemaPrepare: Promise<boolean> | null = null;
+
+  return (_ignoredContext) => {
+    // Get up to date schema, in case we're in watch mode
+    const schemaOrPromise = instance.getSchema();
+    const { resolvedPreset, dynamicOptions } = instance;
+    if (schemaOrPromise !== latestSchemaOrPromise) {
+      if ("then" in schemaOrPromise) {
+        latestSchemaOrPromise = schemaOrPromise;
+        schemaPrepare = (async () => {
+          latestSchema = await schemaOrPromise;
+          latestSchemaOrPromise = schemaOrPromise;
+          latestParseAndValidate = makeParseAndValidateFunction(
+            latestSchema,
+            resolvedPreset,
+            dynamicOptions,
+          );
+          schemaPrepare = null;
+          return true;
+        })();
+      } else {
+        latestSchemaOrPromise = schemaOrPromise;
+        if (latestSchema === schemaOrPromise) {
+          // No action necessary
+        } else {
+          latestSchema = schemaOrPromise;
+          latestParseAndValidate = makeParseAndValidateFunction(
+            latestSchema,
+            resolvedPreset,
+            dynamicOptions,
+          );
+        }
+      }
+    }
+    if (schemaPrepare !== null) {
+      const sleeper = sleep(dynamicOptions.schemaWaitTime);
+      const schemaReadyPromise = Promise.race([schemaPrepare, sleeper.promise]);
+      return schemaReadyPromise.then((schemaReady) => {
+        sleeper.release();
+        if (schemaReady !== true) {
+          // Handle missing schema
+          throw new Error(`Schema isn't ready`);
+        }
+        return {
+          schema: latestSchema,
+          parseAndValidate: latestParseAndValidate,
+          resolvedPreset,
+          execute,
+          subscribe,
+          contextValue: Object.create(null),
+        };
+      });
+    }
+    return {
+      schema: latestSchema,
+      parseAndValidate: latestParseAndValidate,
+      resolvedPreset,
+      execute,
+      subscribe,
+      contextValue: Object.create(null),
+    };
+  };
 }
 
 const END = Buffer.from("\r\n-----\r\n", "utf8");
