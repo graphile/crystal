@@ -416,7 +416,7 @@ export class GrafservBase {
     };
   }
 
-  getExecutionStuff = defaultMakeGetExecutionStuff();
+  getExecutionStuff = defaultMakeGetExecutionStuff(this);
 }
 
 interface ExecutionStuff {
@@ -428,18 +428,18 @@ interface ExecutionStuff {
   contextValue: Record<string, any>;
 }
 
-function defaultMakeGetExecutionStuff(): (
-  ctx: any,
-) => PromiseOrDirect<ExecutionStuff> {
+function defaultMakeGetExecutionStuff(
+  instance: GrafservBase,
+): (ctx: any) => PromiseOrDirect<ExecutionStuff> {
   let latestSchema: GraphQLSchema;
   let latestSchemaOrPromise: PromiseOrDirect<GraphQLSchema>;
   let latestParseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
   let schemaPrepare: Promise<boolean> | null = null;
 
-  return function getExecutionStuff(this: GrafservBase, _ignoredContext) {
+  function realGetExecutionStuff(instance: GrafservBase) {
     // Get up to date schema, in case we're in watch mode
-    const schemaOrPromise = this.getSchema();
-    const { resolvedPreset, dynamicOptions } = this;
+    const schemaOrPromise = instance.getSchema();
+    const { resolvedPreset, dynamicOptions } = instance;
     if (schemaOrPromise !== latestSchemaOrPromise) {
       if ("then" in schemaOrPromise) {
         latestSchemaOrPromise = schemaOrPromise;
@@ -513,6 +513,19 @@ function defaultMakeGetExecutionStuff(): (
       subscribe,
       contextValue: Object.create(null),
     };
+  }
+  let lastResult: PromiseOrDirect<ExecutionStuff> | undefined;
+  return function getExecutionStuff(this: GrafservBase, _ignoredContext) {
+    if (!lastResult || this.getSchema() !== latestSchemaOrPromise) {
+      lastResult = realGetExecutionStuff(this);
+      if (isPromiseLike(lastResult)) {
+        lastResult = lastResult.then((result) => {
+          lastResult = result;
+          return result;
+        });
+      }
+    }
+    return lastResult;
   };
 }
 
