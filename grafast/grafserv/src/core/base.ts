@@ -513,9 +513,10 @@ function defaultMakeGetExecutionStuff(
       contextValue: Object.create(null),
     };
   }
-  let lastResult: PromiseOrDirect<ExecutionStuff> | undefined;
+  let lastResult: PromiseOrDirect<ExecutionStuff> =
+    realGetExecutionStuff(instance);
   return function getExecutionStuff(this: GrafservBase, _ignoredContext) {
-    if (!lastResult || this.getSchema() !== latestSchemaOrPromise) {
+    if (this.getSchema() !== latestSchemaOrPromise) {
       lastResult = realGetExecutionStuff(this);
       if (isPromiseLike(lastResult)) {
         lastResult.then(
