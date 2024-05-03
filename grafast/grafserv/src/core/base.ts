@@ -18,6 +18,7 @@ import type {
   DynamicOptions,
   ErrorResult,
   EventStreamEvent,
+  ExecutionStuff,
   GrafservConfig,
   HandlerResult,
   NoContentHandlerResult,
@@ -212,6 +213,7 @@ export class GrafservBase {
     // Note: this gets directly mutated
     const dynamicOptions: DynamicOptions = {
       validationRules: [...graphql.specifiedRules],
+      getExecutionStuff: undefined,
       ...optionsFromConfig(resolvedPreset),
     };
     const initResult = hooks.process("init", dynamicOptions);
@@ -224,6 +226,9 @@ export class GrafservBase {
         this.initialized = true;
         // ENHANCE: this.graphqlHandler?.release()?
         this.refreshHandlers();
+        this.getExecutionStuff =
+          dynamicOptions.getExecutionStuff ??
+          defaultMakeGetExecutionStuff(this);
         // MUST come after the handlers have been refreshed, otherwise we'll
         // get infinite loops
         this.eventEmitter.emit("dynamicOptions:ready", {});
@@ -419,18 +424,9 @@ export class GrafservBase {
   getExecutionStuff = defaultMakeGetExecutionStuff(this);
 }
 
-interface ExecutionStuff {
-  schema: GraphQLSchema;
-  parseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
-  resolvedPreset: GraphileConfig.ResolvedPreset;
-  execute: typeof execute;
-  subscribe: typeof subscribe;
-  contextValue: Record<string, any>;
-}
-
 function defaultMakeGetExecutionStuff(
   instance: GrafservBase,
-): (ctx: any) => PromiseOrDirect<ExecutionStuff> {
+): (ctx: Partial<Grafast.RequestContext>) => PromiseOrDirect<ExecutionStuff> {
   let latestSchema: GraphQLSchema;
   let latestSchemaOrPromise: PromiseOrDirect<GraphQLSchema>;
   let latestParseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;

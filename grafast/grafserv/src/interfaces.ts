@@ -1,6 +1,6 @@
 import "graphile-config";
 
-import type { PromiseOrDirect, SafeError } from "grafast";
+import type { execute, PromiseOrDirect, SafeError, subscribe } from "grafast";
 import type {
   AsyncExecutionResult,
   ExecutionResult,
@@ -9,6 +9,8 @@ import type {
 } from "grafast/graphql";
 import type { Context } from "graphql-ws";
 
+import type { GrafservBase } from ".";
+import type { makeParseAndValidateFunction } from "./middleware/graphql";
 import type { OptionsFromConfig } from "./options";
 
 export type ContextCallback = (
@@ -54,6 +56,10 @@ export interface GrafservPluginContext {
   resolvedPreset: GraphileConfig.ResolvedPreset;
 }
 export interface InitEvent {
+  getExecutionStuff?: (
+    this: GrafservBase,
+    ctx: Partial<Grafast.RequestContext>,
+  ) => PromiseOrDirect<ExecutionStuff>;
   validationRules: ValidationRule[];
 }
 export interface ProcessGraphQLRequestBodyEvent {
@@ -240,3 +246,12 @@ export type Result =
   | NoContentResult;
 
 export type DynamicOptions = OptionsFromConfig & InitEvent;
+
+export interface ExecutionStuff {
+  schema: GraphQLSchema;
+  parseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
+  resolvedPreset: GraphileConfig.ResolvedPreset;
+  execute: typeof execute;
+  subscribe: typeof subscribe;
+  contextValue: Record<string, any>;
+}
