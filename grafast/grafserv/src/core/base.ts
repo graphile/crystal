@@ -218,7 +218,14 @@ export class GrafservBase {
     this.releaseHandlers.push(cb);
   }
 
-  public setPreset(newPreset: GraphileConfig.Preset) {
+  private _settingPreset = false;
+  public setPreset(newPreset: GraphileConfig.Preset): PromiseOrDirect<void> {
+    if (this._settingPreset) {
+      throw new Error(
+        `Setting a preset is currently in progress; please wait for it to complete.`,
+      );
+    }
+    this._settingPreset = true;
     const resolvedPreset = resolvePresets([newPreset]);
     const hooks = getGrafservHooks(this.resolvedPreset);
     // Note: this gets directly mutated
@@ -228,25 +235,30 @@ export class GrafservBase {
       ...optionsFromConfig(resolvedPreset),
     };
     const initResult = hooks.process("init", dynamicOptions);
-    Promise.resolve(initResult).then(
-      () => {
-        // Overwrite all the `this.*` properties at once
-        this.resolvedPreset = resolvedPreset;
-        this.hooks = hooks;
-        this.dynamicOptions = dynamicOptions;
-        this.initialized = true;
-        // ENHANCE: this.graphqlHandler?.release()?
-        this.refreshHandlers();
-        this.getExecutionConfig = dynamicOptions.getExecutionConfig;
-        // MUST come after the handlers have been refreshed, otherwise we'll
-        // get infinite loops
-        this.eventEmitter.emit("dynamicOptions:ready", {});
-      },
-      (e) => {
-        this.graphqlHandler = this.failedGraphqlHandler;
-        this.graphiqlHandler = this.failedGraphiqlHandler;
-        this.eventEmitter.emit("dynamicOptions:error", e);
-      },
+    return (
+      Promise.resolve(initResult)
+        .then(() => {
+          // Overwrite all the `this.*` properties at once
+          this.resolvedPreset = resolvedPreset;
+          this.hooks = hooks;
+          this.dynamicOptions = dynamicOptions;
+          this.initialized = true;
+          // ENHANCE: this.graphqlHandler?.release()?
+          this.refreshHandlers();
+          this.getExecutionConfig = dynamicOptions.getExecutionConfig;
+          // MUST come after the handlers have been refreshed, otherwise we'll
+          // get infinite loops
+          this.eventEmitter.emit("dynamicOptions:ready", {});
+        })
+        .then(null, (e) => {
+          this.graphqlHandler = this.failedGraphqlHandler;
+          this.graphiqlHandler = this.failedGraphiqlHandler;
+          this.eventEmitter.emit("dynamicOptions:error", e);
+        })
+        // Finally:
+        .then(() => {
+          this._settingPreset = false;
+        })
     );
   }
 
