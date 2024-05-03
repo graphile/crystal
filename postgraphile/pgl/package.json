@@ -59,6 +59,11 @@
       "node": "./fwd/grafast/envelop/index.js",
       "default": "./fwd/grafast/envelop/index.js"
     },
+    "./grafast/mermaid": {
+      "types": "./fwd/grafast/mermaid/index.d.ts",
+      "node": "./fwd/grafast/mermaid/index.js",
+      "default": "./fwd/grafast/mermaid/index.js"
+    },
     "./grafast/graphql": {
       "types": "./fwd/grafast/graphql/index.d.ts",
       "node": "./fwd/grafast/graphql/index.js",
@@ -69,6 +74,11 @@
       "node": "./fwd/grafserv/index.js",
       "default": "./fwd/grafserv/index.js"
     },
+    "./grafserv/envelop": {
+      "types": "./fwd/grafserv/envelop/index.d.ts",
+      "node": "./fwd/grafserv/envelop/index.js",
+      "default": "./fwd/grafserv/envelop/index.js"
+    },
     "./grafserv/node": {
       "types": "./fwd/grafserv/node/index.d.ts",
       "node": "./fwd/grafserv/node/index.js",
@@ -78,6 +88,11 @@
       "types": "./fwd/grafserv/express/v4/index.d.ts",
       "node": "./fwd/grafserv/express/v4/index.js",
       "default": "./fwd/grafserv/express/v4/index.js"
+    },
+    "./grafserv/lambda/v1": {
+      "types": "./fwd/grafserv/lambda/v1/index.d.ts",
+      "node": "./fwd/grafserv/lambda/v1/index.js",
+      "default": "./fwd/grafserv/lambda/v1/index.js"
     },
     "./grafserv/koa/v2": {
       "types": "./fwd/grafserv/koa/v2/index.d.ts",
