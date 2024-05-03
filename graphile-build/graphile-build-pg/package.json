@@ -76,9 +76,9 @@
     "index.js"
   ],
   "devDependencies": {
-    "@envelop/core": "^4.0.1",
-    "@envelop/parser-cache": "^6.0.2",
-    "@envelop/validation-cache": "^6.0.2",
+    "@envelop/core": "^5.0.0",
+    "@envelop/parser-cache": "^7.0.0",
+    "@envelop/validation-cache": "^7.0.0",
     "@types/debug": "^4.1.8",
     "@types/express": "^4.17.17",
     "@types/jest": "^29.5.4",
