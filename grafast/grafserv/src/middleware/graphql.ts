@@ -21,6 +21,7 @@ import type { AsyncHooks } from "graphile-config";
 
 import { makeAcceptMatcher } from "../accept.js";
 import { getGrafservHooks } from "../hooks.js";
+import type { GrafservBase } from "../index.js";
 import type {
   DynamicOptions,
   GrafservBody,
@@ -309,68 +310,8 @@ export function validateGraphQLBody(
   return parsed as ValidatedGraphQLBody;
 }
 
-const _makeGraphQLHandlerInternal = (
-  resolvedPreset: GraphileConfig.ResolvedPreset,
-  dynamicOptions: DynamicOptions,
-  schemaOrPromise: PromiseOrDirect<GraphQLSchema> | null,
-) => {
-  if (schemaOrPromise == null) {
-    const err = Promise.reject(
-      new GraphQLError(
-        "The schema is currently unavailable",
-        null,
-        null,
-        null,
-        null,
-        null,
-        {
-          statusCode: 503,
-        },
-      ),
-    );
-    return () => err;
-  }
-
-  let latestSchema: GraphQLSchema;
-  let latestParseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
-  let wait: PromiseLike<void> | null;
-
-  if (isPromiseLike(schemaOrPromise)) {
-    wait = schemaOrPromise.then((_schema) => {
-      if (_schema == null) {
-        throw new GraphQLError(
-          "The schema is current unavailable.",
-          null,
-          null,
-          null,
-          null,
-          null,
-          {
-            statusCode: 503,
-          },
-        );
-      }
-      latestSchema = _schema;
-      latestParseAndValidate = makeParseAndValidateFunction(
-        latestSchema,
-        resolvedPreset,
-        dynamicOptions,
-      );
-      wait = null;
-    });
-  } else {
-    latestSchema = schemaOrPromise;
-    latestParseAndValidate = makeParseAndValidateFunction(
-      latestSchema,
-      resolvedPreset,
-      dynamicOptions,
-    );
-  }
-
-  const outputDataAsString = dynamicOptions.outputDataAsString;
-  const { maskIterator, maskPayload, maskError } = dynamicOptions;
-
-  const hooks = getGrafservHooks(resolvedPreset);
+const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
+  const { dynamicOptions, resolvedPreset, hooks } = instance;
 
   return async (
     request: NormalizedRequestDigest,
@@ -435,19 +376,6 @@ const _makeGraphQLHandlerInternal = (
     // If we get here, we're handling a GraphQL request
     const isLegacy = chosenContentType === APPLICATION_JSON;
 
-    if (wait !== null) {
-      const sleeper = sleep(dynamicOptions.schemaWaitTime);
-      await Promise.race([wait, sleeper.promise]);
-      sleeper.release();
-      if (!latestSchema) {
-        // Handle missing schema
-        throw httpError(502, `Schema isn't ready`);
-      }
-    }
-    // Get a reference to the latest versions to use for this entire operation
-    const schema = latestSchema;
-    const parseAndValidate = latestParseAndValidate;
-
     let body: ValidatedGraphQLBody;
     try {
       // Read the body
@@ -488,6 +416,22 @@ const _makeGraphQLHandlerInternal = (
         );
       }
     }
+
+    const grafastCtx: Partial<Grafast.RequestContext> = {
+      ...request.requestContext,
+      http: request,
+    };
+
+    const {
+      schema,
+      parseAndValidate,
+      execute,
+      subscribe,
+      contextValue,
+      // dynamicOptions?
+    } = await instance.getExecutionStuff(grafastCtx);
+    const outputDataAsString = dynamicOptions.outputDataAsString;
+    const { maskIterator, maskPayload, maskError } = dynamicOptions;
 
     const { query, operationName, variableValues } = body;
     const { errors, document } = parseAndValidate(query);
@@ -530,17 +474,14 @@ const _makeGraphQLHandlerInternal = (
       schema,
       document,
       rootValue: null,
-      contextValue: Object.create(null),
+      contextValue,
       variableValues,
       operationName,
     };
 
     try {
-      await hookArgs(args, resolvedPreset, {
-        ...request.requestContext,
-        http: request,
-      });
-      const result = await grafastExecute(args, resolvedPreset);
+      await hookArgs(args, resolvedPreset, grafastCtx);
+      const result = await execute(args, resolvedPreset);
       if (isAsyncIterable(result)) {
         return {
           type: "graphqlIncremental",
@@ -584,17 +525,9 @@ const _makeGraphQLHandlerInternal = (
   };
 };
 
-export const makeGraphQLHandler = (
-  resolvedPreset: GraphileConfig.ResolvedPreset,
-  hooks: AsyncHooks<GraphileConfig.GrafservHooks>,
-  dynamicOptions: DynamicOptions,
-  schemaOrPromise: PromiseOrDirect<GraphQLSchema> | null,
-) => {
-  const handler = _makeGraphQLHandlerInternal(
-    resolvedPreset,
-    dynamicOptions,
-    schemaOrPromise,
-  );
+export const makeGraphQLHandler = (instance: GrafservBase) => {
+  const handler = _makeGraphQLHandlerInternal(instance);
+  const { dynamicOptions } = instance;
   return (
     request: NormalizedRequestDigest,
     graphiqlHandler?: (

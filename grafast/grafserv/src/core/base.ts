@@ -262,12 +262,7 @@ export class GrafservBase {
       // This will be handled once `setPreset` completes
       return;
     }
-    this.graphqlHandler = makeGraphQLHandler(
-      this.resolvedPreset,
-      this.hooks,
-      this.dynamicOptions,
-      this.schema,
-    );
+    this.graphqlHandler = makeGraphQLHandler(this);
     this.graphiqlHandler = makeGraphiQLHandler(
       this.resolvedPreset,
       this.hooks,
@@ -421,7 +416,7 @@ export class GrafservBase {
     };
   }
 
-  getExecutionStuff = defaultMakeGetExecutionStuff(this);
+  getExecutionStuff = defaultMakeGetExecutionStuff();
 }
 
 interface ExecutionStuff {
@@ -433,18 +428,18 @@ interface ExecutionStuff {
   contextValue: Record<string, any>;
 }
 
-function defaultMakeGetExecutionStuff(
-  instance: GrafservBase,
-): (ctx: any) => PromiseOrDirect<ExecutionStuff> {
+function defaultMakeGetExecutionStuff(): (
+  ctx: any,
+) => PromiseOrDirect<ExecutionStuff> {
   let latestSchema: GraphQLSchema;
   let latestSchemaOrPromise: PromiseOrDirect<GraphQLSchema>;
   let latestParseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
   let schemaPrepare: Promise<boolean> | null = null;
 
-  return (_ignoredContext) => {
+  return function getExecutionStuff(this: GrafservBase, _ignoredContext) {
     // Get up to date schema, in case we're in watch mode
-    const schemaOrPromise = instance.getSchema();
-    const { resolvedPreset, dynamicOptions } = instance;
+    const schemaOrPromise = this.getSchema();
+    const { resolvedPreset, dynamicOptions } = this;
     if (schemaOrPromise !== latestSchemaOrPromise) {
       if ("then" in schemaOrPromise) {
         latestSchemaOrPromise = schemaOrPromise;
@@ -492,6 +487,24 @@ function defaultMakeGetExecutionStuff(
         };
       });
     }
+    /*
+  if (schemaOrPromise == null) {
+    const err = Promise.reject(
+      new GraphQLError(
+        "The schema is currently unavailable",
+        null,
+        null,
+        null,
+        null,
+        null,
+        {
+          statusCode: 503,
+        },
+      ),
+    );
+    return () => err;
+  }
+    */
     return {
       schema: latestSchema,
       parseAndValidate: latestParseAndValidate,
