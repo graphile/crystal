@@ -10,9 +10,9 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
-    "./plugins/envelop": {
-      "types": "./dist/plugins/envelop/index.d.ts",
-      "default": "./dist/plugins/envelop/index.js"
+    "./envelop": {
+      "types": "./dist/envelop/index.d.ts",
+      "default": "./dist/envelop/index.js"
     },
     "./node": {
       "types": "./dist/servers/node/index.d.ts",

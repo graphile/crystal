@@ -1,7 +1,7 @@
 import { envelop, useLogger, useMaskedErrors } from "@envelop/core";
 import { fetch } from "@whatwg-node/fetch";
 
-import { GrafservEnvelopPreset } from "../src/plugins/envelop/index.js";
+import { GrafservEnvelopPreset } from "../src/envelop/index.js";
 import { makeExampleServer } from "./exampleServer.js";
 
 let server: Awaited<ReturnType<typeof makeExampleServer>> | null = null;

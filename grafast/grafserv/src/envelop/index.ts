@@ -8,7 +8,7 @@ import {
 import type { GraphileConfig } from "graphile-config";
 import * as graphql from "graphql";
 
-import { version } from "../../version.js";
+import { version } from "../version.js";
 
 declare global {
   namespace GraphileConfig {
