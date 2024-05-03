@@ -1,3 +1,4 @@
+import type { PromiseOrDirect } from "grafast";
 import type { AsyncHooks } from "graphile-config";
 import type { RuruHTMLParts, RuruServerConfig } from "ruru/server";
 import { defaultHTMLParts, makeHTMLParts, ruruHTML } from "ruru/server";
@@ -9,13 +10,13 @@ export function makeGraphiQLHandler(
   resolvedPreset: GraphileConfig.ResolvedPreset,
   hooks: AsyncHooks<GraphileConfig.GrafservHooks>,
   dynamicOptions: OptionsFromConfig,
-) {
+): (request: NormalizedRequestDigest) => PromiseOrDirect<HandlerResult> {
   const { htmlParts: htmlPartsFromConfig } = resolvedPreset?.ruru ?? {};
   const unhookedHTMLParts: RuruHTMLParts = {
     ...defaultHTMLParts,
     ...htmlPartsFromConfig,
   };
-  return async (request: NormalizedRequestDigest): Promise<HandlerResult> => {
+  return async (request) => {
     let htmlParts = unhookedHTMLParts!;
     if (hooks.callbacks.ruruHTMLParts) {
       htmlParts = {

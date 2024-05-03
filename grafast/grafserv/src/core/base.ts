@@ -305,7 +305,7 @@ export class GrafservBase {
         null,
         e,
       );
-      deferred.resolve({
+      const response = (): HandlerResult => ({
         type: "graphql",
         request,
         dynamicOptions,
@@ -316,6 +316,10 @@ export class GrafservBase {
         // so it shouldn't be hit.
         contentType: APPLICATION_JSON,
       });
+      deferred.resolve(response());
+      if (this.graphqlHandler === this.waitForGraphqlHandler) {
+        this.graphqlHandler = response;
+      }
     };
     this.eventEmitter.on("dynamicOptions:ready", onReady);
     this.eventEmitter.on("dynamicOptions:error", onError);
@@ -349,7 +353,7 @@ export class GrafservBase {
         e,
       );
       // TODO: this should be an HTML response
-      deferred.resolve({
+      const response = (): HandlerResult => ({
         type: "graphql",
         request,
         dynamicOptions,
@@ -360,6 +364,10 @@ export class GrafservBase {
         // so it shouldn't be hit.
         contentType: APPLICATION_JSON,
       });
+      deferred.resolve(response());
+      if (this.graphiqlHandler === this.waitForGraphiqlHandler) {
+        this.graphiqlHandler = response;
+      }
     };
     this.eventEmitter.on("dynamicOptions:ready", onReady);
     this.eventEmitter.on("dynamicOptions:error", onError);

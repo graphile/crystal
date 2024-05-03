@@ -2,7 +2,7 @@ import { parse as parseGraphQLQueryString } from "node:querystring";
 
 import { LRU } from "@graphile/lru";
 import { createHash } from "crypto";
-import type { GrafastExecutionArgs } from "grafast";
+import type { GrafastExecutionArgs, PromiseOrDirect } from "grafast";
 import { $$extensions, hookArgs, isAsyncIterable, SafeError } from "grafast";
 import type { DocumentNode, GraphQLSchema } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
@@ -290,7 +290,7 @@ const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
     request: NormalizedRequestDigest,
     graphiqlHandler?: (
       request: NormalizedRequestDigest,
-    ) => Promise<HandlerResult | null>,
+    ) => PromiseOrDirect<HandlerResult | null>,
   ): Promise<HandlerResult | null> => {
     const accept = request[$$normalizedHeaders].accept;
     // Do they want HTML, or do they want GraphQL?
@@ -506,8 +506,8 @@ export const makeGraphQLHandler = (instance: GrafservBase) => {
     request: NormalizedRequestDigest,
     graphiqlHandler?: (
       request: NormalizedRequestDigest,
-    ) => Promise<HandlerResult | null>,
-  ) =>
+    ) => PromiseOrDirect<HandlerResult | null>,
+  ): PromiseOrDirect<HandlerResult | null> =>
     handler(request, graphiqlHandler).catch((e) =>
       handleGraphQLHandlerError(request, dynamicOptions, e),
     );
