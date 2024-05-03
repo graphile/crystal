@@ -29,7 +29,7 @@ const sharedConfig: GraphileConfig.Preset = {
 };
 
 test("envelop plugin is used", async () => {
-  const logFn = jest.fn((eventName, args) => {});
+  const logFn = jest.fn((_eventName, _args) => {});
   const getEnveloped = envelop({
     plugins: [useLogger({ logFn })],
   });

@@ -2,39 +2,24 @@ import { parse as parseGraphQLQueryString } from "node:querystring";
 
 import { LRU } from "@graphile/lru";
 import { createHash } from "crypto";
-import type { GrafastExecutionArgs, PromiseOrDirect } from "grafast";
-import {
-  $$extensions,
-  execute as grafastExecute,
-  hookArgs,
-  isAsyncIterable,
-  isPromiseLike,
-  SafeError,
-} from "grafast";
-import type {
-  DocumentNode,
-  ExecutionArgs,
-  GraphQLSchema,
-} from "grafast/graphql";
+import type { GrafastExecutionArgs } from "grafast";
+import { $$extensions, hookArgs, isAsyncIterable, SafeError } from "grafast";
+import type { DocumentNode, GraphQLSchema } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
-import type { AsyncHooks } from "graphile-config";
 
 import { makeAcceptMatcher } from "../accept.js";
-import { getGrafservHooks } from "../hooks.js";
 import type { GrafservBase } from "../index.js";
 import type {
   DynamicOptions,
   GrafservBody,
   HandlerResult,
-  InitEvent,
   NormalizedRequestDigest,
   ParsedGraphQLBody,
   RequestContentType,
   ValidatedGraphQLBody,
 } from "../interfaces.js";
 import { $$normalizedHeaders } from "../interfaces.js";
-import type { OptionsFromConfig } from "../options.js";
-import { httpError, parseGraphQLJSONBody, sleep } from "../utils.js";
+import { httpError, parseGraphQLJSONBody } from "../utils.js";
 
 const { getOperationAST, GraphQLError, parse, Source, validate } = graphql;
 
@@ -414,7 +399,7 @@ const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
       schema,
       parseAndValidate,
       execute,
-      subscribe,
+      // subscribe,
       contextValue,
       // dynamicOptions?
     } = await instance.getExecutionConfig(grafastCtx);

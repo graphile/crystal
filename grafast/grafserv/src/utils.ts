@@ -1,18 +1,16 @@
 import type { Readable } from "node:stream";
 
-import type { execute, PromiseOrDirect, subscribe } from "grafast";
+import type { execute, GrafastExecutionArgs, subscribe } from "grafast";
 import { hookArgs, SafeError, stripAnsi } from "grafast";
 import type {
   AsyncExecutionResult,
   ExecutionArgs,
   ExecutionResult,
-  GraphQLSchema,
 } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
 import type { ServerOptions, SubscribePayload } from "graphql-ws";
 import type { Extra } from "graphql-ws/lib/use/ws";
 
-import { getGrafservHooks } from "./hooks.js";
 import type { GrafservBase } from "./index.js";
 import type {
   GrafservBody,
@@ -22,7 +20,6 @@ import type {
   RequestDigest,
 } from "./interfaces.js";
 import { $$normalizedHeaders } from "./interfaces.js";
-import type { makeParseAndValidateFunction } from "./middleware/graphql.js";
 import { validateGraphQLBody } from "./middleware/graphql.js";
 
 const { GraphQLError } = graphql;
@@ -187,10 +184,9 @@ export function httpError(statusCode: number, message: string): SafeError {
   return new SafeError(message, { statusCode });
 }
 
-type ExtendedExecutionArgs = ExecutionArgs & {
+type ExtendedExecutionArgs = GrafastExecutionArgs & {
   execute: typeof execute;
   subscribe: typeof subscribe;
-  resolvedPreset: GraphileConfig.ResolvedPreset;
 };
 
 export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
@@ -255,16 +251,16 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
       }
     },
     // TODO: validate that this actually does mask every error
-    onError(ctx, message, errors) {
+    onError(_ctx, _message, errors) {
       return errors.map(instance.dynamicOptions.maskError);
     },
     async execute(args: ExecutionArgs) {
       const eargs = args as ExtendedExecutionArgs;
-      return eargs.execute(eargs, eargs.resolvedPreset);
+      return eargs.execute(eargs);
     },
     async subscribe(args: ExecutionArgs) {
       const eargs = args as ExtendedExecutionArgs;
-      return eargs.subscribe(eargs, eargs.resolvedPreset);
+      return eargs.subscribe(eargs);
     },
   };
 }
