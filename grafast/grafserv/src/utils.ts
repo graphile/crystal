@@ -211,7 +211,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
           execute,
           subscribe,
           contextValue,
-        } = await instance.getExecutionStuff(grafastCtx);
+        } = await instance.getExecutionConfig(grafastCtx);
 
         const parsedBody = parseGraphQLJSONBody(message.payload);
         await instance.hooks.process("processGraphQLRequestBody", {

@@ -56,10 +56,10 @@ export interface GrafservPluginContext {
   resolvedPreset: GraphileConfig.ResolvedPreset;
 }
 export interface InitEvent {
-  getExecutionStuff?: (
+  getExecutionConfig?: (
     this: GrafservBase,
     ctx: Partial<Grafast.RequestContext>,
-  ) => PromiseOrDirect<ExecutionStuff>;
+  ) => PromiseOrDirect<ExecutionConfig>;
   validationRules: ValidationRule[];
 }
 export interface ProcessGraphQLRequestBodyEvent {
@@ -247,7 +247,7 @@ export type Result =
 
 export type DynamicOptions = OptionsFromConfig & InitEvent;
 
-export interface ExecutionStuff {
+export interface ExecutionConfig {
   schema: GraphQLSchema;
   parseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
   resolvedPreset: GraphileConfig.ResolvedPreset;

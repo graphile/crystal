@@ -429,7 +429,7 @@ const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
       subscribe,
       contextValue,
       // dynamicOptions?
-    } = await instance.getExecutionStuff(grafastCtx);
+    } = await instance.getExecutionConfig(grafastCtx);
     const outputDataAsString = dynamicOptions.outputDataAsString;
     const { maskIterator, maskPayload, maskError } = dynamicOptions;
 

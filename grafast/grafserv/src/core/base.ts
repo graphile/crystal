@@ -18,7 +18,7 @@ import type {
   DynamicOptions,
   ErrorResult,
   EventStreamEvent,
-  ExecutionStuff,
+  ExecutionConfig,
   GrafservConfig,
   HandlerResult,
   NoContentHandlerResult,
@@ -213,7 +213,7 @@ export class GrafservBase {
     // Note: this gets directly mutated
     const dynamicOptions: DynamicOptions = {
       validationRules: [...graphql.specifiedRules],
-      getExecutionStuff: undefined,
+      getExecutionConfig: undefined,
       ...optionsFromConfig(resolvedPreset),
     };
     const initResult = hooks.process("init", dynamicOptions);
@@ -226,9 +226,9 @@ export class GrafservBase {
         this.initialized = true;
         // ENHANCE: this.graphqlHandler?.release()?
         this.refreshHandlers();
-        this.getExecutionStuff =
-          dynamicOptions.getExecutionStuff ??
-          defaultMakeGetExecutionStuff(this);
+        this.getExecutionConfig =
+          dynamicOptions.getExecutionConfig ??
+          defaultMakeGetExecutionConfig(this);
         // MUST come after the handlers have been refreshed, otherwise we'll
         // get infinite loops
         this.eventEmitter.emit("dynamicOptions:ready", {});
@@ -421,18 +421,18 @@ export class GrafservBase {
     };
   }
 
-  getExecutionStuff = defaultMakeGetExecutionStuff(this);
+  getExecutionConfig = defaultMakeGetExecutionConfig(this);
 }
 
-function defaultMakeGetExecutionStuff(
+function defaultMakeGetExecutionConfig(
   instance: GrafservBase,
-): (ctx: Partial<Grafast.RequestContext>) => PromiseOrDirect<ExecutionStuff> {
+): (ctx: Partial<Grafast.RequestContext>) => PromiseOrDirect<ExecutionConfig> {
   let latestSchema: GraphQLSchema;
   let latestSchemaOrPromise: PromiseOrDirect<GraphQLSchema>;
   let latestParseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
   let schemaPrepare: Promise<boolean> | null = null;
 
-  function realGetExecutionStuff(instance: GrafservBase) {
+  function realGetExecutionConfig(instance: GrafservBase) {
     // Get up to date schema, in case we're in watch mode
     const schemaOrPromise = instance.getSchema();
     const { resolvedPreset, dynamicOptions } = instance;
@@ -509,11 +509,11 @@ function defaultMakeGetExecutionStuff(
       contextValue: Object.create(null),
     };
   }
-  let lastResult: PromiseOrDirect<ExecutionStuff> =
-    realGetExecutionStuff(instance);
-  return function getExecutionStuff(this: GrafservBase, _ignoredContext) {
+  let lastResult: PromiseOrDirect<ExecutionConfig> =
+    realGetExecutionConfig(instance);
+  return function getExecutionConfig(this: GrafservBase, _ignoredContext) {
     if (this.getSchema() !== latestSchemaOrPromise) {
-      lastResult = realGetExecutionStuff(this);
+      lastResult = realGetExecutionConfig(this);
       if (isPromiseLike(lastResult)) {
         lastResult.then(
           // Cache so next time can return synchronously.
