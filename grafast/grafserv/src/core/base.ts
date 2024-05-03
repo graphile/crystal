@@ -38,6 +38,10 @@ import {
 import { optionsFromConfig } from "../options.js";
 import { handleErrors, normalizeRequest, sleep } from "../utils.js";
 
+const failedToBuildHandlersError = new graphql.GraphQLError(
+  "Unknown error occurred.",
+);
+
 const { isSchema, validateSchema } = graphql;
 
 export class GrafservBase {
@@ -239,6 +243,8 @@ export class GrafservBase {
         this.eventEmitter.emit("dynamicOptions:ready", {});
       },
       (e) => {
+        this.graphqlHandler = this.failedGraphqlHandler;
+        this.graphiqlHandler = this.failedGraphiqlHandler;
         this.eventEmitter.emit("dynamicOptions:error", e);
       },
     );
@@ -305,7 +311,7 @@ export class GrafservBase {
         null,
         e,
       );
-      const response = (): HandlerResult => ({
+      deferred.resolve({
         type: "graphql",
         request,
         dynamicOptions,
@@ -316,10 +322,6 @@ export class GrafservBase {
         // so it shouldn't be hit.
         contentType: APPLICATION_JSON,
       });
-      deferred.resolve(response());
-      if (this.graphqlHandler === this.waitForGraphqlHandler) {
-        this.graphqlHandler = response;
-      }
     };
     this.eventEmitter.on("dynamicOptions:ready", onReady);
     this.eventEmitter.on("dynamicOptions:error", onError);
@@ -332,8 +334,8 @@ export class GrafservBase {
     ...args
   ) {
     const [request] = args;
-    const deferred = defer<HandlerResult>();
     const { dynamicOptions } = this;
+    const deferred = defer<HandlerResult>();
     const onReady = () => {
       this.eventEmitter.off("dynamicOptions:ready", onReady);
       this.eventEmitter.off("dynamicOptions:error", onError);
@@ -353,7 +355,7 @@ export class GrafservBase {
         e,
       );
       // TODO: this should be an HTML response
-      const response = (): HandlerResult => ({
+      deferred.resolve({
         type: "graphql",
         request,
         dynamicOptions,
@@ -364,15 +366,47 @@ export class GrafservBase {
         // so it shouldn't be hit.
         contentType: APPLICATION_JSON,
       });
-      deferred.resolve(response());
-      if (this.graphiqlHandler === this.waitForGraphiqlHandler) {
-        this.graphiqlHandler = response;
-      }
     };
     this.eventEmitter.on("dynamicOptions:ready", onReady);
     this.eventEmitter.on("dynamicOptions:error", onError);
     setTimeout(onError, 5000, new Error("Server initialization timed out"));
     return Promise.resolve(deferred);
+  };
+
+  failedGraphqlHandler: ReturnType<typeof makeGraphQLHandler> = function (
+    this: GrafservBase,
+    ...args
+  ) {
+    const [request] = args;
+    const { dynamicOptions } = this;
+    return {
+      type: "graphql",
+      request,
+      dynamicOptions,
+      payload: { errors: [failedToBuildHandlersError] },
+      statusCode: 503,
+      // Fall back to application/json; this is when an unexpected error happens
+      // so it shouldn't be hit.
+      contentType: APPLICATION_JSON,
+    };
+  };
+
+  failedGraphiqlHandler: ReturnType<typeof makeGraphiQLHandler> = function (
+    this: GrafservBase,
+    ...args
+  ) {
+    const [request] = args;
+    const { dynamicOptions } = this;
+    return {
+      type: "graphql",
+      request,
+      dynamicOptions,
+      payload: { errors: [failedToBuildHandlersError] },
+      statusCode: 503,
+      // Fall back to application/json; this is when an unexpected error happens
+      // so it shouldn't be hit.
+      contentType: APPLICATION_JSON,
+    };
   };
 
   // TODO: Rename this, or make it a middleware, or something
