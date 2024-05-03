@@ -56,8 +56,16 @@ export function postgraphile(
         oldSchemaResult.resolve(schemaResult);
       }
       if (server) {
-        server.setPreset(schemaResult.resolvedPreset);
-        server.setSchema(schemaResult.schema);
+        try {
+          // TODO: `setPreset` should go in a queue
+          server.setPreset(schemaResult.resolvedPreset);
+          server.setSchema(schemaResult.schema);
+        } catch (e) {
+          console.error(
+            "Error occurred whilst setting preset and schema to new result:",
+          );
+          console.error(e);
+        }
       }
     });
   } else {
