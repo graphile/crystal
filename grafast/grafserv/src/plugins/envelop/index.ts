@@ -80,3 +80,13 @@ export const GrafservEnvelopPlugin: GraphileConfig.Plugin = {
     },
   },
 };
+
+export const GrafservEnvelopPreset: GraphileConfig.Preset = {
+  plugins: [GrafservEnvelopPlugin],
+  grafserv: {
+    // Let Envelop handle error masking
+    maskError(e) {
+      return e;
+    },
+  },
+};

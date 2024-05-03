@@ -1,7 +1,7 @@
 import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 
-import { constant, makeGrafastSchema } from "grafast";
+import { constant, error, makeGrafastSchema } from "grafast";
 import { resolvePresets } from "graphile-config";
 
 import { grafserv } from "../src/servers/node/index.js";
@@ -20,12 +20,16 @@ export async function makeExampleServer(
     typeDefs: /* GraphQL */ `
       type Query {
         hello: String!
+        throwAnError: String
       }
     `,
     plans: {
       Query: {
         hello() {
           return constant("world");
+        },
+        throwAnError() {
+          return error(new Error("You asked for an error... Here it is."));
         },
       },
     },
