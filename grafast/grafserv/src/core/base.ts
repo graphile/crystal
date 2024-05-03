@@ -441,8 +441,8 @@ function defaultMakeGetExecutionStuff(
     const schemaOrPromise = instance.getSchema();
     const { resolvedPreset, dynamicOptions } = instance;
     if (schemaOrPromise !== latestSchemaOrPromise) {
+      latestSchemaOrPromise = schemaOrPromise;
       if ("then" in schemaOrPromise) {
-        latestSchemaOrPromise = schemaOrPromise;
         schemaPrepare = (async () => {
           latestSchema = await schemaOrPromise;
           latestSchemaOrPromise = schemaOrPromise;
@@ -455,7 +455,6 @@ function defaultMakeGetExecutionStuff(
           return true;
         })();
       } else {
-        latestSchemaOrPromise = schemaOrPromise;
         if (latestSchema === schemaOrPromise) {
           // No action necessary
         } else {
