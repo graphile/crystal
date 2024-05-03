@@ -225,7 +225,7 @@
   "peerDependencies": {
     "@dataplan/json": "workspace:*",
     "@dataplan/pg": "workspace:*",
-    "@envelop/core": "^3.0.4",
+    "@envelop/core": "^5.0.0",
     "grafast": "workspace:^",
     "grafserv": "workspace:^",
     "graphile-build": "workspace:*",
