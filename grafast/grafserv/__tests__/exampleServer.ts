@@ -2,6 +2,7 @@ import { createServer } from "node:http";
 import type { AddressInfo } from "node:net";
 
 import { constant, makeGrafastSchema } from "grafast";
+import { resolvePresets } from "graphile-config";
 
 import { grafserv } from "../src/servers/node/index.js";
 
@@ -14,6 +15,7 @@ export async function makeExampleServer(
     },
   },
 ) {
+  const resolvedPreset = resolvePresets([preset]);
   const schema = makeGrafastSchema({
     typeDefs: /* GraphQL */ `
       type Query {
@@ -46,7 +48,7 @@ export async function makeExampleServer(
     info.family === "IPv6"
       ? `[${info.address === "::" ? "::1" : info.address}]`
       : info.address
-  }:${info.port}${preset.grafserv!.graphqlPath}`;
+  }:${info.port}${resolvedPreset.grafserv!.graphqlPath}`;
 
   const release = () => {
     serv.release();

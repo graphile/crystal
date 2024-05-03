@@ -44,6 +44,11 @@ export class GrafservBase {
   private releaseHandlers: Array<() => PromiseOrDirect<void>> = [];
   private releasing = false;
   public dynamicOptions: DynamicOptions;
+  public getExecutionConfig(
+    _ctx: Partial<Grafast.RequestContext>,
+  ): PromiseOrDirect<ExecutionConfig> {
+    throw new Error("Overwritten in constructor");
+  }
   public resolvedPreset: GraphileConfig.ResolvedPreset;
   /** @internal */
   public hooks: AsyncHooks<GraphileConfig.GrafservHooks>;
@@ -64,8 +69,10 @@ export class GrafservBase {
     this.resolvedPreset = config.preset ? resolvePresets([config.preset]) : {};
     this.dynamicOptions = {
       validationRules: [...graphql.specifiedRules],
+      getExecutionConfig: defaultMakeGetExecutionConfig(),
       ...optionsFromConfig(this.resolvedPreset),
     };
+    this.getExecutionConfig = this.dynamicOptions.getExecutionConfig;
     this.hooks = getGrafservHooks(this.resolvedPreset);
     this.schemaError = null;
     this.schema = config.schema;
@@ -213,7 +220,7 @@ export class GrafservBase {
     // Note: this gets directly mutated
     const dynamicOptions: DynamicOptions = {
       validationRules: [...graphql.specifiedRules],
-      getExecutionConfig: undefined,
+      getExecutionConfig: defaultMakeGetExecutionConfig(),
       ...optionsFromConfig(resolvedPreset),
     };
     const initResult = hooks.process("init", dynamicOptions);
@@ -226,9 +233,7 @@ export class GrafservBase {
         this.initialized = true;
         // ENHANCE: this.graphqlHandler?.release()?
         this.refreshHandlers();
-        this.getExecutionConfig =
-          dynamicOptions.getExecutionConfig ??
-          defaultMakeGetExecutionConfig(this);
+        this.getExecutionConfig = dynamicOptions.getExecutionConfig;
         // MUST come after the handlers have been refreshed, otherwise we'll
         // get infinite loops
         this.eventEmitter.emit("dynamicOptions:ready", {});
@@ -420,22 +425,20 @@ export class GrafservBase {
       },
     };
   }
-
-  getExecutionConfig = defaultMakeGetExecutionConfig(this);
 }
 
-function defaultMakeGetExecutionConfig(
-  instance: GrafservBase,
-): (ctx: Partial<Grafast.RequestContext>) => PromiseOrDirect<ExecutionConfig> {
+function defaultMakeGetExecutionConfig(): (
+  ctx: Partial<Grafast.RequestContext>,
+) => PromiseOrDirect<ExecutionConfig> {
   let latestSchema: GraphQLSchema;
   let latestSchemaOrPromise: PromiseOrDirect<GraphQLSchema>;
   let latestParseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
   let schemaPrepare: Promise<boolean> | null = null;
 
-  function realGetExecutionConfig(instance: GrafservBase) {
+  return function getExecutionConfig(this: GrafservBase) {
     // Get up to date schema, in case we're in watch mode
-    const schemaOrPromise = instance.getSchema();
-    const { resolvedPreset, dynamicOptions } = instance;
+    const schemaOrPromise = this.getSchema();
+    const { resolvedPreset, dynamicOptions } = this;
     if (schemaOrPromise !== latestSchemaOrPromise) {
       latestSchemaOrPromise = schemaOrPromise;
       if ("then" in schemaOrPromise) {
@@ -508,26 +511,6 @@ function defaultMakeGetExecutionConfig(
       subscribe,
       contextValue: Object.create(null),
     };
-  }
-  let lastResult: PromiseOrDirect<ExecutionConfig> =
-    realGetExecutionConfig(instance);
-  return function getExecutionConfig(this: GrafservBase, _ignoredContext) {
-    if (this.getSchema() !== latestSchemaOrPromise) {
-      lastResult = realGetExecutionConfig(this);
-      if (isPromiseLike(lastResult)) {
-        lastResult.then(
-          // Cache so next time can return synchronously.
-          (result) => {
-            lastResult = result;
-            return result;
-          },
-          () => {
-            /* ignore errors */
-          },
-        );
-      }
-    }
-    return lastResult;
   };
 }
 

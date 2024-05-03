@@ -56,7 +56,7 @@ export interface GrafservPluginContext {
   resolvedPreset: GraphileConfig.ResolvedPreset;
 }
 export interface InitEvent {
-  getExecutionConfig?: (
+  getExecutionConfig: (
     this: GrafservBase,
     ctx: Partial<Grafast.RequestContext>,
   ) => PromiseOrDirect<ExecutionConfig>;

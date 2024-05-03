@@ -2942,6 +2942,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@envelop/core@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "@envelop/core@npm:5.0.0"
+  dependencies:
+    "@envelop/types": "npm:5.0.0"
+    tslib: "npm:^2.5.0"
+  checksum: 455d40e1253b2391751ff7c7c9b0ae71fa2552417df01035bee45d8ecccfb4528209196ad3e1e60c5d0602da4de64ef4cc3f547287a99c830f394c9f3477ab84
+  languageName: node
+  linkType: hard
+
 "@envelop/parser-cache@npm:^6.0.2":
   version: 6.0.2
   resolution: "@envelop/parser-cache@npm:6.0.2"
@@ -2961,6 +2971,15 @@ __metadata:
   dependencies:
     tslib: "npm:^2.5.0"
   checksum: 189ac9f5862c6de39cbced191b28ffbdb1f5cfd7d658dd4c199767bbc6a6c66e22bb80dcfd7269574145a0bc271130f029f92809f4b9fcf7a6b1b6ea929c1250
+  languageName: node
+  linkType: hard
+
+"@envelop/types@npm:5.0.0":
+  version: 5.0.0
+  resolution: "@envelop/types@npm:5.0.0"
+  dependencies:
+    tslib: "npm:^2.5.0"
+  checksum: fb851b256a2d7bbe60c4b170ea438941f66320a9a7f11cebfdfdce8e6d0463b2f3c83a244e100b0030f3b84ef486364b805a9f3356aedf9bd1b7f0b18000eef6
   languageName: node
   linkType: hard
 
@@ -12074,6 +12093,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "grafserv@workspace:grafast/grafserv"
   dependencies:
+    "@envelop/core": "npm:^5.0.0"
     "@fastify/websocket": "npm:^8.2.0"
     "@graphile/lru": "workspace:^"
     "@types/aws-lambda": "npm:^8.10.123"
@@ -12100,12 +12120,15 @@ __metadata:
     tslib: "npm:^2.6.2"
     typescript: "npm:^5.2.2"
   peerDependencies:
+    "@envelop/core": ^5.0.0
     grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
     h3: ^1.7.1
     ws: ^8.12.1
   peerDependenciesMeta:
+    "@envelop/core":
+      optional: true
     h3:
       optional: true
     ws:

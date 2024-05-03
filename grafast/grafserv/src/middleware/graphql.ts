@@ -2,7 +2,7 @@ import { parse as parseGraphQLQueryString } from "node:querystring";
 
 import { LRU } from "@graphile/lru";
 import { createHash } from "crypto";
-import type { PromiseOrDirect } from "grafast";
+import type { GrafastExecutionArgs, PromiseOrDirect } from "grafast";
 import {
   $$extensions,
   execute as grafastExecute,
@@ -83,19 +83,7 @@ export function makeParseAndValidateFunction(
     try {
       document = parse(source);
     } catch (e) {
-      const result = {
-        errors: [
-          new GraphQLError(
-            e.message,
-            null,
-            undefined,
-            undefined,
-            undefined,
-            e,
-            undefined,
-          ),
-        ],
-      };
+      const result = { errors: [e] };
       parseAndValidationCache?.set(hash, result);
       lastParseAndValidateQuery = query;
       lastParseAndValidateResult = result;
@@ -470,18 +458,19 @@ const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
       }
     }
 
-    const args: ExecutionArgs = {
+    const args: GrafastExecutionArgs = {
       schema,
       document,
       rootValue: null,
       contextValue,
       variableValues,
       operationName,
+      resolvedPreset,
     };
 
     try {
       await hookArgs(args, resolvedPreset, grafastCtx);
-      const result = await execute(args, resolvedPreset);
+      const result = await execute(args);
       if (isAsyncIterable(result)) {
         return {
           type: "graphqlIncremental",

@@ -45,6 +45,7 @@ import type {
   $$queryCache,
   CacheByOperationEntry,
   DataFromStep,
+  GrafastExecutionArgs,
   GrafastTimeouts,
   ScalarInputPlanResolver,
 } from "./interfaces.js";
@@ -323,6 +324,7 @@ export {
   getEnumValueConfig,
   grafast,
   GrafastArgumentConfig,
+  GrafastExecutionArgs,
   GrafastFieldConfig,
   GrafastFieldConfigArgumentMap,
   grafast as grafastGraphql,

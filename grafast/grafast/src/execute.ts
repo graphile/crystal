@@ -9,7 +9,11 @@ import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 import { NULL_PRESET } from "./config.js";
 import { isDev } from "./dev.js";
 import { inspect } from "./inspect.js";
-import type { ExecutionEventEmitter, ExecutionEventMap } from "./interfaces.js";
+import type {
+  ExecutionEventEmitter,
+  ExecutionEventMap,
+  GrafastExecutionArgs,
+} from "./interfaces.js";
 import { $$eventEmitter, $$extensions } from "./interfaces.js";
 import { grafastPrepare } from "./prepare.js";
 import { isPromiseLike } from "./utils.js";
@@ -90,15 +94,35 @@ export function withGrafastArgs(
 }
 
 /**
+ * @deprecated Second and third parameters should be passed as part of args,
+ * specifically `resolvedPreset` and `outputDataAsString`.
+ */
+export function execute(
+  args: GrafastExecutionArgs,
+  resolvedPreset: GraphileConfig.ResolvedPreset | undefined,
+  outputDataAsString?: boolean,
+): PromiseOrValue<
+  ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
+>;
+/**
  * Use this instead of GraphQL.js' execute method and we'll automatically
  * run grafastPrepare for you and handle the result.
  */
 export function execute(
   args: ExecutionArgs,
-  resolvedPreset: GraphileConfig.ResolvedPreset = NULL_PRESET,
-  outputDataAsString = false,
+): PromiseOrValue<
+  ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
+>;
+export function execute(
+  args: GrafastExecutionArgs,
+  resolvedPreset?: GraphileConfig.ResolvedPreset,
+  outputDataAsString?: boolean,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 > {
-  return withGrafastArgs(args, resolvedPreset, outputDataAsString);
+  return withGrafastArgs(
+    args,
+    args.resolvedPreset ?? resolvedPreset ?? NULL_PRESET,
+    args.outputDataAsString ?? outputDataAsString ?? false,
+  );
 }
