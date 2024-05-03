@@ -519,10 +519,16 @@ function defaultMakeGetExecutionStuff(
     if (!lastResult || this.getSchema() !== latestSchemaOrPromise) {
       lastResult = realGetExecutionStuff(this);
       if (isPromiseLike(lastResult)) {
-        lastResult = lastResult.then((result) => {
-          lastResult = result;
-          return result;
-        });
+        lastResult.then(
+          // Cache so next time can return synchronously.
+          (result) => {
+            lastResult = result;
+            return result;
+          },
+          () => {
+            /* ignore errors */
+          },
+        );
       }
     }
     return lastResult;
