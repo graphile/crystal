@@ -123,6 +123,20 @@ function assertPlugin(plugin: any): asserts plugin is GraphileConfig.Plugin {
       }' to have a string 'version'; found ${inspect(plugin.version)}`,
     );
   }
+  const keys = Object.keys(plugin);
+  const forbiddenKeys = keys.filter(isForbiddenPluginKey);
+  if (forbiddenKeys.length) {
+    throw new Error(
+      `Expected a GraphileConfig plugin, but found an object with forbidden keys ` +
+        `(e.g. keys starting with a capital letter, or a 'default' key). This typically indicates an ` +
+        `issue with ESM compatibility or import method, for example ` +
+        `doing \`import MyPlugin from 'my-plugin'\` instead of ` +
+        `\`import { MyPlugin } from 'my-plugin'\` or vice versa. ` +
+        `Forbidden keys: '${forbiddenKeys.join(
+          "', '",
+        )}', full value: '${inspect(plugin)}'`,
+    );
+  }
   for (const forbiddenKey of PLUGIN_FORBIDDEN_KEYS) {
     if (plugin[forbiddenKey]) {
       throw new Error(
@@ -133,7 +147,11 @@ function assertPlugin(plugin: any): asserts plugin is GraphileConfig.Plugin {
 }
 
 function isForbiddenPresetKey(key: string): boolean {
-  return /^[A-Z_]/.test(key);
+  return /^[A-Z_]/.test(key) || key === "default";
+}
+
+function isForbiddenPluginKey(key: string): boolean {
+  return /^[A-Z_]/.test(key) || key === "default";
 }
 
 /**
@@ -157,7 +175,7 @@ function resolvePreset(
   if (forbiddenKeys.length) {
     throw new Error(
       `Expected a GraphileConfig preset, but found an object with forbidden keys ` +
-        `(e.g. keys starting with a capital letter). This typically indicates an ` +
+        `(e.g. keys starting with a capital letter, or a 'default' key). This typically indicates an ` +
         `issue with ESM compatibility or import method, for example ` +
         `doing \`import MyPreset from 'my-preset'\` instead of ` +
         `\`import { MyPreset } from 'my-preset'\` or vice versa. ` +
