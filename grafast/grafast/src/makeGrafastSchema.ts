@@ -401,6 +401,11 @@ export function makeGrafastSchema(details: {
               type: mapType(rawFieldSpec.type),
             };
             fields[fieldName] = fieldConfig;
+            if (fieldConfig.args) {
+              for (const [argName, arg] of Object.entries(fieldConfig.args)) {
+                arg.type = mapType(arg.type);
+              }
+            }
           }
           return fields;
         };
