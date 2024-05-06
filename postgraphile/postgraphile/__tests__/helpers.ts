@@ -9,16 +9,11 @@ if (process.env.DEBUG) {
 import "graphile-config";
 import "graphile-build-pg";
 
-import type {
-  PgClient,
-  PgClientQuery,
-  PgClientResult,
-  WithPgClient,
-} from "@dataplan/pg";
+import type { PgClientQuery } from "@dataplan/pg";
 import { PgSubscriber } from "@dataplan/pg/adaptors/pg";
 import { promises as fsp } from "fs";
+import { mkdir, mkdtemp, rmdir, unlink } from "fs/promises";
 import {
-  $$bypassGraphQL,
   execute as grafastExecute,
   hookArgs,
   subscribe as grafastSubscribe,
@@ -41,6 +36,7 @@ import {
 } from "grafast/graphql";
 import { planToMermaid } from "grafast/mermaid";
 import { StreamDeferPlugin } from "graphile-build";
+import { exportSchema } from "graphile-export";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 import type { JwtPayload } from "jsonwebtoken";
@@ -158,6 +154,43 @@ export async function withPoolClientTransaction<T>(
       await poolClient.query("rollback");
     }
   });
+}
+
+// Has to be within `postgraphile` folder otherwise imports won't work
+const TMPDIR = `${__dirname}/../.tests_tmp`;
+
+let mktmpPromise: any;
+function mktmp() {
+  if (!mktmpPromise) {
+    mktmpPromise = (async () => {
+      try {
+        await mkdir(TMPDIR);
+      } catch (e) {
+        if (e.code === "EEXIST") {
+          // NOOP
+        } else {
+          throw e;
+        }
+      }
+    })();
+  }
+  return mktmpPromise;
+}
+
+async function importExportedSchema(schema: GraphQLSchema) {
+  await mktmp();
+  const tempDir = await mkdtemp(`${TMPDIR}/postgraphiletests-`);
+  const targetFile = tempDir + "/schema.js";
+  await exportSchema(schema, targetFile, { mode: "typeDefs" });
+  try {
+    const module = await import(targetFile);
+    await unlink(targetFile);
+    await rmdir(tempDir);
+    return module.schema;
+  } catch (e) {
+    console.log(`Importing ${targetFile} (schema export) failed: ${e}`);
+    throw e;
+  }
 }
 
 export async function runTestQuery(
@@ -301,7 +334,11 @@ export async function runTestQuery(
     await testPool.query(setupSql);
   }
   try {
-    const { schema, resolvedPreset } = await makeSchema(preset);
+    const { schema: rawSchema, resolvedPreset } = await makeSchema(preset);
+
+    const schema = process.env.EXPORT_SCHEMA
+      ? await importExportedSchema(rawSchema)
+      : rawSchema;
     return await withTestWithPgClient<any>(
       testPool,
       queries,
