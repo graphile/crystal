@@ -1697,30 +1697,44 @@ function exportSchemaTypeDefs({
             `${type.name}.extensions.grafast.plan`,
           )
         : null;
-      if (planAST) {
+      if (
+        planAST ||
+        type.serialize !== GraphQLScalarType.prototype.serialize ||
+        type.parseValue !== GraphQLScalarType.prototype.parseValue ||
+        type.parseLiteral !== GraphQLScalarType.prototype.parseLiteral
+      ) {
         plansProperties.push(
           t.objectProperty(
             identifierOrLiteral(type.name),
             t.objectExpression(
               objectToObjectProperties({
-                serialize: convertToIdentifierViaAST(
-                  file,
-                  type.serialize,
-                  `${type.name}Serialize`,
-                  `${type.name}.serialize`,
-                ),
-                parseValue: convertToIdentifierViaAST(
-                  file,
-                  type.parseValue,
-                  `${type.name}ParseValue`,
-                  `${type.name}.parseValue`,
-                ),
-                parseLiteral: convertToIdentifierViaAST(
-                  file,
-                  type.parseLiteral,
-                  `${type.name}ParseLiteral`,
-                  `${type.name}.parseLiteral`,
-                ),
+                serialize:
+                  type.serialize !== GraphQLScalarType.prototype.serialize
+                    ? convertToIdentifierViaAST(
+                        file,
+                        type.serialize,
+                        `${type.name}Serialize`,
+                        `${type.name}.serialize`,
+                      )
+                    : null,
+                parseValue:
+                  type.parseValue !== GraphQLScalarType.prototype.parseValue
+                    ? convertToIdentifierViaAST(
+                        file,
+                        type.parseValue,
+                        `${type.name}ParseValue`,
+                        `${type.name}.parseValue`,
+                      )
+                    : null,
+                parseLiteral:
+                  type.parseLiteral !== GraphQLScalarType.prototype.parseLiteral
+                    ? convertToIdentifierViaAST(
+                        file,
+                        type.parseLiteral,
+                        `${type.name}ParseLiteral`,
+                        `${type.name}.parseLiteral`,
+                      )
+                    : null,
                 plan: planAST,
               }),
             ),
