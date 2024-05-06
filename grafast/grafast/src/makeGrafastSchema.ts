@@ -122,14 +122,40 @@ export function makeGrafastSchema(details: {
   const astSchema = buildASTSchema(parse(typeDefs), {
     enableDeferStream,
   });
-  const rawSchemaConfig = astSchema.toConfig();
-  const schemaConfig = {
-    ...rawSchemaConfig,
-    types: [...rawSchemaConfig.types],
+  const schemaConfig = astSchema.toConfig() as graphql.GraphQLSchemaConfig & {
+    types: Array<graphql.GraphQLNamedType>;
   };
 
-  // Now add the plans/etc to the schema
-  for (const [typeName, spec] of Object.entries(plans)) {
+  const typeByName = new Map<string, graphql.GraphQLNamedType>();
+
+  function mapType(type: graphql.GraphQLObjectType): graphql.GraphQLObjectType;
+  function mapType(
+    type: graphql.GraphQLInterfaceType,
+  ): graphql.GraphQLInterfaceType;
+  function mapType(
+    type: graphql.GraphQLNamedType & graphql.GraphQLOutputType,
+  ): graphql.GraphQLNamedType & graphql.GraphQLOutputType;
+  function mapType(
+    type: graphql.GraphQLNamedType & graphql.GraphQLInputType,
+  ): graphql.GraphQLNamedType & graphql.GraphQLInputType;
+  function mapType(type: graphql.GraphQLOutputType): graphql.GraphQLOutputType;
+  function mapType(type: graphql.GraphQLInputType): graphql.GraphQLInputType;
+  function mapType(type: graphql.GraphQLType): graphql.GraphQLType;
+  function mapType(type: graphql.GraphQLType): graphql.GraphQLType {
+    if (graphql.isNonNullType(type)) {
+      return new graphql.GraphQLNonNull(mapType(type.ofType));
+    } else if (graphql.isListType(type)) {
+      return new graphql.GraphQLList(mapType(type.ofType));
+    } else {
+      const replacementType = typeByName.get(type.name);
+      if (!replacementType) {
+        throw new Error(`Failed to find replaced type '${type.name}'`);
+      }
+      return replacementType;
+    }
+  }
+
+  for (const [typeName, _spec] of Object.entries(plans)) {
     const astTypeIndex = schemaConfig.types.findIndex(
       (t) => t.name === typeName,
     );
@@ -140,268 +166,385 @@ export function makeGrafastSchema(details: {
       );
       continue;
     }
-    if (isObjectType(astType)) {
-      const config = astType.toConfig();
-      if (typeof spec !== "object" || !spec) {
-        throw new Error(`Invalid object config for '${typeName}'`);
+  }
+
+  const BUILT_IN_TYPE_NAMES = ["String", "Int", "Float", "Boolean", "ID"];
+
+  // Now mod the types
+  const rawTypes = schemaConfig.types;
+  schemaConfig.types = rawTypes.map((astType) => {
+    const typeName = astType.name;
+    const replacementType = (() => {
+      if (typeName.startsWith("__") || BUILT_IN_TYPE_NAMES.includes(typeName)) {
+        return astType;
       }
+      if (isObjectType(astType)) {
+        const rawConfig = astType.toConfig();
+        const objectPlans = plans[astType.name] as ObjectPlans | undefined;
 
-      const objSpec = spec as ObjectPlans;
-      const fields = config.fields;
-      for (const [fieldName, fieldSpec] of Object.entries(objSpec)) {
-        if (fieldName === "__assertStep") {
-          exportNameHint(fieldSpec, `${typeName}_assertStep`);
-          (
-            config.extensions as graphql.GraphQLObjectTypeExtensions<any, any>
-          ).grafast = { assertStep: fieldSpec as any };
-          continue;
-        } else if (fieldName.startsWith("__")) {
-          throw new Error(
-            `Unsupported field name '${fieldName}'; perhaps you meant '__assertStep'?`,
-          );
-        }
+        const rawFields = rawConfig.fields;
+        const rawInterfaces = rawConfig.interfaces;
+        const config: graphql.GraphQLObjectTypeConfig<any, any> = {
+          ...rawConfig,
+          extensions: {
+            ...rawConfig.extensions,
+          },
+        };
+        if (objectPlans) {
+          for (const [fieldName, rawFieldSpec] of Object.entries(objectPlans)) {
+            if (fieldName === "__assertStep") {
+              exportNameHint(rawFieldSpec, `${typeName}_assertStep`);
+              (
+                config.extensions as graphql.GraphQLObjectTypeExtensions<
+                  any,
+                  any
+                >
+              ).grafast = { assertStep: rawFieldSpec as any };
+              continue;
+            } else if (fieldName.startsWith("__")) {
+              throw new Error(
+                `Unsupported field name '${fieldName}'; perhaps you meant '__assertStep'?`,
+              );
+            }
+            const fieldSpec = rawFieldSpec as FieldPlans;
 
-        const field = fields[fieldName];
-        if (!field) {
-          console.warn(
-            `'plans' specified configuration for object type '${typeName}' field '${fieldName}', but that field was not present in the type`,
-          );
-          continue;
-        }
-
-        if (typeof fieldSpec === "function") {
-          exportNameHint(fieldSpec, `${typeName}_${fieldName}_plan`);
-          // it's a plan
-          (field.extensions as any).grafast = {
-            plan: fieldSpec,
-          };
-        } else {
-          // it's a spec
-          const grafastExtensions: GraphQLFieldExtensions<any, any>["grafast"] =
-            Object.create(null);
-          (field.extensions as any).grafast = grafastExtensions;
-          if (typeof fieldSpec.resolve === "function") {
-            exportNameHint(
-              fieldSpec.resolve,
-              `${typeName}_${fieldName}_resolve`,
-            );
-            field.resolve = fieldSpec.resolve;
-          }
-          if (typeof fieldSpec.subscribe === "function") {
-            exportNameHint(
-              fieldSpec.subscribe,
-              `${typeName}_${fieldName}_subscribe`,
-            );
-            field.subscribe = fieldSpec.subscribe;
-          }
-          if (typeof fieldSpec.plan === "function") {
-            exportNameHint(fieldSpec.plan, `${typeName}_${fieldName}_plan`);
-            grafastExtensions!.plan = fieldSpec.plan;
-          }
-          if (typeof fieldSpec.subscribePlan === "function") {
-            exportNameHint(
-              fieldSpec.subscribePlan,
-              `${typeName}_${fieldName}_subscribePlan`,
-            );
-            grafastExtensions!.subscribePlan = fieldSpec.subscribePlan;
-          }
-
-          if (typeof fieldSpec.args === "object" && fieldSpec.args != null) {
-            for (const [argName, argSpec] of Object.entries(fieldSpec.args)) {
-              const arg = field.args?.[argName];
-              if (!arg) {
-                console.warn(
-                  `'plans' specified configuration for object type '${typeName}' field '${fieldName}' arg '${argName}', but that arg was not present in the type`,
-                );
-                continue;
-              }
-              if (typeof argSpec === "function") {
-                // Invalid
-                throw new Error(
-                  `Invalid configuration for plans.${typeName}.${fieldName}.args.${argName} - saw a function, but expected an object with 'inputPlan' (optional) and 'applyPlan' (optional) plans`,
-                );
-              } else {
-                if (argSpec) {
-                  exportNameHint(
-                    argSpec.applyPlan,
-                    `${typeName}_${fieldName}_${argName}_applyPlan`,
+            const field = rawFields[fieldName];
+            if (!field) {
+              console.warn(
+                `'plans' specified configuration for object type '${typeName}' field '${fieldName}', but that field was not present in the type`,
+              );
+              continue;
+            }
+            if (
+              "args" in fieldSpec &&
+              typeof fieldSpec.args === "object" &&
+              fieldSpec.args != null
+            ) {
+              for (const [argName, argSpec] of Object.entries(fieldSpec.args)) {
+                const arg = field.args?.[argName];
+                if (!arg) {
+                  console.warn(
+                    `'plans' specified configuration for object type '${typeName}' field '${fieldName}' arg '${argName}', but that arg was not present in the type`,
                   );
-                  exportNameHint(
-                    argSpec.inputPlan,
-                    `${typeName}_${fieldName}_${argName}_inputPlan`,
-                  );
+                  continue;
                 }
-                const grafastExtensions: Grafast.ArgumentExtensions =
-                  Object.create(null);
-                (arg.extensions as any).grafast = grafastExtensions;
-                Object.assign(grafastExtensions, argSpec);
               }
             }
           }
         }
-      }
-      schemaConfig.types[astTypeIndex] = new graphql.GraphQLObjectType(config);
-    } else if (isInputObjectType(astType)) {
-      const config = astType.toConfig();
-      if (typeof spec !== "object" || !spec) {
-        throw new Error(`Invalid input object config for '${typeName}'`);
-      }
+        config.interfaces = function () {
+          return rawInterfaces.map((t) => mapType(t));
+        };
 
-      const inputSpec = spec as InputObjectPlans;
-
-      const fields = config.fields;
-
-      for (const [fieldName, fieldSpec] of Object.entries(inputSpec)) {
-        const field = fields[fieldName];
-        if (!field) {
-          console.warn(
-            `'plans' specified configuration for input object type '${typeName}' field '${fieldName}', but that field was not present in the type`,
-          );
-          continue;
-        }
-        if (typeof fieldSpec === "function") {
-          throw new Error(
-            `Expected input object type '${typeName}' field '${fieldName}' to be an object, but found a function. We don't know if this should be the 'inputPlan' or 'applyPlan' - please supply an object.`,
-          );
-        } else {
-          if (fieldSpec) {
-            exportNameHint(
-              fieldSpec.inputPlan,
-              `${typeName}_${fieldName}_inputPlan`,
-            );
-            exportNameHint(
-              fieldSpec.applyPlan,
-              `${typeName}_${fieldName}_applyPlan`,
-            );
-          }
-          // it's a spec
-          const grafastExtensions: Grafast.InputFieldExtensions =
+        config.fields = function () {
+          const fields: graphql.GraphQLFieldConfigMap<any, any> =
             Object.create(null);
-          (field.extensions as any).grafast = grafastExtensions;
-          Object.assign(grafastExtensions, fieldSpec);
-        }
-      }
-      schemaConfig.types[astTypeIndex] = new graphql.GraphQLInputObjectType(
-        config,
-      );
-    } else if (isInterfaceType(astType)) {
-      const config = astType.toConfig();
-      if (typeof spec !== "object" || !spec) {
-        throw new Error(`Invalid interface/union config for '${typeName}'`);
-      }
-      const polySpec = spec as InterfaceOrUnionPlans;
-      if (polySpec.__resolveType) {
-        exportNameHint(polySpec.__resolveType, `${typeName}_resolveType`);
-        config.resolveType = polySpec.__resolveType;
-      }
-      schemaConfig.types[astTypeIndex] = new graphql.GraphQLInterfaceType(
-        config,
-      );
-    } else if (isUnionType(astType)) {
-      const config = astType.toConfig();
-      if (typeof spec !== "object" || !spec) {
-        throw new Error(`Invalid interface/union config for '${typeName}'`);
-      }
-      const polySpec = spec as InterfaceOrUnionPlans;
-      if (polySpec.__resolveType) {
-        exportNameHint(polySpec.__resolveType, `${typeName}_resolveType`);
-        config.resolveType = polySpec.__resolveType;
-      }
-      schemaConfig.types[astTypeIndex] = new graphql.GraphQLUnionType(config);
-    } else if (isScalarType(astType)) {
-      const rawConfig = astType.toConfig();
-      const config = {
-        ...rawConfig,
-        extensions: {
-          ...rawConfig.extensions,
-        },
-      };
-      if (typeof spec !== "object" || !spec) {
-        throw new Error(`Invalid scalar config for '${typeName}'`);
-      }
-      const scalarSpec = spec as ScalarPlans;
-      if (typeof scalarSpec.serialize === "function") {
-        exportNameHint(scalarSpec.serialize, `${typeName}_serialize`);
-        config.serialize = scalarSpec.serialize;
-      }
-      if (typeof scalarSpec.parseValue === "function") {
-        exportNameHint(scalarSpec.parseValue, `${typeName}_parseValue`);
-        config.parseValue = scalarSpec.parseValue;
-      }
-      if (typeof scalarSpec.parseLiteral === "function") {
-        exportNameHint(scalarSpec.parseLiteral, `${typeName}_parseLiteral`);
-        config.parseLiteral = scalarSpec.parseLiteral;
-      }
-      if (typeof scalarSpec.plan === "function") {
-        exportNameHint(scalarSpec.plan, `${typeName}_plan`);
-        config.extensions.grafast = { plan: scalarSpec.plan };
-      }
-      schemaConfig.types[astTypeIndex] = new graphql.GraphQLScalarType(config);
-    } else if (isEnumType(astType)) {
-      const rawConfig = astType.toConfig();
-      const config = {
-        ...rawConfig,
-        values: Object.fromEntries(
-          Object.entries(rawConfig.values).map(([valueName, value]) => [
-            valueName,
-            {
-              ...value,
-              extensions: {
-                ...value.extensions,
-              },
-            },
-          ]),
-        ),
-      };
-      if (typeof spec !== "object" || !spec) {
-        throw new Error(`Invalid enum config for '${typeName}'`);
-      }
-      const enumValues = config.values;
-      for (const [enumValueName, enumValueSpec] of Object.entries(
-        spec as EnumPlans,
-      )) {
-        const enumValue = enumValues[enumValueName];
-        if (!enumValue) {
-          console.warn(
-            `'plans' specified configuration for enum type '${typeName}' value '${enumValueName}', but that value was not present in the type`,
-          );
-          continue;
-        }
-        if (typeof enumValueSpec === "function") {
-          exportNameHint(
-            enumValueSpec,
-            `${typeName}_${enumValueName}_applyPlan`,
-          );
-          // It's a plan
-          enumValue.extensions.grafast = {
-            applyPlan: enumValueSpec,
-          } as Grafast.EnumValueExtensions;
-        } else if (typeof enumValueSpec === "object" && enumValueSpec != null) {
-          // It's a full spec
-          if (enumValueSpec.applyPlan) {
-            exportNameHint(
-              enumValueSpec.applyPlan,
-              `${typeName}_${enumValueName}_applyPlan`,
-            );
-            (enumValue.extensions as any).grafast = {
-              applyPlan: enumValueSpec.applyPlan,
-            } as Grafast.EnumValueExtensions;
+          for (const [fieldName, rawFieldSpec] of Object.entries(rawFields)) {
+            if (fieldName.startsWith("__")) {
+              continue;
+            }
+            const fieldSpec = (objectPlans as ObjectPlans | undefined)?.[
+              fieldName
+            ];
+            const fieldConfig: graphql.GraphQLFieldConfig<any, any> = {
+              ...rawFieldSpec,
+              type: mapType(rawFieldSpec.type),
+            };
+            fields[fieldName] = fieldConfig;
+            if (fieldSpec) {
+              if (typeof fieldSpec === "function") {
+                exportNameHint(fieldSpec, `${typeName}_${fieldName}_plan`);
+                // it's a plan
+                (fieldConfig.extensions as any).grafast = {
+                  plan: fieldSpec,
+                };
+              } else {
+                // it's a spec
+                const grafastExtensions: GraphQLFieldExtensions<
+                  any,
+                  any
+                >["grafast"] = Object.create(null);
+                (fieldConfig.extensions as any).grafast = grafastExtensions;
+                if (typeof fieldSpec.resolve === "function") {
+                  exportNameHint(
+                    fieldSpec.resolve,
+                    `${typeName}_${fieldName}_resolve`,
+                  );
+                  fieldConfig.resolve = fieldSpec.resolve;
+                }
+                if (typeof fieldSpec.subscribe === "function") {
+                  exportNameHint(
+                    fieldSpec.subscribe,
+                    `${typeName}_${fieldName}_subscribe`,
+                  );
+                  fieldConfig.subscribe = fieldSpec.subscribe;
+                }
+                if (typeof fieldSpec.plan === "function") {
+                  exportNameHint(
+                    fieldSpec.plan,
+                    `${typeName}_${fieldName}_plan`,
+                  );
+                  grafastExtensions!.plan = fieldSpec.plan;
+                }
+                if (typeof fieldSpec.subscribePlan === "function") {
+                  exportNameHint(
+                    fieldSpec.subscribePlan,
+                    `${typeName}_${fieldName}_subscribePlan`,
+                  );
+                  grafastExtensions!.subscribePlan = fieldSpec.subscribePlan;
+                }
+
+                if (fieldConfig.args) {
+                  for (const [argName, arg] of Object.entries(
+                    fieldConfig.args,
+                  )) {
+                    arg.type = mapType(arg.type);
+                    const argSpec = fieldSpec.args?.[argName];
+                    if (typeof argSpec === "function") {
+                      // Invalid
+                      throw new Error(
+                        `Invalid configuration for plans.${typeName}.${fieldName}.args.${argName} - saw a function, but expected an object with 'inputPlan' (optional) and 'applyPlan' (optional) plans`,
+                      );
+                    } else if (argSpec) {
+                      exportNameHint(
+                        argSpec.applyPlan,
+                        `${typeName}_${fieldName}_${argName}_applyPlan`,
+                      );
+                      exportNameHint(
+                        argSpec.inputPlan,
+                        `${typeName}_${fieldName}_${argName}_inputPlan`,
+                      );
+                      const grafastExtensions: Grafast.ArgumentExtensions =
+                        Object.create(null);
+                      (arg.extensions as any).grafast = grafastExtensions;
+                      Object.assign(grafastExtensions, argSpec);
+                    }
+                  }
+                }
+              }
+            }
           }
-          if ("value" in enumValueSpec) {
-            enumValue.value = enumValueSpec.value;
+          return fields;
+        };
+        return new graphql.GraphQLObjectType(config);
+      } else if (isInputObjectType(astType)) {
+        const rawConfig = astType.toConfig();
+        const config: graphql.GraphQLInputObjectTypeConfig = {
+          ...rawConfig,
+        };
+        const inputObjectPlans = plans[astType.name] as
+          | InputObjectPlans
+          | undefined;
+
+        if (inputObjectPlans) {
+          for (const [fieldName, fieldSpec] of Object.entries(
+            inputObjectPlans,
+          )) {
+            const field = rawConfig.fields[fieldName];
+            if (!field) {
+              console.warn(
+                `'plans' specified configuration for input object type '${typeName}' field '${fieldName}', but that field was not present in the type`,
+              );
+              continue;
+            }
+            if (typeof fieldSpec === "function") {
+              throw new Error(
+                `Expected input object type '${typeName}' field '${fieldName}' to be an object, but found a function. We don't know if this should be the 'inputPlan' or 'applyPlan' - please supply an object.`,
+              );
+            }
           }
-        } else {
-          // It must be the value
-          enumValue.value = enumValueSpec;
         }
+
+        const rawFields = rawConfig.fields;
+        config.fields = function () {
+          const fields: graphql.GraphQLInputFieldConfigMap =
+            Object.create(null);
+
+          for (const [fieldName, rawFieldConfig] of Object.entries(rawFields)) {
+            const fieldSpec = inputObjectPlans?.[fieldName];
+            const fieldConfig: graphql.GraphQLInputFieldConfig = {
+              ...rawFieldConfig,
+              type: mapType(rawFieldConfig.type),
+            };
+            fields[fieldName] = fieldConfig;
+            if (fieldSpec) {
+              exportNameHint(
+                fieldSpec.inputPlan,
+                `${typeName}_${fieldName}_inputPlan`,
+              );
+              exportNameHint(
+                fieldSpec.applyPlan,
+                `${typeName}_${fieldName}_applyPlan`,
+              );
+            }
+            // it's a spec
+            const grafastExtensions: Grafast.InputFieldExtensions =
+              Object.create(null);
+            (fieldConfig.extensions as any).grafast = grafastExtensions;
+            Object.assign(grafastExtensions, fieldSpec);
+          }
+          return fields;
+        };
+        return new graphql.GraphQLInputObjectType(config);
+      } else if (isInterfaceType(astType)) {
+        const rawConfig = astType.toConfig();
+        const config: graphql.GraphQLInterfaceTypeConfig<any, any> = {
+          ...rawConfig,
+        };
+        const rawFields = rawConfig.fields;
+        config.fields = function () {
+          const fields: graphql.GraphQLFieldConfigMap<any, any> =
+            Object.create(null);
+          for (const [fieldName, rawFieldSpec] of Object.entries(rawFields)) {
+            const fieldConfig: graphql.GraphQLFieldConfig<any, any> = {
+              ...rawFieldSpec,
+              type: mapType(rawFieldSpec.type),
+            };
+            fields[fieldName] = fieldConfig;
+          }
+          return fields;
+        };
+        const rawInterfaces = rawConfig.interfaces;
+        config.interfaces = function () {
+          return rawInterfaces.map((t) => mapType(t));
+        };
+        const polyPlans = plans[astType.name] as
+          | InterfaceOrUnionPlans
+          | undefined;
+        if (polyPlans?.__resolveType) {
+          exportNameHint(polyPlans.__resolveType, `${typeName}_resolveType`);
+          config.resolveType = polyPlans.__resolveType;
+        }
+        return new graphql.GraphQLInterfaceType(config);
+      } else if (isUnionType(astType)) {
+        const rawConfig = astType.toConfig();
+        const config: graphql.GraphQLUnionTypeConfig<any, any> = {
+          ...rawConfig,
+        };
+        const rawTypes = rawConfig.types;
+        config.types = function () {
+          return rawTypes.map((t) => mapType(t));
+        };
+        const polyPlans = plans[astType.name] as
+          | InterfaceOrUnionPlans
+          | undefined;
+        if (polyPlans?.__resolveType) {
+          exportNameHint(polyPlans.__resolveType, `${typeName}_resolveType`);
+          config.resolveType = polyPlans.__resolveType;
+        }
+        return new graphql.GraphQLUnionType(config);
+      } else if (isScalarType(astType)) {
+        const rawConfig = astType.toConfig();
+        const config = {
+          ...(rawConfig as graphql.GraphQLScalarTypeConfig<any, any>),
+          extensions: {
+            ...rawConfig.extensions,
+          },
+        };
+        const scalarPlans = plans[astType.name] as ScalarPlans | undefined;
+        if (typeof scalarPlans?.serialize === "function") {
+          exportNameHint(scalarPlans.serialize, `${typeName}_serialize`);
+          config.serialize = scalarPlans.serialize;
+        }
+        if (typeof scalarPlans?.parseValue === "function") {
+          exportNameHint(scalarPlans.parseValue, `${typeName}_parseValue`);
+          config.parseValue = scalarPlans.parseValue;
+        }
+        if (typeof scalarPlans?.parseLiteral === "function") {
+          exportNameHint(scalarPlans.parseLiteral, `${typeName}_parseLiteral`);
+          config.parseLiteral = scalarPlans.parseLiteral;
+        }
+        if (typeof scalarPlans?.plan === "function") {
+          exportNameHint(scalarPlans.plan, `${typeName}_plan`);
+          config.extensions!.grafast = { plan: scalarPlans.plan };
+        }
+        return new graphql.GraphQLScalarType(config);
+      } else if (isEnumType(astType)) {
+        const rawConfig = astType.toConfig();
+        const config = {
+          ...rawConfig,
+        } as graphql.GraphQLEnumTypeConfig & {
+          extensions: graphql.GraphQLEnumTypeExtensions;
+          values: Record<
+            string,
+            graphql.GraphQLEnumValueConfig & {
+              extensions?: graphql.GraphQLEnumValueExtensions;
+            }
+          >;
+        };
+        const enumPlans = plans[astType.name] as EnumPlans | undefined;
+        const enumValues = config.values;
+        if (enumPlans) {
+          for (const [enumValueName, enumValueSpec] of Object.entries(
+            enumPlans,
+          )) {
+            const enumValue = enumValues[enumValueName];
+            if (!enumValue) {
+              console.warn(
+                `'plans' specified configuration for enum type '${typeName}' value '${enumValueName}', but that value was not present in the type`,
+              );
+              continue;
+            }
+            if (typeof enumValueSpec === "function") {
+              exportNameHint(
+                enumValueSpec,
+                `${typeName}_${enumValueName}_applyPlan`,
+              );
+              // It's a plan
+              if (!enumValue.extensions) {
+                enumValue.extensions = Object.create(
+                  null,
+                ) as graphql.GraphQLEnumValueExtensions;
+              }
+              enumValue.extensions.grafast = {
+                applyPlan: enumValueSpec,
+              } as Grafast.EnumValueExtensions;
+            } else if (
+              typeof enumValueSpec === "object" &&
+              enumValueSpec != null
+            ) {
+              // It's a full spec
+              if (enumValueSpec.applyPlan) {
+                exportNameHint(
+                  enumValueSpec.applyPlan,
+                  `${typeName}_${enumValueName}_applyPlan`,
+                );
+                (enumValue.extensions as any).grafast = {
+                  applyPlan: enumValueSpec.applyPlan,
+                } as Grafast.EnumValueExtensions;
+              }
+              if ("value" in enumValueSpec) {
+                enumValue.value = enumValueSpec.value;
+              }
+            } else {
+              // It must be the value
+              enumValue.value = enumValueSpec;
+            }
+          }
+        }
+        return new graphql.GraphQLEnumType(config);
+      } else {
+        const never: never = astType;
+        throw new Error(`Unhandled type ${never}`);
       }
-      if (config.name === "Color") {
-        console.dir(config);
+    })();
+    typeByName.set(typeName, replacementType);
+    return replacementType;
+  });
+  if (schemaConfig.query) {
+    schemaConfig.query = mapType(schemaConfig.query);
+  }
+  if (schemaConfig.mutation) {
+    schemaConfig.mutation = mapType(schemaConfig.mutation);
+  }
+  if (schemaConfig.subscription) {
+    schemaConfig.subscription = mapType(schemaConfig.subscription);
+  }
+  if (schemaConfig.directives) {
+    for (const directiveConfig of schemaConfig.directives) {
+      for (const argConfig of directiveConfig.args) {
+        argConfig.type = mapType(argConfig.type);
       }
-      schemaConfig.types[astTypeIndex] = new graphql.GraphQLEnumType(config);
-    } else {
-      const never: never = astType;
-      console.error(`Unhandled type ${never}`);
     }
   }
   const schema = new GraphQLSchema(schemaConfig);
