@@ -4,8 +4,8 @@ import type {
   GraphQLScalarLiteralParser,
   GraphQLScalarSerializer,
   GraphQLScalarValueParser,
-  GraphQLSchema,
 } from "graphql";
+import { GraphQLSchema } from "graphql";
 import * as graphql from "graphql";
 
 import type {
@@ -119,31 +119,40 @@ export function makeGrafastSchema(details: {
 }): GraphQLSchema {
   const { typeDefs, plans, enableDeferStream = false } = details;
 
-  const schema = buildASTSchema(parse(typeDefs), {
+  const astSchema = buildASTSchema(parse(typeDefs), {
     enableDeferStream,
   });
+  const rawSchemaConfig = astSchema.toConfig();
+  const schemaConfig = {
+    ...rawSchemaConfig,
+    types: [...rawSchemaConfig.types],
+  };
 
   // Now add the plans/etc to the schema
   for (const [typeName, spec] of Object.entries(plans)) {
-    const type = schema.getType(typeName);
-    if (!type) {
+    const astTypeIndex = schemaConfig.types.findIndex(
+      (t) => t.name === typeName,
+    );
+    const astType = schemaConfig.types[astTypeIndex];
+    if (!astType) {
       console.warn(
         `'plans' specified configuration for type '${typeName}', but that type was not present in the schema`,
       );
       continue;
     }
-    if (isObjectType(type)) {
+    if (isObjectType(astType)) {
+      const config = astType.toConfig();
       if (typeof spec !== "object" || !spec) {
         throw new Error(`Invalid object config for '${typeName}'`);
       }
 
       const objSpec = spec as ObjectPlans;
-      const fields = type.getFields();
+      const fields = config.fields;
       for (const [fieldName, fieldSpec] of Object.entries(objSpec)) {
         if (fieldName === "__assertStep") {
           exportNameHint(fieldSpec, `${typeName}_assertStep`);
           (
-            type.extensions as graphql.GraphQLObjectTypeExtensions<any, any>
+            config.extensions as graphql.GraphQLObjectTypeExtensions<any, any>
           ).grafast = { assertStep: fieldSpec as any };
           continue;
         } else if (fieldName.startsWith("__")) {
@@ -199,7 +208,7 @@ export function makeGrafastSchema(details: {
 
           if (typeof fieldSpec.args === "object" && fieldSpec.args != null) {
             for (const [argName, argSpec] of Object.entries(fieldSpec.args)) {
-              const arg = field.args.find((arg) => arg.name === argName);
+              const arg = field.args?.[argName];
               if (!arg) {
                 console.warn(
                   `'plans' specified configuration for object type '${typeName}' field '${fieldName}' arg '${argName}', but that arg was not present in the type`,
@@ -231,14 +240,16 @@ export function makeGrafastSchema(details: {
           }
         }
       }
-    } else if (isInputObjectType(type)) {
+      schemaConfig.types[astTypeIndex] = new graphql.GraphQLObjectType(config);
+    } else if (isInputObjectType(astType)) {
+      const config = astType.toConfig();
       if (typeof spec !== "object" || !spec) {
         throw new Error(`Invalid input object config for '${typeName}'`);
       }
 
       const inputSpec = spec as InputObjectPlans;
 
-      const fields = type.getFields();
+      const fields = config.fields;
 
       for (const [fieldName, fieldSpec] of Object.entries(inputSpec)) {
         const field = fields[fieldName];
@@ -270,45 +281,86 @@ export function makeGrafastSchema(details: {
           Object.assign(grafastExtensions, fieldSpec);
         }
       }
-    } else if (isInterfaceType(type) || isUnionType(type)) {
+      schemaConfig.types[astTypeIndex] = new graphql.GraphQLInputObjectType(
+        config,
+      );
+    } else if (isInterfaceType(astType)) {
+      const config = astType.toConfig();
       if (typeof spec !== "object" || !spec) {
         throw new Error(`Invalid interface/union config for '${typeName}'`);
       }
       const polySpec = spec as InterfaceOrUnionPlans;
       if (polySpec.__resolveType) {
         exportNameHint(polySpec.__resolveType, `${typeName}_resolveType`);
-        type.resolveType = polySpec.__resolveType;
+        config.resolveType = polySpec.__resolveType;
       }
-    } else if (isScalarType(type)) {
+      schemaConfig.types[astTypeIndex] = new graphql.GraphQLInterfaceType(
+        config,
+      );
+    } else if (isUnionType(astType)) {
+      const config = astType.toConfig();
+      if (typeof spec !== "object" || !spec) {
+        throw new Error(`Invalid interface/union config for '${typeName}'`);
+      }
+      const polySpec = spec as InterfaceOrUnionPlans;
+      if (polySpec.__resolveType) {
+        exportNameHint(polySpec.__resolveType, `${typeName}_resolveType`);
+        config.resolveType = polySpec.__resolveType;
+      }
+      schemaConfig.types[astTypeIndex] = new graphql.GraphQLUnionType(config);
+    } else if (isScalarType(astType)) {
+      const rawConfig = astType.toConfig();
+      const config = {
+        ...rawConfig,
+        extensions: {
+          ...rawConfig.extensions,
+        },
+      };
       if (typeof spec !== "object" || !spec) {
         throw new Error(`Invalid scalar config for '${typeName}'`);
       }
       const scalarSpec = spec as ScalarPlans;
       if (typeof scalarSpec.serialize === "function") {
         exportNameHint(scalarSpec.serialize, `${typeName}_serialize`);
-        type.serialize = scalarSpec.serialize;
+        config.serialize = scalarSpec.serialize;
       }
       if (typeof scalarSpec.parseValue === "function") {
         exportNameHint(scalarSpec.parseValue, `${typeName}_parseValue`);
-        type.parseValue = scalarSpec.parseValue;
+        config.parseValue = scalarSpec.parseValue;
       }
       if (typeof scalarSpec.parseLiteral === "function") {
         exportNameHint(scalarSpec.parseLiteral, `${typeName}_parseLiteral`);
-        type.parseLiteral = scalarSpec.parseLiteral;
+        config.parseLiteral = scalarSpec.parseLiteral;
       }
       if (typeof scalarSpec.plan === "function") {
         exportNameHint(scalarSpec.plan, `${typeName}_plan`);
-        (type.extensions as any).grafast = { plan: scalarSpec.plan };
+        config.extensions.grafast = { plan: scalarSpec.plan };
       }
-    } else if (isEnumType(type)) {
+      schemaConfig.types[astTypeIndex] = new graphql.GraphQLScalarType(config);
+    } else if (isEnumType(astType)) {
+      const rawConfig = astType.toConfig();
+      const config = {
+        ...rawConfig,
+        values: Object.fromEntries(
+          Object.entries(rawConfig.values).map(([valueName, value]) => [
+            valueName,
+            {
+              ...value,
+              extensions: {
+                ...value.extensions,
+              },
+            },
+          ]),
+        ),
+      };
       if (typeof spec !== "object" || !spec) {
         throw new Error(`Invalid enum config for '${typeName}'`);
       }
-      const enumValues = type.getValues();
+      const enumValues = config.values;
       for (const [enumValueName, enumValueSpec] of Object.entries(
         spec as EnumPlans,
       )) {
-        const enumValue = enumValues.find((val) => val.name === enumValueName);
+        const enumValue = enumValues[enumValueName];
         if (!enumValue) {
           console.warn(
             `'plans' specified configuration for enum type '${typeName}' value '${enumValueName}', but that value was not present in the type`,
@@ -321,7 +373,7 @@ export function makeGrafastSchema(details: {
             `${typeName}_${enumValueName}_applyPlan`,
           );
           // It's a plan
-          (enumValue.extensions as any).grafast = {
+          enumValue.extensions.grafast = {
             applyPlan: enumValueSpec,
           } as Grafast.EnumValueExtensions;
         } else if (typeof enumValueSpec === "object" && enumValueSpec != null) {
@@ -343,10 +395,15 @@ export function makeGrafastSchema(details: {
           enumValue.value = enumValueSpec;
         }
       }
+      if (config.name === "Color") {
+        console.dir(config);
+      }
+      schemaConfig.types[astTypeIndex] = new graphql.GraphQLEnumType(config);
     } else {
-      const never: never = type;
+      const never: never = astType;
       console.error(`Unhandled type ${never}`);
     }
   }
+  const schema = new GraphQLSchema(schemaConfig);
   return schema;
 }
