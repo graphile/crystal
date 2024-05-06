@@ -13,7 +13,11 @@ const PROBABLY_A_PLUGIN_NOT_A_PRESET_KEYS = [
   "prependPlugins",
   "skipPlugins",
 ];
-const PLUGIN_FORBIDDEN_KEYS = ["plugins", "disablePlugins", "extends"];
+const PROBABLY_A_PRESET_NOT_A_PLUGIN_KEYS = [
+  "plugins",
+  "disablePlugins",
+  "extends",
+];
 
 let inspect: (obj: any, options?: { colors: boolean }) => string;
 
@@ -137,7 +141,7 @@ function assertPlugin(plugin: any): asserts plugin is GraphileConfig.Plugin {
         )}', full value: '${inspect(plugin)}'`,
     );
   }
-  for (const forbiddenKey of PLUGIN_FORBIDDEN_KEYS) {
+  for (const forbiddenKey of PROBABLY_A_PRESET_NOT_A_PLUGIN_KEYS) {
     if (plugin[forbiddenKey]) {
       throw new Error(
         `Plugin '${plugin.name}' has '${forbiddenKey}' property which suggests it is a preset rather than a plugin. If it is indeed a preset you should add it to your preset via 'extends' rather than 'plugins'.`,
