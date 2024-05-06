@@ -10,6 +10,10 @@
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     },
+    "./envelop": {
+      "types": "./dist/envelop/index.d.ts",
+      "default": "./dist/envelop/index.js"
+    },
     "./node": {
       "types": "./dist/servers/node/index.d.ts",
       "default": "./dist/servers/node/index.js"
@@ -85,6 +89,7 @@
     "node": ">=16.10"
   },
   "peerDependencies": {
+    "@envelop/core": "^5.0.0",
     "grafast": "workspace:^",
     "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
@@ -92,6 +97,9 @@
     "ws": "^8.12.1"
   },
   "peerDependenciesMeta": {
+    "@envelop/core": {
+      "optional": true
+    },
     "h3": {
       "optional": true
     },
@@ -100,6 +108,7 @@
     }
   },
   "devDependencies": {
+    "@envelop/core": "^5.0.0",
     "@fastify/websocket": "^8.2.0",
     "@types/aws-lambda": "^8.10.123",
     "@types/express": "^4.17.17",

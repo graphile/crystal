@@ -2,25 +2,15 @@ import { parse as parseGraphQLQueryString } from "node:querystring";
 
 import { LRU } from "@graphile/lru";
 import { createHash } from "crypto";
-import type { PromiseOrDirect } from "grafast";
-import {
-  $$extensions,
-  execute as grafastExecute,
-  hookArgs,
-  isAsyncIterable,
-  isPromiseLike,
-  SafeError,
-} from "grafast";
-import type {
-  DocumentNode,
-  ExecutionArgs,
-  GraphQLSchema,
-} from "grafast/graphql";
+import type { GrafastExecutionArgs, PromiseOrDirect } from "grafast";
+import { $$extensions, hookArgs, isAsyncIterable, SafeError } from "grafast";
+import type { DocumentNode, GraphQLSchema } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
 
 import { makeAcceptMatcher } from "../accept.js";
-import { getGrafservHooks } from "../hooks.js";
+import type { GrafservBase } from "../index.js";
 import type {
+  DynamicOptions,
   GrafservBody,
   HandlerResult,
   NormalizedRequestDigest,
@@ -29,12 +19,9 @@ import type {
   ValidatedGraphQLBody,
 } from "../interfaces.js";
 import { $$normalizedHeaders } from "../interfaces.js";
-import type { OptionsFromConfig } from "../options.js";
 import { httpError, parseGraphQLJSONBody } from "../utils.js";
 
 const { getOperationAST, GraphQLError, parse, Source, validate } = graphql;
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 let lastString: string;
 let lastHash: string;
@@ -46,13 +33,21 @@ const calculateQueryHash = (queryString: string): string => {
   return lastHash;
 };
 
-export function makeParseAndValidateFunction(schema: GraphQLSchema) {
+export function makeParseAndValidateFunction(
+  schema: GraphQLSchema,
+  resolvedPreset: GraphileConfig.ResolvedPreset,
+  dynamicOptions: DynamicOptions,
+) {
   type ParseAndValidateResult =
     | { document: DocumentNode; errors?: undefined }
     | { document?: undefined; errors: readonly graphql.GraphQLError[] };
-  const parseAndValidationCache = new LRU<string, ParseAndValidateResult>({
-    maxLength: 500,
-  });
+  const maxLength = resolvedPreset.grafserv?.parseAndValidateCacheSize ?? 500;
+  const parseAndValidationCache =
+    maxLength >= 1
+      ? new LRU<string, ParseAndValidateResult>({
+          maxLength,
+        })
+      : null;
   let lastParseAndValidateQuery: string;
   let lastParseAndValidateResult: ParseAndValidateResult;
   function parseAndValidate(query: string): ParseAndValidateResult {
@@ -61,7 +56,7 @@ export function makeParseAndValidateFunction(schema: GraphQLSchema) {
     }
     const hash = query.length > 500 ? calculateQueryHash(query) : query;
 
-    const cached = parseAndValidationCache.get(hash);
+    const cached = parseAndValidationCache?.get(hash);
     if (cached !== undefined) {
       lastParseAndValidateQuery = query;
       lastParseAndValidateResult = cached;
@@ -73,29 +68,17 @@ export function makeParseAndValidateFunction(schema: GraphQLSchema) {
     try {
       document = parse(source);
     } catch (e) {
-      const result = {
-        errors: [
-          new GraphQLError(
-            e.message,
-            null,
-            undefined,
-            undefined,
-            undefined,
-            e,
-            undefined,
-          ),
-        ],
-      };
-      parseAndValidationCache.set(hash, result);
+      const result = { errors: [e] };
+      parseAndValidationCache?.set(hash, result);
       lastParseAndValidateQuery = query;
       lastParseAndValidateResult = result;
       return result;
     }
-    const errors = validate(schema, document);
+    const errors = validate(schema, document, dynamicOptions.validationRules);
     const result: ParseAndValidateResult = errors.length
       ? { errors }
       : { document };
-    parseAndValidationCache.set(hash, result);
+    parseAndValidationCache?.set(hash, result);
     lastParseAndValidateQuery = query;
     lastParseAndValidateResult = result;
     return result;
@@ -300,66 +283,14 @@ export function validateGraphQLBody(
   return parsed as ValidatedGraphQLBody;
 }
 
-const _makeGraphQLHandlerInternal = (
-  resolvedPreset: GraphileConfig.ResolvedPreset,
-  dynamicOptions: OptionsFromConfig,
-  schemaOrPromise: PromiseOrDirect<GraphQLSchema> | null,
-) => {
-  if (schemaOrPromise == null) {
-    const err = Promise.reject(
-      new GraphQLError(
-        "The schema is currently unavailable",
-        null,
-        null,
-        null,
-        null,
-        null,
-        {
-          statusCode: 503,
-        },
-      ),
-    );
-    return () => err;
-  }
-
-  let latestSchema: GraphQLSchema;
-  let latestParseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
-  let wait: PromiseLike<void> | null;
-
-  if (isPromiseLike(schemaOrPromise)) {
-    wait = schemaOrPromise.then((_schema) => {
-      if (_schema == null) {
-        throw new GraphQLError(
-          "The schema is current unavailable.",
-          null,
-          null,
-          null,
-          null,
-          null,
-          {
-            statusCode: 503,
-          },
-        );
-      }
-      latestSchema = _schema;
-      latestParseAndValidate = makeParseAndValidateFunction(latestSchema);
-      wait = null;
-    });
-  } else {
-    latestSchema = schemaOrPromise;
-    latestParseAndValidate = makeParseAndValidateFunction(latestSchema);
-  }
-
-  const outputDataAsString = dynamicOptions.outputDataAsString;
-  const { maskIterator, maskPayload, maskError } = dynamicOptions;
-
-  const hooks = getGrafservHooks(resolvedPreset);
+const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
+  const { dynamicOptions, resolvedPreset, hooks } = instance;
 
   return async (
     request: NormalizedRequestDigest,
     graphiqlHandler?: (
       request: NormalizedRequestDigest,
-    ) => Promise<HandlerResult | null>,
+    ) => PromiseOrDirect<HandlerResult | null>,
   ): Promise<HandlerResult | null> => {
     const accept = request[$$normalizedHeaders].accept;
     // Do they want HTML, or do they want GraphQL?
@@ -418,17 +349,6 @@ const _makeGraphQLHandlerInternal = (
     // If we get here, we're handling a GraphQL request
     const isLegacy = chosenContentType === APPLICATION_JSON;
 
-    if (wait !== null) {
-      await Promise.race([wait, sleep(dynamicOptions.schemaWaitTime)]);
-      if (!latestSchema) {
-        // Handle missing schema
-        throw httpError(502, `Schema isn't ready`);
-      }
-    }
-    // Get a reference to the latest versions to use for this entire operation
-    const schema = latestSchema;
-    const parseAndValidate = latestParseAndValidate;
-
     let body: ValidatedGraphQLBody;
     try {
       // Read the body
@@ -470,6 +390,22 @@ const _makeGraphQLHandlerInternal = (
       }
     }
 
+    const grafastCtx: Partial<Grafast.RequestContext> = {
+      ...request.requestContext,
+      http: request,
+    };
+
+    const {
+      schema,
+      parseAndValidate,
+      execute,
+      // subscribe,
+      contextValue,
+      // dynamicOptions?
+    } = await instance.getExecutionConfig(grafastCtx);
+    const outputDataAsString = dynamicOptions.outputDataAsString;
+    const { maskIterator, maskPayload, maskError } = dynamicOptions;
+
     const { query, operationName, variableValues } = body;
     const { errors, document } = parseAndValidate(query);
 
@@ -507,21 +443,19 @@ const _makeGraphQLHandlerInternal = (
       }
     }
 
-    const args: ExecutionArgs = {
+    const args: GrafastExecutionArgs = {
       schema,
       document,
       rootValue: null,
-      contextValue: Object.create(null),
+      contextValue,
       variableValues,
       operationName,
+      resolvedPreset,
     };
 
     try {
-      await hookArgs(args, resolvedPreset, {
-        ...request.requestContext,
-        http: request,
-      });
-      const result = await grafastExecute(args, resolvedPreset);
+      await hookArgs(args, resolvedPreset, grafastCtx);
+      const result = await execute(args);
       if (isAsyncIterable(result)) {
         return {
           type: "graphqlIncremental",
@@ -565,22 +499,15 @@ const _makeGraphQLHandlerInternal = (
   };
 };
 
-export const makeGraphQLHandler = (
-  resolvedPreset: GraphileConfig.ResolvedPreset,
-  dynamicOptions: OptionsFromConfig,
-  schemaOrPromise: PromiseOrDirect<GraphQLSchema> | null,
-) => {
-  const handler = _makeGraphQLHandlerInternal(
-    resolvedPreset,
-    dynamicOptions,
-    schemaOrPromise,
-  );
+export const makeGraphQLHandler = (instance: GrafservBase) => {
+  const handler = _makeGraphQLHandlerInternal(instance);
+  const { dynamicOptions } = instance;
   return (
     request: NormalizedRequestDigest,
     graphiqlHandler?: (
       request: NormalizedRequestDigest,
-    ) => Promise<HandlerResult | null>,
-  ) =>
+    ) => PromiseOrDirect<HandlerResult | null>,
+  ): PromiseOrDirect<HandlerResult | null> =>
     handler(request, graphiqlHandler).catch((e) =>
       handleGraphQLHandlerError(request, dynamicOptions, e),
     );
@@ -588,7 +515,7 @@ export const makeGraphQLHandler = (
 
 function handleGraphQLHandlerError(
   request: NormalizedRequestDigest,
-  dynamicOptions: OptionsFromConfig,
+  dynamicOptions: DynamicOptions,
   e: Error | SafeError,
 ) {
   if (e instanceof SafeError) {

@@ -2932,49 +2932,49 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@envelop/core@npm:^4.0.1":
-  version: 4.0.1
-  resolution: "@envelop/core@npm:4.0.1"
+"@envelop/core@npm:^5.0.0":
+  version: 5.0.0
+  resolution: "@envelop/core@npm:5.0.0"
   dependencies:
-    "@envelop/types": "npm:4.0.1"
+    "@envelop/types": "npm:5.0.0"
     tslib: "npm:^2.5.0"
-  checksum: a12d37ccb798bbc4aefe7c80b1bc46789f21f31754c865a7494d66172627f5bf314092518a7c4afd0554f3ed1ed13a2a4763b0e8b983ad793205e650793847d5
+  checksum: 455d40e1253b2391751ff7c7c9b0ae71fa2552417df01035bee45d8ecccfb4528209196ad3e1e60c5d0602da4de64ef4cc3f547287a99c830f394c9f3477ab84
   languageName: node
   linkType: hard
 
-"@envelop/parser-cache@npm:^6.0.2":
-  version: 6.0.2
-  resolution: "@envelop/parser-cache@npm:6.0.2"
+"@envelop/parser-cache@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "@envelop/parser-cache@npm:7.0.0"
   dependencies:
     lru-cache: "npm:^10.0.0"
     tslib: "npm:^2.5.0"
   peerDependencies:
-    "@envelop/core": ^4.0.1
+    "@envelop/core": ^5.0.0
     graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
-  checksum: 71fa20295a39ae579e4d0e9860361273fea76feab683f64970aa0333f175691381ca87f851311a535bcfb402ed1b77ed4fb2767ae47c76ed16b5d886189ae09e
+  checksum: 4a85d7157a406f55d2939ff9bebb9ef151c7807daa014f852975b4250cd7ecd7cff4362e319f6fcb3faec1d4e654cb1d7e3f3e1b916b9d4e8873cbe185d24c50
   languageName: node
   linkType: hard
 
-"@envelop/types@npm:4.0.1":
-  version: 4.0.1
-  resolution: "@envelop/types@npm:4.0.1"
+"@envelop/types@npm:5.0.0":
+  version: 5.0.0
+  resolution: "@envelop/types@npm:5.0.0"
   dependencies:
     tslib: "npm:^2.5.0"
-  checksum: 189ac9f5862c6de39cbced191b28ffbdb1f5cfd7d658dd4c199767bbc6a6c66e22bb80dcfd7269574145a0bc271130f029f92809f4b9fcf7a6b1b6ea929c1250
+  checksum: fb851b256a2d7bbe60c4b170ea438941f66320a9a7f11cebfdfdce8e6d0463b2f3c83a244e100b0030f3b84ef486364b805a9f3356aedf9bd1b7f0b18000eef6
   languageName: node
   linkType: hard
 
-"@envelop/validation-cache@npm:^6.0.2":
-  version: 6.0.2
-  resolution: "@envelop/validation-cache@npm:6.0.2"
+"@envelop/validation-cache@npm:^7.0.0":
+  version: 7.0.0
+  resolution: "@envelop/validation-cache@npm:7.0.0"
   dependencies:
     hash-it: "npm:^6.0.0"
     lru-cache: "npm:^10.0.0"
     tslib: "npm:^2.5.0"
   peerDependencies:
-    "@envelop/core": ^4.0.1
+    "@envelop/core": ^5.0.0
     graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
-  checksum: 21463856adb35a76ef65fae5998ca4127b56dc3616b2e936ea05a7dac80d920372bc8d9e8966a88980529ad918c8fd1308040224f2bd153023531f574dfdb0f3
+  checksum: 19fed5ee237567f7f0a84677b95b058bb2130501bcb80fcd765ba341a859c766c78ace840f3cc5fd5a89c32d6b36e269b5f3752515e1856279c52510a170ade9
   languageName: node
   linkType: hard
 
@@ -12058,7 +12058,7 @@ __metadata:
     typescript: "npm:^5.2.2"
     zx: "npm:^7.2.3"
   peerDependencies:
-    "@envelop/core": ^3.0.4
+    "@envelop/core": ^5.0.0
     graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
     tamedevil: "workspace:^"
@@ -12074,6 +12074,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "grafserv@workspace:grafast/grafserv"
   dependencies:
+    "@envelop/core": "npm:^5.0.0"
     "@fastify/websocket": "npm:^8.2.0"
     "@graphile/lru": "workspace:^"
     "@types/aws-lambda": "npm:^8.10.123"
@@ -12100,12 +12101,15 @@ __metadata:
     tslib: "npm:^2.6.2"
     typescript: "npm:^5.2.2"
   peerDependencies:
+    "@envelop/core": ^5.0.0
     grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
     h3: ^1.7.1
     ws: ^8.12.1
   peerDependenciesMeta:
+    "@envelop/core":
+      optional: true
     h3:
       optional: true
     ws:
@@ -12131,9 +12135,9 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "graphile-build-pg@workspace:graphile-build/graphile-build-pg"
   dependencies:
-    "@envelop/core": "npm:^4.0.1"
-    "@envelop/parser-cache": "npm:^6.0.2"
-    "@envelop/validation-cache": "npm:^6.0.2"
+    "@envelop/core": "npm:^5.0.0"
+    "@envelop/parser-cache": "npm:^7.0.0"
+    "@envelop/validation-cache": "npm:^7.0.0"
     "@types/debug": "npm:^4.1.8"
     "@types/express": "npm:^4.17.17"
     "@types/jest": "npm:^29.5.4"
@@ -17829,7 +17833,7 @@ __metadata:
   peerDependencies:
     "@dataplan/json": "workspace:*"
     "@dataplan/pg": "workspace:*"
-    "@envelop/core": ^3.0.4
+    "@envelop/core": ^5.0.0
     grafast: "workspace:^"
     grafserv: "workspace:^"
     graphile-build: "workspace:*"

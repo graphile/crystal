@@ -1,6 +1,7 @@
 import type EventEmitter from "eventemitter3";
 import type {
   ASTNode,
+  ExecutionArgs,
   FragmentDefinitionNode,
   GraphQLArgs,
   GraphQLArgument,
@@ -942,3 +943,8 @@ export const $$deepDepSkip = Symbol("deepDepSkip_experimental");
 
 export type DataFromStep<TStep extends ExecutableStep> =
   TStep extends ExecutableStep<infer TData> ? TData : never;
+
+export interface GrafastExecutionArgs extends ExecutionArgs {
+  resolvedPreset?: GraphileConfig.ResolvedPreset;
+  outputDataAsString?: boolean;
+}

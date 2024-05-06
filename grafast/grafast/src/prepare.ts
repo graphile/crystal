@@ -310,7 +310,6 @@ function executePreemptive(
   const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [new Set()];
 
   const store: Bucket["store"] = new Map();
-  store.set(operationPlan.rootLayerPlan.rootStep!.id, unaryExecutionValue(0));
   store.set(
     operationPlan.variableValuesStep.id,
     unaryExecutionValue(variableValues),
