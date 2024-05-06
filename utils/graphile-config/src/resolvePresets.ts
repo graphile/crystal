@@ -2,7 +2,7 @@ import "./interfaces.js";
 
 import { sortWithBeforeAfterProvides } from "./sort.js";
 
-const PRESET_FORBIDDEN_KEYS = [
+const PROBABLY_A_PLUGIN_NOT_A_PRESET_KEYS = [
   "name", // If we want to give presets a name, we should use 'id', 'label', 'title' or similar.
   "experimental",
   "provides",
@@ -132,6 +132,10 @@ function assertPlugin(plugin: any): asserts plugin is GraphileConfig.Plugin {
   }
 }
 
+function isForbiddenPresetKey(key: string): boolean {
+  return /^[A-Z_]/.test(key);
+}
+
 /**
  * Turns a preset into a resolved preset (i.e. resolves all its `extends`).
  *
@@ -148,8 +152,23 @@ function resolvePreset(
     );
   }
 
+  const keys = Object.keys(preset);
+  const forbiddenKeys = keys.filter(isForbiddenPresetKey);
+  if (forbiddenKeys.length) {
+    throw new Error(
+      `Expected a GraphileConfig preset, but found an object with forbidden keys ` +
+        `(e.g. keys starting with a capital letter). This typically indicates an ` +
+        `issue with ESM compatibility or import method, for example ` +
+        `doing \`import MyPreset from 'my-preset'\` instead of ` +
+        `\`import { MyPreset } from 'my-preset'\` or vice versa. ` +
+        `Forbidden keys: '${forbiddenKeys.join(
+          "', '",
+        )}', full value: '${inspect(preset)}'`,
+    );
+  }
+
   try {
-    for (const forbiddenKey of PRESET_FORBIDDEN_KEYS) {
+    for (const forbiddenKey of PROBABLY_A_PLUGIN_NOT_A_PRESET_KEYS) {
       if ((preset as any)[forbiddenKey]) {
         throw new Error(
           `Preset has '${forbiddenKey}' property which suggests it is a plugin rather than a preset. If it is indeed a plugin you should add it to your preset via 'plugins' rather than 'extends'.`,
