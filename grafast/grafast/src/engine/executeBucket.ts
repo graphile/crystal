@@ -1230,8 +1230,15 @@ export function newBucket(
       }
       if (step._isUnary) {
         if (isDev && store.has(stepId)) {
+          const ev = store.get(stepId);
           console.error(
             `GrafastInternalWarning<603e635f-af46-4feb-abb1-bac184bf7ef2>: value for step ${step} has already been stored to bucket ${layerPlan}; overwriting.`,
+            {
+              isBatch: ev?.isBatch,
+              value0: ev?.at(0),
+              flags0: ev?._flagsAt(0),
+            },
+            { isBatch: false, value, flags },
           );
         }
         const ev = unaryExecutionValue(value, flags);
@@ -1239,9 +1246,15 @@ export function newBucket(
       } else {
         const storeEntry = store.get(stepId);
         if (!storeEntry || !storeEntry.isBatch) {
-          throw new Error(
-            `GrafastInternalError<8149fd32-b543-409b-96bb-b5b3059607d5>: value for step ${step} expected to be a batch value, but is null or non-batch`,
-          );
+          if (!storeEntry) {
+            throw new Error(
+              `GrafastInternalError<e2ba1e4a-5391-4f81-bb21-fb200e29aea2>: value for step ${step} expected to be a batch value, but is not set`,
+            );
+          } else {
+            throw new Error(
+              `GrafastInternalError<f587d317-8919-4f14-905a-ab7bb338dd2b>: value for step ${step} expected to be a batch value, but is unary (non-batch)`,
+            );
+          }
         }
         storeEntry._setResult(index, value, flags);
       }
