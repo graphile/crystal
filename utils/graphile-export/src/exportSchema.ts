@@ -1902,6 +1902,8 @@ async function lint(code: string, rawFilePath: string | URL) {
     );
     return;
   }
+  const filePath =
+    typeof rawFilePath === "string" ? rawFilePath : rawFilePath.pathname;
   const { ESLint } = eslintModule;
   const eslint = new ESLint({
     useEslintrc: false, // Don't use external config
@@ -1928,16 +1930,18 @@ async function lint(code: string, rawFilePath: string | URL) {
     },
   });
 
-  const filePath =
-    typeof rawFilePath === "string" ? rawFilePath : rawFilePath.pathname;
-  const results = await eslint.lintText(code, { filePath });
+  const results = await eslint.lintText(code, {
+    warnIgnored: true,
+    // DO NOT PASS THE `filePath`; it can result in the file being ignored!
+  });
 
   if (results.length !== 1) {
+    console.dir({ filePath, results });
     throw new Error(`Expected ESLint results to have exactly one entry`);
   }
   const [result] = results;
 
-  if (result.errorCount > 0) {
+  if (result.warningCount > 0 || result.errorCount > 0) {
     console.log(
       `ESLint found problems in the export; this likely indicates some issue with \`EXPORTABLE\` calls`,
     );
