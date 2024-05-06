@@ -713,35 +713,39 @@ export const PgTypesPlugin: GraphileConfig.Plugin = {
               }
             };
 
-            const parseValueLiteral = (
-              ast: ValueNode,
-              variables: { [key: string]: any } | null | undefined,
-            ) => {
-              switch (ast.kind) {
-                case Kind.INT:
-                case Kind.FLOAT:
-                  // Number isn't really okay, but we'll coerce it to a string anyway.
-                  return String(parseFloat(ast.value));
-                case Kind.STRING:
-                  // String is okay.
-                  return String(ast.value);
-                case Kind.NULL:
-                  // Null is okay.
-                  return null;
-                case Kind.VARIABLE: {
-                  // Variable is okay if that variable is either a string or null.
-                  const name = ast.name.value;
-                  const value = variables ? variables[name] : undefined;
-                  if (value === null || typeof value === "string") {
-                    return value;
+            const parseValueLiteral = EXPORTABLE(
+              (Kind) =>
+                (
+                  ast: ValueNode,
+                  variables: { [key: string]: any } | null | undefined,
+                ) => {
+                  switch (ast.kind) {
+                    case Kind.INT:
+                    case Kind.FLOAT:
+                      // Number isn't really okay, but we'll coerce it to a string anyway.
+                      return String(parseFloat(ast.value));
+                    case Kind.STRING:
+                      // String is okay.
+                      return String(ast.value);
+                    case Kind.NULL:
+                      // Null is okay.
+                      return null;
+                    case Kind.VARIABLE: {
+                      // Variable is okay if that variable is either a string or null.
+                      const name = ast.name.value;
+                      const value = variables ? variables[name] : undefined;
+                      if (value === null || typeof value === "string") {
+                        return value;
+                      }
+                      return undefined;
+                    }
+                    default:
+                      // Everything else is invalid.
+                      return undefined;
                   }
-                  return undefined;
-                }
-                default:
-                  // Everything else is invalid.
-                  return undefined;
-              }
-            };
+                },
+              [Kind],
+            );
 
             build.registerScalarType(
               hstoreTypeName,
