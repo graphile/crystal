@@ -1,17 +1,22 @@
 import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec } from "@dataplan/pg";
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
 const handler = {
   typeName: "Query",
   codec: {
     name: "raw",
-    encode(value) {
+    encode: Object.assign(function rawEncode(value) {
       return typeof value === "string" ? value : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function rawDecode(value) {
       return typeof value === "string" ? value : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   },
   match(specifier) {
     return specifier === "query";
@@ -28,44 +33,36 @@ const handler = {
 };
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode(value) {
-    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  },
-  decode(value) {
-    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }
+  encode: (() => {
+    function base64JSONEncode(value) {
+      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+    }
+    base64JSONEncode.isSyncAndSafe = true; // Optimization
+    return base64JSONEncode;
+  })(),
+  decode: (() => {
+    function base64JSONDecode(value) {
+      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+    }
+    base64JSONDecode.isSyncAndSafe = true; // Optimization
+    return base64JSONDecode;
+  })()
 };
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode(value) {
+    encode: Object.assign(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }
-  }
-});
-const fileAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  filename: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   }
 });
 const executor = new PgExecutor({
@@ -78,10 +75,29 @@ const executor = new PgExecutor({
     });
   }
 });
-const fileCodec = recordCodec({
+const spec_file = {
   name: "file",
   identifier: sql.identifier("inheritence", "file"),
-  attributes: fileAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    filename: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -92,32 +108,32 @@ const fileCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const userAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const userCodec = recordCodec({
+  executor: executor
+};
+const fileCodec = recordCodec(spec_file);
+const spec_user = {
   name: "user",
   identifier: sql.identifier("inheritence", "user"),
-  attributes: userAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -128,41 +144,41 @@ const userCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const userFileAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  filename: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  user_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const userFileCodec = recordCodec({
+  executor: executor
+};
+const userCodec = recordCodec(spec_user);
+const spec_userFile = {
   name: "userFile",
   identifier: sql.identifier("inheritence", "user_file"),
-  attributes: userFileAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    filename: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    user_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -173,8 +189,9 @@ const userFileCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
+  executor: executor
+};
+const userFileCodec = recordCodec(spec_userFile);
 const fileUniques = [{
   isPrimary: true,
   attributes: ["id"],
@@ -430,6 +447,9 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
     plan($select);
   });
 };
+function CursorSerialize(value) {
+  return "" + value;
+}
 const specFromArgs = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.File, $nodeId);
@@ -1782,6 +1802,16 @@ export const plans = {
       return $edge.node();
     }
   },
+  Cursor: {
+    serialize: CursorSerialize,
+    parseValue: CursorSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
   PageInfo: {
     __assertStep: assertPageInfoCapableStep,
     hasNextPage($pageInfo) {
@@ -1952,7 +1982,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), userFileAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_userFile.attributes.id.codec)}`;
             }
           });
         }
@@ -1975,7 +2005,7 @@ export const plans = {
             type: "attribute",
             attribute: "filename",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), userFileAttributes.filename.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_userFile.attributes.filename.codec)}`;
             }
           });
         }
@@ -1998,7 +2028,7 @@ export const plans = {
             type: "attribute",
             attribute: "user_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), userFileAttributes.user_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_userFile.attributes.user_id.codec)}`;
             }
           });
         }
@@ -2153,7 +2183,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), fileAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_file.attributes.id.codec)}`;
             }
           });
         }
@@ -2176,7 +2206,7 @@ export const plans = {
             type: "attribute",
             attribute: "filename",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), fileAttributes.filename.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_file.attributes.filename.codec)}`;
             }
           });
         }
@@ -2331,7 +2361,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), userAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_user.attributes.id.codec)}`;
             }
           });
         }
@@ -2354,7 +2384,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), userAttributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_user.attributes.name.codec)}`;
             }
           });
         }
@@ -2680,6 +2710,9 @@ export const plans = {
     }
   },
   FileInput: {
+    "__inputPlan": function FileInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -2754,6 +2787,9 @@ export const plans = {
     }
   },
   UserInput: {
+    "__inputPlan": function UserInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -2833,6 +2869,9 @@ export const plans = {
     }
   },
   UserFileInput: {
+    "__inputPlan": function UserFileInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -2913,6 +2952,9 @@ export const plans = {
     }
   },
   FilePatch: {
+    "__inputPlan": function FilePatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -3000,6 +3042,9 @@ export const plans = {
     }
   },
   UserPatch: {
+    "__inputPlan": function UserPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -3092,6 +3137,9 @@ export const plans = {
     }
   },
   UserFilePatch: {
+    "__inputPlan": function UserFilePatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());

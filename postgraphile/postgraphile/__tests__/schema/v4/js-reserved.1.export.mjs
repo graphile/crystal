@@ -1,15 +1,24 @@
 import { PgDeleteSingleStep, PgExecutor, PgSelectSingleStep, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
+import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
 const handler_codec_base64JSON = {
   name: "base64JSON",
-  encode(value) {
-    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  },
-  decode(value) {
-    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }
+  encode: (() => {
+    function base64JSONEncode(value) {
+      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+    }
+    base64JSONEncode.isSyncAndSafe = true; // Optimization
+    return base64JSONEncode;
+  })(),
+  decode: (() => {
+    function base64JSONDecode(value) {
+      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+    }
+    base64JSONDecode.isSyncAndSafe = true; // Optimization
+    return base64JSONDecode;
+  })()
 };
 const itemTypeCodec = enumCodec({
   name: "itemType",
@@ -25,49 +34,6 @@ const itemTypeCodec = enumCodec({
     tags: Object.create(null)
   }
 });
-const relationalTopicsAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    },
-    identicalVia: "relationalItemsByMyId"
-  },
-  title: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  type: {
-    codec: itemTypeCodec,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: {}
-    }
-  },
-  constructor: {
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    via: "relationalItemsByMyId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: {}
-    }
-  }
-});
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -78,10 +44,52 @@ const executor = new PgExecutor({
     });
   }
 });
-const relationalTopicsCodec = recordCodec({
+const spec_relationalTopics = {
   name: "relationalTopics",
   identifier: sql.identifier("js_reserved", "relational_topics"),
-  attributes: relationalTopicsAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      },
+      identicalVia: "relationalItemsByMyId"
+    },
+    title: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    type: {
+      codec: itemTypeCodec,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: {}
+      }
+    },
+    constructor: {
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      via: "relationalItemsByMyId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -93,41 +101,41 @@ const relationalTopicsCodec = recordCodec({
     tags: Object.create(null),
     relationalInterfaceCodecName: "relationalItems"
   },
-  executor
-});
-const __proto__Attributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  brand: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const __proto__Codec = recordCodec({
+  executor: executor
+};
+const relationalTopicsCodec = recordCodec(spec_relationalTopics);
+const spec___proto__ = {
   name: "__proto__",
   identifier: sql.identifier("js_reserved", "__proto__"),
-  attributes: __proto__Attributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    brand: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -138,41 +146,41 @@ const __proto__Codec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const buildingAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  constructor: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const buildingCodec = recordCodec({
+  executor: executor
+};
+const __proto__Codec = recordCodec(spec___proto__);
+const spec_building = {
   name: "building",
   identifier: sql.identifier("js_reserved", "building"),
-  attributes: buildingAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    constructor: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -183,41 +191,41 @@ const buildingCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const constructorAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  export: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const constructorCodec = recordCodec({
+  executor: executor
+};
+const buildingCodec = recordCodec(spec_building);
+const spec_constructor = {
   name: "constructor",
   identifier: sql.identifier("js_reserved", "constructor"),
-  attributes: constructorAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    export: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -228,41 +236,41 @@ const constructorCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const cropAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  yield: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  amount: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const cropCodec = recordCodec({
+  executor: executor
+};
+const constructorCodec = recordCodec(spec_constructor);
+const spec_crop = {
   name: "crop",
   identifier: sql.identifier("js_reserved", "crop"),
-  attributes: cropAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    yield: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    amount: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -273,41 +281,41 @@ const cropCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const machineAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  input: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  constructor: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const machineCodec = recordCodec({
+  executor: executor
+};
+const cropCodec = recordCodec(spec_crop);
+const spec_machine = {
   name: "machine",
   identifier: sql.identifier("js_reserved", "machine"),
-  attributes: machineAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    input: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    constructor: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -318,41 +326,41 @@ const machineCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const materialAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  class: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  valueOf: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const materialCodec = recordCodec({
+  executor: executor
+};
+const machineCodec = recordCodec(spec_machine);
+const spec_material = {
   name: "material",
   identifier: sql.identifier("js_reserved", "material"),
-  attributes: materialAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    class: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    valueOf: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -363,41 +371,41 @@ const materialCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const nullAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  hasOwnProperty: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  break: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const nullCodec = recordCodec({
+  executor: executor
+};
+const materialCodec = recordCodec(spec_material);
+const spec_null = {
   name: "null",
   identifier: sql.identifier("js_reserved", "null"),
-  attributes: nullAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    hasOwnProperty: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    break: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -408,37 +416,37 @@ const nullCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const projectAttributes = Object.fromEntries([["id", {
-  description: undefined,
-  codec: TYPES.int,
-  notNull: true,
-  hasDefault: true,
-  extensions: {
-    tags: {}
-  }
-}], ["brand", {
-  description: undefined,
-  codec: TYPES.text,
-  notNull: false,
-  hasDefault: false,
-  extensions: {
-    tags: {}
-  }
-}], ["__proto__", {
-  description: undefined,
-  codec: TYPES.text,
-  notNull: false,
-  hasDefault: false,
-  extensions: {
-    tags: {}
-  }
-}]]);
-const projectCodec = recordCodec({
+  executor: executor
+};
+const nullCodec = recordCodec(spec_null);
+const spec_project = {
   name: "project",
   identifier: sql.identifier("js_reserved", "project"),
-  attributes: projectAttributes,
+  attributes: Object.fromEntries([["id", {
+    description: undefined,
+    codec: TYPES.int,
+    notNull: true,
+    hasDefault: true,
+    extensions: {
+      tags: {}
+    }
+  }], ["brand", {
+    description: undefined,
+    codec: TYPES.text,
+    notNull: false,
+    hasDefault: false,
+    extensions: {
+      tags: {}
+    }
+  }], ["__proto__", {
+    description: undefined,
+    codec: TYPES.text,
+    notNull: false,
+    hasDefault: false,
+    extensions: {
+      tags: {}
+    }
+  }]]),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -449,64 +457,64 @@ const projectCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const relationalStatusAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    },
-    identicalVia: "relationalItemsByMyId"
-  },
-  description: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  note: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  type: {
-    codec: itemTypeCodec,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalTopicsAttributes.type.extensions.tags
-    }
-  },
-  constructor: {
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    via: "relationalItemsByMyId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalTopicsAttributes.constructor.extensions.tags
-    }
-  }
-});
-const relationalStatusCodec = recordCodec({
+  executor: executor
+};
+const projectCodec = recordCodec(spec_project);
+const spec_relationalStatus = {
   name: "relationalStatus",
   identifier: sql.identifier("js_reserved", "relational_status"),
-  attributes: relationalStatusAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      },
+      identicalVia: "relationalItemsByMyId"
+    },
+    description: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    note: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    type: {
+      codec: itemTypeCodec,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalTopics.attributes.type.extensions.tags
+      }
+    },
+    constructor: {
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      via: "relationalItemsByMyId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalTopics.attributes.constructor.extensions.tags
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -518,41 +526,41 @@ const relationalStatusCodec = recordCodec({
     tags: Object.create(null),
     relationalInterfaceCodecName: "relationalItems"
   },
-  executor
-});
-const yieldAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  crop: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  export: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const yieldCodec = recordCodec({
+  executor: executor
+};
+const relationalStatusCodec = recordCodec(spec_relationalStatus);
+const spec_yield = {
   name: "yield",
   identifier: sql.identifier("js_reserved", "yield"),
-  attributes: yieldAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    crop: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    export: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -563,50 +571,50 @@ const yieldCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const reservedAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  null: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  case: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  do: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const reservedCodec = recordCodec({
+  executor: executor
+};
+const yieldCodec = recordCodec(spec_yield);
+const spec_reserved = {
   name: "reserved",
   identifier: sql.identifier("js_reserved", "reserved"),
-  attributes: reservedAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    null: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    case: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    do: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -617,57 +625,73 @@ const reservedCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const relationalItemsAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  type: {
-    description: undefined,
-    codec: itemTypeCodec,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: relationalTopicsAttributes.type.extensions.tags
-    }
-  },
-  constructor: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: relationalTopicsAttributes.constructor.extensions.tags
-    }
-  }
-});
-const extensions14 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "js_reserved",
-    name: "relational_items"
-  },
-  tags: Object.assign(Object.create(null), {
-    interface: "mode:relational type:type",
-    type: ["TOPIC references:relational_topics", "STATUS references:relational_status"]
-  })
+  executor: executor
 };
-const relationalItemsCodec = recordCodec({
+const reservedCodec = recordCodec(spec_reserved);
+const spec_relationalItems = {
   name: "relationalItems",
   identifier: sql.identifier("js_reserved", "relational_items"),
-  attributes: relationalItemsAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    type: {
+      description: undefined,
+      codec: itemTypeCodec,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: spec_relationalTopics.attributes.type.extensions.tags
+      }
+    },
+    constructor: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: spec_relationalTopics.attributes.constructor.extensions.tags
+      }
+    }
+  }),
   description: undefined,
-  extensions: extensions14,
-  executor
-});
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "js_reserved",
+      name: "relational_items"
+    },
+    tags: Object.assign(Object.create(null), {
+      interface: "mode:relational type:type",
+      type: ["TOPIC references:relational_topics", "STATUS references:relational_status"]
+    })
+  },
+  executor: executor,
+  polymorphism: {
+    mode: "relational",
+    typeAttributes: ["type"],
+    types: Object.assign(Object.create(null), {
+      TOPIC: {
+        name: "RelationalTopic",
+        references: "relational_topics",
+        relationName: "relationalTopicsByTheirId"
+      },
+      STATUS: {
+        name: "RelationalStatus",
+        references: "relational_status",
+        relationName: "relationalStatusByTheirId"
+      }
+    })
+  }
+};
+const relationalItemsCodec = recordCodec(spec_relationalItems);
 const awaitFunctionIdentifer = sql.identifier("js_reserved", "await");
 const caseFunctionIdentifer = sql.identifier("js_reserved", "case");
 const valueOfFunctionIdentifer = sql.identifier("js_reserved", "valueOf");
@@ -968,7 +992,7 @@ const registryConfig_pgResources_relational_items_relational_items = {
     },
     tags: {
       interface: "mode:relational type:type",
-      type: extensions14.tags.type
+      type: spec_relationalItems.extensions.tags.type
     }
   }
 };
@@ -1453,22 +1477,30 @@ const handler = {
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: {
     name: "raw",
-    encode(value) {
+    encode: Object.assign(function rawEncode(value) {
       return typeof value === "string" ? value : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function rawDecode(value) {
       return typeof value === "string" ? value : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   },
   base64JSON: handler_codec_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode(value) {
+    encode: Object.assign(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   }
 });
 const building_buildingPgResource = registry.pgResources["building"];
@@ -1549,6 +1581,9 @@ const specFromRecord3 = $record => {
     return memo;
   }, Object.create(null));
 };
+function CursorSerialize(value) {
+  return "" + value;
+}
 const handler4 = {
   typeName: "RelationalStatus",
   codec: handler_codec_base64JSON,
@@ -6955,6 +6990,16 @@ export const plans = {
       return $edge.node();
     }
   },
+  Cursor: {
+    serialize: CursorSerialize,
+    parseValue: CursorSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
   PageInfo: {
     __assertStep: assertPageInfoCapableStep,
     hasNextPage($pageInfo) {
@@ -7125,7 +7170,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), machineAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_machine.attributes.id.codec)}`;
             }
           });
         }
@@ -7148,7 +7193,7 @@ export const plans = {
             type: "attribute",
             attribute: "input",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), machineAttributes.input.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_machine.attributes.input.codec)}`;
             }
           });
         }
@@ -7171,7 +7216,7 @@ export const plans = {
             type: "attribute",
             attribute: "constructor",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), machineAttributes.constructor.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_machine.attributes.constructor.codec)}`;
             }
           });
         }
@@ -7360,7 +7405,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.id.codec)}`;
             }
           });
         }
@@ -7383,7 +7428,7 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.type.codec)}`;
             }
           });
         }
@@ -7406,7 +7451,7 @@ export const plans = {
             type: "attribute",
             attribute: "constructor",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.constructor.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.constructor.codec)}`;
             }
           });
         }
@@ -9391,7 +9436,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.id.codec)}`;
             }
           });
         }
@@ -9414,7 +9459,7 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.title.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.title.codec)}`;
             }
           });
         }
@@ -9437,7 +9482,7 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.type.codec)}`;
             }
           });
         }
@@ -9460,7 +9505,7 @@ export const plans = {
             type: "attribute",
             attribute: "constructor",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.constructor.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.constructor.codec)}`;
             }
           });
         }
@@ -9649,7 +9694,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), __proto__Attributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec___proto__.attributes.id.codec)}`;
             }
           });
         }
@@ -9672,7 +9717,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), __proto__Attributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec___proto__.attributes.name.codec)}`;
             }
           });
         }
@@ -9695,7 +9740,7 @@ export const plans = {
             type: "attribute",
             attribute: "brand",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), __proto__Attributes.brand.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec___proto__.attributes.brand.codec)}`;
             }
           });
         }
@@ -9884,7 +9929,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), buildingAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_building.attributes.id.codec)}`;
             }
           });
         }
@@ -9907,7 +9952,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), buildingAttributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_building.attributes.name.codec)}`;
             }
           });
         }
@@ -9930,7 +9975,7 @@ export const plans = {
             type: "attribute",
             attribute: "constructor",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), buildingAttributes.constructor.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_building.attributes.constructor.codec)}`;
             }
           });
         }
@@ -10119,7 +10164,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), constructorAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_constructor.attributes.id.codec)}`;
             }
           });
         }
@@ -10142,7 +10187,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), constructorAttributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_constructor.attributes.name.codec)}`;
             }
           });
         }
@@ -10165,7 +10210,7 @@ export const plans = {
             type: "attribute",
             attribute: "export",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), constructorAttributes.export.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_constructor.attributes.export.codec)}`;
             }
           });
         }
@@ -10354,7 +10399,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), cropAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_crop.attributes.id.codec)}`;
             }
           });
         }
@@ -10377,7 +10422,7 @@ export const plans = {
             type: "attribute",
             attribute: "yield",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), cropAttributes.yield.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_crop.attributes.yield.codec)}`;
             }
           });
         }
@@ -10400,7 +10445,7 @@ export const plans = {
             type: "attribute",
             attribute: "amount",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), cropAttributes.amount.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_crop.attributes.amount.codec)}`;
             }
           });
         }
@@ -10589,7 +10634,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), materialAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_material.attributes.id.codec)}`;
             }
           });
         }
@@ -10612,7 +10657,7 @@ export const plans = {
             type: "attribute",
             attribute: "class",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), materialAttributes.class.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_material.attributes.class.codec)}`;
             }
           });
         }
@@ -10635,7 +10680,7 @@ export const plans = {
             type: "attribute",
             attribute: "valueOf",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), materialAttributes.valueOf.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_material.attributes.valueOf.codec)}`;
             }
           });
         }
@@ -10824,7 +10869,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), nullAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_null.attributes.id.codec)}`;
             }
           });
         }
@@ -10847,7 +10892,7 @@ export const plans = {
             type: "attribute",
             attribute: "hasOwnProperty",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), nullAttributes.hasOwnProperty.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_null.attributes.hasOwnProperty.codec)}`;
             }
           });
         }
@@ -10870,7 +10915,7 @@ export const plans = {
             type: "attribute",
             attribute: "break",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), nullAttributes.break.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_null.attributes.break.codec)}`;
             }
           });
         }
@@ -11059,7 +11104,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), projectAttributes["id"].codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_project.attributes["id"].codec)}`;
             }
           });
         }
@@ -11082,7 +11127,7 @@ export const plans = {
             type: "attribute",
             attribute: "brand",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), projectAttributes["brand"].codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_project.attributes["brand"].codec)}`;
             }
           });
         }
@@ -11105,7 +11150,7 @@ export const plans = {
             type: "attribute",
             attribute: "__proto__",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), projectAttributes["__proto__"].codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_project.attributes["__proto__"].codec)}`;
             }
           });
         }
@@ -11362,7 +11407,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalStatusAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalStatus.attributes.id.codec)}`;
             }
           });
         }
@@ -11385,7 +11430,7 @@ export const plans = {
             type: "attribute",
             attribute: "description",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalStatusAttributes.description.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalStatus.attributes.description.codec)}`;
             }
           });
         }
@@ -11408,7 +11453,7 @@ export const plans = {
             type: "attribute",
             attribute: "note",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalStatusAttributes.note.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalStatus.attributes.note.codec)}`;
             }
           });
         }
@@ -11431,7 +11476,7 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalStatusAttributes.type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalStatus.attributes.type.codec)}`;
             }
           });
         }
@@ -11454,7 +11499,7 @@ export const plans = {
             type: "attribute",
             attribute: "constructor",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalStatusAttributes.constructor.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalStatus.attributes.constructor.codec)}`;
             }
           });
         }
@@ -11643,7 +11688,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), yieldAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_yield.attributes.id.codec)}`;
             }
           });
         }
@@ -11666,7 +11711,7 @@ export const plans = {
             type: "attribute",
             attribute: "crop",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), yieldAttributes.crop.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_yield.attributes.crop.codec)}`;
             }
           });
         }
@@ -11689,7 +11734,7 @@ export const plans = {
             type: "attribute",
             attribute: "export",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), yieldAttributes.export.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_yield.attributes.export.codec)}`;
             }
           });
         }
@@ -11912,7 +11957,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), reservedAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_reserved.attributes.id.codec)}`;
             }
           });
         }
@@ -11935,7 +11980,7 @@ export const plans = {
             type: "attribute",
             attribute: "null",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), reservedAttributes.null.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_reserved.attributes.null.codec)}`;
             }
           });
         }
@@ -11958,7 +12003,7 @@ export const plans = {
             type: "attribute",
             attribute: "case",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), reservedAttributes.case.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_reserved.attributes.case.codec)}`;
             }
           });
         }
@@ -11981,7 +12026,7 @@ export const plans = {
             type: "attribute",
             attribute: "do",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), reservedAttributes.do.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_reserved.attributes.do.codec)}`;
             }
           });
         }
@@ -13415,6 +13460,9 @@ export const plans = {
     }
   },
   _Proto__Input: {
+    "__inputPlan": function _Proto__Input_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -13496,6 +13544,9 @@ export const plans = {
     }
   },
   BuildingInput: {
+    "__inputPlan": function BuildingInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -13577,6 +13628,9 @@ export const plans = {
     }
   },
   ConstructorInput: {
+    "__inputPlan": function ConstructorInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -13658,6 +13712,9 @@ export const plans = {
     }
   },
   CropInput: {
+    "__inputPlan": function CropInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -13743,6 +13800,9 @@ export const plans = {
     }
   },
   MachineInput: {
+    "__inputPlan": function MachineInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -13824,6 +13884,9 @@ export const plans = {
     }
   },
   MaterialInput: {
+    "__inputPlan": function MaterialInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -13905,6 +13968,9 @@ export const plans = {
     }
   },
   NullInput: {
+    "__inputPlan": function NullInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -13986,6 +14052,9 @@ export const plans = {
     }
   },
   ProjectInput: {
+    "__inputPlan": function ProjectInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -14067,6 +14136,9 @@ export const plans = {
     }
   },
   YieldInput: {
+    "__inputPlan": function YieldInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -14148,6 +14220,9 @@ export const plans = {
     }
   },
   ReservedInput: {
+    "__inputPlan": function ReservedInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -14235,6 +14310,9 @@ export const plans = {
     }
   },
   _ProtoPatch: {
+    "__inputPlan": function _ProtoPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -14343,6 +14421,9 @@ export const plans = {
     }
   },
   BuildingPatch: {
+    "__inputPlan": function BuildingPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -14451,6 +14532,9 @@ export const plans = {
     }
   },
   ConstructorPatch: {
+    "__inputPlan": function ConstructorPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -14573,6 +14657,9 @@ export const plans = {
     }
   },
   CropPatch: {
+    "__inputPlan": function CropPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -14685,6 +14772,9 @@ export const plans = {
     }
   },
   MachinePatch: {
+    "__inputPlan": function MachinePatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -14779,6 +14869,9 @@ export const plans = {
     }
   },
   MaterialPatch: {
+    "__inputPlan": function MaterialPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -14901,6 +14994,9 @@ export const plans = {
     }
   },
   NullPatch: {
+    "__inputPlan": function NullPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -15023,6 +15119,9 @@ export const plans = {
     }
   },
   ProjectPatch: {
+    "__inputPlan": function ProjectPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -15131,6 +15230,9 @@ export const plans = {
     }
   },
   YieldPatch: {
+    "__inputPlan": function YieldPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -15239,6 +15341,9 @@ export const plans = {
     }
   },
   ReservedPatch: {
+    "__inputPlan": function ReservedPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());

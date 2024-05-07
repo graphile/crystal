@@ -1,17 +1,22 @@
 import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec } from "@dataplan/pg";
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
 const handler = {
   typeName: "Query",
   codec: {
     name: "raw",
-    encode(value) {
+    encode: Object.assign(function rawEncode(value) {
       return typeof value === "string" ? value : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function rawDecode(value) {
       return typeof value === "string" ? value : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   },
   match(specifier) {
     return specifier === "query";
@@ -28,44 +33,36 @@ const handler = {
 };
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode(value) {
-    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  },
-  decode(value) {
-    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }
+  encode: (() => {
+    function base64JSONEncode(value) {
+      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+    }
+    base64JSONEncode.isSyncAndSafe = true; // Optimization
+    return base64JSONEncode;
+  })(),
+  decode: (() => {
+    function base64JSONDecode(value) {
+      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+    }
+    base64JSONDecode.isSyncAndSafe = true; // Optimization
+    return base64JSONDecode;
+  })()
 };
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode(value) {
+    encode: Object.assign(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }
-  }
-});
-const usersAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   }
 });
 const executor = new PgExecutor({
@@ -78,10 +75,29 @@ const executor = new PgExecutor({
     });
   }
 });
-const usersCodec = recordCodec({
+const spec_users = {
   name: "users",
   identifier: sql.identifier("partitions", "users"),
-  attributes: usersAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -92,50 +108,50 @@ const usersCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const measurementsAttributes = Object.assign(Object.create(null), {
-  timestamp: {
-    description: undefined,
-    codec: TYPES.timestamptz,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  key: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  value: {
-    description: undefined,
-    codec: TYPES.float,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  user_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const measurementsCodec = recordCodec({
+  executor: executor
+};
+const usersCodec = recordCodec(spec_users);
+const spec_measurements = {
   name: "measurements",
   identifier: sql.identifier("partitions", "measurements"),
-  attributes: measurementsAttributes,
+  attributes: Object.assign(Object.create(null), {
+    timestamp: {
+      description: undefined,
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    key: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    value: {
+      description: undefined,
+      codec: TYPES.float,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    user_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -146,8 +162,9 @@ const measurementsCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
+  executor: executor
+};
+const measurementsCodec = recordCodec(spec_measurements);
 const usersUniques = [{
   isPrimary: true,
   attributes: ["id"],
@@ -350,6 +367,9 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
     plan($select);
   });
 };
+function DatetimeSerialize(value) {
+  return "" + value;
+}
 const specFromArgs = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.User, $nodeId);
@@ -1341,6 +1361,16 @@ export const plans = {
       });
     }
   },
+  Datetime: {
+    serialize: DatetimeSerialize,
+    parseValue: DatetimeSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
   MeasurementsEdge: {
     __assertStep: assertEdgeCapableStep,
     cursor($edge) {
@@ -1348,6 +1378,16 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  Cursor: {
+    serialize: DatetimeSerialize,
+    parseValue: DatetimeSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
     }
   },
   PageInfo: {
@@ -1554,7 +1594,7 @@ export const plans = {
             type: "attribute",
             attribute: "timestamp",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), measurementsAttributes.timestamp.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_measurements.attributes.timestamp.codec)}`;
             }
           });
         }
@@ -1577,7 +1617,7 @@ export const plans = {
             type: "attribute",
             attribute: "key",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), measurementsAttributes.key.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_measurements.attributes.key.codec)}`;
             }
           });
         }
@@ -1600,7 +1640,7 @@ export const plans = {
             type: "attribute",
             attribute: "value",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), measurementsAttributes.value.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_measurements.attributes.value.codec)}`;
             }
           });
         }
@@ -1623,7 +1663,7 @@ export const plans = {
             type: "attribute",
             attribute: "user_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), measurementsAttributes.user_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_measurements.attributes.user_id.codec)}`;
             }
           });
         }
@@ -1778,7 +1818,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), usersAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_users.attributes.id.codec)}`;
             }
           });
         }
@@ -1801,7 +1841,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), usersAttributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_users.attributes.name.codec)}`;
             }
           });
         }
@@ -2044,6 +2084,9 @@ export const plans = {
     }
   },
   UserInput: {
+    "__inputPlan": function UserInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -2123,6 +2166,9 @@ export const plans = {
     }
   },
   MeasurementInput: {
+    "__inputPlan": function MeasurementInput_inputPlan() {
+      return object(Object.create(null));
+    },
     timestamp: {
       applyPlan($insert, val) {
         $insert.set("timestamp", val.get());
@@ -2210,6 +2256,9 @@ export const plans = {
     }
   },
   UserPatch: {
+    "__inputPlan": function UserPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -2302,6 +2351,9 @@ export const plans = {
     }
   },
   MeasurementPatch: {
+    "__inputPlan": function MeasurementPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     timestamp: {
       applyPlan($insert, val) {
         $insert.set("timestamp", val.get());

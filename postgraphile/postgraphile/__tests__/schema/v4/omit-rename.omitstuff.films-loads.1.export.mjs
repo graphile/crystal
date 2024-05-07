@@ -1,17 +1,22 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, makeRegistry, pgClassExpression, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
+import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
 const handler = {
   typeName: "Query",
   codec: {
     name: "raw",
-    encode(value) {
+    encode: Object.assign(function rawEncode(value) {
       return typeof value === "string" ? value : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function rawDecode(value) {
       return typeof value === "string" ? value : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   },
   match(specifier) {
     return specifier === "query";
@@ -28,24 +33,36 @@ const handler = {
 };
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode(value) {
-    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  },
-  decode(value) {
-    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }
+  encode: (() => {
+    function base64JSONEncode(value) {
+      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+    }
+    base64JSONEncode.isSyncAndSafe = true; // Optimization
+    return base64JSONEncode;
+  })(),
+  decode: (() => {
+    function base64JSONDecode(value) {
+      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+    }
+    base64JSONDecode.isSyncAndSafe = true; // Optimization
+    return base64JSONDecode;
+  })()
 };
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode(value) {
+    encode: Object.assign(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   }
 });
 const executor = new PgExecutor({
@@ -84,25 +101,24 @@ const flambleCodec = recordCodec({
       name: "flamble"
     })
   },
-  executor
+  executor: executor
 });
-const renamed_tableAttributes = Object.assign(Object.create(null), {
-  col1: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        name: "colA"
-      }
-    }
-  }
-});
-const renamed_tableCodec = recordCodec({
+const spec_renamed_table = {
   name: "renamed_table",
   identifier: sql.identifier("d", "original_table"),
-  attributes: renamed_tableAttributes,
+  attributes: Object.assign(Object.create(null), {
+    col1: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          name: "colA"
+        }
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -115,21 +131,10 @@ const renamed_tableCodec = recordCodec({
       name: "renamed_table"
     })
   },
-  executor
-});
-const extensions3 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "d",
-    name: "films"
-  },
-  tags: Object.assign(Object.create(null), {
-    omit: "read,all,update,create,delete,many",
-    behavior: ["-select -node -query:resource:list -query:resource:connection -update -insert -delete -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection"]
-  })
+  executor: executor
 };
-const filmsCodec = recordCodec({
+const renamed_tableCodec = recordCodec(spec_renamed_table);
+const spec_films = {
   name: "films",
   identifier: sql.identifier("d", "films"),
   attributes: Object.assign(Object.create(null), {
@@ -153,33 +158,44 @@ const filmsCodec = recordCodec({
     }
   }),
   description: undefined,
-  extensions: extensions3,
-  executor
-});
-const studiosAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "d",
+      name: "films"
+    },
+    tags: Object.assign(Object.create(null), {
+      omit: "read,all,update,create,delete,many",
+      behavior: ["-select -node -query:resource:list -query:resource:connection -update -insert -delete -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection"]
+    })
   },
-  name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const studiosCodec = recordCodec({
+  executor: executor
+};
+const filmsCodec = recordCodec(spec_films);
+const spec_studios = {
   name: "studios",
   identifier: sql.identifier("d", "studios"),
-  attributes: studiosAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -190,41 +206,41 @@ const studiosCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const postAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  body: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  author_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const postCodec = recordCodec({
+  executor: executor
+};
+const studiosCodec = recordCodec(spec_studios);
+const spec_post = {
   name: "post",
   identifier: sql.identifier("d", "post"),
-  attributes: postAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    body: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    author_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -235,41 +251,41 @@ const postCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const tvEpisodesAttributes = Object.assign(Object.create(null), {
-  code: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  title: {
-    description: undefined,
-    codec: TYPES.varchar,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  show_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const tvEpisodesCodec = recordCodec({
+  executor: executor
+};
+const postCodec = recordCodec(spec_post);
+const spec_tvEpisodes = {
   name: "tvEpisodes",
   identifier: sql.identifier("d", "tv_episodes"),
-  attributes: tvEpisodesAttributes,
+  attributes: Object.assign(Object.create(null), {
+    code: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    title: {
+      description: undefined,
+      codec: TYPES.varchar,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    show_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -280,41 +296,41 @@ const tvEpisodesCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const tvShowsAttributes = Object.assign(Object.create(null), {
-  code: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  title: {
-    description: undefined,
-    codec: TYPES.varchar,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  studio_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const tvShowsCodec = recordCodec({
+  executor: executor
+};
+const tvEpisodesCodec = recordCodec(spec_tvEpisodes);
+const spec_tvShows = {
   name: "tvShows",
   identifier: sql.identifier("d", "tv_shows"),
-  attributes: tvShowsAttributes,
+  attributes: Object.assign(Object.create(null), {
+    code: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    title: {
+      description: undefined,
+      codec: TYPES.varchar,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    studio_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -325,8 +341,9 @@ const tvShowsCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
+  executor: executor
+};
+const tvShowsCodec = recordCodec(spec_tvShows);
 const jwtTokenCodec = recordCodec({
   name: "jwtToken",
   identifier: sql.identifier("d", "jwt_token"),
@@ -369,125 +386,124 @@ const jwtTokenCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
-const personAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  first_name: {
-    description: undefined,
-    codec: TYPES.varchar,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  last_name: {
-    description: undefined,
-    codec: TYPES.varchar,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  col_no_create: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: true,
-    extensions: {
-      tags: {
-        omit: "create",
-        behavior: ["-insert"]
-      }
-    }
-  },
-  col_no_update: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: true,
-    extensions: {
-      tags: {
-        omit: "update",
-        behavior: ["-update"]
-      }
-    }
-  },
-  col_no_order: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: true,
-    extensions: {
-      tags: {
-        omit: "order",
-        behavior: ["-order -orderBy"]
-      }
-    }
-  },
-  col_no_filter: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: true,
-    extensions: {
-      tags: {
-        omit: "filter",
-        behavior: ["-filter -filterBy"]
-      }
-    }
-  },
-  col_no_create_update: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: true,
-    extensions: {
-      tags: {
-        omit: "create,update",
-        behavior: ["-insert -update"]
-      }
-    }
-  },
-  col_no_create_update_order_filter: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: true,
-    extensions: {
-      tags: {
-        omit: "create,update,order,filter",
-        behavior: ["-insert -update -order -orderBy -filter -filterBy"]
-      }
-    }
-  },
-  col_no_anything: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: true,
-    extensions: {
-      tags: {
-        omit: true,
-        behavior: ["-*"]
-      }
-    }
-  }
-});
-const personCodec = recordCodec({
+const spec_person = {
   name: "person",
   identifier: sql.identifier("d", "person"),
-  attributes: personAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    first_name: {
+      description: undefined,
+      codec: TYPES.varchar,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    last_name: {
+      description: undefined,
+      codec: TYPES.varchar,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    col_no_create: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {
+          omit: "create",
+          behavior: ["-insert"]
+        }
+      }
+    },
+    col_no_update: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {
+          omit: "update",
+          behavior: ["-update"]
+        }
+      }
+    },
+    col_no_order: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {
+          omit: "order",
+          behavior: ["-order -orderBy"]
+        }
+      }
+    },
+    col_no_filter: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {
+          omit: "filter",
+          behavior: ["-filter -filterBy"]
+        }
+      }
+    },
+    col_no_create_update: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {
+          omit: "create,update",
+          behavior: ["-insert -update"]
+        }
+      }
+    },
+    col_no_create_update_order_filter: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {
+          omit: "create,update,order,filter",
+          behavior: ["-insert -update -order -orderBy -filter -filterBy"]
+        }
+      }
+    },
+    col_no_anything: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {
+          omit: true,
+          behavior: ["-*"]
+        }
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -498,8 +514,9 @@ const personCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
+  executor: executor
+};
+const personCodec = recordCodec(spec_person);
 const original_functionFunctionIdentifer = sql.identifier("d", "original_function");
 const getflambleFunctionIdentifer = sql.identifier("d", "getflamble");
 const studiosUniques = [{
@@ -773,7 +790,7 @@ const registry = makeRegistry({
         },
         tags: {
           omit: "read,all,update,create,delete,many",
-          behavior: extensions3.tags.behavior
+          behavior: spec_films.extensions.tags.behavior
         }
       }
     },
@@ -1343,6 +1360,9 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
     plan($select);
   });
 };
+function CursorSerialize(value) {
+  return "" + value;
+}
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
 }
@@ -4124,6 +4144,16 @@ export const plans = {
       return $edge.node();
     }
   },
+  Cursor: {
+    serialize: CursorSerialize,
+    parseValue: CursorSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
   PageInfo: {
     __assertStep: assertPageInfoCapableStep,
     hasNextPage($pageInfo) {
@@ -4294,7 +4324,7 @@ export const plans = {
             type: "attribute",
             attribute: "code",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), tvEpisodesAttributes.code.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_tvEpisodes.attributes.code.codec)}`;
             }
           });
         }
@@ -4317,7 +4347,7 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), tvEpisodesAttributes.title.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_tvEpisodes.attributes.title.codec)}`;
             }
           });
         }
@@ -4340,7 +4370,7 @@ export const plans = {
             type: "attribute",
             attribute: "show_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), tvEpisodesAttributes.show_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_tvEpisodes.attributes.show_id.codec)}`;
             }
           });
         }
@@ -4513,7 +4543,7 @@ export const plans = {
             type: "attribute",
             attribute: "code",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), tvShowsAttributes.code.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_tvShows.attributes.code.codec)}`;
             }
           });
         }
@@ -4536,7 +4566,7 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), tvShowsAttributes.title.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_tvShows.attributes.title.codec)}`;
             }
           });
         }
@@ -4559,7 +4589,7 @@ export const plans = {
             type: "attribute",
             attribute: "studio_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), tvShowsAttributes.studio_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_tvShows.attributes.studio_id.codec)}`;
             }
           });
         }
@@ -4893,7 +4923,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), postAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_post.attributes.id.codec)}`;
             }
           });
         }
@@ -4916,7 +4946,7 @@ export const plans = {
             type: "attribute",
             attribute: "body",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), postAttributes.body.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_post.attributes.body.codec)}`;
             }
           });
         }
@@ -4939,7 +4969,7 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), postAttributes.author_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_post.attributes.author_id.codec)}`;
             }
           });
         }
@@ -5034,7 +5064,7 @@ export const plans = {
             type: "attribute",
             attribute: "col1",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), renamed_tableAttributes.col1.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_renamed_table.attributes.col1.codec)}`;
             }
           });
         }
@@ -5189,7 +5219,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), studiosAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_studios.attributes.id.codec)}`;
             }
           });
         }
@@ -5212,7 +5242,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), studiosAttributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_studios.attributes.name.codec)}`;
             }
           });
         }
@@ -5537,7 +5567,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_person.attributes.id.codec)}`;
             }
           });
         }
@@ -5560,7 +5590,7 @@ export const plans = {
             type: "attribute",
             attribute: "first_name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.first_name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_person.attributes.first_name.codec)}`;
             }
           });
         }
@@ -5583,7 +5613,7 @@ export const plans = {
             type: "attribute",
             attribute: "last_name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.last_name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_person.attributes.last_name.codec)}`;
             }
           });
         }
@@ -5606,7 +5636,7 @@ export const plans = {
             type: "attribute",
             attribute: "col_no_create",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.col_no_create.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_person.attributes.col_no_create.codec)}`;
             }
           });
         }
@@ -5629,7 +5659,7 @@ export const plans = {
             type: "attribute",
             attribute: "col_no_update",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.col_no_update.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_person.attributes.col_no_update.codec)}`;
             }
           });
         }
@@ -5652,7 +5682,7 @@ export const plans = {
             type: "attribute",
             attribute: "col_no_order",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.col_no_order.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_person.attributes.col_no_order.codec)}`;
             }
           });
         }
@@ -5675,7 +5705,7 @@ export const plans = {
             type: "attribute",
             attribute: "col_no_create_update",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.col_no_create_update.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_person.attributes.col_no_create_update.codec)}`;
             }
           });
         }
@@ -6250,6 +6280,9 @@ export const plans = {
     }
   },
   RenamedTableInput: {
+    "__inputPlan": function RenamedTableInput_inputPlan() {
+      return object(Object.create(null));
+    },
     colA: {
       applyPlan($insert, val) {
         $insert.set("col1", val.get());
@@ -6317,6 +6350,9 @@ export const plans = {
     }
   },
   StudioInput: {
+    "__inputPlan": function StudioInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -6396,6 +6432,9 @@ export const plans = {
     }
   },
   PostInput: {
+    "__inputPlan": function PostInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -6482,6 +6521,9 @@ export const plans = {
     }
   },
   TvEpisodeInput: {
+    "__inputPlan": function TvEpisodeInput_inputPlan() {
+      return object(Object.create(null));
+    },
     code: {
       applyPlan($insert, val) {
         $insert.set("code", val.get());
@@ -6568,6 +6610,9 @@ export const plans = {
     }
   },
   TvShowInput: {
+    "__inputPlan": function TvShowInput_inputPlan() {
+      return object(Object.create(null));
+    },
     code: {
       applyPlan($insert, val) {
         $insert.set("code", val.get());
@@ -6649,6 +6694,9 @@ export const plans = {
     }
   },
   PersonInput: {
+    "__inputPlan": function PersonInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -6750,6 +6798,9 @@ export const plans = {
     }
   },
   StudioPatch: {
+    "__inputPlan": function StudioPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -6842,6 +6893,9 @@ export const plans = {
     }
   },
   PostPatch: {
+    "__inputPlan": function PostPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -6941,6 +6995,9 @@ export const plans = {
     }
   },
   TvEpisodePatch: {
+    "__inputPlan": function TvEpisodePatch_inputPlan() {
+      return object(Object.create(null));
+    },
     code: {
       applyPlan($insert, val) {
         $insert.set("code", val.get());
@@ -7040,6 +7097,9 @@ export const plans = {
     }
   },
   TvShowPatch: {
+    "__inputPlan": function TvShowPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     code: {
       applyPlan($insert, val) {
         $insert.set("code", val.get());
@@ -7134,6 +7194,9 @@ export const plans = {
     }
   },
   PersonPatch: {
+    "__inputPlan": function PersonPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
