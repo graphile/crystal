@@ -293,6 +293,9 @@ class CodegenFile {
 
   _values: Map<any, t.Expression> = new Map();
 
+  _funcToAstCache: Map<AnyFunction, FunctionExpressionIncludingAttributes> =
+    new Map();
+
   constructor(public options: ExportOptions) {}
 
   addStatements(statements: t.Statement | t.Statement[]): void {
@@ -1248,7 +1251,7 @@ function func(
   } else if (isImportable(fn)) {
     return file.import(fn.$$export.moduleName, fn.$$export.exportName);
   } else {
-    return funcToAst(fn, locationHint, nameHint);
+    return funcToAst(file, fn, locationHint, nameHint).ast;
   }
 }
 
@@ -1261,7 +1264,12 @@ function factoryAst<TTuple extends any[]>(
   nameHint: string,
 ) {
   const factory = fn.$exporter$factory;
-  const funcAST = funcToAst(factory, locationHint, nameHint);
+  const { functionWithoutOwnAttributesAST: funcAST } = funcToAst(
+    file,
+    factory,
+    locationHint,
+    nameHint,
+  );
   const depArgs = fn.$exporter$args.map((arg, i) => {
     if (typeof arg === "string") {
       return t.stringLiteral(arg);
@@ -1319,11 +1327,22 @@ function factoryAst<TTuple extends any[]>(
   }
 }
 
+interface FunctionExpressionIncludingAttributes {
+  functionWithoutOwnAttributesAST:
+    | t.FunctionExpression
+    | t.ArrowFunctionExpression;
+  ast: t.CallExpression | t.FunctionExpression | t.ArrowFunctionExpression;
+}
+
 function funcToAst(
+  file: CodegenFile,
   fn: AnyFunction,
   locationHint: string,
   _nameHint: string,
-): t.FunctionExpression | t.ArrowFunctionExpression {
+): FunctionExpressionIncludingAttributes {
+  if (file._funcToAstCache.has(fn)) {
+    return file._funcToAstCache.get(fn)!;
+  }
   const path = _funcToAst(fn, locationHint, _nameHint);
 
   const externalReferences = new Set<string>();
@@ -1358,7 +1377,40 @@ function funcToAst(
     );
   }
 
-  return path.node;
+  const fnExpression = path.node;
+  const ownProps = Object.entries(fn);
+  const result = (() => {
+    if (ownProps.length > 0) {
+      // Need to assign things to it
+      const properties = ownProps.map(([key, value]) => {
+        return t.objectProperty(
+          identifierOrLiteral(key),
+          convertToIdentifierViaAST(
+            file,
+            value,
+            `${locationHint}.${key}`,
+            `${locationHint}['${key}']`,
+          ),
+        );
+      });
+      return {
+        functionWithoutOwnAttributesAST: fnExpression,
+        ast: t.callExpression(
+          t.memberExpression(t.identifier("Object"), t.identifier("assign")),
+          [fnExpression, t.objectExpression(properties)],
+        ),
+      };
+    } else {
+      return {
+        functionWithoutOwnAttributesAST: fnExpression,
+        ast: fnExpression,
+      };
+    }
+  })();
+
+  file._funcToAstCache.set(fn, result);
+
+  return result;
 }
 
 function parseExpressionViaDoc(funcString: string) {
