@@ -119,7 +119,7 @@ beforeAll(() => {
   };
   // Wait for these promises to resolve, even if it's with errors.
   return Promise.all([result1.catch(e => {}), result2.catch(e => {}), result3.catch(e => {})]);
-}, 30000);
+}, 60000);
 
 afterAll(() => {
   result1 = result2 = result3 = null;

@@ -3,7 +3,7 @@ Error.stackTraceLimit = Infinity;
 
 if (process.env.DEBUG) {
   // When debug is set, outputting the console logs makes the tests slow.
-  jest.setTimeout(30000);
+  jest.setTimeout(60000);
 }
 
 import "graphile-config";

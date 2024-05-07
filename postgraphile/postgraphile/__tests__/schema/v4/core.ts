@@ -15,7 +15,7 @@ import {
   withPoolClientTransaction,
 } from "../../helpers.js";
 
-jest.setTimeout(30000);
+jest.setTimeout(60000);
 
 let countByPath = Object.create(null);
 
