@@ -175,7 +175,8 @@
     "test:operations:mutations": "jest -i __tests__/mutations",
     "test:schema": "jest -i __tests__/schema",
     "test:schema-exports": "node scripts/test-schema-exports.mjs",
-    "test:operations-exports": "EXPORT_SCHEMA=1 yarn test:operations",
+    "test:operations-exports": "yarn test:operations-exports:typeDefs",
+    "test:operations-exports:typeDefs": "EXPORT_SCHEMA=typeDefs yarn test:operations",
     "prepack": "tsc -b tsconfig.build.json"
   },
   "repository": {

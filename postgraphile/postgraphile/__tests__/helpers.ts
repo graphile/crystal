@@ -58,7 +58,20 @@ import { makeV4Preset } from "../src/presets/v4.js";
  */
 export const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === "1";
 
-const EXPORT_SCHEMA_MODE = process.env.EXPORT_SCHEMA === "1";
+const EXPORT_SCHEMA_MODE = process.env.EXPORT_SCHEMA as
+  | undefined
+  | "graphql-js"
+  | "typeDefs";
+
+if (
+  EXPORT_SCHEMA_MODE &&
+  EXPORT_SCHEMA_MODE !== "graphql-js" &&
+  EXPORT_SCHEMA_MODE !== "typeDefs"
+) {
+  throw new Error(
+    `EXPORT_SCHEMA must be unset, or set to 'graphql-js' or 'typeDefs'`,
+  );
+}
 
 async function getServerVersionNum(pgClient: Pool | PoolClient) {
   const versionResult = await pgClient.query("show server_version_num;");
@@ -185,7 +198,7 @@ async function importExportedSchema(schema: GraphQLSchema) {
   const tempDir = await mkdtemp(`${TMPDIR}/postgraphiletests-`);
   const targetFile = tempDir + "/schema.js";
   await exportSchema(schema, targetFile, {
-    mode: "typeDefs",
+    mode: EXPORT_SCHEMA_MODE,
     modules: {
       jsonwebtoken,
     },
