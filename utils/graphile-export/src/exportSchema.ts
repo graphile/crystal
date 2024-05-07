@@ -1709,6 +1709,20 @@ function exportSchemaTypeDefs({
     } else if (type instanceof GraphQLInputObjectType) {
       const typeProperties: t.ObjectProperty[] = [];
 
+      if (type.extensions?.grafast?.inputPlan) {
+        typeProperties.push(
+          t.objectProperty(
+            identifierOrLiteral("__inputPlan"),
+            convertToIdentifierViaAST(
+              file,
+              type.extensions?.grafast.inputPlan,
+              `${type.name}.inputPlan`,
+              `${type.name}.extensions.grafast.inputPlan`,
+            ),
+          ),
+        );
+      }
+
       for (const [fieldName, field] of Object.entries(type.toConfig().fields)) {
         typeProperties.push(
           t.objectProperty(
