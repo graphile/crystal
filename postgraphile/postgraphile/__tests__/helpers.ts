@@ -40,6 +40,7 @@ import { exportSchema } from "graphile-export";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 import type { JwtPayload } from "jsonwebtoken";
+import * as jsonwebtoken from "jsonwebtoken";
 import { decode } from "jsonwebtoken";
 import { relative } from "path";
 import type { PoolClient } from "pg";
@@ -183,7 +184,12 @@ async function importExportedSchema(schema: GraphQLSchema) {
   await mktmp();
   const tempDir = await mkdtemp(`${TMPDIR}/postgraphiletests-`);
   const targetFile = tempDir + "/schema.js";
-  await exportSchema(schema, targetFile, { mode: "typeDefs" });
+  await exportSchema(schema, targetFile, {
+    mode: "typeDefs",
+    modules: {
+      jsonwebtoken,
+    },
+  });
   try {
     const module = await import(targetFile);
     await unlink(targetFile);
