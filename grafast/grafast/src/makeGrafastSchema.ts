@@ -60,6 +60,8 @@ export type ObjectPlans = {
  * The plans for each field of a GraphQL input object type.
  */
 export type InputObjectPlans = {
+  __inputPlan?: () => ExecutableStep;
+} & {
   [fieldName: string]: Grafast.InputFieldExtensions;
 };
 
@@ -331,6 +333,12 @@ export function makeGrafastSchema(details: {
         const rawConfig = astType.toConfig();
         const config: graphql.GraphQLInputObjectTypeConfig = {
           ...rawConfig,
+          extensions: {
+            ...rawConfig.extensions,
+            grafast: {
+              ...rawConfig.extensions?.grafast,
+            },
+          },
         };
         const inputObjectPlans = plans[astType.name] as
           | InputObjectPlans
@@ -340,6 +348,11 @@ export function makeGrafastSchema(details: {
           for (const [fieldName, fieldSpec] of Object.entries(
             inputObjectPlans,
           )) {
+            if (fieldName === "__inputPlan") {
+              config.extensions!.grafast!.inputPlan =
+                fieldSpec as () => ExecutableStep;
+              continue;
+            }
             const field = rawConfig.fields[fieldName];
             if (!field) {
               console.warn(
