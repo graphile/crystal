@@ -1137,6 +1137,24 @@ const getExistingIdentifier = (file: CodegenFile, thing: unknown) => {
   }
 };
 
+function importWellKnownOrFactory(
+  file: CodegenFile,
+  value: unknown,
+  locationHint: string,
+  nameHint: string,
+): t.Expression | undefined {
+  if (isImportable(value)) {
+    return file.import(value.$$export.moduleName, value.$$export.exportName);
+  } else if (wellKnown(file.options, value)) {
+    const { moduleName, exportName } = wellKnown(file.options, value)!;
+    return file.import(moduleName, exportName);
+  } else if (isExportedFromFactory(value)) {
+    return factoryAst(file, value, locationHint, nameHint);
+  } else {
+    return undefined;
+  }
+}
+
 function convertToIdentifierViaAST(
   file: CodegenFile,
   thing: unknown,
@@ -1154,16 +1172,16 @@ function convertToIdentifierViaAST(
   const variableIdentifier = file.makeVariable(nameHint || "value");
   file._values.set(thing, variableIdentifier);
 
-  const ast = isExportedFromFactory(thing)
-    ? factoryAst(file, thing, locationHint, nameHint)
-    : _convertToAST(
-        file,
-        thing,
-        locationHint,
-        nameHint,
-        depth,
-        variableIdentifier,
-      );
+  const ast =
+    importWellKnownOrFactory(file, thing, locationHint, nameHint) ??
+    _convertToAST(
+      file,
+      thing,
+      locationHint,
+      nameHint,
+      depth,
+      variableIdentifier,
+    );
   if (ast.type === "Identifier") {
     console.warn(
       `graphile-export error: AST returned an identifier '${ast.name}'; this could cause an infinite loop.`,
@@ -1243,16 +1261,10 @@ function func(
   // scope; e.g.:
   //
   // `(() => { const foo = 1, bar = 2; return /*>*/() => {return foo+bar}/*<*/})();`
-  if (isExportedFromFactory(fn)) {
-    return factoryAst(file, fn, locationHint, nameHint);
-  } else if (wellKnown(file.options, fn)) {
-    const { moduleName, exportName } = wellKnown(file.options, fn)!;
-    return file.import(moduleName, exportName);
-  } else if (isImportable(fn)) {
-    return file.import(fn.$$export.moduleName, fn.$$export.exportName);
-  } else {
-    return funcToAst(file, fn, locationHint, nameHint).ast;
-  }
+  return (
+    importWellKnownOrFactory(file, fn, locationHint, nameHint) ??
+    funcToAst(file, fn, locationHint, nameHint).ast
+  );
 }
 
 const shouldOptimizeFactoryCalls = true;
