@@ -293,6 +293,9 @@ class CodegenFile {
 
   _values: Map<any, t.Expression> = new Map();
 
+  _funcToAstCache: Map<AnyFunction, FunctionExpressionIncludingAttributes> =
+    new Map();
+
   constructor(public options: ExportOptions) {}
 
   addStatements(statements: t.Statement | t.Statement[]): void {
@@ -1134,6 +1137,24 @@ const getExistingIdentifier = (file: CodegenFile, thing: unknown) => {
   }
 };
 
+function importWellKnownOrFactory(
+  file: CodegenFile,
+  value: unknown,
+  locationHint: string,
+  nameHint: string,
+): t.Expression | undefined {
+  if (isImportable(value)) {
+    return file.import(value.$$export.moduleName, value.$$export.exportName);
+  } else if (wellKnown(file.options, value)) {
+    const { moduleName, exportName } = wellKnown(file.options, value)!;
+    return file.import(moduleName, exportName);
+  } else if (isExportedFromFactory(value)) {
+    return factoryAst(file, value, locationHint, nameHint);
+  } else {
+    return undefined;
+  }
+}
+
 function convertToIdentifierViaAST(
   file: CodegenFile,
   thing: unknown,
@@ -1151,16 +1172,16 @@ function convertToIdentifierViaAST(
   const variableIdentifier = file.makeVariable(nameHint || "value");
   file._values.set(thing, variableIdentifier);
 
-  const ast = isExportedFromFactory(thing)
-    ? factoryAst(file, thing, locationHint, nameHint)
-    : _convertToAST(
-        file,
-        thing,
-        locationHint,
-        nameHint,
-        depth,
-        variableIdentifier,
-      );
+  const ast =
+    importWellKnownOrFactory(file, thing, locationHint, nameHint) ??
+    _convertToAST(
+      file,
+      thing,
+      locationHint,
+      nameHint,
+      depth,
+      variableIdentifier,
+    );
   if (ast.type === "Identifier") {
     console.warn(
       `graphile-export error: AST returned an identifier '${ast.name}'; this could cause an infinite loop.`,
@@ -1240,16 +1261,10 @@ function func(
   // scope; e.g.:
   //
   // `(() => { const foo = 1, bar = 2; return /*>*/() => {return foo+bar}/*<*/})();`
-  if (isExportedFromFactory(fn)) {
-    return factoryAst(file, fn, locationHint, nameHint);
-  } else if (wellKnown(file.options, fn)) {
-    const { moduleName, exportName } = wellKnown(file.options, fn)!;
-    return file.import(moduleName, exportName);
-  } else if (isImportable(fn)) {
-    return file.import(fn.$$export.moduleName, fn.$$export.exportName);
-  } else {
-    return funcToAst(fn, locationHint, nameHint);
-  }
+  return (
+    importWellKnownOrFactory(file, fn, locationHint, nameHint) ??
+    funcToAst(file, fn, locationHint, nameHint).ast
+  );
 }
 
 const shouldOptimizeFactoryCalls = true;
@@ -1261,7 +1276,12 @@ function factoryAst<TTuple extends any[]>(
   nameHint: string,
 ) {
   const factory = fn.$exporter$factory;
-  const funcAST = funcToAst(factory, locationHint, nameHint);
+  const { functionWithoutOwnAttributesAST: funcAST } = funcToAst(
+    file,
+    factory,
+    locationHint,
+    nameHint,
+  );
   const depArgs = fn.$exporter$args.map((arg, i) => {
     if (typeof arg === "string") {
       return t.stringLiteral(arg);
@@ -1319,11 +1339,22 @@ function factoryAst<TTuple extends any[]>(
   }
 }
 
+interface FunctionExpressionIncludingAttributes {
+  functionWithoutOwnAttributesAST:
+    | t.FunctionExpression
+    | t.ArrowFunctionExpression;
+  ast: t.CallExpression | t.FunctionExpression | t.ArrowFunctionExpression;
+}
+
 function funcToAst(
+  file: CodegenFile,
   fn: AnyFunction,
   locationHint: string,
   _nameHint: string,
-): t.FunctionExpression | t.ArrowFunctionExpression {
+): FunctionExpressionIncludingAttributes {
+  if (file._funcToAstCache.has(fn)) {
+    return file._funcToAstCache.get(fn)!;
+  }
   const path = _funcToAst(fn, locationHint, _nameHint);
 
   const externalReferences = new Set<string>();
@@ -1358,7 +1389,40 @@ function funcToAst(
     );
   }
 
-  return path.node;
+  const fnExpression = path.node;
+  const ownProps = Object.entries(fn);
+  const result = (() => {
+    if (ownProps.length > 0) {
+      // Need to assign things to it
+      const properties = ownProps.map(([key, value]) => {
+        return t.objectProperty(
+          identifierOrLiteral(key),
+          convertToIdentifierViaAST(
+            file,
+            value,
+            `${locationHint}.${key}`,
+            `${locationHint}['${key}']`,
+          ),
+        );
+      });
+      return {
+        functionWithoutOwnAttributesAST: fnExpression,
+        ast: t.callExpression(
+          t.memberExpression(t.identifier("Object"), t.identifier("assign")),
+          [fnExpression, t.objectExpression(properties)],
+        ),
+      };
+    } else {
+      return {
+        functionWithoutOwnAttributesAST: fnExpression,
+        ast: fnExpression,
+      };
+    }
+  })();
+
+  file._funcToAstCache.set(fn, result);
+
+  return result;
 }
 
 function parseExpressionViaDoc(funcString: string) {
@@ -1494,16 +1558,10 @@ function exportSchemaGraphQLJS({
         "schema.extensions",
         "schema.extensions",
       ),
-      enableDeferStream: t.booleanLiteral(
-        process.env.ENABLE_DEFER_STREAM === "1",
-      ),
-      /*
-      // TODO: use the below once https://github.com/graphql/graphql-js/pull/3450 is fixed:
       enableDeferStream:
         config.enableDeferStream != null
           ? t.booleanLiteral(config.enableDeferStream)
           : null,
-          */
       assumeValid: null, // TODO: t.booleanLiteral(true),
     }),
   );
@@ -1645,6 +1703,20 @@ function exportSchemaTypeDefs({
     } else if (type instanceof GraphQLInputObjectType) {
       const typeProperties: t.ObjectProperty[] = [];
 
+      if (type.extensions?.grafast?.inputPlan) {
+        typeProperties.push(
+          t.objectProperty(
+            identifierOrLiteral("__inputPlan"),
+            convertToIdentifierViaAST(
+              file,
+              type.extensions?.grafast.inputPlan,
+              `${type.name}.inputPlan`,
+              `${type.name}.extensions.grafast.inputPlan`,
+            ),
+          ),
+        );
+      }
+
       for (const [fieldName, field] of Object.entries(type.toConfig().fields)) {
         typeProperties.push(
           t.objectProperty(
@@ -1697,30 +1769,44 @@ function exportSchemaTypeDefs({
             `${type.name}.extensions.grafast.plan`,
           )
         : null;
-      if (planAST) {
+      if (
+        planAST ||
+        type.serialize !== GraphQLScalarType.prototype.serialize ||
+        type.parseValue !== GraphQLScalarType.prototype.parseValue ||
+        type.parseLiteral !== GraphQLScalarType.prototype.parseLiteral
+      ) {
         plansProperties.push(
           t.objectProperty(
             identifierOrLiteral(type.name),
             t.objectExpression(
               objectToObjectProperties({
-                serialize: convertToIdentifierViaAST(
-                  file,
-                  type.serialize,
-                  `${type.name}Serialize`,
-                  `${type.name}.serialize`,
-                ),
-                parseValue: convertToIdentifierViaAST(
-                  file,
-                  type.parseValue,
-                  `${type.name}ParseValue`,
-                  `${type.name}.parseValue`,
-                ),
-                parseLiteral: convertToIdentifierViaAST(
-                  file,
-                  type.parseLiteral,
-                  `${type.name}ParseLiteral`,
-                  `${type.name}.parseLiteral`,
-                ),
+                serialize:
+                  type.serialize !== GraphQLScalarType.prototype.serialize
+                    ? convertToIdentifierViaAST(
+                        file,
+                        type.serialize,
+                        `${type.name}Serialize`,
+                        `${type.name}.serialize`,
+                      )
+                    : null,
+                parseValue:
+                  type.parseValue !== GraphQLScalarType.prototype.parseValue
+                    ? convertToIdentifierViaAST(
+                        file,
+                        type.parseValue,
+                        `${type.name}ParseValue`,
+                        `${type.name}.parseValue`,
+                      )
+                    : null,
+                parseLiteral:
+                  type.parseLiteral !== GraphQLScalarType.prototype.parseLiteral
+                    ? convertToIdentifierViaAST(
+                        file,
+                        type.parseLiteral,
+                        `${type.name}ParseLiteral`,
+                        `${type.name}.parseLiteral`,
+                      )
+                    : null,
                 plan: planAST,
               }),
             ),
@@ -1835,6 +1921,14 @@ export async function exportSchemaAsString(
       ].includes(d.name),
   );
 
+  if (
+    process.env.ENABLE_DEFER_STREAM === "1" ||
+    config.directives.some((d) => d.name === "defer" || d.name === "skip")
+  ) {
+    // Ref: https://github.com/graphql/graphql-js/pull/3450
+    config.enableDeferStream = true;
+  }
+
   const file = new CodegenFile(options);
 
   const schemaExportDetails: SchemaExportDetails = {
@@ -1902,6 +1996,8 @@ async function lint(code: string, rawFilePath: string | URL) {
     );
     return;
   }
+  const filePath =
+    typeof rawFilePath === "string" ? rawFilePath : rawFilePath.pathname;
   const { ESLint } = eslintModule;
   const eslint = new ESLint({
     useEslintrc: false, // Don't use external config
@@ -1928,16 +2024,18 @@ async function lint(code: string, rawFilePath: string | URL) {
     },
   });
 
-  const filePath =
-    typeof rawFilePath === "string" ? rawFilePath : rawFilePath.pathname;
-  const results = await eslint.lintText(code, { filePath });
+  const results = await eslint.lintText(code, {
+    warnIgnored: true,
+    // DO NOT PASS THE `filePath`; it can result in the file being ignored!
+  });
 
   if (results.length !== 1) {
+    console.dir({ filePath, results });
     throw new Error(`Expected ESLint results to have exactly one entry`);
   }
   const [result] = results;
 
-  if (result.errorCount > 0) {
+  if (result.warningCount > 0 || result.errorCount > 0) {
     console.log(
       `ESLint found problems in the export; this likely indicates some issue with \`EXPORTABLE\` calls`,
     );

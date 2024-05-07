@@ -12422,13 +12422,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphql@npm:^16.1.0-experimental-stream-defer.6":
-  version: 16.8.0
-  resolution: "graphql@npm:16.8.0"
-  checksum: 93a2e9e0ff33f05bb64c4f46595814549155e88d27e79a266e9493ded10e66afac0d15fdb44804321b2d54bf1ab25530f0817cb61f33cfb2fabd68ad4c627356
-  languageName: node
-  linkType: hard
-
 "gray-matter@npm:^4.0.3":
   version: 4.0.3
   resolution: "gray-matter@npm:4.0.3"

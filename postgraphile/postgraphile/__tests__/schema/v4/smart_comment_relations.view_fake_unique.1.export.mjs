@@ -1,17 +1,22 @@
 import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec } from "@dataplan/pg";
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
 const handler = {
   typeName: "Query",
   codec: {
     name: "raw",
-    encode(value) {
+    encode: Object.assign(function rawEncode(value) {
       return typeof value === "string" ? value : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function rawDecode(value) {
       return typeof value === "string" ? value : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   },
   match(specifier) {
     return specifier === "query";
@@ -28,24 +33,36 @@ const handler = {
 };
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode(value) {
-    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  },
-  decode(value) {
-    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }
+  encode: (() => {
+    function base64JSONEncode(value) {
+      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+    }
+    base64JSONEncode.isSyncAndSafe = true; // Optimization
+    return base64JSONEncode;
+  })(),
+  decode: (() => {
+    function base64JSONDecode(value) {
+      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+    }
+    base64JSONDecode.isSyncAndSafe = true; // Optimization
+    return base64JSONDecode;
+  })()
 };
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode(value) {
+    encode: Object.assign(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   }
 });
 const executor = new PgExecutor({
@@ -58,20 +75,7 @@ const executor = new PgExecutor({
     });
   }
 });
-const extensions = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "smart_comment_relations",
-    name: "post"
-  },
-  tags: Object.assign(Object.create(null), {
-    name: "post_table",
-    omit: true,
-    behavior: ["-*"]
-  })
-};
-const post_tableCodec = recordCodec({
+const spec_post_table = {
   name: "post_table",
   identifier: sql.identifier("smart_comment_relations", "post"),
   attributes: Object.assign(Object.create(null), {
@@ -86,24 +90,36 @@ const post_tableCodec = recordCodec({
     }
   }),
   description: undefined,
-  extensions,
-  executor
-});
-const postsAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const postsCodec = recordCodec({
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "post"
+    },
+    tags: Object.assign(Object.create(null), {
+      name: "post_table",
+      omit: true,
+      behavior: ["-*"]
+    })
+  },
+  executor: executor
+};
+const post_tableCodec = recordCodec(spec_post_table);
+const spec_posts = {
   name: "posts",
   identifier: sql.identifier("smart_comment_relations", "post_view"),
-  attributes: postsAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -117,22 +133,10 @@ const postsCodec = recordCodec({
       unique: "id"
     })
   },
-  executor
-});
-const extensions3 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "smart_comment_relations",
-    name: "offer"
-  },
-  tags: Object.assign(Object.create(null), {
-    name: "offer_table",
-    omit: true,
-    behavior: ["-*"]
-  })
+  executor: executor
 };
-const offer_tableCodec = recordCodec({
+const postsCodec = recordCodec(spec_posts);
+const spec_offer_table = {
   name: "offer_table",
   identifier: sql.identifier("smart_comment_relations", "offer"),
   attributes: Object.assign(Object.create(null), {
@@ -156,33 +160,45 @@ const offer_tableCodec = recordCodec({
     }
   }),
   description: undefined,
-  extensions: extensions3,
-  executor
-});
-const offersAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "offer"
+    },
+    tags: Object.assign(Object.create(null), {
+      name: "offer_table",
+      omit: true,
+      behavior: ["-*"]
+    })
   },
-  post_id: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const offersCodec = recordCodec({
+  executor: executor
+};
+const offer_tableCodec = recordCodec(spec_offer_table);
+const spec_offers = {
   name: "offers",
   identifier: sql.identifier("smart_comment_relations", "offer_view"),
-  attributes: offersAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    post_id: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -197,32 +213,32 @@ const offersCodec = recordCodec({
       foreignKey: "(post_id) references post_view(id)"
     })
   },
-  executor
-});
-const streetsAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const streetsCodec = recordCodec({
+  executor: executor
+};
+const offersCodec = recordCodec(spec_offers);
+const spec_streets = {
   name: "streets",
   identifier: sql.identifier("smart_comment_relations", "streets"),
-  attributes: streetsAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -235,41 +251,41 @@ const streetsCodec = recordCodec({
       unique: "name"
     })
   },
-  executor
-});
-const propertiesAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  street_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  name_or_number: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const propertiesCodec = recordCodec({
+  executor: executor
+};
+const streetsCodec = recordCodec(spec_streets);
+const spec_properties = {
   name: "properties",
   identifier: sql.identifier("smart_comment_relations", "properties"),
-  attributes: propertiesAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    street_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    name_or_number: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -280,41 +296,41 @@ const propertiesCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const streetPropertyAttributes = Object.assign(Object.create(null), {
-  str_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  prop_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  current_owner: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const streetPropertyCodec = recordCodec({
+  executor: executor
+};
+const propertiesCodec = recordCodec(spec_properties);
+const spec_streetProperty = {
   name: "streetProperty",
   identifier: sql.identifier("smart_comment_relations", "street_property"),
-  attributes: streetPropertyAttributes,
+  attributes: Object.assign(Object.create(null), {
+    str_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    prop_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    current_owner: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -325,148 +341,147 @@ const streetPropertyCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const housesAttributes = Object.assign(Object.create(null), {
-  building_name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  property_name_or_number: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        notNull: true
-      }
-    }
-  },
-  street_name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        notNull: true
-      }
-    }
-  },
-  street_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  building_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  property_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  floors: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const extensions8 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "smart_comment_relations",
-    name: "houses"
-  },
-  tags: Object.assign(Object.create(null), {
-    primaryKey: "street_id,property_id",
-    foreignKey: ["(street_id) references smart_comment_relations.streets", "(building_id) references smart_comment_relations.buildings (id)", "(property_id) references properties", "(street_id, property_id) references street_property (str_id, prop_id)"]
-  })
+  executor: executor
 };
-const housesCodec = recordCodec({
+const streetPropertyCodec = recordCodec(spec_streetProperty);
+const spec_houses = {
   name: "houses",
   identifier: sql.identifier("smart_comment_relations", "houses"),
-  attributes: housesAttributes,
+  attributes: Object.assign(Object.create(null), {
+    building_name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    property_name_or_number: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          notNull: true
+        }
+      }
+    },
+    street_name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          notNull: true
+        }
+      }
+    },
+    street_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    building_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    property_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    floors: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
-  extensions: extensions8,
-  executor
-});
-const buildingsAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "smart_comment_relations",
+      name: "houses"
+    },
+    tags: Object.assign(Object.create(null), {
+      primaryKey: "street_id,property_id",
+      foreignKey: ["(street_id) references smart_comment_relations.streets", "(building_id) references smart_comment_relations.buildings (id)", "(property_id) references properties", "(street_id, property_id) references street_property (str_id, prop_id)"]
+    })
   },
-  property_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  floors: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  is_primary: {
-    description: undefined,
-    codec: TYPES.boolean,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const buildingsCodec = recordCodec({
+  executor: executor
+};
+const housesCodec = recordCodec(spec_houses);
+const spec_buildings = {
   name: "buildings",
   identifier: sql.identifier("smart_comment_relations", "buildings"),
-  attributes: buildingsAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    property_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    floors: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    is_primary: {
+      description: undefined,
+      codec: TYPES.boolean,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -479,8 +494,9 @@ const buildingsCodec = recordCodec({
       foreignKey: "(name) references streets (name)|@fieldName namedAfterStreet|@foreignFieldName buildingsNamedAfterStreet|@foreignSimpleFieldName buildingsNamedAfterStreetList"
     })
   },
-  executor
-});
+  executor: executor
+};
+const buildingsCodec = recordCodec(spec_buildings);
 const registryConfig_pgResources_post_table_post_table = {
   executor,
   name: "post_table",
@@ -507,7 +523,7 @@ const registryConfig_pgResources_post_table_post_table = {
     tags: {
       name: "post_table",
       omit: true,
-      behavior: extensions.tags.behavior
+      behavior: spec_post_table.extensions.tags.behavior
     }
   }
 };
@@ -566,7 +582,7 @@ const registryConfig_pgResources_offer_table_offer_table = {
     tags: {
       name: "offer_table",
       omit: true,
-      behavior: extensions3.tags.behavior
+      behavior: spec_offer_table.extensions.tags.behavior
     }
   }
 };
@@ -717,7 +733,7 @@ const registryConfig_pgResources_houses_houses = {
     },
     tags: {
       primaryKey: "street_id,property_id",
-      foreignKey: extensions8.tags.foreignKey,
+      foreignKey: spec_houses.extensions.tags.foreignKey,
       behavior: ["-insert", "-update", "-delete"]
     }
   }
@@ -1346,6 +1362,9 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
     plan($select);
   });
 };
+function CursorSerialize(value) {
+  return "" + value;
+}
 const specFromArgs = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Offer, $nodeId);
@@ -4281,6 +4300,16 @@ export const plans = {
       return $edge.node();
     }
   },
+  Cursor: {
+    serialize: CursorSerialize,
+    parseValue: CursorSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
   PageInfo: {
     __assertStep: assertPageInfoCapableStep,
     hasNextPage($pageInfo) {
@@ -4417,7 +4446,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), offersAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_offers.attributes.id.codec)}`;
             }
           });
         }
@@ -4440,7 +4469,7 @@ export const plans = {
             type: "attribute",
             attribute: "post_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), offersAttributes.post_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_offers.attributes.post_id.codec)}`;
             }
           });
         }
@@ -5392,7 +5421,7 @@ export const plans = {
             type: "attribute",
             attribute: "building_name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), housesAttributes.building_name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_houses.attributes.building_name.codec)}`;
             }
           });
         }
@@ -5415,7 +5444,7 @@ export const plans = {
             type: "attribute",
             attribute: "property_name_or_number",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), housesAttributes.property_name_or_number.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_houses.attributes.property_name_or_number.codec)}`;
             }
           });
         }
@@ -5438,7 +5467,7 @@ export const plans = {
             type: "attribute",
             attribute: "street_name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), housesAttributes.street_name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_houses.attributes.street_name.codec)}`;
             }
           });
         }
@@ -5461,7 +5490,7 @@ export const plans = {
             type: "attribute",
             attribute: "street_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), housesAttributes.street_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_houses.attributes.street_id.codec)}`;
             }
           });
         }
@@ -5484,7 +5513,7 @@ export const plans = {
             type: "attribute",
             attribute: "building_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), housesAttributes.building_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_houses.attributes.building_id.codec)}`;
             }
           });
         }
@@ -5507,7 +5536,7 @@ export const plans = {
             type: "attribute",
             attribute: "property_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), housesAttributes.property_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_houses.attributes.property_id.codec)}`;
             }
           });
         }
@@ -5530,7 +5559,7 @@ export const plans = {
             type: "attribute",
             attribute: "floors",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), housesAttributes.floors.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_houses.attributes.floors.codec)}`;
             }
           });
         }
@@ -5703,7 +5732,7 @@ export const plans = {
             type: "attribute",
             attribute: "str_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), streetPropertyAttributes.str_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_streetProperty.attributes.str_id.codec)}`;
             }
           });
         }
@@ -5726,7 +5755,7 @@ export const plans = {
             type: "attribute",
             attribute: "prop_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), streetPropertyAttributes.prop_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_streetProperty.attributes.prop_id.codec)}`;
             }
           });
         }
@@ -5749,7 +5778,7 @@ export const plans = {
             type: "attribute",
             attribute: "current_owner",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), streetPropertyAttributes.current_owner.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_streetProperty.attributes.current_owner.codec)}`;
             }
           });
         }
@@ -6006,7 +6035,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), buildingsAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_buildings.attributes.id.codec)}`;
             }
           });
         }
@@ -6029,7 +6058,7 @@ export const plans = {
             type: "attribute",
             attribute: "property_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), buildingsAttributes.property_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_buildings.attributes.property_id.codec)}`;
             }
           });
         }
@@ -6052,7 +6081,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), buildingsAttributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_buildings.attributes.name.codec)}`;
             }
           });
         }
@@ -6075,7 +6104,7 @@ export const plans = {
             type: "attribute",
             attribute: "floors",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), buildingsAttributes.floors.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_buildings.attributes.floors.codec)}`;
             }
           });
         }
@@ -6098,7 +6127,7 @@ export const plans = {
             type: "attribute",
             attribute: "is_primary",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), buildingsAttributes.is_primary.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_buildings.attributes.is_primary.codec)}`;
             }
           });
         }
@@ -6271,7 +6300,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), propertiesAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_properties.attributes.id.codec)}`;
             }
           });
         }
@@ -6294,7 +6323,7 @@ export const plans = {
             type: "attribute",
             attribute: "street_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), propertiesAttributes.street_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_properties.attributes.street_id.codec)}`;
             }
           });
         }
@@ -6317,7 +6346,7 @@ export const plans = {
             type: "attribute",
             attribute: "name_or_number",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), propertiesAttributes.name_or_number.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_properties.attributes.name_or_number.codec)}`;
             }
           });
         }
@@ -6406,7 +6435,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), postsAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_posts.attributes.id.codec)}`;
             }
           });
         }
@@ -6561,7 +6590,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), streetsAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_streets.attributes.id.codec)}`;
             }
           });
         }
@@ -6584,7 +6613,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), streetsAttributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_streets.attributes.name.codec)}`;
             }
           });
         }
@@ -7140,6 +7169,9 @@ export const plans = {
     }
   },
   PostInput: {
+    "__inputPlan": function PostInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -7212,6 +7244,9 @@ export const plans = {
     }
   },
   OfferInput: {
+    "__inputPlan": function OfferInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -7286,6 +7321,9 @@ export const plans = {
     }
   },
   StreetInput: {
+    "__inputPlan": function StreetInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -7365,6 +7403,9 @@ export const plans = {
     }
   },
   PropertyInput: {
+    "__inputPlan": function PropertyInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -7456,6 +7497,9 @@ export const plans = {
     }
   },
   StreetPropertyInput: {
+    "__inputPlan": function StreetPropertyInput_inputPlan() {
+      return object(Object.create(null));
+    },
     strId: {
       applyPlan($insert, val) {
         $insert.set("str_id", val.get());
@@ -7547,6 +7591,9 @@ export const plans = {
     }
   },
   BuildingInput: {
+    "__inputPlan": function BuildingInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -7610,6 +7657,9 @@ export const plans = {
     }
   },
   PostPatch: {
+    "__inputPlan": function PostPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -7681,6 +7731,9 @@ export const plans = {
     }
   },
   OfferPatch: {
+    "__inputPlan": function OfferPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -7768,6 +7821,9 @@ export const plans = {
     }
   },
   StreetPatch: {
+    "__inputPlan": function StreetPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -7874,6 +7930,9 @@ export const plans = {
     }
   },
   PropertyPatch: {
+    "__inputPlan": function PropertyPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -7978,6 +8037,9 @@ export const plans = {
     }
   },
   StreetPropertyPatch: {
+    "__inputPlan": function StreetPropertyPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     strId: {
       applyPlan($insert, val) {
         $insert.set("str_id", val.get());
@@ -8083,6 +8145,9 @@ export const plans = {
     }
   },
   BuildingPatch: {
+    "__inputPlan": function BuildingPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());

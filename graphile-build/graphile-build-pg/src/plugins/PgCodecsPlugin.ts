@@ -403,6 +403,8 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
             typeTagsAndDescription.description ??
             classTagsAndDescription.description;
 
+          // Do NOT mark `extensions` as `EXPORTABLE` otherwise changes
+          // implemented through hooks will not be represented in the export.
           const extensions: PgCodecExtensions = {
             oid: pgClass.reltype,
             isTableLike: ["r", "v", "m", "f", "p"].includes(pgClass.relkind),
@@ -418,32 +420,16 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           const sqlIdent = info.helpers.pgBasics.identifier(nspName, className);
           exportNameHint(sqlIdent, `${codecName}Identifier`);
           exportNameHint(attributes, `${codecName}Attributes`);
-          const spec: PgRecordTypeCodecSpec<any, any> = EXPORTABLE(
-            (
-              attributes,
-              codecName,
-              description,
-              executor,
-              extensions,
-              sqlIdent,
-            ) => ({
-              name: codecName,
-              identifier: sqlIdent,
-              attributes,
-              description,
-              extensions,
-              executor,
-            }),
-            [
-              attributes,
-              codecName,
-              description,
-              executor,
-              extensions,
-              sqlIdent,
-            ],
-            `${codecName}CodecSpec`,
-          );
+          // Do NOT mark `spec` as `EXPORTABLE` otherwise the changes from
+          // `pgCodecs_recordType_spec` won't be represented in the export.
+          const spec: PgRecordTypeCodecSpec<any, any> = {
+            name: codecName,
+            identifier: sqlIdent,
+            attributes,
+            description,
+            extensions,
+            executor,
+          };
           await info.process("pgCodecs_recordType_spec", {
             serviceName,
             pgClass,

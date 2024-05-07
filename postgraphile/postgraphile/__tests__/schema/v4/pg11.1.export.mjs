@@ -1,17 +1,22 @@
 import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec } from "@dataplan/pg";
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
 const handler = {
   typeName: "Query",
   codec: {
     name: "raw",
-    encode(value) {
+    encode: Object.assign(function rawEncode(value) {
       return typeof value === "string" ? value : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function rawDecode(value) {
       return typeof value === "string" ? value : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   },
   match(specifier) {
     return specifier === "query";
@@ -28,46 +33,36 @@ const handler = {
 };
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode(value) {
-    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  },
-  decode(value) {
-    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }
+  encode: (() => {
+    function base64JSONEncode(value) {
+      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+    }
+    base64JSONEncode.isSyncAndSafe = true; // Optimization
+    return base64JSONEncode;
+  })(),
+  decode: (() => {
+    function base64JSONDecode(value) {
+      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+    }
+    base64JSONDecode.isSyncAndSafe = true; // Optimization
+    return base64JSONDecode;
+  })()
 };
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode(value) {
+    encode: Object.assign(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }
-  }
-});
-const alwaysAsIdentityAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {
-        behavior: ["-attribute:insert -attribute:update"]
-      }
-    }
-  },
-  t: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   }
 });
 const executor = new PgExecutor({
@@ -80,10 +75,31 @@ const executor = new PgExecutor({
     });
   }
 });
-const alwaysAsIdentityCodec = recordCodec({
+const spec_alwaysAsIdentity = {
   name: "alwaysAsIdentity",
   identifier: sql.identifier("pg11", "always_as_identity"),
-  attributes: alwaysAsIdentityAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {
+          behavior: ["-attribute:insert -attribute:update"]
+        }
+      }
+    },
+    t: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -94,32 +110,32 @@ const alwaysAsIdentityCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const byDefaultAsIdentityAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  t: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const byDefaultAsIdentityCodec = recordCodec({
+  executor: executor
+};
+const alwaysAsIdentityCodec = recordCodec(spec_alwaysAsIdentity);
+const spec_byDefaultAsIdentity = {
   name: "byDefaultAsIdentity",
   identifier: sql.identifier("pg11", "by_default_as_identity"),
-  attributes: byDefaultAsIdentityAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    t: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -130,59 +146,59 @@ const byDefaultAsIdentityCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const networkAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  inet: {
-    description: undefined,
-    codec: TYPES.inet,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  cidr: {
-    description: undefined,
-    codec: TYPES.cidr,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  macaddr: {
-    description: undefined,
-    codec: TYPES.macaddr,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  macaddr8: {
-    description: undefined,
-    codec: TYPES.macaddr8,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const networkCodec = recordCodec({
+  executor: executor
+};
+const byDefaultAsIdentityCodec = recordCodec(spec_byDefaultAsIdentity);
+const spec_network = {
   name: "network",
   identifier: sql.identifier("pg11", "network"),
-  attributes: networkAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    inet: {
+      description: undefined,
+      codec: TYPES.inet,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    cidr: {
+      description: undefined,
+      codec: TYPES.cidr,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    macaddr: {
+      description: undefined,
+      codec: TYPES.macaddr,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    macaddr8: {
+      description: undefined,
+      codec: TYPES.macaddr8,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -193,8 +209,9 @@ const networkCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
+  executor: executor
+};
+const networkCodec = recordCodec(spec_network);
 const bigintDomainCodec = domainOfCodec(TYPES.bigint, "bigintDomain", sql.identifier("c", "bigint_domain"), {
   description: undefined,
   extensions: {
@@ -361,7 +378,7 @@ const compoundTypeCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
 const domainConstrainedCompoundTypeCodec = domainOfCodec(compoundTypeCodec, "domainConstrainedCompoundType", sql.identifier("pg11", "domain_constrained_compound_type"), {
   description: undefined,
@@ -375,57 +392,56 @@ const domainConstrainedCompoundTypeCodec = domainOfCodec(compoundTypeCodec, "dom
   },
   notNull: false
 });
-const typesAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  regrole: {
-    description: undefined,
-    codec: TYPES.regrole,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  regnamespace: {
-    description: undefined,
-    codec: TYPES.regnamespace,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  bigint_domain_array_domain: {
-    description: undefined,
-    codec: bigintDomainArrayDomainCodec,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  domain_constrained_compound_type: {
-    description: undefined,
-    codec: domainConstrainedCompoundTypeCodec,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const typesCodec = recordCodec({
+const spec_types = {
   name: "types",
   identifier: sql.identifier("pg11", "types"),
-  attributes: typesAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    regrole: {
+      description: undefined,
+      codec: TYPES.regrole,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    regnamespace: {
+      description: undefined,
+      codec: TYPES.regnamespace,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    bigint_domain_array_domain: {
+      description: undefined,
+      codec: bigintDomainArrayDomainCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    domain_constrained_compound_type: {
+      description: undefined,
+      codec: domainConstrainedCompoundTypeCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -436,8 +452,9 @@ const typesCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
+  executor: executor
+};
+const typesCodec = recordCodec(spec_types);
 const always_as_identityUniques = [{
   isPrimary: true,
   attributes: ["id"],
@@ -729,7 +746,16 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
     plan($select);
   });
 };
+function InternetAddressSerialize(value) {
+  return "" + value;
+}
 const resource_frmcdc_domainConstrainedCompoundTypePgResource = registry.pgResources["frmcdc_domainConstrainedCompoundType"];
+const coerce = string => {
+  if (!/^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$/i.test(string)) {
+    throw new GraphQLError("Invalid UUID, expected 32 hexadecimal characters, optionally with hypens");
+  }
+  return string;
+};
 const specFromArgs = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.AlwaysAsIdentity, $nodeId);
@@ -2495,6 +2521,16 @@ export const plans = {
       return $record.get("macaddr8");
     }
   },
+  InternetAddress: {
+    serialize: InternetAddressSerialize,
+    parseValue: InternetAddressSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"InternetAddress" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
   Type: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
@@ -2521,6 +2557,36 @@ export const plans = {
       }
       $select.getClassStep().setTrusted();
       return $select;
+    }
+  },
+  RegRole: {
+    serialize: InternetAddressSerialize,
+    parseValue: InternetAddressSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"RegRole" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  RegNamespace: {
+    serialize: InternetAddressSerialize,
+    parseValue: InternetAddressSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"RegNamespace" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  BigintDomain: {
+    serialize: InternetAddressSerialize,
+    parseValue: InternetAddressSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"BigInt" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
     }
   },
   DomainConstrainedCompoundType: {
@@ -2559,6 +2625,19 @@ export const plans = {
     },
     BLUE: {
       value: "blue"
+    }
+  },
+  UUID: {
+    serialize: InternetAddressSerialize,
+    parseValue(value) {
+      return coerce("" + value);
+    },
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        // ERRORS: add name to this error
+        throw new GraphQLError(`${"UUID" ?? "This scalar"} can only parse string values (kind = '${ast.kind}')`);
+      }
+      return coerce(ast.value);
     }
   },
   EnumCaps: {
@@ -2621,6 +2700,16 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  Cursor: {
+    serialize: InternetAddressSerialize,
+    parseValue: InternetAddressSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
     }
   },
   PageInfo: {
@@ -2759,7 +2848,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), alwaysAsIdentityAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_alwaysAsIdentity.attributes.id.codec)}`;
             }
           });
         }
@@ -2782,7 +2871,7 @@ export const plans = {
             type: "attribute",
             attribute: "t",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), alwaysAsIdentityAttributes.t.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_alwaysAsIdentity.attributes.t.codec)}`;
             }
           });
         }
@@ -2937,7 +3026,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), byDefaultAsIdentityAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_byDefaultAsIdentity.attributes.id.codec)}`;
             }
           });
         }
@@ -2960,7 +3049,7 @@ export const plans = {
             type: "attribute",
             attribute: "t",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), byDefaultAsIdentityAttributes.t.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_byDefaultAsIdentity.attributes.t.codec)}`;
             }
           });
         }
@@ -3217,7 +3306,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), networkAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_network.attributes.id.codec)}`;
             }
           });
         }
@@ -3240,7 +3329,7 @@ export const plans = {
             type: "attribute",
             attribute: "inet",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), networkAttributes.inet.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_network.attributes.inet.codec)}`;
             }
           });
         }
@@ -3263,7 +3352,7 @@ export const plans = {
             type: "attribute",
             attribute: "cidr",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), networkAttributes.cidr.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_network.attributes.cidr.codec)}`;
             }
           });
         }
@@ -3286,7 +3375,7 @@ export const plans = {
             type: "attribute",
             attribute: "macaddr",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), networkAttributes.macaddr.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_network.attributes.macaddr.codec)}`;
             }
           });
         }
@@ -3309,7 +3398,7 @@ export const plans = {
             type: "attribute",
             attribute: "macaddr8",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), networkAttributes.macaddr8.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_network.attributes.macaddr8.codec)}`;
             }
           });
         }
@@ -3532,7 +3621,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.id.codec)}`;
             }
           });
         }
@@ -3555,7 +3644,7 @@ export const plans = {
             type: "attribute",
             attribute: "regrole",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.regrole.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.regrole.codec)}`;
             }
           });
         }
@@ -3578,7 +3667,7 @@ export const plans = {
             type: "attribute",
             attribute: "regnamespace",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.regnamespace.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.regnamespace.codec)}`;
             }
           });
         }
@@ -3601,7 +3690,7 @@ export const plans = {
             type: "attribute",
             attribute: "bigint_domain_array_domain",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.bigint_domain_array_domain.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.bigint_domain_array_domain.codec)}`;
             }
           });
         }
@@ -3624,7 +3713,7 @@ export const plans = {
             type: "attribute",
             attribute: "domain_constrained_compound_type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.domain_constrained_compound_type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.domain_constrained_compound_type.codec)}`;
             }
           });
         }
@@ -3634,6 +3723,9 @@ export const plans = {
     }
   },
   DomainConstrainedCompoundTypeInput: {
+    "__inputPlan": function DomainConstrainedCompoundTypeInput_inputPlan() {
+      return object(Object.create(null));
+    },
     a: {
       applyPlan($insert, val) {
         $insert.set("a", val.get());
@@ -4101,6 +4193,9 @@ export const plans = {
     }
   },
   AlwaysAsIdentityInput: {
+    "__inputPlan": function AlwaysAsIdentityInput_inputPlan() {
+      return object(Object.create(null));
+    },
     t: {
       applyPlan($insert, val) {
         $insert.set("t", val.get());
@@ -4168,6 +4263,9 @@ export const plans = {
     }
   },
   ByDefaultAsIdentityInput: {
+    "__inputPlan": function ByDefaultAsIdentityInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -4242,6 +4340,9 @@ export const plans = {
     }
   },
   NetworkInput: {
+    "__inputPlan": function NetworkInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -4337,6 +4438,9 @@ export const plans = {
     }
   },
   TypeInput: {
+    "__inputPlan": function TypeInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -4431,6 +4535,9 @@ export const plans = {
     }
   },
   AlwaysAsIdentityPatch: {
+    "__inputPlan": function AlwaysAsIdentityPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     t: {
       applyPlan($insert, val) {
         $insert.set("t", val.get());
@@ -4511,6 +4618,9 @@ export const plans = {
     }
   },
   ByDefaultAsIdentityPatch: {
+    "__inputPlan": function ByDefaultAsIdentityPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -4598,6 +4708,9 @@ export const plans = {
     }
   },
   NetworkPatch: {
+    "__inputPlan": function NetworkPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -4706,6 +4819,9 @@ export const plans = {
     }
   },
   TypePatch: {
+    "__inputPlan": function TypePatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());

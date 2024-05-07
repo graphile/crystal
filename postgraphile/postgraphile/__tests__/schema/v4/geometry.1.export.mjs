@@ -1,17 +1,22 @@
 import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec } from "@dataplan/pg";
 import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
 const handler = {
   typeName: "Query",
   codec: {
     name: "raw",
-    encode(value) {
+    encode: Object.assign(function rawEncode(value) {
       return typeof value === "string" ? value : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function rawDecode(value) {
       return typeof value === "string" ? value : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   },
   match(specifier) {
     return specifier === "query";
@@ -28,107 +33,36 @@ const handler = {
 };
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode(value) {
-    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  },
-  decode(value) {
-    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }
+  encode: (() => {
+    function base64JSONEncode(value) {
+      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+    }
+    base64JSONEncode.isSyncAndSafe = true; // Optimization
+    return base64JSONEncode;
+  })(),
+  decode: (() => {
+    function base64JSONDecode(value) {
+      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+    }
+    base64JSONDecode.isSyncAndSafe = true; // Optimization
+    return base64JSONDecode;
+  })()
 };
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode(value) {
+    encode: Object.assign(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }
-  }
-});
-const geomAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  point: {
-    description: undefined,
-    codec: TYPES.point,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  line: {
-    description: undefined,
-    codec: TYPES.line,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  lseg: {
-    description: undefined,
-    codec: TYPES.lseg,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  box: {
-    description: undefined,
-    codec: TYPES.box,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  open_path: {
-    description: undefined,
-    codec: TYPES.path,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  closed_path: {
-    description: undefined,
-    codec: TYPES.path,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  polygon: {
-    description: undefined,
-    codec: TYPES.polygon,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  circle: {
-    description: undefined,
-    codec: TYPES.circle,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   }
 });
 const executor = new PgExecutor({
@@ -141,10 +75,92 @@ const executor = new PgExecutor({
     });
   }
 });
-const geomCodec = recordCodec({
+const spec_geom = {
   name: "geom",
   identifier: sql.identifier("geometry", "geom"),
-  attributes: geomAttributes,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    point: {
+      description: undefined,
+      codec: TYPES.point,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    line: {
+      description: undefined,
+      codec: TYPES.line,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    lseg: {
+      description: undefined,
+      codec: TYPES.lseg,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    box: {
+      description: undefined,
+      codec: TYPES.box,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    open_path: {
+      description: undefined,
+      codec: TYPES.path,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    closed_path: {
+      description: undefined,
+      codec: TYPES.path,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    polygon: {
+      description: undefined,
+      codec: TYPES.polygon,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    circle: {
+      description: undefined,
+      codec: TYPES.circle,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -155,8 +171,9 @@ const geomCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
+  executor: executor
+};
+const geomCodec = recordCodec(spec_geom);
 const geomUniques = [{
   isPrimary: true,
   attributes: ["id"],
@@ -269,6 +286,9 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
     plan($select);
   });
 };
+function CursorSerialize(value) {
+  return "" + value;
+}
 const specFromArgs = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Geom, $nodeId);
@@ -915,6 +935,16 @@ export const plans = {
       return $edge.node();
     }
   },
+  Cursor: {
+    serialize: CursorSerialize,
+    parseValue: CursorSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
   PageInfo: {
     __assertStep: assertPageInfoCapableStep,
     hasNextPage($pageInfo) {
@@ -1289,7 +1319,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), geomAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_geom.attributes.id.codec)}`;
             }
           });
         }
@@ -1312,7 +1342,7 @@ export const plans = {
             type: "attribute",
             attribute: "point",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), geomAttributes.point.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_geom.attributes.point.codec)}`;
             }
           });
         }
@@ -1335,7 +1365,7 @@ export const plans = {
             type: "attribute",
             attribute: "line",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), geomAttributes.line.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_geom.attributes.line.codec)}`;
             }
           });
         }
@@ -1358,7 +1388,7 @@ export const plans = {
             type: "attribute",
             attribute: "lseg",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), geomAttributes.lseg.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_geom.attributes.lseg.codec)}`;
             }
           });
         }
@@ -1381,7 +1411,7 @@ export const plans = {
             type: "attribute",
             attribute: "box",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), geomAttributes.box.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_geom.attributes.box.codec)}`;
             }
           });
         }
@@ -1404,7 +1434,7 @@ export const plans = {
             type: "attribute",
             attribute: "open_path",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), geomAttributes.open_path.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_geom.attributes.open_path.codec)}`;
             }
           });
         }
@@ -1427,7 +1457,7 @@ export const plans = {
             type: "attribute",
             attribute: "closed_path",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), geomAttributes.closed_path.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_geom.attributes.closed_path.codec)}`;
             }
           });
         }
@@ -1450,7 +1480,7 @@ export const plans = {
             type: "attribute",
             attribute: "polygon",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), geomAttributes.polygon.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_geom.attributes.polygon.codec)}`;
             }
           });
         }
@@ -1473,7 +1503,7 @@ export const plans = {
             type: "attribute",
             attribute: "circle",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), geomAttributes.circle.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_geom.attributes.circle.codec)}`;
             }
           });
         }
@@ -1656,6 +1686,9 @@ export const plans = {
     }
   },
   GeomInput: {
+    "__inputPlan": function GeomInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -1778,6 +1811,9 @@ export const plans = {
     }
   },
   GeomPatch: {
+    "__inputPlan": function GeomPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());

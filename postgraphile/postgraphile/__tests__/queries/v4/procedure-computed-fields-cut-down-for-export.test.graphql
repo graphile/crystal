@@ -1,0 +1,11 @@
+## expect(errors).toBeFalsy();
+#> schema: ["a"]
+#> subscriptions: true
+query {
+  postById(id: 1) {
+    id
+    computedCompoundTypeArray(object: {}) {
+      __typename
+    }
+  }
+}

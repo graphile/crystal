@@ -1,0 +1,10 @@
+{
+  postById: {
+    id: 1,
+    computedCompoundTypeArray: [
+      null,
+      null,
+      null,
+    ],
+  },
+}
