@@ -222,7 +222,9 @@ export function makeGrafastSchema(details: {
               typeof fieldSpec.args === "object" &&
               fieldSpec.args != null
             ) {
-              for (const [argName, argSpec] of Object.entries(fieldSpec.args)) {
+              for (const [argName, _argSpec] of Object.entries(
+                fieldSpec.args,
+              )) {
                 const arg = field.args?.[argName];
                 if (!arg) {
                   console.warn(
@@ -415,7 +417,7 @@ export function makeGrafastSchema(details: {
             };
             fields[fieldName] = fieldConfig;
             if (fieldConfig.args) {
-              for (const [argName, arg] of Object.entries(fieldConfig.args)) {
+              for (const [_argName, arg] of Object.entries(fieldConfig.args)) {
                 arg.type = mapType(arg.type);
               }
             }
