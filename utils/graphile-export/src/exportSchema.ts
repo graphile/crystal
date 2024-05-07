@@ -1558,16 +1558,10 @@ function exportSchemaGraphQLJS({
         "schema.extensions",
         "schema.extensions",
       ),
-      enableDeferStream: t.booleanLiteral(
-        process.env.ENABLE_DEFER_STREAM === "1",
-      ),
-      /*
-      // TODO: use the below once https://github.com/graphql/graphql-js/pull/3450 is fixed:
       enableDeferStream:
         config.enableDeferStream != null
           ? t.booleanLiteral(config.enableDeferStream)
           : null,
-          */
       assumeValid: null, // TODO: t.booleanLiteral(true),
     }),
   );
@@ -1926,6 +1920,14 @@ export async function exportSchemaAsString(
         "stream",
       ].includes(d.name),
   );
+
+  if (
+    process.env.ENABLE_DEFER_STREAM === "1" ||
+    config.directives.some((d) => d.name === "defer" || d.name === "skip")
+  ) {
+    // Ref: https://github.com/graphql/graphql-js/pull/3450
+    config.enableDeferStream = true;
+  }
 
   const file = new CodegenFile(options);
 
