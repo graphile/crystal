@@ -18,7 +18,7 @@ jobs:
     with:
       prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
       package: "postgraphile"
-      testcommand: "test:v4"
+      testcommand: "test:operations:v4"
       args: "--ci"
 
   postgraphile_queries_v4_export_typeDefs:
@@ -27,7 +27,7 @@ jobs:
     with:
       prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
       package: "postgraphile"
-      testcommand: "test:v4"
+      testcommand: "test:operations:v4"
       args: "--ci"
       exportSchema: "typeDefs"
 
@@ -37,7 +37,7 @@ jobs:
     with:
       prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
       package: "postgraphile"
-      testcommand: "test:v4"
+      testcommand: "test:operations:v4"
       args: "--ci"
       exportSchema: "graphql-js"
 
@@ -47,7 +47,7 @@ jobs:
     with:
       prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
       package: "postgraphile"
-      testcommand: "test:polymorphic"
+      testcommand: "test:operations:polymorphic"
       args: "--ci"
 
   postgraphile_queries_polymorphic_export_typeDefs:
@@ -56,7 +56,7 @@ jobs:
     with:
       prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
       package: "postgraphile"
-      testcommand: "test:polymorphic"
+      testcommand: "test:operations:polymorphic"
       args: "--ci"
       exportSchema: "typeDefs"
 
@@ -66,7 +66,7 @@ jobs:
     with:
       prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
       package: "postgraphile"
-      testcommand: "test:polymorphic"
+      testcommand: "test:operations:polymorphic"
       args: "--ci"
       exportSchema: "graphql-js"
 
@@ -76,7 +76,7 @@ jobs:
     with:
       prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
       package: "postgraphile"
-      testcommand: "test:mutations"
+      testcommand: "test:operations:mutations"
       args: "--ci"
 
   postgraphile_mutations_export_typeDefs:
@@ -85,7 +85,7 @@ jobs:
     with:
       prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
       package: "postgraphile"
-      testcommand: "test:mutations"
+      testcommand: "test:operations:mutations"
       args: "--ci"
       exportSchema: "typeDefs"
 
@@ -95,7 +95,7 @@ jobs:
     with:
       prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
       package: "postgraphile"
-      testcommand: "test:mutations"
+      testcommand: "test:operations:mutations"
       args: "--ci"
       exportSchema: "graphql-js"
 
