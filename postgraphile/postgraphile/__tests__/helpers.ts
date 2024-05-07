@@ -704,14 +704,6 @@ export const assertSnapshotsMatch = async (
     ext?: string;
   },
 ): Promise<void> => {
-  if (EXPORT_SCHEMA_MODE && only === "mermaid") {
-    // TODO: Remove this, we should aim for identical planning snapshots in
-    // source and exported schema.
-    console.warn(
-      "SKIPPING MERMAID SNAPSHOT COMPARISON due to EXPORT_SCHEMA=1.",
-    );
-    return;
-  }
   const { path, result, ext, config } = props;
   const basePath = path.replace(/\.test\.graphql$/, "");
   if (basePath === path) {
