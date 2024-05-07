@@ -11,62 +11,59 @@ Graphile ecosystem. Find out
 - Netflix
 - Stellate
 - Steelhead
+- Sylvera
 
 ## Leaders
 
 - Qwick
 - Joe Dennis
 - Robert Claypool
-- nigelrmtaylor
 - Principia Mentis
 - Luxor Labs
+- nigelrmtaylor
 - Axinom
 - Taiste
 - Notably
 - Nathanael Beisiegel
-- LatchBio
-- Ian Stewart
 - Trigger.dev
-- Cintra
-- FOLX Health
+- Ian Stewart
 - BairesDev
+- Cintra
 - Two Bit Solutions
 - Dimply
-- Beacon
 - Ndustrial
-- Giovanny Gutiérrez
-- Upowr
+- Beacon
 - deliver.media
+- Upowr
 
 ## Supporters
 
 - HR-ON
 - stlbucket
 - Sam Levin
-- Chris Watland
 - svarmony
 - James Rascoe
-- CJ Lazell
-- Daniel Einspanjer
 - Simon Elliott
 - Matt Bretl
+- Daniel Einspanjer
 - Mansoor Razzaq
-- Alvin Ali Khaled
 - Keith Layne
-- nullachtvierzehn
 - Paul Melnikow
-- Benjamin Berman
+- Alvin Ali Khaled
+- nullachtvierzehn
 - Zymego
+- Benjamin Berman
 - IFCHOR GROUP
 - Nate Smith
-- JYC
+- garpulon
 - The Outbound Collective
 - Charlie Hadden
 - Kiron Open Higher Education
 - urtho
-- Vizcom
 - Andrew Joseph
-- garpulon
 - SIED 70
 - Peter C. Romano
 - mateo
+- Gus Becciu
+- kontakto-fi
+- Dialo
