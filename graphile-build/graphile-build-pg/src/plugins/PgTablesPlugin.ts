@@ -464,39 +464,17 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
               ...tags,
             },
           } as const;
-          const options = EXPORTABLE(
-            (
-              codec,
-              description,
-              executor,
-              extensions,
-              identifier,
-              isVirtual,
-              name,
-              uniques,
-            ) =>
-              ({
-                executor,
-                name,
-                identifier,
-                from: codec.sqlType,
-                codec,
-                uniques,
-                isVirtual,
-                description,
-                extensions,
-              }) as const,
-            [
-              codec,
-              description,
-              executor,
-              extensions,
-              identifier,
-              isVirtual,
-              name,
-              uniques,
-            ],
-          );
+          const options = {
+            executor,
+            name,
+            identifier,
+            from: codec.sqlType,
+            codec,
+            uniques,
+            isVirtual,
+            description,
+            extensions,
+          } as const;
 
           await info.process("pgTables_PgResourceOptions", {
             serviceName,
