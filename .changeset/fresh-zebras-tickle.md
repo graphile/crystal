@@ -2,4 +2,5 @@
 "graphile-build-pg": patch
 ---
 
-Remove an unnecessary EXPORTABLE
+Resource options now marked EXPORTABLE _after_ hooks called, enabling more
+plugins to be exportable.
