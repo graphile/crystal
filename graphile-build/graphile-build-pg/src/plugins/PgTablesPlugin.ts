@@ -482,9 +482,19 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             resourceOptions: options,
           });
 
+          // Need to mark this exportable to avoid out-of-order access to
+          // variables in the export
+          const entries = Object.entries(options);
+          const finalOptions = EXPORTABLE(
+            (entries) =>
+              Object.fromEntries(entries) as unknown as PgResourceOptions,
+            [entries],
+          );
+
           const resourceOptions = EXPORTABLE(
-            (makePgResourceOptions, options) => makePgResourceOptions(options),
-            [makePgResourceOptions, options],
+            (finalOptions, makePgResourceOptions) =>
+              makePgResourceOptions(finalOptions),
+            [finalOptions, makePgResourceOptions],
           );
 
           const registryBuilder =
