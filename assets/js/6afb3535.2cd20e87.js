@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_localrepo_postgraphile_website=self.webpackChunk_localrepo_postgraphile_website||[]).push([[2890],{43011:e=>{e.exports=JSON.parse('[{"label":"Beta","permalink":"/news/tags/beta","count":1},{"label":"Alpha","permalink":"/news/tags/alpha","count":1}]')}}]);
