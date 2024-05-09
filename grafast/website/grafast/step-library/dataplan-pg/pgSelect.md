@@ -349,7 +349,15 @@ Returns a `pgSelect` representing the records related via the
 
 ### $pgSelectSingle.record()
 
-Returns a PgClassExpressionStep representing the entire table, useful for debugging or to use with `pgSelectSingleFromRecord`.
+Returns a PgClassExpressionStep representing the entire table, useful for debugging or to use with `pgSelectSingleFromRecord`. Here is a simple example:
+
+```ts
+const $user = usersResource.find({ id: constant(1) });
+const $record = $user.record();
+
+sideEffect($record, (user) => console.dir(user));
+return $user;
+```
 
 ### $pgSelectSingle.cursor()
 
