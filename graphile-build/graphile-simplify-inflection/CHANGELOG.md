@@ -1,5 +1,14 @@
 # v8.0.0
 
+## 8.0.0-beta.5
+
+### Patch Changes
+
+- [#2006](https://github.com/graphile/crystal/pull/2006)
+  [`bee0a0a68`](https://github.com/graphile/crystal/commit/bee0a0a68d48816f84b1a7f5ec69bd6069211426)
+  Thanks [@benjie](https://github.com/benjie)! - Adopt improved inflection
+  typings.
+
 ## 8.0.0-beta.4
 
 ### Patch Changes

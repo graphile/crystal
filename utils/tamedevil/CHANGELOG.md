@@ -1,5 +1,14 @@
 # tamedevil
 
+## 0.0.0-beta.7
+
+### Patch Changes
+
+- [#1973](https://github.com/graphile/crystal/pull/1973)
+  [`b788dd868`](https://github.com/graphile/crystal/commit/b788dd86849e703cc3aa863fd9190c36a087b865)
+  Thanks [@benjie](https://github.com/benjie)! - Add te.debug helper for
+  debugging a te expression via printing a formatted version.
+
 ## 0.0.0-beta.6
 
 ### Patch Changes

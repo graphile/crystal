@@ -1,6 +1,6 @@
 {
   "name": "graphile-export",
-  "version": "0.0.2-beta.11",
+  "version": "0.0.2-beta.12",
   "description": "Export in-memory generated GraphQL schemas to JS files when built with our helpers.",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -55,7 +55,7 @@
   "peerDependencies": {
     "eslint": "^8.48.0",
     "grafast": "workspace:^",
-    "pg-sql2": "workspace:^5.0.0-beta.5"
+    "pg-sql2": "workspace:^5.0.0-beta.6"
   },
   "peerDependenciesMeta": {
     "eslint": {

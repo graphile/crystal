@@ -1,5 +1,14 @@
 # pg-introspection
 
+## 0.0.1-beta.8
+
+### Patch Changes
+
+- [#1962](https://github.com/graphile/crystal/pull/1962)
+  [`7606a5b87`](https://github.com/graphile/crystal/commit/7606a5b87aed747fad4eb11744ef7b01cfa3b879)
+  Thanks [@DanielFGray](https://github.com/DanielFGray)! - Export PgEntity type
+  in pg-introspection
+
 ## 0.0.1-beta.7
 
 ### Patch Changes

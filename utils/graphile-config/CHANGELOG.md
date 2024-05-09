@@ -1,5 +1,15 @@
 # graphile-config
 
+## 0.0.1-beta.8
+
+### Patch Changes
+
+- [#2048](https://github.com/graphile/crystal/pull/2048)
+  [`db8ceed0f`](https://github.com/graphile/crystal/commit/db8ceed0f17923eb78ff09c9f3f28800a5c7e3b6)
+  Thanks [@benjie](https://github.com/benjie)! - Help detect more invalid
+  presets and plugins (bad imports) by forbidding keys starting with a capital
+  or the key `default`.
+
 ## 0.0.1-beta.7
 
 ### Patch Changes
