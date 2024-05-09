@@ -578,6 +578,12 @@ export function executeBucket(
           const step = sudo(
             _allSteps[allStepsIndex] as UnbatchedExecutableStep,
           );
+
+          // Unary steps only need to be processed once
+          if (step._isUnary && dataIndex !== 0) {
+            continue;
+          }
+
           try {
             const deps: any = [];
             const extra = extras[allStepsIndex];
