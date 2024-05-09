@@ -12197,6 +12197,7 @@ __metadata:
     lodash: "npm:^4.17.21"
     pluralize: "npm:^7.0.0"
     semver: "npm:^7.5.4"
+    tamedevil: "workspace:^"
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.6.2"
     typescript: "npm:^5.2.2"
