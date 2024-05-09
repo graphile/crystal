@@ -45,6 +45,7 @@ export function EXPORTABLE_OBJECT_CLONE<T extends object>(obj: T): T {
         ",\n",
       ),
     )}});`;
+    // eslint-disable-next-line graphile-export/exhaustive-deps
     return EXPORTABLE(fn, values);
   } else {
     throw new Error(
