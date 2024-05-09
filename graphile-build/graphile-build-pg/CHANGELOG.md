@@ -1,5 +1,21 @@
 # graphile-build-pg
 
+## 5.0.0-beta.22
+
+### Patch Changes
+
+- [#2056](https://github.com/graphile/crystal/pull/2056)
+  [`1842af661`](https://github.com/graphile/crystal/commit/1842af661950d5f962b65f6362a45a3b9c8f15e8)
+  Thanks [@benjie](https://github.com/benjie)! - Improve exporting of resource
+  options (neater export code)
+
+- Updated dependencies
+  [[`1842af661`](https://github.com/graphile/crystal/commit/1842af661950d5f962b65f6362a45a3b9c8f15e8),
+  [`bd5a908a4`](https://github.com/graphile/crystal/commit/bd5a908a4d04310f90dfb46ad87398ffa993af3b)]:
+  - graphile-build@5.0.0-beta.18
+  - grafast@0.1.1-beta.8
+  - @dataplan/pg@0.0.1-beta.19
+
 ## 5.0.0-beta.21
 
 ### Patch Changes

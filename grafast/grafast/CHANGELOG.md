@@ -1,5 +1,15 @@
 # grafast
 
+## 0.1.1-beta.8
+
+### Patch Changes
+
+- [#2055](https://github.com/graphile/crystal/pull/2055)
+  [`bd5a908a4`](https://github.com/graphile/crystal/commit/bd5a908a4d04310f90dfb46ad87398ffa993af3b)
+  Thanks [@benjie](https://github.com/benjie)! - Hotfix: unbatched unary steps
+  executed multiple times under certain circumstances leading to excessive
+  logging.
+
 ## 0.1.1-beta.7
 
 ### Patch Changes
