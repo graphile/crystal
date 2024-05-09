@@ -7,7 +7,11 @@ import type {
 } from "@dataplan/pg";
 import { assertPgClassSingleStep, makePgResourceOptions } from "@dataplan/pg";
 import { object } from "grafast";
-import { EXPORTABLE, gatherConfig } from "graphile-build";
+import {
+  EXPORTABLE,
+  EXPORTABLE_OBJECT_CLONE,
+  gatherConfig,
+} from "graphile-build";
 import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
 
 import { addBehaviorToTags, exportNameHint } from "../utils.js";
@@ -484,12 +488,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
 
           // Need to mark this exportable to avoid out-of-order access to
           // variables in the export
-          const entries = Object.entries(options);
-          const finalOptions = EXPORTABLE(
-            (entries) =>
-              Object.fromEntries(entries) as unknown as PgResourceOptions,
-            [entries],
-          );
+          const finalOptions = EXPORTABLE_OBJECT_CLONE(options);
 
           const resourceOptions = EXPORTABLE(
             (finalOptions, makePgResourceOptions) =>

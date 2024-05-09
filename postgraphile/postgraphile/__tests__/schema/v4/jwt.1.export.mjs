@@ -78,6 +78,7 @@ const guidCodec = domainOfCodec(TYPES.varchar, "guid", sql.identifier("b", "guid
   },
   notNull: false
 });
+const updatableViewIdentifier = sql.identifier("b", "updatable_view");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -90,7 +91,7 @@ const executor = new PgExecutor({
 });
 const spec_updatableView = {
   name: "updatableView",
-  identifier: sql.identifier("b", "updatable_view"),
+  identifier: updatableViewIdentifier,
   attributes: Object.assign(Object.create(null), {
     x: {
       description: undefined,
@@ -145,9 +146,10 @@ const spec_updatableView = {
   executor: executor
 };
 const updatableViewCodec = recordCodec(spec_updatableView);
+const jwtTokenIdentifier = sql.identifier("b", "jwt_token");
 const jwtTokenCodec = recordCodec({
   name: "jwtToken",
-  identifier: sql.identifier("b", "jwt_token"),
+  identifier: jwtTokenIdentifier,
   attributes: Object.assign(Object.create(null), {
     role: {
       description: undefined,
@@ -222,9 +224,10 @@ const uuidArrayCodec = listOfCodec(TYPES.uuid, {
   description: undefined,
   name: "uuidArray"
 });
+const authPayloadIdentifier = sql.identifier("b", "auth_payload");
 const authPayloadCodec = recordCodec({
   name: "authPayload",
-  identifier: sql.identifier("b", "auth_payload"),
+  identifier: authPayloadIdentifier,
   attributes: Object.assign(Object.create(null), {
     jwt: {
       description: undefined,
@@ -399,6 +402,7 @@ const compoundTypeCodec = recordCodec({
   },
   executor: executor
 });
+const typesIdentifier = sql.identifier("b", "types");
 const colorArrayCodec = listOfCodec(colorCodec, {
   extensions: {
     pg: {
@@ -604,7 +608,7 @@ const spec_types_attributes_ltree_codec_ltree = {
 const spec_types_attributes_ltree_array_codec_ltree_ = listOfCodec(spec_types_attributes_ltree_codec_ltree);
 const spec_types = {
   name: "types",
-  identifier: sql.identifier("b", "types"),
+  identifier: typesIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1082,10 +1086,10 @@ const mult_4FunctionIdentifer = sql.identifier("b", "mult_4");
 const guid_fnFunctionIdentifer = sql.identifier("b", "guid_fn");
 const authenticate_failFunctionIdentifer = sql.identifier("b", "authenticate_fail");
 const resourceConfig_jwt_token = {
-  executor,
+  executor: executor,
   name: "jwt_token",
   identifier: "main.b.jwt_token",
-  from: jwtTokenCodec.sqlType,
+  from: jwtTokenIdentifier,
   codec: jwtTokenCodec,
   uniques: [],
   isVirtual: true,
@@ -1120,10 +1124,10 @@ const typesUniques = [{
   }
 }];
 const registryConfig_pgResources_types_types = {
-  executor,
+  executor: executor,
   name: "types",
   identifier: "main.b.types",
-  from: typesCodec.sqlType,
+  from: typesIdentifier,
   codec: typesCodec,
   uniques: typesUniques,
   isVirtual: false,
@@ -1438,10 +1442,10 @@ const registry = makeRegistry({
       description: undefined
     },
     updatable_view: {
-      executor,
+      executor: executor,
       name: "updatable_view",
       identifier: "main.b.updatable_view",
-      from: updatableViewCodec.sqlType,
+      from: updatableViewIdentifier,
       codec: updatableViewCodec,
       uniques: [{
         isPrimary: false,
@@ -1604,10 +1608,10 @@ const registry = makeRegistry({
       description: undefined
     }),
     authenticate_payload: PgResource.functionResourceOptions({
-      executor,
+      executor: executor,
       name: "auth_payload",
       identifier: "main.b.auth_payload",
-      from: authPayloadCodec.sqlType,
+      from: authPayloadIdentifier,
       codec: authPayloadCodec,
       uniques: [],
       isVirtual: true,

@@ -65,6 +65,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
+const flambleIdentifier = sql.identifier("d", "flibble");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -77,7 +78,7 @@ const executor = new PgExecutor({
 });
 const flambleCodec = recordCodec({
   name: "flamble",
-  identifier: sql.identifier("d", "flibble"),
+  identifier: flambleIdentifier,
   attributes: Object.assign(Object.create(null), {
     f: {
       description: undefined,
@@ -103,9 +104,10 @@ const flambleCodec = recordCodec({
   },
   executor: executor
 });
+const renamed_tableIdentifier = sql.identifier("d", "original_table");
 const spec_renamed_table = {
   name: "renamed_table",
-  identifier: sql.identifier("d", "original_table"),
+  identifier: renamed_tableIdentifier,
   attributes: Object.assign(Object.create(null), {
     col1: {
       description: undefined,
@@ -134,9 +136,10 @@ const spec_renamed_table = {
   executor: executor
 };
 const renamed_tableCodec = recordCodec(spec_renamed_table);
+const filmsIdentifier = sql.identifier("d", "films");
 const spec_films = {
   name: "films",
-  identifier: sql.identifier("d", "films"),
+  identifier: filmsIdentifier,
   attributes: Object.assign(Object.create(null), {
     code: {
       description: undefined,
@@ -173,9 +176,10 @@ const spec_films = {
   executor: executor
 };
 const filmsCodec = recordCodec(spec_films);
+const studiosIdentifier = sql.identifier("d", "studios");
 const spec_studios = {
   name: "studios",
-  identifier: sql.identifier("d", "studios"),
+  identifier: studiosIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -209,9 +213,10 @@ const spec_studios = {
   executor: executor
 };
 const studiosCodec = recordCodec(spec_studios);
+const postIdentifier = sql.identifier("d", "post");
 const spec_post = {
   name: "post",
-  identifier: sql.identifier("d", "post"),
+  identifier: postIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -254,9 +259,10 @@ const spec_post = {
   executor: executor
 };
 const postCodec = recordCodec(spec_post);
+const tvEpisodesIdentifier = sql.identifier("d", "tv_episodes");
 const spec_tvEpisodes = {
   name: "tvEpisodes",
-  identifier: sql.identifier("d", "tv_episodes"),
+  identifier: tvEpisodesIdentifier,
   attributes: Object.assign(Object.create(null), {
     code: {
       description: undefined,
@@ -299,9 +305,10 @@ const spec_tvEpisodes = {
   executor: executor
 };
 const tvEpisodesCodec = recordCodec(spec_tvEpisodes);
+const tvShowsIdentifier = sql.identifier("d", "tv_shows");
 const spec_tvShows = {
   name: "tvShows",
-  identifier: sql.identifier("d", "tv_shows"),
+  identifier: tvShowsIdentifier,
   attributes: Object.assign(Object.create(null), {
     code: {
       description: undefined,
@@ -344,9 +351,10 @@ const spec_tvShows = {
   executor: executor
 };
 const tvShowsCodec = recordCodec(spec_tvShows);
+const jwtTokenIdentifier = sql.identifier("d", "jwt_token");
 const jwtTokenCodec = recordCodec({
   name: "jwtToken",
-  identifier: sql.identifier("d", "jwt_token"),
+  identifier: jwtTokenIdentifier,
   attributes: Object.assign(Object.create(null), {
     role: {
       description: undefined,
@@ -388,9 +396,10 @@ const jwtTokenCodec = recordCodec({
   },
   executor: executor
 });
+const personIdentifier = sql.identifier("d", "person");
 const spec_person = {
   name: "person",
-  identifier: sql.identifier("d", "person"),
+  identifier: personIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -528,10 +537,10 @@ const studiosUniques = [{
   }
 }];
 const registryConfig_pgResources_studios_studios = {
-  executor,
+  executor: executor,
   name: "studios",
   identifier: "main.d.studios",
-  from: studiosCodec.sqlType,
+  from: studiosIdentifier,
   codec: studiosCodec,
   uniques: studiosUniques,
   isVirtual: false,
@@ -555,10 +564,10 @@ const postUniques = [{
   }
 }];
 const registryConfig_pgResources_post_post = {
-  executor,
+  executor: executor,
   name: "post",
   identifier: "main.d.post",
-  from: postCodec.sqlType,
+  from: postIdentifier,
   codec: postCodec,
   uniques: postUniques,
   isVirtual: false,
@@ -582,10 +591,10 @@ const tv_episodesUniques = [{
   }
 }];
 const registryConfig_pgResources_tv_episodes_tv_episodes = {
-  executor,
+  executor: executor,
   name: "tv_episodes",
   identifier: "main.d.tv_episodes",
-  from: tvEpisodesCodec.sqlType,
+  from: tvEpisodesIdentifier,
   codec: tvEpisodesCodec,
   uniques: tv_episodesUniques,
   isVirtual: false,
@@ -609,10 +618,10 @@ const tv_showsUniques = [{
   }
 }];
 const registryConfig_pgResources_tv_shows_tv_shows = {
-  executor,
+  executor: executor,
   name: "tv_shows",
   identifier: "main.d.tv_shows",
-  from: tvShowsCodec.sqlType,
+  from: tvShowsIdentifier,
   codec: tvShowsCodec,
   uniques: tv_showsUniques,
   isVirtual: false,
@@ -641,10 +650,10 @@ const personUniques = [{
   }
 }];
 const registryConfig_pgResources_person_person = {
-  executor,
+  executor: executor,
   name: "person",
   identifier: "main.d.person",
-  from: personCodec.sqlType,
+  from: personIdentifier,
   codec: personCodec,
   uniques: personUniques,
   isVirtual: false,
@@ -702,10 +711,10 @@ const registry = makeRegistry({
       description: undefined
     },
     getflamble: PgResource.functionResourceOptions({
-      executor,
+      executor: executor,
       name: "flamble",
       identifier: "main.d.flibble",
-      from: flambleCodec.sqlType,
+      from: flambleIdentifier,
       codec: flambleCodec,
       uniques: [],
       isVirtual: true,
@@ -745,10 +754,10 @@ const registry = makeRegistry({
       description: undefined
     }),
     renamed_table: {
-      executor,
+      executor: executor,
       name: "renamed_table",
       identifier: "main.d.original_table",
-      from: renamed_tableCodec.sqlType,
+      from: renamed_tableIdentifier,
       codec: renamed_tableCodec,
       uniques: [],
       isVirtual: false,
@@ -766,10 +775,10 @@ const registry = makeRegistry({
       }
     },
     films: {
-      executor,
+      executor: executor,
       name: "films",
       identifier: "main.d.films",
-      from: filmsCodec.sqlType,
+      from: filmsIdentifier,
       codec: filmsCodec,
       uniques: [{
         isPrimary: true,
@@ -799,10 +808,10 @@ const registry = makeRegistry({
     tv_episodes: registryConfig_pgResources_tv_episodes_tv_episodes,
     tv_shows: registryConfig_pgResources_tv_shows_tv_shows,
     login: PgResource.functionResourceOptions({
-      executor,
+      executor: executor,
       name: "jwt_token",
       identifier: "main.d.jwt_token",
-      from: jwtTokenCodec.sqlType,
+      from: jwtTokenIdentifier,
       codec: jwtTokenCodec,
       uniques: [],
       isVirtual: true,

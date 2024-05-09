@@ -25,6 +25,7 @@ import extend, { indent } from "./extend.js";
 import type SchemaBuilder from "./SchemaBuilder.js";
 import {
   EXPORTABLE,
+  EXPORTABLE_OBJECT_CLONE,
   exportNameHint,
   stringTypeSpec,
   wrapDescription,
@@ -146,6 +147,7 @@ export default function makeNewBuild(
 
     EXPORTABLE,
     exportNameHint,
+    EXPORTABLE_OBJECT_CLONE,
     grafast,
     graphql,
 

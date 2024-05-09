@@ -65,6 +65,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
+const fileIdentifier = sql.identifier("inheritence", "file");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -77,7 +78,7 @@ const executor = new PgExecutor({
 });
 const spec_file = {
   name: "file",
-  identifier: sql.identifier("inheritence", "file"),
+  identifier: fileIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -111,9 +112,10 @@ const spec_file = {
   executor: executor
 };
 const fileCodec = recordCodec(spec_file);
+const userIdentifier = sql.identifier("inheritence", "user");
 const spec_user = {
   name: "user",
-  identifier: sql.identifier("inheritence", "user"),
+  identifier: userIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -147,9 +149,10 @@ const spec_user = {
   executor: executor
 };
 const userCodec = recordCodec(spec_user);
+const userFileIdentifier = sql.identifier("inheritence", "user_file");
 const spec_userFile = {
   name: "userFile",
-  identifier: sql.identifier("inheritence", "user_file"),
+  identifier: userFileIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -209,10 +212,10 @@ const userUniques = [{
   }
 }];
 const registryConfig_pgResources_user_user = {
-  executor,
+  executor: executor,
   name: "user",
   identifier: "main.inheritence.user",
-  from: userCodec.sqlType,
+  from: userIdentifier,
   codec: userCodec,
   uniques: userUniques,
   isVirtual: false,
@@ -236,10 +239,10 @@ const user_fileUniques = [{
   }
 }];
 const registryConfig_pgResources_user_file_user_file = {
-  executor,
+  executor: executor,
   name: "user_file",
   identifier: "main.inheritence.user_file",
-  from: userFileCodec.sqlType,
+  from: userFileIdentifier,
   codec: userFileCodec,
   uniques: user_fileUniques,
   isVirtual: false,
@@ -266,10 +269,10 @@ const registry = makeRegistry({
   }),
   pgResources: Object.assign(Object.create(null), {
     file: {
-      executor,
+      executor: executor,
       name: "file",
       identifier: "main.inheritence.file",
-      from: fileCodec.sqlType,
+      from: fileIdentifier,
       codec: fileCodec,
       uniques: fileUniques,
       isVirtual: false,

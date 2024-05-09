@@ -421,9 +421,10 @@ const registryConfig_pgCodecs_SearchTestSummariesRecord_SearchTestSummariesRecor
   executor,
   isAnonymous: true
 });
+const myTableIdentifier = sql.identifier("c", "my_table");
 const spec_myTable = {
   name: "myTable",
-  identifier: sql.identifier("c", "my_table"),
+  identifier: myTableIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -457,9 +458,10 @@ const spec_myTable = {
   executor: executor
 };
 const myTableCodec = recordCodec(spec_myTable);
+const personSecretIdentifier = sql.identifier("c", "person_secret");
 const spec_personSecret = {
   name: "personSecret",
-  identifier: sql.identifier("c", "person_secret"),
+  identifier: personSecretIdentifier,
   attributes: Object.assign(Object.create(null), {
     person_id: {
       description: undefined,
@@ -497,9 +499,10 @@ const spec_personSecret = {
   executor: executor
 };
 const personSecretCodec = recordCodec(spec_personSecret);
+const compoundKeyIdentifier = sql.identifier("c", "compound_key");
 const spec_compoundKey = {
   name: "compoundKey",
-  identifier: sql.identifier("c", "compound_key"),
+  identifier: compoundKeyIdentifier,
   attributes: Object.assign(Object.create(null), {
     person_id_2: {
       description: undefined,
@@ -542,9 +545,10 @@ const spec_compoundKey = {
   executor: executor
 };
 const compoundKeyCodec = recordCodec(spec_compoundKey);
+const nullTestRecordIdentifier = sql.identifier("c", "null_test_record");
 const spec_nullTestRecord = {
   name: "nullTestRecord",
-  identifier: sql.identifier("c", "null_test_record"),
+  identifier: nullTestRecordIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -596,9 +600,10 @@ const spec_nullTestRecord = {
   executor: executor
 };
 const nullTestRecordCodec = recordCodec(spec_nullTestRecord);
+const edgeCaseIdentifier = sql.identifier("c", "edge_case");
 const spec_edgeCase = {
   name: "edgeCase",
-  identifier: sql.identifier("c", "edge_case"),
+  identifier: edgeCaseIdentifier,
   attributes: Object.assign(Object.create(null), {
     not_null_has_default: {
       description: undefined,
@@ -641,9 +646,10 @@ const spec_edgeCase = {
   executor: executor
 };
 const edgeCaseCodec = recordCodec(spec_edgeCase);
+const leftArmIdentifier = sql.identifier("c", "left_arm");
 const spec_leftArm = {
   name: "leftArm",
-  identifier: sql.identifier("c", "left_arm"),
+  identifier: leftArmIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -695,6 +701,7 @@ const spec_leftArm = {
   executor: executor
 };
 const leftArmCodec = recordCodec(spec_leftArm);
+const issue756Identifier = sql.identifier("c", "issue756");
 const notNullTimestampCodec = domainOfCodec(TYPES.timestamptz, "notNullTimestamp", sql.identifier("c", "not_null_timestamp"), {
   description: undefined,
   extensions: {
@@ -709,7 +716,7 @@ const notNullTimestampCodec = domainOfCodec(TYPES.timestamptz, "notNullTimestamp
 });
 const spec_issue756 = {
   name: "issue756",
-  identifier: sql.identifier("c", "issue756"),
+  identifier: issue756Identifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -743,6 +750,7 @@ const spec_issue756 = {
   executor: executor
 };
 const issue756Codec = recordCodec(spec_issue756);
+const compoundTypeIdentifier = sql.identifier("c", "compound_type");
 const colorCodec = enumCodec({
   name: "color",
   identifier: sql.identifier("b", "color"),
@@ -787,7 +795,7 @@ const enumWithEmptyStringCodec = enumCodec({
 });
 const compoundTypeCodec = recordCodec({
   name: "compoundType",
-  identifier: sql.identifier("c", "compound_type"),
+  identifier: compoundTypeIdentifier,
   attributes: Object.assign(Object.create(null), {
     a: {
       description: undefined,
@@ -1178,6 +1186,7 @@ const registryConfig_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOu
   executor,
   isAnonymous: true
 });
+const personIdentifier = sql.identifier("c", "person");
 const textArrayCodec = listOfCodec(TYPES.text, {
   extensions: {
     pg: {
@@ -1243,7 +1252,7 @@ const wrappedUrlCodec = recordCodec({
 });
 const spec_person = {
   name: "person",
-  identifier: sql.identifier("c", "person"),
+  identifier: personIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: "The primary unique identifier for the person",
@@ -2307,10 +2316,10 @@ const person_secretUniques = [{
   }
 }];
 const registryConfig_pgResources_person_secret_person_secret = {
-  executor,
+  executor: executor,
   name: "person_secret",
   identifier: "main.c.person_secret",
-  from: personSecretCodec.sqlType,
+  from: personSecretIdentifier,
   codec: personSecretCodec,
   uniques: person_secretUniques,
   isVirtual: false,
@@ -2336,10 +2345,10 @@ const compound_keyUniques = [{
   }
 }];
 const registryConfig_pgResources_compound_key_compound_key = {
-  executor,
+  executor: executor,
   name: "compound_key",
   identifier: "main.c.compound_key",
-  from: compoundKeyCodec.sqlType,
+  from: compoundKeyIdentifier,
   codec: compoundKeyCodec,
   uniques: compound_keyUniques,
   isVirtual: false,
@@ -2380,10 +2389,10 @@ const left_armUniques = [{
   }
 }];
 const registryConfig_pgResources_left_arm_left_arm = {
-  executor,
+  executor: executor,
   name: "left_arm",
   identifier: "main.c.left_arm",
-  from: leftArmCodec.sqlType,
+  from: leftArmIdentifier,
   codec: leftArmCodec,
   uniques: left_armUniques,
   isVirtual: false,
@@ -2408,10 +2417,10 @@ const issue756Uniques = [{
   }
 }];
 const registryConfig_pgResources_issue756_issue756 = {
-  executor,
+  executor: executor,
   name: "issue756",
   identifier: "main.c.issue756",
-  from: issue756Codec.sqlType,
+  from: issue756Identifier,
   codec: issue756Codec,
   uniques: issue756Uniques,
   isVirtual: false,
@@ -2465,10 +2474,10 @@ const personUniques = [{
   }
 }];
 const registryConfig_pgResources_person_person = {
-  executor,
+  executor: executor,
   name: "person",
   identifier: "main.c.person",
-  from: personCodec.sqlType,
+  from: personIdentifier,
   codec: personCodec,
   uniques: personUniques,
   isVirtual: false,
@@ -3546,10 +3555,10 @@ const registry = makeRegistry({
       description: undefined
     },
     my_table: {
-      executor,
+      executor: executor,
       name: "my_table",
       identifier: "main.c.my_table",
-      from: myTableCodec.sqlType,
+      from: myTableIdentifier,
       codec: myTableCodec,
       uniques: my_tableUniques,
       isVirtual: false,
@@ -3567,10 +3576,10 @@ const registry = makeRegistry({
     person_secret: registryConfig_pgResources_person_secret_person_secret,
     compound_key: registryConfig_pgResources_compound_key_compound_key,
     null_test_record: {
-      executor,
+      executor: executor,
       name: "null_test_record",
       identifier: "main.c.null_test_record",
-      from: nullTestRecordCodec.sqlType,
+      from: nullTestRecordIdentifier,
       codec: nullTestRecordCodec,
       uniques: null_test_recordUniques,
       isVirtual: false,
@@ -3637,10 +3646,10 @@ const registry = makeRegistry({
       description: undefined
     }),
     edge_case: {
-      executor,
+      executor: executor,
       name: "edge_case",
       identifier: "main.c.edge_case",
-      from: edgeCaseCodec.sqlType,
+      from: edgeCaseIdentifier,
       codec: edgeCaseCodec,
       uniques: [],
       isVirtual: false,
@@ -3968,10 +3977,10 @@ const registry = makeRegistry({
       description: undefined
     },
     compound_type_set_query: PgResource.functionResourceOptions({
-      executor,
+      executor: executor,
       name: "compound_type",
       identifier: "main.c.compound_type",
-      from: compoundTypeCodec.sqlType,
+      from: compoundTypeIdentifier,
       codec: compoundTypeCodec,
       uniques: [],
       isVirtual: true,

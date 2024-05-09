@@ -65,6 +65,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
+const geomIdentifier = sql.identifier("geometry", "geom");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -77,7 +78,7 @@ const executor = new PgExecutor({
 });
 const spec_geom = {
   name: "geom",
-  identifier: sql.identifier("geometry", "geom"),
+  identifier: geomIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -199,10 +200,10 @@ const pgResource_geomPgResource = makeRegistry({
   }),
   pgResources: Object.assign(Object.create(null), {
     geom: {
-      executor,
+      executor: executor,
       name: "geom",
       identifier: "main.geometry.geom",
-      from: geomCodec.sqlType,
+      from: geomIdentifier,
       codec: geomCodec,
       uniques: geomUniques,
       isVirtual: false,

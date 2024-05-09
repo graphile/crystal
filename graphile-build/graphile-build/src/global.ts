@@ -315,6 +315,7 @@ declare global {
         args: [...TScope],
         nameHint?: string,
       ): T;
+      EXPORTABLE_OBJECT_CLONE<T extends object>(obj: T): T;
       exportNameHint(obj: any, nameHint: string): void;
 
       /**

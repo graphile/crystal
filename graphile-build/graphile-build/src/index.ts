@@ -39,6 +39,7 @@ export {
   constantCase,
   constantCaseAll,
   EXPORTABLE,
+  EXPORTABLE_OBJECT_CLONE,
   formatInsideUnderscores,
   gatherConfig,
   pluralize,

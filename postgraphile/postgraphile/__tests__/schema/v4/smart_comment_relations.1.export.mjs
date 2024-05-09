@@ -65,6 +65,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
+const post_tableIdentifier = sql.identifier("smart_comment_relations", "post");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -77,7 +78,7 @@ const executor = new PgExecutor({
 });
 const spec_post_table = {
   name: "post_table",
-  identifier: sql.identifier("smart_comment_relations", "post"),
+  identifier: post_tableIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -106,9 +107,10 @@ const spec_post_table = {
   executor: executor
 };
 const post_tableCodec = recordCodec(spec_post_table);
+const postsIdentifier = sql.identifier("smart_comment_relations", "post_view");
 const spec_posts = {
   name: "posts",
-  identifier: sql.identifier("smart_comment_relations", "post_view"),
+  identifier: postsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -136,9 +138,10 @@ const spec_posts = {
   executor: executor
 };
 const postsCodec = recordCodec(spec_posts);
+const offer_tableIdentifier = sql.identifier("smart_comment_relations", "offer");
 const spec_offer_table = {
   name: "offer_table",
-  identifier: sql.identifier("smart_comment_relations", "offer"),
+  identifier: offer_tableIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -176,9 +179,10 @@ const spec_offer_table = {
   executor: executor
 };
 const offer_tableCodec = recordCodec(spec_offer_table);
+const offersIdentifier = sql.identifier("smart_comment_relations", "offer_view");
 const spec_offers = {
   name: "offers",
-  identifier: sql.identifier("smart_comment_relations", "offer_view"),
+  identifier: offersIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -216,9 +220,10 @@ const spec_offers = {
   executor: executor
 };
 const offersCodec = recordCodec(spec_offers);
+const streetsIdentifier = sql.identifier("smart_comment_relations", "streets");
 const spec_streets = {
   name: "streets",
-  identifier: sql.identifier("smart_comment_relations", "streets"),
+  identifier: streetsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -254,9 +259,10 @@ const spec_streets = {
   executor: executor
 };
 const streetsCodec = recordCodec(spec_streets);
+const propertiesIdentifier = sql.identifier("smart_comment_relations", "properties");
 const spec_properties = {
   name: "properties",
-  identifier: sql.identifier("smart_comment_relations", "properties"),
+  identifier: propertiesIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -299,9 +305,10 @@ const spec_properties = {
   executor: executor
 };
 const propertiesCodec = recordCodec(spec_properties);
+const streetPropertyIdentifier = sql.identifier("smart_comment_relations", "street_property");
 const spec_streetProperty = {
   name: "streetProperty",
-  identifier: sql.identifier("smart_comment_relations", "street_property"),
+  identifier: streetPropertyIdentifier,
   attributes: Object.assign(Object.create(null), {
     str_id: {
       description: undefined,
@@ -344,9 +351,10 @@ const spec_streetProperty = {
   executor: executor
 };
 const streetPropertyCodec = recordCodec(spec_streetProperty);
+const housesIdentifier = sql.identifier("smart_comment_relations", "houses");
 const spec_houses = {
   name: "houses",
-  identifier: sql.identifier("smart_comment_relations", "houses"),
+  identifier: housesIdentifier,
   attributes: Object.assign(Object.create(null), {
     building_name: {
       description: undefined,
@@ -432,9 +440,10 @@ const spec_houses = {
   executor: executor
 };
 const housesCodec = recordCodec(spec_houses);
+const buildingsIdentifier = sql.identifier("smart_comment_relations", "buildings");
 const spec_buildings = {
   name: "buildings",
-  identifier: sql.identifier("smart_comment_relations", "buildings"),
+  identifier: buildingsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -498,10 +507,10 @@ const spec_buildings = {
 };
 const buildingsCodec = recordCodec(spec_buildings);
 const registryConfig_pgResources_post_table_post_table = {
-  executor,
+  executor: executor,
   name: "post_table",
   identifier: "main.smart_comment_relations.post",
-  from: post_tableCodec.sqlType,
+  from: post_tableIdentifier,
   codec: post_tableCodec,
   uniques: [{
     isPrimary: true,
@@ -536,10 +545,10 @@ const postsUniques = [{
   }
 }];
 const registryConfig_pgResources_posts_posts = {
-  executor,
+  executor: executor,
   name: "posts",
   identifier: "main.smart_comment_relations.post_view",
-  from: postsCodec.sqlType,
+  from: postsIdentifier,
   codec: postsCodec,
   uniques: postsUniques,
   isVirtual: false,
@@ -558,10 +567,10 @@ const registryConfig_pgResources_posts_posts = {
   }
 };
 const registryConfig_pgResources_offer_table_offer_table = {
-  executor,
+  executor: executor,
   name: "offer_table",
   identifier: "main.smart_comment_relations.offer",
-  from: offer_tableCodec.sqlType,
+  from: offer_tableIdentifier,
   codec: offer_tableCodec,
   uniques: [{
     isPrimary: true,
@@ -596,10 +605,10 @@ const offersUniques = [{
   }
 }];
 const registryConfig_pgResources_offers_offers = {
-  executor,
+  executor: executor,
   name: "offers",
   identifier: "main.smart_comment_relations.offer_view",
-  from: offersCodec.sqlType,
+  from: offersIdentifier,
   codec: offersCodec,
   uniques: offersUniques,
   isVirtual: false,
@@ -634,10 +643,10 @@ const streetsUniques = [{
   }
 }];
 const registryConfig_pgResources_streets_streets = {
-  executor,
+  executor: executor,
   name: "streets",
   identifier: "main.smart_comment_relations.streets",
-  from: streetsCodec.sqlType,
+  from: streetsIdentifier,
   codec: streetsCodec,
   uniques: streetsUniques,
   isVirtual: false,
@@ -663,10 +672,10 @@ const propertiesUniques = [{
   }
 }];
 const registryConfig_pgResources_properties_properties = {
-  executor,
+  executor: executor,
   name: "properties",
   identifier: "main.smart_comment_relations.properties",
-  from: propertiesCodec.sqlType,
+  from: propertiesIdentifier,
   codec: propertiesCodec,
   uniques: propertiesUniques,
   isVirtual: false,
@@ -690,10 +699,10 @@ const street_propertyUniques = [{
   }
 }];
 const registryConfig_pgResources_street_property_street_property = {
-  executor,
+  executor: executor,
   name: "street_property",
   identifier: "main.smart_comment_relations.street_property",
-  from: streetPropertyCodec.sqlType,
+  from: streetPropertyIdentifier,
   codec: streetPropertyCodec,
   uniques: street_propertyUniques,
   isVirtual: false,
@@ -717,10 +726,10 @@ const housesUniques = [{
   }
 }];
 const registryConfig_pgResources_houses_houses = {
-  executor,
+  executor: executor,
   name: "houses",
   identifier: "main.smart_comment_relations.houses",
-  from: housesCodec.sqlType,
+  from: housesIdentifier,
   codec: housesCodec,
   uniques: housesUniques,
   isVirtual: false,
@@ -748,10 +757,10 @@ const buildingsUniques = [{
   }
 }];
 const registryConfig_pgResources_buildings_buildings = {
-  executor,
+  executor: executor,
   name: "buildings",
   identifier: "main.smart_comment_relations.buildings",
-  from: buildingsCodec.sqlType,
+  from: buildingsIdentifier,
   codec: buildingsCodec,
   uniques: buildingsUniques,
   isVirtual: false,

@@ -46,6 +46,7 @@
     "lodash": "^4.17.21",
     "pluralize": "^7.0.0",
     "semver": "^7.5.4",
+    "tamedevil": "workspace:^",
     "tslib": "^2.6.2"
   },
   "engines": {
