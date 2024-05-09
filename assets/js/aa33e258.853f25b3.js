@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_localrepo_star_website=self.webpackChunk_localrepo_star_website||[]).push([[9322],{9103:e=>{e.exports=JSON.parse('{"name":"docusaurus-plugin-content-docs","id":"pg-sql2"}')}}]);

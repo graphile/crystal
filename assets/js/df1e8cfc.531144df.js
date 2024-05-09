@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_localrepo_star_website=self.webpackChunk_localrepo_star_website||[]).push([[7382],{7085:e=>{e.exports=JSON.parse('{"name":"docusaurus-theme-search-algolia","id":"default"}')}}]);
