@@ -19,6 +19,7 @@
     "website:postgraphile": "cd postgraphile/website && yarn start",
     "website:build": "cd graphile-build/website && yarn start",
     "website:star": "cd utils/website && yarn start",
+    "websites:deploy": "yarn workspace @localrepo/grafast-website run deploy && yarn workspace @localrepo/postgraphile-website run deploy && yarn workspace @localrepo/graphile-build-website run deploy && yarn workspace @localrepo/star-website run deploy",
     "-----": "-----",
     "eslint": "eslint --ext .js,.jsx,.ts,.tsx",
     "prettier": "prettier --cache --ignore-path ./.eslintignore",
