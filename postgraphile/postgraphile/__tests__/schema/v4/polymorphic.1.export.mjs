@@ -20,6 +20,7 @@ const handler_codec_base64JSON = {
     return base64JSONDecode;
   })()
 };
+const awsApplicationFirstPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "aws_application_first_party_vulnerabilities");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -32,7 +33,7 @@ const executor = new PgExecutor({
 });
 const spec_awsApplicationFirstPartyVulnerabilities = {
   name: "awsApplicationFirstPartyVulnerabilities",
-  identifier: sql.identifier("polymorphic", "aws_application_first_party_vulnerabilities"),
+  identifier: awsApplicationFirstPartyVulnerabilitiesIdentifier,
   attributes: Object.assign(Object.create(null), {
     aws_application_id: {
       description: undefined,
@@ -69,9 +70,10 @@ const spec_awsApplicationFirstPartyVulnerabilities = {
   executor: executor
 };
 const awsApplicationFirstPartyVulnerabilitiesCodec = recordCodec(spec_awsApplicationFirstPartyVulnerabilities);
+const awsApplicationThirdPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "aws_application_third_party_vulnerabilities");
 const spec_awsApplicationThirdPartyVulnerabilities = {
   name: "awsApplicationThirdPartyVulnerabilities",
-  identifier: sql.identifier("polymorphic", "aws_application_third_party_vulnerabilities"),
+  identifier: awsApplicationThirdPartyVulnerabilitiesIdentifier,
   attributes: Object.assign(Object.create(null), {
     aws_application_id: {
       description: undefined,
@@ -108,9 +110,10 @@ const spec_awsApplicationThirdPartyVulnerabilities = {
   executor: executor
 };
 const awsApplicationThirdPartyVulnerabilitiesCodec = recordCodec(spec_awsApplicationThirdPartyVulnerabilities);
+const gcpApplicationFirstPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "gcp_application_first_party_vulnerabilities");
 const spec_gcpApplicationFirstPartyVulnerabilities = {
   name: "gcpApplicationFirstPartyVulnerabilities",
-  identifier: sql.identifier("polymorphic", "gcp_application_first_party_vulnerabilities"),
+  identifier: gcpApplicationFirstPartyVulnerabilitiesIdentifier,
   attributes: Object.assign(Object.create(null), {
     gcp_application_id: {
       description: undefined,
@@ -147,9 +150,10 @@ const spec_gcpApplicationFirstPartyVulnerabilities = {
   executor: executor
 };
 const gcpApplicationFirstPartyVulnerabilitiesCodec = recordCodec(spec_gcpApplicationFirstPartyVulnerabilities);
+const gcpApplicationThirdPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "gcp_application_third_party_vulnerabilities");
 const spec_gcpApplicationThirdPartyVulnerabilities = {
   name: "gcpApplicationThirdPartyVulnerabilities",
-  identifier: sql.identifier("polymorphic", "gcp_application_third_party_vulnerabilities"),
+  identifier: gcpApplicationThirdPartyVulnerabilitiesIdentifier,
   attributes: Object.assign(Object.create(null), {
     gcp_application_id: {
       description: undefined,
@@ -186,9 +190,10 @@ const spec_gcpApplicationThirdPartyVulnerabilities = {
   executor: executor
 };
 const gcpApplicationThirdPartyVulnerabilitiesCodec = recordCodec(spec_gcpApplicationThirdPartyVulnerabilities);
+const organizationsIdentifier = sql.identifier("polymorphic", "organizations");
 const spec_organizations = {
   name: "organizations",
-  identifier: sql.identifier("polymorphic", "organizations"),
+  identifier: organizationsIdentifier,
   attributes: Object.assign(Object.create(null), {
     organization_id: {
       description: undefined,
@@ -224,9 +229,10 @@ const spec_organizations = {
   executor: executor
 };
 const organizationsCodec = recordCodec(spec_organizations);
+const peopleIdentifier = sql.identifier("polymorphic", "people");
 const spec_people = {
   name: "people",
-  identifier: sql.identifier("polymorphic", "people"),
+  identifier: peopleIdentifier,
   attributes: Object.assign(Object.create(null), {
     person_id: {
       description: undefined,
@@ -277,9 +283,10 @@ const spec_people = {
   executor: executor
 };
 const peopleCodec = recordCodec(spec_people);
+const prioritiesIdentifier = sql.identifier("polymorphic", "priorities");
 const spec_priorities = {
   name: "priorities",
-  identifier: sql.identifier("polymorphic", "priorities"),
+  identifier: prioritiesIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -316,6 +323,7 @@ const spec_priorities = {
   executor: executor
 };
 const prioritiesCodec = recordCodec(spec_priorities);
+const relationalChecklistsIdentifier = sql.identifier("polymorphic", "relational_checklists");
 const itemTypeCodec = enumCodec({
   name: "itemType",
   identifier: sql.identifier("polymorphic", "item_type"),
@@ -332,7 +340,7 @@ const itemTypeCodec = enumCodec({
 });
 const spec_relationalChecklists = {
   name: "relationalChecklists",
-  identifier: sql.identifier("polymorphic", "relational_checklists"),
+  identifier: relationalChecklistsIdentifier,
   attributes: Object.assign(Object.create(null), {
     checklist_item_id: {
       description: undefined,
@@ -477,9 +485,10 @@ const spec_relationalChecklists = {
   executor: executor
 };
 const relationalChecklistsCodec = recordCodec(spec_relationalChecklists);
+const relationalItemRelationCompositePksIdentifier = sql.identifier("polymorphic", "relational_item_relation_composite_pks");
 const spec_relationalItemRelationCompositePks = {
   name: "relationalItemRelationCompositePks",
-  identifier: sql.identifier("polymorphic", "relational_item_relation_composite_pks"),
+  identifier: relationalItemRelationCompositePksIdentifier,
   attributes: Object.assign(Object.create(null), {
     parent_id: {
       description: undefined,
@@ -513,9 +522,10 @@ const spec_relationalItemRelationCompositePks = {
   executor: executor
 };
 const relationalItemRelationCompositePksCodec = recordCodec(spec_relationalItemRelationCompositePks);
+const relationalTopicsIdentifier = sql.identifier("polymorphic", "relational_topics");
 const spec_relationalTopics = {
   name: "relationalTopics",
-  identifier: sql.identifier("polymorphic", "relational_topics"),
+  identifier: relationalTopicsIdentifier,
   attributes: Object.assign(Object.create(null), {
     topic_item_id: {
       description: undefined,
@@ -660,9 +670,10 @@ const spec_relationalTopics = {
   executor: executor
 };
 const relationalTopicsCodec = recordCodec(spec_relationalTopics);
+const singleTableItemRelationCompositePksIdentifier = sql.identifier("polymorphic", "single_table_item_relation_composite_pks");
 const spec_singleTableItemRelationCompositePks = {
   name: "singleTableItemRelationCompositePks",
-  identifier: sql.identifier("polymorphic", "single_table_item_relation_composite_pks"),
+  identifier: singleTableItemRelationCompositePksIdentifier,
   attributes: Object.assign(Object.create(null), {
     parent_id: {
       description: undefined,
@@ -696,9 +707,10 @@ const spec_singleTableItemRelationCompositePks = {
   executor: executor
 };
 const singleTableItemRelationCompositePksCodec = recordCodec(spec_singleTableItemRelationCompositePks);
+const relationalChecklistItemsIdentifier = sql.identifier("polymorphic", "relational_checklist_items");
 const spec_relationalChecklistItems = {
   name: "relationalChecklistItems",
-  identifier: sql.identifier("polymorphic", "relational_checklist_items"),
+  identifier: relationalChecklistItemsIdentifier,
   attributes: Object.assign(Object.create(null), {
     checklist_item_item_id: {
       description: undefined,
@@ -852,9 +864,10 @@ const spec_relationalChecklistItems = {
   executor: executor
 };
 const relationalChecklistItemsCodec = recordCodec(spec_relationalChecklistItems);
+const relationalDividersIdentifier = sql.identifier("polymorphic", "relational_dividers");
 const spec_relationalDividers = {
   name: "relationalDividers",
-  identifier: sql.identifier("polymorphic", "relational_dividers"),
+  identifier: relationalDividersIdentifier,
   attributes: Object.assign(Object.create(null), {
     divider_item_id: {
       description: undefined,
@@ -1008,9 +1021,10 @@ const spec_relationalDividers = {
   executor: executor
 };
 const relationalDividersCodec = recordCodec(spec_relationalDividers);
+const relationalItemRelationsIdentifier = sql.identifier("polymorphic", "relational_item_relations");
 const spec_relationalItemRelations = {
   name: "relationalItemRelations",
-  identifier: sql.identifier("polymorphic", "relational_item_relations"),
+  identifier: relationalItemRelationsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1053,9 +1067,10 @@ const spec_relationalItemRelations = {
   executor: executor
 };
 const relationalItemRelationsCodec = recordCodec(spec_relationalItemRelations);
+const singleTableItemRelationsIdentifier = sql.identifier("polymorphic", "single_table_item_relations");
 const spec_singleTableItemRelations = {
   name: "singleTableItemRelations",
-  identifier: sql.identifier("polymorphic", "single_table_item_relations"),
+  identifier: singleTableItemRelationsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1098,9 +1113,10 @@ const spec_singleTableItemRelations = {
   executor: executor
 };
 const singleTableItemRelationsCodec = recordCodec(spec_singleTableItemRelations);
+const logEntriesIdentifier = sql.identifier("polymorphic", "log_entries");
 const spec_logEntries = {
   name: "logEntries",
-  identifier: sql.identifier("polymorphic", "log_entries"),
+  identifier: logEntriesIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1168,9 +1184,10 @@ const spec_logEntries = {
   executor: executor
 };
 const logEntriesCodec = recordCodec(spec_logEntries);
+const relationalPostsIdentifier = sql.identifier("polymorphic", "relational_posts");
 const spec_relationalPosts = {
   name: "relationalPosts",
-  identifier: sql.identifier("polymorphic", "relational_posts"),
+  identifier: relationalPostsIdentifier,
   attributes: Object.assign(Object.create(null), {
     post_item_id: {
       description: undefined,
@@ -1333,9 +1350,10 @@ const spec_relationalPosts = {
   executor: executor
 };
 const relationalPostsCodec = recordCodec(spec_relationalPosts);
+const firstPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "first_party_vulnerabilities");
 const spec_firstPartyVulnerabilities = {
   name: "firstPartyVulnerabilities",
-  identifier: sql.identifier("polymorphic", "first_party_vulnerabilities"),
+  identifier: firstPartyVulnerabilitiesIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1415,9 +1433,10 @@ const spec_firstPartyVulnerabilities = {
   executor: executor
 };
 const firstPartyVulnerabilitiesCodec = recordCodec(spec_firstPartyVulnerabilities);
+const thirdPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "third_party_vulnerabilities");
 const spec_thirdPartyVulnerabilities = {
   name: "thirdPartyVulnerabilities",
-  identifier: sql.identifier("polymorphic", "third_party_vulnerabilities"),
+  identifier: thirdPartyVulnerabilitiesIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1497,9 +1516,10 @@ const spec_thirdPartyVulnerabilities = {
   executor: executor
 };
 const thirdPartyVulnerabilitiesCodec = recordCodec(spec_thirdPartyVulnerabilities);
+const awsApplicationsIdentifier = sql.identifier("polymorphic", "aws_applications");
 const spec_awsApplications = {
   name: "awsApplications",
-  identifier: sql.identifier("polymorphic", "aws_applications"),
+  identifier: awsApplicationsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1597,9 +1617,10 @@ const spec_awsApplications = {
   executor: executor
 };
 const awsApplicationsCodec = recordCodec(spec_awsApplications);
+const gcpApplicationsIdentifier = sql.identifier("polymorphic", "gcp_applications");
 const spec_gcpApplications = {
   name: "gcpApplications",
-  identifier: sql.identifier("polymorphic", "gcp_applications"),
+  identifier: gcpApplicationsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1697,9 +1718,10 @@ const spec_gcpApplications = {
   executor: executor
 };
 const gcpApplicationsCodec = recordCodec(spec_gcpApplications);
+const singleTableItemsIdentifier = sql.identifier("polymorphic", "single_table_items");
 const spec_singleTableItems = {
   name: "singleTableItems",
-  identifier: sql.identifier("polymorphic", "single_table_items"),
+  identifier: singleTableItemsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1949,9 +1971,10 @@ const spec_singleTableItems = {
   }
 };
 const singleTableItemsCodec = recordCodec(spec_singleTableItems);
+const relationalItemsIdentifier = sql.identifier("polymorphic", "relational_items");
 const spec_relationalItems = {
   name: "relationalItems",
-  identifier: sql.identifier("polymorphic", "relational_items"),
+  identifier: relationalItemsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -2296,10 +2319,10 @@ const spec_ZeroImplementation = {
   }
 };
 const registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws_application_first_party_vulnerabilities = {
-  executor,
+  executor: executor,
   name: "aws_application_first_party_vulnerabilities",
   identifier: "main.polymorphic.aws_application_first_party_vulnerabilities",
-  from: awsApplicationFirstPartyVulnerabilitiesCodec.sqlType,
+  from: awsApplicationFirstPartyVulnerabilitiesIdentifier,
   codec: awsApplicationFirstPartyVulnerabilitiesCodec,
   uniques: [{
     isPrimary: true,
@@ -2325,10 +2348,10 @@ const registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws
   }
 };
 const registryConfig_pgResources_aws_application_third_party_vulnerabilities_aws_application_third_party_vulnerabilities = {
-  executor,
+  executor: executor,
   name: "aws_application_third_party_vulnerabilities",
   identifier: "main.polymorphic.aws_application_third_party_vulnerabilities",
-  from: awsApplicationThirdPartyVulnerabilitiesCodec.sqlType,
+  from: awsApplicationThirdPartyVulnerabilitiesIdentifier,
   codec: awsApplicationThirdPartyVulnerabilitiesCodec,
   uniques: [{
     isPrimary: true,
@@ -2354,10 +2377,10 @@ const registryConfig_pgResources_aws_application_third_party_vulnerabilities_aws
   }
 };
 const registryConfig_pgResources_gcp_application_first_party_vulnerabilities_gcp_application_first_party_vulnerabilities = {
-  executor,
+  executor: executor,
   name: "gcp_application_first_party_vulnerabilities",
   identifier: "main.polymorphic.gcp_application_first_party_vulnerabilities",
-  from: gcpApplicationFirstPartyVulnerabilitiesCodec.sqlType,
+  from: gcpApplicationFirstPartyVulnerabilitiesIdentifier,
   codec: gcpApplicationFirstPartyVulnerabilitiesCodec,
   uniques: [{
     isPrimary: true,
@@ -2383,10 +2406,10 @@ const registryConfig_pgResources_gcp_application_first_party_vulnerabilities_gcp
   }
 };
 const registryConfig_pgResources_gcp_application_third_party_vulnerabilities_gcp_application_third_party_vulnerabilities = {
-  executor,
+  executor: executor,
   name: "gcp_application_third_party_vulnerabilities",
   identifier: "main.polymorphic.gcp_application_third_party_vulnerabilities",
-  from: gcpApplicationThirdPartyVulnerabilitiesCodec.sqlType,
+  from: gcpApplicationThirdPartyVulnerabilitiesIdentifier,
   codec: gcpApplicationThirdPartyVulnerabilitiesCodec,
   uniques: [{
     isPrimary: true,
@@ -2427,10 +2450,10 @@ const organizationsUniques = [{
   }
 }];
 const registryConfig_pgResources_organizations_organizations = {
-  executor,
+  executor: executor,
   name: "organizations",
   identifier: "main.polymorphic.organizations",
-  from: organizationsCodec.sqlType,
+  from: organizationsIdentifier,
   codec: organizationsCodec,
   uniques: organizationsUniques,
   isVirtual: false,
@@ -2463,10 +2486,10 @@ const peopleUniques = [{
   }
 }];
 const registryConfig_pgResources_people_people = {
-  executor,
+  executor: executor,
   name: "people",
   identifier: "main.polymorphic.people",
-  from: peopleCodec.sqlType,
+  from: peopleIdentifier,
   codec: peopleCodec,
   uniques: peopleUniques,
   isVirtual: false,
@@ -2486,10 +2509,10 @@ const registryConfig_pgResources_people_people = {
   }
 };
 const registryConfig_pgResources_priorities_priorities = {
-  executor,
+  executor: executor,
   name: "priorities",
   identifier: "main.polymorphic.priorities",
-  from: prioritiesCodec.sqlType,
+  from: prioritiesIdentifier,
   codec: prioritiesCodec,
   uniques: [{
     isPrimary: true,
@@ -2523,10 +2546,10 @@ const relational_checklistsUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_checklists_relational_checklists = {
-  executor,
+  executor: executor,
   name: "relational_checklists",
   identifier: "main.polymorphic.relational_checklists",
-  from: relationalChecklistsCodec.sqlType,
+  from: relationalChecklistsIdentifier,
   codec: relationalChecklistsCodec,
   uniques: relational_checklistsUniques,
   isVirtual: false,
@@ -2550,10 +2573,10 @@ const relational_item_relation_composite_pksUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_item_relation_composite_pks_relational_item_relation_composite_pks = {
-  executor,
+  executor: executor,
   name: "relational_item_relation_composite_pks",
   identifier: "main.polymorphic.relational_item_relation_composite_pks",
-  from: relationalItemRelationCompositePksCodec.sqlType,
+  from: relationalItemRelationCompositePksIdentifier,
   codec: relationalItemRelationCompositePksCodec,
   uniques: relational_item_relation_composite_pksUniques,
   isVirtual: false,
@@ -2577,10 +2600,10 @@ const relational_topicsUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_topics_relational_topics = {
-  executor,
+  executor: executor,
   name: "relational_topics",
   identifier: "main.polymorphic.relational_topics",
-  from: relationalTopicsCodec.sqlType,
+  from: relationalTopicsIdentifier,
   codec: relationalTopicsCodec,
   uniques: relational_topicsUniques,
   isVirtual: false,
@@ -2604,10 +2627,10 @@ const single_table_item_relation_composite_pksUniques = [{
   }
 }];
 const registryConfig_pgResources_single_table_item_relation_composite_pks_single_table_item_relation_composite_pks = {
-  executor,
+  executor: executor,
   name: "single_table_item_relation_composite_pks",
   identifier: "main.polymorphic.single_table_item_relation_composite_pks",
-  from: singleTableItemRelationCompositePksCodec.sqlType,
+  from: singleTableItemRelationCompositePksIdentifier,
   codec: singleTableItemRelationCompositePksCodec,
   uniques: single_table_item_relation_composite_pksUniques,
   isVirtual: false,
@@ -2631,10 +2654,10 @@ const relational_checklist_itemsUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_checklist_items_relational_checklist_items = {
-  executor,
+  executor: executor,
   name: "relational_checklist_items",
   identifier: "main.polymorphic.relational_checklist_items",
-  from: relationalChecklistItemsCodec.sqlType,
+  from: relationalChecklistItemsIdentifier,
   codec: relationalChecklistItemsCodec,
   uniques: relational_checklist_itemsUniques,
   isVirtual: false,
@@ -2658,10 +2681,10 @@ const relational_dividersUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_dividers_relational_dividers = {
-  executor,
+  executor: executor,
   name: "relational_dividers",
   identifier: "main.polymorphic.relational_dividers",
-  from: relationalDividersCodec.sqlType,
+  from: relationalDividersIdentifier,
   codec: relationalDividersCodec,
   uniques: relational_dividersUniques,
   isVirtual: false,
@@ -2692,10 +2715,10 @@ const relational_item_relationsUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_item_relations_relational_item_relations = {
-  executor,
+  executor: executor,
   name: "relational_item_relations",
   identifier: "main.polymorphic.relational_item_relations",
-  from: relationalItemRelationsCodec.sqlType,
+  from: relationalItemRelationsIdentifier,
   codec: relationalItemRelationsCodec,
   uniques: relational_item_relationsUniques,
   isVirtual: false,
@@ -2726,10 +2749,10 @@ const single_table_item_relationsUniques = [{
   }
 }];
 const registryConfig_pgResources_single_table_item_relations_single_table_item_relations = {
-  executor,
+  executor: executor,
   name: "single_table_item_relations",
   identifier: "main.polymorphic.single_table_item_relations",
-  from: singleTableItemRelationsCodec.sqlType,
+  from: singleTableItemRelationsIdentifier,
   codec: singleTableItemRelationsCodec,
   uniques: single_table_item_relationsUniques,
   isVirtual: false,
@@ -2753,10 +2776,10 @@ const log_entriesUniques = [{
   }
 }];
 const registryConfig_pgResources_log_entries_log_entries = {
-  executor,
+  executor: executor,
   name: "log_entries",
   identifier: "main.polymorphic.log_entries",
-  from: logEntriesCodec.sqlType,
+  from: logEntriesIdentifier,
   codec: logEntriesCodec,
   uniques: log_entriesUniques,
   isVirtual: false,
@@ -2783,10 +2806,10 @@ const relational_postsUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_posts_relational_posts = {
-  executor,
+  executor: executor,
   name: "relational_posts",
   identifier: "main.polymorphic.relational_posts",
-  from: relationalPostsCodec.sqlType,
+  from: relationalPostsIdentifier,
   codec: relationalPostsCodec,
   uniques: relational_postsUniques,
   isVirtual: false,
@@ -2810,10 +2833,10 @@ const first_party_vulnerabilitiesUniques = [{
   }
 }];
 const registryConfig_pgResources_first_party_vulnerabilities_first_party_vulnerabilities = {
-  executor,
+  executor: executor,
   name: "first_party_vulnerabilities",
   identifier: "main.polymorphic.first_party_vulnerabilities",
-  from: firstPartyVulnerabilitiesCodec.sqlType,
+  from: firstPartyVulnerabilitiesIdentifier,
   codec: firstPartyVulnerabilitiesCodec,
   uniques: first_party_vulnerabilitiesUniques,
   isVirtual: false,
@@ -2841,10 +2864,10 @@ const third_party_vulnerabilitiesUniques = [{
   }
 }];
 const registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnerabilities = {
-  executor,
+  executor: executor,
   name: "third_party_vulnerabilities",
   identifier: "main.polymorphic.third_party_vulnerabilities",
-  from: thirdPartyVulnerabilitiesCodec.sqlType,
+  from: thirdPartyVulnerabilitiesIdentifier,
   codec: thirdPartyVulnerabilitiesCodec,
   uniques: third_party_vulnerabilitiesUniques,
   isVirtual: false,
@@ -2872,10 +2895,10 @@ const aws_applicationsUniques = [{
   }
 }];
 const registryConfig_pgResources_aws_applications_aws_applications = {
-  executor,
+  executor: executor,
   name: "aws_applications",
   identifier: "main.polymorphic.aws_applications",
-  from: awsApplicationsCodec.sqlType,
+  from: awsApplicationsIdentifier,
   codec: awsApplicationsCodec,
   uniques: aws_applicationsUniques,
   isVirtual: false,
@@ -2903,10 +2926,10 @@ const gcp_applicationsUniques = [{
   }
 }];
 const registryConfig_pgResources_gcp_applications_gcp_applications = {
-  executor,
+  executor: executor,
   name: "gcp_applications",
   identifier: "main.polymorphic.gcp_applications",
-  from: gcpApplicationsCodec.sqlType,
+  from: gcpApplicationsIdentifier,
   codec: gcpApplicationsCodec,
   uniques: gcp_applicationsUniques,
   isVirtual: false,
@@ -2935,10 +2958,10 @@ const single_table_itemsUniques = [{
   }
 }];
 const registryConfig_pgResources_single_table_items_single_table_items = {
-  executor,
+  executor: executor,
   name: "single_table_items",
   identifier: "main.polymorphic.single_table_items",
-  from: singleTableItemsCodec.sqlType,
+  from: singleTableItemsIdentifier,
   codec: singleTableItemsCodec,
   uniques: single_table_itemsUniques,
   isVirtual: false,
@@ -2968,10 +2991,10 @@ const relational_itemsUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_items_relational_items = {
-  executor,
+  executor: executor,
   name: "relational_items",
   identifier: "main.polymorphic.relational_items",
-  from: relationalItemsCodec.sqlType,
+  from: relationalItemsIdentifier,
   codec: relationalItemsCodec,
   uniques: relational_itemsUniques,
   isVirtual: false,

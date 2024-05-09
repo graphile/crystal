@@ -65,6 +65,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
+const peopleIdentifier = sql.identifier("simple_collections", "people");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -77,7 +78,7 @@ const executor = new PgExecutor({
 });
 const spec_people = {
   name: "people",
-  identifier: sql.identifier("simple_collections", "people"),
+  identifier: peopleIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -114,9 +115,10 @@ const spec_people = {
   executor: executor
 };
 const peopleCodec = recordCodec(spec_people);
+const petsIdentifier = sql.identifier("simple_collections", "pets");
 const spec_pets = {
   name: "pets",
-  identifier: sql.identifier("simple_collections", "pets"),
+  identifier: petsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -168,10 +170,10 @@ const peopleUniques = [{
   }
 }];
 const registryConfig_pgResources_people_people = {
-  executor,
+  executor: executor,
   name: "people",
   identifier: "main.simple_collections.people",
-  from: peopleCodec.sqlType,
+  from: peopleIdentifier,
   codec: peopleCodec,
   uniques: peopleUniques,
   isVirtual: false,
@@ -198,10 +200,10 @@ const petsUniques = [{
   }
 }];
 const registryConfig_pgResources_pets_pets = {
-  executor,
+  executor: executor,
   name: "pets",
   identifier: "main.simple_collections.pets",
-  from: petsCodec.sqlType,
+  from: petsIdentifier,
   codec: petsCodec,
   uniques: petsUniques,
   isVirtual: false,

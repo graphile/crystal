@@ -65,6 +65,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
+const abcdIdentifier = sql.identifier("enum_tables", "abcd");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -77,7 +78,7 @@ const executor = new PgExecutor({
 });
 const spec_abcd = {
   name: "abcd",
-  identifier: sql.identifier("enum_tables", "abcd"),
+  identifier: abcdIdentifier,
   attributes: Object.assign(Object.create(null), {
     letter: {
       description: undefined,
@@ -117,9 +118,10 @@ const spec_abcd = {
   executor: executor
 };
 const abcdCodec = recordCodec(spec_abcd);
+const abcdViewIdentifier = sql.identifier("enum_tables", "abcd_view");
 const spec_abcdView = {
   name: "abcdView",
-  identifier: sql.identifier("enum_tables", "abcd_view"),
+  identifier: abcdViewIdentifier,
   attributes: Object.assign(Object.create(null), {
     letter: {
       description: undefined,
@@ -158,9 +160,10 @@ const spec_abcdView = {
   executor: executor
 };
 const abcdViewCodec = recordCodec(spec_abcdView);
+const simpleEnumIdentifier = sql.identifier("enum_tables", "simple_enum");
 const spec_simpleEnum = {
   name: "simpleEnum",
-  identifier: sql.identifier("enum_tables", "simple_enum"),
+  identifier: simpleEnumIdentifier,
   attributes: Object.assign(Object.create(null), {
     value: {
       description: undefined,
@@ -197,6 +200,7 @@ const spec_simpleEnum = {
   executor: executor
 };
 const simpleEnumCodec = recordCodec(spec_simpleEnum);
+const letterDescriptionsIdentifier = sql.identifier("enum_tables", "letter_descriptions");
 const spec_letterDescriptions_attributes_letter_codec_LetterAToDEnum = enumCodec({
   name: "LetterAToDEnum",
   identifier: TYPES.text.sqlType,
@@ -245,7 +249,7 @@ const spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaView
 });
 const spec_letterDescriptions = {
   name: "letterDescriptions",
-  identifier: sql.identifier("enum_tables", "letter_descriptions"),
+  identifier: letterDescriptionsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -299,6 +303,7 @@ const spec_letterDescriptions = {
   executor: executor
 };
 const letterDescriptionsCodec = recordCodec(spec_letterDescriptions);
+const referencingTableIdentifier = sql.identifier("enum_tables", "referencing_table");
 const spec_referencingTable_attributes_enum_1_codec_EnumTheFirstEnum = enumCodec({
   name: "EnumTheFirstEnum",
   identifier: TYPES.text.sqlType,
@@ -393,7 +398,7 @@ const spec_referencingTable_attributes_simple_enum_codec_SimpleEnumEnum = enumCo
 });
 const spec_referencingTable = {
   name: "referencingTable",
-  identifier: sql.identifier("enum_tables", "referencing_table"),
+  identifier: referencingTableIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -454,9 +459,10 @@ const spec_referencingTable = {
   executor: executor
 };
 const referencingTableCodec = recordCodec(spec_referencingTable);
+const lotsOfEnumsIdentifier = sql.identifier("enum_tables", "lots_of_enums");
 const spec_lotsOfEnums = {
   name: "lotsOfEnums",
-  identifier: sql.identifier("enum_tables", "lots_of_enums"),
+  identifier: lotsOfEnumsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -530,10 +536,10 @@ const spec_lotsOfEnums = {
 };
 const lotsOfEnumsCodec = recordCodec(spec_lotsOfEnums);
 const registryConfig_pgResources_abcd_abcd = {
-  executor,
+  executor: executor,
   name: "abcd",
   identifier: "main.enum_tables.abcd",
-  from: abcdCodec.sqlType,
+  from: abcdIdentifier,
   codec: abcdCodec,
   uniques: [{
     isPrimary: true,
@@ -560,10 +566,10 @@ const registryConfig_pgResources_abcd_abcd = {
   }
 };
 const registryConfig_pgResources_abcd_view_abcd_view = {
-  executor,
+  executor: executor,
   name: "abcd_view",
   identifier: "main.enum_tables.abcd_view",
-  from: abcdViewCodec.sqlType,
+  from: abcdViewIdentifier,
   codec: abcdViewCodec,
   uniques: [{
     isPrimary: true,
@@ -591,10 +597,10 @@ const registryConfig_pgResources_abcd_view_abcd_view = {
   }
 };
 const registryConfig_pgResources_simple_enum_simple_enum = {
-  executor,
+  executor: executor,
   name: "simple_enum",
   identifier: "main.enum_tables.simple_enum",
-  from: simpleEnumCodec.sqlType,
+  from: simpleEnumIdentifier,
   codec: simpleEnumCodec,
   uniques: [{
     isPrimary: true,
@@ -643,10 +649,10 @@ const letter_descriptionsUniques = [{
   }
 }];
 const registryConfig_pgResources_letter_descriptions_letter_descriptions = {
-  executor,
+  executor: executor,
   name: "letter_descriptions",
   identifier: "main.enum_tables.letter_descriptions",
-  from: letterDescriptionsCodec.sqlType,
+  from: letterDescriptionsIdentifier,
   codec: letterDescriptionsCodec,
   uniques: letter_descriptionsUniques,
   isVirtual: false,
@@ -672,10 +678,10 @@ const referencing_tableUniques = [{
   }
 }];
 const registryConfig_pgResources_referencing_table_referencing_table = {
-  executor,
+  executor: executor,
   name: "referencing_table",
   identifier: "main.enum_tables.referencing_table",
-  from: referencingTableCodec.sqlType,
+  from: referencingTableIdentifier,
   codec: referencingTableCodec,
   uniques: referencing_tableUniques,
   isVirtual: false,
@@ -691,10 +697,10 @@ const registryConfig_pgResources_referencing_table_referencing_table = {
   }
 };
 const registryConfig_pgResources_lots_of_enums_lots_of_enums = {
-  executor,
+  executor: executor,
   name: "lots_of_enums",
   identifier: "main.enum_tables.lots_of_enums",
-  from: lotsOfEnumsCodec.sqlType,
+  from: lotsOfEnumsIdentifier,
   codec: lotsOfEnumsCodec,
   uniques: [{
     isPrimary: true,

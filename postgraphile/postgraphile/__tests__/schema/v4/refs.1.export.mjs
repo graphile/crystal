@@ -65,6 +65,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
+const peopleIdentifier = sql.identifier("refs", "people");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -77,7 +78,7 @@ const executor = new PgExecutor({
 });
 const spec_people = {
   name: "people",
-  identifier: sql.identifier("refs", "people"),
+  identifier: peopleIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -111,9 +112,10 @@ const spec_people = {
   executor: executor
 };
 const peopleCodec = recordCodec(spec_people);
+const postsIdentifier = sql.identifier("refs", "posts");
 const spec_posts = {
   name: "posts",
-  identifier: sql.identifier("refs", "posts"),
+  identifier: postsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -174,10 +176,10 @@ const peopleUniques = [{
   }
 }];
 const registryConfig_pgResources_people_people = {
-  executor,
+  executor: executor,
   name: "people",
   identifier: "main.refs.people",
-  from: peopleCodec.sqlType,
+  from: peopleIdentifier,
   codec: peopleCodec,
   uniques: peopleUniques,
   isVirtual: false,
@@ -201,10 +203,10 @@ const postsUniques = [{
   }
 }];
 const registryConfig_pgResources_posts_posts = {
-  executor,
+  executor: executor,
   name: "posts",
   identifier: "main.refs.posts",
-  from: postsCodec.sqlType,
+  from: postsIdentifier,
   codec: postsCodec,
   uniques: postsUniques,
   isVirtual: false,

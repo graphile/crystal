@@ -20,6 +20,7 @@ const handler_codec_base64JSON = {
     return base64JSONDecode;
   })()
 };
+const relationalTopicsIdentifier = sql.identifier("js_reserved", "relational_topics");
 const itemTypeCodec = enumCodec({
   name: "itemType",
   identifier: sql.identifier("js_reserved", "item_type"),
@@ -46,7 +47,7 @@ const executor = new PgExecutor({
 });
 const spec_relationalTopics = {
   name: "relationalTopics",
-  identifier: sql.identifier("js_reserved", "relational_topics"),
+  identifier: relationalTopicsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -104,9 +105,10 @@ const spec_relationalTopics = {
   executor: executor
 };
 const relationalTopicsCodec = recordCodec(spec_relationalTopics);
+const __proto__Identifier = sql.identifier("js_reserved", "__proto__");
 const spec___proto__ = {
   name: "__proto__",
-  identifier: sql.identifier("js_reserved", "__proto__"),
+  identifier: __proto__Identifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -149,9 +151,10 @@ const spec___proto__ = {
   executor: executor
 };
 const __proto__Codec = recordCodec(spec___proto__);
+const buildingIdentifier = sql.identifier("js_reserved", "building");
 const spec_building = {
   name: "building",
-  identifier: sql.identifier("js_reserved", "building"),
+  identifier: buildingIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -194,9 +197,10 @@ const spec_building = {
   executor: executor
 };
 const buildingCodec = recordCodec(spec_building);
+const constructorIdentifier = sql.identifier("js_reserved", "constructor");
 const spec_constructor = {
   name: "constructor",
-  identifier: sql.identifier("js_reserved", "constructor"),
+  identifier: constructorIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -239,9 +243,10 @@ const spec_constructor = {
   executor: executor
 };
 const constructorCodec = recordCodec(spec_constructor);
+const cropIdentifier = sql.identifier("js_reserved", "crop");
 const spec_crop = {
   name: "crop",
-  identifier: sql.identifier("js_reserved", "crop"),
+  identifier: cropIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -284,9 +289,10 @@ const spec_crop = {
   executor: executor
 };
 const cropCodec = recordCodec(spec_crop);
+const machineIdentifier = sql.identifier("js_reserved", "machine");
 const spec_machine = {
   name: "machine",
-  identifier: sql.identifier("js_reserved", "machine"),
+  identifier: machineIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -329,9 +335,10 @@ const spec_machine = {
   executor: executor
 };
 const machineCodec = recordCodec(spec_machine);
+const materialIdentifier = sql.identifier("js_reserved", "material");
 const spec_material = {
   name: "material",
-  identifier: sql.identifier("js_reserved", "material"),
+  identifier: materialIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -374,9 +381,10 @@ const spec_material = {
   executor: executor
 };
 const materialCodec = recordCodec(spec_material);
+const nullIdentifier = sql.identifier("js_reserved", "null");
 const spec_null = {
   name: "null",
-  identifier: sql.identifier("js_reserved", "null"),
+  identifier: nullIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -419,9 +427,10 @@ const spec_null = {
   executor: executor
 };
 const nullCodec = recordCodec(spec_null);
+const projectIdentifier = sql.identifier("js_reserved", "project");
 const spec_project = {
   name: "project",
-  identifier: sql.identifier("js_reserved", "project"),
+  identifier: projectIdentifier,
   attributes: Object.fromEntries([["id", {
     description: undefined,
     codec: TYPES.int,
@@ -460,9 +469,10 @@ const spec_project = {
   executor: executor
 };
 const projectCodec = recordCodec(spec_project);
+const relationalStatusIdentifier = sql.identifier("js_reserved", "relational_status");
 const spec_relationalStatus = {
   name: "relationalStatus",
-  identifier: sql.identifier("js_reserved", "relational_status"),
+  identifier: relationalStatusIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -529,9 +539,10 @@ const spec_relationalStatus = {
   executor: executor
 };
 const relationalStatusCodec = recordCodec(spec_relationalStatus);
+const yieldIdentifier = sql.identifier("js_reserved", "yield");
 const spec_yield = {
   name: "yield",
-  identifier: sql.identifier("js_reserved", "yield"),
+  identifier: yieldIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -574,9 +585,10 @@ const spec_yield = {
   executor: executor
 };
 const yieldCodec = recordCodec(spec_yield);
+const reservedIdentifier = sql.identifier("js_reserved", "reserved");
 const spec_reserved = {
   name: "reserved",
-  identifier: sql.identifier("js_reserved", "reserved"),
+  identifier: reservedIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -628,9 +640,10 @@ const spec_reserved = {
   executor: executor
 };
 const reservedCodec = recordCodec(spec_reserved);
+const relationalItemsIdentifier = sql.identifier("js_reserved", "relational_items");
 const spec_relationalItems = {
   name: "relationalItems",
-  identifier: sql.identifier("js_reserved", "relational_items"),
+  identifier: relationalItemsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -705,10 +718,10 @@ const relational_topicsUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_topics_relational_topics = {
-  executor,
+  executor: executor,
   name: "relational_topics",
   identifier: "main.js_reserved.relational_topics",
-  from: relationalTopicsCodec.sqlType,
+  from: relationalTopicsIdentifier,
   codec: relationalTopicsCodec,
   uniques: relational_topicsUniques,
   isVirtual: false,
@@ -754,10 +767,10 @@ const buildingUniques = [{
   }
 }];
 const registryConfig_pgResources_building_building = {
-  executor,
+  executor: executor,
   name: "building",
   identifier: "main.js_reserved.building",
-  from: buildingCodec.sqlType,
+  from: buildingIdentifier,
   codec: buildingCodec,
   uniques: buildingUniques,
   isVirtual: false,
@@ -818,10 +831,10 @@ const machineUniques = [{
   }
 }];
 const registryConfig_pgResources_machine_machine = {
-  executor,
+  executor: executor,
   name: "machine",
   identifier: "main.js_reserved.machine",
-  from: machineCodec.sqlType,
+  from: machineIdentifier,
   codec: machineCodec,
   uniques: machineUniques,
   isVirtual: false,
@@ -904,10 +917,10 @@ const relational_statusUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_status_relational_status = {
-  executor,
+  executor: executor,
   name: "relational_status",
   identifier: "main.js_reserved.relational_status",
-  from: relationalStatusCodec.sqlType,
+  from: relationalStatusIdentifier,
   codec: relationalStatusCodec,
   uniques: relational_statusUniques,
   isVirtual: false,
@@ -975,10 +988,10 @@ const relational_itemsUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_items_relational_items = {
-  executor,
+  executor: executor,
   name: "relational_items",
   identifier: "main.js_reserved.relational_items",
-  from: relationalItemsCodec.sqlType,
+  from: relationalItemsIdentifier,
   codec: relationalItemsCodec,
   uniques: relational_itemsUniques,
   isVirtual: false,
@@ -1176,10 +1189,10 @@ const registryConfig = {
     },
     description: undefined
   }], ["relational_topics", registryConfig_pgResources_relational_topics_relational_topics], ["__proto__", {
-    executor,
+    executor: executor,
     name: "__proto__",
     identifier: "main.js_reserved.__proto__",
-    from: __proto__Codec.sqlType,
+    from: __proto__Identifier,
     codec: __proto__Codec,
     uniques: __proto__Uniques,
     isVirtual: false,
@@ -1194,10 +1207,10 @@ const registryConfig = {
       tags: {}
     }
   }], ["building", registryConfig_pgResources_building_building], ["constructor", {
-    executor,
+    executor: executor,
     name: "constructor",
     identifier: "main.js_reserved.constructor",
-    from: constructorCodec.sqlType,
+    from: constructorIdentifier,
     codec: constructorCodec,
     uniques: constructorUniques,
     isVirtual: false,
@@ -1212,10 +1225,10 @@ const registryConfig = {
       tags: {}
     }
   }], ["crop", {
-    executor,
+    executor: executor,
     name: "crop",
     identifier: "main.js_reserved.crop",
-    from: cropCodec.sqlType,
+    from: cropIdentifier,
     codec: cropCodec,
     uniques: cropUniques,
     isVirtual: false,
@@ -1230,10 +1243,10 @@ const registryConfig = {
       tags: {}
     }
   }], ["machine", registryConfig_pgResources_machine_machine], ["material", {
-    executor,
+    executor: executor,
     name: "material",
     identifier: "main.js_reserved.material",
-    from: materialCodec.sqlType,
+    from: materialIdentifier,
     codec: materialCodec,
     uniques: materialUniques,
     isVirtual: false,
@@ -1248,10 +1261,10 @@ const registryConfig = {
       tags: {}
     }
   }], ["null", {
-    executor,
+    executor: executor,
     name: "null",
     identifier: "main.js_reserved.null",
-    from: nullCodec.sqlType,
+    from: nullIdentifier,
     codec: nullCodec,
     uniques: nullUniques,
     isVirtual: false,
@@ -1266,10 +1279,10 @@ const registryConfig = {
       tags: {}
     }
   }], ["project", {
-    executor,
+    executor: executor,
     name: "project",
     identifier: "main.js_reserved.project",
-    from: projectCodec.sqlType,
+    from: projectIdentifier,
     codec: projectCodec,
     uniques: projectUniques,
     isVirtual: false,
@@ -1284,10 +1297,10 @@ const registryConfig = {
       tags: {}
     }
   }], ["relational_status", registryConfig_pgResources_relational_status_relational_status], ["yield", {
-    executor,
+    executor: executor,
     name: "yield",
     identifier: "main.js_reserved.yield",
-    from: yieldCodec.sqlType,
+    from: yieldIdentifier,
     codec: yieldCodec,
     uniques: yieldUniques,
     isVirtual: false,
@@ -1302,10 +1315,10 @@ const registryConfig = {
       tags: {}
     }
   }], ["reserved", {
-    executor,
+    executor: executor,
     name: "reserved",
     identifier: "main.js_reserved.reserved",
-    from: reservedCodec.sqlType,
+    from: reservedIdentifier,
     codec: reservedCodec,
     uniques: reservedUniques,
     isVirtual: false,

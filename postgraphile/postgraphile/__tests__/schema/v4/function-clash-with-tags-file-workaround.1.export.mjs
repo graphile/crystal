@@ -459,9 +459,10 @@ const textArrayCodec = listOfCodec(TYPES.text, {
   description: undefined,
   name: "textArray"
 });
+const nonUpdatableViewIdentifier = sql.identifier("a", "non_updatable_view");
 const spec_nonUpdatableView = {
   name: "nonUpdatableView",
-  identifier: sql.identifier("a", "non_updatable_view"),
+  identifier: nonUpdatableViewIdentifier,
   attributes: Object.assign(Object.create(null), {
     "?column?": {
       description: undefined,
@@ -486,9 +487,10 @@ const spec_nonUpdatableView = {
   executor: executor
 };
 const nonUpdatableViewCodec = recordCodec(spec_nonUpdatableView);
+const inputsIdentifier = sql.identifier("a", "inputs");
 const spec_inputs = {
   name: "inputs",
-  identifier: sql.identifier("a", "inputs"),
+  identifier: inputsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -513,9 +515,10 @@ const spec_inputs = {
   executor: executor
 };
 const inputsCodec = recordCodec(spec_inputs);
+const patchsIdentifier = sql.identifier("a", "patchs");
 const spec_patchs = {
   name: "patchs",
-  identifier: sql.identifier("a", "patchs"),
+  identifier: patchsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -540,9 +543,10 @@ const spec_patchs = {
   executor: executor
 };
 const patchsCodec = recordCodec(spec_patchs);
+const reservedIdentifier = sql.identifier("a", "reserved");
 const spec_reserved = {
   name: "reserved",
-  identifier: sql.identifier("a", "reserved"),
+  identifier: reservedIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -567,9 +571,10 @@ const spec_reserved = {
   executor: executor
 };
 const reservedCodec = recordCodec(spec_reserved);
+const reservedPatchsIdentifier = sql.identifier("a", "reservedPatchs");
 const spec_reservedPatchs = {
   name: "reservedPatchs",
-  identifier: sql.identifier("a", "reservedPatchs"),
+  identifier: reservedPatchsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -594,9 +599,10 @@ const spec_reservedPatchs = {
   executor: executor
 };
 const reservedPatchsCodec = recordCodec(spec_reservedPatchs);
+const reservedInputIdentifier = sql.identifier("a", "reserved_input");
 const spec_reservedInput = {
   name: "reservedInput",
-  identifier: sql.identifier("a", "reserved_input"),
+  identifier: reservedInputIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -621,9 +627,10 @@ const spec_reservedInput = {
   executor: executor
 };
 const reservedInputCodec = recordCodec(spec_reservedInput);
+const defaultValueIdentifier = sql.identifier("a", "default_value");
 const spec_defaultValue = {
   name: "defaultValue",
-  identifier: sql.identifier("a", "default_value"),
+  identifier: defaultValueIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -657,9 +664,10 @@ const spec_defaultValue = {
   executor: executor
 };
 const defaultValueCodec = recordCodec(spec_defaultValue);
+const foreignKeyIdentifier = sql.identifier("a", "foreign_key");
 const spec_foreignKey = {
   name: "foreignKey",
-  identifier: sql.identifier("a", "foreign_key"),
+  identifier: foreignKeyIdentifier,
   attributes: Object.assign(Object.create(null), {
     person_id: {
       description: undefined,
@@ -702,9 +710,10 @@ const spec_foreignKey = {
   executor: executor
 };
 const foreignKeyCodec = recordCodec(spec_foreignKey);
+const noPrimaryKeyIdentifier = sql.identifier("a", "no_primary_key");
 const spec_noPrimaryKey = {
   name: "noPrimaryKey",
-  identifier: sql.identifier("a", "no_primary_key"),
+  identifier: noPrimaryKeyIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -738,9 +747,10 @@ const spec_noPrimaryKey = {
   executor: executor
 };
 const noPrimaryKeyCodec = recordCodec(spec_noPrimaryKey);
+const testviewIdentifier = sql.identifier("a", "testview");
 const spec_testview = {
   name: "testview",
-  identifier: sql.identifier("a", "testview"),
+  identifier: testviewIdentifier,
   attributes: Object.assign(Object.create(null), {
     testviewid: {
       description: undefined,
@@ -783,9 +793,10 @@ const spec_testview = {
   executor: executor
 };
 const testviewCodec = recordCodec(spec_testview);
+const uniqueForeignKeyIdentifier = sql.identifier("a", "unique_foreign_key");
 const spec_uniqueForeignKey = {
   name: "uniqueForeignKey",
-  identifier: sql.identifier("a", "unique_foreign_key"),
+  identifier: uniqueForeignKeyIdentifier,
   attributes: Object.assign(Object.create(null), {
     compound_key_1: {
       description: undefined,
@@ -822,9 +833,10 @@ const spec_uniqueForeignKey = {
   executor: executor
 };
 const uniqueForeignKeyCodec = recordCodec(spec_uniqueForeignKey);
+const myTableIdentifier = sql.identifier("c", "my_table");
 const spec_myTable = {
   name: "myTable",
-  identifier: sql.identifier("c", "my_table"),
+  identifier: myTableIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -858,9 +870,10 @@ const spec_myTable = {
   executor: executor
 };
 const myTableCodec = recordCodec(spec_myTable);
+const personSecretIdentifier = sql.identifier("c", "person_secret");
 const spec_personSecret = {
   name: "personSecret",
-  identifier: sql.identifier("c", "person_secret"),
+  identifier: personSecretIdentifier,
   attributes: Object.assign(Object.create(null), {
     person_id: {
       description: undefined,
@@ -898,9 +911,10 @@ const spec_personSecret = {
   executor: executor
 };
 const personSecretCodec = recordCodec(spec_personSecret);
+const viewTableIdentifier = sql.identifier("a", "view_table");
 const spec_viewTable = {
   name: "viewTable",
-  identifier: sql.identifier("a", "view_table"),
+  identifier: viewTableIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -943,9 +957,10 @@ const spec_viewTable = {
   executor: executor
 };
 const viewTableCodec = recordCodec(spec_viewTable);
+const compoundKeyIdentifier = sql.identifier("c", "compound_key");
 const spec_compoundKey = {
   name: "compoundKey",
-  identifier: sql.identifier("c", "compound_key"),
+  identifier: compoundKeyIdentifier,
   attributes: Object.assign(Object.create(null), {
     person_id_2: {
       description: undefined,
@@ -988,9 +1003,10 @@ const spec_compoundKey = {
   executor: executor
 };
 const compoundKeyCodec = recordCodec(spec_compoundKey);
+const similarTable1Identifier = sql.identifier("a", "similar_table_1");
 const spec_similarTable1 = {
   name: "similarTable1",
-  identifier: sql.identifier("a", "similar_table_1"),
+  identifier: similarTable1Identifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1042,9 +1058,10 @@ const spec_similarTable1 = {
   executor: executor
 };
 const similarTable1Codec = recordCodec(spec_similarTable1);
+const similarTable2Identifier = sql.identifier("a", "similar_table_2");
 const spec_similarTable2 = {
   name: "similarTable2",
-  identifier: sql.identifier("a", "similar_table_2"),
+  identifier: similarTable2Identifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1096,9 +1113,10 @@ const spec_similarTable2 = {
   executor: executor
 };
 const similarTable2Codec = recordCodec(spec_similarTable2);
+const updatableViewIdentifier = sql.identifier("b", "updatable_view");
 const spec_updatableView = {
   name: "updatableView",
-  identifier: sql.identifier("b", "updatable_view"),
+  identifier: updatableViewIdentifier,
   attributes: Object.assign(Object.create(null), {
     x: {
       description: undefined,
@@ -1153,9 +1171,10 @@ const spec_updatableView = {
   executor: executor
 };
 const updatableViewCodec = recordCodec(spec_updatableView);
+const nullTestRecordIdentifier = sql.identifier("c", "null_test_record");
 const spec_nullTestRecord = {
   name: "nullTestRecord",
-  identifier: sql.identifier("c", "null_test_record"),
+  identifier: nullTestRecordIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1220,9 +1239,10 @@ const uuidArrayCodec = listOfCodec(TYPES.uuid, {
   description: undefined,
   name: "uuidArray"
 });
+const edgeCaseIdentifier = sql.identifier("c", "edge_case");
 const spec_edgeCase = {
   name: "edgeCase",
-  identifier: sql.identifier("c", "edge_case"),
+  identifier: edgeCaseIdentifier,
   attributes: Object.assign(Object.create(null), {
     not_null_has_default: {
       description: undefined,
@@ -1265,9 +1285,10 @@ const spec_edgeCase = {
   executor: executor
 };
 const edgeCaseCodec = recordCodec(spec_edgeCase);
+const leftArmIdentifier = sql.identifier("c", "left_arm");
 const spec_leftArm = {
   name: "leftArm",
-  identifier: sql.identifier("c", "left_arm"),
+  identifier: leftArmIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1319,9 +1340,10 @@ const spec_leftArm = {
   executor: executor
 };
 const leftArmCodec = recordCodec(spec_leftArm);
+const jwtTokenIdentifier = sql.identifier("b", "jwt_token");
 const jwtTokenCodec = recordCodec({
   name: "jwtToken",
-  identifier: sql.identifier("b", "jwt_token"),
+  identifier: jwtTokenIdentifier,
   attributes: Object.assign(Object.create(null), {
     role: {
       description: undefined,
@@ -1381,6 +1403,7 @@ const jwtTokenCodec = recordCodec({
   },
   executor: executor
 });
+const issue756Identifier = sql.identifier("c", "issue756");
 const notNullTimestampCodec = domainOfCodec(TYPES.timestamptz, "notNullTimestamp", sql.identifier("c", "not_null_timestamp"), {
   description: undefined,
   extensions: {
@@ -1395,7 +1418,7 @@ const notNullTimestampCodec = domainOfCodec(TYPES.timestamptz, "notNullTimestamp
 });
 const spec_issue756 = {
   name: "issue756",
-  identifier: sql.identifier("c", "issue756"),
+  identifier: issue756Identifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1429,9 +1452,10 @@ const spec_issue756 = {
   executor: executor
 };
 const issue756Codec = recordCodec(spec_issue756);
+const authPayloadIdentifier = sql.identifier("b", "auth_payload");
 const authPayloadCodec = recordCodec({
   name: "authPayload",
-  identifier: sql.identifier("b", "auth_payload"),
+  identifier: authPayloadIdentifier,
   attributes: Object.assign(Object.create(null), {
     jwt: {
       description: undefined,
@@ -1475,6 +1499,7 @@ const authPayloadCodec = recordCodec({
   },
   executor: executor
 });
+const compoundTypeIdentifier = sql.identifier("c", "compound_type");
 const colorCodec = enumCodec({
   name: "color",
   identifier: sql.identifier("b", "color"),
@@ -1519,7 +1544,7 @@ const enumWithEmptyStringCodec = enumCodec({
 });
 const compoundTypeCodec = recordCodec({
   name: "compoundType",
-  identifier: sql.identifier("c", "compound_type"),
+  identifier: compoundTypeIdentifier,
   attributes: Object.assign(Object.create(null), {
     a: {
       description: undefined,
@@ -1666,6 +1691,7 @@ const registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCom
   executor,
   isAnonymous: true
 });
+const postIdentifier = sql.identifier("a", "post");
 const anEnumCodec = enumCodec({
   name: "anEnum",
   identifier: sql.identifier("a", "an_enum"),
@@ -1743,7 +1769,7 @@ const comptypeArrayCodec = listOfCodec(comptypeCodec, {
 });
 const spec_post = {
   name: "post",
-  identifier: sql.identifier("a", "post"),
+  identifier: postIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1914,6 +1940,7 @@ const registryConfig_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOu
   executor,
   isAnonymous: true
 });
+const personIdentifier = sql.identifier("c", "person");
 const emailCodec = domainOfCodec(TYPES.text, "email", sql.identifier("b", "email"), {
   description: undefined,
   extensions: {
@@ -1966,7 +1993,7 @@ const wrappedUrlCodec = recordCodec({
 });
 const spec_person = {
   name: "person",
-  identifier: sql.identifier("c", "person"),
+  identifier: personIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: "The primary unique identifier for the person",
@@ -2305,6 +2332,7 @@ const registryConfig_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexR
   executor,
   isAnonymous: true
 });
+const typesIdentifier = sql.identifier("b", "types");
 const colorArrayCodec = listOfCodec(colorCodec, {
   extensions: {
     pg: {
@@ -2484,7 +2512,7 @@ const spec_types_attributes_ltree_codec_ltree = {
 const spec_types_attributes_ltree_array_codec_ltree_ = listOfCodec(spec_types_attributes_ltree_codec_ltree);
 const spec_types = {
   name: "types",
-  identifier: sql.identifier("b", "types"),
+  identifier: typesIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -3092,10 +3120,10 @@ const default_valueUniques = [{
   }
 }];
 const registryConfig_pgResources_foreign_key_foreign_key = {
-  executor,
+  executor: executor,
   name: "foreign_key",
   identifier: "main.a.foreign_key",
-  from: foreignKeyCodec.sqlType,
+  from: foreignKeyIdentifier,
   codec: foreignKeyCodec,
   uniques: [],
   isVirtual: false,
@@ -3111,10 +3139,10 @@ const registryConfig_pgResources_foreign_key_foreign_key = {
   }
 };
 const registryConfig_pgResources_unique_foreign_key_unique_foreign_key = {
-  executor,
+  executor: executor,
   name: "unique_foreign_key",
   identifier: "main.a.unique_foreign_key",
-  from: uniqueForeignKeyCodec.sqlType,
+  from: uniqueForeignKeyIdentifier,
   codec: uniqueForeignKeyCodec,
   uniques: [{
     isPrimary: false,
@@ -3156,10 +3184,10 @@ const person_secretUniques = [{
   }
 }];
 const registryConfig_pgResources_person_secret_person_secret = {
-  executor,
+  executor: executor,
   name: "person_secret",
   identifier: "main.c.person_secret",
-  from: personSecretCodec.sqlType,
+  from: personSecretIdentifier,
   codec: personSecretCodec,
   uniques: person_secretUniques,
   isVirtual: false,
@@ -3193,10 +3221,10 @@ const compound_keyUniques = [{
   }
 }];
 const registryConfig_pgResources_compound_key_compound_key = {
-  executor,
+  executor: executor,
   name: "compound_key",
   identifier: "main.c.compound_key",
-  from: compoundKeyCodec.sqlType,
+  from: compoundKeyIdentifier,
   codec: compoundKeyCodec,
   uniques: compound_keyUniques,
   isVirtual: false,
@@ -3254,10 +3282,10 @@ const left_armUniques = [{
   }
 }];
 const registryConfig_pgResources_left_arm_left_arm = {
-  executor,
+  executor: executor,
   name: "left_arm",
   identifier: "main.c.left_arm",
-  from: leftArmCodec.sqlType,
+  from: leftArmIdentifier,
   codec: leftArmCodec,
   uniques: left_armUniques,
   isVirtual: false,
@@ -3274,10 +3302,10 @@ const registryConfig_pgResources_left_arm_left_arm = {
 };
 const authenticate_failFunctionIdentifer = sql.identifier("b", "authenticate_fail");
 const resourceConfig_jwt_token = {
-  executor,
+  executor: executor,
   name: "jwt_token",
   identifier: "main.b.jwt_token",
-  from: jwtTokenCodec.sqlType,
+  from: jwtTokenIdentifier,
   codec: jwtTokenCodec,
   uniques: [],
   isVirtual: true,
@@ -3304,10 +3332,10 @@ const issue756Uniques = [{
   }
 }];
 const registryConfig_pgResources_issue756_issue756 = {
-  executor,
+  executor: executor,
   name: "issue756",
   identifier: "main.c.issue756",
-  from: issue756Codec.sqlType,
+  from: issue756Identifier,
   codec: issue756Codec,
   uniques: issue756Uniques,
   isVirtual: false,
@@ -3350,10 +3378,10 @@ const postUniques = [{
   }
 }];
 const registryConfig_pgResources_post_post = {
-  executor,
+  executor: executor,
   name: "post",
   identifier: "main.a.post",
-  from: postCodec.sqlType,
+  from: postIdentifier,
   codec: postCodec,
   uniques: postUniques,
   isVirtual: false,
@@ -3373,10 +3401,10 @@ const registryConfig_pgResources_post_post = {
 };
 const compound_type_set_queryFunctionIdentifer = sql.identifier("c", "compound_type_set_query");
 const resourceConfig_compound_type = {
-  executor,
+  executor: executor,
   name: "compound_type",
   identifier: "main.c.compound_type",
-  from: compoundTypeCodec.sqlType,
+  from: compoundTypeIdentifier,
   codec: compoundTypeCodec,
   uniques: [],
   isVirtual: true,
@@ -3435,10 +3463,10 @@ const personUniques = [{
   }
 }];
 const registryConfig_pgResources_person_person = {
-  executor,
+  executor: executor,
   name: "person",
   identifier: "main.c.person",
-  from: personCodec.sqlType,
+  from: personIdentifier,
   codec: personCodec,
   uniques: personUniques,
   isVirtual: false,
@@ -3472,10 +3500,10 @@ const typesUniques = [{
   }
 }];
 const registryConfig_pgResources_types_types = {
-  executor,
+  executor: executor,
   name: "types",
   identifier: "main.b.types",
-  from: typesCodec.sqlType,
+  from: typesIdentifier,
   codec: typesCodec,
   uniques: typesUniques,
   isVirtual: false,
@@ -5673,10 +5701,10 @@ const registry = makeRegistry({
       description: undefined
     },
     non_updatable_view: {
-      executor,
+      executor: executor,
       name: "non_updatable_view",
       identifier: "main.a.non_updatable_view",
-      from: nonUpdatableViewCodec.sqlType,
+      from: nonUpdatableViewIdentifier,
       codec: nonUpdatableViewCodec,
       uniques: [],
       isVirtual: false,
@@ -5694,10 +5722,10 @@ const registry = makeRegistry({
       }
     },
     inputs: {
-      executor,
+      executor: executor,
       name: "inputs",
       identifier: "main.a.inputs",
-      from: inputsCodec.sqlType,
+      from: inputsIdentifier,
       codec: inputsCodec,
       uniques: inputsUniques,
       isVirtual: false,
@@ -5713,10 +5741,10 @@ const registry = makeRegistry({
       }
     },
     patchs: {
-      executor,
+      executor: executor,
       name: "patchs",
       identifier: "main.a.patchs",
-      from: patchsCodec.sqlType,
+      from: patchsIdentifier,
       codec: patchsCodec,
       uniques: patchsUniques,
       isVirtual: false,
@@ -5732,10 +5760,10 @@ const registry = makeRegistry({
       }
     },
     reserved: {
-      executor,
+      executor: executor,
       name: "reserved",
       identifier: "main.a.reserved",
-      from: reservedCodec.sqlType,
+      from: reservedIdentifier,
       codec: reservedCodec,
       uniques: reservedUniques,
       isVirtual: false,
@@ -5751,10 +5779,10 @@ const registry = makeRegistry({
       }
     },
     reservedPatchs: {
-      executor,
+      executor: executor,
       name: "reservedPatchs",
       identifier: "main.a.reservedPatchs",
-      from: reservedPatchsCodec.sqlType,
+      from: reservedPatchsIdentifier,
       codec: reservedPatchsCodec,
       uniques: reservedPatchsUniques,
       isVirtual: false,
@@ -5770,10 +5798,10 @@ const registry = makeRegistry({
       }
     },
     reserved_input: {
-      executor,
+      executor: executor,
       name: "reserved_input",
       identifier: "main.a.reserved_input",
-      from: reservedInputCodec.sqlType,
+      from: reservedInputIdentifier,
       codec: reservedInputCodec,
       uniques: reserved_inputUniques,
       isVirtual: false,
@@ -5789,10 +5817,10 @@ const registry = makeRegistry({
       }
     },
     default_value: {
-      executor,
+      executor: executor,
       name: "default_value",
       identifier: "main.a.default_value",
-      from: defaultValueCodec.sqlType,
+      from: defaultValueIdentifier,
       codec: defaultValueCodec,
       uniques: default_valueUniques,
       isVirtual: false,
@@ -5809,10 +5837,10 @@ const registry = makeRegistry({
     },
     foreign_key: registryConfig_pgResources_foreign_key_foreign_key,
     no_primary_key: {
-      executor,
+      executor: executor,
       name: "no_primary_key",
       identifier: "main.a.no_primary_key",
-      from: noPrimaryKeyCodec.sqlType,
+      from: noPrimaryKeyIdentifier,
       codec: noPrimaryKeyCodec,
       uniques: [{
         isPrimary: false,
@@ -5835,10 +5863,10 @@ const registry = makeRegistry({
       }
     },
     testview: {
-      executor,
+      executor: executor,
       name: "testview",
       identifier: "main.a.testview",
-      from: testviewCodec.sqlType,
+      from: testviewIdentifier,
       codec: testviewCodec,
       uniques: [],
       isVirtual: false,
@@ -5855,10 +5883,10 @@ const registry = makeRegistry({
     },
     unique_foreign_key: registryConfig_pgResources_unique_foreign_key_unique_foreign_key,
     my_table: {
-      executor,
+      executor: executor,
       name: "my_table",
       identifier: "main.c.my_table",
-      from: myTableCodec.sqlType,
+      from: myTableIdentifier,
       codec: myTableCodec,
       uniques: my_tableUniques,
       isVirtual: false,
@@ -5875,10 +5903,10 @@ const registry = makeRegistry({
     },
     person_secret: registryConfig_pgResources_person_secret_person_secret,
     view_table: {
-      executor,
+      executor: executor,
       name: "view_table",
       identifier: "main.a.view_table",
-      from: viewTableCodec.sqlType,
+      from: viewTableIdentifier,
       codec: viewTableCodec,
       uniques: view_tableUniques,
       isVirtual: false,
@@ -5895,10 +5923,10 @@ const registry = makeRegistry({
     },
     compound_key: registryConfig_pgResources_compound_key_compound_key,
     similar_table_1: {
-      executor,
+      executor: executor,
       name: "similar_table_1",
       identifier: "main.a.similar_table_1",
-      from: similarTable1Codec.sqlType,
+      from: similarTable1Identifier,
       codec: similarTable1Codec,
       uniques: similar_table_1Uniques,
       isVirtual: false,
@@ -5914,10 +5942,10 @@ const registry = makeRegistry({
       }
     },
     similar_table_2: {
-      executor,
+      executor: executor,
       name: "similar_table_2",
       identifier: "main.a.similar_table_2",
-      from: similarTable2Codec.sqlType,
+      from: similarTable2Identifier,
       codec: similarTable2Codec,
       uniques: similar_table_2Uniques,
       isVirtual: false,
@@ -5933,10 +5961,10 @@ const registry = makeRegistry({
       }
     },
     updatable_view: {
-      executor,
+      executor: executor,
       name: "updatable_view",
       identifier: "main.b.updatable_view",
-      from: updatableViewCodec.sqlType,
+      from: updatableViewIdentifier,
       codec: updatableViewCodec,
       uniques: [{
         isPrimary: false,
@@ -5964,10 +5992,10 @@ const registry = makeRegistry({
       }
     },
     null_test_record: {
-      executor,
+      executor: executor,
       name: "null_test_record",
       identifier: "main.c.null_test_record",
-      from: nullTestRecordCodec.sqlType,
+      from: nullTestRecordIdentifier,
       codec: nullTestRecordCodec,
       uniques: null_test_recordUniques,
       isVirtual: false,
@@ -6073,10 +6101,10 @@ const registry = makeRegistry({
       description: undefined
     },
     edge_case: {
-      executor,
+      executor: executor,
       name: "edge_case",
       identifier: "main.c.edge_case",
-      from: edgeCaseCodec.sqlType,
+      from: edgeCaseIdentifier,
       codec: edgeCaseCodec,
       uniques: [],
       isVirtual: false,
@@ -6266,10 +6294,10 @@ const registry = makeRegistry({
       description: undefined
     }),
     authenticate_payload: PgResource.functionResourceOptions({
-      executor,
+      executor: executor,
       name: "auth_payload",
       identifier: "main.b.auth_payload",
-      from: authPayloadCodec.sqlType,
+      from: authPayloadIdentifier,
       codec: authPayloadCodec,
       uniques: [],
       isVirtual: true,

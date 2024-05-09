@@ -65,6 +65,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
+const usersIdentifier = sql.identifier("partitions", "users");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -77,7 +78,7 @@ const executor = new PgExecutor({
 });
 const spec_users = {
   name: "users",
-  identifier: sql.identifier("partitions", "users"),
+  identifier: usersIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -111,9 +112,10 @@ const spec_users = {
   executor: executor
 };
 const usersCodec = recordCodec(spec_users);
+const measurementsIdentifier = sql.identifier("partitions", "measurements");
 const spec_measurements = {
   name: "measurements",
-  identifier: sql.identifier("partitions", "measurements"),
+  identifier: measurementsIdentifier,
   attributes: Object.assign(Object.create(null), {
     timestamp: {
       description: undefined,
@@ -174,10 +176,10 @@ const usersUniques = [{
   }
 }];
 const registryConfig_pgResources_users_users = {
-  executor,
+  executor: executor,
   name: "users",
   identifier: "main.partitions.users",
-  from: usersCodec.sqlType,
+  from: usersIdentifier,
   codec: usersCodec,
   uniques: usersUniques,
   isVirtual: false,
@@ -201,10 +203,10 @@ const measurementsUniques = [{
   }
 }];
 const registryConfig_pgResources_measurements_measurements = {
-  executor,
+  executor: executor,
   name: "measurements",
   identifier: "main.partitions.measurements",
-  from: measurementsCodec.sqlType,
+  from: measurementsIdentifier,
   codec: measurementsCodec,
   uniques: measurementsUniques,
   isVirtual: false,

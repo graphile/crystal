@@ -65,6 +65,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
+const tIdentifier = sql.identifier("nested_arrays", "t");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -192,7 +193,7 @@ const workingHoursCodec = domainOfCodec(workhoursArrayCodec, "workingHours", sql
 });
 const spec_t = {
   name: "t",
-  identifier: sql.identifier("nested_arrays", "t"),
+  identifier: tIdentifier,
   attributes: Object.assign(Object.create(null), {
     k: {
       description: undefined,
@@ -282,10 +283,10 @@ const registry = makeRegistry({
       description: undefined
     },
     t: {
-      executor,
+      executor: executor,
       name: "t",
       identifier: "main.nested_arrays.t",
-      from: tCodec.sqlType,
+      from: tIdentifier,
       codec: tCodec,
       uniques: tUniques,
       isVirtual: false,

@@ -65,6 +65,7 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
+const alwaysAsIdentityIdentifier = sql.identifier("pg11", "always_as_identity");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -77,7 +78,7 @@ const executor = new PgExecutor({
 });
 const spec_alwaysAsIdentity = {
   name: "alwaysAsIdentity",
-  identifier: sql.identifier("pg11", "always_as_identity"),
+  identifier: alwaysAsIdentityIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -113,9 +114,10 @@ const spec_alwaysAsIdentity = {
   executor: executor
 };
 const alwaysAsIdentityCodec = recordCodec(spec_alwaysAsIdentity);
+const byDefaultAsIdentityIdentifier = sql.identifier("pg11", "by_default_as_identity");
 const spec_byDefaultAsIdentity = {
   name: "byDefaultAsIdentity",
-  identifier: sql.identifier("pg11", "by_default_as_identity"),
+  identifier: byDefaultAsIdentityIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -149,9 +151,10 @@ const spec_byDefaultAsIdentity = {
   executor: executor
 };
 const byDefaultAsIdentityCodec = recordCodec(spec_byDefaultAsIdentity);
+const networkIdentifier = sql.identifier("pg11", "network");
 const spec_network = {
   name: "network",
-  identifier: sql.identifier("pg11", "network"),
+  identifier: networkIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -392,9 +395,10 @@ const domainConstrainedCompoundTypeCodec = domainOfCodec(compoundTypeCodec, "dom
   },
   notNull: false
 });
+const typesIdentifier = sql.identifier("pg11", "types");
 const spec_types = {
   name: "types",
-  identifier: sql.identifier("pg11", "types"),
+  identifier: typesIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -517,10 +521,10 @@ const registry = makeRegistry({
   }),
   pgResources: Object.assign(Object.create(null), {
     always_as_identity: {
-      executor,
+      executor: executor,
       name: "always_as_identity",
       identifier: "main.pg11.always_as_identity",
-      from: alwaysAsIdentityCodec.sqlType,
+      from: alwaysAsIdentityIdentifier,
       codec: alwaysAsIdentityCodec,
       uniques: always_as_identityUniques,
       isVirtual: false,
@@ -536,10 +540,10 @@ const registry = makeRegistry({
       }
     },
     by_default_as_identity: {
-      executor,
+      executor: executor,
       name: "by_default_as_identity",
       identifier: "main.pg11.by_default_as_identity",
-      from: byDefaultAsIdentityCodec.sqlType,
+      from: byDefaultAsIdentityIdentifier,
       codec: byDefaultAsIdentityCodec,
       uniques: by_default_as_identityUniques,
       isVirtual: false,
@@ -555,10 +559,10 @@ const registry = makeRegistry({
       }
     },
     network: {
-      executor,
+      executor: executor,
       name: "network",
       identifier: "main.pg11.network",
-      from: networkCodec.sqlType,
+      from: networkIdentifier,
       codec: networkCodec,
       uniques: networkUniques,
       isVirtual: false,
@@ -574,10 +578,10 @@ const registry = makeRegistry({
       }
     },
     types: {
-      executor,
+      executor: executor,
       name: "types",
       identifier: "main.pg11.types",
-      from: typesCodec.sqlType,
+      from: typesIdentifier,
       codec: typesCodec,
       uniques: typesUniques,
       isVirtual: false,
