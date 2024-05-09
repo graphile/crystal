@@ -349,13 +349,19 @@ Returns a `pgSelect` representing the records related via the
 
 ### $pgSelectSingle.record()
 
-Returns a PgClassExpressionStep representing the entire table, useful for debugging or to use with `pgSelectSingleFromRecord`. Here is a simple example:
+Returns a PgClassExpressionStep representing the entire table, useful for debugging or to use with `pgSelectSingleFromRecord`.
+
+Here's a debugging example, we log out the full record to make sure it's the one we wanted:
 
 ```ts
-const $user = usersResource.find({ id: constant(1) });
-const $record = $user.record();
+// Get the record from somewhere, e.g.:
+const $user = usersResource.get({ id: constant(1) });
 
+// Get the full user object as a record and log it for debugging:
+const $record = $user.record();
 sideEffect($record, (user) => console.dir(user));
+
+// Return the original $user object
 return $user;
 ```
 
