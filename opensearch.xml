@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/"
                        xmlns:moz="http://www.mozilla.org/2006/browser/search/">
-  <ShortName>PostGraphile</ShortName>
-  <Description>Search PostGraphile</Description>
+  <ShortName>Graphile Build</ShortName>
+  <Description>Search Graphile Build</Description>
   <InputEncoding>UTF-8</InputEncoding>
-  <Image width="16" height="16" type="image/x-icon">https://postgraphile.org/img/favicon.ico</Image>
-  <Url type="text/html" method="get" template="https://postgraphile.org/search?q={searchTerms}"/>
-  <Url type="application/opensearchdescription+xml" rel="self" template="https://postgraphile.org/opensearch.xml" />
-  <moz:SearchForm>https://postgraphile.org/</moz:SearchForm>
+  <Image width="16" height="16" type="image/x-icon">https://build.graphile.org/img/favicon.ico</Image>
+  <Url type="text/html" method="get" template="https://build.graphile.org/search?q={searchTerms}"/>
+  <Url type="application/opensearchdescription+xml" rel="self" template="https://build.graphile.org/opensearch.xml" />
+  <moz:SearchForm>https://build.graphile.org/</moz:SearchForm>
 </OpenSearchDescription>

@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunk_localrepo_postgraphile_website=self.webpackChunk_localrepo_postgraphile_website||[]).push([[832],{86866:e=>{e.exports=JSON.parse('{"name":"docusaurus-plugin-content-blog","id":"news"}')}}]);
