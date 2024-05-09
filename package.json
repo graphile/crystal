@@ -19,7 +19,7 @@
     "website:postgraphile": "cd postgraphile/website && yarn start",
     "website:build": "cd graphile-build/website && yarn start",
     "website:star": "cd utils/website && yarn start",
-    "websites:deploy": "yarn workspaces foreach --include '@localrepo/*-website' run deploy",
+    "websites:deploy": "./publish-websites.sh",
     "-----": "-----",
     "eslint": "eslint --ext .js,.jsx,.ts,.tsx",
     "prettier": "prettier --cache --ignore-path ./.eslintignore",
