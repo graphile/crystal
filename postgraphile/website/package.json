@@ -26,6 +26,7 @@
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@mdx-js/react": "^1.6.22",
     "clsx": "^2.0.0",
+    "postcss-nested": "^6.0.1",
     "prism-react-renderer": "^2.0.6",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

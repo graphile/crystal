@@ -101,6 +101,16 @@ const config = {
         path: "./news",
       },
     ],
+    // PostCSS configuration
+    (context, options) => {
+      return {
+        name: "configure-postcss-plugin",
+        configurePostCss(postcssOptions) {
+          postcssOptions.plugins.push(require("postcss-nested"));
+          return postcssOptions;
+        },
+      };
+    },
   ],
 
   stylesheets: [
