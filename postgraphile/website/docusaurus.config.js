@@ -102,7 +102,7 @@ const config = {
       },
     ],
     // PostCSS configuration
-    (context, options) => {
+    () => {
       return {
         name: "configure-postcss-plugin",
         configurePostCss(postcssOptions) {
