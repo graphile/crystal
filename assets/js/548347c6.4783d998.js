@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_localrepo_grafast_website=self.webpackChunk_localrepo_grafast_website||[]).push([[8388],{40931:e=>{e.exports=JSON.parse('{"title":"Recent posts","items":[{"title":"Step Aside Resolvers - Grafast 0.1 Released!","permalink":"/news/2023-10-13-grafast-0.1"}]}')}}]);

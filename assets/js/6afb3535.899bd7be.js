@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_localrepo_grafast_website=self.webpackChunk_localrepo_grafast_website||[]).push([[2890],{43011:e=>{e.exports=JSON.parse('[{"label":"0.1","permalink":"/news/tags/0-1","count":1}]')}}]);
