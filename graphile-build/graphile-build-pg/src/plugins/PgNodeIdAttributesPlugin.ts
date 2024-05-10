@@ -237,7 +237,17 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                             ],
                           )
                         : EXPORTABLE(
-                            (TRAP_INHIBITED, assertNotNull, condition, getSpec, localAttributes, remoteAttributes, trap, typeName) => function plan(
+                            (
+                              TRAP_INHIBITED,
+                              assertNotNull,
+                              condition,
+                              getSpec,
+                              localAttributes,
+                              remoteAttributes,
+                              trap,
+                              typeName,
+                            ) =>
+                              function plan(
                                 $insert: SetterStep<any, any>,
                                 val,
                               ) {
@@ -268,7 +278,16 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                   $insert.set(localName, $value);
                                 }
                               },
-                            [TRAP_INHIBITED, assertNotNull, condition, getSpec, localAttributes, remoteAttributes, trap, typeName],
+                            [
+                              TRAP_INHIBITED,
+                              assertNotNull,
+                              condition,
+                              getSpec,
+                              localAttributes,
+                              remoteAttributes,
+                              trap,
+                              typeName,
+                            ],
                           ),
                     },
                   ),
