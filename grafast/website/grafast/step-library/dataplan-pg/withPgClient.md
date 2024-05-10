@@ -27,6 +27,9 @@ for it to return, and then release the client again, ultimately resolving to
 the return result of your callback.
 
 ```ts
+// import withPgClient step
+import { withPgClient } from "postgraphile/@dataplan/pg";
+
 // Grab executor from any resource
 const { executor } = usersResource;
 
