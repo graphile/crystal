@@ -1,0 +1,25 @@
+## expect(errors).toHaveLength(1);
+## expect(errors[0].message).toMatch(/invalid node identifier/i);
+#> schema: ["a", "b", "c"]
+#> extends: ["postgraphile/presets/relay:PgRelayPreset"]
+mutation {
+  updateLeftArm(
+    input: {
+      id: "WyJsZWZ0X2FybXMiLDQyXQ=="
+      leftArmPatch: {
+        # my_table 1 - doesn't make sense!
+        personByPersonId: "WyJteV90YWJsZXMiLDFd"
+        lengthInMetres: 0.75
+      }
+    }
+  ) {
+    leftArm {
+      id
+      personByPersonId {
+        id
+      }
+      lengthInMetres
+      mood
+    }
+  }
+}
