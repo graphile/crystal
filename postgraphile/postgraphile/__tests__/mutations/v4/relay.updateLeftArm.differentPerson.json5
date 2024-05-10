@@ -1,0 +1,12 @@
+{
+  updateLeftArm: {
+    leftArm: {
+      id: "WyJsZWZ0X2FybXMiLDQyXQ==",
+      personByPersonId: {
+        id: "WyJwZW9wbGUiLDNd",
+      },
+      lengthInMetres: 0.74,
+      mood: "neutral",
+    },
+  },
+}

@@ -1,0 +1,14 @@
+[
+  {
+    message: "Invalid node identifier for 'Person'",
+    locations: [
+      {
+        line: 2,
+        column: 3,
+      },
+    ],
+    path: [
+      'updateLeftArm',
+    ],
+  },
+]
