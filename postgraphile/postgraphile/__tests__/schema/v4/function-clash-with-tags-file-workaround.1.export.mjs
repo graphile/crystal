@@ -1302,7 +1302,7 @@ const spec_leftArm = {
     person_id: {
       description: undefined,
       codec: TYPES.int,
-      notNull: true,
+      notNull: false,
       hasDefault: true,
       extensions: {
         tags: {}
@@ -18756,7 +18756,7 @@ type LeftArm implements Node {
   """
   nodeId: ID!
   id: Int!
-  personId: Int!
+  personId: Int
   lengthInMetres: Float
   mood: String!
 

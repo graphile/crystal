@@ -1240,7 +1240,7 @@ const spec_leftArm = {
     person_id: {
       description: undefined,
       codec: TYPES.int,
-      notNull: true,
+      notNull: false,
       hasDefault: true,
       extensions: {
         tags: {}
@@ -17874,7 +17874,7 @@ type PersonSecret {
 """Tracks metadata about the left arms of various people"""
 type LeftArm {
   id: Int!
-  personId: Int!
+  personId: Int
   lengthInMetres: Float
   mood: String!
 
