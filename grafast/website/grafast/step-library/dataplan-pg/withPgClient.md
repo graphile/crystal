@@ -28,7 +28,7 @@ the return result of your callback.
 
 ```ts
 // import withPgClient step
-import { withPgClient } from "postgraphile/@dataplan/pg";
+import { withPgClient } from "@dataplan/pg";
 
 // Grab executor from any resource
 const { executor } = usersResource;
