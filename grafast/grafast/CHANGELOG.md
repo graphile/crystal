@@ -1,5 +1,15 @@
 # grafast
 
+## 0.1.1-beta.9
+
+### Patch Changes
+
+- [#2064](https://github.com/graphile/crystal/pull/2064)
+  [`437570f97`](https://github.com/graphile/crystal/commit/437570f97e8520afaf3d0d0b514d1f4c31546b76)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a bug relating to Global
+  Object Identifiers (specifically in update mutations, but probably elsewhere
+  too) related to early exit.
+
 ## 0.1.1-beta.8
 
 ### Patch Changes

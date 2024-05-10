@@ -1,5 +1,20 @@
 # graphile-build-pg
 
+## 5.0.0-beta.23
+
+### Patch Changes
+
+- [#2064](https://github.com/graphile/crystal/pull/2064)
+  [`437570f97`](https://github.com/graphile/crystal/commit/437570f97e8520afaf3d0d0b514d1f4c31546b76)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a bug relating to Global
+  Object Identifiers (specifically in update mutations, but probably elsewhere
+  too) related to early exit.
+- Updated dependencies
+  [[`437570f97`](https://github.com/graphile/crystal/commit/437570f97e8520afaf3d0d0b514d1f4c31546b76)]:
+  - grafast@0.1.1-beta.9
+  - @dataplan/pg@0.0.1-beta.20
+  - graphile-build@5.0.0-beta.19
+
 ## 5.0.0-beta.22
 
 ### Patch Changes

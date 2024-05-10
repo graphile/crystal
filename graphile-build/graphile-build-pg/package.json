@@ -1,6 +1,6 @@
 {
   "name": "graphile-build-pg",
-  "version": "5.0.0-beta.22",
+  "version": "5.0.0-beta.23",
   "description": "PostgreSQL plugins for Graphile Build - build a supercharged GraphQL schema by reflection over a PostgreSQL database and executed by Grafast.",
   "type": "commonjs",
   "main": "./dist/index.js",
