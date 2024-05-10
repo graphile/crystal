@@ -312,6 +312,7 @@ export function trap<T>(
   options?: {
     valueForInhibited?: FlagStepOptions["valueForInhibited"];
     valueForError?: FlagStepOptions["valueForError"];
+    if?: FlagStepOptions["if"];
   },
 ) {
   return new __FlagStep<T>($step, {

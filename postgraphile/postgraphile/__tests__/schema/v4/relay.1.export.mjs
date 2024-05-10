@@ -4245,17 +4245,19 @@ export const plans = {
     author: {
       applyPlan($condition, val) {
         const $nodeId = val.get();
+        const $nodeIdExists = condition("exists", $nodeId);
         const spec = getSpec2($nodeId);
         for (let i = 0, l = registryConfig.pgRelations.post.author.localAttributes.length; i < l; i++) {
           const localName = registryConfig.pgRelations.post.author.localAttributes[i];
           const codec = localAttributeCodecs[i];
           const remoteName = registryConfig.pgRelations.post.author.remoteAttributes[i];
-          const $rawCol = spec[remoteName];
-          // const $col = nodeIdentifierColumnOrNull($nodeId, spec, 'id')
-          const $col = assertNotNull(trap($rawCol, 4), `Invalid node identifier for '${"Person"}'`, {
-            if: condition("exists", $nodeId)
+          // Set `null` if invalid
+          const $rawValue = trap(spec[remoteName], 4);
+          // If `null` but `$nodeId` wasn't null, throw an error: invalid Node ID!
+          const $value = assertNotNull($rawValue, `Invalid node identifier for '${"Person"}'`, {
+            if: $nodeIdExists
           });
-          const sqlRemoteValue = $condition.placeholder($col, codec);
+          const sqlRemoteValue = $condition.placeholder($value, codec);
           $condition.where({
             type: "attribute",
             attribute: localName,
@@ -4594,17 +4596,19 @@ export const plans = {
     tvShowByShowId: {
       applyPlan($condition, val) {
         const $nodeId = val.get();
+        const $nodeIdExists = condition("exists", $nodeId);
         const spec = getSpec3($nodeId);
         for (let i = 0, l = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes.length; i < l; i++) {
           const localName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes[i];
           const codec = localAttributeCodecs2[i];
           const remoteName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.remoteAttributes[i];
-          const $rawCol = spec[remoteName];
-          // const $col = nodeIdentifierColumnOrNull($nodeId, spec, 'id')
-          const $col = assertNotNull(trap($rawCol, 4), `Invalid node identifier for '${"TvShow"}'`, {
-            if: condition("exists", $nodeId)
+          // Set `null` if invalid
+          const $rawValue = trap(spec[remoteName], 4);
+          // If `null` but `$nodeId` wasn't null, throw an error: invalid Node ID!
+          const $value = assertNotNull($rawValue, `Invalid node identifier for '${"TvShow"}'`, {
+            if: $nodeIdExists
           });
-          const sqlRemoteValue = $condition.placeholder($col, codec);
+          const sqlRemoteValue = $condition.placeholder($value, codec);
           $condition.where({
             type: "attribute",
             attribute: localName,
@@ -4725,17 +4729,19 @@ export const plans = {
     studioByStudioId: {
       applyPlan($condition, val) {
         const $nodeId = val.get();
+        const $nodeIdExists = condition("exists", $nodeId);
         const spec = getSpec4($nodeId);
         for (let i = 0, l = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes.length; i < l; i++) {
           const localName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes[i];
           const codec = localAttributeCodecs3[i];
           const remoteName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.remoteAttributes[i];
-          const $rawCol = spec[remoteName];
-          // const $col = nodeIdentifierColumnOrNull($nodeId, spec, 'id')
-          const $col = assertNotNull(trap($rawCol, 4), `Invalid node identifier for '${"Studio"}'`, {
-            if: condition("exists", $nodeId)
+          // Set `null` if invalid
+          const $rawValue = trap(spec[remoteName], 4);
+          // If `null` but `$nodeId` wasn't null, throw an error: invalid Node ID!
+          const $value = assertNotNull($rawValue, `Invalid node identifier for '${"Studio"}'`, {
+            if: $nodeIdExists
           });
-          const sqlRemoteValue = $condition.placeholder($col, codec);
+          const sqlRemoteValue = $condition.placeholder($value, codec);
           $condition.where({
             type: "attribute",
             attribute: localName,
@@ -6170,12 +6176,19 @@ export const plans = {
     },
     author: {
       applyPlan($insert, val) {
-        const spec = getSpec5(val.get());
+        const $nodeId = val.get();
+        const $nodeIdExists = condition("exists", $nodeId);
+        const spec = getSpec5($nodeId);
         for (let i = 0, l = registryConfig.pgRelations.post.author.localAttributes.length; i < l; i++) {
           const localName = registryConfig.pgRelations.post.author.localAttributes[i];
           const remoteName = registryConfig.pgRelations.post.author.remoteAttributes[i];
-          const $val = spec[remoteName];
-          $insert.set(localName, $val);
+          // Set `null` if invalid
+          const $rawValue = trap(spec[remoteName], 4);
+          // If `null` but `$nodeId` wasn't null, throw an error: invalid Node ID!
+          const $value = assertNotNull($rawValue, `Invalid node identifier for '${"Person"}'`, {
+            if: $nodeIdExists
+          });
+          $insert.set(localName, $value);
         }
       },
       autoApplyAfterParentInputPlan: true,
@@ -6260,12 +6273,19 @@ export const plans = {
     },
     tvShowByShowId: {
       applyPlan($insert, val) {
-        const spec = getSpec6(val.get());
+        const $nodeId = val.get();
+        const $nodeIdExists = condition("exists", $nodeId);
+        const spec = getSpec6($nodeId);
         for (let i = 0, l = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes.length; i < l; i++) {
           const localName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes[i];
           const remoteName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.remoteAttributes[i];
-          const $val = spec[remoteName];
-          $insert.set(localName, $val);
+          // Set `null` if invalid
+          const $rawValue = trap(spec[remoteName], 4);
+          // If `null` but `$nodeId` wasn't null, throw an error: invalid Node ID!
+          const $value = assertNotNull($rawValue, `Invalid node identifier for '${"TvShow"}'`, {
+            if: $nodeIdExists
+          });
+          $insert.set(localName, $value);
         }
       },
       autoApplyAfterParentInputPlan: true,
@@ -6350,12 +6370,19 @@ export const plans = {
     },
     studioByStudioId: {
       applyPlan($insert, val) {
-        const spec = getSpec7(val.get());
+        const $nodeId = val.get();
+        const $nodeIdExists = condition("exists", $nodeId);
+        const spec = getSpec7($nodeId);
         for (let i = 0, l = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes.length; i < l; i++) {
           const localName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes[i];
           const remoteName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.remoteAttributes[i];
-          const $val = spec[remoteName];
-          $insert.set(localName, $val);
+          // Set `null` if invalid
+          const $rawValue = trap(spec[remoteName], 4);
+          // If `null` but `$nodeId` wasn't null, throw an error: invalid Node ID!
+          const $value = assertNotNull($rawValue, `Invalid node identifier for '${"Studio"}'`, {
+            if: $nodeIdExists
+          });
+          $insert.set(localName, $value);
         }
       },
       autoApplyAfterParentInputPlan: true,
@@ -6675,12 +6702,19 @@ export const plans = {
     },
     author: {
       applyPlan($insert, val) {
-        const spec = getSpec8(val.get());
+        const $nodeId = val.get();
+        const $nodeIdExists = condition("exists", $nodeId);
+        const spec = getSpec8($nodeId);
         for (let i = 0, l = registryConfig.pgRelations.post.author.localAttributes.length; i < l; i++) {
           const localName = registryConfig.pgRelations.post.author.localAttributes[i];
           const remoteName = registryConfig.pgRelations.post.author.remoteAttributes[i];
-          const $val = spec[remoteName];
-          $insert.set(localName, $val);
+          // Set `null` if invalid
+          const $rawValue = trap(spec[remoteName], 4);
+          // If `null` but `$nodeId` wasn't null, throw an error: invalid Node ID!
+          const $value = assertNotNull($rawValue, `Invalid node identifier for '${"Person"}'`, {
+            if: $nodeIdExists
+          });
+          $insert.set(localName, $value);
         }
       },
       autoApplyAfterParentInputPlan: true,
@@ -6757,12 +6791,19 @@ export const plans = {
     },
     tvShowByShowId: {
       applyPlan($insert, val) {
-        const spec = getSpec9(val.get());
+        const $nodeId = val.get();
+        const $nodeIdExists = condition("exists", $nodeId);
+        const spec = getSpec9($nodeId);
         for (let i = 0, l = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes.length; i < l; i++) {
           const localName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.localAttributes[i];
           const remoteName = registryConfig.pgRelations.tvEpisodes.tvShowsByMyShowId.remoteAttributes[i];
-          const $val = spec[remoteName];
-          $insert.set(localName, $val);
+          // Set `null` if invalid
+          const $rawValue = trap(spec[remoteName], 4);
+          // If `null` but `$nodeId` wasn't null, throw an error: invalid Node ID!
+          const $value = assertNotNull($rawValue, `Invalid node identifier for '${"TvShow"}'`, {
+            if: $nodeIdExists
+          });
+          $insert.set(localName, $value);
         }
       },
       autoApplyAfterParentInputPlan: true,
@@ -6839,12 +6880,19 @@ export const plans = {
     },
     studioByStudioId: {
       applyPlan($insert, val) {
-        const spec = getSpec10(val.get());
+        const $nodeId = val.get();
+        const $nodeIdExists = condition("exists", $nodeId);
+        const spec = getSpec10($nodeId);
         for (let i = 0, l = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes.length; i < l; i++) {
           const localName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.localAttributes[i];
           const remoteName = registryConfig.pgRelations.tvShows.studiosByMyStudioId.remoteAttributes[i];
-          const $val = spec[remoteName];
-          $insert.set(localName, $val);
+          // Set `null` if invalid
+          const $rawValue = trap(spec[remoteName], 4);
+          // If `null` but `$nodeId` wasn't null, throw an error: invalid Node ID!
+          const $value = assertNotNull($rawValue, `Invalid node identifier for '${"Studio"}'`, {
+            if: $nodeIdExists
+          });
+          $insert.set(localName, $value);
         }
       },
       autoApplyAfterParentInputPlan: true,

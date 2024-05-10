@@ -1238,7 +1238,7 @@ const spec_cLeftArm = {
     person_id: {
       description: undefined,
       codec: TYPES.int,
-      notNull: true,
+      notNull: false,
       hasDefault: true,
       extensions: {
         tags: {}
@@ -17930,7 +17930,7 @@ type CPersonSecret {
 """Tracks metadata about the left arms of various people"""
 type CLeftArm {
   rowId: Int!
-  personId: Int!
+  personId: Int
   lengthInMetres: Float
   mood: String!
 

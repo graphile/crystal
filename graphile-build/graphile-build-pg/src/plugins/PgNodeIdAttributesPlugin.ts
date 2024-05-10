@@ -187,6 +187,10 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                 val,
                               ) {
                                 const $nodeId = val.get();
+                                const $nodeIdExists = condition(
+                                  "exists",
+                                  $nodeId,
+                                );
                                 const spec = getSpec($nodeId);
                                 for (
                                   let i = 0, l = localAttributes.length;
@@ -196,15 +200,19 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                   const localName = localAttributes[i];
                                   const codec = localAttributeCodecs[i];
                                   const remoteName = remoteAttributes[i];
-                                  const $rawCol = spec[remoteName];
-                                  // const $col = nodeIdentifierColumnOrNull($nodeId, spec, 'id')
-                                  const $col = assertNotNull(
-                                    trap($rawCol, TRAP_INHIBITED),
+                                  // Set `null` if invalid
+                                  const $rawValue = trap(
+                                    spec[remoteName],
+                                    TRAP_INHIBITED,
+                                  );
+                                  // If `null` but `$nodeId` wasn't null, throw an error: invalid Node ID!
+                                  const $value = assertNotNull(
+                                    $rawValue,
                                     `Invalid node identifier for '${typeName}'`,
-                                    { if: condition("exists", $nodeId) },
+                                    { if: $nodeIdExists },
                                   );
                                   const sqlRemoteValue = $condition.placeholder(
-                                    $col,
+                                    $value,
                                     codec,
                                   );
                                   $condition.where({
@@ -229,12 +237,26 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                             ],
                           )
                         : EXPORTABLE(
-                            (getSpec, localAttributes, remoteAttributes) =>
+                            (
+                              TRAP_INHIBITED,
+                              assertNotNull,
+                              condition,
+                              getSpec,
+                              localAttributes,
+                              remoteAttributes,
+                              trap,
+                              typeName,
+                            ) =>
                               function plan(
                                 $insert: SetterStep<any, any>,
                                 val,
                               ) {
-                                const spec = getSpec(val.get());
+                                const $nodeId = val.get();
+                                const $nodeIdExists = condition(
+                                  "exists",
+                                  $nodeId,
+                                );
+                                const spec = getSpec($nodeId);
                                 for (
                                   let i = 0, l = localAttributes.length;
                                   i < l;
@@ -242,11 +264,30 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                 ) {
                                   const localName = localAttributes[i];
                                   const remoteName = remoteAttributes[i];
-                                  const $val = spec[remoteName];
-                                  $insert.set(localName, $val);
+                                  // Set `null` if invalid
+                                  const $rawValue = trap(
+                                    spec[remoteName],
+                                    TRAP_INHIBITED,
+                                  );
+                                  // If `null` but `$nodeId` wasn't null, throw an error: invalid Node ID!
+                                  const $value = assertNotNull(
+                                    $rawValue,
+                                    `Invalid node identifier for '${typeName}'`,
+                                    { if: $nodeIdExists },
+                                  );
+                                  $insert.set(localName, $value);
                                 }
                               },
-                            [getSpec, localAttributes, remoteAttributes],
+                            [
+                              TRAP_INHIBITED,
+                              assertNotNull,
+                              condition,
+                              getSpec,
+                              localAttributes,
+                              remoteAttributes,
+                              trap,
+                              typeName,
+                            ],
                           ),
                     },
                   ),
