@@ -2,7 +2,7 @@
  * Business logic is the same for Grafast and GraphQL
  */
 
-const { db } = require("./database");
+import { db } from "./database.mjs";
 
 const logSql = process.env.LOG_SQL === "1";
 
@@ -16,7 +16,7 @@ const queryAll = (query, parameters) =>
     );
   });
 
-exports.getUsersByIds = async function getUsersByIds(ids, options = {}) {
+export async function getUsersByIds(ids, options = {}) {
   const columns = options.columns
     ? [...new Set(["id", ...options.columns])]
     : ["*"];
@@ -27,12 +27,9 @@ exports.getUsersByIds = async function getUsersByIds(ids, options = {}) {
     ids,
   );
   return ids.map((id) => users.find((u) => u.id === id));
-};
+}
 
-exports.getFriendshipsByUserIds = async function getFriendshipsByUserIds(
-  userIds,
-  options = {},
-) {
+export async function getFriendshipsByUserIds(userIds, options = {}) {
   const columns = options.columns
     ? [...new Set(["user_id", ...options.columns])]
     : ["*"];
@@ -45,4 +42,4 @@ exports.getFriendshipsByUserIds = async function getFriendshipsByUserIds(
   return userIds.map((userId) =>
     friendships.filter((f) => f.user_id === userId),
   );
-};
+}

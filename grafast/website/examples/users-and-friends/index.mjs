@@ -1,24 +1,25 @@
-const {
-  buildSchema,
-  // printSchema,
-  graphql,
-  execute: graphqlExecute,
-  parse,
-  validate,
-} = require("graphql");
-const {
-  makeGrafastSchema,
+import { writeFile } from "node:fs/promises";
+
+import {
   context,
   each,
+  execute as grafastExecute,
   grafast,
+  makeGrafastSchema,
   stringifyPayload,
-  execute: grafastExecute,
-} = require("grafast");
-const { planToMermaid } = require("grafast/mermaid");
-const { makeDataLoaders } = require("./dataloaders");
-const { userById, friendshipsByUserId } = require("./plans");
-const fsp = require("node:fs/promises");
-const { resolvePresets } = require("graphile-config");
+} from "grafast";
+import { planToMermaid } from "grafast/mermaid";
+import { resolvePresets } from "graphile-config";
+import {
+  buildSchema,
+  execute as graphqlExecute,
+  graphql,
+  parse,
+  validate,
+} from "graphql";
+
+import { makeDataLoaders } from "./dataloaders.mjs";
+import { friendshipsByUserId, userById } from "./plans.mjs";
 
 // Benchmark settings
 const NUMBER_OF_REQUESTS = 10000;
@@ -284,14 +285,14 @@ async function main() {
         resolvedPreset: { grafast: { explain: ["plan"] } },
       });
 
-      await fsp.writeFile(
+      await writeFile(
         `${__dirname}/plan.mermaid`,
         planToMermaid(
           grafastResultWithPlan.extensions.explain.operations[0].plan,
           { skipBuckets: false, concise: true },
         ),
       );
-      await fsp.writeFile(
+      await writeFile(
         `${__dirname}/plan-simplified.mermaid`,
         planToMermaid(
           grafastResultWithPlan.extensions.explain.operations[0].plan,

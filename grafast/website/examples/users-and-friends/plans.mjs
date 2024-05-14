@@ -1,17 +1,17 @@
-const {
-  getUsersByIds,
-  getFriendshipsByUserIds,
-} = require("./businessLogic.js");
+import { loadMany, loadOne } from "grafast";
 
-const { loadOne, loadMany } = require("grafast");
+import { getFriendshipsByUserIds, getUsersByIds } from "./businessLogic.mjs";
 
 const userByIdCallback = (ids, { attributes }) =>
   getUsersByIds(ids, { columns: attributes });
 userByIdCallback.displayName = "userById";
-exports.userById = ($id) => loadOne($id, "id", userByIdCallback);
+export function userById($id) {
+  return loadOne($id, "id", userByIdCallback);
+}
 
 const friendshipsByUserIdCallback = (ids, { attributes }) =>
   getFriendshipsByUserIds(ids, { columns: attributes });
 friendshipsByUserIdCallback.displayName = "friendshipsByUserId";
-exports.friendshipsByUserId = ($id) =>
-  loadMany($id, "user_id", friendshipsByUserIdCallback);
+export function friendshipsByUserId($id) {
+  return loadMany($id, "user_id", friendshipsByUserIdCallback);
+}

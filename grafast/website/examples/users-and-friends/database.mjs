@@ -1,5 +1,5 @@
-const sqlite3 = require("sqlite3");
-const db = new sqlite3.Database(":memory:");
+import sqlite3 from "sqlite3";
+export const db = new sqlite3.Database(":memory:");
 const NAMES = [
   "Alice",
   "Bob",
@@ -77,5 +77,3 @@ CREATE TABLE friendships (
 });
 
 // db.close();
-
-exports.db = db;
