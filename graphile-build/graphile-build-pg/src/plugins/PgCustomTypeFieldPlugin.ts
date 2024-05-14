@@ -574,29 +574,33 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
               argDetails,
               makeArgs,
               makeFieldArgs,
-              makeExpression({
-                $placeholderable,
-                resource,
-                fieldArgs,
-                path = [],
-                initialArgs = [],
-              }) {
-                const args = makeArgs(fieldArgs, path);
-                const { digests } = digestsFromArgumentSpecs(
-                  $placeholderable,
-                  args,
-                  initialArgs.map((a, position) => ({
-                    placeholder: a,
-                    position,
-                  })),
-                  initialArgs.length,
-                );
-                if (typeof resource.from !== "function") {
-                  throw new Error("!function");
-                }
-                const src = resource.from(...digests);
-                return src;
-              },
+              makeExpression: EXPORTABLE(
+                (digestsFromArgumentSpecs, makeArgs) =>
+                  ({
+                    $placeholderable,
+                    resource,
+                    fieldArgs,
+                    path = [],
+                    initialArgs = [],
+                  }) => {
+                    const args = makeArgs(fieldArgs, path);
+                    const { digests } = digestsFromArgumentSpecs(
+                      $placeholderable,
+                      args,
+                      initialArgs.map((a, position) => ({
+                        placeholder: a,
+                        position,
+                      })),
+                      initialArgs.length,
+                    );
+                    if (typeof resource.from !== "function") {
+                      throw new Error("!function");
+                    }
+                    const src = resource.from(...digests);
+                    return src;
+                  },
+                [digestsFromArgumentSpecs, makeArgs],
+              ),
             };
           };
 
