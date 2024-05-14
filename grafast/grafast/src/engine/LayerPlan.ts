@@ -523,7 +523,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         if (this.rootStep._isUnary) {
           throw new Error("listItem layer plan can't have a unary root step!");
         }
-        const ev = batchExecutionValue([]);
+        const ev = batchExecutionValue([] as any[]);
         store.set(itemStepId, ev);
 
         for (const stepId of copyStepIds) {
@@ -552,7 +552,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             for (let j = 0, l = list.length; j < l; j++) {
               const newIndex = size++;
               newIndexes.push(newIndex);
-              (ev.entries[newIndex] as any[]) = list[j];
+              (ev.entries as any[])[newIndex] = list[j];
               // TODO: are these the right flags?
               ev._flags[newIndex] = list[j] == null ? FLAG_NULL : NO_FLAGS;
 
