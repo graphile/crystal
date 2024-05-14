@@ -388,19 +388,32 @@ async function main() {
             },
           }),
         );
-        const result2 = stringifyPayload(
-          await grafastExecute({
-            schema: schemaGF,
-            document,
-            variableValues,
-            contextValue: { ...baseContext },
-            resolvedPreset,
-            outputDataAsString: asString,
-          }),
-          asString,
-        );
+        const grafastRawResult = await grafastExecute({
+          schema: schemaGF,
+          document,
+          variableValues,
+          contextValue: { ...baseContext },
+          resolvedPreset: {
+            extends: [resolvedPreset],
+            grafast: {
+              explain: ["plan"],
+            },
+          },
+          outputDataAsString: asString,
+        });
+        //const extensions = grafastRawResult.extensions;
+        delete grafastRawResult.extensions;
+
+        const result2 = stringifyPayload(grafastRawResult, asString);
         assert.equal(result2, result1);
         console.log(result1);
+        // await writeFile(
+        //   `${__dirname}/planforjem.mermaid`,
+        //   planToMermaid(extensions.explain.operations[0].plan, {
+        //     skipBuckets: false,
+        //     concise: true,
+        //   }),
+        // );
       }
       break;
     }
