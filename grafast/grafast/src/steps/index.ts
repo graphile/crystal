@@ -76,7 +76,13 @@ export {
   ListTransformOptions,
   ListTransformReduce,
 } from "./listTransform.js";
-export { makeDecodeNodeId, node, NodeStep, specFromNodeId } from "./node.js";
+export {
+  makeDecodeNodeId,
+  node,
+  nodeIdFromNode,
+  NodeStep,
+  specFromNodeId,
+} from "./node.js";
 export { object, ObjectPlanMeta, ObjectStep } from "./object.js";
 export { partitionByIndex } from "./partitionByIndex.js";
 export {

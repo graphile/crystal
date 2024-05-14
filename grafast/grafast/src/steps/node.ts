@@ -123,6 +123,14 @@ export function specFromNodeId(
   return handler.getSpec($decoded);
 }
 
+export function nodeIdFromNode(
+  handler: NodeIdHandler<any>,
+  $node: ExecutableStep,
+) {
+  const specifier = handler.plan($node);
+  return lambda(specifier, handler.codec.encode);
+}
+
 export function makeDecodeNodeId(handlers: NodeIdHandler[]) {
   const codecs = [...new Set(handlers.map((h) => h.codec))];
 
