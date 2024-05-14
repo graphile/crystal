@@ -42,6 +42,17 @@ CREATE TABLE friendships (
 );
 `,
   );
+  db.run(
+    `\
+CREATE TABLE posts (
+  id int primary key,
+  author_id int,
+  content text,
+  created_at int not null default CURRENT_TIMESTAMP,
+  updated_at int
+);
+`,
+  );
 
   {
     const stmt = db.prepare(
@@ -72,6 +83,25 @@ CREATE TABLE friendships (
         stmt.run(++id, nameIndex + 1, friendIndex + 1);
       }
     }
+    stmt.finalize();
+  }
+
+  {
+    const stmt = db.prepare(
+      "INSERT INTO posts (id, author_id, content) VALUES (?, ?, ?)",
+    );
+    let id = 0;
+    for (let nameIndex = 0; nameIndex < NAMES.length; nameIndex++) {
+      // A stable list of friendIds
+      const friendIndexes = NAMES.map((_, idx) => idx).filter(
+        (idx) => idx % (nameIndex + 1) === 0,
+      );
+      for (const friendIndex of friendIndexes) {
+        stmt.run(++id, nameIndex + 1, `I'm friends with ${NAMES[friendIndex]}`);
+      }
+    }
+    stmt.run(++id, null, `Have you heard about updog?`);
+    stmt.run(++id, null, `Sillypeoplesaywhat.`);
     stmt.finalize();
   }
 });
