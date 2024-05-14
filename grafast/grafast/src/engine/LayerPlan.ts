@@ -520,17 +520,14 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         }
         const itemStepId = this.rootStep.id;
         // Item steps are **NOT** unary
-        let ev: ExecutionValue;
         if (this.rootStep._isUnary) {
-          // handled later
-          const list = listStepStore.at(0);
-          ev = unaryExecutionValue(Array.isArray(list) ? list[0] : list);
-        } else {
-          ev = batchExecutionValue([]);
+          throw new Error("listItem layer plan can't have a unary root step!");
         }
+        const ev = batchExecutionValue([]);
         store.set(itemStepId, ev);
 
         for (const stepId of copyStepIds) {
+          // Deliberate shadowing
           const ev = parentBucket.store.get(stepId)!;
           if (ev.isBatch) {
             // Prepare store with an empty list for each copyPlanId
@@ -555,11 +552,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             for (let j = 0, l = list.length; j < l; j++) {
               const newIndex = size++;
               newIndexes.push(newIndex);
-              if (ev.isBatch) {
-                (ev.entries[newIndex] as any[]) = list[j];
-                // TODO: are these the right flags?
-                ev._flags[newIndex] = list[j] == null ? FLAG_NULL : NO_FLAGS;
-              }
+              (ev.entries[newIndex] as any[]) = list[j];
+              // TODO: are these the right flags?
+              ev._flags[newIndex] = list[j] == null ? FLAG_NULL : NO_FLAGS;
 
               polymorphicPathList[newIndex] =
                 parentBucket.polymorphicPathList[originalIndex];
