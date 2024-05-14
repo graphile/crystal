@@ -1,24 +1,36 @@
-const {
-  buildSchema,
-  // printSchema,
-  graphql,
-  execute: graphqlExecute,
-  parse,
-  validate,
-} = require("graphql");
-const {
-  makeGrafastSchema,
+import assert from "node:assert";
+import { writeFile } from "node:fs/promises";
+
+import {
+  condition,
   context,
   each,
+  execute as grafastExecute,
   grafast,
+  inhibitOnNull,
+  makeGrafastSchema,
+  nodeIdFromNode,
+  specFromNodeId,
   stringifyPayload,
-  execute: grafastExecute,
-} = require("grafast");
-const { planToMermaid } = require("grafast/mermaid");
-const { makeDataLoaders } = require("./dataloaders");
-const { userById, friendshipsByUserId } = require("./plans");
-const fsp = require("node:fs/promises");
-const { resolvePresets } = require("graphile-config");
+  trap,
+  TRAP_INHIBITED,
+} from "grafast";
+import { planToMermaid } from "grafast/mermaid";
+import { resolvePresets } from "graphile-config";
+import {
+  buildSchema,
+  execute as graphqlExecute,
+  graphql,
+  parse,
+  validate,
+} from "graphql";
+
+import { makeDataLoaders } from "./dataloaders.mjs";
+import { base64JSONCodec, handlers } from "./nodeIds.mjs";
+import { friendshipsByUserId, postsByAuthorId, userById } from "./plans.mjs";
+
+// ESM port of Node.js __dirname
+const __dirname = new URL(".", import.meta.url).pathname;
 
 // Benchmark settings
 const NUMBER_OF_REQUESTS = 10000;
@@ -29,10 +41,21 @@ const asString = true;
 const typeDefs = /* GraphQL */ `
   type Query {
     currentUser: User
+    # Note: null 'id' is valid: that would be anonymous posts.
+    postsByAuthorId(id: ID): [Post]
   }
-  type User {
+  interface Node {
+    id: ID!
+  }
+  type User implements Node {
+    id: ID!
     name: String!
     friends: [User]!
+  }
+  type Post implements Node {
+    id: ID!
+    author: User
+    content: String
   }
 `;
 const resolvers = {
@@ -40,8 +63,33 @@ const resolvers = {
     async currentUser(_, args, context) {
       return context.userLoader.load(context.currentUserId);
     },
+    postsByAuthorId(_, args, context) {
+      const nodeId = args.id;
+      if (nodeId == null) {
+        return context.postsByAuthorIdLoader.load(
+          // DataLoader doesn't support null here, so we're using -1 as a
+          // stand-in
+          -1,
+        );
+      }
+      const tuple = base64JSONCodec.decode(nodeId);
+      if (
+        Array.isArray(tuple) &&
+        tuple.length === 2 &&
+        tuple[0] === "User" &&
+        typeof tuple[1] === "number"
+      ) {
+        return context.postsByAuthorIdLoader.load(tuple[1]);
+      } else {
+        // Only Users can author posts, posts by any other entity is an empty array
+        return [];
+      }
+    },
   },
   User: {
+    id(user) {
+      return base64JSONCodec.encode(["User", user.id]);
+    },
     name(user) {
       return user.full_name;
     },
@@ -55,6 +103,14 @@ const resolvers = {
       return friends;
     },
   },
+  Post: {
+    id(post) {
+      return base64JSONCodec.encode(["Post", post.id]);
+    },
+    author(post) {
+      return post.author_id ? context.userLoader.load(post.author_id) : null;
+    },
+  },
 };
 
 const planResolvers = {
@@ -62,8 +118,25 @@ const planResolvers = {
     currentUser() {
       return userById(context().get("currentUserId"));
     },
+    postsByAuthorId(_, { $id }) {
+      const spec = specFromNodeId(handlers.User, $id);
+      // This will be null if the ID is null or invalid
+      const $userIdOrNull = spec.id;
+      // Inhibit the ID if the spec returns null but the $id was non-null
+      const $validUserIdOrNull = inhibitOnNull($userIdOrNull, {
+        if: condition("not null", $id),
+      });
+      // Fetch the posts (if not inhibited)
+      const $posts = postsByAuthorId($validUserIdOrNull);
+      return trap($posts, TRAP_INHIBITED, {
+        valueForInhibited: "EMPTY_LIST",
+      });
+    },
   },
   User: {
+    id($user) {
+      return nodeIdFromNode(handlers.User, $user);
+    },
     name($user) {
       return $user.get("full_name");
     },
@@ -73,6 +146,14 @@ const planResolvers = {
         userById($friendship.get("friend_id")),
       );
       return $friends;
+    },
+  },
+  Post: {
+    id($post) {
+      return nodeIdFromNode(handlers.Post, $post);
+    },
+    author($post) {
+      return userById($post.get("author_id"));
     },
   },
 };
@@ -142,28 +223,24 @@ async function runGraphQL() {
 const baseContext = { currentUserId: 1 };
 const resolvedPreset = resolvePresets([{}]);
 async function runGrafastWithGraphQLSchema() {
-  const result = await grafastExecute(
-    {
-      schema: schemaDL,
-      document,
-      contextValue: { ...baseContext, ...makeDataLoaders() },
-    },
+  const result = await grafastExecute({
+    schema: schemaDL,
+    document,
+    contextValue: { ...baseContext, ...makeDataLoaders() },
     resolvedPreset,
-    asString,
-  );
+    outputDataAsString: asString,
+  });
   return stringifyPayload(result, asString);
 }
 
 async function runGrafast() {
-  const result = await grafastExecute(
-    {
-      schema: schemaGF,
-      document,
-      contextValue: baseContext,
-    },
+  const result = await grafastExecute({
+    schema: schemaGF,
+    document,
+    contextValue: baseContext,
     resolvedPreset,
-    asString,
-  );
+    outputDataAsString: asString,
+  });
   return stringifyPayload(result, asString);
 }
 
@@ -262,6 +339,84 @@ async function runCompare() {
 
 async function main() {
   switch (process.argv[2]) {
+    case "nodeId": {
+      const source = /* GraphQL */ `
+        query PostsByAuthorId($id: ID) {
+          postsByAuthorId(id: $id) {
+            content
+            #id
+            #author {
+            #  id
+            #  name
+            #  friends {
+            #    name
+            #  }
+            #}
+          }
+        }
+      `;
+
+      // To make it fair, we parse and validate the query ahead of time and just time
+      // execution (because grafast caches parse results).
+
+      const document = parse(source);
+      const errors1 = validate(schemaDL, document);
+      const errors2 = validate(schemaGF, document);
+      if (errors1.length) {
+        throw errors1[0];
+      }
+      if (errors2.length) {
+        throw errors2[0];
+      }
+      const vars = [
+        // User 1
+        { id: base64JSONCodec.encode(["User", 1]) },
+        // Anonymous posts
+        { id: null },
+        // Invalid Node ID for this query, expect empty array
+        { id: base64JSONCodec.encode(["Post", 2]) },
+      ];
+      for (const variableValues of vars) {
+        const result1 = JSON.stringify(
+          await graphqlExecute({
+            schema: schemaDL,
+            document,
+            variableValues,
+            contextValue: {
+              ...baseContext,
+              ...makeDataLoaders(),
+            },
+          }),
+        );
+        const grafastRawResult = await grafastExecute({
+          schema: schemaGF,
+          document,
+          variableValues,
+          contextValue: { ...baseContext },
+          resolvedPreset: {
+            extends: [resolvedPreset],
+            grafast: {
+              explain: ["plan"],
+            },
+          },
+          outputDataAsString: asString,
+        });
+        //const extensions = grafastRawResult.extensions;
+        delete grafastRawResult.extensions;
+
+        const result2 = stringifyPayload(grafastRawResult, asString);
+        assert.equal(result2, result1);
+        console.log(result1);
+        // await writeFile(
+        //   `${__dirname}/planforjem.mermaid`,
+        //   planToMermaid(extensions.explain.operations[0].plan, {
+        //     skipBuckets: false,
+        //     concise: true,
+        //   }),
+        // );
+      }
+      break;
+    }
     case "docs": {
       console.log("Generating query plans for documentation");
 
@@ -284,14 +439,14 @@ async function main() {
         resolvedPreset: { grafast: { explain: ["plan"] } },
       });
 
-      await fsp.writeFile(
+      await writeFile(
         `${__dirname}/plan.mermaid`,
         planToMermaid(
           grafastResultWithPlan.extensions.explain.operations[0].plan,
           { skipBuckets: false, concise: true },
         ),
       );
-      await fsp.writeFile(
+      await writeFile(
         `${__dirname}/plan-simplified.mermaid`,
         planToMermaid(
           grafastResultWithPlan.extensions.explain.operations[0].plan,

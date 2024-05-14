@@ -11,6 +11,7 @@ import {
   FLAG_INHIBITED,
   FLAG_NULL,
   FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS,
+  NO_FLAGS,
 } from "../interfaces.js";
 import { resolveType } from "../polymorphic.js";
 import type {
@@ -18,11 +19,7 @@ import type {
   ModifierStep,
   UnbatchedExecutableStep,
 } from "../step";
-import {
-  batchExecutionValue,
-  newBucket,
-  unaryExecutionValue,
-} from "./executeBucket.js";
+import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
 /*
@@ -519,19 +516,14 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         }
         const itemStepId = this.rootStep.id;
         // Item steps are **NOT** unary
-        const itemStepIdList: any[] | null = this.rootStep._isUnary ? null : [];
         if (this.rootStep._isUnary) {
-          // handled later
-          const list = listStepStore.at(0);
-          store.set(
-            itemStepId,
-            unaryExecutionValue(Array.isArray(list) ? list[0] : list),
-          );
-        } else {
-          store.set(itemStepId, batchExecutionValue(itemStepIdList!));
+          throw new Error("listItem layer plan can't have a unary root step!");
         }
+        const ev = batchExecutionValue([] as any[]);
+        store.set(itemStepId, ev);
 
         for (const stepId of copyStepIds) {
+          // Deliberate shadowing
           const ev = parentBucket.store.get(stepId)!;
           if (ev.isBatch) {
             // Prepare store with an empty list for each copyPlanId
@@ -556,9 +548,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             for (let j = 0, l = list.length; j < l; j++) {
               const newIndex = size++;
               newIndexes.push(newIndex);
-              if (itemStepIdList !== null) {
-                itemStepIdList[newIndex] = list[j];
-              }
+              (ev.entries as any[])[newIndex] = list[j];
+              // TODO: are these the right flags?
+              ev._flags[newIndex] = list[j] == null ? FLAG_NULL : NO_FLAGS;
 
               polymorphicPathList[newIndex] =
                 parentBucket.polymorphicPathList[originalIndex];

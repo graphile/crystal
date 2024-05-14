@@ -1276,7 +1276,7 @@ export function bucketToString(this: Bucket) {
 export function batchExecutionValue<TData>(
   entries: TData[],
   _flags: ExecutionEntryFlags[] = arrayOfLength(entries.length, 0),
-): ExecutionValue<TData> {
+): BatchExecutionValue<TData> {
   let cachedStateUnion: ExecutionEntryFlags | null = null;
   return {
     at: batchEntriesAt,
@@ -1334,7 +1334,7 @@ function _copyResult(
 export function unaryExecutionValue<TData>(
   value: TData,
   _entryFlags: ExecutionEntryFlags = 0,
-): ExecutionValue<TData> {
+): UnaryExecutionValue<TData> {
   return {
     at: unaryAt,
     isBatch: false,

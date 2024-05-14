@@ -13,7 +13,7 @@
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
     "posttest": "yarn build",
-    "test": "cd examples/users-and-friends && node index.js"
+    "test": "cd examples/users-and-friends && node index.mjs"
   },
   "dependencies": {
     "@docusaurus/core": "2.4.1",
