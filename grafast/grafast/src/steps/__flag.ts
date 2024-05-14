@@ -283,8 +283,12 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
  * Example use case: get user by id, but id is null: no need to fetch the user
  * since we know they won't exist.
  */
-export function inhibitOnNull<T>($step: ExecutableStep<T>) {
+export function inhibitOnNull<T>(
+  $step: ExecutableStep<T>,
+  options?: { if?: FlagStepOptions["if"] },
+) {
   return new __FlagStep<T>($step, {
+    ...options,
     acceptFlags: DEFAULT_ACCEPT_FLAGS & ~FLAG_NULL,
   });
 }
