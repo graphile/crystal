@@ -5,12 +5,13 @@ import te from "tamedevil";
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
 import { inspect } from "../inspect.js";
-import type { UnaryExecutionValue } from "../interfaces.js";
+import type { ExecutionValue, UnaryExecutionValue } from "../interfaces.js";
 import {
   FLAG_ERROR,
   FLAG_INHIBITED,
   FLAG_NULL,
   FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS,
+  NO_FLAGS,
 } from "../interfaces.js";
 import { resolveType } from "../polymorphic.js";
 import type {
@@ -519,17 +520,15 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         }
         const itemStepId = this.rootStep.id;
         // Item steps are **NOT** unary
-        const itemStepIdList: any[] | null = this.rootStep._isUnary ? null : [];
+        let ev: ExecutionValue;
         if (this.rootStep._isUnary) {
           // handled later
           const list = listStepStore.at(0);
-          store.set(
-            itemStepId,
-            unaryExecutionValue(Array.isArray(list) ? list[0] : list),
-          );
+          ev = unaryExecutionValue(Array.isArray(list) ? list[0] : list);
         } else {
-          store.set(itemStepId, batchExecutionValue(itemStepIdList!));
+          ev = batchExecutionValue([]);
         }
+        store.set(itemStepId, ev);
 
         for (const stepId of copyStepIds) {
           const ev = parentBucket.store.get(stepId)!;
@@ -556,8 +555,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             for (let j = 0, l = list.length; j < l; j++) {
               const newIndex = size++;
               newIndexes.push(newIndex);
-              if (itemStepIdList !== null) {
-                itemStepIdList[newIndex] = list[j];
+              if (ev.isBatch) {
+                (ev.entries[newIndex] as any[]) = list[j];
+                // TODO: are these the right flags?
+                ev._flags[newIndex] = list[j] == null ? FLAG_NULL : NO_FLAGS;
               }
 
               polymorphicPathList[newIndex] =
