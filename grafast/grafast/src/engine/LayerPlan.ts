@@ -5,7 +5,7 @@ import te from "tamedevil";
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
 import { inspect } from "../inspect.js";
-import type { ExecutionValue, UnaryExecutionValue } from "../interfaces.js";
+import type { UnaryExecutionValue } from "../interfaces.js";
 import {
   FLAG_ERROR,
   FLAG_INHIBITED,
@@ -19,11 +19,7 @@ import type {
   ModifierStep,
   UnbatchedExecutableStep,
 } from "../step";
-import {
-  batchExecutionValue,
-  newBucket,
-  unaryExecutionValue,
-} from "./executeBucket.js";
+import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
 /*
