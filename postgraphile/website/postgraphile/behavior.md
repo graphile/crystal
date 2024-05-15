@@ -146,6 +146,13 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `resource:delete` - can delete a record in this resource
 - `resource:list` - "list" field for a resource at any level
 - `resource:connection` - "connection" field for a resource at any level
+- `resource:list:filter` - can we filter this resource's results (when represented as a list)?
+- `resource:connection:filter` - can we filter this resource's results (when represented as a connection)?
+- `resource:aggregates` - does this resource support aggregates across its attributes (i.e. does the `aggregates` field get added to connections)
+- `resource:groupedAggregates` - does this resource support grouped aggregates across its attributes (i.e. does the `groupedAggregates` field get added to connections)
+- `resource:groupedAggregates:having` - can groupedAggregates on this resource have a 'having' clause?
+- `sum:resource:groupedAggregates:having` - can groupedAggregates on this resource have a 'having' clause that uses the 'sum' aggregate?
+- `sum:resource:aggregates` - does this resource support 'sum' aggregates across its attributes (replace 'sum' with the aggregate id you care about) (i.e. does the `sum` field get added within the `aggregates` field on connections?)
 - `constraint:resource:update` - can update a record by this constraint
 - `constraint:resource:delete` - can delete a record by this constraint
 - `nodeId:resource:update` - can update a record by its NodeID
@@ -154,6 +161,14 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `attribute:insert` - can this attribute be inserted into?
 - `attribute:update` - can this attribute be updated?
 - `attribute:base` - should we add this attribute to the "base" input type?
+- `attribute:aggregate` - can we aggregate on this attribute?
+- `sum:attribute:aggregate` - can we perform the 'sum' aggregate on this attribute? (replace 'sum' with the aggregate id you care about) (i.e. does this attribute get added to the `sum` field on the `aggregates` field on connections?)
+- `sum:resource:aggregate` - does this computed-column-like resource support the 'sum' aggregate when acting as an attribute (replace 'sum' with the aggregate id you care about)
+- `attribute:groupBy` - can we group by this attribute when performing grouped aggregates?
+- `attribute:havingBy` - can this attribute be used in the 'having' clause of a grouped aggregate?
+- `sum:attribute:havingBy` - can the sum of this attribute be used in the 'having' clause of a grouped aggregate?
+- `resource:havingBy` - can this computed-column-like resource be used in the 'having' clause of a grouped aggregate?
+- `sum:resource:havingBy` - can the sum of this computed-column-like resource be be used in the 'having' clause of a grouped aggregate?
 - `nodeId:insert` - can we insert to the columns represented by this nodeId which represents a table related via foreign key constraint?
 - `nodeId:update` - can we update the columns represented by this nodeId which represents a table related via foreign key constraint?
 - `nodeId:base` - should we add a nodeId input representing this foreign key constraint to the "base" input type?
@@ -179,13 +194,20 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `order` - can we sort this thing? (resource)
 - `query:resource:list:order`
 - `query:resource:connection:order`
+- `resource:relatedAggregates:orderBy` - can we order this resource by aggregates on its relationships?
 - `orderBy` - can we order by this thing (e.g. column)?
 - `proc:orderBy` - can we order by the result of this proc (function resource)?
 - `attribute:orderBy` - can we order by this attribute (column, property)?
+- `attribute:aggregate:orderBy` - can we order by aggregates of this attribute (column, property)?
+- `sum:attribute:aggregate:orderBy` - can we order by 'sum' aggregates of this attribute (column, property)?
 - `filterBy` - can we filter by this thing (e.g. column, table, etc)?
 - `proc:filterBy` - can we filter by the result of this proc (function resource)
 - `attribute:filterBy` - can we filter by this attribute (column, property)?
 - `condition:attribute:filterBy` - can we filter by this attribute (column, property) in the `condition` argument?
+- `attribute:aggregate:filterBy` - can we filter by the aggregate of this attribute (column, property)?
+- `sum:attribute:aggregate:filterBy` - can we filter by the 'sum' aggregate of this attribute (column, property)?
+- `resource:aggregates:filterBy` - can we filter (a different resource) by this resource's aggregates?
+- `sum:resource:aggregates:filterBy` - can we filter (a different resource) by this resource's 'sum' aggregates?
 - `single` - can we get just one?
 - `query:resource:single` - can we get a single one of these (resource) at the root?
 - `singularRelation:resource:single` - can we get a single one of these (resource) from a
@@ -196,6 +218,8 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
   this singular relationship (when we know there can be at most one)?
 - `manyRelation:resource:list`
 - `manyRelation:resource:connection`
+- `manyRelation:aggregates:orderBy` - can we order by aggregates of this manyRelation?
+- `sum:manyRelation:aggregates:orderBy` - can we order by 'sum' aggregates of this manyRelation?
 - `jwt` - should the given codec behave as if it were a JWT?
 - `insert:input:record` - input to the 'insert' mutation
 - `totalCount` - on a codec, should we add the `totalCount` field?
