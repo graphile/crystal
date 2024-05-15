@@ -1,5 +1,26 @@
 # grafast
 
+## 0.1.1-beta.10
+
+### Patch Changes
+
+- [#2067](https://github.com/graphile/crystal/pull/2067)
+  [`3c161f7e1`](https://github.com/graphile/crystal/commit/3c161f7e13375105b1035a7d5d1c0f2b507ca5c7)
+  Thanks [@benjie](https://github.com/benjie)! - Add `nodeIdFromNode()` helper
+
+- [#2067](https://github.com/graphile/crystal/pull/2067)
+  [`a674a9923`](https://github.com/graphile/crystal/commit/a674a9923bc908c9315afa40e0cb256ee0953d16)
+  Thanks [@benjie](https://github.com/benjie)! - Fix performance issue in
+  `loadOne()`/`loadMany()` due to using `setTimeout(cb, 0)`, now using
+  `process.nextTick(cb)`. High enough concurrency and the issue goes away, but
+  with limited concurrency this causes a lot of `(idle)` in profiling and thus
+  completing 10k items took longer. (Lots of time spent in `epoll_pwait`.)
+
+- [#2067](https://github.com/graphile/crystal/pull/2067)
+  [`b7cfeffd1`](https://github.com/graphile/crystal/commit/b7cfeffd1019d61c713a5054c4f5929960a2a6ab)
+  Thanks [@benjie](https://github.com/benjie)! - Allow applying `if` to
+  `inhibitOnNull` - e.g. only inhibit on null if some other condition matches.
+
 ## 0.1.1-beta.9
 
 ### Patch Changes

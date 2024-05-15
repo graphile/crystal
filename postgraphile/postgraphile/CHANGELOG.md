@@ -1,5 +1,21 @@
 # postgraphile
 
+## 5.0.0-beta.25
+
+### Patch Changes
+
+- Updated dependencies
+  [[`3c161f7e1`](https://github.com/graphile/crystal/commit/3c161f7e13375105b1035a7d5d1c0f2b507ca5c7),
+  [`a674a9923`](https://github.com/graphile/crystal/commit/a674a9923bc908c9315afa40e0cb256ee0953d16),
+  [`b7cfeffd1`](https://github.com/graphile/crystal/commit/b7cfeffd1019d61c713a5054c4f5929960a2a6ab)]:
+  - grafast@0.1.1-beta.10
+  - @dataplan/json@0.0.1-beta.19
+  - @dataplan/pg@0.0.1-beta.21
+  - grafserv@0.1.1-beta.12
+  - graphile-build@5.0.0-beta.20
+  - graphile-build-pg@5.0.0-beta.24
+  - graphile-utils@5.0.0-beta.24
+
 ## 5.0.0-beta.24
 
 ### Patch Changes
