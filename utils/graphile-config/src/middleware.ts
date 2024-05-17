@@ -10,21 +10,21 @@ export type MiddlewareObject<T> = Record<
 type ActivityFn<
   TActivities extends MiddlewareObject<TActivities>,
   TActivityName extends keyof TActivities,
-> = TActivities[TActivityName] extends PluginHook<infer U> ? U : never;
+> = TActivities[TActivityName] extends PluginHook<infer UFn> ? UFn : never;
 type ActivityParameter<
   TActivities extends MiddlewareObject<TActivities>,
   TActivityName extends keyof TActivities,
-> = TActivities[TActivityName] extends PluginHook<(arg: infer U) => any>
-  ? U
+> = TActivities[TActivityName] extends PluginHook<(arg: infer UArg) => any>
+  ? UArg
   : never;
 
 type RealActivityFn<
   TActivities extends MiddlewareObject<TActivities>,
   TActivityName extends keyof TActivities,
 > = TActivities[TActivityName] extends PluginHook<
-  (...args: infer UArgs) => infer UResult
+  (arg: infer UArg) => infer UResult
 >
-  ? (next: MiddlewareNext<UResult>, ...args: UArgs) => UResult
+  ? (next: MiddlewareNext<UResult>, arg: UArg) => UResult
   : never;
 
 export class Middlewares<TActivities extends MiddlewareObject<TActivities>> {
