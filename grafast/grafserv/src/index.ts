@@ -1,6 +1,6 @@
 import type { PromiseOrDirect } from "grafast";
 import type { GraphQLError } from "grafast/graphql";
-import type { PluginHook } from "graphile-config";
+import type { AsyncHookResultHandler, PluginHook } from "graphile-config";
 import type { RuruHTMLParts } from "ruru/server";
 
 import type {
@@ -8,7 +8,9 @@ import type {
   InitEvent,
   NormalizedRequestDigest,
   ProcessGraphQLRequestBodyEvent,
+  ProcessRequestEvent,
   RequestContentType,
+  Result,
 } from "./interfaces.js";
 
 export {
@@ -165,6 +167,9 @@ declare global {
 
     interface GrafservHooks {
       init(event: InitEvent): PromiseOrDirect<void>;
+      processRequest(
+        event: ProcessRequestEvent,
+      ): PromiseOrDirect<void | AsyncHookResultHandler<Result | null>>;
       processGraphQLRequestBody(
         event: ProcessGraphQLRequestBodyEvent,
       ): PromiseOrDirect<void>;

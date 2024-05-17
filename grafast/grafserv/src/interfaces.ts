@@ -67,6 +67,9 @@ export interface ProcessGraphQLRequestBodyEvent {
   request?: NormalizedRequestDigest;
   graphqlWsContext?: Context;
 }
+export interface ProcessRequestEvent {
+  requestDigest: RequestDigest;
+}
 
 export interface GrafservBodyBuffer {
   type: "buffer";

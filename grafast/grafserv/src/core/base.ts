@@ -163,7 +163,12 @@ export class GrafservBase {
   ): PromiseOrDirect<Result | null> {
     let returnValue;
     try {
-      const result = this._processRequest(request);
+      const result = this.hooks.call(
+        "processRequest",
+        { requestDigest: request },
+        ({ requestDigest: request }) => this._processRequest(request),
+      );
+
       if (isPromiseLike(result)) {
         returnValue = result.then(
           convertHandlerResultToResult,
