@@ -131,6 +131,8 @@ export class NodeGrafservBase extends GrafservBase {
 
         switch (result.type) {
           case "error": {
+            // TODO: return error in the format the browser would prefer (JSON, HTML, text)
+            // TODO: respect result.headers
             if (result.error instanceof SafeError) {
               const payload = Buffer.from(result.error.message, "utf8");
               res.writeHead(result.statusCode, {
@@ -143,6 +145,7 @@ export class NodeGrafservBase extends GrafservBase {
               return next(result.error);
             } else {
               // TODO: catch all the code paths that lead here!
+              console.error(result.error);
               const payload = Buffer.from("An error occurred", "utf8");
               res.writeHead(result.statusCode, {
                 "Content-Type": "text/plain; charset=utf-8",
