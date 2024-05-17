@@ -11,6 +11,12 @@ type ActivityFn<
   TActivities extends MiddlewareObject<TActivities>,
   TActivityName extends keyof TActivities,
 > = TActivities[TActivityName] extends PluginHook<infer U> ? U : never;
+type ActivityParameter<
+  TActivities extends MiddlewareObject<TActivities>,
+  TActivityName extends keyof TActivities,
+> = TActivities[TActivityName] extends PluginHook<(arg: infer U) => any>
+  ? U
+  : never;
 
 type RealActivityFn<
   TActivities extends MiddlewareObject<TActivities>,
@@ -41,16 +47,16 @@ export class Middlewares<TActivities extends MiddlewareObject<TActivities>> {
   run<TActivityName extends keyof TActivities>(
     activityName: TActivityName,
     activity: (
-      ...args: Parameters<ActivityFn<TActivities, TActivityName>>
+      arg: ActivityParameter<TActivities, TActivityName>,
     ) => ReturnType<ActivityFn<TActivities, TActivityName>>,
-    ...args: Parameters<ActivityFn<TActivities, TActivityName>>
+    arg: ActivityParameter<TActivities, TActivityName>,
   ) {
     const middlewares = this.middlewares[activityName];
     if (middlewares === undefined) {
-      return activity(...args);
+      return activity(arg);
     }
     const m = middlewares.length - 1;
-    return executeMiddleware(middlewares, activity, args, 0, m);
+    return executeMiddleware(middlewares, activity, arg, 0, m);
   }
 }
 
@@ -60,16 +66,16 @@ function executeMiddleware<
 >(
   middlewares: ReadonlyArray<RealActivityFn<TActivities, TActivityName>>,
   activity: (
-    ...args: Parameters<ActivityFn<TActivities, TActivityName>>
+    arg: ActivityParameter<TActivities, TActivityName>,
   ) => ReturnType<ActivityFn<TActivities, TActivityName>>,
-  args: Parameters<ActivityFn<TActivities, TActivityName>>,
+  arg: ActivityParameter<TActivities, TActivityName>,
   idx: number,
   maxIdx: number,
 ): ReturnType<ActivityFn<TActivities, TActivityName>> {
   const next =
     idx === maxIdx
-      ? () => activity(...args)
-      : () => executeMiddleware(middlewares, activity, args, idx + 1, maxIdx);
+      ? () => activity(arg)
+      : () => executeMiddleware(middlewares, activity, arg, idx + 1, maxIdx);
   const middleware = middlewares[idx];
-  return middleware(next, ...args) as any;
+  return middleware(next, arg) as any;
 }
