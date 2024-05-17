@@ -36,7 +36,7 @@ import {
   makeParseAndValidateFunction,
 } from "../middleware/graphql.js";
 import { optionsFromConfig } from "../options.js";
-import { handleErrors, noop, normalizeRequest, sleep } from "../utils.js";
+import { handleErrors, normalizeRequest, sleep } from "../utils.js";
 
 const failedToBuildHandlersError = new graphql.GraphQLError(
   "Unknown error occurred.",
