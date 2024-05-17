@@ -6,11 +6,13 @@ export { GraphileConfig };
 
 export {
   applyHooks,
+  AsyncHookResultHandler,
   AsyncHooks,
   HookObject,
-  AsyncHookResultHandler,
 } from "./hooks.js";
 export type { PluginHook, PluginHookObject } from "./interfaces.js";
+export type { MiddlewareNext, MiddlewareObject } from "./middleware.js";
+export { Middlewares } from "./middleware.js";
 export { isResolvedPreset, resolvePresets } from "./resolvePresets.js";
 
 export function sortedPlugins(
