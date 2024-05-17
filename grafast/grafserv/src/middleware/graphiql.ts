@@ -24,11 +24,15 @@ export function makeGraphiQLHandler(
         ...makeHTMLParts(),
         ...htmlPartsFromConfig,
       };
-      await middlewares.run("ruruHTMLParts", noop, {
-        resolvedPreset,
-        htmlParts,
-        request,
-      });
+      await middlewares.run(
+        "ruruHTMLParts",
+        {
+          resolvedPreset,
+          htmlParts,
+          request,
+        },
+        noop,
+      );
     }
     const config: RuruServerConfig = {
       endpoint: dynamicOptions.graphqlPath,

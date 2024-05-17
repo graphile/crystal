@@ -210,11 +210,15 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
       } = await instance.getExecutionConfig(grafastCtx);
 
       const parsedBody = parseGraphQLJSONBody(message.payload);
-      await instance.middlewares.run("processGraphQLRequestBody", noop, {
-        resolvedPreset,
-        body: parsedBody,
-        graphqlWsContext: ctx,
-      });
+      await instance.middlewares.run(
+        "processGraphQLRequestBody",
+        {
+          resolvedPreset,
+          body: parsedBody,
+          graphqlWsContext: ctx,
+        },
+        noop,
+      );
 
       const { query, operationName, variableValues } =
         validateGraphQLBody(parsedBody);
@@ -254,11 +258,15 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
   const { resolvedPreset } = instance;
   return {
     onSubscribe(ctx, message) {
-      return instance.middlewares.run("onSubscribe", onSubscribe, {
-        resolvedPreset,
-        ctx,
-        message,
-      });
+      return instance.middlewares.run(
+        "onSubscribe",
+        {
+          resolvedPreset,
+          ctx,
+          message,
+        },
+        onSubscribe,
+      );
     },
     // TODO: validate that this actually does mask every error
     onError(_ctx, _message, errors) {

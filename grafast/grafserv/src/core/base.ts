@@ -164,6 +164,7 @@ export class GrafservBase {
     const { resolvedPreset } = this;
     return this.middlewares.run(
       "processRequest",
+      { resolvedPreset, requestDigest, instance: this },
       ({ requestDigest: request }) => {
         let returnValue: PromiseOrDirect<Result | null>;
         try {
@@ -190,7 +191,6 @@ export class GrafservBase {
           return returnValue;
         }
       },
-      { resolvedPreset, requestDigest, instance: this },
     );
   }
 
@@ -245,24 +245,20 @@ export class GrafservBase {
     return (
       new Promise((resolve) =>
         resolve(
-          middlewares.run(
-            "setPreset",
-            (dynamicOptions) => {
-              const { resolvedPreset } = dynamicOptions;
-              // Overwrite all the `this.*` properties at once
-              this.resolvedPreset = resolvedPreset;
-              this.middlewares = middlewares;
-              this.dynamicOptions = dynamicOptions as DynamicOptions;
-              this.initialized = true;
-              // ENHANCE: this.graphqlHandler?.release()?
-              this.refreshHandlers();
-              this.getExecutionConfig = dynamicOptions.getExecutionConfig;
-              // MUST come after the handlers have been refreshed, otherwise we'll
-              // get infinite loops
-              this.eventEmitter.emit("dynamicOptions:ready", {});
-            },
-            dynamicOptions,
-          ),
+          middlewares.run("setPreset", dynamicOptions, (dynamicOptions) => {
+            const { resolvedPreset } = dynamicOptions;
+            // Overwrite all the `this.*` properties at once
+            this.resolvedPreset = resolvedPreset;
+            this.middlewares = middlewares;
+            this.dynamicOptions = dynamicOptions as DynamicOptions;
+            this.initialized = true;
+            // ENHANCE: this.graphqlHandler?.release()?
+            this.refreshHandlers();
+            this.getExecutionConfig = dynamicOptions.getExecutionConfig;
+            // MUST come after the handlers have been refreshed, otherwise we'll
+            // get infinite loops
+            this.eventEmitter.emit("dynamicOptions:ready", {});
+          }),
         ),
       )
         .then(null, (e) => {

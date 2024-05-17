@@ -46,10 +46,10 @@ export class Middlewares<TActivities extends MiddlewareObject<TActivities>> {
 
   run<TActivityName extends keyof TActivities>(
     activityName: TActivityName,
+    arg: ActivityParameter<TActivities, TActivityName>,
     activity: (
       arg: ActivityParameter<TActivities, TActivityName>,
     ) => ReturnType<ActivityFn<TActivities, TActivityName>>,
-    arg: ActivityParameter<TActivities, TActivityName>,
   ) {
     const middlewares = this.middlewares[activityName];
     if (middlewares === undefined) {
