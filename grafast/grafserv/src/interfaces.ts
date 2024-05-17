@@ -7,7 +7,8 @@ import type {
   GraphQLSchema,
   ValidationRule,
 } from "grafast/graphql";
-import type { Context } from "graphql-ws";
+import type { Context, SubscribeMessage } from "graphql-ws";
+import type { RuruHTMLParts } from "ruru/server";
 
 import type { GrafservBase } from ".";
 import type { makeParseAndValidateFunction } from "./middleware/graphql";
@@ -56,6 +57,7 @@ export interface GrafservPluginContext {
   resolvedPreset: GraphileConfig.ResolvedPreset;
 }
 export interface InitEvent {
+  resolvedPreset: GraphileConfig.ResolvedPreset;
   getExecutionConfig: (
     this: GrafservBase,
     ctx: Partial<Grafast.RequestContext>,
@@ -63,12 +65,27 @@ export interface InitEvent {
   validationRules: ValidationRule[];
 }
 export interface ProcessGraphQLRequestBodyEvent {
+  resolvedPreset: GraphileConfig.ResolvedPreset;
   body: ParsedGraphQLBody;
   request?: NormalizedRequestDigest;
   graphqlWsContext?: Context;
 }
 export interface ProcessRequestEvent {
+  resolvedPreset: GraphileConfig.ResolvedPreset;
   requestDigest: RequestDigest;
+  instance: GrafservBase;
+}
+
+export interface RuruHTMLPartsEvent {
+  resolvedPreset: GraphileConfig.ResolvedPreset;
+  htmlParts: RuruHTMLParts;
+  request: NormalizedRequestDigest;
+}
+
+export interface OnSubscribeEvent {
+  resolvedPreset: GraphileConfig.ResolvedPreset;
+  ctx: Context<Record<string, unknown> | undefined, unknown>;
+  message: SubscribeMessage;
 }
 
 export interface GrafservBodyBuffer {

@@ -1,16 +1,22 @@
 import type { PromiseOrDirect } from "grafast";
-import type { GraphQLError } from "grafast/graphql";
-import type { AsyncHookResultHandler, PluginHook } from "graphile-config";
+import type { ExecutionArgs, GraphQLError } from "grafast/graphql";
+import type {
+  AsyncHookResultHandler,
+  MiddlewareNext,
+  PluginHook,
+} from "graphile-config";
 import type { RuruHTMLParts } from "ruru/server";
 
 import type {
   GrafservPluginContext,
   InitEvent,
   NormalizedRequestDigest,
+  OnSubscribeEvent,
   ProcessGraphQLRequestBodyEvent,
   ProcessRequestEvent,
   RequestContentType,
   Result,
+  RuruHTMLPartsEvent,
 } from "./interfaces.js";
 
 export {
@@ -75,10 +81,20 @@ declare global {
     }
     interface Plugin {
       grafserv?: {
+        /** @deprecated Please use middlewares instead */
         hooks?: {
           [key in keyof GrafservHooks]?: PluginHook<
             GrafservHooks[key] extends (...args: infer UArgs) => infer UResult
               ? (info: GrafservPluginContext, ...args: UArgs) => UResult
+              : never
+          >;
+        };
+        middlewares?: {
+          [key in keyof GrafservMiddlewares]?: PluginHook<
+            GrafservMiddlewares[key] extends (
+              ...args: infer UArgs
+            ) => infer UResult
+              ? (next: MiddlewareNext<UResult>, ...args: UArgs) => UResult
               : never
           >;
         };
@@ -165,14 +181,15 @@ declare global {
       parseAndValidateCacheSize?: number;
     }
 
+    /** @deprecated Please use middlewares instead */
     interface GrafservHooks {
+      /** @deprecated Please use middlewares instead */
       init(event: InitEvent): PromiseOrDirect<void>;
-      processRequest(
-        event: ProcessRequestEvent,
-      ): PromiseOrDirect<void | AsyncHookResultHandler<Result | null>>;
+      /** @deprecated Please use middlewares instead */
       processGraphQLRequestBody(
         event: ProcessGraphQLRequestBodyEvent,
       ): PromiseOrDirect<void>;
+      /** @deprecated Please use middlewares instead */
       ruruHTMLParts(
         parts: RuruHTMLParts,
         extra: {
@@ -180,5 +197,19 @@ declare global {
         },
       ): PromiseOrDirect<void>;
     }
+    interface GrafservMiddlewares {
+      setPreset(event: InitEvent): PromiseOrDirect<void>;
+      processRequest(
+        event: ProcessRequestEvent,
+      ): PromiseOrDirect<Result | null>;
+      processGraphQLRequestBody(
+        event: ProcessGraphQLRequestBodyEvent,
+      ): PromiseOrDirect<void>;
+      ruruHTMLParts(event: RuruHTMLPartsEvent): PromiseOrDirect<void>;
+      onSubscribe(
+        event: OnSubscribeEvent,
+      ): TruePromiseOrDirect<void | readonly GraphQLError[] | ExecutionArgs>;
+    }
   }
 }
+export type TruePromiseOrDirect<T> = Promise<T> | T;

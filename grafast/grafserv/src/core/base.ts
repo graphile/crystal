@@ -9,10 +9,10 @@ import {
 } from "grafast";
 import type { GraphQLSchema } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
-import type { AsyncHooks } from "graphile-config";
+import type { Middlewares } from "graphile-config";
 import { resolvePresets } from "graphile-config";
 
-import { getGrafservHooks } from "../hooks.js";
+import { getGrafservMiddlewares } from "../hooks.js";
 import type {
   BufferResult,
   DynamicOptions,
@@ -36,7 +36,7 @@ import {
   makeParseAndValidateFunction,
 } from "../middleware/graphql.js";
 import { optionsFromConfig } from "../options.js";
-import { handleErrors, normalizeRequest, sleep } from "../utils.js";
+import { handleErrors, noop, normalizeRequest, sleep } from "../utils.js";
 
 const failedToBuildHandlersError = new graphql.GraphQLError(
   "Unknown error occurred.",
@@ -55,7 +55,7 @@ export class GrafservBase {
   }
   public resolvedPreset: GraphileConfig.ResolvedPreset;
   /** @internal */
-  public hooks: AsyncHooks<GraphileConfig.GrafservHooks>;
+  public middlewares: Middlewares<GraphileConfig.GrafservMiddlewares>;
   protected schema: GraphQLSchema | PromiseLike<GraphQLSchema> | null;
   protected schemaError: PromiseLike<GraphQLSchema> | null;
   protected eventEmitter: TypedEventEmitter<{
@@ -77,7 +77,7 @@ export class GrafservBase {
       ...optionsFromConfig(this.resolvedPreset),
     };
     this.getExecutionConfig = this.dynamicOptions.getExecutionConfig;
-    this.hooks = getGrafservHooks(this.resolvedPreset);
+    this.middlewares = getGrafservMiddlewares(this.resolvedPreset);
     this.schemaError = null;
     this.schema = config.schema;
     if (isPromiseLike(config.schema)) {
@@ -159,36 +159,39 @@ export class GrafservBase {
   }
 
   protected processRequest(
-    request: RequestDigest,
+    requestDigest: RequestDigest,
   ): PromiseOrDirect<Result | null> {
-    let returnValue;
-    try {
-      const result = this.hooks.call(
-        "processRequest",
-        { requestDigest: request },
-        ({ requestDigest: request }) => this._processRequest(request),
-      );
+    const { resolvedPreset } = this;
+    return this.middlewares.run(
+      "processRequest",
+      ({ requestDigest: request }) => {
+        let returnValue: PromiseOrDirect<Result | null>;
+        try {
+          const result = this._processRequest(request);
 
-      if (isPromiseLike(result)) {
-        returnValue = result.then(
-          convertHandlerResultToResult,
-          convertErrorToErrorResult,
-        );
-      } else {
-        returnValue = convertHandlerResultToResult(result);
-      }
-    } catch (e) {
-      returnValue = convertErrorToErrorResult(e);
-    }
-    if (this.resolvedPreset.grafserv?.dangerouslyAllowAllCORSRequests) {
-      if (isPromiseLike(returnValue)) {
-        return returnValue.then(dangerousCorsWrap);
-      } else {
-        return dangerousCorsWrap(returnValue);
-      }
-    } else {
-      return returnValue;
-    }
+          if (isPromiseLike(result)) {
+            returnValue = result.then(
+              convertHandlerResultToResult,
+              convertErrorToErrorResult,
+            );
+          } else {
+            returnValue = convertHandlerResultToResult(result);
+          }
+        } catch (e) {
+          returnValue = convertErrorToErrorResult(e);
+        }
+        if (this.resolvedPreset.grafserv?.dangerouslyAllowAllCORSRequests) {
+          if (isPromiseLike(returnValue)) {
+            return returnValue.then(dangerousCorsWrap);
+          } else {
+            return dangerousCorsWrap(returnValue);
+          }
+        } else {
+          return returnValue;
+        }
+      },
+      { resolvedPreset, requestDigest, instance: this },
+    );
   }
 
   public getPreset(): GraphileConfig.ResolvedPreset {
@@ -232,29 +235,36 @@ export class GrafservBase {
     }
     this._settingPreset = true;
     const resolvedPreset = resolvePresets([newPreset]);
-    const hooks = getGrafservHooks(this.resolvedPreset);
+    const middlewares = getGrafservMiddlewares(this.resolvedPreset);
     // Note: this gets directly mutated
     const dynamicOptions: DynamicOptions = {
       validationRules: [...graphql.specifiedRules],
       getExecutionConfig: defaultMakeGetExecutionConfig(),
       ...optionsFromConfig(resolvedPreset),
     };
-    const initResult = hooks.process("init", dynamicOptions);
     return (
-      Promise.resolve(initResult)
-        .then(() => {
-          // Overwrite all the `this.*` properties at once
-          this.resolvedPreset = resolvedPreset;
-          this.hooks = hooks;
-          this.dynamicOptions = dynamicOptions;
-          this.initialized = true;
-          // ENHANCE: this.graphqlHandler?.release()?
-          this.refreshHandlers();
-          this.getExecutionConfig = dynamicOptions.getExecutionConfig;
-          // MUST come after the handlers have been refreshed, otherwise we'll
-          // get infinite loops
-          this.eventEmitter.emit("dynamicOptions:ready", {});
-        })
+      new Promise((resolve) =>
+        resolve(
+          middlewares.run(
+            "setPreset",
+            (dynamicOptions) => {
+              const { resolvedPreset } = dynamicOptions;
+              // Overwrite all the `this.*` properties at once
+              this.resolvedPreset = resolvedPreset;
+              this.middlewares = middlewares;
+              this.dynamicOptions = dynamicOptions as DynamicOptions;
+              this.initialized = true;
+              // ENHANCE: this.graphqlHandler?.release()?
+              this.refreshHandlers();
+              this.getExecutionConfig = dynamicOptions.getExecutionConfig;
+              // MUST come after the handlers have been refreshed, otherwise we'll
+              // get infinite loops
+              this.eventEmitter.emit("dynamicOptions:ready", {});
+            },
+            dynamicOptions,
+          ),
+        ),
+      )
         .then(null, (e) => {
           this.graphqlHandler = this.failedGraphqlHandler;
           this.graphiqlHandler = this.failedGraphiqlHandler;
@@ -298,7 +308,7 @@ export class GrafservBase {
     this.graphqlHandler = makeGraphQLHandler(this);
     this.graphiqlHandler = makeGraphiQLHandler(
       this.resolvedPreset,
-      this.hooks,
+      this.middlewares,
       this.dynamicOptions,
     );
   }

@@ -1,10 +1,10 @@
-import type { PluginHook, PromiseOrDirect } from "./interfaces.js";
+import type { PluginHook } from "./interfaces.js";
 
-export type MiddlewareNext = () => PromiseOrDirect<void>;
+export type MiddlewareNext<TResult> = () => TResult;
 
 export type MiddlewareObject<T> = Record<
   keyof T,
-  PluginHook<(next: MiddlewareNext, ...args: any[]) => any>
+  PluginHook<(...args: any[]) => any>
 >;
 
 type ActivityFn<
@@ -12,14 +12,23 @@ type ActivityFn<
   TActivityName extends keyof TActivities,
 > = TActivities[TActivityName] extends PluginHook<infer U> ? U : never;
 
+type RealActivityFn<
+  TActivities extends MiddlewareObject<TActivities>,
+  TActivityName extends keyof TActivities,
+> = TActivities[TActivityName] extends PluginHook<
+  (...args: infer UArgs) => infer UResult
+>
+  ? (next: MiddlewareNext<UResult>, ...args: UArgs) => UResult
+  : never;
+
 export class Middlewares<TActivities extends MiddlewareObject<TActivities>> {
   middlewares: {
-    [key in keyof TActivities]?: Array<ActivityFn<TActivities, key>>;
+    [key in keyof TActivities]?: Array<RealActivityFn<TActivities, key>>;
   } = Object.create(null);
 
   register<TActivityName extends keyof TActivities>(
     event: TActivityName,
-    fn: ActivityFn<TActivities, TActivityName>,
+    fn: RealActivityFn<TActivities, TActivityName>,
   ): void {
     const list = this.middlewares[event];
     if (list !== undefined) {
@@ -49,7 +58,7 @@ function executeMiddleware<
   TActivities extends MiddlewareObject<TActivities>,
   TActivityName extends keyof TActivities,
 >(
-  middlewares: ReadonlyArray<ActivityFn<TActivities, TActivityName>>,
+  middlewares: ReadonlyArray<RealActivityFn<TActivities, TActivityName>>,
   activity: (
     ...args: Parameters<ActivityFn<TActivities, TActivityName>>
   ) => ReturnType<ActivityFn<TActivities, TActivityName>>,
@@ -62,5 +71,5 @@ function executeMiddleware<
       ? () => activity(...args)
       : () => executeMiddleware(middlewares, activity, args, idx + 1, maxIdx);
   const middleware = middlewares[idx];
-  return middleware(next, ...args);
+  return middleware(next, ...args) as any;
 }

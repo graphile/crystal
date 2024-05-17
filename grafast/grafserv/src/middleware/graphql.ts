@@ -19,7 +19,7 @@ import type {
   ValidatedGraphQLBody,
 } from "../interfaces.js";
 import { $$normalizedHeaders } from "../interfaces.js";
-import { httpError, parseGraphQLJSONBody } from "../utils.js";
+import { httpError, noop, parseGraphQLJSONBody } from "../utils.js";
 
 const { getOperationAST, GraphQLError, parse, Source, validate } = graphql;
 
@@ -284,7 +284,7 @@ export function validateGraphQLBody(
 }
 
 const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
-  const { dynamicOptions, resolvedPreset, hooks } = instance;
+  const { dynamicOptions, resolvedPreset, middlewares } = instance;
 
   return async (
     request: NormalizedRequestDigest,
@@ -357,10 +357,11 @@ const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
           ? parseGraphQLBody(resolvedPreset, request, await request.getBody())
           : parseGraphQLQueryParams(await request.getQueryParams());
 
-      // Apply our hooks (if any) to the body (they will mutate the body in place)
+      // Apply our middlewares (if any) to the body (they will mutate the body in place)
       const hookResult =
-        hooks.callbacks.processGraphQLRequestBody != null
-          ? hooks.process("processGraphQLRequestBody", {
+        middlewares.middlewares.processGraphQLRequestBody != null
+          ? middlewares.run("processGraphQLRequestBody", noop, {
+              resolvedPreset,
               body: parsedBody,
               request,
             })

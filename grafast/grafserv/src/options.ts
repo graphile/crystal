@@ -138,6 +138,7 @@ export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
     }
   };
   return {
+    resolvedPreset: config,
     outputDataAsString,
     graphqlPath,
     graphqlOverGET,
