@@ -9,10 +9,6 @@ import type {
 
 const isDev = process.env.GRAPHILE_ENV === "development";
 
-/** @deprecated Use FunctionalityObject */
-export type HookObject<T> = FunctionalityObject<T>;
-
-/** @deprecated Use Middlewares */
 export class AsyncHooks<THooks extends FunctionalityObject<THooks>> {
   callbacks: {
     [key in keyof THooks]?: Array<
@@ -66,9 +62,12 @@ export class AsyncHooks<THooks extends FunctionalityObject<THooks>> {
   }
 }
 
+/* DEPRECATED */
+
+/** @deprecated Use FunctionalityObject */
+export type HookObject<T> = FunctionalityObject<T>;
 /** @deprecated Use `orderedApply` */
 export const applyHooks = orderedApply;
-
 /** @deprecated Use CallbackDescriptor */
 export type PluginHookObject<T extends (...args: any[]) => any> =
   CallbackDescriptor<T>;
