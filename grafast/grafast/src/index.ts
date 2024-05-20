@@ -2,7 +2,7 @@ import "./thereCanBeOnlyOne.js";
 
 import type LRU from "@graphile/lru";
 import debugFactory from "debug";
-import type { PluginHook } from "graphile-config";
+import type { CallbackOrDescriptor } from "graphile-config";
 import type {
   DocumentNode,
   ExecutionArgs as GraphQLExecutionArgs,
@@ -45,9 +45,12 @@ import type {
   $$queryCache,
   CacheByOperationEntry,
   DataFromStep,
+  ExecuteEvent,
   GrafastExecutionArgs,
   GrafastTimeouts,
+  ParseAndValidateEvent,
   ScalarInputPlanResolver,
+  ValidateSchemaEvent,
 } from "./interfaces.js";
 import {
   $$bypassGraphQL,
@@ -735,7 +738,7 @@ declare global {
       grafast?: GraphileConfig.GrafastOptions;
     }
     interface GrafastHooks {
-      args: PluginHook<
+      args: CallbackOrDescriptor<
         (event: {
           args: Grafast.ExecutionArgs;
           ctx: Grafast.RequestContext;
@@ -743,9 +746,18 @@ declare global {
         }) => PromiseOrValue<void>
       >;
     }
+    interface GrafastMiddlewares {
+      validateSchema(event: ValidateSchemaEvent): readonly GraphQLError[];
+      parseAndValidate(
+        event: ParseAndValidateEvent,
+      ): DocumentNode | readonly GraphQLError[];
+      execute(event: ExecuteEvent): ReturnType<typeof execute>;
+      subscribe(event: ExecuteEvent): ReturnType<typeof subscribe>;
+    }
     interface Plugin {
       grafast?: {
         hooks?: GrafastHooks;
+        middlewares?: GrafastMiddlewares;
       };
     }
   }

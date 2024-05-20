@@ -39,9 +39,18 @@ export function subscribe(
   | AsyncGenerator<ExecutionResult | AsyncExecutionResult, void, void>
   | ExecutionResult
 > {
-  return withGrafastArgs(
-    args,
-    args.resolvedPreset ?? resolvedPreset ?? NULL_PRESET,
-    args.outputDataAsString ?? outputDataAsString ?? false,
-  );
+  if (resolvedPreset || outputDataAsString) {
+    return subscribe({
+      resolvedPreset,
+      outputDataAsString,
+      ...args,
+    });
+  }
+  if (args.middlewares) {
+    return args.middlewares.run("subscribe", { args }, ({ args }) =>
+      withGrafastArgs(args),
+    );
+  } else {
+    return withGrafastArgs(args);
+  }
 }

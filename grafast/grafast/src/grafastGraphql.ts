@@ -12,8 +12,9 @@ import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 import { SafeError } from "./error.js";
 import { execute } from "./execute.js";
 import { hookArgs } from "./index.js";
-import type { GrafastArgs } from "./interfaces.js";
+import type { GrafastArgs, GrafastExecutionArgs } from "./interfaces.js";
 import { $$queryCache } from "./interfaces.js";
+import { getMiddlewares } from "./middlewares.js";
 import { isPromiseLike } from "./utils.js";
 
 const { GraphQLError, parse, Source, validate, validateSchema } = graphql;
@@ -113,8 +114,8 @@ const parseAndValidate = (
 };
 
 /**
- * A replacement for GraphQL.js' `graphql` method that calls Grafast's
- * execute instead
+ * @deprecated Second and third parameters should be passed as part of args,
+ * specifically `resolvedPreset` and `requestContext`.
  */
 export function grafast(
   args: GrafastArgs,
@@ -122,7 +123,30 @@ export function grafast(
   legacyCtx?: Partial<Grafast.RequestContext>,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
+>;
+/**
+ * A replacement for GraphQL.js' `graphql` method that calls Grafast's
+ * execute instead
+ */
+export function grafast(
+  args: GrafastArgs,
+): PromiseOrValue<
+  ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
+>;
+export function grafast(
+  args: GrafastArgs,
+  legacyResolvedPreset?: GraphileConfig.ResolvedPreset,
+  legacyCtx?: Partial<Grafast.RequestContext>,
+): PromiseOrValue<
+  ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 > {
+  if (legacyResolvedPreset || legacyCtx) {
+    return grafast({
+      resolvedPreset: legacyResolvedPreset,
+      requestContext: legacyCtx,
+      ...args,
+    });
+  }
   const {
     schema,
     source,
@@ -132,24 +156,37 @@ export function grafast(
     operationName,
     fieldResolver,
     typeResolver,
-    resolvedPreset = legacyResolvedPreset,
-    requestContext = legacyCtx,
+    resolvedPreset,
+    requestContext,
+    middlewares = resolvedPreset ? getMiddlewares(resolvedPreset) : undefined,
   } = args;
 
   // Validate Schema
-  const schemaValidationErrors = validateSchema(schema);
+  const schemaValidationErrors = middlewares
+    ? middlewares.run(
+        "validateSchema",
+        { schema, resolvedPreset: resolvedPreset! },
+        ({ schema }) => validateSchema(schema),
+      )
+    : validateSchema(schema);
   if (schemaValidationErrors.length > 0) {
     return { errors: schemaValidationErrors };
   }
 
   // Cached parse and validate
-  const documentOrErrors = parseAndValidate(schema, source);
+  const documentOrErrors = middlewares
+    ? middlewares.run(
+        "parseAndValidate",
+        { resolvedPreset: resolvedPreset!, schema, source },
+        ({ schema, source }) => parseAndValidate(schema, source),
+      )
+    : parseAndValidate(schema, source);
   if (Array.isArray(documentOrErrors)) {
     return { errors: documentOrErrors };
   }
   const document = documentOrErrors as DocumentNode;
 
-  const executionArgs: ExecutionArgs = {
+  const executionArgs: GrafastExecutionArgs = {
     schema,
     document,
     rootValue,
@@ -158,25 +195,23 @@ export function grafast(
     operationName,
     fieldResolver,
     typeResolver,
+    middlewares,
   };
 
   if (resolvedPreset && requestContext) {
     const argsOrPromise = hookArgs(
       executionArgs,
+      // TODO: remove resolvedPreset, requestContext since they're already included in executionArgs.
       resolvedPreset,
       requestContext,
     );
     if (isPromiseLike(argsOrPromise)) {
-      return Promise.resolve(argsOrPromise).then((hookedArgs) =>
-        execute(hookedArgs, resolvedPreset),
-      );
+      return Promise.resolve(argsOrPromise).then(execute);
     } else {
-      // Execute
-      return execute(argsOrPromise, resolvedPreset);
+      return execute(argsOrPromise);
     }
   } else {
-    // Execute
-    return execute(executionArgs, resolvedPreset);
+    return execute(executionArgs);
   }
 }
 

@@ -23,13 +23,11 @@ import { isPromiseLike } from "./utils.js";
  * @internal
  */
 export function withGrafastArgs(
-  args: ExecutionArgs,
-  resolvedPreset: GraphileConfig.ResolvedPreset,
-  outputDataAsString: boolean,
+  args: GrafastExecutionArgs,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
-  const options = resolvedPreset?.grafast;
+  const options = args.resolvedPreset?.grafast;
   if (isDev) {
     if (
       args.rootValue != null &&
@@ -79,8 +77,9 @@ export function withGrafastArgs(
 
   const rootValue = grafastPrepare(args, {
     explain: options?.explain,
-    outputDataAsString,
     timeouts: options?.timeouts,
+    // TODO: Delete this
+    outputDataAsString: args.outputDataAsString,
   });
   if (unlisten !== null) {
     Promise.resolve(rootValue).then(unlisten, unlisten);
@@ -120,9 +119,18 @@ export function execute(
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 > {
-  return withGrafastArgs(
-    args,
-    args.resolvedPreset ?? resolvedPreset ?? NULL_PRESET,
-    args.outputDataAsString ?? outputDataAsString ?? false,
-  );
+  if (resolvedPreset || outputDataAsString) {
+    return execute({
+      resolvedPreset,
+      outputDataAsString,
+      ...args,
+    });
+  }
+  if (args.middlewares) {
+    return args.middlewares.run("execute", { args }, ({ args }) =>
+      withGrafastArgs(args),
+    );
+  } else {
+    return withGrafastArgs(args);
+  }
 }
