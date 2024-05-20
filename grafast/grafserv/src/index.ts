@@ -1,6 +1,10 @@
 import type { PromiseOrDirect } from "grafast";
 import type { ExecutionArgs, GraphQLError } from "grafast/graphql";
-import type { MiddlewareNext, PluginHook } from "graphile-config";
+import type {
+  CallbackOrDescriptor,
+  MiddlewareNext,
+  PluginHook,
+} from "graphile-config";
 import type { RuruHTMLParts } from "ruru/server";
 
 import type {
@@ -79,14 +83,14 @@ declare global {
       grafserv?: {
         /** @deprecated Please use middlewares instead */
         hooks?: {
-          [key in keyof GrafservHooks]?: PluginHook<
+          [key in keyof GrafservHooks]?: CallbackOrDescriptor<
             GrafservHooks[key] extends (...args: infer UArgs) => infer UResult
               ? (info: GrafservPluginContext, ...args: UArgs) => UResult
               : never
           >;
         };
         middlewares?: {
-          [key in keyof GrafservMiddlewares]?: PluginHook<
+          [key in keyof GrafservMiddlewares]?: CallbackOrDescriptor<
             GrafservMiddlewares[key] extends (
               ...args: infer UArgs
             ) => infer UResult

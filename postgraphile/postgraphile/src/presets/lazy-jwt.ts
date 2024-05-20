@@ -26,66 +26,70 @@ const GrafservPgJWTPlugin: GraphileConfig.Plugin = {
   version,
 
   grafast: {
-    hooks: {
-      args(event) {
-        const { args, ctx, resolvedPreset } = event;
+    middlewares: {
+      prepareArgs(next, event) {
+        const { args } = event;
+        const { resolvedPreset, requestContext: ctx } = args;
         const secret =
-          resolvedPreset.grafserv?.pgJwtSecret ??
-          resolvedPreset.schema?.pgJwtSecret;
-        const pgJwtVerifyOptions = resolvedPreset.grafserv?.pgJwtVerifyOptions;
+          resolvedPreset?.grafserv?.pgJwtSecret ??
+          resolvedPreset?.schema?.pgJwtSecret;
+        const pgJwtVerifyOptions = resolvedPreset?.grafserv?.pgJwtVerifyOptions;
         if (secret) {
-          const authorization = ctx.node?.req?.headers?.authorization;
+          const authorization = ctx?.node?.req?.headers?.authorization;
           if (typeof authorization === "string") {
             const [bearer, token] = authorization.split(" ");
             if (bearer.toLowerCase() === "bearer") {
-              return Promise.resolve().then(async () => {
-                const claims = await new Promise<JwtPayload>(
-                  (resolve, reject) =>
-                    verifyJwt(
-                      token,
-                      secret,
-                      {
-                        algorithms: ["HS256", "HS384"],
-                        audience: "postgraphile",
-                        ...pgJwtVerifyOptions,
-                        complete: false,
-                      },
-                      (err, claims) => {
-                        if (err) {
-                          (err as any).statusCode = 401;
-                          reject(err);
-                        } else if (!claims || typeof claims === "string") {
-                          reject(
-                            Object.assign(new Error("Invalid JWT payload"), {
-                              statusCode: 401,
-                            }),
-                          );
-                        } else {
-                          resolve(claims);
-                        }
-                      },
-                    ),
-                );
-                if (!args.contextValue.pgSettings) {
-                  args.contextValue.pgSettings = Object.create(null);
-                }
-                const pgSettings = args.contextValue.pgSettings!;
-                if (claims.role) {
-                  pgSettings.role = claims.role;
-                }
-                for (const [key, value] of Object.entries(claims)) {
-                  if (
-                    value &&
-                    /^[a-z_][a-z0-9_]*$/i.test(key) &&
-                    key.length <= 52
-                  ) {
-                    pgSettings[`jwt.claims.${key}`] = String(value);
+              return Promise.resolve()
+                .then(async () => {
+                  const claims = await new Promise<JwtPayload>(
+                    (resolve, reject) =>
+                      verifyJwt(
+                        token,
+                        secret,
+                        {
+                          algorithms: ["HS256", "HS384"],
+                          audience: "postgraphile",
+                          ...pgJwtVerifyOptions,
+                          complete: false,
+                        },
+                        (err, claims) => {
+                          if (err) {
+                            (err as any).statusCode = 401;
+                            reject(err);
+                          } else if (!claims || typeof claims === "string") {
+                            reject(
+                              Object.assign(new Error("Invalid JWT payload"), {
+                                statusCode: 401,
+                              }),
+                            );
+                          } else {
+                            resolve(claims);
+                          }
+                        },
+                      ),
+                  );
+                  if (!args.contextValue.pgSettings) {
+                    args.contextValue.pgSettings = Object.create(null);
                   }
-                }
-              });
+                  const pgSettings = args.contextValue.pgSettings!;
+                  if (claims.role) {
+                    pgSettings.role = claims.role;
+                  }
+                  for (const [key, value] of Object.entries(claims)) {
+                    if (
+                      value &&
+                      /^[a-z_][a-z0-9_]*$/i.test(key) &&
+                      key.length <= 52
+                    ) {
+                      pgSettings[`jwt.claims.${key}`] = String(value);
+                    }
+                  }
+                })
+                .then(next);
             }
           }
         }
+        return next();
       },
     },
   },

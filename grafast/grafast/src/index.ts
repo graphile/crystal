@@ -2,7 +2,7 @@ import "./thereCanBeOnlyOne.js";
 
 import type LRU from "@graphile/lru";
 import debugFactory from "debug";
-import type { CallbackOrDescriptor } from "graphile-config";
+import type { CallbackOrDescriptor, MiddlewareNext } from "graphile-config";
 import type {
   DocumentNode,
   ExecutionArgs as GraphQLExecutionArgs,
@@ -759,7 +759,15 @@ declare global {
     }
     interface Plugin {
       grafast?: {
-        middlewares?: GrafastMiddlewares;
+        middlewares?: {
+          [key in keyof GrafastMiddlewares]?: CallbackOrDescriptor<
+            GrafastMiddlewares[key] extends (
+              ...args: infer UArgs
+            ) => infer UResult
+              ? (next: MiddlewareNext<UResult>, ...args: UArgs) => UResult
+              : never
+          >;
+        };
       };
     }
   }
