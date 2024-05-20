@@ -1,27 +1,31 @@
-import type { PluginHook } from "./interfaces.js";
+import type { CallbackDescriptor } from "./interfaces.js";
 
 export type MiddlewareNext<TResult> = () => TResult;
 
 export type MiddlewareObject<T> = Record<
   keyof T,
-  PluginHook<(...args: any[]) => any>
+  CallbackDescriptor<(...args: any[]) => any>
 >;
 
 type ActivityFn<
   TActivities extends MiddlewareObject<TActivities>,
   TActivityName extends keyof TActivities,
-> = TActivities[TActivityName] extends PluginHook<infer UFn> ? UFn : never;
+> = TActivities[TActivityName] extends CallbackDescriptor<infer UFn>
+  ? UFn
+  : never;
 type ActivityParameter<
   TActivities extends MiddlewareObject<TActivities>,
   TActivityName extends keyof TActivities,
-> = TActivities[TActivityName] extends PluginHook<(arg: infer UArg) => any>
+> = TActivities[TActivityName] extends CallbackDescriptor<
+  (arg: infer UArg) => any
+>
   ? UArg
   : never;
 
 type RealActivityFn<
   TActivities extends MiddlewareObject<TActivities>,
   TActivityName extends keyof TActivities,
-> = TActivities[TActivityName] extends PluginHook<
+> = TActivities[TActivityName] extends CallbackDescriptor<
   (arg: infer UArg) => infer UResult
 >
   ? (next: MiddlewareNext<UResult>, arg: UArg) => UResult

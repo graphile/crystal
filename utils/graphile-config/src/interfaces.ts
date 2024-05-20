@@ -14,17 +14,3 @@ export type CallbackDescriptor<
 export type UnwrapCallback<
   T extends CallbackDescriptor<(...args: any[]) => any>,
 > = T extends CallbackDescriptor<infer U> ? U : never;
-
-/* BACKWARDS COMPATIBILITY */
-
-/** @deprecated Use OrderedCallback */
-export type PluginHookObject<T extends (...args: any[]) => any> =
-  OrderedCallback<T>;
-/** @deprecated Use CallbackDescriptor */
-export type PluginHook<
-  T extends (...args: any[]) => PromiseOrDirect<UnwrapCallback<any> | void>,
-> = CallbackDescriptor<T>;
-/** @deprecated Use UnwrapCallback */
-export type PluginHookCallback<
-  T extends CallbackDescriptor<(...args: any[]) => any>,
-> = UnwrapCallback<T>;

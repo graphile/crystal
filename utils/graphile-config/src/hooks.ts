@@ -1,6 +1,11 @@
 import type { FunctionalityObject } from "./functionality.js";
 import { orderedApply } from "./functionality.js";
-import type { CallbackDescriptor } from "./interfaces.js";
+import type {
+  CallbackDescriptor,
+  OrderedCallback,
+  PromiseOrDirect,
+  UnwrapCallback,
+} from "./interfaces.js";
 
 const isDev = process.env.GRAPHILE_ENV === "development";
 
@@ -63,3 +68,15 @@ export class AsyncHooks<THooks extends FunctionalityObject<THooks>> {
 
 /** @deprecated Use `orderedApply` */
 export const applyHooks = orderedApply;
+
+/** @deprecated Use OrderedCallback */
+export type PluginHookObject<T extends (...args: any[]) => any> =
+  OrderedCallback<T>;
+/** @deprecated Use CallbackDescriptor */
+export type PluginHook<
+  T extends (...args: any[]) => PromiseOrDirect<UnwrapCallback<any> | void>,
+> = CallbackDescriptor<T>;
+/** @deprecated Use UnwrapCallback */
+export type PluginHookCallback<
+  T extends CallbackDescriptor<(...args: any[]) => any>,
+> = UnwrapCallback<T>;
