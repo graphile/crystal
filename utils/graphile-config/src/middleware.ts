@@ -1,20 +1,15 @@
-import type { CallbackDescriptor } from "./interfaces.js";
+import type { CallbackDescriptor, FunctionalityObject } from "./interfaces.js";
 
 export type MiddlewareNext<TResult> = () => TResult;
 
-export type MiddlewareObject<T> = Record<
-  keyof T,
-  CallbackDescriptor<(...args: any[]) => any>
->;
-
 type ActivityFn<
-  TActivities extends MiddlewareObject<TActivities>,
+  TActivities extends FunctionalityObject<TActivities>,
   TActivityName extends keyof TActivities,
 > = TActivities[TActivityName] extends CallbackDescriptor<infer UFn>
   ? UFn
   : never;
 type ActivityParameter<
-  TActivities extends MiddlewareObject<TActivities>,
+  TActivities extends FunctionalityObject<TActivities>,
   TActivityName extends keyof TActivities,
 > = TActivities[TActivityName] extends CallbackDescriptor<
   (arg: infer UArg) => any
@@ -23,7 +18,7 @@ type ActivityParameter<
   : never;
 
 type RealActivityFn<
-  TActivities extends MiddlewareObject<TActivities>,
+  TActivities extends FunctionalityObject<TActivities>,
   TActivityName extends keyof TActivities,
 > = TActivities[TActivityName] extends CallbackDescriptor<
   (arg: infer UArg) => infer UResult
@@ -31,7 +26,7 @@ type RealActivityFn<
   ? (next: MiddlewareNext<UResult>, arg: UArg) => UResult
   : never;
 
-export class Middlewares<TActivities extends MiddlewareObject<TActivities>> {
+export class Middlewares<TActivities extends FunctionalityObject<TActivities>> {
   middlewares: {
     [key in keyof TActivities]?: Array<RealActivityFn<TActivities, key>>;
   } = Object.create(null);
@@ -65,7 +60,7 @@ export class Middlewares<TActivities extends MiddlewareObject<TActivities>> {
 }
 
 function executeMiddleware<
-  TActivities extends MiddlewareObject<TActivities>,
+  TActivities extends FunctionalityObject<TActivities>,
   TActivityName extends keyof TActivities,
 >(
   middlewares: ReadonlyArray<RealActivityFn<TActivities, TActivityName>>,

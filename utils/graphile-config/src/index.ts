@@ -4,7 +4,7 @@ import { sortWithBeforeAfterProvides } from "./sort.js";
 
 export { GraphileConfig };
 
-export { FunctionalityObject, orderedApply } from "./functionality.js";
+export { orderedApply } from "./functionality.js";
 export {
   applyHooks,
   AsyncHooks,
@@ -12,8 +12,12 @@ export {
   PluginHook,
   PluginHookObject,
 } from "./hooks.js";
-export type { CallbackDescriptor, OrderedCallback } from "./interfaces.js";
-export type { MiddlewareNext, MiddlewareObject } from "./middleware.js";
+export type {
+  CallbackDescriptor,
+  FunctionalityObject,
+  OrderedCallback,
+} from "./interfaces.js";
+export type { MiddlewareNext } from "./middleware.js";
 export { Middlewares } from "./middleware.js";
 export { isResolvedPreset, resolvePresets } from "./resolvePresets.js";
 

@@ -1,7 +1,7 @@
-import type { FunctionalityObject } from "./functionality.js";
 import { orderedApply } from "./functionality.js";
 import type {
   CallbackDescriptor,
+  FunctionalityObject,
   OrderedCallback,
   PromiseOrDirect,
   UnwrapCallback,

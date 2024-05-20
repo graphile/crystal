@@ -1,14 +1,11 @@
 import type {
+  AnyCallback,
   CallbackDescriptor,
+  FunctionalityObject,
   OrderedCallback,
-  PromiseOrDirect,
 } from "./interfaces.js";
 import { sortWithBeforeAfterProvides } from "./sort.js";
 
-export type FunctionalityObject<T> = Record<
-  keyof T,
-  CallbackDescriptor<(...args: any[]) => any>
->;
 export function orderedApply<
   TFunctionality extends FunctionalityObject<TFunctionality>,
 >(
@@ -57,10 +54,10 @@ export function orderedApply<
         }
 
         // TypeScript nonsense
-        const isOrderedCallback = <T extends (...args: any[]) => any>(
+        const isOrderedCallback = <T extends AnyCallback>(
           v: CallbackDescriptor<T>,
         ): v is OrderedCallback<T> => typeof v !== "function";
-        const isCallback = <T extends (...args: any[]) => any>(
+        const isCallback = <T extends AnyCallback>(
           v: CallbackDescriptor<T>,
         ): v is T => typeof v === "function";
 
