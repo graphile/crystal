@@ -3,6 +3,7 @@ import type {
   CallbackDescriptor,
   FunctionalityObject,
   OrderedCallback,
+  UnwrapCallback,
 } from "./interfaces.js";
 import { sortWithBeforeAfterProvides } from "./sort.js";
 
@@ -29,11 +30,7 @@ export function orderedApply<
     provides: string[];
     before: string[];
     after: string[];
-    callback: TFunctionality[keyof TFunctionality] extends CallbackDescriptor<
-      infer U
-    >
-      ? U
-      : never;
+    callback: UnwrapCallback<TFunctionality[keyof TFunctionality]>;
   };
   // Normalize all the hooks and gather them into collections
   const allFunctionalities: {
