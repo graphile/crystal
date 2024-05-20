@@ -949,7 +949,7 @@ export type DataFromStep<TStep extends ExecutableStep> =
 
 export interface GrafastExecutionArgs extends ExecutionArgs {
   resolvedPreset?: GraphileConfig.ResolvedPreset;
-  middlewares?: Middlewares<GraphileConfig.GrafastMiddlewares>;
+  middlewares?: Middlewares<GraphileConfig.GrafastMiddlewares> | null;
   requestContext?: Partial<Grafast.RequestContext>;
   outputDataAsString?: boolean;
 }

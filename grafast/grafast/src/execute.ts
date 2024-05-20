@@ -6,15 +6,16 @@ import type {
 } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
-import { NULL_PRESET } from "./config.js";
 import { isDev } from "./dev.js";
 import { inspect } from "./inspect.js";
 import type {
+  ExecuteEvent,
   ExecutionEventEmitter,
   ExecutionEventMap,
   GrafastExecutionArgs,
 } from "./interfaces.js";
 import { $$eventEmitter, $$extensions } from "./interfaces.js";
+import { getMiddlewares } from "./middlewares.js";
 import { grafastPrepare } from "./prepare.js";
 import { isPromiseLike } from "./utils.js";
 
@@ -97,7 +98,7 @@ export function withGrafastArgs(
  * specifically `resolvedPreset` and `outputDataAsString`.
  */
 export function execute(
-  args: GrafastExecutionArgs,
+  args: ExecutionArgs,
   resolvedPreset: GraphileConfig.ResolvedPreset | undefined,
   outputDataAsString?: boolean,
 ): PromiseOrValue<
@@ -108,29 +109,39 @@ export function execute(
  * run grafastPrepare for you and handle the result.
  */
 export function execute(
-  args: ExecutionArgs,
+  args: GrafastExecutionArgs,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 >;
 export function execute(
   args: GrafastExecutionArgs,
-  resolvedPreset?: GraphileConfig.ResolvedPreset,
-  outputDataAsString?: boolean,
+  legacyResolvedPreset?: GraphileConfig.ResolvedPreset,
+  legacyOutputDataAsString?: boolean,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 > {
-  if (resolvedPreset || outputDataAsString) {
+  if (
+    legacyResolvedPreset !== undefined ||
+    legacyOutputDataAsString !== undefined ||
+    args.middlewares === undefined
+  ) {
+    const resolvedPreset = args.resolvedPreset ?? legacyResolvedPreset;
+    const middlewares =
+      args.middlewares === undefined && resolvedPreset != null
+        ? getMiddlewares(resolvedPreset)
+        : args.middlewares;
     return execute({
-      resolvedPreset,
-      outputDataAsString,
       ...args,
+      resolvedPreset,
+      middlewares,
     });
   }
-  if (args.middlewares) {
-    return args.middlewares.run("execute", { args }, ({ args }) =>
-      withGrafastArgs(args),
-    );
+  if (args.middlewares != null) {
+    return args.middlewares.run("execute", { args }, executeMiddlewareCallback);
   } else {
     return withGrafastArgs(args);
   }
 }
+
+const executeMiddlewareCallback = (event: ExecuteEvent) =>
+  withGrafastArgs(event.args);

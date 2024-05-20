@@ -31,18 +31,12 @@ export function hookArgs(
     legacyCtx !== undefined ||
     rawArgs.middlewares === undefined
   ) {
-    const resolvedPreset = rawArgs.resolvedPreset ?? legacyResolvedPreset;
-    const requestContext = rawArgs.requestContext ?? legacyCtx;
-    const middlewares =
-      rawArgs.middlewares === undefined && resolvedPreset != null
-        ? getMiddlewares(resolvedPreset)
+    rawArgs.resolvedPreset = rawArgs.resolvedPreset ?? legacyResolvedPreset;
+    rawArgs.requestContext = rawArgs.requestContext ?? legacyCtx;
+    rawArgs.middlewares =
+      rawArgs.middlewares === undefined && rawArgs.resolvedPreset != null
+        ? getMiddlewares(rawArgs.resolvedPreset)
         : rawArgs.middlewares;
-    return hookArgs({
-      ...rawArgs,
-      resolvedPreset,
-      requestContext,
-      middlewares,
-    });
   }
   const args = rawArgs as Grafast.ExecutionArgs;
   const {
