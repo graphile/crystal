@@ -9,12 +9,14 @@ export type OrderedCallback<T extends AnyCallback> = {
 
 export type PromiseOrDirect<T> = T | PromiseLike<T>;
 
-export type CallbackDescriptor<T extends AnyCallback> = T | OrderedCallback<T>;
+export type CallbackOrDescriptor<T extends AnyCallback> =
+  | T
+  | OrderedCallback<T>;
 
-export type UnwrapCallback<T extends CallbackDescriptor<AnyCallback>> =
-  T extends CallbackDescriptor<infer U> ? U : never;
+export type UnwrapCallback<T extends CallbackOrDescriptor<AnyCallback>> =
+  T extends CallbackOrDescriptor<infer U> ? U : never;
 
 export type FunctionalityObject<T> = Record<
   keyof T,
-  CallbackDescriptor<AnyCallback>
+  CallbackOrDescriptor<AnyCallback>
 >;

@@ -1,6 +1,6 @@
 import { orderedApply } from "./functionality.js";
 import type {
-  CallbackDescriptor,
+  CallbackOrDescriptor,
   FunctionalityObject,
   OrderedCallback,
   PromiseOrDirect,
@@ -16,13 +16,13 @@ export type HookObject<T> = FunctionalityObject<T>;
 export class AsyncHooks<THooks extends FunctionalityObject<THooks>> {
   callbacks: {
     [key in keyof THooks]?: Array<
-      THooks[keyof THooks] extends CallbackDescriptor<infer U> ? U : never
+      THooks[keyof THooks] extends CallbackOrDescriptor<infer U> ? U : never
     >;
   } = Object.create(null);
 
   hook<THookName extends keyof THooks>(
     event: THookName,
-    fn: THooks[THookName] extends CallbackDescriptor<infer U> ? U : never,
+    fn: THooks[THookName] extends CallbackOrDescriptor<infer U> ? U : never,
   ): void {
     this.callbacks[event] = this.callbacks[event] || [];
     this.callbacks[event]!.push(fn);
@@ -35,7 +35,7 @@ export class AsyncHooks<THooks extends FunctionalityObject<THooks>> {
   process<THookName extends keyof THooks>(
     hookName: THookName,
     ...args: Parameters<
-      THooks[THookName] extends CallbackDescriptor<infer U> ? U : never
+      THooks[THookName] extends CallbackOrDescriptor<infer U> ? U : never
     >
   ): void | Promise<void> {
     const callbacks = this.callbacks[hookName];
@@ -72,11 +72,11 @@ export const applyHooks = orderedApply;
 /** @deprecated Use OrderedCallback */
 export type PluginHookObject<T extends (...args: any[]) => any> =
   OrderedCallback<T>;
-/** @deprecated Use CallbackDescriptor */
+/** @deprecated Use CallbackOrDescriptor */
 export type PluginHook<
   T extends (...args: any[]) => PromiseOrDirect<UnwrapCallback<any> | void>,
-> = CallbackDescriptor<T>;
+> = CallbackOrDescriptor<T>;
 /** @deprecated Use UnwrapCallback */
 export type PluginHookCallback<
-  T extends CallbackDescriptor<(...args: any[]) => any>,
+  T extends CallbackOrDescriptor<(...args: any[]) => any>,
 > = UnwrapCallback<T>;

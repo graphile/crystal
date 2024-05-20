@@ -1,6 +1,6 @@
 import type {
   AnyCallback,
-  CallbackDescriptor,
+  CallbackOrDescriptor,
   FunctionalityObject,
   OrderedCallback,
   UnwrapCallback,
@@ -16,7 +16,7 @@ export function orderedApply<
   ) => Partial<TFunctionality> | undefined,
   applyCallback: <TFunctionalityName extends keyof TFunctionality>(
     functionalityName: TFunctionalityName,
-    hookFn: TFunctionality[TFunctionalityName] extends CallbackDescriptor<
+    hookFn: TFunctionality[TFunctionalityName] extends CallbackOrDescriptor<
       infer U
     >
       ? U
@@ -52,13 +52,13 @@ export function orderedApply<
 
         // TypeScript nonsense
         const isOrderedCallback = <T extends AnyCallback>(
-          v: CallbackDescriptor<T>,
+          v: CallbackOrDescriptor<T>,
         ): v is OrderedCallback<T> => typeof v !== "function";
         const isCallback = <T extends AnyCallback>(
-          v: CallbackDescriptor<T>,
+          v: CallbackOrDescriptor<T>,
         ): v is T => typeof v === "function";
 
-        const callback: TFunctionality[typeof key] extends CallbackDescriptor<
+        const callback: TFunctionality[typeof key] extends CallbackOrDescriptor<
           infer U
         >
           ? U

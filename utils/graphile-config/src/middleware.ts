@@ -1,17 +1,20 @@
-import type { CallbackDescriptor, FunctionalityObject } from "./interfaces.js";
+import type {
+  CallbackOrDescriptor,
+  FunctionalityObject,
+} from "./interfaces.js";
 
 export type MiddlewareNext<TResult> = () => TResult;
 
 type ActivityFn<
   TActivities extends FunctionalityObject<TActivities>,
   TActivityName extends keyof TActivities,
-> = TActivities[TActivityName] extends CallbackDescriptor<infer UFn>
+> = TActivities[TActivityName] extends CallbackOrDescriptor<infer UFn>
   ? UFn
   : never;
 type ActivityParameter<
   TActivities extends FunctionalityObject<TActivities>,
   TActivityName extends keyof TActivities,
-> = TActivities[TActivityName] extends CallbackDescriptor<
+> = TActivities[TActivityName] extends CallbackOrDescriptor<
   (arg: infer UArg) => any
 >
   ? UArg
@@ -20,7 +23,7 @@ type ActivityParameter<
 type RealActivityFn<
   TActivities extends FunctionalityObject<TActivities>,
   TActivityName extends keyof TActivities,
-> = TActivities[TActivityName] extends CallbackDescriptor<
+> = TActivities[TActivityName] extends CallbackOrDescriptor<
   (arg: infer UArg) => infer UResult
 >
   ? (next: MiddlewareNext<UResult>, arg: UArg) => UResult

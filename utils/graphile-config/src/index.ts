@@ -13,7 +13,7 @@ export {
   PluginHookObject,
 } from "./hooks.js";
 export type {
-  CallbackDescriptor,
+  CallbackOrDescriptor,
   FunctionalityObject,
   OrderedCallback,
 } from "./interfaces.js";
