@@ -49,6 +49,7 @@ import type {
   GrafastExecutionArgs,
   GrafastTimeouts,
   ParseAndValidateEvent,
+  PrepareArgsEvent,
   ScalarInputPlanResolver,
   ValidateSchemaEvent,
 } from "./interfaces.js";
@@ -745,26 +746,19 @@ declare global {
        */
       grafast?: GraphileConfig.GrafastOptions;
     }
-    interface GrafastHooks {
-      args: CallbackOrDescriptor<
-        (event: {
-          args: Grafast.ExecutionArgs;
-          ctx: Grafast.RequestContext;
-          resolvedPreset: GraphileConfig.ResolvedPreset;
-        }) => PromiseOrValue<void>
-      >;
-    }
     interface GrafastMiddlewares {
       validateSchema(event: ValidateSchemaEvent): readonly GraphQLError[];
       parseAndValidate(
         event: ParseAndValidateEvent,
       ): DocumentNode | readonly GraphQLError[];
+      prepareArgs(
+        event: PrepareArgsEvent,
+      ): PromiseOrDirect<Grafast.ExecutionArgs>;
       execute(event: ExecuteEvent): ReturnType<typeof execute>;
       subscribe(event: ExecuteEvent): ReturnType<typeof subscribe>;
     }
     interface Plugin {
       grafast?: {
-        hooks?: GrafastHooks;
         middlewares?: GrafastMiddlewares;
       };
     }

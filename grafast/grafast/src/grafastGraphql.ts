@@ -140,7 +140,11 @@ export function grafast(
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 > {
-  if (legacyResolvedPreset || legacyCtx || args.middlewares === undefined) {
+  if (
+    legacyResolvedPreset !== undefined ||
+    legacyCtx !== undefined ||
+    args.middlewares === undefined
+  ) {
     const resolvedPreset = args.resolvedPreset ?? legacyResolvedPreset;
     const requestContext = args.requestContext ?? legacyCtx;
     const middlewares =
@@ -203,15 +207,12 @@ export function grafast(
     fieldResolver,
     typeResolver,
     middlewares,
+    resolvedPreset,
+    requestContext,
   };
 
   if (resolvedPreset && requestContext) {
-    const argsOrPromise = hookArgs(
-      executionArgs,
-      // TODO: remove resolvedPreset, requestContext since they're already included in executionArgs.
-      resolvedPreset,
-      requestContext,
-    );
+    const argsOrPromise = hookArgs(executionArgs);
     if (isPromiseLike(argsOrPromise)) {
       return Promise.resolve(argsOrPromise).then(execute);
     } else {

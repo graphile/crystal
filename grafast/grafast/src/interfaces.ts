@@ -963,6 +963,9 @@ export interface ParseAndValidateEvent {
   schema: GraphQLSchema;
   source: string | Source;
 }
+export interface PrepareArgsEvent {
+  args: Grafast.ExecutionArgs;
+}
 export interface ExecuteEvent {
   args: GrafastExecutionArgs;
 }

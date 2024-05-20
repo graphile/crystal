@@ -1,8 +1,8 @@
 import type { ExecutionArgs } from "graphql";
 
-import { hook, NULL_PRESET } from "./config.js";
-import type { GrafastExecutionArgs } from "./interfaces.js";
+import type { GrafastExecutionArgs, PromiseOrDirect } from "./interfaces.js";
 import { $$hooked } from "./interfaces.js";
+import { getMiddlewares } from "./middlewares.js";
 import { isPromiseLike } from "./utils.js";
 const EMPTY_OBJECT: Record<string, never> = Object.freeze(Object.create(null));
 
@@ -11,10 +11,10 @@ export function hookArgs(
   rawArgs: ExecutionArgs,
   resolvedPreset: GraphileConfig.ResolvedPreset,
   ctx: Partial<Grafast.RequestContext>,
-): Grafast.ExecutionArgs | PromiseLike<Grafast.ExecutionArgs>;
+): PromiseOrDirect<Grafast.ExecutionArgs>;
 export function hookArgs(
   rawArgs: GrafastExecutionArgs,
-): Grafast.ExecutionArgs | PromiseLike<Grafast.ExecutionArgs>;
+): PromiseOrDirect<Grafast.ExecutionArgs>;
 /**
  * Applies Graphile Config hooks to your GraphQL request, e.g. to
  * populate context or similar.
@@ -25,16 +25,31 @@ export function hookArgs(
   rawArgs: GrafastExecutionArgs,
   legacyResolvedPreset?: GraphileConfig.ResolvedPreset,
   legacyCtx?: Partial<Grafast.RequestContext>,
-): Grafast.ExecutionArgs | PromiseLike<Grafast.ExecutionArgs> {
-  if (legacyResolvedPreset || legacyCtx) {
+): PromiseOrDirect<Grafast.ExecutionArgs> {
+  if (
+    legacyResolvedPreset !== undefined ||
+    legacyCtx !== undefined ||
+    rawArgs.middlewares === undefined
+  ) {
+    const resolvedPreset = rawArgs.resolvedPreset ?? legacyResolvedPreset;
+    const requestContext = rawArgs.requestContext ?? legacyCtx;
+    const middlewares =
+      rawArgs.middlewares === undefined && resolvedPreset != null
+        ? getMiddlewares(resolvedPreset)
+        : rawArgs.middlewares;
     return hookArgs({
-      resolvedPreset: legacyResolvedPreset,
-      requestContext: legacyCtx,
       ...rawArgs,
+      resolvedPreset,
+      requestContext,
+      middlewares,
     });
   }
   const args = rawArgs as Grafast.ExecutionArgs;
-  const { resolvedPreset, requestContext: ctx = EMPTY_OBJECT } = args;
+  const {
+    resolvedPreset,
+    requestContext: ctx = EMPTY_OBJECT,
+    middlewares,
+  } = args;
   // Assert that args haven't already been hooked
   if (args[$$hooked]) {
     throw new Error("Must not call hookArgs twice!");
@@ -67,19 +82,11 @@ export function hookArgs(
     }
   };
 
-  if (
-    resolvedPreset != null &&
-    resolvedPreset !== NULL_PRESET &&
-    resolvedPreset.plugins &&
-    resolvedPreset.plugins.length > 0
-  ) {
-    const event = { args, ctx, resolvedPreset };
-    const result = hook(resolvedPreset, "args", event);
-    if (isPromiseLike(result)) {
-      return result.then(() => finalize(event.args));
-    } else {
-      return finalize(event.args);
-    }
+  if (middlewares) {
+    return middlewares.run("prepareArgs", { args }, ({ args }) =>
+      finalize(args),
+    );
+  } else {
+    return finalize(args);
   }
-  return finalize(args);
 }
