@@ -4,12 +4,8 @@ import { sortWithBeforeAfterProvides } from "./sort.js";
 
 export { GraphileConfig };
 
-export {
-  applyHooks,
-  AsyncHookResultHandler,
-  AsyncHooks,
-  HookObject,
-} from "./hooks.js";
+export { FunctionalityObject, orderedApply } from "./functionality.js";
+export { applyHooks, AsyncHooks, HookObject } from "./hooks.js";
 export type { PluginHook, PluginHookObject } from "./interfaces.js";
 export type { MiddlewareNext, MiddlewareObject } from "./middleware.js";
 export { Middlewares } from "./middleware.js";
