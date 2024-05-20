@@ -83,7 +83,7 @@ export function withHooks<TResult>(
   return withGraphileConfig((gc) => {
     if (gc !== null) {
       const hooks = new gc.AsyncHooks<GraphileConfig.GrafastHooks>();
-      gc.applyHooks(
+      gc.orderedApply(
         plugins,
         (p) => p.grafast?.hooks,
         (name, fn, _plugin) => {

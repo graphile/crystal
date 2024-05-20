@@ -1,6 +1,6 @@
 import { isPromiseLike } from "grafast";
 import type { MiddlewareNext } from "graphile-config";
-import { applyHooks, Middlewares } from "graphile-config";
+import { Middlewares,orderedApply } from "graphile-config";
 
 // We could use a global WeakMap, but storing directly onto the resolvedPreset
 // should use more traditional garbage collection.
@@ -15,7 +15,7 @@ export function getGrafservMiddlewares(
     return resolvedPreset[$$middleware];
   }
   const hooks = new Middlewares<GraphileConfig.GrafservMiddlewares>();
-  applyHooks(
+  orderedApply(
     resolvedPreset.plugins,
     (p) => p.grafserv?.middlewares,
     (name, fn, _plugin) => {
@@ -24,7 +24,7 @@ export function getGrafservMiddlewares(
   );
 
   // TODO: Delete this backwards compatibility
-  applyHooks(
+  orderedApply(
     resolvedPreset.plugins,
     (p) => p.grafserv?.hooks,
     (name, fn, _plugin) => {
