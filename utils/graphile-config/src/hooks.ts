@@ -1,16 +1,12 @@
-import type {
-  PluginHook,
-  PluginHookObject,
-  PromiseOrDirect,
-} from "./interfaces.js";
-import { sortWithBeforeAfterProvides } from "./sort.js";
+import type { FunctionalityObject } from "./functionality.js";
+import { orderedApply } from "./functionality.js";
+import type { CallbackDescriptor, PromiseOrDirect } from "./interfaces.js";
+import { isPromiseLike } from "./utils.js";
 
 const isDev = process.env.GRAPHILE_ENV === "development";
 
-export type HookObject<T> = Record<
-  keyof T,
-  PluginHook<(...args: any[]) => any>
->;
+/** @deprecated Use FunctionalityObject */
+export type HookObject<T> = FunctionalityObject<T>;
 
 export type AsyncHookResultHandler<TResult> = (
   result: AsyncHookResult<TResult>,
@@ -49,7 +45,7 @@ function finish<TResult>(result: AsyncHookResult<TResult>) {
 
 /**
  * When we've finished the implementation() call, this goes through our
- * stack of result handlers and calls the handler for each hook in reverse
+ * stack of result handlers and calls the handler for each functionality in reverse
  * order. Each handler may or may not be asynchronous, so this forms a
  * queue.
  */
@@ -92,16 +88,17 @@ function handleResult<TResult>(
   }
 }
 
-export class AsyncHooks<THooks extends HookObject<THooks>> {
+/** @deprecated Use Middlewares */
+export class AsyncHooks<THooks extends FunctionalityObject<THooks>> {
   callbacks: {
     [key in keyof THooks]?: Array<
-      THooks[keyof THooks] extends PluginHook<infer U> ? U : never
+      THooks[keyof THooks] extends CallbackDescriptor<infer U> ? U : never
     >;
   } = Object.create(null);
 
   hook<THookName extends keyof THooks>(
     event: THookName,
-    fn: THooks[THookName] extends PluginHook<infer U> ? U : never,
+    fn: THooks[THookName] extends CallbackDescriptor<infer U> ? U : never,
   ): void {
     this.callbacks[event] = this.callbacks[event] || [];
     this.callbacks[event]!.push(fn);
@@ -110,11 +107,11 @@ export class AsyncHooks<THooks extends HookObject<THooks>> {
   call<THookName extends keyof THooks, TResult>(
     hookName: THookName,
     event: Parameters<
-      THooks[THookName] extends PluginHook<infer U> ? U : never
+      THooks[THookName] extends CallbackDescriptor<infer U> ? U : never
     >[0],
     implementation: (
       event: Parameters<
-        THooks[THookName] extends PluginHook<infer U> ? U : never
+        THooks[THookName] extends CallbackDescriptor<infer U> ? U : never
       >[0],
     ) => PromiseOrDirect<TResult>,
   ): PromiseOrDirect<TResult> {
@@ -219,7 +216,7 @@ export class AsyncHooks<THooks extends HookObject<THooks>> {
   process<THookName extends keyof THooks>(
     hookName: THookName,
     ...args: Parameters<
-      THooks[THookName] extends PluginHook<infer U> ? U : never
+      THooks[THookName] extends CallbackDescriptor<infer U> ? U : never
     >
   ): void | Promise<void> {
     const callbacks = this.callbacks[hookName];
@@ -250,96 +247,5 @@ export class AsyncHooks<THooks extends HookObject<THooks>> {
   }
 }
 
-export function applyHooks<THooks extends HookObject<THooks>>(
-  plugins: readonly GraphileConfig.Plugin[] | undefined,
-  hooksRetriever: (
-    plugin: GraphileConfig.Plugin,
-  ) => Partial<THooks> | undefined,
-  applyHookCallback: <THookName extends keyof THooks>(
-    hookName: THookName,
-    hookFn: THooks[THookName] extends PluginHook<infer U> ? U : never,
-    plugin: GraphileConfig.Plugin,
-  ) => void,
-): void {
-  type FullHookSpec = {
-    id: string;
-    plugin: GraphileConfig.Plugin;
-    provides: string[];
-    before: string[];
-    after: string[];
-    callback: THooks[keyof THooks] extends PluginHook<infer U> ? U : never;
-  };
-  // Normalize all the hooks and gather them into collections
-  const allHooks: {
-    [key in keyof THooks]?: Array<FullHookSpec>;
-  } = Object.create(null);
-  let uid = 0;
-  if (plugins) {
-    for (const plugin of plugins) {
-      const hooks = hooksRetriever(plugin);
-      if (!hooks) {
-        continue;
-      }
-      const keys = Object.keys(hooks) as unknown as Array<keyof typeof hooks>;
-      for (const key of keys) {
-        const hookSpecRaw: THooks[typeof key] | undefined = hooks[key];
-        if (!hookSpecRaw) {
-          continue;
-        }
-
-        // TypeScript nonsense
-        const isPluginHookObject = <T extends (...args: any[]) => any>(
-          v: PluginHook<T>,
-        ): v is PluginHookObject<T> => typeof v !== "function";
-        const isPluginHookFunction = <T extends (...args: any[]) => any>(
-          v: PluginHook<T>,
-        ): v is T => typeof v === "function";
-
-        const callback: THooks[typeof key] extends PluginHook<infer U>
-          ? U
-          : never = (
-          isPluginHookFunction(hookSpecRaw) ? hookSpecRaw : hookSpecRaw.callback
-        ) as any;
-        const { provides, before, after } = isPluginHookObject(hookSpecRaw)
-          ? hookSpecRaw
-          : ({} as { provides?: never[]; before?: never[]; after?: never });
-        if (!allHooks[key]) {
-          allHooks[key] = [];
-        }
-        // We need to give each hook a unique ID
-        const id = String(uid++);
-        allHooks[key]!.push({
-          id,
-          plugin,
-          callback,
-          provides: [...(provides || []), id, plugin.name],
-          before: before || [],
-          after: after || [],
-        });
-      }
-    }
-  }
-
-  // Sort the collections according to provides, before and after.
-  for (const hookName in allHooks) {
-    const hooks = allHooks[hookName] as FullHookSpec[] | undefined;
-    if (!hooks) {
-      continue;
-    }
-
-    const final = sortWithBeforeAfterProvides(hooks, "id");
-
-    // Finally we can register the hooks
-    for (const hook of final) {
-      applyHookCallback(hookName, hook.callback, hook.plugin);
-    }
-  }
-}
-
-function isPromiseLike<T>(value: T | PromiseLike<T>): value is PromiseLike<T> {
-  return (
-    typeof value === "object" &&
-    value !== null &&
-    typeof (value as any).then === "function"
-  );
-}
+/** @deprecated Use `orderedApply` */
+export const applyHooks = orderedApply;
