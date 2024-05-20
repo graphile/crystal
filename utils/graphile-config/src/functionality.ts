@@ -1,8 +1,8 @@
 import type {
   AnyCallback,
+  CallbackDescriptor,
   CallbackOrDescriptor,
   FunctionalityObject,
-  OrderedCallback,
   UnwrapCallback,
 } from "./interfaces.js";
 import { sortWithBeforeAfterProvides } from "./sort.js";
@@ -51,9 +51,9 @@ export function orderedApply<
         }
 
         // TypeScript nonsense
-        const isOrderedCallback = <T extends AnyCallback>(
+        const isCallbackDescriptor = <T extends AnyCallback>(
           v: CallbackOrDescriptor<T>,
-        ): v is OrderedCallback<T> => typeof v !== "function";
+        ): v is CallbackDescriptor<T> => typeof v !== "function";
         const isCallback = <T extends AnyCallback>(
           v: CallbackOrDescriptor<T>,
         ): v is T => typeof v === "function";
@@ -65,7 +65,7 @@ export function orderedApply<
           : never = (
           isCallback(hookSpecRaw) ? hookSpecRaw : hookSpecRaw.callback
         ) as any;
-        const { provides, before, after } = isOrderedCallback(hookSpecRaw)
+        const { provides, before, after } = isCallbackDescriptor(hookSpecRaw)
           ? hookSpecRaw
           : ({} as { provides?: never[]; before?: never[]; after?: never });
         if (!allFunctionalities[key]) {
