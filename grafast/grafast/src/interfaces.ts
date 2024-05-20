@@ -19,10 +19,12 @@ import type {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLType,
+  OperationDefinitionNode,
   Source,
   ValueNode,
   VariableNode,
 } from "graphql";
+import type { ObjMap } from "graphql/jsutils/ObjMap.js";
 
 import type { Bucket, RequestTools } from "./bucket.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
@@ -970,5 +972,15 @@ export interface ExecuteEvent {
   args: GrafastExecutionArgs;
 }
 export interface SubscribeEvent {
+  args: GrafastExecutionArgs;
+}
+export interface EstablishOperationPlanEvent {
+  schema: GraphQLSchema;
+  operation: OperationDefinitionNode;
+  fragments: ObjMap<FragmentDefinitionNode>;
+  variableValues: Record<string, any>;
+  context: any;
+  rootValue: any;
+  planningTimeout: number | undefined;
   args: GrafastExecutionArgs;
 }

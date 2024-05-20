@@ -29,8 +29,13 @@ import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
 import type { OutputPlan } from "./engine/OutputPlan.js";
 import { coerceError, getChildBucketAndIndex } from "./engine/OutputPlan.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
-import type { GrafastPlanJSON, OperationPlan } from "./index.js";
 import type {
+  GrafastExecutionArgs,
+  GrafastPlanJSON,
+  OperationPlan,
+} from "./index.js";
+import type {
+  EstablishOperationPlanEvent,
   GrafastTimeouts,
   JSONValue,
   PromiseOrDirect,
@@ -537,11 +542,23 @@ declare module "./engine/OperationPlan.js" {
   }
 }
 
+function establishOperationPlanFromEvent(event: EstablishOperationPlanEvent) {
+  return establishOperationPlan(
+    event.schema,
+    event.operation,
+    event.fragments,
+    event.variableValues,
+    event.context as any,
+    event.rootValue,
+    event.planningTimeout,
+  );
+}
+
 /**
  * @internal
  */
 export function grafastPrepare(
-  args: ExecutionArgs,
+  args: GrafastExecutionArgs,
   options: GrafastPrepareOptions = {},
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
@@ -552,6 +569,7 @@ export function grafastPrepare(
     rootValue = Object.create(null),
     // operationName,
     // document,
+    middlewares,
   } = args;
   const exeContext = buildExecutionContext(args);
 
@@ -567,15 +585,32 @@ export function grafastPrepare(
   const planningTimeout = options.timeouts?.planning;
   let operationPlan!: OperationPlan;
   try {
-    operationPlan = establishOperationPlan(
-      schema,
-      operation,
-      fragments,
-      variableValues,
-      context as any,
-      rootValue,
-      planningTimeout,
-    );
+    if (middlewares) {
+      operationPlan = middlewares.run(
+        "establishOperationPlan",
+        {
+          schema,
+          operation,
+          fragments,
+          variableValues,
+          context: context as any,
+          rootValue,
+          planningTimeout,
+          args,
+        },
+        establishOperationPlanFromEvent,
+      );
+    } else {
+      operationPlan = establishOperationPlan(
+        schema,
+        operation,
+        fragments,
+        variableValues,
+        context as any,
+        rootValue,
+        planningTimeout,
+      );
+    }
   } catch (error) {
     const graphqlError =
       error instanceof GraphQLError

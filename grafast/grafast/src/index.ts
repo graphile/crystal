@@ -45,6 +45,7 @@ import type {
   $$queryCache,
   CacheByOperationEntry,
   DataFromStep,
+  EstablishOperationPlanEvent,
   ExecuteEvent,
   GrafastExecutionArgs,
   GrafastTimeouts,
@@ -756,6 +757,7 @@ declare global {
       ): PromiseOrDirect<Grafast.ExecutionArgs>;
       execute(event: ExecuteEvent): ReturnType<typeof execute>;
       subscribe(event: ExecuteEvent): ReturnType<typeof subscribe>;
+      establishOperationPlan(event: EstablishOperationPlanEvent): OperationPlan;
     }
     interface Plugin {
       grafast?: {
