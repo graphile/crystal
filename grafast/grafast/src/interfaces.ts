@@ -29,7 +29,12 @@ import type { ObjMap } from "graphql/jsutils/ObjMap.js";
 import type { Bucket, RequestTools } from "./bucket.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { FlaggedValue, SafeError } from "./error.js";
-import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
+import type {
+  ExecutableStep,
+  ListCapableStep,
+  ModifierStep,
+  StreamableStep,
+} from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type {
   __InputListStep,
@@ -983,4 +988,14 @@ export interface EstablishOperationPlanEvent {
   rootValue: any;
   planningTimeout: number | undefined;
   args: GrafastExecutionArgs;
+}
+export interface ExecuteStepEvent {
+  args: GrafastExecutionArgs;
+  step: ExecutableStep;
+  executeDetails: ExecutionDetails;
+}
+export interface StreamStepEvent {
+  args: GrafastExecutionArgs;
+  step: StreamableStep<unknown>;
+  streamDetails: StreamDetails;
 }

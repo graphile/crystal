@@ -47,11 +47,13 @@ import type {
   DataFromStep,
   EstablishOperationPlanEvent,
   ExecuteEvent,
+  ExecuteStepEvent,
   GrafastExecutionArgs,
   GrafastTimeouts,
   ParseAndValidateEvent,
   PrepareArgsEvent,
   ScalarInputPlanResolver,
+  StreamStepEvent,
   ValidateSchemaEvent,
 } from "./interfaces.js";
 import {
@@ -758,6 +760,12 @@ declare global {
       execute(event: ExecuteEvent): ReturnType<typeof execute>;
       subscribe(event: ExecuteEvent): ReturnType<typeof subscribe>;
       establishOperationPlan(event: EstablishOperationPlanEvent): OperationPlan;
+      executeStep(
+        event: ExecuteStepEvent,
+      ): PromiseOrDirect<GrafastResultsList<any>>;
+      streamStep(
+        event: StreamStepEvent,
+      ): PromiseOrDirect<GrafastResultStreamList<unknown>>;
     }
     interface Plugin {
       grafast?: {

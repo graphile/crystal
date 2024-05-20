@@ -299,6 +299,7 @@ function outputBucket(
 }
 
 function executePreemptive(
+  args: GrafastExecutionArgs,
   operationPlan: OperationPlan,
   variableValues: any,
   context: any,
@@ -337,6 +338,7 @@ function executePreemptive(
   const stopTime =
     executionTimeout !== null ? startTime + executionTimeout : null;
   const requestContext: RequestTools = {
+    args,
     startTime,
     stopTime,
     // toSerialize: [],
@@ -644,6 +646,7 @@ export function grafastPrepare(
 
   const executionTimeout = options.timeouts?.execution ?? null;
   return executePreemptive(
+    args,
     operationPlan,
     variableValues,
     context,

@@ -7,17 +7,22 @@ import { isFlaggedValue, SafeError } from "../error.js";
 import { inspect } from "../inspect.js";
 import type {
   BatchExecutionValue,
+  ExecuteStepEvent,
+  ExecutionDetails,
   ExecutionEntryFlags,
   ExecutionExtra,
   ExecutionValue,
   ForcedValues,
+  GrafastExecutionArgs,
   GrafastInternalResultsOrStream,
   GrafastResultsList,
   GrafastResultStreamList,
   IndexForEach,
   IndexMap,
   PromiseOrDirect,
+  StreamDetails,
   StreamMaybeMoreableArray,
+  StreamStepEvent,
   UnaryExecutionValue,
   UnbatchedExecutionExtra,
 } from "../interfaces.js";
@@ -111,7 +116,8 @@ export function executeBucket(
     }
   }
 
-  const { stopTime, eventEmitter } = requestContext;
+  const { stopTime, eventEmitter, args } = requestContext;
+  const { middlewares } = args;
   const {
     metaByMetaKey,
     size,
@@ -750,27 +756,45 @@ export function executeBucket(
           `${step} is using a legacy form of 'stream' which accepts multiple arguments, please see https://err.red/gev2`,
         );
       }
-      return step.stream({
+      const streamDetails: StreamDetails<readonly any[]> = {
         indexMap: makeIndexMap(count),
         indexForEach: makeIndexForEach(count),
         count,
         values,
         extra,
         streamOptions,
-      });
+      };
+      if (!step.isSyncAndSafe && middlewares) {
+        return middlewares.run(
+          "streamStep",
+          { args, step, streamDetails },
+          streamStepFromEvent,
+        );
+      } else {
+        return step.stream(streamDetails);
+      }
     } else {
       if (step.execute.length > 1) {
         throw new Error(
           `${step} is using a legacy form of 'execute' which accepts multiple arguments, please see https://err.red/gev2`,
         );
       }
-      return step.execute({
+      const executeDetails: ExecutionDetails<readonly any[]> = {
         indexMap: makeIndexMap(count),
         indexForEach: makeIndexForEach(count),
         count,
         values,
         extra,
-      });
+      };
+      if (!step.isSyncAndSafe && middlewares) {
+        return middlewares.run(
+          "executeStep",
+          { args, step, executeDetails },
+          executeStepFromEvent,
+        );
+      } else {
+        return step.execute(executeDetails);
+      }
     }
   }
 
@@ -1405,4 +1429,12 @@ function makeIndexForEach(count: number) {
     indexForEachCache.set(count, result);
   }
   return result;
+}
+
+function streamStepFromEvent(event: StreamStepEvent) {
+  return event.step.stream(event.streamDetails);
+}
+
+function executeStepFromEvent(event: ExecuteStepEvent) {
+  return event.step.execute(event.executeDetails);
 }
