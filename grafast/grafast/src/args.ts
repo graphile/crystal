@@ -1,9 +1,20 @@
 import type { ExecutionArgs } from "graphql";
 
 import { hook, NULL_PRESET } from "./config.js";
+import type { GrafastExecutionArgs } from "./interfaces.js";
 import { $$hooked } from "./interfaces.js";
 import { isPromiseLike } from "./utils.js";
+const EMPTY_OBJECT: Record<string, never> = Object.freeze(Object.create(null));
 
+/** @deprecated Pass `resolvedPreset` and `requestContext` via args directly */
+export function hookArgs(
+  rawArgs: ExecutionArgs,
+  resolvedPreset: GraphileConfig.ResolvedPreset,
+  ctx: Partial<Grafast.RequestContext>,
+): Grafast.ExecutionArgs | PromiseLike<Grafast.ExecutionArgs>;
+export function hookArgs(
+  rawArgs: GrafastExecutionArgs,
+): Grafast.ExecutionArgs | PromiseLike<Grafast.ExecutionArgs>;
 /**
  * Applies Graphile Config hooks to your GraphQL request, e.g. to
  * populate context or similar.
@@ -11,11 +22,19 @@ import { isPromiseLike } from "./utils.js";
  * @experimental
  */
 export function hookArgs(
-  rawArgs: ExecutionArgs,
-  resolvedPreset: GraphileConfig.ResolvedPreset,
-  ctx: Partial<Grafast.RequestContext>,
+  rawArgs: GrafastExecutionArgs,
+  legacyResolvedPreset?: GraphileConfig.ResolvedPreset,
+  legacyCtx?: Partial<Grafast.RequestContext>,
 ): Grafast.ExecutionArgs | PromiseLike<Grafast.ExecutionArgs> {
+  if (legacyResolvedPreset || legacyCtx) {
+    return hookArgs({
+      resolvedPreset: legacyResolvedPreset,
+      requestContext: legacyCtx,
+      ...rawArgs,
+    });
+  }
   const args = rawArgs as Grafast.ExecutionArgs;
+  const { resolvedPreset, requestContext: ctx = EMPTY_OBJECT } = args;
   // Assert that args haven't already been hooked
   if (args[$$hooked]) {
     throw new Error("Must not call hookArgs twice!");
@@ -27,7 +46,7 @@ export function hookArgs(
 
   // finalize(args): args is deliberately shadowed
   const finalize = (args: Grafast.ExecutionArgs) => {
-    const userContext = resolvedPreset.grafast?.context;
+    const userContext = resolvedPreset?.grafast?.context;
     if (typeof userContext === "function") {
       const result = userContext(ctx, args);
       if (isPromiseLike(result)) {
@@ -49,6 +68,7 @@ export function hookArgs(
   };
 
   if (
+    resolvedPreset != null &&
     resolvedPreset !== NULL_PRESET &&
     resolvedPreset.plugins &&
     resolvedPreset.plugins.length > 0

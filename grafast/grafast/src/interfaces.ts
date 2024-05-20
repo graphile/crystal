@@ -949,8 +949,9 @@ export type DataFromStep<TStep extends ExecutableStep> =
 
 export interface GrafastExecutionArgs extends ExecutionArgs {
   resolvedPreset?: GraphileConfig.ResolvedPreset;
-  outputDataAsString?: boolean;
   middlewares?: Middlewares<GraphileConfig.GrafastMiddlewares>;
+  requestContext?: Partial<Grafast.RequestContext>;
+  outputDataAsString?: boolean;
 }
 
 export interface ValidateSchemaEvent {

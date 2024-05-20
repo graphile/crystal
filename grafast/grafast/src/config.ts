@@ -65,7 +65,7 @@ declare global {
   }
 }
 
-export function withHooks<TResult>(
+function withHooks<TResult>(
   resolvedPreset: GraphileConfig.ResolvedPreset,
   callback: (
     hooks: AsyncHooks<GraphileConfig.GrafastHooks> | null,

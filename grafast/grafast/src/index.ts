@@ -604,8 +604,16 @@ export const DeepEvalStep = ApplyTransformsStep;
 declare global {
   namespace Grafast {
     type ExecutionArgs = Pick<
-      GraphQLExecutionArgs,
-      "schema" | "document" | "rootValue" | "variableValues" | "operationName"
+      GrafastExecutionArgs,
+      | "schema"
+      | "document"
+      | "rootValue"
+      | "variableValues"
+      | "operationName"
+      | "resolvedPreset"
+      | "middlewares"
+      | "requestContext"
+      | "outputDataAsString"
     > & { [$$hooked]?: boolean; contextValue: Grafast.Context };
 
     /**
