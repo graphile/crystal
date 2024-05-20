@@ -29,6 +29,7 @@ export type {
   BufferStreamResult,
   ErrorResult,
   EventStreamHeandlerResult,
+  ExecutionConfig,
   GrafservBody,
   GrafservBodyBuffer,
   GrafservBodyJSON,

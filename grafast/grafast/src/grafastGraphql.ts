@@ -185,13 +185,14 @@ export function grafast(
   }
 
   // Cached parse and validate
-  const documentOrErrors = middlewares
-    ? middlewares.run(
-        "parseAndValidate",
-        { resolvedPreset: resolvedPreset!, schema, source },
-        ({ schema, source }) => parseAndValidate(schema, source),
-      )
-    : parseAndValidate(schema, source);
+  const documentOrErrors =
+    middlewares != null && resolvedPreset != null
+      ? middlewares.run(
+          "parseAndValidate",
+          { resolvedPreset, schema, source },
+          ({ schema, source }) => parseAndValidate(schema, source),
+        )
+      : parseAndValidate(schema, source);
   if (Array.isArray(documentOrErrors)) {
     return { errors: documentOrErrors };
   }
