@@ -140,11 +140,18 @@ export function grafast(
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 > {
-  if (legacyResolvedPreset || legacyCtx) {
+  if (legacyResolvedPreset || legacyCtx || args.middlewares === undefined) {
+    const resolvedPreset = args.resolvedPreset ?? legacyResolvedPreset;
+    const requestContext = args.requestContext ?? legacyCtx;
+    const middlewares =
+      args.middlewares === undefined && resolvedPreset != null
+        ? getMiddlewares(resolvedPreset)
+        : args.middlewares;
     return grafast({
-      resolvedPreset: legacyResolvedPreset,
-      requestContext: legacyCtx,
       ...args,
+      resolvedPreset,
+      requestContext,
+      middlewares,
     });
   }
   const {
@@ -158,7 +165,7 @@ export function grafast(
     typeResolver,
     resolvedPreset,
     requestContext,
-    middlewares = resolvedPreset ? getMiddlewares(resolvedPreset) : undefined,
+    middlewares,
   } = args;
 
   // Validate Schema
