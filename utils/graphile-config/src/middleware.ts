@@ -2,6 +2,7 @@ import type {
   CallbackOrDescriptor,
   FunctionalityObject,
 } from "./interfaces.js";
+import { isPromiseLike } from "./utils.js";
 
 export type MiddlewareNext<TResult> = () => TResult;
 
@@ -58,7 +59,37 @@ export class Middlewares<TActivities extends FunctionalityObject<TActivities>> {
       return activity(arg);
     }
     const m = middlewares.length - 1;
-    return executeMiddleware(middlewares, activity, arg, 0, m);
+    return executeMiddleware(
+      activityName,
+      true,
+      middlewares,
+      activity,
+      arg,
+      0,
+      m,
+    );
+  }
+  runSync<TActivityName extends keyof TActivities>(
+    activityName: TActivityName,
+    arg: ActivityParameter<TActivities, TActivityName>,
+    activity: (
+      arg: ActivityParameter<TActivities, TActivityName>,
+    ) => ReturnType<ActivityFn<TActivities, TActivityName>>,
+  ) {
+    const middlewares = this.middlewares[activityName];
+    if (middlewares === undefined) {
+      return activity(arg);
+    }
+    const m = middlewares.length - 1;
+    return executeMiddleware(
+      activityName,
+      false,
+      middlewares,
+      activity,
+      arg,
+      0,
+      m,
+    );
   }
 }
 
@@ -66,6 +97,8 @@ function executeMiddleware<
   TActivities extends FunctionalityObject<TActivities>,
   TActivityName extends keyof TActivities,
 >(
+  activityName: TActivityName,
+  allowAsync: boolean,
   middlewares: ReadonlyArray<RealActivityFn<TActivities, TActivityName>>,
   activity: (
     arg: ActivityParameter<TActivities, TActivityName>,
@@ -77,7 +110,24 @@ function executeMiddleware<
   const next =
     idx === maxIdx
       ? () => activity(arg)
-      : () => executeMiddleware(middlewares, activity, arg, idx + 1, maxIdx);
+      : () =>
+          executeMiddleware(
+            activityName,
+            allowAsync,
+            middlewares,
+            activity,
+            arg,
+            idx + 1,
+            maxIdx,
+          );
   const middleware = middlewares[idx];
-  return middleware(next, arg) as any;
+  const result = middleware(next, arg) as any;
+  if (!allowAsync && isPromiseLike(result)) {
+    throw new Error(
+      `'${String(
+        activityName,
+      )}' is a synchronous activity, all middlewares must be synchronous but the middleware at index ${idx} returned a promise.`,
+    );
+  }
+  return result;
 }
