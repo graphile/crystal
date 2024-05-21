@@ -1,10 +1,23 @@
 import type {
   CallbackOrDescriptor,
   FunctionalityObject,
+  PromiseOrDirect,
 } from "./interfaces.js";
 import { isPromiseLike } from "./utils.js";
 
-export type MiddlewareNext<TResult> = () => TResult;
+export interface MiddlewareNext<
+  TRawResult,
+  TAwaitedResult = Awaited<TRawResult>,
+> {
+  (): TRawResult;
+  callback(
+    callback: (
+      params:
+        | { error: object; result?: never }
+        | { error?: undefined; result: TAwaitedResult },
+    ) => TRawResult,
+  ): TRawResult;
+}
 
 type ActivityFn<
   TActivities extends FunctionalityObject<TActivities>,
@@ -107,7 +120,7 @@ function executeMiddleware<
   idx: number,
   maxIdx: number,
 ): ReturnType<ActivityFn<TActivities, TActivityName>> {
-  const next =
+  const next = makeNext<ReturnType<ActivityFn<TActivities, TActivityName>>>(
     idx === maxIdx
       ? () => activity(arg)
       : () =>
@@ -119,9 +132,13 @@ function executeMiddleware<
             arg,
             idx + 1,
             maxIdx,
-          );
+          ),
+  );
   const middleware = middlewares[idx];
-  const result = middleware(next, arg) as any;
+  const result = middleware(
+    next as MiddlewareNext<unknown, unknown>,
+    arg,
+  ) as any;
   if (!allowAsync && isPromiseLike(result)) {
     throw new Error(
       `'${String(
@@ -130,4 +147,32 @@ function executeMiddleware<
     );
   }
   return result;
+}
+
+function makeNext<TRawResult, TAwaitedResult = Awaited<TRawResult>>(
+  fn: () => TRawResult,
+): MiddlewareNext<TRawResult, TAwaitedResult> {
+  let called = false;
+  const next = fn as MiddlewareNext<TRawResult, TAwaitedResult>;
+  next.callback = (callback) => {
+    if (called) {
+      throw new Error(`next() was already called; don't call it twice!`);
+    }
+    called = true;
+    let result: PromiseOrDirect<TAwaitedResult>;
+    try {
+      result = fn() as PromiseOrDirect<TAwaitedResult>;
+    } catch (error) {
+      return callback({ error });
+    }
+    if (isPromiseLike(result)) {
+      return result.then(
+        (result) => callback({ result }),
+        (error) => callback({ error }),
+      ) as TRawResult;
+    } else {
+      return callback({ result });
+    }
+  };
+  return next;
 }
