@@ -1,6 +1,6 @@
 {
   "name": "@dataplan/pg",
-  "version": "0.0.1-beta.21",
+  "version": "0.0.1-beta.22",
   "description": "PostgreSQL step classes for Grafast",
   "type": "commonjs",
   "main": "dist/index.js",
