@@ -23,7 +23,7 @@ PostGraphile is formed of three layers.
   the relevant settings; and then sending the query on to the GraphQL schema
   (see next) to be resolved. **About 70% of PostGraphile users end up using this
   layer in their applications**; reasons to use this over the CLI include the
-  ability to add Express middlewares before PostGraphile (e.g. to perform rate
+  ability to add Express middleware before PostGraphile (e.g. to perform rate
   limiting, sessions, custom logging, custom authentication and other concerns)
   and the ability to take greater control over the PostGraphile system.
 - Deepest down is the

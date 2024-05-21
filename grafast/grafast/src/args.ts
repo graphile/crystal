@@ -6,7 +6,7 @@ import type {
   PromiseOrDirect,
 } from "./interfaces.js";
 import { $$hooked } from "./interfaces.js";
-import { getGrafastMiddlewares } from "./middlewares.js";
+import { getGrafastMiddleware } from "./middleware.js";
 import { isPromiseLike } from "./utils.js";
 const EMPTY_OBJECT: Record<string, never> = Object.freeze(Object.create(null));
 
@@ -37,18 +37,18 @@ export function hookArgs(
     rawArgs.requestContext = rawArgs.requestContext ?? legacyCtx;
   }
   const {
-    middlewares: rawMiddlewares,
+    middleware: rawMiddleware,
     resolvedPreset,
     contextValue: rawContextValue,
   } = rawArgs;
   // Make context mutable
   rawArgs.contextValue = Object.assign(Object.create(null), rawContextValue);
-  const middlewares =
-    rawMiddlewares === undefined && resolvedPreset != null
-      ? getGrafastMiddlewares(resolvedPreset)
-      : rawMiddlewares ?? null;
-  if (rawMiddlewares === undefined) {
-    rawArgs.middlewares = middlewares;
+  const middleware =
+    rawMiddleware === undefined && resolvedPreset != null
+      ? getGrafastMiddleware(resolvedPreset)
+      : rawMiddleware ?? null;
+  if (rawMiddleware === undefined) {
+    rawArgs.middleware = middleware;
   }
   const args = rawArgs as Grafast.ExecutionArgs;
   // Assert that args haven't already been hooked
@@ -57,8 +57,8 @@ export function hookArgs(
   }
   args[$$hooked] = true;
 
-  if (middlewares != null) {
-    return middlewares.run("prepareArgs", { args }, finalizeWithEvent);
+  if (middleware != null) {
+    return middleware.run("prepareArgs", { args }, finalizeWithEvent);
   } else {
     return finalize(args);
   }

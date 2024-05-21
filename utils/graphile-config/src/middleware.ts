@@ -39,8 +39,8 @@ type RealActivityFn<
   ? (next: MiddlewareNext<UResult>, arg: UArg) => UResult
   : never;
 
-export class Middlewares<TActivities extends FunctionalityObject<TActivities>> {
-  middlewares: {
+export class Middleware<TActivities extends FunctionalityObject<TActivities>> {
+  middleware: {
     [key in keyof TActivities]?: Array<RealActivityFn<TActivities, key>>;
   } = Object.create(null);
 
@@ -48,11 +48,11 @@ export class Middlewares<TActivities extends FunctionalityObject<TActivities>> {
     event: TActivityName,
     fn: RealActivityFn<TActivities, TActivityName>,
   ): void {
-    const list = this.middlewares[event];
+    const list = this.middleware[event];
     if (list !== undefined) {
       list.push(fn);
     } else {
-      this.middlewares[event] = [fn];
+      this.middleware[event] = [fn];
     }
   }
 
@@ -63,15 +63,15 @@ export class Middlewares<TActivities extends FunctionalityObject<TActivities>> {
       arg: ActivityParameter<TActivities, TActivityName>,
     ) => ReturnType<ActivityFn<TActivities, TActivityName>>,
   ): ReturnType<ActivityFn<TActivities, TActivityName>> {
-    const middlewares = this.middlewares[activityName];
-    if (middlewares === undefined) {
+    const middleware = this.middleware[activityName];
+    if (middleware === undefined) {
       return activity(arg);
     }
-    const m = middlewares.length - 1;
+    const m = middleware.length - 1;
     return executeMiddleware(
       activityName,
       true,
-      middlewares,
+      middleware,
       activity,
       arg,
       0,
@@ -85,15 +85,15 @@ export class Middlewares<TActivities extends FunctionalityObject<TActivities>> {
       arg: ActivityParameter<TActivities, TActivityName>,
     ) => ReturnType<ActivityFn<TActivities, TActivityName>>,
   ): ReturnType<ActivityFn<TActivities, TActivityName>> {
-    const middlewares = this.middlewares[activityName];
-    if (middlewares === undefined) {
+    const middleware = this.middleware[activityName];
+    if (middleware === undefined) {
       return activity(arg);
     }
-    const m = middlewares.length - 1;
+    const m = middleware.length - 1;
     return executeMiddleware(
       activityName,
       false,
-      middlewares,
+      middleware,
       activity,
       arg,
       0,
@@ -108,7 +108,7 @@ function executeMiddleware<
 >(
   activityName: TActivityName,
   allowAsync: boolean,
-  middlewares: ReadonlyArray<RealActivityFn<TActivities, TActivityName>>,
+  middlewareList: ReadonlyArray<RealActivityFn<TActivities, TActivityName>>,
   activity: (
     arg: ActivityParameter<TActivities, TActivityName>,
   ) => ReturnType<ActivityFn<TActivities, TActivityName>>,
@@ -123,14 +123,14 @@ function executeMiddleware<
           executeMiddleware(
             activityName,
             allowAsync,
-            middlewares,
+            middlewareList,
             activity,
             arg,
             idx + 1,
             maxIdx,
           ),
   );
-  const middleware = middlewares[idx];
+  const middleware = middlewareList[idx];
   const result = middleware(
     next as MiddlewareNext<unknown, unknown>,
     arg,
@@ -139,7 +139,7 @@ function executeMiddleware<
     throw new Error(
       `'${String(
         activityName,
-      )}' is a synchronous activity, all middlewares must be synchronous but the middleware at index ${idx} returned a promise.`,
+      )}' is a synchronous activity, all middleware must be synchronous but the middleware at index ${idx} returned a promise.`,
     );
   }
   return result;

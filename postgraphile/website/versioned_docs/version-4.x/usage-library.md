@@ -361,10 +361,10 @@ for <tt>postgraphile@4.12.3</tt>.
     are supported: 'subscriptions' or 'all'. Defaults to `subscriptions`
   - `websocketMiddlewares`: [EXPERIMENTAL] If you're using websockets
     (subscriptions || live) then you may want to authenticate your users using
-    sessions or similar. You can pass some simple middlewares here that will be
+    sessions or similar. You can pass some simple middleware here that will be
     executed against the websocket connection in order to perform
     authentication. We current only support Express (not Koa, Fastify, Restify,
-    etc) middlewares here.
+    etc) middleware here.
   - `pgDefaultRole`: The default Postgres role to use. If no role was provided
     in a provided JWT token, this role will be used.
   - `dynamicJson`: By default, JSON and JSONB fields are presented as strings

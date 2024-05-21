@@ -15,7 +15,7 @@ export const PgContextPlugin: GraphileConfig.Plugin = {
   version: version,
 
   grafast: {
-    middlewares: {
+    middleware: {
       prepareArgs(next, { args }) {
         if (!args.contextValue) {
           args.contextValue = Object.create(null);

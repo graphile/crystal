@@ -1,25 +1,25 @@
 import { isPromiseLike } from "grafast";
 import type { MiddlewareNext } from "graphile-config";
-import { Middlewares, orderedApply } from "graphile-config";
+import { Middleware, orderedApply } from "graphile-config";
 
 // We could use a global WeakMap, but storing directly onto the resolvedPreset
 // should use more traditional garbage collection.
 const $$middleware = Symbol("middleware");
 
-export function getGrafservMiddlewares(
+export function getGrafservMiddleware(
   resolvedPreset: GraphileConfig.ResolvedPreset & {
-    [$$middleware]?: Middlewares<GraphileConfig.GrafservMiddlewares>;
+    [$$middleware]?: Middleware<GraphileConfig.GrafservMiddleware>;
   },
 ) {
   if (resolvedPreset[$$middleware]) {
     return resolvedPreset[$$middleware];
   }
-  const middlewares = new Middlewares<GraphileConfig.GrafservMiddlewares>();
+  const middleware = new Middleware<GraphileConfig.GrafservMiddleware>();
   orderedApply(
     resolvedPreset.plugins,
-    (p) => p.grafserv?.middlewares,
+    (p) => p.grafserv?.middleware,
     (name, fn, _plugin) => {
-      middlewares.register(name, fn as any);
+      middleware.register(name, fn as any);
     },
   );
 
@@ -38,7 +38,7 @@ export function getGrafservMiddlewares(
       // Backwards compatibility with the old hooks
       switch (name) {
         case "init": {
-          middlewares.register("setPreset", (next, event) => {
+          middleware.register("setPreset", (next, event) => {
             const { resolvedPreset } = event;
             const result = fn({ resolvedPreset }, event);
             return resultThenNext(result, next);
@@ -46,7 +46,7 @@ export function getGrafservMiddlewares(
           break;
         }
         case "ruruHTMLParts": {
-          middlewares.register("ruruHTMLParts", (next, event) => {
+          middleware.register("ruruHTMLParts", (next, event) => {
             const { resolvedPreset, request, htmlParts } = event;
             const result = fn({ resolvedPreset }, htmlParts, {
               request,
@@ -56,7 +56,7 @@ export function getGrafservMiddlewares(
           break;
         }
         case "processGraphQLRequestBody": {
-          middlewares.register("processGraphQLRequestBody", (next, event) => {
+          middleware.register("processGraphQLRequestBody", (next, event) => {
             const { resolvedPreset } = event;
             const result = fn({ resolvedPreset }, event);
             return resultThenNext(result, next);
@@ -68,9 +68,9 @@ export function getGrafservMiddlewares(
   );
 
   try {
-    resolvedPreset[$$middleware] = middlewares;
+    resolvedPreset[$$middleware] = middleware;
   } catch {
     // Ignore - preset must be readonly
   }
-  return middlewares;
+  return middleware;
 }

@@ -20,7 +20,7 @@ const PersistedPlugin: GraphileConfig.Plugin = {
   version,
 
   grafserv: {
-    middlewares: {
+    middleware: {
       processGraphQLRequestBody(next, event) {
         const { body, resolvedPreset } = event;
         const options = resolvedPreset.grafserv;

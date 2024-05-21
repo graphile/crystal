@@ -26,7 +26,7 @@ const GrafservPgJWTPlugin: GraphileConfig.Plugin = {
   version,
 
   grafast: {
-    middlewares: {
+    middleware: {
       prepareArgs(next, event) {
         const { args } = event;
         const { resolvedPreset, requestContext: ctx } = args;

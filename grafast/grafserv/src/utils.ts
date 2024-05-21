@@ -200,7 +200,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
           connectionParams: ctx.connectionParams,
         },
       };
-      const { grafastMiddlewares } = instance;
+      const { grafastMiddleware } = instance;
       const {
         schema,
         parseAndValidate,
@@ -211,7 +211,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
       } = await instance.getExecutionConfig(grafastCtx);
 
       const parsedBody = parseGraphQLJSONBody(message.payload);
-      await instance.middlewares.run(
+      await instance.middleware.run(
         "processGraphQLRequestBody",
         {
           resolvedPreset,
@@ -238,7 +238,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
         operationName,
         resolvedPreset,
         requestContext: grafastCtx,
-        middlewares: grafastMiddlewares,
+        middleware: grafastMiddleware,
       };
 
       await hookArgs(args);
@@ -260,7 +260,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
   }
   return {
     onSubscribe(ctx, message) {
-      return instance.middlewares.run(
+      return instance.middleware.run(
         "onSubscribe",
         {
           resolvedPreset: instance.resolvedPreset,

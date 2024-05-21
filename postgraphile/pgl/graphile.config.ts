@@ -74,7 +74,7 @@ function makeRuruTitlePlugin(title: string): GraphileConfig.Plugin {
     version: "0.0.0",
 
     grafserv: {
-      middlewares: {
+      middleware: {
         ruruHTMLParts(next, event) {
           const { htmlParts, request } = event;
           htmlParts.titleTag = `<title>${escapeHTML(

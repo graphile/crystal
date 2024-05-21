@@ -50,16 +50,16 @@ and ctx/resolvedPreset can be extracted directly from `args`:
  }
 ```
 
-Many more middlewares have been added; use TypeScript's autocomplete to see
+Many more middleware have been added; use TypeScript's autocomplete to see
 what's available until we have proper documentation for them.
 
 `plugin.grafserv.hooks.*` are still supported but deprecated; instead use
-middlewares `plugin.grafserv.middlewares.*` (note that call signatures have
+middleware `plugin.grafserv.middleware.*` (note that call signatures have
 changed slightly, similar to the diff above):
 
-- `hooks.init` -> `middlewares.setPreset`
-- `hooks.processGraphQLRequestBody` -> `middlewares.processGraphQLRequestBody`
-- `hooks.ruruHTMLParts` -> `middlewares.ruruHTMLParts`
+- `hooks.init` -> `middleware.setPreset`
+- `hooks.processGraphQLRequestBody` -> `middleware.processGraphQLRequestBody`
+- `hooks.ruruHTMLParts` -> `middleware.ruruHTMLParts`
 
 A few TypeScript types related to Hooks have been renamed, but their old names
 are still available, just deprecated. They will be removed in a future update:

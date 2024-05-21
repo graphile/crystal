@@ -25,7 +25,7 @@ function makeRuruTitlePlugin(title: string): GraphileConfig.Plugin {
     version: "0.0.0",
 
     grafserv: {
-      middlewares: {
+      middleware: {
         ruruHTMLParts(next, event) {
           const { htmlParts, request } = event;
           htmlParts.titleTag = `<title>${escapeHTML(
@@ -68,7 +68,7 @@ export const QueryByNamePlugin: GraphileConfig.Plugin = {
   version,
 
   grafserv: {
-    middlewares: {
+    middleware: {
       processGraphQLRequestBody(next, event) {
         const { body } = event;
         const document = documents[body.id];

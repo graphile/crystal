@@ -63,12 +63,12 @@ In a production app, you typically want to add a few common enhancements, e.g.
 Since there's already a lot of options and opinions in this space, and they're
 not directly related to the problem of serving GraphQL from your PostgreSQL
 database, PostGraphile does not include these things by default. We recommend
-that you use something like Express middlewares to implement these common
+that you use something like Express middleware to implement these common
 requirements. This is why we recommend
 [using PostGraphile as a library](./usage-library/) for production usage.
 
-Picking the Express (or similar) middlewares that work for you is beyond the
-scope of this article; below is an example of where to place these middlewares.
+Picking the Express (or similar) middleware that work for you is beyond the
+scope of this article; below is an example of where to place these middleware.
 
 ```js
 const express = require("express");

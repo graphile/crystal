@@ -15,7 +15,7 @@ import type {
   GrafastExecutionArgs,
 } from "./interfaces.js";
 import { $$eventEmitter, $$extensions } from "./interfaces.js";
-import { getGrafastMiddlewares } from "./middlewares.js";
+import { getGrafastMiddleware } from "./middleware.js";
 import { grafastPrepare } from "./prepare.js";
 import { isPromiseLike } from "./utils.js";
 
@@ -129,15 +129,15 @@ export function execute(
   }
 
   const { resolvedPreset } = args;
-  const middlewares =
-    args.middlewares === undefined && resolvedPreset != null
-      ? getGrafastMiddlewares(resolvedPreset)
-      : args.middlewares ?? null;
-  if (args.middlewares === undefined) {
-    args.middlewares = middlewares;
+  const middleware =
+    args.middleware === undefined && resolvedPreset != null
+      ? getGrafastMiddleware(resolvedPreset)
+      : args.middleware ?? null;
+  if (args.middleware === undefined) {
+    args.middleware = middleware;
   }
-  if (middlewares !== null) {
-    return middlewares.run("execute", { args }, executeMiddlewareCallback);
+  if (middleware !== null) {
+    return middleware.run("execute", { args }, executeMiddlewareCallback);
   } else {
     return withGrafastArgs(args);
   }

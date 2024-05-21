@@ -1,5 +1,5 @@
 import type EventEmitter from "eventemitter3";
-import type { Middlewares } from "graphile-config";
+import type { Middleware } from "graphile-config";
 import type {
   ASTNode,
   ExecutionArgs,
@@ -933,7 +933,7 @@ export type StreamMoreableArray<T = any> = Array<T> & {
 export interface GrafastArgs extends GraphQLArgs {
   resolvedPreset?: GraphileConfig.ResolvedPreset;
   requestContext?: Partial<Grafast.RequestContext>;
-  middlewares?: Middlewares<GraphileConfig.GrafastMiddlewares> | null;
+  middleware?: Middleware<GraphileConfig.GrafastMiddleware> | null;
 }
 export type Maybe<T> = T | null | undefined;
 
@@ -956,7 +956,7 @@ export type DataFromStep<TStep extends ExecutableStep> =
 
 export interface GrafastExecutionArgs extends ExecutionArgs {
   resolvedPreset?: GraphileConfig.ResolvedPreset;
-  middlewares?: Middlewares<GraphileConfig.GrafastMiddlewares> | null;
+  middleware?: Middleware<GraphileConfig.GrafastMiddleware> | null;
   requestContext?: Partial<Grafast.RequestContext>;
   outputDataAsString?: boolean;
 }

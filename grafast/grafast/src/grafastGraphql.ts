@@ -18,7 +18,7 @@ import type {
   ValidateSchemaEvent,
 } from "./interfaces.js";
 import { $$queryCache } from "./interfaces.js";
-import { getGrafastMiddlewares } from "./middlewares.js";
+import { getGrafastMiddleware } from "./middleware.js";
 import { isPromiseLike } from "./utils.js";
 
 const { GraphQLError, parse, Source, validate, validateSchema } = graphql;
@@ -163,19 +163,19 @@ export function grafast(
     typeResolver,
     resolvedPreset,
     requestContext,
-    middlewares: rawMiddlewares,
+    middleware: rawMiddleware,
   } = args;
-  const middlewares =
-    rawMiddlewares !== undefined
-      ? rawMiddlewares
+  const middleware =
+    rawMiddleware !== undefined
+      ? rawMiddleware
       : resolvedPreset != null
-      ? getGrafastMiddlewares(resolvedPreset)
+      ? getGrafastMiddleware(resolvedPreset)
       : null;
 
   // Validate Schema
   const schemaValidationErrors =
-    middlewares != null && resolvedPreset != null
-      ? middlewares.runSync(
+    middleware != null && resolvedPreset != null
+      ? middleware.runSync(
           "validateSchema",
           { schema, resolvedPreset },
           validateSchemaWithEvent,
@@ -187,8 +187,8 @@ export function grafast(
 
   // Cached parse and validate
   const documentOrErrors =
-    middlewares != null && resolvedPreset != null
-      ? middlewares.runSync(
+    middleware != null && resolvedPreset != null
+      ? middleware.runSync(
           "parseAndValidate",
           { resolvedPreset, schema, source },
           parseAndValidateWithEvent,
@@ -208,7 +208,7 @@ export function grafast(
     operationName,
     fieldResolver,
     typeResolver,
-    middlewares,
+    middleware,
     resolvedPreset,
     requestContext,
   };

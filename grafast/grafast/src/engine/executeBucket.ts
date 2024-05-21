@@ -116,7 +116,7 @@ export function executeBucket(
   }
 
   const { stopTime, eventEmitter, args } = requestContext;
-  const { middlewares } = args;
+  const { middleware } = args;
   const {
     metaByMetaKey,
     size,
@@ -763,8 +763,8 @@ export function executeBucket(
         extra,
         streamOptions,
       };
-      if (!step.isSyncAndSafe && middlewares != null) {
-        return middlewares.run(
+      if (!step.isSyncAndSafe && middleware != null) {
+        return middleware.run(
           "streamStep",
           { args, step, streamDetails },
           streamStepFromEvent,
@@ -785,8 +785,8 @@ export function executeBucket(
         values,
         extra,
       };
-      if (!step.isSyncAndSafe && middlewares != null) {
-        return middlewares.run(
+      if (!step.isSyncAndSafe && middleware != null) {
+        return middleware.run(
           "executeStep",
           { args, step, executeDetails },
           executeStepFromEvent,

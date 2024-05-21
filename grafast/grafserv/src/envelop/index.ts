@@ -23,7 +23,7 @@ export const GrafservEnvelopPlugin: GraphileConfig.Plugin = {
   version,
 
   grafserv: {
-    middlewares: {
+    middleware: {
       setPreset(next, event) {
         const { resolvedPreset } = event;
         const userGetEnveloped = resolvedPreset.grafserv?.getEnveloped;

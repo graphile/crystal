@@ -570,7 +570,7 @@ export function grafastPrepare(
     rootValue = Object.create(null),
     // operationName,
     // document,
-    middlewares,
+    middleware,
   } = args;
   const exeContext = buildExecutionContext(args);
 
@@ -586,8 +586,8 @@ export function grafastPrepare(
   const planningTimeout = options.timeouts?.planning;
   let operationPlan!: OperationPlan;
   try {
-    if (middlewares != null) {
-      operationPlan = middlewares.runSync(
+    if (middleware != null) {
+      operationPlan = middleware.runSync(
         "establishOperationPlan",
         {
           schema,

@@ -284,7 +284,7 @@ export function validateGraphQLBody(
 }
 
 const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
-  const { dynamicOptions, resolvedPreset, middlewares, grafastMiddlewares } =
+  const { dynamicOptions, resolvedPreset, middleware, grafastMiddleware } =
     instance;
 
   return async (
@@ -358,10 +358,10 @@ const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
           ? parseGraphQLBody(resolvedPreset, request, await request.getBody())
           : parseGraphQLQueryParams(await request.getQueryParams());
 
-      // Apply our middlewares (if any) to the body (they will mutate the body in place)
+      // Apply our middleware (if any) to the body (they will mutate the body in place)
       const hookResult =
-        middlewares.middlewares.processGraphQLRequestBody != null
-          ? middlewares.run(
+        middleware.middleware.processGraphQLRequestBody != null
+          ? middleware.run(
               "processGraphQLRequestBody",
               {
                 resolvedPreset,
@@ -458,7 +458,7 @@ const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
       operationName,
       resolvedPreset,
       requestContext: grafastCtx,
-      middlewares: grafastMiddlewares,
+      middleware: grafastMiddleware,
     };
 
     try {

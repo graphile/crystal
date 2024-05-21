@@ -44,8 +44,8 @@ yarn add @graphile/pg-pubsub
   call signature is now
   `enhanceHttpServerWithSubscriptions(httpServer, postgraphileMiddleware)` - see
   [Subscriptions Advanced Setup](./subscriptions/#advanced-setup).
-- **If** you were passing `middlewares` to `enhanceHttpServerWithSubscriptions`;
-  you should instead pass these middlewares as `websocketMiddlewares` via the
+- **If** you were passing `middleware` to `enhanceHttpServerWithSubscriptions`;
+  you should instead pass these middleware as `websocketMiddlewares` via the
   `postgraphile` options.
 
 #### CLI

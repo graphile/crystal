@@ -105,7 +105,7 @@ import {
   TypedEventEmitter,
   UnbatchedExecutionExtra,
 } from "./interfaces.js";
-import { getGrafastMiddlewares } from "./middlewares.js";
+import { getGrafastMiddleware } from "./middleware.js";
 import { polymorphicWrap } from "./polymorphic.js";
 import {
   assertExecutableStep,
@@ -330,7 +330,7 @@ export {
   FirstStep,
   flagError,
   getEnumValueConfig,
-  getGrafastMiddlewares,
+  getGrafastMiddleware,
   grafast,
   GrafastArgumentConfig,
   GrafastExecutionArgs,
@@ -481,7 +481,7 @@ exportAsMany("grafast", {
   OperationPlan,
   defer,
   execute,
-  getGrafastMiddlewares,
+  getGrafastMiddleware,
   grafast,
   grafastSync,
   subscribe,
@@ -617,7 +617,7 @@ declare global {
       | "variableValues"
       | "operationName"
       | "resolvedPreset"
-      | "middlewares"
+      | "middleware"
       | "requestContext"
       | "outputDataAsString"
     > & { [$$hooked]?: boolean; contextValue: Grafast.Context };
@@ -751,7 +751,7 @@ declare global {
        */
       grafast?: GraphileConfig.GrafastOptions;
     }
-    interface GrafastMiddlewares {
+    interface GrafastMiddleware {
       /** Synchronous! */
       validateSchema(event: ValidateSchemaEvent): readonly GraphQLError[];
       /** Synchronous! */
@@ -774,9 +774,9 @@ declare global {
     }
     interface Plugin {
       grafast?: {
-        middlewares?: {
-          [key in keyof GrafastMiddlewares]?: CallbackOrDescriptor<
-            GrafastMiddlewares[key] extends (
+        middleware?: {
+          [key in keyof GrafastMiddleware]?: CallbackOrDescriptor<
+            GrafastMiddleware[key] extends (
               ...args: infer UArgs
             ) => infer UResult
               ? (

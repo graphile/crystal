@@ -3,17 +3,17 @@ import type { PromiseOrDirect, TypedEventEmitter } from "grafast";
 import {
   defer,
   execute,
-  getGrafastMiddlewares,
+  getGrafastMiddleware,
   isPromiseLike,
   stringifyPayload,
   subscribe,
 } from "grafast";
 import type { GraphQLSchema } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
-import type { Middlewares } from "graphile-config";
+import type { Middleware } from "graphile-config";
 import { resolvePresets } from "graphile-config";
 
-import { getGrafservMiddlewares } from "../hooks.js";
+import { getGrafservMiddleware } from "../hooks.js";
 import type {
   BufferResult,
   DynamicOptions,
@@ -57,8 +57,8 @@ export class GrafservBase {
   }
   public resolvedPreset: GraphileConfig.ResolvedPreset;
   /** @internal */
-  public middlewares: Middlewares<GraphileConfig.GrafservMiddlewares>;
-  public grafastMiddlewares: Middlewares<GraphileConfig.GrafastMiddlewares>;
+  public middleware: Middleware<GraphileConfig.GrafservMiddleware>;
+  public grafastMiddleware: Middleware<GraphileConfig.GrafastMiddleware>;
   protected schema: GraphQLSchema | PromiseLike<GraphQLSchema> | null;
   protected schemaError: PromiseLike<GraphQLSchema> | null;
   protected eventEmitter: TypedEventEmitter<{
@@ -80,8 +80,8 @@ export class GrafservBase {
       ...optionsFromConfig(this.resolvedPreset),
     };
     this.getExecutionConfig = this.dynamicOptions.getExecutionConfig;
-    this.middlewares = getGrafservMiddlewares(this.resolvedPreset);
-    this.grafastMiddlewares = getGrafastMiddlewares(this.resolvedPreset);
+    this.middleware = getGrafservMiddleware(this.resolvedPreset);
+    this.grafastMiddleware = getGrafastMiddleware(this.resolvedPreset);
     this.schemaError = null;
     this.schema = config.schema;
     if (isPromiseLike(config.schema)) {
@@ -167,7 +167,7 @@ export class GrafservBase {
     requestDigest: RequestDigest,
   ): PromiseOrDirect<Result | null> {
     const { resolvedPreset } = this;
-    return this.middlewares.run(
+    return this.middleware.run(
       "processRequest",
       { resolvedPreset, requestDigest, instance: this },
       processRequestWithEvent,
@@ -215,8 +215,8 @@ export class GrafservBase {
     }
     this._settingPreset = true;
     const resolvedPreset = resolvePresets([newPreset]);
-    const middlewares = getGrafservMiddlewares(this.resolvedPreset);
-    const grafastMiddlewares = getGrafastMiddlewares(this.resolvedPreset);
+    const middleware = getGrafservMiddleware(this.resolvedPreset);
+    const grafastMiddleware = getGrafastMiddleware(this.resolvedPreset);
     // Note: this gets directly mutated
     const dynamicOptions: DynamicOptions = {
       validationRules: [...graphql.specifiedRules],
@@ -226,12 +226,12 @@ export class GrafservBase {
     return (
       new Promise((resolve) =>
         resolve(
-          middlewares.run("setPreset", dynamicOptions, (dynamicOptions) => {
+          middleware.run("setPreset", dynamicOptions, (dynamicOptions) => {
             const { resolvedPreset } = dynamicOptions;
             // Overwrite all the `this.*` properties at once
             this.resolvedPreset = resolvedPreset;
-            this.middlewares = middlewares;
-            this.grafastMiddlewares = grafastMiddlewares;
+            this.middleware = middleware;
+            this.grafastMiddleware = grafastMiddleware;
             this.dynamicOptions = dynamicOptions as DynamicOptions;
             this.initialized = true;
             // ENHANCE: this.graphqlHandler?.release()?
@@ -286,7 +286,7 @@ export class GrafservBase {
     this.graphqlHandler = makeGraphQLHandler(this);
     this.graphiqlHandler = makeGraphiQLHandler(
       this.resolvedPreset,
-      this.middlewares,
+      this.middleware,
       this.dynamicOptions,
     );
   }

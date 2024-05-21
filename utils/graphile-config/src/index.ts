@@ -18,7 +18,7 @@ export type {
   FunctionalityObject,
 } from "./interfaces.js";
 export type { MiddlewareNext } from "./middleware.js";
-export { Middlewares } from "./middleware.js";
+export { Middleware } from "./middleware.js";
 export { isResolvedPreset, resolvePresets } from "./resolvePresets.js";
 
 export function sortedPlugins(
