@@ -586,8 +586,8 @@ export function grafastPrepare(
   const planningTimeout = options.timeouts?.planning;
   let operationPlan!: OperationPlan;
   try {
-    if (middlewares) {
-      operationPlan = middlewares.run(
+    if (middlewares != null) {
+      operationPlan = middlewares.runSync(
         "establishOperationPlan",
         {
           schema,

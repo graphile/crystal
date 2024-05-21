@@ -191,7 +191,7 @@ type ExtendedExecutionArgs = GrafastExecutionArgs & {
 };
 
 export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
-  async function onSubscribe({ ctx, message }: OnSubscribeEvent) {
+  async function onSubscribeWithEvent({ ctx, message }: OnSubscribeEvent) {
     try {
       const grafastCtx: Partial<Grafast.RequestContext> = {
         ws: {
@@ -265,7 +265,7 @@ export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
           ctx,
           message,
         },
-        onSubscribe,
+        onSubscribeWithEvent,
       );
     },
     // TODO: validate that this actually does mask every error

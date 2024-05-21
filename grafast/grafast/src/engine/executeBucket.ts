@@ -763,7 +763,7 @@ export function executeBucket(
         extra,
         streamOptions,
       };
-      if (!step.isSyncAndSafe && middlewares) {
+      if (!step.isSyncAndSafe && middlewares != null) {
         return middlewares.run(
           "streamStep",
           { args, step, streamDetails },
@@ -785,7 +785,7 @@ export function executeBucket(
         values,
         extra,
       };
-      if (!step.isSyncAndSafe && middlewares) {
+      if (!step.isSyncAndSafe && middlewares != null) {
         return middlewares.run(
           "executeStep",
           { args, step, executeDetails },

@@ -749,7 +749,9 @@ declare global {
       grafast?: GraphileConfig.GrafastOptions;
     }
     interface GrafastMiddlewares {
+      /** Synchronous! */
       validateSchema(event: ValidateSchemaEvent): readonly GraphQLError[];
+      /** Synchronous! */
       parseAndValidate(
         event: ParseAndValidateEvent,
       ): DocumentNode | readonly GraphQLError[];
@@ -758,6 +760,7 @@ declare global {
       ): PromiseOrDirect<Grafast.ExecutionArgs>;
       execute(event: ExecuteEvent): ReturnType<typeof execute>;
       subscribe(event: ExecuteEvent): ReturnType<typeof subscribe>;
+      /** Synchronous! */
       establishOperationPlan(event: EstablishOperationPlanEvent): OperationPlan;
       executeStep(
         event: ExecuteStepEvent,

@@ -11,7 +11,12 @@ import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 import { SafeError } from "./error.js";
 import { execute } from "./execute.js";
 import { hookArgs } from "./index.js";
-import type { GrafastArgs, GrafastExecutionArgs } from "./interfaces.js";
+import type {
+  GrafastArgs,
+  GrafastExecutionArgs,
+  ParseAndValidateEvent,
+  ValidateSchemaEvent,
+} from "./interfaces.js";
 import { $$queryCache } from "./interfaces.js";
 import { getMiddlewares } from "./middlewares.js";
 import { isPromiseLike } from "./utils.js";
@@ -168,13 +173,14 @@ export function grafast(
       : null;
 
   // Validate Schema
-  const schemaValidationErrors = middlewares
-    ? middlewares.run(
-        "validateSchema",
-        { schema, resolvedPreset: resolvedPreset! },
-        ({ schema }) => validateSchema(schema),
-      )
-    : validateSchema(schema);
+  const schemaValidationErrors =
+    middlewares != null && resolvedPreset != null
+      ? middlewares.runSync(
+          "validateSchema",
+          { schema, resolvedPreset },
+          validateSchemaWithEvent,
+        )
+      : validateSchema(schema);
   if (schemaValidationErrors.length > 0) {
     return { errors: schemaValidationErrors };
   }
@@ -182,10 +188,10 @@ export function grafast(
   // Cached parse and validate
   const documentOrErrors =
     middlewares != null && resolvedPreset != null
-      ? middlewares.run(
+      ? middlewares.runSync(
           "parseAndValidate",
           { resolvedPreset, schema, source },
-          ({ schema, source }) => parseAndValidate(schema, source),
+          parseAndValidateWithEvent,
         )
       : parseAndValidate(schema, source);
   if (Array.isArray(documentOrErrors)) {
@@ -229,4 +235,12 @@ export function grafastSync(
     throw new SafeError("Grafast execution failed to complete synchronously.");
   }
   return result as ExecutionResult;
+}
+
+function validateSchemaWithEvent(event: ValidateSchemaEvent) {
+  return validateSchema(event.schema);
+}
+
+function parseAndValidateWithEvent(event: ParseAndValidateEvent) {
+  return parseAndValidate(event.schema, event.source);
 }

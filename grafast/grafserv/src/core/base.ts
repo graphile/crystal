@@ -24,6 +24,7 @@ import type {
   NoContentHandlerResult,
   NoContentResult,
   NormalizedRequestDigest,
+  ProcessRequestEvent,
   RequestDigest,
   Result,
   SchemaChangeEvent,
@@ -100,7 +101,8 @@ export class GrafservBase {
     this.setPreset(this.resolvedPreset);
   }
 
-  private _processRequest(
+  /** @internal */
+  _processRequest(
     inRequest: RequestDigest,
   ): PromiseOrDirect<HandlerResult | null> {
     const request = normalizeRequest(inRequest);
@@ -165,32 +167,7 @@ export class GrafservBase {
     return this.middlewares.run(
       "processRequest",
       { resolvedPreset, requestDigest, instance: this },
-      ({ requestDigest: request }) => {
-        let returnValue: PromiseOrDirect<Result | null>;
-        try {
-          const result = this._processRequest(request);
-
-          if (isPromiseLike(result)) {
-            returnValue = result.then(
-              convertHandlerResultToResult,
-              convertErrorToErrorResult,
-            );
-          } else {
-            returnValue = convertHandlerResultToResult(result);
-          }
-        } catch (e) {
-          returnValue = convertErrorToErrorResult(e);
-        }
-        if (this.resolvedPreset.grafserv?.dangerouslyAllowAllCORSRequests) {
-          if (isPromiseLike(returnValue)) {
-            return returnValue.then(dangerousCorsWrap);
-          } else {
-            return dangerousCorsWrap(returnValue);
-          }
-        } else {
-          return returnValue;
-        }
-      },
+      processRequestWithEvent,
     );
   }
 
@@ -793,4 +770,32 @@ function optionsResponse(
     dynamicOptions: dynamicOptions,
     statusCode: 204,
   };
+}
+
+function processRequestWithEvent(event: ProcessRequestEvent) {
+  const { requestDigest: request, instance } = event;
+  let returnValue: PromiseOrDirect<Result | null>;
+  try {
+    const result = instance._processRequest(request);
+
+    if (isPromiseLike(result)) {
+      returnValue = result.then(
+        convertHandlerResultToResult,
+        convertErrorToErrorResult,
+      );
+    } else {
+      returnValue = convertHandlerResultToResult(result);
+    }
+  } catch (e) {
+    returnValue = convertErrorToErrorResult(e);
+  }
+  if (instance.resolvedPreset.grafserv?.dangerouslyAllowAllCORSRequests) {
+    if (isPromiseLike(returnValue)) {
+      return returnValue.then(dangerousCorsWrap);
+    } else {
+      return dangerousCorsWrap(returnValue);
+    }
+  } else {
+    return returnValue;
+  }
 }

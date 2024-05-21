@@ -57,7 +57,7 @@ export function hookArgs(
   }
   args[$$hooked] = true;
 
-  if (middlewares) {
+  if (middlewares != null) {
     return middlewares.run("prepareArgs", { args }, finalizeWithEvent);
   } else {
     return finalize(args);
