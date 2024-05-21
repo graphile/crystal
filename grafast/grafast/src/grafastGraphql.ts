@@ -18,7 +18,7 @@ import type {
   ValidateSchemaEvent,
 } from "./interfaces.js";
 import { $$queryCache } from "./interfaces.js";
-import { getMiddlewares } from "./middlewares.js";
+import { getGrafastMiddlewares } from "./middlewares.js";
 import { isPromiseLike } from "./utils.js";
 
 const { GraphQLError, parse, Source, validate, validateSchema } = graphql;
@@ -169,7 +169,7 @@ export function grafast(
     rawMiddlewares !== undefined
       ? rawMiddlewares
       : resolvedPreset != null
-      ? getMiddlewares(resolvedPreset)
+      ? getGrafastMiddlewares(resolvedPreset)
       : null;
 
   // Validate Schema

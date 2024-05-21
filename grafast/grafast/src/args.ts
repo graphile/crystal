@@ -6,7 +6,7 @@ import type {
   PromiseOrDirect,
 } from "./interfaces.js";
 import { $$hooked } from "./interfaces.js";
-import { getMiddlewares } from "./middlewares.js";
+import { getGrafastMiddlewares } from "./middlewares.js";
 import { isPromiseLike } from "./utils.js";
 const EMPTY_OBJECT: Record<string, never> = Object.freeze(Object.create(null));
 
@@ -45,7 +45,7 @@ export function hookArgs(
   rawArgs.contextValue = Object.assign(Object.create(null), rawContextValue);
   const middlewares =
     rawMiddlewares === undefined && resolvedPreset != null
-      ? getMiddlewares(resolvedPreset)
+      ? getGrafastMiddlewares(resolvedPreset)
       : rawMiddlewares ?? null;
   if (rawMiddlewares === undefined) {
     rawArgs.middlewares = middlewares;

@@ -8,7 +8,7 @@ import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 import { withGrafastArgs } from "./execute.js";
 import type { GrafastExecutionArgs } from "./index.js";
 import type { SubscribeEvent } from "./interfaces.js";
-import { getMiddlewares } from "./middlewares.js";
+import { getGrafastMiddlewares } from "./middlewares.js";
 
 /**
  * @deprecated Second and third parameters should be passed as part of args,
@@ -51,7 +51,7 @@ export function subscribe(
   const { resolvedPreset } = args;
   const middlewares =
     args.middlewares === undefined && resolvedPreset != null
-      ? getMiddlewares(resolvedPreset)
+      ? getGrafastMiddlewares(resolvedPreset)
       : args.middlewares ?? null;
   if (args.middlewares === undefined) {
     args.middlewares = middlewares;

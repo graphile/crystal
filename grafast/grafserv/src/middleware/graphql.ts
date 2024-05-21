@@ -284,7 +284,8 @@ export function validateGraphQLBody(
 }
 
 const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
-  const { dynamicOptions, resolvedPreset, middlewares } = instance;
+  const { dynamicOptions, resolvedPreset, middlewares, grafastMiddlewares } =
+    instance;
 
   return async (
     request: NormalizedRequestDigest,
@@ -456,10 +457,12 @@ const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
       variableValues,
       operationName,
       resolvedPreset,
+      requestContext: grafastCtx,
+      middlewares: grafastMiddlewares,
     };
 
     try {
-      await hookArgs(args, resolvedPreset, grafastCtx);
+      await hookArgs(args);
       const result = await execute(args);
       if (isAsyncIterable(result)) {
         return {

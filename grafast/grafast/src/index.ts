@@ -105,6 +105,7 @@ import {
   TypedEventEmitter,
   UnbatchedExecutionExtra,
 } from "./interfaces.js";
+import { getGrafastMiddlewares } from "./middlewares.js";
 import { polymorphicWrap } from "./polymorphic.js";
 import {
   assertExecutableStep,
@@ -329,6 +330,7 @@ export {
   FirstStep,
   flagError,
   getEnumValueConfig,
+  getGrafastMiddlewares,
   grafast,
   GrafastArgumentConfig,
   GrafastExecutionArgs,
@@ -479,6 +481,7 @@ exportAsMany("grafast", {
   OperationPlan,
   defer,
   execute,
+  getGrafastMiddlewares,
   grafast,
   grafastSync,
   subscribe,
