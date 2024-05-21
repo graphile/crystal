@@ -22,7 +22,7 @@ safely since middleware is a superset of hooks' capabilities. `applyHooks` has
 been renamed to `orderedApply` (because it applies to more than just hooks),
 calling `applyHooks` will still work but is deprecated.
 
-`grafast` no longer automatically reads your `graphile.config.ts` or similar;
+🚨 `grafast` no longer automatically reads your `graphile.config.ts` or similar;
 you must do that yourself and pass the `resolvedPreset` to grafast via the
 `args`. This is to aid in bundling of grafast since it should not need to read
 from filesystem or dynamically load modules.
@@ -30,9 +30,9 @@ from filesystem or dynamically load modules.
 `grafast` no longer outputs performance warning when you set
 `GRAPHILE_ENV=development`.
 
-`plugin.grafast.hooks.args` is now `plugin.grafast.middleware.prepareArgs`, and
-the signature has changed - you must be sure to call the `next()` function and
-ctx/resolvedPreset can be extracted directly from `args`:
+🚨 `plugin.grafast.hooks.args` is now `plugin.grafast.middleware.prepareArgs`,
+and the signature has changed - you must be sure to call the `next()` function
+and ctx/resolvedPreset can be extracted directly from `args`:
 
 ```diff
  const plugin = {
