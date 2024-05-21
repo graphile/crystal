@@ -58,7 +58,7 @@ export class GrafservBase {
   public resolvedPreset: GraphileConfig.ResolvedPreset;
   /** @internal */
   public middleware: Middleware<GraphileConfig.GrafservMiddleware>;
-  public grafastMiddleware: Middleware<GraphileConfig.GrafastMiddleware>;
+  public grafastMiddleware: Middleware<GraphileConfig.GrafastMiddleware> | null;
   protected schema: GraphQLSchema | PromiseLike<GraphQLSchema> | null;
   protected schemaError: PromiseLike<GraphQLSchema> | null;
   protected eventEmitter: TypedEventEmitter<{
