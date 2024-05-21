@@ -53,7 +53,7 @@ export class Middlewares<TActivities extends FunctionalityObject<TActivities>> {
     activity: (
       arg: ActivityParameter<TActivities, TActivityName>,
     ) => ReturnType<ActivityFn<TActivities, TActivityName>>,
-  ) {
+  ): ReturnType<ActivityFn<TActivities, TActivityName>> {
     const middlewares = this.middlewares[activityName];
     if (middlewares === undefined) {
       return activity(arg);
@@ -75,7 +75,7 @@ export class Middlewares<TActivities extends FunctionalityObject<TActivities>> {
     activity: (
       arg: ActivityParameter<TActivities, TActivityName>,
     ) => ReturnType<ActivityFn<TActivities, TActivityName>>,
-  ) {
+  ): ReturnType<ActivityFn<TActivities, TActivityName>> {
     const middlewares = this.middlewares[activityName];
     if (middlewares === undefined) {
       return activity(arg);
