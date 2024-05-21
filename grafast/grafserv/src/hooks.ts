@@ -8,17 +8,18 @@ const $$middleware = Symbol("middleware");
 
 export function getGrafservMiddleware(
   resolvedPreset: GraphileConfig.ResolvedPreset & {
-    [$$middleware]?: Middleware<GraphileConfig.GrafservMiddleware>;
+    [$$middleware]?: Middleware<GraphileConfig.GrafservMiddleware> | null;
   },
 ) {
   if (resolvedPreset[$$middleware]) {
     return resolvedPreset[$$middleware];
   }
-  const middleware = new Middleware<GraphileConfig.GrafservMiddleware>();
+  let middleware: Middleware<GraphileConfig.GrafservMiddleware> | null = null;
   orderedApply(
     resolvedPreset.plugins,
     (p) => p.grafserv?.middleware,
     (name, fn, _plugin) => {
+      if (!middleware) middleware = new Middleware();
       middleware.register(name, fn as any);
     },
   );
@@ -35,6 +36,7 @@ export function getGrafservMiddleware(
           return next();
         }
       }
+      if (!middleware) middleware = new Middleware();
       // Backwards compatibility with the old hooks
       switch (name) {
         case "init": {

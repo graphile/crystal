@@ -9,7 +9,7 @@ import { noop } from "../utils.js";
 
 export function makeGraphiQLHandler(
   resolvedPreset: GraphileConfig.ResolvedPreset,
-  middleware: Middleware<GraphileConfig.GrafservMiddleware>,
+  middleware: Middleware<GraphileConfig.GrafservMiddleware> | null,
   dynamicOptions: OptionsFromConfig,
 ): (request: NormalizedRequestDigest) => PromiseOrDirect<HandlerResult> {
   const { htmlParts: htmlPartsFromConfig } = resolvedPreset?.ruru ?? {};
@@ -19,7 +19,7 @@ export function makeGraphiQLHandler(
   };
   return async (request) => {
     let htmlParts = unhookedHTMLParts!;
-    if (middleware.middleware.ruruHTMLParts) {
+    if (middleware != null && middleware.middleware.ruruHTMLParts != null) {
       htmlParts = {
         ...makeHTMLParts(),
         ...htmlPartsFromConfig,

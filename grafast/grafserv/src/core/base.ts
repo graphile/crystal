@@ -29,6 +29,7 @@ import type {
   RequestDigest,
   Result,
   SchemaChangeEvent,
+  SetPresetEvent,
 } from "../interfaces.js";
 import { mapIterator } from "../mapIterator.js";
 import { makeGraphiQLHandler } from "../middleware/graphiql.js";
@@ -57,7 +58,7 @@ export class GrafservBase {
   }
   public resolvedPreset: GraphileConfig.ResolvedPreset;
   /** @internal */
-  public middleware: Middleware<GraphileConfig.GrafservMiddleware>;
+  public middleware: Middleware<GraphileConfig.GrafservMiddleware> | null;
   public grafastMiddleware: Middleware<GraphileConfig.GrafastMiddleware> | null;
   protected schema: GraphQLSchema | PromiseLike<GraphQLSchema> | null;
   protected schemaError: PromiseLike<GraphQLSchema> | null;
@@ -167,11 +168,14 @@ export class GrafservBase {
     requestDigest: RequestDigest,
   ): PromiseOrDirect<Result | null> {
     const { resolvedPreset } = this;
-    return this.middleware.run(
-      "processRequest",
-      { resolvedPreset, requestDigest, instance: this },
-      processRequestWithEvent,
-    );
+    const event: ProcessRequestEvent = {
+      resolvedPreset,
+      requestDigest,
+      instance: this,
+    };
+    return this.middleware != null
+      ? this.middleware.run("processRequest", event, processRequestWithEvent)
+      : processRequestWithEvent(event);
   }
 
   public getPreset(): GraphileConfig.ResolvedPreset {
@@ -223,24 +227,27 @@ export class GrafservBase {
       getExecutionConfig: defaultMakeGetExecutionConfig(),
       ...optionsFromConfig(resolvedPreset),
     };
+    const storeDynamicOptions = (dynamicOptions: SetPresetEvent) => {
+      const { resolvedPreset } = dynamicOptions;
+      // Overwrite all the `this.*` properties at once
+      this.resolvedPreset = resolvedPreset;
+      this.middleware = middleware;
+      this.grafastMiddleware = grafastMiddleware;
+      this.dynamicOptions = dynamicOptions as DynamicOptions;
+      this.initialized = true;
+      // ENHANCE: this.graphqlHandler?.release()?
+      this.refreshHandlers();
+      this.getExecutionConfig = dynamicOptions.getExecutionConfig;
+      // MUST come after the handlers have been refreshed, otherwise we'll
+      // get infinite loops
+      this.eventEmitter.emit("dynamicOptions:ready", {});
+    };
     return (
       new Promise((resolve) =>
         resolve(
-          middleware.run("setPreset", dynamicOptions, (dynamicOptions) => {
-            const { resolvedPreset } = dynamicOptions;
-            // Overwrite all the `this.*` properties at once
-            this.resolvedPreset = resolvedPreset;
-            this.middleware = middleware;
-            this.grafastMiddleware = grafastMiddleware;
-            this.dynamicOptions = dynamicOptions as DynamicOptions;
-            this.initialized = true;
-            // ENHANCE: this.graphqlHandler?.release()?
-            this.refreshHandlers();
-            this.getExecutionConfig = dynamicOptions.getExecutionConfig;
-            // MUST come after the handlers have been refreshed, otherwise we'll
-            // get infinite loops
-            this.eventEmitter.emit("dynamicOptions:ready", {});
-          }),
+          middleware != null
+            ? middleware.run("setPreset", dynamicOptions, storeDynamicOptions)
+            : storeDynamicOptions(dynamicOptions),
         ),
       )
         .then(null, (e) => {

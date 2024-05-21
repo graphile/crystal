@@ -56,7 +56,7 @@ export interface ValidatedGraphQLBody {
 export interface GrafservPluginContext {
   resolvedPreset: GraphileConfig.ResolvedPreset;
 }
-export interface InitEvent {
+export interface SetPresetEvent {
   resolvedPreset: GraphileConfig.ResolvedPreset;
   getExecutionConfig: (
     this: GrafservBase,
@@ -64,6 +64,8 @@ export interface InitEvent {
   ) => PromiseOrDirect<ExecutionConfig>;
   validationRules: ValidationRule[];
 }
+/** @deprecated Use SetPresetEvent instead */
+export type InitEvent = SetPresetEvent;
 export interface ProcessGraphQLRequestBodyEvent {
   resolvedPreset: GraphileConfig.ResolvedPreset;
   body: ParsedGraphQLBody;

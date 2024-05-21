@@ -359,20 +359,22 @@ const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
           : parseGraphQLQueryParams(await request.getQueryParams());
 
       // Apply our middleware (if any) to the body (they will mutate the body in place)
-      const hookResult =
+      if (
+        middleware != null &&
         middleware.middleware.processGraphQLRequestBody != null
-          ? middleware.run(
-              "processGraphQLRequestBody",
-              {
-                resolvedPreset,
-                body: parsedBody,
-                request,
-              },
-              noop,
-            )
-          : undefined;
-      if (hookResult != null) {
-        await hookResult;
+      ) {
+        const hookResult = middleware.run(
+          "processGraphQLRequestBody",
+          {
+            resolvedPreset,
+            body: parsedBody,
+            request,
+          },
+          noop,
+        );
+        if (hookResult != null) {
+          await hookResult;
+        }
       }
 
       // Validate that the body is of the right shape
