@@ -23,9 +23,10 @@ export const GrafservEnvelopPlugin: GraphileConfig.Plugin = {
   version,
 
   grafserv: {
-    hooks: {
-      init(info, event) {
-        const userGetEnveloped = info.resolvedPreset.grafserv?.getEnveloped;
+    middlewares: {
+      setPreset(next, event) {
+        const { resolvedPreset } = event;
+        const userGetEnveloped = resolvedPreset.grafserv?.getEnveloped;
         if (!userGetEnveloped) {
           throw new Error(
             `GrafservEnvelopPlugin is enabled, but there is no 'preset.grafserv.getEnveloped' method to call`,
@@ -76,6 +77,7 @@ export const GrafservEnvelopPlugin: GraphileConfig.Plugin = {
             parseAndValidate,
           };
         };
+        return next();
       },
     },
   },
