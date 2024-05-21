@@ -11,11 +11,7 @@ export interface MiddlewareNext<
 > {
   (): TRawResult;
   callback(
-    callback: (
-      params:
-        | { error: object; result?: never }
-        | { error?: undefined; result: TAwaitedResult },
-    ) => TRawResult,
+    callback: (error: object | null, result: TAwaitedResult) => TRawResult,
   ): TRawResult;
 }
 
@@ -163,15 +159,18 @@ function makeNext<TRawResult, TAwaitedResult = Awaited<TRawResult>>(
     try {
       result = fn() as PromiseOrDirect<TAwaitedResult>;
     } catch (error) {
-      return callback({ error });
+      return callback(error, undefined as any);
     }
     if (isPromiseLike(result)) {
       return result.then(
-        (result) => callback({ result }),
-        (error) => callback({ error }),
+        (result) =>
+          callback(null, result) as
+            | TAwaitedResult
+            | PromiseLike<TAwaitedResult>,
+        callback as any,
       ) as TRawResult;
     } else {
-      return callback({ result });
+      return callback(null, result);
     }
   };
   return next;
