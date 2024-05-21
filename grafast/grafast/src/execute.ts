@@ -120,24 +120,24 @@ export function execute(
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 > {
-  if (
-    legacyResolvedPreset !== undefined ||
-    legacyOutputDataAsString !== undefined ||
-    args.middlewares === undefined
-  ) {
-    const resolvedPreset = args.resolvedPreset ?? legacyResolvedPreset;
-    const middlewares =
-      args.middlewares === undefined && resolvedPreset != null
-        ? getMiddlewares(resolvedPreset)
-        : args.middlewares;
-    return execute({
-      ...args,
-      resolvedPreset,
-      middlewares,
-    });
+  // TODO: remove legacy compatibility
+  if (legacyResolvedPreset !== undefined) {
+    args.resolvedPreset = legacyResolvedPreset;
   }
-  if (args.middlewares != null) {
-    return args.middlewares.run("execute", { args }, executeMiddlewareCallback);
+  if (legacyOutputDataAsString !== undefined) {
+    args.outputDataAsString = legacyOutputDataAsString;
+  }
+
+  const { resolvedPreset } = args;
+  const middlewares =
+    args.middlewares === undefined && resolvedPreset != null
+      ? getMiddlewares(resolvedPreset)
+      : args.middlewares ?? null;
+  if (args.middlewares === undefined) {
+    args.middlewares = middlewares;
+  }
+  if (middlewares !== null) {
+    return middlewares.run("execute", { args }, executeMiddlewareCallback);
   } else {
     return withGrafastArgs(args);
   }

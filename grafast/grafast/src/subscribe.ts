@@ -5,7 +5,6 @@ import type {
 } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
-import { NULL_PRESET } from "./config.js";
 import { withGrafastArgs } from "./execute.js";
 import type { GrafastExecutionArgs } from "./index.js";
 import type { SubscribeEvent } from "./interfaces.js";
@@ -41,28 +40,24 @@ export function subscribe(
   | AsyncGenerator<ExecutionResult | AsyncExecutionResult, void, void>
   | ExecutionResult
 > {
-  if (
-    legacyResolvedPreset !== undefined ||
-    legacyOutputDataAsString !== undefined ||
-    args.middlewares === undefined
-  ) {
-    const resolvedPreset = args.resolvedPreset ?? legacyResolvedPreset;
-    const middlewares =
-      args.middlewares === undefined && resolvedPreset != null
-        ? getMiddlewares(resolvedPreset)
-        : args.middlewares;
-    return subscribe({
-      ...args,
-      resolvedPreset,
-      middlewares,
-    });
+  // TODO: remove legacy compatibility
+  if (legacyResolvedPreset !== undefined) {
+    args.resolvedPreset = legacyResolvedPreset;
   }
-  if (args.middlewares != null) {
-    return args.middlewares.run(
-      "subscribe",
-      { args },
-      subscribeMiddlewareCallback,
-    );
+  if (legacyOutputDataAsString !== undefined) {
+    args.outputDataAsString = legacyOutputDataAsString;
+  }
+
+  const { resolvedPreset } = args;
+  const middlewares =
+    args.middlewares === undefined && resolvedPreset != null
+      ? getMiddlewares(resolvedPreset)
+      : args.middlewares ?? null;
+  if (args.middlewares === undefined) {
+    args.middlewares = middlewares;
+  }
+  if (middlewares !== null) {
+    return middlewares.run("subscribe", { args }, subscribeMiddlewareCallback);
   } else {
     return withGrafastArgs(args);
   }

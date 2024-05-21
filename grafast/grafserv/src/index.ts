@@ -1,10 +1,6 @@
 import type { PromiseOrDirect } from "grafast";
 import type { ExecutionArgs, GraphQLError } from "grafast/graphql";
-import type {
-  CallbackOrDescriptor,
-  MiddlewareNext,
-  PluginHook,
-} from "graphile-config";
+import type { CallbackOrDescriptor, MiddlewareNext } from "graphile-config";
 import type { RuruHTMLParts } from "ruru/server";
 
 import type {

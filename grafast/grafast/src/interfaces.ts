@@ -933,7 +933,7 @@ export type StreamMoreableArray<T = any> = Array<T> & {
 export interface GrafastArgs extends GraphQLArgs {
   resolvedPreset?: GraphileConfig.ResolvedPreset;
   requestContext?: Partial<Grafast.RequestContext>;
-  middlewares?: Middlewares<GraphileConfig.GrafastMiddlewares>;
+  middlewares?: Middlewares<GraphileConfig.GrafastMiddlewares> | null;
 }
 export type Maybe<T> = T | null | undefined;
 

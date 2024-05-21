@@ -13,7 +13,6 @@ import type {
   ExecutionExtra,
   ExecutionValue,
   ForcedValues,
-  GrafastExecutionArgs,
   GrafastInternalResultsOrStream,
   GrafastResultsList,
   GrafastResultStreamList,

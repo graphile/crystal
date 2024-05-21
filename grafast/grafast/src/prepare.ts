@@ -1,4 +1,3 @@
-import type { ExecutionArgs } from "graphql";
 import * as graphql from "graphql";
 import type {
   AsyncExecutionResult,

@@ -2,7 +2,6 @@ import LRU from "@graphile/lru";
 import type {
   AsyncExecutionResult,
   DocumentNode,
-  ExecutionArgs,
   ExecutionResult,
   GraphQLSchema,
 } from "graphql";
@@ -140,24 +139,14 @@ export function grafast(
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 > {
-  if (
-    legacyResolvedPreset !== undefined ||
-    legacyCtx !== undefined ||
-    args.middlewares === undefined
-  ) {
-    const resolvedPreset = args.resolvedPreset ?? legacyResolvedPreset;
-    const requestContext = args.requestContext ?? legacyCtx;
-    const middlewares =
-      args.middlewares === undefined && resolvedPreset != null
-        ? getMiddlewares(resolvedPreset)
-        : args.middlewares;
-    return grafast({
-      ...args,
-      resolvedPreset,
-      requestContext,
-      middlewares,
-    });
+  // Convert legacy args to properties on `args`:
+  if (legacyResolvedPreset !== undefined) {
+    args.resolvedPreset = args.resolvedPreset ?? legacyResolvedPreset;
   }
+  if (legacyCtx !== undefined) {
+    args.requestContext = args.requestContext ?? legacyCtx;
+  }
+
   const {
     schema,
     source,
@@ -169,8 +158,14 @@ export function grafast(
     typeResolver,
     resolvedPreset,
     requestContext,
-    middlewares,
+    middlewares: rawMiddlewares,
   } = args;
+  const middlewares =
+    rawMiddlewares !== undefined
+      ? rawMiddlewares
+      : resolvedPreset != null
+      ? getMiddlewares(resolvedPreset)
+      : null;
 
   // Validate Schema
   const schemaValidationErrors = middlewares

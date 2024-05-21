@@ -5,7 +5,6 @@ import debugFactory from "debug";
 import type { CallbackOrDescriptor, MiddlewareNext } from "graphile-config";
 import type {
   DocumentNode,
-  ExecutionArgs as GraphQLExecutionArgs,
   GraphQLError,
   OperationDefinitionNode,
 } from "graphql";

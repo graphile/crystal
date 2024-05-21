@@ -1,8 +1,4 @@
-import {
-  type MiddlewareNext,
-  Middlewares,
-  orderedApply,
-} from "graphile-config";
+import { Middlewares, orderedApply } from "graphile-config";
 
 const $$middleware = Symbol("middleware");
 export function getMiddlewares(

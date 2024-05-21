@@ -1,6 +1,10 @@
 import type { ExecutionArgs } from "graphql";
 
-import type { GrafastExecutionArgs, PromiseOrDirect } from "./interfaces.js";
+import type {
+  GrafastExecutionArgs,
+  PrepareArgsEvent,
+  PromiseOrDirect,
+} from "./interfaces.js";
 import { $$hooked } from "./interfaces.js";
 import { getMiddlewares } from "./middlewares.js";
 import { isPromiseLike } from "./utils.js";
@@ -26,61 +30,63 @@ export function hookArgs(
   legacyResolvedPreset?: GraphileConfig.ResolvedPreset,
   legacyCtx?: Partial<Grafast.RequestContext>,
 ): PromiseOrDirect<Grafast.ExecutionArgs> {
-  if (
-    legacyResolvedPreset !== undefined ||
-    legacyCtx !== undefined ||
-    rawArgs.middlewares === undefined
-  ) {
-    rawArgs.resolvedPreset = rawArgs.resolvedPreset ?? legacyResolvedPreset;
+  if (legacyResolvedPreset !== undefined) {
+    rawArgs.resolvedPreset = legacyResolvedPreset;
+  }
+  if (legacyCtx !== undefined) {
     rawArgs.requestContext = rawArgs.requestContext ?? legacyCtx;
-    rawArgs.middlewares =
-      rawArgs.middlewares === undefined && rawArgs.resolvedPreset != null
-        ? getMiddlewares(rawArgs.resolvedPreset)
-        : rawArgs.middlewares;
+  }
+  const {
+    middlewares: rawMiddlewares,
+    resolvedPreset,
+    contextValue: rawContextValue,
+  } = rawArgs;
+  // Make context mutable
+  rawArgs.contextValue = Object.assign(Object.create(null), rawContextValue);
+  const middlewares =
+    rawMiddlewares === undefined && resolvedPreset != null
+      ? getMiddlewares(resolvedPreset)
+      : rawMiddlewares ?? null;
+  if (rawMiddlewares === undefined) {
+    rawArgs.middlewares = middlewares;
   }
   const args = rawArgs as Grafast.ExecutionArgs;
-  const {
-    resolvedPreset,
-    requestContext: ctx = EMPTY_OBJECT,
-    middlewares,
-  } = args;
   // Assert that args haven't already been hooked
   if (args[$$hooked]) {
     throw new Error("Must not call hookArgs twice!");
   }
   args[$$hooked] = true;
 
-  // Make context mutable
-  args.contextValue = Object.assign(Object.create(null), args.contextValue);
-
-  // finalize(args): args is deliberately shadowed
-  const finalize = (args: Grafast.ExecutionArgs) => {
-    const userContext = resolvedPreset?.grafast?.context;
-    if (typeof userContext === "function") {
-      const result = userContext(ctx, args);
-      if (isPromiseLike(result)) {
-        // Deliberately shadowed 'result'
-        return result.then((result) => {
-          Object.assign(args.contextValue as Partial<Grafast.Context>, result);
-          return args;
-        });
-      } else {
-        Object.assign(args.contextValue as Partial<Grafast.Context>, result);
-        return args;
-      }
-    } else if (typeof userContext === "object" && userContext !== null) {
-      Object.assign(args.contextValue as Partial<Grafast.Context>, userContext);
-      return args;
-    } else {
-      return args;
-    }
-  };
-
   if (middlewares) {
-    return middlewares.run("prepareArgs", { args }, ({ args }) =>
-      finalize(args),
-    );
+    return middlewares.run("prepareArgs", { args }, finalizeWithEvent);
   } else {
     return finalize(args);
   }
+}
+
+function finalize(args: Grafast.ExecutionArgs) {
+  const userContext = args.resolvedPreset?.grafast?.context;
+  const contextValue = args.contextValue as Partial<Grafast.Context>;
+  if (typeof userContext === "function") {
+    const result = userContext(args.requestContext ?? EMPTY_OBJECT, args);
+    if (isPromiseLike(result)) {
+      // Deliberately shadowed 'result'
+      return result.then((result) => {
+        Object.assign(contextValue, result);
+        return args;
+      });
+    } else {
+      Object.assign(contextValue, result);
+      return args;
+    }
+  } else if (typeof userContext === "object" && userContext !== null) {
+    Object.assign(contextValue, userContext);
+    return args;
+  } else {
+    return args;
+  }
+}
+
+function finalizeWithEvent(event: PrepareArgsEvent) {
+  return finalize(event.args);
 }
