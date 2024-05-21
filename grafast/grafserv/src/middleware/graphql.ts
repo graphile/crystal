@@ -19,7 +19,7 @@ import type {
   ValidatedGraphQLBody,
 } from "../interfaces.js";
 import { $$normalizedHeaders } from "../interfaces.js";
-import { httpError, parseGraphQLJSONBody } from "../utils.js";
+import { httpError, noop, parseGraphQLJSONBody } from "../utils.js";
 
 const { getOperationAST, GraphQLError, parse, Source, validate } = graphql;
 
@@ -284,7 +284,8 @@ export function validateGraphQLBody(
 }
 
 const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
-  const { dynamicOptions, resolvedPreset, hooks } = instance;
+  const { dynamicOptions, resolvedPreset, middleware, grafastMiddleware } =
+    instance;
 
   return async (
     request: NormalizedRequestDigest,
@@ -357,16 +358,23 @@ const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
           ? parseGraphQLBody(resolvedPreset, request, await request.getBody())
           : parseGraphQLQueryParams(await request.getQueryParams());
 
-      // Apply our hooks (if any) to the body (they will mutate the body in place)
-      const hookResult =
-        hooks.callbacks.processGraphQLRequestBody != null
-          ? hooks.process("processGraphQLRequestBody", {
-              body: parsedBody,
-              request,
-            })
-          : undefined;
-      if (hookResult != null) {
-        await hookResult;
+      // Apply our middleware (if any) to the body (they will mutate the body in place)
+      if (
+        middleware != null &&
+        middleware.middleware.processGraphQLRequestBody != null
+      ) {
+        const hookResult = middleware.run(
+          "processGraphQLRequestBody",
+          {
+            resolvedPreset,
+            body: parsedBody,
+            request,
+          },
+          noop,
+        );
+        if (hookResult != null) {
+          await hookResult;
+        }
       }
 
       // Validate that the body is of the right shape
@@ -451,10 +459,12 @@ const _makeGraphQLHandlerInternal = (instance: GrafservBase) => {
       variableValues,
       operationName,
       resolvedPreset,
+      requestContext: grafastCtx,
+      middleware: grafastMiddleware,
     };
 
     try {
-      await hookArgs(args, resolvedPreset, grafastCtx);
+      await hookArgs(args);
       const result = await execute(args);
       if (isAsyncIterable(result)) {
         return {

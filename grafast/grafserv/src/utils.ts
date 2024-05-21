@@ -16,6 +16,7 @@ import type {
   GrafservBody,
   JSONValue,
   NormalizedRequestDigest,
+  OnSubscribeEvent,
   ParsedGraphQLBody,
   RequestDigest,
 } from "./interfaces.js";
@@ -190,65 +191,86 @@ type ExtendedExecutionArgs = GrafastExecutionArgs & {
 };
 
 export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
-  return {
-    async onSubscribe(ctx, message) {
-      try {
-        const grafastCtx: Partial<Grafast.RequestContext> = {
-          ws: {
-            request: (ctx.extra as Extra).request,
-            socket: (ctx.extra as Extra).socket,
-            connectionParams: ctx.connectionParams,
+  async function onSubscribeWithEvent({ ctx, message }: OnSubscribeEvent) {
+    try {
+      const grafastCtx: Partial<Grafast.RequestContext> = {
+        ws: {
+          request: (ctx.extra as Extra).request,
+          socket: (ctx.extra as Extra).socket,
+          connectionParams: ctx.connectionParams,
+        },
+      };
+      const { grafastMiddleware } = instance;
+      const {
+        schema,
+        parseAndValidate,
+        resolvedPreset,
+        execute,
+        subscribe,
+        contextValue,
+      } = await instance.getExecutionConfig(grafastCtx);
+
+      const parsedBody = parseGraphQLJSONBody(message.payload);
+
+      if (instance.middleware) {
+        await instance.middleware.run(
+          "processGraphQLRequestBody",
+          {
+            resolvedPreset,
+            body: parsedBody,
+            graphqlWsContext: ctx,
           },
-        };
-        const {
-          schema,
-          parseAndValidate,
-          resolvedPreset,
-          execute,
-          subscribe,
-          contextValue,
-        } = await instance.getExecutionConfig(grafastCtx);
-
-        const parsedBody = parseGraphQLJSONBody(message.payload);
-        await instance.hooks.process("processGraphQLRequestBody", {
-          body: parsedBody,
-          graphqlWsContext: ctx,
-        });
-
-        const { query, operationName, variableValues } =
-          validateGraphQLBody(parsedBody);
-        const { errors, document } = parseAndValidate(query);
-        if (errors !== undefined) {
-          return errors;
-        }
-        const args: ExtendedExecutionArgs = {
-          execute,
-          subscribe,
-          schema,
-          document,
-          rootValue: null,
-          contextValue,
-          variableValues,
-          operationName,
-          resolvedPreset,
-        };
-
-        await hookArgs(args, resolvedPreset, grafastCtx);
-
-        return args;
-      } catch (e) {
-        return [
-          new GraphQLError(
-            e.message,
-            null,
-            undefined,
-            undefined,
-            undefined,
-            e,
-            undefined,
-          ),
-        ];
+          noop,
+        );
       }
+
+      const { query, operationName, variableValues } =
+        validateGraphQLBody(parsedBody);
+      const { errors, document } = parseAndValidate(query);
+      if (errors !== undefined) {
+        return errors;
+      }
+      const args: ExtendedExecutionArgs = {
+        execute,
+        subscribe,
+        schema,
+        document,
+        rootValue: null,
+        contextValue,
+        variableValues,
+        operationName,
+        resolvedPreset,
+        requestContext: grafastCtx,
+        middleware: grafastMiddleware,
+      };
+
+      await hookArgs(args);
+
+      return args;
+    } catch (e) {
+      return [
+        new GraphQLError(
+          e.message,
+          null,
+          undefined,
+          undefined,
+          undefined,
+          e,
+          undefined,
+        ),
+      ];
+    }
+  }
+  return {
+    onSubscribe(ctx, message) {
+      const event: OnSubscribeEvent = {
+        resolvedPreset: instance.resolvedPreset,
+        ctx,
+        message,
+      };
+      return instance.middleware != null
+        ? instance.middleware.run("onSubscribe", event, onSubscribeWithEvent)
+        : onSubscribeWithEvent(event);
     },
     // TODO: validate that this actually does mask every error
     onError(_ctx, _message, errors) {
@@ -299,3 +321,5 @@ export async function concatBufferIterator(
   }
   return Buffer.concat(buffers);
 }
+
+export function noop(): void {}

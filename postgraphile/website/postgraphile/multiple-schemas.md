@@ -87,7 +87,7 @@ endpoint based on some information provided in the HTTP request, but how you
 would do this is dependent on what webserver framework you're using.
 
 If you're using something simple like Node, Express or Connect then you can
-build middlewares for each instance and then write a custom middleware to call
+build middleware for each instance and then write a custom middleware to call
 the right one:
 
 ```ts

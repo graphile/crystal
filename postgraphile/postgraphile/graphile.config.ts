@@ -88,11 +88,13 @@ function makeRuruTitlePlugin(title: string): GraphileConfig.Plugin {
     version: "0.0.0",
 
     grafserv: {
-      hooks: {
-        ruruHTMLParts(_info, parts, extra) {
-          parts.titleTag = `<title>${escapeHTML(
-            title + " | " + extra.request.getHeader("host"),
+      middleware: {
+        ruruHTMLParts(next, event) {
+          const { htmlParts, request } = event;
+          htmlParts.titleTag = `<title>${escapeHTML(
+            title + " | " + request.getHeader("host"),
           )}</title>`;
+          return next();
         },
       },
     },
@@ -104,9 +106,10 @@ const RuruQueryParamsPlugin: GraphileConfig.Plugin = {
   version: "0.0.0",
 
   grafserv: {
-    hooks: {
-      ruruHTMLParts(_info, parts, _extra) {
-        parts.headerScripts += `
+    middleware: {
+      ruruHTMLParts(next, event) {
+        const { htmlParts } = event;
+        htmlParts.headerScripts += `
 <script>
 {
   const currentUrl = new URL(document.URL);
@@ -119,6 +122,7 @@ const RuruQueryParamsPlugin: GraphileConfig.Plugin = {
 }
 </script>
 `;
+        return next();
       },
     },
   },
@@ -132,9 +136,10 @@ const RuruQueryParamsUpdatePlugin: GraphileConfig.Plugin = {
   version: "0.0.0",
 
   grafserv: {
-    hooks: {
-      ruruHTMLParts(_info, parts, _extra) {
-        parts.headerScripts += `
+    middleware: {
+      ruruHTMLParts(next, event) {
+        const { htmlParts } = event;
+        htmlParts.headerScripts += `
 <script>
 {
   const currentUrl = new URL(document.URL);

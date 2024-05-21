@@ -2,10 +2,9 @@ import "./thereCanBeOnlyOne.js";
 
 import type LRU from "@graphile/lru";
 import debugFactory from "debug";
-import type { PluginHook } from "graphile-config";
+import type { CallbackOrDescriptor, MiddlewareNext } from "graphile-config";
 import type {
   DocumentNode,
-  ExecutionArgs as GraphQLExecutionArgs,
   GraphQLError,
   OperationDefinitionNode,
 } from "graphql";
@@ -45,9 +44,16 @@ import type {
   $$queryCache,
   CacheByOperationEntry,
   DataFromStep,
+  EstablishOperationPlanEvent,
+  ExecuteEvent,
+  ExecuteStepEvent,
   GrafastExecutionArgs,
   GrafastTimeouts,
+  ParseAndValidateEvent,
+  PrepareArgsEvent,
   ScalarInputPlanResolver,
+  StreamStepEvent,
+  ValidateSchemaEvent,
 } from "./interfaces.js";
 import {
   $$bypassGraphQL,
@@ -99,6 +105,7 @@ import {
   TypedEventEmitter,
   UnbatchedExecutionExtra,
 } from "./interfaces.js";
+import { getGrafastMiddleware } from "./middleware.js";
 import { polymorphicWrap } from "./polymorphic.js";
 import {
   assertExecutableStep,
@@ -323,6 +330,7 @@ export {
   FirstStep,
   flagError,
   getEnumValueConfig,
+  getGrafastMiddleware,
   grafast,
   GrafastArgumentConfig,
   GrafastExecutionArgs,
@@ -473,6 +481,7 @@ exportAsMany("grafast", {
   OperationPlan,
   defer,
   execute,
+  getGrafastMiddleware,
   grafast,
   grafastSync,
   subscribe,
@@ -601,8 +610,16 @@ export const DeepEvalStep = ApplyTransformsStep;
 declare global {
   namespace Grafast {
     type ExecutionArgs = Pick<
-      GraphQLExecutionArgs,
-      "schema" | "document" | "rootValue" | "variableValues" | "operationName"
+      GrafastExecutionArgs,
+      | "schema"
+      | "document"
+      | "rootValue"
+      | "variableValues"
+      | "operationName"
+      | "resolvedPreset"
+      | "middleware"
+      | "requestContext"
+      | "outputDataAsString"
     > & { [$$hooked]?: boolean; contextValue: Grafast.Context };
 
     /**
@@ -734,18 +751,41 @@ declare global {
        */
       grafast?: GraphileConfig.GrafastOptions;
     }
-    interface GrafastHooks {
-      args: PluginHook<
-        (event: {
-          args: Grafast.ExecutionArgs;
-          ctx: Grafast.RequestContext;
-          resolvedPreset: GraphileConfig.ResolvedPreset;
-        }) => PromiseOrValue<void>
-      >;
+    interface GrafastMiddleware {
+      /** Synchronous! */
+      validateSchema(event: ValidateSchemaEvent): readonly GraphQLError[];
+      /** Synchronous! */
+      parseAndValidate(
+        event: ParseAndValidateEvent,
+      ): DocumentNode | readonly GraphQLError[];
+      prepareArgs(
+        event: PrepareArgsEvent,
+      ): PromiseOrDirect<Grafast.ExecutionArgs>;
+      execute(event: ExecuteEvent): ReturnType<typeof execute>;
+      subscribe(event: ExecuteEvent): ReturnType<typeof subscribe>;
+      /** Synchronous! */
+      establishOperationPlan(event: EstablishOperationPlanEvent): OperationPlan;
+      executeStep(
+        event: ExecuteStepEvent,
+      ): PromiseOrDirect<GrafastResultsList<any>>;
+      streamStep(
+        event: StreamStepEvent,
+      ): PromiseOrDirect<GrafastResultStreamList<unknown>>;
     }
     interface Plugin {
       grafast?: {
-        hooks?: GrafastHooks;
+        middleware?: {
+          [key in keyof GrafastMiddleware]?: CallbackOrDescriptor<
+            GrafastMiddleware[key] extends (
+              ...args: infer UArgs
+            ) => infer UResult
+              ? (
+                  next: MiddlewareNext<Awaited<UResult>>,
+                  ...args: UArgs
+                ) => UResult
+              : never
+          >;
+        };
       };
     }
   }

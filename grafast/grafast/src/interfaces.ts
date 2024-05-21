@@ -1,4 +1,5 @@
 import type EventEmitter from "eventemitter3";
+import type { Middleware } from "graphile-config";
 import type {
   ASTNode,
   ExecutionArgs,
@@ -18,14 +19,22 @@ import type {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLType,
+  OperationDefinitionNode,
+  Source,
   ValueNode,
   VariableNode,
 } from "graphql";
+import type { ObjMap } from "graphql/jsutils/ObjMap.js";
 
 import type { Bucket, RequestTools } from "./bucket.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
 import type { FlaggedValue, SafeError } from "./error.js";
-import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
+import type {
+  ExecutableStep,
+  ListCapableStep,
+  ModifierStep,
+  StreamableStep,
+} from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type {
   __InputListStep,
@@ -924,6 +933,7 @@ export type StreamMoreableArray<T = any> = Array<T> & {
 export interface GrafastArgs extends GraphQLArgs {
   resolvedPreset?: GraphileConfig.ResolvedPreset;
   requestContext?: Partial<Grafast.RequestContext>;
+  middleware?: Middleware<GraphileConfig.GrafastMiddleware> | null;
 }
 export type Maybe<T> = T | null | undefined;
 
@@ -946,5 +956,46 @@ export type DataFromStep<TStep extends ExecutableStep> =
 
 export interface GrafastExecutionArgs extends ExecutionArgs {
   resolvedPreset?: GraphileConfig.ResolvedPreset;
+  middleware?: Middleware<GraphileConfig.GrafastMiddleware> | null;
+  requestContext?: Partial<Grafast.RequestContext>;
   outputDataAsString?: boolean;
+}
+
+export interface ValidateSchemaEvent {
+  resolvedPreset: GraphileConfig.ResolvedPreset;
+  schema: GraphQLSchema;
+}
+export interface ParseAndValidateEvent {
+  resolvedPreset: GraphileConfig.ResolvedPreset;
+  schema: GraphQLSchema;
+  source: string | Source;
+}
+export interface PrepareArgsEvent {
+  args: Grafast.ExecutionArgs;
+}
+export interface ExecuteEvent {
+  args: GrafastExecutionArgs;
+}
+export interface SubscribeEvent {
+  args: GrafastExecutionArgs;
+}
+export interface EstablishOperationPlanEvent {
+  schema: GraphQLSchema;
+  operation: OperationDefinitionNode;
+  fragments: ObjMap<FragmentDefinitionNode>;
+  variableValues: Record<string, any>;
+  context: any;
+  rootValue: any;
+  planningTimeout: number | undefined;
+  args: GrafastExecutionArgs;
+}
+export interface ExecuteStepEvent {
+  args: GrafastExecutionArgs;
+  step: ExecutableStep;
+  executeDetails: ExecutionDetails;
+}
+export interface StreamStepEvent {
+  args: GrafastExecutionArgs;
+  step: StreamableStep<unknown>;
+  streamDetails: StreamDetails;
 }

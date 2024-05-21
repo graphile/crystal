@@ -8,7 +8,7 @@ import {
   lexicographicSortSchema,
   printSchema,
 } from "grafast/graphql";
-import { applyHooks, AsyncHooks, resolvePresets } from "graphile-config";
+import { AsyncHooks, orderedApply, resolvePresets } from "graphile-config";
 
 import extend from "./extend.js";
 import { makeInitialInflection } from "./inflection.js";
@@ -122,7 +122,7 @@ export const buildInflection = (
     }
 
     // Overwrite the inflectors
-    applyHooks(
+    orderedApply(
       plugins,
       (plugin) => plugin.inflection?.replace,
       (inflectorName, replacementFunction, plugin) => {
@@ -234,7 +234,7 @@ const gatherBase = (
     }
 
     // Register the hooks
-    applyHooks(
+    orderedApply(
       gatherPlugins,
       (p) => p.gather!.hooks,
       (name, fn, plugin) => {

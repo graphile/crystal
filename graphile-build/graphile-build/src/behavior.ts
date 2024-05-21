@@ -1,5 +1,5 @@
 import { arraysMatch } from "grafast";
-import { applyHooks, sortedPlugins } from "graphile-config";
+import { orderedApply, sortedPlugins } from "graphile-config";
 
 type BehaviorScope = string[];
 interface BehaviorSpec {
@@ -120,7 +120,7 @@ export class Behavior {
       build,
     );
 
-    applyHooks(
+    orderedApply(
       resolvedPreset.plugins,
       getEntityBehaviorHooks,
       (hookName, hookFn, plugin) => {

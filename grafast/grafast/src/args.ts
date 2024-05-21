@@ -1,9 +1,24 @@
 import type { ExecutionArgs } from "graphql";
 
-import { hook, NULL_PRESET } from "./config.js";
+import type {
+  GrafastExecutionArgs,
+  PrepareArgsEvent,
+  PromiseOrDirect,
+} from "./interfaces.js";
 import { $$hooked } from "./interfaces.js";
+import { getGrafastMiddleware } from "./middleware.js";
 import { isPromiseLike } from "./utils.js";
+const EMPTY_OBJECT: Record<string, never> = Object.freeze(Object.create(null));
 
+/** @deprecated Pass `resolvedPreset` and `requestContext` via args directly */
+export function hookArgs(
+  rawArgs: ExecutionArgs,
+  resolvedPreset: GraphileConfig.ResolvedPreset,
+  ctx: Partial<Grafast.RequestContext>,
+): PromiseOrDirect<Grafast.ExecutionArgs>;
+export function hookArgs(
+  rawArgs: GrafastExecutionArgs,
+): PromiseOrDirect<Grafast.ExecutionArgs>;
 /**
  * Applies Graphile Config hooks to your GraphQL request, e.g. to
  * populate context or similar.
@@ -11,10 +26,30 @@ import { isPromiseLike } from "./utils.js";
  * @experimental
  */
 export function hookArgs(
-  rawArgs: ExecutionArgs,
-  resolvedPreset: GraphileConfig.ResolvedPreset,
-  ctx: Partial<Grafast.RequestContext>,
-): Grafast.ExecutionArgs | PromiseLike<Grafast.ExecutionArgs> {
+  rawArgs: GrafastExecutionArgs,
+  legacyResolvedPreset?: GraphileConfig.ResolvedPreset,
+  legacyCtx?: Partial<Grafast.RequestContext>,
+): PromiseOrDirect<Grafast.ExecutionArgs> {
+  if (legacyResolvedPreset !== undefined) {
+    rawArgs.resolvedPreset = legacyResolvedPreset;
+  }
+  if (legacyCtx !== undefined) {
+    rawArgs.requestContext = rawArgs.requestContext ?? legacyCtx;
+  }
+  const {
+    middleware: rawMiddleware,
+    resolvedPreset,
+    contextValue: rawContextValue,
+  } = rawArgs;
+  // Make context mutable
+  rawArgs.contextValue = Object.assign(Object.create(null), rawContextValue);
+  const middleware =
+    rawMiddleware === undefined && resolvedPreset != null
+      ? getGrafastMiddleware(resolvedPreset)
+      : rawMiddleware ?? null;
+  if (rawMiddleware === undefined) {
+    rawArgs.middleware = middleware;
+  }
   const args = rawArgs as Grafast.ExecutionArgs;
   // Assert that args haven't already been hooked
   if (args[$$hooked]) {
@@ -22,44 +57,36 @@ export function hookArgs(
   }
   args[$$hooked] = true;
 
-  // Make context mutable
-  args.contextValue = Object.assign(Object.create(null), args.contextValue);
-
-  // finalize(args): args is deliberately shadowed
-  const finalize = (args: Grafast.ExecutionArgs) => {
-    const userContext = resolvedPreset.grafast?.context;
-    if (typeof userContext === "function") {
-      const result = userContext(ctx, args);
-      if (isPromiseLike(result)) {
-        // Deliberately shadowed 'result'
-        return result.then((result) => {
-          Object.assign(args.contextValue as Partial<Grafast.Context>, result);
-          return args;
-        });
-      } else {
-        Object.assign(args.contextValue as Partial<Grafast.Context>, result);
-        return args;
-      }
-    } else if (typeof userContext === "object" && userContext !== null) {
-      Object.assign(args.contextValue as Partial<Grafast.Context>, userContext);
-      return args;
-    } else {
-      return args;
-    }
-  };
-
-  if (
-    resolvedPreset !== NULL_PRESET &&
-    resolvedPreset.plugins &&
-    resolvedPreset.plugins.length > 0
-  ) {
-    const event = { args, ctx, resolvedPreset };
-    const result = hook(resolvedPreset, "args", event);
-    if (isPromiseLike(result)) {
-      return result.then(() => finalize(event.args));
-    } else {
-      return finalize(event.args);
-    }
+  if (middleware != null) {
+    return middleware.run("prepareArgs", { args }, finalizeWithEvent);
+  } else {
+    return finalize(args);
   }
-  return finalize(args);
+}
+
+function finalize(args: Grafast.ExecutionArgs) {
+  const userContext = args.resolvedPreset?.grafast?.context;
+  const contextValue = args.contextValue as Partial<Grafast.Context>;
+  if (typeof userContext === "function") {
+    const result = userContext(args.requestContext ?? EMPTY_OBJECT, args);
+    if (isPromiseLike(result)) {
+      // Deliberately shadowed 'result'
+      return result.then((result) => {
+        Object.assign(contextValue, result);
+        return args;
+      });
+    } else {
+      Object.assign(contextValue, result);
+      return args;
+    }
+  } else if (typeof userContext === "object" && userContext !== null) {
+    Object.assign(contextValue, userContext);
+    return args;
+  } else {
+    return args;
+  }
+}
+
+function finalizeWithEvent(event: PrepareArgsEvent) {
+  return finalize(event.args);
 }

@@ -74,11 +74,13 @@ function makeRuruTitlePlugin(title: string): GraphileConfig.Plugin {
     version: "0.0.0",
 
     grafserv: {
-      hooks: {
-        ruruHTMLParts(_info, parts, extra) {
-          parts.titleTag = `<title>${escapeHTML(
-            title + " | " + extra.request.getHeader("host"),
+      middleware: {
+        ruruHTMLParts(next, event) {
+          const { htmlParts, request } = event;
+          htmlParts.titleTag = `<title>${escapeHTML(
+            title + " | " + request.getHeader("host"),
           )}</title>`;
+          return next();
         },
       },
     },

@@ -3,16 +3,17 @@ import type { PromiseOrDirect, TypedEventEmitter } from "grafast";
 import {
   defer,
   execute,
+  getGrafastMiddleware,
   isPromiseLike,
   stringifyPayload,
   subscribe,
 } from "grafast";
 import type { GraphQLSchema } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
-import type { AsyncHooks } from "graphile-config";
+import type { Middleware } from "graphile-config";
 import { resolvePresets } from "graphile-config";
 
-import { getGrafservHooks } from "../hooks.js";
+import { getGrafservMiddleware } from "../hooks.js";
 import type {
   BufferResult,
   DynamicOptions,
@@ -24,9 +25,11 @@ import type {
   NoContentHandlerResult,
   NoContentResult,
   NormalizedRequestDigest,
+  ProcessRequestEvent,
   RequestDigest,
   Result,
   SchemaChangeEvent,
+  SetPresetEvent,
 } from "../interfaces.js";
 import { mapIterator } from "../mapIterator.js";
 import { makeGraphiQLHandler } from "../middleware/graphiql.js";
@@ -55,7 +58,8 @@ export class GrafservBase {
   }
   public resolvedPreset: GraphileConfig.ResolvedPreset;
   /** @internal */
-  public hooks: AsyncHooks<GraphileConfig.GrafservHooks>;
+  public middleware: Middleware<GraphileConfig.GrafservMiddleware> | null;
+  public grafastMiddleware: Middleware<GraphileConfig.GrafastMiddleware> | null;
   protected schema: GraphQLSchema | PromiseLike<GraphQLSchema> | null;
   protected schemaError: PromiseLike<GraphQLSchema> | null;
   protected eventEmitter: TypedEventEmitter<{
@@ -77,7 +81,8 @@ export class GrafservBase {
       ...optionsFromConfig(this.resolvedPreset),
     };
     this.getExecutionConfig = this.dynamicOptions.getExecutionConfig;
-    this.hooks = getGrafservHooks(this.resolvedPreset);
+    this.middleware = getGrafservMiddleware(this.resolvedPreset);
+    this.grafastMiddleware = getGrafastMiddleware(this.resolvedPreset);
     this.schemaError = null;
     this.schema = config.schema;
     if (isPromiseLike(config.schema)) {
@@ -100,7 +105,8 @@ export class GrafservBase {
     this.setPreset(this.resolvedPreset);
   }
 
-  private _processRequest(
+  /** @internal */
+  _processRequest(
     inRequest: RequestDigest,
   ): PromiseOrDirect<HandlerResult | null> {
     const request = normalizeRequest(inRequest);
@@ -159,31 +165,17 @@ export class GrafservBase {
   }
 
   protected processRequest(
-    request: RequestDigest,
+    requestDigest: RequestDigest,
   ): PromiseOrDirect<Result | null> {
-    let returnValue;
-    try {
-      const result = this._processRequest(request);
-      if (isPromiseLike(result)) {
-        returnValue = result.then(
-          convertHandlerResultToResult,
-          convertErrorToErrorResult,
-        );
-      } else {
-        returnValue = convertHandlerResultToResult(result);
-      }
-    } catch (e) {
-      returnValue = convertErrorToErrorResult(e);
-    }
-    if (this.resolvedPreset.grafserv?.dangerouslyAllowAllCORSRequests) {
-      if (isPromiseLike(returnValue)) {
-        return returnValue.then(dangerousCorsWrap);
-      } else {
-        return dangerousCorsWrap(returnValue);
-      }
-    } else {
-      return returnValue;
-    }
+    const { resolvedPreset } = this;
+    const event: ProcessRequestEvent = {
+      resolvedPreset,
+      requestDigest,
+      instance: this,
+    };
+    return this.middleware != null
+      ? this.middleware.run("processRequest", event, processRequestWithEvent)
+      : processRequestWithEvent(event);
   }
 
   public getPreset(): GraphileConfig.ResolvedPreset {
@@ -227,29 +219,37 @@ export class GrafservBase {
     }
     this._settingPreset = true;
     const resolvedPreset = resolvePresets([newPreset]);
-    const hooks = getGrafservHooks(this.resolvedPreset);
+    const middleware = getGrafservMiddleware(this.resolvedPreset);
+    const grafastMiddleware = getGrafastMiddleware(this.resolvedPreset);
     // Note: this gets directly mutated
     const dynamicOptions: DynamicOptions = {
       validationRules: [...graphql.specifiedRules],
       getExecutionConfig: defaultMakeGetExecutionConfig(),
       ...optionsFromConfig(resolvedPreset),
     };
-    const initResult = hooks.process("init", dynamicOptions);
+    const storeDynamicOptions = (dynamicOptions: SetPresetEvent) => {
+      const { resolvedPreset } = dynamicOptions;
+      // Overwrite all the `this.*` properties at once
+      this.resolvedPreset = resolvedPreset;
+      this.middleware = middleware;
+      this.grafastMiddleware = grafastMiddleware;
+      this.dynamicOptions = dynamicOptions as DynamicOptions;
+      this.initialized = true;
+      // ENHANCE: this.graphqlHandler?.release()?
+      this.refreshHandlers();
+      this.getExecutionConfig = dynamicOptions.getExecutionConfig;
+      // MUST come after the handlers have been refreshed, otherwise we'll
+      // get infinite loops
+      this.eventEmitter.emit("dynamicOptions:ready", {});
+    };
     return (
-      Promise.resolve(initResult)
-        .then(() => {
-          // Overwrite all the `this.*` properties at once
-          this.resolvedPreset = resolvedPreset;
-          this.hooks = hooks;
-          this.dynamicOptions = dynamicOptions;
-          this.initialized = true;
-          // ENHANCE: this.graphqlHandler?.release()?
-          this.refreshHandlers();
-          this.getExecutionConfig = dynamicOptions.getExecutionConfig;
-          // MUST come after the handlers have been refreshed, otherwise we'll
-          // get infinite loops
-          this.eventEmitter.emit("dynamicOptions:ready", {});
-        })
+      new Promise((resolve) =>
+        resolve(
+          middleware != null
+            ? middleware.run("setPreset", dynamicOptions, storeDynamicOptions)
+            : storeDynamicOptions(dynamicOptions),
+        ),
+      )
         .then(null, (e) => {
           this.graphqlHandler = this.failedGraphqlHandler;
           this.graphiqlHandler = this.failedGraphiqlHandler;
@@ -293,7 +293,7 @@ export class GrafservBase {
     this.graphqlHandler = makeGraphQLHandler(this);
     this.graphiqlHandler = makeGraphiQLHandler(
       this.resolvedPreset,
-      this.hooks,
+      this.middleware,
       this.dynamicOptions,
     );
   }
@@ -782,4 +782,32 @@ function optionsResponse(
     dynamicOptions: dynamicOptions,
     statusCode: 204,
   };
+}
+
+function processRequestWithEvent(event: ProcessRequestEvent) {
+  const { requestDigest: request, instance } = event;
+  let returnValue: PromiseOrDirect<Result | null>;
+  try {
+    const result = instance._processRequest(request);
+
+    if (isPromiseLike(result)) {
+      returnValue = result.then(
+        convertHandlerResultToResult,
+        convertErrorToErrorResult,
+      );
+    } else {
+      returnValue = convertHandlerResultToResult(result);
+    }
+  } catch (e) {
+    returnValue = convertErrorToErrorResult(e);
+  }
+  if (instance.resolvedPreset.grafserv?.dangerouslyAllowAllCORSRequests) {
+    if (isPromiseLike(returnValue)) {
+      return returnValue.then(dangerousCorsWrap);
+    } else {
+      return dangerousCorsWrap(returnValue);
+    }
+  } else {
+    return returnValue;
+  }
 }

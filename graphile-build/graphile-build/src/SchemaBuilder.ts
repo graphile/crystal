@@ -4,7 +4,7 @@ import debugFactory from "debug";
 import { EventEmitter } from "events";
 import type { GraphQLSchemaConfig } from "grafast/graphql";
 import { GraphQLSchema, validateSchema } from "grafast/graphql";
-import { applyHooks } from "graphile-config";
+import { orderedApply } from "graphile-config";
 import { inspect } from "util";
 
 import type { BehaviorDynamicMethods } from "./behavior.js";
@@ -59,7 +59,7 @@ class SchemaBuilder<
 
     this.newWithHooks = makeNewWithHooks({ builder: this }).newWithHooks;
 
-    applyHooks(
+    orderedApply(
       resolvedPreset.plugins,
       getSchemaHooks,
       (hookName, hookFn, plugin) => {

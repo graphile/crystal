@@ -4,8 +4,21 @@ import { sortWithBeforeAfterProvides } from "./sort.js";
 
 export { GraphileConfig };
 
-export { applyHooks, AsyncHooks, HookObject } from "./hooks.js";
-export type { PluginHook, PluginHookObject } from "./interfaces.js";
+export { orderedApply } from "./functionality.js";
+export {
+  applyHooks,
+  AsyncHooks,
+  HookObject,
+  PluginHook,
+  PluginHookObject,
+} from "./hooks.js";
+export type {
+  CallbackDescriptor,
+  CallbackOrDescriptor,
+  FunctionalityObject,
+} from "./interfaces.js";
+export type { MiddlewareNext } from "./middleware.js";
+export { Middleware } from "./middleware.js";
 export { isResolvedPreset, resolvePresets } from "./resolvePresets.js";
 
 export function sortedPlugins(

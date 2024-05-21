@@ -5,9 +5,10 @@ import type {
 } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
-import { NULL_PRESET } from "./config.js";
 import { withGrafastArgs } from "./execute.js";
 import type { GrafastExecutionArgs } from "./index.js";
+import type { SubscribeEvent } from "./interfaces.js";
+import { getGrafastMiddleware } from "./middleware.js";
 
 /**
  * @deprecated Second and third parameters should be passed as part of args,
@@ -33,15 +34,34 @@ export function subscribe(
 >;
 export function subscribe(
   args: GrafastExecutionArgs,
-  resolvedPreset?: GraphileConfig.ResolvedPreset,
-  outputDataAsString?: boolean,
+  legacyResolvedPreset?: GraphileConfig.ResolvedPreset,
+  legacyOutputDataAsString?: boolean,
 ): PromiseOrValue<
   | AsyncGenerator<ExecutionResult | AsyncExecutionResult, void, void>
   | ExecutionResult
 > {
-  return withGrafastArgs(
-    args,
-    args.resolvedPreset ?? resolvedPreset ?? NULL_PRESET,
-    args.outputDataAsString ?? outputDataAsString ?? false,
-  );
+  // TODO: remove legacy compatibility
+  if (legacyResolvedPreset !== undefined) {
+    args.resolvedPreset = legacyResolvedPreset;
+  }
+  if (legacyOutputDataAsString !== undefined) {
+    args.outputDataAsString = legacyOutputDataAsString;
+  }
+
+  const { resolvedPreset } = args;
+  const middleware =
+    args.middleware === undefined && resolvedPreset != null
+      ? getGrafastMiddleware(resolvedPreset)
+      : args.middleware ?? null;
+  if (args.middleware === undefined) {
+    args.middleware = middleware;
+  }
+  if (middleware !== null) {
+    return middleware.run("subscribe", { args }, subscribeMiddlewareCallback);
+  } else {
+    return withGrafastArgs(args);
+  }
 }
+
+const subscribeMiddlewareCallback = (event: SubscribeEvent) =>
+  withGrafastArgs(event.args);

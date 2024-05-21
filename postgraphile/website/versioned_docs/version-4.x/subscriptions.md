@@ -219,7 +219,7 @@ passing the `pluginHook` with the `@graphile/pg-pubsub` plugin, setting
 `subscriptions: true` and adding your custom plugin.
 
 We emulate part of the Express stack, so if you require sessions you can pass
-additional Connect/Express middlewares (sorry, we don't support Koa middlewares
+additional Connect/Express middleware (sorry, we don't support Koa middleware
 here at this time) via the `websocketMiddlewares` option.
 
 Here's an example:
@@ -237,7 +237,7 @@ const postgraphileOptions = {
   subscriptions: true, // start the websocket server
   appendPlugins: [MySubscriptionPlugin], // Load our plugin
   websocketMiddlewares: [
-    // Add whatever middlewares you need here, note that they should only
+    // Add whatever middleware you need here, note that they should only
     // manipulate properties on req/res, they must not sent response data. e.g.:
     //
     //   require('express-session')(),
@@ -311,7 +311,7 @@ passing the `pluginHook` with the `@graphile/pg-pubsub` plugin and using
 `simpleSubscriptions: true`.
 
 We emulate part of the Express stack, so if you require sessions you can pass
-additional Connect/Express middlewares (sorry, we don't support Koa middlewares
+additional Connect/Express middleware (sorry, we don't support Koa middleware
 here at this time) via the `websocketMiddlewares` option.
 
 Here's an example:
@@ -328,7 +328,7 @@ const postgraphileOptions = {
   subscriptions: true,
   simpleSubscriptions: true,
   websocketMiddlewares: [
-    // Add whatever middlewares you need here, note that they should only
+    // Add whatever middleware you need here, note that they should only
     // manipulate properties on req/res, they must not sent response data. e.g.:
     //
     //   require('express-session')(),
@@ -724,7 +724,7 @@ const postgraphileOptions = {
   pluginHook,
   simpleSubscriptions: true,
   websocketMiddlewares: [
-    // Add whatever middlewares you need here, note that
+    // Add whatever middleware you need here, note that
     // they should only manipulate properties on req/res,
     // they must not sent response data. e.g.:
     //

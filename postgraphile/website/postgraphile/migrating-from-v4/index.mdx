@@ -439,7 +439,7 @@ The above code might differ significantly depending on which webserver
 framework you're using. In V4 we tried to support as many servers as possible
 by reducing everything to the lowest common denominator: the Node HTTP `req`
 and `res` objects. This made it easy to add the middleware, but made it
-challenging for you to deeply integrate with the various middlewares and
+challenging for you to deeply integrate with the various middleware and
 capabilities in your webserver of choice. In V5, we have created an independent
 abstraction over HTTP requests which Grafserv handles, and then we provide
 different adaptors (or you can write your own!) to convert back and forth

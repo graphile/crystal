@@ -4,6 +4,10 @@ import type {} from "../interfaces.js";
 import { withPgClientFromPgService } from "../pgServices.js";
 import { version } from "../version.js";
 
+export const EMPTY_OBJECT: Record<string, never> = Object.freeze(
+  Object.create(null),
+);
+
 export const PgContextPlugin: GraphileConfig.Plugin = {
   name: "PgContextPlugin",
   description:
@@ -11,13 +15,14 @@ export const PgContextPlugin: GraphileConfig.Plugin = {
   version: version,
 
   grafast: {
-    hooks: {
-      args({ args, ctx, resolvedPreset: config }) {
+    middleware: {
+      prepareArgs(next, { args }) {
         if (!args.contextValue) {
           args.contextValue = Object.create(null);
         }
+        const { resolvedPreset: config, requestContext: ctx } = args;
         const contextValue = args.contextValue as Record<string, any>;
-        if (config.pgServices) {
+        if (config?.pgServices) {
           for (const pgService of config.pgServices) {
             const {
               pgSettings,
@@ -44,7 +49,7 @@ export const PgContextPlugin: GraphileConfig.Plugin = {
               }
               contextValue[pgSettingsKey] =
                 typeof pgSettings === "function"
-                  ? pgSettings(ctx)
+                  ? pgSettings(ctx ?? EMPTY_OBJECT)
                   : pgSettings ?? undefined;
             }
             if (pgSubscriberKey != null) {
@@ -66,6 +71,7 @@ export const PgContextPlugin: GraphileConfig.Plugin = {
             );
           }
         }
+        return next();
       },
     },
   },
