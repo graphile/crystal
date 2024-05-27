@@ -96,21 +96,21 @@ export class KoaGrafserv extends GrafservBase {
           ctx.response.set(headers);
           ctx.response.status = statusCode;
           ctx.response.body = buffer;
-          return;
+          break;
         }
         case "json": {
           const { statusCode, headers, json } = result;
           ctx.response.set(headers);
           ctx.response.status = statusCode;
           ctx.response.body = json;
-          return;
+          break;
         }
         case "noContent": {
           const { statusCode, headers } = result;
           ctx.response.set(headers);
           ctx.response.status = statusCode;
           ctx.response.body = null;
-          return;
+          break;
         }
         case "bufferStream": {
           const { statusCode, headers, lowLatency, bufferIterator } = result;
@@ -127,7 +127,7 @@ export class KoaGrafserv extends GrafservBase {
             stream.write(buffer);
           }
 
-          return;
+          break;
         }
         default: {
           const never: never = result;
@@ -136,9 +136,10 @@ export class KoaGrafserv extends GrafservBase {
           ctx.response.type = "text/plain";
           ctx.response.status = 501;
           ctx.response.body = "Server hasn't implemented this yet";
-          return;
+          break;
         }
       }
+      return await next();
     };
   }
 
