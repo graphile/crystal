@@ -384,6 +384,28 @@ const preset: GraphileConfig.Preset = {
         },
       },
     }),
+    makeExtendSchemaPlugin({
+      typeDefs: gql`
+        extend type Subscription {
+          error: Int
+        }
+      `,
+      plans: {
+        Subscription: {
+          error: {
+            subscribePlan: EXPORTABLE(
+              (constant, lambda) =>
+                function subscribePlan() {
+                  return lambda(constant(3), () => {
+                    throw new Error("Testing error");
+                  });
+                },
+              [constant, lambda],
+            ),
+          },
+        },
+      },
+    }),
     // PrimaryKeyMutationsOnlyPlugin,
     PersistedPlugin,
     makeRuruTitlePlugin("<New title text here!>"),
