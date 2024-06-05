@@ -3,10 +3,11 @@ import { constant, ExecutableStep } from "grafast";
 
 import type { PgClient, PgExecutor, WithPgClient } from "../executor";
 
-export type WithPgClientStepCallback<TData, TResult> = (
-  client: PgClient,
-  data: TData,
-) => Promise<TResult>;
+export type WithPgClientStepCallback<
+  TData,
+  TResult,
+  TPgClient extends PgClient = PgClient,
+> = (client: TPgClient, data: TData) => Promise<TResult>;
 
 /**
  * Runs the given `callback` against the given `executor` using any plan data
@@ -16,6 +17,7 @@ export type WithPgClientStepCallback<TData, TResult> = (
 export class WithPgClientStep<
   TData = any,
   TResult = any,
+  TPgClient extends PgClient = PgClient,
 > extends ExecutableStep<TResult> {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -44,7 +46,7 @@ export class WithPgClientStep<
   constructor(
     executor: PgExecutor,
     $data: ExecutableStep<TData>,
-    private callback: WithPgClientStepCallback<TData, TResult>,
+    private callback: WithPgClientStepCallback<TData, TResult, TPgClient>,
   ) {
     super();
     this.executor = executor;
@@ -56,7 +58,7 @@ export class WithPgClientStep<
     indexMap,
     values,
   }: ExecutionDetails<
-    [{ pgSettings: any; withPgClient: WithPgClient }, TData]
+    [{ pgSettings: any; withPgClient: WithPgClient<TPgClient> }, TData]
   >): GrafastResultsList<TResult> {
     const contextDep = values[this.contextId as 0];
     const dataDep = values[this.dataId as 1];
@@ -69,12 +71,16 @@ export class WithPgClientStep<
   }
 }
 
-export function withPgClient<TData, TResult>(
+export function withPgClient<
+  TData,
+  TResult,
+  TPgClient extends PgClient = PgClient,
+>(
   executor: PgExecutor,
   $data:
     | ExecutableStep<TData>
     | (TData extends null | undefined ? null | undefined : never),
-  callback: WithPgClientStepCallback<TData, TResult>,
+  callback: WithPgClientStepCallback<TData, TResult, TPgClient>,
 ) {
   return new WithPgClientStep(
     executor,
@@ -83,14 +89,18 @@ export function withPgClient<TData, TResult>(
   );
 }
 
-export function withPgClientTransaction<TData, TResult>(
+export function withPgClientTransaction<
+  TData,
+  TResult,
+  TPgClient extends PgClient = PgClient,
+>(
   executor: PgExecutor,
   $data:
     | ExecutableStep<TData>
     | (TData extends null | undefined ? null | undefined : never),
-  callback: WithPgClientStepCallback<TData, TResult>,
+  callback: WithPgClientStepCallback<TData, TResult, TPgClient>,
 ) {
-  return withPgClient(
+  return withPgClient<TData, TResult, TPgClient>(
     executor,
     $data ?? constant($data as TData),
     (client, data) =>

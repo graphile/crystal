@@ -1,18 +1,21 @@
-import { pathToFileURL } from "node:url";
-
-import type { PgClient, WithPgClient } from "./executor.ts";
+import type { PgClient, WithPgClient } from "./executor.js";
 
 type PromiseOrDirect<T> = T | PromiseLike<T>;
 
 /** @experimental */
 export interface PgAdaptor<
   TAdaptor extends
-    keyof GraphileConfig.PgDatabaseAdaptorOptions = keyof GraphileConfig.PgDatabaseAdaptorOptions,
+    keyof GraphileConfig.PgAdaptors = keyof GraphileConfig.PgAdaptors,
 > {
   createWithPgClient: (
-    adaptorSettings: GraphileConfig.PgServiceConfiguration<TAdaptor>["adaptorSettings"],
-    variant?: "SUPERUSER" | null,
-  ) => PromiseOrDirect<WithPgClient>;
+    adaptorSettings: GraphileConfig.PgAdaptors[TAdaptor]["adaptorSettings"],
+    variant?: "SUPERUSER" | string | null,
+  ) => PromiseOrDirect<
+    WithPgClient<GraphileConfig.PgAdaptors[TAdaptor]["client"]>
+  >;
+  makePgService: (
+    options: GraphileConfig.PgAdaptors[TAdaptor]["makePgServiceOptions"],
+  ) => GraphileConfig.PgServiceConfiguration<TAdaptor>;
 }
 
 /**
@@ -26,83 +29,43 @@ export function isPromiseLike<T>(
 
 const isTest = process.env.NODE_ENV === "test";
 
-interface PgClientBySourceCacheValue {
-  withPgClient: WithPgClient;
+interface PgClientBySourceCacheValue<TPgClient extends PgClient = PgClient> {
+  withPgClient: WithPgClient<TPgClient>;
   retainers: number;
 }
 
 const withPgClientDetailsByConfigCache = new Map<
-  GraphileConfig.PgServiceConfiguration,
+  GraphileConfig.PgServiceConfiguration<any>,
   PromiseOrDirect<PgClientBySourceCacheValue>
 >();
-
-function reallyLoadAdaptor<
-  TAdaptor extends
-    keyof GraphileConfig.PgDatabaseAdaptorOptions = keyof GraphileConfig.PgDatabaseAdaptorOptions,
->(adaptorString: TAdaptor): PromiseOrDirect<PgAdaptor<TAdaptor>> {
-  try {
-    const adaptor = require(adaptorString);
-    return adaptor?.createWithPgClient ? adaptor : adaptor?.default;
-  } catch (e) {
-    if (e.code === "ERR_REQUIRE_ESM") {
-      const importSpecifier = adaptorString.match(/^([a-z]:|\.\/|\/)/i)
-        ? pathToFileURL(adaptorString).href
-        : adaptorString;
-      const adaptorPromise = import(importSpecifier);
-      return adaptorPromise.then((adaptor) =>
-        adaptor?.createWithPgClient ? adaptor : adaptor?.default,
-      );
-    } else {
-      throw e;
-    }
-  }
-}
-
-const loadAdaptorCache = new Map<string, PromiseOrDirect<PgAdaptor<any>>>();
-function loadAdaptor<
-  TAdaptor extends
-    keyof GraphileConfig.PgDatabaseAdaptorOptions = keyof GraphileConfig.PgDatabaseAdaptorOptions,
->(adaptorString: TAdaptor): PromiseOrDirect<PgAdaptor<TAdaptor>> {
-  const cached = loadAdaptorCache.get(adaptorString);
-  if (cached) {
-    return cached;
-  } else {
-    const result = reallyLoadAdaptor(adaptorString);
-    loadAdaptorCache.set(adaptorString, result);
-    if (isPromiseLike(result)) {
-      result.then(
-        (resolved) => {
-          loadAdaptorCache.set(adaptorString, resolved);
-        },
-        () => {},
-      );
-    }
-    return result;
-  }
-}
 
 /**
  * Get or build the 'withPgClient' callback function for a given database
  * config, caching it to make future lookups faster.
  */
-export function getWithPgClientFromPgService(
-  config: GraphileConfig.PgServiceConfiguration,
-): PromiseOrDirect<WithPgClient> {
+export function getWithPgClientFromPgService<
+  TAdaptor extends
+    keyof GraphileConfig.PgAdaptors = keyof GraphileConfig.PgAdaptors,
+>(
+  config: GraphileConfig.PgServiceConfiguration<TAdaptor>,
+): PromiseOrDirect<
+  WithPgClient<GraphileConfig.PgAdaptors[TAdaptor]["client"]>
+> {
+  type TPgClient = GraphileConfig.PgAdaptors[TAdaptor]["client"];
   const existing = withPgClientDetailsByConfigCache.get(config);
   if (existing) {
     if (isPromiseLike(existing)) {
       return existing.then((v) => {
         v.retainers++;
-        return v.withPgClient;
+        return v.withPgClient as WithPgClient<TPgClient>;
       });
     } else {
       existing.retainers++;
-      return existing.withPgClient;
+      return existing.withPgClient as WithPgClient<TPgClient>;
     }
   } else {
     const promise = (async () => {
-      const adaptor = await loadAdaptor(config.adaptor);
-      const factory = adaptor?.createWithPgClient;
+      const factory = config.adaptor?.createWithPgClient;
       if (typeof factory !== "function") {
         throw new Error(
           `'${config.adaptor}' does not look like a withPgClient adaptor - please ensure it exports a method called 'createWithPgClient'`,
@@ -144,7 +107,7 @@ export function getWithPgClientFromPgService(
     promise.catch(() => {
       withPgClientDetailsByConfigCache.delete(config);
     });
-    return promise.then((v) => v.withPgClient);
+    return promise.then((v) => v.withPgClient as WithPgClient<TPgClient>);
   }
 }
 
@@ -170,8 +133,7 @@ export async function withSuperuserPgClientFromPgService<T>(
   pgSettings: { [key: string]: string } | null,
   callback: (client: PgClient) => T | Promise<T>,
 ): Promise<T> {
-  const adaptor = await loadAdaptor(config.adaptor);
-  const withPgClient = await adaptor.createWithPgClient(
+  const withPgClient = await config.adaptor.createWithPgClient(
     config.adaptorSettings,
     "SUPERUSER",
   );

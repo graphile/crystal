@@ -28,6 +28,27 @@ import type {
 import type { MakePgServiceOptions } from "../interfaces.js";
 import type { PgAdaptor } from "../pgServices.js";
 
+declare global {
+  namespace Grafast {
+    interface Context {
+      pgSettings: {
+        [key: string]: string;
+      } | null;
+      withPgClient: WithPgClient<NodePostgresPgClient>;
+      pgSubscriber: PgSubscriber | null;
+    }
+  }
+  namespace GraphileConfig {
+    interface PgAdaptors {
+      "@dataplan/pg/adaptors/pg": {
+        adaptorSettings: PgAdaptorSettings | undefined;
+        makePgServiceOptions: PgAdaptorMakePgServiceOptions;
+        client: NodePostgresPgClient;
+      };
+    }
+  }
+}
+
 // Set `DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE=0` to disable prepared statements
 const cacheSizeFromEnv = process.env.DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE
   ? parseInt(process.env.DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE, 10)
@@ -354,7 +375,7 @@ export function makeWithPgClientViaPgClientAlreadyInTransaction(
   return withPgClient;
 }
 
-export interface PgAdaptorOptions {
+export interface PgAdaptorSettings {
   /** ONLY FOR USE IN TESTS! */
   poolClient?: pg.PoolClient;
   /** ONLY FOR USE IN TESTS! */
@@ -374,8 +395,11 @@ export interface PgAdaptorOptions {
   superuserConnectionString?: string;
 }
 
+/** @deprecated Use PgAdaptorSettings instead. */
+export type PgAdaptorOptions = PgAdaptorSettings;
+
 export function createWithPgClient(
-  options: PgAdaptorOptions = Object.create(null),
+  options: PgAdaptorSettings = Object.create(null),
   variant?: "SUPERUSER" | string | null,
 ): WithPgClient<NodePostgresPgClient> {
   if (variant === "SUPERUSER") {
@@ -414,8 +438,10 @@ export function createWithPgClient(
 }
 
 // This is here as a TypeScript assertion, to ensure we conform to PgAdaptor
-const _testValidAdaptor: PgAdaptor<"@dataplan/pg/adaptors/pg">["createWithPgClient"] =
-  createWithPgClient;
+const adaptor: PgAdaptor<"@dataplan/pg/adaptors/pg"> = {
+  createWithPgClient,
+  makePgService,
+};
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -702,21 +728,13 @@ export class PgSubscriber<
   }
 }
 
-declare global {
-  namespace Grafast {
-    interface Context {
-      pgSettings: {
-        [key: string]: string;
-      } | null;
-      withPgClient: WithPgClient<NodePostgresPgClient>;
-      pgSubscriber: PgSubscriber | null;
-    }
-  }
+export interface PgAdaptorMakePgServiceOptions extends MakePgServiceOptions {
+  pool?: pg.Pool;
 }
 
 export function makePgService(
-  options: MakePgServiceOptions & { pool?: pg.Pool },
-): GraphileConfig.PgServiceConfiguration {
+  options: PgAdaptorMakePgServiceOptions,
+): GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg"> {
   const {
     name = "main",
     connectionString,
@@ -757,26 +775,27 @@ export function makePgService(
     pgSubscriber = new PgSubscriber(pool);
     releasers.push(() => pgSubscriber!.release?.());
   }
-  const service: GraphileConfig.PgServiceConfiguration = {
-    name,
-    schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
-    withPgClientKey: withPgClientKey as any,
-    pgSettingsKey: pgSettingsKey as any,
-    pgSubscriberKey: pgSubscriberKey as any,
-    pgSettings,
-    pgSettingsForIntrospection,
-    pgSubscriber,
-    adaptor: "@dataplan/pg/adaptors/pg",
-    adaptorSettings: {
-      pool,
-      superuserConnectionString,
-    },
-    async release() {
-      // Release in reverse order
-      for (const releaser of [...releasers].reverse()) {
-        await releaser();
-      }
-    },
-  };
+  const service: GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg"> =
+    {
+      name,
+      schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
+      withPgClientKey: withPgClientKey as any,
+      pgSettingsKey: pgSettingsKey as any,
+      pgSubscriberKey: pgSubscriberKey as any,
+      pgSettings,
+      pgSettingsForIntrospection,
+      pgSubscriber,
+      adaptor,
+      adaptorSettings: {
+        pool,
+        superuserConnectionString,
+      },
+      async release() {
+        // Release in reverse order
+        for (const releaser of [...releasers].reverse()) {
+          await releaser();
+        }
+      },
+    };
   return service;
 }
