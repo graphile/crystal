@@ -9,16 +9,14 @@ export interface PgAdaptor<
     keyof GraphileConfig.PgAdaptors = keyof GraphileConfig.PgAdaptors,
 > {
   createWithPgClient: (
-    adaptorSettings:
-      | GraphileConfig.PgAdaptors[TAdaptor]["adaptorSettings"]
-      | undefined,
-    variant?: "SUPERUSER" | null,
+    adaptorSettings: GraphileConfig.PgAdaptors[TAdaptor]["adaptorSettings"],
+    variant?: "SUPERUSER" | string | null,
   ) => PromiseOrDirect<
     WithPgClient<GraphileConfig.PgAdaptors[TAdaptor]["client"]>
   >;
   makePgService: (
-    options: MakePgServiceOptions,
-  ) => GraphileConfig.PgServiceConfiguration;
+    options: GraphileConfig.PgAdaptors[TAdaptor]["makePgServiceOptions"],
+  ) => GraphileConfig.PgServiceConfiguration<TAdaptor>;
 }
 
 /**

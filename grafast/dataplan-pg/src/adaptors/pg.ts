@@ -41,11 +41,8 @@ declare global {
   namespace GraphileConfig {
     interface PgAdaptors {
       "@dataplan/pg/adaptors/pg": {
-        adaptor: {
-          createWithPgClient: typeof createWithPgClient;
-          makePgService: typeof makePgService;
-        };
-        adaptorSettings: PgAdaptorSettings;
+        adaptorSettings: PgAdaptorSettings | undefined;
+        makePgServiceOptions: PgAdaptorMakePgServiceOptions;
         client: NodePostgresPgClient;
       };
     }
@@ -441,8 +438,10 @@ export function createWithPgClient(
 }
 
 // This is here as a TypeScript assertion, to ensure we conform to PgAdaptor
-const _testValidAdaptor: PgAdaptor<"@dataplan/pg/adaptors/pg">["createWithPgClient"] =
-  createWithPgClient;
+const adaptor: PgAdaptor<"@dataplan/pg/adaptors/pg"> = {
+  createWithPgClient,
+  makePgService,
+};
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -776,26 +775,27 @@ export function makePgService(
     pgSubscriber = new PgSubscriber(pool);
     releasers.push(() => pgSubscriber!.release?.());
   }
-  const service: GraphileConfig.PgServiceConfiguration = {
-    name,
-    schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
-    withPgClientKey: withPgClientKey as any,
-    pgSettingsKey: pgSettingsKey as any,
-    pgSubscriberKey: pgSubscriberKey as any,
-    pgSettings,
-    pgSettingsForIntrospection,
-    pgSubscriber,
-    adaptor: { createWithPgClient, makePgService },
-    adaptorSettings: {
-      pool,
-      superuserConnectionString,
-    },
-    async release() {
-      // Release in reverse order
-      for (const releaser of [...releasers].reverse()) {
-        await releaser();
-      }
-    },
-  };
+  const service: GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg"> =
+    {
+      name,
+      schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
+      withPgClientKey: withPgClientKey as any,
+      pgSettingsKey: pgSettingsKey as any,
+      pgSubscriberKey: pgSubscriberKey as any,
+      pgSettings,
+      pgSettingsForIntrospection,
+      pgSubscriber,
+      adaptor,
+      adaptorSettings: {
+        pool,
+        superuserConnectionString,
+      },
+      async release() {
+        // Release in reverse order
+        for (const releaser of [...releasers].reverse()) {
+          await releaser();
+        }
+      },
+    };
   return service;
 }

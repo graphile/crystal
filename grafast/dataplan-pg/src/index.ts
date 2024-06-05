@@ -1,7 +1,6 @@
 import type { GrafastSubscriber } from "grafast";
 import { exportAsMany } from "grafast";
 
-import type { NodePostgresPgClient, PgAdaptorSettings } from "./adaptors/pg.js";
 import {
   domainOfCodec,
   enumCodec,
@@ -434,7 +433,7 @@ declare global {
       name: string;
       schemas?: string[];
 
-      adaptor: GraphileConfig.PgAdaptors[TAdaptor]["adaptor"];
+      adaptor: PgAdaptor<TAdaptor>;
       adaptorSettings?: GraphileConfig.PgAdaptors[TAdaptor]["adaptorSettings"];
 
       /** The key on 'context' where the withPgClient function will be sourced */
@@ -474,7 +473,11 @@ declare global {
     }
 
     interface Preset {
-      pgServices?: ReadonlyArray<PgServiceConfiguration>;
+      pgServices?: ReadonlyArray<
+        {
+          [Key in keyof GraphileConfig.PgAdaptors]: PgServiceConfiguration<Key>;
+        }[keyof GraphileConfig.PgAdaptors]
+      >;
     }
 
     interface PgAdaptors {
