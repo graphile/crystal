@@ -310,7 +310,7 @@ nitty-gritty: each entry in the list is an object with the following keys (only
   alphanumeric! Don't set this unless you have more than one pgService; see
   warning below.
 - `adaptor: PgAdaptor` - the module to use as the postgres adaptor; e.g. the
-  result of `import(@dataplan/pg/adaptors/pg)` for the `pg` module
+  result of `import("@dataplan/pg/adaptors/pg")` for the `pg` module
 - `adaptorSettings` - options to pass to the adaptor, these are different for
   each adaptor (see [`adaptorSettings`](#adaptorsettings) below)
 - `schemas: string[]` - an array of PostgreSQL schema names to use
