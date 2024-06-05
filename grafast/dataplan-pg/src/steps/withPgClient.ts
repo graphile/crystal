@@ -6,7 +6,7 @@ import type { PgClient, PgExecutor, WithPgClient } from "../executor";
 export type WithPgClientStepCallback<
   TData,
   TResult,
-  TPgClient extends PgClient,
+  TPgClient extends PgClient = PgClient,
 > = (client: TPgClient, data: TData) => Promise<TResult>;
 
 /**
@@ -71,7 +71,11 @@ export class WithPgClientStep<
   }
 }
 
-export function withPgClient<TPgClient extends PgClient, TData, TResult>(
+export function withPgClient<
+  TData,
+  TResult,
+  TPgClient extends PgClient = PgClient,
+>(
   executor: PgExecutor,
   $data:
     | ExecutableStep<TData>
@@ -96,10 +100,10 @@ export function withPgClientTransaction<
     | (TData extends null | undefined ? null | undefined : never),
   callback: WithPgClientStepCallback<TData, TResult, TPgClient>,
 ) {
-  return withPgClient(
+  return withPgClient<TData, TResult, TPgClient>(
     executor,
     $data ?? constant($data as TData),
-    (client: TPgClient, data) =>
+    (client, data) =>
       client.withTransaction((txClient) => callback(txClient, data)),
   );
 }
