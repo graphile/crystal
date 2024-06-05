@@ -481,7 +481,18 @@ declare global {
     }
 
     interface PgAdaptors {
-      /* Add your own via declaration merging */
+      /*
+       * Add your adaptor configurations via declaration merging; they should
+       * conform to this:
+       *
+       * ```
+       * [moduleName: string]: {
+       *   adaptorSettings: { ... } | undefined;
+       *   makePgServiceOptions: MakePgServiceOptions & { ... };
+       *   client: PgClient & MyPgClientStuff;
+       * };
+       * ```
+       */
     }
   }
   namespace DataplanPg {
