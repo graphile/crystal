@@ -1,5 +1,4 @@
 import type { PgClient, WithPgClient } from "./executor.js";
-import type { MakePgServiceOptions } from "./interfaces.js";
 
 type PromiseOrDirect<T> = T | PromiseLike<T>;
 
