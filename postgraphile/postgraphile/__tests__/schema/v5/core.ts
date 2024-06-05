@@ -1,4 +1,4 @@
-import * as PGAdaptor from "@dataplan/pg/adaptors/pg";
+import * as adaptor from "@dataplan/pg/adaptors/pg";
 import { writeFile } from "fs/promises";
 import type { PromiseOrDirect } from "grafast";
 import type { GraphQLSchema } from "grafast/graphql";
@@ -43,7 +43,7 @@ export const test =
         plugins: [StripOidsPlugin],
         pgServices: [
           {
-            adaptor: PGAdaptor,
+            adaptor,
             name: "main",
             withPgClientKey: "withPgClient",
             pgSettingsKey: "pgSettings",
