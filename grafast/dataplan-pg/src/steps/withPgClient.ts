@@ -86,9 +86,9 @@ export function withPgClient<TPgClient extends PgClient, TData, TResult>(
 }
 
 export function withPgClientTransaction<
-  TPgClient extends PgClient,
   TData,
   TResult,
+  TPgClient extends PgClient = PgClient,
 >(
   executor: PgExecutor,
   $data:
