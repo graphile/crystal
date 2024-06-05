@@ -311,9 +311,9 @@ export async function runTestQuery(
                 search_path,
               })
             : search_path
-            ? () => ({
+            ? {
                 search_path,
-              })
+              }
             : undefined,
         schemas: schemas,
         adaptorSettings: {
