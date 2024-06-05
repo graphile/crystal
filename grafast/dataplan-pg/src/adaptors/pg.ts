@@ -28,6 +28,30 @@ import type {
 import type { MakePgServiceOptions } from "../interfaces.js";
 import type { PgAdaptor } from "../pgServices.js";
 
+declare global {
+  namespace Grafast {
+    interface Context {
+      pgSettings: {
+        [key: string]: string;
+      } | null;
+      withPgClient: WithPgClient<NodePostgresPgClient>;
+      pgSubscriber: PgSubscriber | null;
+    }
+  }
+  namespace GraphileConfig {
+    interface PgAdaptors {
+      "@dataplan/pg/adaptors/pg": {
+        adaptor: {
+          createWithPgClient: typeof createWithPgClient;
+          makePgService: typeof makePgService;
+        };
+        adaptorSettings: PgAdaptorSettings;
+        client: NodePostgresPgClient;
+      };
+    }
+  }
+}
+
 // Set `DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE=0` to disable prepared statements
 const cacheSizeFromEnv = process.env.DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE
   ? parseInt(process.env.DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE, 10)
@@ -705,21 +729,13 @@ export class PgSubscriber<
   }
 }
 
-declare global {
-  namespace Grafast {
-    interface Context {
-      pgSettings: {
-        [key: string]: string;
-      } | null;
-      withPgClient: WithPgClient<NodePostgresPgClient>;
-      pgSubscriber: PgSubscriber | null;
-    }
-  }
+export interface PgAdaptorMakePgServiceOptions extends MakePgServiceOptions {
+  pool?: pg.Pool;
 }
 
 export function makePgService(
-  options: MakePgServiceOptions & { pool?: pg.Pool },
-): GraphileConfig.PgServiceConfiguration {
+  options: PgAdaptorMakePgServiceOptions,
+): GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg"> {
   const {
     name = "main",
     connectionString,

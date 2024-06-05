@@ -4,9 +4,9 @@ import { constant, ExecutableStep } from "grafast";
 import type { PgClient, PgExecutor, WithPgClient } from "../executor";
 
 export type WithPgClientStepCallback<
-  TPgClient extends PgClient,
   TData,
   TResult,
+  TPgClient extends PgClient,
 > = (client: TPgClient, data: TData) => Promise<TResult>;
 
 /**
@@ -15,9 +15,9 @@ export type WithPgClientStepCallback<
  * useful for running custom transactions.
  */
 export class WithPgClientStep<
-  TPgClient extends PgClient,
   TData = any,
   TResult = any,
+  TPgClient extends PgClient = PgClient,
 > extends ExecutableStep<TResult> {
   static $$export = {
     moduleName: "@dataplan/pg",
@@ -46,7 +46,7 @@ export class WithPgClientStep<
   constructor(
     executor: PgExecutor,
     $data: ExecutableStep<TData>,
-    private callback: WithPgClientStepCallback<TPgClient, TData, TResult>,
+    private callback: WithPgClientStepCallback<TData, TResult, TPgClient>,
   ) {
     super();
     this.executor = executor;
@@ -76,7 +76,7 @@ export function withPgClient<TPgClient extends PgClient, TData, TResult>(
   $data:
     | ExecutableStep<TData>
     | (TData extends null | undefined ? null | undefined : never),
-  callback: WithPgClientStepCallback<TPgClient, TData, TResult>,
+  callback: WithPgClientStepCallback<TData, TResult, TPgClient>,
 ) {
   return new WithPgClientStep(
     executor,
@@ -94,7 +94,7 @@ export function withPgClientTransaction<
   $data:
     | ExecutableStep<TData>
     | (TData extends null | undefined ? null | undefined : never),
-  callback: WithPgClientStepCallback<TPgClient, TData, TResult>,
+  callback: WithPgClientStepCallback<TData, TResult, TPgClient>,
 ) {
   return withPgClient(
     executor,

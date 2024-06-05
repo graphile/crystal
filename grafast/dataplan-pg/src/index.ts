@@ -478,11 +478,6 @@ declare global {
     }
 
     interface PgAdaptors {
-      "@dataplan/pg/adaptors/pg": {
-        adaptor: PgAdaptor;
-        adaptorSettings: PgAdaptorSettings;
-        client: NodePostgresPgClient;
-      };
       /* Add your own via declaration merging */
     }
   }

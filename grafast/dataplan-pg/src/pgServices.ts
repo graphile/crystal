@@ -1,5 +1,3 @@
-import type * as pg from "pg";
-
 import type { PgClient, WithPgClient } from "./executor";
 import type { MakePgServiceOptions } from "./interfaces";
 
@@ -19,7 +17,7 @@ export interface PgAdaptor<
     WithPgClient<GraphileConfig.PgAdaptors[TAdaptor]["client"]>
   >;
   makePgService: (
-    options: MakePgServiceOptions & { pool?: pg.Pool },
+    options: MakePgServiceOptions,
   ) => GraphileConfig.PgServiceConfiguration;
 }
 
@@ -34,13 +32,13 @@ export function isPromiseLike<T>(
 
 const isTest = process.env.NODE_ENV === "test";
 
-interface PgClientBySourceCacheValue {
-  withPgClient: WithPgClient<any>;
+interface PgClientBySourceCacheValue<TPgClient extends PgClient = PgClient> {
+  withPgClient: WithPgClient<TPgClient>;
   retainers: number;
 }
 
 const withPgClientDetailsByConfigCache = new Map<
-  GraphileConfig.PgServiceConfiguration,
+  GraphileConfig.PgServiceConfiguration<any>,
   PromiseOrDirect<PgClientBySourceCacheValue>
 >();
 
@@ -48,19 +46,25 @@ const withPgClientDetailsByConfigCache = new Map<
  * Get or build the 'withPgClient' callback function for a given database
  * config, caching it to make future lookups faster.
  */
-export function getWithPgClientFromPgService<TPgClient extends PgClient>(
-  config: GraphileConfig.PgServiceConfiguration,
-): PromiseOrDirect<WithPgClient<TPgClient>> {
+export function getWithPgClientFromPgService<
+  TAdaptor extends
+    keyof GraphileConfig.PgAdaptors = keyof GraphileConfig.PgAdaptors,
+>(
+  config: GraphileConfig.PgServiceConfiguration<TAdaptor>,
+): PromiseOrDirect<
+  WithPgClient<GraphileConfig.PgAdaptors[TAdaptor]["client"]>
+> {
+  type TPgClient = GraphileConfig.PgAdaptors[TAdaptor]["client"];
   const existing = withPgClientDetailsByConfigCache.get(config);
   if (existing) {
     if (isPromiseLike(existing)) {
       return existing.then((v) => {
         v.retainers++;
-        return v.withPgClient;
+        return v.withPgClient as WithPgClient<TPgClient>;
       });
     } else {
       existing.retainers++;
-      return existing.withPgClient;
+      return existing.withPgClient as WithPgClient<TPgClient>;
     }
   } else {
     const promise = (async () => {
@@ -106,7 +110,7 @@ export function getWithPgClientFromPgService<TPgClient extends PgClient>(
     promise.catch(() => {
       withPgClientDetailsByConfigCache.delete(config);
     });
-    return promise.then((v) => v.withPgClient);
+    return promise.then((v) => v.withPgClient as WithPgClient<TPgClient>);
   }
 }
 
