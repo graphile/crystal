@@ -131,7 +131,7 @@ generated schema:
 - Insufficient permissions on the tables
 - Tables not in an exposed schema
 - Views instead of tables
-- Missing primary keys (though 'insert' mutations will still be added in this
+- Missing primary keys (though 'create' mutations will still be added in this
   case)
 - If you only see mutations using primary key: You might be using the
   `PrimaryKeyMutationsOnlyPlugin`
