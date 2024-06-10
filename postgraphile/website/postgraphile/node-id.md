@@ -69,6 +69,36 @@ export const client = new ApolloClient({
 });
 ```
 
+### Using the Global Object Identifier in Function Arguments
+
+The global object identifier can be accepted as a function argument using
+[`@argNvariant nodeId`](./smart-tags/#arg0variant-arg1variant-).
+
+```sql
+create table entity_a(
+  id uuid primary key
+);
+
+create table entity_b(
+  id uuid primary key
+);
+
+create table junction(
+  a_id uuid REFERENCES entity_a(id),
+  b_id uuid REFERENCES entity_b(id),
+  primary key (a_id, b_id)
+);
+
+create function add_junction_entry(a entity_a, b entity_b) returns junction as $$
+  insert into junction values (a.id, b.id) returning *;
+$$ language sql volatile;
+
+comment on function add_junction_entry(a entity_a, b entity_b) is $$
+  @arg0variant nodeId
+  @arg1variant nodeId
+$$;
+```
+
 ### Disabling the Global Object Identifier
 
 The global object identifier is added by the amber preset. If you use the amber
