@@ -11,7 +11,7 @@ relevant database permissions.
 
 ### Designing mutations
 
-CRUD mutations can easily be disabled by disabling the `create`,
+CRUD mutations can easily be disabled by disabling the `insert`,
 `update` and `delete` behaviors in your preset:
 
 ```js title="graphile.config.mjs"
@@ -127,11 +127,11 @@ First of all, check for errors being output from your PostGraphile server. If
 there are no errors, here's some reasons that mutations might not show up in the
 generated schema:
 
-- Your behaviors (e.g. `defaultBehavior: "-create -update -delete"` or `@behavior -create -update -delete` smart comments on the tables) may be disabling them
+- Your behaviors (e.g. `defaultBehavior: "-insert -update -delete"` or `@behavior -insert -update -delete` smart comments on the tables) may be disabling them
 - Insufficient permissions on the tables
 - Tables not in an exposed schema
 - Views instead of tables
-- Missing primary keys (though 'create' mutations will still be added in this
+- Missing primary keys (though 'insert' mutations will still be added in this
   case)
 - If you only see mutations using primary key: You might be using the
   `PrimaryKeyMutationsOnlyPlugin`

@@ -27,7 +27,7 @@ influence whether and how that entity is exposed. You may influence their
 resulting behaviors by adding your own behavior strings to the entity, either
 directly or via smart tags/smart comments. For example, if you don't want users
 to be able to modify entries in the `forums` table, you might add a database
-comment such as `comment on table forums is '@behavior -create -update
+comment such as `comment on table forums is '@behavior -insert -update
 -delete';` (this is just one of many ways of attaching behaviors).
 
 The final behavior string of an entity is made by concatenating the behavior
