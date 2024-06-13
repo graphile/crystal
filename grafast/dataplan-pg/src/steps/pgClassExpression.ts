@@ -1,7 +1,7 @@
 import type { UnbatchedExecutionExtra } from "grafast";
 import { access, exportAs, UnbatchedExecutableStep } from "grafast";
 import type { SQL } from "pg-sql2";
-import sql from "pg-sql2";
+import sql, { $$toSQL } from "pg-sql2";
 
 import type { PgResource } from "../datasource.js";
 import type {
@@ -252,6 +252,10 @@ export class PgClassExpressionStep<
       (p) => sql.isEquivalent(this.expression, p.expression, options),
       // TODO: when we defer placeholders until finalize we'll need to do additional comparison here
     );
+  }
+
+  public [$$toSQL](): SQL {
+    return this.expression;
   }
 
   public toSQL(): SQL {
