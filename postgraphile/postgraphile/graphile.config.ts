@@ -3,7 +3,11 @@ import type { PgSelectSingleStep } from "@dataplan/pg";
 import { TYPES } from "@dataplan/pg";
 import PersistedPlugin from "@grafserv/persisted";
 import { EXPORTABLE, exportSchema } from "graphile-export";
-import { gql, makeExtendSchemaPlugin } from "graphile-utils";
+import {
+  gql,
+  makeExtendSchemaPlugin,
+  makeWrapPlansPlugin,
+} from "graphile-utils";
 import * as jsonwebtoken from "jsonwebtoken";
 import type {} from "postgraphile";
 import { jsonParse } from "postgraphile/@dataplan/json";
@@ -291,10 +295,12 @@ const preset: GraphileConfig.Preset = {
           }
           extend type Query {
             throw: Int
+            wrapMe: Int
           }
         `,
         plans: {
           Query: {
+            wrapMe: EXPORTABLE((constant) => () => constant(42), [constant]),
             throw: EXPORTABLE(
               (error) => () => {
                 return error(
@@ -330,6 +336,18 @@ const preset: GraphileConfig.Preset = {
           },
         },
       };
+    }),
+    makeWrapPlansPlugin({
+      Query: {
+        wrapMe(plan) {
+          return plan();
+        },
+      },
+      Mutation: {
+        updatePost(plan) {
+          return plan();
+        },
+      },
     }),
     makeExtendSchemaPlugin({
       typeDefs: gql`
