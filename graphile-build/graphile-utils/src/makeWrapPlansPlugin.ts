@@ -150,18 +150,11 @@ export function makeWrapPlansPlugin<T>(
               [access, fieldName],
             ),
           } = field;
+          const typeName = Self.name;
           return {
             ...field,
             plan: EXPORTABLE(
-              (
-                ExecutableStep,
-                field,
-                inspect,
-                isExecutableStep,
-                oldPlan,
-                planWrapper,
-              ) =>
-                (...planParams) => {
+              (ExecutableStep, fieldName, inspect, isExecutableStep, oldPlan, planWrapper, typeName) => (...planParams) => {
                   // A replacement for `oldPlan` that automatically passes through arguments that weren't replaced
                   const smartPlan = (...overrideParams: Array<any>) => {
                     const $prev = oldPlan(
@@ -172,9 +165,9 @@ export function makeWrapPlansPlugin<T>(
                     );
                     if (!($prev instanceof ExecutableStep)) {
                       console.error(
-                        `Wrapped a plan function, but that function did not return a step!\n${String(
+                        `Wrapped a plan function at ${typeName}.${fieldName}, but that function did not return a step!\n${String(
                           oldPlan,
-                        )}\n${inspect(field)}`,
+                        )}`,
                       );
 
                       throw new Error(
@@ -204,14 +197,7 @@ export function makeWrapPlansPlugin<T>(
                   }
                   return $newPlan;
                 },
-              [
-                ExecutableStep,
-                field,
-                inspect,
-                isExecutableStep,
-                oldPlan,
-                planWrapper,
-              ],
+              [ExecutableStep, fieldName, inspect, isExecutableStep, oldPlan, planWrapper, typeName],
             ),
           };
         },
