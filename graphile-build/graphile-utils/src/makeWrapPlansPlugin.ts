@@ -154,7 +154,16 @@ export function makeWrapPlansPlugin<T>(
           return {
             ...field,
             plan: EXPORTABLE(
-              (ExecutableStep, fieldName, inspect, isExecutableStep, oldPlan, planWrapper, typeName) => (...planParams) => {
+              (
+                ExecutableStep,
+                fieldName,
+                inspect,
+                isExecutableStep,
+                oldPlan,
+                planWrapper,
+                typeName,
+              ) =>
+                (...planParams) => {
                   // A replacement for `oldPlan` that automatically passes through arguments that weren't replaced
                   const smartPlan = (...overrideParams: Array<any>) => {
                     const $prev = oldPlan(
@@ -197,7 +206,15 @@ export function makeWrapPlansPlugin<T>(
                   }
                   return $newPlan;
                 },
-              [ExecutableStep, fieldName, inspect, isExecutableStep, oldPlan, planWrapper, typeName],
+              [
+                ExecutableStep,
+                fieldName,
+                inspect,
+                isExecutableStep,
+                oldPlan,
+                planWrapper,
+                typeName,
+              ],
             ),
           };
         },
