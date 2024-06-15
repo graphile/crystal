@@ -12055,6 +12055,7 @@ __metadata:
     sqlite3: "npm:^5.1.7"
     tamedevil: "workspace:^"
     ts-node: "npm:^10.9.1"
+    tsafe: "npm:^1.7.2"
     tslib: "npm:^2.6.2"
     typescript: "npm:^5.2.2"
     zx: "npm:^7.2.3"
@@ -21048,6 +21049,13 @@ __metadata:
     ts-node-transpile-only: dist/bin-transpile.js
     ts-script: dist/bin-script-deprecated.js
   checksum: 3031986c63f031813318b548b801106dcf44ceb08e3784cff816f87b13eb7983995f0c33d2d5497769d87a0c0a50afb78848633ffdae274c645e0b731e31bfba
+  languageName: node
+  linkType: hard
+
+"tsafe@npm:^1.7.2":
+  version: 1.7.2
+  resolution: "tsafe@npm:1.7.2"
+  checksum: cfaa6f4bdd5baa845b78fb8aa823c769e16c74651091a06c8e378ce5c430d76a1ca307b225c51a69d6e1ec12dbbea5a2fe9f0b5285c1afe9c442b453358ab969
   languageName: node
   linkType: hard
 
