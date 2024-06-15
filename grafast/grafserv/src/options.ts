@@ -43,6 +43,7 @@ export function defaultMaskError(
     const hash = sha1(String(error));
     const errorId = randomString();
     console.error(
+      "%s\n%O",
       `Masked GraphQL error (hash: '${hash}', id: '${errorId}')`,
       error,
     );
