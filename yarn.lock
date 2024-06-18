@@ -3199,7 +3199,7 @@ __metadata:
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.6.2"
     typescript: "npm:^5.2.2"
-    ws: "npm:^8.13.0"
+    ws: "npm:^8.17.1"
   bin:
     graphile-lds: ./dist/cli.js
   languageName: unknown
@@ -12163,7 +12163,7 @@ __metadata:
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.6.2"
     typescript: "npm:^5.2.2"
-    ws: "npm:^8.13.0"
+    ws: "npm:^8.17.1"
   peerDependencies:
     "@dataplan/pg": "workspace:^"
     grafast: "workspace:^"
@@ -17227,7 +17227,7 @@ __metadata:
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.6.2"
     typescript: "npm:^5.2.2"
-    ws: "npm:^8.13.0"
+    ws: "npm:^8.17.1"
   bin:
     pgl: ./dist/cli-run.js
   languageName: unknown
@@ -17845,7 +17845,7 @@ __metadata:
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.6.2"
     typescript: "npm:^5.2.2"
-    ws: "npm:^8.13.0"
+    ws: "npm:^8.17.1"
   peerDependencies:
     "@dataplan/json": "workspace:*"
     "@dataplan/pg": "workspace:*"
@@ -22541,6 +22541,21 @@ __metadata:
     utf-8-validate:
       optional: true
   checksum: 055ae0eae637aed9ef538d8185c4b275261c5d023a5fe6f0dc4c2e2ac3dba2deaef12c7a60d7c4f2b64126e24fb2eef1f553893f9d818790bc81f298aee2fd62
+  languageName: node
+  linkType: hard
+
+"ws@npm:^8.17.1":
+  version: 8.17.1
+  resolution: "ws@npm:8.17.1"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ">=5.0.2"
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 2b3b8c40e0e9156645a62b1d33ae46330730e8d303996d1cf3b68cc300e742cd44a5b9f3d7b24b9bfdfb19dfec45cc650cd39ec7ba4e36eb7363c1ced8e08f77
   languageName: node
   linkType: hard
 
