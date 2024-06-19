@@ -325,8 +325,9 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
 
             const situations_ = Array.isArray(variants) ? variants : [variants];
             for (const situation of situations_) {
-              if (meta.typeNameBySituation[situation] != null) {
-                // TODO: allow this?
+              if ((!build.status.isBuildPhaseComplete || build.status.isInitPhaseComplete) &&
+                  meta.typeNameBySituation[situation] != null) {
+                // TODO: allow this in more phases?
                 throw new Error("Type already set");
               }
               meta.typeNameBySituation[situation] = typeName;
