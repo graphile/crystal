@@ -1012,7 +1012,7 @@ export function executeBucket(
       const sstep = sudo(step);
       const depCount = sstep.dependencies.length;
       // FIXME: Temporary disable side effect error handling
-      /*if (depCount > 0 || sideEffectStepsWithErrors !== null) {
+      if (depCount > 0 || sideEffectStepsWithErrors !== null) {
         for (let i = 0, l = depCount; i < l; i++) {
           const $dep = sstep.dependencies[i];
           addDependency(
@@ -1021,7 +1021,7 @@ export function executeBucket(
             sstep.dependencyOnReject[i],
           );
         }
-        if (sideEffectStepsWithErrors !== null) {
+        /*if (sideEffectStepsWithErrors !== null) {
           if (sstep.polymorphicPaths) {
             for (const path of sstep.polymorphicPaths) {
               for (const sideEffectStep of sideEffectStepsWithErrors[path]) {
@@ -1037,8 +1037,8 @@ export function executeBucket(
             addDependency(sideEffectStep, defaultForbiddenFlags, undefined);
             }
           }
-        }
-      }*/
+        }*/
+      }
       if (
         isDev &&
         step.layerPlan.reason.type === "polymorphic" &&
