@@ -14,10 +14,9 @@ import {
   lambda,
   list,
   makeGrafastSchema,
+  sideEffect,
   trap,
-  TRAP_ERROR,
-  sideEffect
-} from "../dist/index.js";
+  TRAP_ERROR} from "../dist/index.js";
 
 const makeSchema = () => {
   return makeGrafastSchema({
@@ -159,7 +158,7 @@ it("enables trapping an error to error", async () => {
   });
 });
 
-it("traps side effects in the chain", async () => {
+it("traps errors thrown in side effects in the chain", async () => {
   const schema = makeSchema();
 
   const source =  /* GraphQL */`
