@@ -56,8 +56,8 @@ const makeSchema = () => {
           const $sideEffect = sideEffect(null, () => {
             throw new Error("Test");
           })
-          const $trap = trap($sideEffect, TRAP_ERROR, { valueForError: "PASS_THROUGH"});
-          return lambda([$trap], () => {
+          const $trap = trap($sideEffect, TRAP_ERROR, { valueForError: "PASS_THROUGH" });
+          return lambda($trap, () => {
             return 1;
           });
         }
@@ -166,6 +166,6 @@ it("traps errors thrown in side effects in the chain", async () => {
       mySideEffect 
     }
   `
-  const result = await grafast({ source: `{ mySideEffect }`, schema });
+  const result = await grafast({ source, schema });
   expect(result).to.deep.equal({ data: { mySideEffect: 1 } });
 })
