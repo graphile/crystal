@@ -16,6 +16,7 @@ import {
   makeGrafastSchema,
   trap,
   TRAP_ERROR,
+  sideEffect
 } from "../dist/index.js";
 
 const makeSchema = () => {
@@ -29,6 +30,7 @@ const makeSchema = () => {
         errorToNull(setNullToError: Int): Int
         errorToEmptyList(setNullToError: Int): [Int]
         errorToError(setNullToError: Int): Error
+        mySideEffect: Int
       }
     `,
     plans: {
@@ -51,6 +53,15 @@ const makeSchema = () => {
           const $derived = lambda($a, () => null, true);
           return trap($derived, TRAP_ERROR, { valueForError: "PASS_THROUGH" });
         },
+        mySideEffect() {
+          const $sideEffect = sideEffect(null, () => {
+            throw new Error("Test");
+          })
+          const $trap = trap($sideEffect, TRAP_ERROR, { valueForError: "PASS_THROUGH"});
+          return lambda([$trap], () => {
+            return 1;
+          });
+        }
       },
     },
     enableDeferStream: false,
@@ -147,3 +158,15 @@ it("enables trapping an error to error", async () => {
     error: { message: "Null!" },
   });
 });
+
+it("traps side effects in the chain", async () => {
+  const schema = makeSchema();
+
+  const source =  /* GraphQL */`
+    query withSideEffects { 
+      mySideEffect 
+    }
+  `
+  const result = await grafast({ source: `{ mySideEffect }`, schema });
+  expect(result).to.deep.equal({ data: { mySideEffect: 1 } });
+})

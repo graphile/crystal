@@ -29,6 +29,7 @@
   "scripts": {
     "test": "yarn test:mocha",
     "test:mocha": "mocha '**/__tests__/**/*-test.ts'",
+    "test:mocha:inspect": "NODE_ENV=test mocha inspect --inspect-brk",
     "build": "zx scripts/build-npm.mjs",
     "postpack": "echo 'FORBIDDEN' && exit 1",
     "md": "spec-md CRYSTAL_FLOW.md > CRYSTAL_FLOW.html"
