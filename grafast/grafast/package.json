@@ -104,7 +104,7 @@
     "jest": "^29.6.4",
     "lodash": "^4.17.21",
     "mermaid": "^9.4.3",
-    "mocha": "^10.2.0",
+    "mocha": "^10.4.0",
     "nodemon": "^3.0.1",
     "pg-sql2": "workspace:^",
     "spec-md": "^3.1.0",
