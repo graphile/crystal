@@ -4,7 +4,7 @@ import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 import sqlite3 from "sqlite3";
 
-import type { ExecutionDetails, GrafastResultsList } from "../dist/index.js";
+import {ExecutionDetails, GrafastResultsList, TRAP_ERROR_OR_INHIBITED} from "../dist/index.js";
 import {
   access,
   assertNotNull,
@@ -56,7 +56,7 @@ const makeSchema = () => {
           const $sideEffect = sideEffect(null, () => {
             throw new Error("Test");
           })
-          const $trap = trap($sideEffect, TRAP_ERROR, { valueForError: "PASS_THROUGH" });
+          const $trap = trap($sideEffect, TRAP_ERROR_OR_INHIBITED, { valueForError: "PASS_THROUGH" });
           return lambda($trap, () => {
             return 1;
           });
