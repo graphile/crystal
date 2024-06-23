@@ -475,7 +475,7 @@ declare global {
     }
 
     interface Preset {
-      pgServices?: ReadonlyArray<PgAdaptor<any, any, any>>;
+      pgServices?: ReadonlyArray<PgServiceConfiguration<any>>;
     }
   }
   namespace DataplanPg {
