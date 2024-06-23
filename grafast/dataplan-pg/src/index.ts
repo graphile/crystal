@@ -109,9 +109,9 @@ import {
   TuplePlanMap,
 } from "./interfaces.js";
 import { PgLockableParameter, PgLockCallback } from "./pgLocker.js";
-import type { PgAdaptor } from "./pgServices.js";
 import {
   getWithPgClientFromPgService,
+  type PgAdaptor,
   withPgClientFromPgService,
   withSuperuserPgClientFromPgService,
 } from "./pgServices.js";
