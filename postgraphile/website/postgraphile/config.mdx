@@ -393,7 +393,7 @@ common set of optional configuration parameters:
 - `schemas`
 - `superuserConnectionString`
 - `pubsub` (create a pgSubscriber entry; should default to `true`)
-- pass-through options (same as in `pgServices` above):
+- a subset of pass-through options from `pgServices` above:
   - `name` (default: "main")
   - `pgSettingsKey` (default with default `name`: `pgSettings`, otherwise: `${name}_pgSettings`)
   - `withPgClientKey` (default with default `name`: `withPgClient`, otherwise: `${name}_withPgClient`)
