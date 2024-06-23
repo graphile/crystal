@@ -38,15 +38,6 @@ declare global {
       pgSubscriber: PgSubscriber | null;
     }
   }
-  namespace GraphileConfig {
-    interface PgAdaptors {
-      "@dataplan/pg/adaptors/pg": {
-        adaptorSettings: PgAdaptorSettings | undefined;
-        makePgServiceOptions: PgAdaptorMakePgServiceOptions;
-        client: NodePostgresPgClient;
-      };
-    }
-  }
 }
 
 // Set `DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE=0` to disable prepared statements
@@ -438,7 +429,7 @@ export function createWithPgClient(
 }
 
 // This is here as a TypeScript assertion, to ensure we conform to PgAdaptor
-const adaptor: PgAdaptor<"@dataplan/pg/adaptors/pg"> = {
+const adaptor: PgAdaptor<PgAdaptorSettings, PgAdaptorMakePgServiceOptions> = {
   createWithPgClient,
   makePgService,
 };
@@ -734,7 +725,7 @@ export interface PgAdaptorMakePgServiceOptions extends MakePgServiceOptions {
 
 export function makePgService(
   options: PgAdaptorMakePgServiceOptions,
-): GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg"> {
+): GraphileConfig.PgServiceConfiguration<typeof adaptor> {
   const {
     name = "main",
     connectionString,
@@ -775,7 +766,7 @@ export function makePgService(
     pgSubscriber = new PgSubscriber(pool);
     releasers.push(() => pgSubscriber!.release?.());
   }
-  const service: GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg"> =
+  const service: GraphileConfig.PgServiceConfiguration<typeof adaptor> =
     {
       name,
       schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],

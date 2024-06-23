@@ -427,19 +427,21 @@ export { version } from "./version.js";
 declare global {
   namespace GraphileConfig {
     interface PgServiceConfiguration<
-      TAdaptor extends
-        keyof GraphileConfig.PgAdaptors = keyof GraphileConfig.PgAdaptors,
+      TAdaptor extends PgAdaptor<any, any, any>,
     > {
       name: string;
       schemas?: string[];
 
-      adaptor: PgAdaptor<TAdaptor>;
-      adaptorSettings?: GraphileConfig.PgAdaptors[TAdaptor]["adaptorSettings"];
+      adaptor: TAdaptor;
+      adaptorSettings?: Exclude<
+        TAdaptor["typeOptionalAdaptorSettings"],
+        undefined
+      >;
 
       /** The key on 'context' where the withPgClient function will be sourced */
       withPgClientKey: KeysOfType<
         Grafast.Context & object,
-        WithPgClient<GraphileConfig.PgAdaptors[TAdaptor]["client"]>
+        WithPgClient<Exclude<TAdaptor["typeOptionalPgClient"], undefined>>
       >;
 
       /** Return settings to set in the session */
@@ -473,26 +475,7 @@ declare global {
     }
 
     interface Preset {
-      pgServices?: ReadonlyArray<
-        {
-          [Key in keyof GraphileConfig.PgAdaptors]: PgServiceConfiguration<Key>;
-        }[keyof GraphileConfig.PgAdaptors]
-      >;
-    }
-
-    interface PgAdaptors {
-      /*
-       * Add your adaptor configurations via declaration merging; they should
-       * conform to this:
-       *
-       * ```
-       * [moduleName: string]: {
-       *   adaptorSettings: { ... } | undefined;
-       *   makePgServiceOptions: MakePgServiceOptions & { ... };
-       *   client: PgClient & MyPgClientStuff;
-       * };
-       * ```
-       */
+      pgServices?: ReadonlyArray<PgAdaptor<any, any, any>>;
     }
   }
   namespace DataplanPg {
