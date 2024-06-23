@@ -766,27 +766,26 @@ export function makePgService(
     pgSubscriber = new PgSubscriber(pool);
     releasers.push(() => pgSubscriber!.release?.());
   }
-  const service: GraphileConfig.PgServiceConfiguration<typeof adaptor> =
-    {
-      name,
-      schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
-      withPgClientKey: withPgClientKey as any,
-      pgSettingsKey: pgSettingsKey as any,
-      pgSubscriberKey: pgSubscriberKey as any,
-      pgSettings,
-      pgSettingsForIntrospection,
-      pgSubscriber,
-      adaptor,
-      adaptorSettings: {
-        pool,
-        superuserConnectionString,
-      },
-      async release() {
-        // Release in reverse order
-        for (const releaser of [...releasers].reverse()) {
-          await releaser();
-        }
-      },
-    };
+  const service: GraphileConfig.PgServiceConfiguration<typeof adaptor> = {
+    name,
+    schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
+    withPgClientKey: withPgClientKey as any,
+    pgSettingsKey: pgSettingsKey as any,
+    pgSubscriberKey: pgSubscriberKey as any,
+    pgSettings,
+    pgSettingsForIntrospection,
+    pgSubscriber,
+    adaptor,
+    adaptorSettings: {
+      pool,
+      superuserConnectionString,
+    },
+    async release() {
+      // Release in reverse order
+      for (const releaser of [...releasers].reverse()) {
+        await releaser();
+      }
+    },
+  };
   return service;
 }
