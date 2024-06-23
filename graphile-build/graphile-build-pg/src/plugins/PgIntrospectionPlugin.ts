@@ -66,7 +66,7 @@ declare global {
         getIntrospection(): PromiseOrDirect<IntrospectionResults>;
         getService(serviceName: string): Promise<{
           introspection: Introspection;
-          pgService: GraphileConfig.PgServiceConfiguration;
+          pgService: GraphileConfig.PgServiceConfiguration<any>;
         }>;
         getExecutorForService(serviceName: string): PgExecutor;
 
@@ -229,7 +229,7 @@ declare global {
 }
 
 type IntrospectionResults = Array<{
-  pgService: GraphileConfig.PgServiceConfiguration;
+  pgService: GraphileConfig.PgServiceConfiguration<any>;
   introspection: Introspection;
 }>;
 
@@ -705,7 +705,9 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
 };
 
 function introspectPgServices(
-  pgServices: ReadonlyArray<GraphileConfig.PgServiceConfiguration> | undefined,
+  pgServices:
+    | ReadonlyArray<GraphileConfig.PgServiceConfiguration<any>>
+    | undefined,
 ): Promise<IntrospectionResults> {
   if (!pgServices) {
     return Promise.resolve([]);
