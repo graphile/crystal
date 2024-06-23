@@ -719,9 +719,9 @@ export class PgSubscriber<
   }
 }
 
-export interface PgAdaptorMakePgServiceOptions extends MakePgServiceOptions {
-  pool?: pg.Pool;
-}
+export interface PgAdaptorMakePgServiceOptions
+  extends MakePgServiceOptions,
+    PgAdaptorSettings {}
 
 export function makePgService(
   options: PgAdaptorMakePgServiceOptions,
@@ -730,7 +730,6 @@ export function makePgService(
     name = "main",
     connectionString,
     schemas,
-    superuserConnectionString,
     withPgClientKey = name === "main" ? "withPgClient" : `${name}_withPgClient`,
     pgSettingsKey = name === "main" ? "pgSettings" : `${name}_pgSettings`,
     pgSubscriberKey = name === "main" ? "pgSubscriber" : `${name}_pgSubscriber`,
@@ -747,7 +746,7 @@ export function makePgService(
   const releasers: (() => void | PromiseLike<void>)[] = [];
   let pool = options.pool;
   if (!pool) {
-    pool = new Pool({ connectionString });
+    pool = new Pool({ connectionString, ...options.poolConfig });
     releasers.push(() => pool!.end());
   }
   if (!options.pool) {
@@ -766,6 +765,21 @@ export function makePgService(
     pgSubscriber = new PgSubscriber(pool);
     releasers.push(() => pgSubscriber!.release?.());
   }
+  // We could use `...options` instead, but that would insert more properties than necessary
+  const adaptorSettings: {
+    [K in keyof Required<PgAdaptorSettings>]: PgAdaptorSettings[K];
+  } = {
+    poolClient: options.poolClient,
+    poolClientIsInTransaction: options.poolClientIsInTransaction,
+    superuserPoolClient: options.superuserPoolClient,
+    superuserPoolClientIsInTransaction:
+      options.superuserPoolClientIsInTransaction,
+    pool,
+    poolConfig: options.poolConfig,
+    connectionString,
+    superuserPool: options.superuserPool,
+    superuserConnectionString: options.superuserConnectionString,
+  };
   const service: GraphileConfig.PgServiceConfiguration<typeof adaptor> = {
     name,
     schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
@@ -776,10 +790,7 @@ export function makePgService(
     pgSettingsForIntrospection,
     pgSubscriber,
     adaptor,
-    adaptorSettings: {
-      pool,
-      superuserConnectionString,
-    },
+    adaptorSettings,
     async release() {
       // Release in reverse order
       for (const releaser of [...releasers].reverse()) {
