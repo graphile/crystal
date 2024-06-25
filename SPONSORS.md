@@ -8,15 +8,11 @@ Graphile ecosystem. Find out
 
 - The Guild
 - Dovetail
-- Netflix
 - Stellate
 - Steelhead
-- Sylvera
 
 ## Leaders
 
-- Qwick
-- Joe Dennis
 - Robert Claypool
 - Principia Mentis
 - Luxor Labs
@@ -34,25 +30,22 @@ Graphile ecosystem. Find out
 - Ndustrial
 - Beacon
 - deliver.media
+- Seam
 - Upowr
+- Ravio
+- OpenPipe
 
 ## Supporters
 
 - HR-ON
 - stlbucket
-- Sam Levin
-- svarmony
-- James Rascoe
 - Simon Elliott
 - Matt Bretl
-- Daniel Einspanjer
-- Mansoor Razzaq
 - Keith Layne
 - Paul Melnikow
 - Alvin Ali Khaled
 - nullachtvierzehn
 - Zymego
-- Benjamin Berman
 - IFCHOR GROUP
 - Nate Smith
 - garpulon
@@ -65,5 +58,9 @@ Graphile ecosystem. Find out
 - Peter C. Romano
 - mateo
 - Gus Becciu
-- kontakto-fi
 - Dialo
+- Tailos, Inc.
+- sheilamosaik
+- kontakto-fi
+- Miguel O. Carvajal
+- Jovi De Croock
