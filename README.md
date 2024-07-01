@@ -174,8 +174,8 @@ yarn add postgraphile
 ```
 
 ```js
-import { createServer } from "http";
-import postgraphile from "postgraphile";
+import { createServer } from 'http';
+import postgraphile from 'postgraphile';
 
 createServer(postgraphile());
 ```
@@ -233,10 +233,8 @@ PostGraphile features include:
 - [Just use the generated GraphQL schema](https://www.graphile.org/postgraphile/usage-schema/)
 
 [procedure documentation]: https://www.graphile.org/postgraphile/procedures/
-[advanced queries documentation]:
-  https://www.graphile.org/postgraphile/custom-queries/
-[row-level-security]:
-  http://www.postgresql.org/docs/current/static/ddl-rowsecurity.html
+[advanced queries documentation]: https://www.graphile.org/postgraphile/custom-queries/
+[row-level-security]: http://www.postgresql.org/docs/current/static/ddl-rowsecurity.html
 
 ## Requirements
 
