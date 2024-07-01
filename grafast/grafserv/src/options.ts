@@ -48,7 +48,6 @@ export function defaultMaskError(
       errorId,
       error,
       error.originalError ?? error,
-    )
     );
     return new GraphQLError(
       `An error occurred (logged with hash: '${hash}', id: '${errorId}')`,
