@@ -304,8 +304,14 @@ const preset: GraphileConfig.Preset = {
             throw: EXPORTABLE(
               (error) => () => {
                 return error(
-                  new Error(
-                    "You've requested the 'throw' field... which throws!",
+                  Object.assign(
+                    new Error(
+                      "You've requested the 'throw' field... which throws!",
+                    ),
+                    {
+                      metadata: true,
+                      mol: 42,
+                    },
                   ),
                 );
               },
