@@ -73,7 +73,7 @@ class GetRecordsStep<T extends Record<string, any>> extends ExecutableStep {
   }
 
   // Unary Dep Id
-  private firstUDI: string | number;
+  private firstUDI: number | undefined;
   setFirst($first: ExecutableStep) {
     this.firstUDI = this.addUnaryDependency($first);
   }
@@ -90,8 +90,8 @@ class GetRecordsStep<T extends Record<string, any>> extends ExecutableStep {
     // Note: This SQL is not safe from SQL injection, it makes no effort to
     // escape table or column names. Do not use this in production, this is a
     // test file!
-    const otherOrders = [];
-    const otherConditions = [];
+    const otherOrders: string[] = [];
+    const otherConditions: string[] = [];
     const orderBy = `${[...identifierCols, ...otherOrders].join(", ")}`;
     const sql = `\
 select *
@@ -168,7 +168,7 @@ const makeSchema = () => {
     `,
     plans: {
       Query: {
-        allPeople(_) {
+        allPeople(_: ExecutableStep) {
           return getRecords("people");
         },
       },

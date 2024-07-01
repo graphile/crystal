@@ -7614,11 +7614,11 @@ __metadata:
   linkType: hard
 
 "braces@npm:^3.0.2, braces@npm:~3.0.2":
-  version: 3.0.2
-  resolution: "braces@npm:3.0.2"
+  version: 3.0.3
+  resolution: "braces@npm:3.0.3"
   dependencies:
-    fill-range: "npm:^7.0.1"
-  checksum: 1aa7f7f39e1dff23894196303515503dd945f36adcb78073ee067b421ecc595265556911183b24d1bc4e51011d3536d63d117cb4493e5123fcc7456596a93637
+    fill-range: "npm:^7.1.1"
+  checksum: da64a9229103e87292c7488c7f78a3578ba49c0696079881239932ed2c3b5d8f32ea334e639cacfbf572cdc79b80a5ee887e4e1fe70d4007809b7f6cae4d3495
   languageName: node
   linkType: hard
 
@@ -11275,12 +11275,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fill-range@npm:^7.0.1":
-  version: 7.0.1
-  resolution: "fill-range@npm:7.0.1"
+"fill-range@npm:^7.1.1":
+  version: 7.1.1
+  resolution: "fill-range@npm:7.1.1"
   dependencies:
     to-regex-range: "npm:^5.0.1"
-  checksum: e5ccb299de8a12ea5dcef663f658933e2fbdf40aeab3e7e5af9132e82d7f6bdd0984ac2e122dc1825707f33917c308bc40b632b852331c900c317c5d64bb7bf0
+  checksum: f8c014cc6f391259a89d57a90b8b8cbf8b263d3c5abfc44bee70ac539dc54e12bd6ef6f06ab80919d8248f59556831cd2a0dc776dc68e90f3ecc4e665eb47bf3
   languageName: node
   linkType: hard
 
@@ -12055,6 +12055,7 @@ __metadata:
     sqlite3: "npm:^5.1.7"
     tamedevil: "workspace:^"
     ts-node: "npm:^10.9.1"
+    tsafe: "npm:^1.7.2"
     tslib: "npm:^2.6.2"
     typescript: "npm:^5.2.2"
     zx: "npm:^7.2.3"
@@ -21048,6 +21049,13 @@ __metadata:
     ts-node-transpile-only: dist/bin-transpile.js
     ts-script: dist/bin-script-deprecated.js
   checksum: 3031986c63f031813318b548b801106dcf44ceb08e3784cff816f87b13eb7983995f0c33d2d5497769d87a0c0a50afb78848633ffdae274c645e0b731e31bfba
+  languageName: node
+  linkType: hard
+
+"tsafe@npm:^1.7.2":
+  version: 1.7.2
+  resolution: "tsafe@npm:1.7.2"
+  checksum: cfaa6f4bdd5baa845b78fb8aa823c769e16c74651091a06c8e378ce5c430d76a1ca307b225c51a69d6e1ec12dbbea5a2fe9f0b5285c1afe9c442b453358ab969
   languageName: node
   linkType: hard
 

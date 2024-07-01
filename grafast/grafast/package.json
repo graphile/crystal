@@ -28,7 +28,7 @@
   },
   "scripts": {
     "test": "yarn test:mocha",
-    "test:mocha": "mocha '**/__tests__/**/*-test.ts'",
+    "test:mocha": "tsc -b tsconfig.test.json && mocha '**/__tests__/**/*-test.ts'",
     "build": "zx scripts/build-npm.mjs",
     "postpack": "echo 'FORBIDDEN' && exit 1",
     "md": "spec-md CRYSTAL_FLOW.md > CRYSTAL_FLOW.html"
@@ -109,6 +109,7 @@
     "spec-md": "^3.1.0",
     "sqlite3": "^5.1.7",
     "ts-node": "^10.9.1",
+    "tsafe": "^1.7.2",
     "typescript": "^5.2.2",
     "zx": "^7.2.3"
   },

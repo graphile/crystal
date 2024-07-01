@@ -12,8 +12,6 @@ const $$flagged = Symbol("grafastFlaggedValue");
 
 /**
  * Wrapper for errors to return (rather than throw or reject) from user code.
- *
- * @internal
  */
 export interface FlaggedValue<TValue = any> {
   [$$flagged]: true;
