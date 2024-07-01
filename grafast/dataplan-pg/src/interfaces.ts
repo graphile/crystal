@@ -418,7 +418,7 @@ export type KeysOfType<TObject, TValueType> = {
 export interface MakePgServiceOptions
   extends Partial<
     Pick<
-      GraphileConfig.PgServiceConfiguration,
+      GraphileConfig.PgServiceConfiguration<any>,
       | "name"
       | "pgSettings"
       | "pgSettingsForIntrospection"

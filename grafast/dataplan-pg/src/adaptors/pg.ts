@@ -38,15 +38,6 @@ declare global {
       pgSubscriber: PgSubscriber | null;
     }
   }
-  namespace GraphileConfig {
-    interface PgAdaptors {
-      "@dataplan/pg/adaptors/pg": {
-        adaptorSettings: PgAdaptorSettings | undefined;
-        makePgServiceOptions: PgAdaptorMakePgServiceOptions;
-        client: NodePostgresPgClient;
-      };
-    }
-  }
 }
 
 // Set `DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE=0` to disable prepared statements
@@ -438,7 +429,7 @@ export function createWithPgClient(
 }
 
 // This is here as a TypeScript assertion, to ensure we conform to PgAdaptor
-const adaptor: PgAdaptor<"@dataplan/pg/adaptors/pg"> = {
+const adaptor: PgAdaptor<PgAdaptorSettings, PgAdaptorMakePgServiceOptions> = {
   createWithPgClient,
   makePgService,
 };
@@ -728,18 +719,17 @@ export class PgSubscriber<
   }
 }
 
-export interface PgAdaptorMakePgServiceOptions extends MakePgServiceOptions {
-  pool?: pg.Pool;
-}
+export interface PgAdaptorMakePgServiceOptions
+  extends MakePgServiceOptions,
+    PgAdaptorSettings {}
 
 export function makePgService(
   options: PgAdaptorMakePgServiceOptions,
-): GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg"> {
+): GraphileConfig.PgServiceConfiguration<typeof adaptor> {
   const {
     name = "main",
     connectionString,
     schemas,
-    superuserConnectionString,
     withPgClientKey = name === "main" ? "withPgClient" : `${name}_withPgClient`,
     pgSettingsKey = name === "main" ? "pgSettings" : `${name}_pgSettings`,
     pgSubscriberKey = name === "main" ? "pgSubscriber" : `${name}_pgSubscriber`,
@@ -756,7 +746,7 @@ export function makePgService(
   const releasers: (() => void | PromiseLike<void>)[] = [];
   let pool = options.pool;
   if (!pool) {
-    pool = new Pool({ connectionString });
+    pool = new Pool({ connectionString, ...options.poolConfig });
     releasers.push(() => pool!.end());
   }
   if (!options.pool) {
@@ -775,27 +765,38 @@ export function makePgService(
     pgSubscriber = new PgSubscriber(pool);
     releasers.push(() => pgSubscriber!.release?.());
   }
-  const service: GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg"> =
-    {
-      name,
-      schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
-      withPgClientKey: withPgClientKey as any,
-      pgSettingsKey: pgSettingsKey as any,
-      pgSubscriberKey: pgSubscriberKey as any,
-      pgSettings,
-      pgSettingsForIntrospection,
-      pgSubscriber,
-      adaptor,
-      adaptorSettings: {
-        pool,
-        superuserConnectionString,
-      },
-      async release() {
-        // Release in reverse order
-        for (const releaser of [...releasers].reverse()) {
-          await releaser();
-        }
-      },
-    };
+  // We could use `...options` instead, but that would insert more properties than necessary
+  const adaptorSettings: {
+    [K in keyof Required<PgAdaptorSettings>]: PgAdaptorSettings[K];
+  } = {
+    poolClient: options.poolClient,
+    poolClientIsInTransaction: options.poolClientIsInTransaction,
+    superuserPoolClient: options.superuserPoolClient,
+    superuserPoolClientIsInTransaction:
+      options.superuserPoolClientIsInTransaction,
+    pool,
+    poolConfig: options.poolConfig,
+    connectionString,
+    superuserPool: options.superuserPool,
+    superuserConnectionString: options.superuserConnectionString,
+  };
+  const service: GraphileConfig.PgServiceConfiguration<typeof adaptor> = {
+    name,
+    schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
+    withPgClientKey: withPgClientKey as any,
+    pgSettingsKey: pgSettingsKey as any,
+    pgSubscriberKey: pgSubscriberKey as any,
+    pgSettings,
+    pgSettingsForIntrospection,
+    pgSubscriber,
+    adaptor,
+    adaptorSettings,
+    async release() {
+      // Release in reverse order
+      for (const releaser of [...releasers].reverse()) {
+        await releaser();
+      }
+    },
+  };
   return service;
 }

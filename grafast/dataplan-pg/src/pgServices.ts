@@ -1,21 +1,32 @@
+import type { NodePostgresPgClient, PgAdaptorSettings } from "./adaptors/pg.js";
 import type { PgClient, WithPgClient } from "./executor.js";
+import type { MakePgServiceOptions } from "./interfaces.js";
 
 type PromiseOrDirect<T> = T | PromiseLike<T>;
 
-/** @experimental */
 export interface PgAdaptor<
-  TAdaptor extends
-    keyof GraphileConfig.PgAdaptors = keyof GraphileConfig.PgAdaptors,
+  TSettings extends PgAdaptorSettings = PgAdaptorSettings,
+  TMakePgServiceOptions extends MakePgServiceOptions = MakePgServiceOptions,
+  TPgClient extends NodePostgresPgClient = NodePostgresPgClient,
 > {
+  /**
+   * @internal
+   * USED TO EXPOSE THE `TSettings` TYPE ONLY
+   */
+  typeOptionalAdaptorSettings?: TSettings;
+  /**
+   * @internal
+   * USED TO EXPOSE THE `TPgClient` TYPE ONLY
+   */
+  typeOptionalPgClient?: TPgClient;
+
   createWithPgClient: (
-    adaptorSettings: GraphileConfig.PgAdaptors[TAdaptor]["adaptorSettings"],
+    adaptorSettings?: TSettings,
     variant?: "SUPERUSER" | string | null,
-  ) => PromiseOrDirect<
-    WithPgClient<GraphileConfig.PgAdaptors[TAdaptor]["client"]>
-  >;
+  ) => PromiseOrDirect<WithPgClient<TPgClient>>;
   makePgService: (
-    options: GraphileConfig.PgAdaptors[TAdaptor]["makePgServiceOptions"],
-  ) => GraphileConfig.PgServiceConfiguration<TAdaptor>;
+    options: TMakePgServiceOptions,
+  ) => GraphileConfig.PgServiceConfiguration<this>;
 }
 
 /**
@@ -44,14 +55,13 @@ const withPgClientDetailsByConfigCache = new Map<
  * config, caching it to make future lookups faster.
  */
 export function getWithPgClientFromPgService<
-  TAdaptor extends
-    keyof GraphileConfig.PgAdaptors = keyof GraphileConfig.PgAdaptors,
+  TAdaptor extends PgAdaptor = PgAdaptor,
 >(
   config: GraphileConfig.PgServiceConfiguration<TAdaptor>,
 ): PromiseOrDirect<
-  WithPgClient<GraphileConfig.PgAdaptors[TAdaptor]["client"]>
+  WithPgClient<Exclude<PgAdaptor["typeOptionalPgClient"], undefined>>
 > {
-  type TPgClient = GraphileConfig.PgAdaptors[TAdaptor]["client"];
+  type TPgClient = Exclude<PgAdaptor["typeOptionalPgClient"], undefined>;
   const existing = withPgClientDetailsByConfigCache.get(config);
   if (existing) {
     if (isPromiseLike(existing)) {
@@ -111,8 +121,11 @@ export function getWithPgClientFromPgService<
   }
 }
 
-export async function withPgClientFromPgService<T>(
-  config: GraphileConfig.PgServiceConfiguration,
+export async function withPgClientFromPgService<
+  T,
+  TAdaptor extends PgAdaptor = PgAdaptor,
+>(
+  config: GraphileConfig.PgServiceConfiguration<TAdaptor>,
   pgSettings: { [key: string]: string } | null,
   callback: (client: PgClient) => T | Promise<T>,
 ): Promise<T> {
@@ -128,8 +141,11 @@ export async function withPgClientFromPgService<T>(
 }
 
 // We don't cache superuser withPgClients
-export async function withSuperuserPgClientFromPgService<T>(
-  config: GraphileConfig.PgServiceConfiguration,
+export async function withSuperuserPgClientFromPgService<
+  T,
+  TAdaptor extends PgAdaptor = PgAdaptor,
+>(
+  config: GraphileConfig.PgServiceConfiguration<TAdaptor>,
   pgSettings: { [key: string]: string } | null,
   callback: (client: PgClient) => T | Promise<T>,
 ): Promise<T> {

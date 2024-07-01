@@ -3,6 +3,10 @@ import { pathToFileURL } from "node:url";
 import { inspect } from "node:util";
 
 import type { PgAdaptor } from "@dataplan/pg";
+import type {
+  PgAdaptorMakePgServiceOptions,
+  PgAdaptorSettings,
+} from "@dataplan/pg/adaptors/pg";
 import { grafserv } from "grafserv/node";
 import { resolvePresets } from "graphile-config";
 import type { ArgsFromOptions, Argv } from "graphile-config/cli";
@@ -300,7 +304,7 @@ export async function run(args: ArgsFromOptions<typeof options>) {
 }
 
 async function loadDefaultAdaptor(): Promise<
-  PgAdaptor<"@dataplan/pg/adaptors/pg">
+  PgAdaptor<PgAdaptorSettings, PgAdaptorMakePgServiceOptions>
 > {
   const mod = await import("@dataplan/pg/adaptors/pg");
   return typeof mod.makePgService === "function" ? mod : mod.default;
