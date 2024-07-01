@@ -1011,6 +1011,7 @@ export function executeBucket(
       };
       const sstep = sudo(step);
       const depCount = sstep.dependencies.length;
+      // FIXME: Temporary disable side effect error handling
       if (depCount > 0 || sideEffectStepsWithErrors !== null) {
         for (let i = 0, l = depCount; i < l; i++) {
           const $dep = sstep.dependencies[i];
@@ -1020,23 +1021,23 @@ export function executeBucket(
             sstep.dependencyOnReject[i],
           );
         }
-        if (sideEffectStepsWithErrors !== null) {
+        /*if (sideEffectStepsWithErrors !== null) {
           if (sstep.polymorphicPaths) {
             for (const path of sstep.polymorphicPaths) {
               for (const sideEffectStep of sideEffectStepsWithErrors[path]) {
                 // TODO: revisit this, feels like we might be adding the same
                 // effect multiple times if it matches multiple paths.
-                addDependency(sideEffectStep, defaultForbiddenFlags, undefined);
+               addDependency(sideEffectStep, defaultForbiddenFlags, undefined);
               }
             }
           } else {
             for (const sideEffectStep of sideEffectStepsWithErrors[
               NO_POLY_PATH
             ]) {
-              addDependency(sideEffectStep, defaultForbiddenFlags, undefined);
+            addDependency(sideEffectStep, defaultForbiddenFlags, undefined);
             }
           }
-        }
+        }*/
       }
       if (
         isDev &&

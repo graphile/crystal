@@ -4,7 +4,7 @@ import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
 import sqlite3 from "sqlite3";
 
-import type { ExecutionDetails, GrafastResultsList } from "../dist/index.js";
+import {ExecutionDetails, GrafastResultsList, TRAP_ERROR_OR_INHIBITED} from "../dist/index.js";
 import {
   access,
   assertNotNull,
@@ -14,9 +14,9 @@ import {
   lambda,
   list,
   makeGrafastSchema,
+  sideEffect,
   trap,
-  TRAP_ERROR,
-} from "../dist/index.js";
+  TRAP_ERROR} from "../dist/index.js";
 
 const makeSchema = () => {
   return makeGrafastSchema({
@@ -29,6 +29,7 @@ const makeSchema = () => {
         errorToNull(setNullToError: Int): Int
         errorToEmptyList(setNullToError: Int): [Int]
         errorToError(setNullToError: Int): Error
+        mySideEffect: Int
       }
     `,
     plans: {
@@ -51,6 +52,15 @@ const makeSchema = () => {
           const $derived = lambda($a, () => null, true);
           return trap($derived, TRAP_ERROR, { valueForError: "PASS_THROUGH" });
         },
+        mySideEffect() {
+          const $sideEffect = sideEffect(null, () => {
+            throw new Error("Test");
+          })
+          const $trap = trap($sideEffect, TRAP_ERROR_OR_INHIBITED, { valueForError: "PASS_THROUGH" });
+          return lambda($trap, () => {
+            return 1;
+          });
+        }
       },
     },
     enableDeferStream: false,
@@ -147,3 +157,15 @@ it("enables trapping an error to error", async () => {
     error: { message: "Null!" },
   });
 });
+
+it("traps errors thrown in side effects in the chain", async () => {
+  const schema = makeSchema();
+
+  const source =  /* GraphQL */`
+    query withSideEffects { 
+      mySideEffect 
+    }
+  `
+  const result = await grafast({ source, schema });
+  expect(result).to.deep.equal({ data: { mySideEffect: 1 } });
+})
