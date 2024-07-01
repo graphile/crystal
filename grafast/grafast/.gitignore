@@ -1,2 +1,3 @@
 dist
 tsconfig.tsbuildinfo
+tsconfig.test.tsbuildinfo
