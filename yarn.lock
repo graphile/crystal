@@ -3199,7 +3199,7 @@ __metadata:
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.6.2"
     typescript: "npm:^5.2.2"
-    ws: "npm:^8.13.0"
+    ws: "npm:^8.17.1"
   bin:
     graphile-lds: ./dist/cli.js
   languageName: unknown
@@ -12164,7 +12164,7 @@ __metadata:
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.6.2"
     typescript: "npm:^5.2.2"
-    ws: "npm:^8.13.0"
+    ws: "npm:^8.17.1"
   peerDependencies:
     "@dataplan/pg": "workspace:^"
     grafast: "workspace:^"
@@ -17228,7 +17228,7 @@ __metadata:
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.6.2"
     typescript: "npm:^5.2.2"
-    ws: "npm:^8.13.0"
+    ws: "npm:^8.17.1"
   bin:
     pgl: ./dist/cli-run.js
   languageName: unknown
@@ -17846,7 +17846,7 @@ __metadata:
     ts-node: "npm:^10.9.1"
     tslib: "npm:^2.6.2"
     typescript: "npm:^5.2.2"
-    ws: "npm:^8.13.0"
+    ws: "npm:^8.17.1"
   peerDependencies:
     "@dataplan/json": "workspace:*"
     "@dataplan/pg": "workspace:*"
@@ -22523,8 +22523,8 @@ __metadata:
   linkType: hard
 
 "ws@npm:^5.2.0 || ^6.0.0 || ^7.0.0, ws@npm:^7.3.1":
-  version: 7.5.9
-  resolution: "ws@npm:7.5.9"
+  version: 7.5.10
+  resolution: "ws@npm:7.5.10"
   peerDependencies:
     bufferutil: ^4.0.1
     utf-8-validate: ^5.0.2
@@ -22533,13 +22533,13 @@ __metadata:
       optional: true
     utf-8-validate:
       optional: true
-  checksum: 5a4f52060e2a65194c324e5506021c998444ef5740365f7f04a59da38d2da5229221f5ab6e7ceee0d5999d03c2c1c73164a5ebdafa481043edeae4c5c42f988c
+  checksum: d807bdc63e188bf42105b16c01cd93bf84cea9dd2dbed04a0787f6a87787cbf2217da5e4fada44f890f4a981b261d34a99ae3b0bafd75e56e58d1756284b0bb9
   languageName: node
   linkType: hard
 
-"ws@npm:^8.0.0, ws@npm:^8.13.0":
-  version: 8.16.0
-  resolution: "ws@npm:8.16.0"
+"ws@npm:^8.0.0, ws@npm:^8.13.0, ws@npm:^8.17.1":
+  version: 8.17.1
+  resolution: "ws@npm:8.17.1"
   peerDependencies:
     bufferutil: ^4.0.1
     utf-8-validate: ">=5.0.2"
@@ -22548,7 +22548,7 @@ __metadata:
       optional: true
     utf-8-validate:
       optional: true
-  checksum: 055ae0eae637aed9ef538d8185c4b275261c5d023a5fe6f0dc4c2e2ac3dba2deaef12c7a60d7c4f2b64126e24fb2eef1f553893f9d818790bc81f298aee2fd62
+  checksum: 2b3b8c40e0e9156645a62b1d33ae46330730e8d303996d1cf3b68cc300e742cd44a5b9f3d7b24b9bfdfb19dfec45cc650cd39ec7ba4e36eb7363c1ced8e08f77
   languageName: node
   linkType: hard
 
