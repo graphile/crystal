@@ -1,0 +1,8 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "include": ["__tests__"],
+  "references": [{ "path": "./tsconfig.json" }]
+}

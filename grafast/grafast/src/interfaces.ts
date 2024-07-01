@@ -136,8 +136,6 @@ export const $$extensions = Symbol("extensions");
 
 /**
  * The "GraphQLObjectType" type name, useful when dealing with polymorphism.
- *
- * @internal
  */
 export const $$concreteType = Symbol("concreteType");
 
@@ -815,8 +813,6 @@ export interface UnbatchedExecutionExtra extends ExecutionExtraBase {}
  * - 8: disabled due to polymorphism (untrappable)
  * - 16: stopped (untrappable) - e.g. due to fatal (unrecoverable) error
  * - 32: ...
- *
- * @internal
  */
 export type ExecutionEntryFlags = number & { readonly tsBrand?: unique symbol };
 
