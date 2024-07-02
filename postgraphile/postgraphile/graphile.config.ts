@@ -21,6 +21,7 @@ import {
   lambda,
   listen,
   object,
+  sideEffect,
 } from "postgraphile/grafast";
 import { defaultMaskError } from "postgraphile/grafserv";
 import type {} from "postgraphile/grafserv/node";
@@ -40,6 +41,7 @@ declare global {
   namespace Grafast {
     interface Context {
       mol?: number;
+      number?: number;
     }
   }
 }
@@ -280,6 +282,41 @@ const LeftArmPlugin = makeExtendSchemaPlugin((build) => {
   };
 });
 
+const testResolver = EXPORTABLE(
+  (context, sideEffect) =>
+    function () {
+      const $context = context();
+      sideEffect($context, (context) => (context.number = 3));
+      sideEffect($context, (context) => context.number!++);
+      sideEffect($context, (_context) => {
+        throw new Error("Side effect 3 failed");
+      });
+      sideEffect($context, (context) => context.number!++);
+      sideEffect($context, (context) => context.number!++);
+      return $context.get("number");
+    },
+  [context, sideEffect],
+);
+
+const TestSideEffectCancellingPlugin = makeExtendSchemaPlugin({
+  typeDefs: gql/* GraphQL */ `
+    extend type Query {
+      testSideEffectCancelling: Int
+    }
+    extend type Mutation {
+      testSideEffectCancelling: Int
+    }
+  `,
+  plans: {
+    Mutation: {
+      testSideEffectCancelling: testResolver,
+    },
+    Query: {
+      testSideEffectCancelling: testResolver,
+    },
+  },
+});
+
 const preset: GraphileConfig.Preset = {
   plugins: [
     StreamDeferPlugin,
@@ -438,6 +475,7 @@ const preset: GraphileConfig.Preset = {
     RuruQueryParamsPlugin,
     RuruQueryParamsUpdatePlugin,
     ...(Math.random() > 2 ? [LeftArmPlugin] : []),
+    TestSideEffectCancellingPlugin,
   ],
   extends: [
     PostGraphileAmberPreset,
