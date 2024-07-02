@@ -928,6 +928,7 @@ export function isTypePlanned(
 export type Sudo<T> = T extends ExecutableStep<any>
   ? T & {
       dependencies: ReadonlyArray<ExecutableStep>;
+      latestSideEffectStep: ExecutableStep | null;
       dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
       dependencyOnReject: ReadonlyArray<Error | null | undefined>;
       defaultForbiddenFlags: ExecutionEntryFlags;

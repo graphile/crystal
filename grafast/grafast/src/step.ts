@@ -223,6 +223,13 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    */
   protected readonly dependencies: ReadonlyArray<ExecutableStep>;
   /**
+   * If this step follows a side effects, it must implicitly depend on it (so
+   * that any errors the side effect generated will be respected).
+   *
+   * @internal
+   */
+  public readonly latestSideEffectStep: ExecutableStep | null;
+  /**
    * What execution entry flags we can't handle for the given indexed dependency
    * (default = this.defaultForbiddenFlags)
    */
@@ -302,8 +309,18 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
         return hasSideEffects;
       },
       set(value) {
-        if (this.id === this.layerPlan.operationPlan.stepTracker.stepCount) {
+        if (
+          this.id ===
+          this.layerPlan.operationPlan.stepTracker.stepCount - 1
+        ) {
           hasSideEffects = value;
+          if (value === true) {
+            this.layerPlan.latestSideEffectStep = this;
+          } else if (value !== true && hasSideEffects === true) {
+            throw new Error(
+              `Cannot mark a step has having no side effects after having set it to have side effects.`,
+            );
+          }
         } else {
           throw new Error(
             "You must mark a step as having side effects immediately after creating it, before any other steps are created.",
@@ -322,7 +339,11 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     this._stepOptions = { stream: null };
     this.store = true;
     this.polymorphicPaths = currentPolymorphicPaths();
+
+    // Important: MUST come after `this.layerPlan = ...`
     this.id = this.layerPlan._addStep(this);
+    // Important: MUST come after `this.layerPlan._addStep(this)`
+    this.latestSideEffectStep = this.layerPlan.latestSideEffectStep;
   }
 
   protected withMyLayerPlan<T>(callback: () => T): T {
