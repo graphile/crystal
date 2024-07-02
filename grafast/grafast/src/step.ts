@@ -134,19 +134,10 @@ export abstract class BaseStep {
   public _isUnaryLocked: boolean;
   public debug: boolean;
 
-  // ENHANCE: change hasSideEffects to getter/setter, forbid setting after a
-  // particular phase.
-  /**
-   * Set this true for plans that implement mutations; this will prevent them
-   * from being tree-shaken.
-   */
-  public hasSideEffects: boolean;
-
   constructor() {
     this.isArgumentsFinalized = false;
     this.isFinalized = false;
     this.debug = getDebug();
-    this.hasSideEffects = false;
     const layerPlan = currentLayerPlan();
     this.layerPlan = layerPlan;
     this.operationPlan = layerPlan.operationPlan;
@@ -296,8 +287,32 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    */
   public optimizeMetaKey: number | string | symbol | undefined;
 
+  /**
+   * Set this true for plans that implement mutations; this will prevent them
+   * from being tree-shaken.
+   */
+  public hasSideEffects: boolean;
+
   constructor() {
     super();
+    this.hasSideEffects ??= false;
+    let hasSideEffects = this.hasSideEffects;
+    Object.defineProperty(this, "hasSideEffects", {
+      get() {
+        return hasSideEffects;
+      },
+      set(value) {
+        if (this.id === this.layerPlan.operationPlan.stepTracker.stepCount) {
+          hasSideEffects = value;
+        } else {
+          throw new Error(
+            "You must mark a step as having side effects immediately after creating it, before any other steps are created.",
+          );
+        }
+      },
+      enumerable: true,
+      configurable: false,
+    });
     this.dependencies = [];
     this.dependencyForbiddenFlags = [];
     this.dependencyOnReject = [];
