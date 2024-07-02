@@ -10,6 +10,8 @@ import { getGrafastMiddleware } from "./middleware.js";
 import { isPromiseLike } from "./utils.js";
 const EMPTY_OBJECT: Record<string, never> = Object.freeze(Object.create(null));
 
+const $$writeTest = Symbol("grafastWriteTest");
+
 /** @deprecated Pass `resolvedPreset` and `requestContext` via args directly */
 export function hookArgs(
   rawArgs: ExecutionArgs,
@@ -41,8 +43,12 @@ export function hookArgs(
     resolvedPreset,
     contextValue: rawContextValue,
   } = rawArgs;
-  // Make context mutable
-  rawArgs.contextValue = Object.assign(Object.create(null), rawContextValue);
+  try {
+    (rawContextValue as Record<string | symbol, any>)[$$writeTest] = true;
+  } catch (e) {
+    // Make context mutable
+    rawArgs.contextValue = Object.assign(Object.create(null), rawContextValue);
+  }
   const middleware =
     rawMiddleware === undefined && resolvedPreset != null
       ? getGrafastMiddleware(resolvedPreset)
