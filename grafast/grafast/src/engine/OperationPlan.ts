@@ -2022,7 +2022,7 @@ export class OperationPlan {
       if (step.id < offset) continue;
       for (const key in step) {
         const val = step[key as keyof typeof step];
-        if (val instanceof ExecutableStep) {
+        if (key !== "latestSideEffectStep" && val instanceof ExecutableStep) {
           errors.push(
             new Error(
               `ERROR: ExecutableStep ${step} has illegal reference via property '${key}' to step ${val}. You must not reference steps directly, instead add the step as a dependency (\`depId = this.addDependency($step)\`) and use \`this.getDep(depId)\` to look the step up (or, if the step is not a dependency, store the step ID and use \`this.getStep(stepId)\` each time you need to reference it). Failure to comply could result in subtle breakage during optimisation.`,

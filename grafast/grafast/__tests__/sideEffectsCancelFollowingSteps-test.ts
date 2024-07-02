@@ -72,23 +72,19 @@ it("cancels future steps on error", async () => {
     resolvedPreset: {},
     contextValue,
   });
-  if (!("data" in result) && !("error" in result)) {
+  if (!("data" in result)) {
     console.dir(result);
     throw new Error("Unexpected response shape");
   }
-  console.dir(result);
-  console.dir(contextValue);
-  assert.equal(contextValue.number, 4);
-  assert.deepEqual(result, {
-    data: {
-      test: null,
-    },
-    errors: [
-      {
-        message: "Side effect 3 failed",
-        path: ["test"],
-        locations: [{ line: 3, column: 7 }],
-      },
-    ],
+  assert.deepEqual(result.data, {
+    test: null,
   });
+  assert.deepEqual(result.errors?.map((e) => e.toJSON()), [
+    {
+      message: "Side effect 3 failed",
+      path: ["test"],
+      locations: [{ line: 3, column: 7 }],
+    },
+  ]);
+  assert.equal(contextValue.number, 4);
 });

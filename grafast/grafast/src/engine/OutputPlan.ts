@@ -13,7 +13,7 @@ import te, { stringifyJSON, stringifyString } from "tamedevil";
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
 import { isDev } from "../dev.js";
-import { AccessStep } from "../index.js";
+import { AccessStep, stepADependsOnStepB } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
   ExecutionEntryFlags,
@@ -168,6 +168,11 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
    * OutputPlanMode.
    */
   public readonly rootStep: ExecutableStep;
+  /**
+   * If this output plan should resolve to an error if a side effect step
+   * raises an error, this is that side effect.
+   */
+  public readonly sideEffectStep: ExecutableStep | null;
 
   /**
    * Appended to the root step when accessed to avoid the need for AccessSteps
@@ -236,6 +241,13 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     layerPlan.operationPlan.stepTracker.addOutputPlan(this);
     this.childByTypeName =
       this.type.mode === "polymorphic" ? Object.create(null) : undefined;
+
+    const $sideEffect = rootStep.layerPlan.latestSideEffectStep;
+    if ($sideEffect && !stepADependsOnStepB(rootStep, $sideEffect)) {
+      this.sideEffectStep = $sideEffect;
+    } else {
+      this.sideEffectStep = null;
+    }
   }
 
   public print(): string {
@@ -436,20 +448,20 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   }
 
   optimize(): void {
-    /*
-    // PERF: re-enable this optimization, carefully.
-
     // This optimization works by ridding us of access steps at the very end of
-    // paths and just accessing properties directly. However, in rare
-    // circumstances usually involving untethered side effects this can lead to
+    // paths and just accessing properties directly. In rare circumstances
+    // involving untethered side effects in earlier versions this could lead to
     // errors being skipped and data generated previous to the error being
-    // returned. Out of an abundance of caution we're disabling this until we
-    // have time to fully evaluate it.
-  
+    // returned; but OutputPlans now check the latestSideEffectStep so this
+    // should be safe aga.
     const $root = this.layerPlan.operationPlan.dangerouslyGetStep(
       this.rootStep.id,
     );
-    if ($root instanceof AccessStep && $root.fallback === undefined) {
+    if (
+      $root instanceof AccessStep &&
+      $root.fallback === undefined &&
+      $root.latestSideEffectStep === null
+    ) {
       const expressionDetails:
         | [ReadonlyArray<string | number>, any]
         | undefined = ($root.unbatchedExecute! as any)[expressionSymbol];
@@ -466,7 +478,6 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         });
       }
     }
-    */
   }
 
   finalize(): void {
@@ -834,6 +845,15 @@ function makeExecutor<
     rawBucketRootValue = bucket.store.get(this.rootStep.id)!.at(bucketIndex),
     bucketRootFlags = bucket.store.get(this.rootStep.id)!._flagsAt(bucketIndex),
   ) {
+    if (this.sideEffectStep !== null) {
+      const seFlags = bucket.store
+        .get(this.sideEffectStep.id)!
+        ._flagsAt(bucketIndex);
+      if (seFlags & FLAG_ERROR) {
+        const seVal = bucket.store.get(this.sideEffectStep.id)!.at(bucketIndex);
+        throw seVal;
+      }
+    }
     const bucketRootValue =
       this.processRoot !== null
         ? this.processRoot(rawBucketRootValue, bucketRootFlags)

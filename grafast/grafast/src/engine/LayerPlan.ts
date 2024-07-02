@@ -249,6 +249,8 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   steps: ExecutableStep[] = [];
   /** @internal */
   pendingSteps: ExecutableStep[] = [];
+  /** @internal */
+  public latestSideEffectStep: ExecutableStep | null = null;
 
   /**
    * Describes the order in which the steps within this LayerPlan are executed.
