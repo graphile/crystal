@@ -436,6 +436,16 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   }
 
   optimize(): void {
+    /*
+    // PERF: re-enable this optimization, carefully.
+
+    // This optimization works by ridding us of access steps at the very end of
+    // paths and just accessing properties directly. However, in rare
+    // circumstances usually involving untethered side effects this can lead to
+    // errors being skipped and data generated previous to the error being
+    // returned. Out of an abundance of caution we're disabling this until we
+    // have time to fully evaluate it.
+  
     const $root = this.layerPlan.operationPlan.dangerouslyGetStep(
       this.rootStep.id,
     );
@@ -456,6 +466,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
         });
       }
     }
+    */
   }
 
   finalize(): void {
