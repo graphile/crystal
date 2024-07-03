@@ -343,7 +343,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     return output.join("\n");
   }
 
+  _hasSetRootStep = false;
   setRootStep($root: ExecutableStep): void {
+    if (this._hasSetRootStep) {
+      throw new Error(`Set root step on ${this} more than once`);
+    }
+    this._hasSetRootStep = true;
     this.operationPlan.stepTracker.setLayerPlanRootStep(this, $root);
   }
 
