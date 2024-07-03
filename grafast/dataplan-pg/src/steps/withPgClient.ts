@@ -25,7 +25,6 @@ export class WithPgClientStep<
   };
 
   isSyncAndSafe = false;
-  hasSideEffects = true;
 
   /**
    * Tells us what we're dealing with - data type, columns, where to insert it,
@@ -49,6 +48,7 @@ export class WithPgClientStep<
     private callback: WithPgClientStepCallback<TData, TResult, TPgClient>,
   ) {
     super();
+    this.hasSideEffects = true;
     this.executor = executor;
     this.contextId = this.addDependency(this.executor.context());
     this.dataId = this.addDependency($data);

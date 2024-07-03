@@ -303,7 +303,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   constructor() {
     super();
     this.hasSideEffects ??= false;
-    let hasSideEffects = this.hasSideEffects;
+    let hasSideEffects = false;
     Object.defineProperty(this, "hasSideEffects", {
       get() {
         return hasSideEffects;
