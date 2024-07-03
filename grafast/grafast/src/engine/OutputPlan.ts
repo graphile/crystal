@@ -243,7 +243,11 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
       this.type.mode === "polymorphic" ? Object.create(null) : undefined;
 
     const $sideEffect = rootStep.layerPlan.latestSideEffectStep;
-    if ($sideEffect && !stepADependsOnStepB(rootStep, $sideEffect)) {
+    if (
+      $sideEffect &&
+      $sideEffect !== rootStep &&
+      !stepADependsOnStepB(rootStep, $sideEffect)
+    ) {
       this.sideEffectStep = $sideEffect;
     } else {
       this.sideEffectStep = null;
