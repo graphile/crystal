@@ -9,103 +9,103 @@ graph TD
 
 
     %% plan dependencies
-    List229{{"List[229∈0]<br />ᐸ81,186,245,245,245,245,245,245ᐳ"}}:::plan
-    List81{{"List[81∈0]<br />ᐸ40ᐳ"}}:::plan
-    List186{{"List[186∈0]<br />ᐸ96,145ᐳ"}}:::plan
-    Constant245{{"Constant[245∈0]<br />ᐸ[]ᐳ"}}:::plan
-    List81 & List186 & Constant245 & Constant245 & Constant245 & Constant245 & Constant245 & Constant245 --> List229
-    Object40{{"Object[40∈0]<br />ᐸ{from_hours,from_minutes,to_hours,to_minutes}ᐳ"}}:::plan
-    Access49{{"Access[49∈0]<br />ᐸ1.input.t.v.0.0.fromHoursᐳ"}}:::plan
-    Access59{{"Access[59∈0]<br />ᐸ1.input.t.v.0.0.fromMinutesᐳ"}}:::plan
-    Access69{{"Access[69∈0]<br />ᐸ1.input.t.v.0.0.toHoursᐳ"}}:::plan
-    Access79{{"Access[79∈0]<br />ᐸ1.input.t.v.0.0.toMinutesᐳ"}}:::plan
-    Access49 & Access59 & Access69 & Access79 --> Object40
-    Object96{{"Object[96∈0]<br />ᐸ{from_hours,from_minutes,to_hours,to_minutes}ᐳ"}}:::plan
-    Access105{{"Access[105∈0]<br />ᐸ1.input.t.v.1.0.fromHoursᐳ"}}:::plan
-    Access115{{"Access[115∈0]<br />ᐸ1.input.t.v.1.0.fromMinutesᐳ"}}:::plan
-    Access125{{"Access[125∈0]<br />ᐸ1.input.t.v.1.0.toHoursᐳ"}}:::plan
-    Access135{{"Access[135∈0]<br />ᐸ1.input.t.v.1.0.toMinutesᐳ"}}:::plan
-    Access105 & Access115 & Access125 & Access135 --> Object96
-    Object145{{"Object[145∈0]<br />ᐸ{from_hours,from_minutes,to_hours,to_minutes}ᐳ"}}:::plan
-    Access154{{"Access[154∈0]<br />ᐸ1.input.t.v.1.1.fromHoursᐳ"}}:::plan
-    Access164{{"Access[164∈0]<br />ᐸ1.input.t.v.1.1.fromMinutesᐳ"}}:::plan
-    Access174{{"Access[174∈0]<br />ᐸ1.input.t.v.1.1.toHoursᐳ"}}:::plan
-    Access184{{"Access[184∈0]<br />ᐸ1.input.t.v.1.1.toMinutesᐳ"}}:::plan
-    Access154 & Access164 & Access174 & Access184 --> Object145
-    Object12{{"Object[12∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access10{{"Access[10∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access11{{"Access[11∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access10 & Access11 --> Object12
-    Object96 & Object145 --> List186
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value3 --> Access10
-    __Value3 --> Access11
-    __Value1["__Value[1∈0]<br />ᐸvariableValuesᐳ"]:::plan
-    __Value1 --> Access49
-    __Value1 --> Access59
-    __Value1 --> Access69
-    __Value1 --> Access79
-    Object40 --> List81
-    __Value1 --> Access105
-    __Value1 --> Access115
-    __Value1 --> Access125
-    __Value1 --> Access135
-    __Value1 --> Access154
-    __Value1 --> Access164
-    __Value1 --> Access174
-    __Value1 --> Access184
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    PgInsertSingle9[["PgInsertSingle[9∈1]<br />ᐸt(v)ᐳ"]]:::sideeffectplan
-    Object12 & List229 --> PgInsertSingle9
-    Object13{{"Object[13∈1]<br />ᐸ{result}ᐳ"}}:::plan
-    PgInsertSingle9 --> Object13
-    PgClassExpression230{{"PgClassExpression[230∈3]<br />ᐸ__t__.”k”ᐳ"}}:::plan
-    PgInsertSingle9 --> PgClassExpression230
-    PgClassExpression231{{"PgClassExpression[231∈3]<br />ᐸ__t__.”v”ᐳ"}}:::plan
-    PgInsertSingle9 --> PgClassExpression231
-    PgSelect235[["PgSelect[235∈5]<br />ᐸfrmcdc_workHourᐳ"]]:::plan
-    __Item234[/"__Item[234∈5]<br />ᐸ231ᐳ"\]:::itemplan
-    Object12 & __Item234 --> PgSelect235
-    PgClassExpression231 ==> __Item234
-    __Item239[/"__Item[239∈6]<br />ᐸ235ᐳ"\]:::itemplan
-    PgSelect235 ==> __Item239
-    PgSelectSingle240{{"PgSelectSingle[240∈6]<br />ᐸfrmcdc_workHourᐳ"}}:::plan
-    __Item239 --> PgSelectSingle240
-    PgClassExpression241{{"PgClassExpression[241∈6]<br />ᐸ__frmcdc_w...rom_hours”ᐳ"}}:::plan
-    PgSelectSingle240 --> PgClassExpression241
-    PgClassExpression242{{"PgClassExpression[242∈6]<br />ᐸ__frmcdc_w...m_minutes”ᐳ"}}:::plan
-    PgSelectSingle240 --> PgClassExpression242
-    PgClassExpression243{{"PgClassExpression[243∈6]<br />ᐸ__frmcdc_w...”to_hours”ᐳ"}}:::plan
-    PgSelectSingle240 --> PgClassExpression243
-    PgClassExpression244{{"PgClassExpression[244∈6]<br />ᐸ__frmcdc_w...o_minutes”ᐳ"}}:::plan
-    PgSelectSingle240 --> PgClassExpression244
+    List228{{"List[228∈0]<br />ᐸ80,185,244,244,244,244,244,244ᐳ"}}:::plan
+    List80{{"List[80∈0]<br />ᐸ39ᐳ"}}:::plan
+    List185{{"List[185∈0]<br />ᐸ95,144ᐳ"}}:::plan
+    Constant244{{"Constant[244∈0]<br />ᐸ[]ᐳ"}}:::plan
+    List80 & List185 & Constant244 & Constant244 & Constant244 & Constant244 & Constant244 & Constant244 --> List228
+    Object39{{"Object[39∈0]<br />ᐸ{from_hours,from_minutes,to_hours,to_minutes}ᐳ"}}:::plan
+    Access48{{"Access[48∈0]<br />ᐸ0.input.t.v.0.0.fromHoursᐳ"}}:::plan
+    Access58{{"Access[58∈0]<br />ᐸ0.input.t.v.0.0.fromMinutesᐳ"}}:::plan
+    Access68{{"Access[68∈0]<br />ᐸ0.input.t.v.0.0.toHoursᐳ"}}:::plan
+    Access78{{"Access[78∈0]<br />ᐸ0.input.t.v.0.0.toMinutesᐳ"}}:::plan
+    Access48 & Access58 & Access68 & Access78 --> Object39
+    Object95{{"Object[95∈0]<br />ᐸ{from_hours,from_minutes,to_hours,to_minutes}ᐳ"}}:::plan
+    Access104{{"Access[104∈0]<br />ᐸ0.input.t.v.1.0.fromHoursᐳ"}}:::plan
+    Access114{{"Access[114∈0]<br />ᐸ0.input.t.v.1.0.fromMinutesᐳ"}}:::plan
+    Access124{{"Access[124∈0]<br />ᐸ0.input.t.v.1.0.toHoursᐳ"}}:::plan
+    Access134{{"Access[134∈0]<br />ᐸ0.input.t.v.1.0.toMinutesᐳ"}}:::plan
+    Access104 & Access114 & Access124 & Access134 --> Object95
+    Object144{{"Object[144∈0]<br />ᐸ{from_hours,from_minutes,to_hours,to_minutes}ᐳ"}}:::plan
+    Access153{{"Access[153∈0]<br />ᐸ0.input.t.v.1.1.fromHoursᐳ"}}:::plan
+    Access163{{"Access[163∈0]<br />ᐸ0.input.t.v.1.1.fromMinutesᐳ"}}:::plan
+    Access173{{"Access[173∈0]<br />ᐸ0.input.t.v.1.1.toHoursᐳ"}}:::plan
+    Access183{{"Access[183∈0]<br />ᐸ0.input.t.v.1.1.toMinutesᐳ"}}:::plan
+    Access153 & Access163 & Access173 & Access183 --> Object144
+    Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access9{{"Access[9∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access10{{"Access[10∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access9 & Access10 --> Object11
+    Object95 & Object144 --> List185
+    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access9
+    __Value2 --> Access10
+    __Value0["__Value[0∈0]<br />ᐸvariableValuesᐳ"]:::plan
+    __Value0 --> Access48
+    __Value0 --> Access58
+    __Value0 --> Access68
+    __Value0 --> Access78
+    Object39 --> List80
+    __Value0 --> Access104
+    __Value0 --> Access114
+    __Value0 --> Access124
+    __Value0 --> Access134
+    __Value0 --> Access153
+    __Value0 --> Access163
+    __Value0 --> Access173
+    __Value0 --> Access183
+    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
+    PgInsertSingle8[["PgInsertSingle[8∈1]<br />ᐸt(v)ᐳ"]]:::sideeffectplan
+    Object11 & List228 --> PgInsertSingle8
+    Object12{{"Object[12∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    PgInsertSingle8 --> Object12
+    PgClassExpression229{{"PgClassExpression[229∈3]<br />ᐸ__t__.”k”ᐳ"}}:::plan
+    PgInsertSingle8 --> PgClassExpression229
+    PgClassExpression230{{"PgClassExpression[230∈3]<br />ᐸ__t__.”v”ᐳ"}}:::plan
+    PgInsertSingle8 --> PgClassExpression230
+    PgSelect234[["PgSelect[234∈5]<br />ᐸfrmcdc_workHourᐳ"]]:::plan
+    __Item233[/"__Item[233∈5]<br />ᐸ230ᐳ"\]:::itemplan
+    Object11 & __Item233 --> PgSelect234
+    PgClassExpression230 ==> __Item233
+    __Item238[/"__Item[238∈6]<br />ᐸ234ᐳ"\]:::itemplan
+    PgSelect234 ==> __Item238
+    PgSelectSingle239{{"PgSelectSingle[239∈6]<br />ᐸfrmcdc_workHourᐳ"}}:::plan
+    __Item238 --> PgSelectSingle239
+    PgClassExpression240{{"PgClassExpression[240∈6]<br />ᐸ__frmcdc_w...rom_hours”ᐳ"}}:::plan
+    PgSelectSingle239 --> PgClassExpression240
+    PgClassExpression241{{"PgClassExpression[241∈6]<br />ᐸ__frmcdc_w...m_minutes”ᐳ"}}:::plan
+    PgSelectSingle239 --> PgClassExpression241
+    PgClassExpression242{{"PgClassExpression[242∈6]<br />ᐸ__frmcdc_w...”to_hours”ᐳ"}}:::plan
+    PgSelectSingle239 --> PgClassExpression242
+    PgClassExpression243{{"PgClassExpression[243∈6]<br />ᐸ__frmcdc_w...o_minutes”ᐳ"}}:::plan
+    PgSelectSingle239 --> PgClassExpression243
 
     %% define steps
 
     subgraph "Buckets for mutations/v4/nested_arrays.createT"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value1,__Value3,__Value5,Access10,Access11,Object12,Object40,Access49,Access59,Access69,Access79,List81,Object96,Access105,Access115,Access125,Access135,Object145,Access154,Access164,Access174,Access184,List186,List229,Constant245 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 229<br /><br />1: PgInsertSingle[9]<br />2: <br />ᐳ: Object[13]"):::bucket
+    class Bucket0,__Value0,__Value2,__Value4,Access9,Access10,Object11,Object39,Access48,Access58,Access68,Access78,List80,Object95,Access104,Access114,Access124,Access134,Object144,Access153,Access163,Access173,Access183,List185,List228,Constant244 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 11, 228<br /><br />1: PgInsertSingle[8]<br />2: <br />ᐳ: Object[12]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgInsertSingle9,Object13 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 9, 12<br /><br />ROOT Object{1}ᐸ{result}ᐳ[13]"):::bucket
+    class Bucket1,PgInsertSingle8,Object12 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 12, 8, 11<br /><br />ROOT Object{1}ᐸ{result}ᐳ[12]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 9, 12<br /><br />ROOT PgInsertSingle{1}ᐸt(v)ᐳ[9]"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 8, 11<br /><br />ROOT PgInsertSingle{1}ᐸt(v)ᐳ[8]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression230,PgClassExpression231 bucket3
-    Bucket5("Bucket 5 (listItem)<br />Deps: 12<br /><br />ROOT __Item{5}ᐸ231ᐳ[234]"):::bucket
+    class Bucket3,PgClassExpression229,PgClassExpression230 bucket3
+    Bucket5("Bucket 5 (listItem)<br />Deps: 11<br /><br />ROOT __Item{5}ᐸ230ᐳ[233]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item234,PgSelect235 bucket5
-    Bucket6("Bucket 6 (listItem)<br />ROOT __Item{6}ᐸ235ᐳ[239]"):::bucket
+    class Bucket5,__Item233,PgSelect234 bucket5
+    Bucket6("Bucket 6 (listItem)<br />ROOT __Item{6}ᐸ234ᐳ[238]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,__Item239,PgSelectSingle240,PgClassExpression241,PgClassExpression242,PgClassExpression243,PgClassExpression244 bucket6
+    class Bucket6,__Item238,PgSelectSingle239,PgClassExpression240,PgClassExpression241,PgClassExpression242,PgClassExpression243 bucket6
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     Bucket3 --> Bucket5
     Bucket5 --> Bucket6
     classDef unary fill:#fafffa,borderWidth:8px
-    class List229,Object40,Object96,Object145,Object12,List186,Access10,Access11,Access49,Access59,Access69,Access79,List81,Access105,Access115,Access125,Access135,Access154,Access164,Access174,Access184,__Value1,__Value3,__Value5,Constant245,PgInsertSingle9,Object13,PgClassExpression230,PgClassExpression231 unary
+    class List228,Object39,Object95,Object144,Object11,List185,Access9,Access10,Access48,Access58,Access68,Access78,List80,Access104,Access114,Access124,Access134,Access153,Access163,Access173,Access183,__Value0,__Value2,__Value4,Constant244,PgInsertSingle8,Object12,PgClassExpression229,PgClassExpression230 unary
     end
