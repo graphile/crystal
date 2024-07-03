@@ -19,6 +19,7 @@ import type {
   ModifierStep,
   UnbatchedExecutableStep,
 } from "../step";
+import { stepADependsOnStepB } from "../utils.js";
 import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
@@ -290,6 +291,7 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     public parentLayerPlan: LayerPlan | null,
     public readonly reason: TReason, //parentStep: ExecutableStep | null,
   ) {
+    this.latestSideEffectStep = parentLayerPlan?.latestSideEffectStep ?? null;
     this.stepsByConstructor = new Map();
     if (parentLayerPlan !== null) {
       this.depth = parentLayerPlan.depth + 1;
@@ -352,6 +354,14 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     }
     this._hasSetRootStep = true;
     this.operationPlan.stepTracker.setLayerPlanRootStep(this, $root);
+    if (this.latestSideEffectStep) {
+      if (
+        this.latestSideEffectStep === $root ||
+        stepADependsOnStepB($root, this.latestSideEffectStep)
+      ) {
+        this.latestSideEffectStep = null;
+      }
+    }
   }
 
   /** @internal Use plan.getStep(id) instead. */
