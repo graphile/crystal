@@ -9,39 +9,39 @@ graph TD
 
 
     %% plan dependencies
-    Object10{{"Object[10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access8{{"Access[8∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access9{{"Access[9∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access8 & Access9 --> Object10
-    PgSelect7[["PgSelect[7∈0]<br />ᐸrandom_userᐳ"]]:::plan
-    Object10 --> PgSelect7
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value3 --> Access8
-    __Value3 --> Access9
-    First11{{"First[11∈0]"}}:::plan
-    PgSelect7 --> First11
-    PgSelectSingle12{{"PgSelectSingle[12∈0]<br />ᐸusersᐳ"}}:::plan
-    First11 --> PgSelectSingle12
-    __Value1["__Value[1∈0]<br />ᐸvariableValuesᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    GraphQLResolver18[["GraphQLResolver[18∈1]<br />ᐸresolveᐳ"]]:::unbatchedplan
-    Object16{{"Object[16∈1]<br />ᐸ{username}ᐳ"}}:::plan
-    Constant20{{"Constant[20∈1]<br />ᐸ[Object: null prototype] { hashType: 'sha1' }ᐳ"}}:::plan
-    Object16 & Constant20 & __Value3 & __Value1 & __Value5 --> GraphQLResolver18
-    PgClassExpression13{{"PgClassExpression[13∈1]<br />ᐸ__random_u...”username”ᐳ"}}:::plan
-    PgSelectSingle12 --> PgClassExpression13
-    PgClassExpression13 --> Object16
+    Object9{{"Object[9∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access7{{"Access[7∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access8{{"Access[8∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access7 & Access8 --> Object9
+    PgSelect6[["PgSelect[6∈0]<br />ᐸrandom_userᐳ"]]:::plan
+    Object9 --> PgSelect6
+    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access7
+    __Value2 --> Access8
+    First10{{"First[10∈0]"}}:::plan
+    PgSelect6 --> First10
+    PgSelectSingle11{{"PgSelectSingle[11∈0]<br />ᐸusersᐳ"}}:::plan
+    First10 --> PgSelectSingle11
+    __Value0["__Value[0∈0]<br />ᐸvariableValuesᐳ"]:::plan
+    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
+    GraphQLResolver17[["GraphQLResolver[17∈1]<br />ᐸresolveᐳ"]]:::unbatchedplan
+    Object15{{"Object[15∈1]<br />ᐸ{username}ᐳ"}}:::plan
+    Constant19{{"Constant[19∈1]<br />ᐸ[Object: null prototype] { hashType: 'sha1' }ᐳ"}}:::plan
+    Object15 & Constant19 & __Value2 & __Value0 & __Value4 --> GraphQLResolver17
+    PgClassExpression12{{"PgClassExpression[12∈1]<br />ᐸ__random_u...”username”ᐳ"}}:::plan
+    PgSelectSingle11 --> PgClassExpression12
+    PgClassExpression12 --> Object15
 
     %% define steps
 
     subgraph "Buckets for queries/resolvers/basics"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Access[8], Access[9], Object[10]<br />2: PgSelect[7]<br />ᐳ: First[11], PgSelectSingle[12]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Access[7], Access[8], Object[9]<br />2: PgSelect[6]<br />ᐳ: First[10], PgSelectSingle[11]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value1,__Value3,__Value5,PgSelect7,Access8,Access9,Object10,First11,PgSelectSingle12 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 12, 3, 1, 5<br /><br />ROOT PgSelectSingleᐸusersᐳ[12]<br />1: <br />ᐳ: 13, 20, 16<br />2: GraphQLResolver[18]"):::bucket
+    class Bucket0,__Value0,__Value2,__Value4,PgSelect6,Access7,Access8,Object9,First10,PgSelectSingle11 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 11, 2, 0, 4<br /><br />ROOT PgSelectSingleᐸusersᐳ[11]<br />1: <br />ᐳ: 12, 19, 15<br />2: GraphQLResolver[17]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgClassExpression13,Object16,GraphQLResolver18,Constant20 bucket1
+    class Bucket1,PgClassExpression12,Object15,GraphQLResolver17,Constant19 bucket1
     Bucket0 --> Bucket1
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object10,PgSelect7,Access8,Access9,First11,PgSelectSingle12,__Value1,__Value3,__Value5,GraphQLResolver18,PgClassExpression13,Object16,Constant20 unary
+    class Object9,PgSelect6,Access7,Access8,First10,PgSelectSingle11,__Value0,__Value2,__Value4,GraphQLResolver17,PgClassExpression12,Object15,Constant19 unary
     end
