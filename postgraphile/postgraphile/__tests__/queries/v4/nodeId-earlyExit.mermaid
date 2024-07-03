@@ -40,7 +40,6 @@ graph TD
     PgSelect89 --> First93
     PgSelectSingle94{{"PgSelectSingle[94∈0]<br />ᐸpersonᐳ"}}:::plan
     First93 --> PgSelectSingle94
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Connection37{{"Connection[37∈0]<br />ᐸ33ᐳ"}}:::plan
     Connection76{{"Connection[76∈0]<br />ᐸ72ᐳ"}}:::plan
@@ -86,7 +85,7 @@ graph TD
     subgraph "Buckets for queries/v4/nodeId-earlyExit"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 34, 35, 37, 76, 97, 99, 36, 47, 48, 86, 87<br />2: PgSelect[50], PgSelect[89]<br />ᐳ: 54, 55, 93, 94"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access34,Access35,Object36,Connection37,Lambda47,Access48,PgSelect50,First54,PgSelectSingle55,Connection76,Lambda86,Access87,PgSelect89,First93,PgSelectSingle94,Constant97,Constant99 bucket0
+    class Bucket0,__Value3,__Value5,Access34,Access35,Object36,Connection37,Lambda47,Access48,PgSelect50,First54,PgSelectSingle55,Connection76,Lambda86,Access87,PgSelect89,First93,PgSelectSingle94,Constant97,Constant99 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 36, 37<br /><br />ROOT Connectionᐸ33ᐳ[37]<br />1: <br />ᐳ: Constant[41], Constant[96]<br />2: PgSelect[38]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect38,Constant41,Constant96 bucket1
@@ -117,5 +116,5 @@ graph TD
     Bucket5 --> Bucket6
     Bucket6 --> Bucket7
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object36,PgSelect50,PgSelect89,Access34,Access35,Lambda47,Access48,First54,PgSelectSingle55,Lambda86,Access87,First93,PgSelectSingle94,__Value0,__Value3,__Value5,Connection37,Connection76,Constant97,Constant99,PgSelect38,Constant41,Constant96,PgClassExpression56,PgSelect77,Constant80,Constant98,PgClassExpression95 unary
+    class Object36,PgSelect50,PgSelect89,Access34,Access35,Lambda47,Access48,First54,PgSelectSingle55,Lambda86,Access87,First93,PgSelectSingle94,__Value3,__Value5,Connection37,Connection76,Constant97,Constant99,PgSelect38,Constant41,Constant96,PgClassExpression56,PgSelect77,Constant80,Constant98,PgClassExpression95 unary
     end

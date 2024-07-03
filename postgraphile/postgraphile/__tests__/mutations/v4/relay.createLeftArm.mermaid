@@ -29,7 +29,6 @@ graph TD
     __Flag22[["__Flag[22∈0]<br />ᐸ21, rejectNull, onReject: INHIBITᐳ"]]:::plan
     Access21 --> __Flag22
     __Flag22 --> __Flag23
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Constant42{{"Constant[42∈0]<br />ᐸ0.69ᐳ"}}:::plan
     PgInsertSingle14[["PgInsertSingle[14∈1]<br />ᐸleft_arm(length_in_metres,person_id)ᐳ"]]:::sideeffectplan
@@ -68,7 +67,7 @@ graph TD
     subgraph "Buckets for mutations/v4/relay.createLeftArm"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 15, 16, 42, 43, 17, 19, 20, 21<br />2: __Flag[22]<br />3: __Flag[23]<br />4: __Flag[24]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access15,Access16,Object17,Condition19,Lambda20,Access21,__Flag22,__Flag23,__Flag24,Constant42,Constant43 bucket0
+    class Bucket0,__Value3,__Value5,Access15,Access16,Object17,Condition19,Lambda20,Access21,__Flag22,__Flag23,__Flag24,Constant42,Constant43 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 17, 42, 24<br /><br />1: PgInsertSingle[14]<br />2: <br />ᐳ: Object[18]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle14,Object18 bucket1
@@ -86,5 +85,5 @@ graph TD
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object17,__Flag24,Access15,Access16,Condition19,Lambda20,Access21,__Flag22,__Flag23,__Value0,__Value3,__Value5,Constant42,Constant43,PgInsertSingle14,Object18,List27,PgSelect30,PgClassExpression26,Lambda28,PgClassExpression29,First34,PgSelectSingle35,PgClassExpression40,PgClassExpression41,Constant25,Constant36,List38,PgClassExpression37,Lambda39 unary
+    class Object17,__Flag24,Access15,Access16,Condition19,Lambda20,Access21,__Flag22,__Flag23,__Value3,__Value5,Constant42,Constant43,PgInsertSingle14,Object18,List27,PgSelect30,PgClassExpression26,Lambda28,PgClassExpression29,First34,PgSelectSingle35,PgClassExpression40,PgClassExpression41,Constant25,Constant36,List38,PgClassExpression37,Lambda39 unary
     end

@@ -22,7 +22,6 @@ graph TD
     Lambda40{{"Lambda[40∈0]<br />ᐸparseCursorᐳ"}}:::plan
     Constant158{{"Constant[158∈0]<br />ᐸ'WyJjMDM4YzQzNTYwIiwiQXdzQXBwbGljYXRpb24iLCJbXCI0XCJdIl0='ᐳ"}}:::plan
     Constant158 --> Lambda40
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Constant157{{"Constant[157∈0]<br />ᐸ1ᐳ"}}:::plan
     Connection39{{"Connection[39∈1]<br />ᐸ35ᐳ"}}:::plan
@@ -169,7 +168,7 @@ graph TD
     subgraph "Buckets for queries/polymorphic/person-app-vulns.app-page-2"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Lambda40,Constant156,Constant157,Constant158 bucket0
+    class Bucket0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Lambda40,Constant156,Constant157,Constant158 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19, 157, 40<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect20,Connection39,PgValidateParsedCursor45,Access46,ToPg47,Access48 bucket1
@@ -218,5 +217,5 @@ graph TD
     Bucket10 --> Bucket11
     Bucket11 --> Bucket12
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object18,Access16,Access17,Connection19,Lambda40,__Value0,__Value3,__Value5,Constant156,Constant157,Constant158,Connection39,PgSelect20,PgValidateParsedCursor45,Access46,ToPg47,Access48,Connection76,Connection128 unary
+    class Object18,Access16,Access17,Connection19,Lambda40,__Value3,__Value5,Constant156,Constant157,Constant158,Connection39,PgSelect20,PgValidateParsedCursor45,Access46,ToPg47,Access48,Connection76,Connection128 unary
     end

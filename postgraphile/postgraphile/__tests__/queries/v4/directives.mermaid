@@ -12,7 +12,6 @@ graph TD
     Lambda16{{"Lambda[16∈0]<br />ᐸrawEncodeᐳ"}}:::plan
     Constant15{{"Constant[15∈0]<br />ᐸ'query'ᐳ"}}:::plan
     Constant15 --> Lambda16
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
 
     %% define steps
@@ -20,7 +19,7 @@ graph TD
     subgraph "Buckets for queries/v4/directives"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value5,Constant15,Lambda16 bucket0
+    class Bucket0,__Value5,Constant15,Lambda16 bucket0
     classDef unary fill:#fafffa,borderWidth:8px
-    class Lambda16,__Value0,__Value5,Constant15 unary
+    class Lambda16,__Value5,Constant15 unary
     end

@@ -37,7 +37,6 @@ graph TD
     Object14 --> PgSelect154
     PgSelect169[["PgSelect[169∈0]<br />ᐸpostᐳ"]]:::plan
     Object14 --> PgSelect169
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
     PgSelect11 ==> __Item15
@@ -139,7 +138,7 @@ graph TD
     subgraph "Buckets for queries/v4/simple-collections"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 12, 13, 177, 14<br />2: 11, 24, 38, 52, 72, 91, 103, 116, 154, 169"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,PgSelect24,PgSelect38,PgSelect52,PgSelect72,PgSelect91,PgSelect103,PgSelect116,PgSelect154,PgSelect169,Constant177 bucket0
+    class Bucket0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,PgSelect24,PgSelect38,PgSelect52,PgSelect72,PgSelect91,PgSelect103,PgSelect116,PgSelect154,PgSelect169,Constant177 bucket0
     Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ11ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item15,PgSelectSingle16,PgClassExpression17,PgClassExpression18,PgClassExpression19 bucket1
@@ -172,5 +171,5 @@ graph TD
     class Bucket10,__Item173,PgSelectSingle174,PgClassExpression175,PgClassExpression176 bucket10
     Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4 & Bucket5 & Bucket6 & Bucket7 & Bucket8 & Bucket9 & Bucket10
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object14,PgSelect72,PgSelect91,PgSelect11,Access12,Access13,PgSelect24,PgSelect38,PgSelect52,PgSelect103,PgSelect116,PgSelect154,PgSelect169,__Value0,__Value3,__Value5,Constant177 unary
+    class Object14,PgSelect72,PgSelect91,PgSelect11,Access12,Access13,PgSelect24,PgSelect38,PgSelect52,PgSelect103,PgSelect116,PgSelect154,PgSelect169,__Value3,__Value5,Constant177 unary
     end

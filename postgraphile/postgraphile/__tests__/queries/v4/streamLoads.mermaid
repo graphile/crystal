@@ -19,7 +19,6 @@ graph TD
     Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
     Constant37{{"Constant[37∈0]<br />ᐸ1ᐳ"}}:::plan
     Constant37 --> Connection19
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     PgSelect20[["PgSelect[20∈1]<br />ᐸpersonᐳ"]]:::plan
     Object18 & Connection19 --> PgSelect20
@@ -45,7 +44,7 @@ graph TD
     subgraph "Buckets for queries/v4/streamLoads"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Constant37 bucket0
+    class Bucket0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Constant37 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect20 bucket1
@@ -63,5 +62,5 @@ graph TD
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object18,Access16,Access17,Connection19,__Value0,__Value3,__Value5,Constant37,PgSelect20 unary
+    class Object18,Access16,Access17,Connection19,__Value3,__Value5,Constant37,PgSelect20 unary
     end

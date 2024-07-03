@@ -53,7 +53,6 @@ graph TD
     PgSelect41 --> First45
     PgSelectSingle46{{"PgSelectSingle[46∈0]<br />ᐸnullᐳ"}}:::plan
     First45 --> PgSelectSingle46
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression52{{"PgClassExpression[52∈1]<br />ᐸ”js_reserv...lder! */<br />)ᐳ"}}:::plan
     PgSelectSingle46 --> PgClassExpression52
@@ -65,11 +64,11 @@ graph TD
     subgraph "Buckets for queries/v4/js-reserved-function-names"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 12, 13, 54, 55, 56, 57, 58, 62, 65, 14<br />2: 11, 22, 33, 41<br />ᐳ: 15, 16, 17, 26, 27, 28, 37, 38, 39, 45, 46"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,First15,PgSelectSingle16,PgClassExpression17,PgSelect22,First26,PgSelectSingle27,PgClassExpression28,PgSelect33,First37,PgSelectSingle38,PgClassExpression39,PgSelect41,First45,PgSelectSingle46,Constant54,Constant55,Constant56,Constant57,Constant58,Constant62,Constant65 bucket0
+    class Bucket0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,First15,PgSelectSingle16,PgClassExpression17,PgSelect22,First26,PgSelectSingle27,PgClassExpression28,PgSelect33,First37,PgSelectSingle38,PgClassExpression39,PgSelect41,First45,PgSelectSingle46,Constant54,Constant55,Constant56,Constant57,Constant58,Constant62,Constant65 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 46<br /><br />ROOT PgSelectSingleᐸnullᐳ[46]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression52,PgClassExpression53 bucket1
     Bucket0 --> Bucket1
     classDef unary fill:#fafffa,borderWidth:8px
-    class PgSelect41,PgSelect11,PgSelect22,PgSelect33,Object14,Access12,Access13,First15,PgSelectSingle16,PgClassExpression17,First26,PgSelectSingle27,PgClassExpression28,First37,PgSelectSingle38,PgClassExpression39,First45,PgSelectSingle46,__Value0,__Value3,__Value5,Constant54,Constant55,Constant56,Constant57,Constant58,Constant62,Constant65,PgClassExpression52,PgClassExpression53 unary
+    class PgSelect41,PgSelect11,PgSelect22,PgSelect33,Object14,Access12,Access13,First15,PgSelectSingle16,PgClassExpression17,First26,PgSelectSingle27,PgClassExpression28,First37,PgSelectSingle38,PgClassExpression39,First45,PgSelectSingle46,__Value3,__Value5,Constant54,Constant55,Constant56,Constant57,Constant58,Constant62,Constant65,PgClassExpression52,PgClassExpression53 unary
     end

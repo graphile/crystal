@@ -26,7 +26,6 @@ graph TD
     Lambda21 --> PgValidateParsedCursor26
     PgUnionAll103[["PgUnionAll[103∈0]"]]:::plan
     Object19 --> PgUnionAll103
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     PgUnionAll22[["PgUnionAll[22∈1]"]]:::plan
     ToPg28{{"ToPg[28∈1]"}}:::plan
@@ -181,7 +180,7 @@ graph TD
     subgraph "Buckets for queries/polymorphic/vulns"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 17, 18, 140, 141, 19, 21<br />2: 26, 103<br />ᐳ: Connection[20]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access17,Access18,Object19,Connection20,Lambda21,PgValidateParsedCursor26,PgUnionAll103,Constant140,Constant141 bucket0
+    class Bucket0,__Value3,__Value5,Access17,Access18,Object19,Connection20,Lambda21,PgValidateParsedCursor26,PgUnionAll103,Constant140,Constant141 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 19, 20, 21<br /><br />ROOT Connectionᐸ16ᐳ[20]<br />1: PgUnionAll[61]<br />ᐳ: 27, 29, 31, 65, 96, 28, 30, 62<br />2: 22, 63, 66, 80, 94<br />ᐳ: 64, 67, 81, 95<br />3: 68, 82<br />ᐳ: 76, 77, 78, 79, 90, 91, 92, 93, 69, 83"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUnionAll22,Access27,ToPg28,Access29,ToPg30,Access31,PgUnionAll61,First62,PgUnionAllSingle63,PgClassExpression64,PgPageInfo65,PgUnionAll66,First67,PgUnionAllSingle68,PgCursor69,Access76,Access77,Access78,List79,PgUnionAll80,Last81,PgUnionAllSingle82,PgCursor83,Access90,Access91,Access92,List93,PgUnionAll94,Access95,Constant96 bucket1
@@ -206,5 +205,5 @@ graph TD
     Bucket3 --> Bucket4
     Bucket5 --> Bucket6
     classDef unary fill:#fafffa,borderWidth:8px
-    class Connection20,Object19,Access17,Access18,Lambda21,PgValidateParsedCursor26,PgUnionAll103,__Value0,__Value3,__Value5,Constant140,Constant141,PgUnionAll22,PgUnionAll66,PgUnionAll80,PgUnionAll94,List79,List93,PgUnionAll61,Access27,ToPg28,Access29,ToPg30,Access31,First62,PgUnionAllSingle63,PgClassExpression64,PgPageInfo65,First67,PgUnionAllSingle68,PgCursor69,Access76,Access77,Access78,Last81,PgUnionAllSingle82,PgCursor83,Access90,Access91,Access92,Access95,Constant96 unary
+    class Connection20,Object19,Access17,Access18,Lambda21,PgValidateParsedCursor26,PgUnionAll103,__Value3,__Value5,Constant140,Constant141,PgUnionAll22,PgUnionAll66,PgUnionAll80,PgUnionAll94,List79,List93,PgUnionAll61,Access27,ToPg28,Access29,ToPg30,Access31,First62,PgUnionAllSingle63,PgClassExpression64,PgPageInfo65,First67,PgUnionAllSingle68,PgCursor69,Access76,Access77,Access78,Last81,PgUnionAllSingle82,PgCursor83,Access90,Access91,Access92,Access95,Constant96 unary
     end

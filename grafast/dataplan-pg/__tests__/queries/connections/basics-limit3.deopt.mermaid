@@ -19,7 +19,6 @@ graph TD
     Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
     Constant56{{"Constant[56∈0]<br />ᐸ3ᐳ"}}:::plan
     Constant56 --> Connection19
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     PgSelect20[["PgSelect[20∈1]<br />ᐸmessages+1ᐳ"]]:::plan
     Object18 & Connection19 --> PgSelect20
@@ -86,7 +85,7 @@ graph TD
     subgraph "Buckets for queries/connections/basics-limit3"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Constant56 bucket0
+    class Bucket0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Constant56 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect20,PgPageInfo36,Access38,Constant39,First41,PgSelectSingle42,PgCursor43,PgClassExpression44,List45,Last47,PgSelectSingle48,PgCursor49,PgClassExpression50,List51,PgSelect52,First53,PgSelectSingle54,PgClassExpression55 bucket1
@@ -104,5 +103,5 @@ graph TD
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object18,Access16,Access17,Connection19,__Value0,__Value3,__Value5,Constant56,PgSelect20,PgSelect52,PgPageInfo36,Access38,First41,PgSelectSingle42,PgCursor43,PgClassExpression44,List45,Last47,PgSelectSingle48,PgCursor49,PgClassExpression50,List51,First53,PgSelectSingle54,PgClassExpression55,Constant39 unary
+    class Object18,Access16,Access17,Connection19,__Value3,__Value5,Constant56,PgSelect20,PgSelect52,PgPageInfo36,Access38,First41,PgSelectSingle42,PgCursor43,PgClassExpression44,List45,Last47,PgSelectSingle48,PgCursor49,PgClassExpression50,List51,First53,PgSelectSingle54,PgClassExpression55,Constant39 unary
     end

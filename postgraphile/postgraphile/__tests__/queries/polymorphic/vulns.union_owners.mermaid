@@ -19,7 +19,6 @@ graph TD
     Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
     Constant669{{"Constant[669∈0]<br />ᐸ2ᐳ"}}:::plan
     Constant669 --> Connection19
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     PgUnionAll20[["PgUnionAll[20∈1]"]]:::plan
     Object18 & Connection19 --> PgUnionAll20
@@ -845,7 +844,7 @@ graph TD
     subgraph "Buckets for queries/polymorphic/vulns.union_owners"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Constant669 bucket0
+    class Bucket0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Constant669 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUnionAll20 bucket1
@@ -944,5 +943,5 @@ graph TD
     Bucket24 --> Bucket25
     Bucket26 --> Bucket27
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object18,Access16,Access17,Connection19,__Value0,__Value3,__Value5,Constant669,PgUnionAll20,Constant32,Connection51,Connection276,Constant355,Connection374,Connection599,Constant64,Constant114,Constant86,Constant100,Constant136,Constant150,Constant177,Constant227,Constant199,Constant213,Constant249,Constant263,Constant289,Constant303,Constant327,Constant341,Constant387,Constant437,Constant409,Constant423,Constant459,Constant473,Constant500,Constant550,Constant522,Constant536,Constant572,Constant586,Constant612,Constant626,Constant650,Constant664 unary
+    class Object18,Access16,Access17,Connection19,__Value3,__Value5,Constant669,PgUnionAll20,Constant32,Connection51,Connection276,Constant355,Connection374,Connection599,Constant64,Constant114,Constant86,Constant100,Constant136,Constant150,Constant177,Constant227,Constant199,Constant213,Constant249,Constant263,Constant289,Constant303,Constant327,Constant341,Constant387,Constant437,Constant409,Constant423,Constant459,Constant473,Constant500,Constant550,Constant522,Constant536,Constant572,Constant586,Constant612,Constant626,Constant650,Constant664 unary
     end

@@ -17,7 +17,6 @@ graph TD
     Constant68{{"Constant[68∈0]<br />ᐸ'WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtY2VjMTEᐳ"}}:::plan
     Constant68 --> Lambda20
     Lambda20 --> PgValidateParsedCursor22
-    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     PgSelect21[["PgSelect[21∈1]<br />ᐸmessages+1ᐳ"]]:::plan
@@ -89,7 +88,7 @@ graph TD
     subgraph "Buckets for queries/connections/pagination-before-end"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Constant[67], Constant[68], Lambda[20]<br />2: PgValidateParsedCursor[22]<br />ᐳ: Connection[19]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Connection19,Lambda20,PgValidateParsedCursor22,Constant67,Constant68 bucket0
+    class Bucket0,__Value3,__Value5,Connection19,Lambda20,PgValidateParsedCursor22,Constant67,Constant68 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 19, 20<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: <br />ᐳ: 16, 17, 23, 39, 44, 18<br />2: PgSelect[21], PgSelect[61]<br />ᐳ: 41, 46, 47, 51, 52, 54, 55, 59, 60, 62, 63, 64, 48, 56"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access16,Access17,Object18,PgSelect21,Access23,PgPageInfo39,Access41,Constant44,First46,PgSelectSingle47,PgCursor48,PgClassExpression51,List52,Last54,PgSelectSingle55,PgCursor56,PgClassExpression59,List60,PgSelect61,First62,PgSelectSingle63,PgClassExpression64 bucket1
@@ -107,5 +106,5 @@ graph TD
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4
     classDef unary fill:#fafffa,borderWidth:8px
-    class Connection19,Lambda20,PgValidateParsedCursor22,__Value0,__Value3,__Value5,Constant67,Constant68,PgSelect21,Object18,PgSelect61,Access16,Access17,Access23,PgPageInfo39,Access41,First46,PgSelectSingle47,PgCursor48,PgClassExpression51,List52,Last54,PgSelectSingle55,PgCursor56,PgClassExpression59,List60,First62,PgSelectSingle63,PgClassExpression64,Constant44 unary
+    class Connection19,Lambda20,PgValidateParsedCursor22,__Value3,__Value5,Constant67,Constant68,PgSelect21,Object18,PgSelect61,Access16,Access17,Access23,PgPageInfo39,Access41,First46,PgSelectSingle47,PgCursor48,PgClassExpression51,List52,Last54,PgSelectSingle55,PgCursor56,PgClassExpression59,List60,First62,PgSelectSingle63,PgClassExpression64,Constant44 unary
     end

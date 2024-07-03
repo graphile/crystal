@@ -23,7 +23,6 @@ graph TD
     __Value3 --> Access45
     __Value3 --> Access46
     Lambda10 --> Access135
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     List41{{"List[41∈1]<br />ᐸ16,22,28,34,40ᐳ"}}:::plan
     Object16{{"Object[16∈1]<br />ᐸ{match,pks}ᐳ"}}:::plan
@@ -153,7 +152,7 @@ graph TD
     subgraph "Buckets for mutations/v4/polymorphic.relay.custom_delete"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Lambda10,List15,Access45,Access46,Object47,Access135,Constant136 bucket0
+    class Bucket0,__Value3,__Value5,Lambda10,List15,Access45,Access46,Object47,Access135,Constant136 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 10, 15, 47, 5<br /><br />1: Lambda[14]<br />2: Object[16]<br />3: Lambda[20]<br />4: Object[22]<br />5: Lambda[26]<br />6: Object[28]<br />7: Lambda[32]<br />8: Object[34]<br />9: Lambda[38]<br />10: Object[40]<br />11: List[41]<br />12: Lambda[42]<br />13: Access[43]<br />14: PgSelect[44]<br />15: First[48]<br />16: PgSelectSingle[49]<br />17: PgClassExpression[50]<br />18: PgSelect[51]<br />19: <br />ᐳ: 55, 56, 57, 58"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Lambda14,Object16,Lambda20,Object22,Lambda26,Object28,Lambda32,Object34,Lambda38,Object40,List41,Lambda42,Access43,PgSelect44,First48,PgSelectSingle49,PgClassExpression50,PgSelect51,First55,PgSelectSingle56,PgClassExpression57,Object58 bucket1
@@ -179,5 +178,5 @@ graph TD
     Bucket4 --> Bucket5
     Bucket5 --> Bucket6
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object47,Lambda10,List15,Access45,Access46,Access135,__Value0,__Value3,__Value5,Constant136,List41,Object16,Object22,Object28,Object34,Object40,PgSelect44,PgSelect51,Lambda14,Lambda20,Lambda26,Lambda32,Lambda38,Lambda42,Access43,First48,PgSelectSingle49,PgClassExpression50,First55,PgSelectSingle56,PgClassExpression57,Object58,Connection71,Constant137,PgSelect72,Constant82,Constant94,Constant106,Constant118,Constant130 unary
+    class Object47,Lambda10,List15,Access45,Access46,Access135,__Value3,__Value5,Constant136,List41,Object16,Object22,Object28,Object34,Object40,PgSelect44,PgSelect51,Lambda14,Lambda20,Lambda26,Lambda32,Lambda38,Lambda42,Access43,First48,PgSelectSingle49,PgClassExpression50,First55,PgSelectSingle56,PgClassExpression57,Object58,Connection71,Constant137,PgSelect72,Constant82,Constant94,Constant106,Constant118,Constant130 unary
     end

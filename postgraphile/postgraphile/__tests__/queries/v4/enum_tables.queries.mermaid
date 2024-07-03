@@ -29,7 +29,6 @@ graph TD
     PgSelect79 --> First83
     PgSelectSingle84{{"PgSelectSingle[84∈0]<br />ᐸletter_descriptionsᐳ"}}:::plan
     First83 --> PgSelectSingle84
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
     Connection39{{"Connection[39∈0]<br />ᐸ35ᐳ"}}:::plan
@@ -129,7 +128,7 @@ graph TD
     subgraph "Buckets for queries/v4/enum_tables.queries"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 16, 17, 19, 39, 59, 105, 129, 137, 139, 18<br />2: PgSelect[68], PgSelect[79]<br />ᐳ: 72, 73, 83, 84"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Connection39,Connection59,PgSelect68,First72,PgSelectSingle73,PgSelect79,First83,PgSelectSingle84,Connection105,Connection129,Constant137,Constant139 bucket0
+    class Bucket0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Connection39,Connection59,PgSelect68,First72,PgSelectSingle73,PgSelect79,First83,PgSelectSingle84,Connection105,Connection129,Constant137,Constant139 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect20 bucket1
@@ -193,5 +192,5 @@ graph TD
     Bucket15 --> Bucket16
     Bucket16 --> Bucket17
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object18,PgSelect68,PgSelect79,Access16,Access17,First72,PgSelectSingle73,First83,PgSelectSingle84,__Value0,__Value3,__Value5,Connection19,Connection39,Connection59,Connection105,Connection129,Constant137,Constant139,PgSelect20,PgSelect40,PgSelect60,PgClassExpression74,PgClassExpression75,PgClassExpression76,PgClassExpression77,PgClassExpression85,PgClassExpression86,PgClassExpression87,PgClassExpression88,PgSelect106,PgSelect130 unary
+    class Object18,PgSelect68,PgSelect79,Access16,Access17,First72,PgSelectSingle73,First83,PgSelectSingle84,__Value3,__Value5,Connection19,Connection39,Connection59,Connection105,Connection129,Constant137,Constant139,PgSelect20,PgSelect40,PgSelect60,PgClassExpression74,PgClassExpression75,PgClassExpression76,PgClassExpression77,PgClassExpression85,PgClassExpression86,PgClassExpression87,PgClassExpression88,PgSelect106,PgSelect130 unary
     end

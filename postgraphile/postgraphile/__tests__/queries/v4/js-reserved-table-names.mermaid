@@ -93,7 +93,6 @@ graph TD
     PgSelect141 --> First145
     PgSelectSingle146{{"PgSelectSingle[146∈0]<br />ᐸnullᐳ"}}:::plan
     First145 --> PgSelectSingle146
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
     PgSelect11 ==> __Item15
@@ -181,7 +180,7 @@ graph TD
     subgraph "Buckets for queries/v4/js-reserved-table-names"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 12, 13, 149, 150, 151, 152, 154, 155, 156, 157, 158, 14<br />2: 11, 21, 30, 39, 51, 61, 70, 82, 92, 101, 113, 123, 132, 141<br />ᐳ: 25, 26, 34, 35, 43, 44, 65, 66, 74, 75, 96, 97, 105, 106, 127, 128, 136, 137, 145, 146"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,PgSelect21,First25,PgSelectSingle26,PgSelect30,First34,PgSelectSingle35,PgSelect39,First43,PgSelectSingle44,PgSelect51,PgSelect61,First65,PgSelectSingle66,PgSelect70,First74,PgSelectSingle75,PgSelect82,PgSelect92,First96,PgSelectSingle97,PgSelect101,First105,PgSelectSingle106,PgSelect113,PgSelect123,First127,PgSelectSingle128,PgSelect132,First136,PgSelectSingle137,PgSelect141,First145,PgSelectSingle146,Constant149,Constant150,Constant151,Constant152,Constant154,Constant155,Constant156,Constant157,Constant158 bucket0
+    class Bucket0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,PgSelect21,First25,PgSelectSingle26,PgSelect30,First34,PgSelectSingle35,PgSelect39,First43,PgSelectSingle44,PgSelect51,PgSelect61,First65,PgSelectSingle66,PgSelect70,First74,PgSelectSingle75,PgSelect82,PgSelect92,First96,PgSelectSingle97,PgSelect101,First105,PgSelectSingle106,PgSelect113,PgSelect123,First127,PgSelectSingle128,PgSelect132,First136,PgSelectSingle137,PgSelect141,First145,PgSelectSingle146,Constant149,Constant150,Constant151,Constant152,Constant154,Constant155,Constant156,Constant157,Constant158 bucket0
     Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ11ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item15,PgSelectSingle16,PgClassExpression17,PgClassExpression18,PgClassExpression19 bucket1
@@ -226,5 +225,5 @@ graph TD
     class Bucket14,PgClassExpression147,PgClassExpression148 bucket14
     Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4 & Bucket5 & Bucket6 & Bucket7 & Bucket8 & Bucket9 & Bucket10 & Bucket11 & Bucket12 & Bucket13 & Bucket14
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object14,PgSelect21,PgSelect30,PgSelect39,PgSelect61,PgSelect70,PgSelect92,PgSelect101,PgSelect123,PgSelect132,PgSelect141,PgSelect11,Access12,Access13,First25,PgSelectSingle26,First34,PgSelectSingle35,First43,PgSelectSingle44,PgSelect51,First65,PgSelectSingle66,First74,PgSelectSingle75,PgSelect82,First96,PgSelectSingle97,First105,PgSelectSingle106,PgSelect113,First127,PgSelectSingle128,First136,PgSelectSingle137,First145,PgSelectSingle146,__Value0,__Value3,__Value5,Constant149,Constant150,Constant151,Constant152,Constant154,Constant155,Constant156,Constant157,Constant158,PgClassExpression27,PgClassExpression28,PgClassExpression36,PgClassExpression37,PgClassExpression45,PgClassExpression46,PgClassExpression67,PgClassExpression68,PgClassExpression76,PgClassExpression77,PgClassExpression98,PgClassExpression99,PgClassExpression107,PgClassExpression108,PgClassExpression129,PgClassExpression130,PgClassExpression138,PgClassExpression139,PgClassExpression147,PgClassExpression148 unary
+    class Object14,PgSelect21,PgSelect30,PgSelect39,PgSelect61,PgSelect70,PgSelect92,PgSelect101,PgSelect123,PgSelect132,PgSelect141,PgSelect11,Access12,Access13,First25,PgSelectSingle26,First34,PgSelectSingle35,First43,PgSelectSingle44,PgSelect51,First65,PgSelectSingle66,First74,PgSelectSingle75,PgSelect82,First96,PgSelectSingle97,First105,PgSelectSingle106,PgSelect113,First127,PgSelectSingle128,First136,PgSelectSingle137,First145,PgSelectSingle146,__Value3,__Value5,Constant149,Constant150,Constant151,Constant152,Constant154,Constant155,Constant156,Constant157,Constant158,PgClassExpression27,PgClassExpression28,PgClassExpression36,PgClassExpression37,PgClassExpression45,PgClassExpression46,PgClassExpression67,PgClassExpression68,PgClassExpression76,PgClassExpression77,PgClassExpression98,PgClassExpression99,PgClassExpression107,PgClassExpression108,PgClassExpression129,PgClassExpression130,PgClassExpression138,PgClassExpression139,PgClassExpression147,PgClassExpression148 unary
     end

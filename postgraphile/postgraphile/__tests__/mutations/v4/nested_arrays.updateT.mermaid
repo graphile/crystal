@@ -56,7 +56,6 @@ graph TD
     __Value1 --> Access168
     __Value1 --> Access178
     __Value1 --> Access188
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     PgUpdateSingle11[["PgUpdateSingle[11∈1]<br />ᐸt(k;v)ᐳ"]]:::sideeffectplan
     Object14 & Access9 & List233 --> PgUpdateSingle11
@@ -88,7 +87,7 @@ graph TD
     subgraph "Buckets for mutations/v4/nested_arrays.updateT"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value1,__Value3,__Value5,Access9,Access12,Access13,Object14,Object44,Access53,Access63,Access73,Access83,List85,Object100,Access109,Access119,Access129,Access139,Object149,Access158,Access168,Access178,Access188,List190,List233,Constant249 bucket0
+    class Bucket0,__Value1,__Value3,__Value5,Access9,Access12,Access13,Object14,Object44,Access53,Access63,Access73,Access83,List85,Object100,Access109,Access119,Access129,Access139,Object149,Access158,Access168,Access178,Access188,List190,List233,Constant249 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 14, 9, 233<br /><br />1: PgUpdateSingle[11]<br />2: <br />ᐳ: Object[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUpdateSingle11,Object15 bucket1
@@ -110,5 +109,5 @@ graph TD
     Bucket3 --> Bucket5
     Bucket5 --> Bucket6
     classDef unary fill:#fafffa,borderWidth:8px
-    class List233,Object44,Object100,Object149,Object14,List190,Access9,Access12,Access13,Access53,Access63,Access73,Access83,List85,Access109,Access119,Access129,Access139,Access158,Access168,Access178,Access188,__Value0,__Value1,__Value3,__Value5,Constant249,PgUpdateSingle11,Object15,PgClassExpression234,PgClassExpression235 unary
+    class List233,Object44,Object100,Object149,Object14,List190,Access9,Access12,Access13,Access53,Access63,Access73,Access83,List85,Access109,Access119,Access129,Access139,Access158,Access168,Access178,Access188,__Value1,__Value3,__Value5,Constant249,PgUpdateSingle11,Object15,PgClassExpression234,PgClassExpression235 unary
     end

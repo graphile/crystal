@@ -40,7 +40,6 @@ graph TD
     PgSelect49 --> First53
     PgSelectSingle54{{"PgSelectSingle[54∈0]<br />ᐸlarge_node_idᐳ"}}:::plan
     First53 --> PgSelectSingle54
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
     Constant23{{"Constant[23∈0]<br />ᐸ'large_node_ids'ᐳ"}}:::plan
@@ -80,7 +79,7 @@ graph TD
     subgraph "Buckets for queries/v4/large_bigint.issue491"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 16, 17, 19, 23, 61, 62, 18, 30, 31, 46, 47<br />2: PgSelect[33], PgSelect[49]<br />ᐳ: 37, 38, 53, 54"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Constant23,Lambda30,Access31,PgSelect33,First37,PgSelectSingle38,Lambda46,Access47,PgSelect49,First53,PgSelectSingle54,Constant61,Constant62 bucket0
+    class Bucket0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Constant23,Lambda30,Access31,PgSelect33,First37,PgSelectSingle38,Lambda46,Access47,PgSelect49,First53,PgSelectSingle54,Constant61,Constant62 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19, 23<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect20 bucket1
@@ -100,5 +99,5 @@ graph TD
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object18,PgSelect33,PgSelect49,Access16,Access17,Lambda30,Access31,First37,PgSelectSingle38,Lambda46,Access47,First53,PgSelectSingle54,__Value0,__Value3,__Value5,Connection19,Constant23,Constant61,Constant62,PgSelect20,List41,PgClassExpression40,Lambda42,PgClassExpression44,List57,PgClassExpression56,Lambda58,PgClassExpression60 unary
+    class Object18,PgSelect33,PgSelect49,Access16,Access17,Lambda30,Access31,First37,PgSelectSingle38,Lambda46,Access47,First53,PgSelectSingle54,__Value3,__Value5,Connection19,Constant23,Constant61,Constant62,PgSelect20,List41,PgClassExpression40,Lambda42,PgClassExpression44,List57,PgClassExpression56,Lambda58,PgClassExpression60 unary
     end

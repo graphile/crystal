@@ -21,7 +21,6 @@ graph TD
     Connection29{{"Connection[29∈0]<br />ᐸ25ᐳ"}}:::plan
     Constant79{{"Constant[79∈0]<br />ᐸ5ᐳ"}}:::plan
     Constant79 --> Connection29
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
     PgSelect11 ==> __Item15
@@ -113,7 +112,7 @@ graph TD
     subgraph "Buckets for queries/conditions/condition-featured-messages"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 12, 13, 79, 14, 29<br />2: PgSelect[11]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,Connection29,Constant79 bucket0
+    class Bucket0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,Connection29,Constant79 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 14, 29<br /><br />ROOT __Item{1}ᐸ11ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item15,PgSelectSingle16,Constant62,Constant80 bucket1
@@ -146,5 +145,5 @@ graph TD
     Bucket5 --> Bucket6
     Bucket7 --> Bucket8
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object14,PgSelect11,Access12,Access13,Connection29,__Value0,__Value3,__Value5,Constant79,Constant62,Constant80,PgPageInfo59 unary
+    class Object14,PgSelect11,Access12,Access13,Connection29,__Value3,__Value5,Constant79,Constant62,Constant80,PgPageInfo59 unary
     end

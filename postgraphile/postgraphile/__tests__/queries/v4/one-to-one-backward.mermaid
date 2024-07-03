@@ -9,7 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
@@ -85,7 +84,7 @@ graph TD
     subgraph "Buckets for queries/v4/one-to-one-backward"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Connection19 bucket0
+    class Bucket0,__Value3,__Value5,Connection19 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: <br />ᐳ: 16, 17, 37, 62, 18<br />2: PgSelect[20]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access16,Access17,Object18,PgSelect20,Constant37,Constant62 bucket1
@@ -114,5 +113,5 @@ graph TD
     Bucket4 --> Bucket5
     Bucket6 --> Bucket7
     classDef unary fill:#fafffa,borderWidth:8px
-    class __Value0,__Value3,__Value5,Connection19,Object18,PgSelect20,Access16,Access17,Constant37,Constant62 unary
+    class __Value3,__Value5,Connection19,Object18,PgSelect20,Access16,Access17,Constant37,Constant62 unary
     end

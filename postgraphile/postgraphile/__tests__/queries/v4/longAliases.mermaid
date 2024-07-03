@@ -23,7 +23,6 @@ graph TD
     PgSelect8 --> First12
     PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸpersonᐳ"}}:::plan
     First12 --> PgSelectSingle13
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     List16{{"List[16∈1]<br />ᐸ14,15ᐳ"}}:::plan
     Constant14{{"Constant[14∈1]<br />ᐸ'people'ᐳ"}}:::plan
@@ -58,11 +57,11 @@ graph TD
     subgraph "Buckets for queries/v4/longAliases"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 9, 10, 53, 11<br />2: PgSelect[8]<br />ᐳ: First[12], PgSelectSingle[13]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Constant53 bucket0
+    class Bucket0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Constant53 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 12<br /><br />ROOT PgSelectSingleᐸpersonᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Constant14,PgClassExpression15,List16,Lambda17,PgClassExpression18,Connection30,First32,PgSelectSingle33,PgClassExpression34,Connection46,First48,PgSelectSingle49,PgClassExpression50,Access51,Access52 bucket1
     Bucket0 --> Bucket1
     classDef unary fill:#fafffa,borderWidth:8px
-    class PgSelect8,Object11,Access9,Access10,First12,PgSelectSingle13,__Value0,__Value3,__Value5,Constant53,List16,PgClassExpression15,Lambda17,PgClassExpression18,First32,PgSelectSingle33,PgClassExpression34,First48,PgSelectSingle49,PgClassExpression50,Access51,Access52,Constant14,Connection30,Connection46 unary
+    class PgSelect8,Object11,Access9,Access10,First12,PgSelectSingle13,__Value3,__Value5,Constant53,List16,PgClassExpression15,Lambda17,PgClassExpression18,First32,PgSelectSingle33,PgClassExpression34,First48,PgSelectSingle49,PgClassExpression50,Access51,Access52,Constant14,Connection30,Connection46 unary
     end

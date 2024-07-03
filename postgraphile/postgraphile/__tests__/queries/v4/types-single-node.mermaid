@@ -14,7 +14,6 @@ graph TD
     Lambda9 --> Node8
     Constant178{{"Constant[178∈0]<br />ᐸ'WyJ0eXBlcyIsMTFd'ᐳ"}}:::plan
     Constant178 --> Lambda9
-    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     PgSelect70[["PgSelect[70∈1]<br />ᐸcompound_keyᐳ<br />ᐳCompoundKey"]]:::plan
@@ -162,11 +161,11 @@ graph TD
     subgraph "Buckets for queries/v4/types-single-node"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Node8,Lambda9,Constant178 bucket0
+    class Bucket0,__Value3,__Value5,Node8,Lambda9,Constant178 bucket0
     Bucket1("Bucket 1 (polymorphic)<br />Query,Input,Patch,Reserved,ReservedPatchRecord,ReservedInputRecord,DefaultValue,CompoundKey,Person,Post,Type,PersonSecret,LeftArm,MyTable,ViewTable,SimilarTable1,SimilarTable2,NullTestRecord,Issue756<br />Deps: 3, 9, 8, 5<br />ᐳQuery<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756<br />1: <br />ᐳ: 15, 16, 176, 177, 17<br />2: 14, 23, 32, 41, 50, 59, 70, 79, 88, 97, 107, 116, 125, 134, 143, 152, 161, 170<br />ᐳ: 18, 19, 27, 28, 36, 37, 45, 46, 54, 55, 63, 64, 74, 75, 83, 84, 92, 93, 101, 102, 103, 111, 112, 120, 121, 129, 130, 138, 139, 147, 148, 156, 157, 165, 166, 174, 175"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect14,Access15,Access16,Object17,First18,PgSelectSingle19,PgSelect23,First27,PgSelectSingle28,PgSelect32,First36,PgSelectSingle37,PgSelect41,First45,PgSelectSingle46,PgSelect50,First54,PgSelectSingle55,PgSelect59,First63,PgSelectSingle64,PgSelect70,First74,PgSelectSingle75,PgSelect79,First83,PgSelectSingle84,PgSelect88,First92,PgSelectSingle93,PgSelect97,First101,PgSelectSingle102,PgClassExpression103,PgSelect107,First111,PgSelectSingle112,PgSelect116,First120,PgSelectSingle121,PgSelect125,First129,PgSelectSingle130,PgSelect134,First138,PgSelectSingle139,PgSelect143,First147,PgSelectSingle148,PgSelect152,First156,PgSelectSingle157,PgSelect161,First165,PgSelectSingle166,PgSelect170,First174,PgSelectSingle175,Access176,Access177 bucket1
     Bucket0 --> Bucket1
     classDef unary fill:#fafffa,borderWidth:8px
-    class Node8,Lambda9,__Value0,__Value3,__Value5,Constant178,PgSelect70,PgSelect14,Object17,PgSelect23,PgSelect32,PgSelect41,PgSelect50,PgSelect59,PgSelect79,PgSelect88,PgSelect97,PgSelect107,PgSelect116,PgSelect125,PgSelect134,PgSelect143,PgSelect152,PgSelect161,PgSelect170,Access15,Access16,First18,PgSelectSingle19,First27,PgSelectSingle28,First36,PgSelectSingle37,First45,PgSelectSingle46,First54,PgSelectSingle55,First63,PgSelectSingle64,First74,PgSelectSingle75,First83,PgSelectSingle84,First92,PgSelectSingle93,First101,PgSelectSingle102,PgClassExpression103,First111,PgSelectSingle112,First120,PgSelectSingle121,First129,PgSelectSingle130,First138,PgSelectSingle139,First147,PgSelectSingle148,First156,PgSelectSingle157,First165,PgSelectSingle166,First174,PgSelectSingle175,Access176,Access177 unary
+    class Node8,Lambda9,__Value3,__Value5,Constant178,PgSelect70,PgSelect14,Object17,PgSelect23,PgSelect32,PgSelect41,PgSelect50,PgSelect59,PgSelect79,PgSelect88,PgSelect97,PgSelect107,PgSelect116,PgSelect125,PgSelect134,PgSelect143,PgSelect152,PgSelect161,PgSelect170,Access15,Access16,First18,PgSelectSingle19,First27,PgSelectSingle28,First36,PgSelectSingle37,First45,PgSelectSingle46,First54,PgSelectSingle55,First63,PgSelectSingle64,First74,PgSelectSingle75,First83,PgSelectSingle84,First92,PgSelectSingle93,First101,PgSelectSingle102,PgClassExpression103,First111,PgSelectSingle112,First120,PgSelectSingle121,First129,PgSelectSingle130,First138,PgSelectSingle139,First147,PgSelectSingle148,First156,PgSelectSingle157,First165,PgSelectSingle166,First174,PgSelectSingle175,Access176,Access177 unary
     end

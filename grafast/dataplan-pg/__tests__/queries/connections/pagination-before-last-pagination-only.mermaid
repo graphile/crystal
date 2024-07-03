@@ -17,7 +17,6 @@ graph TD
     Constant32{{"Constant[32∈0]<br />ᐸ'WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAᐳ"}}:::plan
     Constant32 --> Lambda20
     Lambda20 --> PgValidateParsedCursor25
-    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     PgSelect23[["PgSelect[23∈1]<br />ᐸmessages+1ᐳ"]]:::plan
@@ -49,11 +48,11 @@ graph TD
     subgraph "Buckets for queries/connections/pagination-before-last-pagination-only"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Constant[31], Constant[32], Lambda[20]<br />2: PgValidateParsedCursor[25]<br />ᐳ: Connection[19]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Connection19,Lambda20,PgValidateParsedCursor25,Constant31,Constant32 bucket0
+    class Bucket0,__Value3,__Value5,Connection19,Lambda20,PgValidateParsedCursor25,Constant31,Constant32 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 19, 20<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: <br />ᐳ: 16, 17, 21, 22, 26, 18<br />2: PgSelect[23], PgSelect[27]<br />ᐳ: 24, 28, 29, 30"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access16,Access17,Object18,PgPageInfo21,Constant22,PgSelect23,Access24,Access26,PgSelect27,First28,PgSelectSingle29,PgClassExpression30 bucket1
     Bucket0 --> Bucket1
     classDef unary fill:#fafffa,borderWidth:8px
-    class Connection19,Lambda20,PgValidateParsedCursor25,__Value0,__Value3,__Value5,Constant31,Constant32,PgSelect23,Object18,PgSelect27,Access16,Access17,PgPageInfo21,Access24,Access26,First28,PgSelectSingle29,PgClassExpression30,Constant22 unary
+    class Connection19,Lambda20,PgValidateParsedCursor25,__Value3,__Value5,Constant31,Constant32,PgSelect23,Object18,PgSelect27,Access16,Access17,PgPageInfo21,Access24,Access26,First28,PgSelectSingle29,PgClassExpression30,Constant22 unary
     end

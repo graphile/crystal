@@ -24,7 +24,6 @@ graph TD
     Constant62{{"Constant[62∈0]<br />ᐸ'WyI2Y2M3ZmU5NDM2IiwiNy4yIiwiVGhpcmRQYXJ0eVZ1bG5lcmFiaWxpdHkᐳ"}}:::plan
     Constant62 --> Lambda20
     Lambda20 --> PgValidateParsedCursor25
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     PgUnionAll21[["PgUnionAll[21∈1]"]]:::plan
     ToPg27{{"ToPg[27∈1]"}}:::plan
@@ -94,7 +93,7 @@ graph TD
     subgraph "Buckets for queries/interfaces-via-union-all/vulnerabilitiesConnection.before1"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 16, 17, 61, 62, 18, 20<br />2: PgValidateParsedCursor[25]<br />ᐳ: Connection[19]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Lambda20,PgValidateParsedCursor25,Constant61,Constant62 bucket0
+    class Bucket0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Lambda20,PgValidateParsedCursor25,Constant61,Constant62 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19, 20<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: <br />ᐳ: 26, 28, 30, 27, 29<br />2: PgUnionAll[21]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgUnionAll21,Access26,ToPg27,Access28,ToPg29,Access30 bucket1
@@ -112,5 +111,5 @@ graph TD
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4
     classDef unary fill:#fafffa,borderWidth:8px
-    class Connection19,Object18,Access16,Access17,Lambda20,PgValidateParsedCursor25,__Value0,__Value3,__Value5,Constant61,Constant62,PgUnionAll21,Access26,ToPg27,Access28,ToPg29,Access30 unary
+    class Connection19,Object18,Access16,Access17,Lambda20,PgValidateParsedCursor25,__Value3,__Value5,Constant61,Constant62,PgUnionAll21,Access26,ToPg27,Access28,ToPg29,Access30 unary
     end
