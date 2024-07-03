@@ -31,7 +31,6 @@ graph TD
     Constant116{{"Constant[116∈0]<br />ᐸ'27'ᐳ"}}:::plan
     Constant116 --> Lambda73
     Lambda73 --> PgValidateParsedCursor79
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Constant42{{"Constant[42∈0]<br />ᐸfalseᐳ"}}:::plan
     PgSelect22[["PgSelect[22∈1]<br />ᐸperson+1ᐳ"]]:::plan
@@ -148,7 +147,7 @@ graph TD
     subgraph "Buckets for queries/v4/connections-blankcursor"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 16, 17, 42, 113, 114, 116, 18, 20, 73<br />2: 26, 79<br />ᐳ: Connection[19], Connection[72]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Lambda20,PgValidateParsedCursor26,Constant42,Connection72,Lambda73,PgValidateParsedCursor79,Constant113,Constant114,Constant116 bucket0
+    class Bucket0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Lambda20,PgValidateParsedCursor26,Constant42,Connection72,Lambda73,PgValidateParsedCursor79,Constant113,Constant114,Constant116 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 19, 18, 20, 42<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: PgSelect[43]<br />ᐳ: 21, 27, 44, 45, 46<br />2: PgSelect[22]<br />ᐳ: 23, 24, 28, 29, 31, 32, 36, 37, 39, 25, 33"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgPageInfo21,PgSelect22,First23,PgSelectSingle24,PgCursor25,Access27,PgClassExpression28,List29,Last31,PgSelectSingle32,PgCursor33,PgClassExpression36,List37,Access39,PgSelect43,First44,PgSelectSingle45,PgClassExpression46 bucket1
@@ -173,5 +172,5 @@ graph TD
     Bucket4 --> Bucket5
     Bucket5 --> Bucket6
     classDef unary fill:#fafffa,borderWidth:8px
-    class Connection19,Connection72,Object18,Access16,Access17,Lambda20,PgValidateParsedCursor26,Lambda73,PgValidateParsedCursor79,__Value0,__Value3,__Value5,Constant42,Constant113,Constant114,Constant116,PgSelect22,PgSelect43,PgPageInfo21,First23,PgSelectSingle24,PgCursor25,Access27,PgClassExpression28,List29,Last31,PgSelectSingle32,PgCursor33,PgClassExpression36,List37,Access39,First44,PgSelectSingle45,PgClassExpression46,PgSelect75,PgSelect96,PgPageInfo74,First76,PgSelectSingle77,PgCursor78,Access80,PgClassExpression81,List82,Last84,PgSelectSingle85,PgCursor86,PgClassExpression89,List90,Access92,First97,PgSelectSingle98,PgClassExpression99 unary
+    class Connection19,Connection72,Object18,Access16,Access17,Lambda20,PgValidateParsedCursor26,Lambda73,PgValidateParsedCursor79,__Value3,__Value5,Constant42,Constant113,Constant114,Constant116,PgSelect22,PgSelect43,PgPageInfo21,First23,PgSelectSingle24,PgCursor25,Access27,PgClassExpression28,List29,Last31,PgSelectSingle32,PgCursor33,PgClassExpression36,List37,Access39,First44,PgSelectSingle45,PgClassExpression46,PgSelect75,PgSelect96,PgPageInfo74,First76,PgSelectSingle77,PgCursor78,Access80,PgClassExpression81,List82,Last84,PgSelectSingle85,PgCursor86,PgClassExpression89,List90,Access92,First97,PgSelectSingle98,PgClassExpression99 unary
     end

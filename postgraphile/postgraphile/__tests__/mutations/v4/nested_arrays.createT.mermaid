@@ -54,7 +54,6 @@ graph TD
     __Value1 --> Access164
     __Value1 --> Access174
     __Value1 --> Access184
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     PgInsertSingle9[["PgInsertSingle[9∈1]<br />ᐸt(v)ᐳ"]]:::sideeffectplan
     Object12 & List229 --> PgInsertSingle9
@@ -86,7 +85,7 @@ graph TD
     subgraph "Buckets for mutations/v4/nested_arrays.createT"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value1,__Value3,__Value5,Access10,Access11,Object12,Object40,Access49,Access59,Access69,Access79,List81,Object96,Access105,Access115,Access125,Access135,Object145,Access154,Access164,Access174,Access184,List186,List229,Constant245 bucket0
+    class Bucket0,__Value1,__Value3,__Value5,Access10,Access11,Object12,Object40,Access49,Access59,Access69,Access79,List81,Object96,Access105,Access115,Access125,Access135,Object145,Access154,Access164,Access174,Access184,List186,List229,Constant245 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 229<br /><br />1: PgInsertSingle[9]<br />2: <br />ᐳ: Object[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle9,Object13 bucket1
@@ -108,5 +107,5 @@ graph TD
     Bucket3 --> Bucket5
     Bucket5 --> Bucket6
     classDef unary fill:#fafffa,borderWidth:8px
-    class List229,Object40,Object96,Object145,Object12,List186,Access10,Access11,Access49,Access59,Access69,Access79,List81,Access105,Access115,Access125,Access135,Access154,Access164,Access174,Access184,__Value0,__Value1,__Value3,__Value5,Constant245,PgInsertSingle9,Object13,PgClassExpression230,PgClassExpression231 unary
+    class List229,Object40,Object96,Object145,Object12,List186,Access10,Access11,Access49,Access59,Access69,Access79,List81,Access105,Access115,Access125,Access135,Access154,Access164,Access174,Access184,__Value1,__Value3,__Value5,Constant245,PgInsertSingle9,Object13,PgClassExpression230,PgClassExpression231 unary
     end

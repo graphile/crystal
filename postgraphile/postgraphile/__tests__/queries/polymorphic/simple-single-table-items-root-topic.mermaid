@@ -32,7 +32,6 @@ graph TD
     Lambda131{{"Lambda[131∈0]<br />ᐸdecodeNodeIdWithCodecsᐳ"}}:::plan
     Lambda131 --> Node130
     Constant355 --> Lambda131
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
     PgSelect20[["PgSelect[20∈1]<br />ᐸsingle_table_itemsᐳ"]]:::plan
@@ -258,7 +257,7 @@ graph TD
     subgraph "Buckets for queries/polymorphic/simple-single-table-items-root-topic"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 16, 17, 19, 355, 18, 104, 105, 131, 130<br />2: PgSelect[107]<br />ᐳ: First[111], PgSelectSingle[112]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Lambda104,Access105,PgSelect107,First111,PgSelectSingle112,Node130,Lambda131,Constant355 bucket0
+    class Bucket0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Lambda104,Access105,PgSelect107,First111,PgSelectSingle112,Node130,Lambda131,Constant355 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect20 bucket1
@@ -290,5 +289,5 @@ graph TD
     Bucket5 --> Bucket6
     Bucket7 --> Bucket8
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object18,PgSelect107,Access16,Access17,Lambda104,Access105,First111,PgSelectSingle112,Node130,Lambda131,__Value0,__Value3,__Value5,Connection19,Constant355,PgSelect20,Constant24,Constant40,Constant56,Constant72,Constant88,List116,PgClassExpression113,Lambda117,PgClassExpression118,PgClassExpression119,PgSelectSingle126,RemapKeys351,Constant114,PgClassExpression127,PgClassExpression128,PgSelect200,PgSelect220,PgSelect135,PgSelect144,PgSelect153,PgSelect162,PgSelect171,PgSelect180,PgSelect189,PgSelect209,PgSelect238,List256,PgSelect290,PgSelect299,PgSelect308,PgSelect317,PgSelect326,PgSelect336,PgSelect345,First139,PgSelectSingle140,First148,PgSelectSingle149,First157,PgSelectSingle158,First166,PgSelectSingle167,First175,PgSelectSingle176,First184,PgSelectSingle185,First193,PgSelectSingle194,First204,PgSelectSingle205,First213,PgSelectSingle214,First224,PgSelectSingle225,First242,PgSelectSingle243,PgClassExpression253,Lambda257,PgClassExpression258,PgClassExpression259,PgSelectSingle266,First294,PgSelectSingle295,First303,PgSelectSingle304,First312,PgSelectSingle313,First321,PgSelectSingle322,First330,PgSelectSingle331,First340,PgSelectSingle341,First349,PgSelectSingle350,RemapKeys353,Access356,Access357,Constant254,PgClassExpression267,PgClassExpression268 unary
+    class Object18,PgSelect107,Access16,Access17,Lambda104,Access105,First111,PgSelectSingle112,Node130,Lambda131,__Value3,__Value5,Connection19,Constant355,PgSelect20,Constant24,Constant40,Constant56,Constant72,Constant88,List116,PgClassExpression113,Lambda117,PgClassExpression118,PgClassExpression119,PgSelectSingle126,RemapKeys351,Constant114,PgClassExpression127,PgClassExpression128,PgSelect200,PgSelect220,PgSelect135,PgSelect144,PgSelect153,PgSelect162,PgSelect171,PgSelect180,PgSelect189,PgSelect209,PgSelect238,List256,PgSelect290,PgSelect299,PgSelect308,PgSelect317,PgSelect326,PgSelect336,PgSelect345,First139,PgSelectSingle140,First148,PgSelectSingle149,First157,PgSelectSingle158,First166,PgSelectSingle167,First175,PgSelectSingle176,First184,PgSelectSingle185,First193,PgSelectSingle194,First204,PgSelectSingle205,First213,PgSelectSingle214,First224,PgSelectSingle225,First242,PgSelectSingle243,PgClassExpression253,Lambda257,PgClassExpression258,PgClassExpression259,PgSelectSingle266,First294,PgSelectSingle295,First303,PgSelectSingle304,First312,PgSelectSingle313,First321,PgSelectSingle322,First330,PgSelectSingle331,First340,PgSelectSingle341,First349,PgSelectSingle350,RemapKeys353,Access356,Access357,Constant254,PgClassExpression267,PgClassExpression268 unary
     end

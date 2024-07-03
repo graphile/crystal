@@ -19,7 +19,6 @@ graph TD
     Connection21{{"Connection[21∈0]<br />ᐸ17ᐳ"}}:::plan
     Constant64{{"Constant[64∈0]<br />ᐸ5ᐳ"}}:::plan
     Constant64 --> Connection21
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     List51{{"List[51∈1]<br />ᐸ48,49,50ᐳ"}}:::plan
     PgClassExpression48{{"PgClassExpression[48∈1]<br />ᐸ__author__.usernameᐳ"}}:::plan
@@ -98,7 +97,7 @@ graph TD
     subgraph "Buckets for queries/connections/order"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access18,Access19,Object20,Connection21,Constant64 bucket0
+    class Bucket0,__Value3,__Value5,Access18,Access19,Object20,Connection21,Constant64 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 20, 21<br /><br />ROOT Connectionᐸ17ᐳ[21]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect22,PgPageInfo40,Access42,Constant43,First45,PgSelectSingle46,PgCursor47,PgClassExpression48,PgClassExpression49,PgClassExpression50,List51,Last53,PgSelectSingle54,PgCursor55,PgClassExpression56,PgClassExpression57,PgClassExpression58,List59,PgSelect60,First61,PgSelectSingle62,PgClassExpression63 bucket1
@@ -116,5 +115,5 @@ graph TD
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object20,Access18,Access19,Connection21,__Value0,__Value3,__Value5,Constant64,List51,List59,PgSelect22,PgSelect60,PgPageInfo40,Access42,First45,PgSelectSingle46,PgCursor47,PgClassExpression48,PgClassExpression49,PgClassExpression50,Last53,PgSelectSingle54,PgCursor55,PgClassExpression56,PgClassExpression57,PgClassExpression58,First61,PgSelectSingle62,PgClassExpression63,Constant43 unary
+    class Object20,Access18,Access19,Connection21,__Value3,__Value5,Constant64,List51,List59,PgSelect22,PgSelect60,PgPageInfo40,Access42,First45,PgSelectSingle46,PgCursor47,PgClassExpression48,PgClassExpression49,PgClassExpression50,Last53,PgSelectSingle54,PgCursor55,PgClassExpression56,PgClassExpression57,PgClassExpression58,First61,PgSelectSingle62,PgClassExpression63,Constant43 unary
     end

@@ -39,7 +39,6 @@ graph TD
     PgSelect340 --> First344
     PgSelectSingle345{{"PgSelectSingle[345∈0]<br />ᐸhousesᐳ"}}:::plan
     First344 --> PgSelectSingle345
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
     Constant23{{"Constant[23∈0]<br />ᐸ'houses'ᐳ"}}:::plan
@@ -328,7 +327,7 @@ graph TD
     subgraph "Buckets for queries/v4/smart_comment_relations.houses"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 16, 17, 19, 23, 41, 64, 128, 382, 383, 384, 18, 335, 336, 338<br />2: PgSelect[320], PgSelect[340]<br />ᐳ: 324, 325, 344, 345"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Constant23,Constant41,Constant64,Constant128,PgSelect320,First324,PgSelectSingle325,Lambda335,Access336,Access338,PgSelect340,First344,PgSelectSingle345,Constant382,Constant383,Constant384 bucket0
+    class Bucket0,__Value3,__Value5,Access16,Access17,Object18,Connection19,Constant23,Constant41,Constant64,Constant128,PgSelect320,First324,PgSelectSingle325,Lambda335,Access336,Access338,PgSelect340,First344,PgSelectSingle345,Constant382,Constant383,Constant384 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19, 23, 41, 64, 128<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect20,Connection60,Connection111,Connection161,Connection211,Connection258,Connection308 bucket1
@@ -435,5 +434,5 @@ graph TD
     Bucket24 --> Bucket25
     Bucket25 --> Bucket26
     classDef unary fill:#fafffa,borderWidth:8px
-    class PgSelect320,PgSelect340,Object18,Access16,Access17,First324,PgSelectSingle325,Lambda335,Access336,Access338,First344,PgSelectSingle345,__Value0,__Value3,__Value5,Connection19,Constant23,Constant41,Constant64,Constant128,Constant382,Constant383,Constant384,PgSelect20,Connection60,Connection111,Connection161,Connection211,Connection258,Connection308,List332,PgClassExpression326,PgClassExpression327,PgClassExpression328,PgClassExpression330,PgClassExpression331,Lambda333,List352,PgClassExpression346,PgClassExpression347,PgClassExpression348,PgClassExpression350,PgClassExpression351,Lambda353 unary
+    class PgSelect320,PgSelect340,Object18,Access16,Access17,First324,PgSelectSingle325,Lambda335,Access336,Access338,First344,PgSelectSingle345,__Value3,__Value5,Connection19,Constant23,Constant41,Constant64,Constant128,Constant382,Constant383,Constant384,PgSelect20,Connection60,Connection111,Connection161,Connection211,Connection258,Connection308,List332,PgClassExpression326,PgClassExpression327,PgClassExpression328,PgClassExpression330,PgClassExpression331,Lambda333,List352,PgClassExpression346,PgClassExpression347,PgClassExpression348,PgClassExpression350,PgClassExpression351,Lambda353 unary
     end

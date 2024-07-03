@@ -9,7 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Connection31{{"Connection[31∈0]<br />ᐸ27ᐳ"}}:::plan
@@ -36,7 +35,7 @@ graph TD
     subgraph "Buckets for queries/v4/connections-condition-computed-column"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Connection31 bucket0
+    class Bucket0,__Value3,__Value5,Connection31 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 31<br /><br />ROOT Connectionᐸ27ᐳ[31]<br />1: <br />ᐳ: 28, 29, 37, 30<br />2: PgSelect[32]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access28,Access29,Object30,PgSelect32,Constant37 bucket1
@@ -50,5 +49,5 @@ graph TD
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     classDef unary fill:#fafffa,borderWidth:8px
-    class __Value0,__Value3,__Value5,Connection31,PgSelect32,Object30,Access28,Access29,Constant37 unary
+    class __Value3,__Value5,Connection31,PgSelect32,Object30,Access28,Access29,Constant37 unary
     end

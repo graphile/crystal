@@ -23,7 +23,6 @@ graph TD
     PgSelect8 --> First12
     PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸmessagesᐳ"}}:::plan
     First12 --> PgSelectSingle13
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     PgClassExpression14{{"PgClassExpression[14∈1]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression14
@@ -41,7 +40,7 @@ graph TD
     subgraph "Buckets for queries/relations/basics-no-join-if-identical"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 9, 10, 26, 11<br />2: PgSelect[8]<br />ᐳ: First[12], PgSelectSingle[13]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Constant26 bucket0
+    class Bucket0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Constant26 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸmessagesᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression14,PgClassExpression15,PgSelectSingle22,RemapKeys24 bucket1
@@ -51,5 +50,5 @@ graph TD
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     classDef unary fill:#fafffa,borderWidth:8px
-    class PgSelect8,Object11,Access9,Access10,First12,PgSelectSingle13,__Value0,__Value3,__Value5,Constant26,PgClassExpression14,PgClassExpression15,PgSelectSingle22,RemapKeys24,PgClassExpression16 unary
+    class PgSelect8,Object11,Access9,Access10,First12,PgSelectSingle13,__Value3,__Value5,Constant26,PgClassExpression14,PgClassExpression15,PgSelectSingle22,RemapKeys24,PgClassExpression16 unary
     end

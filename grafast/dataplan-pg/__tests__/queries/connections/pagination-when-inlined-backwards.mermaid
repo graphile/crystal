@@ -21,7 +21,6 @@ graph TD
     Connection28{{"Connection[28∈0]<br />ᐸ24ᐳ"}}:::plan
     Constant84{{"Constant[84∈0]<br />ᐸ2ᐳ"}}:::plan
     Constant84 --> Connection28
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
     PgSelect11 ==> __Item15
@@ -102,7 +101,7 @@ graph TD
     subgraph "Buckets for queries/connections/pagination-when-inlined-backwards"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 12, 13, 84, 14, 28<br />2: PgSelect[11]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,Connection28,Constant84 bucket0
+    class Bucket0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,Connection28,Constant84 bucket0
     Bucket1("Bucket 1 (listItem)<br />Deps: 28<br /><br />ROOT __Item{1}ᐸ11ᐳ[15]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item15,PgSelectSingle16,Constant58 bucket1
@@ -135,5 +134,5 @@ graph TD
     Bucket5 --> Bucket6
     Bucket7 --> Bucket8
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object14,PgSelect11,Access12,Access13,Connection28,__Value0,__Value3,__Value5,Constant84,Constant58,PgPageInfo57 unary
+    class Object14,PgSelect11,Access12,Access13,Connection28,__Value3,__Value5,Constant84,Constant58,PgPageInfo57 unary
     end

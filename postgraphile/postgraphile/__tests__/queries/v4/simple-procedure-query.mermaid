@@ -33,7 +33,6 @@ graph TD
     Object12 --> PgSelect71
     PgSelect88[["PgSelect[88∈0]<br />ᐸpostᐳ"]]:::plan
     Object12 --> PgSelect88
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     __Item13[/"__Item[13∈1]<br />ᐸ9ᐳ"\]:::itemplan
     PgSelect9 ==> __Item13
@@ -103,7 +102,7 @@ graph TD
     subgraph "Buckets for queries/v4/simple-procedure-query"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 10, 11, 52, 108, 109, 12<br />2: 9, 29, 40, 53, 62, 71, 88"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect9,Access10,Access11,Object12,PgSelect29,PgSelect40,Constant52,PgSelect53,PgSelect62,PgSelect71,PgSelect88,Constant108,Constant109 bucket0
+    class Bucket0,__Value3,__Value5,PgSelect9,Access10,Access11,Object12,PgSelect29,PgSelect40,Constant52,PgSelect53,PgSelect62,PgSelect71,PgSelect88,Constant108,Constant109 bucket0
     Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ9ᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item13,PgSelectSingle14 bucket1
@@ -155,5 +154,5 @@ graph TD
     Bucket12 --> Bucket13
     Bucket13 --> Bucket14
     classDef unary fill:#fafffa,borderWidth:8px
-    class PgSelect53,Object12,PgSelect9,Access10,Access11,PgSelect29,PgSelect40,PgSelect62,PgSelect71,PgSelect88,__Value0,__Value3,__Value5,Constant52,Constant108,Constant109 unary
+    class PgSelect53,Object12,PgSelect9,Access10,Access11,PgSelect29,PgSelect40,PgSelect62,PgSelect71,PgSelect88,__Value3,__Value5,Constant52,Constant108,Constant109 unary
     end

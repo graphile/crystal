@@ -16,7 +16,6 @@ graph TD
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access13
     __Value3 --> Access14
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Constant45{{"Constant[45∈0]<br />ᐸ1ᐳ"}}:::plan
     Constant46{{"Constant[46∈0]<br />ᐸ'Bobby Tables'ᐳ"}}:::plan
@@ -66,7 +65,7 @@ graph TD
     subgraph "Buckets for mutations/v4/inheritence.createUserFile"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access13,Access14,Object15,Constant45,Constant46,Constant47 bucket0
+    class Bucket0,__Value3,__Value5,Access13,Access14,Object15,Constant45,Constant46,Constant47 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 15, 45, 46<br /><br />1: PgInsertSingle[12]<br />2: <br />ᐳ: Object[16]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle12,Object16 bucket1
@@ -95,5 +94,5 @@ graph TD
     Bucket5 --> Bucket6
     Bucket6 --> Bucket7
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object15,Access13,Access14,__Value0,__Value3,__Value5,Constant45,Constant46,Constant47,PgInsertSingle12,Object16,List19,PgClassExpression18,Lambda20,PgClassExpression22,Constant17,PgInsertSingle29,Object32,Access30,Access31,Object33,PgSelect37,PgClassExpression34,PgClassExpression35,PgClassExpression36,First41,PgSelectSingle42,PgClassExpression43,PgClassExpression44 unary
+    class Object15,Access13,Access14,__Value3,__Value5,Constant45,Constant46,Constant47,PgInsertSingle12,Object16,List19,PgClassExpression18,Lambda20,PgClassExpression22,Constant17,PgInsertSingle29,Object32,Access30,Access31,Object33,PgSelect37,PgClassExpression34,PgClassExpression35,PgClassExpression36,First41,PgSelectSingle42,PgClassExpression43,PgClassExpression44 unary
     end

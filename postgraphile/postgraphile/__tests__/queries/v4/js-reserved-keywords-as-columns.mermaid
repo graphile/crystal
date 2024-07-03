@@ -46,7 +46,6 @@ graph TD
     PgSelect67 --> First71
     PgSelectSingle72{{"PgSelectSingle[72∈0]<br />ᐸcropᐳ"}}:::plan
     First71 --> PgSelectSingle72
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
     PgSelect20[["PgSelect[20∈1]<br />ᐸmaterialᐳ"]]:::plan
@@ -93,7 +92,7 @@ graph TD
     subgraph "Buckets for queries/v4/js-reserved-keywords-as-columns"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 16, 17, 19, 75, 76, 77, 78, 18<br />2: 27, 36, 48, 58, 67<br />ᐳ: 31, 32, 40, 41, 62, 63, 71, 72"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19,PgSelect27,First31,PgSelectSingle32,PgSelect36,First40,PgSelectSingle41,PgSelect48,PgSelect58,First62,PgSelectSingle63,PgSelect67,First71,PgSelectSingle72,Constant75,Constant76,Constant77,Constant78 bucket0
+    class Bucket0,__Value3,__Value5,Access16,Access17,Object18,Connection19,PgSelect27,First31,PgSelectSingle32,PgSelect36,First40,PgSelectSingle41,PgSelect48,PgSelect58,First62,PgSelectSingle63,PgSelect67,First71,PgSelectSingle72,Constant75,Constant76,Constant77,Constant78 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect20 bucket1
@@ -122,5 +121,5 @@ graph TD
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object18,PgSelect27,PgSelect36,PgSelect58,PgSelect67,Access16,Access17,First31,PgSelectSingle32,First40,PgSelectSingle41,PgSelect48,First62,PgSelectSingle63,First71,PgSelectSingle72,__Value0,__Value3,__Value5,Connection19,Constant75,Constant76,Constant77,Constant78,PgSelect20,PgClassExpression33,PgClassExpression34,PgClassExpression42,PgClassExpression43,PgClassExpression64,PgClassExpression65,PgClassExpression73,PgClassExpression74 unary
+    class Object18,PgSelect27,PgSelect36,PgSelect58,PgSelect67,Access16,Access17,First31,PgSelectSingle32,First40,PgSelectSingle41,PgSelect48,First62,PgSelectSingle63,First71,PgSelectSingle72,__Value3,__Value5,Connection19,Constant75,Constant76,Constant77,Constant78,PgSelect20,PgClassExpression33,PgClassExpression34,PgClassExpression42,PgClassExpression43,PgClassExpression64,PgClassExpression65,PgClassExpression73,PgClassExpression74 unary
     end

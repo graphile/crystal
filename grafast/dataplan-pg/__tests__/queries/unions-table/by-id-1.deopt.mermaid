@@ -29,7 +29,6 @@ graph TD
     PgSelectSingle13 --> PgClassExpression14
     PgClassExpression16{{"PgClassExpression[16∈0]<br />ᐸ__union_items__.”id”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression16
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     PgSelect17[["PgSelect[17∈1]<br />ᐸunion_topicsᐳ<br />ᐳUnionTopic"]]:::plan
     Object11 & PgClassExpression16 --> PgSelect17
@@ -95,11 +94,11 @@ graph TD
     subgraph "Buckets for queries/unions-table/by-id-1"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 9, 10, 65, 11<br />2: PgSelect[8]<br />ᐳ: 12, 13, 14, 15, 16"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,PgPolymorphic15,PgClassExpression16,Constant65 bucket0
+    class Bucket0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,PgPolymorphic15,PgClassExpression16,Constant65 bucket0
     Bucket1("Bucket 1 (polymorphic)<br />UnionTopic,UnionPost,UnionDivider,UnionChecklist,UnionChecklistItem<br />Deps: 11, 16, 15<br />ᐳUnionTopic<br />ᐳUnionPost<br />ᐳUnionDivider<br />ᐳUnionChecklist<br />ᐳUnionChecklistItem"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect17,First21,PgSelectSingle22,PgClassExpression23,PgClassExpression24,PgSelect26,First30,PgSelectSingle31,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgClassExpression35,PgSelect37,First41,PgSelectSingle42,PgClassExpression43,PgClassExpression44,PgClassExpression45,PgSelect47,First51,PgSelectSingle52,PgClassExpression53,PgClassExpression54,PgSelect56,First60,PgSelectSingle61,PgClassExpression62,PgClassExpression63,PgClassExpression64 bucket1
     Bucket0 --> Bucket1
     classDef unary fill:#fafffa,borderWidth:8px
-    class PgSelect8,Object11,PgPolymorphic15,Access9,Access10,First12,PgSelectSingle13,PgClassExpression14,PgClassExpression16,__Value0,__Value3,__Value5,Constant65,PgSelect17,PgSelect26,PgSelect37,PgSelect47,PgSelect56,First21,PgSelectSingle22,PgClassExpression23,PgClassExpression24,First30,PgSelectSingle31,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgClassExpression35,First41,PgSelectSingle42,PgClassExpression43,PgClassExpression44,PgClassExpression45,First51,PgSelectSingle52,PgClassExpression53,PgClassExpression54,First60,PgSelectSingle61,PgClassExpression62,PgClassExpression63,PgClassExpression64 unary
+    class PgSelect8,Object11,PgPolymorphic15,Access9,Access10,First12,PgSelectSingle13,PgClassExpression14,PgClassExpression16,__Value3,__Value5,Constant65,PgSelect17,PgSelect26,PgSelect37,PgSelect47,PgSelect56,First21,PgSelectSingle22,PgClassExpression23,PgClassExpression24,First30,PgSelectSingle31,PgClassExpression32,PgClassExpression33,PgClassExpression34,PgClassExpression35,First41,PgSelectSingle42,PgClassExpression43,PgClassExpression44,PgClassExpression45,First51,PgSelectSingle52,PgClassExpression53,PgClassExpression54,First60,PgSelectSingle61,PgClassExpression62,PgClassExpression63,PgClassExpression64 unary
     end

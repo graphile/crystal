@@ -16,7 +16,6 @@ graph TD
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access85
     __Value3 --> Access86
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Constant209{{"Constant[209∈0]<br />ᐸ[Object: null prototype] { x: 99, y: 1234 }ᐳ"}}:::plan
     Constant222{{"Constant[222∈0]<br />ᐸ[Object: null prototype] {   a: [Object: null prototype] { xᐳ"}}:::plan
@@ -66,7 +65,7 @@ graph TD
     subgraph "Buckets for mutations/v4/geometry.mutations"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access85,Access86,Object87,Constant209,Constant222,Constant223,Constant224,Constant226,Constant227,Constant228,Constant229 bucket0
+    class Bucket0,__Value3,__Value5,Access85,Access86,Object87,Constant209,Constant222,Constant223,Constant224,Constant226,Constant227,Constant228,Constant229 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 87, 209, 222, 223, 224, 227, 228, 229, 226<br /><br />1: PgInsertSingle[84]<br />2: <br />ᐳ: Object[88]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle84,Object88 bucket1
@@ -117,5 +116,5 @@ graph TD
     Bucket10 --> Bucket11
     Bucket12 --> Bucket13
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object87,Access85,Access86,__Value0,__Value3,__Value5,Constant209,Constant222,Constant223,Constant224,Constant226,Constant227,Constant228,Constant229,PgInsertSingle84,Object88,PgClassExpression119,PgClassExpression120,PgClassExpression123,PgClassExpression130,PgClassExpression137,PgClassExpression144,PgClassExpression150,PgClassExpression156,PgClassExpression161,Access146,Access152,Access157 unary
+    class Object87,Access85,Access86,__Value3,__Value5,Constant209,Constant222,Constant223,Constant224,Constant226,Constant227,Constant228,Constant229,PgInsertSingle84,Object88,PgClassExpression119,PgClassExpression120,PgClassExpression123,PgClassExpression130,PgClassExpression137,PgClassExpression144,PgClassExpression150,PgClassExpression156,PgClassExpression161,Access146,Access152,Access157 unary
     end

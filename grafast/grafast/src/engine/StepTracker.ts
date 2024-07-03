@@ -25,7 +25,7 @@ import type { OutputPlan } from "./OutputPlan.js";
  */
 export class StepTracker {
   /** @internal */
-  public stepCount = 0;
+  public stepCount = 1; // This is a lie, but it helped to keep diffs smaller. Fix in a PR on its own.
   /** @internal */
   public lockedStepCount = 0;
   /** @internal */

@@ -31,7 +31,6 @@ graph TD
     PgSelectSingle13 --> PgClassExpression16
     PgClassExpression23{{"PgClassExpression[23∈0]<br />ᐸ__relation...parent_id”ᐳ"}}:::plan
     PgSelectSingle13 --> PgClassExpression23
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     PgSelect17[["PgSelect[17∈1]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     Object11 & PgClassExpression16 --> PgSelect17
@@ -121,7 +120,7 @@ graph TD
     subgraph "Buckets for queries/interfaces-relational/relation"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 9, 10, 501, 11<br />2: PgSelect[8]<br />ᐳ: 12, 13, 14, 15, 16, 23"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,PgPolymorphic15,PgClassExpression16,PgClassExpression23,Constant501 bucket0
+    class Bucket0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,PgClassExpression14,PgPolymorphic15,PgClassExpression16,PgClassExpression23,Constant501 bucket0
     Bucket1("Bucket 1 (polymorphic)<br />RelationalTopic,RelationalPost,RelationalDivider,RelationalChecklist,RelationalChecklistItem<br />Deps: 11, 16, 23, 15<br />ᐳRelationalTopic<br />ᐳRelationalPost<br />ᐳRelationalDivider<br />ᐳRelationalChecklist<br />ᐳRelationalChecklistItem"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect17,First21,PgSelectSingle22,PgSelect24,First28,PgSelectSingle29,PgClassExpression30,PgPolymorphic31,PgClassExpression32,PgClassExpression40,PgSelect114,First118,PgSelectSingle119,PgSelect211,First215,PgSelectSingle216,PgSelect308,First312,PgSelectSingle313,PgSelect405,First409,PgSelectSingle410 bucket1
@@ -135,5 +134,5 @@ graph TD
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     classDef unary fill:#fafffa,borderWidth:8px
-    class PgSelect8,Object11,PgPolymorphic15,Access9,Access10,First12,PgSelectSingle13,PgClassExpression14,PgClassExpression16,PgClassExpression23,__Value0,__Value3,__Value5,Constant501,PgSelect17,PgSelect24,PgPolymorphic31,PgSelect114,PgSelect211,PgSelect308,PgSelect405,First21,PgSelectSingle22,First28,PgSelectSingle29,PgClassExpression30,PgClassExpression32,PgClassExpression40,First118,PgSelectSingle119,First215,PgSelectSingle216,First312,PgSelectSingle313,First409,PgSelectSingle410,PgSelect33,PgSelect41,PgSelect49,PgSelect65,PgSelect81,PgSelect97,First37,PgSelectSingle38,First45,PgSelectSingle46,First53,PgSelectSingle54,First69,PgSelectSingle70,First85,PgSelectSingle86,First101,PgSelectSingle102,PgClassExpression47 unary
+    class PgSelect8,Object11,PgPolymorphic15,Access9,Access10,First12,PgSelectSingle13,PgClassExpression14,PgClassExpression16,PgClassExpression23,__Value3,__Value5,Constant501,PgSelect17,PgSelect24,PgPolymorphic31,PgSelect114,PgSelect211,PgSelect308,PgSelect405,First21,PgSelectSingle22,First28,PgSelectSingle29,PgClassExpression30,PgClassExpression32,PgClassExpression40,First118,PgSelectSingle119,First215,PgSelectSingle216,First312,PgSelectSingle313,First409,PgSelectSingle410,PgSelect33,PgSelect41,PgSelect49,PgSelect65,PgSelect81,PgSelect97,First37,PgSelectSingle38,First45,PgSelectSingle46,First53,PgSelectSingle54,First69,PgSelectSingle70,First85,PgSelectSingle86,First101,PgSelectSingle102,PgClassExpression47 unary
     end

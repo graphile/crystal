@@ -26,7 +26,6 @@ graph TD
     PgSelect8 --> First12
     PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸforumsᐳ"}}:::plan
     First12 --> PgSelectSingle13
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     PgSelectSingle21{{"PgSelectSingle[21∈1]<br />ᐸforums_unique_author_countᐳ"}}:::plan
     PgSelectSingle13 --> PgSelectSingle21
@@ -50,11 +49,11 @@ graph TD
     subgraph "Buckets for queries/functions/computed-column-scalar"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 9, 10, 14, 47, 48, 49, 11<br />2: PgSelect[8]<br />ᐳ: First[12], PgSelectSingle[13]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Constant14,Constant47,Constant48,Constant49 bucket0
+    class Bucket0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Constant14,Constant47,Constant48,Constant49 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸforumsᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelectSingle21,PgClassExpression22,PgSelectSingle30,PgClassExpression31,PgSelectSingle39,PgClassExpression40,RemapKeys43,RemapKeys45 bucket1
     Bucket0 --> Bucket1
     classDef unary fill:#fafffa,borderWidth:8px
-    class PgSelect8,Object11,Access9,Access10,First12,PgSelectSingle13,__Value0,__Value3,__Value5,Constant14,Constant47,Constant48,Constant49,PgSelectSingle21,PgClassExpression22,PgSelectSingle30,PgClassExpression31,PgSelectSingle39,PgClassExpression40,RemapKeys43,RemapKeys45 unary
+    class PgSelect8,Object11,Access9,Access10,First12,PgSelectSingle13,__Value3,__Value5,Constant14,Constant47,Constant48,Constant49,PgSelectSingle21,PgClassExpression22,PgSelectSingle30,PgClassExpression31,PgSelectSingle39,PgClassExpression40,RemapKeys43,RemapKeys45 unary
     end

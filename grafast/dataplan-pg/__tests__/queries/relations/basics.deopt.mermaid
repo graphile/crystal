@@ -23,7 +23,6 @@ graph TD
     PgSelect8 --> First12
     PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸmessagesᐳ"}}:::plan
     First12 --> PgSelectSingle13
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     PgSelect17[["PgSelect[17∈1]<br />ᐸforumsᐳ"]]:::plan
     PgClassExpression16{{"PgClassExpression[16∈1]<br />ᐸ__messages__.”forum_id”ᐳ"}}:::plan
@@ -45,7 +44,7 @@ graph TD
     subgraph "Buckets for queries/relations/basics"
     Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 9, 10, 25, 11<br />2: PgSelect[8]<br />ᐳ: First[12], PgSelectSingle[13]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Constant25 bucket0
+    class Bucket0,__Value3,__Value5,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Constant25 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13, 11<br /><br />ROOT PgSelectSingleᐸmessagesᐳ[13]<br />1: <br />ᐳ: 14, 15, 16<br />2: PgSelect[17]<br />ᐳ: First[21], PgSelectSingle[22]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgClassExpression14,PgClassExpression15,PgClassExpression16,PgSelect17,First21,PgSelectSingle22 bucket1
@@ -55,5 +54,5 @@ graph TD
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     classDef unary fill:#fafffa,borderWidth:8px
-    class PgSelect8,Object11,Access9,Access10,First12,PgSelectSingle13,__Value0,__Value3,__Value5,Constant25,PgSelect17,PgClassExpression14,PgClassExpression15,PgClassExpression16,First21,PgSelectSingle22,PgClassExpression24 unary
+    class PgSelect8,Object11,Access9,Access10,First12,PgSelectSingle13,__Value3,__Value5,Constant25,PgSelect17,PgClassExpression14,PgClassExpression15,PgClassExpression16,First21,PgSelectSingle22,PgClassExpression24 unary
     end

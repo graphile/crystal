@@ -9,7 +9,6 @@ graph TD
 
 
     %% plan dependencies
-    __Value0["__Value[0∈0]"]:::plan
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Connection21{{"Connection[21∈0]<br />ᐸ17ᐳ"}}:::plan
@@ -46,7 +45,7 @@ graph TD
     subgraph "Buckets for queries/polymorphic/person-log-entries.condition"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Connection21 bucket0
+    class Bucket0,__Value3,__Value5,Connection21 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 21<br /><br />ROOT Connectionᐸ17ᐳ[21]<br />1: <br />ᐳ: 18, 19, 42, 20<br />2: PgSelect[22]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access18,Access19,Object20,PgSelect22,Constant42 bucket1
@@ -64,5 +63,5 @@ graph TD
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4
     classDef unary fill:#fafffa,borderWidth:8px
-    class __Value0,__Value3,__Value5,Connection21,PgSelect22,Object20,Access18,Access19,Constant42 unary
+    class __Value3,__Value5,Connection21,PgSelect22,Object20,Access18,Access19,Constant42 unary
     end

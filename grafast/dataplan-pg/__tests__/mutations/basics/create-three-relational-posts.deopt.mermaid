@@ -16,7 +16,6 @@ graph TD
     __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
     __Value3 --> Access10
     __Value3 --> Access11
-    __Value0["__Value[0∈0]"]:::plan
     __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
     Constant7{{"Constant[7∈0]<br />ᐸ'POST'ᐳ"}}:::plan
     Constant8{{"Constant[8∈0]<br />ᐸ2ᐳ"}}:::plan
@@ -200,7 +199,7 @@ graph TD
     subgraph "Buckets for mutations/basics/create-three-relational-posts"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Constant7,Constant8,Access10,Access11,Object12,Constant14,Constant15,Constant16,Constant28,Constant29,Constant42,Constant43 bucket0
+    class Bucket0,__Value3,__Value5,Constant7,Constant8,Access10,Access11,Object12,Constant14,Constant15,Constant16,Constant28,Constant29,Constant42,Constant43 bucket0
     Bucket1("Bucket 1 (mutationField)<br />Deps: 12, 7, 8, 14, 15, 16, 28, 29, 42, 43, 5<br /><br />1: PgInsertSingle[9]<br />2: PgClassExpression[13]<br />3: PgInsertSingle[17]<br />4: PgInsertSingle[23]<br />5: PgClassExpression[27]<br />6: PgInsertSingle[31]<br />7: PgInsertSingle[37]<br />8: PgClassExpression[41]<br />9: PgInsertSingle[45]<br />10: <br />ᐳ: PgClassExpression[49]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgInsertSingle9,PgClassExpression13,PgInsertSingle17,PgInsertSingle23,PgClassExpression27,PgInsertSingle31,PgInsertSingle37,PgClassExpression41,PgInsertSingle45,PgClassExpression49 bucket1
@@ -224,5 +223,5 @@ graph TD
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4 & Bucket5 & Bucket6
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object12,Access10,Access11,__Value0,__Value3,__Value5,Constant7,Constant8,Constant14,Constant15,Constant16,Constant28,Constant29,Constant42,Constant43,PgInsertSingle17,PgInsertSingle31,PgInsertSingle45,PgInsertSingle9,PgInsertSingle23,PgInsertSingle37,PgClassExpression13,PgClassExpression27,PgClassExpression41,PgClassExpression49,PgSelect51,PgSelect103,PgSelect155,First55,PgSelectSingle56,PgClassExpression59,First107,PgSelectSingle108,PgClassExpression111,First159,PgSelectSingle160,PgClassExpression163,Constant206,Constant207,Constant208,PgPolymorphic58,PgPolymorphic110,PgPolymorphic162,PgClassExpression57,PgClassExpression109,PgClassExpression161,PgSelect60,PgSelect68,PgSelect79,PgSelect87,PgSelect95,First64,PgSelectSingle65,First72,PgSelectSingle73,PgClassExpression75,PgClassExpression76,PgClassExpression77,First83,PgSelectSingle84,First91,PgSelectSingle92,First99,PgSelectSingle100,PgSelect112,PgSelect120,PgSelect131,PgSelect139,PgSelect147,First116,PgSelectSingle117,First124,PgSelectSingle125,PgClassExpression127,PgClassExpression128,PgClassExpression129,First135,PgSelectSingle136,First143,PgSelectSingle144,First151,PgSelectSingle152,PgSelect164,PgSelect172,PgSelect183,PgSelect191,PgSelect199,First168,PgSelectSingle169,First176,PgSelectSingle177,PgClassExpression179,PgClassExpression180,PgClassExpression181,First187,PgSelectSingle188,First195,PgSelectSingle196,First203,PgSelectSingle204 unary
+    class Object12,Access10,Access11,__Value3,__Value5,Constant7,Constant8,Constant14,Constant15,Constant16,Constant28,Constant29,Constant42,Constant43,PgInsertSingle17,PgInsertSingle31,PgInsertSingle45,PgInsertSingle9,PgInsertSingle23,PgInsertSingle37,PgClassExpression13,PgClassExpression27,PgClassExpression41,PgClassExpression49,PgSelect51,PgSelect103,PgSelect155,First55,PgSelectSingle56,PgClassExpression59,First107,PgSelectSingle108,PgClassExpression111,First159,PgSelectSingle160,PgClassExpression163,Constant206,Constant207,Constant208,PgPolymorphic58,PgPolymorphic110,PgPolymorphic162,PgClassExpression57,PgClassExpression109,PgClassExpression161,PgSelect60,PgSelect68,PgSelect79,PgSelect87,PgSelect95,First64,PgSelectSingle65,First72,PgSelectSingle73,PgClassExpression75,PgClassExpression76,PgClassExpression77,First83,PgSelectSingle84,First91,PgSelectSingle92,First99,PgSelectSingle100,PgSelect112,PgSelect120,PgSelect131,PgSelect139,PgSelect147,First116,PgSelectSingle117,First124,PgSelectSingle125,PgClassExpression127,PgClassExpression128,PgClassExpression129,First135,PgSelectSingle136,First143,PgSelectSingle144,First151,PgSelectSingle152,PgSelect164,PgSelect172,PgSelect183,PgSelect191,PgSelect199,First168,PgSelectSingle169,First176,PgSelectSingle177,PgClassExpression179,PgClassExpression180,PgClassExpression181,First187,PgSelectSingle188,First195,PgSelectSingle196,First203,PgSelectSingle204 unary
     end
