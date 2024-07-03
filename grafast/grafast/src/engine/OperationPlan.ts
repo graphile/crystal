@@ -3406,6 +3406,15 @@ export class OperationPlan {
         ensurePlanAvailableInLayer($root, layerPlan);
       }
 
+      const $sideEffect = layerPlan.parentSideEffectStep;
+      if ($sideEffect) {
+        // We read it from the parent layer plan at newBucket time, but we
+        // don't need to actually scale it up/down.
+        //
+        // If parentSideEffectStep exists then parentLayerPlan must exist.
+        ensurePlanAvailableInLayer($sideEffect, layerPlan.parentLayerPlan!);
+      }
+
       // Copy polymorphic parentStepId
       if (layerPlan.reason.type === "polymorphic") {
         const parentStep = layerPlan.reason.parentStep;
