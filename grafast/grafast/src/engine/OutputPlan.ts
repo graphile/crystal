@@ -558,25 +558,19 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
               spec.outputPlan.layerPlan.id === this.layerPlan.id,
           };
         }
-        makeObjectExecutor(
+        this.execute = makeObjectExecutor(
           type.typeName,
           digestFieldTypes,
           this.deferredOutputPlans.length > 0,
           type.mode === "root",
           false,
-          (fn) => {
-            this.execute = fn;
-          },
         );
-        makeObjectExecutor(
+        this.executeString = makeObjectExecutor(
           type.typeName,
           digestFieldTypes,
           this.deferredOutputPlans.length > 0,
           type.mode === "root",
           true,
-          (fn) => {
-            this.executeString = fn;
-          },
         );
         break;
       }
@@ -1418,262 +1412,168 @@ function makeObjectExecutor<TAsString extends boolean>(
   // this.type.mode === "root",
   isRoot: boolean,
   asString: TAsString,
-  callback: (
-    fn: TAsString extends true
-      ? typeof OutputPlan.prototype.executeString
-      : typeof OutputPlan.prototype.execute,
-  ) => void,
-): void {
+): TAsString extends true ? ExecuteString : Execute {
   if (!SAFE_NAME.test(typeName)) {
     throw new Error(
       `Unsafe type name: ${typeName}; doesn't conform to 'Name' in the GraphQL spec`,
     );
   }
-  const keys: string[] = [];
-  const fieldSpecs: FieldTypeDigest[] = [];
-  let signature =
-    (asString ? "s" : "o") +
-    (isRoot ? "r" : "") +
-    (hasDeferredOutputPlans ? "d" : "");
-  let hasChildBucketReference = false;
-
-  for (const [key, fieldSpec] of Object.entries(fieldTypes)) {
-    if (!SAFE_NAME.test(key)) {
-      // This should not be able to happen if the GraphQL operation is valid
+  if (isDev) {
+    if (Object.getPrototypeOf(fieldTypes) !== null) {
       throw new Error(
-        `Unsafe key: ${key}; doesn't conform to 'Name' in the GraphQL spec`,
+        `GrafastInternalError<3d8e3547-d818-44e1-a076-16b828e3a34d>: fieldTypes must have a null prototype`,
       );
     }
-
-    keys.push(key);
-    fieldSpecs.push(fieldSpec);
-
-    const { fieldType, sameBucket } = fieldSpec;
-    switch (fieldType) {
-      case "__typename": {
-        signature += "_";
-        break;
-      }
-      case "outputPlan?": {
-        signature += "?";
-        break;
-      }
-      case "outputPlan!": {
-        signature += "!";
-        break;
-      }
-      default: {
-        const never: never = fieldType;
-        throw new Error(`Unsupported field type '${never}'`);
-      }
-    }
-    if (!sameBucket) {
-      hasChildBucketReference = true;
-      signature += "~";
-    }
   }
-  withObjectExecutorFactory(
-    signature,
-    fieldSpecs,
-    hasDeferredOutputPlans,
-    isRoot,
-    asString,
-    hasChildBucketReference,
-    (factory) => {
-      const fn = factory(typeName, keys);
-      callback(fn);
-    },
-  );
-}
+  return makeExecutor<TAsString, OutputPlanTypeObject>({
+    inner(
+      bucketRootValue,
+      root,
+      mutablePath,
+      bucket,
+      bucketIndex,
+      rawBucketRootValue,
+      bucketRootFlags,
+    ): TAsString extends true ? string : JSONValue {
+      let string: string | undefined = asString ? "{" : undefined;
+      const obj: Record<string, JSONValue> | undefined = asString
+        ? undefined
+        : Object.create(null);
+      const { keys } = this;
+      const mutablePathIndex = mutablePath.push("!") - 1;
 
-type Factory<TAsString extends boolean> = (
-  typeName: string,
-  keys: string[],
-) => TAsString extends true
-  ? typeof OutputPlan.prototype.executeString
-  : typeof OutputPlan.prototype.execute;
-
-const makeObjectExecutorCache = new LRU<string, Factory<boolean>>({
-  maxLength: 1000,
-});
-const makingObjectExecutorCallbacks = new Map<
-  string,
-  Array<(factory: Factory<boolean>) => void>
->();
-
-function withObjectExecutorFactory<TAsString extends boolean>(
-  signature: string,
-  fieldSpecs: ReadonlyArray<FieldTypeDigest>,
-  hasDeferredOutputPlans: boolean,
-  isRoot: boolean,
-  asString: TAsString,
-  _hasChildBucketReference: boolean,
-  callback: (factory: Factory<TAsString>) => void,
-) {
-  const fn = makeObjectExecutorCache.get(signature);
-  if (fn !== undefined) {
-    return callback(fn);
-  }
-  const building = makingObjectExecutorCallbacks.get(signature);
-  if (building !== undefined) {
-    building.push(callback as (factory: Factory<boolean>) => void);
-    return;
-  }
-
-  const callbacks = [callback as (factory: Factory<boolean>) => void];
-  makingObjectExecutorCallbacks.set(signature, callbacks);
-
-  const factory: Factory<TAsString> = (typeName, fields) => {
-    const inner: MakeExecutorOptions<TAsString, OutputPlanTypeObject>["inner"] =
-      function (
-        bucketRootValue,
-        root,
-        mutablePath,
-        bucket,
-        bucketIndex,
-        rawBucketRootValue,
-        bucketRootFlags,
-      ): TAsString extends true ? string : JSONValue {
-        let string: string | undefined = asString ? "{" : undefined;
-        const obj: Record<string, JSONValue> | undefined = asString
-          ? undefined
-          : Object.create(null);
-        const { keys } = this;
-        const mutablePathIndex = mutablePath.push("!") - 1;
-
-        const fieldsCount = fields.length;
-        for (let i = 0; i < fieldsCount; i++) {
-          const { fieldType, sameBucket } = fieldSpecs[i];
-          const fieldNameI = fields[i];
-          switch (fieldType) {
-            case "__typename": {
-              if (asString) {
-                // NOTE: this code relies on the fact that fieldName and typeName do
-                // not require any quoting in JSON/JS - they must conform to GraphQL
-                // `Name`.
-                string! += `${i === 0 ? "" : ","}"${fieldNameI}":"${typeName}"`;
-              } else {
-                obj![fieldNameI] = typeName;
-              }
-              break;
+      let first = true;
+      for (const responseKey in fieldTypes) {
+        if (first) {
+          first = false;
+        } else if (asString) {
+          string! += ",";
+        }
+        // NOTE: this code relies on the fact that fieldName and typeName do
+        // not require any quoting in JSON/JS - they must conform to GraphQL
+        // `Name`.
+        if (!SAFE_NAME.test(responseKey)) {
+          // This should not be able to happen if the GraphQL operation is valid
+          throw new Error(
+            `Unsafe key: ${responseKey}; doesn't conform to 'Name' in the GraphQL spec`,
+          );
+        }
+        const { fieldType, sameBucket } = fieldTypes[responseKey];
+        switch (fieldType) {
+          case "__typename": {
+            if (asString) {
+              string! += `"${responseKey}":"${typeName}"`;
+            } else {
+              obj![responseKey] = typeName;
             }
-            case "outputPlan!":
-            case "outputPlan?": {
-              mutablePath[mutablePathIndex] = fieldNameI;
-              const spec = keys[fieldNameI] as OutputPlanKeyValueOutputPlan;
+            break;
+          }
+          case "outputPlan!":
+          case "outputPlan?": {
+            mutablePath[mutablePathIndex] = responseKey;
+            const spec = keys[responseKey] as OutputPlanKeyValueOutputPlan;
+            if (asString) {
+              string! += `"${responseKey}":`;
+            }
+            if (sameBucket) {
+              const val = executeChildPlan(
+                this,
+                spec.locationDetails,
+                spec.outputPlan,
+                fieldType === "outputPlan!",
+                asString,
+                bucket,
+                bucketIndex,
+
+                bucket,
+                mutablePath,
+                mutablePathIndex,
+                root,
+                rawBucketRootValue,
+                bucketRootFlags,
+              );
               if (asString) {
-                string! += `${i === 0 ? "" : ","}"${fieldNameI}":`;
+                string! += val;
+              } else {
+                obj![responseKey] = val;
               }
-              if (sameBucket) {
-                const val = executeChildPlan(
-                  this,
-                  spec.locationDetails,
+            } else {
+              const directChild = bucket.children[spec.outputPlan.layerPlan.id];
+              let childBucket, childBucketIndex;
+              if (directChild !== undefined) {
+                childBucket = directChild.bucket;
+                childBucketIndex = directChild.map.get(bucketIndex);
+              } else {
+                const c = getChildBucketAndIndex(
                   spec.outputPlan,
-                  fieldType === "outputPlan!",
-                  asString,
+                  this,
                   bucket,
                   bucketIndex,
-
-                  bucket,
-                  mutablePath,
-                  mutablePathIndex,
-                  root,
-                  rawBucketRootValue,
-                  bucketRootFlags,
                 );
-                if (asString) {
-                  string! += val;
+                if (c !== null) {
+                  [childBucket, childBucketIndex] = c;
                 } else {
-                  obj![fieldNameI] = val;
-                }
-              } else {
-                const directChild =
-                  bucket.children[spec.outputPlan.layerPlan.id];
-                let childBucket, childBucketIndex;
-                if (directChild !== undefined) {
-                  childBucket = directChild.bucket;
-                  childBucketIndex = directChild.map.get(bucketIndex);
-                } else {
-                  const c = getChildBucketAndIndex(
-                    spec.outputPlan,
-                    this,
-                    bucket,
-                    bucketIndex,
-                  );
-                  if (c !== null) {
-                    [childBucket, childBucketIndex] = c;
-                  } else {
-                    childBucket = childBucketIndex = null;
-                  }
-                }
-                const val = executeChildPlan(
-                  this,
-                  spec.locationDetails,
-                  spec.outputPlan,
-                  fieldType === "outputPlan!",
-                  asString,
-                  childBucket,
-                  childBucketIndex as number,
-
-                  bucket,
-                  mutablePath,
-                  mutablePathIndex,
-                  root,
-                  rawBucketRootValue,
-                  bucketRootFlags,
-                );
-                if (asString) {
-                  string! += val;
-                } else {
-                  obj![fieldNameI] = val;
+                  childBucket = childBucketIndex = null;
                 }
               }
-              break;
-            }
-            default: {
-              const never: never = fieldType;
-              throw new Error(
-                `GrafastInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${never}`,
+              const val = executeChildPlan(
+                this,
+                spec.locationDetails,
+                spec.outputPlan,
+                fieldType === "outputPlan!",
+                asString,
+                childBucket,
+                childBucketIndex as number,
+
+                bucket,
+                mutablePath,
+                mutablePathIndex,
+                root,
+                rawBucketRootValue,
+                bucketRootFlags,
               );
+              if (asString) {
+                string! += val;
+              } else {
+                obj![responseKey] = val;
+              }
             }
+            break;
+          }
+          default: {
+            const never: never = fieldType;
+            throw new Error(
+              `GrafastInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${never}`,
+            );
           }
         }
+      }
 
-        mutablePath.length = mutablePathIndex;
-        if (asString) {
-          string! += "}";
+      mutablePath.length = mutablePathIndex;
+      if (asString) {
+        string! += "}";
+      }
+      if (hasDeferredOutputPlans) {
+        // Everything seems okay; queue any deferred payloads
+        for (const defer of this.deferredOutputPlans) {
+          root.queue.push({
+            root,
+            path: mutablePath.slice(1),
+            bucket,
+            bucketIndex,
+            outputPlan: defer,
+            label: defer.type.deferLabel,
+          });
         }
-        if (hasDeferredOutputPlans) {
-          // Everything seems okay; queue any deferred payloads
-          for (const defer of this.deferredOutputPlans) {
-            root.queue.push({
-              root,
-              path: mutablePath.slice(1),
-              bucket,
-              bucketIndex,
-              outputPlan: defer,
-              label: defer.type.deferLabel,
-            });
-          }
-        }
-        return (asString ? string : obj) as TAsString extends true
-          ? string
-          : JSONValue;
-      };
-
-    return makeExecutor({
-      inner: inner,
-      nameExtra: "object",
-      asString,
-      skipNullHandling: isRoot,
-    });
-  };
-
-  makeObjectExecutorCache.set(signature, factory);
-  makingObjectExecutorCallbacks.delete(signature);
-  for (const callback of callbacks) {
-    callback(factory);
-  }
+      }
+      return (asString ? string : obj) as TAsString extends true
+        ? string
+        : JSONValue;
+    },
+    nameExtra: "object",
+    asString,
+    skipNullHandling: isRoot,
+  });
 }
 
 const makeCache = new LRU<string, (value: any) => any>({
