@@ -1498,7 +1498,7 @@ ${makeExecuteChildPlanCode(
   te_bucketIndex,
 )}`
     : te`\
-  directChild = bucket.children[spec.outputPlan.layerPlanId];
+  directChild = bucket.children[spec.outputPlan.layerPlan.id];
   if (directChild !== undefined) {
     childBucket = directChild.bucket;
     childBucketIndex = directChild.map.get(bucketIndex);
