@@ -1425,6 +1425,48 @@ function makeObjectExecutor<TAsString extends boolean>(
       );
     }
   }
+  const fieldDigests = Object.entries(fieldTypes).map(
+    ([responseKey, fieldSpec], i) => {
+      // NOTE: this code relies on the fact that fieldName and typeName do
+      // not require any quoting in JSON/JS - they must conform to GraphQL
+      // `Name`.
+      if (!SAFE_NAME.test(responseKey)) {
+        // This should not be able to happen if the GraphQL operation is valid
+        throw new Error(
+          `Unsafe key: ${responseKey}; doesn't conform to 'Name' in the GraphQL spec`,
+        );
+      }
+      const { fieldType, sameBucket } = fieldSpec;
+      const addComma = asString && i > 0;
+      switch (fieldType) {
+        case "__typename": {
+          return {
+            mode: 0 as const,
+            addComma,
+            responseKey,
+            stringValue: asString ? `"${responseKey}":"${typeName}"` : null,
+          } as const;
+        }
+        case "outputPlan!":
+        case "outputPlan?": {
+          return {
+            mode: 1 as const,
+            addComma,
+            responseKey,
+            stringPrefix: asString ? `"${responseKey}":` : null,
+            sameBucket,
+            isNonNull: fieldType === "outputPlan!",
+          } as const;
+        }
+        default: {
+          const never: never = fieldType;
+          throw new Error(
+            `GrafastInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${never}`,
+          );
+        }
+      }
+    },
+  );
   return makeExecutor<TAsString, OutputPlanTypeObject>({
     inner(
       bucketRootValue,
@@ -1439,113 +1481,93 @@ function makeObjectExecutor<TAsString extends boolean>(
       const obj: Record<string, JSONValue> | undefined = asString
         ? undefined
         : Object.create(null);
-      const { keys } = this;
+      const keys = this.keys;
       const mutablePathIndex = mutablePath.push("!") - 1;
 
-      let first = true;
-      for (const responseKey in fieldTypes) {
-        if (first) {
-          first = false;
-        } else if (asString) {
+      for (const digest of fieldDigests) {
+        if (digest.addComma) {
           string! += ",";
         }
-        // NOTE: this code relies on the fact that fieldName and typeName do
-        // not require any quoting in JSON/JS - they must conform to GraphQL
-        // `Name`.
-        if (!SAFE_NAME.test(responseKey)) {
-          // This should not be able to happen if the GraphQL operation is valid
-          throw new Error(
-            `Unsafe key: ${responseKey}; doesn't conform to 'Name' in the GraphQL spec`,
-          );
-        }
-        const { fieldType, sameBucket } = fieldTypes[responseKey];
-        switch (fieldType) {
-          case "__typename": {
-            if (asString) {
-              string! += `"${responseKey}":"${typeName}"`;
-            } else {
-              obj![responseKey] = typeName;
-            }
-            break;
+        const responseKey = digest.responseKey;
+        if (digest.mode === 0) {
+          if (asString) {
+            string! += digest.stringValue;
+          } else {
+            obj![responseKey] = typeName;
           }
-          case "outputPlan!":
-          case "outputPlan?": {
-            mutablePath[mutablePathIndex] = responseKey;
-            const spec = keys[responseKey] as OutputPlanKeyValueOutputPlan;
+        } else if (digest.mode === 1) {
+          mutablePath[mutablePathIndex] = responseKey;
+          const spec = keys[responseKey] as OutputPlanKeyValueOutputPlan;
+          if (digest.sameBucket) {
+            const val = executeChildPlan(
+              this,
+              spec.locationDetails,
+              spec.outputPlan,
+              digest.isNonNull,
+              asString,
+              bucket,
+              bucketIndex,
+
+              bucket,
+              mutablePath,
+              mutablePathIndex,
+              root,
+              rawBucketRootValue,
+              bucketRootFlags,
+            );
             if (asString) {
-              string! += `"${responseKey}":`;
+              string! += digest.stringPrefix;
+              string! += val;
+            } else {
+              obj![responseKey] = val;
             }
-            if (sameBucket) {
-              const val = executeChildPlan(
-                this,
-                spec.locationDetails,
+          } else {
+            const directChild = bucket.children[spec.outputPlan.layerPlan.id];
+            let childBucket, childBucketIndex;
+            if (directChild !== undefined) {
+              childBucket = directChild.bucket;
+              childBucketIndex = directChild.map.get(bucketIndex);
+            } else {
+              const c = getChildBucketAndIndex(
                 spec.outputPlan,
-                fieldType === "outputPlan!",
-                asString,
+                this,
                 bucket,
                 bucketIndex,
-
-                bucket,
-                mutablePath,
-                mutablePathIndex,
-                root,
-                rawBucketRootValue,
-                bucketRootFlags,
               );
-              if (asString) {
-                string! += val;
+              if (c !== null) {
+                [childBucket, childBucketIndex] = c;
               } else {
-                obj![responseKey] = val;
-              }
-            } else {
-              const directChild = bucket.children[spec.outputPlan.layerPlan.id];
-              let childBucket, childBucketIndex;
-              if (directChild !== undefined) {
-                childBucket = directChild.bucket;
-                childBucketIndex = directChild.map.get(bucketIndex);
-              } else {
-                const c = getChildBucketAndIndex(
-                  spec.outputPlan,
-                  this,
-                  bucket,
-                  bucketIndex,
-                );
-                if (c !== null) {
-                  [childBucket, childBucketIndex] = c;
-                } else {
-                  childBucket = childBucketIndex = null;
-                }
-              }
-              const val = executeChildPlan(
-                this,
-                spec.locationDetails,
-                spec.outputPlan,
-                fieldType === "outputPlan!",
-                asString,
-                childBucket,
-                childBucketIndex as number,
-
-                bucket,
-                mutablePath,
-                mutablePathIndex,
-                root,
-                rawBucketRootValue,
-                bucketRootFlags,
-              );
-              if (asString) {
-                string! += val;
-              } else {
-                obj![responseKey] = val;
+                childBucket = childBucketIndex = null;
               }
             }
-            break;
-          }
-          default: {
-            const never: never = fieldType;
-            throw new Error(
-              `GrafastInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${never}`,
+            const val = executeChildPlan(
+              this,
+              spec.locationDetails,
+              spec.outputPlan,
+              digest.isNonNull,
+              asString,
+              childBucket,
+              childBucketIndex as number,
+
+              bucket,
+              mutablePath,
+              mutablePathIndex,
+              root,
+              rawBucketRootValue,
+              bucketRootFlags,
             );
+            if (asString) {
+              string! += digest.stringPrefix;
+              string! += val;
+            } else {
+              obj![responseKey] = val;
+            }
           }
+        } else {
+          const never: never = digest;
+          throw new Error(
+            `GrafastInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${never}`,
+          );
         }
       }
 
