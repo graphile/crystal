@@ -1441,7 +1441,7 @@ function makeObjectExecutor<TAsString extends boolean>(
       switch (fieldType) {
         case "__typename": {
           return {
-            mode: 0 as const,
+            isTypeName: true as const,
             addComma,
             responseKey,
             stringValue: asString ? `"${responseKey}":"${typeName}"` : null,
@@ -1450,7 +1450,7 @@ function makeObjectExecutor<TAsString extends boolean>(
         case "outputPlan!":
         case "outputPlan?": {
           return {
-            mode: 1 as const,
+            isTypeName: false as const,
             addComma,
             responseKey,
             stringPrefix: asString ? `"${responseKey}":` : null,
@@ -1489,13 +1489,13 @@ function makeObjectExecutor<TAsString extends boolean>(
           string! += ",";
         }
         const responseKey = digest.responseKey;
-        if (digest.mode === 0) {
+        if (digest.isTypeName) {
           if (asString) {
             string! += digest.stringValue;
           } else {
             obj![responseKey] = typeName;
           }
-        } else if (digest.mode === 1) {
+        } else {
           mutablePath[mutablePathIndex] = responseKey;
           const spec = keys[responseKey] as OutputPlanKeyValueOutputPlan;
           if (digest.sameBucket) {
@@ -1507,7 +1507,6 @@ function makeObjectExecutor<TAsString extends boolean>(
               asString,
               bucket,
               bucketIndex,
-
               bucket,
               mutablePath,
               mutablePathIndex,
@@ -1548,7 +1547,6 @@ function makeObjectExecutor<TAsString extends boolean>(
               asString,
               childBucket,
               childBucketIndex as number,
-
               bucket,
               mutablePath,
               mutablePathIndex,
@@ -1563,11 +1561,6 @@ function makeObjectExecutor<TAsString extends boolean>(
               obj![responseKey] = val;
             }
           }
-        } else {
-          const never: never = digest;
-          throw new Error(
-            `GrafastInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${never}`,
-          );
         }
       }
 
