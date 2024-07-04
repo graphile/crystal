@@ -150,70 +150,6 @@ export type OutputPlanKeyValueOutputPlanWithCachedBits =
     layerPlanId: number;
   };
 
-const ref_FLAG_ERROR = te.ref(FLAG_ERROR, "FLAG_ERROR");
-const ref_coerceError = te.ref(coerceError, "coerceError");
-const ref_nonNullError = te.ref(nonNullError, "nonNullError");
-const ref_stringifyString = te.ref(stringifyString, "stringifyString");
-const ref_stringifyJSON = te.ref(stringifyJSON, "stringifyJSON");
-const ref_isPolymorphicData = te.ref(isPolymorphicData, "isPolymorphicData");
-const ref_$$concreteType = te.ref($$concreteType, "$$concreteType");
-const ref_assert = te.ref(assert, "assert");
-const ref_getChildBucketAndIndex = te.ref(
-  getChildBucketAndIndex,
-  "getChildBucketAndIndex",
-);
-const ref_inspect = te.ref(inspect, "inspect");
-const ref_$$streamMore = te.ref($$streamMore, "$$streamMore");
-const te_String = te`String`;
-const te_nullIsFineComment = te`// root/introspection, null is fine`;
-const te_nullString = te`"null"`;
-const te_null = te`null`;
-const te_childBucket = te`childBucket`;
-const te_childBucketIndex = te`childBucketIndex`;
-const te_executeString = te`executeString`;
-const te_execute = te`execute`;
-const te_polymorphic = te`polymorphic`;
-const te_letStringLbrace = te`let string = "{";`;
-const te_stringPlusEquals = te`string +=`;
-const te_stringPlusEqualsRbrace = te`  string += "}";\n`;
-const te_stringPlusEqualsRbracket = te`    string += "]";\n`;
-const te_constObjEqualsObjectCreateNull = te`const obj = Object.create(null);`;
-const te_comma = te`,`;
-const te_specDotLocationDetails = te`spec.locationDetails`;
-const te_thisDotLocationDetails = te`this.locationDetails`;
-const te_specDotOutputPlan = te`spec.outputPlan`;
-const te_bucket = te`bucket`;
-const te_bucketIndex = te`bucketIndex`;
-const te_handleDeferred = te`
-  // Everything seems okay; queue any deferred payloads
-  for (const defer of this.deferredOutputPlans) {
-    root.queue.push({
-      root,
-      path: mutablePath.slice(1),
-      bucket,
-      bucketIndex,
-      outputPlan: defer,
-      label: defer.type.deferLabel,
-    });
-  }
-`;
-const te_string = te`string`;
-const te_object = te`object`;
-const te_obj = te`obj`;
-const te_data = te`data`;
-const te_commonErrorHandler = te.ref(commonErrorHandler, "handleError");
-const te_childBucketCBIDC = te`, childBucket, childBucketIndex, directChild`;
-const te_letString = te`let string;`;
-const te_constDataEqualsEmptyArray = te`const data = [];`;
-const te_stringEqualsEmptyArrayString = te`    string = "[]";`;
-const te_stringEqualsLeftSquareBraceString = te`    string = "[";\n`;
-const te_noopComment = te`    /* noop */`;
-const te_ifIGt0StrPlusEqualComma = te`\n      if (i > 0) { string += ","; }\n`;
-const te_dataIEquals = te`data[i] =`;
-const te_childOutputPlan = te`childOutputPlan`;
-const te_underscoreNonNull = te`_nonNull`;
-const te_underscoreStream = te`_stream`;
-
 /**
  * Defines a way of taking a layerPlan and converting it into an output value.
  *
@@ -477,8 +413,8 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     _mutablePath: ReadonlyArray<string | number>,
     _bucket: Bucket,
     _bucketIndex: number,
-    rawBucketRootValue?: any,
-    bucketRootFlags?: ExecutionEntryFlags,
+    _rawBucketRootValue?: any,
+    _bucketRootFlags?: ExecutionEntryFlags,
   ): JSONValue {
     throw new Error(`OutputPlan.execute has yet to be built!`);
   }
@@ -493,8 +429,8 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     _mutablePath: ReadonlyArray<string | number>,
     _bucket: Bucket,
     _bucketIndex: number,
-    rawBucketRootValue?: any,
-    bucketRootFlags?: ExecutionEntryFlags,
+    _rawBucketRootValue?: any,
+    _bucketRootFlags?: ExecutionEntryFlags,
   ): string {
     throw new Error(`OutputPlan.executeString has yet to be built!`);
   }
@@ -1233,7 +1169,6 @@ function makeArrayExecutor<TAsString extends boolean>(
 
       const childOutputPlan = this.child;
       const l = bucketRootValue.length;
-      let fieldResult;
       let string: string | undefined;
       let data: any[] | undefined;
       if (l === 0) {
@@ -1452,10 +1387,8 @@ function introspect<TAsString extends boolean>(
     : JSONValue;
 }
 
-const ref_introspect = te.ref(introspect, "introspect");
-
 const introspectionExecutor = makeExecutor<false, OutputPlanTypeIntrospection>({
-  inner(bucketRootValue, root, mutablePath, bucket, bucketIndex) {
+  inner(_bucketRootValue, root, mutablePath) {
     return introspect(root, this, mutablePath, false);
   },
   nameExtra: `introspection`,
@@ -1466,7 +1399,7 @@ const introspectionExecutorString = makeExecutor<
   true,
   OutputPlanTypeIntrospection
 >({
-  inner(bucketRootValue, root, mutablePath, bucket, bucketIndex) {
+  inner(_bucketRootValue, root, mutablePath) {
     return introspect(root, this, mutablePath, true);
   },
   nameExtra: `introspection`,
@@ -1574,7 +1507,7 @@ function withObjectExecutorFactory<TAsString extends boolean>(
   hasDeferredOutputPlans: boolean,
   isRoot: boolean,
   asString: TAsString,
-  hasChildBucketReference: boolean,
+  _hasChildBucketReference: boolean,
   callback: (factory: Factory<TAsString>) => void,
 ) {
   const fn = makeObjectExecutorCache.get(signature);
