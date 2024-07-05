@@ -49,8 +49,9 @@ If the above succeeds, you're good to go! If not, please try again after running
 
 #### macOS
 
-macOS comes with an older version of `diff` by standard. We rely on `diff` for snapshot testing.
-Should your snapshot tests fail unexpectedly (for instance, with varying line endings), consider updating `diff`.
+macOS comes with an older version of `diff` by standard. We rely on `diff` for
+snapshot testing. Should your snapshot tests fail unexpectedly (for instance,
+with varying line endings), consider updating `diff`.
 
 You can make use of `homebrew` or other macOS package managers for this purpose.
 
@@ -107,20 +108,20 @@ significantly.
 ```js
 // Slow:
 const result = ["a", "b", "c"].reduce(
-    (memo, letter) => ({...memo, [letter]: true}),
-    {},
+  (memo, letter) => ({ ...memo, [letter]: true }),
+  {},
 );
 
 // Faster:
 const result = ["a", "b", "c"].reduce((memo, letter) => {
-    memo[letter] = true;
-    return memo;
+  memo[letter] = true;
+  return memo;
 }, {});
 
 // Fastest:
 const result = {};
 for (const letter of ["a", "b", "c"]) {
-    result[letter] = true;
+  result[letter] = true;
 }
 ```
 
