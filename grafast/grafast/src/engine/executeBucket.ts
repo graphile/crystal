@@ -43,9 +43,6 @@ import { timeSource } from "../timeSource.js";
 import { arrayOfLength, isPromiseLike, sudo } from "../utils.js";
 import type { MetaByMetaKey } from "./OperationPlan.js";
 
-/** Path to use when there's no polymorphic paths. */
-const NO_POLY_PATH = "";
-
 const timeoutError = Object.freeze(
   new SafeError(
     "Execution timeout exceeded, please simplify or add limits to your request.",
@@ -126,8 +123,6 @@ export function executeBucket(
 
   const phaseCount = phases.length;
 
-  let sideEffectStepsWithErrors: null | Record<string, ExecutableStep[]> = null;
-
   // Like a `for(i = 0; i < phaseCount; i++)` loop with some `await`s in it, except it does promise
   // handling manually so that it can complete synchronously (no promises) if
   // possible.
@@ -147,7 +142,6 @@ export function executeBucket(
     let executePromises:
       | PromiseLike<GrafastInternalResultsOrStream<any>>[]
       | null = null;
-    let sideEffectSteps: null | ExecutableStep[] = null;
     let executePromiseResultIndex: number[] | null = null;
     const resultList: Array<GrafastInternalResultsOrStream<any> | undefined> =
       [];
@@ -182,13 +176,6 @@ export function executeBucket(
         normalStepIndex++
       ) {
         const step = normalSteps[normalStepIndex].step;
-        if (step.hasSideEffects) {
-          if (sideEffectSteps === null) {
-            sideEffectSteps = [step];
-          } else {
-            sideEffectSteps.push(step);
-          }
-        }
         try {
           const r = executeStep(step);
           if (isPromiseLike(r)) {
@@ -216,26 +203,6 @@ export function executeBucket(
         }
       }
     }
-    const handleSideEffectSteps = () => {
-      if (!sideEffectStepsWithErrors) {
-        sideEffectStepsWithErrors = bucket.polymorphicPathList.reduce(
-          (memo, path) => {
-            memo[path ?? NO_POLY_PATH] = [];
-            return memo;
-          },
-          Object.create(null) as Record<string, ExecutableStep[]>,
-        );
-      }
-      for (const step of sideEffectSteps!) {
-        if (step.polymorphicPaths) {
-          for (const path of step.polymorphicPaths) {
-            sideEffectStepsWithErrors[path].push(step);
-          }
-        } else {
-          sideEffectStepsWithErrors[NO_POLY_PATH].push(step);
-        }
-      }
-    };
 
     const next = () => {
       return nextPhase(phaseIndex + 1);
@@ -470,12 +437,6 @@ export function executeBucket(
                 bucket.setResult(finishedStep, dataIndex, error, FLAG_ERROR);
               }
             }
-            if (
-              (bucket.flagUnion & FLAG_ERROR) === FLAG_ERROR &&
-              sideEffectSteps
-            ) {
-              handleSideEffectSteps();
-            }
             return promises ? Promise.all(promises) : undefined;
           })
           .then(null, (e) => {
@@ -500,9 +461,6 @@ export function executeBucket(
             }
           });
       } else {
-        if ((bucket.flagUnion & FLAG_ERROR) === FLAG_ERROR && sideEffectSteps) {
-          handleSideEffectSteps();
-        }
         return promises ? Promise.all(promises) : undefined;
       }
     };
@@ -828,7 +786,7 @@ export function executeBucket(
     let newSize = 0;
     const stepPolymorphicPaths = step.polymorphicPaths;
     const legitDepsCount = sudo(step).dependencies.length;
-    let dependencies = sideEffectStepsWithErrors
+    let dependencies = step.latestSideEffectStep
       ? dependenciesIncludingSideEffects.slice(0, legitDepsCount)
       : dependenciesIncludingSideEffects;
 
@@ -1012,7 +970,7 @@ export function executeBucket(
       };
       const sstep = sudo(step);
       const depCount = sstep.dependencies.length;
-      if (depCount > 0 || sideEffectStepsWithErrors !== null) {
+      if (depCount > 0) {
         for (let i = 0, l = depCount; i < l; i++) {
           const $dep = sstep.dependencies[i];
           addDependency(
@@ -1021,23 +979,10 @@ export function executeBucket(
             sstep.dependencyOnReject[i],
           );
         }
-        if (sideEffectStepsWithErrors !== null) {
-          if (sstep.polymorphicPaths) {
-            for (const path of sstep.polymorphicPaths) {
-              for (const sideEffectStep of sideEffectStepsWithErrors[path]) {
-                // TODO: revisit this, feels like we might be adding the same
-                // effect multiple times if it matches multiple paths.
-                addDependency(sideEffectStep, defaultForbiddenFlags, undefined);
-              }
-            }
-          } else {
-            for (const sideEffectStep of sideEffectStepsWithErrors[
-              NO_POLY_PATH
-            ]) {
-              addDependency(sideEffectStep, defaultForbiddenFlags, undefined);
-            }
-          }
-        }
+      }
+      const $sideEffect = step.latestSideEffectStep;
+      if ($sideEffect) {
+        addDependency($sideEffect, defaultForbiddenFlags, undefined);
       }
       if (
         isDev &&
