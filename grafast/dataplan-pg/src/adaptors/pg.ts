@@ -376,7 +376,7 @@ export function makeWithPgClientViaPgClientAlreadyInTransaction(
   return withPgClient;
 }
 
-export interface PgAdaptorSettings {
+export interface PgAdaptorSettings extends CommonPgAdaptorAndServiceSettings {
   /** ONLY FOR USE IN TESTS! */
   poolClient?: PoolClient;
   /** ONLY FOR USE IN TESTS! */
@@ -385,13 +385,17 @@ export interface PgAdaptorSettings {
   superuserPoolClient?: PoolClient;
   /** ONLY FOR USE IN TESTS! */
   superuserPoolClientIsInTransaction?: boolean;
+}
 
+interface CommonPgAdaptorAndServiceSettings {
   pool?: Pool;
   poolConfig?: Omit<PoolConfig, "connectionString">;
   connectionString?: string;
 
   /** For installing the watch fixtures */
   superuserPool?: Pool;
+  /** For installing the watch fixtures */
+  superuserPoolConfig?: Omit<PoolConfig, "connectionString">;
   /** For installing the watch fixtures */
   superuserConnectionString?: string;
 }
@@ -729,8 +733,29 @@ export class PgSubscriber<
   }
 }
 
-export interface PgAdaptorMakePgServiceOptions extends MakePgServiceOptions {
-  pool?: Pool;
+export interface PgAdaptorMakePgServiceOptions
+  extends MakePgServiceOptions,
+    CommonPgAdaptorAndServiceSettings {}
+
+function mkpool(
+  name: string,
+  releasers: (() => void | PromiseLike<void>)[],
+  poolConfig: Omit<PoolConfig, "connectionString"> | undefined,
+  connectionString: string | undefined,
+) {
+  const pool = new PgPool({ ...poolConfig, connectionString });
+  releasers.push(() => pool!.end());
+
+  // If you pass your own pool, you're responsible for doing this yourself
+  pool.on("connect", (client) => {
+    client.on("error", (e) => {
+      console.error(`Client error (active, ${name})`, e);
+    });
+  });
+  pool.on("error", (e) => {
+    console.error(`Client error (in pool, ${name})`, e);
+  });
+  return pool;
 }
 
 export function makePgService(
@@ -738,9 +763,18 @@ export function makePgService(
 ): GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg"> {
   const {
     name = "main",
+
+    // Begin: CommonPgAdaptorAndServiceSettings
+    pool: rawPool,
+    poolConfig,
     connectionString,
-    schemas,
+
+    superuserPool: rawSuperuserPool,
+    superuserPoolConfig,
     superuserConnectionString,
+    // End: CommonPgAdaptorAndServiceSettings
+
+    schemas,
     withPgClientKey = name === "main" ? "withPgClient" : `${name}_withPgClient`,
     pgSettingsKey = name === "main" ? "pgSettings" : `${name}_pgSettings`,
     pgSubscriberKey = name === "main" ? "pgSubscriber" : `${name}_pgSubscriber`,
@@ -754,27 +788,27 @@ export function makePgService(
     );
   }
   const releasers: (() => void | PromiseLike<void>)[] = [];
-  let pool = options.pool;
-  if (!pool) {
-    pool = new PgPool({ connectionString });
-    releasers.push(() => pool!.end());
-  }
-  if (!options.pool) {
-    // If you pass your own pool, you're responsible for doing this yourself
-    pool.on("connect", (client) => {
-      client.on("error", (e) => {
-        console.error("Client error (active)", e);
-      });
-    });
-    pool.on("error", (e) => {
-      console.error("Client error (in pool)", e);
-    });
-  }
+
+  const pool =
+    rawPool ?? mkpool("pool", releasers, poolConfig, connectionString);
+
+  const superuserPool =
+    rawSuperuserPool ??
+    (superuserConnectionString
+      ? mkpool(
+          "superuserPool",
+          releasers,
+          superuserPoolConfig,
+          superuserConnectionString,
+        )
+      : undefined);
+
   let pgSubscriber = options.pgSubscriber ?? null;
   if (!pgSubscriber && pubsub) {
     pgSubscriber = new PgSubscriber(pool);
     releasers.push(() => pgSubscriber!.release?.());
   }
+
   const service: GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg"> =
     {
       name,
@@ -788,7 +822,7 @@ export function makePgService(
       adaptor,
       adaptorSettings: {
         pool,
-        superuserConnectionString,
+        superuserPool,
       },
       async release() {
         // Release in reverse order
