@@ -2550,6 +2550,13 @@ export class OperationPlan {
       }
     }
 
+    // Check that it doesn't depend on a side effect in the same bucket
+    if (
+      step.latestSideEffectStep &&
+      step.latestSideEffectStep.layerPlan === step.layerPlan
+    ) {
+      return;
+    }
     // Finally, check that none of its dependencies are in the same bucket.
     const deps = sudo(step).dependencies;
     if (deps.some((dep) => dep.layerPlan === step.layerPlan)) {
@@ -3401,6 +3408,9 @@ export class OperationPlan {
         }
         for (const dep of sudo(step).dependencies) {
           ensurePlanAvailableInLayer(dep, layerPlan);
+        }
+        if (step.latestSideEffectStep) {
+          ensurePlanAvailableInLayer(step.latestSideEffectStep, layerPlan);
         }
       }
 
