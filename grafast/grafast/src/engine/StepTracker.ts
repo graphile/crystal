@@ -5,7 +5,7 @@ import type { AddDependencyOptions } from "../interfaces.js";
 import { $$subroutine, ALL_FLAGS, TRAPPABLE_FLAGS } from "../interfaces.js";
 import { ExecutableStep } from "../step.js";
 import { __FlagStep } from "../steps/__flag.js";
-import { sudo, writeableArray } from "../utils.js";
+import { stepADependsOnStepB, sudo, writeableArray } from "../utils.js";
 import type {
   LayerPlan,
   LayerPlanReasonSubroutine,
@@ -357,6 +357,13 @@ export class StepTracker {
       step: $dependent,
       dependencyIndex,
     });
+
+    if (
+      $dependent.latestSideEffectStep &&
+      stepADependsOnStepB($dependency, $dependent.latestSideEffectStep)
+    ) {
+      $dependent.latestSideEffectStep = null;
+    }
 
     return dependencyIndex;
   }
