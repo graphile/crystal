@@ -542,39 +542,7 @@ export function executeBucket(
           bucket.store.set(step.id, batchExecutionValue(arrayOfLength(size)));
         }
       }
-      outerLoop: for (let dataIndex = 0; dataIndex < size; dataIndex++) {
-        if (sideEffectStepsWithErrors) {
-          const currentPolymorphicPath = bucket.polymorphicPathList[dataIndex];
-          for (const dep of sideEffectStepsWithErrors[
-            currentPolymorphicPath ?? NO_POLY_PATH
-          ]) {
-            const depExecutionValue = bucket.store.get(dep.id)!;
-            const depFlags = depExecutionValue._flagsAt(dataIndex);
-            if ((depFlags & FLAG_POLY_SKIPPED) === FLAG_POLY_SKIPPED) {
-              /* noop */
-            } else if ((depFlags & FLAG_ERROR) === FLAG_ERROR) {
-              for (
-                let allStepsIndex = executedLength;
-                allStepsIndex < allStepsLength;
-                allStepsIndex++
-              ) {
-                const step = _allSteps[
-                  allStepsIndex
-                ] as UnbatchedExecutableStep;
-                if (step._isUnary) {
-                  // COPY the unary value
-                  bucket.store.set(step.id, depExecutionValue);
-                  bucket.flagUnion |= depFlags;
-                } else {
-                  const depVal = depExecutionValue.at(dataIndex);
-                  bucket.setResult(step, dataIndex, depVal, depFlags);
-                }
-              }
-              continue outerLoop;
-            }
-          }
-        }
-
+      for (let dataIndex = 0; dataIndex < size; dataIndex++) {
         stepLoop: for (
           let allStepsIndex = executedLength;
           allStepsIndex < allStepsLength;
@@ -587,6 +555,31 @@ export function executeBucket(
           // Unary steps only need to be processed once
           if (step._isUnary && dataIndex !== 0) {
             continue;
+          }
+
+          // Check if the side effect errored
+          const $sideEffect = step.latestSideEffectStep;
+          if ($sideEffect) {
+            const depExecutionValue = bucket.store.get($sideEffect.id);
+            if (!depExecutionValue) {
+              throw new Error(
+                `GrafastInternalError<fcc8d302-ac66-40e8-aaea-ee2c7e2b30b2>: failed to get result for side effect ${$sideEffect} which impacts ${step}`,
+              );
+            }
+            const depFlags = depExecutionValue._flagsAt(dataIndex);
+            if (depFlags & FLAG_POLY_SKIPPED) {
+              /* noop */
+            } else if (depFlags & FLAG_ERROR) {
+              if (step._isUnary) {
+                // COPY the unary value
+                bucket.store.set(step.id, depExecutionValue);
+                bucket.flagUnion |= depFlags;
+              } else {
+                const depVal = depExecutionValue.at(dataIndex);
+                bucket.setResult(step, dataIndex, depVal, depFlags);
+              }
+              continue stepLoop;
+            }
           }
 
           try {
