@@ -560,25 +560,33 @@ export function executeBucket(
           // Check if the side effect errored
           const $sideEffect = step.latestSideEffectStep;
           if ($sideEffect) {
-            const depExecutionValue = bucket.store.get($sideEffect.id);
-            if (!depExecutionValue) {
-              throw new Error(
-                `GrafastInternalError<fcc8d302-ac66-40e8-aaea-ee2c7e2b30b2>: failed to get result for side effect ${$sideEffect} which impacts ${step}`,
-              );
-            }
-            const depFlags = depExecutionValue._flagsAt(dataIndex);
-            if (depFlags & FLAG_POLY_SKIPPED) {
-              /* noop */
-            } else if (depFlags & FLAG_ERROR) {
-              if (step._isUnary) {
-                // COPY the unary value
-                bucket.store.set(step.id, depExecutionValue);
-                bucket.flagUnion |= depFlags;
-              } else {
-                const depVal = depExecutionValue.at(dataIndex);
-                bucket.setResult(step, dataIndex, depVal, depFlags);
+            const currentPolymorphicPath =
+              bucket.polymorphicPathList[dataIndex];
+            if (
+              currentPolymorphicPath === null ||
+              !$sideEffect.polymorphicPaths ||
+              $sideEffect.polymorphicPaths.has(currentPolymorphicPath)
+            ) {
+              const depExecutionValue = bucket.store.get($sideEffect.id);
+              if (!depExecutionValue) {
+                throw new Error(
+                  `GrafastInternalError<fcc8d302-ac66-40e8-aaea-ee2c7e2b30b2>: failed to get result for side effect ${$sideEffect} which impacts ${step}`,
+                );
               }
-              continue stepLoop;
+              const depFlags = depExecutionValue._flagsAt(dataIndex);
+              if (depFlags & FLAG_POLY_SKIPPED) {
+                /* noop */
+              } else if (depFlags & FLAG_ERROR) {
+                if (step._isUnary) {
+                  // COPY the unary value
+                  bucket.store.set(step.id, depExecutionValue);
+                  bucket.flagUnion |= depFlags;
+                } else {
+                  const depVal = depExecutionValue.at(dataIndex);
+                  bucket.setResult(step, dataIndex, depVal, depFlags);
+                }
+                continue stepLoop;
+              }
             }
           }
 
