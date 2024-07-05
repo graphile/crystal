@@ -692,6 +692,9 @@ export function getChildBucketAndIndex(
   bucketIndex: number,
   arrayIndex: number | null = null,
 ): [Bucket, number] | null {
+  if (bucket.layerPlan === layerPlan) {
+    return [bucket, bucketIndex];
+  }
   if (
     (arrayIndex == null) ===
     (outputPlan != null && outputPlan.type.mode === "array")
