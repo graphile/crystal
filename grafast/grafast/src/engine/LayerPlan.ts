@@ -347,9 +347,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         ? `{${this.reason.typeNames.join(",")}}`
         : "";
     const deps = this.copyStepIds.length > 0 ? `/${this.copyStepIds}` : "";
-    return `LayerPlan<${this.id}${chain}?${this.reason.type}${reasonExtra}!${
-      this.rootStep?.id ?? "x"
-    }${deps}>`;
+    return `LayerPlan<${this.id}${chain}${
+      this.parentSideEffectStep ? `^${this.parentSideEffectStep.id}` : ""
+    }?${this.reason.type}${reasonExtra}!${this.rootStep?.id ?? "x"}${deps}>`;
   }
 
   print(depth = 0) {
