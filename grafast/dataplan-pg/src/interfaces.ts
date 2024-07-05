@@ -421,9 +421,9 @@ export interface MakePgServiceOptions
       GraphileConfig.PgServiceConfiguration,
       | "name"
       | "pgSettings"
+      | "pgSettingsKey"
       | "pgSettingsForIntrospection"
       | "withPgClientKey"
-      | "pgSettingsKey"
       | "pgSubscriber"
       | "pgSubscriberKey"
     >
