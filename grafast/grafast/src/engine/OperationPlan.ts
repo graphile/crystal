@@ -2286,7 +2286,8 @@ export class OperationPlan {
           possiblyPeer !== step &&
           !possiblyPeer.hasSideEffects &&
           possiblyPeer.layerPlan === layerPlan &&
-          possiblyPeer.constructor === stepConstructor
+          possiblyPeer.constructor === stepConstructor &&
+          possiblyPeer.latestSideEffectStep === step.latestSideEffectStep
         ) {
           if (allPeers === null) {
             allPeers = [possiblyPeer];
@@ -2327,6 +2328,7 @@ export class OperationPlan {
           peerDependencyIndex === 0 &&
           !possiblyPeer.hasSideEffects &&
           possiblyPeer.constructor === stepConstructor &&
+          possiblyPeer.latestSideEffectStep === step.latestSideEffectStep &&
           peerLayerPlan.depth >= minDepth &&
           sudo(possiblyPeer).dependencies.length === dependencyCount &&
           peerLayerPlan === ancestry[peerLayerPlan.depth] &&
@@ -2386,6 +2388,7 @@ export class OperationPlan {
               peerDependencyIndex === dependencyIndex &&
               !possiblyPeer.hasSideEffects &&
               possiblyPeer.constructor === stepConstructor &&
+              possiblyPeer.latestSideEffectStep === step.latestSideEffectStep &&
               peerDependencies.length === dependencyCount &&
               peerLayerPlan === ancestry[peerLayerPlan.depth] &&
               peerFlags[0] === flags[0] &&
