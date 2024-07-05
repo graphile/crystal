@@ -1,6 +1,6 @@
 import chalk from "chalk";
 
-import type { JSONValue } from "../index.js";
+import type { GrafastResultsList, JSONValue } from "../index.js";
 import { $$deepDepSkip } from "../interfaces.js";
 import type { ExecutableStep } from "../step.js";
 import { $$noExec, UnbatchedExecutableStep } from "../step.js";
@@ -50,10 +50,10 @@ export class __ItemStep<TData> extends UnbatchedExecutableStep<TData> {
     return this.getDep(0);
   }
 
-  execute(): never {
+  execute(): GrafastResultsList<TData> {
     throw new Error("__ItemStep must never execute");
   }
-  unbatchedExecute(): never {
+  unbatchedExecute(): TData {
     throw new Error("__ItemStep must never execute");
   }
 

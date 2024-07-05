@@ -9,54 +9,53 @@ graph TD
 
 
     %% plan dependencies
-    Object14{{"Object[14∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access13{{"Access[13∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access12 & Access13 --> Object14
-    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
-    Object14 --> PgSelect11
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value3 --> Access12
-    __Value3 --> Access13
-    __Value0["__Value[0∈0]"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
-    PgSelect11 ==> __Item15
-    PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
-    __Item15 --> PgSelectSingle16
-    PgClassExpression17{{"PgClassExpression[17∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
-    PgSelectSingle16 --> PgClassExpression17
-    Access31{{"Access[31∈2]<br />ᐸ15.1ᐳ"}}:::plan
-    __Item15 --> Access31
-    __Item28[/"__Item[28∈3]<br />ᐸ31ᐳ"\]:::itemplan
-    Access31 ==> __Item28
-    PgSelectSingle29{{"PgSelectSingle[29∈3]<br />ᐸmessagesᐳ"}}:::plan
-    __Item28 --> PgSelectSingle29
-    PgClassExpression30{{"PgClassExpression[30∈4]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
-    PgSelectSingle29 --> PgClassExpression30
+    Object13{{"Object[13∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access11{{"Access[11∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access12{{"Access[12∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access11 & Access12 --> Object13
+    PgSelect10[["PgSelect[10∈0]<br />ᐸforumsᐳ"]]:::plan
+    Object13 --> PgSelect10
+    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access11
+    __Value2 --> Access12
+    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
+    __Item14[/"__Item[14∈1]<br />ᐸ10ᐳ"\]:::itemplan
+    PgSelect10 ==> __Item14
+    PgSelectSingle15{{"PgSelectSingle[15∈1]<br />ᐸforumsᐳ"}}:::plan
+    __Item14 --> PgSelectSingle15
+    PgClassExpression16{{"PgClassExpression[16∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
+    PgSelectSingle15 --> PgClassExpression16
+    Access30{{"Access[30∈2]<br />ᐸ14.1ᐳ"}}:::plan
+    __Item14 --> Access30
+    __Item27[/"__Item[27∈3]<br />ᐸ30ᐳ"\]:::itemplan
+    Access30 ==> __Item27
+    PgSelectSingle28{{"PgSelectSingle[28∈3]<br />ᐸmessagesᐳ"}}:::plan
+    __Item27 --> PgSelectSingle28
+    PgClassExpression29{{"PgClassExpression[29∈4]<br />ᐸ__messages__.”body”ᐳ"}}:::plan
+    PgSelectSingle28 --> PgClassExpression29
 
     %% define steps
 
     subgraph "Buckets for queries/conditions/basics"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Access[12], Access[13], Object[14]<br />2: PgSelect[11]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: Access[11], Access[12], Object[13]<br />2: PgSelect[10]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14 bucket0
-    Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ11ᐳ[15]"):::bucket
+    class Bucket0,__Value2,__Value4,PgSelect10,Access11,Access12,Object13 bucket0
+    Bucket1("Bucket 1 (listItem)<br />ROOT __Item{1}ᐸ10ᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item15,PgSelectSingle16 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 15<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]"):::bucket
+    class Bucket1,__Item14,PgSelectSingle15 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 14<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression17,Access31 bucket2
-    Bucket3("Bucket 3 (listItem)<br />ROOT __Item{3}ᐸ31ᐳ[28]"):::bucket
+    class Bucket2,PgClassExpression16,Access30 bucket2
+    Bucket3("Bucket 3 (listItem)<br />ROOT __Item{3}ᐸ30ᐳ[27]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,__Item28,PgSelectSingle29 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 29<br /><br />ROOT PgSelectSingle{3}ᐸmessagesᐳ[29]"):::bucket
+    class Bucket3,__Item27,PgSelectSingle28 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 28<br /><br />ROOT PgSelectSingle{3}ᐸmessagesᐳ[28]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression30 bucket4
+    class Bucket4,PgClassExpression29 bucket4
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object14,PgSelect11,Access12,Access13,__Value0,__Value3,__Value5 unary
+    class Object13,PgSelect10,Access11,Access12,__Value2,__Value4 unary
     end

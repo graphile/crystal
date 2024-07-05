@@ -9,62 +9,61 @@ graph TD
 
 
     %% plan dependencies
-    Object14{{"Object[14∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access12{{"Access[12∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access13{{"Access[13∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access12 & Access13 --> Object14
-    PgSelect11[["PgSelect[11∈0]<br />ᐸforumsᐳ"]]:::plan
-    Object14 --> PgSelect11
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value3 --> Access12
-    __Value3 --> Access13
-    Connection28{{"Connection[28∈0]<br />ᐸ24ᐳ"}}:::plan
-    Constant37{{"Constant[37∈0]<br />ᐸ5ᐳ"}}:::plan
-    Constant37 --> Connection28
-    __Value0["__Value[0∈0]"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    __Item15[/"__Item[15∈1]<br />ᐸ11ᐳ"\]:::itemplan
-    PgSelect11 ==> __Item15
-    PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸforumsᐳ"}}:::plan
-    __Item15 --> PgSelectSingle16
-    Constant38{{"Constant[38∈1]<br />ᐸtrueᐳ"}}:::plan
-    PgSelect31[["PgSelect[31∈3]<br />ᐸmessages+1ᐳ"]]:::plan
-    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
-    PgClassExpression29{{"PgClassExpression[29∈3]<br />ᐸ__forums__...chived_at”ᐳ"}}:::plan
-    Object14 & PgClassExpression23 & Constant38 & PgClassExpression29 & Connection28 --> PgSelect31
-    PgSelect33[["PgSelect[33∈3]<br />ᐸmessages(aggregate)ᐳ"]]:::plan
-    Object14 & PgClassExpression23 & Constant38 & PgClassExpression29 & Connection28 --> PgSelect33
-    PgSelectSingle16 --> PgClassExpression23
-    PgSelectSingle16 --> PgClassExpression29
-    PgPageInfo30{{"PgPageInfo[30∈3]"}}:::plan
-    Connection28 --> PgPageInfo30
-    Access32{{"Access[32∈3]<br />ᐸ31.hasMoreᐳ"}}:::plan
-    PgSelect31 --> Access32
-    First34{{"First[34∈3]"}}:::plan
-    PgSelect33 --> First34
-    PgSelectSingle35{{"PgSelectSingle[35∈3]<br />ᐸmessagesᐳ"}}:::plan
-    First34 --> PgSelectSingle35
-    PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸcount(*)ᐳ"}}:::plan
-    PgSelectSingle35 --> PgClassExpression36
+    Object13{{"Object[13∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access11{{"Access[11∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access12{{"Access[12∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access11 & Access12 --> Object13
+    PgSelect10[["PgSelect[10∈0]<br />ᐸforumsᐳ"]]:::plan
+    Object13 --> PgSelect10
+    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access11
+    __Value2 --> Access12
+    Connection27{{"Connection[27∈0]<br />ᐸ23ᐳ"}}:::plan
+    Constant36{{"Constant[36∈0]<br />ᐸ5ᐳ"}}:::plan
+    Constant36 --> Connection27
+    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
+    __Item14[/"__Item[14∈1]<br />ᐸ10ᐳ"\]:::itemplan
+    PgSelect10 ==> __Item14
+    PgSelectSingle15{{"PgSelectSingle[15∈1]<br />ᐸforumsᐳ"}}:::plan
+    __Item14 --> PgSelectSingle15
+    Constant37{{"Constant[37∈1]<br />ᐸtrueᐳ"}}:::plan
+    PgSelect30[["PgSelect[30∈3]<br />ᐸmessages+1ᐳ"]]:::plan
+    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__forums__.”id”ᐳ"}}:::plan
+    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__forums__...chived_at”ᐳ"}}:::plan
+    Object13 & PgClassExpression22 & Constant37 & PgClassExpression28 & Connection27 --> PgSelect30
+    PgSelect32[["PgSelect[32∈3]<br />ᐸmessages(aggregate)ᐳ"]]:::plan
+    Object13 & PgClassExpression22 & Constant37 & PgClassExpression28 & Connection27 --> PgSelect32
+    PgSelectSingle15 --> PgClassExpression22
+    PgSelectSingle15 --> PgClassExpression28
+    PgPageInfo29{{"PgPageInfo[29∈3]"}}:::plan
+    Connection27 --> PgPageInfo29
+    Access31{{"Access[31∈3]<br />ᐸ30.hasMoreᐳ"}}:::plan
+    PgSelect30 --> Access31
+    First33{{"First[33∈3]"}}:::plan
+    PgSelect32 --> First33
+    PgSelectSingle34{{"PgSelectSingle[34∈3]<br />ᐸmessagesᐳ"}}:::plan
+    First33 --> PgSelectSingle34
+    PgClassExpression35{{"PgClassExpression[35∈3]<br />ᐸcount(*)ᐳ"}}:::plan
+    PgSelectSingle34 --> PgClassExpression35
 
     %% define steps
 
     subgraph "Buckets for queries/conditions/condition-featured-messages-minimal"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 12, 13, 37, 14, 28<br />2: PgSelect[11]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 11, 12, 36, 13, 27<br />2: PgSelect[10]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,PgSelect11,Access12,Access13,Object14,Connection28,Constant37 bucket0
-    Bucket1("Bucket 1 (listItem)<br />Deps: 28, 14<br /><br />ROOT __Item{1}ᐸ11ᐳ[15]"):::bucket
+    class Bucket0,__Value2,__Value4,PgSelect10,Access11,Access12,Object13,Connection27,Constant36 bucket0
+    Bucket1("Bucket 1 (listItem)<br />Deps: 27, 13<br /><br />ROOT __Item{1}ᐸ10ᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,__Item15,PgSelectSingle16,Constant38 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 16, 28, 14, 38<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[16]"):::bucket
+    class Bucket1,__Item14,PgSelectSingle15,Constant37 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 15, 27, 13, 37<br /><br />ROOT PgSelectSingle{1}ᐸforumsᐳ[15]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 16, 28, 14, 38<br /><br />ROOT Connectionᐸ24ᐳ[28]<br />1: <br />ᐳ: 23, 29, 30<br />2: PgSelect[31], PgSelect[33]<br />ᐳ: 32, 34, 35, 36"):::bucket
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 15, 27, 13, 37<br /><br />ROOT Connectionᐸ23ᐳ[27]<br />1: <br />ᐳ: 22, 28, 29<br />2: PgSelect[30], PgSelect[32]<br />ᐳ: 31, 33, 34, 35"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression23,PgClassExpression29,PgPageInfo30,PgSelect31,Access32,PgSelect33,First34,PgSelectSingle35,PgClassExpression36 bucket3
+    class Bucket3,PgClassExpression22,PgClassExpression28,PgPageInfo29,PgSelect30,Access31,PgSelect32,First33,PgSelectSingle34,PgClassExpression35 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object14,PgSelect11,Access12,Access13,Connection28,__Value0,__Value3,__Value5,Constant37,Constant38,PgPageInfo30 unary
+    class Object13,PgSelect10,Access11,Access12,Connection27,__Value2,__Value4,Constant36,Constant37,PgPageInfo29 unary
     end

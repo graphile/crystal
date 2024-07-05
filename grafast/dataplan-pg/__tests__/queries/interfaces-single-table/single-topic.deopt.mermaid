@@ -9,52 +9,51 @@ graph TD
 
 
     %% plan dependencies
-    PgSelect9[["PgSelect[9∈0]<br />ᐸsingle_table_itemsᐳ"]]:::plan
-    Object12{{"Object[12∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant24{{"Constant[24∈0]<br />ᐸ10ᐳ"}}:::plan
-    Constant8{{"Constant[8∈0]<br />ᐸ'TOPIC'ᐳ"}}:::plan
-    Object12 & Constant24 & Constant8 --> PgSelect9
-    Access10{{"Access[10∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access11{{"Access[11∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access10 & Access11 --> Object12
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value3 --> Access10
-    __Value3 --> Access11
-    First13{{"First[13∈0]"}}:::plan
-    PgSelect9 --> First13
-    PgSelectSingle14{{"PgSelectSingle[14∈0]<br />ᐸsingle_table_itemsᐳ"}}:::plan
-    First13 --> PgSelectSingle14
-    __Value0["__Value[0∈0]"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    PgClassExpression15{{"PgClassExpression[15∈1]<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
-    PgSelectSingle14 --> PgClassExpression15
-    PgClassExpression16{{"PgClassExpression[16∈1]<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
-    PgSelectSingle14 --> PgClassExpression16
-    PgClassExpression17{{"PgClassExpression[17∈1]<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
-    PgSelectSingle14 --> PgClassExpression17
-    PgClassExpression18{{"PgClassExpression[18∈1]<br />ᐸ__single_t...”position”ᐳ"}}:::plan
-    PgSelectSingle14 --> PgClassExpression18
-    PgClassExpression19{{"PgClassExpression[19∈1]<br />ᐸ__single_t...reated_at”ᐳ"}}:::plan
-    PgSelectSingle14 --> PgClassExpression19
-    PgClassExpression20{{"PgClassExpression[20∈1]<br />ᐸ__single_t...pdated_at”ᐳ"}}:::plan
-    PgSelectSingle14 --> PgClassExpression20
-    PgClassExpression21{{"PgClassExpression[21∈1]<br />ᐸ__single_t..._archived”ᐳ"}}:::plan
-    PgSelectSingle14 --> PgClassExpression21
-    PgClassExpression22{{"PgClassExpression[22∈1]<br />ᐸ__single_t...chived_at”ᐳ"}}:::plan
-    PgSelectSingle14 --> PgClassExpression22
-    PgClassExpression23{{"PgClassExpression[23∈1]<br />ᐸ__single_t...__.”title”ᐳ"}}:::plan
-    PgSelectSingle14 --> PgClassExpression23
+    PgSelect8[["PgSelect[8∈0]<br />ᐸsingle_table_itemsᐳ"]]:::plan
+    Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant23{{"Constant[23∈0]<br />ᐸ10ᐳ"}}:::plan
+    Constant7{{"Constant[7∈0]<br />ᐸ'TOPIC'ᐳ"}}:::plan
+    Object11 & Constant23 & Constant7 --> PgSelect8
+    Access9{{"Access[9∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access10{{"Access[10∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access9 & Access10 --> Object11
+    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access9
+    __Value2 --> Access10
+    First12{{"First[12∈0]"}}:::plan
+    PgSelect8 --> First12
+    PgSelectSingle13{{"PgSelectSingle[13∈0]<br />ᐸsingle_table_itemsᐳ"}}:::plan
+    First12 --> PgSelectSingle13
+    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
+    PgClassExpression14{{"PgClassExpression[14∈1]<br />ᐸ__single_t...ems__.”id”ᐳ"}}:::plan
+    PgSelectSingle13 --> PgClassExpression14
+    PgClassExpression15{{"PgClassExpression[15∈1]<br />ᐸ__single_t...s__.”type”ᐳ"}}:::plan
+    PgSelectSingle13 --> PgClassExpression15
+    PgClassExpression16{{"PgClassExpression[16∈1]<br />ᐸ__single_t...__.”type2”ᐳ"}}:::plan
+    PgSelectSingle13 --> PgClassExpression16
+    PgClassExpression17{{"PgClassExpression[17∈1]<br />ᐸ__single_t...”position”ᐳ"}}:::plan
+    PgSelectSingle13 --> PgClassExpression17
+    PgClassExpression18{{"PgClassExpression[18∈1]<br />ᐸ__single_t...reated_at”ᐳ"}}:::plan
+    PgSelectSingle13 --> PgClassExpression18
+    PgClassExpression19{{"PgClassExpression[19∈1]<br />ᐸ__single_t...pdated_at”ᐳ"}}:::plan
+    PgSelectSingle13 --> PgClassExpression19
+    PgClassExpression20{{"PgClassExpression[20∈1]<br />ᐸ__single_t..._archived”ᐳ"}}:::plan
+    PgSelectSingle13 --> PgClassExpression20
+    PgClassExpression21{{"PgClassExpression[21∈1]<br />ᐸ__single_t...chived_at”ᐳ"}}:::plan
+    PgSelectSingle13 --> PgClassExpression21
+    PgClassExpression22{{"PgClassExpression[22∈1]<br />ᐸ__single_t...__.”title”ᐳ"}}:::plan
+    PgSelectSingle13 --> PgClassExpression22
 
     %% define steps
 
     subgraph "Buckets for queries/interfaces-single-table/single-topic"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 8, 10, 11, 24, 12<br />2: PgSelect[9]<br />ᐳ: First[13], PgSelectSingle[14]"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 7, 9, 10, 23, 11<br />2: PgSelect[8]<br />ᐳ: First[12], PgSelectSingle[13]"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Constant8,PgSelect9,Access10,Access11,Object12,First13,PgSelectSingle14,Constant24 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14<br /><br />ROOT PgSelectSingleᐸsingle_table_itemsᐳ[14]"):::bucket
+    class Bucket0,__Value2,__Value4,Constant7,PgSelect8,Access9,Access10,Object11,First12,PgSelectSingle13,Constant23 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 13<br /><br />ROOT PgSelectSingleᐸsingle_table_itemsᐳ[13]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgClassExpression15,PgClassExpression16,PgClassExpression17,PgClassExpression18,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgClassExpression22,PgClassExpression23 bucket1
+    class Bucket1,PgClassExpression14,PgClassExpression15,PgClassExpression16,PgClassExpression17,PgClassExpression18,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgClassExpression22 bucket1
     Bucket0 --> Bucket1
     classDef unary fill:#fafffa,borderWidth:8px
-    class PgSelect9,Object12,Access10,Access11,First13,PgSelectSingle14,__Value0,__Value3,__Value5,Constant8,Constant24,PgClassExpression15,PgClassExpression16,PgClassExpression17,PgClassExpression18,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgClassExpression22,PgClassExpression23 unary
+    class PgSelect8,Object11,Access9,Access10,First12,PgSelectSingle13,__Value2,__Value4,Constant7,Constant23,PgClassExpression14,PgClassExpression15,PgClassExpression16,PgClassExpression17,PgClassExpression18,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgClassExpression22 unary
     end

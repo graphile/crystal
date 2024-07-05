@@ -393,12 +393,14 @@ common set of optional configuration parameters:
 - `schemas`
 - `superuserConnectionString`
 - `pubsub` (create a pgSubscriber entry; should default to `true`)
-- pass-through options (same as in `pgServices` above):
+- pass-through options (a subset of those in `pgServices` above):
   - `name` (default: "main")
-  - `pgSettingsKey` (default with default `name`: `pgSettings`, otherwise: `${name}_pgSettings`)
-  - `withPgClientKey` (default with default `name`: `withPgClient`, otherwise: `${name}_withPgClient`)
-  - `pgSubscriberKey` (default with default `name`: `pgSubscriber`, otherwise: `${name}_pgSubscriber`)
   - `pgSettings`
+  - `pgSettingsKey` (default with default `name`: `pgSettings`, otherwise: `${name}_pgSettings`)
+  - `pgSettingsForIntrospection`
+  - `withPgClientKey` (default with default `name`: `withPgClient`, otherwise: `${name}_withPgClient`)
+  - `pgSubscriber`
+  - `pgSubscriberKey` (default with default `name`: `pgSubscriber`, otherwise: `${name}_pgSubscriber`)
 
 :::info
 
@@ -461,8 +463,6 @@ primarily, it accepts the following options:
 - `pool` - pass your own pre-built `pg.Pool` instance to use, in which case all
   other (non-superuser) options will be ignored. You are responsible for
   releasing this pool!
-- `superuserPool` - as `pool`, but for superuser connections (only needed to
-  install the watch fixtures in watch mode)
 - `connectionString` - the database connection string to use, we'll create a
   pool for you automatically (and handle releasing it) using this connection
   string
@@ -470,10 +470,18 @@ primarily, it accepts the following options:
   `connectionString`) to pass through to `pg.Pool`; see the [pg.Pool
   options](https://node-postgres.com/apis/pool) which inherit the [pg.Client
   options](https://node-postgres.com/apis/client).
-- `superuserConnectionString` - as `connectionString`, but for superuser
-  connections (only needed to install the watch fixtures in watch mode)
 - `pubsub` (default: `true`) - enable LISTEN/NOTIFY via creation of a
   `pgSubscriber`
+- `superuserPool` - as `pool`, but for superuser connections (only used to
+  install the watch fixtures in watch mode)
+- `superuserConnectionString` - as `connectionString`, but for superuser
+  connections (only used to install the watch fixtures in watch mode)
+- `superuserPoolConfig` - as `poolConfig`, but for superuser
+  connections (only used to install the watch fixtures in watch mode)
+
+Note if `pool` is provided then `connectionString` and `poolConfig` should not
+be specified. Similarly if `superuserPool` is provided then
+`superuserConnectionString` and `superuserPoolConfig` should not be specified.
 
 ### `gather` options
 

@@ -17,6 +17,7 @@ import {
   FLAG_NULL,
   TRAPPABLE_FLAGS,
 } from "../interfaces.js";
+import type { ListCapableStep } from "../step.js";
 import { ExecutableStep, isListCapableStep } from "../step.js";
 import type { __ItemStep } from "./__item.js";
 
@@ -149,9 +150,13 @@ export class __FlagStep<TData> extends ExecutableStep<TData> {
   [$$deepDepSkip](): ExecutableStep {
     return this.getDepOptions(0).step;
   }
-  listItem?: ($item: __ItemStep<this>) => ExecutableStep;
+  listItem?: (
+    $item: __ItemStep<ListCapableStep<unknown, ExecutableStep<unknown>>>,
+  ) => ExecutableStep;
   // Copied over listItem if the dependent step is a list capable step
-  _listItem($item: __ItemStep<this>) {
+  _listItem(
+    $item: __ItemStep<ListCapableStep<unknown, ExecutableStep<unknown>>>,
+  ) {
     const $dep = this.dependencies[0];
     return isListCapableStep($dep) ? $dep.listItem($item) : $item;
   }

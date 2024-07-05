@@ -9,29 +9,28 @@ graph TD
 
 
     %% plan dependencies
-    __Value0["__Value[0∈0]"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection15{{"Connection[15∈0]<br />ᐸ14ᐳ"}}:::plan
-    Constant19{{"Constant[19∈1]<br />ᐸ[]ᐳ"}}:::plan
-    __Item17[/"__Item[17∈2]<br />ᐸ19ᐳ"\]:::itemplan
-    Constant19 ==> __Item17
-    PgUnionAllSingle18["PgUnionAllSingle[18∈2]"]:::plan
-    __Item17 --> PgUnionAllSingle18
+    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
+    Connection14{{"Connection[14∈0]<br />ᐸ13ᐳ"}}:::plan
+    Constant18{{"Constant[18∈1]<br />ᐸ[]ᐳ"}}:::plan
+    __Item16[/"__Item[16∈2]<br />ᐸ18ᐳ"\]:::itemplan
+    Constant18 ==> __Item16
+    PgUnionAllSingle17["PgUnionAllSingle[17∈2]"]:::plan
+    __Item16 --> PgUnionAllSingle17
 
     %% define steps
 
     subgraph "Buckets for queries/polymorphic/zero-implementations"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value5,Connection15 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 15<br /><br />ROOT Connectionᐸ14ᐳ[15]"):::bucket
+    class Bucket0,__Value4,Connection14 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 14<br /><br />ROOT Connectionᐸ13ᐳ[14]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Constant19 bucket1
-    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ19ᐳ[17]"):::bucket
+    class Bucket1,Constant18 bucket1
+    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ18ᐳ[16]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item17,PgUnionAllSingle18 bucket2
+    class Bucket2,__Item16,PgUnionAllSingle17 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     classDef unary fill:#fafffa,borderWidth:8px
-    class __Value0,__Value5,Connection15,Constant19 unary
+    class __Value4,Connection14,Constant18 unary
     end

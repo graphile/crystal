@@ -9,113 +9,112 @@ graph TD
 
 
     %% plan dependencies
-    Object36{{"Object[36∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access34{{"Access[34∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access35{{"Access[35∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access34 & Access35 --> Object36
-    PgSelect50[["PgSelect[50∈0]<br />ᐸpersonᐳ"]]:::plan
-    Access48{{"Access[48∈0]<br />ᐸ47.1ᐳ"}}:::plan
-    Object36 -->|rejectNull| PgSelect50
-    Access48 --> PgSelect50
-    PgSelect89[["PgSelect[89∈0]<br />ᐸpersonᐳ"]]:::plan
-    Access87{{"Access[87∈0]<br />ᐸ86.1ᐳ"}}:::plan
-    Object36 -->|rejectNull| PgSelect89
-    Access87 --> PgSelect89
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value3 --> Access34
-    __Value3 --> Access35
-    Lambda47{{"Lambda[47∈0]<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
-    Constant97{{"Constant[97∈0]<br />ᐸ'WyJwZW9wbGUiLDZd'ᐳ"}}:::plan
-    Constant97 --> Lambda47
-    Lambda47 --> Access48
-    First54{{"First[54∈0]"}}:::plan
-    PgSelect50 --> First54
-    PgSelectSingle55{{"PgSelectSingle[55∈0]<br />ᐸpersonᐳ"}}:::plan
-    First54 --> PgSelectSingle55
-    Lambda86{{"Lambda[86∈0]<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
-    Constant99{{"Constant[99∈0]<br />ᐸ'WyJwb3N0cyIsM10='ᐳ"}}:::plan
-    Constant99 --> Lambda86
-    Lambda86 --> Access87
-    First93{{"First[93∈0]"}}:::plan
-    PgSelect89 --> First93
-    PgSelectSingle94{{"PgSelectSingle[94∈0]<br />ᐸpersonᐳ"}}:::plan
-    First93 --> PgSelectSingle94
-    __Value0["__Value[0∈0]"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection37{{"Connection[37∈0]<br />ᐸ33ᐳ"}}:::plan
-    Connection76{{"Connection[76∈0]<br />ᐸ72ᐳ"}}:::plan
-    PgSelect38[["PgSelect[38∈1]<br />ᐸpersonᐳ"]]:::plan
-    Constant96{{"Constant[96∈1]<br />ᐸ'Twenty Seventwo'ᐳ"}}:::plan
-    Object36 & Constant96 & Connection37 --> PgSelect38
-    Constant41{{"Constant[41∈1]<br />ᐸ'people'ᐳ"}}:::plan
-    __Item39[/"__Item[39∈2]<br />ᐸ38ᐳ"\]:::itemplan
-    PgSelect38 ==> __Item39
-    PgSelectSingle40{{"PgSelectSingle[40∈2]<br />ᐸpersonᐳ"}}:::plan
-    __Item39 --> PgSelectSingle40
-    List43{{"List[43∈3]<br />ᐸ41,42ᐳ"}}:::plan
-    PgClassExpression42{{"PgClassExpression[42∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Constant41 & PgClassExpression42 --> List43
-    PgSelectSingle40 --> PgClassExpression42
-    Lambda44{{"Lambda[44∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List43 --> Lambda44
-    PgClassExpression45{{"PgClassExpression[45∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle40 --> PgClassExpression45
-    PgClassExpression56{{"PgClassExpression[56∈4]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle55 --> PgClassExpression56
-    PgSelect77[["PgSelect[77∈5]<br />ᐸpostᐳ"]]:::plan
-    Constant98{{"Constant[98∈5]<br />ᐸ'Is that a cooking show?'ᐳ"}}:::plan
-    Object36 & Constant98 & Connection76 --> PgSelect77
-    Constant80{{"Constant[80∈5]<br />ᐸ'posts'ᐳ"}}:::plan
-    __Item78[/"__Item[78∈6]<br />ᐸ77ᐳ"\]:::itemplan
-    PgSelect77 ==> __Item78
-    PgSelectSingle79{{"PgSelectSingle[79∈6]<br />ᐸpostᐳ"}}:::plan
-    __Item78 --> PgSelectSingle79
-    List82{{"List[82∈7]<br />ᐸ80,81ᐳ"}}:::plan
-    PgClassExpression81{{"PgClassExpression[81∈7]<br />ᐸ__post__.”id”ᐳ"}}:::plan
-    Constant80 & PgClassExpression81 --> List82
-    PgSelectSingle79 --> PgClassExpression81
-    Lambda83{{"Lambda[83∈7]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List82 --> Lambda83
-    PgClassExpression84{{"PgClassExpression[84∈7]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
-    PgSelectSingle79 --> PgClassExpression84
-    PgClassExpression95{{"PgClassExpression[95∈8]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle94 --> PgClassExpression95
+    Object35{{"Object[35∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access33{{"Access[33∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access34{{"Access[34∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access33 & Access34 --> Object35
+    PgSelect49[["PgSelect[49∈0]<br />ᐸpersonᐳ"]]:::plan
+    Access47{{"Access[47∈0]<br />ᐸ46.1ᐳ"}}:::plan
+    Object35 -->|rejectNull| PgSelect49
+    Access47 --> PgSelect49
+    PgSelect88[["PgSelect[88∈0]<br />ᐸpersonᐳ"]]:::plan
+    Access86{{"Access[86∈0]<br />ᐸ85.1ᐳ"}}:::plan
+    Object35 -->|rejectNull| PgSelect88
+    Access86 --> PgSelect88
+    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access33
+    __Value2 --> Access34
+    Lambda46{{"Lambda[46∈0]<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
+    Constant96{{"Constant[96∈0]<br />ᐸ'WyJwZW9wbGUiLDZd'ᐳ"}}:::plan
+    Constant96 --> Lambda46
+    Lambda46 --> Access47
+    First53{{"First[53∈0]"}}:::plan
+    PgSelect49 --> First53
+    PgSelectSingle54{{"PgSelectSingle[54∈0]<br />ᐸpersonᐳ"}}:::plan
+    First53 --> PgSelectSingle54
+    Lambda85{{"Lambda[85∈0]<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
+    Constant98{{"Constant[98∈0]<br />ᐸ'WyJwb3N0cyIsM10='ᐳ"}}:::plan
+    Constant98 --> Lambda85
+    Lambda85 --> Access86
+    First92{{"First[92∈0]"}}:::plan
+    PgSelect88 --> First92
+    PgSelectSingle93{{"PgSelectSingle[93∈0]<br />ᐸpersonᐳ"}}:::plan
+    First92 --> PgSelectSingle93
+    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
+    Connection36{{"Connection[36∈0]<br />ᐸ32ᐳ"}}:::plan
+    Connection75{{"Connection[75∈0]<br />ᐸ71ᐳ"}}:::plan
+    PgSelect37[["PgSelect[37∈1]<br />ᐸpersonᐳ"]]:::plan
+    Constant95{{"Constant[95∈1]<br />ᐸ'Twenty Seventwo'ᐳ"}}:::plan
+    Object35 & Constant95 & Connection36 --> PgSelect37
+    Constant40{{"Constant[40∈1]<br />ᐸ'people'ᐳ"}}:::plan
+    __Item38[/"__Item[38∈2]<br />ᐸ37ᐳ"\]:::itemplan
+    PgSelect37 ==> __Item38
+    PgSelectSingle39{{"PgSelectSingle[39∈2]<br />ᐸpersonᐳ"}}:::plan
+    __Item38 --> PgSelectSingle39
+    List42{{"List[42∈3]<br />ᐸ40,41ᐳ"}}:::plan
+    PgClassExpression41{{"PgClassExpression[41∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Constant40 & PgClassExpression41 --> List42
+    PgSelectSingle39 --> PgClassExpression41
+    Lambda43{{"Lambda[43∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List42 --> Lambda43
+    PgClassExpression44{{"PgClassExpression[44∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle39 --> PgClassExpression44
+    PgClassExpression55{{"PgClassExpression[55∈4]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle54 --> PgClassExpression55
+    PgSelect76[["PgSelect[76∈5]<br />ᐸpostᐳ"]]:::plan
+    Constant97{{"Constant[97∈5]<br />ᐸ'Is that a cooking show?'ᐳ"}}:::plan
+    Object35 & Constant97 & Connection75 --> PgSelect76
+    Constant79{{"Constant[79∈5]<br />ᐸ'posts'ᐳ"}}:::plan
+    __Item77[/"__Item[77∈6]<br />ᐸ76ᐳ"\]:::itemplan
+    PgSelect76 ==> __Item77
+    PgSelectSingle78{{"PgSelectSingle[78∈6]<br />ᐸpostᐳ"}}:::plan
+    __Item77 --> PgSelectSingle78
+    List81{{"List[81∈7]<br />ᐸ79,80ᐳ"}}:::plan
+    PgClassExpression80{{"PgClassExpression[80∈7]<br />ᐸ__post__.”id”ᐳ"}}:::plan
+    Constant79 & PgClassExpression80 --> List81
+    PgSelectSingle78 --> PgClassExpression80
+    Lambda82{{"Lambda[82∈7]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List81 --> Lambda82
+    PgClassExpression83{{"PgClassExpression[83∈7]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
+    PgSelectSingle78 --> PgClassExpression83
+    PgClassExpression94{{"PgClassExpression[94∈8]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle93 --> PgClassExpression94
 
     %% define steps
 
     subgraph "Buckets for queries/v4/nodeId-earlyExit"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 34, 35, 37, 76, 97, 99, 36, 47, 48, 86, 87<br />2: PgSelect[50], PgSelect[89]<br />ᐳ: 54, 55, 93, 94"):::bucket
+    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 33, 34, 36, 75, 96, 98, 35, 46, 47, 85, 86<br />2: PgSelect[49], PgSelect[88]<br />ᐳ: 53, 54, 92, 93"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access34,Access35,Object36,Connection37,Lambda47,Access48,PgSelect50,First54,PgSelectSingle55,Connection76,Lambda86,Access87,PgSelect89,First93,PgSelectSingle94,Constant97,Constant99 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 36, 37<br /><br />ROOT Connectionᐸ33ᐳ[37]<br />1: <br />ᐳ: Constant[41], Constant[96]<br />2: PgSelect[38]"):::bucket
+    class Bucket0,__Value2,__Value4,Access33,Access34,Object35,Connection36,Lambda46,Access47,PgSelect49,First53,PgSelectSingle54,Connection75,Lambda85,Access86,PgSelect88,First92,PgSelectSingle93,Constant96,Constant98 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 35, 36<br /><br />ROOT Connectionᐸ32ᐳ[36]<br />1: <br />ᐳ: Constant[40], Constant[95]<br />2: PgSelect[37]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect38,Constant41,Constant96 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 41<br /><br />ROOT __Item{2}ᐸ38ᐳ[39]"):::bucket
+    class Bucket1,PgSelect37,Constant40,Constant95 bucket1
+    Bucket2("Bucket 2 (listItem)<br />Deps: 40<br /><br />ROOT __Item{2}ᐸ37ᐳ[38]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item39,PgSelectSingle40 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 40, 41<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[40]"):::bucket
+    class Bucket2,__Item38,PgSelectSingle39 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 39, 40<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[39]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression42,List43,Lambda44,PgClassExpression45 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 55<br /><br />ROOT PgSelectSingleᐸpersonᐳ[55]"):::bucket
+    class Bucket3,PgClassExpression41,List42,Lambda43,PgClassExpression44 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 54<br /><br />ROOT PgSelectSingleᐸpersonᐳ[54]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,PgClassExpression56 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 36, 76<br /><br />ROOT Connectionᐸ72ᐳ[76]<br />1: <br />ᐳ: Constant[80], Constant[98]<br />2: PgSelect[77]"):::bucket
+    class Bucket4,PgClassExpression55 bucket4
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 35, 75<br /><br />ROOT Connectionᐸ71ᐳ[75]<br />1: <br />ᐳ: Constant[79], Constant[97]<br />2: PgSelect[76]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,PgSelect77,Constant80,Constant98 bucket5
-    Bucket6("Bucket 6 (listItem)<br />Deps: 80<br /><br />ROOT __Item{6}ᐸ77ᐳ[78]"):::bucket
+    class Bucket5,PgSelect76,Constant79,Constant97 bucket5
+    Bucket6("Bucket 6 (listItem)<br />Deps: 79<br /><br />ROOT __Item{6}ᐸ76ᐳ[77]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,__Item78,PgSelectSingle79 bucket6
-    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 79, 80<br /><br />ROOT PgSelectSingle{6}ᐸpostᐳ[79]"):::bucket
+    class Bucket6,__Item77,PgSelectSingle78 bucket6
+    Bucket7("Bucket 7 (nullableBoundary)<br />Deps: 78, 79<br /><br />ROOT PgSelectSingle{6}ᐸpostᐳ[78]"):::bucket
     classDef bucket7 stroke:#808000
-    class Bucket7,PgClassExpression81,List82,Lambda83,PgClassExpression84 bucket7
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 94<br /><br />ROOT PgSelectSingleᐸpersonᐳ[94]"):::bucket
+    class Bucket7,PgClassExpression80,List81,Lambda82,PgClassExpression83 bucket7
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 93<br /><br />ROOT PgSelectSingleᐸpersonᐳ[93]"):::bucket
     classDef bucket8 stroke:#dda0dd
-    class Bucket8,PgClassExpression95 bucket8
+    class Bucket8,PgClassExpression94 bucket8
     Bucket0 --> Bucket1 & Bucket4 & Bucket5 & Bucket8
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     Bucket5 --> Bucket6
     Bucket6 --> Bucket7
     classDef unary fill:#fafffa,borderWidth:8px
-    class Object36,PgSelect50,PgSelect89,Access34,Access35,Lambda47,Access48,First54,PgSelectSingle55,Lambda86,Access87,First93,PgSelectSingle94,__Value0,__Value3,__Value5,Connection37,Connection76,Constant97,Constant99,PgSelect38,Constant41,Constant96,PgClassExpression56,PgSelect77,Constant80,Constant98,PgClassExpression95 unary
+    class Object35,PgSelect49,PgSelect88,Access33,Access34,Lambda46,Access47,First53,PgSelectSingle54,Lambda85,Access86,First92,PgSelectSingle93,__Value2,__Value4,Connection36,Connection75,Constant96,Constant98,PgSelect37,Constant40,Constant95,PgClassExpression55,PgSelect76,Constant79,Constant97,PgClassExpression94 unary
     end

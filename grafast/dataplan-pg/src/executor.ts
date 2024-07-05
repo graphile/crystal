@@ -78,7 +78,7 @@ export interface PgClient {
 
 export interface WithPgClient<TPgClient extends PgClient = PgClient> {
   <T>(
-    pgSettings: { [key: string]: string } | null,
+    pgSettings: Record<string, string | undefined> | null,
     callback: (client: TPgClient) => T | Promise<T>,
   ): Promise<T>;
 

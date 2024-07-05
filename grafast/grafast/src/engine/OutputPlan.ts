@@ -15,13 +15,17 @@ import type { Bucket } from "../bucket.js";
 import { isDev } from "../dev.js";
 import { AccessStep } from "../index.js";
 import { inspect } from "../inspect.js";
-import type { JSONValue, LocationDetails } from "../interfaces.js";
+import type {
+  ExecutionEntryFlags,
+  JSONValue,
+  LocationDetails,
+} from "../interfaces.js";
 import { $$concreteType, $$streamMore, FLAG_ERROR } from "../interfaces.js";
 import { isPolymorphicData } from "../polymorphic.js";
 import type { ExecutableStep } from "../step.js";
 import { expressionSymbol } from "../steps/access.js";
 import type { PayloadRoot } from "./executeOutputPlan.js";
-import type { LayerPlan } from "./LayerPlan.js";
+import type { LayerPlan, LayerPlanReasonListItem } from "./LayerPlan.js";
 
 const {
   executeSync,
@@ -146,70 +150,6 @@ export type OutputPlanKeyValueOutputPlanWithCachedBits =
     layerPlanId: number;
   };
 
-const ref_FLAG_ERROR = te.ref(FLAG_ERROR, "FLAG_ERROR");
-const ref_coerceError = te.ref(coerceError, "coerceError");
-const ref_nonNullError = te.ref(nonNullError, "nonNullError");
-const ref_stringifyString = te.ref(stringifyString, "stringifyString");
-const ref_stringifyJSON = te.ref(stringifyJSON, "stringifyJSON");
-const ref_isPolymorphicData = te.ref(isPolymorphicData, "isPolymorphicData");
-const ref_$$concreteType = te.ref($$concreteType, "$$concreteType");
-const ref_assert = te.ref(assert, "assert");
-const ref_getChildBucketAndIndex = te.ref(
-  getChildBucketAndIndex,
-  "getChildBucketAndIndex",
-);
-const ref_inspect = te.ref(inspect, "inspect");
-const ref_$$streamMore = te.ref($$streamMore, "$$streamMore");
-const te_String = te`String`;
-const te_nullIsFineComment = te`// root/introspection, null is fine`;
-const te_nullString = te`"null"`;
-const te_null = te`null`;
-const te_childBucket = te`childBucket`;
-const te_childBucketIndex = te`childBucketIndex`;
-const te_executeString = te`executeString`;
-const te_execute = te`execute`;
-const te_polymorphic = te`polymorphic`;
-const te_letStringLbrace = te`let string = "{";`;
-const te_stringPlusEquals = te`string +=`;
-const te_stringPlusEqualsRbrace = te`  string += "}";\n`;
-const te_stringPlusEqualsRbracket = te`    string += "]";\n`;
-const te_constObjEqualsObjectCreateNull = te`const obj = Object.create(null);`;
-const te_comma = te`,`;
-const te_specDotLocationDetails = te`spec.locationDetails`;
-const te_thisDotLocationDetails = te`this.locationDetails`;
-const te_specDotOutputPlan = te`spec.outputPlan`;
-const te_bucket = te`bucket`;
-const te_bucketIndex = te`bucketIndex`;
-const te_handleDeferred = te`
-  // Everything seems okay; queue any deferred payloads
-  for (const defer of this.deferredOutputPlans) {
-    root.queue.push({
-      root,
-      path: mutablePath.slice(1),
-      bucket,
-      bucketIndex,
-      outputPlan: defer,
-      label: defer.type.deferLabel,
-    });
-  }
-`;
-const te_string = te`string`;
-const te_object = te`object`;
-const te_obj = te`obj`;
-const te_data = te`data`;
-const te_commonErrorHandler = te.ref(commonErrorHandler, "handleError");
-const te_childBucketCBIDC = te`, childBucket, childBucketIndex, directChild`;
-const te_letString = te`let string;`;
-const te_constDataEqualsEmptyArray = te`const data = [];`;
-const te_stringEqualsEmptyArrayString = te`    string = "[]";`;
-const te_stringEqualsLeftSquareBraceString = te`    string = "[";\n`;
-const te_noopComment = te`    /* noop */`;
-const te_ifIGt0StrPlusEqualComma = te`\n      if (i > 0) { string += ","; }\n`;
-const te_dataIEquals = te`data[i] =`;
-const te_childOutputPlan = te`childOutputPlan`;
-const te_underscoreNonNull = te`_nonNull`;
-const te_underscoreStream = te`_stream`;
-
 /**
  * Defines a way of taking a layerPlan and converting it into an output value.
  *
@@ -231,8 +171,11 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
 
   /**
    * Appended to the root step when accessed to avoid the need for AccessSteps
+   *
+   * @internal
    */
-  private processRoot: ((value: any) => any) | null = null;
+  public processRoot: ((value: any, flags: ExecutionEntryFlags) => any) | null =
+    null;
 
   /**
    * For root/object output plans, the keys to set on the resulting object
@@ -467,9 +410,11 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     // By just reusing the same path over and over we don't need to allocate
     // more memory for more arrays; but we must be _incredibly_ careful to
     // ensure any changes to it are reversed.
-    _mutablePath: Array<string | number>,
+    _mutablePath: ReadonlyArray<string | number>,
     _bucket: Bucket,
     _bucketIndex: number,
+    _rawBucketRootValue?: any,
+    _bucketRootFlags?: ExecutionEntryFlags,
   ): JSONValue {
     throw new Error(`OutputPlan.execute has yet to be built!`);
   }
@@ -481,9 +426,11 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     // By just reusing the same path over and over we don't need to allocate
     // more memory for more arrays; but we must be _incredibly_ careful to
     // ensure any changes to it are reversed.
-    _mutablePath: Array<string | number>,
+    _mutablePath: ReadonlyArray<string | number>,
     _bucket: Bucket,
     _bucketIndex: number,
+    _rawBucketRootValue?: any,
+    _bucketRootFlags?: ExecutionEntryFlags,
   ): string {
     throw new Error(`OutputPlan.executeString has yet to be built!`);
   }
@@ -611,25 +558,19 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
               spec.outputPlan.layerPlan.id === this.layerPlan.id,
           };
         }
-        makeObjectExecutor(
+        this.execute = makeObjectExecutor(
           type.typeName,
           digestFieldTypes,
           this.deferredOutputPlans.length > 0,
           type.mode === "root",
           false,
-          (fn) => {
-            this.execute = fn;
-          },
         );
-        makeObjectExecutor(
+        this.executeString = makeObjectExecutor(
           type.typeName,
           digestFieldTypes,
           this.deferredOutputPlans.length > 0,
           type.mode === "root",
           true,
-          (fn) => {
-            this.executeString = fn;
-          },
         );
         break;
       }
@@ -802,134 +743,208 @@ export function getChildBucketAndIndex(
   return [currentBucket, currentIndex];
 }
 
-interface MakeExecutorOptions<TAsString extends boolean> {
-  inner: TE;
-  nameExtra: TE;
+interface Execute {
+  (
+    this: OutputPlan,
+    _root: PayloadRoot,
+    // By just reusing the same path over and over we don't need to allocate
+    // more memory for more arrays; but we must be _incredibly_ careful to
+    // ensure any changes to it are reversed.
+    _mutablePath: Array<string | number>,
+    _bucket: Bucket,
+    _bucketIndex: number,
+    rawBucketRootValue?: any,
+    bucketRootFlags?: ExecutionEntryFlags,
+  ): JSONValue;
+  displayName?: string;
+  name?: string;
+}
+interface ExecuteString {
+  (
+    this: OutputPlan,
+    _root: PayloadRoot,
+    // By just reusing the same path over and over we don't need to allocate
+    // more memory for more arrays; but we must be _incredibly_ careful to
+    // ensure any changes to it are reversed.
+    _mutablePath: Array<string | number>,
+    _bucket: Bucket,
+    _bucketIndex: number,
+    rawBucketRootValue?: any,
+    bucketRootFlags?: ExecutionEntryFlags,
+  ): string;
+  displayName?: string;
+  name?: string;
+}
+
+interface MakeExecutorOptions<
+  TAsString extends boolean,
+  TType extends OutputPlanType,
+> {
+  inner: (
+    this: OutputPlan<TType>,
+    bucketRootValue: any,
+    root: PayloadRoot,
+    // By just reusing the same path over and over we don't need to allocate
+    // more memory for more arrays; but we must be _incredibly_ careful to
+    // ensure any changes to it are reversed.
+    mutablePath: Array<string | number>,
+    bucket: Bucket,
+    bucketIndex: number,
+    rawBucketRootValue: any,
+    bucketRootFlags: ExecutionEntryFlags,
+  ) => TAsString extends true ? string : JSONValue;
+  nameExtra: string;
   asString: TAsString;
   // this.type.mode === "introspection" || this.type.mode === "root"
   skipNullHandling?: boolean;
-  preamble?: TE;
+  preamble?: (
+    this: OutputPlan<TType>,
+    bucketRootValue: any,
+  ) => undefined | (TAsString extends true ? string : JSONValue);
 }
 
-function makeExecutorExpression<TAsString extends boolean>(
-  options: MakeExecutorOptions<TAsString>,
-): TE {
+function makeExecutor<
+  TAsString extends boolean,
+  TType extends OutputPlanType = OutputPlanType,
+>(config: MakeExecutorOptions<TAsString, TType>) {
   const {
+    preamble = null,
     inner,
-    nameExtra,
     asString,
+    nameExtra,
     skipNullHandling = false,
-    preamble = te.blank,
-  } = options;
-  return te`\
-(function compiledOutputPlan${asString ? te_String : te.blank}_${nameExtra}(
-  root,
-  mutablePath,
-  bucket,
-  bucketIndex,
-  rawBucketRootValue = bucket.store.get(this.rootStep.id).at(bucketIndex),
-  bucketRootFlags = bucket.store.get(this.rootStep.id)._flagsAt(bucketIndex)
-) {
-  const bucketRootValue = this.processRoot !== null ? this.processRoot(rawBucketRootValue, bucketRootFlags) : rawBucketRootValue;
-${preamble}\
-  ${
-    skipNullHandling
-      ? isDev
-        ? te_nullIsFineComment
-        : te.blank
-      : te`if (bucketRootValue == null) return ${
-          asString ? te_nullString : te_null
-        };`
-  }
-  if (bucketRootFlags & ${ref_FLAG_ERROR}) {
-    throw ${ref_coerceError}(bucketRootValue, this.locationDetails, mutablePath.slice(1));
-  }
-${inner}
-})`;
+  } = config;
+  const fn: TAsString extends true ? ExecuteString : Execute = function (
+    this: OutputPlan,
+    root: PayloadRoot,
+    mutablePath: Array<string | number>,
+    bucket: Bucket,
+    bucketIndex: number,
+    rawBucketRootValue = bucket.store.get(this.rootStep.id)!.at(bucketIndex),
+    bucketRootFlags = bucket.store.get(this.rootStep.id)!._flagsAt(bucketIndex),
+  ) {
+    const bucketRootValue =
+      this.processRoot !== null
+        ? this.processRoot(rawBucketRootValue, bucketRootFlags)
+        : rawBucketRootValue;
+    const earlyReturn = preamble?.call(
+      this as OutputPlan<any>,
+      bucketRootValue,
+    );
+    if (earlyReturn !== undefined) {
+      return earlyReturn as any;
+    }
+    if (bucketRootFlags & FLAG_ERROR) {
+      throw coerceError(
+        bucketRootValue,
+        this.locationDetails,
+        mutablePath.slice(1),
+      );
+    }
+    if (!skipNullHandling) {
+      if (bucketRootValue == null)
+        return (asString ? "null" : null) as TAsString extends true
+          ? string
+          : JSONValue;
+    }
+    return inner.call(
+      this as OutputPlan<any>,
+      bucketRootValue,
+      root,
+      mutablePath,
+      bucket,
+      bucketIndex,
+      rawBucketRootValue,
+      bucketRootFlags,
+    );
+  } as any;
+  fn.displayName = `outputPlan${asString ? "String" : ""}_${nameExtra}`;
+  return fn;
 }
 
-function makeExecutor<TAsString extends boolean>(
-  options: MakeExecutorOptions<TAsString>,
-): TAsString extends true
-  ? typeof OutputPlan.prototype.executeString
-  : typeof OutputPlan.prototype.execute;
-function makeExecutor<TAsString extends boolean>(
-  options: MakeExecutorOptions<TAsString>,
-  callback: (fn: any) => void,
-): void;
-function makeExecutor(
-  options: MakeExecutorOptions<boolean>,
-  callback?: (fn: any) => void,
-): any {
-  const expression = makeExecutorExpression(options);
-  if (callback !== undefined) {
-    te.runInBatch(expression, callback);
-  } else {
-    return te.run(te`return ${expression}`);
-  }
-}
-
-function makeExecuteChildPlanCode(
-  setTargetOrReturn: TE,
-  locationDetails: TE,
-  childOutputPlan: TE,
+function executeChildPlan(
+  that: OutputPlan,
+  locationDetails: LocationDetails,
+  childOutputPlan: OutputPlan | null,
   isNonNull: boolean,
   asString: boolean,
-  childBucket: TE = te_childBucket,
-  childBucketIndex: TE = te_childBucketIndex,
+  childBucket: Bucket | null,
+  childBucketIndex: number | null,
+  bucket: Bucket,
+  mutablePath: ReadonlyArray<string | number>,
+  mutablePathIndex: number,
+  root: PayloadRoot,
+  rawBucketRootValue: any,
+  bucketRootFlags: ExecutionEntryFlags,
 ) {
-  const te_childOutputPlanExecute = te`${childOutputPlan}.${
-    asString ? te_executeString : te_execute
-  }(
-  root,
-  mutablePath,
-  ${childBucket},
-  ${childBucketIndex},
-  ${childBucket}.rootStep === this.rootStep ? rawBucketRootValue : undefined,
-  ${childBucket}.rootStep === this.rootStep ? bucketRootFlags : undefined
-)`;
   // This is the code that changes based on if the field is nullable or not
   if (isNonNull) {
     // No need to catch error
-    return te`\
-  ${
-    childBucket === te_bucket
-      ? te.blank
-      : te`if (${childBucket} == null) {
-    throw ${ref_nonNullError}(${locationDetails}, mutablePath.slice(1));
-  }
-  `
-  }fieldResult = ${te_childOutputPlanExecute};
-  if (fieldResult == ${asString ? te_nullString : te_null}) {
-    throw ${ref_nonNullError}(${locationDetails}, mutablePath.slice(1));
-  }
-  ${setTargetOrReturn} fieldResult;`;
+    if (childBucket === bucket) {
+      //noop
+    } else {
+      if (childBucket == null) {
+        throw nonNullError(locationDetails, mutablePath.slice(1));
+      }
+    }
+    const fieldResult = childOutputPlan![
+      asString ? "executeString" : "execute"
+    ](
+      root,
+      mutablePath,
+      childBucket,
+      childBucketIndex!,
+      // NOTE: the previous code may have had a bug here, it referenced childBucket.rootStep
+      childOutputPlan!.rootStep === that.rootStep
+        ? rawBucketRootValue
+        : undefined,
+      childOutputPlan!.rootStep === that.rootStep ? bucketRootFlags : undefined,
+    );
+    if (fieldResult == (asString ? "null" : null)) {
+      throw nonNullError(locationDetails, mutablePath.slice(1));
+    }
+    return fieldResult;
   } else {
     // Need to catch error and set null
-    return te`\
-  {
     const streamCount = root.streams.length;
     const queueCount = root.queue.length;
     try {
-      ${setTargetOrReturn} ${
-        childBucket === te_bucket
-          ? te.blank
-          : te`${childBucket} == null ? ${
-              asString ? te_nullString : te_null
-            } : `
-      }${te_childOutputPlanExecute};
+      if (childBucket !== bucket && childBucket == null) {
+        return asString ? "null" : null;
+      } else {
+        return childOutputPlan![asString ? "executeString" : "execute"](
+          root,
+          mutablePath,
+          childBucket,
+          childBucketIndex!,
+          // NOTE: the previous code may have had a bug here, it referenced childBucket.rootStep
+          childOutputPlan!.rootStep === that.rootStep
+            ? rawBucketRootValue
+            : undefined,
+          childOutputPlan!.rootStep === that.rootStep
+            ? bucketRootFlags
+            : undefined,
+        );
+      }
     } catch (e) {
-      ${te_commonErrorHandler}(e, ${locationDetails}, mutablePath, mutablePathIndex, root, streamCount, queueCount);
-      ${setTargetOrReturn} ${asString ? te_nullString : te_null};
+      commonErrorHandler(
+        e,
+        locationDetails,
+        mutablePath,
+        mutablePathIndex,
+        root,
+        streamCount,
+        queueCount,
+      );
+      return asString ? "null" : null;
     }
-  }`;
   }
 }
 
 function commonErrorHandler(
   e: Error,
   locationDetails: LocationDetails,
-  mutablePath: Array<string | number>,
+  mutablePath: ReadonlyArray<string | number>,
   mutablePathIndex: number,
   root: PayloadRoot,
   streamCount: number,
@@ -945,109 +960,108 @@ function commonErrorHandler(
   const pathLengthTarget = mutablePathIndex + 1;
   const overSize = mutablePath.length - pathLengthTarget;
   if (overSize > 0) {
-    mutablePath.splice(pathLengthTarget, overSize);
+    (mutablePath as Array<string | number>).splice(pathLengthTarget, overSize);
   }
   root.errors.push(error);
 }
 
-/*
- * Below here we create the executors that can be shared across many different
- * OutputPlans without having to be recreated (thus saving significant memory,
- * and increasing the probability of optimization).
- */
-
 const nullExecutor = makeExecutor({
-  inner: te.cache`  return null;`,
-  nameExtra: te.cache`null`,
+  inner: () => null,
+  nameExtra: "null",
   asString: false,
 });
+
 const nullExecutorString = makeExecutor({
-  inner: te.cache`  return "null";`,
-  nameExtra: te.cache`null`,
+  inner: () => "null",
+  nameExtra: `null`,
   asString: true,
 });
 
 /* This is what leafExecutor should use if insideGraphQL (which isn't currently
- * supported)
-`\
-  if (root.insideGraphQL) {
-    // Don't serialize to avoid the double serialization problem
-    return bucketRootValue;
-  } else {
-    return this.type.graphqlType.serialize(bucketRootValue);
-  }
-` */
-const leafExecutor = makeExecutor({
-  inner: te`\
-  return this.type.graphqlType.serialize(bucketRootValue);
-`,
-  nameExtra: te.cache`leaf`,
+   * supported)
+  `\
+    if (root.insideGraphQL) {
+      // Don't serialize to avoid the double serialization problem
+      return bucketRootValue;
+    } else {
+      return this.type.graphqlType.serialize(bucketRootValue);
+    }
+  ` */
+const leafExecutor = makeExecutor<false, OutputPlanTypeLeaf>({
+  inner(bucketRootValue) {
+    return this.type.graphqlType.serialize(bucketRootValue) as JSONValue;
+  },
+  nameExtra: `leaf`,
   asString: false,
 });
 
-const leafExecutorString = makeExecutor({
-  inner: te`\
-  return ${ref_stringifyJSON}(this.type.graphqlType.serialize(bucketRootValue));
-`,
-  nameExtra: te.cache`leaf`,
+const leafExecutorString = makeExecutor<true, OutputPlanTypeLeaf>({
+  inner(bucketRootValue) {
+    return stringifyJSON(
+      (this.type as OutputPlanTypeLeaf).graphqlType.serialize(bucketRootValue),
+    );
+  },
+  nameExtra: `leaf`,
   asString: true,
 });
 
-const booleanLeafExecutorString = makeExecutor({
-  inner: te`\
-  const val = this.type.graphqlType.serialize(bucketRootValue);
-  return val === true ? 'true' : 'false';
-`,
-  nameExtra: te.cache`booleanLeaf`,
+const booleanLeafExecutorString = makeExecutor<true, OutputPlanTypeLeaf>({
+  inner(bucketRootValue) {
+    const val = this.type.graphqlType.serialize(bucketRootValue);
+    return val === true ? "true" : "false";
+  },
+  nameExtra: `booleanLeaf`,
   asString: true,
   skipNullHandling: false,
-  preamble: te`\
-  if (bucketRootValue === true) return 'true';
-  if (bucketRootValue === false) return 'false';
-`,
+  preamble(bucketRootValue) {
+    if (bucketRootValue === true) return "true";
+    if (bucketRootValue === false) return "false";
+  },
 });
 
-const intLeafExecutorString = makeExecutor({
-  inner: te`\
-  return '' + this.type.graphqlType.serialize(bucketRootValue);
-`,
-  nameExtra: te.cache`intLeaf`,
+const intLeafExecutorString = makeExecutor<true, OutputPlanTypeLeaf>({
+  inner(bucketRootValue) {
+    return "" + this.type.graphqlType.serialize(bucketRootValue);
+  },
+  nameExtra: `intLeaf`,
   asString: true,
   skipNullHandling: false,
   // Fast check to see if number is 32 bit integer
-  preamble: te`\
-  if ((bucketRootValue | 0) === bucketRootValue) {
-    return '' + bucketRootValue;
-  }
-`,
+  preamble(bucketRootValue) {
+    if ((bucketRootValue | 0) === bucketRootValue) {
+      return "" + bucketRootValue;
+    }
+  },
 });
 
-const floatLeafExecutorString = makeExecutor({
-  inner: te`\
-  return String(this.type.graphqlType.serialize(bucketRootValue));
-`,
-  nameExtra: te.cache`floatLeaf`,
+const floatLeafExecutorString = makeExecutor<true, OutputPlanTypeLeaf>({
+  inner(bucketRootValue) {
+    return String(this.type.graphqlType.serialize(bucketRootValue));
+  },
+  nameExtra: `floatLeaf`,
   asString: true,
   skipNullHandling: false,
-  preamble: te`\
-  if (Number.isFinite(bucketRootValue)) {
-    return '' + bucketRootValue;
-  }
-`,
+  preamble(bucketRootValue) {
+    if (Number.isFinite(bucketRootValue)) {
+      return "" + bucketRootValue;
+    }
+  },
 });
 
-const stringLeafExecutorString = makeExecutor({
-  inner: te`\
-  return ${ref_stringifyString}(this.type.graphqlType.serialize(bucketRootValue));
-`,
-  nameExtra: te.cache`stringLeaf`,
+const stringLeafExecutorString = makeExecutor<true, OutputPlanTypeLeaf>({
+  inner(bucketRootValue) {
+    return stringifyString(
+      this.type.graphqlType.serialize(bucketRootValue) as string,
+    );
+  },
+  nameExtra: `stringLeaf`,
   asString: true,
   skipNullHandling: false,
-  preamble: te`\
-  if (typeof bucketRootValue === 'string') {
-    return ${ref_stringifyString}(bucketRootValue);
-  }
-`,
+  preamble(bucketRootValue) {
+    if (typeof bucketRootValue === "string") {
+      return stringifyString(bucketRootValue);
+    }
+  },
 });
 
 // NOTE: the reference to $$concreteType here is a (temporary) optimization; it
@@ -1059,61 +1073,61 @@ function makePolymorphicExecutor<TAsString extends boolean>(
   asString: TAsString,
 ) {
   return makeExecutor({
-    inner: te`\
-${
-  isDev
-    ? te`\
-  if (!${ref_isPolymorphicData}(bucketRootValue)) {
-    throw ${ref_coerceError}(
-      new Error(
-        "GrafastInternalError<db7fcda5-dc39-4568-a7ce-ee8acb88806b>: Expected polymorphic data",
-      ),
-      this.locationDetails,
-      mutablePath.slice(1),
-    );
-  }
-`
-    : te.blank
-}\
-  const typeName = bucketRootValue[${ref_$$concreteType}];
-  const childOutputPlan = this.childByTypeName[typeName];
-  ${
-    isDev
-      ? te`{
-    ${ref_assert}.ok(
-      typeName,
-      "GrafastInternalError<fd3f3cf0-0789-4c74-a6cd-839c808896ed>: Could not determine concreteType for object",
-    );
-    ${ref_assert}.ok(
-      childOutputPlan,
-      \`GrafastInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '\${typeName}' from '\${bucket.layerPlan}'\`,
-    );
-  }`
-      : te.blank
-  }
+    inner(bucketRootValue, root, mutablePath, bucket, bucketIndex) {
+      if (isDev) {
+        if (!isPolymorphicData(bucketRootValue)) {
+          throw coerceError(
+            new Error(
+              "GrafastInternalError<db7fcda5-dc39-4568-a7ce-ee8acb88806b>: Expected polymorphic data",
+            ),
+            this.locationDetails,
+            mutablePath.slice(1),
+          );
+        }
+      }
+      const typeName = bucketRootValue[$$concreteType];
+      const childOutputPlan = this.childByTypeName![typeName];
+      if (isDev) {
+        assert.ok(
+          typeName,
+          "GrafastInternalError<fd3f3cf0-0789-4c74-a6cd-839c808896ed>: Could not determine concreteType for object",
+        );
+        assert.ok(
+          childOutputPlan,
+          `GrafastInternalError<a46999ef-41ff-4a22-bae9-fa37ff6e5f7f>: Could not determine the OutputPlan to use for '${typeName}' from '${bucket.layerPlan}'`,
+        );
+      }
 
-  const directChild = bucket.children[childOutputPlan.layerPlan.id];
-  if (directChild !== undefined) {
-    return childOutputPlan.${
-      asString ? te_executeString : te_execute
-    }(root, mutablePath, directChild.bucket, directChild.map.get(bucketIndex));
-  } else {
-    const c = ${ref_getChildBucketAndIndex}(
-      childOutputPlan,
-      this,
-      bucket,
-      bucketIndex,
-    );
-    if (!c) {
-      throw new Error("GrafastInternalError<691509d8-31fa-4cfe-a6df-dcba21bd521f>: polymorphic executor couldn't determine child bucket");
-    }
-    const [childBucket, childBucketIndex] = c;
-    return childOutputPlan.${
-      asString ? te_executeString : te_execute
-    }(root, mutablePath, childBucket, childBucketIndex);
-  }
-`,
-    nameExtra: te_polymorphic,
+      const directChild = bucket.children[childOutputPlan.layerPlan.id];
+      if (directChild !== undefined) {
+        return childOutputPlan[asString ? "executeString" : "execute"](
+          root,
+          mutablePath,
+          directChild.bucket,
+          directChild.map.get(bucketIndex) as number,
+        ) as TAsString extends true ? string : JSONValue;
+      } else {
+        const c = getChildBucketAndIndex(
+          childOutputPlan,
+          this,
+          bucket,
+          bucketIndex,
+        );
+        if (!c) {
+          throw new Error(
+            "GrafastInternalError<691509d8-31fa-4cfe-a6df-dcba21bd521f>: polymorphic executor couldn't determine child bucket",
+          );
+        }
+        const [childBucket, childBucketIndex] = c;
+        return childOutputPlan[asString ? "executeString" : "execute"](
+          root,
+          mutablePath,
+          childBucket,
+          childBucketIndex,
+        ) as TAsString extends true ? string : JSONValue;
+      }
+    },
+    nameExtra: "polymorphic",
     asString,
   });
 }
@@ -1127,84 +1141,130 @@ function makeArrayExecutor<TAsString extends boolean>(
   asString: TAsString,
 ) {
   return makeExecutor({
-    inner: te`\
-  if (!Array.isArray(bucketRootValue)) {
-    console.warn(\`Hit fallback for value \${${ref_inspect}(bucketRootValue)} coercion to mode 'array'\`);
-    return ${asString ? te_nullString : te_null};
-  }
-
-  const childOutputPlan = this.child;
-  const l = bucketRootValue.length;
-  let fieldResult;
-  ${asString ? te_letString : te_constDataEqualsEmptyArray}
-  if (l === 0) {
-${asString ? te_stringEqualsEmptyArrayString : te_noopComment}
-  } else {
-${asString ? te_stringEqualsLeftSquareBraceString : te.blank}\
-    const mutablePathIndex = mutablePath.push(-1) - 1;
-
-    // Now to populate the children...
-    const directChild = bucket.children[childOutputPlan.layerPlan.id];
-    let childBucket, childBucketIndex, lookup;
-    if (directChild !== undefined) {
-      childBucket = directChild.bucket;
-      lookup = directChild.map.get(bucketIndex)
-    }
-    for (let i = 0; i < l; i++) {
-      if (directChild !== undefined) {
-        childBucketIndex = lookup[i];
-      } else {
-        const c = ${ref_getChildBucketAndIndex}(
-          childOutputPlan,
-          this,
-          bucket,
-          bucketIndex,
-          i,
+    inner(
+      bucketRootValue,
+      root,
+      mutablePath,
+      bucket,
+      bucketIndex,
+      rawBucketRootValue,
+      bucketRootFlags,
+    ) {
+      if (!Array.isArray(bucketRootValue)) {
+        console.warn(
+          `Hit fallback for value ${inspect(
+            bucketRootValue,
+          )} coercion to mode 'array'`,
         );
-        if (c !== null) {
-          ([childBucket, childBucketIndex] = c);
+        return (asString ? "null" : null) as TAsString extends true
+          ? string
+          : JSONValue;
+      }
+
+      const childOutputPlan = this.child;
+      const l = bucketRootValue.length;
+      let string: string | undefined;
+      let data: any[] | undefined;
+      if (l === 0) {
+        if (asString) {
+          string = "[]";
         } else {
-          childBucket = childBucketIndex = null;
+          data = [];
+        }
+      } else {
+        if (asString) {
+          string = "[";
+        } else {
+          data = [];
+        }
+        const mutablePathIndex = mutablePath.push(-1) - 1;
+
+        // Now to populate the children...
+        const directChild = bucket.children[childOutputPlan!.layerPlan.id];
+        let childBucket: Bucket | null,
+          childBucketIndex: number | null,
+          lookup: number[] | undefined;
+        if (directChild !== undefined) {
+          childBucket = directChild.bucket;
+          lookup = directChild.map.get(bucketIndex) as number[];
+        }
+        for (let i = 0; i < l; i++) {
+          if (directChild !== undefined) {
+            childBucketIndex = lookup![i];
+          } else {
+            const c = getChildBucketAndIndex(
+              childOutputPlan!,
+              this,
+              bucket,
+              bucketIndex,
+              i,
+            );
+            if (c !== null) {
+              [childBucket, childBucketIndex] = c;
+            } else {
+              childBucket = childBucketIndex = null;
+            }
+          }
+
+          mutablePath[mutablePathIndex] = i;
+          if (asString) {
+            if (i > 0) {
+              string! += ",";
+            }
+          }
+          const val = executeChildPlan(
+            this,
+            this.locationDetails,
+            childOutputPlan,
+            childIsNonNull,
+            asString,
+            childBucket!,
+            childBucketIndex!,
+            bucket,
+            mutablePath,
+            mutablePathIndex,
+            root,
+            rawBucketRootValue,
+            bucketRootFlags,
+          );
+          if (asString) {
+            string! += val;
+          } else {
+            data![i] = val;
+          }
+        }
+
+        mutablePath.length = mutablePathIndex;
+        if (asString) {
+          string! += "]";
+        }
+      }
+      if (canStream) {
+        const stream = (bucketRootValue as any)[$$streamMore] as
+          | AsyncIterableIterator<any>
+          | undefined;
+        if (stream !== undefined) {
+          root.streams.push({
+            root,
+            path: mutablePath.slice(1),
+            bucket,
+            bucketIndex,
+            outputPlan: childOutputPlan!,
+            label: (
+              childOutputPlan!.layerPlan as LayerPlan<LayerPlanReasonListItem>
+            ).reason.stream?.label,
+            stream,
+            startIndex: bucketRootValue.length,
+          });
         }
       }
 
-      mutablePath[mutablePathIndex] = i;
-${asString ? te_ifIGt0StrPlusEqualComma : te.blank}
-${makeExecuteChildPlanCode(
-  asString ? te_stringPlusEquals : te_dataIEquals,
-  te_thisDotLocationDetails,
-  te_childOutputPlan,
-  childIsNonNull,
-  asString,
-)}
-    }
-
-    mutablePath.length = mutablePathIndex;
-${asString ? te_stringPlusEqualsRbracket : te.blank}
-  }
-${
-  canStream
-    ? te`\
-  const stream = bucketRootValue[${ref_$$streamMore}] /* as | AsyncIterableIterator<any> | undefined*/;
-  if (stream !== undefined) {
-    root.streams.push({
-      root,
-      path: mutablePath.slice(1),
-      bucket,
-      bucketIndex,
-      outputPlan: childOutputPlan,
-      label: childOutputPlan.layerPlan.reason.stream?.label,
-      stream,
-      startIndex: bucketRootValue.length,
-    });
-  }`
-    : te.blank
-}
-
-  return ${asString ? te_string : te_data};
-`,
-    nameExtra: te`array${childIsNonNull ? te_underscoreNonNull : te.blank}${
-      canStream ? te_underscoreStream : te.blank
+      return (asString ? string : data) as TAsString extends true
+        ? string
+        : JSONValue;
+    },
+    nameExtra: `array${childIsNonNull ? "_nonNull" : ""}${
+      canStream ? "_stream" : ""
     }`,
     asString,
   });
@@ -1238,12 +1298,12 @@ const arrayExecutorString_nonNullable_streaming = makeArrayExecutor(
  *
  * ENHANCE: write our own introspection execution!
  */
-const introspect = (
+function introspect<TAsString extends boolean>(
   root: PayloadRoot,
   outputPlan: OutputPlan<OutputPlanTypeIntrospection>,
   mutablePath: ReadonlyArray<string | number>,
-  asString: boolean,
-) => {
+  asString: TAsString,
+): TAsString extends true ? string : JSONValue {
   const { locationDetails } = outputPlan;
   const {
     field: rawField,
@@ -1284,7 +1344,9 @@ const introspect = (
   const canonical = JSON.stringify(variableValues);
   const cached = introspectionCacheByVariableValues.get(canonical);
   if (cached !== undefined) {
-    return asString ? JSON.stringify(cached) : cached;
+    return (
+      asString ? JSON.stringify(cached) : cached
+    ) as TAsString extends true ? string : JSONValue;
   }
   const graphqlResult = executeSync({
     schema: outputPlan.layerPlan.operationPlan.schema,
@@ -1314,20 +1376,27 @@ const introspect = (
   }
   const result = graphqlResult.data!.a as JSONValue;
   introspectionCacheByVariableValues.set(canonical, result);
-  return asString ? JSON.stringify(result) : result;
-};
+  return (asString ? JSON.stringify(result) : result) as TAsString extends true
+    ? string
+    : JSONValue;
+}
 
-const ref_introspect = te.ref(introspect, "introspect");
-
-const introspectionExecutor = makeExecutor({
-  inner: te`  return ${ref_introspect}(root, this, mutablePath, false)`,
-  nameExtra: te.cache`introspection`,
+const introspectionExecutor = makeExecutor<false, OutputPlanTypeIntrospection>({
+  inner(_bucketRootValue, root, mutablePath) {
+    return introspect(root, this, mutablePath, false);
+  },
+  nameExtra: `introspection`,
   asString: false,
   skipNullHandling: true,
 });
-const introspectionExecutorString = makeExecutor({
-  inner: te`  return ${ref_introspect}(root, this, mutablePath, true)`,
-  nameExtra: te.cache`introspection`,
+const introspectionExecutorString = makeExecutor<
+  true,
+  OutputPlanTypeIntrospection
+>({
+  inner(_bucketRootValue, root, mutablePath) {
+    return introspect(root, this, mutablePath, true);
+  },
+  nameExtra: `introspection`,
   asString: true,
   skipNullHandling: true,
 });
@@ -1343,225 +1412,182 @@ function makeObjectExecutor<TAsString extends boolean>(
   // this.type.mode === "root",
   isRoot: boolean,
   asString: TAsString,
-  callback: (
-    fn: TAsString extends true
-      ? typeof OutputPlan.prototype.executeString
-      : typeof OutputPlan.prototype.execute,
-  ) => void,
-): void {
+): TAsString extends true ? ExecuteString : Execute {
   if (!SAFE_NAME.test(typeName)) {
     throw new Error(
       `Unsafe type name: ${typeName}; doesn't conform to 'Name' in the GraphQL spec`,
     );
   }
-  const keys: string[] = [];
-  const fieldSpecs: FieldTypeDigest[] = [];
-  let signature =
-    (asString ? "s" : "o") +
-    (isRoot ? "r" : "") +
-    (hasDeferredOutputPlans ? "d" : "");
-  let hasChildBucketReference = false;
-
-  for (const [key, fieldSpec] of Object.entries(fieldTypes)) {
-    if (!SAFE_NAME.test(key)) {
-      // This should not be able to happen if the GraphQL operation is valid
+  if (isDev) {
+    if (Object.getPrototypeOf(fieldTypes) !== null) {
       throw new Error(
-        `Unsafe key: ${key}; doesn't conform to 'Name' in the GraphQL spec`,
+        `GrafastInternalError<3d8e3547-d818-44e1-a076-16b828e3a34d>: fieldTypes must have a null prototype`,
       );
     }
-
-    keys.push(key);
-    fieldSpecs.push(fieldSpec);
-
-    const { fieldType, sameBucket } = fieldSpec;
-    switch (fieldType) {
-      case "__typename": {
-        signature += "_";
-        break;
-      }
-      case "outputPlan?": {
-        signature += "?";
-        break;
-      }
-      case "outputPlan!": {
-        signature += "!";
-        break;
-      }
-      default: {
-        const never: never = fieldType;
-        throw new Error(`Unsupported field type '${never}'`);
-      }
-    }
-    if (!sameBucket) {
-      hasChildBucketReference = true;
-      signature += "~";
-    }
   }
-  withObjectExecutorFactory(
-    signature,
-    fieldSpecs,
-    hasDeferredOutputPlans,
-    isRoot,
-    asString,
-    hasChildBucketReference,
-    (factory) => {
-      const fn = factory(typeName, ...keys);
-      callback(fn);
-    },
-  );
-}
-
-type Factory<TAsString extends boolean> = (
-  typeName: string,
-  ...keys: string[]
-) => TAsString extends true
-  ? typeof OutputPlan.prototype.executeString
-  : typeof OutputPlan.prototype.execute;
-
-const makeObjectExecutorCache = new LRU<string, Factory<boolean>>({
-  maxLength: 1000,
-});
-const makingObjectExecutorCallbacks = new Map<
-  string,
-  Array<(factory: Factory<boolean>) => void>
->();
-
-function withObjectExecutorFactory<TAsString extends boolean>(
-  signature: string,
-  fieldSpecs: ReadonlyArray<FieldTypeDigest>,
-  hasDeferredOutputPlans: boolean,
-  isRoot: boolean,
-  asString: TAsString,
-  hasChildBucketReference: boolean,
-  callback: (factory: Factory<TAsString>) => void,
-) {
-  const fn = makeObjectExecutorCache.get(signature);
-  if (fn !== undefined) {
-    return callback(fn);
-  }
-  const building = makingObjectExecutorCallbacks.get(signature);
-  if (building !== undefined) {
-    building.push(callback as (factory: Factory<boolean>) => void);
-    return;
-  }
-
-  const callbacks = [callback as (factory: Factory<boolean>) => void];
-  makingObjectExecutorCallbacks.set(signature, callbacks);
-
-  const inner = te`\
-  ${asString ? te_letStringLbrace : te_constObjEqualsObjectCreateNull}
-  const { keys } = this;
-  const mutablePathIndex = mutablePath.push("!") - 1;
-  let spec${
-    hasChildBucketReference ? te_childBucketCBIDC : te.blank
-  }, fieldResult;
-
-${te.join(
-  fieldSpecs.map(({ fieldType, sameBucket }, i) => {
-    const te_fieldNameI = te.identifier(`fieldName_${i}`);
-    switch (fieldType) {
-      case "__typename": {
-        if (asString) {
-          // NOTE: this code relies on the fact that fieldName and typeName do
-          // not require any quoting in JSON/JS - they must conform to GraphQL
-          // `Name`.
-          return te`  string += \`${
-            i === 0 ? te.blank : te_comma
-          }"\${${te_fieldNameI}}":"\${typeName}"\`;\n`;
-        } else {
-          return te`  obj[${te_fieldNameI}] = typeName;\n`;
-        }
-      }
-      case "outputPlan!":
-      case "outputPlan?": {
-        return te`\
-  mutablePath[mutablePathIndex] = ${te_fieldNameI};
-  spec = keys[${te_fieldNameI}];
-${
-  asString
-    ? te`  string += \`${
-        i === 0 ? te.blank : te_comma
-      }"\${${te_fieldNameI}}":\`;
-`
-    : te.blank
-}\
-${
-  sameBucket
-    ? te`\
-${makeExecuteChildPlanCode(
-  asString ? te_stringPlusEquals : te`obj[${te_fieldNameI}] =`,
-  te_specDotLocationDetails,
-  te_specDotOutputPlan,
-  fieldType === "outputPlan!",
-  asString,
-  te_bucket,
-  te_bucketIndex,
-)}`
-    : te`\
-  directChild = bucket.children[spec.outputPlan.layerPlanId];
-  if (directChild !== undefined) {
-    childBucket = directChild.bucket;
-    childBucketIndex = directChild.map.get(bucketIndex);
-  } else {
-    const c = ${ref_getChildBucketAndIndex}(
-      spec.outputPlan,
-      this,
-      bucket,
-      bucketIndex,
-    );
-    if (c !== null) {
-      ([childBucket, childBucketIndex] = c);
-    } else {
-      childBucket = childBucketIndex = null;
-    }
-  }
-${makeExecuteChildPlanCode(
-  asString ? te_stringPlusEquals : te`obj[${te_fieldNameI}] =`,
-  te_specDotLocationDetails,
-  te_specDotOutputPlan,
-  fieldType === "outputPlan!",
-  asString,
-)}`
-}
-`;
-      }
-      default: {
-        const never: never = fieldType;
+  const fieldDigests = Object.entries(fieldTypes).map(
+    ([responseKey, fieldSpec], i) => {
+      // NOTE: this code relies on the fact that fieldName and typeName do
+      // not require any quoting in JSON/JS - they must conform to GraphQL
+      // `Name`.
+      if (!SAFE_NAME.test(responseKey)) {
+        // This should not be able to happen if the GraphQL operation is valid
         throw new Error(
-          `GrafastInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${never}`,
+          `Unsafe key: ${responseKey}; doesn't conform to 'Name' in the GraphQL spec`,
         );
       }
-    }
-  }),
-  "\n",
-)}
+      const { fieldType, sameBucket } = fieldSpec;
+      const addComma = asString && i > 0;
+      switch (fieldType) {
+        case "__typename": {
+          return {
+            isTypeName: true as const,
+            addComma,
+            responseKey,
+            stringValue: asString ? `"${responseKey}":"${typeName}"` : null,
+          } as const;
+        }
+        case "outputPlan!":
+        case "outputPlan?": {
+          return {
+            isTypeName: false as const,
+            addComma,
+            responseKey,
+            stringPrefix: asString ? `"${responseKey}":` : null,
+            sameBucket,
+            isNonNull: fieldType === "outputPlan!",
+          } as const;
+        }
+        default: {
+          const never: never = fieldType;
+          throw new Error(
+            `GrafastInternalError<879082f4-fe6f-4112-814f-852b9932ca83>: unsupported key type ${never}`,
+          );
+        }
+      }
+    },
+  );
+  return makeExecutor<TAsString, OutputPlanTypeObject>({
+    inner(
+      bucketRootValue,
+      root,
+      mutablePath,
+      bucket,
+      bucketIndex,
+      rawBucketRootValue,
+      bucketRootFlags,
+    ): TAsString extends true ? string : JSONValue {
+      let string: string | undefined = asString ? "{" : undefined;
+      const obj: Record<string, JSONValue> | undefined = asString
+        ? undefined
+        : Object.create(null);
+      const keys = this.keys;
+      const mutablePathIndex = mutablePath.push("!") - 1;
 
-  mutablePath.length = mutablePathIndex;
-${asString ? te_stringPlusEqualsRbrace : te.blank}\
-${hasDeferredOutputPlans ? te_handleDeferred : te.blank}
-  return ${asString ? te_string : te_obj};`;
+      for (const digest of fieldDigests) {
+        if (digest.addComma) {
+          string! += ",";
+        }
+        const responseKey = digest.responseKey;
+        if (digest.isTypeName) {
+          if (asString) {
+            string! += digest.stringValue;
+          } else {
+            obj![responseKey] = typeName;
+          }
+        } else {
+          mutablePath[mutablePathIndex] = responseKey;
+          const spec = keys[responseKey] as OutputPlanKeyValueOutputPlan;
+          if (digest.sameBucket) {
+            const val = executeChildPlan(
+              this,
+              spec.locationDetails,
+              spec.outputPlan,
+              digest.isNonNull,
+              asString,
+              bucket,
+              bucketIndex,
+              bucket,
+              mutablePath,
+              mutablePathIndex,
+              root,
+              rawBucketRootValue,
+              bucketRootFlags,
+            );
+            if (asString) {
+              string! += digest.stringPrefix;
+              string! += val;
+            } else {
+              obj![responseKey] = val;
+            }
+          } else {
+            const directChild = bucket.children[spec.outputPlan.layerPlan.id];
+            let childBucket, childBucketIndex;
+            if (directChild !== undefined) {
+              childBucket = directChild.bucket;
+              childBucketIndex = directChild.map.get(bucketIndex);
+            } else {
+              const c = getChildBucketAndIndex(
+                spec.outputPlan,
+                this,
+                bucket,
+                bucketIndex,
+              );
+              if (c !== null) {
+                [childBucket, childBucketIndex] = c;
+              } else {
+                childBucket = childBucketIndex = null;
+              }
+            }
+            const val = executeChildPlan(
+              this,
+              spec.locationDetails,
+              spec.outputPlan,
+              digest.isNonNull,
+              asString,
+              childBucket,
+              childBucketIndex as number,
+              bucket,
+              mutablePath,
+              mutablePathIndex,
+              root,
+              rawBucketRootValue,
+              bucketRootFlags,
+            );
+            if (asString) {
+              string! += digest.stringPrefix;
+              string! += val;
+            } else {
+              obj![responseKey] = val;
+            }
+          }
+        }
+      }
 
-  const executorExpression = makeExecutorExpression({
-    inner: inner,
-    nameExtra: te_object,
+      mutablePath.length = mutablePathIndex;
+      if (asString) {
+        string! += "}";
+      }
+      if (hasDeferredOutputPlans) {
+        // Everything seems okay; queue any deferred payloads
+        for (const defer of this.deferredOutputPlans) {
+          root.queue.push({
+            root,
+            path: mutablePath.slice(1),
+            bucket,
+            bucketIndex,
+            outputPlan: defer,
+            label: defer.type.deferLabel,
+          });
+        }
+      }
+      return (asString ? string : obj) as TAsString extends true
+        ? string
+        : JSONValue;
+    },
+    nameExtra: "object",
     asString,
     skipNullHandling: isRoot,
-    preamble: te.blank,
-  });
-
-  const factoryExpression = te`\
-function objectExecutorFactory(typeName${te.join(
-    fieldSpecs.map((_, i) => te`, ${te.identifier(`fieldName_${i}`)}`),
-    "",
-  )}) {
-  return ${executorExpression};
-}`;
-  te.runInBatch<Factory<boolean>>(factoryExpression, (factory) => {
-    makeObjectExecutorCache.set(signature, factory);
-    makingObjectExecutorCallbacks.delete(signature);
-    for (const callback of callbacks) {
-      callback(factory);
-    }
   });
 }
 

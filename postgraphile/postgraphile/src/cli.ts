@@ -185,8 +185,8 @@ export async function run(args: ArgsFromOptions<typeof options>) {
       );
     }
     const schemas = rawSchema?.split(",") ?? ["public"];
-    const adaptor =
-      preset.pgServices?.[0]?.adaptor ?? (await loadDefaultAdaptor());
+    const svc = preset.pgServices?.[0];
+    const adaptor = svc?.adaptor ?? (await loadDefaultAdaptor());
 
     const makePgService = adaptor.makePgService;
     if (typeof makePgService !== "function") {
@@ -194,10 +194,13 @@ export async function run(args: ArgsFromOptions<typeof options>) {
         `Loaded adaptor '${adaptor}' but it does not export a 'makePgService' helper`,
       );
     }
+
     const newPgServices = [
       makePgService({
+        poolConfig: svc?.adaptorSettings?.poolConfig,
         connectionString,
         schemas,
+        superuserPoolConfig: svc?.adaptorSettings?.superuserPoolConfig,
         superuserConnectionString,
         ...(rawSubscriptions ? { pubsub: true } : null),
       }),

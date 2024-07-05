@@ -1,6 +1,7 @@
 import { isDev } from "../dev.js";
 import { SafeError } from "../index.js";
 import type {
+  GrafastResultsList,
   GrafastResultStreamList,
   GrafastSubscriber,
   StreamDetails,
@@ -59,7 +60,7 @@ export class ListenStep<
     this.topicDep = this.addDependency($topic);
   }
 
-  execute(): never {
+  execute(): GrafastResultsList<TTopics[TTopic]> {
     throw new Error("ListenStep cannot be executed, it can only be streamed");
   }
 

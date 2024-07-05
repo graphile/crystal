@@ -113,7 +113,7 @@ export function getWithPgClientFromPgService<
 
 export async function withPgClientFromPgService<T>(
   config: GraphileConfig.PgServiceConfiguration,
-  pgSettings: { [key: string]: string } | null,
+  pgSettings: Record<string, string | undefined> | null,
   callback: (client: PgClient) => T | Promise<T>,
 ): Promise<T> {
   const withPgClientFromPgService = getWithPgClientFromPgService(config);
@@ -130,7 +130,7 @@ export async function withPgClientFromPgService<T>(
 // We don't cache superuser withPgClients
 export async function withSuperuserPgClientFromPgService<T>(
   config: GraphileConfig.PgServiceConfiguration,
-  pgSettings: { [key: string]: string } | null,
+  pgSettings: Record<string, string | undefined> | null,
   callback: (client: PgClient) => T | Promise<T>,
 ): Promise<T> {
   const withPgClient = await config.adaptor.createWithPgClient(
