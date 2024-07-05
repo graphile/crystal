@@ -262,7 +262,7 @@ function outputBucket(
     childBucketIndex = rootBucketIndex;
   } else {
     const c = getChildBucketAndIndex(
-      outputPlan,
+      outputPlan.layerPlan,
       null,
       rootBucket,
       rootBucketIndex,

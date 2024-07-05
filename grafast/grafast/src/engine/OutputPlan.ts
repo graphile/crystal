@@ -13,7 +13,7 @@ import te, { stringifyJSON, stringifyString } from "tamedevil";
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
 import { isDev } from "../dev.js";
-import { AccessStep, stepADependsOnStepB } from "../index.js";
+import { AccessStep, stepADependsOnStepB, stripAnsi } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
   ExecutionEntryFlags,
@@ -684,7 +684,7 @@ export function nonNullError(
  * @internal
  */
 export function getChildBucketAndIndex(
-  childOutputPlan: OutputPlan,
+  layerPlan: LayerPlan,
   outputPlan: OutputPlan | null,
   bucket: Bucket,
   bucketIndex: number,
@@ -698,13 +698,13 @@ export function getChildBucketAndIndex(
       "GrafastInternalError<83d0e3cc-7eec-4185-85b4-846540288162>: arrayIndex must be supplied iff outputPlan is an array",
     );
   }
-  if (outputPlan != null && childOutputPlan.layerPlan === bucket.layerPlan) {
+  if (outputPlan != null && layerPlan === bucket.layerPlan) {
     // Same layer; straightforward
     return [bucket, bucketIndex];
   }
 
-  const reversePath = [childOutputPlan.layerPlan];
-  let current: LayerPlan | null = childOutputPlan.layerPlan;
+  const reversePath = [layerPlan];
+  let current: LayerPlan | null = layerPlan;
   while (!bucket.children[current.id]) {
     current = current.parentLayerPlan;
     if (!current) {
@@ -855,7 +855,7 @@ function makeExecutor<
         ._flagsAt(bucketIndex);
       if (seFlags & FLAG_ERROR) {
         const seVal = bucket.store.get(this.sideEffectStep.id)!.at(bucketIndex);
-        throw seVal;
+        throw coerceError(seVal, this.locationDetails, mutablePath.slice(1));
       }
     }
     const bucketRootValue =
@@ -906,12 +906,58 @@ function executeChildPlan(
   childBucket: Bucket | null,
   childBucketIndex: number | null,
   bucket: Bucket,
+  bucketIndex: number,
   mutablePath: ReadonlyArray<string | number>,
   mutablePathIndex: number,
   root: PayloadRoot,
   rawBucketRootValue: any,
   bucketRootFlags: ExecutionEntryFlags,
 ) {
+  const $sideEffect = childOutputPlan.layerPlan.parentSideEffectStep;
+  if ($sideEffect !== null) {
+    // Check if there's an error
+    const errorBucketDetails = getChildBucketAndIndex(
+      $sideEffect.layerPlan,
+      null,
+      bucket,
+      bucketIndex,
+    );
+    if (errorBucketDetails) {
+      const [errorBucket, errorBucketIndex] = errorBucketDetails;
+      const ev = errorBucket.store.get($sideEffect.id);
+      if (!ev) {
+        throw new Error(
+          `GrafastInternalError<d18d52b5-f5bf-42df-a2dd-80e522310b8e>: ${stripAnsi(
+            String($sideEffect),
+          )} has no entry in ${bucket}`,
+        );
+      }
+      const flags = ev._flagsAt(errorBucketIndex);
+      if (flags & FLAG_ERROR) {
+        const e = coerceError(
+          ev.at(errorBucketIndex),
+          locationDetails,
+          mutablePath.slice(1),
+        );
+        if (isNonNull) {
+          throw e;
+        } else {
+          const streamCount = root.streams.length;
+          const queueCount = root.queue.length;
+          commonErrorHandler(
+            e,
+            locationDetails,
+            mutablePath,
+            mutablePathIndex,
+            root,
+            streamCount,
+            queueCount,
+          );
+          return asString ? "null" : null;
+        }
+      }
+    }
+  }
   // This is the code that changes based on if the field is nullable or not
   if (isNonNull) {
     // No need to catch error
@@ -1141,7 +1187,7 @@ function makePolymorphicExecutor<TAsString extends boolean>(
         ) as TAsString extends true ? string : JSONValue;
       } else {
         const c = getChildBucketAndIndex(
-          childOutputPlan,
+          childOutputPlan.layerPlan,
           this,
           bucket,
           bucketIndex,
@@ -1231,7 +1277,7 @@ function makeArrayExecutor<TAsString extends boolean>(
             childBucketIndex = lookup![i];
           } else {
             const c = getChildBucketAndIndex(
-              childOutputPlan,
+              childOutputPlan.layerPlan,
               this,
               bucket,
               bucketIndex,
@@ -1259,6 +1305,7 @@ function makeArrayExecutor<TAsString extends boolean>(
             childBucket!,
             childBucketIndex!,
             bucket,
+            bucketIndex,
             mutablePath,
             mutablePathIndex,
             root,
@@ -1546,6 +1593,7 @@ function makeObjectExecutor<TAsString extends boolean>(
               bucket,
               bucketIndex,
               bucket,
+              bucketIndex,
               mutablePath,
               mutablePathIndex,
               root,
@@ -1566,7 +1614,7 @@ function makeObjectExecutor<TAsString extends boolean>(
               childBucketIndex = directChild.map.get(bucketIndex);
             } else {
               const c = getChildBucketAndIndex(
-                spec.outputPlan,
+                spec.outputPlan.layerPlan,
                 this,
                 bucket,
                 bucketIndex,
@@ -1586,6 +1634,7 @@ function makeObjectExecutor<TAsString extends boolean>(
               childBucket,
               childBucketIndex as number,
               bucket,
+              bucketIndex,
               mutablePath,
               mutablePathIndex,
               root,
