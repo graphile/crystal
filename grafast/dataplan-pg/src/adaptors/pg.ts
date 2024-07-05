@@ -14,6 +14,7 @@ import type {
   Notification,
   Pool,
   PoolClient,
+  PoolConfig,
   QueryArrayConfig,
   QueryConfig,
 } from "pg";
@@ -46,6 +47,8 @@ declare global {
     }
   }
 }
+
+const PgPool = pg.Pool ?? (pg as any).default?.Pool;
 
 // Set `DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE=0` to disable prepared statements
 const cacheSizeFromEnv = process.env.DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE
@@ -85,7 +88,7 @@ export interface NodePostgresPgClient extends PgClient {
 }
 
 function newNodePostgresPgClient(
-  pgClient: pg.PoolClient,
+  pgClient: PoolClient,
   txLevel: number,
   alwaysQueue: boolean,
   alreadyInTransaction: boolean,
@@ -214,7 +217,7 @@ declare module "pg" {
 }
 
 async function makeNodePostgresWithPgClient_inner<T>(
-  pgClient: pg.PoolClient,
+  pgClient: PoolClient,
   pgSettings: Record<string, string | undefined> | null,
   callback: (client: NodePostgresPgClient) => T | Promise<T>,
   alwaysQueue: boolean,
@@ -285,7 +288,7 @@ async function makeNodePostgresWithPgClient_inner<T>(
 }
 
 /**
- * Returns a `withPgClient` for the given `pg.Pool` instance.
+ * Returns a `withPgClient` for the given `Pool` instance.
  */
 export function makePgAdaptorWithPgClient(
   pool: Pool,
@@ -336,12 +339,12 @@ export function makePgAdaptorWithPgClient(
 }
 
 /**
- * Returns a `withPgClient` for the given `pg.PoolClient` instance. ONLY
+ * Returns a `withPgClient` for the given `PoolClient` instance. ONLY
  * SUITABLE FOR TESTS!
  *
  */
 export function makeWithPgClientViaPgClientAlreadyInTransaction(
-  pgClient: pg.PoolClient,
+  pgClient: PoolClient,
   alreadyInTransaction = false,
 ): WithPgClient<NodePostgresPgClient> {
   const release = () => {};
@@ -375,16 +378,16 @@ export function makeWithPgClientViaPgClientAlreadyInTransaction(
 
 export interface PgAdaptorSettings {
   /** ONLY FOR USE IN TESTS! */
-  poolClient?: pg.PoolClient;
+  poolClient?: PoolClient;
   /** ONLY FOR USE IN TESTS! */
   poolClientIsInTransaction?: boolean;
   /** ONLY FOR USE IN TESTS! */
-  superuserPoolClient?: pg.PoolClient;
+  superuserPoolClient?: PoolClient;
   /** ONLY FOR USE IN TESTS! */
   superuserPoolClientIsInTransaction?: boolean;
 
   pool?: Pool;
-  poolConfig?: Omit<pg.PoolConfig, "connectionString">;
+  poolConfig?: Omit<PoolConfig, "connectionString">;
   connectionString?: string;
 
   /** For installing the watch fixtures */
@@ -409,7 +412,7 @@ export function createWithPgClient(
         options.superuserPoolClientIsInTransaction,
       );
     } else if (options.superuserConnectionString) {
-      const pool = new pg.Pool({
+      const pool = new PgPool({
         ...options.poolConfig,
         connectionString: options.superuserConnectionString,
       });
@@ -426,7 +429,7 @@ export function createWithPgClient(
       options.poolClientIsInTransaction,
     );
   } else {
-    const pool = new pg.Pool({
+    const pool = new PgPool({
       ...options.poolConfig,
       connectionString: options.connectionString,
     });
@@ -727,7 +730,7 @@ export class PgSubscriber<
 }
 
 export interface PgAdaptorMakePgServiceOptions extends MakePgServiceOptions {
-  pool?: pg.Pool;
+  pool?: Pool;
 }
 
 export function makePgService(
@@ -750,11 +753,10 @@ export function makePgService(
       `makePgService called with pgSettings but no pgSettingsKey - please indicate where the settings should be stored, e.g. 'pgSettingsKey: "pgSettings"' (must be unique across sources)`,
     );
   }
-  const Pool = pg.Pool ?? (pg as any).default?.Pool;
   const releasers: (() => void | PromiseLike<void>)[] = [];
   let pool = options.pool;
   if (!pool) {
-    pool = new Pool({ connectionString });
+    pool = new PgPool({ connectionString });
     releasers.push(() => pool!.end());
   }
   if (!options.pool) {
