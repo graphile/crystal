@@ -443,17 +443,20 @@ declare global {
       >;
 
       /** Return settings to set in the session */
-      pgSettings?: (
-        requestContext: Grafast.RequestContext,
-      ) => { [key: string]: string } | null;
+      pgSettings?:
+        | ((
+            requestContext: Grafast.RequestContext,
+          ) => Record<string, string | undefined>)
+        | Record<string, string | undefined>
+        | null;
 
       /** Settings to set in the session that performs introspection (during gather phase) */
-      pgSettingsForIntrospection?: { [key: string]: string } | null;
+      pgSettingsForIntrospection?: Record<string, string | undefined> | null;
 
       /** The key on 'context' where the pgSettings for this DB will be sourced */
       pgSettingsKey?: KeysOfType<
         Grafast.Context & object,
-        { [key: string]: string } | null | undefined
+        Record<string, string | undefined> | null | undefined
       >;
 
       /** The GrafastSubscriber to use for subscriptions */

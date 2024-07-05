@@ -31,9 +31,7 @@ import type { PgAdaptor } from "../pgServices.js";
 declare global {
   namespace Grafast {
     interface Context {
-      pgSettings: {
-        [key: string]: string;
-      } | null;
+      pgSettings: Record<string, string | undefined> | null;
       withPgClient: WithPgClient<NodePostgresPgClient>;
       pgSubscriber: PgSubscriber | null;
     }
@@ -217,7 +215,7 @@ declare module "pg" {
 
 async function makeNodePostgresWithPgClient_inner<T>(
   pgClient: pg.PoolClient,
-  pgSettings: { [key: string]: string } | null,
+  pgSettings: Record<string, string | undefined> | null,
   callback: (client: NodePostgresPgClient) => T | Promise<T>,
   alwaysQueue: boolean,
   alreadyInTransaction: boolean,
