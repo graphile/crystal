@@ -13,5 +13,5 @@
     "module": "NodeNext"
   },
   "include": ["."],
-  "exclude": ["__tests__", "dist"]
+  "exclude": ["dist"]
 }
