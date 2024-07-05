@@ -900,7 +900,7 @@ function makeExecutor<
 function executeChildPlan(
   that: OutputPlan,
   locationDetails: LocationDetails,
-  childOutputPlan: OutputPlan | null,
+  childOutputPlan: OutputPlan,
   isNonNull: boolean,
   asString: boolean,
   childBucket: Bucket | null,
@@ -922,18 +922,16 @@ function executeChildPlan(
         throw nonNullError(locationDetails, mutablePath.slice(1));
       }
     }
-    const fieldResult = childOutputPlan![
-      asString ? "executeString" : "execute"
-    ](
+    const fieldResult = childOutputPlan[asString ? "executeString" : "execute"](
       root,
       mutablePath,
       childBucket,
       childBucketIndex!,
       // NOTE: the previous code may have had a bug here, it referenced childBucket.rootStep
-      childOutputPlan!.rootStep === that.rootStep
+      childOutputPlan.rootStep === that.rootStep
         ? rawBucketRootValue
         : undefined,
-      childOutputPlan!.rootStep === that.rootStep ? bucketRootFlags : undefined,
+      childOutputPlan.rootStep === that.rootStep ? bucketRootFlags : undefined,
     );
     if (fieldResult == (asString ? "null" : null)) {
       throw nonNullError(locationDetails, mutablePath.slice(1));
@@ -947,16 +945,16 @@ function executeChildPlan(
       if (childBucket !== bucket && childBucket == null) {
         return asString ? "null" : null;
       } else {
-        return childOutputPlan![asString ? "executeString" : "execute"](
+        return childOutputPlan[asString ? "executeString" : "execute"](
           root,
           mutablePath,
           childBucket,
           childBucketIndex!,
           // NOTE: the previous code may have had a bug here, it referenced childBucket.rootStep
-          childOutputPlan!.rootStep === that.rootStep
+          childOutputPlan.rootStep === that.rootStep
             ? rawBucketRootValue
             : undefined,
-          childOutputPlan!.rootStep === that.rootStep
+          childOutputPlan.rootStep === that.rootStep
             ? bucketRootFlags
             : undefined,
         );
@@ -1196,6 +1194,11 @@ function makeArrayExecutor<TAsString extends boolean>(
           : JSONValue;
       }
 
+      if (this.child === null) {
+        throw new Error(
+          `GrafastInternalError<365fd45e-2939-411b-92a6-4f6875d8fbd3>: ${this} has no child output plan?!`,
+        );
+      }
       const childOutputPlan = this.child;
       const l = bucketRootValue.length;
       let string: string | undefined;
@@ -1215,7 +1218,7 @@ function makeArrayExecutor<TAsString extends boolean>(
         const mutablePathIndex = mutablePath.push(-1) - 1;
 
         // Now to populate the children...
-        const directChild = bucket.children[childOutputPlan!.layerPlan.id];
+        const directChild = bucket.children[childOutputPlan.layerPlan.id];
         let childBucket: Bucket | null,
           childBucketIndex: number | null,
           lookup: number[] | undefined;
@@ -1228,7 +1231,7 @@ function makeArrayExecutor<TAsString extends boolean>(
             childBucketIndex = lookup![i];
           } else {
             const c = getChildBucketAndIndex(
-              childOutputPlan!,
+              childOutputPlan,
               this,
               bucket,
               bucketIndex,
@@ -1284,9 +1287,9 @@ function makeArrayExecutor<TAsString extends boolean>(
             path: mutablePath.slice(1),
             bucket,
             bucketIndex,
-            outputPlan: childOutputPlan!,
+            outputPlan: childOutputPlan,
             label: (
-              childOutputPlan!.layerPlan as LayerPlan<LayerPlanReasonListItem>
+              childOutputPlan.layerPlan as LayerPlan<LayerPlanReasonListItem>
             ).reason.stream?.label,
             stream,
             startIndex: bucketRootValue.length,
