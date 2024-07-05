@@ -417,7 +417,7 @@ export function createWithPgClient(
       );
     } else if (options.superuserConnectionString) {
       const pool = new PgPool({
-        ...options.poolConfig,
+        ...options.superuserPoolConfig,
         connectionString: options.superuserConnectionString,
       });
       const release = () => pool.end();
