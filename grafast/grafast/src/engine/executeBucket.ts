@@ -955,11 +955,16 @@ export function executeBucket(
       let needsFiltering = false;
       const defaultForbiddenFlags = sudo(step).defaultForbiddenFlags;
       const addDependency = (
-        step: ExecutableStep,
+        $dep: ExecutableStep,
         forbiddenFlags: ExecutionEntryFlags,
         onReject: Error | null | undefined,
       ) => {
-        const executionValue = store.get(step.id)!;
+        const executionValue = store.get($dep.id);
+        if (executionValue === undefined) {
+          throw new Error(
+            `GrafastInternalError<d9e9eb37-4251-4659-a545-4730826ecf0e>: ${$dep} data couldn't be found, but required by ${step} (with side effect ${step.latestSideEffectStep})!`,
+          );
+        }
         _rawDependencies.push(executionValue);
         _rawForbiddenFlags.push(forbiddenFlags);
         _rawOnReject.push(onReject);

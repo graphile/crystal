@@ -81,6 +81,7 @@ import {
   findVariableNamesUsed,
   hasItemPlan,
   isTypePlanned,
+  stepADependsOnStepB,
   sudo,
   writeableArray,
 } from "../utils.js";
@@ -2286,8 +2287,7 @@ export class OperationPlan {
           possiblyPeer !== step &&
           !possiblyPeer.hasSideEffects &&
           possiblyPeer.layerPlan === layerPlan &&
-          possiblyPeer.constructor === stepConstructor &&
-          possiblyPeer.latestSideEffectStep === step.latestSideEffectStep
+          possiblyPeer.constructor === stepConstructor
         ) {
           if (allPeers === null) {
             allPeers = [possiblyPeer];
@@ -2328,7 +2328,6 @@ export class OperationPlan {
           peerDependencyIndex === 0 &&
           !possiblyPeer.hasSideEffects &&
           possiblyPeer.constructor === stepConstructor &&
-          possiblyPeer.latestSideEffectStep === step.latestSideEffectStep &&
           peerLayerPlan.depth >= minDepth &&
           sudo(possiblyPeer).dependencies.length === dependencyCount &&
           peerLayerPlan === ancestry[peerLayerPlan.depth] &&
@@ -2388,7 +2387,6 @@ export class OperationPlan {
               peerDependencyIndex === dependencyIndex &&
               !possiblyPeer.hasSideEffects &&
               possiblyPeer.constructor === stepConstructor &&
-              possiblyPeer.latestSideEffectStep === step.latestSideEffectStep &&
               peerDependencies.length === dependencyCount &&
               peerLayerPlan === ancestry[peerLayerPlan.depth] &&
               peerFlags[0] === flags[0] &&
@@ -2550,13 +2548,6 @@ export class OperationPlan {
       }
     }
 
-    // Check that it doesn't depend on a side effect in the same bucket
-    if (
-      step.latestSideEffectStep &&
-      step.latestSideEffectStep.layerPlan === step.layerPlan
-    ) {
-      return;
-    }
     // Finally, check that none of its dependencies are in the same bucket.
     const deps = sudo(step).dependencies;
     if (deps.some((dep) => dep.layerPlan === step.layerPlan)) {
@@ -3263,16 +3254,18 @@ export class OperationPlan {
       const pending = new Set<ExecutableStep>(layerPlan.pendingSteps);
       const processed = new Set<ExecutableStep>();
 
+      let latestSideEffectStep: ExecutableStep | null = null;
       const processSideEffectPlan = (step: ExecutableStep) => {
         if (processed.has(step) || isPrepopulatedStep(step)) {
           return;
         }
+        const sstep = sudo(step);
         processed.add(step);
         pending.delete(step);
 
         const sideEffectDeps: ExecutableStep[] = [];
         const rest: ExecutableStep[] = [];
-        for (const dep of sudo(step).dependencies) {
+        for (const dep of sstep.dependencies) {
           if (dep.layerPlan !== layerPlan) {
             continue;
           }
@@ -3295,6 +3288,16 @@ export class OperationPlan {
         // run them in parallel, and they don't even have side effects!
         for (const dep of rest) {
           processSideEffectPlan(dep);
+        }
+
+        if (
+          latestSideEffectStep !== null &&
+          !stepADependsOnStepB(sstep, latestSideEffectStep)
+        ) {
+          sstep.latestSideEffectStep = latestSideEffectStep;
+        }
+        if (step.hasSideEffects) {
+          latestSideEffectStep = step;
         }
 
         const phase = /*#__INLINE__*/ newLayerPlanPhase();
@@ -3338,6 +3341,13 @@ export class OperationPlan {
         for (const step of nextSteps) {
           processed.add(step);
           pending.delete(step);
+          const sstep = sudo(step);
+          if (
+            latestSideEffectStep !== null &&
+            !stepADependsOnStepB(sstep, latestSideEffectStep)
+          ) {
+            sstep.latestSideEffectStep = latestSideEffectStep;
+          }
           if (step.isSyncAndSafe && isUnbatchedExecutableStep(step)) {
             if (phase.unbatchedSyncAndSafeSteps !== undefined) {
               phase.unbatchedSyncAndSafeSteps.push({
@@ -3370,6 +3380,13 @@ export class OperationPlan {
               if (readyToExecute(step)) {
                 processed.add(step);
                 pending.delete(step);
+                const sstep = sudo(step);
+                if (
+                  latestSideEffectStep !== null &&
+                  !stepADependsOnStepB(sstep, latestSideEffectStep)
+                ) {
+                  sstep.latestSideEffectStep = latestSideEffectStep;
+                }
                 foundOne = true;
                 if (phase.unbatchedSyncAndSafeSteps !== undefined) {
                   phase.unbatchedSyncAndSafeSteps.push({

@@ -358,12 +358,38 @@ export class StepTracker {
       dependencyIndex,
     });
 
+    /*
+    // If an explicit dependency is added on a side effect (directly or
+    // indirectly) then the implicit side effect should be removed (otherwise
+    // traps won't work).
     if (
       $dependent.latestSideEffectStep &&
-      stepADependsOnStepB($dependency, $dependent.latestSideEffectStep)
+      ($dependent.latestSideEffectStep === $dependency ||
+        stepADependsOnStepB($dependency, $dependent.latestSideEffectStep))
     ) {
       $dependent.latestSideEffectStep = null;
     }
+
+    // If a side effect step adds a dependency on a step, then that step cannot
+    // be dependent on the side effect step - that would form a loop!
+    if ($dependent.hasSideEffects) {
+      function recursivelyRemoveLatestSideEffectStep(
+        step: ExecutableStep,
+      ): void {
+        if (step.layerPlan !== $dependent.layerPlan) {
+          return;
+        }
+        const sstep = sudo(step);
+        if (step.latestSideEffectStep === $dependent) {
+          sstep.latestSideEffectStep = null;
+        }
+        for (const dep of sstep.dependencies) {
+          recursivelyRemoveLatestSideEffectStep(dep);
+        }
+      }
+      recursivelyRemoveLatestSideEffectStep($dependency);
+    }
+    */
 
     return dependencyIndex;
   }

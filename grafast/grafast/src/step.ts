@@ -302,6 +302,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
 
   constructor() {
     super();
+    this.latestSideEffectStep = null;
     this.hasSideEffects ??= false;
     let hasSideEffects = false;
     Object.defineProperty(this, "hasSideEffects", {
@@ -342,8 +343,6 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
 
     // Important: MUST come after `this.layerPlan = ...`
     this.id = this.layerPlan._addStep(this);
-    // Important: MUST come after `this.layerPlan._addStep(this)`
-    this.latestSideEffectStep = this.layerPlan.latestSideEffectStep;
   }
 
   protected withMyLayerPlan<T>(callback: () => T): T {

@@ -850,12 +850,30 @@ function makeExecutor<
     bucketRootFlags = bucket.store.get(this.rootStep.id)!._flagsAt(bucketIndex),
   ) {
     if (this.sideEffectStep !== null) {
-      const seFlags = bucket.store
-        .get(this.sideEffectStep.id)!
-        ._flagsAt(bucketIndex);
-      if (seFlags & FLAG_ERROR) {
-        const seVal = bucket.store.get(this.sideEffectStep.id)!.at(bucketIndex);
-        throw coerceError(seVal, this.locationDetails, mutablePath.slice(1));
+      const sideEffectBucketDetails = getChildBucketAndIndex(
+        this.sideEffectStep.layerPlan,
+        null,
+        bucket,
+        bucketIndex,
+      );
+      if (sideEffectBucketDetails) {
+        const [sideEffectBucket, sideEffectBucketIndex] =
+          sideEffectBucketDetails;
+        const ev = sideEffectBucket.store.get(this.sideEffectStep.id);
+        if (!ev) {
+          throw new Error(
+            `GrafastInternalError<da9cc5a0-23bf-4af8-a103-92f995795398>: ${stripAnsi(
+              String(this.sideEffectStep),
+            )} has no entry in ${bucket}`,
+          );
+        }
+        const seFlags = ev._flagsAt(sideEffectBucketIndex);
+        if (seFlags & FLAG_ERROR) {
+          const seVal = sideEffectBucket.store
+            .get(this.sideEffectStep.id)!
+            .at(sideEffectBucketIndex);
+          throw coerceError(seVal, this.locationDetails, mutablePath.slice(1));
+        }
       }
     }
     const bucketRootValue =
@@ -916,15 +934,15 @@ function executeChildPlan(
   const $sideEffect = childOutputPlan.layerPlan.parentSideEffectStep;
   if ($sideEffect !== null) {
     // Check if there's an error
-    const errorBucketDetails = getChildBucketAndIndex(
+    const sideEffectBucketDetails = getChildBucketAndIndex(
       $sideEffect.layerPlan,
       null,
       bucket,
       bucketIndex,
     );
-    if (errorBucketDetails) {
-      const [errorBucket, errorBucketIndex] = errorBucketDetails;
-      const ev = errorBucket.store.get($sideEffect.id);
+    if (sideEffectBucketDetails) {
+      const [sideEffectBucket, sideEffectBucketIndex] = sideEffectBucketDetails;
+      const ev = sideEffectBucket.store.get($sideEffect.id);
       if (!ev) {
         throw new Error(
           `GrafastInternalError<d18d52b5-f5bf-42df-a2dd-80e522310b8e>: ${stripAnsi(
@@ -932,10 +950,10 @@ function executeChildPlan(
           )} has no entry in ${bucket}`,
         );
       }
-      const flags = ev._flagsAt(errorBucketIndex);
+      const flags = ev._flagsAt(sideEffectBucketIndex);
       if (flags & FLAG_ERROR) {
         const e = coerceError(
-          ev.at(errorBucketIndex),
+          ev.at(sideEffectBucketIndex),
           locationDetails,
           mutablePath.slice(1),
         );
