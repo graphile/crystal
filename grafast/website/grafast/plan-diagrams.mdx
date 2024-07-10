@@ -211,6 +211,25 @@ ${init}
 `}
 />
 
+### Unary steps
+
+During planning, Grafast may determine that there will only ever be one value
+(per request) for a given step, and thus it demarks this step as a "unary
+step". This can be important for the step's dependents since they know they'll
+receive exactly one value from this step, rather than a batch of values, and
+thus they may be able to simplify their logic. This can be critically important
+for things such as pagination limits, and steps are allowed to require that a
+dependency is unary.
+
+In plan diagrams, unary steps are denoted by a `➊` in their Node:
+
+<Mermaid
+  chart={`\
+${init}
+    Access17{{"Access[16∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+`}
+/>
+
 ## How to see a request's plan diagram
 
 Your server must be configured to expose plans for you to be able to see them;
