@@ -328,6 +328,19 @@ export function planToMermaid(
     }${step.metaString ? `<${step.metaString}>` : ""}[${step.id}]`;
   };
 
+  let firstSideEffect = true;
+  sortedSteps.forEach((step) => {
+    if (step.implicitSideEffectStepId) {
+      if (firstSideEffect) {
+        graph.push("");
+        graph.push("    %% implicit side effects");
+        firstSideEffect = false;
+      }
+      const sideEffectStep = stepById[step.implicitSideEffectStepId];
+      graph.push(`    ${planId(sideEffectStep)} -.-o ${planId(step)}`);
+    }
+  });
+
   graph.push("");
   if (!concise && !skipBuckets) graph.push("    subgraph Buckets");
   const layerPlans = Object.values(layerPlanById);
@@ -339,25 +352,30 @@ export function planToMermaid(
       (layerPlan.reason.type === "polymorphic"
         ? `\n${layerPlan.reason.typeNames}`
         : ``);
-    const outputMapStuff: string[] = [];
     if (!skipBuckets) {
       graph.push(
         `    Bucket${layerPlan.id}(${mermaidEscape(
           `Bucket ${layerPlan.id}${raisonDEtre}${
+            layerPlan.parentSideEffectStepId != null
+              ? `\nParent side effect step: ${
+                  stepById[layerPlan.parentSideEffectStepId].id
+                }`
+              : ""
+          }${
             layerPlan.copyStepIds.length > 0
               ? `\nDeps: ${layerPlan.copyStepIds
                   .map((pId) => stepById[pId]!.id)
-                  .join(", ")}\n`
+                  .join(", ")}`
               : ""
           }${
             layerPlan.reason.type === "polymorphic"
-              ? pp(layerPlan.reason.polymorphicPaths)
+              ? "\n" + pp(layerPlan.reason.polymorphicPaths)
               : ""
-          }${
+          }\n${
             layerPlan.rootStepId != null && layerPlan.reason.type !== "root"
               ? `\nROOT ${stepToString(stepById[layerPlan.rootStepId])}`
               : ""
-          }${startSteps(layerPlan)}\n${outputMapStuff.join("\n")}`,
+          }${startSteps(layerPlan)}`,
         )}):::bucket`,
       );
     }

@@ -10,6 +10,7 @@ export interface GrafastPlanStepJSONv1 {
   metaString: string | null;
   isUnary: boolean;
   bucketId: string | number;
+  implicitSideEffectStepId: string | number | null;
   dependencyIds: ReadonlyArray<string | number>;
   dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
   dependencyOnReject: ReadonlyArray<string | null | undefined>;
@@ -84,6 +85,7 @@ export interface GrafastPlanBucketReasonSubroutineJSONv1 {
 export interface GrafastPlanBucketJSONv1 {
   id: number;
   reason: GrafastPlanBucketReasonJSONv1;
+  parentSideEffectStepId: string | number | null;
   copyStepIds: ReadonlyArray<string | number>;
   steps: ReadonlyArray<GrafastPlanStepJSONv1>;
   rootStepId: string | number | null;

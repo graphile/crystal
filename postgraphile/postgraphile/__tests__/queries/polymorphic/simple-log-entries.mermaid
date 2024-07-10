@@ -78,7 +78,7 @@ graph TD
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 17<br /><br />ROOT PgSelectSingle{2}ᐸlog_entriesᐳ[21]<br />1: <br />ᐳ: 22, 23, 24<br />2: PgUnionAll[25]<br />ᐳ: First[29]<br />3: PgUnionAllSingle[30]<br />ᐳ: Access[31]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgUnionAll25,First29,PgUnionAllSingle30,Access31 bucket3
-    Bucket4("Bucket 4 (polymorphic)<br />Organization,Person<br />Deps: 31, 17, 30<br />ᐳOrganization<br />ᐳPerson<br />1: JSONParse[32], JSONParse[42]<br />ᐳ: Access[33], Access[43]<br />2: PgSelect[34], PgSelect[44]<br />ᐳ: 38, 39, 40, 48, 49, 50"):::bucket
+    Bucket4("Bucket 4 (polymorphic)<br />Organization,Person<br />Deps: 31, 17, 30<br />ᐳOrganization<br />ᐳPerson<br /><br />1: JSONParse[32], JSONParse[42]<br />ᐳ: Access[33], Access[43]<br />2: PgSelect[34], PgSelect[44]<br />ᐳ: 38, 39, 40, 48, 49, 50"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,JSONParse32,Access33,PgSelect34,First38,PgSelectSingle39,PgClassExpression40,JSONParse42,Access43,PgSelect44,First48,PgSelectSingle49,PgClassExpression50 bucket4
     Bucket0 --> Bucket1
