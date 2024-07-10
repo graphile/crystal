@@ -9,7 +9,7 @@ flowchart TD
     classDef path fill:#eee,stroke:#000,color:#000
     classDef plan fill:#fff,stroke-width:1px,color:#000
     classDef itemplan fill:#fff,stroke-width:2px,color:#000
-    classDef sideeffectplan fill:#f00,stroke-width:2px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
     classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
     classDef bucket0 stroke:#696969
     classDef bucket2 stroke:#7f007f
@@ -191,6 +191,25 @@ confers no benefit from batching. This allows the system to calculate their
 values alongside their dependencies without having to loop multiple times.
 Typically they're used for trivial operations such as accessing a named
 property from an object or accessing the first/last entry in a list.
+
+### Implicit side effect dependency
+
+If a step is implicitly dependent on a side effect due to occuring after the side effect, a dotted line ending in a circle will join the nodes:
+
+<Mermaid
+  chart={`\
+${init}
+    Access17{{"Access[17∈3]<br />ᐸ15.friend_idᐳ"}}:::plan
+    SideEffect18[["SideEffect[18∈3]"]]:::sideeffectplan
+    LoadOne19{{"LoadOne[19∈3]"}}:::plan
+    Access17 --> SideEffect18
+    Access17 --> LoadOne19
+    SideEffect18 -.-o LoadOne19
+    class Access17 bucket3
+    class SideEffect18 bucket3
+    class LoadOne19 bucket3
+`}
+/>
 
 ## How to see a request's plan diagram
 
