@@ -458,7 +458,8 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     if (
       $root instanceof AccessStep &&
       $root.fallback === undefined &&
-      $root.implicitSideEffectStep === null
+      $root.implicitSideEffectStep === null &&
+      (!this.sideEffectStep || !stepADependsOnStepB($root, this.sideEffectStep))
     ) {
       const expressionDetails:
         | [ReadonlyArray<string | number>, any]
