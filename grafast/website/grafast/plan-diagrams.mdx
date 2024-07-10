@@ -192,9 +192,24 @@ values alongside their dependencies without having to loop multiple times.
 Typically they're used for trivial operations such as accessing a named
 property from an object or accessing the first/last entry in a list.
 
+### Side-effect steps
+
+Certain steps may have side effects (e.g. cause mutations in your data sources,
+etc), and thus they have a significant impact on the plan. Side effect steps
+are rendered with a slightly reddish-hued background.
+
+<Mermaid
+  chart={`\
+${init}
+    SideEffect18[["SideEffect[18∈3]"]]:::sideeffectplan
+`}
+/>
+
 ### Implicit side effect dependency
 
-If a step is implicitly dependent on a side effect due to occuring after the side effect, a dotted line ending in a circle will join the nodes:
+If a step is implicitly dependent on a side effect due to occuring after the
+side effect, a dotted line ending in a circle will join the nodes to indicate
+the step is implicitly dependent on the previous step:
 
 <Mermaid
   chart={`\
