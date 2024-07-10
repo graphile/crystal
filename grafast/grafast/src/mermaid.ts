@@ -352,7 +352,6 @@ export function planToMermaid(
       (layerPlan.reason.type === "polymorphic"
         ? `\n${layerPlan.reason.typeNames}`
         : ``);
-    const outputMapStuff: string[] = [];
     if (!skipBuckets) {
       graph.push(
         `    Bucket${layerPlan.id}(${mermaidEscape(
@@ -376,7 +375,7 @@ export function planToMermaid(
             layerPlan.rootStepId != null && layerPlan.reason.type !== "root"
               ? `\nROOT ${stepToString(stepById[layerPlan.rootStepId])}`
               : ""
-          }${startSteps(layerPlan)}\n${outputMapStuff.join("\n")}`,
+          }${startSteps(layerPlan)}`,
         )}):::bucket`,
       );
     }
