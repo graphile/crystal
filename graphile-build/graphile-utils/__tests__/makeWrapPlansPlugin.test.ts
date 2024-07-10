@@ -323,18 +323,20 @@ describe("wrapping plans matching a filter", () => {
     }> =
       ({ scope }) =>
       (plan, user, args, _info) => {
-        sideEffect(args.get(), (argValues) => {
+        function beforeFn(argValues: any) {
           before.push([
             `Mutation '${scope.fieldName}' starting with arguments:`,
             argValues,
           ]);
-        });
+        }
+        sideEffect(args.get(), beforeFn);
 
         const $result = plan();
 
-        sideEffect($result, (result) => {
+        function afterFn(result: any) {
           after.push([`Mutation '${scope.fieldName}' result:`, result]);
-        });
+        }
+        sideEffect($result, afterFn);
 
         return $result;
       };

@@ -520,6 +520,8 @@ export class PgSelectStep<
     const cloneFromMatchingMode =
       cloneFrom?.mode === this.mode ? cloneFrom : null;
 
+    this.hasSideEffects = this.mode === "mutation";
+
     this.resource = resource;
     if (cloneFrom !== null) {
       // Prevent any changes to our original to help avoid programming
@@ -659,8 +661,6 @@ export class PgSelectStep<
         );
       }
     });
-
-    this.hasSideEffects = this.mode === "mutation";
 
     debugPlanVerbose(
       `%s (%s) constructor (%s; %s)`,

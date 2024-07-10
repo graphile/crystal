@@ -47,8 +47,6 @@ export class PgUpdateSingleStep<
   };
   isSyncAndSafe = false;
 
-  hasSideEffects = true;
-
   /**
    * Tells us what we're dealing with - data type, columns, where to update it,
    * what it's called, etc.
@@ -120,6 +118,7 @@ export class PgUpdateSingleStep<
     },
   ) {
     super();
+    this.hasSideEffects = true;
     this.resource = resource;
     this.name = resource.name;
     this.symbol = Symbol(this.name);

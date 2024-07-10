@@ -928,6 +928,7 @@ export function isTypePlanned(
 export type Sudo<T> = T extends ExecutableStep<any>
   ? T & {
       dependencies: ReadonlyArray<ExecutableStep>;
+      implicitSideEffectStep: ExecutableStep | null;
       dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
       dependencyOnReject: ReadonlyArray<Error | null | undefined>;
       defaultForbiddenFlags: ExecutionEntryFlags;
@@ -955,6 +956,10 @@ export function writeableArray<T>(a: ReadonlyArray<T>): Array<T> {
   return a as any;
 }
 
+/**
+ * Returns `true` if the first argument depends on the second argument either
+ * directly or indirectly (via a chain of dependencies).
+ */
 export function stepADependsOnStepB(
   stepA: ExecutableStep,
   stepB: ExecutableStep,
@@ -962,6 +967,13 @@ export function stepADependsOnStepB(
   if (stepA === stepB) {
     throw new Error("Invalid call to stepADependsOnStepB");
   }
+
+  // PERF: bredth-first might be better.
+
+  // PERF: we can stop looking once we pass a certain layerPlan boundary.
+
+  // PERF: maybe some form of caching here would be sensible?
+
   // Depth-first search for match
   for (const dep of sudo(stepA).dependencies) {
     if (dep === stepB) {

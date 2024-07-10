@@ -5,7 +5,7 @@ import te from "tamedevil";
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
 import { inspect } from "../inspect.js";
-import type { UnaryExecutionValue } from "../interfaces.js";
+import type { ExecutionValue, UnaryExecutionValue } from "../interfaces.js";
 import {
   FLAG_ERROR,
   FLAG_INHIBITED,
@@ -251,6 +251,25 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
   pendingSteps: ExecutableStep[] = [];
 
   /**
+   * This goes along with `parentStep` in the reason, except it applies to all
+   * layer plan types and we figure it out automatically from the parent layer
+   * plan. If this step has an error at a given index, then it should be
+   * treated as if the parentStep had an error at that same index.
+   *
+   * @internal
+   */
+  public parentSideEffectStep: ExecutableStep | null = null;
+
+  /**
+   * This tracks the latest seen side effect at the current point in planning
+   * (such that created steps take this to be their implicitSideEffectStep).
+   * This isn't used once planning is complete.
+   *
+   * @internal
+   */
+  public latestSideEffectStep: ExecutableStep | null = null;
+
+  /**
    * Describes the order in which the steps within this LayerPlan are executed.
    *
    * Special attention must be paid to steps that have side effects.
@@ -288,6 +307,14 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     public parentLayerPlan: LayerPlan | null,
     public readonly reason: TReason, //parentStep: ExecutableStep | null,
   ) {
+    // This layer plan is dependent on the latest side effect. Note that when
+    // we set a `rootStep` later, if the root step is dependent on this step
+    // (directly or indirectly) we will clear this property.
+    this.parentSideEffectStep = parentLayerPlan?.latestSideEffectStep ?? null;
+
+    // There has yet to be any side effects created in this layer.
+    this.latestSideEffectStep = null;
+
     this.stepsByConstructor = new Map();
     if (parentLayerPlan !== null) {
       this.depth = parentLayerPlan.depth + 1;
@@ -330,9 +357,9 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         ? `{${this.reason.typeNames.join(",")}}`
         : "";
     const deps = this.copyStepIds.length > 0 ? `/${this.copyStepIds}` : "";
-    return `LayerPlan<${this.id}${chain}?${this.reason.type}${reasonExtra}!${
-      this.rootStep?.id ?? "x"
-    }${deps}>`;
+    return `LayerPlan<${this.id}${chain}${
+      this.parentSideEffectStep ? `^${this.parentSideEffectStep.id}` : ""
+    }?${this.reason.type}${reasonExtra}!${this.rootStep?.id ?? "x"}${deps}>`;
   }
 
   print(depth = 0) {
@@ -350,6 +377,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     }
     this._hasSetRootStep = true;
     this.operationPlan.stepTracker.setLayerPlanRootStep(this, $root);
+
+    // NOTE: we may clear `this.parentSideEffectStep` based on the `$root` step
+    // having an explicit dependency on `this.parentSideEffectStep`; but that
+    // will be done as part of `OperationPlan::finalizeLayerPlans()` because
+    // steps aren't assigned `implicitSideEffectStep`s until that point.
   }
 
   /** @internal Use plan.getStep(id) instead. */
@@ -390,6 +422,15 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> =
       this.reason.type === "mutationField" ? parentBucket.iterators : [];
     const map: Map<number, number | number[]> = new Map();
+
+    const $parentSideEffect = this.parentSideEffectStep;
+    let parentSideEffectValue: ExecutionValue | null;
+    if ($parentSideEffect) {
+      parentSideEffectValue = parentBucket.store.get($parentSideEffect.id)!;
+    } else {
+      parentSideEffectValue = null;
+    }
+
     let size = 0;
     switch (this.reason.type) {
       case "nullableBoundary": {
@@ -414,15 +455,26 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
           if (forbiddenFlags) {
             size = 0;
           } else {
-            size = parentBucket.size;
             store.set(itemStepId, fieldValue);
             for (const stepId of copyStepIds) {
               store.set(stepId, parentBucket.store.get(stepId)!);
             }
-            for (let i = 0; i < size; i++) {
-              map.set(i, i);
-              polymorphicPathList[i] = parentBucket.polymorphicPathList[i];
-              iterators[i] = parentBucket.iterators[i];
+            const parentBucketSize = parentBucket.size;
+            for (
+              let originalIndex = 0;
+              originalIndex < parentBucketSize;
+              originalIndex++
+            ) {
+              if (
+                parentSideEffectValue === null ||
+                !(parentSideEffectValue._flagsAt(originalIndex) & FLAG_ERROR)
+              ) {
+                const newIndex = size++;
+                map.set(originalIndex, newIndex);
+                polymorphicPathList[newIndex] =
+                  parentBucket.polymorphicPathList[originalIndex];
+                iterators[newIndex] = parentBucket.iterators[originalIndex];
+              }
             }
           }
         } else if (hasNoNullsOrErrors) {
@@ -480,11 +532,17 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
             originalIndex < parentBucket.size;
             originalIndex++
           ) {
-            const fieldValue: any[] | null | undefined | Error =
-              nullableStepStore.at(originalIndex);
-            if (fieldValue != null) {
+            if (
+              (parentSideEffectValue === null ||
+                !(
+                  parentSideEffectValue._flagsAt(originalIndex) & FLAG_ERROR
+                )) &&
+              !(nullableStepStore._flagsAt(originalIndex) & FLAG_NULL)
+            ) {
               const newIndex = size++;
               map.set(originalIndex, newIndex);
+              const fieldValue: any[] | null | undefined | Error =
+                nullableStepStore.at(originalIndex);
               itemStepIdList[newIndex] = fieldValue;
 
               polymorphicPathList[newIndex] =
@@ -547,7 +605,11 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         ) {
           const list: any[] | null | undefined | Error =
             listStepStore.at(originalIndex);
-          if (Array.isArray(list)) {
+          if (
+            (parentSideEffectValue === null ||
+              !(parentSideEffectValue._flagsAt(originalIndex) & FLAG_ERROR)) &&
+            Array.isArray(list)
+          ) {
             const newIndexes: number[] = [];
             map.set(originalIndex, newIndexes);
             for (let j = 0, l = list.length; j < l; j++) {
@@ -625,6 +687,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
         ) {
           const flags = polymorphicPlanStore._flagsAt(originalIndex);
           if (flags & (FLAG_ERROR | FLAG_INHIBITED | FLAG_NULL)) {
+            continue;
+          }
+          if (
+            parentSideEffectValue !== null &&
+            parentSideEffectValue._flagsAt(originalIndex) & FLAG_ERROR
+          ) {
             continue;
           }
           const value = polymorphicPlanStore.at(originalIndex);

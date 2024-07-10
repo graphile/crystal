@@ -17,7 +17,6 @@ export class SideEffectStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
   };
   isSyncAndSafe = false;
   allowMultipleOptimizations = false;
-  hasSideEffects = true;
 
   private planDep: number | null;
   constructor(
@@ -25,6 +24,7 @@ export class SideEffectStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
     private fn: (value: TIn) => PromiseOrDirect<TOut>,
   ) {
     super();
+    this.hasSideEffects = true;
     this.planDep = $plan != null ? this.addDependency($plan) : null;
   }
 

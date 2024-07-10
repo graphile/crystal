@@ -13,7 +13,7 @@ import te, { stringifyJSON, stringifyString } from "tamedevil";
 import * as assert from "../assert.js";
 import type { Bucket } from "../bucket.js";
 import { isDev } from "../dev.js";
-import { AccessStep } from "../index.js";
+import { AccessStep, stepADependsOnStepB, stripAnsi } from "../index.js";
 import { inspect } from "../inspect.js";
 import type {
   ExecutionEntryFlags,
@@ -168,6 +168,11 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
    * OutputPlanMode.
    */
   public readonly rootStep: ExecutableStep;
+  /**
+   * If this output plan should resolve to an error if a side effect step
+   * raises an error, this is that side effect.
+   */
+  public readonly sideEffectStep: ExecutableStep | null;
 
   /**
    * Appended to the root step when accessed to avoid the need for AccessSteps
@@ -236,6 +241,9 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     layerPlan.operationPlan.stepTracker.addOutputPlan(this);
     this.childByTypeName =
       this.type.mode === "polymorphic" ? Object.create(null) : undefined;
+
+    // NOTE: this may be cleared during `this.finalize()`
+    this.sideEffectStep = layerPlan.latestSideEffectStep;
   }
 
   public print(): string {
@@ -276,7 +284,9 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   }
 
   toString() {
-    return `OutputPlan<${this.type.mode}∈${this.layerPlan.id}!${this.rootStep.id}>`;
+    return `OutputPlan<${this.type.mode}${
+      this.sideEffectStep ? `^${this.sideEffectStep.id}` : ""
+    }∈${this.layerPlan.id}!${this.rootStep.id}>`;
   }
 
   addChild(
@@ -436,10 +446,21 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   }
 
   optimize(): void {
+    // This optimization works by ridding us of access steps at the very end of
+    // paths and just accessing properties directly. In rare circumstances
+    // involving untethered side effects in earlier versions this could lead to
+    // errors being skipped and data generated previous to the error being
+    // returned; but OutputPlans now check the latestSideEffectStep so this
+    // should be safe aga.
     const $root = this.layerPlan.operationPlan.dangerouslyGetStep(
       this.rootStep.id,
     );
-    if ($root instanceof AccessStep && $root.fallback === undefined) {
+    if (
+      $root instanceof AccessStep &&
+      $root.fallback === undefined &&
+      $root.implicitSideEffectStep === null &&
+      (!this.sideEffectStep || !stepADependsOnStepB($root, this.sideEffectStep))
+    ) {
       const expressionDetails:
         | [ReadonlyArray<string | number>, any]
         | undefined = ($root.unbatchedExecute! as any)[expressionSymbol];
@@ -459,6 +480,22 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   }
 
   finalize(): void {
+    // Clear the sideEffectStep if the rootStep explicitly depends on it.
+    // NOTE: this occurs here since more dependencies could have been added to
+    // $root after `this` was created.
+    const $sideEffect = this.sideEffectStep;
+    if ($sideEffect) {
+      const $root = this.rootStep;
+      if (
+        $root === $sideEffect ||
+        $root.implicitSideEffectStep === $sideEffect ||
+        stepADependsOnStepB($root, $sideEffect)
+      ) {
+        // It's marked readonly, but we override it anyway
+        (this.sideEffectStep as ExecutableStep | null) = null;
+      }
+    }
+
     // Build the executor
     switch (this.type.mode) {
       case "null": {
@@ -658,12 +695,15 @@ export function nonNullError(
  * @internal
  */
 export function getChildBucketAndIndex(
-  childOutputPlan: OutputPlan,
+  layerPlan: LayerPlan,
   outputPlan: OutputPlan | null,
   bucket: Bucket,
   bucketIndex: number,
   arrayIndex: number | null = null,
 ): [Bucket, number] | null {
+  if (bucket.layerPlan === layerPlan) {
+    return [bucket, bucketIndex];
+  }
   if (
     (arrayIndex == null) ===
     (outputPlan != null && outputPlan.type.mode === "array")
@@ -672,13 +712,13 @@ export function getChildBucketAndIndex(
       "GrafastInternalError<83d0e3cc-7eec-4185-85b4-846540288162>: arrayIndex must be supplied iff outputPlan is an array",
     );
   }
-  if (outputPlan != null && childOutputPlan.layerPlan === bucket.layerPlan) {
+  if (outputPlan != null && layerPlan === bucket.layerPlan) {
     // Same layer; straightforward
     return [bucket, bucketIndex];
   }
 
-  const reversePath = [childOutputPlan.layerPlan];
-  let current: LayerPlan | null = childOutputPlan.layerPlan;
+  const reversePath = [layerPlan];
+  let current: LayerPlan | null = layerPlan;
   while (!bucket.children[current.id]) {
     current = current.parentLayerPlan;
     if (!current) {
@@ -823,6 +863,31 @@ function makeExecutor<
     rawBucketRootValue = bucket.store.get(this.rootStep.id)!.at(bucketIndex),
     bucketRootFlags = bucket.store.get(this.rootStep.id)!._flagsAt(bucketIndex),
   ) {
+    if (this.sideEffectStep !== null) {
+      const sideEffectBucketDetails = getChildBucketAndIndex(
+        this.sideEffectStep.layerPlan,
+        null,
+        bucket,
+        bucketIndex,
+      );
+      if (sideEffectBucketDetails) {
+        const [sideEffectBucket, sideEffectBucketIndex] =
+          sideEffectBucketDetails;
+        const ev = sideEffectBucket.store.get(this.sideEffectStep.id);
+        if (!ev) {
+          throw new Error(
+            `GrafastInternalError<da9cc5a0-23bf-4af8-a103-92f995795398>: ${stripAnsi(
+              String(this.sideEffectStep),
+            )} has no entry in ${bucket}`,
+          );
+        }
+        const seFlags = ev._flagsAt(sideEffectBucketIndex);
+        if (seFlags & FLAG_ERROR) {
+          const seVal = ev.at(sideEffectBucketIndex);
+          throw coerceError(seVal, this.locationDetails, mutablePath.slice(1));
+        }
+      }
+    }
     const bucketRootValue =
       this.processRoot !== null
         ? this.processRoot(rawBucketRootValue, bucketRootFlags)
@@ -865,18 +930,64 @@ function makeExecutor<
 function executeChildPlan(
   that: OutputPlan,
   locationDetails: LocationDetails,
-  childOutputPlan: OutputPlan | null,
+  childOutputPlan: OutputPlan,
   isNonNull: boolean,
   asString: boolean,
   childBucket: Bucket | null,
   childBucketIndex: number | null,
   bucket: Bucket,
+  bucketIndex: number,
   mutablePath: ReadonlyArray<string | number>,
   mutablePathIndex: number,
   root: PayloadRoot,
   rawBucketRootValue: any,
   bucketRootFlags: ExecutionEntryFlags,
 ) {
+  const $sideEffect = childOutputPlan.layerPlan.parentSideEffectStep;
+  if ($sideEffect !== null) {
+    // Check if there's an error
+    const sideEffectBucketDetails = getChildBucketAndIndex(
+      $sideEffect.layerPlan,
+      null,
+      bucket,
+      bucketIndex,
+    );
+    if (sideEffectBucketDetails) {
+      const [sideEffectBucket, sideEffectBucketIndex] = sideEffectBucketDetails;
+      const ev = sideEffectBucket.store.get($sideEffect.id);
+      if (!ev) {
+        throw new Error(
+          `GrafastInternalError<d18d52b5-f5bf-42df-a2dd-80e522310b8e>: ${stripAnsi(
+            String($sideEffect),
+          )} has no entry in ${bucket}`,
+        );
+      }
+      const flags = ev._flagsAt(sideEffectBucketIndex);
+      if (flags & FLAG_ERROR) {
+        const e = coerceError(
+          ev.at(sideEffectBucketIndex),
+          locationDetails,
+          mutablePath.slice(1),
+        );
+        if (isNonNull) {
+          throw e;
+        } else {
+          const streamCount = root.streams.length;
+          const queueCount = root.queue.length;
+          commonErrorHandler(
+            e,
+            locationDetails,
+            mutablePath,
+            mutablePathIndex,
+            root,
+            streamCount,
+            queueCount,
+          );
+          return asString ? "null" : null;
+        }
+      }
+    }
+  }
   // This is the code that changes based on if the field is nullable or not
   if (isNonNull) {
     // No need to catch error
@@ -887,18 +998,16 @@ function executeChildPlan(
         throw nonNullError(locationDetails, mutablePath.slice(1));
       }
     }
-    const fieldResult = childOutputPlan![
-      asString ? "executeString" : "execute"
-    ](
+    const fieldResult = childOutputPlan[asString ? "executeString" : "execute"](
       root,
       mutablePath,
       childBucket,
       childBucketIndex!,
       // NOTE: the previous code may have had a bug here, it referenced childBucket.rootStep
-      childOutputPlan!.rootStep === that.rootStep
+      childOutputPlan.rootStep === that.rootStep
         ? rawBucketRootValue
         : undefined,
-      childOutputPlan!.rootStep === that.rootStep ? bucketRootFlags : undefined,
+      childOutputPlan.rootStep === that.rootStep ? bucketRootFlags : undefined,
     );
     if (fieldResult == (asString ? "null" : null)) {
       throw nonNullError(locationDetails, mutablePath.slice(1));
@@ -912,16 +1021,16 @@ function executeChildPlan(
       if (childBucket !== bucket && childBucket == null) {
         return asString ? "null" : null;
       } else {
-        return childOutputPlan![asString ? "executeString" : "execute"](
+        return childOutputPlan[asString ? "executeString" : "execute"](
           root,
           mutablePath,
           childBucket,
           childBucketIndex!,
           // NOTE: the previous code may have had a bug here, it referenced childBucket.rootStep
-          childOutputPlan!.rootStep === that.rootStep
+          childOutputPlan.rootStep === that.rootStep
             ? rawBucketRootValue
             : undefined,
-          childOutputPlan!.rootStep === that.rootStep
+          childOutputPlan.rootStep === that.rootStep
             ? bucketRootFlags
             : undefined,
         );
@@ -1108,7 +1217,7 @@ function makePolymorphicExecutor<TAsString extends boolean>(
         ) as TAsString extends true ? string : JSONValue;
       } else {
         const c = getChildBucketAndIndex(
-          childOutputPlan,
+          childOutputPlan.layerPlan,
           this,
           bucket,
           bucketIndex,
@@ -1161,6 +1270,11 @@ function makeArrayExecutor<TAsString extends boolean>(
           : JSONValue;
       }
 
+      if (this.child === null) {
+        throw new Error(
+          `GrafastInternalError<365fd45e-2939-411b-92a6-4f6875d8fbd3>: ${this} has no child output plan?!`,
+        );
+      }
       const childOutputPlan = this.child;
       const l = bucketRootValue.length;
       let string: string | undefined;
@@ -1180,7 +1294,7 @@ function makeArrayExecutor<TAsString extends boolean>(
         const mutablePathIndex = mutablePath.push(-1) - 1;
 
         // Now to populate the children...
-        const directChild = bucket.children[childOutputPlan!.layerPlan.id];
+        const directChild = bucket.children[childOutputPlan.layerPlan.id];
         let childBucket: Bucket | null,
           childBucketIndex: number | null,
           lookup: number[] | undefined;
@@ -1193,7 +1307,7 @@ function makeArrayExecutor<TAsString extends boolean>(
             childBucketIndex = lookup![i];
           } else {
             const c = getChildBucketAndIndex(
-              childOutputPlan!,
+              childOutputPlan.layerPlan,
               this,
               bucket,
               bucketIndex,
@@ -1221,6 +1335,7 @@ function makeArrayExecutor<TAsString extends boolean>(
             childBucket!,
             childBucketIndex!,
             bucket,
+            bucketIndex,
             mutablePath,
             mutablePathIndex,
             root,
@@ -1249,9 +1364,9 @@ function makeArrayExecutor<TAsString extends boolean>(
             path: mutablePath.slice(1),
             bucket,
             bucketIndex,
-            outputPlan: childOutputPlan!,
+            outputPlan: childOutputPlan,
             label: (
-              childOutputPlan!.layerPlan as LayerPlan<LayerPlanReasonListItem>
+              childOutputPlan.layerPlan as LayerPlan<LayerPlanReasonListItem>
             ).reason.stream?.label,
             stream,
             startIndex: bucketRootValue.length,
@@ -1508,6 +1623,7 @@ function makeObjectExecutor<TAsString extends boolean>(
               bucket,
               bucketIndex,
               bucket,
+              bucketIndex,
               mutablePath,
               mutablePathIndex,
               root,
@@ -1528,7 +1644,7 @@ function makeObjectExecutor<TAsString extends boolean>(
               childBucketIndex = directChild.map.get(bucketIndex);
             } else {
               const c = getChildBucketAndIndex(
-                spec.outputPlan,
+                spec.outputPlan.layerPlan,
                 this,
                 bucket,
                 bucketIndex,
@@ -1548,6 +1664,7 @@ function makeObjectExecutor<TAsString extends boolean>(
               childBucket,
               childBucketIndex as number,
               bucket,
+              bucketIndex,
               mutablePath,
               mutablePathIndex,
               root,
