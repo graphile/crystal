@@ -883,9 +883,7 @@ function makeExecutor<
         }
         const seFlags = ev._flagsAt(sideEffectBucketIndex);
         if (seFlags & FLAG_ERROR) {
-          const seVal = sideEffectBucket.store
-            .get(this.sideEffectStep.id)!
-            .at(sideEffectBucketIndex);
+          const seVal = ev.at(sideEffectBucketIndex);
           throw coerceError(seVal, this.locationDetails, mutablePath.slice(1));
         }
       }
