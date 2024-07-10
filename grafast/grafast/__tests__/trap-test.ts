@@ -2,23 +2,16 @@
 import { expect } from "chai";
 import type { ExecutionResult } from "graphql";
 import { it } from "mocha";
-import sqlite3 from "sqlite3";
 
 import {
-  access,
   assertNotNull,
-  context,
-  ExecutableStep,
-  ExecutionDetails,
   grafast,
-  GrafastResultsList,
   lambda,
   list,
   makeGrafastSchema,
   sideEffect,
   trap,
   TRAP_ERROR,
-  TRAP_ERROR_OR_INHIBITED,
 } from "../dist/index.js";
 
 const makeSchema = () => {
@@ -65,7 +58,7 @@ const makeSchema = () => {
           const $sideEffect = sideEffect(null, () => {
             throw new Error("Test");
           });
-          const $trap = trap($sideEffect, TRAP_ERROR_OR_INHIBITED, {
+          const $trap = trap($sideEffect, TRAP_ERROR, {
             valueForError: "PASS_THROUGH",
           });
           return lambda($trap, () => {
@@ -79,7 +72,7 @@ const makeSchema = () => {
               detail: "Goodbye, and thanks for all the fish!",
             });
           });
-          const $errorValue = trap($sideEffect, TRAP_ERROR_OR_INHIBITED, {
+          const $errorValue = trap($sideEffect, TRAP_ERROR, {
             valueForError: "PASS_THROUGH",
           });
           return $errorValue;
