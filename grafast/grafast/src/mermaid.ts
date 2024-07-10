@@ -371,7 +371,7 @@ export function planToMermaid(
             layerPlan.reason.type === "polymorphic"
               ? "\n" + pp(layerPlan.reason.polymorphicPaths)
               : ""
-          }${
+          }\n${
             layerPlan.rootStepId != null && layerPlan.reason.type !== "root"
               ? `\nROOT ${stepToString(stepById[layerPlan.rootStepId])}`
               : ""
