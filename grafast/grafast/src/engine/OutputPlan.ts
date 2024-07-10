@@ -242,16 +242,8 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     this.childByTypeName =
       this.type.mode === "polymorphic" ? Object.create(null) : undefined;
 
-    const $sideEffect = layerPlan.latestSideEffectStep;
-    if (
-      $sideEffect &&
-      $sideEffect !== rootStep &&
-      !stepADependsOnStepB(rootStep, $sideEffect)
-    ) {
-      this.sideEffectStep = $sideEffect;
-    } else {
-      this.sideEffectStep = null;
-    }
+    // NOTE: this may be cleared during `this.finalize()`
+    this.sideEffectStep = layerPlan.latestSideEffectStep;
   }
 
   public print(): string {
@@ -487,6 +479,18 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
   }
 
   finalize(): void {
+    // Clear the sideEffectStep if the rootStep explicitly depends on it.
+    // NOTE: this occurs here since more dependencies could have been added to
+    // $root after `this` was created.
+    const $sideEffect = this.sideEffectStep;
+    if ($sideEffect) {
+      const $root = this.rootStep;
+      if ($root === $sideEffect || stepADependsOnStepB($root, $sideEffect)) {
+        // It's marked readonly, but we override it anyway
+        (this.sideEffectStep as ExecutableStep | null) = null;
+      }
+    }
+
     // Build the executor
     switch (this.type.mode) {
       case "null": {
