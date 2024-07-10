@@ -328,10 +328,14 @@ export function planToMermaid(
     }${step.metaString ? `<${step.metaString}>` : ""}[${step.id}]`;
   };
 
-  graph.push("");
-  graph.push("    %% implicit side effects");
+  let firstSideEffect = true;
   sortedSteps.forEach((step) => {
     if (step.implicitSideEffectStepId) {
+      if (firstSideEffect) {
+        graph.push("");
+        graph.push("    %% implicit side effects");
+        firstSideEffect = false;
+      }
       const sideEffectStep = stepById[step.implicitSideEffectStepId];
       graph.push(`    ${planId(sideEffectStep)} -.-o ${planId(step)}`);
     }
