@@ -466,7 +466,7 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     if (
       $root instanceof AccessStep &&
       $root.fallback === undefined &&
-      $root.latestSideEffectStep === null
+      $root.implicitSideEffectStep === null
     ) {
       const expressionDetails:
         | [ReadonlyArray<string | number>, any]

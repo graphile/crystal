@@ -261,7 +261,13 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
    */
   public parentSideEffectStep: ExecutableStep | null = null;
 
-  /** @internal */
+  /**
+   * This tracks the latest seen side effect at the current point in planning
+   * (such that created steps take this to be their implicitSideEffectStep).
+   * This isn't used once planning is complete.
+   *
+   * @internal
+   */
   public latestSideEffectStep: ExecutableStep | null = null;
 
   /**
@@ -302,7 +308,12 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     public parentLayerPlan: LayerPlan | null,
     public readonly reason: TReason, //parentStep: ExecutableStep | null,
   ) {
+    // This layer plan is dependent on the latest side effect. Note that when
+    // we set a `rootStep` later, if the root step is dependent on this step
+    // (directly or indirectly) we will clear this property.
     this.parentSideEffectStep = parentLayerPlan?.latestSideEffectStep ?? null;
+
+    // There has yet to be any side effects created in this layer.
     this.latestSideEffectStep = null;
 
     this.stepsByConstructor = new Map();
@@ -367,12 +378,16 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     }
     this._hasSetRootStep = true;
     this.operationPlan.stepTracker.setLayerPlanRootStep(this, $root);
-    if (this.latestSideEffectStep) {
+
+    // If we add an explicit dependency on `this.parentSideEffectStep` then we
+    // should remove the implicit dependency (e.g. so that if you `trap()` the
+    // error it does not interfere).
+    if (this.parentSideEffectStep) {
       if (
-        this.latestSideEffectStep === $root ||
-        stepADependsOnStepB($root, this.latestSideEffectStep)
+        this.parentSideEffectStep === $root ||
+        stepADependsOnStepB($root, this.parentSideEffectStep)
       ) {
-        this.latestSideEffectStep = null;
+        this.parentSideEffectStep = null;
       }
     }
   }

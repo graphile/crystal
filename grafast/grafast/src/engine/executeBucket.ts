@@ -516,7 +516,7 @@ export function executeBucket(
           }
 
           // Check if the side effect errored
-          const $sideEffect = step.latestSideEffectStep;
+          const $sideEffect = step.implicitSideEffectStep;
           if ($sideEffect) {
             const currentPolymorphicPath =
               bucket.polymorphicPathList[dataIndex];
@@ -786,7 +786,7 @@ export function executeBucket(
     let newSize = 0;
     const stepPolymorphicPaths = step.polymorphicPaths;
     const legitDepsCount = sudo(step).dependencies.length;
-    let dependencies = step.latestSideEffectStep
+    let dependencies = step.implicitSideEffectStep
       ? dependenciesIncludingSideEffects.slice(0, legitDepsCount)
       : dependenciesIncludingSideEffects;
 
@@ -962,7 +962,7 @@ export function executeBucket(
         const executionValue = store.get($dep.id);
         if (executionValue === undefined) {
           throw new Error(
-            `GrafastInternalError<d9e9eb37-4251-4659-a545-4730826ecf0e>: ${$dep} data couldn't be found, but required by ${step} (with side effect ${step.latestSideEffectStep})!`,
+            `GrafastInternalError<d9e9eb37-4251-4659-a545-4730826ecf0e>: ${$dep} data couldn't be found, but required by ${step} (with side effect ${step.implicitSideEffectStep})!`,
           );
         }
         _rawDependencies.push(executionValue);
@@ -985,7 +985,7 @@ export function executeBucket(
           );
         }
       }
-      const $sideEffect = step.latestSideEffectStep;
+      const $sideEffect = step.implicitSideEffectStep;
       if ($sideEffect) {
         addDependency($sideEffect, defaultForbiddenFlags, undefined);
       }

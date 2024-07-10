@@ -228,7 +228,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    *
    * @internal
    */
-  public readonly latestSideEffectStep: ExecutableStep | null;
+  public readonly implicitSideEffectStep: ExecutableStep | null;
   /**
    * What execution entry flags we can't handle for the given indexed dependency
    * (default = this.defaultForbiddenFlags)
@@ -302,7 +302,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
 
   constructor() {
     super();
-    this.latestSideEffectStep = null;
+    this.implicitSideEffectStep = null;
     this.hasSideEffects ??= false;
     let hasSideEffects = false;
     Object.defineProperty(this, "hasSideEffects", {

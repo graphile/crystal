@@ -3294,7 +3294,7 @@ export class OperationPlan {
           latestSideEffectStep !== null &&
           !stepADependsOnStepB(sstep, latestSideEffectStep)
         ) {
-          sstep.latestSideEffectStep = latestSideEffectStep;
+          sstep.implicitSideEffectStep = latestSideEffectStep;
         }
         if (step.hasSideEffects) {
           latestSideEffectStep = step;
@@ -3346,7 +3346,7 @@ export class OperationPlan {
             latestSideEffectStep !== null &&
             !stepADependsOnStepB(sstep, latestSideEffectStep)
           ) {
-            sstep.latestSideEffectStep = latestSideEffectStep;
+            sstep.implicitSideEffectStep = latestSideEffectStep;
           }
           if (step.isSyncAndSafe && isUnbatchedExecutableStep(step)) {
             if (phase.unbatchedSyncAndSafeSteps !== undefined) {
@@ -3385,7 +3385,7 @@ export class OperationPlan {
                   latestSideEffectStep !== null &&
                   !stepADependsOnStepB(sstep, latestSideEffectStep)
                 ) {
-                  sstep.latestSideEffectStep = latestSideEffectStep;
+                  sstep.implicitSideEffectStep = latestSideEffectStep;
                 }
                 foundOne = true;
                 if (phase.unbatchedSyncAndSafeSteps !== undefined) {
@@ -3426,8 +3426,8 @@ export class OperationPlan {
         for (const dep of sudo(step).dependencies) {
           ensurePlanAvailableInLayer(dep, layerPlan);
         }
-        if (step.latestSideEffectStep) {
-          ensurePlanAvailableInLayer(step.latestSideEffectStep, layerPlan);
+        if (step.implicitSideEffectStep) {
+          ensurePlanAvailableInLayer(step.implicitSideEffectStep, layerPlan);
         }
       }
 

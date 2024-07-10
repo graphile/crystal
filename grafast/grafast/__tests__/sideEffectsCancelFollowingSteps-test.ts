@@ -1,19 +1,10 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import assert from "assert";
-import { expect } from "chai";
-import type { AsyncExecutionResult } from "graphql";
 import { it } from "mocha";
 
-import type {
-  ExecutableStep,
-  ExecutionDetails,
-  PromiseOrDirect,
-} from "../dist/index.js";
 import {
-  constant,
   context,
   grafast,
-  lambda,
   makeGrafastSchema,
   sideEffect,
 } from "../dist/index.js";
@@ -33,6 +24,7 @@ const testResolver = function () {
   sideEffect($context, (_context) => {
     throw new Error("Side effect 3 failed");
   });
+  // The following two effects should not take place; so context.number should end up being at 3 + 1 = 4.
   sideEffect($context, (context) => context.number!++);
   sideEffect($context, (context) => context.number!++);
   return $context.get("number");
