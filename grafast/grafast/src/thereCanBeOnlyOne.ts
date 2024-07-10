@@ -1,6 +1,8 @@
 const $$grafast = Symbol.for("grafast");
 
-const globalAny = globalThis as any;
+const globalAny = globalThis as typeof globalThis & {
+  [$$grafast]?: true | Error;
+};
 if (globalAny[$$grafast] === true) {
   // Already warned
 } else if (globalAny[$$grafast]) {
