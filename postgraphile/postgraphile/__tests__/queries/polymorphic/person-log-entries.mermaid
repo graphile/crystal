@@ -52,13 +52,13 @@ graph TD
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 18<br /><br />ROOT Connectionᐸ14ᐳ[18]<br />1: <br />ᐳ: Access[15], Access[16], Object[17]<br />2: PgSelect[19]"):::bucket
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access15,Access16,Object17,PgSelect19 bucket1
-    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ19ᐳ[20]"):::bucket
+    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ19ᐳ[20]"):::bucket
     classDef bucket2 stroke:#7f007f
     class Bucket2,__Item20,PgSelectSingle21 bucket2
     Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 20<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[21]"):::bucket
     classDef bucket3 stroke:#ffa500
     class Bucket3,PgClassExpression26,PgClassExpression36,PgCursor37,List39,Access40 bucket3
-    Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ40ᐳ[31]"):::bucket
+    Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ40ᐳ[31]"):::bucket
     classDef bucket4 stroke:#0000ff
     class Bucket4,__Item31,PgSelectSingle32,PgClassExpression33,PgClassExpression34 bucket4
     Bucket0 --> Bucket1

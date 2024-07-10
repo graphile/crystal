@@ -90,7 +90,7 @@ graph TD
     %% define steps
 
     subgraph "Buckets for queries/connections/pagination-before-end"
-    Bucket0("Bucket 0 (root)<br />1: <br />ᐳ: 15, 16, 64, 65, 17, 19<br />2: PgValidateParsedCursor[21]<br />ᐳ: Connection[18]"):::bucket
+    Bucket0("Bucket 0 (root)<br /><br />1: <br />ᐳ: 15, 16, 64, 65, 17, 19<br />2: PgValidateParsedCursor[21]<br />ᐳ: Connection[18]"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value2,__Value4,Access15,Access16,Object17,Connection18,Lambda19,PgValidateParsedCursor21,Constant64,Constant65 bucket0
     Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 17, 18, 19<br /><br />ROOT Connectionᐸ14ᐳ[18]<br />1: PgSelect[60]<br />ᐳ: 22, 38, 43, 61, 62, 63<br />2: PgSelect[20]<br />ᐳ: 40, 45, 46, 50, 51, 53, 54, 58, 59, 47, 55"):::bucket
