@@ -9,22 +9,22 @@ graph TD
 
 
     %% plan dependencies
-    Object13{{"Object[13∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access11{{"Access[11∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access12{{"Access[12∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
-    PgSelect10[["PgSelect[10∈0]<br />ᐸforumsᐳ"]]:::plan
+    PgSelect10[["PgSelect[10∈0] ➊<br />ᐸforumsᐳ"]]:::plan
     Object13 --> PgSelect10
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection27{{"Connection[27∈0]<br />ᐸ23ᐳ"}}:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection27{{"Connection[27∈0] ➊<br />ᐸ23ᐳ"}}:::plan
     __Item14[/"__Item[14∈1]<br />ᐸ10ᐳ"\]:::itemplan
     PgSelect10 ==> __Item14
     PgSelectSingle15{{"PgSelectSingle[15∈1]<br />ᐸforumsᐳ"}}:::plan
     __Item14 --> PgSelectSingle15
-    Constant59{{"Constant[59∈1]<br />ᐸfalseᐳ"}}:::plan
+    Constant59{{"Constant[59∈1] ➊<br />ᐸfalseᐳ"}}:::plan
     PgClassExpression16{{"PgClassExpression[16∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle15 --> PgClassExpression16
     PgSelect29[["PgSelect[29∈3]<br />ᐸmessagesᐳ"]]:::plan
@@ -37,7 +37,7 @@ graph TD
     Object13 & PgClassExpression22 & PgClassExpression28 & Connection27 --> PgSelect61
     PgSelectSingle15 --> PgClassExpression22
     PgSelectSingle15 --> PgClassExpression28
-    PgPageInfo58{{"PgPageInfo[58∈3]"}}:::plan
+    PgPageInfo58{{"PgPageInfo[58∈3] ➊"}}:::plan
     Connection27 --> PgPageInfo58
     First62{{"First[62∈3]"}}:::plan
     PgSelect61 --> First62
@@ -129,6 +129,4 @@ graph TD
     Bucket5 --> Bucket6
     Bucket7 --> Bucket8
     Bucket8 --> Bucket9
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object13,PgSelect10,Access11,Access12,__Value2,__Value4,Connection27,Constant59,PgPageInfo58 unary
     end

@@ -9,16 +9,16 @@ graph TD
 
 
     %% plan dependencies
-    Object9{{"Object[9∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access7{{"Access[7∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access8{{"Access[8∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object9{{"Object[9∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access7{{"Access[7∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access8{{"Access[8∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access7 & Access8 --> Object9
-    PgSelect6[["PgSelect[6∈0]<br />ᐸpeopleᐳ"]]:::plan
+    PgSelect6[["PgSelect[6∈0] ➊<br />ᐸpeopleᐳ"]]:::plan
     Object9 --> PgSelect6
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access7
     __Value2 --> Access8
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item10[/"__Item[10∈1]<br />ᐸ6ᐳ"\]:::itemplan
     PgSelect6 ==> __Item10
     PgSelectSingle11{{"PgSelectSingle[11∈1]<br />ᐸpeopleᐳ"}}:::plan
@@ -142,6 +142,4 @@ graph TD
     Bucket4 --> Bucket5
     Bucket5 --> Bucket6 & Bucket8
     Bucket6 --> Bucket7
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object9,PgSelect6,Access7,Access8,__Value2,__Value4 unary
     end

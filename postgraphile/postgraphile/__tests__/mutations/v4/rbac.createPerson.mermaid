@@ -9,44 +9,44 @@ graph TD
 
 
     %% plan dependencies
-    Object20{{"Object[20∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access18{{"Access[18∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access19{{"Access[19∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object20{{"Object[20∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access18{{"Access[18∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access19{{"Access[19∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access18 & Access19 --> Object20
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access18
     __Value2 --> Access19
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant38{{"Constant[38∈0]<br />ᐸ'Jane Doe'ᐳ"}}:::plan
-    Constant41{{"Constant[41∈0]<br />ᐸ'Unknown'ᐳ"}}:::plan
-    Constant42{{"Constant[42∈0]<br />ᐸ'jane.doe@example.com'ᐳ"}}:::plan
-    Constant44{{"Constant[44∈0]<br />ᐸ[ 'Jay Doe', 'JD' ]ᐳ"}}:::plan
-    Constant45{{"Constant[45∈0]<br />ᐸ[Object: null prototype] { url: 'http://example.com' }ᐳ"}}:::plan
-    PgInsertSingle17[["PgInsertSingle[17∈1]<br />ᐸperson(person_full_name,aliases,about,email,site)ᐳ"]]:::sideeffectplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant38{{"Constant[38∈0] ➊<br />ᐸ'Jane Doe'ᐳ"}}:::plan
+    Constant41{{"Constant[41∈0] ➊<br />ᐸ'Unknown'ᐳ"}}:::plan
+    Constant42{{"Constant[42∈0] ➊<br />ᐸ'jane.doe@example.com'ᐳ"}}:::plan
+    Constant44{{"Constant[44∈0] ➊<br />ᐸ[ 'Jay Doe', 'JD' ]ᐳ"}}:::plan
+    Constant45{{"Constant[45∈0] ➊<br />ᐸ[Object: null prototype] { url: 'http://example.com' }ᐳ"}}:::plan
+    PgInsertSingle17[["PgInsertSingle[17∈1] ➊<br />ᐸperson(person_full_name,aliases,about,email,site)ᐳ"]]:::sideeffectplan
     Object20 & Constant38 & Constant44 & Constant41 & Constant42 & Constant45 --> PgInsertSingle17
-    Object21{{"Object[21∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    Object21{{"Object[21∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle17 --> Object21
-    PgSelect31[["PgSelect[31∈3]<br />ᐸfrmcdc_wrappedUrlᐳ"]]:::plan
-    PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__person__.”site”ᐳ"}}:::plan
+    PgSelect31[["PgSelect[31∈3] ➊<br />ᐸfrmcdc_wrappedUrlᐳ"]]:::plan
+    PgClassExpression30{{"PgClassExpression[30∈3] ➊<br />ᐸ__person__.”site”ᐳ"}}:::plan
     Object20 & PgClassExpression30 --> PgSelect31
-    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgInsertSingle17 --> PgClassExpression24
-    PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgInsertSingle17 --> PgClassExpression25
-    PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__person__.”aliases”ᐳ"}}:::plan
+    PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__person__.”aliases”ᐳ"}}:::plan
     PgInsertSingle17 --> PgClassExpression26
-    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__person__.”about”ᐳ"}}:::plan
+    PgClassExpression28{{"PgClassExpression[28∈3] ➊<br />ᐸ__person__.”about”ᐳ"}}:::plan
     PgInsertSingle17 --> PgClassExpression28
-    PgClassExpression29{{"PgClassExpression[29∈3]<br />ᐸ__person__.”email”ᐳ"}}:::plan
+    PgClassExpression29{{"PgClassExpression[29∈3] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
     PgInsertSingle17 --> PgClassExpression29
     PgInsertSingle17 --> PgClassExpression30
-    First35{{"First[35∈3]"}}:::plan
+    First35{{"First[35∈3] ➊"}}:::plan
     PgSelect31 --> First35
-    PgSelectSingle36{{"PgSelectSingle[36∈3]<br />ᐸfrmcdc_wrappedUrlᐳ"}}:::plan
+    PgSelectSingle36{{"PgSelectSingle[36∈3] ➊<br />ᐸfrmcdc_wrappedUrlᐳ"}}:::plan
     First35 --> PgSelectSingle36
     __Item27[/"__Item[27∈4]<br />ᐸ26ᐳ"\]:::itemplan
     PgClassExpression26 ==> __Item27
-    PgClassExpression37{{"PgClassExpression[37∈5]<br />ᐸ__frmcdc_w...rl__.”url”ᐳ"}}:::plan
+    PgClassExpression37{{"PgClassExpression[37∈5] ➊<br />ᐸ__frmcdc_w...rl__.”url”ᐳ"}}:::plan
     PgSelectSingle36 --> PgClassExpression37
 
     %% define steps
@@ -74,6 +74,4 @@ graph TD
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4 & Bucket5
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object20,Access18,Access19,__Value2,__Value4,Constant38,Constant41,Constant42,Constant44,Constant45,PgInsertSingle17,Object21,PgSelect31,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression28,PgClassExpression29,PgClassExpression30,First35,PgSelectSingle36,PgClassExpression37 unary
     end

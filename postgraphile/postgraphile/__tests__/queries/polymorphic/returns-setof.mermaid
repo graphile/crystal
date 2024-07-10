@@ -9,22 +9,22 @@ graph TD
 
 
     %% plan dependencies
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection15{{"Connection[15∈0]<br />ᐸ11ᐳ"}}:::plan
-    Object14{{"Object[14∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access12{{"Access[12∈1]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access13{{"Access[13∈1]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection15{{"Connection[15∈0] ➊<br />ᐸ11ᐳ"}}:::plan
+    Object14{{"Object[14∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access12{{"Access[12∈1] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access13{{"Access[13∈1] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
-    PgSelect16[["PgSelect[16∈1]<br />ᐸall_single_tables(aggregate)ᐳ"]]:::plan
+    PgSelect16[["PgSelect[16∈1] ➊<br />ᐸall_single_tables(aggregate)ᐳ"]]:::plan
     Object14 & Connection15 --> PgSelect16
     __Value2 --> Access12
     __Value2 --> Access13
-    First17{{"First[17∈1]"}}:::plan
+    First17{{"First[17∈1] ➊"}}:::plan
     PgSelect16 --> First17
-    PgSelectSingle18{{"PgSelectSingle[18∈1]<br />ᐸall_single_tablesᐳ"}}:::plan
+    PgSelectSingle18{{"PgSelectSingle[18∈1] ➊<br />ᐸall_single_tablesᐳ"}}:::plan
     First17 --> PgSelectSingle18
-    PgClassExpression19{{"PgClassExpression[19∈1]<br />ᐸcount(*)ᐳ"}}:::plan
+    PgClassExpression19{{"PgClassExpression[19∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle18 --> PgClassExpression19
 
     %% define steps
@@ -37,6 +37,4 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access12,Access13,Object14,PgSelect16,First17,PgSelectSingle18,PgClassExpression19 bucket1
     Bucket0 --> Bucket1
-    classDef unary fill:#fafffa,borderWidth:8px
-    class __Value2,__Value4,Connection15,Object14,PgSelect16,Access12,Access13,First17,PgSelectSingle18,PgClassExpression19 unary
     end

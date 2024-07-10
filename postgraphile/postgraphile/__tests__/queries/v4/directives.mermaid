@@ -9,10 +9,10 @@ graph TD
 
 
     %% plan dependencies
-    Lambda15{{"Lambda[15∈0]<br />ᐸrawEncodeᐳ"}}:::plan
-    Constant14{{"Constant[14∈0]<br />ᐸ'query'ᐳ"}}:::plan
+    Lambda15{{"Lambda[15∈0] ➊<br />ᐸrawEncodeᐳ"}}:::plan
+    Constant14{{"Constant[14∈0] ➊<br />ᐸ'query'ᐳ"}}:::plan
     Constant14 --> Lambda15
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
 
     %% define steps
 
@@ -20,6 +20,4 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value4,Constant14,Lambda15 bucket0
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Lambda15,__Value4,Constant14 unary
     end

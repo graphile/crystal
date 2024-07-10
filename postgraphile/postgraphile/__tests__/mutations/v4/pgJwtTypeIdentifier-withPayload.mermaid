@@ -9,52 +9,52 @@ graph TD
 
 
     %% plan dependencies
-    Object14{{"Object[14∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access12{{"Access[12∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access13{{"Access[13∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access12
     __Value2 --> Access13
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant46{{"Constant[46∈0]<br />ᐸ1ᐳ"}}:::plan
-    Constant47{{"Constant[47∈0]<br />ᐸ'2'ᐳ"}}:::plan
-    Constant48{{"Constant[48∈0]<br />ᐸ'3'ᐳ"}}:::plan
-    PgSelect11[["PgSelect[11∈1]<br />ᐸauthenticate_payload(mutation)ᐳ"]]:::sideeffectplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant46{{"Constant[46∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Constant47{{"Constant[47∈0] ➊<br />ᐸ'2'ᐳ"}}:::plan
+    Constant48{{"Constant[48∈0] ➊<br />ᐸ'3'ᐳ"}}:::plan
+    PgSelect11[["PgSelect[11∈1] ➊<br />ᐸauthenticate_payload(mutation)ᐳ"]]:::sideeffectplan
     Object14 & Constant46 & Constant47 & Constant48 --> PgSelect11
-    First15{{"First[15∈1]"}}:::plan
+    First15{{"First[15∈1] ➊"}}:::plan
     PgSelect11 --> First15
-    PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸauthenticate_payloadᐳ"}}:::plan
+    PgSelectSingle16{{"PgSelectSingle[16∈1] ➊<br />ᐸauthenticate_payloadᐳ"}}:::plan
     First15 --> PgSelectSingle16
-    Object17{{"Object[17∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    Object17{{"Object[17∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelectSingle16 --> Object17
-    PgSelect29[["PgSelect[29∈2]<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression37{{"PgClassExpression[37∈2]<br />ᐸ__authenti...oad__.”id”ᐳ"}}:::plan
+    PgSelect29[["PgSelect[29∈2] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression37{{"PgClassExpression[37∈2] ➊<br />ᐸ__authenti...oad__.”id”ᐳ"}}:::plan
     Object14 & PgClassExpression37 --> PgSelect29
-    First33{{"First[33∈2]"}}:::plan
+    First33{{"First[33∈2] ➊"}}:::plan
     PgSelect29 --> First33
-    PgSelectSingle34{{"PgSelectSingle[34∈2]<br />ᐸpersonᐳ"}}:::plan
+    PgSelectSingle34{{"PgSelectSingle[34∈2] ➊<br />ᐸpersonᐳ"}}:::plan
     First33 --> PgSelectSingle34
     PgSelectSingle16 --> PgClassExpression37
-    PgSelect19[["PgSelect[19∈3]<br />ᐸfrmcdc_jwtTokenᐳ"]]:::plan
-    PgClassExpression18{{"PgClassExpression[18∈3]<br />ᐸ__authenti...ad__.”jwt”ᐳ"}}:::plan
+    PgSelect19[["PgSelect[19∈3] ➊<br />ᐸfrmcdc_jwtTokenᐳ"]]:::plan
+    PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__authenti...ad__.”jwt”ᐳ"}}:::plan
     Object14 & PgClassExpression18 --> PgSelect19
     PgSelectSingle16 --> PgClassExpression18
-    First23{{"First[23∈3]"}}:::plan
+    First23{{"First[23∈3] ➊"}}:::plan
     PgSelect19 --> First23
-    PgSelectSingle24{{"PgSelectSingle[24∈3]<br />ᐸfrmcdc_jwtTokenᐳ"}}:::plan
+    PgSelectSingle24{{"PgSelectSingle[24∈3] ➊<br />ᐸfrmcdc_jwtTokenᐳ"}}:::plan
     First23 --> PgSelectSingle24
-    PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__frmcdc_jwt_token__ᐳ"}}:::plan
+    PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__frmcdc_jwt_token__ᐳ"}}:::plan
     PgSelectSingle24 --> PgClassExpression25
-    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__authenti...__.”admin”ᐳ"}}:::plan
+    PgClassExpression27{{"PgClassExpression[27∈3] ➊<br />ᐸ__authenti...__.”admin”ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression27
-    PgClassExpression35{{"PgClassExpression[35∈4]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgClassExpression35{{"PgClassExpression[35∈4] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression35
-    PgClassExpression36{{"PgClassExpression[36∈4]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgClassExpression36{{"PgClassExpression[36∈4] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression36
-    PgClassExpression44{{"PgClassExpression[44∈5]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgClassExpression44{{"PgClassExpression[44∈5] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression44
-    PgClassExpression45{{"PgClassExpression[45∈5]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgClassExpression45{{"PgClassExpression[45∈5] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle34 --> PgClassExpression45
 
     %% define steps
@@ -82,6 +82,4 @@ graph TD
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3 & Bucket5
     Bucket3 --> Bucket4
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object14,Access12,Access13,__Value2,__Value4,Constant46,Constant47,Constant48,PgSelect11,First15,PgSelectSingle16,Object17,PgSelect29,First33,PgSelectSingle34,PgClassExpression37,PgSelect19,PgClassExpression18,First23,PgSelectSingle24,PgClassExpression25,PgClassExpression27,PgClassExpression35,PgClassExpression36,PgClassExpression44,PgClassExpression45 unary
     end

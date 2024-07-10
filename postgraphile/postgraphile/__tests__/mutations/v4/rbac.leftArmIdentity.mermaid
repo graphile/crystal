@@ -9,35 +9,35 @@ graph TD
 
 
     %% plan dependencies
-    Object17{{"Object[17∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access15{{"Access[15∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access16{{"Access[16∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access15 & Access16 --> Object17
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access15
     __Value2 --> Access16
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant33{{"Constant[33∈0]<br />ᐸ[Object: null prototype] {   id: 9001,   person_id: 99,   leᐳ"}}:::plan
-    PgSelect14[["PgSelect[14∈1]<br />ᐸleft_arm_identity(mutation)ᐳ"]]:::sideeffectplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant33{{"Constant[33∈0] ➊<br />ᐸ[Object: null prototype] {   id: 9001,   person_id: 99,   leᐳ"}}:::plan
+    PgSelect14[["PgSelect[14∈1] ➊<br />ᐸleft_arm_identity(mutation)ᐳ"]]:::sideeffectplan
     Object17 & Constant33 --> PgSelect14
-    First18{{"First[18∈1]"}}:::plan
+    First18{{"First[18∈1] ➊"}}:::plan
     PgSelect14 --> First18
-    PgSelectSingle19{{"PgSelectSingle[19∈1]<br />ᐸleft_arm_identityᐳ"}}:::plan
+    PgSelectSingle19{{"PgSelectSingle[19∈1] ➊<br />ᐸleft_arm_identityᐳ"}}:::plan
     First18 --> PgSelectSingle19
-    Object20{{"Object[20∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    Object20{{"Object[20∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelectSingle19 --> Object20
-    List23{{"List[23∈3]<br />ᐸ21,22ᐳ"}}:::plan
-    Constant21{{"Constant[21∈3]<br />ᐸ'left_arms'ᐳ"}}:::plan
-    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__left_arm...ity__.”id”ᐳ"}}:::plan
+    List23{{"List[23∈3] ➊<br />ᐸ21,22ᐳ"}}:::plan
+    Constant21{{"Constant[21∈3] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan
+    PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__left_arm...ity__.”id”ᐳ"}}:::plan
     Constant21 & PgClassExpression22 --> List23
     PgSelectSingle19 --> PgClassExpression22
-    Lambda24{{"Lambda[24∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    Lambda24{{"Lambda[24∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List23 --> Lambda24
-    PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
+    PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
     PgSelectSingle19 --> PgClassExpression26
-    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
+    PgClassExpression27{{"PgClassExpression[27∈3] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
     PgSelectSingle19 --> PgClassExpression27
-    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__left_arm...y__.”mood”ᐳ"}}:::plan
+    PgClassExpression28{{"PgClassExpression[28∈3] ➊<br />ᐸ__left_arm...y__.”mood”ᐳ"}}:::plan
     PgSelectSingle19 --> PgClassExpression28
 
     %% define steps
@@ -58,6 +58,4 @@ graph TD
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object17,Access15,Access16,__Value2,__Value4,Constant33,PgSelect14,First18,PgSelectSingle19,Object20,List23,PgClassExpression22,Lambda24,PgClassExpression26,PgClassExpression27,PgClassExpression28,Constant21 unary
     end

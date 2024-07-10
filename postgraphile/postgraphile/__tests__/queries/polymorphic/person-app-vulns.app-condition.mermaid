@@ -9,34 +9,34 @@ graph TD
 
 
     %% plan dependencies
-    Object17{{"Object[17∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access15{{"Access[15∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access16{{"Access[16∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access15 & Access16 --> Object17
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access15
     __Value2 --> Access16
-    Connection18{{"Connection[18∈0]<br />ᐸ14ᐳ"}}:::plan
-    Constant76{{"Constant[76∈0]<br />ᐸ4ᐳ"}}:::plan
+    Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
+    Constant76{{"Constant[76∈0] ➊<br />ᐸ4ᐳ"}}:::plan
     Constant76 --> Connection18
-    Lambda42{{"Lambda[42∈0]<br />ᐸparseCursorᐳ"}}:::plan
-    Constant78{{"Constant[78∈0]<br />ᐸ'WyJjMDM4YzQzNTYwIiwiQXdzQXBwbGljYXRpb24iLCJbXCI0XCJdIl0='ᐳ"}}:::plan
+    Lambda42{{"Lambda[42∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
+    Constant78{{"Constant[78∈0] ➊<br />ᐸ'WyJjMDM4YzQzNTYwIiwiQXdzQXBwbGljYXRpb24iLCJbXCI0XCJdIl0='ᐳ"}}:::plan
     Constant78 --> Lambda42
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection41{{"Connection[41∈1]<br />ᐸ37ᐳ"}}:::plan
-    Constant77{{"Constant[77∈1]<br />ᐸ1ᐳ"}}:::plan
-    PgValidateParsedCursor47["PgValidateParsedCursor[47∈1]"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection41{{"Connection[41∈1] ➊<br />ᐸ37ᐳ"}}:::plan
+    Constant77{{"Constant[77∈1] ➊<br />ᐸ1ᐳ"}}:::plan
+    PgValidateParsedCursor47["PgValidateParsedCursor[47∈1] ➊"]:::plan
     Constant77 & Lambda42 & PgValidateParsedCursor47 --> Connection41
-    PgSelect19[["PgSelect[19∈1]<br />ᐸpeopleᐳ"]]:::plan
+    PgSelect19[["PgSelect[19∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
     Object17 & Connection18 --> PgSelect19
     Lambda42 --> PgValidateParsedCursor47
-    Access48{{"Access[48∈1]<br />ᐸ42.1ᐳ"}}:::plan
+    Access48{{"Access[48∈1] ➊<br />ᐸ42.1ᐳ"}}:::plan
     Lambda42 --> Access48
-    ToPg49{{"ToPg[49∈1]"}}:::plan
+    ToPg49{{"ToPg[49∈1] ➊"}}:::plan
     Access48 --> ToPg49
-    Access50{{"Access[50∈1]<br />ᐸ42.2ᐳ"}}:::plan
+    Access50{{"Access[50∈1] ➊<br />ᐸ42.2ᐳ"}}:::plan
     Lambda42 --> Access50
-    Constant79{{"Constant[79∈1]<br />ᐸ'AWfulS'ᐳ"}}:::plan
+    Constant79{{"Constant[79∈1] ➊<br />ᐸ'AWfulS'ᐳ"}}:::plan
     __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
     PgSelect19 ==> __Item20
     PgSelectSingle21{{"PgSelectSingle[21∈2]<br />ᐸpeopleᐳ"}}:::plan
@@ -118,6 +118,4 @@ graph TD
     Bucket3 --> Bucket4
     Bucket4 --> Bucket5
     Bucket5 --> Bucket6
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object17,Access15,Access16,Connection18,Lambda42,__Value2,__Value4,Constant76,Constant78,Connection41,PgSelect19,PgValidateParsedCursor47,Access48,ToPg49,Access50,Constant77,Constant79 unary
     end

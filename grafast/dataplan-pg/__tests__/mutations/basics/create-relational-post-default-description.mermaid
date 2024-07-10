@@ -9,41 +9,41 @@ graph TD
 
 
     %% plan dependencies
-    Object15{{"Object[15∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access13{{"Access[13∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access14{{"Access[14∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object15{{"Object[15∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access13{{"Access[13∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access14{{"Access[14∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access13 & Access14 --> Object15
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access13
     __Value2 --> Access14
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant10{{"Constant[10∈0]<br />ᐸ'POST'ᐳ"}}:::plan
-    Constant11{{"Constant[11∈0]<br />ᐸ2ᐳ"}}:::plan
-    Constant34{{"Constant[34∈0]<br />ᐸ'My Relational Post'ᐳ"}}:::plan
-    Constant35{{"Constant[35∈0]<br />ᐸ'Such a great post.'ᐳ"}}:::plan
-    PgInsertSingle17[["PgInsertSingle[17∈1]<br />ᐸrelational_posts(id,title,note)ᐳ"]]:::sideeffectplan
-    PgClassExpression16{{"PgClassExpression[16∈1]<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant10{{"Constant[10∈0] ➊<br />ᐸ'POST'ᐳ"}}:::plan
+    Constant11{{"Constant[11∈0] ➊<br />ᐸ2ᐳ"}}:::plan
+    Constant34{{"Constant[34∈0] ➊<br />ᐸ'My Relational Post'ᐳ"}}:::plan
+    Constant35{{"Constant[35∈0] ➊<br />ᐸ'Such a great post.'ᐳ"}}:::plan
+    PgInsertSingle17[["PgInsertSingle[17∈1] ➊<br />ᐸrelational_posts(id,title,note)ᐳ"]]:::sideeffectplan
+    PgClassExpression16{{"PgClassExpression[16∈1] ➊<br />ᐸ__relation...ems__.”id”ᐳ"}}:::plan
     Object15 & PgClassExpression16 & Constant34 & Constant35 --> PgInsertSingle17
-    PgInsertSingle12[["PgInsertSingle[12∈1]<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
+    PgInsertSingle12[["PgInsertSingle[12∈1] ➊<br />ᐸrelational_items(type,author_id)ᐳ"]]:::sideeffectplan
     Object15 & Constant10 & Constant11 --> PgInsertSingle12
     PgInsertSingle12 --> PgClassExpression16
-    PgClassExpression21{{"PgClassExpression[21∈1]<br />ᐸ__relational_posts__ᐳ"}}:::plan
+    PgClassExpression21{{"PgClassExpression[21∈1] ➊<br />ᐸ__relational_posts__ᐳ"}}:::plan
     PgInsertSingle17 --> PgClassExpression21
-    PgSelect24[["PgSelect[24∈2]<br />ᐸrelational_postsᐳ"]]:::plan
-    PgClassExpression22{{"PgClassExpression[22∈2]<br />ᐸ(__relatio...ts__).”id”ᐳ"}}:::plan
+    PgSelect24[["PgSelect[24∈2] ➊<br />ᐸrelational_postsᐳ"]]:::plan
+    PgClassExpression22{{"PgClassExpression[22∈2] ➊<br />ᐸ(__relatio...ts__).”id”ᐳ"}}:::plan
     Object15 & PgClassExpression22 --> PgSelect24
     PgInsertSingle17 --> PgClassExpression22
-    First28{{"First[28∈2]"}}:::plan
+    First28{{"First[28∈2] ➊"}}:::plan
     PgSelect24 --> First28
-    PgSelectSingle29{{"PgSelectSingle[29∈2]<br />ᐸrelational_postsᐳ"}}:::plan
+    PgSelectSingle29{{"PgSelectSingle[29∈2] ➊<br />ᐸrelational_postsᐳ"}}:::plan
     First28 --> PgSelectSingle29
-    PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
+    PgClassExpression30{{"PgClassExpression[30∈3] ➊<br />ᐸ__relation...sts__.”id”ᐳ"}}:::plan
     PgSelectSingle29 --> PgClassExpression30
-    PgClassExpression31{{"PgClassExpression[31∈3]<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
+    PgClassExpression31{{"PgClassExpression[31∈3] ➊<br />ᐸ__relation...__.”title”ᐳ"}}:::plan
     PgSelectSingle29 --> PgClassExpression31
-    PgClassExpression32{{"PgClassExpression[32∈3]<br />ᐸ__relation...scription”ᐳ"}}:::plan
+    PgClassExpression32{{"PgClassExpression[32∈3] ➊<br />ᐸ__relation...scription”ᐳ"}}:::plan
     PgSelectSingle29 --> PgClassExpression32
-    PgClassExpression33{{"PgClassExpression[33∈3]<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
+    PgClassExpression33{{"PgClassExpression[33∈3] ➊<br />ᐸ__relation...s__.”note”ᐳ"}}:::plan
     PgSelectSingle29 --> PgClassExpression33
 
     %% define steps
@@ -64,6 +64,4 @@ graph TD
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object15,Access13,Access14,__Value2,__Value4,Constant10,Constant11,Constant34,Constant35,PgInsertSingle17,PgInsertSingle12,PgClassExpression16,PgClassExpression21,PgSelect24,PgClassExpression22,First28,PgSelectSingle29,PgClassExpression30,PgClassExpression31,PgClassExpression32,PgClassExpression33 unary
     end

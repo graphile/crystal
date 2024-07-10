@@ -9,36 +9,36 @@ graph TD
 
 
     %% plan dependencies
-    Object12{{"Object[12∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access10{{"Access[10∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access11{{"Access[11∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access10 & Access11 --> Object12
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant23{{"Constant[23∈0]<br />ᐸ1ᐳ"}}:::plan
-    PgDeleteSingle9[["PgDeleteSingle[9∈1]<br />ᐸperson(id)ᐳ"]]:::sideeffectplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant23{{"Constant[23∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    PgDeleteSingle9[["PgDeleteSingle[9∈1] ➊<br />ᐸperson(id)ᐳ"]]:::sideeffectplan
     Object12 & Constant23 --> PgDeleteSingle9
-    Object13{{"Object[13∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    Object13{{"Object[13∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgDeleteSingle9 --> Object13
-    PgClassExpression14{{"PgClassExpression[14∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgClassExpression14{{"PgClassExpression[14∈3] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgDeleteSingle9 --> PgClassExpression14
-    PgClassExpression15{{"PgClassExpression[15∈3]<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
+    PgClassExpression15{{"PgClassExpression[15∈3] ➊<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
     PgDeleteSingle9 --> PgClassExpression15
-    PgClassExpression16{{"PgClassExpression[16∈3]<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
+    PgClassExpression16{{"PgClassExpression[16∈3] ➊<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
     PgDeleteSingle9 --> PgClassExpression16
-    PgClassExpression17{{"PgClassExpression[17∈3]<br />ᐸ__person__...no_create”ᐳ"}}:::plan
+    PgClassExpression17{{"PgClassExpression[17∈3] ➊<br />ᐸ__person__...no_create”ᐳ"}}:::plan
     PgDeleteSingle9 --> PgClassExpression17
-    PgClassExpression18{{"PgClassExpression[18∈3]<br />ᐸ__person__...no_update”ᐳ"}}:::plan
+    PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__person__...no_update”ᐳ"}}:::plan
     PgDeleteSingle9 --> PgClassExpression18
-    PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
+    PgClassExpression19{{"PgClassExpression[19∈3] ➊<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
     PgDeleteSingle9 --> PgClassExpression19
-    PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
+    PgClassExpression20{{"PgClassExpression[20∈3] ➊<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
     PgDeleteSingle9 --> PgClassExpression20
-    PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__person__...te_update”ᐳ"}}:::plan
+    PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__person__...te_update”ᐳ"}}:::plan
     PgDeleteSingle9 --> PgClassExpression21
-    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
+    PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
     PgDeleteSingle9 --> PgClassExpression22
 
     %% define steps
@@ -59,6 +59,4 @@ graph TD
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object12,Access10,Access11,__Value2,__Value4,Constant23,PgDeleteSingle9,Object13,PgClassExpression14,PgClassExpression15,PgClassExpression16,PgClassExpression17,PgClassExpression18,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgClassExpression22 unary
     end

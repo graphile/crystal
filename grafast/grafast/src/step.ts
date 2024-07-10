@@ -396,12 +396,11 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     return chalk.bold.blue(
       `${this.constructor.name.replace(/Step$/, "")}${
         this.layerPlan.id === 0 ? "" : chalk.grey(`{${this.layerPlan.id}}`)
-      }${meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""}[${inspect(
-        this.id,
-        {
-          colors: true,
-        },
-      )}]`,
+      }${this._isUnary ? "➊" : ""}${
+        meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""
+      }[${inspect(this.id, {
+        colors: true,
+      })}]`,
     );
   }
 

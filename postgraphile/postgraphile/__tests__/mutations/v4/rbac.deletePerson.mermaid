@@ -9,25 +9,25 @@ graph TD
 
 
     %% plan dependencies
-    Object12{{"Object[12∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access10{{"Access[10∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access11{{"Access[11∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access10 & Access11 --> Object12
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant18{{"Constant[18∈0]<br />ᐸ3ᐳ"}}:::plan
-    PgDeleteSingle9[["PgDeleteSingle[9∈1]<br />ᐸperson(id)ᐳ"]]:::sideeffectplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant18{{"Constant[18∈0] ➊<br />ᐸ3ᐳ"}}:::plan
+    PgDeleteSingle9[["PgDeleteSingle[9∈1] ➊<br />ᐸperson(id)ᐳ"]]:::sideeffectplan
     Object12 & Constant18 --> PgDeleteSingle9
-    Object13{{"Object[13∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    Object13{{"Object[13∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgDeleteSingle9 --> Object13
-    List16{{"List[16∈2]<br />ᐸ14,15ᐳ"}}:::plan
-    Constant14{{"Constant[14∈2]<br />ᐸ'people'ᐳ"}}:::plan
-    PgClassExpression15{{"PgClassExpression[15∈2]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    List16{{"List[16∈2] ➊<br />ᐸ14,15ᐳ"}}:::plan
+    Constant14{{"Constant[14∈2] ➊<br />ᐸ'people'ᐳ"}}:::plan
+    PgClassExpression15{{"PgClassExpression[15∈2] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     Constant14 & PgClassExpression15 --> List16
     PgDeleteSingle9 --> PgClassExpression15
-    Lambda17{{"Lambda[17∈2]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    Lambda17{{"Lambda[17∈2] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List16 --> Lambda17
 
     %% define steps
@@ -44,6 +44,4 @@ graph TD
     class Bucket2,Constant14,PgClassExpression15,List16,Lambda17 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object12,Access10,Access11,__Value2,__Value4,Constant18,PgDeleteSingle9,Object13,List16,PgClassExpression15,Lambda17,Constant14 unary
     end

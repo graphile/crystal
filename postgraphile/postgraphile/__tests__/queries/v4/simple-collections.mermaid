@@ -9,35 +9,35 @@ graph TD
 
 
     %% plan dependencies
-    Object13{{"Object[13∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access11{{"Access[11∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access12{{"Access[12∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
-    PgSelect71[["PgSelect[71∈0]<br />ᐸpostᐳ"]]:::plan
-    Constant176{{"Constant[176∈0]<br />ᐸ2ᐳ"}}:::plan
+    PgSelect71[["PgSelect[71∈0] ➊<br />ᐸpostᐳ"]]:::plan
+    Constant176{{"Constant[176∈0] ➊<br />ᐸ2ᐳ"}}:::plan
     Object13 & Constant176 --> PgSelect71
-    PgSelect90[["PgSelect[90∈0]<br />ᐸpostᐳ"]]:::plan
+    PgSelect90[["PgSelect[90∈0] ➊<br />ᐸpostᐳ"]]:::plan
     Object13 & Constant176 --> PgSelect90
-    PgSelect10[["PgSelect[10∈0]<br />ᐸpersonᐳ"]]:::plan
+    PgSelect10[["PgSelect[10∈0] ➊<br />ᐸpersonᐳ"]]:::plan
     Object13 --> PgSelect10
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
-    PgSelect23[["PgSelect[23∈0]<br />ᐸpersonᐳ"]]:::plan
+    PgSelect23[["PgSelect[23∈0] ➊<br />ᐸpersonᐳ"]]:::plan
     Object13 --> PgSelect23
-    PgSelect37[["PgSelect[37∈0]<br />ᐸpersonᐳ"]]:::plan
+    PgSelect37[["PgSelect[37∈0] ➊<br />ᐸpersonᐳ"]]:::plan
     Object13 --> PgSelect37
-    PgSelect51[["PgSelect[51∈0]<br />ᐸpersonᐳ"]]:::plan
+    PgSelect51[["PgSelect[51∈0] ➊<br />ᐸpersonᐳ"]]:::plan
     Object13 --> PgSelect51
-    PgSelect102[["PgSelect[102∈0]<br />ᐸpersonᐳ"]]:::plan
+    PgSelect102[["PgSelect[102∈0] ➊<br />ᐸpersonᐳ"]]:::plan
     Object13 --> PgSelect102
-    PgSelect115[["PgSelect[115∈0]<br />ᐸpersonᐳ"]]:::plan
+    PgSelect115[["PgSelect[115∈0] ➊<br />ᐸpersonᐳ"]]:::plan
     Object13 --> PgSelect115
-    PgSelect153[["PgSelect[153∈0]<br />ᐸpersonᐳ"]]:::plan
+    PgSelect153[["PgSelect[153∈0] ➊<br />ᐸpersonᐳ"]]:::plan
     Object13 --> PgSelect153
-    PgSelect168[["PgSelect[168∈0]<br />ᐸpostᐳ"]]:::plan
+    PgSelect168[["PgSelect[168∈0] ➊<br />ᐸpostᐳ"]]:::plan
     Object13 --> PgSelect168
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item14[/"__Item[14∈1]<br />ᐸ10ᐳ"\]:::itemplan
     PgSelect10 ==> __Item14
     PgSelectSingle15{{"PgSelectSingle[15∈1]<br />ᐸpersonᐳ"}}:::plan
@@ -170,6 +170,4 @@ graph TD
     classDef bucket10 stroke:#ffff00
     class Bucket10,__Item172,PgSelectSingle173,PgClassExpression174,PgClassExpression175 bucket10
     Bucket0 --> Bucket1 & Bucket2 & Bucket3 & Bucket4 & Bucket5 & Bucket6 & Bucket7 & Bucket8 & Bucket9 & Bucket10
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object13,PgSelect71,PgSelect90,PgSelect10,Access11,Access12,PgSelect23,PgSelect37,PgSelect51,PgSelect102,PgSelect115,PgSelect153,PgSelect168,__Value2,__Value4,Constant176 unary
     end

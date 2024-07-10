@@ -9,16 +9,16 @@ graph TD
 
 
     %% plan dependencies
-    Object12{{"Object[12∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access10{{"Access[10∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access11{{"Access[11∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access10 & Access11 --> Object12
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant15{{"Constant[15∈0]<br />ᐸ[Object: null prototype] { a: 3 }ᐳ"}}:::plan
-    WithPgClient9[["WithPgClient[9∈1]"]]:::sideeffectplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant15{{"Constant[15∈0] ➊<br />ᐸ[Object: null prototype] { a: 3 }ᐳ"}}:::plan
+    WithPgClient9[["WithPgClient[9∈1] ➊"]]:::sideeffectplan
     Object12 & Constant15 --> WithPgClient9
     __Item13[/"__Item[13∈3]<br />ᐸ9ᐳ"\]:::itemplan
     WithPgClient9 ==> __Item13
@@ -41,6 +41,4 @@ graph TD
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object12,Access10,Access11,__Value2,__Value4,Constant15,WithPgClient9 unary
     end

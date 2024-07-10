@@ -192,9 +192,24 @@ values alongside their dependencies without having to loop multiple times.
 Typically they're used for trivial operations such as accessing a named
 property from an object or accessing the first/last entry in a list.
 
+### Side-effect steps
+
+Certain steps may have side effects (e.g. cause mutations in your data sources,
+etc), and thus they have a significant impact on the plan. Side effect steps
+are rendered with a slightly reddish-hued background.
+
+<Mermaid
+  chart={`\
+${init}
+    SideEffect18[["SideEffect[18∈3]"]]:::sideeffectplan
+`}
+/>
+
 ### Implicit side effect dependency
 
-If a step is implicitly dependent on a side effect due to occuring after the side effect, a dotted line ending in a circle will join the nodes:
+If a step is implicitly dependent on a side effect due to occuring after the
+side effect, a dotted line ending in a circle will join the nodes to indicate
+the step is implicitly dependent on the previous step:
 
 <Mermaid
   chart={`\
@@ -208,6 +223,25 @@ ${init}
     class Access17 bucket3
     class SideEffect18 bucket3
     class LoadOne19 bucket3
+`}
+/>
+
+### Unary steps
+
+During planning, Grafast may determine that there will only ever be one value
+(per request) for a given step, and thus it demarks this step as a "unary
+step". This can be important for the step's dependents since they know they'll
+receive exactly one value from this step, rather than a batch of values, and
+thus they may be able to simplify their logic. This can be critically important
+for things such as pagination limits, and steps are allowed to require that a
+dependency is unary.
+
+In plan diagrams, unary steps are denoted by a `➊` in their Node:
+
+<Mermaid
+  chart={`\
+${init}
+    Access17{{"Access[16∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
 `}
 />
 

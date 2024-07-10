@@ -9,37 +9,37 @@ graph TD
 
 
     %% plan dependencies
-    PgSelect7[["PgSelect[7∈0]<br />ᐸforumsᐳ"]]:::plan
-    Object10{{"Object[10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant53{{"Constant[53∈0]<br />ᐸ'f1700000-0000-0000-0000-000000000f17'ᐳ"}}:::plan
-    Constant29{{"Constant[29∈0]<br />ᐸundefinedᐳ"}}:::plan
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸforumsᐳ"]]:::plan
+    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant53{{"Constant[53∈0] ➊<br />ᐸ'f1700000-0000-0000-0000-000000000f17'ᐳ"}}:::plan
+    Constant29{{"Constant[29∈0] ➊<br />ᐸundefinedᐳ"}}:::plan
     Object10 & Constant53 & Constant29 --> PgSelect7
-    Access8{{"Access[8∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access9{{"Access[9∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
-    First11{{"First[11∈0]"}}:::plan
+    First11{{"First[11∈0] ➊"}}:::plan
     PgSelect7 --> First11
-    PgSelectSingle12{{"PgSelectSingle[12∈0]<br />ᐸforumsᐳ"}}:::plan
+    PgSelectSingle12{{"PgSelectSingle[12∈0] ➊<br />ᐸforumsᐳ"}}:::plan
     First11 --> PgSelectSingle12
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    PgSelectSingle19{{"PgSelectSingle[19∈1]<br />ᐸusersᐳ"}}:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    PgSelectSingle19{{"PgSelectSingle[19∈1] ➊<br />ᐸusersᐳ"}}:::plan
     PgSelectSingle12 --> PgSelectSingle19
-    PgClassExpression20{{"PgClassExpression[20∈2]<br />ᐸ__forums_r...”username”ᐳ"}}:::plan
+    PgClassExpression20{{"PgClassExpression[20∈2] ➊<br />ᐸ__forums_r...”username”ᐳ"}}:::plan
     PgSelectSingle19 --> PgClassExpression20
-    PgClassExpression21{{"PgClassExpression[21∈2]<br />ᐸ__forums_r...vatar_url”ᐳ"}}:::plan
+    PgClassExpression21{{"PgClassExpression[21∈2] ➊<br />ᐸ__forums_r...vatar_url”ᐳ"}}:::plan
     PgSelectSingle19 --> PgClassExpression21
-    PgSelectSingle28{{"PgSelectSingle[28∈2]<br />ᐸusers_most_recent_forumᐳ"}}:::plan
-    RemapKeys49{{"RemapKeys[49∈2]<br />ᐸ19:{”0”:2,”1”:3,”2”:4}ᐳ"}}:::plan
+    PgSelectSingle28{{"PgSelectSingle[28∈2] ➊<br />ᐸusers_most_recent_forumᐳ"}}:::plan
+    RemapKeys49{{"RemapKeys[49∈2] ➊<br />ᐸ19:{”0”:2,”1”:3,”2”:4}ᐳ"}}:::plan
     RemapKeys49 --> PgSelectSingle28
     PgSelectSingle19 --> RemapKeys49
-    PgSelectSingle36{{"PgSelectSingle[36∈3]<br />ᐸforums_unique_author_countᐳ"}}:::plan
+    PgSelectSingle36{{"PgSelectSingle[36∈3] ➊<br />ᐸforums_unique_author_countᐳ"}}:::plan
     PgSelectSingle28 --> PgSelectSingle36
-    PgClassExpression37{{"PgClassExpression[37∈3]<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
+    PgClassExpression37{{"PgClassExpression[37∈3] ➊<br />ᐸ__forums_u..._count__.vᐳ"}}:::plan
     PgSelectSingle36 --> PgClassExpression37
-    Access48{{"Access[48∈3]<br />ᐸ49.1ᐳ"}}:::plan
+    Access48{{"Access[48∈3] ➊<br />ᐸ49.1ᐳ"}}:::plan
     RemapKeys49 --> Access48
     __Item43[/"__Item[43∈4]<br />ᐸ48ᐳ"\]:::itemplan
     Access48 ==> __Item43
@@ -74,6 +74,4 @@ graph TD
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4
     Bucket4 --> Bucket5
-    classDef unary fill:#fafffa,borderWidth:8px
-    class PgSelect7,Object10,Access8,Access9,First11,PgSelectSingle12,__Value2,__Value4,Constant29,Constant53,PgSelectSingle19,PgClassExpression20,PgClassExpression21,PgSelectSingle28,RemapKeys49,PgSelectSingle36,PgClassExpression37,Access48 unary
     end

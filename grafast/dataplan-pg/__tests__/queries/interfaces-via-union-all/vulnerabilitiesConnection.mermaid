@@ -9,16 +9,16 @@ graph TD
 
 
     %% plan dependencies
-    Object17{{"Object[17∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access15{{"Access[15∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access16{{"Access[16∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access15 & Access16 --> Object17
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access15
     __Value2 --> Access16
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection18{{"Connection[18∈0]<br />ᐸ14ᐳ"}}:::plan
-    PgUnionAll19[["PgUnionAll[19∈1]"]]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
+    PgUnionAll19[["PgUnionAll[19∈1] ➊"]]:::plan
     Object17 & Connection18 --> PgUnionAll19
     __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
     PgUnionAll19 ==> __Item20
@@ -93,6 +93,4 @@ graph TD
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object17,Access15,Access16,__Value2,__Value4,Connection18,PgUnionAll19 unary
     end

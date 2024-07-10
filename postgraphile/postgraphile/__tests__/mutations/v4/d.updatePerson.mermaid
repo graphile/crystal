@@ -9,40 +9,40 @@ graph TD
 
 
     %% plan dependencies
-    Object19{{"Object[19∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access17{{"Access[17∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access18{{"Access[18∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object19{{"Object[19∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access17{{"Access[17∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access18{{"Access[18∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access17 & Access18 --> Object19
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access17
     __Value2 --> Access18
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant30{{"Constant[30∈0]<br />ᐸ1ᐳ"}}:::plan
-    Constant31{{"Constant[31∈0]<br />ᐸ'Doe'ᐳ"}}:::plan
-    Constant32{{"Constant[32∈0]<br />ᐸ'update2'ᐳ"}}:::plan
-    Constant33{{"Constant[33∈0]<br />ᐸ'update1'ᐳ"}}:::plan
-    Constant34{{"Constant[34∈0]<br />ᐸ'update3'ᐳ"}}:::plan
-    PgUpdateSingle16[["PgUpdateSingle[16∈1]<br />ᐸperson(id;last_name,col_no_create,col_no_order,col_no_filter)ᐳ"]]:::sideeffectplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant30{{"Constant[30∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Constant31{{"Constant[31∈0] ➊<br />ᐸ'Doe'ᐳ"}}:::plan
+    Constant32{{"Constant[32∈0] ➊<br />ᐸ'update2'ᐳ"}}:::plan
+    Constant33{{"Constant[33∈0] ➊<br />ᐸ'update1'ᐳ"}}:::plan
+    Constant34{{"Constant[34∈0] ➊<br />ᐸ'update3'ᐳ"}}:::plan
+    PgUpdateSingle16[["PgUpdateSingle[16∈1] ➊<br />ᐸperson(id;last_name,col_no_create,col_no_order,col_no_filter)ᐳ"]]:::sideeffectplan
     Object19 & Constant30 & Constant31 & Constant32 & Constant33 & Constant34 --> PgUpdateSingle16
-    Object20{{"Object[20∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    Object20{{"Object[20∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle16 --> Object20
-    PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgUpdateSingle16 --> PgClassExpression21
-    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
+    PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
     PgUpdateSingle16 --> PgClassExpression22
-    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
+    PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
     PgUpdateSingle16 --> PgClassExpression23
-    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__person__...no_create”ᐳ"}}:::plan
+    PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__person__...no_create”ᐳ"}}:::plan
     PgUpdateSingle16 --> PgClassExpression24
-    PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__person__...no_update”ᐳ"}}:::plan
+    PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__person__...no_update”ᐳ"}}:::plan
     PgUpdateSingle16 --> PgClassExpression25
-    PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
+    PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
     PgUpdateSingle16 --> PgClassExpression26
-    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
+    PgClassExpression27{{"PgClassExpression[27∈3] ➊<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
     PgUpdateSingle16 --> PgClassExpression27
-    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__person__...te_update”ᐳ"}}:::plan
+    PgClassExpression28{{"PgClassExpression[28∈3] ➊<br />ᐸ__person__...te_update”ᐳ"}}:::plan
     PgUpdateSingle16 --> PgClassExpression28
-    PgClassExpression29{{"PgClassExpression[29∈3]<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
+    PgClassExpression29{{"PgClassExpression[29∈3] ➊<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
     PgUpdateSingle16 --> PgClassExpression29
 
     %% define steps
@@ -63,6 +63,4 @@ graph TD
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object19,Access17,Access18,__Value2,__Value4,Constant30,Constant31,Constant32,Constant33,Constant34,PgUpdateSingle16,Object20,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgClassExpression28,PgClassExpression29 unary
     end

@@ -9,44 +9,44 @@ graph TD
 
 
     %% plan dependencies
-    Object35{{"Object[35∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access33{{"Access[33∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access34{{"Access[34∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object35{{"Object[35∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access33{{"Access[33∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access34{{"Access[34∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access33 & Access34 --> Object35
-    PgSelect49[["PgSelect[49∈0]<br />ᐸpersonᐳ"]]:::plan
-    Access47{{"Access[47∈0]<br />ᐸ46.1ᐳ"}}:::plan
+    PgSelect49[["PgSelect[49∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Access47{{"Access[47∈0] ➊<br />ᐸ46.1ᐳ"}}:::plan
     Object35 -->|rejectNull| PgSelect49
     Access47 --> PgSelect49
-    PgSelect88[["PgSelect[88∈0]<br />ᐸpersonᐳ"]]:::plan
-    Access86{{"Access[86∈0]<br />ᐸ85.1ᐳ"}}:::plan
+    PgSelect88[["PgSelect[88∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Access86{{"Access[86∈0] ➊<br />ᐸ85.1ᐳ"}}:::plan
     Object35 -->|rejectNull| PgSelect88
     Access86 --> PgSelect88
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access33
     __Value2 --> Access34
-    Lambda46{{"Lambda[46∈0]<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
-    Constant96{{"Constant[96∈0]<br />ᐸ'WyJwZW9wbGUiLDZd'ᐳ"}}:::plan
+    Lambda46{{"Lambda[46∈0] ➊<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
+    Constant96{{"Constant[96∈0] ➊<br />ᐸ'WyJwZW9wbGUiLDZd'ᐳ"}}:::plan
     Constant96 --> Lambda46
     Lambda46 --> Access47
-    First53{{"First[53∈0]"}}:::plan
+    First53{{"First[53∈0] ➊"}}:::plan
     PgSelect49 --> First53
-    PgSelectSingle54{{"PgSelectSingle[54∈0]<br />ᐸpersonᐳ"}}:::plan
+    PgSelectSingle54{{"PgSelectSingle[54∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First53 --> PgSelectSingle54
-    Lambda85{{"Lambda[85∈0]<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
-    Constant98{{"Constant[98∈0]<br />ᐸ'WyJwb3N0cyIsM10='ᐳ"}}:::plan
+    Lambda85{{"Lambda[85∈0] ➊<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
+    Constant98{{"Constant[98∈0] ➊<br />ᐸ'WyJwb3N0cyIsM10='ᐳ"}}:::plan
     Constant98 --> Lambda85
     Lambda85 --> Access86
-    First92{{"First[92∈0]"}}:::plan
+    First92{{"First[92∈0] ➊"}}:::plan
     PgSelect88 --> First92
-    PgSelectSingle93{{"PgSelectSingle[93∈0]<br />ᐸpersonᐳ"}}:::plan
+    PgSelectSingle93{{"PgSelectSingle[93∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First92 --> PgSelectSingle93
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection36{{"Connection[36∈0]<br />ᐸ32ᐳ"}}:::plan
-    Connection75{{"Connection[75∈0]<br />ᐸ71ᐳ"}}:::plan
-    PgSelect37[["PgSelect[37∈1]<br />ᐸpersonᐳ"]]:::plan
-    Constant95{{"Constant[95∈1]<br />ᐸ'Twenty Seventwo'ᐳ"}}:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection36{{"Connection[36∈0] ➊<br />ᐸ32ᐳ"}}:::plan
+    Connection75{{"Connection[75∈0] ➊<br />ᐸ71ᐳ"}}:::plan
+    PgSelect37[["PgSelect[37∈1] ➊<br />ᐸpersonᐳ"]]:::plan
+    Constant95{{"Constant[95∈1] ➊<br />ᐸ'Twenty Seventwo'ᐳ"}}:::plan
     Object35 & Constant95 & Connection36 --> PgSelect37
-    Constant40{{"Constant[40∈1]<br />ᐸ'people'ᐳ"}}:::plan
+    Constant40{{"Constant[40∈1] ➊<br />ᐸ'people'ᐳ"}}:::plan
     __Item38[/"__Item[38∈2]<br />ᐸ37ᐳ"\]:::itemplan
     PgSelect37 ==> __Item38
     PgSelectSingle39{{"PgSelectSingle[39∈2]<br />ᐸpersonᐳ"}}:::plan
@@ -59,12 +59,12 @@ graph TD
     List42 --> Lambda43
     PgClassExpression44{{"PgClassExpression[44∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle39 --> PgClassExpression44
-    PgClassExpression55{{"PgClassExpression[55∈4]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgClassExpression55{{"PgClassExpression[55∈4] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle54 --> PgClassExpression55
-    PgSelect76[["PgSelect[76∈5]<br />ᐸpostᐳ"]]:::plan
-    Constant97{{"Constant[97∈5]<br />ᐸ'Is that a cooking show?'ᐳ"}}:::plan
+    PgSelect76[["PgSelect[76∈5] ➊<br />ᐸpostᐳ"]]:::plan
+    Constant97{{"Constant[97∈5] ➊<br />ᐸ'Is that a cooking show?'ᐳ"}}:::plan
     Object35 & Constant97 & Connection75 --> PgSelect76
-    Constant79{{"Constant[79∈5]<br />ᐸ'posts'ᐳ"}}:::plan
+    Constant79{{"Constant[79∈5] ➊<br />ᐸ'posts'ᐳ"}}:::plan
     __Item77[/"__Item[77∈6]<br />ᐸ76ᐳ"\]:::itemplan
     PgSelect76 ==> __Item77
     PgSelectSingle78{{"PgSelectSingle[78∈6]<br />ᐸpostᐳ"}}:::plan
@@ -77,7 +77,7 @@ graph TD
     List81 --> Lambda82
     PgClassExpression83{{"PgClassExpression[83∈7]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgSelectSingle78 --> PgClassExpression83
-    PgClassExpression94{{"PgClassExpression[94∈8]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgClassExpression94{{"PgClassExpression[94∈8] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle93 --> PgClassExpression94
 
     %% define steps
@@ -115,6 +115,4 @@ graph TD
     Bucket2 --> Bucket3
     Bucket5 --> Bucket6
     Bucket6 --> Bucket7
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object35,PgSelect49,PgSelect88,Access33,Access34,Lambda46,Access47,First53,PgSelectSingle54,Lambda85,Access86,First92,PgSelectSingle93,__Value2,__Value4,Connection36,Connection75,Constant96,Constant98,PgSelect37,Constant40,Constant95,PgClassExpression55,PgSelect76,Constant79,Constant97,PgClassExpression94 unary
     end

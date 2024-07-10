@@ -9,22 +9,22 @@ graph TD
 
 
     %% plan dependencies
-    Connection18{{"Connection[18∈0]<br />ᐸ14ᐳ"}}:::plan
-    Constant44{{"Constant[44∈0]<br />ᐸ2ᐳ"}}:::plan
-    Lambda19{{"Lambda[19∈0]<br />ᐸparseCursorᐳ"}}:::plan
-    PgValidateParsedCursor21["PgValidateParsedCursor[21∈0]"]:::plan
+    Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
+    Constant44{{"Constant[44∈0] ➊<br />ᐸ2ᐳ"}}:::plan
+    Lambda19{{"Lambda[19∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
+    PgValidateParsedCursor21["PgValidateParsedCursor[21∈0] ➊"]:::plan
     Constant44 & Lambda19 & PgValidateParsedCursor21 --> Connection18
-    Constant45{{"Constant[45∈0]<br />ᐸ'WyI5NjdkZTdmYTdlIiwzXQ=='ᐳ"}}:::plan
+    Constant45{{"Constant[45∈0] ➊<br />ᐸ'WyI5NjdkZTdmYTdlIiwzXQ=='ᐳ"}}:::plan
     Constant45 --> Lambda19
     Lambda19 --> PgValidateParsedCursor21
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    PgSelect20[["PgSelect[20∈1]<br />ᐸpeopleᐳ"]]:::plan
-    Object17{{"Object[17∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access22{{"Access[22∈1]<br />ᐸ19.1ᐳ"}}:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    PgSelect20[["PgSelect[20∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
+    Object17{{"Object[17∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access22{{"Access[22∈1] ➊<br />ᐸ19.1ᐳ"}}:::plan
     Object17 & Connection18 & Lambda19 & Access22 --> PgSelect20
-    Access15{{"Access[15∈1]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access16{{"Access[16∈1]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access15{{"Access[15∈1] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access16{{"Access[16∈1] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access15 & Access16 --> Object17
     __Value2 --> Access15
     __Value2 --> Access16
@@ -74,6 +74,4 @@ graph TD
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Connection18,Lambda19,PgValidateParsedCursor21,__Value2,__Value4,Constant44,Constant45,PgSelect20,Object17,Access15,Access16,Access22 unary
     end

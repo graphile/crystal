@@ -9,149 +9,149 @@ graph TD
 
 
     %% plan dependencies
-    Node7{{"Node[7∈0]"}}:::plan
-    Lambda8{{"Lambda[8∈0]<br />ᐸdecodeNodeIdWithCodecsᐳ"}}:::plan
+    Node7{{"Node[7∈0] ➊"}}:::plan
+    Lambda8{{"Lambda[8∈0] ➊<br />ᐸdecodeNodeIdWithCodecsᐳ"}}:::plan
     Lambda8 --> Node7
-    Constant177{{"Constant[177∈0]<br />ᐸ'WyJ0eXBlcyIsMTFd'ᐳ"}}:::plan
+    Constant177{{"Constant[177∈0] ➊<br />ᐸ'WyJ0eXBlcyIsMTFd'ᐳ"}}:::plan
     Constant177 --> Lambda8
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    PgSelect69[["PgSelect[69∈1]<br />ᐸcompound_keyᐳ<br />ᐳCompoundKey"]]:::plan
-    Object16{{"Object[16∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
-    Access175{{"Access[175∈1]<br />ᐸ8.base64JSON.1ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
-    Access176{{"Access[176∈1]<br />ᐸ8.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    PgSelect69[["PgSelect[69∈1] ➊<br />ᐸcompound_keyᐳ<br />ᐳCompoundKey"]]:::plan
+    Object16{{"Object[16∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
+    Access175{{"Access[175∈1] ➊<br />ᐸ8.base64JSON.1ᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
+    Access176{{"Access[176∈1] ➊<br />ᐸ8.base64JSON.2ᐳ<br />ᐳCompoundKey"}}:::plan
     Object16 -->|rejectNull| PgSelect69
     Access175 -->|rejectNull| PgSelect69
     Access176 --> PgSelect69
-    PgSelect13[["PgSelect[13∈1]<br />ᐸinputsᐳ<br />ᐳInput"]]:::plan
+    PgSelect13[["PgSelect[13∈1] ➊<br />ᐸinputsᐳ<br />ᐳInput"]]:::plan
     Object16 -->|rejectNull| PgSelect13
     Access175 --> PgSelect13
-    Access14{{"Access[14∈1]<br />ᐸ2.pgSettingsᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
-    Access15{{"Access[15∈1]<br />ᐸ2.withPgClientᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
+    Access14{{"Access[14∈1] ➊<br />ᐸ2.pgSettingsᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
+    Access15{{"Access[15∈1] ➊<br />ᐸ2.withPgClientᐳ<br />ᐳInput<br />ᐳPatch<br />ᐳReserved<br />ᐳReservedPatchRecord<br />ᐳReservedInputRecord<br />ᐳDefaultValue<br />ᐳCompoundKey<br />ᐳPerson<br />ᐳPost<br />ᐳType<br />ᐳPersonSecret<br />ᐳLeftArm<br />ᐳMyTable<br />ᐳViewTable<br />ᐳSimilarTable1<br />ᐳSimilarTable2<br />ᐳNullTestRecord<br />ᐳIssue756"}}:::plan
     Access14 & Access15 --> Object16
-    PgSelect22[["PgSelect[22∈1]<br />ᐸpatchsᐳ<br />ᐳPatch"]]:::plan
+    PgSelect22[["PgSelect[22∈1] ➊<br />ᐸpatchsᐳ<br />ᐳPatch"]]:::plan
     Object16 -->|rejectNull| PgSelect22
     Access175 --> PgSelect22
-    PgSelect31[["PgSelect[31∈1]<br />ᐸreservedᐳ<br />ᐳReserved"]]:::plan
+    PgSelect31[["PgSelect[31∈1] ➊<br />ᐸreservedᐳ<br />ᐳReserved"]]:::plan
     Object16 -->|rejectNull| PgSelect31
     Access175 --> PgSelect31
-    PgSelect40[["PgSelect[40∈1]<br />ᐸreservedPatchsᐳ<br />ᐳReservedPatchRecord"]]:::plan
+    PgSelect40[["PgSelect[40∈1] ➊<br />ᐸreservedPatchsᐳ<br />ᐳReservedPatchRecord"]]:::plan
     Object16 -->|rejectNull| PgSelect40
     Access175 --> PgSelect40
-    PgSelect49[["PgSelect[49∈1]<br />ᐸreserved_inputᐳ<br />ᐳReservedInputRecord"]]:::plan
+    PgSelect49[["PgSelect[49∈1] ➊<br />ᐸreserved_inputᐳ<br />ᐳReservedInputRecord"]]:::plan
     Object16 -->|rejectNull| PgSelect49
     Access175 --> PgSelect49
-    PgSelect58[["PgSelect[58∈1]<br />ᐸdefault_valueᐳ<br />ᐳDefaultValue"]]:::plan
+    PgSelect58[["PgSelect[58∈1] ➊<br />ᐸdefault_valueᐳ<br />ᐳDefaultValue"]]:::plan
     Object16 -->|rejectNull| PgSelect58
     Access175 --> PgSelect58
-    PgSelect78[["PgSelect[78∈1]<br />ᐸpersonᐳ<br />ᐳPerson"]]:::plan
+    PgSelect78[["PgSelect[78∈1] ➊<br />ᐸpersonᐳ<br />ᐳPerson"]]:::plan
     Object16 -->|rejectNull| PgSelect78
     Access175 --> PgSelect78
-    PgSelect87[["PgSelect[87∈1]<br />ᐸpostᐳ<br />ᐳPost"]]:::plan
+    PgSelect87[["PgSelect[87∈1] ➊<br />ᐸpostᐳ<br />ᐳPost"]]:::plan
     Object16 -->|rejectNull| PgSelect87
     Access175 --> PgSelect87
-    PgSelect96[["PgSelect[96∈1]<br />ᐸtypesᐳ<br />ᐳType"]]:::plan
+    PgSelect96[["PgSelect[96∈1] ➊<br />ᐸtypesᐳ<br />ᐳType"]]:::plan
     Object16 -->|rejectNull| PgSelect96
     Access175 --> PgSelect96
-    PgSelect106[["PgSelect[106∈1]<br />ᐸperson_secretᐳ<br />ᐳPersonSecret"]]:::plan
+    PgSelect106[["PgSelect[106∈1] ➊<br />ᐸperson_secretᐳ<br />ᐳPersonSecret"]]:::plan
     Object16 -->|rejectNull| PgSelect106
     Access175 --> PgSelect106
-    PgSelect115[["PgSelect[115∈1]<br />ᐸleft_armᐳ<br />ᐳLeftArm"]]:::plan
+    PgSelect115[["PgSelect[115∈1] ➊<br />ᐸleft_armᐳ<br />ᐳLeftArm"]]:::plan
     Object16 -->|rejectNull| PgSelect115
     Access175 --> PgSelect115
-    PgSelect124[["PgSelect[124∈1]<br />ᐸmy_tableᐳ<br />ᐳMyTable"]]:::plan
+    PgSelect124[["PgSelect[124∈1] ➊<br />ᐸmy_tableᐳ<br />ᐳMyTable"]]:::plan
     Object16 -->|rejectNull| PgSelect124
     Access175 --> PgSelect124
-    PgSelect133[["PgSelect[133∈1]<br />ᐸview_tableᐳ<br />ᐳViewTable"]]:::plan
+    PgSelect133[["PgSelect[133∈1] ➊<br />ᐸview_tableᐳ<br />ᐳViewTable"]]:::plan
     Object16 -->|rejectNull| PgSelect133
     Access175 --> PgSelect133
-    PgSelect142[["PgSelect[142∈1]<br />ᐸsimilar_table_1ᐳ<br />ᐳSimilarTable1"]]:::plan
+    PgSelect142[["PgSelect[142∈1] ➊<br />ᐸsimilar_table_1ᐳ<br />ᐳSimilarTable1"]]:::plan
     Object16 -->|rejectNull| PgSelect142
     Access175 --> PgSelect142
-    PgSelect151[["PgSelect[151∈1]<br />ᐸsimilar_table_2ᐳ<br />ᐳSimilarTable2"]]:::plan
+    PgSelect151[["PgSelect[151∈1] ➊<br />ᐸsimilar_table_2ᐳ<br />ᐳSimilarTable2"]]:::plan
     Object16 -->|rejectNull| PgSelect151
     Access175 --> PgSelect151
-    PgSelect160[["PgSelect[160∈1]<br />ᐸnull_test_recordᐳ<br />ᐳNullTestRecord"]]:::plan
+    PgSelect160[["PgSelect[160∈1] ➊<br />ᐸnull_test_recordᐳ<br />ᐳNullTestRecord"]]:::plan
     Object16 -->|rejectNull| PgSelect160
     Access175 --> PgSelect160
-    PgSelect169[["PgSelect[169∈1]<br />ᐸissue756ᐳ<br />ᐳIssue756"]]:::plan
+    PgSelect169[["PgSelect[169∈1] ➊<br />ᐸissue756ᐳ<br />ᐳIssue756"]]:::plan
     Object16 -->|rejectNull| PgSelect169
     Access175 --> PgSelect169
     __Value2 --> Access14
     __Value2 --> Access15
-    First17{{"First[17∈1]"}}:::plan
+    First17{{"First[17∈1] ➊"}}:::plan
     PgSelect13 --> First17
-    PgSelectSingle18{{"PgSelectSingle[18∈1]<br />ᐸinputsᐳ"}}:::plan
+    PgSelectSingle18{{"PgSelectSingle[18∈1] ➊<br />ᐸinputsᐳ"}}:::plan
     First17 --> PgSelectSingle18
-    First26{{"First[26∈1]"}}:::plan
+    First26{{"First[26∈1] ➊"}}:::plan
     PgSelect22 --> First26
-    PgSelectSingle27{{"PgSelectSingle[27∈1]<br />ᐸpatchsᐳ"}}:::plan
+    PgSelectSingle27{{"PgSelectSingle[27∈1] ➊<br />ᐸpatchsᐳ"}}:::plan
     First26 --> PgSelectSingle27
-    First35{{"First[35∈1]"}}:::plan
+    First35{{"First[35∈1] ➊"}}:::plan
     PgSelect31 --> First35
-    PgSelectSingle36{{"PgSelectSingle[36∈1]<br />ᐸreservedᐳ"}}:::plan
+    PgSelectSingle36{{"PgSelectSingle[36∈1] ➊<br />ᐸreservedᐳ"}}:::plan
     First35 --> PgSelectSingle36
-    First44{{"First[44∈1]"}}:::plan
+    First44{{"First[44∈1] ➊"}}:::plan
     PgSelect40 --> First44
-    PgSelectSingle45{{"PgSelectSingle[45∈1]<br />ᐸreservedPatchsᐳ"}}:::plan
+    PgSelectSingle45{{"PgSelectSingle[45∈1] ➊<br />ᐸreservedPatchsᐳ"}}:::plan
     First44 --> PgSelectSingle45
-    First53{{"First[53∈1]"}}:::plan
+    First53{{"First[53∈1] ➊"}}:::plan
     PgSelect49 --> First53
-    PgSelectSingle54{{"PgSelectSingle[54∈1]<br />ᐸreserved_inputᐳ"}}:::plan
+    PgSelectSingle54{{"PgSelectSingle[54∈1] ➊<br />ᐸreserved_inputᐳ"}}:::plan
     First53 --> PgSelectSingle54
-    First62{{"First[62∈1]"}}:::plan
+    First62{{"First[62∈1] ➊"}}:::plan
     PgSelect58 --> First62
-    PgSelectSingle63{{"PgSelectSingle[63∈1]<br />ᐸdefault_valueᐳ"}}:::plan
+    PgSelectSingle63{{"PgSelectSingle[63∈1] ➊<br />ᐸdefault_valueᐳ"}}:::plan
     First62 --> PgSelectSingle63
-    First73{{"First[73∈1]"}}:::plan
+    First73{{"First[73∈1] ➊"}}:::plan
     PgSelect69 --> First73
-    PgSelectSingle74{{"PgSelectSingle[74∈1]<br />ᐸcompound_keyᐳ"}}:::plan
+    PgSelectSingle74{{"PgSelectSingle[74∈1] ➊<br />ᐸcompound_keyᐳ"}}:::plan
     First73 --> PgSelectSingle74
-    First82{{"First[82∈1]"}}:::plan
+    First82{{"First[82∈1] ➊"}}:::plan
     PgSelect78 --> First82
-    PgSelectSingle83{{"PgSelectSingle[83∈1]<br />ᐸpersonᐳ"}}:::plan
+    PgSelectSingle83{{"PgSelectSingle[83∈1] ➊<br />ᐸpersonᐳ"}}:::plan
     First82 --> PgSelectSingle83
-    First91{{"First[91∈1]"}}:::plan
+    First91{{"First[91∈1] ➊"}}:::plan
     PgSelect87 --> First91
-    PgSelectSingle92{{"PgSelectSingle[92∈1]<br />ᐸpostᐳ"}}:::plan
+    PgSelectSingle92{{"PgSelectSingle[92∈1] ➊<br />ᐸpostᐳ"}}:::plan
     First91 --> PgSelectSingle92
-    First100{{"First[100∈1]"}}:::plan
+    First100{{"First[100∈1] ➊"}}:::plan
     PgSelect96 --> First100
-    PgSelectSingle101{{"PgSelectSingle[101∈1]<br />ᐸtypesᐳ"}}:::plan
+    PgSelectSingle101{{"PgSelectSingle[101∈1] ➊<br />ᐸtypesᐳ"}}:::plan
     First100 --> PgSelectSingle101
-    PgClassExpression102{{"PgClassExpression[102∈1]<br />ᐸ__types__.”id”ᐳ"}}:::plan
+    PgClassExpression102{{"PgClassExpression[102∈1] ➊<br />ᐸ__types__.”id”ᐳ"}}:::plan
     PgSelectSingle101 --> PgClassExpression102
-    First110{{"First[110∈1]"}}:::plan
+    First110{{"First[110∈1] ➊"}}:::plan
     PgSelect106 --> First110
-    PgSelectSingle111{{"PgSelectSingle[111∈1]<br />ᐸperson_secretᐳ"}}:::plan
+    PgSelectSingle111{{"PgSelectSingle[111∈1] ➊<br />ᐸperson_secretᐳ"}}:::plan
     First110 --> PgSelectSingle111
-    First119{{"First[119∈1]"}}:::plan
+    First119{{"First[119∈1] ➊"}}:::plan
     PgSelect115 --> First119
-    PgSelectSingle120{{"PgSelectSingle[120∈1]<br />ᐸleft_armᐳ"}}:::plan
+    PgSelectSingle120{{"PgSelectSingle[120∈1] ➊<br />ᐸleft_armᐳ"}}:::plan
     First119 --> PgSelectSingle120
-    First128{{"First[128∈1]"}}:::plan
+    First128{{"First[128∈1] ➊"}}:::plan
     PgSelect124 --> First128
-    PgSelectSingle129{{"PgSelectSingle[129∈1]<br />ᐸmy_tableᐳ"}}:::plan
+    PgSelectSingle129{{"PgSelectSingle[129∈1] ➊<br />ᐸmy_tableᐳ"}}:::plan
     First128 --> PgSelectSingle129
-    First137{{"First[137∈1]"}}:::plan
+    First137{{"First[137∈1] ➊"}}:::plan
     PgSelect133 --> First137
-    PgSelectSingle138{{"PgSelectSingle[138∈1]<br />ᐸview_tableᐳ"}}:::plan
+    PgSelectSingle138{{"PgSelectSingle[138∈1] ➊<br />ᐸview_tableᐳ"}}:::plan
     First137 --> PgSelectSingle138
-    First146{{"First[146∈1]"}}:::plan
+    First146{{"First[146∈1] ➊"}}:::plan
     PgSelect142 --> First146
-    PgSelectSingle147{{"PgSelectSingle[147∈1]<br />ᐸsimilar_table_1ᐳ"}}:::plan
+    PgSelectSingle147{{"PgSelectSingle[147∈1] ➊<br />ᐸsimilar_table_1ᐳ"}}:::plan
     First146 --> PgSelectSingle147
-    First155{{"First[155∈1]"}}:::plan
+    First155{{"First[155∈1] ➊"}}:::plan
     PgSelect151 --> First155
-    PgSelectSingle156{{"PgSelectSingle[156∈1]<br />ᐸsimilar_table_2ᐳ"}}:::plan
+    PgSelectSingle156{{"PgSelectSingle[156∈1] ➊<br />ᐸsimilar_table_2ᐳ"}}:::plan
     First155 --> PgSelectSingle156
-    First164{{"First[164∈1]"}}:::plan
+    First164{{"First[164∈1] ➊"}}:::plan
     PgSelect160 --> First164
-    PgSelectSingle165{{"PgSelectSingle[165∈1]<br />ᐸnull_test_recordᐳ"}}:::plan
+    PgSelectSingle165{{"PgSelectSingle[165∈1] ➊<br />ᐸnull_test_recordᐳ"}}:::plan
     First164 --> PgSelectSingle165
-    First173{{"First[173∈1]"}}:::plan
+    First173{{"First[173∈1] ➊"}}:::plan
     PgSelect169 --> First173
-    PgSelectSingle174{{"PgSelectSingle[174∈1]<br />ᐸissue756ᐳ"}}:::plan
+    PgSelectSingle174{{"PgSelectSingle[174∈1] ➊<br />ᐸissue756ᐳ"}}:::plan
     First173 --> PgSelectSingle174
     Lambda8 --> Access175
     Lambda8 --> Access176
@@ -166,6 +166,4 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,PgSelect13,Access14,Access15,Object16,First17,PgSelectSingle18,PgSelect22,First26,PgSelectSingle27,PgSelect31,First35,PgSelectSingle36,PgSelect40,First44,PgSelectSingle45,PgSelect49,First53,PgSelectSingle54,PgSelect58,First62,PgSelectSingle63,PgSelect69,First73,PgSelectSingle74,PgSelect78,First82,PgSelectSingle83,PgSelect87,First91,PgSelectSingle92,PgSelect96,First100,PgSelectSingle101,PgClassExpression102,PgSelect106,First110,PgSelectSingle111,PgSelect115,First119,PgSelectSingle120,PgSelect124,First128,PgSelectSingle129,PgSelect133,First137,PgSelectSingle138,PgSelect142,First146,PgSelectSingle147,PgSelect151,First155,PgSelectSingle156,PgSelect160,First164,PgSelectSingle165,PgSelect169,First173,PgSelectSingle174,Access175,Access176 bucket1
     Bucket0 --> Bucket1
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Node7,Lambda8,__Value2,__Value4,Constant177,PgSelect69,PgSelect13,Object16,PgSelect22,PgSelect31,PgSelect40,PgSelect49,PgSelect58,PgSelect78,PgSelect87,PgSelect96,PgSelect106,PgSelect115,PgSelect124,PgSelect133,PgSelect142,PgSelect151,PgSelect160,PgSelect169,Access14,Access15,First17,PgSelectSingle18,First26,PgSelectSingle27,First35,PgSelectSingle36,First44,PgSelectSingle45,First53,PgSelectSingle54,First62,PgSelectSingle63,First73,PgSelectSingle74,First82,PgSelectSingle83,First91,PgSelectSingle92,First100,PgSelectSingle101,PgClassExpression102,First110,PgSelectSingle111,First119,PgSelectSingle120,First128,PgSelectSingle129,First137,PgSelectSingle138,First146,PgSelectSingle147,First155,PgSelectSingle156,First164,PgSelectSingle165,First173,PgSelectSingle174,Access175,Access176 unary
     end

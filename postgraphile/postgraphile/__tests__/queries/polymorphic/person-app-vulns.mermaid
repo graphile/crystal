@@ -9,20 +9,20 @@ graph TD
 
 
     %% plan dependencies
-    Object17{{"Object[17∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access15{{"Access[15∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access16{{"Access[16∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access15 & Access16 --> Object17
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access15
     __Value2 --> Access16
-    Connection18{{"Connection[18∈0]<br />ᐸ14ᐳ"}}:::plan
-    Constant335{{"Constant[335∈0]<br />ᐸ4ᐳ"}}:::plan
+    Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
+    Constant335{{"Constant[335∈0] ➊<br />ᐸ4ᐳ"}}:::plan
     Constant335 --> Connection18
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    PgSelect19[["PgSelect[19∈1]<br />ᐸpeopleᐳ"]]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    PgSelect19[["PgSelect[19∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
     Object17 & Connection18 --> PgSelect19
-    Connection38{{"Connection[38∈1]<br />ᐸ34ᐳ"}}:::plan
+    Connection38{{"Connection[38∈1] ➊<br />ᐸ34ᐳ"}}:::plan
     __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
     PgSelect19 ==> __Item20
     PgSelectSingle21{{"PgSelectSingle[21∈2]<br />ᐸpeopleᐳ"}}:::plan
@@ -87,13 +87,13 @@ graph TD
     PgUnionAllSingle72 --> Access73
     PgUnionAll169[["PgUnionAll[169∈8]<br />ᐳAwsApplication"]]:::plan
     PgClassExpression83{{"PgClassExpression[83∈8]<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
-    Connection168{{"Connection[168∈8]<br />ᐸ164ᐳ<br />ᐳAwsApplication"}}:::plan
+    Connection168{{"Connection[168∈8] ➊<br />ᐸ164ᐳ<br />ᐳAwsApplication"}}:::plan
     Object17 & PgClassExpression83 & PgClassExpression83 & Connection168 --> PgUnionAll169
     PgUnionAll173[["PgUnionAll[173∈8]<br />ᐳAwsApplication"]]:::plan
     Object17 & PgClassExpression83 & PgClassExpression83 & Connection168 --> PgUnionAll173
     PgUnionAll300[["PgUnionAll[300∈8]<br />ᐳGcpApplication"]]:::plan
     PgClassExpression214{{"PgClassExpression[214∈8]<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
-    Connection299{{"Connection[299∈8]<br />ᐸ295ᐳ<br />ᐳGcpApplication"}}:::plan
+    Connection299{{"Connection[299∈8] ➊<br />ᐸ295ᐳ<br />ᐳGcpApplication"}}:::plan
     Object17 & PgClassExpression214 & PgClassExpression214 & Connection299 --> PgUnionAll300
     PgUnionAll304[["PgUnionAll[304∈8]<br />ᐳGcpApplication"]]:::plan
     Object17 & PgClassExpression214 & PgClassExpression214 & Connection299 --> PgUnionAll304
@@ -476,6 +476,4 @@ graph TD
     Bucket16 --> Bucket17
     Bucket18 --> Bucket19
     Bucket19 --> Bucket20
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object17,Access15,Access16,Connection18,__Value2,__Value4,Constant335,PgSelect19,Connection38,Connection168,Connection299 unary
     end

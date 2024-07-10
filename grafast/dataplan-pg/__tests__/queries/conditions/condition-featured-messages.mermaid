@@ -9,28 +9,28 @@ graph TD
 
 
     %% plan dependencies
-    PgSelect10[["PgSelect[10∈0]<br />ᐸforumsᐳ"]]:::plan
-    Object13{{"Object[13∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant86{{"Constant[86∈0]<br />ᐸtrueᐳ"}}:::plan
+    PgSelect10[["PgSelect[10∈0] ➊<br />ᐸforumsᐳ"]]:::plan
+    Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant86{{"Constant[86∈0] ➊<br />ᐸtrueᐳ"}}:::plan
     Object13 & Constant86 --> PgSelect10
-    Access11{{"Access[11∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access12{{"Access[12∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
-    Connection28{{"Connection[28∈0]<br />ᐸ24ᐳ"}}:::plan
-    Constant85{{"Constant[85∈0]<br />ᐸ5ᐳ"}}:::plan
+    Connection28{{"Connection[28∈0] ➊<br />ᐸ24ᐳ"}}:::plan
+    Constant85{{"Constant[85∈0] ➊<br />ᐸ5ᐳ"}}:::plan
     Constant85 --> Connection28
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item14[/"__Item[14∈1]<br />ᐸ10ᐳ"\]:::itemplan
     PgSelect10 ==> __Item14
     PgSelectSingle15{{"PgSelectSingle[15∈1]<br />ᐸforumsᐳ"}}:::plan
     __Item14 --> PgSelectSingle15
-    Constant61{{"Constant[61∈1]<br />ᐸfalseᐳ"}}:::plan
+    Constant61{{"Constant[61∈1] ➊<br />ᐸfalseᐳ"}}:::plan
     PgClassExpression16{{"PgClassExpression[16∈2]<br />ᐸ__forums__.”name”ᐳ"}}:::plan
     PgSelectSingle15 --> PgClassExpression16
-    PgPageInfo58{{"PgPageInfo[58∈3]"}}:::plan
+    PgPageInfo58{{"PgPageInfo[58∈3] ➊"}}:::plan
     Connection28 --> PgPageInfo58
     Access60{{"Access[60∈3]<br />ᐸ83.hasMoreᐳ"}}:::plan
     Lambda83{{"Lambda[83∈3]"}}:::plan
@@ -134,6 +134,4 @@ graph TD
     Bucket4 --> Bucket5 & Bucket7
     Bucket5 --> Bucket6
     Bucket7 --> Bucket8
-    classDef unary fill:#fafffa,borderWidth:8px
-    class PgSelect10,Object13,Access11,Access12,Connection28,__Value2,__Value4,Constant85,Constant86,Constant61,PgPageInfo58 unary
     end

@@ -9,60 +9,60 @@ graph TD
 
 
     %% plan dependencies
-    Connection20{{"Connection[20∈0]<br />ᐸ16ᐳ"}}:::plan
-    Constant65{{"Constant[65∈0]<br />ᐸ5ᐳ"}}:::plan
+    Connection20{{"Connection[20∈0] ➊<br />ᐸ16ᐳ"}}:::plan
+    Constant65{{"Constant[65∈0] ➊<br />ᐸ5ᐳ"}}:::plan
     Constant65 --> Connection20
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    List50{{"List[50∈1]<br />ᐸ47,48,49ᐳ"}}:::plan
-    PgClassExpression47{{"PgClassExpression[47∈1]<br />ᐸ__author__.usernameᐳ"}}:::plan
-    PgClassExpression48{{"PgClassExpression[48∈1]<br />ᐸ__messages__.bodyᐳ"}}:::plan
-    PgClassExpression49{{"PgClassExpression[49∈1]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    List50{{"List[50∈1] ➊<br />ᐸ47,48,49ᐳ"}}:::plan
+    PgClassExpression47{{"PgClassExpression[47∈1] ➊<br />ᐸ__author__.usernameᐳ"}}:::plan
+    PgClassExpression48{{"PgClassExpression[48∈1] ➊<br />ᐸ__messages__.bodyᐳ"}}:::plan
+    PgClassExpression49{{"PgClassExpression[49∈1] ➊<br />ᐸ__messages__.”id”ᐳ"}}:::plan
     PgClassExpression47 & PgClassExpression48 & PgClassExpression49 --> List50
-    List58{{"List[58∈1]<br />ᐸ55,56,57ᐳ"}}:::plan
-    PgClassExpression55{{"PgClassExpression[55∈1]<br />ᐸ__author__.usernameᐳ"}}:::plan
-    PgClassExpression56{{"PgClassExpression[56∈1]<br />ᐸ__messages__.bodyᐳ"}}:::plan
-    PgClassExpression57{{"PgClassExpression[57∈1]<br />ᐸ__messages__.”id”ᐳ"}}:::plan
+    List58{{"List[58∈1] ➊<br />ᐸ55,56,57ᐳ"}}:::plan
+    PgClassExpression55{{"PgClassExpression[55∈1] ➊<br />ᐸ__author__.usernameᐳ"}}:::plan
+    PgClassExpression56{{"PgClassExpression[56∈1] ➊<br />ᐸ__messages__.bodyᐳ"}}:::plan
+    PgClassExpression57{{"PgClassExpression[57∈1] ➊<br />ᐸ__messages__.”id”ᐳ"}}:::plan
     PgClassExpression55 & PgClassExpression56 & PgClassExpression57 --> List58
-    Object19{{"Object[19∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access17{{"Access[17∈1]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access18{{"Access[18∈1]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object19{{"Object[19∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access17{{"Access[17∈1] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access18{{"Access[18∈1] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access17 & Access18 --> Object19
-    PgSelect21[["PgSelect[21∈1]<br />ᐸmessages+1ᐳ"]]:::plan
+    PgSelect21[["PgSelect[21∈1] ➊<br />ᐸmessages+1ᐳ"]]:::plan
     Object19 & Connection20 --> PgSelect21
-    PgSelect59[["PgSelect[59∈1]<br />ᐸmessages(aggregate)ᐳ"]]:::plan
+    PgSelect59[["PgSelect[59∈1] ➊<br />ᐸmessages(aggregate)ᐳ"]]:::plan
     Object19 & Connection20 --> PgSelect59
     __Value2 --> Access17
     __Value2 --> Access18
-    PgPageInfo39{{"PgPageInfo[39∈1]"}}:::plan
+    PgPageInfo39{{"PgPageInfo[39∈1] ➊"}}:::plan
     Connection20 --> PgPageInfo39
-    Access41{{"Access[41∈1]<br />ᐸ21.hasMoreᐳ"}}:::plan
+    Access41{{"Access[41∈1] ➊<br />ᐸ21.hasMoreᐳ"}}:::plan
     PgSelect21 --> Access41
-    First44{{"First[44∈1]"}}:::plan
+    First44{{"First[44∈1] ➊"}}:::plan
     PgSelect21 --> First44
-    PgSelectSingle45{{"PgSelectSingle[45∈1]<br />ᐸmessagesᐳ"}}:::plan
+    PgSelectSingle45{{"PgSelectSingle[45∈1] ➊<br />ᐸmessagesᐳ"}}:::plan
     First44 --> PgSelectSingle45
-    PgCursor46{{"PgCursor[46∈1]"}}:::plan
+    PgCursor46{{"PgCursor[46∈1] ➊"}}:::plan
     List50 --> PgCursor46
     PgSelectSingle45 --> PgClassExpression47
     PgSelectSingle45 --> PgClassExpression48
     PgSelectSingle45 --> PgClassExpression49
-    Last52{{"Last[52∈1]"}}:::plan
+    Last52{{"Last[52∈1] ➊"}}:::plan
     PgSelect21 --> Last52
-    PgSelectSingle53{{"PgSelectSingle[53∈1]<br />ᐸmessagesᐳ"}}:::plan
+    PgSelectSingle53{{"PgSelectSingle[53∈1] ➊<br />ᐸmessagesᐳ"}}:::plan
     Last52 --> PgSelectSingle53
-    PgCursor54{{"PgCursor[54∈1]"}}:::plan
+    PgCursor54{{"PgCursor[54∈1] ➊"}}:::plan
     List58 --> PgCursor54
     PgSelectSingle53 --> PgClassExpression55
     PgSelectSingle53 --> PgClassExpression56
     PgSelectSingle53 --> PgClassExpression57
-    First60{{"First[60∈1]"}}:::plan
+    First60{{"First[60∈1] ➊"}}:::plan
     PgSelect59 --> First60
-    PgSelectSingle61{{"PgSelectSingle[61∈1]<br />ᐸmessagesᐳ"}}:::plan
+    PgSelectSingle61{{"PgSelectSingle[61∈1] ➊<br />ᐸmessagesᐳ"}}:::plan
     First60 --> PgSelectSingle61
-    PgClassExpression62{{"PgClassExpression[62∈1]<br />ᐸcount(*)ᐳ"}}:::plan
+    PgClassExpression62{{"PgClassExpression[62∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle61 --> PgClassExpression62
-    Constant42{{"Constant[42∈1]<br />ᐸfalseᐳ"}}:::plan
+    Constant42{{"Constant[42∈1] ➊<br />ᐸfalseᐳ"}}:::plan
     __Item22[/"__Item[22∈2]<br />ᐸ21ᐳ"\]:::itemplan
     PgSelect21 ==> __Item22
     PgSelectSingle23{{"PgSelectSingle[23∈2]<br />ᐸmessagesᐳ"}}:::plan
@@ -110,6 +110,4 @@ graph TD
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Connection20,__Value2,__Value4,Constant65,List50,List58,Object19,PgSelect21,PgSelect59,Access17,Access18,PgPageInfo39,Access41,First44,PgSelectSingle45,PgCursor46,PgClassExpression47,PgClassExpression48,PgClassExpression49,Last52,PgSelectSingle53,PgCursor54,PgClassExpression55,PgClassExpression56,PgClassExpression57,First60,PgSelectSingle61,PgClassExpression62,Constant42 unary
     end

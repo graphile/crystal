@@ -9,16 +9,16 @@ graph TD
 
 
     %% plan dependencies
-    Object19{{"Object[19∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access17{{"Access[17∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access18{{"Access[18∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object19{{"Object[19∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access17{{"Access[17∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access18{{"Access[18∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access17 & Access18 --> Object19
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access17
     __Value2 --> Access18
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection20{{"Connection[20∈0]<br />ᐸ16ᐳ"}}:::plan
-    PgUnionAll21[["PgUnionAll[21∈1]"]]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection20{{"Connection[20∈0] ➊<br />ᐸ16ᐳ"}}:::plan
+    PgUnionAll21[["PgUnionAll[21∈1] ➊"]]:::plan
     Object19 & Connection20 --> PgUnionAll21
     __Item22[/"__Item[22∈2]<br />ᐸ21ᐳ"\]:::itemplan
     PgUnionAll21 ==> __Item22
@@ -28,11 +28,11 @@ graph TD
     PgUnionAllSingle23 --> Access24
     PgUnionAll50[["PgUnionAll[50∈3]<br />ᐳAwsApplication"]]:::plan
     PgClassExpression43{{"PgClassExpression[43∈3]<br />ᐸ__aws_appl...ons__.”id”ᐳ"}}:::plan
-    Connection49{{"Connection[49∈3]<br />ᐸ45ᐳ<br />ᐳAwsApplication"}}:::plan
+    Connection49{{"Connection[49∈3] ➊<br />ᐸ45ᐳ<br />ᐳAwsApplication"}}:::plan
     Object19 & PgClassExpression43 & PgClassExpression43 & Connection49 --> PgUnionAll50
     PgUnionAll103[["PgUnionAll[103∈3]<br />ᐳGcpApplication"]]:::plan
     PgClassExpression96{{"PgClassExpression[96∈3]<br />ᐸ__gcp_appl...ons__.”id”ᐳ"}}:::plan
-    Connection102{{"Connection[102∈3]<br />ᐸ98ᐳ<br />ᐳGcpApplication"}}:::plan
+    Connection102{{"Connection[102∈3] ➊<br />ᐸ98ᐳ<br />ᐳGcpApplication"}}:::plan
     Object19 & PgClassExpression96 & PgClassExpression96 & Connection102 --> PgUnionAll103
     PgSelect27[["PgSelect[27∈3]<br />ᐸaws_applicationsᐳ<br />ᐳAwsApplication"]]:::plan
     Access26{{"Access[26∈3]<br />ᐸ25.0ᐳ"}}:::plan
@@ -170,6 +170,4 @@ graph TD
     Bucket3 --> Bucket4 & Bucket6
     Bucket4 --> Bucket5
     Bucket6 --> Bucket7
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object19,Access17,Access18,__Value2,__Value4,Connection20,PgUnionAll21,Connection49,Connection102 unary
     end

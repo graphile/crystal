@@ -9,51 +9,51 @@ graph TD
 
 
     %% plan dependencies
-    Object13{{"Object[13∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access11{{"Access[11∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access12{{"Access[12∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant41{{"Constant[41∈0]<br />ᐸ'test'ᐳ"}}:::plan
-    Constant43{{"Constant[43∈0]<br />ᐸ100ᐳ"}}:::plan
-    PgInsertSingle10[["PgInsertSingle[10∈1]<br />ᐸalways_as_identity(t)ᐳ"]]:::sideeffectplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant41{{"Constant[41∈0] ➊<br />ᐸ'test'ᐳ"}}:::plan
+    Constant43{{"Constant[43∈0] ➊<br />ᐸ100ᐳ"}}:::plan
+    PgInsertSingle10[["PgInsertSingle[10∈1] ➊<br />ᐸalways_as_identity(t)ᐳ"]]:::sideeffectplan
     Object13 & Constant41 --> PgInsertSingle10
-    Object14{{"Object[14∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    Object14{{"Object[14∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle10 --> Object14
-    PgClassExpression15{{"PgClassExpression[15∈3]<br />ᐸ__always_a...ity__.”id”ᐳ"}}:::plan
+    PgClassExpression15{{"PgClassExpression[15∈3] ➊<br />ᐸ__always_a...ity__.”id”ᐳ"}}:::plan
     PgInsertSingle10 --> PgClassExpression15
-    PgClassExpression16{{"PgClassExpression[16∈3]<br />ᐸ__always_a...tity__.”t”ᐳ"}}:::plan
+    PgClassExpression16{{"PgClassExpression[16∈3] ➊<br />ᐸ__always_a...tity__.”t”ᐳ"}}:::plan
     PgInsertSingle10 --> PgClassExpression16
-    PgInsertSingle22[["PgInsertSingle[22∈4]<br />ᐸby_default_as_identity(t)ᐳ"]]:::sideeffectplan
-    Object25{{"Object[25∈4]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgInsertSingle22[["PgInsertSingle[22∈4] ➊<br />ᐸby_default_as_identity(t)ᐳ"]]:::sideeffectplan
+    Object25{{"Object[25∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object25 & Constant41 --> PgInsertSingle22
-    Access23{{"Access[23∈4]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access24{{"Access[24∈4]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access23{{"Access[23∈4] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access24{{"Access[24∈4] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access23 & Access24 --> Object25
     __Value2 --> Access23
     __Value2 --> Access24
-    Object26{{"Object[26∈4]<br />ᐸ{result}ᐳ"}}:::plan
+    Object26{{"Object[26∈4] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle22 --> Object26
-    PgClassExpression27{{"PgClassExpression[27∈6]<br />ᐸ__by_defau...ity__.”id”ᐳ"}}:::plan
+    PgClassExpression27{{"PgClassExpression[27∈6] ➊<br />ᐸ__by_defau...ity__.”id”ᐳ"}}:::plan
     PgInsertSingle22 --> PgClassExpression27
-    PgClassExpression28{{"PgClassExpression[28∈6]<br />ᐸ__by_defau...tity__.”t”ᐳ"}}:::plan
+    PgClassExpression28{{"PgClassExpression[28∈6] ➊<br />ᐸ__by_defau...tity__.”t”ᐳ"}}:::plan
     PgInsertSingle22 --> PgClassExpression28
-    PgInsertSingle34[["PgInsertSingle[34∈7]<br />ᐸby_default_as_identity(id,t)ᐳ"]]:::sideeffectplan
-    Object37{{"Object[37∈7]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgInsertSingle34[["PgInsertSingle[34∈7] ➊<br />ᐸby_default_as_identity(id,t)ᐳ"]]:::sideeffectplan
+    Object37{{"Object[37∈7] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object37 & Constant43 & Constant41 --> PgInsertSingle34
-    Access35{{"Access[35∈7]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access36{{"Access[36∈7]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access35{{"Access[35∈7] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access36{{"Access[36∈7] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access35 & Access36 --> Object37
     __Value2 --> Access35
     __Value2 --> Access36
-    Object38{{"Object[38∈7]<br />ᐸ{result}ᐳ"}}:::plan
+    Object38{{"Object[38∈7] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle34 --> Object38
-    PgClassExpression39{{"PgClassExpression[39∈9]<br />ᐸ__by_defau...ity__.”id”ᐳ"}}:::plan
+    PgClassExpression39{{"PgClassExpression[39∈9] ➊<br />ᐸ__by_defau...ity__.”id”ᐳ"}}:::plan
     PgInsertSingle34 --> PgClassExpression39
-    PgClassExpression40{{"PgClassExpression[40∈9]<br />ᐸ__by_defau...tity__.”t”ᐳ"}}:::plan
+    PgClassExpression40{{"PgClassExpression[40∈9] ➊<br />ᐸ__by_defau...tity__.”t”ᐳ"}}:::plan
     PgInsertSingle34 --> PgClassExpression40
 
     %% define steps
@@ -96,6 +96,4 @@ graph TD
     Bucket5 --> Bucket6
     Bucket7 --> Bucket8
     Bucket8 --> Bucket9
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object13,Access11,Access12,__Value2,__Value4,Constant41,Constant43,PgInsertSingle10,Object14,PgClassExpression15,PgClassExpression16,PgInsertSingle22,Object25,Access23,Access24,Object26,PgClassExpression27,PgClassExpression28,PgInsertSingle34,Object37,Access35,Access36,Object38,PgClassExpression39,PgClassExpression40 unary
     end

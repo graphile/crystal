@@ -9,22 +9,22 @@ graph TD
 
 
     %% plan dependencies
-    Object21{{"Object[21∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access19{{"Access[19∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access20{{"Access[20∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object21{{"Object[21∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access19{{"Access[19∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access20{{"Access[20∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access19 & Access20 --> Object21
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access19
     __Value2 --> Access20
-    __Value0["__Value[0∈0]<br />ᐸvariableValuesᐳ"]:::plan
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection22{{"Connection[22∈0]<br />ᐸ18ᐳ"}}:::plan
-    Connection42{{"Connection[42∈0]<br />ᐸ38ᐳ"}}:::plan
-    Connection63{{"Connection[63∈0]<br />ᐸ59ᐳ"}}:::plan
-    PgSelect23[["PgSelect[23∈1]<br />ᐸmy_tableᐳ"]]:::plan
-    __InputDynamicScalar15{{"__InputDynamicScalar[15∈1]"}}:::plan
+    __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection22{{"Connection[22∈0] ➊<br />ᐸ18ᐳ"}}:::plan
+    Connection42{{"Connection[42∈0] ➊<br />ᐸ38ᐳ"}}:::plan
+    Connection63{{"Connection[63∈0] ➊<br />ᐸ59ᐳ"}}:::plan
+    PgSelect23[["PgSelect[23∈1] ➊<br />ᐸmy_tableᐳ"]]:::plan
+    __InputDynamicScalar15{{"__InputDynamicScalar[15∈1] ➊"}}:::plan
     Object21 & __InputDynamicScalar15 & Connection22 --> PgSelect23
-    Access16{{"Access[16∈1]<br />ᐸ0.myValᐳ"}}:::plan
+    Access16{{"Access[16∈1] ➊<br />ᐸ0.myValᐳ"}}:::plan
     Access16 --> __InputDynamicScalar15
     __Value0 --> Access16
     __Item24[/"__Item[24∈2]<br />ᐸ23ᐳ"\]:::itemplan
@@ -35,8 +35,8 @@ graph TD
     PgSelectSingle25 --> PgClassExpression26
     PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan
     PgSelectSingle25 --> PgClassExpression27
-    PgSelect43[["PgSelect[43∈4]<br />ᐸmy_tableᐳ"]]:::plan
-    __InputDynamicScalar37{{"__InputDynamicScalar[37∈4]"}}:::plan
+    PgSelect43[["PgSelect[43∈4] ➊<br />ᐸmy_tableᐳ"]]:::plan
+    __InputDynamicScalar37{{"__InputDynamicScalar[37∈4] ➊"}}:::plan
     Object21 & __InputDynamicScalar37 & Connection42 --> PgSelect43
     __Item44[/"__Item[44∈5]<br />ᐸ43ᐳ"\]:::itemplan
     PgSelect43 ==> __Item44
@@ -46,8 +46,8 @@ graph TD
     PgSelectSingle45 --> PgClassExpression46
     PgClassExpression47{{"PgClassExpression[47∈6]<br />ᐸ__my_table...json_data”ᐳ"}}:::plan
     PgSelectSingle45 --> PgClassExpression47
-    PgSelect64[["PgSelect[64∈7]<br />ᐸmy_tableᐳ"]]:::plan
-    Access57{{"Access[57∈7]<br />ᐸ0.myVal2ᐳ"}}:::plan
+    PgSelect64[["PgSelect[64∈7] ➊<br />ᐸmy_tableᐳ"]]:::plan
+    Access57{{"Access[57∈7] ➊<br />ᐸ0.myVal2ᐳ"}}:::plan
     Object21 & Access57 & Connection63 --> PgSelect64
     __Value0 --> Access57
     __Item65[/"__Item[65∈8]<br />ᐸ64ᐳ"\]:::itemplan
@@ -99,6 +99,4 @@ graph TD
     Bucket5 --> Bucket6
     Bucket7 --> Bucket8
     Bucket8 --> Bucket9
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object21,Access19,Access20,__Value0,__Value2,__Value4,Connection22,Connection42,Connection63,PgSelect23,__InputDynamicScalar15,Access16,PgSelect43,__InputDynamicScalar37,PgSelect64,Access57 unary
     end

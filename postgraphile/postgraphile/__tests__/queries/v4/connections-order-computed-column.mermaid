@@ -9,17 +9,17 @@ graph TD
 
 
     %% plan dependencies
-    Object17{{"Object[17∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access15{{"Access[15∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access16{{"Access[16∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access15 & Access16 --> Object17
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access15
     __Value2 --> Access16
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection18{{"Connection[18∈0]<br />ᐸ14ᐳ"}}:::plan
-    Connection36{{"Connection[36∈0]<br />ᐸ32ᐳ"}}:::plan
-    PgSelect19[["PgSelect[19∈1]<br />ᐸpersonᐳ"]]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
+    Connection36{{"Connection[36∈0] ➊<br />ᐸ32ᐳ"}}:::plan
+    PgSelect19[["PgSelect[19∈1] ➊<br />ᐸpersonᐳ"]]:::plan
     Object17 & Connection18 --> PgSelect19
     __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
     PgSelect19 ==> __Item20
@@ -29,7 +29,7 @@ graph TD
     PgSelectSingle21 --> PgClassExpression22
     PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression23
-    PgSelect37[["PgSelect[37∈4]<br />ᐸpersonᐳ"]]:::plan
+    PgSelect37[["PgSelect[37∈4] ➊<br />ᐸpersonᐳ"]]:::plan
     Object17 & Connection36 --> PgSelect37
     __Item38[/"__Item[38∈5]<br />ᐸ37ᐳ"\]:::itemplan
     PgSelect37 ==> __Item38
@@ -69,6 +69,4 @@ graph TD
     Bucket2 --> Bucket3
     Bucket4 --> Bucket5
     Bucket5 --> Bucket6
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object17,Access15,Access16,__Value2,__Value4,Connection18,Connection36,PgSelect19,PgSelect37 unary
     end

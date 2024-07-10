@@ -9,28 +9,28 @@ graph TD
 
 
     %% plan dependencies
-    Object17{{"Object[17∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access15{{"Access[15∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access16{{"Access[16∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access15 & Access16 --> Object17
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access15
     __Value2 --> Access16
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection18{{"Connection[18∈0]<br />ᐸ14ᐳ"}}:::plan
-    Connection35{{"Connection[35∈0]<br />ᐸ31ᐳ"}}:::plan
-    Connection66{{"Connection[66∈0]<br />ᐸ62ᐳ"}}:::plan
-    PgSelect19[["PgSelect[19∈1]<br />ᐸperson(aggregate)ᐳ"]]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
+    Connection35{{"Connection[35∈0] ➊<br />ᐸ31ᐳ"}}:::plan
+    Connection66{{"Connection[66∈0] ➊<br />ᐸ62ᐳ"}}:::plan
+    PgSelect19[["PgSelect[19∈1] ➊<br />ᐸperson(aggregate)ᐳ"]]:::plan
     Object17 & Connection18 --> PgSelect19
-    First20{{"First[20∈1]"}}:::plan
+    First20{{"First[20∈1] ➊"}}:::plan
     PgSelect19 --> First20
-    PgSelectSingle21{{"PgSelectSingle[21∈1]<br />ᐸpersonᐳ"}}:::plan
+    PgSelectSingle21{{"PgSelectSingle[21∈1] ➊<br />ᐸpersonᐳ"}}:::plan
     First20 --> PgSelectSingle21
-    PgClassExpression22{{"PgClassExpression[22∈1]<br />ᐸcount(*)ᐳ"}}:::plan
+    PgClassExpression22{{"PgClassExpression[22∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression22
-    PgSelect36[["PgSelect[36∈2]<br />ᐸpersonᐳ"]]:::plan
+    PgSelect36[["PgSelect[36∈2] ➊<br />ᐸpersonᐳ"]]:::plan
     Object17 & Connection35 --> PgSelect36
-    Connection50{{"Connection[50∈2]<br />ᐸ46ᐳ"}}:::plan
+    Connection50{{"Connection[50∈2] ➊<br />ᐸ46ᐳ"}}:::plan
     __Item37[/"__Item[37∈3]<br />ᐸ36ᐳ"\]:::itemplan
     PgSelect36 ==> __Item37
     PgSelectSingle38{{"PgSelectSingle[38∈3]<br />ᐸpersonᐳ"}}:::plan
@@ -43,13 +43,13 @@ graph TD
     PgClassExpression54{{"PgClassExpression[54∈4]<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle53 --> PgClassExpression54
     __Item37 --> Access71
-    PgSelect67[["PgSelect[67∈5]<br />ᐸtable_set_query(aggregate)ᐳ"]]:::plan
+    PgSelect67[["PgSelect[67∈5] ➊<br />ᐸtable_set_query(aggregate)ᐳ"]]:::plan
     Object17 & Connection66 --> PgSelect67
-    First68{{"First[68∈5]"}}:::plan
+    First68{{"First[68∈5] ➊"}}:::plan
     PgSelect67 --> First68
-    PgSelectSingle69{{"PgSelectSingle[69∈5]<br />ᐸtable_set_queryᐳ"}}:::plan
+    PgSelectSingle69{{"PgSelectSingle[69∈5] ➊<br />ᐸtable_set_queryᐳ"}}:::plan
     First68 --> PgSelectSingle69
-    PgClassExpression70{{"PgClassExpression[70∈5]<br />ᐸcount(*)ᐳ"}}:::plan
+    PgClassExpression70{{"PgClassExpression[70∈5] ➊<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle69 --> PgClassExpression70
 
     %% define steps
@@ -76,6 +76,4 @@ graph TD
     Bucket0 --> Bucket1 & Bucket2 & Bucket5
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object17,Access15,Access16,__Value2,__Value4,Connection18,Connection35,Connection66,PgSelect19,First20,PgSelectSingle21,PgClassExpression22,PgSelect36,Connection50,PgSelect67,First68,PgSelectSingle69,PgClassExpression70 unary
     end

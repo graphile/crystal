@@ -9,17 +9,17 @@ graph TD
 
 
     %% plan dependencies
-    PgSelect15[["PgSelect[15∈0]<br />ᐸforumsᐳ"]]:::plan
-    Object18{{"Object[18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant40{{"Constant[40∈0]<br />ᐸtrueᐳ"}}:::plan
+    PgSelect15[["PgSelect[15∈0] ➊<br />ᐸforumsᐳ"]]:::plan
+    Object18{{"Object[18∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant40{{"Constant[40∈0] ➊<br />ᐸtrueᐳ"}}:::plan
     Object18 & Constant40 & Constant40 --> PgSelect15
-    Access16{{"Access[16∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access17{{"Access[17∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access16{{"Access[16∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access17{{"Access[17∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access16 & Access17 --> Object18
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access16
     __Value2 --> Access17
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item19[/"__Item[19∈1]<br />ᐸ15ᐳ"\]:::itemplan
     PgSelect15 ==> __Item19
     PgSelectSingle20{{"PgSelectSingle[20∈1]<br />ᐸforumsᐳ"}}:::plan
@@ -59,6 +59,4 @@ graph TD
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4
-    classDef unary fill:#fafffa,borderWidth:8px
-    class PgSelect15,Object18,Access16,Access17,__Value2,__Value4,Constant40 unary
     end

@@ -9,31 +9,31 @@ graph TD
 
 
     %% plan dependencies
-    Object13{{"Object[13∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access11{{"Access[11∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access12{{"Access[12∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object13{{"Object[13∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access11{{"Access[11∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access12{{"Access[12∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access11 & Access12 --> Object13
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access11
     __Value2 --> Access12
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant23{{"Constant[23∈0]<br />ᐸ0.66ᐳ"}}:::plan
-    PgInsertSingle10[["PgInsertSingle[10∈1]<br />ᐸleft_arm(length_in_metres)ᐳ"]]:::sideeffectplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant23{{"Constant[23∈0] ➊<br />ᐸ0.66ᐳ"}}:::plan
+    PgInsertSingle10[["PgInsertSingle[10∈1] ➊<br />ᐸleft_arm(length_in_metres)ᐳ"]]:::sideeffectplan
     Object13 & Constant23 --> PgInsertSingle10
-    Object14{{"Object[14∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    Object14{{"Object[14∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle10 --> Object14
-    List17{{"List[17∈3]<br />ᐸ15,16ᐳ"}}:::plan
-    Constant15{{"Constant[15∈3]<br />ᐸ'left_arms'ᐳ"}}:::plan
-    PgClassExpression16{{"PgClassExpression[16∈3]<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
+    List17{{"List[17∈3] ➊<br />ᐸ15,16ᐳ"}}:::plan
+    Constant15{{"Constant[15∈3] ➊<br />ᐸ'left_arms'ᐳ"}}:::plan
+    PgClassExpression16{{"PgClassExpression[16∈3] ➊<br />ᐸ__left_arm__.”id”ᐳ"}}:::plan
     Constant15 & PgClassExpression16 --> List17
     PgInsertSingle10 --> PgClassExpression16
-    Lambda18{{"Lambda[18∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    Lambda18{{"Lambda[18∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List17 --> Lambda18
-    PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
+    PgClassExpression20{{"PgClassExpression[20∈3] ➊<br />ᐸ__left_arm...person_id”ᐳ"}}:::plan
     PgInsertSingle10 --> PgClassExpression20
-    PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
+    PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__left_arm...in_metres”ᐳ"}}:::plan
     PgInsertSingle10 --> PgClassExpression21
-    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__left_arm__.”mood”ᐳ"}}:::plan
+    PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__left_arm__.”mood”ᐳ"}}:::plan
     PgInsertSingle10 --> PgClassExpression22
 
     %% define steps
@@ -54,6 +54,4 @@ graph TD
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object13,Access11,Access12,__Value2,__Value4,Constant23,PgInsertSingle10,Object14,List17,PgClassExpression16,Lambda18,PgClassExpression20,PgClassExpression21,PgClassExpression22,Constant15 unary
     end

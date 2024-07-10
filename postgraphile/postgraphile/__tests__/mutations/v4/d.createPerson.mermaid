@@ -9,39 +9,39 @@ graph TD
 
 
     %% plan dependencies
-    Object18{{"Object[18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access16{{"Access[16∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access17{{"Access[17∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object18{{"Object[18∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access16{{"Access[16∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access17{{"Access[17∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access16 & Access17 --> Object18
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access16
     __Value2 --> Access17
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant29{{"Constant[29∈0]<br />ᐸ'Doe'ᐳ"}}:::plan
-    Constant30{{"Constant[30∈0]<br />ᐸ'create2'ᐳ"}}:::plan
-    Constant31{{"Constant[31∈0]<br />ᐸ'create1'ᐳ"}}:::plan
-    Constant32{{"Constant[32∈0]<br />ᐸ'create3'ᐳ"}}:::plan
-    PgInsertSingle15[["PgInsertSingle[15∈1]<br />ᐸperson(last_name,col_no_update,col_no_order,col_no_filter)ᐳ"]]:::sideeffectplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant29{{"Constant[29∈0] ➊<br />ᐸ'Doe'ᐳ"}}:::plan
+    Constant30{{"Constant[30∈0] ➊<br />ᐸ'create2'ᐳ"}}:::plan
+    Constant31{{"Constant[31∈0] ➊<br />ᐸ'create1'ᐳ"}}:::plan
+    Constant32{{"Constant[32∈0] ➊<br />ᐸ'create3'ᐳ"}}:::plan
+    PgInsertSingle15[["PgInsertSingle[15∈1] ➊<br />ᐸperson(last_name,col_no_update,col_no_order,col_no_filter)ᐳ"]]:::sideeffectplan
     Object18 & Constant29 & Constant30 & Constant31 & Constant32 --> PgInsertSingle15
-    Object19{{"Object[19∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    Object19{{"Object[19∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle15 --> Object19
-    PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgClassExpression20{{"PgClassExpression[20∈3] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     PgInsertSingle15 --> PgClassExpression20
-    PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
+    PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__person__.”first_name”ᐳ"}}:::plan
     PgInsertSingle15 --> PgClassExpression21
-    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
+    PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__person__.”last_name”ᐳ"}}:::plan
     PgInsertSingle15 --> PgClassExpression22
-    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__person__...no_create”ᐳ"}}:::plan
+    PgClassExpression23{{"PgClassExpression[23∈3] ➊<br />ᐸ__person__...no_create”ᐳ"}}:::plan
     PgInsertSingle15 --> PgClassExpression23
-    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__person__...no_update”ᐳ"}}:::plan
+    PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__person__...no_update”ᐳ"}}:::plan
     PgInsertSingle15 --> PgClassExpression24
-    PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
+    PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__person__..._no_order”ᐳ"}}:::plan
     PgInsertSingle15 --> PgClassExpression25
-    PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
+    PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__person__...no_filter”ᐳ"}}:::plan
     PgInsertSingle15 --> PgClassExpression26
-    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__person__...te_update”ᐳ"}}:::plan
+    PgClassExpression27{{"PgClassExpression[27∈3] ➊<br />ᐸ__person__...te_update”ᐳ"}}:::plan
     PgInsertSingle15 --> PgClassExpression27
-    PgClassExpression28{{"PgClassExpression[28∈3]<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
+    PgClassExpression28{{"PgClassExpression[28∈3] ➊<br />ᐸ__person__...er_filter”ᐳ"}}:::plan
     PgInsertSingle15 --> PgClassExpression28
 
     %% define steps
@@ -62,6 +62,4 @@ graph TD
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object18,Access16,Access17,__Value2,__Value4,Constant29,Constant30,Constant31,Constant32,PgInsertSingle15,Object19,PgClassExpression20,PgClassExpression21,PgClassExpression22,PgClassExpression23,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgClassExpression28 unary
     end

@@ -9,38 +9,38 @@ graph TD
 
 
     %% plan dependencies
-    List228{{"List[228∈0]<br />ᐸ80,185,244,244,244,244,244,244ᐳ"}}:::plan
-    List80{{"List[80∈0]<br />ᐸ39ᐳ"}}:::plan
-    List185{{"List[185∈0]<br />ᐸ95,144ᐳ"}}:::plan
-    Constant244{{"Constant[244∈0]<br />ᐸ[]ᐳ"}}:::plan
+    List228{{"List[228∈0] ➊<br />ᐸ80,185,244,244,244,244,244,244ᐳ"}}:::plan
+    List80{{"List[80∈0] ➊<br />ᐸ39ᐳ"}}:::plan
+    List185{{"List[185∈0] ➊<br />ᐸ95,144ᐳ"}}:::plan
+    Constant244{{"Constant[244∈0] ➊<br />ᐸ[]ᐳ"}}:::plan
     List80 & List185 & Constant244 & Constant244 & Constant244 & Constant244 & Constant244 & Constant244 --> List228
-    Object39{{"Object[39∈0]<br />ᐸ{from_hours,from_minutes,to_hours,to_minutes}ᐳ"}}:::plan
-    Access48{{"Access[48∈0]<br />ᐸ0.input.t.v.0.0.fromHoursᐳ"}}:::plan
-    Access58{{"Access[58∈0]<br />ᐸ0.input.t.v.0.0.fromMinutesᐳ"}}:::plan
-    Access68{{"Access[68∈0]<br />ᐸ0.input.t.v.0.0.toHoursᐳ"}}:::plan
-    Access78{{"Access[78∈0]<br />ᐸ0.input.t.v.0.0.toMinutesᐳ"}}:::plan
+    Object39{{"Object[39∈0] ➊<br />ᐸ{from_hours,from_minutes,to_hours,to_minutes}ᐳ"}}:::plan
+    Access48{{"Access[48∈0] ➊<br />ᐸ0.input.t.v.0.0.fromHoursᐳ"}}:::plan
+    Access58{{"Access[58∈0] ➊<br />ᐸ0.input.t.v.0.0.fromMinutesᐳ"}}:::plan
+    Access68{{"Access[68∈0] ➊<br />ᐸ0.input.t.v.0.0.toHoursᐳ"}}:::plan
+    Access78{{"Access[78∈0] ➊<br />ᐸ0.input.t.v.0.0.toMinutesᐳ"}}:::plan
     Access48 & Access58 & Access68 & Access78 --> Object39
-    Object95{{"Object[95∈0]<br />ᐸ{from_hours,from_minutes,to_hours,to_minutes}ᐳ"}}:::plan
-    Access104{{"Access[104∈0]<br />ᐸ0.input.t.v.1.0.fromHoursᐳ"}}:::plan
-    Access114{{"Access[114∈0]<br />ᐸ0.input.t.v.1.0.fromMinutesᐳ"}}:::plan
-    Access124{{"Access[124∈0]<br />ᐸ0.input.t.v.1.0.toHoursᐳ"}}:::plan
-    Access134{{"Access[134∈0]<br />ᐸ0.input.t.v.1.0.toMinutesᐳ"}}:::plan
+    Object95{{"Object[95∈0] ➊<br />ᐸ{from_hours,from_minutes,to_hours,to_minutes}ᐳ"}}:::plan
+    Access104{{"Access[104∈0] ➊<br />ᐸ0.input.t.v.1.0.fromHoursᐳ"}}:::plan
+    Access114{{"Access[114∈0] ➊<br />ᐸ0.input.t.v.1.0.fromMinutesᐳ"}}:::plan
+    Access124{{"Access[124∈0] ➊<br />ᐸ0.input.t.v.1.0.toHoursᐳ"}}:::plan
+    Access134{{"Access[134∈0] ➊<br />ᐸ0.input.t.v.1.0.toMinutesᐳ"}}:::plan
     Access104 & Access114 & Access124 & Access134 --> Object95
-    Object144{{"Object[144∈0]<br />ᐸ{from_hours,from_minutes,to_hours,to_minutes}ᐳ"}}:::plan
-    Access153{{"Access[153∈0]<br />ᐸ0.input.t.v.1.1.fromHoursᐳ"}}:::plan
-    Access163{{"Access[163∈0]<br />ᐸ0.input.t.v.1.1.fromMinutesᐳ"}}:::plan
-    Access173{{"Access[173∈0]<br />ᐸ0.input.t.v.1.1.toHoursᐳ"}}:::plan
-    Access183{{"Access[183∈0]<br />ᐸ0.input.t.v.1.1.toMinutesᐳ"}}:::plan
+    Object144{{"Object[144∈0] ➊<br />ᐸ{from_hours,from_minutes,to_hours,to_minutes}ᐳ"}}:::plan
+    Access153{{"Access[153∈0] ➊<br />ᐸ0.input.t.v.1.1.fromHoursᐳ"}}:::plan
+    Access163{{"Access[163∈0] ➊<br />ᐸ0.input.t.v.1.1.fromMinutesᐳ"}}:::plan
+    Access173{{"Access[173∈0] ➊<br />ᐸ0.input.t.v.1.1.toHoursᐳ"}}:::plan
+    Access183{{"Access[183∈0] ➊<br />ᐸ0.input.t.v.1.1.toMinutesᐳ"}}:::plan
     Access153 & Access163 & Access173 & Access183 --> Object144
-    Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access9{{"Access[9∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access10{{"Access[10∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
     Object95 & Object144 --> List185
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    __Value0["__Value[0∈0]<br />ᐸvariableValuesᐳ"]:::plan
+    __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
     __Value0 --> Access48
     __Value0 --> Access58
     __Value0 --> Access68
@@ -54,14 +54,14 @@ graph TD
     __Value0 --> Access163
     __Value0 --> Access173
     __Value0 --> Access183
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    PgInsertSingle8[["PgInsertSingle[8∈1]<br />ᐸt(v)ᐳ"]]:::sideeffectplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    PgInsertSingle8[["PgInsertSingle[8∈1] ➊<br />ᐸt(v)ᐳ"]]:::sideeffectplan
     Object11 & List228 --> PgInsertSingle8
-    Object12{{"Object[12∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    Object12{{"Object[12∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle8 --> Object12
-    PgClassExpression229{{"PgClassExpression[229∈3]<br />ᐸ__t__.”k”ᐳ"}}:::plan
+    PgClassExpression229{{"PgClassExpression[229∈3] ➊<br />ᐸ__t__.”k”ᐳ"}}:::plan
     PgInsertSingle8 --> PgClassExpression229
-    PgClassExpression230{{"PgClassExpression[230∈3]<br />ᐸ__t__.”v”ᐳ"}}:::plan
+    PgClassExpression230{{"PgClassExpression[230∈3] ➊<br />ᐸ__t__.”v”ᐳ"}}:::plan
     PgInsertSingle8 --> PgClassExpression230
     PgSelect234[["PgSelect[234∈5]<br />ᐸfrmcdc_workHourᐳ"]]:::plan
     __Item233[/"__Item[233∈5]<br />ᐸ230ᐳ"\]:::itemplan
@@ -106,6 +106,4 @@ graph TD
     Bucket2 --> Bucket3
     Bucket3 --> Bucket5
     Bucket5 --> Bucket6
-    classDef unary fill:#fafffa,borderWidth:8px
-    class List228,Object39,Object95,Object144,Object11,List185,Access9,Access10,Access48,Access58,Access68,Access78,List80,Access104,Access114,Access124,Access134,Access153,Access163,Access173,Access183,__Value0,__Value2,__Value4,Constant244,PgInsertSingle8,Object12,PgClassExpression229,PgClassExpression230 unary
     end

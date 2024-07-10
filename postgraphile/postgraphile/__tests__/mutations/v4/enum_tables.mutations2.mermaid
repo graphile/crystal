@@ -9,27 +9,27 @@ graph TD
 
 
     %% plan dependencies
-    Object17{{"Object[17∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access15{{"Access[15∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access16{{"Access[16∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access15 & Access16 --> Object17
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access15
     __Value2 --> Access16
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant23{{"Constant[23∈0]<br />ᐸ'a3'ᐳ"}}:::plan
-    Constant24{{"Constant[24∈0]<br />ᐸ'b4'ᐳ"}}:::plan
-    PgInsertSingle14[["PgInsertSingle[14∈1]<br />ᐸreferencing_table(enum_1,enum_2)ᐳ"]]:::sideeffectplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant23{{"Constant[23∈0] ➊<br />ᐸ'a3'ᐳ"}}:::plan
+    Constant24{{"Constant[24∈0] ➊<br />ᐸ'b4'ᐳ"}}:::plan
+    PgInsertSingle14[["PgInsertSingle[14∈1] ➊<br />ᐸreferencing_table(enum_1,enum_2)ᐳ"]]:::sideeffectplan
     Object17 & Constant23 & Constant24 --> PgInsertSingle14
-    Object18{{"Object[18∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    Object18{{"Object[18∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle14 --> Object18
-    PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__referenc...ble__.”id”ᐳ"}}:::plan
+    PgClassExpression19{{"PgClassExpression[19∈3] ➊<br />ᐸ__referenc...ble__.”id”ᐳ"}}:::plan
     PgInsertSingle14 --> PgClassExpression19
-    PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__referenc..._.”enum_1”ᐳ"}}:::plan
+    PgClassExpression20{{"PgClassExpression[20∈3] ➊<br />ᐸ__referenc..._.”enum_1”ᐳ"}}:::plan
     PgInsertSingle14 --> PgClassExpression20
-    PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__referenc..._.”enum_2”ᐳ"}}:::plan
+    PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__referenc..._.”enum_2”ᐳ"}}:::plan
     PgInsertSingle14 --> PgClassExpression21
-    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__referenc..._.”enum_3”ᐳ"}}:::plan
+    PgClassExpression22{{"PgClassExpression[22∈3] ➊<br />ᐸ__referenc..._.”enum_3”ᐳ"}}:::plan
     PgInsertSingle14 --> PgClassExpression22
 
     %% define steps
@@ -50,6 +50,4 @@ graph TD
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object17,Access15,Access16,__Value2,__Value4,Constant23,Constant24,PgInsertSingle14,Object18,PgClassExpression19,PgClassExpression20,PgClassExpression21,PgClassExpression22 unary
     end

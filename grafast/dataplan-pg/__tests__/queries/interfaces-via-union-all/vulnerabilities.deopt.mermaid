@@ -9,17 +9,17 @@ graph TD
 
 
     %% plan dependencies
-    PgUnionAll8[["PgUnionAll[8∈0]"]]:::plan
-    Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant12{{"Constant[12∈0]<br />ᐸ6ᐳ"}}:::plan
+    PgUnionAll8[["PgUnionAll[8∈0] ➊"]]:::plan
+    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant12{{"Constant[12∈0] ➊<br />ᐸ6ᐳ"}}:::plan
     Object11 & Constant12 & Constant12 --> PgUnionAll8
-    Access9{{"Access[9∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access10{{"Access[10∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item14[/"__Item[14∈1]<br />ᐸ8ᐳ"\]:::itemplan
     PgUnionAll8 ==> __Item14
     PgUnionAllSingle15["PgUnionAllSingle[15∈1]"]:::plan
@@ -77,6 +77,4 @@ graph TD
     class Bucket2,JSONParse17,Access18,PgSelect19,First23,PgSelectSingle24,PgClassExpression25,PgClassExpression26,PgClassExpression27,PgClassExpression28,JSONParse30,Access31,PgSelect32,First36,PgSelectSingle37,PgClassExpression38,PgClassExpression39,PgClassExpression40,PgClassExpression41 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
-    classDef unary fill:#fafffa,borderWidth:8px
-    class PgUnionAll8,Object11,Access9,Access10,__Value2,__Value4,Constant12 unary
     end

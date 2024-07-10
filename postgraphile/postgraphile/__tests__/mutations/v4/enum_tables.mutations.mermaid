@@ -9,60 +9,60 @@ graph TD
 
 
     %% plan dependencies
-    Object12{{"Object[12∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access10{{"Access[10∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access11{{"Access[11∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object12{{"Object[12∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access10{{"Access[10∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access11{{"Access[11∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access10 & Access11 --> Object12
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access10
     __Value2 --> Access11
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant50{{"Constant[50∈0]<br />ᐸ'C'ᐳ"}}:::plan
-    Constant53{{"Constant[53∈0]<br />ᐸ'One does like to see the letter C'ᐳ"}}:::plan
-    PgDeleteSingle9[["PgDeleteSingle[9∈1]<br />ᐸletter_descriptions(letter)ᐳ"]]:::sideeffectplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant50{{"Constant[50∈0] ➊<br />ᐸ'C'ᐳ"}}:::plan
+    Constant53{{"Constant[53∈0] ➊<br />ᐸ'One does like to see the letter C'ᐳ"}}:::plan
+    PgDeleteSingle9[["PgDeleteSingle[9∈1] ➊<br />ᐸletter_descriptions(letter)ᐳ"]]:::sideeffectplan
     Object12 & Constant50 --> PgDeleteSingle9
-    Object13{{"Object[13∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    Object13{{"Object[13∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgDeleteSingle9 --> Object13
-    PgClassExpression14{{"PgClassExpression[14∈3]<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
+    PgClassExpression14{{"PgClassExpression[14∈3] ➊<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
     PgDeleteSingle9 --> PgClassExpression14
-    PgClassExpression15{{"PgClassExpression[15∈3]<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
+    PgClassExpression15{{"PgClassExpression[15∈3] ➊<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
     PgDeleteSingle9 --> PgClassExpression15
-    PgClassExpression16{{"PgClassExpression[16∈3]<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
+    PgClassExpression16{{"PgClassExpression[16∈3] ➊<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
     PgDeleteSingle9 --> PgClassExpression16
-    PgInsertSingle24[["PgInsertSingle[24∈4]<br />ᐸletter_descriptions(letter,letter_via_view,description)ᐳ"]]:::sideeffectplan
-    Object27{{"Object[27∈4]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgInsertSingle24[["PgInsertSingle[24∈4] ➊<br />ᐸletter_descriptions(letter,letter_via_view,description)ᐳ"]]:::sideeffectplan
+    Object27{{"Object[27∈4] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object27 & Constant50 & Constant50 & Constant53 --> PgInsertSingle24
-    Access25{{"Access[25∈4]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access26{{"Access[26∈4]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access25{{"Access[25∈4] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access26{{"Access[26∈4] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access25 & Access26 --> Object27
     __Value2 --> Access25
     __Value2 --> Access26
-    Object28{{"Object[28∈4]<br />ᐸ{result}ᐳ"}}:::plan
+    Object28{{"Object[28∈4] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle24 --> Object28
-    PgClassExpression29{{"PgClassExpression[29∈6]<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
+    PgClassExpression29{{"PgClassExpression[29∈6] ➊<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
     PgInsertSingle24 --> PgClassExpression29
-    PgClassExpression30{{"PgClassExpression[30∈6]<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
+    PgClassExpression30{{"PgClassExpression[30∈6] ➊<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
     PgInsertSingle24 --> PgClassExpression30
-    PgClassExpression31{{"PgClassExpression[31∈6]<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
+    PgClassExpression31{{"PgClassExpression[31∈6] ➊<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
     PgInsertSingle24 --> PgClassExpression31
-    PgClassExpression32{{"PgClassExpression[32∈6]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
+    PgClassExpression32{{"PgClassExpression[32∈6] ➊<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
     PgInsertSingle24 --> PgClassExpression32
-    PgSelect42[["PgSelect[42∈7]<br />ᐸreferencing_table_mutation(mutation)ᐳ"]]:::sideeffectplan
-    Object45{{"Object[45∈7]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant58{{"Constant[58∈7]<br />ᐸ[Object: null prototype] {   enum_1: 'a1',   enum_2: 'b2',  ᐳ"}}:::plan
+    PgSelect42[["PgSelect[42∈7] ➊<br />ᐸreferencing_table_mutation(mutation)ᐳ"]]:::sideeffectplan
+    Object45{{"Object[45∈7] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant58{{"Constant[58∈7] ➊<br />ᐸ[Object: null prototype] {   enum_1: 'a1',   enum_2: 'b2',  ᐳ"}}:::plan
     Object45 & Constant58 --> PgSelect42
-    Access43{{"Access[43∈7]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access44{{"Access[44∈7]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access43{{"Access[43∈7] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access44{{"Access[44∈7] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access43 & Access44 --> Object45
     __Value2 --> Access43
     __Value2 --> Access44
-    First46{{"First[46∈7]"}}:::plan
+    First46{{"First[46∈7] ➊"}}:::plan
     PgSelect42 --> First46
-    PgSelectSingle47{{"PgSelectSingle[47∈7]<br />ᐸreferencing_table_mutationᐳ"}}:::plan
+    PgSelectSingle47{{"PgSelectSingle[47∈7] ➊<br />ᐸreferencing_table_mutationᐳ"}}:::plan
     First46 --> PgSelectSingle47
-    PgClassExpression48{{"PgClassExpression[48∈7]<br />ᐸ__referenc...tation__.vᐳ"}}:::plan
+    PgClassExpression48{{"PgClassExpression[48∈7] ➊<br />ᐸ__referenc...tation__.vᐳ"}}:::plan
     PgSelectSingle47 --> PgClassExpression48
-    Object49{{"Object[49∈7]<br />ᐸ{result}ᐳ"}}:::plan
+    Object49{{"Object[49∈7] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression48 --> Object49
 
     %% define steps
@@ -101,6 +101,4 @@ graph TD
     Bucket4 --> Bucket5
     Bucket5 --> Bucket6
     Bucket7 --> Bucket8
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object12,Access10,Access11,__Value2,__Value4,Constant50,Constant53,PgDeleteSingle9,Object13,PgClassExpression14,PgClassExpression15,PgClassExpression16,PgInsertSingle24,Object27,Access25,Access26,Object28,PgClassExpression29,PgClassExpression30,PgClassExpression31,PgClassExpression32,PgSelect42,Object45,Access43,Access44,First46,PgSelectSingle47,PgClassExpression48,Object49,Constant58 unary
     end

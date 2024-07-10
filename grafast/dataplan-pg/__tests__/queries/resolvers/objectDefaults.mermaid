@@ -9,15 +9,15 @@ graph TD
 
 
     %% plan dependencies
-    GraphQLResolver7[["GraphQLResolver[7∈0]<br />ᐸresolveᐳ"]]:::unbatchedplan
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant15{{"Constant[15∈0]<br />ᐸ[Object: null prototype] {}ᐳ"}}:::plan
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value0["__Value[0∈0]<br />ᐸvariableValuesᐳ"]:::plan
+    GraphQLResolver7[["GraphQLResolver[7∈0] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant15{{"Constant[15∈0] ➊<br />ᐸ[Object: null prototype] {}ᐳ"}}:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
     __Value4 & Constant15 & __Value2 & __Value0 & __Value4 --> GraphQLResolver7
-    Access9{{"Access[9∈1]<br />ᐸ7.numbersᐳ"}}:::plan
+    Access9{{"Access[9∈1] ➊<br />ᐸ7.numbersᐳ"}}:::plan
     GraphQLResolver7 --> Access9
-    Access11{{"Access[11∈1]<br />ᐸ7.friendᐳ"}}:::plan
+    Access11{{"Access[11∈1] ➊<br />ᐸ7.friendᐳ"}}:::plan
     GraphQLResolver7 --> Access11
     __Item10[/"__Item[10∈2]<br />ᐸ9ᐳ"\]:::itemplan
     Access9 ==> __Item10
@@ -39,6 +39,4 @@ graph TD
     class Bucket3 bucket3
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2 & Bucket3
-    classDef unary fill:#fafffa,borderWidth:8px
-    class GraphQLResolver7,__Value0,__Value2,__Value4,Constant15,Access9,Access11 unary
     end

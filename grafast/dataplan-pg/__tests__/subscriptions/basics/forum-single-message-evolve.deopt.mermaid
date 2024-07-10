@@ -9,21 +9,21 @@ graph TD
 
 
     %% plan dependencies
-    Listen9["Listen[9∈0]"]:::plan
-    Access8{{"Access[8∈0]<br />ᐸ2.pgSubscriberᐳ"}}:::plan
-    Lambda7{{"Lambda[7∈0]"}}:::plan
+    Listen9["Listen[9∈0] ➊"]:::plan
+    Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSubscriberᐳ"}}:::plan
+    Lambda7{{"Lambda[7∈0] ➊"}}:::plan
     Access8 & Lambda7 --> Listen9
-    Object19{{"Object[19∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access17{{"Access[17∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access18{{"Access[18∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object19{{"Object[19∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access17{{"Access[17∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access18{{"Access[18∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access17 & Access18 --> Object19
-    Constant46{{"Constant[46∈0]<br />ᐸ'ca700000-0000-0000-0000-000000000ca7'ᐳ"}}:::plan
+    Constant46{{"Constant[46∈0] ➊<br />ᐸ'ca700000-0000-0000-0000-000000000ca7'ᐳ"}}:::plan
     Constant46 --> Lambda7
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access17
     __Value2 --> Access18
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item10[/"__Item[10∈1]<br />ᐸ9ᐳ"\]:::itemplan
     Listen9 ==> __Item10
     JSONParse11[["JSONParse[11∈1]<br />ᐸ10ᐳ"]]:::plan
@@ -98,6 +98,4 @@ graph TD
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4 & Bucket5
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Listen9,Object19,Lambda7,Access8,Access17,Access18,__Value2,__Value4,Constant46 unary
     end
