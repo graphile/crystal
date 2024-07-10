@@ -357,14 +357,20 @@ export function planToMermaid(
       graph.push(
         `    Bucket${layerPlan.id}(${mermaidEscape(
           `Bucket ${layerPlan.id}${raisonDEtre}${
+            layerPlan.parentSideEffectStepId != null
+              ? `\nParent side effect step: ${
+                  stepById[layerPlan.parentSideEffectStepId].id
+                }`
+              : ""
+          }${
             layerPlan.copyStepIds.length > 0
               ? `\nDeps: ${layerPlan.copyStepIds
                   .map((pId) => stepById[pId]!.id)
-                  .join(", ")}\n`
+                  .join(", ")}`
               : ""
           }${
             layerPlan.reason.type === "polymorphic"
-              ? pp(layerPlan.reason.polymorphicPaths)
+              ? "\n" + pp(layerPlan.reason.polymorphicPaths)
               : ""
           }${
             layerPlan.rootStepId != null && layerPlan.reason.type !== "root"

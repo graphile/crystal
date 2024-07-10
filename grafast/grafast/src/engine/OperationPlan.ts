@@ -3611,6 +3611,7 @@ export class OperationPlan {
       return {
         id: lp.id,
         reason: printBucketReason(lp.reason),
+        parentSideEffectStepId: lp.parentSideEffectStep?.id ?? null,
         copyStepIds: lp.copyStepIds,
         phases: lp.phases.map(printPhase),
         steps: lp.steps.map(printStep),
