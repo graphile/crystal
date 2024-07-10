@@ -526,7 +526,7 @@ export function executeBucket(
               $sideEffect.polymorphicPaths.has(currentPolymorphicPath)
             ) {
               const depExecutionValue = bucket.store.get($sideEffect.id);
-              if (!depExecutionValue) {
+              if (depExecutionValue === undefined) {
                 throw new Error(
                   `GrafastInternalError<fcc8d302-ac66-40e8-aaea-ee2c7e2b30b2>: failed to get result for side effect ${$sideEffect} which impacts ${step}`,
                 );
