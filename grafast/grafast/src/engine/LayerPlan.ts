@@ -19,7 +19,6 @@ import type {
   ModifierStep,
   UnbatchedExecutableStep,
 } from "../step";
-import { stepADependsOnStepB } from "../utils.js";
 import { batchExecutionValue, newBucket } from "./executeBucket.js";
 import type { OperationPlan } from "./OperationPlan";
 
