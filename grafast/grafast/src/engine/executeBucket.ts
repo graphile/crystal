@@ -518,11 +518,11 @@ export function executeBucket(
           // Check if the side effect errored
           const $sideEffect = step.implicitSideEffectStep;
           if ($sideEffect) {
-            const currentPolymorphicPath =
-              bucket.polymorphicPathList[dataIndex];
+            let currentPolymorphicPath: string | null;
             if (
-              currentPolymorphicPath === null ||
-              !$sideEffect.polymorphicPaths ||
+              $sideEffect.polymorphicPaths === null ||
+              (currentPolymorphicPath =
+                bucket.polymorphicPathList[dataIndex]) === null ||
               $sideEffect.polymorphicPaths.has(currentPolymorphicPath)
             ) {
               const depExecutionValue = bucket.store.get($sideEffect.id);
