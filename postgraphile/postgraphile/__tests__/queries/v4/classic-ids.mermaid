@@ -9,20 +9,20 @@ graph TD
 
 
     %% plan dependencies
-    Object24{{"Object[24∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access22{{"Access[22∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access23{{"Access[23∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object24{{"Object[24∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access22{{"Access[22∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access23{{"Access[23∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access22 & Access23 --> Object24
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access22
     __Value2 --> Access23
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection25{{"Connection[25∈0]<br />ᐸ21ᐳ"}}:::plan
-    Connection50{{"Connection[50∈0]<br />ᐸ46ᐳ"}}:::plan
-    PgSelect26[["PgSelect[26∈1]<br />ᐸpostᐳ"]]:::plan
-    Constant55{{"Constant[55∈1]<br />ᐸ1ᐳ"}}:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection25{{"Connection[25∈0] ➊<br />ᐸ21ᐳ"}}:::plan
+    Connection50{{"Connection[50∈0] ➊<br />ᐸ46ᐳ"}}:::plan
+    PgSelect26[["PgSelect[26∈1] ➊<br />ᐸpostᐳ"]]:::plan
+    Constant55{{"Constant[55∈1] ➊<br />ᐸ1ᐳ"}}:::plan
     Object24 & Constant55 & Connection25 --> PgSelect26
-    Constant29{{"Constant[29∈1]<br />ᐸ'posts'ᐳ"}}:::plan
+    Constant29{{"Constant[29∈1] ➊<br />ᐸ'posts'ᐳ"}}:::plan
     __Item27[/"__Item[27∈2]<br />ᐸ26ᐳ"\]:::itemplan
     PgSelect26 ==> __Item27
     PgSelectSingle28{{"PgSelectSingle[28∈2]<br />ᐸpostᐳ"}}:::plan
@@ -35,8 +35,8 @@ graph TD
     List31 --> Lambda32
     PgClassExpression34{{"PgClassExpression[34∈3]<br />ᐸ__post__.”headline”ᐳ"}}:::plan
     PgSelectSingle28 --> PgClassExpression34
-    PgSelect51[["PgSelect[51∈4]<br />ᐸedge_caseᐳ"]]:::plan
-    Constant56{{"Constant[56∈4]<br />ᐸ2ᐳ"}}:::plan
+    PgSelect51[["PgSelect[51∈4] ➊<br />ᐸedge_caseᐳ"]]:::plan
+    Constant56{{"Constant[56∈4] ➊<br />ᐸ2ᐳ"}}:::plan
     Object24 & Constant56 & Connection50 --> PgSelect51
     __Item52[/"__Item[52∈5]<br />ᐸ51ᐳ"\]:::itemplan
     PgSelect51 ==> __Item52
@@ -74,6 +74,4 @@ graph TD
     Bucket2 --> Bucket3
     Bucket4 --> Bucket5
     Bucket5 --> Bucket6
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object24,Access22,Access23,__Value2,__Value4,Connection25,Connection50,PgSelect26,Constant29,Constant55,PgSelect51,Constant56 unary
     end

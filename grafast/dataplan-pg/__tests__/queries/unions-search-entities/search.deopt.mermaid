@@ -9,19 +9,19 @@ graph TD
 
 
     %% plan dependencies
-    PgSelect7[["PgSelect[7∈0]<br />ᐸentity_searchᐳ"]]:::plan
-    Object10{{"Object[10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant70{{"Constant[70∈0]<br />ᐸ'Dave'ᐳ"}}:::plan
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸentity_searchᐳ"]]:::plan
+    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant70{{"Constant[70∈0] ➊<br />ᐸ'Dave'ᐳ"}}:::plan
     Object10 & Constant70 --> PgSelect7
-    Access8{{"Access[8∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access9{{"Access[9∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
-    __ListTransform11[["__ListTransform[11∈0]<br />ᐸeach:7ᐳ"]]:::plan
+    __ListTransform11[["__ListTransform[11∈0] ➊<br />ᐸeach:7ᐳ"]]:::plan
     PgSelect7 --> __ListTransform11
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item12[/"__Item[12∈1]<br />ᐸ7ᐳ"\]:::itemplan
     PgSelect7 -.-> __Item12
     PgSelectSingle13{{"PgSelectSingle[13∈1]<br />ᐸentity_searchᐳ"}}:::plan
@@ -130,6 +130,4 @@ graph TD
     Bucket0 --> Bucket1 & Bucket2
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4 & Bucket5 & Bucket6
-    classDef unary fill:#fafffa,borderWidth:8px
-    class PgSelect7,Object10,Access8,Access9,__ListTransform11,__Value2,__Value4,Constant70 unary
     end

@@ -9,36 +9,36 @@ graph TD
 
 
     %% plan dependencies
-    Object17{{"Object[17∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access15{{"Access[15∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access16{{"Access[16∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access15 & Access16 --> Object17
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access15
     __Value2 --> Access16
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant28{{"Constant[28∈0]<br />ᐸ'10.0.0.0'ᐳ"}}:::plan
-    Constant29{{"Constant[29∈0]<br />ᐸ'10.0.0.0/8'ᐳ"}}:::plan
-    Constant30{{"Constant[30∈0]<br />ᐸ'000000000000'ᐳ"}}:::plan
-    Constant31{{"Constant[31∈0]<br />ᐸ'0000000000000000'ᐳ"}}:::plan
-    PgInsertSingle14[["PgInsertSingle[14∈1]<br />ᐸnetwork(inet,cidr,macaddr,macaddr8)ᐳ"]]:::sideeffectplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant28{{"Constant[28∈0] ➊<br />ᐸ'10.0.0.0'ᐳ"}}:::plan
+    Constant29{{"Constant[29∈0] ➊<br />ᐸ'10.0.0.0/8'ᐳ"}}:::plan
+    Constant30{{"Constant[30∈0] ➊<br />ᐸ'000000000000'ᐳ"}}:::plan
+    Constant31{{"Constant[31∈0] ➊<br />ᐸ'0000000000000000'ᐳ"}}:::plan
+    PgInsertSingle14[["PgInsertSingle[14∈1] ➊<br />ᐸnetwork(inet,cidr,macaddr,macaddr8)ᐳ"]]:::sideeffectplan
     Object17 & Constant28 & Constant29 & Constant30 & Constant31 --> PgInsertSingle14
-    Object18{{"Object[18∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    Object18{{"Object[18∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle14 --> Object18
-    List21{{"List[21∈3]<br />ᐸ19,20ᐳ"}}:::plan
-    Constant19{{"Constant[19∈3]<br />ᐸ'networks'ᐳ"}}:::plan
-    PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__network__.”id”ᐳ"}}:::plan
+    List21{{"List[21∈3] ➊<br />ᐸ19,20ᐳ"}}:::plan
+    Constant19{{"Constant[19∈3] ➊<br />ᐸ'networks'ᐳ"}}:::plan
+    PgClassExpression20{{"PgClassExpression[20∈3] ➊<br />ᐸ__network__.”id”ᐳ"}}:::plan
     Constant19 & PgClassExpression20 --> List21
     PgInsertSingle14 --> PgClassExpression20
-    Lambda22{{"Lambda[22∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    Lambda22{{"Lambda[22∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List21 --> Lambda22
-    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__network__.”inet”ᐳ"}}:::plan
+    PgClassExpression24{{"PgClassExpression[24∈3] ➊<br />ᐸ__network__.”inet”ᐳ"}}:::plan
     PgInsertSingle14 --> PgClassExpression24
-    PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__network__.”cidr”ᐳ"}}:::plan
+    PgClassExpression25{{"PgClassExpression[25∈3] ➊<br />ᐸ__network__.”cidr”ᐳ"}}:::plan
     PgInsertSingle14 --> PgClassExpression25
-    PgClassExpression26{{"PgClassExpression[26∈3]<br />ᐸ__network__.”macaddr”ᐳ"}}:::plan
+    PgClassExpression26{{"PgClassExpression[26∈3] ➊<br />ᐸ__network__.”macaddr”ᐳ"}}:::plan
     PgInsertSingle14 --> PgClassExpression26
-    PgClassExpression27{{"PgClassExpression[27∈3]<br />ᐸ__network__.”macaddr8”ᐳ"}}:::plan
+    PgClassExpression27{{"PgClassExpression[27∈3] ➊<br />ᐸ__network__.”macaddr8”ᐳ"}}:::plan
     PgInsertSingle14 --> PgClassExpression27
 
     %% define steps
@@ -59,6 +59,4 @@ graph TD
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object17,Access15,Access16,__Value2,__Value4,Constant28,Constant29,Constant30,Constant31,PgInsertSingle14,Object18,List21,PgClassExpression20,Lambda22,PgClassExpression24,PgClassExpression25,PgClassExpression26,PgClassExpression27,Constant19 unary
     end

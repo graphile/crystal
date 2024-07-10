@@ -9,39 +9,39 @@ graph TD
 
 
     %% plan dependencies
-    Connection18{{"Connection[18∈0]<br />ᐸ14ᐳ"}}:::plan
-    Constant30{{"Constant[30∈0]<br />ᐸ3ᐳ"}}:::plan
-    Lambda19{{"Lambda[19∈0]<br />ᐸparseCursorᐳ"}}:::plan
-    PgValidateParsedCursor24["PgValidateParsedCursor[24∈0]"]:::plan
+    Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
+    Constant30{{"Constant[30∈0] ➊<br />ᐸ3ᐳ"}}:::plan
+    Lambda19{{"Lambda[19∈0] ➊<br />ᐸparseCursorᐳ"}}:::plan
+    PgValidateParsedCursor24["PgValidateParsedCursor[24∈0] ➊"]:::plan
     Constant30 & Lambda19 & PgValidateParsedCursor24 --> Connection18
-    Constant31{{"Constant[31∈0]<br />ᐸ'WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAᐳ"}}:::plan
+    Constant31{{"Constant[31∈0] ➊<br />ᐸ'WyJmMGIyOGM5NGMxIiwiZjE3MGYxNzAtMDAwMC0wMDAwLTAwMDAtYjBiMDAᐳ"}}:::plan
     Constant31 --> Lambda19
     Lambda19 --> PgValidateParsedCursor24
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    PgSelect22[["PgSelect[22∈1]<br />ᐸmessages+1ᐳ"]]:::plan
-    Object17{{"Object[17∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access25{{"Access[25∈1]<br />ᐸ19.1ᐳ"}}:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    PgSelect22[["PgSelect[22∈1] ➊<br />ᐸmessages+1ᐳ"]]:::plan
+    Object17{{"Object[17∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access25{{"Access[25∈1] ➊<br />ᐸ19.1ᐳ"}}:::plan
     Object17 & Connection18 & Lambda19 & Access25 --> PgSelect22
-    Access15{{"Access[15∈1]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access16{{"Access[16∈1]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access15{{"Access[15∈1] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access16{{"Access[16∈1] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access15 & Access16 --> Object17
-    PgSelect26[["PgSelect[26∈1]<br />ᐸmessages(aggregate)ᐳ"]]:::plan
+    PgSelect26[["PgSelect[26∈1] ➊<br />ᐸmessages(aggregate)ᐳ"]]:::plan
     Object17 & Connection18 --> PgSelect26
     __Value2 --> Access15
     __Value2 --> Access16
-    PgPageInfo20{{"PgPageInfo[20∈1]"}}:::plan
+    PgPageInfo20{{"PgPageInfo[20∈1] ➊"}}:::plan
     Connection18 --> PgPageInfo20
-    Access23{{"Access[23∈1]<br />ᐸ22.hasMoreᐳ"}}:::plan
+    Access23{{"Access[23∈1] ➊<br />ᐸ22.hasMoreᐳ"}}:::plan
     PgSelect22 --> Access23
     Lambda19 --> Access25
-    First27{{"First[27∈1]"}}:::plan
+    First27{{"First[27∈1] ➊"}}:::plan
     PgSelect26 --> First27
-    PgSelectSingle28{{"PgSelectSingle[28∈1]<br />ᐸmessagesᐳ"}}:::plan
+    PgSelectSingle28{{"PgSelectSingle[28∈1] ➊<br />ᐸmessagesᐳ"}}:::plan
     First27 --> PgSelectSingle28
-    PgClassExpression29{{"PgClassExpression[29∈1]<br />ᐸcount(*)ᐳ"}}:::plan
+    PgClassExpression29{{"PgClassExpression[29∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle28 --> PgClassExpression29
-    Constant21{{"Constant[21∈1]<br />ᐸfalseᐳ"}}:::plan
+    Constant21{{"Constant[21∈1] ➊<br />ᐸfalseᐳ"}}:::plan
 
     %% define steps
 
@@ -53,6 +53,4 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,Access15,Access16,Object17,PgPageInfo20,Constant21,PgSelect22,Access23,Access25,PgSelect26,First27,PgSelectSingle28,PgClassExpression29 bucket1
     Bucket0 --> Bucket1
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Connection18,Lambda19,PgValidateParsedCursor24,__Value2,__Value4,Constant30,Constant31,PgSelect22,Object17,PgSelect26,Access15,Access16,PgPageInfo20,Access23,Access25,First27,PgSelectSingle28,PgClassExpression29,Constant21 unary
     end

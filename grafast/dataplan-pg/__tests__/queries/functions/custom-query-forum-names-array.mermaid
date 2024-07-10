@@ -9,22 +9,22 @@ graph TD
 
 
     %% plan dependencies
-    Object9{{"Object[9∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access7{{"Access[7∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access8{{"Access[8∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object9{{"Object[9∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access7{{"Access[7∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access8{{"Access[8∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access7 & Access8 --> Object9
-    PgSelect6[["PgSelect[6∈0]<br />ᐸforum_names_arrayᐳ"]]:::plan
+    PgSelect6[["PgSelect[6∈0] ➊<br />ᐸforum_names_arrayᐳ"]]:::plan
     Object9 --> PgSelect6
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access7
     __Value2 --> Access8
-    First10{{"First[10∈0]"}}:::plan
+    First10{{"First[10∈0] ➊"}}:::plan
     PgSelect6 --> First10
-    PgSelectSingle11{{"PgSelectSingle[11∈0]<br />ᐸforum_names_arrayᐳ"}}:::plan
+    PgSelectSingle11{{"PgSelectSingle[11∈0] ➊<br />ᐸforum_names_arrayᐳ"}}:::plan
     First10 --> PgSelectSingle11
-    PgClassExpression12{{"PgClassExpression[12∈0]<br />ᐸ__forum_names_array__.vᐳ"}}:::plan
+    PgClassExpression12{{"PgClassExpression[12∈0] ➊<br />ᐸ__forum_names_array__.vᐳ"}}:::plan
     PgSelectSingle11 --> PgClassExpression12
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item13[/"__Item[13∈1]<br />ᐸ12ᐳ"\]:::itemplan
     PgClassExpression12 ==> __Item13
 
@@ -38,6 +38,4 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,__Item13 bucket1
     Bucket0 --> Bucket1
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object9,PgSelect6,Access7,Access8,First10,PgSelectSingle11,PgClassExpression12,__Value2,__Value4 unary
     end

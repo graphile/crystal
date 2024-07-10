@@ -9,19 +9,19 @@ graph TD
 
 
     %% plan dependencies
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection15{{"Connection[15∈0]<br />ᐸ11ᐳ"}}:::plan
-    Constant19{{"Constant[19∈0]<br />ᐸ'people'ᐳ"}}:::plan
-    Object14{{"Object[14∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access12{{"Access[12∈1]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access13{{"Access[13∈1]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection15{{"Connection[15∈0] ➊<br />ᐸ11ᐳ"}}:::plan
+    Constant19{{"Constant[19∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
+    Object14{{"Object[14∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access12{{"Access[12∈1] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access13{{"Access[13∈1] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
-    PgSelect16[["PgSelect[16∈1]<br />ᐸbadly_behaved_functionᐳ"]]:::plan
+    PgSelect16[["PgSelect[16∈1] ➊<br />ᐸbadly_behaved_functionᐳ"]]:::plan
     Object14 & Connection15 --> PgSelect16
     __Value2 --> Access12
     __Value2 --> Access13
-    __ListTransform27[["__ListTransform[27∈1]<br />ᐸeach:26ᐳ"]]:::plan
+    __ListTransform27[["__ListTransform[27∈1] ➊<br />ᐸeach:26ᐳ"]]:::plan
     PgSelect16 --> __ListTransform27
     __Item17[/"__Item[17∈2]<br />ᐸ16ᐳ"\]:::itemplan
     PgSelect16 ==> __Item17
@@ -92,6 +92,4 @@ graph TD
     Bucket2 --> Bucket3
     Bucket5 --> Bucket6
     Bucket6 --> Bucket7
-    classDef unary fill:#fafffa,borderWidth:8px
-    class __Value2,__Value4,Connection15,Constant19,Object14,PgSelect16,Access12,Access13,__ListTransform27 unary
     end

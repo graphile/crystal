@@ -9,15 +9,15 @@ graph TD
 
 
     %% plan dependencies
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection30{{"Connection[30∈0]<br />ᐸ26ᐳ"}}:::plan
-    PgSelect31[["PgSelect[31∈1]<br />ᐸpersonᐳ"]]:::plan
-    Object29{{"Object[29∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant36{{"Constant[36∈1]<br />ᐸ'o1 Budd Deey'ᐳ"}}:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection30{{"Connection[30∈0] ➊<br />ᐸ26ᐳ"}}:::plan
+    PgSelect31[["PgSelect[31∈1] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object29{{"Object[29∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant36{{"Constant[36∈1] ➊<br />ᐸ'o1 Budd Deey'ᐳ"}}:::plan
     Object29 & Constant36 & Connection30 --> PgSelect31
-    Access27{{"Access[27∈1]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access28{{"Access[28∈1]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access27{{"Access[27∈1] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access28{{"Access[28∈1] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access27 & Access28 --> Object29
     __Value2 --> Access27
     __Value2 --> Access28
@@ -48,6 +48,4 @@ graph TD
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
-    classDef unary fill:#fafffa,borderWidth:8px
-    class __Value2,__Value4,Connection30,PgSelect31,Object29,Access27,Access28,Constant36 unary
     end

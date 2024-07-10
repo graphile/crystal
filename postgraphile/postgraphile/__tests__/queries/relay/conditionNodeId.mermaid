@@ -9,21 +9,21 @@ graph TD
 
 
     %% plan dependencies
-    Object20{{"Object[20∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access18{{"Access[18∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access19{{"Access[19∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object20{{"Object[20∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access18{{"Access[18∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access19{{"Access[19∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access18 & Access19 --> Object20
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access18
     __Value2 --> Access19
-    __Value0["__Value[0∈0]<br />ᐸvariableValuesᐳ"]:::plan
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection21{{"Connection[21∈0]<br />ᐸ17ᐳ"}}:::plan
-    Constant32{{"Constant[32∈0]<br />ᐸ'people'ᐳ"}}:::plan
-    Connection52{{"Connection[52∈0]<br />ᐸ48ᐳ"}}:::plan
-    Connection88{{"Connection[88∈0]<br />ᐸ84ᐳ"}}:::plan
-    Connection125{{"Connection[125∈0]<br />ᐸ121ᐳ"}}:::plan
-    PgSelect22[["PgSelect[22∈1]<br />ᐸpostᐳ"]]:::plan
+    __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection21{{"Connection[21∈0] ➊<br />ᐸ17ᐳ"}}:::plan
+    Constant32{{"Constant[32∈0] ➊<br />ᐸ'people'ᐳ"}}:::plan
+    Connection52{{"Connection[52∈0] ➊<br />ᐸ48ᐳ"}}:::plan
+    Connection88{{"Connection[88∈0] ➊<br />ᐸ84ᐳ"}}:::plan
+    Connection125{{"Connection[125∈0] ➊<br />ᐸ121ᐳ"}}:::plan
+    PgSelect22[["PgSelect[22∈1] ➊<br />ᐸpostᐳ"]]:::plan
     Object20 & Connection21 --> PgSelect22
     __Item23[/"__Item[23∈2]<br />ᐸ22ᐳ"\]:::itemplan
     PgSelect22 ==> __Item23
@@ -39,20 +39,20 @@ graph TD
     PgSelectSingle31 --> PgClassExpression33
     Lambda35{{"Lambda[35∈4]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List34 --> Lambda35
-    PgSelect59[["PgSelect[59∈5]<br />ᐸpostᐳ"]]:::plan
-    __Flag58[["__Flag[58∈5]<br />ᐸ57, if(53), rejectNull, onReject: Error: Invali…ᐳ"]]:::plan
+    PgSelect59[["PgSelect[59∈5] ➊<br />ᐸpostᐳ"]]:::plan
+    __Flag58[["__Flag[58∈5] ➊<br />ᐸ57, if(53), rejectNull, onReject: Error: Invali…ᐳ"]]:::plan
     Object20 & __Flag58 & Connection52 --> PgSelect59
-    __Flag57[["__Flag[57∈5]<br />ᐸ56, trapInhibited, onReject: INHIBITᐳ"]]:::plan
-    Condition53{{"Condition[53∈5]<br />ᐸexistsᐳ"}}:::plan
+    __Flag57[["__Flag[57∈5] ➊<br />ᐸ56, trapInhibited, onReject: INHIBITᐳ"]]:::plan
+    Condition53{{"Condition[53∈5] ➊<br />ᐸexistsᐳ"}}:::plan
     __Flag57 & Condition53 --> __Flag58
-    Access46{{"Access[46∈5]<br />ᐸ0.aliceᐳ"}}:::plan
+    Access46{{"Access[46∈5] ➊<br />ᐸ0.aliceᐳ"}}:::plan
     __Value0 --> Access46
     Access46 --> Condition53
-    Lambda54{{"Lambda[54∈5]<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
+    Lambda54{{"Lambda[54∈5] ➊<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
     Access46 --> Lambda54
-    Access55{{"Access[55∈5]<br />ᐸ54.1ᐳ"}}:::plan
+    Access55{{"Access[55∈5] ➊<br />ᐸ54.1ᐳ"}}:::plan
     Lambda54 --> Access55
-    __Flag56[["__Flag[56∈5]<br />ᐸ55, rejectNull, onReject: INHIBITᐳ"]]:::plan
+    __Flag56[["__Flag[56∈5] ➊<br />ᐸ55, rejectNull, onReject: INHIBITᐳ"]]:::plan
     Access55 --> __Flag56
     __Flag56 --> __Flag57
     __Item60[/"__Item[60∈6]<br />ᐸ59ᐳ"\]:::itemplan
@@ -69,19 +69,19 @@ graph TD
     PgSelectSingle68 --> PgClassExpression70
     Lambda72{{"Lambda[72∈8]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List71 --> Lambda72
-    PgSelect95[["PgSelect[95∈9]<br />ᐸpostᐳ"]]:::plan
-    __Flag94[["__Flag[94∈9]<br />ᐸ93, if(89), rejectNull, onReject: Error: Invali…ᐳ"]]:::plan
+    PgSelect95[["PgSelect[95∈9] ➊<br />ᐸpostᐳ"]]:::plan
+    __Flag94[["__Flag[94∈9] ➊<br />ᐸ93, if(89), rejectNull, onReject: Error: Invali…ᐳ"]]:::plan
     Object20 & __Flag94 & Connection88 --> PgSelect95
-    __Flag93[["__Flag[93∈9]<br />ᐸ92, trapInhibited, onReject: INHIBITᐳ"]]:::plan
-    Condition89{{"Condition[89∈9]<br />ᐸexistsᐳ"}}:::plan
+    __Flag93[["__Flag[93∈9] ➊<br />ᐸ92, trapInhibited, onReject: INHIBITᐳ"]]:::plan
+    Condition89{{"Condition[89∈9] ➊<br />ᐸexistsᐳ"}}:::plan
     __Flag93 & Condition89 --> __Flag94
-    Constant155{{"Constant[155∈9]<br />ᐸnullᐳ"}}:::plan
+    Constant155{{"Constant[155∈9] ➊<br />ᐸnullᐳ"}}:::plan
     Constant155 --> Condition89
-    Lambda90{{"Lambda[90∈9]<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
+    Lambda90{{"Lambda[90∈9] ➊<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
     Constant155 --> Lambda90
-    Access91{{"Access[91∈9]<br />ᐸ90.1ᐳ"}}:::plan
+    Access91{{"Access[91∈9] ➊<br />ᐸ90.1ᐳ"}}:::plan
     Lambda90 --> Access91
-    __Flag92[["__Flag[92∈9]<br />ᐸ91, rejectNull, onReject: INHIBITᐳ"]]:::plan
+    __Flag92[["__Flag[92∈9] ➊<br />ᐸ91, rejectNull, onReject: INHIBITᐳ"]]:::plan
     Access91 --> __Flag92
     __Flag92 --> __Flag93
     __Item96[/"__Item[96∈10]<br />ᐸ95ᐳ"\]:::itemplan
@@ -98,20 +98,20 @@ graph TD
     PgSelectSingle104 --> PgClassExpression106
     Lambda108{{"Lambda[108∈12]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List107 --> Lambda108
-    PgSelect132[["PgSelect[132∈13]<br />ᐸpostᐳ"]]:::plan
-    __Flag131[["__Flag[131∈13]<br />ᐸ130, if(126), rejectNull, onReject: Error: Invali…ᐳ"]]:::plan
+    PgSelect132[["PgSelect[132∈13] ➊<br />ᐸpostᐳ"]]:::plan
+    __Flag131[["__Flag[131∈13] ➊<br />ᐸ130, if(126), rejectNull, onReject: Error: Invali…ᐳ"]]:::plan
     Object20 & __Flag131 & Connection125 --> PgSelect132
-    __Flag130[["__Flag[130∈13]<br />ᐸ129, trapInhibited, onReject: INHIBITᐳ"]]:::plan
-    Condition126{{"Condition[126∈13]<br />ᐸexistsᐳ"}}:::plan
+    __Flag130[["__Flag[130∈13] ➊<br />ᐸ129, trapInhibited, onReject: INHIBITᐳ"]]:::plan
+    Condition126{{"Condition[126∈13] ➊<br />ᐸexistsᐳ"}}:::plan
     __Flag130 & Condition126 --> __Flag131
-    Access119{{"Access[119∈13]<br />ᐸ0.post3ᐳ"}}:::plan
+    Access119{{"Access[119∈13] ➊<br />ᐸ0.post3ᐳ"}}:::plan
     __Value0 --> Access119
     Access119 --> Condition126
-    Lambda127{{"Lambda[127∈13]<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
+    Lambda127{{"Lambda[127∈13] ➊<br />ᐸspecifier_Person_base64JSONᐳ"}}:::plan
     Access119 --> Lambda127
-    Access128{{"Access[128∈13]<br />ᐸ127.1ᐳ"}}:::plan
+    Access128{{"Access[128∈13] ➊<br />ᐸ127.1ᐳ"}}:::plan
     Lambda127 --> Access128
-    __Flag129[["__Flag[129∈13]<br />ᐸ128, rejectNull, onReject: INHIBITᐳ"]]:::plan
+    __Flag129[["__Flag[129∈13] ➊<br />ᐸ128, rejectNull, onReject: INHIBITᐳ"]]:::plan
     Access128 --> __Flag129
     __Flag129 --> __Flag130
     __Item133[/"__Item[133∈14]<br />ᐸ132ᐳ"\]:::itemplan
@@ -196,6 +196,4 @@ graph TD
     Bucket13 --> Bucket14
     Bucket14 --> Bucket15
     Bucket15 --> Bucket16
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object20,Access18,Access19,__Value0,__Value2,__Value4,Connection21,Constant32,Connection52,Connection88,Connection125,PgSelect22,PgSelect59,__Flag58,Access46,Condition53,Lambda54,Access55,__Flag56,__Flag57,PgSelect95,__Flag94,Condition89,Lambda90,Access91,__Flag92,__Flag93,Constant155,PgSelect132,__Flag131,Access119,Condition126,Lambda127,Access128,__Flag129,__Flag130 unary
     end

@@ -9,34 +9,34 @@ graph TD
 
 
     %% plan dependencies
-    Object17{{"Object[17∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access15{{"Access[15∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access16{{"Access[16∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access15 & Access16 --> Object17
-    PgSelect67[["PgSelect[67∈0]<br />ᐸletter_descriptionsᐳ"]]:::plan
-    Constant136{{"Constant[136∈0]<br />ᐸ'B'ᐳ"}}:::plan
+    PgSelect67[["PgSelect[67∈0] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
+    Constant136{{"Constant[136∈0] ➊<br />ᐸ'B'ᐳ"}}:::plan
     Object17 & Constant136 --> PgSelect67
-    PgSelect78[["PgSelect[78∈0]<br />ᐸletter_descriptionsᐳ"]]:::plan
+    PgSelect78[["PgSelect[78∈0] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
     Object17 & Constant136 --> PgSelect78
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access15
     __Value2 --> Access16
-    First71{{"First[71∈0]"}}:::plan
+    First71{{"First[71∈0] ➊"}}:::plan
     PgSelect67 --> First71
-    PgSelectSingle72{{"PgSelectSingle[72∈0]<br />ᐸletter_descriptionsᐳ"}}:::plan
+    PgSelectSingle72{{"PgSelectSingle[72∈0] ➊<br />ᐸletter_descriptionsᐳ"}}:::plan
     First71 --> PgSelectSingle72
-    First82{{"First[82∈0]"}}:::plan
+    First82{{"First[82∈0] ➊"}}:::plan
     PgSelect78 --> First82
-    PgSelectSingle83{{"PgSelectSingle[83∈0]<br />ᐸletter_descriptionsᐳ"}}:::plan
+    PgSelectSingle83{{"PgSelectSingle[83∈0] ➊<br />ᐸletter_descriptionsᐳ"}}:::plan
     First82 --> PgSelectSingle83
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection18{{"Connection[18∈0]<br />ᐸ14ᐳ"}}:::plan
-    Connection38{{"Connection[38∈0]<br />ᐸ34ᐳ"}}:::plan
-    Connection58{{"Connection[58∈0]<br />ᐸ54ᐳ"}}:::plan
-    Connection104{{"Connection[104∈0]<br />ᐸ100ᐳ"}}:::plan
-    Connection128{{"Connection[128∈0]<br />ᐸ124ᐳ"}}:::plan
-    Constant138{{"Constant[138∈0]<br />ᐸ'C'ᐳ"}}:::plan
-    PgSelect19[["PgSelect[19∈1]<br />ᐸletter_descriptionsᐳ"]]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
+    Connection38{{"Connection[38∈0] ➊<br />ᐸ34ᐳ"}}:::plan
+    Connection58{{"Connection[58∈0] ➊<br />ᐸ54ᐳ"}}:::plan
+    Connection104{{"Connection[104∈0] ➊<br />ᐸ100ᐳ"}}:::plan
+    Connection128{{"Connection[128∈0] ➊<br />ᐸ124ᐳ"}}:::plan
+    Constant138{{"Constant[138∈0] ➊<br />ᐸ'C'ᐳ"}}:::plan
+    PgSelect19[["PgSelect[19∈1] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
     Object17 & Connection18 --> PgSelect19
     __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
     PgSelect19 ==> __Item20
@@ -50,7 +50,7 @@ graph TD
     PgSelectSingle21 --> PgClassExpression24
     PgClassExpression25{{"PgClassExpression[25∈3]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
     PgSelectSingle21 --> PgClassExpression25
-    PgSelect39[["PgSelect[39∈4]<br />ᐸletter_descriptionsᐳ"]]:::plan
+    PgSelect39[["PgSelect[39∈4] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
     Object17 & Connection38 --> PgSelect39
     __Item40[/"__Item[40∈5]<br />ᐸ39ᐳ"\]:::itemplan
     PgSelect39 ==> __Item40
@@ -64,7 +64,7 @@ graph TD
     PgSelectSingle41 --> PgClassExpression44
     PgClassExpression45{{"PgClassExpression[45∈6]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
     PgSelectSingle41 --> PgClassExpression45
-    PgSelect59[["PgSelect[59∈7]<br />ᐸletter_descriptionsᐳ"]]:::plan
+    PgSelect59[["PgSelect[59∈7] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
     Object17 & Connection58 --> PgSelect59
     __Item60[/"__Item[60∈8]<br />ᐸ59ᐳ"\]:::itemplan
     PgSelect59 ==> __Item60
@@ -78,23 +78,23 @@ graph TD
     PgSelectSingle61 --> PgClassExpression64
     PgClassExpression65{{"PgClassExpression[65∈9]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
     PgSelectSingle61 --> PgClassExpression65
-    PgClassExpression73{{"PgClassExpression[73∈10]<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
+    PgClassExpression73{{"PgClassExpression[73∈10] ➊<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
     PgSelectSingle72 --> PgClassExpression73
-    PgClassExpression74{{"PgClassExpression[74∈10]<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
+    PgClassExpression74{{"PgClassExpression[74∈10] ➊<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
     PgSelectSingle72 --> PgClassExpression74
-    PgClassExpression75{{"PgClassExpression[75∈10]<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
+    PgClassExpression75{{"PgClassExpression[75∈10] ➊<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
     PgSelectSingle72 --> PgClassExpression75
-    PgClassExpression76{{"PgClassExpression[76∈10]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
+    PgClassExpression76{{"PgClassExpression[76∈10] ➊<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
     PgSelectSingle72 --> PgClassExpression76
-    PgClassExpression84{{"PgClassExpression[84∈11]<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
+    PgClassExpression84{{"PgClassExpression[84∈11] ➊<br />ᐸ__letter_d...ons__.”id”ᐳ"}}:::plan
     PgSelectSingle83 --> PgClassExpression84
-    PgClassExpression85{{"PgClassExpression[85∈11]<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
+    PgClassExpression85{{"PgClassExpression[85∈11] ➊<br />ᐸ__letter_d..._.”letter”ᐳ"}}:::plan
     PgSelectSingle83 --> PgClassExpression85
-    PgClassExpression86{{"PgClassExpression[86∈11]<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
+    PgClassExpression86{{"PgClassExpression[86∈11] ➊<br />ᐸ__letter_d..._via_view”ᐳ"}}:::plan
     PgSelectSingle83 --> PgClassExpression86
-    PgClassExpression87{{"PgClassExpression[87∈11]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
+    PgClassExpression87{{"PgClassExpression[87∈11] ➊<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
     PgSelectSingle83 --> PgClassExpression87
-    PgSelect105[["PgSelect[105∈12]<br />ᐸletter_descriptionsᐳ"]]:::plan
+    PgSelect105[["PgSelect[105∈12] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
     Object17 & Constant138 & Connection104 --> PgSelect105
     __Item106[/"__Item[106∈13]<br />ᐸ105ᐳ"\]:::itemplan
     PgSelect105 ==> __Item106
@@ -108,7 +108,7 @@ graph TD
     PgSelectSingle107 --> PgClassExpression110
     PgClassExpression111{{"PgClassExpression[111∈14]<br />ᐸ__letter_d...scription”ᐳ"}}:::plan
     PgSelectSingle107 --> PgClassExpression111
-    PgSelect129[["PgSelect[129∈15]<br />ᐸletter_descriptionsᐳ"]]:::plan
+    PgSelect129[["PgSelect[129∈15] ➊<br />ᐸletter_descriptionsᐳ"]]:::plan
     Object17 & Constant138 & Connection128 --> PgSelect129
     __Item130[/"__Item[130∈16]<br />ᐸ129ᐳ"\]:::itemplan
     PgSelect129 ==> __Item130
@@ -191,6 +191,4 @@ graph TD
     Bucket13 --> Bucket14
     Bucket15 --> Bucket16
     Bucket16 --> Bucket17
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object17,PgSelect67,PgSelect78,Access15,Access16,First71,PgSelectSingle72,First82,PgSelectSingle83,__Value2,__Value4,Connection18,Connection38,Connection58,Connection104,Connection128,Constant136,Constant138,PgSelect19,PgSelect39,PgSelect59,PgClassExpression73,PgClassExpression74,PgClassExpression75,PgClassExpression76,PgClassExpression84,PgClassExpression85,PgClassExpression86,PgClassExpression87,PgSelect105,PgSelect129 unary
     end

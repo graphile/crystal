@@ -9,26 +9,26 @@ graph TD
 
 
     %% plan dependencies
-    Object14{{"Object[14∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access12{{"Access[12∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access13{{"Access[13∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object14{{"Object[14∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access12{{"Access[12∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access13{{"Access[13∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access12 & Access13 --> Object14
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access12
     __Value2 --> Access13
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant19{{"Constant[19∈0]<br />ᐸ1ᐳ"}}:::plan
-    Constant20{{"Constant[20∈0]<br />ᐸ'2'ᐳ"}}:::plan
-    Constant21{{"Constant[21∈0]<br />ᐸ'3'ᐳ"}}:::plan
-    PgSelect11[["PgSelect[11∈1]<br />ᐸauthenticate(mutation)ᐳ"]]:::sideeffectplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant19{{"Constant[19∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Constant20{{"Constant[20∈0] ➊<br />ᐸ'2'ᐳ"}}:::plan
+    Constant21{{"Constant[21∈0] ➊<br />ᐸ'3'ᐳ"}}:::plan
+    PgSelect11[["PgSelect[11∈1] ➊<br />ᐸauthenticate(mutation)ᐳ"]]:::sideeffectplan
     Object14 & Constant19 & Constant20 & Constant21 --> PgSelect11
-    First15{{"First[15∈1]"}}:::plan
+    First15{{"First[15∈1] ➊"}}:::plan
     PgSelect11 --> First15
-    PgSelectSingle16{{"PgSelectSingle[16∈1]<br />ᐸauthenticateᐳ"}}:::plan
+    PgSelectSingle16{{"PgSelectSingle[16∈1] ➊<br />ᐸauthenticateᐳ"}}:::plan
     First15 --> PgSelectSingle16
-    Object17{{"Object[17∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    Object17{{"Object[17∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgSelectSingle16 --> Object17
-    PgClassExpression18{{"PgClassExpression[18∈2]<br />ᐸ__authenticate__ᐳ"}}:::plan
+    PgClassExpression18{{"PgClassExpression[18∈2] ➊<br />ᐸ__authenticate__ᐳ"}}:::plan
     PgSelectSingle16 --> PgClassExpression18
 
     %% define steps
@@ -45,6 +45,4 @@ graph TD
     class Bucket2,PgClassExpression18 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object14,Access12,Access13,__Value2,__Value4,Constant19,Constant20,Constant21,PgSelect11,First15,PgSelectSingle16,Object17,PgClassExpression18 unary
     end

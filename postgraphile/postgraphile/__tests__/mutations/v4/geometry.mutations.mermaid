@@ -9,53 +9,53 @@ graph TD
 
 
     %% plan dependencies
-    Object86{{"Object[86∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access84{{"Access[84∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access85{{"Access[85∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object86{{"Object[86∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access84{{"Access[84∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access85{{"Access[85∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access84 & Access85 --> Object86
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access84
     __Value2 --> Access85
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant208{{"Constant[208∈0]<br />ᐸ[Object: null prototype] { x: 99, y: 1234 }ᐳ"}}:::plan
-    Constant221{{"Constant[221∈0]<br />ᐸ[Object: null prototype] {   a: [Object: null prototype] { xᐳ"}}:::plan
-    Constant222{{"Constant[222∈0]<br />ᐸ[Object: null prototype] {   a: [Object: null prototype] { xᐳ"}}:::plan
-    Constant223{{"Constant[223∈0]<br />ᐸ[Object: null prototype] {   a: [Object: null prototype] { xᐳ"}}:::plan
-    Constant225{{"Constant[225∈0]<br />ᐸ[Object: null prototype] {   center: [Object: null prototypeᐳ"}}:::plan
-    Constant226{{"Constant[226∈0]<br />ᐸ[Object: null prototype] {   points: [     [Object: null proᐳ"}}:::plan
-    Constant227{{"Constant[227∈0]<br />ᐸ[Object: null prototype] {   points: [     [Object: null proᐳ"}}:::plan
-    Constant228{{"Constant[228∈0]<br />ᐸ[Object: null prototype] {   points: [     [Object: null proᐳ"}}:::plan
-    PgInsertSingle83[["PgInsertSingle[83∈1]<br />ᐸgeom(point,line,lseg,box,open_path,closed_path,polygon,circle)ᐳ"]]:::sideeffectplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant208{{"Constant[208∈0] ➊<br />ᐸ[Object: null prototype] { x: 99, y: 1234 }ᐳ"}}:::plan
+    Constant221{{"Constant[221∈0] ➊<br />ᐸ[Object: null prototype] {   a: [Object: null prototype] { xᐳ"}}:::plan
+    Constant222{{"Constant[222∈0] ➊<br />ᐸ[Object: null prototype] {   a: [Object: null prototype] { xᐳ"}}:::plan
+    Constant223{{"Constant[223∈0] ➊<br />ᐸ[Object: null prototype] {   a: [Object: null prototype] { xᐳ"}}:::plan
+    Constant225{{"Constant[225∈0] ➊<br />ᐸ[Object: null prototype] {   center: [Object: null prototypeᐳ"}}:::plan
+    Constant226{{"Constant[226∈0] ➊<br />ᐸ[Object: null prototype] {   points: [     [Object: null proᐳ"}}:::plan
+    Constant227{{"Constant[227∈0] ➊<br />ᐸ[Object: null prototype] {   points: [     [Object: null proᐳ"}}:::plan
+    Constant228{{"Constant[228∈0] ➊<br />ᐸ[Object: null prototype] {   points: [     [Object: null proᐳ"}}:::plan
+    PgInsertSingle83[["PgInsertSingle[83∈1] ➊<br />ᐸgeom(point,line,lseg,box,open_path,closed_path,polygon,circle)ᐳ"]]:::sideeffectplan
     Object86 & Constant208 & Constant221 & Constant222 & Constant223 & Constant226 & Constant227 & Constant228 & Constant225 --> PgInsertSingle83
-    Object87{{"Object[87∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    Object87{{"Object[87∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle83 --> Object87
-    PgClassExpression118{{"PgClassExpression[118∈3]<br />ᐸ__geom__.”id”ᐳ"}}:::plan
+    PgClassExpression118{{"PgClassExpression[118∈3] ➊<br />ᐸ__geom__.”id”ᐳ"}}:::plan
     PgInsertSingle83 --> PgClassExpression118
-    PgClassExpression119{{"PgClassExpression[119∈3]<br />ᐸ__geom__.”point”ᐳ"}}:::plan
+    PgClassExpression119{{"PgClassExpression[119∈3] ➊<br />ᐸ__geom__.”point”ᐳ"}}:::plan
     PgInsertSingle83 --> PgClassExpression119
-    PgClassExpression122{{"PgClassExpression[122∈3]<br />ᐸ__geom__.”line”ᐳ"}}:::plan
+    PgClassExpression122{{"PgClassExpression[122∈3] ➊<br />ᐸ__geom__.”line”ᐳ"}}:::plan
     PgInsertSingle83 --> PgClassExpression122
-    PgClassExpression129{{"PgClassExpression[129∈3]<br />ᐸ__geom__.”lseg”ᐳ"}}:::plan
+    PgClassExpression129{{"PgClassExpression[129∈3] ➊<br />ᐸ__geom__.”lseg”ᐳ"}}:::plan
     PgInsertSingle83 --> PgClassExpression129
-    PgClassExpression136{{"PgClassExpression[136∈3]<br />ᐸ__geom__.”box”ᐳ"}}:::plan
+    PgClassExpression136{{"PgClassExpression[136∈3] ➊<br />ᐸ__geom__.”box”ᐳ"}}:::plan
     PgInsertSingle83 --> PgClassExpression136
-    PgClassExpression143{{"PgClassExpression[143∈3]<br />ᐸ__geom__.”open_path”ᐳ"}}:::plan
+    PgClassExpression143{{"PgClassExpression[143∈3] ➊<br />ᐸ__geom__.”open_path”ᐳ"}}:::plan
     PgInsertSingle83 --> PgClassExpression143
-    PgClassExpression149{{"PgClassExpression[149∈3]<br />ᐸ__geom__.”closed_path”ᐳ"}}:::plan
+    PgClassExpression149{{"PgClassExpression[149∈3] ➊<br />ᐸ__geom__.”closed_path”ᐳ"}}:::plan
     PgInsertSingle83 --> PgClassExpression149
-    PgClassExpression155{{"PgClassExpression[155∈3]<br />ᐸ__geom__.”polygon”ᐳ"}}:::plan
+    PgClassExpression155{{"PgClassExpression[155∈3] ➊<br />ᐸ__geom__.”polygon”ᐳ"}}:::plan
     PgInsertSingle83 --> PgClassExpression155
-    PgClassExpression160{{"PgClassExpression[160∈3]<br />ᐸ__geom__.”circle”ᐳ"}}:::plan
+    PgClassExpression160{{"PgClassExpression[160∈3] ➊<br />ᐸ__geom__.”circle”ᐳ"}}:::plan
     PgInsertSingle83 --> PgClassExpression160
-    Access145{{"Access[145∈8]<br />ᐸ143.pointsᐳ"}}:::plan
+    Access145{{"Access[145∈8] ➊<br />ᐸ143.pointsᐳ"}}:::plan
     PgClassExpression143 --> Access145
     __Item146[/"__Item[146∈9]<br />ᐸ145ᐳ"\]:::itemplan
     Access145 ==> __Item146
-    Access151{{"Access[151∈10]<br />ᐸ149.pointsᐳ"}}:::plan
+    Access151{{"Access[151∈10] ➊<br />ᐸ149.pointsᐳ"}}:::plan
     PgClassExpression149 --> Access151
     __Item152[/"__Item[152∈11]<br />ᐸ151ᐳ"\]:::itemplan
     Access151 ==> __Item152
-    Access156{{"Access[156∈12]<br />ᐸ155.pointsᐳ"}}:::plan
+    Access156{{"Access[156∈12] ➊<br />ᐸ155.pointsᐳ"}}:::plan
     PgClassExpression155 --> Access156
     __Item157[/"__Item[157∈13]<br />ᐸ156ᐳ"\]:::itemplan
     Access156 ==> __Item157
@@ -115,6 +115,4 @@ graph TD
     Bucket8 --> Bucket9
     Bucket10 --> Bucket11
     Bucket12 --> Bucket13
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object86,Access84,Access85,__Value2,__Value4,Constant208,Constant221,Constant222,Constant223,Constant225,Constant226,Constant227,Constant228,PgInsertSingle83,Object87,PgClassExpression118,PgClassExpression119,PgClassExpression122,PgClassExpression129,PgClassExpression136,PgClassExpression143,PgClassExpression149,PgClassExpression155,PgClassExpression160,Access145,Access151,Access156 unary
     end

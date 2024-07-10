@@ -9,48 +9,48 @@ graph TD
 
 
     %% plan dependencies
-    PgSelect7[["PgSelect[7∈0]<br />ᐸpersonᐳ"]]:::plan
-    Object10{{"Object[10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant52{{"Constant[52∈0]<br />ᐸ'sara.smith@email.com'ᐳ"}}:::plan
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant52{{"Constant[52∈0] ➊<br />ᐸ'sara.smith@email.com'ᐳ"}}:::plan
     Object10 & Constant52 --> PgSelect7
-    Access8{{"Access[8∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access9{{"Access[9∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
-    First11{{"First[11∈0]"}}:::plan
+    First11{{"First[11∈0] ➊"}}:::plan
     PgSelect7 --> First11
-    PgSelectSingle12{{"PgSelectSingle[12∈0]<br />ᐸpersonᐳ"}}:::plan
+    PgSelectSingle12{{"PgSelectSingle[12∈0] ➊<br />ᐸpersonᐳ"}}:::plan
     First11 --> PgSelectSingle12
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    List15{{"List[15∈1]<br />ᐸ13,14ᐳ"}}:::plan
-    Constant13{{"Constant[13∈1]<br />ᐸ'people'ᐳ"}}:::plan
-    PgClassExpression14{{"PgClassExpression[14∈1]<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    List15{{"List[15∈1] ➊<br />ᐸ13,14ᐳ"}}:::plan
+    Constant13{{"Constant[13∈1] ➊<br />ᐸ'people'ᐳ"}}:::plan
+    PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
     Constant13 & PgClassExpression14 --> List15
     PgSelectSingle12 --> PgClassExpression14
-    Lambda16{{"Lambda[16∈1]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    Lambda16{{"Lambda[16∈1] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
     List15 --> Lambda16
-    PgClassExpression17{{"PgClassExpression[17∈1]<br />ᐸ__person__.”email”ᐳ"}}:::plan
+    PgClassExpression17{{"PgClassExpression[17∈1] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
     PgSelectSingle12 --> PgClassExpression17
-    First31{{"First[31∈1]"}}:::plan
-    Access50{{"Access[50∈1]<br />ᐸ11.2ᐳ"}}:::plan
+    First31{{"First[31∈1] ➊"}}:::plan
+    Access50{{"Access[50∈1] ➊<br />ᐸ11.2ᐳ"}}:::plan
     Access50 --> First31
-    PgSelectSingle32{{"PgSelectSingle[32∈1]<br />ᐸperson_friendsᐳ"}}:::plan
+    PgSelectSingle32{{"PgSelectSingle[32∈1] ➊<br />ᐸperson_friendsᐳ"}}:::plan
     First31 --> PgSelectSingle32
-    PgClassExpression33{{"PgClassExpression[33∈1]<br />ᐸcount(*)ᐳ"}}:::plan
+    PgClassExpression33{{"PgClassExpression[33∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle32 --> PgClassExpression33
-    First47{{"First[47∈1]"}}:::plan
-    Access51{{"Access[51∈1]<br />ᐸ11.3ᐳ"}}:::plan
+    First47{{"First[47∈1] ➊"}}:::plan
+    Access51{{"Access[51∈1] ➊<br />ᐸ11.3ᐳ"}}:::plan
     Access51 --> First47
-    PgSelectSingle48{{"PgSelectSingle[48∈1]<br />ᐸperson_friendsᐳ"}}:::plan
+    PgSelectSingle48{{"PgSelectSingle[48∈1] ➊<br />ᐸperson_friendsᐳ"}}:::plan
     First47 --> PgSelectSingle48
-    PgClassExpression49{{"PgClassExpression[49∈1]<br />ᐸcount(*)ᐳ"}}:::plan
+    PgClassExpression49{{"PgClassExpression[49∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
     PgSelectSingle48 --> PgClassExpression49
     First11 --> Access50
     First11 --> Access51
-    Connection29{{"Connection[29∈1]<br />ᐸ25ᐳ"}}:::plan
-    Connection45{{"Connection[45∈1]<br />ᐸ41ᐳ"}}:::plan
+    Connection29{{"Connection[29∈1] ➊<br />ᐸ25ᐳ"}}:::plan
+    Connection45{{"Connection[45∈1] ➊<br />ᐸ41ᐳ"}}:::plan
 
     %% define steps
 
@@ -62,6 +62,4 @@ graph TD
     classDef bucket1 stroke:#00bfff
     class Bucket1,Constant13,PgClassExpression14,List15,Lambda16,PgClassExpression17,Connection29,First31,PgSelectSingle32,PgClassExpression33,Connection45,First47,PgSelectSingle48,PgClassExpression49,Access50,Access51 bucket1
     Bucket0 --> Bucket1
-    classDef unary fill:#fafffa,borderWidth:8px
-    class PgSelect7,Object10,Access8,Access9,First11,PgSelectSingle12,__Value2,__Value4,Constant52,List15,PgClassExpression14,Lambda16,PgClassExpression17,First31,PgSelectSingle32,PgClassExpression33,First47,PgSelectSingle48,PgClassExpression49,Access50,Access51,Constant13,Connection29,Connection45 unary
     end

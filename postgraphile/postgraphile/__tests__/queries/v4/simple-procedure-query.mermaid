@@ -9,31 +9,31 @@ graph TD
 
 
     %% plan dependencies
-    PgSelect52[["PgSelect[52∈0]<br />ᐸint_set_queryᐳ"]]:::plan
-    Object11{{"Object[11∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant107{{"Constant[107∈0]<br />ᐸ5ᐳ"}}:::plan
-    Constant51{{"Constant[51∈0]<br />ᐸnullᐳ"}}:::plan
-    Constant108{{"Constant[108∈0]<br />ᐸ6ᐳ"}}:::plan
+    PgSelect52[["PgSelect[52∈0] ➊<br />ᐸint_set_queryᐳ"]]:::plan
+    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant107{{"Constant[107∈0] ➊<br />ᐸ5ᐳ"}}:::plan
+    Constant51{{"Constant[51∈0] ➊<br />ᐸnullᐳ"}}:::plan
+    Constant108{{"Constant[108∈0] ➊<br />ᐸ6ᐳ"}}:::plan
     Object11 & Constant107 & Constant51 & Constant108 --> PgSelect52
-    Access9{{"Access[9∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access10{{"Access[10∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access9 & Access10 --> Object11
-    PgSelect8[["PgSelect[8∈0]<br />ᐸcompound_type_set_queryᐳ"]]:::plan
+    PgSelect8[["PgSelect[8∈0] ➊<br />ᐸcompound_type_set_queryᐳ"]]:::plan
     Object11 --> PgSelect8
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access9
     __Value2 --> Access10
-    PgSelect28[["PgSelect[28∈0]<br />ᐸtable_set_queryᐳ"]]:::plan
+    PgSelect28[["PgSelect[28∈0] ➊<br />ᐸtable_set_queryᐳ"]]:::plan
     Object11 --> PgSelect28
-    PgSelect39[["PgSelect[39∈0]<br />ᐸtable_set_queryᐳ"]]:::plan
+    PgSelect39[["PgSelect[39∈0] ➊<br />ᐸtable_set_queryᐳ"]]:::plan
     Object11 --> PgSelect39
-    PgSelect61[["PgSelect[61∈0]<br />ᐸstatic_big_integerᐳ"]]:::plan
+    PgSelect61[["PgSelect[61∈0] ➊<br />ᐸstatic_big_integerᐳ"]]:::plan
     Object11 --> PgSelect61
-    PgSelect70[["PgSelect[70∈0]<br />ᐸquery_interval_setᐳ"]]:::plan
+    PgSelect70[["PgSelect[70∈0] ➊<br />ᐸquery_interval_setᐳ"]]:::plan
     Object11 --> PgSelect70
-    PgSelect87[["PgSelect[87∈0]<br />ᐸpostᐳ"]]:::plan
+    PgSelect87[["PgSelect[87∈0] ➊<br />ᐸpostᐳ"]]:::plan
     Object11 --> PgSelect87
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
     __Item12[/"__Item[12∈1]<br />ᐸ8ᐳ"\]:::itemplan
     PgSelect8 ==> __Item12
     PgSelectSingle13{{"PgSelectSingle[13∈1]<br />ᐸcompound_type_set_queryᐳ"}}:::plan
@@ -153,6 +153,4 @@ graph TD
     Bucket10 --> Bucket11
     Bucket12 --> Bucket13
     Bucket13 --> Bucket14
-    classDef unary fill:#fafffa,borderWidth:8px
-    class PgSelect52,Object11,PgSelect8,Access9,Access10,PgSelect28,PgSelect39,PgSelect61,PgSelect70,PgSelect87,__Value2,__Value4,Constant51,Constant107,Constant108 unary
     end

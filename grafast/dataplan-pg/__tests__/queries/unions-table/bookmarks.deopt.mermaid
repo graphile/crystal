@@ -9,26 +9,26 @@ graph TD
 
 
     %% plan dependencies
-    PgSelect7[["PgSelect[7∈0]<br />ᐸpeopleᐳ"]]:::plan
-    Object10{{"Object[10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant86{{"Constant[86∈0]<br />ᐸ2ᐳ"}}:::plan
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸpeopleᐳ"]]:::plan
+    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant86{{"Constant[86∈0] ➊<br />ᐸ2ᐳ"}}:::plan
     Object10 & Constant86 --> PgSelect7
-    Access8{{"Access[8∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access9{{"Access[9∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
-    First11{{"First[11∈0]"}}:::plan
+    First11{{"First[11∈0] ➊"}}:::plan
     PgSelect7 --> First11
-    PgSelectSingle12{{"PgSelectSingle[12∈0]<br />ᐸpeopleᐳ"}}:::plan
+    PgSelectSingle12{{"PgSelectSingle[12∈0] ➊<br />ᐸpeopleᐳ"}}:::plan
     First11 --> PgSelectSingle12
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    PgClassExpression13{{"PgClassExpression[13∈1]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    PgClassExpression13{{"PgClassExpression[13∈1] ➊<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
     PgSelectSingle12 --> PgClassExpression13
-    PgClassExpression14{{"PgClassExpression[14∈1]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgClassExpression14{{"PgClassExpression[14∈1] ➊<br />ᐸ__people__.”username”ᐳ"}}:::plan
     PgSelectSingle12 --> PgClassExpression14
-    Access85{{"Access[85∈1]<br />ᐸ11.0ᐳ"}}:::plan
+    Access85{{"Access[85∈1] ➊<br />ᐸ11.0ᐳ"}}:::plan
     First11 --> Access85
     __Item20[/"__Item[20∈2]<br />ᐸ85ᐳ"\]:::itemplan
     Access85 ==> __Item20
@@ -154,6 +154,4 @@ graph TD
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4 & Bucket5
     Bucket5 --> Bucket6 & Bucket7 & Bucket8
-    classDef unary fill:#fafffa,borderWidth:8px
-    class PgSelect7,Object10,Access8,Access9,First11,PgSelectSingle12,__Value2,__Value4,Constant86,PgClassExpression13,PgClassExpression14,Access85 unary
     end

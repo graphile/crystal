@@ -9,20 +9,20 @@ graph TD
 
 
     %% plan dependencies
-    Object17{{"Object[17∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access15{{"Access[15∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access16{{"Access[16∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access15 & Access16 --> Object17
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access15
     __Value2 --> Access16
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection18{{"Connection[18∈0]<br />ᐸ14ᐳ"}}:::plan
-    Connection114{{"Connection[114∈0]<br />ᐸ110ᐳ"}}:::plan
-    Connection223{{"Connection[223∈0]<br />ᐸ219ᐳ"}}:::plan
-    Connection261{{"Connection[261∈0]<br />ᐸ257ᐳ"}}:::plan
-    Connection325{{"Connection[325∈0]<br />ᐸ321ᐳ"}}:::plan
-    PgSelect19[["PgSelect[19∈1]<br />ᐸtypesᐳ"]]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
+    Connection114{{"Connection[114∈0] ➊<br />ᐸ110ᐳ"}}:::plan
+    Connection223{{"Connection[223∈0] ➊<br />ᐸ219ᐳ"}}:::plan
+    Connection261{{"Connection[261∈0] ➊<br />ᐸ257ᐳ"}}:::plan
+    Connection325{{"Connection[325∈0] ➊<br />ᐸ321ᐳ"}}:::plan
+    PgSelect19[["PgSelect[19∈1] ➊<br />ᐸtypesᐳ"]]:::plan
     Object17 & Connection18 --> PgSelect19
     __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
     PgSelect19 ==> __Item20
@@ -90,12 +90,12 @@ graph TD
     PgSelectSingle97 --> PgClassExpression99
     PgClassExpression101{{"PgClassExpression[101∈9]<br />ᐸ”c”.”compo...nd_type__)ᐳ"}}:::plan
     PgSelectSingle97 --> PgClassExpression101
-    PgSelect115[["PgSelect[115∈10]<br />ᐸpostᐳ"]]:::plan
-    Constant359{{"Constant[359∈10]<br />ᐸ15ᐳ"}}:::plan
-    Constant360{{"Constant[360∈10]<br />ᐸ20ᐳ"}}:::plan
-    Constant361{{"Constant[361∈10]<br />ᐸ'[...]'ᐳ"}}:::plan
-    Constant145{{"Constant[145∈10]<br />ᐸnullᐳ"}}:::plan
-    Constant377{{"Constant[377∈10]<br />ᐸ[Object: null prototype] {   a: 419,   b: 'easy cheesy bakedᐳ"}}:::plan
+    PgSelect115[["PgSelect[115∈10] ➊<br />ᐸpostᐳ"]]:::plan
+    Constant359{{"Constant[359∈10] ➊<br />ᐸ15ᐳ"}}:::plan
+    Constant360{{"Constant[360∈10] ➊<br />ᐸ20ᐳ"}}:::plan
+    Constant361{{"Constant[361∈10] ➊<br />ᐸ'[...]'ᐳ"}}:::plan
+    Constant145{{"Constant[145∈10] ➊<br />ᐸnullᐳ"}}:::plan
+    Constant377{{"Constant[377∈10] ➊<br />ᐸ[Object: null prototype] {   a: 419,   b: 'easy cheesy bakedᐳ"}}:::plan
     Object17 & Connection114 & Constant359 & Constant360 & Constant361 & Constant359 & Constant360 & Constant361 & Constant360 & Constant361 & Constant359 & Constant145 & Constant377 --> PgSelect115
     __Item116[/"__Item[116∈11]<br />ᐸ115ᐳ"\]:::itemplan
     PgSelect115 ==> __Item116
@@ -185,12 +185,12 @@ graph TD
     PgClassExpression244{{"PgClassExpression[244∈22]<br />ᐸrow_number...tion by 1)ᐳ"}}:::plan
     PgSelectSingle240 --> PgClassExpression244
     PgClassExpression244 --> List245
-    PgSelect262[["PgSelect[262∈25]<br />ᐸpersonᐳ"]]:::plan
+    PgSelect262[["PgSelect[262∈25] ➊<br />ᐸpersonᐳ"]]:::plan
     Object17 & Connection261 --> PgSelect262
-    Connection297{{"Connection[297∈25]<br />ᐸ293ᐳ"}}:::plan
-    Constant375{{"Constant[375∈25]<br />ᐸ1ᐳ"}}:::plan
+    Connection297{{"Connection[297∈25] ➊<br />ᐸ293ᐳ"}}:::plan
+    Constant375{{"Constant[375∈25] ➊<br />ᐸ1ᐳ"}}:::plan
     Constant375 --> Connection297
-    Connection279{{"Connection[279∈25]<br />ᐸ275ᐳ"}}:::plan
+    Connection279{{"Connection[279∈25] ➊<br />ᐸ275ᐳ"}}:::plan
     __Item263[/"__Item[263∈26]<br />ᐸ262ᐳ"\]:::itemplan
     PgSelect262 ==> __Item263
     PgSelectSingle264{{"PgSelectSingle[264∈26]<br />ᐸpersonᐳ"}}:::plan
@@ -227,7 +227,7 @@ graph TD
     PgSelectSingle310 --> PgClassExpression311
     PgClassExpression312{{"PgClassExpression[312∈32]<br />ᐸ__person_f...”headline”ᐳ"}}:::plan
     PgSelectSingle310 --> PgClassExpression312
-    PgSelect326[["PgSelect[326∈33]<br />ᐸedge_caseᐳ"]]:::plan
+    PgSelect326[["PgSelect[326∈33] ➊<br />ᐸedge_caseᐳ"]]:::plan
     Object17 & Connection325 --> PgSelect326
     __Item327[/"__Item[327∈34]<br />ᐸ326ᐳ"\]:::itemplan
     PgSelect326 ==> __Item327
@@ -373,6 +373,4 @@ graph TD
     Bucket30 --> Bucket31
     Bucket33 --> Bucket34
     Bucket34 --> Bucket35
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object17,Access15,Access16,__Value2,__Value4,Connection18,Connection114,Connection223,Connection261,Connection325,PgSelect19,PgSelect115,Constant145,Constant359,Constant360,Constant361,Constant377,PgSelect262,Connection297,Connection279,Constant375,PgSelect326 unary
     end

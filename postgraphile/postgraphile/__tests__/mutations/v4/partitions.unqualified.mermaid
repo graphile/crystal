@@ -9,68 +9,68 @@ graph TD
 
 
     %% plan dependencies
-    Object16{{"Object[16∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access14{{"Access[14∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access15{{"Access[15∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object16{{"Object[16∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access14{{"Access[14∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access15{{"Access[15∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access14 & Access15 --> Object16
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access14
     __Value2 --> Access15
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant56{{"Constant[56∈0]<br />ᐸ'2023-05-24T07:43:00Z'ᐳ"}}:::plan
-    Constant57{{"Constant[57∈0]<br />ᐸ'temp'ᐳ"}}:::plan
-    Constant58{{"Constant[58∈0]<br />ᐸ12.7ᐳ"}}:::plan
-    Constant59{{"Constant[59∈0]<br />ᐸ4ᐳ"}}:::plan
-    Constant62{{"Constant[62∈0]<br />ᐸ13ᐳ"}}:::plan
-    PgInsertSingle13[["PgInsertSingle[13∈1]<br />ᐸmeasurements(timestamp,key,value,user_id)ᐳ"]]:::sideeffectplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant56{{"Constant[56∈0] ➊<br />ᐸ'2023-05-24T07:43:00Z'ᐳ"}}:::plan
+    Constant57{{"Constant[57∈0] ➊<br />ᐸ'temp'ᐳ"}}:::plan
+    Constant58{{"Constant[58∈0] ➊<br />ᐸ12.7ᐳ"}}:::plan
+    Constant59{{"Constant[59∈0] ➊<br />ᐸ4ᐳ"}}:::plan
+    Constant62{{"Constant[62∈0] ➊<br />ᐸ13ᐳ"}}:::plan
+    PgInsertSingle13[["PgInsertSingle[13∈1] ➊<br />ᐸmeasurements(timestamp,key,value,user_id)ᐳ"]]:::sideeffectplan
     Object16 & Constant56 & Constant57 & Constant58 & Constant59 --> PgInsertSingle13
-    Object17{{"Object[17∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    Object17{{"Object[17∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgInsertSingle13 --> Object17
-    PgSelect22[["PgSelect[22∈3]<br />ᐸusersᐳ"]]:::plan
-    PgClassExpression21{{"PgClassExpression[21∈3]<br />ᐸ__measurem....”user_id”ᐳ"}}:::plan
+    PgSelect22[["PgSelect[22∈3] ➊<br />ᐸusersᐳ"]]:::plan
+    PgClassExpression21{{"PgClassExpression[21∈3] ➊<br />ᐸ__measurem....”user_id”ᐳ"}}:::plan
     Object16 & PgClassExpression21 --> PgSelect22
-    PgClassExpression18{{"PgClassExpression[18∈3]<br />ᐸ__measurem...timestamp”ᐳ"}}:::plan
+    PgClassExpression18{{"PgClassExpression[18∈3] ➊<br />ᐸ__measurem...timestamp”ᐳ"}}:::plan
     PgInsertSingle13 --> PgClassExpression18
-    PgClassExpression19{{"PgClassExpression[19∈3]<br />ᐸ__measurements__.”key”ᐳ"}}:::plan
+    PgClassExpression19{{"PgClassExpression[19∈3] ➊<br />ᐸ__measurements__.”key”ᐳ"}}:::plan
     PgInsertSingle13 --> PgClassExpression19
-    PgClassExpression20{{"PgClassExpression[20∈3]<br />ᐸ__measurem...__.”value”ᐳ"}}:::plan
+    PgClassExpression20{{"PgClassExpression[20∈3] ➊<br />ᐸ__measurem...__.”value”ᐳ"}}:::plan
     PgInsertSingle13 --> PgClassExpression20
     PgInsertSingle13 --> PgClassExpression21
-    First26{{"First[26∈3]"}}:::plan
+    First26{{"First[26∈3] ➊"}}:::plan
     PgSelect22 --> First26
-    PgSelectSingle27{{"PgSelectSingle[27∈3]<br />ᐸusersᐳ"}}:::plan
+    PgSelectSingle27{{"PgSelectSingle[27∈3] ➊<br />ᐸusersᐳ"}}:::plan
     First26 --> PgSelectSingle27
-    PgClassExpression28{{"PgClassExpression[28∈4]<br />ᐸ__users__.”id”ᐳ"}}:::plan
+    PgClassExpression28{{"PgClassExpression[28∈4] ➊<br />ᐸ__users__.”id”ᐳ"}}:::plan
     PgSelectSingle27 --> PgClassExpression28
-    PgClassExpression29{{"PgClassExpression[29∈4]<br />ᐸ__users__.”name”ᐳ"}}:::plan
+    PgClassExpression29{{"PgClassExpression[29∈4] ➊<br />ᐸ__users__.”name”ᐳ"}}:::plan
     PgSelectSingle27 --> PgClassExpression29
-    PgUpdateSingle39[["PgUpdateSingle[39∈5]<br />ᐸmeasurements(timestamp,key;value)ᐳ"]]:::sideeffectplan
-    Object42{{"Object[42∈5]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    PgUpdateSingle39[["PgUpdateSingle[39∈5] ➊<br />ᐸmeasurements(timestamp,key;value)ᐳ"]]:::sideeffectplan
+    Object42{{"Object[42∈5] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
     Object42 & Constant56 & Constant57 & Constant62 --> PgUpdateSingle39
-    Access40{{"Access[40∈5]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access41{{"Access[41∈5]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access40{{"Access[40∈5] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access41{{"Access[41∈5] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access40 & Access41 --> Object42
     __Value2 --> Access40
     __Value2 --> Access41
-    Object43{{"Object[43∈5]<br />ᐸ{result}ᐳ"}}:::plan
+    Object43{{"Object[43∈5] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgUpdateSingle39 --> Object43
-    PgSelect48[["PgSelect[48∈7]<br />ᐸusersᐳ"]]:::plan
-    PgClassExpression47{{"PgClassExpression[47∈7]<br />ᐸ__measurem....”user_id”ᐳ"}}:::plan
+    PgSelect48[["PgSelect[48∈7] ➊<br />ᐸusersᐳ"]]:::plan
+    PgClassExpression47{{"PgClassExpression[47∈7] ➊<br />ᐸ__measurem....”user_id”ᐳ"}}:::plan
     Object42 & PgClassExpression47 --> PgSelect48
-    PgClassExpression44{{"PgClassExpression[44∈7]<br />ᐸ__measurem...timestamp”ᐳ"}}:::plan
+    PgClassExpression44{{"PgClassExpression[44∈7] ➊<br />ᐸ__measurem...timestamp”ᐳ"}}:::plan
     PgUpdateSingle39 --> PgClassExpression44
-    PgClassExpression45{{"PgClassExpression[45∈7]<br />ᐸ__measurements__.”key”ᐳ"}}:::plan
+    PgClassExpression45{{"PgClassExpression[45∈7] ➊<br />ᐸ__measurements__.”key”ᐳ"}}:::plan
     PgUpdateSingle39 --> PgClassExpression45
-    PgClassExpression46{{"PgClassExpression[46∈7]<br />ᐸ__measurem...__.”value”ᐳ"}}:::plan
+    PgClassExpression46{{"PgClassExpression[46∈7] ➊<br />ᐸ__measurem...__.”value”ᐳ"}}:::plan
     PgUpdateSingle39 --> PgClassExpression46
     PgUpdateSingle39 --> PgClassExpression47
-    First52{{"First[52∈7]"}}:::plan
+    First52{{"First[52∈7] ➊"}}:::plan
     PgSelect48 --> First52
-    PgSelectSingle53{{"PgSelectSingle[53∈7]<br />ᐸusersᐳ"}}:::plan
+    PgSelectSingle53{{"PgSelectSingle[53∈7] ➊<br />ᐸusersᐳ"}}:::plan
     First52 --> PgSelectSingle53
-    PgClassExpression54{{"PgClassExpression[54∈8]<br />ᐸ__users__.”id”ᐳ"}}:::plan
+    PgClassExpression54{{"PgClassExpression[54∈8] ➊<br />ᐸ__users__.”id”ᐳ"}}:::plan
     PgSelectSingle53 --> PgClassExpression54
-    PgClassExpression55{{"PgClassExpression[55∈8]<br />ᐸ__users__.”name”ᐳ"}}:::plan
+    PgClassExpression55{{"PgClassExpression[55∈8] ➊<br />ᐸ__users__.”name”ᐳ"}}:::plan
     PgSelectSingle53 --> PgClassExpression55
 
     %% define steps
@@ -110,6 +110,4 @@ graph TD
     Bucket5 --> Bucket6
     Bucket6 --> Bucket7
     Bucket7 --> Bucket8
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object16,Access14,Access15,__Value2,__Value4,Constant56,Constant57,Constant58,Constant59,Constant62,PgInsertSingle13,Object17,PgSelect22,PgClassExpression18,PgClassExpression19,PgClassExpression20,PgClassExpression21,First26,PgSelectSingle27,PgClassExpression28,PgClassExpression29,PgUpdateSingle39,Object42,Access40,Access41,Object43,PgSelect48,PgClassExpression44,PgClassExpression45,PgClassExpression46,PgClassExpression47,First52,PgSelectSingle53,PgClassExpression54,PgClassExpression55 unary
     end

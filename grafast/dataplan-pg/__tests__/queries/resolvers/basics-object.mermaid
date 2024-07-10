@@ -9,29 +9,29 @@ graph TD
 
 
     %% plan dependencies
-    Object9{{"Object[9∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access7{{"Access[7∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access8{{"Access[8∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object9{{"Object[9∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access7{{"Access[7∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access8{{"Access[8∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access7 & Access8 --> Object9
-    PgSelect6[["PgSelect[6∈0]<br />ᐸrandom_userᐳ"]]:::plan
+    PgSelect6[["PgSelect[6∈0] ➊<br />ᐸrandom_userᐳ"]]:::plan
     Object9 --> PgSelect6
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access7
     __Value2 --> Access8
-    First10{{"First[10∈0]"}}:::plan
+    First10{{"First[10∈0] ➊"}}:::plan
     PgSelect6 --> First10
-    PgSelectSingle11{{"PgSelectSingle[11∈0]<br />ᐸusersᐳ"}}:::plan
+    PgSelectSingle11{{"PgSelectSingle[11∈0] ➊<br />ᐸusersᐳ"}}:::plan
     First10 --> PgSelectSingle11
-    __Value0["__Value[0∈0]<br />ᐸvariableValuesᐳ"]:::plan
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant20{{"Constant[20∈0]<br />ᐸ[Object: null prototype] {}ᐳ"}}:::plan
-    GraphQLResolver15[["GraphQLResolver[15∈1]<br />ᐸresolveᐳ"]]:::unbatchedplan
-    PgClassExpression12{{"PgClassExpression[12∈1]<br />ᐸ__random_u...”username”ᐳ"}}:::plan
+    __Value0["__Value[0∈0] ➊<br />ᐸvariableValuesᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant20{{"Constant[20∈0] ➊<br />ᐸ[Object: null prototype] {}ᐳ"}}:::plan
+    GraphQLResolver15[["GraphQLResolver[15∈1] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
+    PgClassExpression12{{"PgClassExpression[12∈1] ➊<br />ᐸ__random_u...”username”ᐳ"}}:::plan
     PgClassExpression12 & Constant20 & __Value2 & __Value0 & __Value4 --> GraphQLResolver15
     PgSelectSingle11 --> PgClassExpression12
-    GraphQLResolver17[["GraphQLResolver[17∈2]<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver17[["GraphQLResolver[17∈2] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
     GraphQLResolver15 & Constant20 & __Value2 & __Value0 & __Value4 --> GraphQLResolver17
-    GraphQLResolver19[["GraphQLResolver[19∈2]<br />ᐸresolveᐳ"]]:::unbatchedplan
+    GraphQLResolver19[["GraphQLResolver[19∈2] ➊<br />ᐸresolveᐳ"]]:::unbatchedplan
     GraphQLResolver15 & Constant20 & __Value2 & __Value0 & __Value4 --> GraphQLResolver19
 
     %% define steps
@@ -48,6 +48,4 @@ graph TD
     class Bucket2,GraphQLResolver17,GraphQLResolver19 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object9,PgSelect6,Access7,Access8,First10,PgSelectSingle11,__Value0,__Value2,__Value4,Constant20,GraphQLResolver15,PgClassExpression12,GraphQLResolver17,GraphQLResolver19 unary
     end

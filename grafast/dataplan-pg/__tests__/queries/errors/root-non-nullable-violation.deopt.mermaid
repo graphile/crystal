@@ -9,8 +9,8 @@ graph TD
 
 
     %% plan dependencies
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant6{{"Constant[6∈0]<br />ᐸnullᐳ"}}:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant6{{"Constant[6∈0] ➊<br />ᐸnullᐳ"}}:::plan
 
     %% define steps
 
@@ -18,6 +18,4 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value4,Constant6 bucket0
-    classDef unary fill:#fafffa,borderWidth:8px
-    class __Value4,Constant6 unary
     end

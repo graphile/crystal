@@ -9,69 +9,69 @@ graph TD
 
 
     %% plan dependencies
-    Object46{{"Object[46∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access44{{"Access[44∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access45{{"Access[45∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Object46{{"Object[46∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access44{{"Access[44∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access45{{"Access[45∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access44 & Access45 --> Object46
-    Lambda9{{"Lambda[9∈0]<br />ᐸdecodeNodeIdWithCodecsᐳ"}}:::plan
-    Constant135{{"Constant[135∈0]<br />ᐸ'WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0='ᐳ"}}:::plan
+    Lambda9{{"Lambda[9∈0] ➊<br />ᐸdecodeNodeIdWithCodecsᐳ"}}:::plan
+    Constant135{{"Constant[135∈0] ➊<br />ᐸ'WyJyZWxhdGlvbmFsX3RvcGljcyIsMV0='ᐳ"}}:::plan
     Constant135 --> Lambda9
-    List14{{"List[14∈0]<br />ᐸ134ᐳ"}}:::plan
-    Access134{{"Access[134∈0]<br />ᐸ9.base64JSON.1ᐳ"}}:::plan
+    List14{{"List[14∈0] ➊<br />ᐸ134ᐳ"}}:::plan
+    Access134{{"Access[134∈0] ➊<br />ᐸ9.base64JSON.1ᐳ"}}:::plan
     Access134 --> List14
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access44
     __Value2 --> Access45
     Lambda9 --> Access134
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    List40{{"List[40∈1]<br />ᐸ15,21,27,33,39ᐳ"}}:::plan
-    Object15{{"Object[15∈1]<br />ᐸ{match,pks}ᐳ"}}:::plan
-    Object21{{"Object[21∈1]<br />ᐸ{match,pks}ᐳ"}}:::plan
-    Object27{{"Object[27∈1]<br />ᐸ{match,pks}ᐳ"}}:::plan
-    Object33{{"Object[33∈1]<br />ᐸ{match,pks}ᐳ"}}:::plan
-    Object39{{"Object[39∈1]<br />ᐸ{match,pks}ᐳ"}}:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    List40{{"List[40∈1] ➊<br />ᐸ15,21,27,33,39ᐳ"}}:::plan
+    Object15{{"Object[15∈1] ➊<br />ᐸ{match,pks}ᐳ"}}:::plan
+    Object21{{"Object[21∈1] ➊<br />ᐸ{match,pks}ᐳ"}}:::plan
+    Object27{{"Object[27∈1] ➊<br />ᐸ{match,pks}ᐳ"}}:::plan
+    Object33{{"Object[33∈1] ➊<br />ᐸ{match,pks}ᐳ"}}:::plan
+    Object39{{"Object[39∈1] ➊<br />ᐸ{match,pks}ᐳ"}}:::plan
     Object15 & Object21 & Object27 & Object33 & Object39 --> List40
-    Lambda13[["Lambda[13∈1]"]]:::unbatchedplan
+    Lambda13[["Lambda[13∈1] ➊"]]:::unbatchedplan
     Lambda13 & List14 --> Object15
-    Lambda19[["Lambda[19∈1]"]]:::unbatchedplan
+    Lambda19[["Lambda[19∈1] ➊"]]:::unbatchedplan
     Lambda19 & List14 --> Object21
-    Lambda25[["Lambda[25∈1]"]]:::unbatchedplan
+    Lambda25[["Lambda[25∈1] ➊"]]:::unbatchedplan
     Lambda25 & List14 --> Object27
-    Lambda31[["Lambda[31∈1]"]]:::unbatchedplan
+    Lambda31[["Lambda[31∈1] ➊"]]:::unbatchedplan
     Lambda31 & List14 --> Object33
-    Lambda37[["Lambda[37∈1]"]]:::unbatchedplan
+    Lambda37[["Lambda[37∈1] ➊"]]:::unbatchedplan
     Lambda37 & List14 --> Object39
-    PgSelect43[["PgSelect[43∈1]<br />ᐸrelational_itemsᐳ"]]:::plan
-    Access42{{"Access[42∈1]<br />ᐸ41.0ᐳ"}}:::plan
+    PgSelect43[["PgSelect[43∈1] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
+    Access42{{"Access[42∈1] ➊<br />ᐸ41.0ᐳ"}}:::plan
     Object46 & Access42 --> PgSelect43
-    PgSelect50[["PgSelect[50∈1]<br />ᐸcustom_delete_relational_item(mutation)ᐳ"]]:::sideeffectplan
-    PgClassExpression49{{"PgClassExpression[49∈1]<br />ᐸ__relational_items__ᐳ"}}:::plan
+    PgSelect50[["PgSelect[50∈1] ➊<br />ᐸcustom_delete_relational_item(mutation)ᐳ"]]:::sideeffectplan
+    PgClassExpression49{{"PgClassExpression[49∈1] ➊<br />ᐸ__relational_items__ᐳ"}}:::plan
     Object46 & PgClassExpression49 --> PgSelect50
     Lambda9 --> Lambda13
     Lambda9 --> Lambda19
     Lambda9 --> Lambda25
     Lambda9 --> Lambda31
     Lambda9 --> Lambda37
-    Lambda41{{"Lambda[41∈1]"}}:::plan
+    Lambda41{{"Lambda[41∈1] ➊"}}:::plan
     List40 --> Lambda41
     Lambda41 --> Access42
-    First47{{"First[47∈1]"}}:::plan
+    First47{{"First[47∈1] ➊"}}:::plan
     PgSelect43 --> First47
-    PgSelectSingle48{{"PgSelectSingle[48∈1]<br />ᐸrelational_itemsᐳ"}}:::plan
+    PgSelectSingle48{{"PgSelectSingle[48∈1] ➊<br />ᐸrelational_itemsᐳ"}}:::plan
     First47 --> PgSelectSingle48
     PgSelectSingle48 --> PgClassExpression49
-    First54{{"First[54∈1]"}}:::plan
+    First54{{"First[54∈1] ➊"}}:::plan
     PgSelect50 --> First54
-    PgSelectSingle55{{"PgSelectSingle[55∈1]<br />ᐸcustom_delete_relational_itemᐳ"}}:::plan
+    PgSelectSingle55{{"PgSelectSingle[55∈1] ➊<br />ᐸcustom_delete_relational_itemᐳ"}}:::plan
     First54 --> PgSelectSingle55
-    PgClassExpression56{{"PgClassExpression[56∈1]<br />ᐸ__custom_d...l_item__.vᐳ"}}:::plan
+    PgClassExpression56{{"PgClassExpression[56∈1] ➊<br />ᐸ__custom_d...l_item__.vᐳ"}}:::plan
     PgSelectSingle55 --> PgClassExpression56
-    Object57{{"Object[57∈1]<br />ᐸ{result}ᐳ"}}:::plan
+    Object57{{"Object[57∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
     PgClassExpression56 --> Object57
-    Connection70{{"Connection[70∈2]<br />ᐸ66ᐳ"}}:::plan
-    Constant136{{"Constant[136∈2]<br />ᐸ1ᐳ"}}:::plan
+    Connection70{{"Connection[70∈2] ➊<br />ᐸ66ᐳ"}}:::plan
+    Constant136{{"Constant[136∈2] ➊<br />ᐸ1ᐳ"}}:::plan
     Constant136 --> Connection70
-    PgSelect71[["PgSelect[71∈4]<br />ᐸrelational_itemsᐳ"]]:::plan
+    PgSelect71[["PgSelect[71∈4] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
     Object46 & Connection70 --> PgSelect71
     __Item72[/"__Item[72∈5]<br />ᐸ71ᐳ"\]:::itemplan
     PgSelect71 ==> __Item72
@@ -84,31 +84,31 @@ graph TD
     PgSelect75[["PgSelect[75∈6]<br />ᐸrelational_topicsᐳ<br />ᐳRelationalTopic"]]:::plan
     Object46 & PgClassExpression74 --> PgSelect75
     List83{{"List[83∈6]<br />ᐸ81,82ᐳ<br />ᐳRelationalTopic"}}:::plan
-    Constant81{{"Constant[81∈6]<br />ᐸ'relational_topics'ᐳ<br />ᐳRelationalTopic"}}:::plan
+    Constant81{{"Constant[81∈6] ➊<br />ᐸ'relational_topics'ᐳ<br />ᐳRelationalTopic"}}:::plan
     PgClassExpression82{{"PgClassExpression[82∈6]<br />ᐸ__relation...c_item_id”ᐳ"}}:::plan
     Constant81 & PgClassExpression82 --> List83
     PgSelect87[["PgSelect[87∈6]<br />ᐸrelational_postsᐳ<br />ᐳRelationalPost"]]:::plan
     Object46 & PgClassExpression74 --> PgSelect87
     List95{{"List[95∈6]<br />ᐸ93,94ᐳ<br />ᐳRelationalPost"}}:::plan
-    Constant93{{"Constant[93∈6]<br />ᐸ'relational_posts'ᐳ<br />ᐳRelationalPost"}}:::plan
+    Constant93{{"Constant[93∈6] ➊<br />ᐸ'relational_posts'ᐳ<br />ᐳRelationalPost"}}:::plan
     PgClassExpression94{{"PgClassExpression[94∈6]<br />ᐸ__relation...t_item_id”ᐳ"}}:::plan
     Constant93 & PgClassExpression94 --> List95
     PgSelect99[["PgSelect[99∈6]<br />ᐸrelational_dividersᐳ<br />ᐳRelationalDivider"]]:::plan
     Object46 & PgClassExpression74 --> PgSelect99
     List107{{"List[107∈6]<br />ᐸ105,106ᐳ<br />ᐳRelationalDivider"}}:::plan
-    Constant105{{"Constant[105∈6]<br />ᐸ'relational_dividers'ᐳ<br />ᐳRelationalDivider"}}:::plan
+    Constant105{{"Constant[105∈6] ➊<br />ᐸ'relational_dividers'ᐳ<br />ᐳRelationalDivider"}}:::plan
     PgClassExpression106{{"PgClassExpression[106∈6]<br />ᐸ__relation...r_item_id”ᐳ"}}:::plan
     Constant105 & PgClassExpression106 --> List107
     PgSelect111[["PgSelect[111∈6]<br />ᐸrelational_checklistsᐳ<br />ᐳRelationalChecklist"]]:::plan
     Object46 & PgClassExpression74 --> PgSelect111
     List119{{"List[119∈6]<br />ᐸ117,118ᐳ<br />ᐳRelationalChecklist"}}:::plan
-    Constant117{{"Constant[117∈6]<br />ᐸ'relational_checklists'ᐳ<br />ᐳRelationalChecklist"}}:::plan
+    Constant117{{"Constant[117∈6] ➊<br />ᐸ'relational_checklists'ᐳ<br />ᐳRelationalChecklist"}}:::plan
     PgClassExpression118{{"PgClassExpression[118∈6]<br />ᐸ__relation...t_item_id”ᐳ"}}:::plan
     Constant117 & PgClassExpression118 --> List119
     PgSelect123[["PgSelect[123∈6]<br />ᐸrelational_checklist_itemsᐳ<br />ᐳRelationalChecklistItem"]]:::plan
     Object46 & PgClassExpression74 --> PgSelect123
     List131{{"List[131∈6]<br />ᐸ129,130ᐳ<br />ᐳRelationalChecklistItem"}}:::plan
-    Constant129{{"Constant[129∈6]<br />ᐸ'relational_checklist_items'ᐳ<br />ᐳRelationalChecklistItem"}}:::plan
+    Constant129{{"Constant[129∈6] ➊<br />ᐸ'relational_checklist_items'ᐳ<br />ᐳRelationalChecklistItem"}}:::plan
     PgClassExpression130{{"PgClassExpression[130∈6]<br />ᐸ__relation...m_item_id”ᐳ"}}:::plan
     Constant129 & PgClassExpression130 --> List131
     First79{{"First[79∈6]"}}:::plan
@@ -177,6 +177,4 @@ graph TD
     Bucket3 --> Bucket4
     Bucket4 --> Bucket5
     Bucket5 --> Bucket6
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object46,Lambda9,List14,Access44,Access45,Access134,__Value2,__Value4,Constant135,List40,Object15,Object21,Object27,Object33,Object39,PgSelect43,PgSelect50,Lambda13,Lambda19,Lambda25,Lambda31,Lambda37,Lambda41,Access42,First47,PgSelectSingle48,PgClassExpression49,First54,PgSelectSingle55,PgClassExpression56,Object57,Connection70,Constant136,PgSelect71,Constant81,Constant93,Constant105,Constant117,Constant129 unary
     end

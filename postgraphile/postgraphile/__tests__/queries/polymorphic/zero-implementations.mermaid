@@ -9,9 +9,9 @@ graph TD
 
 
     %% plan dependencies
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection14{{"Connection[14∈0]<br />ᐸ13ᐳ"}}:::plan
-    Constant18{{"Constant[18∈1]<br />ᐸ[]ᐳ"}}:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection14{{"Connection[14∈0] ➊<br />ᐸ13ᐳ"}}:::plan
+    Constant18{{"Constant[18∈1] ➊<br />ᐸ[]ᐳ"}}:::plan
     __Item16[/"__Item[16∈2]<br />ᐸ18ᐳ"\]:::itemplan
     Constant18 ==> __Item16
     PgUnionAllSingle17["PgUnionAllSingle[17∈2]"]:::plan
@@ -31,6 +31,4 @@ graph TD
     class Bucket2,__Item16,PgUnionAllSingle17 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
-    classDef unary fill:#fafffa,borderWidth:8px
-    class __Value4,Connection14,Constant18 unary
     end

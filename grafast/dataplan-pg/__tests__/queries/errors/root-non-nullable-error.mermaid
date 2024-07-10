@@ -9,8 +9,8 @@ graph TD
 
 
     %% plan dependencies
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Error6[["Error[6∈0]"]]:::unbatchedplan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Error6[["Error[6∈0] ➊"]]:::unbatchedplan
 
     %% define steps
 
@@ -18,6 +18,4 @@ graph TD
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
     class Bucket0,__Value4,Error6 bucket0
-    classDef unary fill:#fafffa,borderWidth:8px
-    class __Value4,Error6 unary
     end

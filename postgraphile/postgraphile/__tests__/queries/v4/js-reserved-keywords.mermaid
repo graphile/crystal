@@ -9,44 +9,44 @@ graph TD
 
 
     %% plan dependencies
-    PgSelect7[["PgSelect[7∈0]<br />ᐸmachineᐳ"]]:::plan
-    Object10{{"Object[10∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant93{{"Constant[93∈0]<br />ᐸ1ᐳ"}}:::plan
+    PgSelect7[["PgSelect[7∈0] ➊<br />ᐸmachineᐳ"]]:::plan
+    Object10{{"Object[10∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant93{{"Constant[93∈0] ➊<br />ᐸ1ᐳ"}}:::plan
     Object10 & Constant93 --> PgSelect7
-    Access8{{"Access[8∈0]<br />ᐸ2.pgSettingsᐳ"}}:::plan
-    Access9{{"Access[9∈0]<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access8{{"Access[8∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access9{{"Access[9∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
     Access8 & Access9 --> Object10
-    PgSelect25[["PgSelect[25∈0]<br />ᐸbuildingᐳ"]]:::plan
-    Constant94{{"Constant[94∈0]<br />ᐸ2ᐳ"}}:::plan
+    PgSelect25[["PgSelect[25∈0] ➊<br />ᐸbuildingᐳ"]]:::plan
+    Constant94{{"Constant[94∈0] ➊<br />ᐸ2ᐳ"}}:::plan
     Object10 & Constant94 --> PgSelect25
-    __Value2["__Value[2∈0]<br />ᐸcontextᐳ"]:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
     __Value2 --> Access8
     __Value2 --> Access9
-    First11{{"First[11∈0]"}}:::plan
+    First11{{"First[11∈0] ➊"}}:::plan
     PgSelect7 --> First11
-    PgSelectSingle12{{"PgSelectSingle[12∈0]<br />ᐸmachineᐳ"}}:::plan
+    PgSelectSingle12{{"PgSelectSingle[12∈0] ➊<br />ᐸmachineᐳ"}}:::plan
     First11 --> PgSelectSingle12
-    First29{{"First[29∈0]"}}:::plan
+    First29{{"First[29∈0] ➊"}}:::plan
     PgSelect25 --> First29
-    PgSelectSingle30{{"PgSelectSingle[30∈0]<br />ᐸbuildingᐳ"}}:::plan
+    PgSelectSingle30{{"PgSelectSingle[30∈0] ➊<br />ᐸbuildingᐳ"}}:::plan
     First29 --> PgSelectSingle30
-    __Value4["__Value[4∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection64{{"Connection[64∈0]<br />ᐸ60ᐳ"}}:::plan
-    PgClassExpression13{{"PgClassExpression[13∈1]<br />ᐸ__machine_...nstructor”ᐳ"}}:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection64{{"Connection[64∈0] ➊<br />ᐸ60ᐳ"}}:::plan
+    PgClassExpression13{{"PgClassExpression[13∈1] ➊<br />ᐸ__machine_...nstructor”ᐳ"}}:::plan
     PgSelectSingle12 --> PgClassExpression13
-    PgSelectSingle19{{"PgSelectSingle[19∈1]<br />ᐸbuildingᐳ"}}:::plan
+    PgSelectSingle19{{"PgSelectSingle[19∈1] ➊<br />ᐸbuildingᐳ"}}:::plan
     PgSelectSingle12 --> PgSelectSingle19
-    PgClassExpression23{{"PgClassExpression[23∈1]<br />ᐸ__machine__.”input”ᐳ"}}:::plan
+    PgClassExpression23{{"PgClassExpression[23∈1] ➊<br />ᐸ__machine__.”input”ᐳ"}}:::plan
     PgSelectSingle12 --> PgClassExpression23
-    PgClassExpression20{{"PgClassExpression[20∈2]<br />ᐸ__building__.”id”ᐳ"}}:::plan
+    PgClassExpression20{{"PgClassExpression[20∈2] ➊<br />ᐸ__building__.”id”ᐳ"}}:::plan
     PgSelectSingle19 --> PgClassExpression20
-    PgClassExpression21{{"PgClassExpression[21∈2]<br />ᐸ__building...nstructor”ᐳ"}}:::plan
+    PgClassExpression21{{"PgClassExpression[21∈2] ➊<br />ᐸ__building...nstructor”ᐳ"}}:::plan
     PgSelectSingle19 --> PgClassExpression21
-    PgClassExpression51{{"PgClassExpression[51∈3]<br />ᐸ__building__.”name”ᐳ"}}:::plan
+    PgClassExpression51{{"PgClassExpression[51∈3] ➊<br />ᐸ__building__.”name”ᐳ"}}:::plan
     PgSelectSingle30 --> PgClassExpression51
-    Access92{{"Access[92∈3]<br />ᐸ29.0ᐳ"}}:::plan
+    Access92{{"Access[92∈3] ➊<br />ᐸ29.0ᐳ"}}:::plan
     First29 --> Access92
-    Connection44{{"Connection[44∈3]<br />ᐸ40ᐳ"}}:::plan
+    Connection44{{"Connection[44∈3] ➊<br />ᐸ40ᐳ"}}:::plan
     __Item46[/"__Item[46∈4]<br />ᐸ92ᐳ"\]:::itemplan
     Access92 ==> __Item46
     PgSelectSingle47{{"PgSelectSingle[47∈4]<br />ᐸmachineᐳ"}}:::plan
@@ -57,7 +57,7 @@ graph TD
     PgSelectSingle47 --> PgClassExpression49
     PgClassExpression50{{"PgClassExpression[50∈5]<br />ᐸ__machine__.”input”ᐳ"}}:::plan
     PgSelectSingle47 --> PgClassExpression50
-    PgSelect65[["PgSelect[65∈6]<br />ᐸrelational_itemsᐳ"]]:::plan
+    PgSelect65[["PgSelect[65∈6] ➊<br />ᐸrelational_itemsᐳ"]]:::plan
     Object10 & Connection64 --> PgSelect65
     __Item66[/"__Item[66∈7]<br />ᐸ65ᐳ"\]:::itemplan
     PgSelect65 ==> __Item66
@@ -122,6 +122,4 @@ graph TD
     Bucket4 --> Bucket5
     Bucket6 --> Bucket7
     Bucket7 --> Bucket8
-    classDef unary fill:#fafffa,borderWidth:8px
-    class PgSelect7,Object10,PgSelect25,Access8,Access9,First11,PgSelectSingle12,First29,PgSelectSingle30,__Value2,__Value4,Connection64,Constant93,Constant94,PgClassExpression13,PgSelectSingle19,PgClassExpression23,PgClassExpression20,PgClassExpression21,PgClassExpression51,Access92,Connection44,PgSelect65 unary
     end
