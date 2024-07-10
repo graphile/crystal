@@ -33,6 +33,12 @@ const makeSchema = () => {
         errorToEmptyList(setNullToError: Int): [Int]
         errorToError(setNullToError: Int): Error
         mySideEffect: Int
+        mySideEffectError: MySideEffectError
+      }
+      type MySideEffectError {
+        message: String!
+        errcode: Int!
+        detail: String!
       }
     `,
     plans: {
@@ -65,6 +71,18 @@ const makeSchema = () => {
           return lambda($trap, () => {
             return 1;
           });
+        },
+        mySideEffectError() {
+          const $sideEffect = sideEffect(null, () => {
+            throw Object.assign(new Error("Test 2"), {
+              errcode: 42,
+              detail: "Goodbye, and thanks for all the fish!",
+            });
+          });
+          const $errorValue = trap($sideEffect, TRAP_ERROR_OR_INHIBITED, {
+            valueForError: "PASS_THROUGH",
+          });
+          return $errorValue;
         },
       },
     },
@@ -173,4 +191,28 @@ it("traps errors thrown in side effects in the chain", async () => {
   `;
   const result = await grafast({ source, schema });
   expect(result).to.deep.equal({ data: { mySideEffect: 1 } });
+});
+
+it("traps errors thrown in side effects in the chain and allows pass-through", async () => {
+  const schema = makeSchema();
+
+  const source = /* GraphQL */ `
+    query withSideEffects {
+      mySideEffectError {
+        message
+        errcode
+        detail
+      }
+    }
+  `;
+  const result = await grafast({ source, schema });
+  expect(result).to.deep.equal({
+    data: {
+      mySideEffectError: {
+        message: "Test 2",
+        errcode: 42,
+        detail: "Goodbye, and thanks for all the fish!",
+      },
+    },
+  });
 });
