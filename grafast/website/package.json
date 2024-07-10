@@ -13,6 +13,7 @@
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
     "posttest": "yarn build",
+    "mermaid:update": "cd examples/users-and-friends && node index.mjs docs",
     "test": "cd examples/users-and-friends && node index.mjs"
   },
   "dependencies": {
