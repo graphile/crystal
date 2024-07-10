@@ -100,17 +100,6 @@ export class StepTracker {
   }
 
   public addStep($step: ExecutableStep): number {
-    const previousStep = this.stepById[this.stepCount];
-    // NOTE: `hasSideEffect` cannot be set on previousStep after
-    // this.stepCount++, so this is safe to do.
-    if (
-      previousStep &&
-      previousStep.layerPlan === $step.layerPlan &&
-      previousStep.hasSideEffects
-    ) {
-      $step.layerPlan.latestSideEffectStep = previousStep;
-    }
-
     const stepId = this.stepCount++;
     this.activeSteps.add($step);
     this.stepsWithNoDependencies.add($step);
