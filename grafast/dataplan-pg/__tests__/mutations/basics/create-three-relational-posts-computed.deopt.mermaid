@@ -183,6 +183,10 @@ graph TD
 
     %% define steps
 
+    %% implicit side effects
+    PgSelect8 -.-o PgSelect14
+    PgSelect14 -.-o PgSelect20
+
     subgraph "Buckets for mutations/basics/create-three-relational-posts-computed"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969

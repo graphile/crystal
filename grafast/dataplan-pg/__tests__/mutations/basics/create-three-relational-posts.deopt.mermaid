@@ -196,6 +196,10 @@ graph TD
 
     %% define steps
 
+    %% implicit side effects
+    PgInsertSingle16 -.-o PgInsertSingle22
+    PgInsertSingle30 -.-o PgInsertSingle36
+
     subgraph "Buckets for mutations/basics/create-three-relational-posts"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
