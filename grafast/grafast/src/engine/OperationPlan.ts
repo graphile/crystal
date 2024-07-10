@@ -3533,6 +3533,7 @@ export class OperationPlan {
         metaString: metaString ? stripAnsi(metaString) : metaString,
         isUnary: step._isUnary,
         bucketId: step.layerPlan.id,
+        implicitSideEffectStepId: step.implicitSideEffectStep?.id ?? null,
         dependencyIds: sstep.dependencies.map((d) => d.id),
         dependencyForbiddenFlags: sstep.dependencyForbiddenFlags.slice(),
         dependencyOnReject: sstep.dependencyOnReject.map((or) =>

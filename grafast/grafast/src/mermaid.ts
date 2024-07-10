@@ -329,6 +329,15 @@ export function planToMermaid(
   };
 
   graph.push("");
+  graph.push("    %% implicit side effects");
+  sortedSteps.forEach((step) => {
+    if (step.implicitSideEffectStepId) {
+      const sideEffectStep = stepById[step.implicitSideEffectStepId];
+      graph.push(`    ${planId(sideEffectStep)} -.-o ${planId(step)}`);
+    }
+  });
+
+  graph.push("");
   if (!concise && !skipBuckets) graph.push("    subgraph Buckets");
   const layerPlans = Object.values(layerPlanById);
   for (let i = 0, l = layerPlans.length; i < l; i++) {

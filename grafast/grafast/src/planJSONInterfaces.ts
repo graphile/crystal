@@ -10,6 +10,7 @@ export interface GrafastPlanStepJSONv1 {
   metaString: string | null;
   isUnary: boolean;
   bucketId: string | number;
+  implicitSideEffectStepId: string | number | null;
   dependencyIds: ReadonlyArray<string | number>;
   dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
   dependencyOnReject: ReadonlyArray<string | null | undefined>;
