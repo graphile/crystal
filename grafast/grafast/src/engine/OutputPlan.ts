@@ -485,7 +485,11 @@ export class OutputPlan<TType extends OutputPlanType = OutputPlanType> {
     const $sideEffect = this.sideEffectStep;
     if ($sideEffect) {
       const $root = this.rootStep;
-      if ($root === $sideEffect || stepADependsOnStepB($root, $sideEffect)) {
+      if (
+        $root === $sideEffect ||
+        $root.implicitSideEffectStep === $sideEffect ||
+        stepADependsOnStepB($root, $sideEffect)
+      ) {
         // It's marked readonly, but we override it anyway
         (this.sideEffectStep as ExecutableStep | null) = null;
       }

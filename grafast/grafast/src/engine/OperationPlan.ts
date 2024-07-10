@@ -3444,6 +3444,7 @@ export class OperationPlan {
         if (layerPlan.parentSideEffectStep) {
           if (
             layerPlan.parentSideEffectStep === $root ||
+            layerPlan.parentSideEffectStep === $root.implicitSideEffectStep ||
             stepADependsOnStepB($root, layerPlan.parentSideEffectStep)
           ) {
             layerPlan.parentSideEffectStep = null;
