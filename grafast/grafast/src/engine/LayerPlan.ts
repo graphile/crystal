@@ -379,17 +379,10 @@ export class LayerPlan<TReason extends LayerPlanReason = LayerPlanReason> {
     this._hasSetRootStep = true;
     this.operationPlan.stepTracker.setLayerPlanRootStep(this, $root);
 
-    // If we add an explicit dependency on `this.parentSideEffectStep` then we
-    // should remove the implicit dependency (e.g. so that if you `trap()` the
-    // error it does not interfere).
-    if (this.parentSideEffectStep) {
-      if (
-        this.parentSideEffectStep === $root ||
-        stepADependsOnStepB($root, this.parentSideEffectStep)
-      ) {
-        this.parentSideEffectStep = null;
-      }
-    }
+    // NOTE: we may clear `this.parentSideEffectStep` based on the `$root` step
+    // having an explicit dependency on `this.parentSideEffectStep`; but that
+    // will be done as part of `OperationPlan::finalizeLayerPlans()` because
+    // steps aren't assigned `implicitSideEffectStep`s until that point.
   }
 
   /** @internal Use plan.getStep(id) instead. */

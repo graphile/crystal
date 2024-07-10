@@ -3437,6 +3437,18 @@ export class OperationPlan {
       const $root = layerPlan.rootStep;
       if ($root) {
         ensurePlanAvailableInLayer($root, layerPlan);
+
+        // If $root explicitly dependends on `layerPlan.parentSideEffectStep`
+        // then we should remove the implicit layerPlan dependency (e.g. so
+        // that if you `trap()` the error it does not interfere).
+        if (layerPlan.parentSideEffectStep) {
+          if (
+            layerPlan.parentSideEffectStep === $root ||
+            stepADependsOnStepB($root, layerPlan.parentSideEffectStep)
+          ) {
+            layerPlan.parentSideEffectStep = null;
+          }
+        }
       }
 
       const $sideEffect = layerPlan.parentSideEffectStep;
