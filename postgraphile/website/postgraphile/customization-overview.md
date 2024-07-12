@@ -170,7 +170,7 @@ behavior, these include:
 - `postgraphile/presets/relay` - a preset for people who want a beautiful
   Relay-centric GraphQL schema; in particular this turns off things like primary
   keys and tries to make it so the system uses [GraphQL global object
-  identifiers](,/node-id) everywhere
+  identifiers](./node-id) everywhere
 
 As mentioned above, your `graphile.config.ts` (or similar) file itself defines
 a preset.
