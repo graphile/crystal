@@ -1132,8 +1132,10 @@ export class OperationPlan {
          */
 
         if (resolver !== null) {
-          resolverEmulation = true;
           this.pure = false;
+          if (!planResolver) {
+            resolverEmulation = true;
+          }
         }
 
         const resultIsPlanned = isTypePlanned(this.schema, namedReturnType);
