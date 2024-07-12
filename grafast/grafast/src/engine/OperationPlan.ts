@@ -1075,7 +1075,7 @@ export class OperationPlan {
         // Apply a default plan to fields that do not have a plan nor a resolver.
         const planResolver =
           rawPlanResolver ??
-          (usesDefaultResolver ? makeDefaultPlan(fieldName) : undefined);
+          (resolver ? undefined : makeDefaultPlan(fieldName));
 
         /*
          *  When considering resolvers on fields, there's three booleans to
