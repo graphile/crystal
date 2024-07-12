@@ -28,6 +28,7 @@ const {
   getNullableType,
   isAbstractType,
   isListType,
+  isNonNullType,
 } = graphql;
 
 type ResolveInfoBase = Omit<
@@ -241,7 +242,12 @@ export class GraphQLItemHandler
     super();
     this.addDependency($parent);
     if (isListType(nullableType)) {
-      this.nullableInnerType = nullableType.ofType;
+      const innerType = nullableType.ofType;
+      if (isNonNullType(innerType)) {
+        this.nullableInnerType = innerType.ofType;
+      } else {
+        this.nullableInnerType = innerType;
+      }
     } else {
       if (!isAbstractType(nullableType)) {
         throw new Error(

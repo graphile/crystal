@@ -22,6 +22,7 @@ import type { SelectionSetDigest } from "../graphqlCollectFields.js";
 import {
   evalDirectiveArg,
   graphqlCollectFields,
+  newSelectionSetDigest,
 } from "../graphqlCollectFields.js";
 import { fieldSelectionsForType } from "../graphqlMergeSelectionSets.js";
 import type { GrafastPlanJSON, ModifierStep } from "../index.js";
@@ -676,6 +677,7 @@ export class OperationPlan {
       this.trackedRootValueStep,
       rootType,
       this.operation.selectionSet.selections,
+      true,
     );
     if (this.loc !== null) this.loc.pop();
   }
@@ -717,6 +719,7 @@ export class OperationPlan {
       rootType,
       this.operation.selectionSet.selections,
       true,
+      true,
     );
     if (this.loc !== null) this.loc.pop();
   }
@@ -740,6 +743,7 @@ export class OperationPlan {
       this.trackedRootValueStep.id,
       rootType,
       selectionSet.selections,
+      newSelectionSetDigest(false),
     );
     if (groupedFieldSet.deferred !== undefined) {
       throw new SafeError(
@@ -851,6 +855,7 @@ export class OperationPlan {
         streamItemPlan,
         rootType,
         selectionSet.selections,
+        false,
       );
     } else {
       const subscribeStep = withGlobalLayerPlan(
@@ -940,6 +945,7 @@ export class OperationPlan {
         streamItemPlan,
         rootType,
         selectionSet.selections,
+        true,
       );
     }
     if (this.loc !== null) this.loc.pop();
@@ -990,6 +996,7 @@ export class OperationPlan {
     let mutationIndex = -1;
     const $sideEffect = outputPlan.layerPlan.latestSideEffectStep;
     for (const [responseKey, fieldNodes] of groupedFieldSet.fields.entries()) {
+      let resolverEmulation = groupedFieldSet.resolverEmulation;
       try {
         // All grouped fields are equivalent, as mandated by GraphQL validation rules. Thus we can take the first one.
         const field = fieldNodes[0];
@@ -1041,6 +1048,9 @@ export class OperationPlan {
 
         const fieldType = objectField.type;
         const rawPlanResolver = objectField.extensions?.grafast?.plan;
+        if (rawPlanResolver) {
+          resolverEmulation = false;
+        }
         if (rawPlanResolver?.constructor?.name === "AsyncFunction") {
           throw new Error(
             `Plans must be synchronous, but this schema has an async function at '${
@@ -1058,12 +1068,23 @@ export class OperationPlan {
         const usesDefaultResolver =
           resolvedResolver == null || resolvedResolver === defaultFieldResolver;
 
-        const resolver = usesDefaultResolver ? null : resolvedResolver;
+        const isPolymorphic =
+          isUnionType(namedReturnType) || isInterfaceType(namedReturnType);
+
+        // We should use a resolver if:
+        // 1. they give us a non-default resolver
+        // 2. we're emulating resolvers AND the field is polymorphic
+        const resolver =
+          resolvedResolver && !usesDefaultResolver
+            ? resolvedResolver
+            : resolverEmulation && isPolymorphic
+            ? defaultFieldResolver
+            : null;
 
         // Apply a default plan to fields that do not have a plan nor a resolver.
         const planResolver =
           rawPlanResolver ??
-          (usesDefaultResolver ? makeDefaultPlan(fieldName) : undefined);
+          (resolver ? undefined : makeDefaultPlan(fieldName));
 
         /*
          *  When considering resolvers on fields, there's three booleans to
@@ -1121,6 +1142,9 @@ export class OperationPlan {
 
         if (resolver !== null) {
           this.pure = false;
+          if (!rawPlanResolver) {
+            resolverEmulation = true;
+          }
         }
 
         const resultIsPlanned = isTypePlanned(this.schema, namedReturnType);
@@ -1241,6 +1265,7 @@ export class OperationPlan {
             fieldType,
             step,
             locationDetails,
+            resolverEmulation,
           );
         }
       } finally {
@@ -1303,6 +1328,7 @@ export class OperationPlan {
     parentStep: ExecutableStep,
     objectType: GraphQLObjectType,
     selections: readonly SelectionNode[],
+    resolverEmulation: boolean,
     isMutation = false,
   ) {
     if (this.loc !== null) {
@@ -1325,6 +1351,7 @@ export class OperationPlan {
       parentStep.id,
       objectType,
       selections,
+      newSelectionSetDigest(resolverEmulation),
       isMutation,
     );
     const objectTypeFields = objectType.getFields();
@@ -1358,6 +1385,7 @@ export class OperationPlan {
     fieldType: GraphQLOutputType,
     $step: ExecutableStep,
     locationDetails: LocationDetails,
+    resolverEmulation: boolean,
     listDepth = 0,
   ) {
     const nullableFieldType = getNullableType(fieldType);
@@ -1405,6 +1433,7 @@ export class OperationPlan {
           nullableFieldType.ofType,
           $item,
           locationDetails,
+          resolverEmulation,
           listDepth + 1,
         );
       } finally {
@@ -1563,6 +1592,7 @@ export class OperationPlan {
           $step,
           nullableFieldType,
           selections!,
+          resolverEmulation,
         );
       } finally {
         objectLayerPlan.latestSideEffectStep = $sideEffect;
