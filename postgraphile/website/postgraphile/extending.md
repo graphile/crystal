@@ -15,8 +15,8 @@ _If you're looking for an easy way to remove/rename things, check out
 ### Inflection example
 
 Here's an example of a simple plugin which uses the ["inflection"
-system](./inflection) to rename the `full_name` database column to be output as
-`name` in GraphQL:
+system](./inflection) to rename all database columns named `full_name` to be
+output as `name` in GraphQL:
 
 ```js
 /** @type {GraphileConfig.Plugin} */
@@ -27,8 +27,8 @@ const FullNameToNamePlugin = {
       attribute(previous, options, details) {
         if (details.attributeName === "full_name") {
           return "name";
-        } else {
-          return previous ? previous(details) : details.attributeName;
+        } else if (previous) {
+          return previous?.(details) ?? details.attributeName;
         }
       },
     },
