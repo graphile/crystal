@@ -136,10 +136,9 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
   }
 
   deduplicate(peers: GraphQLResolverStep[]): GraphQLResolverStep[] {
-    return peers.filter(
-      (peer) =>
-        peer.resolver === this.resolver && peer.subscriber === this.subscriber,
-    );
+    // GraphQL resolvers can NEVER be deduplicated, since the ResolveInfo
+    // object passed in will be different for each position.
+    return [];
   }
 
   unbatchedExecute(
