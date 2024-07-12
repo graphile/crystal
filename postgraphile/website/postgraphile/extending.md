@@ -27,7 +27,7 @@ const FullNameToNamePlugin = {
       attribute(previous, options, details) {
         if (details.attributeName === "full_name") {
           return "name";
-        } else if (previous) {
+        } else {
           return previous?.(details) ?? details.attributeName;
         }
       },
