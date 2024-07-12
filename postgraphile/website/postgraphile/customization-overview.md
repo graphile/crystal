@@ -52,9 +52,9 @@ relationships), and your configuration options including your global default
 behavior (e.g. whether you prefer connections (default) or lists).
 
 You can override these default decisions on a global, per table, or per
-constraint basis using the behavior system, e.g. via [smart tags](./smart-tags)
-on the relevant entities, or your `preset.schema.defaultBehavior` configuration
-setting.
+constraint basis using the [behavior](./behavior) system, e.g. via [smart
+tags](./smart-tags) on the relevant entities, or your
+`preset.schema.defaultBehavior` configuration setting.
 
 :::tip
 
