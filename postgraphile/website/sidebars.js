@@ -33,7 +33,7 @@ const sidebars = {
     "performance",
     "requirements",
     "required-knowledge",
-    "customization-summary",
+    "customization-overview",
     {
       type: "html",
       value: "<h4>OPERATION</h4>",
