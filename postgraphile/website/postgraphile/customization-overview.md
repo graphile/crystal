@@ -56,7 +56,7 @@ constraint basis using the [behavior](./behavior) system, e.g. via [smart
 tags](./smart-tags) on the relevant entities, or your
 `preset.schema.defaultBehavior` configuration setting.
 
-:::tip
+:::tip Add "virtual" constraints to views
 
 Views and materialized views don't natively support constraints, so
 PostGraphile provides a system whereby you can add ["virtual
@@ -82,7 +82,7 @@ PostGraphile will add it to the query operation, either as a top-level field
 (aka a "custom query" function) or, if it matches a specific set of criteria,
 as a field on a table type (known as a "computed column" function).
 
-:::tip "Computed column" functions are a misnomer
+:::info "Computed column" functions are a misnomer
 
 "Computed column" functions were originally intended to enable adding of
 scalars to types based on other attributes of the type, but they grew into so
