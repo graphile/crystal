@@ -1067,10 +1067,18 @@ export class OperationPlan {
         const usesDefaultResolver =
           resolvedResolver == null || resolvedResolver === defaultFieldResolver;
 
+        const isPolymorphic =
+          isUnionType(namedReturnType) || isInterfaceType(namedReturnType);
+
+        // We should use a resolver if:
+        // 1. they give us a non-default resolver
+        // 2. we're emulating resolvers AND the field is polymorphic
         const resolver =
-          usesDefaultResolver && !resolverEmulation
-            ? null
-            : resolvedResolver ?? defaultFieldResolver;
+          resolvedResolver && !usesDefaultResolver
+            ? resolvedResolver
+            : resolverEmulation && isPolymorphic
+            ? defaultFieldResolver
+            : null;
 
         // Apply a default plan to fields that do not have a plan nor a resolver.
         const planResolver =
@@ -1133,7 +1141,7 @@ export class OperationPlan {
 
         if (resolver !== null) {
           this.pure = false;
-          if (!planResolver) {
+          if (!rawPlanResolver) {
             resolverEmulation = true;
           }
         }
