@@ -719,6 +719,7 @@ export class OperationPlan {
       rootType,
       this.operation.selectionSet.selections,
       true,
+      true,
     );
     if (this.loc !== null) this.loc.pop();
   }
