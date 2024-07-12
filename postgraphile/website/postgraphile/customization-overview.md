@@ -21,7 +21,7 @@ disposal:
 
 This page provides an overview of those topics.
 
-## Database Objects
+## Database objects
 
 PostGraphile encourages you to focus on the design of your database, and will
 do its best to automatically extract a best practices GraphQL API from your
@@ -33,7 +33,7 @@ When you add new entities to your database, assuming that the revevant
 permissions are `GRANT`-ed, PostGraphile will generate related fields and types
 automatically.
 
-### Tables, Views, Materialized Views and Constraints
+### Tables, views, materialized views and constraints
 
 When you add a table, view, or materialized view to your database, by default PostGraphile
 will build:
@@ -114,7 +114,7 @@ PostgreSQL comments, JSON tags files, and plugins.
 Learn more about [smart tags](./smart-tags) and [virtual constraint smart
 tags](./smart-tags#virtual-constraints).
 
-### Adding Documentation
+### Adding documentation
 
 You can change the description of a type or field in your GraphQL schema
 through annotations. Descriptions are visible in GraphiQL's documentation panel
