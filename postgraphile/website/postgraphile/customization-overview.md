@@ -35,17 +35,26 @@ automatically.
 
 ### Tables, views, materialized views and constraints
 
-When you add a table, view, or materialized view to your database, by default PostGraphile
-will build:
+PostGraphile will build some of the following for tables, views, and
+materialized views that it finds in your database:
 
-- root fields to fetch all rows,
-- root fields to fetch individual rows using the primary key and any unique
-  constraints you've defined, and
+- root query fields to fetch all rows,
+- root query fields to fetch individual rows using the primary key and any unique
+  constraints you've defined,
 - fields on both the referencing and referenced types that reflect the foreign
-  key constraints you defined in the database.
+  key constraints you defined in the database, and
+- mutation fields to create, update, and delete these records.
 
-You can control which fields do or don't get added on a global, per table, or
-per constraint basis using the behavior system, via [smart tags](./smart-tags).
+Which of these are added to your schema will be dependent on the permissions
+(`GRANT`s) that you have defined in the database, the constraints you've
+defined on the tables, the indexes (primarily this impacts reverse
+relationships), and your configuration options including your global default
+behavior (e.g. whether you prefer connections (default) or lists).
+
+You can override these default decisions on a global, per table, or per
+constraint basis using the behavior system, e.g. via [smart tags](./smart-tags)
+on the relevant entities, or your `preset.schema.defaultBehavior` configuration
+setting.
 
 :::tip
 
