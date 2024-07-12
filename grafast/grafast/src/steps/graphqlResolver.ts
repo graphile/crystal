@@ -135,13 +135,6 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
     );
   }
 
-  deduplicate(peers: GraphQLResolverStep[]): GraphQLResolverStep[] {
-    return peers.filter(
-      (peer) =>
-        peer.resolver === this.resolver && peer.subscriber === this.subscriber,
-    );
-  }
-
   unbatchedExecute(
     _extra: UnbatchedExecutionExtra,
     source: any,
