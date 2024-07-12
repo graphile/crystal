@@ -1,7 +1,7 @@
 ---
 layout: page
 path: /postgraphile/usage-schema/
-title: Usage - Schema Only
+title: Direct schema usage
 ---
 
 # PostGraphile schema-only usage

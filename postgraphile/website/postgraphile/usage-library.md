@@ -1,5 +1,5 @@
 ---
-title: Usage - Library
+title: Library/middleware
 ---
 
 # Using PostGraphile as a Library
