@@ -7,6 +7,7 @@
 import "graphile-config";
 
 import { getWithPgClientFromPgService } from "@dataplan/pg";
+import { makePgService } from "@dataplan/pg/adaptors/pg";
 import {
   defaultPreset as graphileBuildPreset,
   QueryQueryPlugin,
@@ -45,7 +46,7 @@ const EnumManglingPlugin: GraphileConfig.Plugin = {
     replace: {
       // Help make enums more forgiving
       enumValue(previous, options, value, codec) {
-        const base = previous?.call(this, value, codec) ?? value;
+        const base = previous?.(value, codec) ?? value;
         return base
           .replace(/[^A-Za-z0-9_]+/g, "_")
           .replace(/^__+/, "_")
@@ -60,16 +61,13 @@ export async function makeSharedPresetAndClient(pool: Pool) {
     extends: [graphileBuildPreset, graphileBuildPgPreset],
     plugins: [QueryQueryPlugin, SwallowErrorsPlugin, EnumManglingPlugin],
     pgServices: [
-      {
+      makePgService({
         name: "main",
         schemas: DATABASE_SCHEMAS,
         pgSettingsKey: "pgSettings",
         withPgClientKey: "withPgClient",
-        adaptor: "@dataplan/pg/adaptors/pg",
-        adaptorSettings: {
-          pool,
-        },
-      },
+        pool,
+      }),
     ],
     gather: {
       // pgJwtTypes: "jwt_token",

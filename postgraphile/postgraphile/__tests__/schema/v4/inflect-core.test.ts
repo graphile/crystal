@@ -14,12 +14,12 @@ const OverrideInflectionPlugin: GraphileConfig.Plugin = {
 
         if (name === "Interval") return "I";
         if (name === "Point") return "P";
-        return previous.call(this, name);
+        return previous!(name);
       },
       inputType(previous, preset, name) {
         if (name === "I") return "II";
         if (name === "P") return "PP";
-        return previous.call(this, name);
+        return previous!(name);
       },
     },
   },

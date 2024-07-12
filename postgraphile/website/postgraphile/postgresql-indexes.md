@@ -1,7 +1,7 @@
 ---
 layout: page
 path: /postgraphile/postgresql-indexes/
-title: PostgreSQL Indexes
+title: PostgreSQL indexes
 ---
 
 It’s important that your queries stay fast for your users, this section outlines

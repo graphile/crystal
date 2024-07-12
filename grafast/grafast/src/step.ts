@@ -15,10 +15,13 @@ import {
 } from "./engine/lib/withGlobalLayerPlan.js";
 import { $$unlock } from "./engine/lock.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
+import { flagError } from "./error.js";
 import { getDebug } from "./global.js";
 import { inspect } from "./inspect.js";
 import type {
+  AddDependencyOptions,
   ExecutionDetails,
+  ExecutionEntryFlags,
   GrafastResultsList,
   GrafastResultStreamList,
   JSONValue,
@@ -28,15 +31,15 @@ import type {
   StreamDetails,
   UnbatchedExecutionExtra,
 } from "./interfaces.js";
-import { $$subroutine } from "./interfaces.js";
+import {
+  $$deepDepSkip,
+  $$subroutine,
+  ALL_FLAGS,
+  DEFAULT_FORBIDDEN_FLAGS,
+} from "./interfaces.js";
 import type { __ItemStep } from "./steps/index.js";
-import { __ListTransformStep } from "./steps/index.js";
 import { stepAMayDependOnStepB } from "./utils.js";
 
-/**
- * @internal
- */
-export const $$deepDepSkip = Symbol("deepDepSkip_experimental");
 /**
  * This indicates that a step never executes (e.g. __ItemStep and __ValueStep)
  * and thus when executed skips direct to reallyCompletedStep.
@@ -44,6 +47,8 @@ export const $$deepDepSkip = Symbol("deepDepSkip_experimental");
  * @internal
  */
 export const $$noExec = Symbol("noExec");
+
+const ref_flagError = te.ref(flagError, "flagError");
 
 function throwDestroyed(this: ExecutableStep): any {
   let message: string;
@@ -129,19 +134,10 @@ export abstract class BaseStep {
   public _isUnaryLocked: boolean;
   public debug: boolean;
 
-  // ENHANCE: change hasSideEffects to getter/setter, forbid setting after a
-  // particular phase.
-  /**
-   * Set this true for plans that implement mutations; this will prevent them
-   * from being tree-shaken.
-   */
-  public hasSideEffects: boolean;
-
   constructor() {
     this.isArgumentsFinalized = false;
     this.isFinalized = false;
     this.debug = getDebug();
-    this.hasSideEffects = false;
     const layerPlan = currentLayerPlan();
     this.layerPlan = layerPlan;
     this.operationPlan = layerPlan.operationPlan;
@@ -204,7 +200,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * - The `execute` method must be a regular (not async) function
    * - The `execute` method must NEVER return a promise
    * - The values within the list returned from `execute` must NEVER include
-   *   promises or GrafastError objects
+   *   promises or FlaggedValue objects
    * - The result of calling `execute` should not differ after a
    *   `step.hasSideEffects` has executed (i.e. it should be pure, only
    *   dependent on its deps and use no external state)
@@ -218,9 +214,29 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   public isSyncAndSafe!: boolean;
 
   /**
+   * (default = ALL_FLAGS & ~FLAG_NULL)
+   */
+  protected readonly defaultForbiddenFlags: ExecutionEntryFlags =
+    DEFAULT_FORBIDDEN_FLAGS;
+  /**
    * The plan this plan will need data from in order to execute.
    */
   protected readonly dependencies: ReadonlyArray<ExecutableStep>;
+  /**
+   * If this step follows a side effects, it must implicitly depend on it (so
+   * that any errors the side effect generated will be respected).
+   *
+   * @internal
+   */
+  public readonly implicitSideEffectStep: ExecutableStep | null;
+  /**
+   * What execution entry flags we can't handle for the given indexed dependency
+   * (default = this.defaultForbiddenFlags)
+   */
+  protected readonly dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
+  protected readonly dependencyOnReject: ReadonlyArray<
+    Error | null | undefined
+  >;
 
   /**
    * Just for mermaid
@@ -278,15 +294,54 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    */
   public optimizeMetaKey: number | string | symbol | undefined;
 
+  /**
+   * Set this true for plans that implement mutations; this will prevent them
+   * from being tree-shaken.
+   */
+  public hasSideEffects: boolean;
+
   constructor() {
     super();
+    this.implicitSideEffectStep = null;
+    this.hasSideEffects ??= false;
+    let hasSideEffects = false;
+    Object.defineProperty(this, "hasSideEffects", {
+      get() {
+        return hasSideEffects;
+      },
+      set(value) {
+        if (
+          this.id ===
+          this.layerPlan.operationPlan.stepTracker.stepCount - 1
+        ) {
+          hasSideEffects = value;
+          if (value === true) {
+            this.layerPlan.latestSideEffectStep = this;
+          } else if (value !== true && hasSideEffects === true) {
+            throw new Error(
+              `Cannot mark a step has having no side effects after having set it to have side effects.`,
+            );
+          }
+        } else {
+          throw new Error(
+            "You must mark a step as having side effects immediately after creating it, before any other steps are created.",
+          );
+        }
+      },
+      enumerable: true,
+      configurable: false,
+    });
     this.dependencies = [];
+    this.dependencyForbiddenFlags = [];
+    this.dependencyOnReject = [];
     this.dependents = [];
     this.isOptimized = false;
     this.allowMultipleOptimizations = false;
     this._stepOptions = { stream: null };
     this.store = true;
     this.polymorphicPaths = currentPolymorphicPaths();
+
+    // Important: MUST come after `this.layerPlan = ...`
     this.id = this.layerPlan._addStep(this);
   }
 
@@ -298,8 +353,19 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     return this.layerPlan.getStep(id, this);
   }
 
-  protected getDep(depId: number): ExecutableStep {
-    return this.dependencies[depId];
+  protected getDepOptions(depId: number): AddDependencyOptions {
+    const step = this.dependencies[depId];
+    const forbiddenFlags = this.dependencyForbiddenFlags[depId];
+    const onReject = this.dependencyOnReject[depId];
+    const acceptFlags = ALL_FLAGS & ~forbiddenFlags;
+    return { step, acceptFlags, onReject };
+  }
+
+  protected getDep(_depId: number): ExecutableStep {
+    // This gets replaced when `__FlagStep` is loaded. Were we on ESM we could
+    // just put the code here, but since we're not we have to avoid the
+    // circular dependency.
+    throw new Error(`Grafast failed to load correctly`);
   }
 
   /**
@@ -330,12 +396,11 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     return chalk.bold.blue(
       `${this.constructor.name.replace(/Step$/, "")}${
         this.layerPlan.id === 0 ? "" : chalk.grey(`{${this.layerPlan.id}}`)
-      }${meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""}[${inspect(
-        this.id,
-        {
-          colors: true,
-        },
-      )}]`,
+      }${this._isUnary ? "➊" : ""}${
+        meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""
+      }[${inspect(this.id, {
+        colors: true,
+      })}]`,
     );
   }
 
@@ -344,48 +409,13 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
   }
 
   protected addDependency(
-    step: ExecutableStep,
-    skipDeduplication = false,
+    stepOrOptions: ExecutableStep | AddDependencyOptions,
   ): number {
-    if (this.isFinalized) {
-      throw new Error(
-        "You cannot add a dependency after the step is finalized.",
-      );
-    }
-    if (!(step instanceof ExecutableStep)) {
-      throw new Error(
-        `Error occurred when adding dependency for '${this}', value passed was not a step, it was '${inspect(
-          step,
-        )}'`,
-      );
-    }
-    if (this._isUnaryLocked && this._isUnary && !step._isUnary) {
-      throw new Error(
-        `${this} is a unary step, so cannot add non-unary step ${step} as a dependency`,
-      );
-    }
-    if (isDev) {
-      // Check that we can actually add this as a dependency
-      if (!this.layerPlan.ancestry.includes(step.layerPlan)) {
-        throw new Error(
-          //console.error(
-          // This is not a GrafastInternalError
-          `Attempted to add '${step}' (${step.layerPlan}) as a dependency of '${this}' (${this.layerPlan}), but we cannot because that LayerPlan isn't an ancestor`,
-        );
-      }
-    }
-
-    // When copying dependencies between classes, we might not want to
-    // deduplicate because we might refer to the dependency by its index. As
-    // such, we should only dedupe by default but allow opting out.
-    if (!skipDeduplication) {
-      const existingIndex = this.dependencies.indexOf(step);
-      if (existingIndex >= 0) {
-        return existingIndex;
-      }
-    }
-
-    return this.operationPlan.stepTracker.addStepDependency(this, step);
+    const options: AddDependencyOptions =
+      stepOrOptions instanceof ExecutableStep
+        ? { step: stepOrOptions, skipDeduplication: false }
+        : stepOrOptions;
+    return this.operationPlan.stepTracker.addStepDependency(this, options);
   }
 
   /**
@@ -394,8 +424,14 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    * `isBatch = false` so you can use the `values[index].value` property
    * directly.
    */
-  protected addUnaryDependency(step: ExecutableStep): number {
-    return this.operationPlan.stepTracker.addStepUnaryDependency(this, step);
+  protected addUnaryDependency(
+    stepOrOptions: ExecutableStep | AddDependencyOptions,
+  ): number {
+    const options: AddDependencyOptions =
+      stepOrOptions instanceof ExecutableStep
+        ? { step: stepOrOptions }
+        : stepOrOptions;
+    return this.operationPlan.stepTracker.addStepUnaryDependency(this, options);
   }
 
   /**
@@ -515,7 +551,7 @@ function _buildOptimizedExecuteV2Expression(
     try {
   ${te.indent(inFrag)}
     } catch (e) {
-      results[i] = e instanceof Error ? e : Promise.reject(e);
+      results[i] = ${ref_flagError}(e);
     }\
 `;
     }
@@ -616,7 +652,7 @@ export abstract class UnbatchedExecutableStep<
         const tuple = values.map((list) => list.at(i));
         return this.unbatchedExecute(extra, ...tuple);
       } catch (e) {
-        return e instanceof Error ? (e as never) : Promise.reject(e);
+        return flagError(e);
       }
     });
   }

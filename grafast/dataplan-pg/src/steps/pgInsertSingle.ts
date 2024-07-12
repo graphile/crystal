@@ -61,7 +61,6 @@ export class PgInsertSingleStep<
   };
 
   isSyncAndSafe = false;
-  hasSideEffects = true;
 
   /**
    * Tells us what we're dealing with - data type, columns, where to insert it,
@@ -126,6 +125,7 @@ export class PgInsertSingleStep<
     },
   ) {
     super();
+    this.hasSideEffects = true;
     this.resource = resource;
     this.name = resource.name;
     this.symbol = Symbol(this.name);

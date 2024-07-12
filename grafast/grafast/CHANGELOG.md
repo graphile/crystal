@@ -1,5 +1,302 @@
 # grafast
 
+## 0.1.1-beta.11
+
+### Patch Changes
+
+- [#2071](https://github.com/graphile/crystal/pull/2071)
+  [`582bd768f`](https://github.com/graphile/crystal/commit/582bd768fec403ce3284f293b85b9fd86e4d3f40)
+  Thanks [@benjie](https://github.com/benjie)! - `GrafastExecutionArgs` now
+  accepts `resolvedPreset` and `requestContext` directly; passing these through
+  additional arguments is now deprecated and support will be removed in a future
+  revision. This affects:
+
+  - `grafast()`
+  - `execute()`
+  - `subscribe()`
+  - `hookArgs()`
+
+  `graphile-config` has gained a middleware system which is more powerful than
+  it's AsyncHooks system. Old hooks can be emulated through the middleware
+  system safely since middleware is a superset of hooks' capabilities.
+  `applyHooks` has been renamed to `orderedApply` (because it applies to more
+  than just hooks), calling `applyHooks` will still work but is deprecated.
+
+  🚨 `grafast` no longer automatically reads your `graphile.config.ts` or
+  similar; you must do that yourself and pass the `resolvedPreset` to grafast
+  via the `args`. This is to aid in bundling of grafast since it should not need
+  to read from filesystem or dynamically load modules.
+
+  `grafast` no longer outputs performance warning when you set
+  `GRAPHILE_ENV=development`.
+
+  🚨 `plugin.grafast.hooks.args` is now `plugin.grafast.middleware.prepareArgs`,
+  and the signature has changed - you must be sure to call the `next()` function
+  and ctx/resolvedPreset can be extracted directly from `args`:
+
+  ```diff
+   const plugin = {
+     grafast: {
+  -    hooks: {
+  +    middleware: {
+  -      args({ args, ctx, resolvedPreset }) {
+  +      prepareArgs(next, { args }) {
+  +        const { requestContext: ctx, resolvedPreset } = args;
+           // ...
+  +        return next();
+         }
+       }
+     }
+   }
+  ```
+
+  Many more middleware have been added; use TypeScript's autocomplete to see
+  what's available until we have proper documentation for them.
+
+  `plugin.grafserv.hooks.*` are still supported but deprecated; instead use
+  middleware `plugin.grafserv.middleware.*` (note that call signatures have
+  changed slightly, similar to the diff above):
+
+  - `hooks.init` -> `middleware.setPreset`
+  - `hooks.processGraphQLRequestBody` -> `middleware.processGraphQLRequestBody`
+  - `hooks.ruruHTMLParts` -> `middleware.ruruHTMLParts`
+
+  A few TypeScript types related to Hooks have been renamed, but their old names
+  are still available, just deprecated. They will be removed in a future update:
+
+  - `HookObject` -> `FunctionalityObject`
+  - `PluginHook` -> `CallbackOrDescriptor`
+  - `PluginHookObject` -> `CallbackDescriptor`
+  - `PluginHookCallback` -> `UnwrapCallback`
+
+- Updated dependencies
+  [[`582bd768f`](https://github.com/graphile/crystal/commit/582bd768fec403ce3284f293b85b9fd86e4d3f40)]:
+  - graphile-config@0.0.1-beta.9
+
+## 0.1.1-beta.10
+
+### Patch Changes
+
+- [#2067](https://github.com/graphile/crystal/pull/2067)
+  [`3c161f7e1`](https://github.com/graphile/crystal/commit/3c161f7e13375105b1035a7d5d1c0f2b507ca5c7)
+  Thanks [@benjie](https://github.com/benjie)! - Add `nodeIdFromNode()` helper
+
+- [#2067](https://github.com/graphile/crystal/pull/2067)
+  [`a674a9923`](https://github.com/graphile/crystal/commit/a674a9923bc908c9315afa40e0cb256ee0953d16)
+  Thanks [@benjie](https://github.com/benjie)! - Fix performance issue in
+  `loadOne()`/`loadMany()` due to using `setTimeout(cb, 0)`, now using
+  `process.nextTick(cb)`. High enough concurrency and the issue goes away, but
+  with limited concurrency this causes a lot of `(idle)` in profiling and thus
+  completing 10k items took longer. (Lots of time spent in `epoll_pwait`.)
+
+- [#2067](https://github.com/graphile/crystal/pull/2067)
+  [`b7cfeffd1`](https://github.com/graphile/crystal/commit/b7cfeffd1019d61c713a5054c4f5929960a2a6ab)
+  Thanks [@benjie](https://github.com/benjie)! - Allow applying `if` to
+  `inhibitOnNull` - e.g. only inhibit on null if some other condition matches.
+
+## 0.1.1-beta.9
+
+### Patch Changes
+
+- [#2064](https://github.com/graphile/crystal/pull/2064)
+  [`437570f97`](https://github.com/graphile/crystal/commit/437570f97e8520afaf3d0d0b514d1f4c31546b76)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a bug relating to Global
+  Object Identifiers (specifically in update mutations, but probably elsewhere
+  too) related to early exit.
+
+## 0.1.1-beta.8
+
+### Patch Changes
+
+- [#2055](https://github.com/graphile/crystal/pull/2055)
+  [`bd5a908a4`](https://github.com/graphile/crystal/commit/bd5a908a4d04310f90dfb46ad87398ffa993af3b)
+  Thanks [@benjie](https://github.com/benjie)! - Hotfix: unbatched unary steps
+  executed multiple times under certain circumstances leading to excessive
+  logging.
+
+## 0.1.1-beta.7
+
+### Patch Changes
+
+- [#1980](https://github.com/graphile/crystal/pull/1980)
+  [`357d475f5`](https://github.com/graphile/crystal/commit/357d475f54fecc8c51892e0346d6872b34132430)
+  Thanks [@benjie](https://github.com/benjie)! - The signature of
+  `ExecutableStep.execute` has changed; please make the following change to each
+  of your custom step classes' `execute` methods:
+
+  ```diff
+  - async execute(count: number, values: any[][], extra: ExecutionExtra) {
+  + async execute({ count, values: newValues, extra }: ExecutionDetails) {
+  +   const values = newValues.map((dep) =>
+  +     dep.isBatch ? dep.entries : new Array(count).fill(dep.value)
+  +   );
+      // REST OF YOUR FUNCTION HERE
+    }
+  ```
+
+  For more details, see: https://err.red/gev2
+
+- [#2050](https://github.com/graphile/crystal/pull/2050)
+  [`3551725e7`](https://github.com/graphile/crystal/commit/3551725e71c3ed876554e19e5ab2c1dcb0fb1143)
+  Thanks [@benjie](https://github.com/benjie)! - Fix detection of
+  enableDeferStream by seeing if `@defer`/`@stream` directives are present.
+
+- [#1969](https://github.com/graphile/crystal/pull/1969)
+  [`80836471e`](https://github.com/graphile/crystal/commit/80836471e5cedb29dee63bc5002550c4f1713cfd)
+  Thanks [@benjie](https://github.com/benjie)! - Don't output non-async warning
+  in production.
+
+- [#2019](https://github.com/graphile/crystal/pull/2019)
+  [`a5c20fefb`](https://github.com/graphile/crystal/commit/a5c20fefb571dea6d1187515dc48dd547e9e6204)
+  Thanks [@benjie](https://github.com/benjie)! - Add `condition()` standard step
+  using lisp-like prefix unary and binary operators.
+
+- [#2046](https://github.com/graphile/crystal/pull/2046)
+  [`1ce08980e`](https://github.com/graphile/crystal/commit/1ce08980e2a52ed9bc81564d248c19648ecd3616)
+  Thanks [@benjie](https://github.com/benjie)! - `resolvedPreset` and
+  `outputDataAsString` can now be specified directly via ExecutionArgs - no need
+  to pass additional params to `execute()` and `subscribe()` to enable these.
+  Previous signatures are now deprecated (but still supported, for a few betas
+  at least).
+
+- [#2050](https://github.com/graphile/crystal/pull/2050)
+  [`dff4f2535`](https://github.com/graphile/crystal/commit/dff4f2535ac6ce893089b312fcd5fffcd98573a5)
+  Thanks [@benjie](https://github.com/benjie)! - makeGrafastSchema completely
+  reworked. Fixes issues with enums, custom scalars, and more.
+
+- [#1978](https://github.com/graphile/crystal/pull/1978)
+  [`a287a57c2`](https://github.com/graphile/crystal/commit/a287a57c2765da0fb6a132ea0953f64453210ceb)
+  Thanks [@benjie](https://github.com/benjie)! - Breaking: `connection()` step
+  now accepts configuration object in place of 2nd argument onwards:
+
+  ```diff
+  -return connection($list, nodePlan, cursorPlan);
+  +return connection($list, { nodePlan, cursorPlan });
+  ```
+
+  Feature: `edgeDataPlan` can be specified as part of this configuration object,
+  allowing you to associate edge data with your connection edges:
+
+  ```ts
+  return connection($list, {
+    edgeDataPlan($item) {
+      return object({ item: $item, otherThing: $otherThing });
+    },
+  });
+
+  // ...
+
+  const plans = {
+    FooEdge: {
+      otherThing($edge) {
+        return $edge.data().get("otherThing");
+      },
+    },
+  };
+  ```
+
+  Feature: `ConnectionStep` and `EdgeStep` gain `get()` methods, so
+  `*Connection.edges`, `*Connection.nodes`, `*Connection.pageInfo`, `*Edge.node`
+  and `*Edge.cursor` no longer need plans to be defined.
+
+- [#2019](https://github.com/graphile/crystal/pull/2019)
+  [`2fe56f9a6`](https://github.com/graphile/crystal/commit/2fe56f9a6dac03484ace45c29c2223a65f9ca1db)
+  Thanks [@benjie](https://github.com/benjie)! - New DEBUG value:
+  `grafast:OutputPlan:verbose`, prints the output plan and the buckets used to
+  produce it to help track down where issues are arising.
+
+- [#1989](https://github.com/graphile/crystal/pull/1989)
+  [`fed603d71`](https://github.com/graphile/crystal/commit/fed603d719c02f33e12190f925c9e3b06c581fac)
+  Thanks [@benjie](https://github.com/benjie)! - Add
+  `this.canAddDependency(step)` to determine if adding a given dependency would
+  be allowed or not.
+
+- [#2015](https://github.com/graphile/crystal/pull/2015)
+  [`ed6e0d278`](https://github.com/graphile/crystal/commit/ed6e0d2788217a1c419634837f4208013eaf2923)
+  Thanks [@benjie](https://github.com/benjie)! - Introduce new `inhibitOnNull`,
+  `assertNotNull` and `trap` steps.
+
+- [#1979](https://github.com/graphile/crystal/pull/1979)
+  [`e82e4911e`](https://github.com/graphile/crystal/commit/e82e4911e32138df1b90ec0fde555ea963018d21)
+  Thanks [@benjie](https://github.com/benjie)! - Render unary steps with a
+  slight background colour.
+
+- [#2050](https://github.com/graphile/crystal/pull/2050)
+  [`42ece5aa6`](https://github.com/graphile/crystal/commit/42ece5aa6ca05345ebc17fb5c7d55df3b79b7612)
+  Thanks [@benjie](https://github.com/benjie)! - makeGrafastSchema can now have
+  an inputPlan specified for input objects.
+
+- [#1995](https://github.com/graphile/crystal/pull/1995)
+  [`e0d69e518`](https://github.com/graphile/crystal/commit/e0d69e518a98c70f9b90f59d243ce33978c1b5a1)
+  Thanks [@benjie](https://github.com/benjie)! - Refactoring of unary logic.
+
+- [#2024](https://github.com/graphile/crystal/pull/2024)
+  [`6699388ec`](https://github.com/graphile/crystal/commit/6699388ec167d35c71220ce5d9113cac578da6cb)
+  Thanks [@benjie](https://github.com/benjie)! - Planning error paths improved
+  to indicate list positions.
+
+- [#2046](https://github.com/graphile/crystal/pull/2046)
+  [`966203504`](https://github.com/graphile/crystal/commit/96620350467ab8c65b56adf2f055e19450f8e772)
+  Thanks [@benjie](https://github.com/benjie)! - Envelop peer dependency
+  upgraded to V5
+
+- [#2024](https://github.com/graphile/crystal/pull/2024)
+  [`c1645b249`](https://github.com/graphile/crystal/commit/c1645b249aae949a548cd916e536ccfb63e5ab35)
+  Thanks [@benjie](https://github.com/benjie)! - Introduce `trap()` step to trap
+  errors and inhibits, and coerce them to a chosen form (e.g. null, empty list).
+
+- [#2050](https://github.com/graphile/crystal/pull/2050)
+  [`ed8bbaa3c`](https://github.com/graphile/crystal/commit/ed8bbaa3cd1563a7601ca8c6b0412633b0ea4ce9)
+  Thanks [@benjie](https://github.com/benjie)! - `ConstantStep` now supports
+  `.get(key)` and `.at(index)` methods.
+
+- [#1973](https://github.com/graphile/crystal/pull/1973)
+  [`a0e82b9c5`](https://github.com/graphile/crystal/commit/a0e82b9c5f4e585f1af1e147299cd07944ece6f8)
+  Thanks [@benjie](https://github.com/benjie)! - Add 'unary steps' concept to
+  codebase and refactor to using new executeV2 execution method which leverages
+  them. Backwards compatibility maintained, but users should move to executeV2.
+
+- [#2036](https://github.com/graphile/crystal/pull/2036)
+  [`14e2412ee`](https://github.com/graphile/crystal/commit/14e2412ee368e8d53abf6774c7f0069f32d4e8a3)
+  Thanks [@benjie](https://github.com/benjie)! - Completely eradicate the
+  concept of `GrafastError`, instead use `flagError()` around any value to treat
+  that value as an error. No longer performs `instanceof Error` checks to detect
+  errors in returned values.
+
+- [#2014](https://github.com/graphile/crystal/pull/2014)
+  [`57ab0e1e7`](https://github.com/graphile/crystal/commit/57ab0e1e72c01213b21d3efc539cd655d83d993a)
+  Thanks [@benjie](https://github.com/benjie)! - Refactor internal planning
+  logic to use new bitwise flags-based filtering.
+
+- [#1990](https://github.com/graphile/crystal/pull/1990)
+  [`8442242e4`](https://github.com/graphile/crystal/commit/8442242e43cac7d89ca0c413cf42c9fabf6f247f)
+  Thanks [@benjie](https://github.com/benjie)! - Add unary-step enhanced loadOne
+  and loadMany usage to avoid manual grouping in callbacks.
+
+- [#2019](https://github.com/graphile/crystal/pull/2019)
+  [`64ce7b765`](https://github.com/graphile/crystal/commit/64ce7b7650530251aec38a51089da66f914c19b4)
+  Thanks [@benjie](https://github.com/benjie)! - Add conditional `trap()`-ing
+  functionality, so you can choose to only trap under certain circumstances.
+
+- [#2019](https://github.com/graphile/crystal/pull/2019)
+  [`cba842357`](https://github.com/graphile/crystal/commit/cba84235786acbd77ade53bae7a3fba4a9be1eb7)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 The step class expression
+  `this.addDependency(step, true)` is no longer supported; instead (and
+  equivalently) please use:
+  `this.addDependency({ step, skipDeduplication: true })`. Note
+  `this.addDependency(step)` (with no additional arguments) is unaffected.
+
+- [#1968](https://github.com/graphile/crystal/pull/1968)
+  [`2fa77d0f2`](https://github.com/graphile/crystal/commit/2fa77d0f237cdb98d3dafb6b5e4083a2c6c38673)
+  Thanks [@benjie](https://github.com/benjie)! - Don't warn about Load having
+  non-async execute function.
+
+- Updated dependencies
+  [[`b788dd868`](https://github.com/graphile/crystal/commit/b788dd86849e703cc3aa863fd9190c36a087b865),
+  [`db8ceed0f`](https://github.com/graphile/crystal/commit/db8ceed0f17923eb78ff09c9f3f28800a5c7e3b6)]:
+  - tamedevil@0.0.0-beta.7
+  - graphile-config@0.0.1-beta.8
+
 ## 0.1.1-beta.6
 
 ### Patch Changes

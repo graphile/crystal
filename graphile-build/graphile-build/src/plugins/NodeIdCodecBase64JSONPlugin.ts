@@ -1,12 +1,4 @@
 import "graphile-config";
-function base64JSONEncode(value: any): string | null {
-  return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-}
-base64JSONEncode.isSyncAndSafe = true; // Optimization
-function base64JSONDecode(value: string): any {
-  return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-}
-base64JSONDecode.isSyncAndSafe = true; // Optimization
 
 export const NodeIdCodecBase64JSONPlugin: GraphileConfig.Plugin = {
   name: "NodeIdCodecBase64JSONPlugin",
@@ -20,6 +12,23 @@ export const NodeIdCodecBase64JSONPlugin: GraphileConfig.Plugin = {
           return _;
         }
         const { EXPORTABLE } = build;
+        const base64JSONEncode = EXPORTABLE(() => {
+          function base64JSONEncode(value: any): string | null {
+            return Buffer.from(JSON.stringify(value), "utf8").toString(
+              "base64",
+            );
+          }
+          base64JSONEncode.isSyncAndSafe = true; // Optimization
+          return base64JSONEncode;
+        }, []);
+        const base64JSONDecode = EXPORTABLE(() => {
+          function base64JSONDecode(value: string): any {
+            return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+          }
+          base64JSONDecode.isSyncAndSafe = true; // Optimization
+          return base64JSONDecode;
+        }, []);
+
         build.registerNodeIdCodec(
           EXPORTABLE(
             (base64JSONDecode, base64JSONEncode) => ({

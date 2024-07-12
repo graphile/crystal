@@ -1,17 +1,22 @@
 import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, domainOfCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectFromRecords, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, each, first, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, each, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
 const handler = {
   typeName: "Query",
   codec: {
     name: "raw",
-    encode(value) {
+    encode: Object.assign(function rawEncode(value) {
       return typeof value === "string" ? value : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function rawDecode(value) {
       return typeof value === "string" ? value : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   },
   match(specifier) {
     return specifier === "query";
@@ -28,26 +33,39 @@ const handler = {
 };
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode(value) {
-    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  },
-  decode(value) {
-    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }
+  encode: (() => {
+    function base64JSONEncode(value) {
+      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+    }
+    base64JSONEncode.isSyncAndSafe = true; // Optimization
+    return base64JSONEncode;
+  })(),
+  decode: (() => {
+    function base64JSONDecode(value) {
+      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+    }
+    base64JSONDecode.isSyncAndSafe = true; // Optimization
+    return base64JSONDecode;
+  })()
 };
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode(value) {
+    encode: Object.assign(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   }
 });
+const tIdentifier = sql.identifier("nested_arrays", "t");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -109,7 +127,7 @@ const workHourPartsCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
 const workHourCodec = domainOfCodec(workHourPartsCodec, "workHour", sql.identifier("nested_arrays", "work_hour"), {
   description: undefined,
@@ -173,30 +191,29 @@ const workingHoursCodec = domainOfCodec(workhoursArrayCodec, "workingHours", sql
   },
   notNull: false
 });
-const tAttributes = Object.assign(Object.create(null), {
-  k: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  v: {
-    description: undefined,
-    codec: workingHoursCodec,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const tCodec = recordCodec({
+const spec_t = {
   name: "t",
-  identifier: sql.identifier("nested_arrays", "t"),
-  attributes: tAttributes,
+  identifier: tIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    k: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    v: {
+      description: undefined,
+      codec: workingHoursCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -207,8 +224,9 @@ const tCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
+  executor: executor
+};
+const tCodec = recordCodec(spec_t);
 const check_work_hoursFunctionIdentifer = sql.identifier("nested_arrays", "check_work_hours");
 const tUniques = [{
   isPrimary: true,
@@ -265,10 +283,10 @@ const registry = makeRegistry({
       description: undefined
     },
     t: {
-      executor,
+      executor: executor,
       name: "t",
       identifier: "main.nested_arrays.t",
-      from: tCodec.sqlType,
+      from: tIdentifier,
       codec: tCodec,
       uniques: tUniques,
       isVirtual: false,
@@ -298,7 +316,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        k: access($list, [1])
+        k: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -406,6 +424,9 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
   });
 };
 const resource_frmcdc_workHourPgResource = registry.pgResources["frmcdc_workHour"];
+function CursorSerialize(value) {
+  return "" + value;
+}
 const specFromArgs = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.T, $nodeId);
@@ -897,6 +918,9 @@ export const plans = {
     }
   },
   WorkHourInput: {
+    "__inputPlan": function WorkHourInput_inputPlan() {
+      return object(Object.create(null));
+    },
     fromHours: {
       applyPlan($insert, val) {
         $insert.set("from_hours", val.get());
@@ -949,6 +973,16 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  Cursor: {
+    serialize: CursorSerialize,
+    parseValue: CursorSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
     }
   },
   PageInfo: {
@@ -1053,7 +1087,7 @@ export const plans = {
             type: "attribute",
             attribute: "k",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), tAttributes.k.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_t.attributes.k.codec)}`;
             }
           });
         }
@@ -1076,7 +1110,7 @@ export const plans = {
             type: "attribute",
             attribute: "v",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), tAttributes.v.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_t.attributes.v.codec)}`;
             }
           });
         }
@@ -1232,6 +1266,9 @@ export const plans = {
     }
   },
   TInput: {
+    "__inputPlan": function TInput_inputPlan() {
+      return object(Object.create(null));
+    },
     k: {
       applyPlan($insert, val) {
         $insert.set("k", val.get());
@@ -1305,6 +1342,9 @@ export const plans = {
     }
   },
   TPatch: {
+    "__inputPlan": function TPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     k: {
       applyPlan($insert, val) {
         $insert.set("k", val.get());

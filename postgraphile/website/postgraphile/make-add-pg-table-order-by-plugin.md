@@ -177,6 +177,7 @@ export type NullsSortMethod =
 export interface OrderByAscDescOptions {
   unique?: boolean;
   nulls?: NullsSortMethod;
+  nullable?: boolean;
 }
 ```
 
@@ -218,3 +219,12 @@ movie with no ratings is not exactly what one thinks of when one hears
 "top-rated"! By specifying `{ nulls: 'last' }`, however, PostGraphile knows that
 this orderBy plugin should still show the movies without any reviews, but just
 put them at the end of the list.
+
+:::warning
+
+If your column or expression is nullable, you must either specify `nullable:
+true` or pass a value for `nulls`; if you don't do this then PostGraphile will
+use a simpler expression for comparisons which is not null-capable, and this
+will break cursor pagination when nulls occur.
+
+:::

@@ -3,7 +3,11 @@ import type { PgSelectSingleStep } from "@dataplan/pg";
 import { TYPES } from "@dataplan/pg";
 import PersistedPlugin from "@grafserv/persisted";
 import { EXPORTABLE, exportSchema } from "graphile-export";
-import { gql, makeExtendSchemaPlugin } from "graphile-utils";
+import {
+  gql,
+  makeExtendSchemaPlugin,
+  makeWrapPlansPlugin,
+} from "graphile-utils";
 import * as jsonwebtoken from "jsonwebtoken";
 import type {} from "postgraphile";
 import { jsonParse } from "postgraphile/@dataplan/json";
@@ -17,6 +21,7 @@ import {
   lambda,
   listen,
   object,
+  sideEffect,
 } from "postgraphile/grafast";
 import { defaultMaskError } from "postgraphile/grafserv";
 import type {} from "postgraphile/grafserv/node";
@@ -36,6 +41,7 @@ declare global {
   namespace Grafast {
     interface Context {
       mol?: number;
+      number?: number;
     }
   }
 }
@@ -88,11 +94,13 @@ function makeRuruTitlePlugin(title: string): GraphileConfig.Plugin {
     version: "0.0.0",
 
     grafserv: {
-      hooks: {
-        ruruHTMLParts(_info, parts, extra) {
-          parts.titleTag = `<title>${escapeHTML(
-            title + " | " + extra.request.getHeader("host"),
+      middleware: {
+        ruruHTMLParts(next, event) {
+          const { htmlParts, request } = event;
+          htmlParts.titleTag = `<title>${escapeHTML(
+            title + " | " + request.getHeader("host"),
           )}</title>`;
+          return next();
         },
       },
     },
@@ -104,9 +112,10 @@ const RuruQueryParamsPlugin: GraphileConfig.Plugin = {
   version: "0.0.0",
 
   grafserv: {
-    hooks: {
-      ruruHTMLParts(_info, parts, _extra) {
-        parts.headerScripts += `
+    middleware: {
+      ruruHTMLParts(next, event) {
+        const { htmlParts } = event;
+        htmlParts.headerScripts += `
 <script>
 {
   const currentUrl = new URL(document.URL);
@@ -119,6 +128,7 @@ const RuruQueryParamsPlugin: GraphileConfig.Plugin = {
 }
 </script>
 `;
+        return next();
       },
     },
   },
@@ -132,9 +142,10 @@ const RuruQueryParamsUpdatePlugin: GraphileConfig.Plugin = {
   version: "0.0.0",
 
   grafserv: {
-    hooks: {
-      ruruHTMLParts(_info, parts, _extra) {
-        parts.headerScripts += `
+    middleware: {
+      ruruHTMLParts(next, event) {
+        const { htmlParts } = event;
+        htmlParts.headerScripts += `
 <script>
 {
   const currentUrl = new URL(document.URL);
@@ -212,6 +223,100 @@ const NonNullRelationsPlugin: GraphileConfig.Plugin = {
   },
 };
 
+const LeftArmPlugin = makeExtendSchemaPlugin((build) => {
+  const { left_arm } = build.input.pgRegistry.pgResources;
+  return {
+    typeDefs: gql`
+      extend type Person {
+        allArms: PersonRelatedArmConnection
+      }
+      type PersonRelatedArmConnection {
+        edges: [PersonRelatedArmEdge]
+      }
+      type PersonRelatedArmEdge {
+        node: LeftArm
+        isTheirs: Boolean
+      }
+    `,
+    plans: {
+      Person: {
+        allArms: EXPORTABLE(
+          (connection, left_arm, object) => ($person) => {
+            const $arms = left_arm.find();
+
+            return connection($arms, {
+              edgeDataPlan($arm) {
+                return object({ arm: $arm, person: $person });
+              },
+            });
+          },
+          [connection, left_arm, object],
+        ),
+      },
+      PersonRelatedArmEdge: {
+        isTheirs: EXPORTABLE(
+          (aEqualsB, lambda) =>
+            (
+              $edge: EdgeStep<
+                any,
+                any,
+                any,
+                ObjectStep<{
+                  arm: PgSelectSingleStep;
+                  person: PgSelectSingleStep;
+                }>,
+                any
+              >,
+            ) => {
+              const $obj = $edge.data();
+              const $arm = $obj.get("arm");
+              const $armPersonId = $arm.get("person_id");
+              const $person = $obj.get("person");
+              const $personId = $person.get("id");
+              return lambda([$personId, $armPersonId], aEqualsB);
+            },
+          [aEqualsB, lambda],
+        ),
+      },
+    },
+  };
+});
+
+const testResolver = EXPORTABLE(
+  (context, sideEffect) =>
+    function () {
+      const $context = context();
+      sideEffect($context, (context) => (context.number = 3));
+      sideEffect($context, (context) => context.number!++);
+      sideEffect($context, (_context) => {
+        throw new Error("Side effect 3 failed");
+      });
+      sideEffect($context, (context) => context.number!++);
+      sideEffect($context, (context) => context.number!++);
+      return $context.get("number");
+    },
+  [context, sideEffect],
+);
+
+const TestSideEffectCancellingPlugin = makeExtendSchemaPlugin({
+  typeDefs: gql/* GraphQL */ `
+    extend type Query {
+      testSideEffectCancelling: Int
+    }
+    extend type Mutation {
+      testSideEffectCancelling: Int
+    }
+  `,
+  plans: {
+    Mutation: {
+      testSideEffectCancelling: testResolver,
+    },
+    Query: {
+      testSideEffectCancelling: testResolver,
+    },
+  },
+});
+
 const preset: GraphileConfig.Preset = {
   plugins: [
     StreamDeferPlugin,
@@ -227,15 +332,23 @@ const preset: GraphileConfig.Preset = {
           }
           extend type Query {
             throw: Int
+            wrapMe: Int
           }
         `,
         plans: {
           Query: {
+            wrapMe: EXPORTABLE((constant) => () => constant(42), [constant]),
             throw: EXPORTABLE(
               (error) => () => {
                 return error(
-                  new Error(
-                    "You've requested the 'throw' field... which throws!",
+                  Object.assign(
+                    new Error(
+                      "You've requested the 'throw' field... which throws!",
+                    ),
+                    {
+                      metadata: true,
+                      mol: 42,
+                    },
                   ),
                 );
               },
@@ -266,6 +379,18 @@ const preset: GraphileConfig.Preset = {
           },
         },
       };
+    }),
+    makeWrapPlansPlugin({
+      Query: {
+        wrapMe(plan) {
+          return plan();
+        },
+      },
+      Mutation: {
+        updatePost(plan) {
+          return plan();
+        },
+      },
     }),
     makeExtendSchemaPlugin({
       typeDefs: gql`
@@ -320,6 +445,28 @@ const preset: GraphileConfig.Preset = {
         },
       },
     }),
+    makeExtendSchemaPlugin({
+      typeDefs: gql`
+        extend type Subscription {
+          error: Int
+        }
+      `,
+      plans: {
+        Subscription: {
+          error: {
+            subscribePlan: EXPORTABLE(
+              (constant, lambda) =>
+                function subscribePlan() {
+                  return lambda(constant(3), () => {
+                    throw new Error("Testing error");
+                  });
+                },
+              [constant, lambda],
+            ),
+          },
+        },
+      },
+    }),
     // PrimaryKeyMutationsOnlyPlugin,
     PersistedPlugin,
     makeRuruTitlePlugin("<New title text here!>"),
@@ -327,64 +474,8 @@ const preset: GraphileConfig.Preset = {
     NonNullRelationsPlugin,
     RuruQueryParamsPlugin,
     RuruQueryParamsUpdatePlugin,
-    makeExtendSchemaPlugin((build) => {
-      const { left_arm } = build.input.pgRegistry.pgResources;
-      return {
-        typeDefs: gql`
-          extend type Person {
-            allArms: PersonRelatedArmConnection
-          }
-          type PersonRelatedArmConnection {
-            edges: [PersonRelatedArmEdge]
-          }
-          type PersonRelatedArmEdge {
-            node: LeftArm
-            isTheirs: Boolean
-          }
-        `,
-        plans: {
-          Person: {
-            allArms: EXPORTABLE(
-              (connection, left_arm, object) => ($person) => {
-                const $arms = left_arm.find();
-
-                return connection($arms, {
-                  edgeDataPlan($arm) {
-                    return object({ arm: $arm, person: $person });
-                  },
-                });
-              },
-              [connection, left_arm, object],
-            ),
-          },
-          PersonRelatedArmEdge: {
-            isTheirs: EXPORTABLE(
-              (aEqualsB, lambda) =>
-                (
-                  $edge: EdgeStep<
-                    any,
-                    any,
-                    any,
-                    ObjectStep<{
-                      arm: PgSelectSingleStep;
-                      person: PgSelectSingleStep;
-                    }>,
-                    any
-                  >,
-                ) => {
-                  const $obj = $edge.data();
-                  const $arm = $obj.get("arm");
-                  const $armPersonId = $arm.get("person_id");
-                  const $person = $obj.get("person");
-                  const $personId = $person.get("id");
-                  return lambda([$personId, $armPersonId], aEqualsB);
-                },
-              [aEqualsB, lambda],
-            ),
-          },
-        },
-      };
-    }),
+    ...(Math.random() > 2 ? [LeftArmPlugin] : []),
+    TestSideEffectCancellingPlugin,
   ],
   extends: [
     PostGraphileAmberPreset,

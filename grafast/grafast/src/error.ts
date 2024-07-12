@@ -1,65 +1,86 @@
-import type { $$extensions } from "./interfaces.js";
-import { $$safeError } from "./interfaces.js";
+import { isDev } from "./dev.js";
+import { inspect } from "./inspect.js";
+import type { ExecutionEntryFlags } from "./interfaces.js";
+import {
+  $$safeError,
+  FLAG_ERROR,
+  FLAG_INHIBITED,
+  FLAG_NULL,
+} from "./interfaces.js";
+
+const $$flagged = Symbol("grafastFlaggedValue");
 
 /**
- * Internally we wrap errors that occur in a GrafastError; this allows us to do
- * simple `instanceof` checks to see if a value is an actual value or an error.
- * Users should never use this class; it's for internal usage only.
- *
- * @internal
+ * Wrapper for errors to return (rather than throw or reject) from user code.
  */
-export interface GrafastError extends Error {
-  originalError: Error;
-  [$$extensions]?: Record<string, any>;
+export interface FlaggedValue<TValue = any> {
+  [$$flagged]: true;
+  flags: ExecutionEntryFlags;
+  value: TValue;
+  planId: number | null;
+  toString(): string;
 }
 
-export const $$error = Symbol("isGrafastError");
+function flaggedValueToString(this: FlaggedValue) {
+  if (this.flags & FLAG_ERROR && this.value instanceof Error) {
+    return String(this.value);
+  } else if (this.flags & FLAG_INHIBITED && this.value === null) {
+    return "INHIBIT";
+  } else {
+    return `${this.flags}/${inspect(this.value)}`;
+  }
+}
 
-// IMPORTANT: this WILL NOT WORK when compiled down to ES5. It requires ES6+
-// native class support.
-/**
- * When an error occurs during plan execution we wrap it in a GrafastError so
- * that we can pass it around as a value.  It gets unwrapped and thrown in the
- * grafast resolver.
- *
- * @internal
- */
-export const _GrafastError = class GrafastError
-  extends Error
-  implements GrafastError
-{
-  public readonly originalError: Error;
-  extensions: Record<string, any>;
-  [$$error] = true;
-  constructor(originalError: Error, planId: number | null) {
-    if (originalError instanceof _GrafastError) {
+function flaggedValue<T>(
+  flags: ExecutionEntryFlags,
+  value: any,
+  planId: null | number,
+): FlaggedValue<T> {
+  if (isDev) {
+    if (value === null && !(flags & FLAG_NULL)) {
       throw new Error(
-        "GrafastInternalError<62505509-8b21-4ef7-80f5-d0f99873174b>: attempted to wrap a GrafastError with a GrafastError.",
+        `flaggedValue called with null, but not flagged as null.`,
       );
     }
-    const message = originalError?.message;
-    super(message);
-    Object.setPrototypeOf(this, GrafastError.prototype);
-    this.originalError = originalError;
-    this.extensions = { grafast: { planId } };
+    if (value === null && !(flags & FLAG_INHIBITED)) {
+      throw new Error(
+        `flaggedValue called with null, but not flagged as inhibited.`,
+      );
+    }
   }
-};
+  return {
+    [$$flagged]: true,
+    flags,
+    value,
+    planId,
+    toString: flaggedValueToString,
+  };
+}
+
+export const $$inhibit = flaggedValue<null>(
+  FLAG_NULL | FLAG_INHIBITED,
+  null,
+  null,
+);
 
 /**
- * DO NOT ALLOW CONSTRUCTION OF ERRORS OUTSIDE OF THIS MODULE!
- *
- * @internal
+ * Used to wrap error values to have Grafast treat them as if they were
+ * thrown/rejected (rather than just regular values).
  */
-export function newGrafastError(error: Error, planId: number | null) {
-  return new _GrafastError(error, planId);
+export function flagError<TError extends Error = Error>(
+  value: TError,
+  planId: number | null = null,
+): FlaggedValue<TError> {
+  return flaggedValue(FLAG_ERROR, value, planId);
 }
 
 /**
- * Is the given value a GrafastError? This is the only public API that people
- * should use for looking at GrafastErrors.
+ * Is this a flagged value?
+ *
+ * @internal
  */
-export function isGrafastError(value: any): value is GrafastError {
-  return typeof value === "object" && value !== null && $$error in value;
+export function isFlaggedValue(value: object): value is FlaggedValue {
+  return Object.hasOwn(value, $$flagged);
 }
 
 export class SafeError<

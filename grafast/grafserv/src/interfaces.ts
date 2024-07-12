@@ -1,13 +1,17 @@
 import "graphile-config";
 
-import type { PromiseOrDirect, SafeError } from "grafast";
+import type { execute, PromiseOrDirect, SafeError, subscribe } from "grafast";
 import type {
   AsyncExecutionResult,
   ExecutionResult,
   GraphQLSchema,
+  ValidationRule,
 } from "grafast/graphql";
-import type { Context } from "graphql-ws";
+import type { Context, SubscribeMessage } from "graphql-ws";
+import type { RuruHTMLParts } from "ruru/server";
 
+import type { GrafservBase } from ".";
+import type { makeParseAndValidateFunction } from "./middleware/graphql";
 import type { OptionsFromConfig } from "./options";
 
 export type ContextCallback = (
@@ -52,10 +56,38 @@ export interface ValidatedGraphQLBody {
 export interface GrafservPluginContext {
   resolvedPreset: GraphileConfig.ResolvedPreset;
 }
+export interface SetPresetEvent {
+  resolvedPreset: GraphileConfig.ResolvedPreset;
+  getExecutionConfig: (
+    this: GrafservBase,
+    ctx: Partial<Grafast.RequestContext>,
+  ) => PromiseOrDirect<ExecutionConfig>;
+  validationRules: ValidationRule[];
+}
+/** @deprecated Use SetPresetEvent instead */
+export type InitEvent = SetPresetEvent;
 export interface ProcessGraphQLRequestBodyEvent {
+  resolvedPreset: GraphileConfig.ResolvedPreset;
   body: ParsedGraphQLBody;
   request?: NormalizedRequestDigest;
   graphqlWsContext?: Context;
+}
+export interface ProcessRequestEvent {
+  resolvedPreset: GraphileConfig.ResolvedPreset;
+  requestDigest: RequestDigest;
+  instance: GrafservBase;
+}
+
+export interface RuruHTMLPartsEvent {
+  resolvedPreset: GraphileConfig.ResolvedPreset;
+  htmlParts: RuruHTMLParts;
+  request: NormalizedRequestDigest;
+}
+
+export interface OnSubscribeEvent {
+  resolvedPreset: GraphileConfig.ResolvedPreset;
+  ctx: Context<Record<string, unknown> | undefined, unknown>;
+  message: SubscribeMessage;
 }
 
 export interface GrafservBodyBuffer {
@@ -234,3 +266,14 @@ export type Result =
   | JSONResult
   | BufferStreamResult
   | NoContentResult;
+
+export type DynamicOptions = OptionsFromConfig & InitEvent;
+
+export interface ExecutionConfig {
+  schema: GraphQLSchema;
+  parseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
+  resolvedPreset: GraphileConfig.ResolvedPreset;
+  execute: typeof execute;
+  subscribe: typeof subscribe;
+  contextValue: Record<string, any>;
+}

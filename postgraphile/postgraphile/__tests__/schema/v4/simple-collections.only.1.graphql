@@ -1168,7 +1168,7 @@ type LeftArm implements Node {
 
   """Reads a single `Person` that is related to this `LeftArm`."""
   personByPersonId: Person
-  personId: Int!
+  personId: Int
 }
 
 """An input representation of `LeftArm` with nullable fields."""

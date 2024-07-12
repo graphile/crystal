@@ -1,6 +1,6 @@
 {
   "name": "@dataplan/pg",
-  "version": "0.0.1-beta.17",
+  "version": "0.0.1-beta.22",
   "description": "PostgreSQL step classes for Grafast",
   "type": "commonjs",
   "main": "dist/index.js",
@@ -22,8 +22,8 @@
     "test:install-schema": "psql -X1v ON_ERROR_STOP=1 -f __tests__/schema.sql -f __tests__/sequence_reset.sql \"${TEST_DATABASE_URL:-graphile_crystal}\"",
     "test": "GRAPHILE_ENV=test yarn test:install-schema && jest -i",
     "posttest": "yarn test:exportSchema:graphql-js && yarn test:exportSchema:typeDefs",
-    "test:exportSchema:graphql-js": "ENABLE_DEFER_STREAM=1 ts-node ./scripts/exportExampleSchema.ts graphql-js && node ./scripts/runExampleSchema.mjs",
-    "test:exportSchema:typeDefs": "ENABLE_DEFER_STREAM=1 ts-node ./scripts/exportExampleSchema.ts typeDefs && node ./scripts/runExampleSchema.mjs",
+    "test:exportSchema:graphql-js": "ts-node ./scripts/exportExampleSchema.ts graphql-js && node ./scripts/runExampleSchema.mjs",
+    "test:exportSchema:typeDefs": "ts-node ./scripts/exportExampleSchema.ts typeDefs && node ./scripts/runExampleSchema.mjs",
     "prepack": "tsc -b && cp src/.npmignore dist/.npmignore",
     "serve:example": "GRAPHILE_ENV=development NODE_ENV=development yarn nodemon --watch serve-example-schema.js --watch dist --watch ../grafast/dist/ -x 'node --inspect --enable-source-maps serve-example-schema.js'"
   },

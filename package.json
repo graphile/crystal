@@ -10,7 +10,7 @@
     "prepack:all": "scripts/prepack-all",
     "build": "tsc -b && yarn && yarn workspace ruru prepack",
     "watch": "yarn build && tsc -b --watch",
-    "clean": "( jest --clearCache || true ) && rm -Rf {utils,grafast,graphile-build,postgraphile}/*/{dist,bundle,tsconfig.tsbuildinfo,tsconfig.build.tsbuildinfo}",
+    "clean": "( jest --clearCache || true ) && rm -Rf {utils,grafast,graphile-build,postgraphile}/*/{dist,bundle,tsconfig.tsbuildinfo,tsconfig.*.tsbuildinfo}",
     "changeset:version": "yarn changeset version && node scripts/postversion.mjs",
     "typedoc:gen": "yarn typedoc .",
     "w": "yarn workspace",
@@ -19,8 +19,9 @@
     "website:postgraphile": "cd postgraphile/website && yarn start",
     "website:build": "cd graphile-build/website && yarn start",
     "website:star": "cd utils/website && yarn start",
+    "websites:deploy": "./publish-websites.sh",
     "-----": "-----",
-    "eslint": "eslint --ext .js,.jsx,.ts,.tsx",
+    "eslint": "node --max-old-space-size=8192 node_modules/.bin/eslint --ext .js,.jsx,.ts,.tsx",
     "prettier": "prettier --cache --ignore-path ./.eslintignore",
     "prettier:all": "yarn prettier '**/*.{json,md,mdx,html,js,jsx,ts,tsx,yml}'",
     "prettier:fix": "yarn prettier:all --write",
@@ -85,6 +86,9 @@
     "yarn": ">=1.3.2"
   },
   "packageManager": "yarn@4.0.0-rc.33",
+  "resolutions": {
+    "graphql": "16.1.0-experimental-stream-defer.6"
+  },
   "dependencies": {
     "@changesets/changelog-github": "^0.4.8",
     "@changesets/cli": "^2.26.2"

@@ -1,6 +1,6 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
-import { valueFromASTUntyped } from "graphql";
+import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { GraphQLError, GraphQLInt, GraphQLString, Kind, valueFromASTUntyped } from "graphql";
 import jsonwebtoken from "jsonwebtoken";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
@@ -8,12 +8,16 @@ const handler = {
   typeName: "Query",
   codec: {
     name: "raw",
-    encode(value) {
+    encode: Object.assign(function rawEncode(value) {
       return typeof value === "string" ? value : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function rawDecode(value) {
       return typeof value === "string" ? value : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   },
   match(specifier) {
     return specifier === "query";
@@ -30,24 +34,36 @@ const handler = {
 };
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode(value) {
-    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  },
-  decode(value) {
-    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }
+  encode: (() => {
+    function base64JSONEncode(value) {
+      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+    }
+    base64JSONEncode.isSyncAndSafe = true; // Optimization
+    return base64JSONEncode;
+  })(),
+  decode: (() => {
+    function base64JSONDecode(value) {
+      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+    }
+    base64JSONDecode.isSyncAndSafe = true; // Optimization
+    return base64JSONDecode;
+  })()
 };
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode(value) {
+    encode: Object.assign(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   }
 });
 const guidCodec = domainOfCodec(TYPES.varchar, "guid", sql.identifier("b", "guid"), {
@@ -62,44 +78,7 @@ const guidCodec = domainOfCodec(TYPES.varchar, "guid", sql.identifier("b", "guid
   },
   notNull: false
 });
-const updatableViewAttributes = Object.assign(Object.create(null), {
-  x: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  name: {
-    description: undefined,
-    codec: TYPES.varchar,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  description: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  constant: {
-    description: "This is constantly 2",
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
+const updatableViewIdentifier = sql.identifier("b", "updatable_view");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -110,10 +89,47 @@ const executor = new PgExecutor({
     });
   }
 });
-const updatableViewCodec = recordCodec({
+const spec_updatableView = {
   name: "updatableView",
-  identifier: sql.identifier("b", "updatable_view"),
-  attributes: updatableViewAttributes,
+  identifier: updatableViewIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    x: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    name: {
+      description: undefined,
+      codec: TYPES.varchar,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    description: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    constant: {
+      description: "This is constantly 2",
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: "YOYOYO!!",
   extensions: {
     isTableLike: true,
@@ -127,11 +143,13 @@ const updatableViewCodec = recordCodec({
       unique: "x|@behavior -single -update -delete"
     })
   },
-  executor
-});
+  executor: executor
+};
+const updatableViewCodec = recordCodec(spec_updatableView);
+const jwtTokenIdentifier = sql.identifier("b", "jwt_token");
 const jwtTokenCodec = recordCodec({
   name: "jwtToken",
-  identifier: sql.identifier("b", "jwt_token"),
+  identifier: jwtTokenIdentifier,
   attributes: Object.assign(Object.create(null), {
     role: {
       description: undefined,
@@ -191,7 +209,7 @@ const jwtTokenCodec = recordCodec({
       behavior: ["-table", "jwt"]
     })
   },
-  executor
+  executor: executor
 });
 const uuidArrayCodec = listOfCodec(TYPES.uuid, {
   extensions: {
@@ -206,9 +224,10 @@ const uuidArrayCodec = listOfCodec(TYPES.uuid, {
   description: undefined,
   name: "uuidArray"
 });
+const authPayloadIdentifier = sql.identifier("b", "auth_payload");
 const authPayloadCodec = recordCodec({
   name: "authPayload",
-  identifier: sql.identifier("b", "auth_payload"),
+  identifier: authPayloadIdentifier,
   attributes: Object.assign(Object.create(null), {
     jwt: {
       description: undefined,
@@ -250,7 +269,7 @@ const authPayloadCodec = recordCodec({
       foreignKey: "(id) references c.person"
     })
   },
-  executor
+  executor: executor
 });
 const colorCodec = enumCodec({
   name: "color",
@@ -381,8 +400,9 @@ const compoundTypeCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
+const typesIdentifier = sql.identifier("b", "types");
 const colorArrayCodec = listOfCodec(colorCodec, {
   extensions: {
     pg: {
@@ -521,7 +541,7 @@ const nestedCompoundTypeCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
 const textArrayDomainCodec = domainOfCodec(textArrayCodec, "textArrayDomain", sql.identifier("c", "text_array_domain"), {
   description: undefined,
@@ -573,7 +593,7 @@ const byteaArrayCodec = listOfCodec(TYPES.bytea, {
   description: undefined,
   name: "byteaArray"
 });
-const typesAttributes_ltree_codec_ltree = {
+const spec_types_attributes_ltree_codec_ltree = {
   name: "ltree",
   sqlType: sql`ltree`,
   toPg(str) {
@@ -585,469 +605,468 @@ const typesAttributes_ltree_codec_ltree = {
   executor: null,
   attributes: undefined
 };
-const typesAttributes_ltree_array_codec_ltree_ = listOfCodec(typesAttributes_ltree_codec_ltree);
-const typesAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  smallint: {
-    description: undefined,
-    codec: TYPES.int2,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  bigint: {
-    description: undefined,
-    codec: TYPES.bigint,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  numeric: {
-    description: undefined,
-    codec: TYPES.numeric,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  decimal: {
-    description: undefined,
-    codec: TYPES.numeric,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  boolean: {
-    description: undefined,
-    codec: TYPES.boolean,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  varchar: {
-    description: undefined,
-    codec: TYPES.varchar,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  enum: {
-    description: undefined,
-    codec: colorCodec,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  enum_array: {
-    description: undefined,
-    codec: colorArrayCodec,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  domain: {
-    description: undefined,
-    codec: anIntCodec,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  domain2: {
-    description: undefined,
-    codec: anotherIntCodec,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  text_array: {
-    description: undefined,
-    codec: textArrayCodec,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  json: {
-    description: undefined,
-    codec: TYPES.json,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  jsonb: {
-    description: undefined,
-    codec: TYPES.jsonb,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  nullable_range: {
-    description: undefined,
-    codec: numrangeCodec,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  numrange: {
-    description: undefined,
-    codec: numrangeCodec,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  daterange: {
-    description: undefined,
-    codec: daterangeCodec,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  an_int_range: {
-    description: undefined,
-    codec: anIntRangeCodec,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  timestamp: {
-    description: undefined,
-    codec: TYPES.timestamp,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  timestamptz: {
-    description: undefined,
-    codec: TYPES.timestamptz,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  date: {
-    description: undefined,
-    codec: TYPES.date,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  time: {
-    description: undefined,
-    codec: TYPES.time,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  timetz: {
-    description: undefined,
-    codec: TYPES.timetz,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  interval: {
-    description: undefined,
-    codec: TYPES.interval,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  interval_array: {
-    description: undefined,
-    codec: intervalArrayCodec,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  money: {
-    description: undefined,
-    codec: TYPES.money,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  compound_type: {
-    description: undefined,
-    codec: compoundTypeCodec,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  nested_compound_type: {
-    description: undefined,
-    codec: nestedCompoundTypeCodec,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  nullable_compound_type: {
-    description: undefined,
-    codec: compoundTypeCodec,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  nullable_nested_compound_type: {
-    description: undefined,
-    codec: nestedCompoundTypeCodec,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  point: {
-    description: undefined,
-    codec: TYPES.point,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  nullablePoint: {
-    description: undefined,
-    codec: TYPES.point,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  inet: {
-    description: undefined,
-    codec: TYPES.inet,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  cidr: {
-    description: undefined,
-    codec: TYPES.cidr,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  macaddr: {
-    description: undefined,
-    codec: TYPES.macaddr,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  regproc: {
-    description: undefined,
-    codec: TYPES.regproc,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  regprocedure: {
-    description: undefined,
-    codec: TYPES.regprocedure,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  regoper: {
-    description: undefined,
-    codec: TYPES.regoper,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  regoperator: {
-    description: undefined,
-    codec: TYPES.regoperator,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  regclass: {
-    description: undefined,
-    codec: TYPES.regclass,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  regtype: {
-    description: undefined,
-    codec: TYPES.regtype,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  regconfig: {
-    description: undefined,
-    codec: TYPES.regconfig,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  regdictionary: {
-    description: undefined,
-    codec: TYPES.regdictionary,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  text_array_domain: {
-    description: undefined,
-    codec: textArrayDomainCodec,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  int8_array_domain: {
-    description: undefined,
-    codec: int8ArrayDomainCodec,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  bytea: {
-    description: undefined,
-    codec: TYPES.bytea,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  bytea_array: {
-    description: undefined,
-    codec: byteaArrayCodec,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  ltree: {
-    description: undefined,
-    codec: typesAttributes_ltree_codec_ltree,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  ltree_array: {
-    description: undefined,
-    codec: typesAttributes_ltree_array_codec_ltree_,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const extensions17 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "types"
-  },
-  tags: Object.assign(Object.create(null), {
-    foreignKey: ["(smallint) references a.post", "(id) references a.post"]
-  })
-};
-const typesCodec = recordCodec({
+const spec_types_attributes_ltree_array_codec_ltree_ = listOfCodec(spec_types_attributes_ltree_codec_ltree);
+const spec_types = {
   name: "types",
-  identifier: sql.identifier("b", "types"),
-  attributes: typesAttributes,
+  identifier: typesIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    smallint: {
+      description: undefined,
+      codec: TYPES.int2,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    bigint: {
+      description: undefined,
+      codec: TYPES.bigint,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    numeric: {
+      description: undefined,
+      codec: TYPES.numeric,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    decimal: {
+      description: undefined,
+      codec: TYPES.numeric,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    boolean: {
+      description: undefined,
+      codec: TYPES.boolean,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    varchar: {
+      description: undefined,
+      codec: TYPES.varchar,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    enum: {
+      description: undefined,
+      codec: colorCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    enum_array: {
+      description: undefined,
+      codec: colorArrayCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    domain: {
+      description: undefined,
+      codec: anIntCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    domain2: {
+      description: undefined,
+      codec: anotherIntCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    text_array: {
+      description: undefined,
+      codec: textArrayCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    json: {
+      description: undefined,
+      codec: TYPES.json,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    jsonb: {
+      description: undefined,
+      codec: TYPES.jsonb,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    nullable_range: {
+      description: undefined,
+      codec: numrangeCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    numrange: {
+      description: undefined,
+      codec: numrangeCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    daterange: {
+      description: undefined,
+      codec: daterangeCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    an_int_range: {
+      description: undefined,
+      codec: anIntRangeCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    timestamp: {
+      description: undefined,
+      codec: TYPES.timestamp,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    timestamptz: {
+      description: undefined,
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    date: {
+      description: undefined,
+      codec: TYPES.date,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    time: {
+      description: undefined,
+      codec: TYPES.time,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    timetz: {
+      description: undefined,
+      codec: TYPES.timetz,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    interval: {
+      description: undefined,
+      codec: TYPES.interval,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    interval_array: {
+      description: undefined,
+      codec: intervalArrayCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    money: {
+      description: undefined,
+      codec: TYPES.money,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    compound_type: {
+      description: undefined,
+      codec: compoundTypeCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    nested_compound_type: {
+      description: undefined,
+      codec: nestedCompoundTypeCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    nullable_compound_type: {
+      description: undefined,
+      codec: compoundTypeCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    nullable_nested_compound_type: {
+      description: undefined,
+      codec: nestedCompoundTypeCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    point: {
+      description: undefined,
+      codec: TYPES.point,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    nullablePoint: {
+      description: undefined,
+      codec: TYPES.point,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    inet: {
+      description: undefined,
+      codec: TYPES.inet,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    cidr: {
+      description: undefined,
+      codec: TYPES.cidr,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    macaddr: {
+      description: undefined,
+      codec: TYPES.macaddr,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    regproc: {
+      description: undefined,
+      codec: TYPES.regproc,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    regprocedure: {
+      description: undefined,
+      codec: TYPES.regprocedure,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    regoper: {
+      description: undefined,
+      codec: TYPES.regoper,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    regoperator: {
+      description: undefined,
+      codec: TYPES.regoperator,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    regclass: {
+      description: undefined,
+      codec: TYPES.regclass,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    regtype: {
+      description: undefined,
+      codec: TYPES.regtype,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    regconfig: {
+      description: undefined,
+      codec: TYPES.regconfig,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    regdictionary: {
+      description: undefined,
+      codec: TYPES.regdictionary,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    text_array_domain: {
+      description: undefined,
+      codec: textArrayDomainCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    int8_array_domain: {
+      description: undefined,
+      codec: int8ArrayDomainCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    bytea: {
+      description: undefined,
+      codec: TYPES.bytea,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    bytea_array: {
+      description: undefined,
+      codec: byteaArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    ltree: {
+      description: undefined,
+      codec: spec_types_attributes_ltree_codec_ltree,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    ltree_array: {
+      description: undefined,
+      codec: spec_types_attributes_ltree_array_codec_ltree_,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
-  extensions: extensions17,
-  executor
-});
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "types"
+    },
+    tags: Object.assign(Object.create(null), {
+      foreignKey: ["(smallint) references a.post", "(id) references a.post"]
+    })
+  },
+  executor: executor
+};
+const typesCodec = recordCodec(spec_types);
 const notNullUrlCodec = domainOfCodec(TYPES.varchar, "notNullUrl", sql.identifier("b", "not_null_url"), {
   description: undefined,
   extensions: {
@@ -1067,10 +1086,10 @@ const mult_4FunctionIdentifer = sql.identifier("b", "mult_4");
 const guid_fnFunctionIdentifer = sql.identifier("b", "guid_fn");
 const authenticate_failFunctionIdentifer = sql.identifier("b", "authenticate_fail");
 const resourceConfig_jwt_token = {
-  executor,
+  executor: executor,
   name: "jwt_token",
   identifier: "main.b.jwt_token",
-  from: jwtTokenCodec.sqlType,
+  from: jwtTokenIdentifier,
   codec: jwtTokenCodec,
   uniques: [],
   isVirtual: true,
@@ -1105,10 +1124,10 @@ const typesUniques = [{
   }
 }];
 const registryConfig_pgResources_types_types = {
-  executor,
+  executor: executor,
   name: "types",
   identifier: "main.b.types",
-  from: typesCodec.sqlType,
+  from: typesIdentifier,
   codec: typesCodec,
   uniques: typesUniques,
   isVirtual: false,
@@ -1121,7 +1140,7 @@ const registryConfig_pgResources_types_types = {
       name: "types"
     },
     tags: {
-      foreignKey: extensions17.tags.foreignKey
+      foreignKey: spec_types.extensions.tags.foreignKey
     }
   }
 };
@@ -1185,8 +1204,8 @@ const registry = makeRegistry({
     int8ArrayDomain: int8ArrayDomainCodec,
     bytea: TYPES.bytea,
     byteaArray: byteaArrayCodec,
-    ltree: typesAttributes_ltree_codec_ltree,
-    "ltree[]": typesAttributes_ltree_array_codec_ltree_,
+    ltree: spec_types_attributes_ltree_codec_ltree,
+    "ltree[]": spec_types_attributes_ltree_array_codec_ltree_,
     bpchar: TYPES.bpchar,
     jwtTokenArray: listOfCodec(jwtTokenCodec, {
       extensions: {
@@ -1253,7 +1272,7 @@ const registry = makeRegistry({
         },
         tags: Object.create(null)
       },
-      executor
+      executor: executor
     })
   }),
   pgResources: Object.assign(Object.create(null), {
@@ -1423,10 +1442,10 @@ const registry = makeRegistry({
       description: undefined
     },
     updatable_view: {
-      executor,
+      executor: executor,
       name: "updatable_view",
       identifier: "main.b.updatable_view",
-      from: updatableViewCodec.sqlType,
+      from: updatableViewIdentifier,
       codec: updatableViewCodec,
       uniques: [{
         isPrimary: false,
@@ -1589,10 +1608,10 @@ const registry = makeRegistry({
       description: undefined
     }),
     authenticate_payload: PgResource.functionResourceOptions({
-      executor,
+      executor: executor,
       name: "auth_payload",
       identifier: "main.b.auth_payload",
-      from: authPayloadCodec.sqlType,
+      from: authPayloadIdentifier,
       codec: authPayloadCodec,
       uniques: [],
       isVirtual: true,
@@ -1954,7 +1973,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -2264,6 +2283,18 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
 };
 const resource_frmcdc_compoundTypePgResource = registry.pgResources["frmcdc_compoundType"];
 const resource_frmcdc_nestedCompoundTypePgResource = registry.pgResources["frmcdc_nestedCompoundType"];
+function BigIntSerialize(value) {
+  return "" + value;
+}
+const coerce = string => {
+  if (!/^[0-9a-f]{8}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{4}-?[0-9a-f]{12}$/i.test(string)) {
+    throw new GraphQLError("Invalid UUID, expected 32 hexadecimal characters, optionally with hypens");
+  }
+  return string;
+};
+function LTreeParseValue(value) {
+  return value;
+}
 const argDetailsSimple6 = [{
   graphqlArgName: "arg0",
   postgresArgName: null,
@@ -3159,9 +3190,6 @@ const specFromArgs2 = args => {
   return specFromNodeId(nodeIdHandlerByTypeName.Type, $nodeId);
 };
 const attributeNames = ["role", "exp", "a", "b", "c"];
-function JwtTokenParseValue(value) {
-  return value;
-}
 const resource_frmcdc_jwtTokenPgResource = registry.pgResources["frmcdc_jwtToken"];
 export const typeDefs = /* GraphQL */`"""The root query type which gives access points into the data universe."""
 type Query implements Node {
@@ -5260,6 +5288,26 @@ export const plans = {
       return $record.get("ltree_array");
     }
   },
+  BigInt: {
+    serialize: BigIntSerialize,
+    parseValue: BigIntSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"BigInt" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  BigFloat: {
+    serialize: BigIntSerialize,
+    parseValue: BigIntSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"BigFloat" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
   Color: {
     RED: {
       value: "red"
@@ -5271,12 +5319,67 @@ export const plans = {
       value: "blue"
     }
   },
+  AnInt: {
+    serialize: GraphQLInt.serialize,
+    parseValue: GraphQLInt.parseValue,
+    parseLiteral: GraphQLInt.parseLiteral
+  },
+  AnotherInt: {
+    serialize: GraphQLInt.serialize,
+    parseValue: GraphQLInt.parseValue,
+    parseLiteral: GraphQLInt.parseLiteral
+  },
+  JSON: {
+    serialize(value) {
+      return JSON.stringify(value);
+    },
+    parseValue(value) {
+      return JSON.parse(value);
+    },
+    parseLiteral(ast, _variables) {
+      if (ast.kind === Kind.STRING) {
+        return JSON.parse(ast.value);
+      } else {
+        return undefined;
+      }
+    }
+  },
   BigFloatRange: {},
   BigFloatRangeBound: {},
   DateRange: {},
   DateRangeBound: {},
+  Date: {
+    serialize: BigIntSerialize,
+    parseValue: BigIntSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Date" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
   AnIntRange: {},
   AnIntRangeBound: {},
+  Datetime: {
+    serialize: BigIntSerialize,
+    parseValue: BigIntSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  Time: {
+    serialize: BigIntSerialize,
+    parseValue: BigIntSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Time" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
   Interval: {
     __assertStep: assertExecutableStep,
     seconds($r) {
@@ -5325,6 +5428,19 @@ export const plans = {
       return $record.get("foo_bar");
     }
   },
+  UUID: {
+    serialize: BigIntSerialize,
+    parseValue(value) {
+      return coerce("" + value);
+    },
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        // ERRORS: add name to this error
+        throw new GraphQLError(`${"UUID" ?? "This scalar"} can only parse string values (kind = '${ast.kind}')`);
+      }
+      return coerce(ast.value);
+    }
+  },
   EnumCaps: {
     _0_BAR: {
       value: "0_BAR"
@@ -5366,7 +5482,132 @@ export const plans = {
     }
   },
   Point: {},
+  InternetAddress: {
+    serialize: BigIntSerialize,
+    parseValue: BigIntSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"InternetAddress" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  RegProc: {
+    serialize: BigIntSerialize,
+    parseValue: BigIntSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"RegProc" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  RegProcedure: {
+    serialize: BigIntSerialize,
+    parseValue: BigIntSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"RegProcedure" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  RegOper: {
+    serialize: BigIntSerialize,
+    parseValue: BigIntSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"RegOper" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  RegOperator: {
+    serialize: BigIntSerialize,
+    parseValue: BigIntSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"RegOperator" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  RegClass: {
+    serialize: BigIntSerialize,
+    parseValue: BigIntSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"RegClass" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  RegType: {
+    serialize: BigIntSerialize,
+    parseValue: BigIntSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"RegType" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  RegConfig: {
+    serialize: BigIntSerialize,
+    parseValue: BigIntSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"RegConfig" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  RegDictionary: {
+    serialize: BigIntSerialize,
+    parseValue: BigIntSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"RegDictionary" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  Base64EncodedBinary: {
+    serialize(data) {
+      if (Buffer.isBuffer(data)) {
+        return data.toString("base64");
+      } else {
+        throw new Error(`Base64EncodeBinary can only be used with Node.js buffers.`);
+      }
+    },
+    parseValue(data) {
+      if (typeof data === "string") {
+        return Buffer.from(data, "base64");
+      } else {
+        throw new GraphQLError("Base64EncodedBinary can only parse string values.");
+      }
+    },
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        // TODO: add name to this error
+        throw new GraphQLError("Base64EncodedBinary can only parse string values");
+      }
+      return Buffer.from(ast.value, "base64");
+    }
+  },
+  LTree: {
+    serialize(x) {
+      return x;
+    },
+    parseValue: LTreeParseValue,
+    parseLiteral(node, variables) {
+      return LTreeParseValue(valueFromASTUntyped(node, variables));
+    }
+  },
   CompoundTypeInput: {
+    "__inputPlan": function CompoundTypeInput_inputPlan() {
+      return object(Object.create(null));
+    },
     a: {
       applyPlan($insert, val) {
         $insert.set("a", val.get());
@@ -5455,6 +5696,16 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  Cursor: {
+    serialize: BigIntSerialize,
+    parseValue: BigIntSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
     }
   },
   PageInfo: {
@@ -5669,7 +5920,7 @@ export const plans = {
             type: "attribute",
             attribute: "x",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), updatableViewAttributes.x.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_updatableView.attributes.x.codec)}`;
             }
           });
         }
@@ -5692,7 +5943,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), updatableViewAttributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_updatableView.attributes.name.codec)}`;
             }
           });
         }
@@ -5715,7 +5966,7 @@ export const plans = {
             type: "attribute",
             attribute: "description",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), updatableViewAttributes.description.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_updatableView.attributes.description.codec)}`;
             }
           });
         }
@@ -5738,7 +5989,7 @@ export const plans = {
             type: "attribute",
             attribute: "constant",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), updatableViewAttributes.constant.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_updatableView.attributes.constant.codec)}`;
             }
           });
         }
@@ -7058,7 +7309,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.id.codec)}`;
             }
           });
         }
@@ -7081,7 +7332,7 @@ export const plans = {
             type: "attribute",
             attribute: "smallint",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.smallint.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.smallint.codec)}`;
             }
           });
         }
@@ -7104,7 +7355,7 @@ export const plans = {
             type: "attribute",
             attribute: "bigint",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.bigint.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.bigint.codec)}`;
             }
           });
         }
@@ -7127,7 +7378,7 @@ export const plans = {
             type: "attribute",
             attribute: "numeric",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.numeric.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.numeric.codec)}`;
             }
           });
         }
@@ -7150,7 +7401,7 @@ export const plans = {
             type: "attribute",
             attribute: "decimal",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.decimal.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.decimal.codec)}`;
             }
           });
         }
@@ -7173,7 +7424,7 @@ export const plans = {
             type: "attribute",
             attribute: "boolean",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.boolean.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.boolean.codec)}`;
             }
           });
         }
@@ -7196,7 +7447,7 @@ export const plans = {
             type: "attribute",
             attribute: "varchar",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.varchar.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.varchar.codec)}`;
             }
           });
         }
@@ -7219,7 +7470,7 @@ export const plans = {
             type: "attribute",
             attribute: "enum",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.enum.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.enum.codec)}`;
             }
           });
         }
@@ -7242,7 +7493,7 @@ export const plans = {
             type: "attribute",
             attribute: "enum_array",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.enum_array.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.enum_array.codec)}`;
             }
           });
         }
@@ -7265,7 +7516,7 @@ export const plans = {
             type: "attribute",
             attribute: "domain",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.domain.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.domain.codec)}`;
             }
           });
         }
@@ -7288,7 +7539,7 @@ export const plans = {
             type: "attribute",
             attribute: "domain2",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.domain2.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.domain2.codec)}`;
             }
           });
         }
@@ -7311,7 +7562,7 @@ export const plans = {
             type: "attribute",
             attribute: "text_array",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.text_array.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.text_array.codec)}`;
             }
           });
         }
@@ -7334,7 +7585,7 @@ export const plans = {
             type: "attribute",
             attribute: "json",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.json.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.json.codec)}`;
             }
           });
         }
@@ -7357,7 +7608,7 @@ export const plans = {
             type: "attribute",
             attribute: "jsonb",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.jsonb.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.jsonb.codec)}`;
             }
           });
         }
@@ -7380,7 +7631,7 @@ export const plans = {
             type: "attribute",
             attribute: "nullable_range",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.nullable_range.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.nullable_range.codec)}`;
             }
           });
         }
@@ -7403,7 +7654,7 @@ export const plans = {
             type: "attribute",
             attribute: "numrange",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.numrange.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.numrange.codec)}`;
             }
           });
         }
@@ -7426,7 +7677,7 @@ export const plans = {
             type: "attribute",
             attribute: "daterange",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.daterange.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.daterange.codec)}`;
             }
           });
         }
@@ -7449,7 +7700,7 @@ export const plans = {
             type: "attribute",
             attribute: "an_int_range",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.an_int_range.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.an_int_range.codec)}`;
             }
           });
         }
@@ -7472,7 +7723,7 @@ export const plans = {
             type: "attribute",
             attribute: "timestamp",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.timestamp.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.timestamp.codec)}`;
             }
           });
         }
@@ -7495,7 +7746,7 @@ export const plans = {
             type: "attribute",
             attribute: "timestamptz",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.timestamptz.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.timestamptz.codec)}`;
             }
           });
         }
@@ -7518,7 +7769,7 @@ export const plans = {
             type: "attribute",
             attribute: "date",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.date.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.date.codec)}`;
             }
           });
         }
@@ -7541,7 +7792,7 @@ export const plans = {
             type: "attribute",
             attribute: "time",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.time.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.time.codec)}`;
             }
           });
         }
@@ -7564,7 +7815,7 @@ export const plans = {
             type: "attribute",
             attribute: "timetz",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.timetz.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.timetz.codec)}`;
             }
           });
         }
@@ -7587,7 +7838,7 @@ export const plans = {
             type: "attribute",
             attribute: "interval",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.interval.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.interval.codec)}`;
             }
           });
         }
@@ -7610,7 +7861,7 @@ export const plans = {
             type: "attribute",
             attribute: "interval_array",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.interval_array.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.interval_array.codec)}`;
             }
           });
         }
@@ -7633,7 +7884,7 @@ export const plans = {
             type: "attribute",
             attribute: "money",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.money.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.money.codec)}`;
             }
           });
         }
@@ -7656,7 +7907,7 @@ export const plans = {
             type: "attribute",
             attribute: "compound_type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.compound_type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.compound_type.codec)}`;
             }
           });
         }
@@ -7679,7 +7930,7 @@ export const plans = {
             type: "attribute",
             attribute: "nested_compound_type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.nested_compound_type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.nested_compound_type.codec)}`;
             }
           });
         }
@@ -7702,7 +7953,7 @@ export const plans = {
             type: "attribute",
             attribute: "nullable_compound_type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.nullable_compound_type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.nullable_compound_type.codec)}`;
             }
           });
         }
@@ -7725,7 +7976,7 @@ export const plans = {
             type: "attribute",
             attribute: "nullable_nested_compound_type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.nullable_nested_compound_type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.nullable_nested_compound_type.codec)}`;
             }
           });
         }
@@ -7748,7 +7999,7 @@ export const plans = {
             type: "attribute",
             attribute: "point",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.point.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.point.codec)}`;
             }
           });
         }
@@ -7771,7 +8022,7 @@ export const plans = {
             type: "attribute",
             attribute: "nullablePoint",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.nullablePoint.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.nullablePoint.codec)}`;
             }
           });
         }
@@ -7794,7 +8045,7 @@ export const plans = {
             type: "attribute",
             attribute: "inet",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.inet.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.inet.codec)}`;
             }
           });
         }
@@ -7817,7 +8068,7 @@ export const plans = {
             type: "attribute",
             attribute: "cidr",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.cidr.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.cidr.codec)}`;
             }
           });
         }
@@ -7840,7 +8091,7 @@ export const plans = {
             type: "attribute",
             attribute: "macaddr",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.macaddr.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.macaddr.codec)}`;
             }
           });
         }
@@ -7863,7 +8114,7 @@ export const plans = {
             type: "attribute",
             attribute: "regproc",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.regproc.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.regproc.codec)}`;
             }
           });
         }
@@ -7886,7 +8137,7 @@ export const plans = {
             type: "attribute",
             attribute: "regprocedure",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.regprocedure.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.regprocedure.codec)}`;
             }
           });
         }
@@ -7909,7 +8160,7 @@ export const plans = {
             type: "attribute",
             attribute: "regoper",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.regoper.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.regoper.codec)}`;
             }
           });
         }
@@ -7932,7 +8183,7 @@ export const plans = {
             type: "attribute",
             attribute: "regoperator",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.regoperator.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.regoperator.codec)}`;
             }
           });
         }
@@ -7955,7 +8206,7 @@ export const plans = {
             type: "attribute",
             attribute: "regclass",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.regclass.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.regclass.codec)}`;
             }
           });
         }
@@ -7978,7 +8229,7 @@ export const plans = {
             type: "attribute",
             attribute: "regtype",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.regtype.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.regtype.codec)}`;
             }
           });
         }
@@ -8001,7 +8252,7 @@ export const plans = {
             type: "attribute",
             attribute: "regconfig",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.regconfig.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.regconfig.codec)}`;
             }
           });
         }
@@ -8024,7 +8275,7 @@ export const plans = {
             type: "attribute",
             attribute: "regdictionary",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.regdictionary.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.regdictionary.codec)}`;
             }
           });
         }
@@ -8047,7 +8298,7 @@ export const plans = {
             type: "attribute",
             attribute: "text_array_domain",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.text_array_domain.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.text_array_domain.codec)}`;
             }
           });
         }
@@ -8070,7 +8321,7 @@ export const plans = {
             type: "attribute",
             attribute: "int8_array_domain",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.int8_array_domain.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.int8_array_domain.codec)}`;
             }
           });
         }
@@ -8093,7 +8344,7 @@ export const plans = {
             type: "attribute",
             attribute: "ltree",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.ltree.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.ltree.codec)}`;
             }
           });
         }
@@ -8116,7 +8367,7 @@ export const plans = {
             type: "attribute",
             attribute: "ltree_array",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), typesAttributes.ltree_array.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_types.attributes.ltree_array.codec)}`;
             }
           });
         }
@@ -8150,6 +8401,9 @@ export const plans = {
     inclusive: undefined
   },
   NestedCompoundTypeInput: {
+    "__inputPlan": function NestedCompoundTypeInput_inputPlan() {
+      return object(Object.create(null));
+    },
     a: {
       applyPlan($insert, val) {
         $insert.set("a", val.get());
@@ -8653,6 +8907,11 @@ export const plans = {
       return rootValue();
     }
   },
+  Guid: {
+    serialize: GraphQLString.serialize,
+    parseValue: GraphQLString.parseValue,
+    parseLiteral: GraphQLString.parseLiteral
+  },
   GuidFnInput: {
     clientMutationId: {
       applyPlan($input, val) {
@@ -8693,9 +8952,9 @@ export const plans = {
       });
       return jsonwebtoken.sign(token, "secret", options);
     },
-    parseValue: JwtTokenParseValue,
+    parseValue: LTreeParseValue,
     parseLiteral(node, variables) {
-      return JwtTokenParseValue(valueFromASTUntyped(node, variables));
+      return LTreeParseValue(valueFromASTUntyped(node, variables));
     },
     plan($in) {
       const $record = $in;
@@ -9003,6 +9262,9 @@ export const plans = {
     }
   },
   UpdatableViewInput: {
+    "__inputPlan": function UpdatableViewInput_inputPlan() {
+      return object(Object.create(null));
+    },
     x: {
       applyPlan($insert, val) {
         $insert.set("x", val.get());
@@ -9091,6 +9353,9 @@ export const plans = {
     }
   },
   TypeInput: {
+    "__inputPlan": function TypeInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -9493,6 +9758,9 @@ export const plans = {
     }
   },
   TypePatch: {
+    "__inputPlan": function TypePatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());

@@ -353,14 +353,14 @@ export class LoadStep<
         meta.loadBatchesByLoad.set(this.load, loadBatches);
         // Guaranteed by the metaKey to be equivalent for all entries sharing the same `meta`. Note equivalent is not identical; key order may change.
         const loadOptions = this.loadOptions!;
-        setTimeout(() => {
+        process.nextTick(() => {
           // Don't allow adding anything else to the batch
           meta.loadBatchesByLoad!.delete(this.load);
           executeBatches(loadBatches!, this.load, {
             ...loadOptions,
             unary: unary as TUnarySpec,
           });
-        }, 0);
+        });
       }
       return (async () => {
         const loadResults = await deferred;

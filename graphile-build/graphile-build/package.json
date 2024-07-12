@@ -1,6 +1,6 @@
 {
   "name": "graphile-build",
-  "version": "5.0.0-beta.16",
+  "version": "5.0.0-beta.21",
   "description": "Build a GraphQL schema from plugins",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -46,6 +46,7 @@
     "lodash": "^4.17.21",
     "pluralize": "^7.0.0",
     "semver": "^7.5.4",
+    "tamedevil": "workspace:^",
     "tslib": "^2.6.2"
   },
   "engines": {

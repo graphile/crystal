@@ -9,16 +9,13 @@ graph TD
 
 
     %% plan dependencies
-    __Value0["__Value[0∈0]"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant7{{"Constant[7∈0]<br />ᐸnullᐳ"}}:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant6{{"Constant[6∈0] ➊<br />ᐸnullᐳ"}}:::plan
 
     %% define steps
 
     subgraph "Buckets for queries/errors/root-non-nullable-violation"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value5,Constant7 bucket0
-    classDef unary fill:#fafffa,borderWidth:8px
-    class __Value0,__Value5,Constant7 unary
+    class Bucket0,__Value4,Constant6 bucket0
     end

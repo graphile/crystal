@@ -9,60 +9,59 @@ graph TD
 
 
     %% plan dependencies
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
-    PgSelect20[["PgSelect[20∈1]<br />ᐸspacecraftᐳ"]]:::plan
-    Object18{{"Object[18∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant48{{"Constant[48∈1]<br />ᐸ[Object: null prototype] { id: '1', type: 'MOBILE' }ᐳ"}}:::plan
-    Object18 & Connection19 & Constant48 --> PgSelect20
-    Access16{{"Access[16∈1]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access17{{"Access[17∈1]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access16 & Access17 --> Object18
-    __Value3 --> Access16
-    __Value3 --> Access17
-    __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
-    PgSelect20 ==> __Item21
-    PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸspacecraftᐳ"}}:::plan
-    __Item21 --> PgSelectSingle22
-    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__spacecraft__.”id”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression23
-    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__spacecraft__.”name”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression24
-    PgSelectSingle35{{"PgSelectSingle[35∈3]<br />ᐸspacecraftᐳ"}}:::plan
-    RemapKeys44{{"RemapKeys[44∈3]<br />ᐸ22:{”0”:2,”1”:3}ᐳ"}}:::plan
-    RemapKeys44 --> PgSelectSingle35
-    PgClassExpression37{{"PgClassExpression[37∈3]<br />ᐸ”space”.”s...lder! */<br />)ᐳ"}}:::plan
-    PgSelectSingle35 --> PgClassExpression37
-    PgSelectSingle22 --> RemapKeys44
-    Access38{{"Access[38∈4]<br />ᐸ37.startᐳ"}}:::plan
-    PgClassExpression37 --> Access38
-    Access41{{"Access[41∈4]<br />ᐸ37.endᐳ"}}:::plan
-    PgClassExpression37 --> Access41
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
+    PgSelect19[["PgSelect[19∈1] ➊<br />ᐸspacecraftᐳ"]]:::plan
+    Object17{{"Object[17∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant47{{"Constant[47∈1] ➊<br />ᐸ[Object: null prototype] { id: '1', type: 'MOBILE' }ᐳ"}}:::plan
+    Object17 & Connection18 & Constant47 --> PgSelect19
+    Access15{{"Access[15∈1] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access16{{"Access[16∈1] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access15 & Access16 --> Object17
+    __Value2 --> Access15
+    __Value2 --> Access16
+    __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
+    PgSelect19 ==> __Item20
+    PgSelectSingle21{{"PgSelectSingle[21∈2]<br />ᐸspacecraftᐳ"}}:::plan
+    __Item20 --> PgSelectSingle21
+    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__spacecraft__.”id”ᐳ"}}:::plan
+    PgSelectSingle21 --> PgClassExpression22
+    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__spacecraft__.”name”ᐳ"}}:::plan
+    PgSelectSingle21 --> PgClassExpression23
+    PgSelectSingle34{{"PgSelectSingle[34∈3]<br />ᐸspacecraftᐳ"}}:::plan
+    RemapKeys43{{"RemapKeys[43∈3]<br />ᐸ21:{”0”:2,”1”:3}ᐳ"}}:::plan
+    RemapKeys43 --> PgSelectSingle34
+    PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸ”space”.”s...lder! */<br />)ᐳ"}}:::plan
+    PgSelectSingle34 --> PgClassExpression36
+    PgSelectSingle21 --> RemapKeys43
+    Access37{{"Access[37∈4]<br />ᐸ36.startᐳ"}}:::plan
+    PgClassExpression36 --> Access37
+    Access40{{"Access[40∈4]<br />ᐸ36.endᐳ"}}:::plan
+    PgClassExpression36 --> Access40
 
     %% define steps
 
     subgraph "Buckets for queries/v4/space"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Connection19 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]<br />1: <br />ᐳ: 16, 17, 48, 18<br />2: PgSelect[20]"):::bucket
+    class Bucket0,__Value2,__Value4,Connection18 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 18<br /><br />ROOT Connectionᐸ14ᐳ[18]<br />1: <br />ᐳ: 15, 16, 47, 17<br />2: PgSelect[19]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access16,Access17,Object18,PgSelect20,Constant48 bucket1
-    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ20ᐳ[21]"):::bucket
+    class Bucket1,Access15,Access16,Object17,PgSelect19,Constant47 bucket1
+    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ19ᐳ[20]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item21,PgSelectSingle22 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22<br /><br />ROOT PgSelectSingle{2}ᐸspacecraftᐳ[22]"):::bucket
+    class Bucket2,__Item20,PgSelectSingle21 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21<br /><br />ROOT PgSelectSingle{2}ᐸspacecraftᐳ[21]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression23,PgClassExpression24,PgSelectSingle35,PgClassExpression37,RemapKeys44 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 37<br /><br />ROOT PgClassExpression{3}ᐸ”space”.”s...lder! */<br />)ᐳ[37]"):::bucket
+    class Bucket3,PgClassExpression22,PgClassExpression23,PgSelectSingle34,PgClassExpression36,RemapKeys43 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 36<br /><br />ROOT PgClassExpression{3}ᐸ”space”.”s...lder! */<br />)ᐳ[36]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,Access38,Access41 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 38, 37<br /><br />ROOT Access{4}ᐸ37.startᐳ[38]"):::bucket
+    class Bucket4,Access37,Access40 bucket4
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 37, 36<br /><br />ROOT Access{4}ᐸ36.startᐳ[37]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 41, 37<br /><br />ROOT Access{4}ᐸ37.endᐳ[41]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 40, 36<br /><br />ROOT Access{4}ᐸ36.endᐳ[40]"):::bucket
     classDef bucket6 stroke:#ff1493
     class Bucket6 bucket6
     Bucket0 --> Bucket1
@@ -70,6 +69,4 @@ graph TD
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4
     Bucket4 --> Bucket5 & Bucket6
-    classDef unary fill:#fafffa,borderWidth:8px
-    class __Value0,__Value3,__Value5,Connection19,PgSelect20,Object18,Access16,Access17,Constant48 unary
     end

@@ -43,8 +43,11 @@ export function defaultMaskError(
     const hash = sha1(String(error));
     const errorId = randomString();
     console.error(
-      `Masked GraphQL error (hash: '${hash}', id: '${errorId}')`,
+      "Masked GraphQL error (hash: '%s', id: '%s')\n%s\n%O",
+      hash,
+      errorId,
       error,
+      error.originalError ?? error,
     );
     return new GraphQLError(
       `An error occurred (logged with hash: '${hash}', id: '${errorId}')`,
@@ -138,6 +141,7 @@ export function optionsFromConfig(config: GraphileConfig.ResolvedPreset) {
     }
   };
   return {
+    resolvedPreset: config,
     outputDataAsString,
     graphqlPath,
     graphqlOverGET,

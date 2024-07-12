@@ -520,6 +520,8 @@ export class PgSelectStep<
     const cloneFromMatchingMode =
       cloneFrom?.mode === this.mode ? cloneFrom : null;
 
+    this.hasSideEffects = this.mode === "mutation";
+
     this.resource = resource;
     if (cloneFrom !== null) {
       // Prevent any changes to our original to help avoid programming
@@ -530,7 +532,10 @@ export class PgSelectStep<
         throw new Error("Should not have any dependencies yet");
       }
       cloneFrom.dependencies.forEach((planId, idx) => {
-        const myIdx = this.addDependency(cloneFrom.getDep(idx), true);
+        const myIdx = this.addDependency({
+          ...cloneFrom.getDepOptions(idx),
+          skipDeduplication: true,
+        });
         if (myIdx !== idx) {
           throw new Error(
             `Failed to clone ${cloneFrom}; dependency indexes did not match: ${myIdx} !== ${idx}`,
@@ -656,8 +661,6 @@ export class PgSelectStep<
         );
       }
     });
-
-    this.hasSideEffects = this.mode === "mutation";
 
     debugPlanVerbose(
       `%s (%s) constructor (%s; %s)`,
@@ -910,8 +913,6 @@ export class PgSelectStep<
    * Finalizes this instance and returns a mutable clone; useful for
    * connections/etc (e.g. copying `where` conditions but adding more, or
    * pagination, or grouping, aggregates, etc)
-   *
-   * @internal
    */
   clone(mode?: PgSelectMode): PgSelectStep<TResource> {
     return new PgSelectStep(this, mode);

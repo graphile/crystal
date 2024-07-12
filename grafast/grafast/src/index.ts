@@ -2,15 +2,15 @@ import "./thereCanBeOnlyOne.js";
 
 import type LRU from "@graphile/lru";
 import debugFactory from "debug";
-import type { PluginHook } from "graphile-config";
+import type { CallbackOrDescriptor, MiddlewareNext } from "graphile-config";
 import type {
   DocumentNode,
-  ExecutionArgs as GraphQLExecutionArgs,
   GraphQLError,
   OperationDefinitionNode,
 } from "graphql";
 
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
+import type { DataFromObjectSteps } from "./steps/object.js";
 
 type PromiseOrValue<T> = T | Promise<T>;
 
@@ -35,12 +35,7 @@ import { defer, Deferred } from "./deferred.js";
 import { isDev, noop } from "./dev.js";
 import { isUnaryStep } from "./engine/lib/withGlobalLayerPlan.js";
 import { OperationPlan } from "./engine/OperationPlan.js";
-import {
-  GrafastError,
-  isGrafastError,
-  isSafeError,
-  SafeError,
-} from "./error.js";
+import { $$inhibit, flagError, isSafeError, SafeError } from "./error.js";
 import { execute } from "./execute.js";
 import { grafast, grafastSync } from "./grafastGraphql.js";
 import type {
@@ -48,8 +43,17 @@ import type {
   $$hooked,
   $$queryCache,
   CacheByOperationEntry,
+  DataFromStep,
+  EstablishOperationPlanEvent,
+  ExecuteEvent,
+  ExecuteStepEvent,
+  GrafastExecutionArgs,
   GrafastTimeouts,
+  ParseAndValidateEvent,
+  PrepareArgsEvent,
   ScalarInputPlanResolver,
+  StreamStepEvent,
+  ValidateSchemaEvent,
 } from "./interfaces.js";
 import {
   $$bypassGraphQL,
@@ -101,6 +105,7 @@ import {
   TypedEventEmitter,
   UnbatchedExecutionExtra,
 } from "./interfaces.js";
+import { getGrafastMiddleware } from "./middleware.js";
 import { polymorphicWrap } from "./polymorphic.js";
 import {
   assertExecutableStep,
@@ -123,6 +128,7 @@ import {
   UnbatchedExecutableStep,
 } from "./step.js";
 import {
+  __FlagStep,
   __InputListStep,
   __InputObjectStep,
   __InputObjectStepWithDollars,
@@ -138,7 +144,10 @@ import {
   applyTransforms,
   ApplyTransformsStep,
   assertEdgeCapableStep,
+  assertNotNull,
   assertPageInfoCapableStep,
+  condition,
+  ConditionStep,
   connection,
   ConnectionCapableStep,
   ConnectionStep,
@@ -161,6 +170,7 @@ import {
   GraphQLResolverStep,
   groupBy,
   GroupByPlanMemo,
+  inhibitOnNull,
   lambda,
   LambdaStep,
   last,
@@ -184,6 +194,7 @@ import {
   LoadStep,
   makeDecodeNodeId,
   node,
+  nodeIdFromNode,
   NodeStep,
   object,
   ObjectPlanMeta,
@@ -211,6 +222,10 @@ import {
   specFromNodeId,
   trackedContext,
   trackedRootValue,
+  trap,
+  TRAP_ERROR,
+  TRAP_ERROR_OR_INHIBITED,
+  TRAP_INHIBITED,
 } from "./steps/index.js";
 import { stringifyPayload } from "./stringifyPayload.js";
 import { stripAnsi } from "./stripAnsi.js";
@@ -239,6 +254,7 @@ import {
 
 export { isAsyncIterable } from "iterall";
 export {
+  __FlagStep,
   __InputListStep,
   __InputObjectStep,
   __InputObjectStepWithDollars,
@@ -252,6 +268,7 @@ export {
   $$eventEmitter,
   $$extensions,
   $$idempotent,
+  $$inhibit,
   $$verbatim,
   access,
   AccessStep,
@@ -266,18 +283,23 @@ export {
   assertExecutableStep,
   assertListCapableStep,
   assertModifierStep,
+  assertNotNull,
   assertPageInfoCapableStep,
   BaseEventMap,
   BaseGraphQLArguments,
   BaseGraphQLRootValue,
   BaseGraphQLVariables,
   BaseStep,
+  condition,
+  ConditionStep,
   connection,
   ConnectionCapableStep,
   ConnectionStep,
   constant,
   ConstantStep,
   context,
+  DataFromObjectSteps,
+  DataFromStep,
   debugPlans,
   defer,
   Deferred,
@@ -306,10 +328,12 @@ export {
   FilterPlanMemo,
   first,
   FirstStep,
+  flagError,
   getEnumValueConfig,
+  getGrafastMiddleware,
   grafast,
   GrafastArgumentConfig,
-  GrafastError,
+  GrafastExecutionArgs,
   GrafastFieldConfig,
   GrafastFieldConfigArgumentMap,
   grafast as grafastGraphql,
@@ -332,6 +356,7 @@ export {
   GraphQLResolverStep,
   groupBy,
   GroupByPlanMemo,
+  inhibitOnNull,
   InputObjectFieldApplyPlanResolver,
   InputObjectFieldInputPlanResolver,
   inputObjectFieldSpec,
@@ -342,7 +367,6 @@ export {
   InterfaceOrUnionPlans,
   isDev,
   isExecutableStep,
-  isGrafastError,
   isListCapableStep,
   isListLikeStep,
   isModifierStep,
@@ -386,6 +410,7 @@ export {
   newObjectTypeBuilder,
   node,
   NodeIdCodec,
+  nodeIdFromNode,
   NodeIdHandler,
   NodeStep,
   noop,
@@ -439,6 +464,10 @@ export {
   subscribe,
   trackedContext,
   trackedRootValue,
+  trap,
+  TRAP_ERROR,
+  TRAP_ERROR_OR_INHIBITED,
+  TRAP_INHIBITED,
   TypedEventEmitter,
   UnbatchedExecutableStep,
   UnbatchedExecutionExtra,
@@ -452,6 +481,7 @@ exportAsMany("grafast", {
   OperationPlan,
   defer,
   execute,
+  getGrafastMiddleware,
   grafast,
   grafastSync,
   subscribe,
@@ -480,13 +510,21 @@ exportAsMany("grafast", {
   assertPageInfoCapableStep,
   ConnectionStep,
   EdgeStep,
+  condition,
+  ConditionStep,
   constant,
   ConstantStep,
   context,
   rootValue,
   trackedContext,
   trackedRootValue,
-  isGrafastError,
+  inhibitOnNull,
+  assertNotNull,
+  trap,
+  __FlagStep,
+  TRAP_ERROR,
+  TRAP_ERROR_OR_INHIBITED,
+  TRAP_INHIBITED,
   debugPlans,
   each,
   error,
@@ -498,6 +536,7 @@ exportAsMany("grafast", {
   first,
   node,
   specFromNodeId,
+  nodeIdFromNode,
   polymorphicBranch,
   PolymorphicBranchStep,
   makeDecodeNodeId,
@@ -554,6 +593,8 @@ exportAsMany("grafast", {
   LoadedRecordStep,
   LoadStep,
   isSafeError,
+  $$inhibit,
+  flagError,
   SafeError,
   isUnaryStep,
 });
@@ -569,8 +610,16 @@ export const DeepEvalStep = ApplyTransformsStep;
 declare global {
   namespace Grafast {
     type ExecutionArgs = Pick<
-      GraphQLExecutionArgs,
-      "schema" | "document" | "rootValue" | "variableValues" | "operationName"
+      GrafastExecutionArgs,
+      | "schema"
+      | "document"
+      | "rootValue"
+      | "variableValues"
+      | "operationName"
+      | "resolvedPreset"
+      | "middleware"
+      | "requestContext"
+      | "outputDataAsString"
     > & { [$$hooked]?: boolean; contextValue: Grafast.Context };
 
     /**
@@ -702,18 +751,41 @@ declare global {
        */
       grafast?: GraphileConfig.GrafastOptions;
     }
-    interface GrafastHooks {
-      args: PluginHook<
-        (event: {
-          args: Grafast.ExecutionArgs;
-          ctx: Grafast.RequestContext;
-          resolvedPreset: GraphileConfig.ResolvedPreset;
-        }) => PromiseOrValue<void>
-      >;
+    interface GrafastMiddleware {
+      /** Synchronous! */
+      validateSchema(event: ValidateSchemaEvent): readonly GraphQLError[];
+      /** Synchronous! */
+      parseAndValidate(
+        event: ParseAndValidateEvent,
+      ): DocumentNode | readonly GraphQLError[];
+      prepareArgs(
+        event: PrepareArgsEvent,
+      ): PromiseOrDirect<Grafast.ExecutionArgs>;
+      execute(event: ExecuteEvent): ReturnType<typeof execute>;
+      subscribe(event: ExecuteEvent): ReturnType<typeof subscribe>;
+      /** Synchronous! */
+      establishOperationPlan(event: EstablishOperationPlanEvent): OperationPlan;
+      executeStep(
+        event: ExecuteStepEvent,
+      ): PromiseOrDirect<GrafastResultsList<any>>;
+      streamStep(
+        event: StreamStepEvent,
+      ): PromiseOrDirect<GrafastResultStreamList<unknown>>;
     }
     interface Plugin {
       grafast?: {
-        hooks?: GrafastHooks;
+        middleware?: {
+          [key in keyof GrafastMiddleware]?: CallbackOrDescriptor<
+            GrafastMiddleware[key] extends (
+              ...args: infer UArgs
+            ) => infer UResult
+              ? (
+                  next: MiddlewareNext<Awaited<UResult>>,
+                  ...args: UArgs
+                ) => UResult
+              : never
+          >;
+        };
       };
     }
   }

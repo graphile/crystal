@@ -1881,7 +1881,7 @@ type CLeftArm {
   cPersonByPersonId: CPerson
   lengthInMetres: Float
   mood: String!
-  personId: Int!
+  personId: Int
   rowId: Int!
 }
 

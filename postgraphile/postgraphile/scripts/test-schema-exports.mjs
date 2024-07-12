@@ -2,8 +2,8 @@ import { readFile } from "fs/promises";
 import { glob } from "glob";
 import {
   isSchema,
-  printSchema,
   lexicographicSortSchema,
+  printSchema,
 } from "grafast/graphql";
 
 const TESTS = new URL("../__tests__", import.meta.url).pathname;

@@ -1,7 +1,7 @@
 ---
 layout: page
 path: /postgraphile/plugins/
-title: Server Plugins
+title: Server plugins
 ---
 
 _NOTE: This page relates to changing how the PostGraphile HTTP server
@@ -25,11 +25,13 @@ function makeRuruTitlePlugin(title: string): GraphileConfig.Plugin {
     version: "0.0.0",
 
     grafserv: {
-      hooks: {
-        ruruHTMLParts(_info, parts, extra) {
-          parts.titleTag = `<title>${escapeHTML(
-            title + " | " + extra.request.getHeader("host"),
+      middleware: {
+        ruruHTMLParts(next, event) {
+          const { htmlParts, request } = event;
+          htmlParts.titleTag = `<title>${escapeHTML(
+            title + " | " + request.getHeader("host"),
           )}</title>`;
+          return next();
         },
       },
     },
@@ -47,7 +49,7 @@ document by looking up the operation name.
 
 This is purely for demonstration of the plugin API, you should not use this
 plugin! Instead, consider the `@grafserv/persisted` module (which uses the same
-hook).
+middleware).
 
 :::
 
@@ -66,8 +68,8 @@ export const QueryByNamePlugin: GraphileConfig.Plugin = {
   version,
 
   grafserv: {
-    hooks: {
-      processGraphQLRequestBody(info, event) {
+    middleware: {
+      processGraphQLRequestBody(next, event) {
         const { body } = event;
         const document = documents[body.id];
         if (!document) {
@@ -78,6 +80,7 @@ export const QueryByNamePlugin: GraphileConfig.Plugin = {
         } else {
           body.query = document;
         }
+        return next();
       },
     },
   },

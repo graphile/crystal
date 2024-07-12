@@ -1,36 +1,41 @@
 import type { Readable } from "node:stream";
 
-import type { PromiseOrDirect } from "grafast";
-import { execute, hookArgs, SafeError, stripAnsi, subscribe } from "grafast";
+import type { execute, GrafastExecutionArgs, subscribe } from "grafast";
+import { hookArgs, SafeError, stripAnsi } from "grafast";
 import type {
   AsyncExecutionResult,
   ExecutionArgs,
   ExecutionResult,
-  GraphQLSchema,
 } from "grafast/graphql";
 import * as graphql from "grafast/graphql";
 import type { ServerOptions, SubscribePayload } from "graphql-ws";
 import type { Extra } from "graphql-ws/lib/use/ws";
 
-import { getGrafservHooks } from "./hooks.js";
 import type { GrafservBase } from "./index.js";
 import type {
   GrafservBody,
   JSONValue,
   NormalizedRequestDigest,
+  OnSubscribeEvent,
   ParsedGraphQLBody,
   RequestDigest,
 } from "./interfaces.js";
 import { $$normalizedHeaders } from "./interfaces.js";
-import {
-  makeParseAndValidateFunction,
-  validateGraphQLBody,
-} from "./middleware/graphql.js";
+import { validateGraphQLBody } from "./middleware/graphql.js";
 
 const { GraphQLError } = graphql;
 
-const sleep = (ms: number) =>
-  new Promise<void>((resolve) => setTimeout(resolve, ms));
+export const sleep = (ms: number) => {
+  let _timeout: NodeJS.Timeout;
+  return {
+    promise: new Promise<void>(
+      (resolve) => void (_timeout = setTimeout(resolve, ms)),
+    ),
+    release() {
+      clearTimeout(_timeout);
+    },
+  };
+};
 
 // TODO: remove this ANSI-removal hack!
 export function handleErrors(
@@ -180,112 +185,104 @@ export function httpError(statusCode: number, message: string): SafeError {
   return new SafeError(message, { statusCode });
 }
 
+type ExtendedExecutionArgs = GrafastExecutionArgs & {
+  execute: typeof execute;
+  subscribe: typeof subscribe;
+};
+
 export function makeGraphQLWSConfig(instance: GrafservBase): ServerOptions {
-  const {
-    resolvedPreset,
-    dynamicOptions: { maskError },
-  } = instance;
+  async function onSubscribeWithEvent({ ctx, message }: OnSubscribeEvent) {
+    try {
+      const grafastCtx: Partial<Grafast.RequestContext> = {
+        ws: {
+          request: (ctx.extra as Extra).request,
+          socket: (ctx.extra as Extra).socket,
+          connectionParams: ctx.connectionParams,
+        },
+      };
+      const { grafastMiddleware } = instance;
+      const {
+        schema,
+        parseAndValidate,
+        resolvedPreset,
+        execute,
+        subscribe,
+        contextValue,
+      } = await instance.getExecutionConfig(grafastCtx);
 
-  const hooks = getGrafservHooks(resolvedPreset);
+      const parsedBody = parseGraphQLJSONBody(message.payload);
 
-  let latestSchema: GraphQLSchema;
-  let latestSchemaOrPromise: PromiseOrDirect<GraphQLSchema>;
-  let latestParseAndValidate: ReturnType<typeof makeParseAndValidateFunction>;
-  let schemaPrepare: Promise<boolean> | null = null;
-
-  return {
-    async onSubscribe(ctx, message) {
-      try {
-        // Get up to date schema, in case we're in watch mode
-        const schemaOrPromise = instance.getSchema();
-        if (schemaOrPromise !== latestSchemaOrPromise) {
-          if ("then" in schemaOrPromise) {
-            latestSchemaOrPromise = schemaOrPromise;
-            schemaPrepare = (async () => {
-              latestSchema = await schemaOrPromise;
-              latestSchemaOrPromise = schemaOrPromise;
-              latestParseAndValidate =
-                makeParseAndValidateFunction(latestSchema);
-              schemaPrepare = null;
-              return true;
-            })();
-          } else {
-            latestSchemaOrPromise = schemaOrPromise;
-            if (latestSchema === schemaOrPromise) {
-              // No action necessary
-            } else {
-              latestSchema = schemaOrPromise;
-              latestParseAndValidate =
-                makeParseAndValidateFunction(latestSchema);
-            }
-          }
-        }
-        if (schemaPrepare !== null) {
-          const schemaReady = await Promise.race([
-            schemaPrepare,
-            sleep(instance.dynamicOptions.schemaWaitTime),
-          ]);
-          if (schemaReady !== true) {
-            // Handle missing schema
-            throw new Error(`Schema isn't ready`);
-          }
-        }
-        const schema = latestSchema;
-        const parseAndValidate = latestParseAndValidate;
-
-        const parsedBody = parseGraphQLJSONBody(message.payload);
-        await hooks.process("processGraphQLRequestBody", {
-          body: parsedBody,
-          graphqlWsContext: ctx,
-        });
-
-        const { query, operationName, variableValues } =
-          validateGraphQLBody(parsedBody);
-        const { errors, document } = parseAndValidate(query);
-        if (errors !== undefined) {
-          return errors;
-        }
-        const args: ExecutionArgs = {
-          schema,
-          document,
-          rootValue: null,
-          contextValue: Object.create(null),
-          variableValues,
-          operationName,
-        };
-
-        await hookArgs(args, resolvedPreset, {
-          ws: {
-            request: (ctx.extra as Extra).request,
-            socket: (ctx.extra as Extra).socket,
-            connectionParams: ctx.connectionParams,
+      if (instance.middleware) {
+        await instance.middleware.run(
+          "processGraphQLRequestBody",
+          {
+            resolvedPreset,
+            body: parsedBody,
+            graphqlWsContext: ctx,
           },
-        });
-
-        return args;
-      } catch (e) {
-        return [
-          new GraphQLError(
-            e.message,
-            null,
-            undefined,
-            undefined,
-            undefined,
-            e,
-            undefined,
-          ),
-        ];
+          noop,
+        );
       }
+
+      const { query, operationName, variableValues } =
+        validateGraphQLBody(parsedBody);
+      const { errors, document } = parseAndValidate(query);
+      if (errors !== undefined) {
+        return errors;
+      }
+      const args: ExtendedExecutionArgs = {
+        execute,
+        subscribe,
+        schema,
+        document,
+        rootValue: null,
+        contextValue,
+        variableValues,
+        operationName,
+        resolvedPreset,
+        requestContext: grafastCtx,
+        middleware: grafastMiddleware,
+      };
+
+      await hookArgs(args);
+
+      return args;
+    } catch (e) {
+      return [
+        new GraphQLError(
+          e.message,
+          null,
+          undefined,
+          undefined,
+          undefined,
+          e,
+          undefined,
+        ),
+      ];
+    }
+  }
+  return {
+    onSubscribe(ctx, message) {
+      const event: OnSubscribeEvent = {
+        resolvedPreset: instance.resolvedPreset,
+        ctx,
+        message,
+      };
+      return instance.middleware != null
+        ? instance.middleware.run("onSubscribe", event, onSubscribeWithEvent)
+        : onSubscribeWithEvent(event);
     },
     // TODO: validate that this actually does mask every error
-    onError(ctx, message, errors) {
-      return errors.map(maskError);
+    onError(_ctx, _message, errors) {
+      return errors.map(instance.dynamicOptions.maskError);
     },
     async execute(args: ExecutionArgs) {
-      return execute(args, resolvedPreset);
+      const eargs = args as ExtendedExecutionArgs;
+      return eargs.execute(eargs);
     },
     async subscribe(args: ExecutionArgs) {
-      return subscribe(args, resolvedPreset);
+      const eargs = args as ExtendedExecutionArgs;
+      return eargs.subscribe(eargs);
     },
   };
 }
@@ -324,3 +321,5 @@ export async function concatBufferIterator(
   }
   return Buffer.concat(buffers);
 }
+
+export function noop(): void {}

@@ -1,7 +1,7 @@
 ---
 layout: page
 path: /postgraphile/quick-start-guide/
-title: Quick Start Guide
+title: Quick start guide
 ---
 
 This quick start guide will walk you through spinning up your first PostGraphile

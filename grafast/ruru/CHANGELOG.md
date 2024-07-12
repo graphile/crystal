@@ -1,5 +1,21 @@
 # ruru
 
+## 2.0.0-beta.13
+
+### Patch Changes
+
+- Updated dependencies
+  [[`582bd768f`](https://github.com/graphile/crystal/commit/582bd768fec403ce3284f293b85b9fd86e4d3f40)]:
+  - graphile-config@0.0.1-beta.9
+
+## 2.0.0-beta.12
+
+### Patch Changes
+
+- Updated dependencies
+  [[`db8ceed0f`](https://github.com/graphile/crystal/commit/db8ceed0f17923eb78ff09c9f3f28800a5c7e3b6)]:
+  - graphile-config@0.0.1-beta.8
+
 ## 2.0.0-beta.11
 
 ### Patch Changes

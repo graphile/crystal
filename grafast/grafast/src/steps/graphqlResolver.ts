@@ -6,9 +6,11 @@ import type {
   GraphQLResolveInfo,
 } from "graphql";
 import * as graphql from "graphql";
+import { isIterable } from "iterall";
 
+import type { FlaggedValue } from "../error.js";
 import type { __ItemStep, ExecutionDetails, ObjectStep } from "../index.js";
-import { context, SafeError } from "../index.js";
+import { context, flagError, SafeError } from "../index.js";
 import type {
   ExecutionExtra,
   GrafastResultsList,
@@ -26,6 +28,7 @@ const {
   getNullableType,
   isAbstractType,
   isListType,
+  isNonNullType,
 } = graphql;
 
 type ResolveInfoBase = Omit<
@@ -33,14 +36,43 @@ type ResolveInfoBase = Omit<
   "path" | "rootValue" | "variableValues"
 >;
 
+interface DCR {
+  data: unknown;
+  context: unknown;
+  resolveInfo: GraphQLResolveInfo;
+}
+
 function dcr(
   data: unknown, // but not a promise
   context: unknown,
   resolveInfo: GraphQLResolveInfo,
-) {
+):
+  | DCR
+  | FlaggedValue
+  | null
+  | undefined
+  | PromiseLike<DCR | FlaggedValue | null | undefined> {
   if (data == null) {
     return data;
+  } else if (data instanceof Error) {
+    return flagError(data);
+  } else if (isPromiseLike(data)) {
+    return data.then((data) => dcr(data, context, resolveInfo));
   }
+  if (isIterable(data)) {
+    const list = Array.isArray(data) ? data : [...data];
+    if (list.some(isPromiseLike)) {
+      const resolved = Promise.all(
+        list.map((entry) =>
+          isPromiseLike(entry) ? entry.then(null, flagError) : entry,
+        ),
+      );
+      // TODO: this does recursion which is inefficient and also incorrect. We
+      // should only traverse as deep as the GraphQL type has lists.
+      return dcr(resolved, context, resolveInfo);
+    }
+  }
+  // TODO: support async iterables
   return { data, context, resolveInfo };
 }
 
@@ -104,13 +136,6 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
     );
   }
 
-  deduplicate(peers: GraphQLResolverStep[]): GraphQLResolverStep[] {
-    return peers.filter(
-      (peer) =>
-        peer.resolver === this.resolver && peer.subscriber === this.subscriber,
-    );
-  }
-
   unbatchedExecute(
     _extra: UnbatchedExecutionExtra,
     source: any,
@@ -137,13 +162,9 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
     );
     const data = this.resolver?.(source, args, context, resolveInfo);
     if (this.returnContextAndResolveInfo) {
-      if (isPromiseLike(data)) {
-        return data.then((data) => dcr(data, context, resolveInfo));
-      } else {
-        return dcr(data, context, resolveInfo);
-      }
+      return dcr(data, context, resolveInfo);
     } else {
-      return data;
+      return flagErrorIfErrorAsync(data);
     }
   }
 
@@ -177,7 +198,8 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
       },
     );
     const data = this.subscriber(source, args, context, resolveInfo);
-    return data;
+    // TODO: should apply flagErrorIfError to each value data yields
+    return flagErrorIfErrorAsync(data);
   }
 
   async stream({
@@ -194,7 +216,7 @@ export class GraphQLResolverStep extends UnbatchedExecutableStep {
         }
         return (this.unbatchedStream as any)(extra, ...tuple);
       } catch (e) {
-        return e instanceof Error ? (e as never) : Promise.reject(e);
+        return flagError(e);
       }
     });
   }
@@ -220,7 +242,12 @@ export class GraphQLItemHandler
     super();
     this.addDependency($parent);
     if (isListType(nullableType)) {
-      this.nullableInnerType = nullableType.ofType;
+      const innerType = nullableType.ofType;
+      if (isNonNullType(innerType)) {
+        this.nullableInnerType = innerType.ofType;
+      } else {
+        this.nullableInnerType = innerType;
+      }
     } else {
       if (!isAbstractType(nullableType)) {
         throw new Error(
@@ -308,9 +335,7 @@ export class GraphQLItemHandler
   execute({
     indexMap,
     values: [values0],
-  }: ExecutionDetails<
-    [Awaited<ReturnType<typeof dcr>>]
-  >): GrafastResultsList<any> {
+  }: ExecutionDetails<[DCR]>): GrafastResultsList<any> {
     if (this.abstractType !== undefined) {
       return indexMap((i) => {
         const data = values0.at(i);
@@ -397,5 +422,17 @@ export function graphqlResolver(
     return graphqlItemHandler($resolverResult, nullableType);
   } else {
     return $resolverResult;
+  }
+}
+
+function flagErrorIfError(data: any) {
+  return data instanceof Error ? flagError(data) : data;
+}
+
+function flagErrorIfErrorAsync(data: any) {
+  if (isPromiseLike(data)) {
+    return data.then(flagErrorIfError);
+  } else {
+    return flagErrorIfError(data);
   }
 }

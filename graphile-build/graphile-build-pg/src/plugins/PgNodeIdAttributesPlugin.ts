@@ -9,6 +9,7 @@ import type {
   PgSelectStep,
 } from "@dataplan/pg";
 import type { SetterStep } from "grafast";
+import { assertNotNull, condition, trap, TRAP_INHIBITED } from "grafast";
 import { EXPORTABLE } from "graphile-build";
 
 import { version } from "../version.js";
@@ -164,70 +165,98 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                       // ENHANCE: if the remote columns are the primary keys
                       // then there's no need to actually fetch the record
                       // (unless we want to check it exists).
+                      // ENHANCE: we know nodeId will always be unary, so we
+                      // could optimize this SQL at execution time when we know
+                      // if it is null or not.
                       applyPlan: isPgCondition
                         ? EXPORTABLE(
                             (
+                              TRAP_INHIBITED,
+                              assertNotNull,
+                              condition,
                               getSpec,
                               localAttributeCodecs,
                               localAttributes,
                               remoteAttributes,
                               sql,
+                              trap,
+                              typeName,
                             ) =>
                               function plan(
                                 $condition: PgConditionStep<PgSelectStep<any>>,
                                 val,
                               ) {
-                                if (val.getRaw().evalIs(null)) {
-                                  for (
-                                    let i = 0, l = localAttributes.length;
-                                    i < l;
-                                    i++
-                                  ) {
-                                    const localName = localAttributes[i];
-                                    $condition.where({
-                                      type: "attribute",
-                                      attribute: localName,
-                                      callback: (expression) =>
-                                        sql`${expression} is null`,
-                                    });
-                                  }
-                                } else {
-                                  const spec = getSpec(val.get());
-                                  for (
-                                    let i = 0, l = localAttributes.length;
-                                    i < l;
-                                    i++
-                                  ) {
-                                    const localName = localAttributes[i];
-                                    const codec = localAttributeCodecs[i];
-                                    const remoteName = remoteAttributes[i];
-                                    $condition.where({
-                                      type: "attribute",
-                                      attribute: localName,
-                                      callback: (expression) =>
-                                        sql`${expression} = ${$condition.placeholder(
-                                          spec[remoteName],
-                                          codec,
-                                        )}`,
-                                    });
-                                  }
+                                const $nodeId = val.get();
+                                const $nodeIdExists = condition(
+                                  "exists",
+                                  $nodeId,
+                                );
+                                const spec = getSpec($nodeId);
+                                for (
+                                  let i = 0, l = localAttributes.length;
+                                  i < l;
+                                  i++
+                                ) {
+                                  const localName = localAttributes[i];
+                                  const codec = localAttributeCodecs[i];
+                                  const remoteName = remoteAttributes[i];
+                                  // Set `null` if invalid
+                                  const $rawValue = trap(
+                                    spec[remoteName],
+                                    TRAP_INHIBITED,
+                                  );
+                                  // If `null` but `$nodeId` wasn't null, throw an error: invalid Node ID!
+                                  const $value = assertNotNull(
+                                    $rawValue,
+                                    `Invalid node identifier for '${typeName}'`,
+                                    { if: $nodeIdExists },
+                                  );
+                                  const sqlRemoteValue = $condition.placeholder(
+                                    $value,
+                                    codec,
+                                  );
+                                  $condition.where({
+                                    type: "attribute",
+                                    attribute: localName,
+                                    callback: (expression) =>
+                                      sql`((${sqlRemoteValue} is null and ${expression} is null) or (${sqlRemoteValue} is not null and ${expression} = ${sqlRemoteValue}))`,
+                                  });
                                 }
                               },
                             [
+                              TRAP_INHIBITED,
+                              assertNotNull,
+                              condition,
                               getSpec,
                               localAttributeCodecs,
                               localAttributes,
                               remoteAttributes,
                               sql,
+                              trap,
+                              typeName,
                             ],
                           )
                         : EXPORTABLE(
-                            (getSpec, localAttributes, remoteAttributes) =>
+                            (
+                              TRAP_INHIBITED,
+                              assertNotNull,
+                              condition,
+                              getSpec,
+                              localAttributes,
+                              remoteAttributes,
+                              trap,
+                              typeName,
+                            ) =>
                               function plan(
                                 $insert: SetterStep<any, any>,
                                 val,
                               ) {
-                                const spec = getSpec(val.get());
+                                const $nodeId = val.get();
+                                const $nodeIdExists = condition(
+                                  "exists",
+                                  $nodeId,
+                                );
+                                const spec = getSpec($nodeId);
                                 for (
                                   let i = 0, l = localAttributes.length;
                                   i < l;
@@ -235,11 +264,30 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                                 ) {
                                   const localName = localAttributes[i];
                                   const remoteName = remoteAttributes[i];
-                                  const $val = spec[remoteName];
-                                  $insert.set(localName, $val);
+                                  // Set `null` if invalid
+                                  const $rawValue = trap(
+                                    spec[remoteName],
+                                    TRAP_INHIBITED,
+                                  );
+                                  // If `null` but `$nodeId` wasn't null, throw an error: invalid Node ID!
+                                  const $value = assertNotNull(
+                                    $rawValue,
+                                    `Invalid node identifier for '${typeName}'`,
+                                    { if: $nodeIdExists },
+                                  );
+                                  $insert.set(localName, $value);
                                 }
                               },
-                            [getSpec, localAttributes, remoteAttributes],
+                            [
+                              TRAP_INHIBITED,
+                              assertNotNull,
+                              condition,
+                              getSpec,
+                              localAttributes,
+                              remoteAttributes,
+                              trap,
+                              typeName,
+                            ],
                           ),
                     },
                   ),

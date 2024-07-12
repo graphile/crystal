@@ -8,6 +8,7 @@ import { GraphQLError, GraphQLObjectType, Kind } from "grafast/graphql";
 import camelCaseAll from "lodash/camelCase.js";
 import upperFirstAll from "lodash/upperFirst.js";
 import plz from "pluralize";
+import te from "tamedevil";
 
 export function EXPORTABLE<T, TScope extends any[]>(
   factory: (...args: TScope) => T,
@@ -26,6 +27,31 @@ export function EXPORTABLE<T, TScope extends any[]>(
     });
   }
   return fn;
+}
+
+export function EXPORTABLE_OBJECT_CLONE<T extends object>(obj: T): T {
+  if (Object.getPrototypeOf(obj) === Object.prototype) {
+    const keys = Object.keys(obj);
+    const values = Object.values(obj);
+    const fn = te.eval<any>`return (${te.join(
+      keys.map((_key, i) => te.identifier(`key${i}`)),
+      ", ",
+    )}) => ({${te.indent(
+      te.join(
+        keys.map(
+          (key, i) =>
+            te`${te.safeKeyOrThrow(key)}: ${te.identifier(`key${i}`)}`,
+        ),
+        ",\n",
+      ),
+    )}});`;
+    // eslint-disable-next-line graphile-export/exhaustive-deps
+    return EXPORTABLE(fn, values);
+  } else {
+    throw new Error(
+      "EXPORTABLE_OBJECT_CLONE can currently only be used with POJOs.",
+    );
+  }
 }
 
 export function exportNameHint(obj: any, nameHint: string): void {

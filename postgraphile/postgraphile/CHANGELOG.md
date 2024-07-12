@@ -1,5 +1,302 @@
 # postgraphile
 
+## 5.0.0-beta.26
+
+### Patch Changes
+
+- [#2071](https://github.com/graphile/crystal/pull/2071)
+  [`582bd768f`](https://github.com/graphile/crystal/commit/582bd768fec403ce3284f293b85b9fd86e4d3f40)
+  Thanks [@benjie](https://github.com/benjie)! - `GrafastExecutionArgs` now
+  accepts `resolvedPreset` and `requestContext` directly; passing these through
+  additional arguments is now deprecated and support will be removed in a future
+  revision. This affects:
+
+  - `grafast()`
+  - `execute()`
+  - `subscribe()`
+  - `hookArgs()`
+
+  `graphile-config` has gained a middleware system which is more powerful than
+  it's AsyncHooks system. Old hooks can be emulated through the middleware
+  system safely since middleware is a superset of hooks' capabilities.
+  `applyHooks` has been renamed to `orderedApply` (because it applies to more
+  than just hooks), calling `applyHooks` will still work but is deprecated.
+
+  🚨 `grafast` no longer automatically reads your `graphile.config.ts` or
+  similar; you must do that yourself and pass the `resolvedPreset` to grafast
+  via the `args`. This is to aid in bundling of grafast since it should not need
+  to read from filesystem or dynamically load modules.
+
+  `grafast` no longer outputs performance warning when you set
+  `GRAPHILE_ENV=development`.
+
+  🚨 `plugin.grafast.hooks.args` is now `plugin.grafast.middleware.prepareArgs`,
+  and the signature has changed - you must be sure to call the `next()` function
+  and ctx/resolvedPreset can be extracted directly from `args`:
+
+  ```diff
+   const plugin = {
+     grafast: {
+  -    hooks: {
+  +    middleware: {
+  -      args({ args, ctx, resolvedPreset }) {
+  +      prepareArgs(next, { args }) {
+  +        const { requestContext: ctx, resolvedPreset } = args;
+           // ...
+  +        return next();
+         }
+       }
+     }
+   }
+  ```
+
+  Many more middleware have been added; use TypeScript's autocomplete to see
+  what's available until we have proper documentation for them.
+
+  `plugin.grafserv.hooks.*` are still supported but deprecated; instead use
+  middleware `plugin.grafserv.middleware.*` (note that call signatures have
+  changed slightly, similar to the diff above):
+
+  - `hooks.init` -> `middleware.setPreset`
+  - `hooks.processGraphQLRequestBody` -> `middleware.processGraphQLRequestBody`
+  - `hooks.ruruHTMLParts` -> `middleware.ruruHTMLParts`
+
+  A few TypeScript types related to Hooks have been renamed, but their old names
+  are still available, just deprecated. They will be removed in a future update:
+
+  - `HookObject` -> `FunctionalityObject`
+  - `PluginHook` -> `CallbackOrDescriptor`
+  - `PluginHookObject` -> `CallbackDescriptor`
+  - `PluginHookCallback` -> `UnwrapCallback`
+
+- Updated dependencies
+  [[`582bd768f`](https://github.com/graphile/crystal/commit/582bd768fec403ce3284f293b85b9fd86e4d3f40)]:
+  - graphile-build@5.0.0-beta.21
+  - graphile-config@0.0.1-beta.9
+  - @dataplan/pg@0.0.1-beta.22
+  - grafserv@0.1.1-beta.13
+  - grafast@0.1.1-beta.11
+  - graphile-build-pg@5.0.0-beta.25
+  - graphile-utils@5.0.0-beta.25
+  - @dataplan/json@0.0.1-beta.20
+
+## 5.0.0-beta.25
+
+### Patch Changes
+
+- Updated dependencies
+  [[`3c161f7e1`](https://github.com/graphile/crystal/commit/3c161f7e13375105b1035a7d5d1c0f2b507ca5c7),
+  [`a674a9923`](https://github.com/graphile/crystal/commit/a674a9923bc908c9315afa40e0cb256ee0953d16),
+  [`b7cfeffd1`](https://github.com/graphile/crystal/commit/b7cfeffd1019d61c713a5054c4f5929960a2a6ab)]:
+  - grafast@0.1.1-beta.10
+  - @dataplan/json@0.0.1-beta.19
+  - @dataplan/pg@0.0.1-beta.21
+  - grafserv@0.1.1-beta.12
+  - graphile-build@5.0.0-beta.20
+  - graphile-build-pg@5.0.0-beta.24
+  - graphile-utils@5.0.0-beta.24
+
+## 5.0.0-beta.24
+
+### Patch Changes
+
+- [#2064](https://github.com/graphile/crystal/pull/2064)
+  [`437570f97`](https://github.com/graphile/crystal/commit/437570f97e8520afaf3d0d0b514d1f4c31546b76)
+  Thanks [@benjie](https://github.com/benjie)! - Fix a bug relating to Global
+  Object Identifiers (specifically in update mutations, but probably elsewhere
+  too) related to early exit.
+- Updated dependencies
+  [[`437570f97`](https://github.com/graphile/crystal/commit/437570f97e8520afaf3d0d0b514d1f4c31546b76)]:
+  - graphile-build-pg@5.0.0-beta.23
+  - grafast@0.1.1-beta.9
+  - graphile-utils@5.0.0-beta.23
+  - @dataplan/json@0.0.1-beta.18
+  - @dataplan/pg@0.0.1-beta.20
+  - grafserv@0.1.1-beta.11
+  - graphile-build@5.0.0-beta.19
+
+## 5.0.0-beta.23
+
+### Patch Changes
+
+- [#2056](https://github.com/graphile/crystal/pull/2056)
+  [`1842af661`](https://github.com/graphile/crystal/commit/1842af661950d5f962b65f6362a45a3b9c8f15e8)
+  Thanks [@benjie](https://github.com/benjie)! - Improve exporting of resource
+  options (neater export code)
+
+- Updated dependencies
+  [[`1842af661`](https://github.com/graphile/crystal/commit/1842af661950d5f962b65f6362a45a3b9c8f15e8),
+  [`bd5a908a4`](https://github.com/graphile/crystal/commit/bd5a908a4d04310f90dfb46ad87398ffa993af3b)]:
+  - graphile-build-pg@5.0.0-beta.22
+  - graphile-build@5.0.0-beta.18
+  - grafast@0.1.1-beta.8
+  - graphile-utils@5.0.0-beta.22
+  - @dataplan/json@0.0.1-beta.17
+  - @dataplan/pg@0.0.1-beta.19
+  - grafserv@0.1.1-beta.10
+
+## 5.0.0-beta.22
+
+### Patch Changes
+
+- [#2015](https://github.com/graphile/crystal/pull/2015)
+  [`5eca6d65a`](https://github.com/graphile/crystal/commit/5eca6d65a816bac3d0ceaa6cafa7df1a79c2be47)
+  Thanks [@benjie](https://github.com/benjie)! - Use `inhibitOnNull` when
+  decoding a spec ID to prevent it being consumed if invalid (e.g. don't allow
+  using a 'Post' node ID to fetch a 'Person' record).
+
+- [#1994](https://github.com/graphile/crystal/pull/1994)
+  [`ab08cbf9c`](https://github.com/graphile/crystal/commit/ab08cbf9c504c3cc22495a99a965e7634c18a6a3)
+  Thanks [@benjie](https://github.com/benjie)! - Introduce
+  `interface SQLable {[$toSQL](): SQL}` to `pg-sql2` and use it to simplify SQL
+  fragments in various places.
+
+- [#1978](https://github.com/graphile/crystal/pull/1978)
+  [`a287a57c2`](https://github.com/graphile/crystal/commit/a287a57c2765da0fb6a132ea0953f64453210ceb)
+  Thanks [@benjie](https://github.com/benjie)! - Breaking: `connection()` step
+  now accepts configuration object in place of 2nd argument onwards:
+
+  ```diff
+  -return connection($list, nodePlan, cursorPlan);
+  +return connection($list, { nodePlan, cursorPlan });
+  ```
+
+  Feature: `edgeDataPlan` can be specified as part of this configuration object,
+  allowing you to associate edge data with your connection edges:
+
+  ```ts
+  return connection($list, {
+    edgeDataPlan($item) {
+      return object({ item: $item, otherThing: $otherThing });
+    },
+  });
+
+  // ...
+
+  const plans = {
+    FooEdge: {
+      otherThing($edge) {
+        return $edge.data().get("otherThing");
+      },
+    },
+  };
+  ```
+
+  Feature: `ConnectionStep` and `EdgeStep` gain `get()` methods, so
+  `*Connection.edges`, `*Connection.nodes`, `*Connection.pageInfo`, `*Edge.node`
+  and `*Edge.cursor` no longer need plans to be defined.
+
+- [#2006](https://github.com/graphile/crystal/pull/2006)
+  [`7ad35fe4d`](https://github.com/graphile/crystal/commit/7ad35fe4d9b20f6ec82dc95c362390a87e25b42c)
+  Thanks [@benjie](https://github.com/benjie)! - When replacing inflectors via
+  `plugin.inflection.replace.<inflector_name>` the first argument is the
+  previous inflector (or null). Previously this was typed including the
+  `this: Inflection` argument which meant to appease TypeScript you needed to do
+  `previous.call(this, arg1, arg2)`, but this was never necessary in JS. This is
+  now fixed, and you can now issue `previous(arg1, arg2)` from TypeScript
+  without error.
+
+- [#2050](https://github.com/graphile/crystal/pull/2050)
+  [`272608c13`](https://github.com/graphile/crystal/commit/272608c135e4ef0f76b8b5a9f764494a3f3ad779)
+  Thanks [@benjie](https://github.com/benjie)! - Add missing EXPORTABLE (and
+  remove excessive EXPORTABLE) to fix schema exports.
+
+- [#1995](https://github.com/graphile/crystal/pull/1995)
+  [`e0d69e518`](https://github.com/graphile/crystal/commit/e0d69e518a98c70f9b90f59d243ce33978c1b5a1)
+  Thanks [@benjie](https://github.com/benjie)! - Refactoring of unary logic.
+
+- [#2048](https://github.com/graphile/crystal/pull/2048)
+  [`db8ceed0f`](https://github.com/graphile/crystal/commit/db8ceed0f17923eb78ff09c9f3f28800a5c7e3b6)
+  Thanks [@benjie](https://github.com/benjie)! - Help detect more invalid
+  presets and plugins (bad imports) by forbidding keys starting with a capital
+  or the key `default`.
+
+- [#2046](https://github.com/graphile/crystal/pull/2046)
+  [`966203504`](https://github.com/graphile/crystal/commit/96620350467ab8c65b56adf2f055e19450f8e772)
+  Thanks [@benjie](https://github.com/benjie)! - Envelop peer dependency
+  upgraded to V5
+
+- [#1973](https://github.com/graphile/crystal/pull/1973)
+  [`a0e82b9c5`](https://github.com/graphile/crystal/commit/a0e82b9c5f4e585f1af1e147299cd07944ece6f8)
+  Thanks [@benjie](https://github.com/benjie)! - Add 'unary steps' concept to
+  codebase and refactor to using new executeV2 execution method which leverages
+  them. Backwards compatibility maintained, but users should move to executeV2.
+
+- [#1989](https://github.com/graphile/crystal/pull/1989)
+  [`c48d3da7f`](https://github.com/graphile/crystal/commit/c48d3da7fe4fac2562fab5f085d252a0bfb6f0b6)
+  Thanks [@benjie](https://github.com/benjie)! - Make it so that more pgSelect
+  queries optimize themselves into parent queries via new step.canAddDependency
+  helper.
+
+- [#2006](https://github.com/graphile/crystal/pull/2006)
+  [`bee0a0a68`](https://github.com/graphile/crystal/commit/bee0a0a68d48816f84b1a7f5ec69bd6069211426)
+  Thanks [@benjie](https://github.com/benjie)! - Adopt improved inflection
+  typings.
+
+- [#2019](https://github.com/graphile/crystal/pull/2019)
+  [`51a94417f`](https://github.com/graphile/crystal/commit/51a94417fb62b54d309be184f4be479bc267c2b7)
+  Thanks [@benjie](https://github.com/benjie)! - Now possible to filter by relay
+  node identifiers without weird results if you pass an incompatible node id
+  (e.g. a 'Post' ID where a 'User' ID was expected) - significantly improves the
+  Relay preset.
+
+- [#1988](https://github.com/graphile/crystal/pull/1988)
+  [`81d17460c`](https://github.com/graphile/crystal/commit/81d17460ced08608814635779c5cf997c19c101d)
+  Thanks [@benjie](https://github.com/benjie)! - Fix issue with record types
+  when attributes need to be cast; this previously caused errors with computed
+  columns when passed particular arguments.
+- Updated dependencies
+  [[`357d475f5`](https://github.com/graphile/crystal/commit/357d475f54fecc8c51892e0346d6872b34132430),
+  [`30bcd6c12`](https://github.com/graphile/crystal/commit/30bcd6c12e59f878617ea987c35a2f589ce05cb8),
+  [`3551725e7`](https://github.com/graphile/crystal/commit/3551725e71c3ed876554e19e5ab2c1dcb0fb1143),
+  [`80836471e`](https://github.com/graphile/crystal/commit/80836471e5cedb29dee63bc5002550c4f1713cfd),
+  [`b788dd868`](https://github.com/graphile/crystal/commit/b788dd86849e703cc3aa863fd9190c36a087b865),
+  [`5eca6d65a`](https://github.com/graphile/crystal/commit/5eca6d65a816bac3d0ceaa6cafa7df1a79c2be47),
+  [`a5c20fefb`](https://github.com/graphile/crystal/commit/a5c20fefb571dea6d1187515dc48dd547e9e6204),
+  [`1ce08980e`](https://github.com/graphile/crystal/commit/1ce08980e2a52ed9bc81564d248c19648ecd3616),
+  [`ab08cbf9c`](https://github.com/graphile/crystal/commit/ab08cbf9c504c3cc22495a99a965e7634c18a6a3),
+  [`dff4f2535`](https://github.com/graphile/crystal/commit/dff4f2535ac6ce893089b312fcd5fffcd98573a5),
+  [`a287a57c2`](https://github.com/graphile/crystal/commit/a287a57c2765da0fb6a132ea0953f64453210ceb),
+  [`45e10950b`](https://github.com/graphile/crystal/commit/45e10950b533f97cdd986e5442e2e160a8e431a2),
+  [`2fe56f9a6`](https://github.com/graphile/crystal/commit/2fe56f9a6dac03484ace45c29c2223a65f9ca1db),
+  [`fed603d71`](https://github.com/graphile/crystal/commit/fed603d719c02f33e12190f925c9e3b06c581fac),
+  [`ed6e0d278`](https://github.com/graphile/crystal/commit/ed6e0d2788217a1c419634837f4208013eaf2923),
+  [`86168b740`](https://github.com/graphile/crystal/commit/86168b740510aef17bde7ae21f1d0eebb0c5c9b3),
+  [`7ad35fe4d`](https://github.com/graphile/crystal/commit/7ad35fe4d9b20f6ec82dc95c362390a87e25b42c),
+  [`e82e4911e`](https://github.com/graphile/crystal/commit/e82e4911e32138df1b90ec0fde555ea963018d21),
+  [`94a05064e`](https://github.com/graphile/crystal/commit/94a05064ea05108685ff71174a9f871ab5b4c147),
+  [`272608c13`](https://github.com/graphile/crystal/commit/272608c135e4ef0f76b8b5a9f764494a3f3ad779),
+  [`42ece5aa6`](https://github.com/graphile/crystal/commit/42ece5aa6ca05345ebc17fb5c7d55df3b79b7612),
+  [`e0d69e518`](https://github.com/graphile/crystal/commit/e0d69e518a98c70f9b90f59d243ce33978c1b5a1),
+  [`e22cb4dfa`](https://github.com/graphile/crystal/commit/e22cb4dfa94b60d1b99c374e8c28943373bd8496),
+  [`db8ceed0f`](https://github.com/graphile/crystal/commit/db8ceed0f17923eb78ff09c9f3f28800a5c7e3b6),
+  [`a5a0816bd`](https://github.com/graphile/crystal/commit/a5a0816bddc85a841770202db57457ff13137852),
+  [`6699388ec`](https://github.com/graphile/crystal/commit/6699388ec167d35c71220ce5d9113cac578da6cb),
+  [`966203504`](https://github.com/graphile/crystal/commit/96620350467ab8c65b56adf2f055e19450f8e772),
+  [`c1645b249`](https://github.com/graphile/crystal/commit/c1645b249aae949a548cd916e536ccfb63e5ab35),
+  [`ed8bbaa3c`](https://github.com/graphile/crystal/commit/ed8bbaa3cd1563a7601ca8c6b0412633b0ea4ce9),
+  [`a0e82b9c5`](https://github.com/graphile/crystal/commit/a0e82b9c5f4e585f1af1e147299cd07944ece6f8),
+  [`14e2412ee`](https://github.com/graphile/crystal/commit/14e2412ee368e8d53abf6774c7f0069f32d4e8a3),
+  [`c48d3da7f`](https://github.com/graphile/crystal/commit/c48d3da7fe4fac2562fab5f085d252a0bfb6f0b6),
+  [`57ab0e1e7`](https://github.com/graphile/crystal/commit/57ab0e1e72c01213b21d3efc539cd655d83d993a),
+  [`8442242e4`](https://github.com/graphile/crystal/commit/8442242e43cac7d89ca0c413cf42c9fabf6f247f),
+  [`bee0a0a68`](https://github.com/graphile/crystal/commit/bee0a0a68d48816f84b1a7f5ec69bd6069211426),
+  [`51a94417f`](https://github.com/graphile/crystal/commit/51a94417fb62b54d309be184f4be479bc267c2b7),
+  [`64ce7b765`](https://github.com/graphile/crystal/commit/64ce7b7650530251aec38a51089da66f914c19b4),
+  [`cba842357`](https://github.com/graphile/crystal/commit/cba84235786acbd77ade53bae7a3fba4a9be1eb7),
+  [`2fa77d0f2`](https://github.com/graphile/crystal/commit/2fa77d0f237cdb98d3dafb6b5e4083a2c6c38673),
+  [`81d17460c`](https://github.com/graphile/crystal/commit/81d17460ced08608814635779c5cf997c19c101d)]:
+  - @dataplan/json@0.0.1-beta.16
+  - @dataplan/pg@0.0.1-beta.18
+  - grafast@0.1.1-beta.7
+  - tamedevil@0.0.0-beta.7
+  - graphile-build-pg@5.0.0-beta.21
+  - pg-sql2@5.0.0-beta.6
+  - graphile-build@5.0.0-beta.17
+  - graphile-utils@5.0.0-beta.21
+  - graphile-config@0.0.1-beta.8
+  - grafserv@0.1.1-beta.9
+
 ## 5.0.0-beta.21
 
 ### Patch Changes

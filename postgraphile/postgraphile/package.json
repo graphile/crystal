@@ -1,6 +1,6 @@
 {
   "name": "postgraphile",
-  "version": "5.0.0-beta.21",
+  "version": "5.0.0-beta.26",
   "description": "Automatic, high performance, and highly customizable GraphQL API for PostgreSQL",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -70,6 +70,11 @@
       "node": "./fwd/grafast/envelop/index.js",
       "default": "./fwd/grafast/envelop/index.js"
     },
+    "./grafast/mermaid": {
+      "types": "./fwd/grafast/mermaid/index.d.ts",
+      "node": "./fwd/grafast/mermaid/index.js",
+      "default": "./fwd/grafast/mermaid/index.js"
+    },
     "./grafast/graphql": {
       "types": "./fwd/grafast/graphql/index.d.ts",
       "node": "./fwd/grafast/graphql/index.js",
@@ -80,6 +85,11 @@
       "node": "./fwd/grafserv/index.js",
       "default": "./fwd/grafserv/index.js"
     },
+    "./grafserv/envelop": {
+      "types": "./fwd/grafserv/envelop/index.d.ts",
+      "node": "./fwd/grafserv/envelop/index.js",
+      "default": "./fwd/grafserv/envelop/index.js"
+    },
     "./grafserv/node": {
       "types": "./fwd/grafserv/node/index.d.ts",
       "node": "./fwd/grafserv/node/index.js",
@@ -89,6 +99,11 @@
       "types": "./fwd/grafserv/express/v4/index.d.ts",
       "node": "./fwd/grafserv/express/v4/index.js",
       "default": "./fwd/grafserv/express/v4/index.js"
+    },
+    "./grafserv/lambda/v1": {
+      "types": "./fwd/grafserv/lambda/v1/index.d.ts",
+      "node": "./fwd/grafserv/lambda/v1/index.js",
+      "default": "./fwd/grafserv/lambda/v1/index.js"
     },
     "./grafserv/koa/v2": {
       "types": "./fwd/grafserv/koa/v2/index.d.ts",
@@ -153,12 +168,15 @@
   },
   "bin": "./dist/cli-run.js",
   "scripts": {
-    "test": "yarn test:v4 && yarn test:polymorphic && yarn test:mutations && yarn test:schema && yarn test:schema-exports",
-    "test:v4": "jest -i __tests__/queries/v4",
-    "test:polymorphic": "jest -i __tests__/queries/polymorphic",
-    "test:mutations": "jest -i __tests__/mutations",
+    "test": "yarn test:operations && yarn test:schema && yarn test:schema-exports && yarn test:operations-exports",
+    "test:operations": "yarn test:operations:v4 && yarn test:operations:polymorphic_etc && yarn test:operations:mutations",
+    "test:operations:v4": "jest -i __tests__/queries/v4",
+    "test:operations:polymorphic_etc": "jest -i __tests__/queries/polymorphic __tests__/queries/relay",
+    "test:operations:mutations": "jest -i __tests__/mutations",
     "test:schema": "jest -i __tests__/schema",
     "test:schema-exports": "node scripts/test-schema-exports.mjs",
+    "test:operations-exports": "yarn test:operations-exports:typeDefs",
+    "test:operations-exports:typeDefs": "EXPORT_SCHEMA=typeDefs yarn test:operations",
     "prepack": "tsc -b tsconfig.build.json"
   },
   "repository": {
@@ -205,12 +223,12 @@
     "pg-sql2": "workspace:^",
     "tamedevil": "workspace:^",
     "tslib": "^2.6.2",
-    "ws": "^8.13.0"
+    "ws": "^8.17.1"
   },
   "peerDependencies": {
     "@dataplan/json": "workspace:*",
     "@dataplan/pg": "workspace:*",
-    "@envelop/core": "^3.0.4",
+    "@envelop/core": "^5.0.0",
     "grafast": "workspace:^",
     "grafserv": "workspace:^",
     "graphile-build": "workspace:*",

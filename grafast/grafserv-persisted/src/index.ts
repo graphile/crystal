@@ -20,10 +20,10 @@ const PersistedPlugin: GraphileConfig.Plugin = {
   version,
 
   grafserv: {
-    hooks: {
-      processGraphQLRequestBody(info, event) {
-        const { body } = event;
-        const options = info.resolvedPreset.grafserv;
+    middleware: {
+      processGraphQLRequestBody(next, event) {
+        const { body, resolvedPreset } = event;
+        const options = resolvedPreset.grafserv;
         if (!options) {
           throw new SafeError(
             "Persisted operations misconfigured; rejecting requests.",
@@ -57,6 +57,7 @@ const PersistedPlugin: GraphileConfig.Plugin = {
             );
           }
         }
+        return next();
       },
     },
   },

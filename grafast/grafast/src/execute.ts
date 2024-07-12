@@ -6,11 +6,16 @@ import type {
 } from "graphql";
 import type { PromiseOrValue } from "graphql/jsutils/PromiseOrValue";
 
-import { NULL_PRESET } from "./config.js";
 import { isDev } from "./dev.js";
 import { inspect } from "./inspect.js";
-import type { ExecutionEventEmitter, ExecutionEventMap } from "./interfaces.js";
+import type {
+  ExecuteEvent,
+  ExecutionEventEmitter,
+  ExecutionEventMap,
+  GrafastExecutionArgs,
+} from "./interfaces.js";
 import { $$eventEmitter, $$extensions } from "./interfaces.js";
+import { getGrafastMiddleware } from "./middleware.js";
 import { grafastPrepare } from "./prepare.js";
 import { isPromiseLike } from "./utils.js";
 
@@ -19,13 +24,11 @@ import { isPromiseLike } from "./utils.js";
  * @internal
  */
 export function withGrafastArgs(
-  args: ExecutionArgs,
-  resolvedPreset: GraphileConfig.ResolvedPreset,
-  outputDataAsString: boolean,
+  args: GrafastExecutionArgs,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
 > {
-  const options = resolvedPreset?.grafast;
+  const options = args.resolvedPreset?.grafast;
   if (isDev) {
     if (
       args.rootValue != null &&
@@ -75,8 +78,9 @@ export function withGrafastArgs(
 
   const rootValue = grafastPrepare(args, {
     explain: options?.explain,
-    outputDataAsString,
     timeouts: options?.timeouts,
+    // TODO: Delete this
+    outputDataAsString: args.outputDataAsString,
   });
   if (unlisten !== null) {
     Promise.resolve(rootValue).then(unlisten, unlisten);
@@ -90,15 +94,54 @@ export function withGrafastArgs(
 }
 
 /**
+ * @deprecated Second and third parameters should be passed as part of args,
+ * specifically `resolvedPreset` and `outputDataAsString`.
+ */
+export function execute(
+  args: ExecutionArgs,
+  resolvedPreset: GraphileConfig.ResolvedPreset | undefined,
+  outputDataAsString?: boolean,
+): PromiseOrValue<
+  ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
+>;
+/**
  * Use this instead of GraphQL.js' execute method and we'll automatically
  * run grafastPrepare for you and handle the result.
  */
 export function execute(
-  args: ExecutionArgs,
-  resolvedPreset: GraphileConfig.ResolvedPreset = NULL_PRESET,
-  outputDataAsString = false,
+  args: GrafastExecutionArgs,
+): PromiseOrValue<
+  ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
+>;
+export function execute(
+  args: GrafastExecutionArgs,
+  legacyResolvedPreset?: GraphileConfig.ResolvedPreset,
+  legacyOutputDataAsString?: boolean,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 > {
-  return withGrafastArgs(args, resolvedPreset, outputDataAsString);
+  // TODO: remove legacy compatibility
+  if (legacyResolvedPreset !== undefined) {
+    args.resolvedPreset = legacyResolvedPreset;
+  }
+  if (legacyOutputDataAsString !== undefined) {
+    args.outputDataAsString = legacyOutputDataAsString;
+  }
+
+  const { resolvedPreset } = args;
+  const middleware =
+    args.middleware === undefined && resolvedPreset != null
+      ? getGrafastMiddleware(resolvedPreset)
+      : args.middleware ?? null;
+  if (args.middleware === undefined) {
+    args.middleware = middleware;
+  }
+  if (middleware !== null) {
+    return middleware.run("execute", { args }, executeMiddlewareCallback);
+  } else {
+    return withGrafastArgs(args);
+  }
 }
+
+const executeMiddlewareCallback = (event: ExecuteEvent) =>
+  withGrafastArgs(event.args);

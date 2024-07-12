@@ -29,6 +29,7 @@ import { SafeError } from "./error.js";
 import { inspect } from "./inspect.js";
 import type {
   BaseGraphQLArguments,
+  ExecutionEntryFlags,
   GrafastFieldConfig,
   GrafastInputFieldConfig,
   InputStep,
@@ -287,7 +288,7 @@ export function isPromise<T>(t: T | Promise<T>): t is Promise<T> {
  */
 export function isPromiseLike<T>(
   t: T | Promise<T> | PromiseLike<T>,
-): t is PromiseLike<T> {
+): t is PromiseLike<T> | Promise<T> {
   return t != null && typeof (t as any).then === "function";
 }
 
@@ -925,7 +926,14 @@ export function isTypePlanned(
  * @internal
  */
 export type Sudo<T> = T extends ExecutableStep<any>
-  ? T & { dependencies: ReadonlyArray<ExecutableStep> }
+  ? T & {
+      dependencies: ReadonlyArray<ExecutableStep>;
+      implicitSideEffectStep: ExecutableStep | null;
+      dependencyForbiddenFlags: ReadonlyArray<ExecutionEntryFlags>;
+      dependencyOnReject: ReadonlyArray<Error | null | undefined>;
+      defaultForbiddenFlags: ExecutionEntryFlags;
+      getDepOptions: ExecutableStep["getDepOptions"];
+    }
   : T;
 
 /**
@@ -937,6 +945,21 @@ export function sudo<T>(obj: T): Sudo<T> {
   return obj as Sudo<T>;
 }
 
+/**
+ * We want everything else to treat things like `dependencies` as read only,
+ * however we ourselves want to be able to write to them, so we can use
+ * writeable for this.
+ *
+ * @internal
+ */
+export function writeableArray<T>(a: ReadonlyArray<T>): Array<T> {
+  return a as any;
+}
+
+/**
+ * Returns `true` if the first argument depends on the second argument either
+ * directly or indirectly (via a chain of dependencies).
+ */
 export function stepADependsOnStepB(
   stepA: ExecutableStep,
   stepB: ExecutableStep,
@@ -944,6 +967,13 @@ export function stepADependsOnStepB(
   if (stepA === stepB) {
     throw new Error("Invalid call to stepADependsOnStepB");
   }
+
+  // PERF: bredth-first might be better.
+
+  // PERF: we can stop looking once we pass a certain layerPlan boundary.
+
+  // PERF: maybe some form of caching here would be sensible?
+
   // Depth-first search for match
   for (const dep of sudo(stepA).dependencies) {
     if (dep === stepB) {

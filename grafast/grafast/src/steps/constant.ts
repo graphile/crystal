@@ -62,6 +62,21 @@ export class ConstantStep<TData> extends UnbatchedExecutableStep<TData> {
   isUndefined() {
     return this.data === undefined;
   }
+
+  get(key: string) {
+    const value =
+      typeof this.data === "object" &&
+      this.data !== null &&
+      Object.hasOwn(this.data, key)
+        ? (this.data as Record<string, any>)[key]
+        : undefined;
+    return constant(value);
+  }
+
+  at(index: number) {
+    const value = Array.isArray(this.data) ? this.data[index] : undefined;
+    return constant(value);
+  }
 }
 
 function isTemplateStringsArray(data: any): data is TemplateStringsArray {

@@ -145,7 +145,7 @@ function specFromNodeId(
 Here's an example of an `updateUser` mutation that uses the `userHandler`
 example handler from above:
 
-```js
+```ts
 const typeDefs = /* GraphQL */ `
   extend type Mutation {
     updateUser(id: ID!, patch: UserPatch!): UpdateUserPayload
@@ -169,6 +169,27 @@ const plans = {
 
       // Return the payload plan:
       return $payload;
+    },
+  },
+};
+```
+
+## nodeIdFromNode
+
+Given you have a step representing a node and you know the handler for it, this
+helper method will return a step representing the Node ID for this node.
+
+```ts
+const typeDefs = /* GraphQL */ `
+  extend type User {
+    id: ID!
+  }
+`;
+
+const planResolvers = {
+  User: {
+    id($user) {
+      return nodeIdFromNode(handlers.User, $user);
     },
   },
 };

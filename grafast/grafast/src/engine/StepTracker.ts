@@ -1,26 +1,18 @@
 import { isDev } from "../dev.js";
 import type { OperationPlan } from "../index.js";
-import { $$subroutine } from "../interfaces.js";
-import type { ExecutableStep } from "../step";
-import { sudo } from "../utils.js";
+import { inspect } from "../inspect.js";
+import type { AddDependencyOptions } from "../interfaces.js";
+import { $$subroutine, ALL_FLAGS, TRAPPABLE_FLAGS } from "../interfaces.js";
+import { ExecutableStep } from "../step.js";
+import { __FlagStep } from "../steps/__flag.js";
+import { sudo, writeableArray } from "../utils.js";
 import type {
   LayerPlan,
   LayerPlanReasonSubroutine,
   LayerPlanReasonsWithParentStep,
-} from "./LayerPlan";
+} from "./LayerPlan.js";
 import { lock } from "./lock.js";
-import type { OutputPlan } from "./OutputPlan";
-
-/**
- * We want everything else to treat things like `dependencies` as read only,
- * however we ourselves want to be able to write to them, so we can use
- * writeable for this.
- *
- * @internal
- */
-function writeableArray<T>(a: ReadonlyArray<T>): Array<T> {
-  return a as any;
-}
+import type { OutputPlan } from "./OutputPlan.js";
 
 /**
  * This class keeps track of all of our steps, and the dependencies between
@@ -274,9 +266,11 @@ export class StepTracker {
   }
 
   public addStepDependency(
-    $dependent: ExecutableStep,
-    $dependency: ExecutableStep,
+    raw$dependent: ExecutableStep,
+    options: AddDependencyOptions,
   ): number {
+    const $dependent = sudo(raw$dependent);
+    const $dependency = sudo(options.step);
     if (!this.activeSteps.has($dependent)) {
       throw new Error(
         `Cannot add ${$dependency} as a dependency of ${$dependent}; the latter is deleted!`,
@@ -287,37 +281,87 @@ export class StepTracker {
         `Cannot add ${$dependency} as a dependency of ${$dependent}; the former is deleted!`,
       );
     }
+    if ($dependent.isFinalized) {
+      throw new Error(
+        "You cannot add a dependency after the step is finalized.",
+      );
+    }
+    if (!($dependency instanceof ExecutableStep)) {
+      throw new Error(
+        `Error occurred when adding dependency for '${$dependent}', value passed was not a step, it was '${inspect(
+          $dependency,
+        )}'`,
+      );
+    }
+    if (isDev) {
+      // Check that we can actually add this as a dependency
+      if (!$dependent.layerPlan.ancestry.includes($dependency.layerPlan)) {
+        throw new Error(
+          //console.error(
+          // This is not a GrafastInternalError
+          `Attempted to add '${$dependency}' (${$dependency.layerPlan}) as a dependency of '${$dependent}' (${$dependent.layerPlan}), but we cannot because that LayerPlan isn't an ancestor`,
+        );
+      }
+    }
+
+    const dependentDependencies = writeableArray($dependent.dependencies);
+    const dependentDependencyForbiddenFlags = writeableArray(
+      $dependent.dependencyForbiddenFlags,
+    );
+    const dependentDependencyOnReject = writeableArray(
+      $dependent.dependencyOnReject,
+    );
+    const {
+      skipDeduplication,
+      acceptFlags = ALL_FLAGS & ~$dependent.defaultForbiddenFlags,
+      onReject,
+    } = options;
+    // When copying dependencies between classes, we might not want to
+    // deduplicate because we might refer to the dependency by its index. As
+    // such, we should only dedupe by default but allow opting out.
+    // TODO: change this to `!skipDeduplication`
+    if (skipDeduplication === false) {
+      const existingIndex = dependentDependencies.indexOf($dependency);
+      if (existingIndex >= 0) {
+        return existingIndex;
+      }
+    }
+
+    if (!$dependency._isUnary && $dependent._isUnary) {
+      if ($dependent._isUnaryLocked) {
+        throw new Error(
+          `Attempted to add non-unary step ${$dependency} as a dependency of ${$dependent}; but the latter is unary, so it cannot depend on batch steps`,
+        );
+      }
+      $dependent._isUnary = false;
+    }
+
+    const forbiddenFlags = ALL_FLAGS & ~(acceptFlags & TRAPPABLE_FLAGS);
+
     this.stepsWithNoDependencies.delete($dependent);
-    const dependencyIndex =
-      writeableArray(sudo($dependent).dependencies).push($dependency) - 1;
+    const dependencyIndex = dependentDependencies.push($dependency) - 1;
+    dependentDependencyForbiddenFlags[dependencyIndex] = forbiddenFlags;
+    dependentDependencyOnReject[dependencyIndex] = onReject;
     writeableArray($dependency.dependents).push({
       step: $dependent,
       dependencyIndex,
     });
-    if (!$dependency._isUnary) {
-      if ($dependent._isUnary) {
-        if ($dependent._isUnaryLocked) {
-          throw new Error(
-            `Attempted to add non-unary step ${$dependency} as a dependency of ${$dependent}; but the latter is unary, so it cannot depend on batch steps`,
-          );
-        }
-        $dependent._isUnary = false;
-      }
-    }
+
     return dependencyIndex;
   }
 
   public addStepUnaryDependency(
     $dependent: ExecutableStep,
-    $dependency: ExecutableStep,
+    options: AddDependencyOptions,
   ): number {
+    const $dependency = options.step;
     if (!$dependency._isUnary) {
       throw new Error(
         `${$dependent} attempted to create a unary step dependency on ${$dependency}, but that step is not unary. You may use \`.addDependency()\` instead of \`.addUnaryDependency()\`.`,
       );
     }
     $dependency._isUnaryLocked = true;
-    return this.addStepDependency($dependent, $dependency);
+    return this.addStepDependency($dependent, options);
   }
 
   public setOutputPlanRootStep(

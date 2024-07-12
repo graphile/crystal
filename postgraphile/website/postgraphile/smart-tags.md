@@ -1,7 +1,7 @@
 ---
 layout: page
 path: /postgraphile/smart-tags/
-title: Smart Tags
+title: Smart tags
 ---
 
 You can customise your PostGraphile GraphQL schema by tagging tables, columns,
@@ -343,8 +343,10 @@ PostGraphile with the same characteristics, i.e. all `not null` columns will
 become non-nullable fields. You can let PostGraphile know that you want to
 convert the composite type into another "variant" GraphQL type with a smart
 comment. Variants include `patch` (which is equivalent to the argument to
-`update*` mutations) and `base` (which makes every column both available
-(ignores permissions) and nullable). For example:
+`update*` mutations), `nodeId` (which can be used to have a function to accept
+the type's [global object identifier](./node-id/)) and `base` (which
+makes every column both available (ignores permissions) and nullable). For
+example:
 
 ```sql
 create table example(

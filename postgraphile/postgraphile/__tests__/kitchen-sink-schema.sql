@@ -103,7 +103,7 @@ comment on table c.person_secret is E'@deprecated This is deprecated (comment on
 -- This is to test that "one-to-one" relationships also work on unique keys
 create table c.left_arm (
   id serial primary key,
-  person_id int not null default c.current_user_id() unique references c.person on delete cascade,
+  person_id int default c.current_user_id() unique references c.person on delete cascade,
   length_in_metres float,
   mood text not null default 'neutral'
 );

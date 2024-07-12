@@ -102,7 +102,7 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Smart Tags",
+      label: "Smart tags",
       link: {
         type: "doc",
         id: "smart-tags",
@@ -111,7 +111,7 @@ const sidebars = {
     },
     {
       type: "category",
-      label: "Schema Plugins",
+      label: "Schema plugins",
       collapsed: false,
       link: {
         type: "doc",

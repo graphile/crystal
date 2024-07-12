@@ -98,7 +98,7 @@ const RootNamingPlugin = {
         if (["Query", "Mutation", "Subscription"].includes(text)) {
           return `Root${text}`;
         } else {
-          return previous.call(this, text);
+          return previous(text);
         }
       },
     },

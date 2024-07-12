@@ -1,28 +1,38 @@
+import type { PromiseOrDirect } from "grafast";
+import type { Middleware } from "graphile-config";
 import type { RuruHTMLParts, RuruServerConfig } from "ruru/server";
 import { defaultHTMLParts, makeHTMLParts, ruruHTML } from "ruru/server";
 
-import { getGrafservHooks } from "../hooks.js";
 import type { HandlerResult, NormalizedRequestDigest } from "../interfaces.js";
 import type { OptionsFromConfig } from "../options.js";
+import { noop } from "../utils.js";
 
 export function makeGraphiQLHandler(
   resolvedPreset: GraphileConfig.ResolvedPreset,
+  middleware: Middleware<GraphileConfig.GrafservMiddleware> | null,
   dynamicOptions: OptionsFromConfig,
-) {
+): (request: NormalizedRequestDigest) => PromiseOrDirect<HandlerResult> {
   const { htmlParts: htmlPartsFromConfig } = resolvedPreset?.ruru ?? {};
-  const hooks = getGrafservHooks(resolvedPreset);
   const unhookedHTMLParts: RuruHTMLParts = {
     ...defaultHTMLParts,
     ...htmlPartsFromConfig,
   };
-  return async (request: NormalizedRequestDigest): Promise<HandlerResult> => {
+  return async (request) => {
     let htmlParts = unhookedHTMLParts!;
-    if (hooks.callbacks.ruruHTMLParts) {
+    if (middleware != null && middleware.middleware.ruruHTMLParts != null) {
       htmlParts = {
         ...makeHTMLParts(),
         ...htmlPartsFromConfig,
       };
-      await hooks.process("ruruHTMLParts", htmlParts, { request });
+      await middleware.run(
+        "ruruHTMLParts",
+        {
+          resolvedPreset,
+          htmlParts,
+          request,
+        },
+        noop,
+      );
     }
     const config: RuruServerConfig = {
       endpoint: dynamicOptions.graphqlPath,

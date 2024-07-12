@@ -1,0 +1,22 @@
+{
+  allPeople: {
+    nodes: [
+      {
+        id: "WyJwZW9wbGUiLDZd",
+        name: "Twenty Seventwo",
+      },
+    ],
+  },
+  person: {
+    name: "Twenty Seventwo",
+  },
+  allPosts: {
+    nodes: [
+      {
+        id: "WyJwb3N0cyIsM10=",
+        headline: "Is that a cooking show?",
+      },
+    ],
+  },
+  postIdUsedToFetchPerson: null,
+}

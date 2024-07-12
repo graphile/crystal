@@ -1,7 +1,7 @@
 ---
 layout: page
 path: /postgraphile/multiple-schemas/
-title: Multiple GraphQL Schemas with PostGraphile
+title: Multiple GraphQL schemas with PostGraphile
 ---
 
 Each PostGraphile instance only creates a single GraphQL schema ─ you don't get
@@ -87,7 +87,7 @@ endpoint based on some information provided in the HTTP request, but how you
 would do this is dependent on what webserver framework you're using.
 
 If you're using something simple like Node, Express or Connect then you can
-build middlewares for each instance and then write a custom middleware to call
+build middleware for each instance and then write a custom middleware to call
 the right one:
 
 ```ts

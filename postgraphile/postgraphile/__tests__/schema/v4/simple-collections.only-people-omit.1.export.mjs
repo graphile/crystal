@@ -1,17 +1,22 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, makeRegistry, pgClassExpression, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId, stepAMayDependOnStepB } from "grafast";
+import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
 const handler = {
   typeName: "Query",
   codec: {
     name: "raw",
-    encode(value) {
+    encode: Object.assign(function rawEncode(value) {
       return typeof value === "string" ? value : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function rawDecode(value) {
       return typeof value === "string" ? value : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   },
   match(specifier) {
     return specifier === "query";
@@ -28,46 +33,39 @@ const handler = {
 };
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode(value) {
-    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  },
-  decode(value) {
-    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }
+  encode: (() => {
+    function base64JSONEncode(value) {
+      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+    }
+    base64JSONEncode.isSyncAndSafe = true; // Optimization
+    return base64JSONEncode;
+  })(),
+  decode: (() => {
+    function base64JSONDecode(value) {
+      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+    }
+    base64JSONDecode.isSyncAndSafe = true; // Optimization
+    return base64JSONDecode;
+  })()
 };
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode(value) {
+    encode: Object.assign(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   }
 });
-const peopleAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
+const peopleIdentifier = sql.identifier("simple_collections", "people");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -78,59 +76,78 @@ const executor = new PgExecutor({
     });
   }
 });
-const extensions = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "simple_collections",
-    name: "people"
-  },
-  tags: Object.assign(Object.create(null), {
-    simpleCollections: "omit",
-    behavior: ["-list +connection"]
-  })
-};
-const peopleCodec = recordCodec({
+const spec_people = {
   name: "people",
-  identifier: sql.identifier("simple_collections", "people"),
-  attributes: peopleAttributes,
+  identifier: peopleIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
-  extensions,
-  executor
-});
-const petsAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "simple_collections",
+      name: "people"
+    },
+    tags: Object.assign(Object.create(null), {
+      simpleCollections: "omit",
+      behavior: ["-list +connection"]
+    })
   },
-  owner_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const petsCodec = recordCodec({
+  executor: executor
+};
+const peopleCodec = recordCodec(spec_people);
+const petsIdentifier = sql.identifier("simple_collections", "pets");
+const spec_pets = {
   name: "pets",
-  identifier: sql.identifier("simple_collections", "pets"),
-  attributes: petsAttributes,
+  identifier: petsIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    owner_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -141,8 +158,9 @@ const petsCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
+  executor: executor
+};
+const petsCodec = recordCodec(spec_pets);
 const peopleUniques = [{
   isPrimary: true,
   attributes: ["id"],
@@ -152,10 +170,10 @@ const peopleUniques = [{
   }
 }];
 const registryConfig_pgResources_people_people = {
-  executor,
+  executor: executor,
   name: "people",
   identifier: "main.simple_collections.people",
-  from: peopleCodec.sqlType,
+  from: peopleIdentifier,
   codec: peopleCodec,
   uniques: peopleUniques,
   isVirtual: false,
@@ -169,7 +187,7 @@ const registryConfig_pgResources_people_people = {
     },
     tags: {
       simpleCollections: "omit",
-      behavior: extensions.tags.behavior
+      behavior: spec_people.extensions.tags.behavior
     }
   }
 };
@@ -182,10 +200,10 @@ const petsUniques = [{
   }
 }];
 const registryConfig_pgResources_pets_pets = {
-  executor,
+  executor: executor,
   name: "pets",
   identifier: "main.simple_collections.pets",
-  from: petsCodec.sqlType,
+  from: petsIdentifier,
   codec: petsCodec,
   uniques: petsUniques,
   isVirtual: false,
@@ -291,7 +309,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -310,7 +328,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -422,6 +440,9 @@ const makeArgs = (args, path = []) => {
   return selectArgs;
 };
 const resource_people_odd_petsPgResource = registry.pgResources["people_odd_pets"];
+function CursorSerialize(value) {
+  return "" + value;
+}
 const specFromArgs = args => {
   const $nodeId = args.get(["input", "nodeId"]);
   return specFromNodeId(nodeIdHandlerByTypeName.Person, $nodeId);
@@ -1471,7 +1492,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), petsAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_pets.attributes.id.codec)}`;
             }
           });
         }
@@ -1494,7 +1515,7 @@ export const plans = {
             type: "attribute",
             attribute: "owner_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), petsAttributes.owner_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_pets.attributes.owner_id.codec)}`;
             }
           });
         }
@@ -1517,7 +1538,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), petsAttributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_pets.attributes.name.codec)}`;
             }
           });
         }
@@ -1549,6 +1570,16 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  Cursor: {
+    serialize: CursorSerialize,
+    parseValue: CursorSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
     }
   },
   PageInfo: {
@@ -1687,7 +1718,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), peopleAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_people.attributes.id.codec)}`;
             }
           });
         }
@@ -1710,7 +1741,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), peopleAttributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_people.attributes.name.codec)}`;
             }
           });
         }
@@ -1951,6 +1982,9 @@ export const plans = {
     }
   },
   PersonInput: {
+    "__inputPlan": function PersonInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -1999,6 +2033,9 @@ export const plans = {
     }
   },
   PetInput: {
+    "__inputPlan": function PetInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -2079,6 +2116,9 @@ export const plans = {
     }
   },
   PersonPatch: {
+    "__inputPlan": function PersonPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -2140,6 +2180,9 @@ export const plans = {
     }
   },
   PetPatch: {
+    "__inputPlan": function PetPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());

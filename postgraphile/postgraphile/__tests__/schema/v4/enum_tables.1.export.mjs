@@ -1,17 +1,22 @@
 import { PgDeleteSingleStep, PgExecutor, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
 const handler = {
   typeName: "Query",
   codec: {
     name: "raw",
-    encode(value) {
+    encode: Object.assign(function rawEncode(value) {
       return typeof value === "string" ? value : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function rawDecode(value) {
       return typeof value === "string" ? value : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   },
   match(specifier) {
     return specifier === "query";
@@ -28,26 +33,39 @@ const handler = {
 };
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode(value) {
-    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  },
-  decode(value) {
-    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }
+  encode: (() => {
+    function base64JSONEncode(value) {
+      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+    }
+    base64JSONEncode.isSyncAndSafe = true; // Optimization
+    return base64JSONEncode;
+  })(),
+  decode: (() => {
+    function base64JSONDecode(value) {
+      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+    }
+    base64JSONDecode.isSyncAndSafe = true; // Optimization
+    return base64JSONDecode;
+  })()
 };
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode(value) {
+    encode: Object.assign(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   }
 });
+const abcdIdentifier = sql.identifier("enum_tables", "abcd");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -58,22 +76,9 @@ const executor = new PgExecutor({
     });
   }
 });
-const extensions = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "enum_tables",
-    name: "abcd"
-  },
-  tags: Object.assign(Object.create(null), {
-    enum: true,
-    enumName: "LetterAToD",
-    behavior: ["-*"]
-  })
-};
-const abcdCodec = recordCodec({
+const spec_abcd = {
   name: "abcd",
-  identifier: sql.identifier("enum_tables", "abcd"),
+  identifier: abcdIdentifier,
   attributes: Object.assign(Object.create(null), {
     letter: {
       description: undefined,
@@ -97,26 +102,26 @@ const abcdCodec = recordCodec({
     }
   }),
   description: undefined,
-  extensions,
-  executor
-});
-const extensions2 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "enum_tables",
-    name: "abcd_view"
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "abcd"
+    },
+    tags: Object.assign(Object.create(null), {
+      enum: true,
+      enumName: "LetterAToD",
+      behavior: ["-*"]
+    })
   },
-  tags: Object.assign(Object.create(null), {
-    primaryKey: "letter",
-    enum: true,
-    enumName: "LetterAToDViaView",
-    behavior: ["-*"]
-  })
+  executor: executor
 };
-const abcdViewCodec = recordCodec({
+const abcdCodec = recordCodec(spec_abcd);
+const abcdViewIdentifier = sql.identifier("enum_tables", "abcd_view");
+const spec_abcdView = {
   name: "abcdView",
-  identifier: sql.identifier("enum_tables", "abcd_view"),
+  identifier: abcdViewIdentifier,
   attributes: Object.assign(Object.create(null), {
     letter: {
       description: undefined,
@@ -138,24 +143,27 @@ const abcdViewCodec = recordCodec({
     }
   }),
   description: undefined,
-  extensions: extensions2,
-  executor
-});
-const extensions3 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "enum_tables",
-    name: "simple_enum"
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "abcd_view"
+    },
+    tags: Object.assign(Object.create(null), {
+      primaryKey: "letter",
+      enum: true,
+      enumName: "LetterAToDViaView",
+      behavior: ["-*"]
+    })
   },
-  tags: Object.assign(Object.create(null), {
-    enum: true,
-    behavior: ["-*"]
-  })
+  executor: executor
 };
-const simpleEnumCodec = recordCodec({
+const abcdViewCodec = recordCodec(spec_abcdView);
+const simpleEnumIdentifier = sql.identifier("enum_tables", "simple_enum");
+const spec_simpleEnum = {
   name: "simpleEnum",
-  identifier: sql.identifier("enum_tables", "simple_enum"),
+  identifier: simpleEnumIdentifier,
   attributes: Object.assign(Object.create(null), {
     value: {
       description: undefined,
@@ -177,10 +185,23 @@ const simpleEnumCodec = recordCodec({
     }
   }),
   description: undefined,
-  extensions: extensions3,
-  executor
-});
-const letterDescriptionsAttributes_letter_codec_LetterAToDEnum = enumCodec({
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "simple_enum"
+    },
+    tags: Object.assign(Object.create(null), {
+      enum: true,
+      behavior: ["-*"]
+    })
+  },
+  executor: executor
+};
+const simpleEnumCodec = recordCodec(spec_simpleEnum);
+const letterDescriptionsIdentifier = sql.identifier("enum_tables", "letter_descriptions");
+const spec_letterDescriptions_attributes_letter_codec_LetterAToDEnum = enumCodec({
   name: "LetterAToDEnum",
   identifier: TYPES.text.sqlType,
   values: [{
@@ -203,7 +224,7 @@ const letterDescriptionsAttributes_letter_codec_LetterAToDEnum = enumCodec({
     }
   }
 });
-const letterDescriptionsAttributes_letter_via_view_codec_LetterAToDViaViewEnum = enumCodec({
+const spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaViewEnum = enumCodec({
   name: "LetterAToDViaViewEnum",
   identifier: TYPES.text.sqlType,
   values: [{
@@ -226,48 +247,47 @@ const letterDescriptionsAttributes_letter_via_view_codec_LetterAToDViaViewEnum =
     }
   }
 });
-const letterDescriptionsAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  letter: {
-    description: undefined,
-    codec: letterDescriptionsAttributes_letter_codec_LetterAToDEnum,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  letter_via_view: {
-    description: undefined,
-    codec: letterDescriptionsAttributes_letter_via_view_codec_LetterAToDViaViewEnum,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  description: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const letterDescriptionsCodec = recordCodec({
+const spec_letterDescriptions = {
   name: "letterDescriptions",
-  identifier: sql.identifier("enum_tables", "letter_descriptions"),
-  attributes: letterDescriptionsAttributes,
+  identifier: letterDescriptionsIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    letter: {
+      description: undefined,
+      codec: spec_letterDescriptions_attributes_letter_codec_LetterAToDEnum,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    letter_via_view: {
+      description: undefined,
+      codec: spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaViewEnum,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    description: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -280,9 +300,11 @@ const letterDescriptionsCodec = recordCodec({
       foreignKey: "(letter_via_view) references enum_tables.abcd_view"
     })
   },
-  executor
-});
-const referencingTableAttributes_enum_1_codec_EnumTheFirstEnum = enumCodec({
+  executor: executor
+};
+const letterDescriptionsCodec = recordCodec(spec_letterDescriptions);
+const referencingTableIdentifier = sql.identifier("enum_tables", "referencing_table");
+const spec_referencingTable_attributes_enum_1_codec_EnumTheFirstEnum = enumCodec({
   name: "EnumTheFirstEnum",
   identifier: TYPES.text.sqlType,
   values: [{
@@ -305,7 +327,7 @@ const referencingTableAttributes_enum_1_codec_EnumTheFirstEnum = enumCodec({
     }
   }
 });
-const referencingTableAttributes_enum_2_codec_EnumTheSecondEnum = enumCodec({
+const spec_referencingTable_attributes_enum_2_codec_EnumTheSecondEnum = enumCodec({
   name: "EnumTheSecondEnum",
   identifier: TYPES.varchar.sqlType,
   values: [{
@@ -328,7 +350,7 @@ const referencingTableAttributes_enum_2_codec_EnumTheSecondEnum = enumCodec({
     }
   }
 });
-const referencingTableAttributes_enum_3_codec_LotsOfEnumsEnum3Enum = enumCodec({
+const spec_referencingTable_attributes_enum_3_codec_LotsOfEnumsEnum3Enum = enumCodec({
   name: "LotsOfEnumsEnum3Enum",
   identifier: TYPES.bpchar.sqlType,
   values: [{
@@ -351,7 +373,7 @@ const referencingTableAttributes_enum_3_codec_LotsOfEnumsEnum3Enum = enumCodec({
     }
   }
 });
-const referencingTableAttributes_simple_enum_codec_SimpleEnumEnum = enumCodec({
+const spec_referencingTable_attributes_simple_enum_codec_SimpleEnumEnum = enumCodec({
   name: "SimpleEnumEnum",
   identifier: TYPES.text.sqlType,
   values: [{
@@ -374,57 +396,56 @@ const referencingTableAttributes_simple_enum_codec_SimpleEnumEnum = enumCodec({
     }
   }
 });
-const referencingTableAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  enum_1: {
-    description: undefined,
-    codec: referencingTableAttributes_enum_1_codec_EnumTheFirstEnum,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  enum_2: {
-    description: undefined,
-    codec: referencingTableAttributes_enum_2_codec_EnumTheSecondEnum,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  enum_3: {
-    description: undefined,
-    codec: referencingTableAttributes_enum_3_codec_LotsOfEnumsEnum3Enum,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  simple_enum: {
-    description: undefined,
-    codec: referencingTableAttributes_simple_enum_codec_SimpleEnumEnum,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const referencingTableCodec = recordCodec({
+const spec_referencingTable = {
   name: "referencingTable",
-  identifier: sql.identifier("enum_tables", "referencing_table"),
-  attributes: referencingTableAttributes,
+  identifier: referencingTableIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    enum_1: {
+      description: undefined,
+      codec: spec_referencingTable_attributes_enum_1_codec_EnumTheFirstEnum,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    enum_2: {
+      description: undefined,
+      codec: spec_referencingTable_attributes_enum_2_codec_EnumTheSecondEnum,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    enum_3: {
+      description: undefined,
+      codec: spec_referencingTable_attributes_enum_3_codec_LotsOfEnumsEnum3Enum,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    simple_enum: {
+      description: undefined,
+      codec: spec_referencingTable_attributes_simple_enum_codec_SimpleEnumEnum,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -435,23 +456,13 @@ const referencingTableCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const extensions12 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "enum_tables",
-    name: "lots_of_enums"
-  },
-  tags: Object.assign(Object.create(null), {
-    omit: true,
-    behavior: ["-*"]
-  })
+  executor: executor
 };
-const lotsOfEnumsCodec = recordCodec({
+const referencingTableCodec = recordCodec(spec_referencingTable);
+const lotsOfEnumsIdentifier = sql.identifier("enum_tables", "lots_of_enums");
+const spec_lotsOfEnums = {
   name: "lotsOfEnums",
-  identifier: sql.identifier("enum_tables", "lots_of_enums"),
+  identifier: lotsOfEnumsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -509,14 +520,26 @@ const lotsOfEnumsCodec = recordCodec({
     }
   }),
   description: undefined,
-  extensions: extensions12,
-  executor
-});
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "enum_tables",
+      name: "lots_of_enums"
+    },
+    tags: Object.assign(Object.create(null), {
+      omit: true,
+      behavior: ["-*"]
+    })
+  },
+  executor: executor
+};
+const lotsOfEnumsCodec = recordCodec(spec_lotsOfEnums);
 const registryConfig_pgResources_abcd_abcd = {
-  executor,
+  executor: executor,
   name: "abcd",
   identifier: "main.enum_tables.abcd",
-  from: abcdCodec.sqlType,
+  from: abcdIdentifier,
   codec: abcdCodec,
   uniques: [{
     isPrimary: true,
@@ -538,15 +561,15 @@ const registryConfig_pgResources_abcd_abcd = {
     tags: {
       enum: true,
       enumName: "LetterAToD",
-      behavior: extensions.tags.behavior
+      behavior: spec_abcd.extensions.tags.behavior
     }
   }
 };
 const registryConfig_pgResources_abcd_view_abcd_view = {
-  executor,
+  executor: executor,
   name: "abcd_view",
   identifier: "main.enum_tables.abcd_view",
-  from: abcdViewCodec.sqlType,
+  from: abcdViewIdentifier,
   codec: abcdViewCodec,
   uniques: [{
     isPrimary: true,
@@ -569,15 +592,15 @@ const registryConfig_pgResources_abcd_view_abcd_view = {
       primaryKey: "letter",
       enum: true,
       enumName: "LetterAToDViaView",
-      behavior: extensions2.tags.behavior
+      behavior: spec_abcdView.extensions.tags.behavior
     }
   }
 };
 const registryConfig_pgResources_simple_enum_simple_enum = {
-  executor,
+  executor: executor,
   name: "simple_enum",
   identifier: "main.enum_tables.simple_enum",
-  from: simpleEnumCodec.sqlType,
+  from: simpleEnumIdentifier,
   codec: simpleEnumCodec,
   uniques: [{
     isPrimary: true,
@@ -598,7 +621,7 @@ const registryConfig_pgResources_simple_enum_simple_enum = {
     },
     tags: {
       enum: true,
-      behavior: extensions3.tags.behavior
+      behavior: spec_simpleEnum.extensions.tags.behavior
     }
   }
 };
@@ -626,10 +649,10 @@ const letter_descriptionsUniques = [{
   }
 }];
 const registryConfig_pgResources_letter_descriptions_letter_descriptions = {
-  executor,
+  executor: executor,
   name: "letter_descriptions",
   identifier: "main.enum_tables.letter_descriptions",
-  from: letterDescriptionsCodec.sqlType,
+  from: letterDescriptionsIdentifier,
   codec: letterDescriptionsCodec,
   uniques: letter_descriptionsUniques,
   isVirtual: false,
@@ -655,10 +678,10 @@ const referencing_tableUniques = [{
   }
 }];
 const registryConfig_pgResources_referencing_table_referencing_table = {
-  executor,
+  executor: executor,
   name: "referencing_table",
   identifier: "main.enum_tables.referencing_table",
-  from: referencingTableCodec.sqlType,
+  from: referencingTableIdentifier,
   codec: referencingTableCodec,
   uniques: referencing_tableUniques,
   isVirtual: false,
@@ -674,10 +697,10 @@ const registryConfig_pgResources_referencing_table_referencing_table = {
   }
 };
 const registryConfig_pgResources_lots_of_enums_lots_of_enums = {
-  executor,
+  executor: executor,
   name: "lots_of_enums",
   identifier: "main.enum_tables.lots_of_enums",
-  from: lotsOfEnumsCodec.sqlType,
+  from: lotsOfEnumsIdentifier,
   codec: lotsOfEnumsCodec,
   uniques: [{
     isPrimary: true,
@@ -736,7 +759,7 @@ const registryConfig_pgResources_lots_of_enums_lots_of_enums = {
     },
     tags: {
       omit: true,
-      behavior: extensions12.tags.behavior
+      behavior: spec_lotsOfEnums.extensions.tags.behavior
     }
   }
 };
@@ -748,13 +771,13 @@ const registry = makeRegistry({
     simpleEnum: simpleEnumCodec,
     int4: TYPES.int,
     letterDescriptions: letterDescriptionsCodec,
-    LetterAToDEnum: letterDescriptionsAttributes_letter_codec_LetterAToDEnum,
-    LetterAToDViaViewEnum: letterDescriptionsAttributes_letter_via_view_codec_LetterAToDViaViewEnum,
+    LetterAToDEnum: spec_letterDescriptions_attributes_letter_codec_LetterAToDEnum,
+    LetterAToDViaViewEnum: spec_letterDescriptions_attributes_letter_via_view_codec_LetterAToDViaViewEnum,
     referencingTable: referencingTableCodec,
-    EnumTheFirstEnum: referencingTableAttributes_enum_1_codec_EnumTheFirstEnum,
-    EnumTheSecondEnum: referencingTableAttributes_enum_2_codec_EnumTheSecondEnum,
-    LotsOfEnumsEnum3Enum: referencingTableAttributes_enum_3_codec_LotsOfEnumsEnum3Enum,
-    SimpleEnumEnum: referencingTableAttributes_simple_enum_codec_SimpleEnumEnum,
+    EnumTheFirstEnum: spec_referencingTable_attributes_enum_1_codec_EnumTheFirstEnum,
+    EnumTheSecondEnum: spec_referencingTable_attributes_enum_2_codec_EnumTheSecondEnum,
+    LotsOfEnumsEnum3Enum: spec_referencingTable_attributes_enum_3_codec_LotsOfEnumsEnum3Enum,
+    SimpleEnumEnum: spec_referencingTable_attributes_simple_enum_codec_SimpleEnumEnum,
     lotsOfEnums: lotsOfEnumsCodec,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar
@@ -1004,7 +1027,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -1023,7 +1046,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -1086,6 +1109,9 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
     plan($select);
   });
 };
+function CursorSerialize(value) {
+  return "" + value;
+}
 const argDetailsSimple = [{
   graphqlArgName: "t",
   postgresArgName: "t",
@@ -2343,6 +2369,16 @@ export const plans = {
       return $edge.node();
     }
   },
+  Cursor: {
+    serialize: CursorSerialize,
+    parseValue: CursorSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
   PageInfo: {
     __assertStep: assertPageInfoCapableStep,
     hasNextPage($pageInfo) {
@@ -2547,7 +2583,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), letterDescriptionsAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_letterDescriptions.attributes.id.codec)}`;
             }
           });
         }
@@ -2570,7 +2606,7 @@ export const plans = {
             type: "attribute",
             attribute: "letter",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), letterDescriptionsAttributes.letter.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_letterDescriptions.attributes.letter.codec)}`;
             }
           });
         }
@@ -2593,7 +2629,7 @@ export const plans = {
             type: "attribute",
             attribute: "letter_via_view",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), letterDescriptionsAttributes.letter_via_view.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_letterDescriptions.attributes.letter_via_view.codec)}`;
             }
           });
         }
@@ -2616,7 +2652,7 @@ export const plans = {
             type: "attribute",
             attribute: "description",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), letterDescriptionsAttributes.description.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_letterDescriptions.attributes.description.codec)}`;
             }
           });
         }
@@ -2873,7 +2909,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), referencingTableAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_referencingTable.attributes.id.codec)}`;
             }
           });
         }
@@ -2896,7 +2932,7 @@ export const plans = {
             type: "attribute",
             attribute: "enum_1",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), referencingTableAttributes.enum_1.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_referencingTable.attributes.enum_1.codec)}`;
             }
           });
         }
@@ -2919,7 +2955,7 @@ export const plans = {
             type: "attribute",
             attribute: "enum_2",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), referencingTableAttributes.enum_2.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_referencingTable.attributes.enum_2.codec)}`;
             }
           });
         }
@@ -2942,7 +2978,7 @@ export const plans = {
             type: "attribute",
             attribute: "enum_3",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), referencingTableAttributes.enum_3.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_referencingTable.attributes.enum_3.codec)}`;
             }
           });
         }
@@ -2965,7 +3001,7 @@ export const plans = {
             type: "attribute",
             attribute: "simple_enum",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), referencingTableAttributes.simple_enum.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_referencingTable.attributes.simple_enum.codec)}`;
             }
           });
         }
@@ -3258,6 +3294,9 @@ export const plans = {
     t: undefined
   },
   ReferencingTableInput: {
+    "__inputPlan": function ReferencingTableInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -3353,6 +3392,9 @@ export const plans = {
     }
   },
   LetterDescriptionInput: {
+    "__inputPlan": function LetterDescriptionInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -3498,6 +3540,9 @@ export const plans = {
     }
   },
   LetterDescriptionPatch: {
+    "__inputPlan": function LetterDescriptionPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -3627,6 +3672,9 @@ export const plans = {
     }
   },
   ReferencingTablePatch: {
+    "__inputPlan": function ReferencingTablePatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());

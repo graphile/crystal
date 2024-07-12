@@ -1,5 +1,20 @@
 # pg-sql2
 
+## 5.0.0-beta.6
+
+### Patch Changes
+
+- [#1994](https://github.com/graphile/crystal/pull/1994)
+  [`ab08cbf9c`](https://github.com/graphile/crystal/commit/ab08cbf9c504c3cc22495a99a965e7634c18a6a3)
+  Thanks [@benjie](https://github.com/benjie)! - Introduce
+  `interface SQLable {[$toSQL](): SQL}` to `pg-sql2` and use it to simplify SQL
+  fragments in various places.
+
+- [#1973](https://github.com/graphile/crystal/pull/1973)
+  [`94a05064e`](https://github.com/graphile/crystal/commit/94a05064ea05108685ff71174a9f871ab5b4c147)
+  Thanks [@benjie](https://github.com/benjie)! - Fix processing of GRAPHILE_ENV
+  to allow "test"
+
 ## 5.0.0-beta.5
 
 ### Patch Changes

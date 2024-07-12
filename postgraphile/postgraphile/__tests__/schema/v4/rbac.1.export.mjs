@@ -1,17 +1,22 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, domainOfCodec, enumCodec, listOfCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUpdateSingle, rangeOfCodec, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { GraphQLError, GraphQLString, Kind } from "graphql";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
 const handler = {
   typeName: "Query",
   codec: {
     name: "raw",
-    encode(value) {
+    encode: Object.assign(function rawEncode(value) {
       return typeof value === "string" ? value : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function rawDecode(value) {
       return typeof value === "string" ? value : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   },
   match(specifier) {
     return specifier === "query";
@@ -28,24 +33,36 @@ const handler = {
 };
 const nodeIdCodecs_base64JSON_base64JSON = {
   name: "base64JSON",
-  encode(value) {
-    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  },
-  decode(value) {
-    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }
+  encode: (() => {
+    function base64JSONEncode(value) {
+      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+    }
+    base64JSONEncode.isSyncAndSafe = true; // Optimization
+    return base64JSONEncode;
+  })(),
+  decode: (() => {
+    function base64JSONDecode(value) {
+      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+    }
+    base64JSONDecode.isSyncAndSafe = true; // Optimization
+    return base64JSONDecode;
+  })()
 };
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: handler.codec,
   base64JSON: nodeIdCodecs_base64JSON_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode(value) {
+    encode: Object.assign(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   }
 });
 const executor = new PgExecutor({
@@ -442,9 +459,10 @@ const textArrayCodec = listOfCodec(TYPES.text, {
   description: undefined,
   name: "textArray"
 });
+const nonUpdatableViewIdentifier = sql.identifier("a", "non_updatable_view");
 const nonUpdatableViewCodec = recordCodec({
   name: "nonUpdatableView",
-  identifier: sql.identifier("a", "non_updatable_view"),
+  identifier: nonUpdatableViewIdentifier,
   attributes: Object.assign(Object.create(null), {
     "?column?": {
       description: undefined,
@@ -468,11 +486,12 @@ const nonUpdatableViewCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
+const inputsIdentifier = sql.identifier("a", "inputs");
 const inputsCodec = recordCodec({
   name: "inputs",
-  identifier: sql.identifier("a", "inputs"),
+  identifier: inputsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -496,11 +515,12 @@ const inputsCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
+const patchsIdentifier = sql.identifier("a", "patchs");
 const patchsCodec = recordCodec({
   name: "patchs",
-  identifier: sql.identifier("a", "patchs"),
+  identifier: patchsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -524,11 +544,12 @@ const patchsCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
+const reservedIdentifier = sql.identifier("a", "reserved");
 const reservedCodec = recordCodec({
   name: "reserved",
-  identifier: sql.identifier("a", "reserved"),
+  identifier: reservedIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -552,11 +573,12 @@ const reservedCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
+const reservedPatchsIdentifier = sql.identifier("a", "reservedPatchs");
 const reservedPatchsCodec = recordCodec({
   name: "reservedPatchs",
-  identifier: sql.identifier("a", "reservedPatchs"),
+  identifier: reservedPatchsIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -580,11 +602,12 @@ const reservedPatchsCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
+const reservedInputIdentifier = sql.identifier("a", "reserved_input");
 const reservedInputCodec = recordCodec({
   name: "reservedInput",
-  identifier: sql.identifier("a", "reserved_input"),
+  identifier: reservedInputIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -608,11 +631,12 @@ const reservedInputCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
+const defaultValueIdentifier = sql.identifier("a", "default_value");
 const defaultValueCodec = recordCodec({
   name: "defaultValue",
-  identifier: sql.identifier("a", "default_value"),
+  identifier: defaultValueIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -647,11 +671,12 @@ const defaultValueCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
+const noPrimaryKeyIdentifier = sql.identifier("a", "no_primary_key");
 const noPrimaryKeyCodec = recordCodec({
   name: "noPrimaryKey",
-  identifier: sql.identifier("a", "no_primary_key"),
+  identifier: noPrimaryKeyIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -686,11 +711,12 @@ const noPrimaryKeyCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
+const uniqueForeignKeyIdentifier = sql.identifier("a", "unique_foreign_key");
 const uniqueForeignKeyCodec = recordCodec({
   name: "uniqueForeignKey",
-  identifier: sql.identifier("a", "unique_foreign_key"),
+  identifier: uniqueForeignKeyIdentifier,
   attributes: Object.assign(Object.create(null), {
     compound_key_1: {
       description: undefined,
@@ -728,11 +754,12 @@ const uniqueForeignKeyCodec = recordCodec({
       behavior: ["-insert -update -delete -query:resource:list -query:resource:connection -order -orderBy -filter -filterBy"]
     })
   },
-  executor
+  executor: executor
 });
+const myTableIdentifier = sql.identifier("c", "my_table");
 const myTableCodec = recordCodec({
   name: "myTable",
-  identifier: sql.identifier("c", "my_table"),
+  identifier: myTableIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -767,37 +794,37 @@ const myTableCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
-const personSecretAttributes = Object.assign(Object.create(null), {
-  person_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        behavior: ["-insert -update"]
-      }
-    }
-  },
-  sekrit: {
-    description: "A secret held by the associated Person",
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        name: "secret",
-        behavior: ["-update"]
-      }
-    }
-  }
-});
-const personSecretCodec = recordCodec({
+const personSecretIdentifier = sql.identifier("c", "person_secret");
+const spec_personSecret = {
   name: "personSecret",
-  identifier: sql.identifier("c", "person_secret"),
-  attributes: personSecretAttributes,
+  identifier: personSecretIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    person_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          behavior: ["-insert -update"]
+        }
+      }
+    },
+    sekrit: {
+      description: "A secret held by the associated Person",
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          name: "secret",
+          behavior: ["-update"]
+        }
+      }
+    }
+  }),
   description: "Tracks the person's secret",
   extensions: {
     isTableLike: true,
@@ -810,11 +837,13 @@ const personSecretCodec = recordCodec({
       deprecated: "This is deprecated (comment on table c.person_secret)."
     })
   },
-  executor
-});
+  executor: executor
+};
+const personSecretCodec = recordCodec(spec_personSecret);
+const foreignKeyIdentifier = sql.identifier("a", "foreign_key");
 const foreignKeyCodec = recordCodec({
   name: "foreignKey",
-  identifier: sql.identifier("a", "foreign_key"),
+  identifier: foreignKeyIdentifier,
   attributes: Object.assign(Object.create(null), {
     person_id: {
       description: undefined,
@@ -860,11 +889,12 @@ const foreignKeyCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
+const testviewIdentifier = sql.identifier("a", "testview");
 const testviewCodec = recordCodec({
   name: "testview",
-  identifier: sql.identifier("a", "testview"),
+  identifier: testviewIdentifier,
   attributes: Object.assign(Object.create(null), {
     testviewid: {
       description: undefined,
@@ -910,11 +940,12 @@ const testviewCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
+const viewTableIdentifier = sql.identifier("a", "view_table");
 const viewTableCodec = recordCodec({
   name: "viewTable",
-  identifier: sql.identifier("a", "view_table"),
+  identifier: viewTableIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -960,11 +991,12 @@ const viewTableCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
+const compoundKeyIdentifier = sql.identifier("c", "compound_key");
 const compoundKeyCodec = recordCodec({
   name: "compoundKey",
-  identifier: sql.identifier("c", "compound_key"),
+  identifier: compoundKeyIdentifier,
   attributes: Object.assign(Object.create(null), {
     person_id_2: {
       description: undefined,
@@ -1010,7 +1042,7 @@ const compoundKeyCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
 const uuidArrayCodec = listOfCodec(TYPES.uuid, {
   extensions: {
@@ -1025,9 +1057,10 @@ const uuidArrayCodec = listOfCodec(TYPES.uuid, {
   description: undefined,
   name: "uuidArray"
 });
+const similarTable1Identifier = sql.identifier("a", "similar_table_1");
 const similarTable1Codec = recordCodec({
   name: "similarTable1",
-  identifier: sql.identifier("a", "similar_table_1"),
+  identifier: similarTable1Identifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1084,11 +1117,12 @@ const similarTable1Codec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
+const similarTable2Identifier = sql.identifier("a", "similar_table_2");
 const similarTable2Codec = recordCodec({
   name: "similarTable2",
-  identifier: sql.identifier("a", "similar_table_2"),
+  identifier: similarTable2Identifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1145,11 +1179,12 @@ const similarTable2Codec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
+const updatableViewIdentifier = sql.identifier("b", "updatable_view");
 const updatableViewCodec = recordCodec({
   name: "updatableView",
-  identifier: sql.identifier("b", "updatable_view"),
+  identifier: updatableViewIdentifier,
   attributes: Object.assign(Object.create(null), {
     x: {
       description: undefined,
@@ -1209,11 +1244,12 @@ const updatableViewCodec = recordCodec({
       unique: "x|@behavior -single -update -delete"
     })
   },
-  executor
+  executor: executor
 });
+const nullTestRecordIdentifier = sql.identifier("c", "null_test_record");
 const nullTestRecordCodec = recordCodec({
   name: "nullTestRecord",
-  identifier: sql.identifier("c", "null_test_record"),
+  identifier: nullTestRecordIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1270,11 +1306,12 @@ const nullTestRecordCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
+const edgeCaseIdentifier = sql.identifier("c", "edge_case");
 const edgeCaseCodec = recordCodec({
   name: "edgeCase",
-  identifier: sql.identifier("c", "edge_case"),
+  identifier: edgeCaseIdentifier,
   attributes: Object.assign(Object.create(null), {
     not_null_has_default: {
       description: undefined,
@@ -1320,11 +1357,12 @@ const edgeCaseCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
+const jwtTokenIdentifier = sql.identifier("b", "jwt_token");
 const jwtTokenCodec = recordCodec({
   name: "jwtToken",
-  identifier: sql.identifier("b", "jwt_token"),
+  identifier: jwtTokenIdentifier,
   attributes: Object.assign(Object.create(null), {
     role: {
       description: undefined,
@@ -1382,8 +1420,9 @@ const jwtTokenCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
+const issue756Identifier = sql.identifier("c", "issue756");
 const notNullTimestampCodec = domainOfCodec(TYPES.timestamptz, "notNullTimestamp", sql.identifier("c", "not_null_timestamp"), {
   description: undefined,
   extensions: {
@@ -1398,7 +1437,7 @@ const notNullTimestampCodec = domainOfCodec(TYPES.timestamptz, "notNullTimestamp
 });
 const issue756Codec = recordCodec({
   name: "issue756",
-  identifier: sql.identifier("c", "issue756"),
+  identifier: issue756Identifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -1433,58 +1472,58 @@ const issue756Codec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
-const leftArmAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {
-        behavior: ["-insert -update"]
-      }
-    }
-  },
-  person_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {
-        behavior: ["-insert -update"]
-      }
-    }
-  },
-  length_in_metres: {
-    description: undefined,
-    codec: TYPES.float,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        behavior: ["-update"]
-      }
-    }
-  },
-  mood: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {
-        behavior: ["-insert"]
-      }
-    }
-  }
-});
-const leftArmCodec = recordCodec({
+const leftArmIdentifier = sql.identifier("c", "left_arm");
+const spec_leftArm = {
   name: "leftArm",
-  identifier: sql.identifier("c", "left_arm"),
-  attributes: leftArmAttributes,
+  identifier: leftArmIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {
+          behavior: ["-insert -update"]
+        }
+      }
+    },
+    person_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {
+          behavior: ["-insert -update"]
+        }
+      }
+    },
+    length_in_metres: {
+      description: undefined,
+      codec: TYPES.float,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          behavior: ["-update"]
+        }
+      }
+    },
+    mood: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {
+          behavior: ["-insert"]
+        }
+      }
+    }
+  }),
   description: "Tracks metadata about the left arms of various people",
   extensions: {
     isTableLike: true,
@@ -1495,11 +1534,13 @@ const leftArmCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
+  executor: executor
+};
+const leftArmCodec = recordCodec(spec_leftArm);
+const authPayloadIdentifier = sql.identifier("b", "auth_payload");
 const authPayloadCodec = recordCodec({
   name: "authPayload",
-  identifier: sql.identifier("b", "auth_payload"),
+  identifier: authPayloadIdentifier,
   attributes: Object.assign(Object.create(null), {
     jwt: {
       description: undefined,
@@ -1541,8 +1582,9 @@ const authPayloadCodec = recordCodec({
       foreignKey: "(id) references c.person"
     })
   },
-  executor
+  executor: executor
 });
+const compoundTypeIdentifier = sql.identifier("c", "compound_type");
 const colorCodec = enumCodec({
   name: "color",
   identifier: sql.identifier("b", "color"),
@@ -1587,7 +1629,7 @@ const enumWithEmptyStringCodec = enumCodec({
 });
 const compoundTypeCodec = recordCodec({
   name: "compoundType",
-  identifier: sql.identifier("c", "compound_type"),
+  identifier: compoundTypeIdentifier,
   attributes: Object.assign(Object.create(null), {
     a: {
       description: undefined,
@@ -1672,7 +1714,7 @@ const compoundTypeCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
 const registryConfig_pgCodecs_FuncOutOutCompoundTypeRecord_FuncOutOutCompoundTypeRecord = recordCodec({
   name: "FuncOutOutCompoundTypeRecord",
@@ -1734,6 +1776,7 @@ const registryConfig_pgCodecs_MutationOutOutCompoundTypeRecord_MutationOutOutCom
   executor,
   isAnonymous: true
 });
+const postIdentifier = sql.identifier("a", "post");
 const anEnumCodec = enumCodec({
   name: "anEnum",
   identifier: sql.identifier("a", "an_enum"),
@@ -1794,7 +1837,7 @@ const comptypeCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
 const comptypeArrayCodec = listOfCodec(comptypeCodec, {
   extensions: {
@@ -1809,78 +1852,77 @@ const comptypeArrayCodec = listOfCodec(comptypeCodec, {
   description: undefined,
   name: "comptypeArray"
 });
-const postAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {
-        behavior: ["-insert -update"]
-      }
-    }
-  },
-  headline: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        behavior: ["-insert -update"]
-      }
-    }
-  },
-  body: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        behavior: ["-insert -update"]
-      }
-    }
-  },
-  author_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: true,
-    extensions: {
-      tags: {
-        behavior: ["-insert -update"]
-      }
-    }
-  },
-  enums: {
-    description: undefined,
-    codec: anEnumArrayCodec,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        behavior: ["-select -filterBy -orderBy -insert -update"]
-      }
-    }
-  },
-  comptypes: {
-    description: undefined,
-    codec: comptypeArrayCodec,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        behavior: ["-select -filterBy -orderBy -insert -update"]
-      }
-    }
-  }
-});
-const postCodec = recordCodec({
+const spec_post = {
   name: "post",
-  identifier: sql.identifier("a", "post"),
-  attributes: postAttributes,
+  identifier: postIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {
+          behavior: ["-insert -update"]
+        }
+      }
+    },
+    headline: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          behavior: ["-insert -update"]
+        }
+      }
+    },
+    body: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          behavior: ["-insert -update"]
+        }
+      }
+    },
+    author_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {
+          behavior: ["-insert -update"]
+        }
+      }
+    },
+    enums: {
+      description: undefined,
+      codec: anEnumArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          behavior: ["-select -filterBy -orderBy -insert -update"]
+        }
+      }
+    },
+    comptypes: {
+      description: undefined,
+      codec: comptypeArrayCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          behavior: ["-select -filterBy -orderBy -insert -update"]
+        }
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -1891,8 +1933,9 @@ const postCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
+  executor: executor
+};
+const postCodec = recordCodec(spec_post);
 const registryConfig_pgCodecs_QueryOutputTwoRowsRecord_QueryOutputTwoRowsRecord = recordCodec({
   name: "QueryOutputTwoRowsRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
@@ -1991,6 +2034,7 @@ const registryConfig_pgCodecs_PersonComputedInoutOutRecord_PersonComputedInoutOu
   executor,
   isAnonymous: true
 });
+const personIdentifier = sql.identifier("c", "person");
 const emailCodec = domainOfCodec(TYPES.text, "email", sql.identifier("b", "email"), {
   description: undefined,
   extensions: {
@@ -2039,129 +2083,128 @@ const wrappedUrlCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
-const personAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: "The primary unique identifier for the person",
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {
-        behavior: ["-insert -update"]
-      }
-    }
-  },
-  person_full_name: {
-    description: "The person\u2019s name",
-    codec: TYPES.varchar,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        name: "name"
-      }
-    }
-  },
-  aliases: {
-    description: undefined,
-    codec: textArrayCodec,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  about: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  email: {
-    description: undefined,
-    codec: emailCodec,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  site: {
-    description: undefined,
-    codec: wrappedUrlCodec,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        deprecated: "Don\u2019t use me"
-      }
-    }
-  },
-  config: {
-    description: undefined,
-    codec: TYPES.hstore,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        behavior: ["-insert -update"]
-      }
-    }
-  },
-  last_login_from_ip: {
-    description: undefined,
-    codec: TYPES.inet,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        behavior: ["-insert -update"]
-      }
-    }
-  },
-  last_login_from_subnet: {
-    description: undefined,
-    codec: TYPES.cidr,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        behavior: ["-insert -update"]
-      }
-    }
-  },
-  user_mac: {
-    description: undefined,
-    codec: TYPES.macaddr,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        behavior: ["-insert -update"]
-      }
-    }
-  },
-  created_at: {
-    description: undefined,
-    codec: TYPES.timestamp,
-    notNull: false,
-    hasDefault: true,
-    extensions: {
-      tags: {
-        behavior: ["-insert -update"]
-      }
-    }
-  }
-});
-const personCodec = recordCodec({
+const spec_person = {
   name: "person",
-  identifier: sql.identifier("c", "person"),
-  attributes: personAttributes,
+  identifier: personIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: "The primary unique identifier for the person",
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {
+          behavior: ["-insert -update"]
+        }
+      }
+    },
+    person_full_name: {
+      description: "The person\u2019s name",
+      codec: TYPES.varchar,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          name: "name"
+        }
+      }
+    },
+    aliases: {
+      description: undefined,
+      codec: textArrayCodec,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    about: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    email: {
+      description: undefined,
+      codec: emailCodec,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    site: {
+      description: undefined,
+      codec: wrappedUrlCodec,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          deprecated: "Don\u2019t use me"
+        }
+      }
+    },
+    config: {
+      description: undefined,
+      codec: TYPES.hstore,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          behavior: ["-insert -update"]
+        }
+      }
+    },
+    last_login_from_ip: {
+      description: undefined,
+      codec: TYPES.inet,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          behavior: ["-insert -update"]
+        }
+      }
+    },
+    last_login_from_subnet: {
+      description: undefined,
+      codec: TYPES.cidr,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          behavior: ["-insert -update"]
+        }
+      }
+    },
+    user_mac: {
+      description: undefined,
+      codec: TYPES.macaddr,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          behavior: ["-insert -update"]
+        }
+      }
+    },
+    created_at: {
+      description: undefined,
+      codec: TYPES.timestamp,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {
+          behavior: ["-insert -update"]
+        }
+      }
+    }
+  }),
   description: "Person test comment",
   extensions: {
     isTableLike: true,
@@ -2172,8 +2215,9 @@ const personCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
+  executor: executor
+};
+const personCodec = recordCodec(spec_person);
 const registryConfig_pgCodecs_PersonComputedFirstArgInoutOutRecord_PersonComputedFirstArgInoutOutRecord = recordCodec({
   name: "PersonComputedFirstArgInoutOutRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
@@ -2394,6 +2438,7 @@ const registryConfig_pgCodecs_PersonComputedComplexRecord_PersonComputedComplexR
   executor,
   isAnonymous: true
 });
+const typesIdentifier = sql.identifier("b", "types");
 const colorArrayCodec = listOfCodec(colorCodec, {
   extensions: {
     pg: {
@@ -2506,7 +2551,7 @@ const nestedCompoundTypeCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
+  executor: executor
 });
 const textArrayDomainCodec = domainOfCodec(textArrayCodec, "textArrayDomain", sql.identifier("c", "text_array_domain"), {
   description: undefined,
@@ -2558,7 +2603,7 @@ const byteaArrayCodec = listOfCodec(TYPES.bytea, {
   description: undefined,
   name: "byteaArray"
 });
-const typesAttributes_ltree_codec_ltree = {
+const spec_types_attributes_ltree_codec_ltree = {
   name: "ltree",
   sqlType: sql`ltree`,
   toPg(str) {
@@ -2570,21 +2615,10 @@ const typesAttributes_ltree_codec_ltree = {
   executor: null,
   attributes: undefined
 };
-const typesAttributes_ltree_array_codec_ltree_ = listOfCodec(typesAttributes_ltree_codec_ltree);
-const extensions46 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "b",
-    name: "types"
-  },
-  tags: Object.assign(Object.create(null), {
-    foreignKey: ["(smallint) references a.post", "(id) references a.post"]
-  })
-};
-const typesCodec = recordCodec({
+const spec_types_attributes_ltree_array_codec_ltree_ = listOfCodec(spec_types_attributes_ltree_codec_ltree);
+const spec_types = {
   name: "types",
-  identifier: sql.identifier("b", "types"),
+  identifier: typesIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -3105,7 +3139,7 @@ const typesCodec = recordCodec({
     },
     ltree: {
       description: undefined,
-      codec: typesAttributes_ltree_codec_ltree,
+      codec: spec_types_attributes_ltree_codec_ltree,
       notNull: false,
       hasDefault: false,
       extensions: {
@@ -3116,7 +3150,7 @@ const typesCodec = recordCodec({
     },
     ltree_array: {
       description: undefined,
-      codec: typesAttributes_ltree_array_codec_ltree_,
+      codec: spec_types_attributes_ltree_array_codec_ltree_,
       notNull: false,
       hasDefault: false,
       extensions: {
@@ -3127,9 +3161,20 @@ const typesCodec = recordCodec({
     }
   }),
   description: undefined,
-  extensions: extensions46,
-  executor
-});
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "b",
+      name: "types"
+    },
+    tags: Object.assign(Object.create(null), {
+      foreignKey: ["(smallint) references a.post", "(id) references a.post"]
+    })
+  },
+  executor: executor
+};
+const typesCodec = recordCodec(spec_types);
 const int4ArrayCodec = listOfCodec(TYPES.int, {
   extensions: {
     pg: {
@@ -3231,10 +3276,10 @@ const query_interval_arrayFunctionIdentifer = sql.identifier("a", "query_interva
 const mutation_text_arrayFunctionIdentifer = sql.identifier("a", "mutation_text_array");
 const query_text_arrayFunctionIdentifer = sql.identifier("a", "query_text_array");
 const registryConfig_pgResources_unique_foreign_key_unique_foreign_key = {
-  executor,
+  executor: executor,
   name: "unique_foreign_key",
   identifier: "main.a.unique_foreign_key",
-  from: uniqueForeignKeyCodec.sqlType,
+  from: uniqueForeignKeyIdentifier,
   codec: uniqueForeignKeyCodec,
   uniques: [{
     isPrimary: false,
@@ -3268,10 +3313,10 @@ const person_secretUniques = [{
   }
 }];
 const registryConfig_pgResources_person_secret_person_secret = {
-  executor,
+  executor: executor,
   name: "person_secret",
   identifier: "main.c.person_secret",
-  from: personSecretCodec.sqlType,
+  from: personSecretIdentifier,
   codec: personSecretCodec,
   uniques: person_secretUniques,
   isVirtual: false,
@@ -3290,10 +3335,10 @@ const registryConfig_pgResources_person_secret_person_secret = {
   }
 };
 const registryConfig_pgResources_foreign_key_foreign_key = {
-  executor,
+  executor: executor,
   name: "foreign_key",
   identifier: "main.a.foreign_key",
-  from: foreignKeyCodec.sqlType,
+  from: foreignKeyIdentifier,
   codec: foreignKeyCodec,
   uniques: [],
   isVirtual: false,
@@ -3311,10 +3356,10 @@ const registryConfig_pgResources_foreign_key_foreign_key = {
   }
 };
 const registryConfig_pgResources_compound_key_compound_key = {
-  executor,
+  executor: executor,
   name: "compound_key",
   identifier: "main.c.compound_key",
-  from: compoundKeyCodec.sqlType,
+  from: compoundKeyIdentifier,
   codec: compoundKeyCodec,
   uniques: [{
     isPrimary: true,
@@ -3343,10 +3388,10 @@ const edge_case_computedFunctionIdentifer = sql.identifier("c", "edge_case_compu
 const return_table_without_grantsFunctionIdentifer = sql.identifier("c", "return_table_without_grants");
 const authenticate_failFunctionIdentifer = sql.identifier("b", "authenticate_fail");
 const resourceConfig_jwt_token = {
-  executor,
+  executor: executor,
   name: "jwt_token",
   identifier: "main.b.jwt_token",
-  from: jwtTokenCodec.sqlType,
+  from: jwtTokenIdentifier,
   codec: jwtTokenCodec,
   uniques: [],
   isVirtual: true,
@@ -3365,10 +3410,10 @@ const resourceConfig_jwt_token = {
 };
 const authenticateFunctionIdentifer = sql.identifier("b", "authenticate");
 const registryConfig_pgResources_issue756_issue756 = {
-  executor,
+  executor: executor,
   name: "issue756",
   identifier: "main.c.issue756",
-  from: issue756Codec.sqlType,
+  from: issue756Identifier,
   codec: issue756Codec,
   uniques: [{
     isPrimary: true,
@@ -3408,10 +3453,10 @@ const left_armUniques = [{
   }
 }];
 const registryConfig_pgResources_left_arm_left_arm = {
-  executor,
+  executor: executor,
   name: "left_arm",
   identifier: "main.c.left_arm",
-  from: leftArmCodec.sqlType,
+  from: leftArmIdentifier,
   codec: leftArmCodec,
   uniques: left_armUniques,
   isVirtual: false,
@@ -3446,10 +3491,10 @@ const post_headline_trimmed_no_defaultsFunctionIdentifer = sql.identifier("a", "
 const post_headline_trimmed_strictFunctionIdentifer = sql.identifier("a", "post_headline_trimmed_strict");
 const compound_type_set_queryFunctionIdentifer = sql.identifier("c", "compound_type_set_query");
 const resourceConfig_compound_type = {
-  executor,
+  executor: executor,
   name: "compound_type",
   identifier: "main.c.compound_type",
-  from: compoundTypeCodec.sqlType,
+  from: compoundTypeIdentifier,
   codec: compoundTypeCodec,
   uniques: [],
   isVirtual: true,
@@ -3483,10 +3528,10 @@ const postUniques = [{
   }
 }];
 const registryConfig_pgResources_post_post = {
-  executor,
+  executor: executor,
   name: "post",
   identifier: "main.a.post",
-  from: postCodec.sqlType,
+  from: postIdentifier,
   codec: postCodec,
   uniques: postUniques,
   isVirtual: false,
@@ -3536,10 +3581,10 @@ const personUniques = [{
   }
 }];
 const registryConfig_pgResources_person_person = {
-  executor,
+  executor: executor,
   name: "person",
   identifier: "main.c.person",
-  from: personCodec.sqlType,
+  from: personIdentifier,
   codec: personCodec,
   uniques: personUniques,
   isVirtual: false,
@@ -3566,10 +3611,10 @@ const table_set_query_plpgsqlFunctionIdentifer = sql.identifier("c", "table_set_
 const person_computed_first_arg_inoutFunctionIdentifer = sql.identifier("c", "person_computed_first_arg_inout");
 const person_friendsFunctionIdentifer = sql.identifier("c", "person_friends");
 const registryConfig_pgResources_types_types = {
-  executor,
+  executor: executor,
   name: "types",
   identifier: "main.b.types",
-  from: typesCodec.sqlType,
+  from: typesIdentifier,
   codec: typesCodec,
   uniques: [{
     isPrimary: true,
@@ -3589,7 +3634,7 @@ const registryConfig_pgResources_types_types = {
       name: "types"
     },
     tags: {
-      foreignKey: extensions46.tags.foreignKey,
+      foreignKey: spec_types.extensions.tags.foreignKey,
       behavior: ["-select -single -list -connection -insert -update -delete"]
     }
   }
@@ -3713,8 +3758,8 @@ const registry = makeRegistry({
     int8ArrayDomain: int8ArrayDomainCodec,
     bytea: TYPES.bytea,
     byteaArray: byteaArrayCodec,
-    ltree: typesAttributes_ltree_codec_ltree,
-    "ltree[]": typesAttributes_ltree_array_codec_ltree_,
+    ltree: spec_types_attributes_ltree_codec_ltree,
+    "ltree[]": spec_types_attributes_ltree_array_codec_ltree_,
     bpchar: TYPES.bpchar,
     compoundTypeArray: listOfCodec(compoundTypeCodec, {
       extensions: {
@@ -3801,7 +3846,7 @@ const registry = makeRegistry({
         },
         tags: Object.create(null)
       },
-      executor
+      executor: executor
     }),
     tablefuncCrosstab3: recordCodec({
       name: "tablefuncCrosstab3",
@@ -3854,7 +3899,7 @@ const registry = makeRegistry({
         },
         tags: Object.create(null)
       },
-      executor
+      executor: executor
     }),
     tablefuncCrosstab4: recordCodec({
       name: "tablefuncCrosstab4",
@@ -3916,7 +3961,7 @@ const registry = makeRegistry({
         },
         tags: Object.create(null)
       },
-      executor
+      executor: executor
     })
   }),
   pgResources: Object.assign(Object.create(null), {
@@ -5775,10 +5820,10 @@ const registry = makeRegistry({
       description: undefined
     },
     non_updatable_view: {
-      executor,
+      executor: executor,
       name: "non_updatable_view",
       identifier: "main.a.non_updatable_view",
-      from: nonUpdatableViewCodec.sqlType,
+      from: nonUpdatableViewIdentifier,
       codec: nonUpdatableViewCodec,
       uniques: [],
       isVirtual: false,
@@ -5796,10 +5841,10 @@ const registry = makeRegistry({
       }
     },
     inputs: {
-      executor,
+      executor: executor,
       name: "inputs",
       identifier: "main.a.inputs",
-      from: inputsCodec.sqlType,
+      from: inputsIdentifier,
       codec: inputsCodec,
       uniques: [{
         isPrimary: true,
@@ -5824,10 +5869,10 @@ const registry = makeRegistry({
       }
     },
     patchs: {
-      executor,
+      executor: executor,
       name: "patchs",
       identifier: "main.a.patchs",
-      from: patchsCodec.sqlType,
+      from: patchsIdentifier,
       codec: patchsCodec,
       uniques: [{
         isPrimary: true,
@@ -5852,10 +5897,10 @@ const registry = makeRegistry({
       }
     },
     reserved: {
-      executor,
+      executor: executor,
       name: "reserved",
       identifier: "main.a.reserved",
-      from: reservedCodec.sqlType,
+      from: reservedIdentifier,
       codec: reservedCodec,
       uniques: [{
         isPrimary: true,
@@ -5880,10 +5925,10 @@ const registry = makeRegistry({
       }
     },
     reservedPatchs: {
-      executor,
+      executor: executor,
       name: "reservedPatchs",
       identifier: "main.a.reservedPatchs",
-      from: reservedPatchsCodec.sqlType,
+      from: reservedPatchsIdentifier,
       codec: reservedPatchsCodec,
       uniques: [{
         isPrimary: true,
@@ -5908,10 +5953,10 @@ const registry = makeRegistry({
       }
     },
     reserved_input: {
-      executor,
+      executor: executor,
       name: "reserved_input",
       identifier: "main.a.reserved_input",
-      from: reservedInputCodec.sqlType,
+      from: reservedInputIdentifier,
       codec: reservedInputCodec,
       uniques: [{
         isPrimary: true,
@@ -5936,10 +5981,10 @@ const registry = makeRegistry({
       }
     },
     default_value: {
-      executor,
+      executor: executor,
       name: "default_value",
       identifier: "main.a.default_value",
-      from: defaultValueCodec.sqlType,
+      from: defaultValueIdentifier,
       codec: defaultValueCodec,
       uniques: [{
         isPrimary: true,
@@ -5964,10 +6009,10 @@ const registry = makeRegistry({
       }
     },
     no_primary_key: {
-      executor,
+      executor: executor,
       name: "no_primary_key",
       identifier: "main.a.no_primary_key",
-      from: noPrimaryKeyCodec.sqlType,
+      from: noPrimaryKeyIdentifier,
       codec: noPrimaryKeyCodec,
       uniques: [{
         isPrimary: false,
@@ -5993,10 +6038,10 @@ const registry = makeRegistry({
     },
     unique_foreign_key: registryConfig_pgResources_unique_foreign_key_unique_foreign_key,
     my_table: {
-      executor,
+      executor: executor,
       name: "my_table",
       identifier: "main.c.my_table",
-      from: myTableCodec.sqlType,
+      from: myTableIdentifier,
       codec: myTableCodec,
       uniques: [{
         isPrimary: true,
@@ -6023,10 +6068,10 @@ const registry = makeRegistry({
     person_secret: registryConfig_pgResources_person_secret_person_secret,
     foreign_key: registryConfig_pgResources_foreign_key_foreign_key,
     testview: {
-      executor,
+      executor: executor,
       name: "testview",
       identifier: "main.a.testview",
-      from: testviewCodec.sqlType,
+      from: testviewIdentifier,
       codec: testviewCodec,
       uniques: [],
       isVirtual: false,
@@ -6044,10 +6089,10 @@ const registry = makeRegistry({
       }
     },
     view_table: {
-      executor,
+      executor: executor,
       name: "view_table",
       identifier: "main.a.view_table",
-      from: viewTableCodec.sqlType,
+      from: viewTableIdentifier,
       codec: viewTableCodec,
       uniques: [{
         isPrimary: true,
@@ -6112,10 +6157,10 @@ const registry = makeRegistry({
       description: undefined
     },
     similar_table_1: {
-      executor,
+      executor: executor,
       name: "similar_table_1",
       identifier: "main.a.similar_table_1",
-      from: similarTable1Codec.sqlType,
+      from: similarTable1Identifier,
       codec: similarTable1Codec,
       uniques: [{
         isPrimary: true,
@@ -6140,10 +6185,10 @@ const registry = makeRegistry({
       }
     },
     similar_table_2: {
-      executor,
+      executor: executor,
       name: "similar_table_2",
       identifier: "main.a.similar_table_2",
-      from: similarTable2Codec.sqlType,
+      from: similarTable2Identifier,
       codec: similarTable2Codec,
       uniques: [{
         isPrimary: true,
@@ -6197,10 +6242,10 @@ const registry = makeRegistry({
       description: undefined
     },
     updatable_view: {
-      executor,
+      executor: executor,
       name: "updatable_view",
       identifier: "main.b.updatable_view",
-      from: updatableViewCodec.sqlType,
+      from: updatableViewIdentifier,
       codec: updatableViewCodec,
       uniques: [{
         isPrimary: false,
@@ -6229,10 +6274,10 @@ const registry = makeRegistry({
       }
     },
     null_test_record: {
-      executor,
+      executor: executor,
       name: "null_test_record",
       identifier: "main.c.null_test_record",
-      from: nullTestRecordCodec.sqlType,
+      from: nullTestRecordIdentifier,
       codec: nullTestRecordCodec,
       uniques: [{
         isPrimary: true,
@@ -6279,10 +6324,10 @@ const registry = makeRegistry({
       description: undefined
     }),
     edge_case: {
-      executor,
+      executor: executor,
       name: "edge_case",
       identifier: "main.c.edge_case",
-      from: edgeCaseCodec.sqlType,
+      from: edgeCaseIdentifier,
       codec: edgeCaseCodec,
       uniques: [],
       isVirtual: false,
@@ -6474,10 +6519,10 @@ const registry = makeRegistry({
       description: undefined
     }),
     authenticate_payload: PgResource.functionResourceOptions({
-      executor,
+      executor: executor,
       name: "auth_payload",
       identifier: "main.b.auth_payload",
-      from: authPayloadCodec.sqlType,
+      from: authPayloadIdentifier,
       codec: authPayloadCodec,
       uniques: [],
       isVirtual: true,
@@ -8647,7 +8692,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        person_id: access($list, [1])
+        person_id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -8666,7 +8711,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -8685,7 +8730,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -8704,7 +8749,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -8876,6 +8921,60 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
   });
 };
 const resource_frmcdc_wrappedUrlPgResource = registry.pgResources["frmcdc_wrappedUrl"];
+const isValidHstoreObject = obj => {
+  if (obj === null) {
+    // Null is okay
+    return true;
+  } else if (typeof obj === "object") {
+    // A hash with string/null values is also okay
+    const keys = Object.keys(obj);
+    for (const key of keys) {
+      const val = obj[key];
+      if (val === null) {
+        // Null is okay
+      } else if (typeof val === "string") {
+        // String is okay
+      } else {
+        // Everything else is invalid.
+        return false;
+      }
+    }
+    return true;
+  } else {
+    // Everything else is invalid.
+    return false;
+  }
+};
+const parseValueLiteral = (ast, variables) => {
+  switch (ast.kind) {
+    case Kind.INT:
+    case Kind.FLOAT:
+      // Number isn't really okay, but we'll coerce it to a string anyway.
+      return String(parseFloat(ast.value));
+    case Kind.STRING:
+      // String is okay.
+      return String(ast.value);
+    case Kind.NULL:
+      // Null is okay.
+      return null;
+    case Kind.VARIABLE:
+      {
+        // Variable is okay if that variable is either a string or null.
+        const name = ast.name.value;
+        const value = variables ? variables[name] : undefined;
+        if (value === null || typeof value === "string") {
+          return value;
+        }
+        return undefined;
+      }
+    default:
+      // Everything else is invalid.
+      return undefined;
+  }
+};
+function InternetAddressSerialize(value) {
+  return "" + value;
+}
 const argDetailsSimple3 = [{
   graphqlArgName: "leftArm",
   postgresArgName: "left_arm",
@@ -9333,7 +9432,7 @@ type LeftArm implements Node {
   """
   nodeId: ID!
   id: Int!
-  personId: Int!
+  personId: Int
   lengthInMetres: Float
   mood: String!
 
@@ -10684,10 +10783,79 @@ export const plans = {
       });
     }
   },
+  Email: {
+    serialize: GraphQLString.serialize,
+    parseValue: GraphQLString.parseValue,
+    parseLiteral: GraphQLString.parseLiteral
+  },
   WrappedUrl: {
     __assertStep: assertPgClassSingleStep,
     url($record) {
       return $record.get("url");
+    }
+  },
+  NotNullUrl: {
+    serialize: GraphQLString.serialize,
+    parseValue: GraphQLString.parseValue,
+    parseLiteral: GraphQLString.parseLiteral
+  },
+  KeyValueHash: {
+    serialize(value) {
+      return value;
+    },
+    parseValue(obj) {
+      if (isValidHstoreObject(obj)) {
+        return obj;
+      }
+      throw new GraphQLError(`This is not a valid ${"KeyValueHash"} object, it must be a key/value hash where keys and values are both strings (or null).`);
+    },
+    parseLiteral(ast, variables) {
+      switch (ast.kind) {
+        case Kind.OBJECT:
+          {
+            const value = ast.fields.reduce((memo, field) => {
+              memo[field.name.value] = parseValueLiteral(field.value, variables);
+              return memo;
+            }, Object.create(null));
+            if (!isValidHstoreObject(value)) {
+              return undefined;
+            }
+            return value;
+          }
+        case Kind.NULL:
+          return null;
+        case Kind.VARIABLE:
+          {
+            const name = ast.name.value;
+            const value = variables ? variables[name] : undefined;
+            if (!isValidHstoreObject(value)) {
+              return undefined;
+            }
+            return value;
+          }
+        default:
+          return undefined;
+      }
+    }
+  },
+  InternetAddress: {
+    serialize: InternetAddressSerialize,
+    parseValue: InternetAddressSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"InternetAddress" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  Datetime: {
+    serialize: InternetAddressSerialize,
+    parseValue: InternetAddressSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
     }
   },
   PostsConnection: {
@@ -10737,6 +10905,16 @@ export const plans = {
     },
     node($edge) {
       return $edge.node();
+    }
+  },
+  Cursor: {
+    serialize: InternetAddressSerialize,
+    parseValue: InternetAddressSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
     }
   },
   PageInfo: {
@@ -10943,7 +11121,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), postAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_post.attributes.id.codec)}`;
             }
           });
         }
@@ -10966,7 +11144,7 @@ export const plans = {
             type: "attribute",
             attribute: "headline",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), postAttributes.headline.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_post.attributes.headline.codec)}`;
             }
           });
         }
@@ -10989,7 +11167,7 @@ export const plans = {
             type: "attribute",
             attribute: "body",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), postAttributes.body.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_post.attributes.body.codec)}`;
             }
           });
         }
@@ -11012,7 +11190,7 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), postAttributes.author_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_post.attributes.author_id.codec)}`;
             }
           });
         }
@@ -11213,7 +11391,7 @@ export const plans = {
             type: "attribute",
             attribute: "person_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personSecretAttributes.person_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_personSecret.attributes.person_id.codec)}`;
             }
           });
         }
@@ -11236,7 +11414,7 @@ export const plans = {
             type: "attribute",
             attribute: "sekrit",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personSecretAttributes.sekrit.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_personSecret.attributes.sekrit.codec)}`;
             }
           });
         }
@@ -11459,7 +11637,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), leftArmAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_leftArm.attributes.id.codec)}`;
             }
           });
         }
@@ -11482,7 +11660,7 @@ export const plans = {
             type: "attribute",
             attribute: "person_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), leftArmAttributes.person_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_leftArm.attributes.person_id.codec)}`;
             }
           });
         }
@@ -11505,7 +11683,7 @@ export const plans = {
             type: "attribute",
             attribute: "length_in_metres",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), leftArmAttributes.length_in_metres.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_leftArm.attributes.length_in_metres.codec)}`;
             }
           });
         }
@@ -11528,7 +11706,7 @@ export const plans = {
             type: "attribute",
             attribute: "mood",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), leftArmAttributes.mood.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_leftArm.attributes.mood.codec)}`;
             }
           });
         }
@@ -11955,7 +12133,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_person.attributes.id.codec)}`;
             }
           });
         }
@@ -11978,7 +12156,7 @@ export const plans = {
             type: "attribute",
             attribute: "person_full_name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.person_full_name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_person.attributes.person_full_name.codec)}`;
             }
           });
         }
@@ -12001,7 +12179,7 @@ export const plans = {
             type: "attribute",
             attribute: "aliases",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.aliases.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_person.attributes.aliases.codec)}`;
             }
           });
         }
@@ -12024,7 +12202,7 @@ export const plans = {
             type: "attribute",
             attribute: "about",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.about.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_person.attributes.about.codec)}`;
             }
           });
         }
@@ -12047,7 +12225,7 @@ export const plans = {
             type: "attribute",
             attribute: "email",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.email.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_person.attributes.email.codec)}`;
             }
           });
         }
@@ -12070,7 +12248,7 @@ export const plans = {
             type: "attribute",
             attribute: "site",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.site.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_person.attributes.site.codec)}`;
             }
           });
         }
@@ -12093,7 +12271,7 @@ export const plans = {
             type: "attribute",
             attribute: "config",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.config.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_person.attributes.config.codec)}`;
             }
           });
         }
@@ -12116,7 +12294,7 @@ export const plans = {
             type: "attribute",
             attribute: "last_login_from_ip",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.last_login_from_ip.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_person.attributes.last_login_from_ip.codec)}`;
             }
           });
         }
@@ -12139,7 +12317,7 @@ export const plans = {
             type: "attribute",
             attribute: "last_login_from_subnet",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.last_login_from_subnet.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_person.attributes.last_login_from_subnet.codec)}`;
             }
           });
         }
@@ -12162,7 +12340,7 @@ export const plans = {
             type: "attribute",
             attribute: "user_mac",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.user_mac.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_person.attributes.user_mac.codec)}`;
             }
           });
         }
@@ -12185,7 +12363,7 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), personAttributes.created_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_person.attributes.created_at.codec)}`;
             }
           });
         }
@@ -12195,6 +12373,9 @@ export const plans = {
     }
   },
   WrappedUrlInput: {
+    "__inputPlan": function WrappedUrlInput_inputPlan() {
+      return object(Object.create(null));
+    },
     url: {
       applyPlan($insert, val) {
         $insert.set("url", val.get());
@@ -12574,6 +12755,9 @@ export const plans = {
     leftArm: undefined
   },
   LeftArmBaseInput: {
+    "__inputPlan": function LeftArmBaseInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -12667,6 +12851,9 @@ export const plans = {
     }
   },
   PersonSecretInput: {
+    "__inputPlan": function PersonSecretInput_inputPlan() {
+      return object(Object.create(null));
+    },
     secret: {
       applyPlan($insert, val) {
         $insert.set("sekrit", val.get());
@@ -12739,6 +12926,9 @@ export const plans = {
     }
   },
   LeftArmInput: {
+    "__inputPlan": function LeftArmInput_inputPlan() {
+      return object(Object.create(null));
+    },
     lengthInMetres: {
       applyPlan($insert, val) {
         $insert.set("length_in_metres", val.get());
@@ -12806,6 +12996,9 @@ export const plans = {
     }
   },
   PersonInput: {
+    "__inputPlan": function PersonInput_inputPlan() {
+      return object(Object.create(null));
+    },
     name: {
       applyPlan($insert, val) {
         $insert.set("person_full_name", val.get());
@@ -12905,6 +13098,9 @@ export const plans = {
     }
   },
   LeftArmPatch: {
+    "__inputPlan": function LeftArmPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     mood: {
       applyPlan($insert, val) {
         $insert.set("mood", val.get());
@@ -12999,6 +13195,9 @@ export const plans = {
     }
   },
   PersonPatch: {
+    "__inputPlan": function PersonPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     name: {
       applyPlan($insert, val) {
         $insert.set("person_full_name", val.get());

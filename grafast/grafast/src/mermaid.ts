@@ -179,8 +179,8 @@ export function planToMermaid(
           : `\n${polyPaths}`;
 
       const planString = `${planName}[${plan.id}${`∈${plan.bucketId}`}]${
-        meta ? `\n<${meta}>` : ""
-      }${polyPathsIfDifferent}`;
+        plan.isUnary ? " ➊" : ""
+      }${meta ? `\n<${meta}>` : ""}${polyPathsIfDifferent}`;
       const [lBrace, rBrace] =
         plan.stepClass === "__ItemStep"
           ? ["[/", "\\]"]
@@ -209,6 +209,33 @@ export function planToMermaid(
   graph.push("    %% plan dependencies");
   const chainByDep: { [depNode: string]: string } = Object.create(null);
 
+  const depDeets = (step: GrafastPlanStepJSONv1, idx: number) => {
+    const forbiddenFlags = step.dependencyForbiddenFlags[idx];
+    const onReject = step.dependencyOnReject[idx];
+    const info: string[] = [];
+    if (forbiddenFlags) {
+      if ((forbiddenFlags & 2) === 2) {
+        info.push("rejectNull");
+      }
+      if ((forbiddenFlags & 1) === 0) {
+        info.push("trapError");
+      }
+      if ((forbiddenFlags & 4) === 0) {
+        info.push("trapInhibited");
+      }
+      if (onReject) {
+        info.push(`onReject=${trim(stripAnsi(onReject))}`);
+      }
+    }
+    const str = info.join(";");
+
+    if (str) {
+      return `|${mermaidEscape(str)}|`;
+    } else {
+      return "";
+    }
+  };
+
   sortedSteps.forEach(
     // This comment is here purely to maintain the previous formatting to reduce a git diff.
     (plan) => {
@@ -228,9 +255,23 @@ export function planToMermaid(
         if (plan.stepClass === "__ItemStep") {
           const [firstDep, ...rest] = depNodes;
           const arrow = plan.extra?.transformStepId == null ? "==>" : "-.->";
-          graph.push(`    ${firstDep} ${arrow} ${planNode}`);
+          graph.push(
+            `    ${firstDep} ${arrow}${depDeets(plan, 0)} ${planNode}`,
+          );
           if (rest.length > 0) {
-            graph.push(`    ${rest.join(" & ")} --> ${planNode}`);
+            const normal: string[] = [];
+            for (let i = 0; i < rest.length; i++) {
+              const r = rest[i];
+              const deets = depDeets(plan, i + 1);
+              if (deets) {
+                graph.push(`    ${r} -->${deets} ${planNode}`);
+              } else {
+                normal.push(r);
+              }
+            }
+            if (normal.length) {
+              graph.push(`    ${normal.join(" & ")} --> ${planNode}`);
+            }
           }
         } else {
           if (
@@ -241,13 +282,30 @@ export function planToMermaid(
             // Try alternating the nodes so they render closer together
             const depNode = depNodes[0];
             if (chainByDep[depNode] === undefined) {
-              graph.push(`    ${depNode} --> ${planNode}`);
+              graph.push(`    ${depNode} -->${depDeets(plan, 0)} ${planNode}`);
             } else {
-              graph.push(`    ${chainByDep[depNode]} o--o ${planNode}`);
+              graph.push(
+                `    ${chainByDep[depNode]} o--o${depDeets(
+                  plan,
+                  0,
+                )} ${planNode}`,
+              );
             }
             chainByDep[depNode] = planNode;
           } else {
-            graph.push(`    ${depNodes.join(" & ")} --> ${planNode}`);
+            const normal: string[] = [];
+            for (let i = 0; i < depNodes.length; i++) {
+              const r = depNodes[i];
+              const deets = depDeets(plan, i + 1);
+              if (deets) {
+                graph.push(`    ${r} -->${deets} ${planNode}`);
+              } else {
+                normal.push(r);
+              }
+            }
+            if (normal.length) {
+              graph.push(`    ${normal.join(" & ")} --> ${planNode}`);
+            }
           }
         }
       }
@@ -270,6 +328,19 @@ export function planToMermaid(
     }${step.metaString ? `<${step.metaString}>` : ""}[${step.id}]`;
   };
 
+  let firstSideEffect = true;
+  sortedSteps.forEach((step) => {
+    if (step.implicitSideEffectStepId) {
+      if (firstSideEffect) {
+        graph.push("");
+        graph.push("    %% implicit side effects");
+        firstSideEffect = false;
+      }
+      const sideEffectStep = stepById[step.implicitSideEffectStepId];
+      graph.push(`    ${planId(sideEffectStep)} -.-o ${planId(step)}`);
+    }
+  });
+
   graph.push("");
   if (!concise && !skipBuckets) graph.push("    subgraph Buckets");
   const layerPlans = Object.values(layerPlanById);
@@ -281,25 +352,30 @@ export function planToMermaid(
       (layerPlan.reason.type === "polymorphic"
         ? `\n${layerPlan.reason.typeNames}`
         : ``);
-    const outputMapStuff: string[] = [];
     if (!skipBuckets) {
       graph.push(
         `    Bucket${layerPlan.id}(${mermaidEscape(
           `Bucket ${layerPlan.id}${raisonDEtre}${
+            layerPlan.parentSideEffectStepId != null
+              ? `\nParent side effect step: ${
+                  stepById[layerPlan.parentSideEffectStepId].id
+                }`
+              : ""
+          }${
             layerPlan.copyStepIds.length > 0
               ? `\nDeps: ${layerPlan.copyStepIds
                   .map((pId) => stepById[pId]!.id)
-                  .join(", ")}\n`
+                  .join(", ")}`
               : ""
           }${
             layerPlan.reason.type === "polymorphic"
-              ? pp(layerPlan.reason.polymorphicPaths)
+              ? "\n" + pp(layerPlan.reason.polymorphicPaths)
               : ""
-          }${
+          }\n${
             layerPlan.rootStepId != null && layerPlan.reason.type !== "root"
               ? `\nROOT ${stepToString(stepById[layerPlan.rootStepId])}`
               : ""
-          }${startSteps(layerPlan)}\n${outputMapStuff.join("\n")}`,
+          }${startSteps(layerPlan)}`,
         )}):::bucket`,
       );
     }
@@ -321,10 +397,6 @@ export function planToMermaid(
       }
     }
   }
-  const isUnary = (step: GrafastPlanStepJSONv1): boolean => step.isUnary;
-  graph.push(`\
-    classDef unary fill:#fafffa,borderWidth:8px
-    class ${sortedSteps.filter(isUnary).map(planId)} unary`);
   if (!concise && !skipBuckets) graph.push("    end");
 
   const graphString = graph.join("\n");
@@ -373,3 +445,11 @@ function pp(polymorphicPaths: ReadonlyArray<string> | null | undefined) {
 }
 
 export * from "./planJSONInterfaces.js";
+
+function trim(string: string, length = 15): string {
+  if (string.length > length) {
+    return string.substring(0, length - 2) + "…";
+  } else {
+    return string;
+  }
+}

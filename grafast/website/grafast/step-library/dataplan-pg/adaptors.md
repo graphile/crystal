@@ -117,7 +117,7 @@ properties:
   `connectionString`
 
 Exactly one of `pool` or `connectionString` must be set, all other options are
-optional.
+optional, and `poolConfig` is ignored if `pool` is specified.
 
 ### new PgSubscriber(pool)
 

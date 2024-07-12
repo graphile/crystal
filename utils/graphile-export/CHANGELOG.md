@@ -1,5 +1,95 @@
 # graphile-export
 
+## 0.0.2-beta.16
+
+### Patch Changes
+
+- Updated dependencies
+  [[`582bd768f`](https://github.com/graphile/crystal/commit/582bd768fec403ce3284f293b85b9fd86e4d3f40)]:
+  - grafast@0.1.1-beta.11
+
+## 0.0.2-beta.15
+
+### Patch Changes
+
+- Updated dependencies
+  [[`3c161f7e1`](https://github.com/graphile/crystal/commit/3c161f7e13375105b1035a7d5d1c0f2b507ca5c7),
+  [`a674a9923`](https://github.com/graphile/crystal/commit/a674a9923bc908c9315afa40e0cb256ee0953d16),
+  [`b7cfeffd1`](https://github.com/graphile/crystal/commit/b7cfeffd1019d61c713a5054c4f5929960a2a6ab)]:
+  - grafast@0.1.1-beta.10
+
+## 0.0.2-beta.14
+
+### Patch Changes
+
+- Updated dependencies
+  [[`437570f97`](https://github.com/graphile/crystal/commit/437570f97e8520afaf3d0d0b514d1f4c31546b76)]:
+  - grafast@0.1.1-beta.9
+
+## 0.0.2-beta.13
+
+### Patch Changes
+
+- Updated dependencies
+  [[`bd5a908a4`](https://github.com/graphile/crystal/commit/bd5a908a4d04310f90dfb46ad87398ffa993af3b)]:
+  - grafast@0.1.1-beta.8
+
+## 0.0.2-beta.12
+
+### Patch Changes
+
+- [#2050](https://github.com/graphile/crystal/pull/2050)
+  [`a4d4de334`](https://github.com/graphile/crystal/commit/a4d4de33435d3f6d04d9e627bcc3e77f6eb66c7b)
+  Thanks [@benjie](https://github.com/benjie)! - Graphile Export now
+  auto-detects that a function has additional properties set, and makes sure
+  these properties are exported too. (Typically this is `fn.isSyncAndSafe=true`
+  for Grafast optimization.)
+
+- [#2050](https://github.com/graphile/crystal/pull/2050)
+  [`de24f1d14`](https://github.com/graphile/crystal/commit/de24f1d143a331f410cf4955a18b10a09790f7f8)
+  Thanks [@benjie](https://github.com/benjie)! - Fix exporting input object
+  inputPlan in typeDefs mode.
+
+- [#1993](https://github.com/graphile/crystal/pull/1993)
+  [`fdc440eb3`](https://github.com/graphile/crystal/commit/fdc440eb31004114aa5e1d91d290414dd0587746)
+  Thanks [@benjie](https://github.com/benjie)! - Ability to export values from
+  graphile-export (e.g. the registry)
+
+- [#2050](https://github.com/graphile/crystal/pull/2050)
+  [`0dbfbb687`](https://github.com/graphile/crystal/commit/0dbfbb68747f2755ba228afe22bf2da25348c71b)
+  Thanks [@benjie](https://github.com/benjie)! - Don't pass filePath to lintText
+  to avoid ESLint ignoring the file.
+
+- Updated dependencies
+  [[`357d475f5`](https://github.com/graphile/crystal/commit/357d475f54fecc8c51892e0346d6872b34132430),
+  [`3551725e7`](https://github.com/graphile/crystal/commit/3551725e71c3ed876554e19e5ab2c1dcb0fb1143),
+  [`80836471e`](https://github.com/graphile/crystal/commit/80836471e5cedb29dee63bc5002550c4f1713cfd),
+  [`a5c20fefb`](https://github.com/graphile/crystal/commit/a5c20fefb571dea6d1187515dc48dd547e9e6204),
+  [`1ce08980e`](https://github.com/graphile/crystal/commit/1ce08980e2a52ed9bc81564d248c19648ecd3616),
+  [`ab08cbf9c`](https://github.com/graphile/crystal/commit/ab08cbf9c504c3cc22495a99a965e7634c18a6a3),
+  [`dff4f2535`](https://github.com/graphile/crystal/commit/dff4f2535ac6ce893089b312fcd5fffcd98573a5),
+  [`a287a57c2`](https://github.com/graphile/crystal/commit/a287a57c2765da0fb6a132ea0953f64453210ceb),
+  [`2fe56f9a6`](https://github.com/graphile/crystal/commit/2fe56f9a6dac03484ace45c29c2223a65f9ca1db),
+  [`fed603d71`](https://github.com/graphile/crystal/commit/fed603d719c02f33e12190f925c9e3b06c581fac),
+  [`ed6e0d278`](https://github.com/graphile/crystal/commit/ed6e0d2788217a1c419634837f4208013eaf2923),
+  [`e82e4911e`](https://github.com/graphile/crystal/commit/e82e4911e32138df1b90ec0fde555ea963018d21),
+  [`94a05064e`](https://github.com/graphile/crystal/commit/94a05064ea05108685ff71174a9f871ab5b4c147),
+  [`42ece5aa6`](https://github.com/graphile/crystal/commit/42ece5aa6ca05345ebc17fb5c7d55df3b79b7612),
+  [`e0d69e518`](https://github.com/graphile/crystal/commit/e0d69e518a98c70f9b90f59d243ce33978c1b5a1),
+  [`6699388ec`](https://github.com/graphile/crystal/commit/6699388ec167d35c71220ce5d9113cac578da6cb),
+  [`966203504`](https://github.com/graphile/crystal/commit/96620350467ab8c65b56adf2f055e19450f8e772),
+  [`c1645b249`](https://github.com/graphile/crystal/commit/c1645b249aae949a548cd916e536ccfb63e5ab35),
+  [`ed8bbaa3c`](https://github.com/graphile/crystal/commit/ed8bbaa3cd1563a7601ca8c6b0412633b0ea4ce9),
+  [`a0e82b9c5`](https://github.com/graphile/crystal/commit/a0e82b9c5f4e585f1af1e147299cd07944ece6f8),
+  [`14e2412ee`](https://github.com/graphile/crystal/commit/14e2412ee368e8d53abf6774c7f0069f32d4e8a3),
+  [`57ab0e1e7`](https://github.com/graphile/crystal/commit/57ab0e1e72c01213b21d3efc539cd655d83d993a),
+  [`8442242e4`](https://github.com/graphile/crystal/commit/8442242e43cac7d89ca0c413cf42c9fabf6f247f),
+  [`64ce7b765`](https://github.com/graphile/crystal/commit/64ce7b7650530251aec38a51089da66f914c19b4),
+  [`cba842357`](https://github.com/graphile/crystal/commit/cba84235786acbd77ade53bae7a3fba4a9be1eb7),
+  [`2fa77d0f2`](https://github.com/graphile/crystal/commit/2fa77d0f237cdb98d3dafb6b5e4083a2c6c38673)]:
+  - grafast@0.1.1-beta.7
+  - pg-sql2@5.0.0-beta.6
+
 ## 0.0.2-beta.11
 
 ### Patch Changes

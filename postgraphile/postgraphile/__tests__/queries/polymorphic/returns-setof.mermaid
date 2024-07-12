@@ -9,35 +9,32 @@ graph TD
 
 
     %% plan dependencies
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection16{{"Connection[16∈0]<br />ᐸ12ᐳ"}}:::plan
-    Object15{{"Object[15∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access13{{"Access[13∈1]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access14{{"Access[14∈1]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access13 & Access14 --> Object15
-    PgSelect17[["PgSelect[17∈1]<br />ᐸall_single_tables(aggregate)ᐳ"]]:::plan
-    Object15 & Connection16 --> PgSelect17
-    __Value3 --> Access13
-    __Value3 --> Access14
-    First18{{"First[18∈1]"}}:::plan
-    PgSelect17 --> First18
-    PgSelectSingle19{{"PgSelectSingle[19∈1]<br />ᐸall_single_tablesᐳ"}}:::plan
-    First18 --> PgSelectSingle19
-    PgClassExpression20{{"PgClassExpression[20∈1]<br />ᐸcount(*)ᐳ"}}:::plan
-    PgSelectSingle19 --> PgClassExpression20
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection15{{"Connection[15∈0] ➊<br />ᐸ11ᐳ"}}:::plan
+    Object14{{"Object[14∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access12{{"Access[12∈1] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access13{{"Access[13∈1] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access12 & Access13 --> Object14
+    PgSelect16[["PgSelect[16∈1] ➊<br />ᐸall_single_tables(aggregate)ᐳ"]]:::plan
+    Object14 & Connection15 --> PgSelect16
+    __Value2 --> Access12
+    __Value2 --> Access13
+    First17{{"First[17∈1] ➊"}}:::plan
+    PgSelect16 --> First17
+    PgSelectSingle18{{"PgSelectSingle[18∈1] ➊<br />ᐸall_single_tablesᐳ"}}:::plan
+    First17 --> PgSelectSingle18
+    PgClassExpression19{{"PgClassExpression[19∈1] ➊<br />ᐸcount(*)ᐳ"}}:::plan
+    PgSelectSingle18 --> PgClassExpression19
 
     %% define steps
 
     subgraph "Buckets for queries/polymorphic/returns-setof"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Connection16 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 16<br /><br />ROOT Connectionᐸ12ᐳ[16]<br />1: <br />ᐳ: Access[13], Access[14], Object[15]<br />2: PgSelect[17]<br />ᐳ: 18, 19, 20"):::bucket
+    class Bucket0,__Value2,__Value4,Connection15 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 15<br /><br />ROOT Connectionᐸ11ᐳ[15]<br />1: <br />ᐳ: Access[12], Access[13], Object[14]<br />2: PgSelect[16]<br />ᐳ: 17, 18, 19"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access13,Access14,Object15,PgSelect17,First18,PgSelectSingle19,PgClassExpression20 bucket1
+    class Bucket1,Access12,Access13,Object14,PgSelect16,First17,PgSelectSingle18,PgClassExpression19 bucket1
     Bucket0 --> Bucket1
-    classDef unary fill:#fafffa,borderWidth:8px
-    class __Value0,__Value3,__Value5,Connection16,Object15,PgSelect17,Access13,Access14,First18,PgSelectSingle19,PgClassExpression20 unary
     end

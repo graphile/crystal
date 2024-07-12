@@ -1,13 +1,22 @@
-export type PluginHookObject<T extends (...args: any[]) => any> = {
+export type AnyCallback = (...args: any[]) => any;
+
+export type CallbackDescriptor<T extends AnyCallback> = {
   provides?: string[];
   before?: string[];
   after?: string[];
   callback: T;
 };
 
-export type PluginHook<T extends (...args: any[]) => any> =
-  | T
-  | PluginHookObject<T>;
+export type PromiseOrDirect<T> = T | PromiseLike<T>;
 
-export type PluginHookCallback<T extends PluginHook<(...args: any[]) => any>> =
-  T extends PluginHook<infer U> ? U : never;
+export type CallbackOrDescriptor<T extends AnyCallback> =
+  | T
+  | CallbackDescriptor<T>;
+
+export type UnwrapCallback<T extends CallbackOrDescriptor<AnyCallback>> =
+  T extends CallbackOrDescriptor<infer U> ? U : never;
+
+export type FunctionalityObject<T> = Record<
+  keyof T,
+  CallbackOrDescriptor<AnyCallback>
+>;

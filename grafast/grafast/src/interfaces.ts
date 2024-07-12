@@ -1,6 +1,8 @@
 import type EventEmitter from "eventemitter3";
+import type { Middleware } from "graphile-config";
 import type {
   ASTNode,
+  ExecutionArgs,
   FragmentDefinitionNode,
   GraphQLArgs,
   GraphQLArgument,
@@ -17,14 +19,22 @@ import type {
   GraphQLScalarType,
   GraphQLSchema,
   GraphQLType,
+  OperationDefinitionNode,
+  Source,
   ValueNode,
   VariableNode,
 } from "graphql";
+import type { ObjMap } from "graphql/jsutils/ObjMap.js";
 
 import type { Bucket, RequestTools } from "./bucket.js";
 import type { OperationPlan } from "./engine/OperationPlan.js";
-import type { SafeError } from "./error.js";
-import type { ExecutableStep, ListCapableStep, ModifierStep } from "./step.js";
+import type { FlaggedValue, SafeError } from "./error.js";
+import type {
+  ExecutableStep,
+  ListCapableStep,
+  ModifierStep,
+  StreamableStep,
+} from "./step.js";
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type {
   __InputListStep,
@@ -126,8 +136,6 @@ export const $$extensions = Symbol("extensions");
 
 /**
  * The "GraphQLObjectType" type name, useful when dealing with polymorphism.
- *
- * @internal
  */
 export const $$concreteType = Symbol("concreteType");
 
@@ -182,10 +190,31 @@ export interface IndexByListItemStepId {
 // These values are just to make reading the code a little clearer
 export type GrafastValuesList<T> = ReadonlyArray<T>;
 export type PromiseOrDirect<T> = PromiseLike<T> | T;
-export type GrafastResultsList<T> = ReadonlyArray<PromiseOrDirect<T>>;
-export type GrafastResultStreamList<T> = ReadonlyArray<
-  PromiseOrDirect<AsyncIterable<PromiseOrDirect<T>> | null> | PromiseLike<never>
+export type GrafastResultsList<T> = ReadonlyArray<
+  PromiseOrDirect<T | FlaggedValue<Error> | FlaggedValue<null>>
 >;
+export type GrafastResultStreamList<T> = ReadonlyArray<
+  | PromiseOrDirect<AsyncIterable<
+      PromiseOrDirect<T | FlaggedValue<Error> | FlaggedValue<null>>
+    > | null>
+  | PromiseLike<never>
+>;
+
+/** @internal */
+export type ForcedValues = {
+  flags: {
+    [index: number]: ExecutionEntryFlags | undefined;
+  };
+  results: {
+    [index: number]: Error | null | undefined;
+  };
+};
+
+/** @internal */
+export type GrafastInternalResultsOrStream<T> = {
+  flags: ReadonlyArray<ExecutionEntryFlags>;
+  results: GrafastResultsList<T> | GrafastResultStreamList<T>;
+};
 
 export type BaseGraphQLRootValue = any;
 export interface BaseGraphQLVariables {
@@ -774,19 +803,81 @@ export interface ExecutionExtraBase {
 export interface ExecutionExtra extends ExecutionExtraBase {}
 export interface UnbatchedExecutionExtra extends ExecutionExtraBase {}
 
+/**
+ * A bitwise number representing a number of flags:
+ *
+ * - 0: normal execution value
+ * - 1: errored (trappable)
+ * - 2: null (trappable)
+ * - 4: inhibited (trappable)
+ * - 8: disabled due to polymorphism (untrappable)
+ * - 16: stopped (untrappable) - e.g. due to fatal (unrecoverable) error
+ * - 32: ...
+ */
+export type ExecutionEntryFlags = number & { readonly tsBrand?: unique symbol };
+
+function flag(f: number): ExecutionEntryFlags {
+  return f as ExecutionEntryFlags;
+}
+
+export const NO_FLAGS = flag(0);
+export const FLAG_ERROR = flag(1 << 0);
+export const FLAG_NULL = flag(1 << 1);
+export const FLAG_INHIBITED = flag(1 << 2);
+export const FLAG_POLY_SKIPPED = flag(1 << 3);
+export const FLAG_STOPPED = flag(1 << 4);
+export const ALL_FLAGS = flag(
+  FLAG_ERROR | FLAG_NULL | FLAG_INHIBITED | FLAG_POLY_SKIPPED | FLAG_STOPPED,
+);
+
+/** By default, accept null values as an input */
+export const DEFAULT_ACCEPT_FLAGS = flag(FLAG_NULL);
+export const TRAPPABLE_FLAGS = flag(FLAG_ERROR | FLAG_NULL | FLAG_INHIBITED);
+export const DEFAULT_FORBIDDEN_FLAGS = flag(ALL_FLAGS & ~DEFAULT_ACCEPT_FLAGS);
+export const FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS = flag(
+  FLAG_NULL | FLAG_POLY_SKIPPED,
+);
+// TODO: make `FORBIDDEN_BY_NULLABLE_BOUNDARY_FLAGS = flag(FLAG_ERROR | FLAG_NULL | FLAG_POLY_SKIPPED | FLAG_INHIBITED | FLAG_STOPPED);`
+// Currently this isn't enabled because the bucket has to exist for the output
+// plan to throw the error; really the root should be evaluated before
+// descending into the output plan rather than as part of descending?
+
 export type ExecutionValue<TData = any> =
-  | {
-      at(i: number): TData;
-      isBatch: true;
-      entries: ReadonlyArray<TData>;
-      value?: never;
-    }
-  | {
-      at(i: number): TData;
-      isBatch: false;
-      value: TData;
-      entries?: never;
-    };
+  | BatchExecutionValue<TData>
+  | UnaryExecutionValue<TData>;
+
+interface ExecutionValueBase<TData = any> {
+  at(i: number): TData;
+  isBatch: boolean;
+  /** @internal */
+  _flagsAt(i: number): ExecutionEntryFlags;
+  /** bitwise OR of all the entry states @internal */
+  _getStateUnion(): ExecutionEntryFlags;
+  /** @internal */
+  _setResult(i: number, value: TData, flags: ExecutionEntryFlags): void;
+  /** @internal */
+  _copyResult(
+    targetIndex: number,
+    source: ExecutionValue,
+    sourceIndex: number,
+  ): void;
+}
+export interface BatchExecutionValue<TData = any>
+  extends ExecutionValueBase<TData> {
+  isBatch: true;
+  entries: ReadonlyArray<TData>;
+  value?: never;
+  /** @internal */
+  readonly _flags: Array<ExecutionEntryFlags>;
+}
+export interface UnaryExecutionValue<TData = any>
+  extends ExecutionValueBase<TData> {
+  isBatch: false;
+  value: TData;
+  entries?: never;
+  /** @internal */
+  _entryFlags: ExecutionEntryFlags;
+}
 
 export type IndexMap = <T>(callback: (i: number) => T) => ReadonlyArray<T>;
 export type IndexForEach = (callback: (i: number) => any) => void;
@@ -838,7 +929,69 @@ export type StreamMoreableArray<T = any> = Array<T> & {
 export interface GrafastArgs extends GraphQLArgs {
   resolvedPreset?: GraphileConfig.ResolvedPreset;
   requestContext?: Partial<Grafast.RequestContext>;
+  middleware?: Middleware<GraphileConfig.GrafastMiddleware> | null;
 }
 export type Maybe<T> = T | null | undefined;
 
 export * from "./planJSONInterfaces.js";
+
+export interface AddDependencyOptions {
+  step: ExecutableStep;
+  skipDeduplication?: boolean;
+  /** @defaultValue `FLAG_NULL` */
+  acceptFlags?: ExecutionEntryFlags;
+  onReject?: null | Error | undefined;
+}
+/**
+ * @internal
+ */
+export const $$deepDepSkip = Symbol("deepDepSkip_experimental");
+
+export type DataFromStep<TStep extends ExecutableStep> =
+  TStep extends ExecutableStep<infer TData> ? TData : never;
+
+export interface GrafastExecutionArgs extends ExecutionArgs {
+  resolvedPreset?: GraphileConfig.ResolvedPreset;
+  middleware?: Middleware<GraphileConfig.GrafastMiddleware> | null;
+  requestContext?: Partial<Grafast.RequestContext>;
+  outputDataAsString?: boolean;
+}
+
+export interface ValidateSchemaEvent {
+  resolvedPreset: GraphileConfig.ResolvedPreset;
+  schema: GraphQLSchema;
+}
+export interface ParseAndValidateEvent {
+  resolvedPreset: GraphileConfig.ResolvedPreset;
+  schema: GraphQLSchema;
+  source: string | Source;
+}
+export interface PrepareArgsEvent {
+  args: Grafast.ExecutionArgs;
+}
+export interface ExecuteEvent {
+  args: GrafastExecutionArgs;
+}
+export interface SubscribeEvent {
+  args: GrafastExecutionArgs;
+}
+export interface EstablishOperationPlanEvent {
+  schema: GraphQLSchema;
+  operation: OperationDefinitionNode;
+  fragments: ObjMap<FragmentDefinitionNode>;
+  variableValues: Record<string, any>;
+  context: any;
+  rootValue: any;
+  planningTimeout: number | undefined;
+  args: GrafastExecutionArgs;
+}
+export interface ExecuteStepEvent {
+  args: GrafastExecutionArgs;
+  step: ExecutableStep;
+  executeDetails: ExecutionDetails;
+}
+export interface StreamStepEvent {
+  args: GrafastExecutionArgs;
+  step: StreamableStep<unknown>;
+  streamDetails: StreamDetails;
+}

@@ -1,16 +1,26 @@
 import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUnionAll, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, lambda, list, makeDecodeNodeId, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, access, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, inhibitOnNull, lambda, list, makeDecodeNodeId, makeGrafastSchema, node, object, rootValue, specFromNodeId } from "grafast";
+import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
 const handler_codec_base64JSON = {
   name: "base64JSON",
-  encode(value) {
-    return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
-  },
-  decode(value) {
-    return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
-  }
+  encode: (() => {
+    function base64JSONEncode(value) {
+      return Buffer.from(JSON.stringify(value), "utf8").toString("base64");
+    }
+    base64JSONEncode.isSyncAndSafe = true; // Optimization
+    return base64JSONEncode;
+  })(),
+  decode: (() => {
+    function base64JSONDecode(value) {
+      return JSON.parse(Buffer.from(value, "base64").toString("utf8"));
+    }
+    base64JSONDecode.isSyncAndSafe = true; // Optimization
+    return base64JSONDecode;
+  })()
 };
+const awsApplicationFirstPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "aws_application_first_party_vulnerabilities");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -21,21 +31,9 @@ const executor = new PgExecutor({
     });
   }
 });
-const extensions = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "aws_application_first_party_vulnerabilities"
-  },
-  tags: Object.assign(Object.create(null), {
-    omit: true,
-    behavior: ["-*"]
-  })
-};
-const awsApplicationFirstPartyVulnerabilitiesCodec = recordCodec({
+const spec_awsApplicationFirstPartyVulnerabilities = {
   name: "awsApplicationFirstPartyVulnerabilities",
-  identifier: sql.identifier("polymorphic", "aws_application_first_party_vulnerabilities"),
+  identifier: awsApplicationFirstPartyVulnerabilitiesIdentifier,
   attributes: Object.assign(Object.create(null), {
     aws_application_id: {
       description: undefined,
@@ -57,24 +55,25 @@ const awsApplicationFirstPartyVulnerabilitiesCodec = recordCodec({
     }
   }),
   description: undefined,
-  extensions,
-  executor
-});
-const extensions2 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "aws_application_third_party_vulnerabilities"
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "aws_application_first_party_vulnerabilities"
+    },
+    tags: Object.assign(Object.create(null), {
+      omit: true,
+      behavior: ["-*"]
+    })
   },
-  tags: Object.assign(Object.create(null), {
-    omit: true,
-    behavior: ["-*"]
-  })
+  executor: executor
 };
-const awsApplicationThirdPartyVulnerabilitiesCodec = recordCodec({
+const awsApplicationFirstPartyVulnerabilitiesCodec = recordCodec(spec_awsApplicationFirstPartyVulnerabilities);
+const awsApplicationThirdPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "aws_application_third_party_vulnerabilities");
+const spec_awsApplicationThirdPartyVulnerabilities = {
   name: "awsApplicationThirdPartyVulnerabilities",
-  identifier: sql.identifier("polymorphic", "aws_application_third_party_vulnerabilities"),
+  identifier: awsApplicationThirdPartyVulnerabilitiesIdentifier,
   attributes: Object.assign(Object.create(null), {
     aws_application_id: {
       description: undefined,
@@ -96,24 +95,25 @@ const awsApplicationThirdPartyVulnerabilitiesCodec = recordCodec({
     }
   }),
   description: undefined,
-  extensions: extensions2,
-  executor
-});
-const extensions3 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "gcp_application_first_party_vulnerabilities"
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "aws_application_third_party_vulnerabilities"
+    },
+    tags: Object.assign(Object.create(null), {
+      omit: true,
+      behavior: ["-*"]
+    })
   },
-  tags: Object.assign(Object.create(null), {
-    omit: true,
-    behavior: ["-*"]
-  })
+  executor: executor
 };
-const gcpApplicationFirstPartyVulnerabilitiesCodec = recordCodec({
+const awsApplicationThirdPartyVulnerabilitiesCodec = recordCodec(spec_awsApplicationThirdPartyVulnerabilities);
+const gcpApplicationFirstPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "gcp_application_first_party_vulnerabilities");
+const spec_gcpApplicationFirstPartyVulnerabilities = {
   name: "gcpApplicationFirstPartyVulnerabilities",
-  identifier: sql.identifier("polymorphic", "gcp_application_first_party_vulnerabilities"),
+  identifier: gcpApplicationFirstPartyVulnerabilitiesIdentifier,
   attributes: Object.assign(Object.create(null), {
     gcp_application_id: {
       description: undefined,
@@ -135,24 +135,25 @@ const gcpApplicationFirstPartyVulnerabilitiesCodec = recordCodec({
     }
   }),
   description: undefined,
-  extensions: extensions3,
-  executor
-});
-const extensions4 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "gcp_application_third_party_vulnerabilities"
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "gcp_application_first_party_vulnerabilities"
+    },
+    tags: Object.assign(Object.create(null), {
+      omit: true,
+      behavior: ["-*"]
+    })
   },
-  tags: Object.assign(Object.create(null), {
-    omit: true,
-    behavior: ["-*"]
-  })
+  executor: executor
 };
-const gcpApplicationThirdPartyVulnerabilitiesCodec = recordCodec({
+const gcpApplicationFirstPartyVulnerabilitiesCodec = recordCodec(spec_gcpApplicationFirstPartyVulnerabilities);
+const gcpApplicationThirdPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "gcp_application_third_party_vulnerabilities");
+const spec_gcpApplicationThirdPartyVulnerabilities = {
   name: "gcpApplicationThirdPartyVulnerabilities",
-  identifier: sql.identifier("polymorphic", "gcp_application_third_party_vulnerabilities"),
+  identifier: gcpApplicationThirdPartyVulnerabilitiesIdentifier,
   attributes: Object.assign(Object.create(null), {
     gcp_application_id: {
       description: undefined,
@@ -174,33 +175,45 @@ const gcpApplicationThirdPartyVulnerabilitiesCodec = recordCodec({
     }
   }),
   description: undefined,
-  extensions: extensions4,
-  executor
-});
-const organizationsAttributes = Object.assign(Object.create(null), {
-  organization_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "gcp_application_third_party_vulnerabilities"
+    },
+    tags: Object.assign(Object.create(null), {
+      omit: true,
+      behavior: ["-*"]
+    })
   },
-  name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const organizationsCodec = recordCodec({
+  executor: executor
+};
+const gcpApplicationThirdPartyVulnerabilitiesCodec = recordCodec(spec_gcpApplicationThirdPartyVulnerabilities);
+const organizationsIdentifier = sql.identifier("polymorphic", "organizations");
+const spec_organizations = {
   name: "organizations",
-  identifier: sql.identifier("polymorphic", "organizations"),
-  attributes: organizationsAttributes,
+  identifier: organizationsIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    organization_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -213,77 +226,67 @@ const organizationsCodec = recordCodec({
       unionMember: "PersonOrOrganization"
     })
   },
-  executor
-});
-const peopleAttributes = Object.assign(Object.create(null), {
-  person_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  username: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const extensions6 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "people"
-  },
-  tags: Object.assign(Object.create(null), {
-    unionMember: "PersonOrOrganization",
-    ref: "applications to:Application",
-    refVia: ["applications via:aws_applications", "applications via:gcp_applications"]
-  }),
-  refDefinitions: Object.assign(Object.create(null), {
-    applications: {
-      singular: false,
-      graphqlType: "Application",
-      sourceGraphqlType: undefined,
+  executor: executor
+};
+const organizationsCodec = recordCodec(spec_organizations);
+const peopleIdentifier = sql.identifier("polymorphic", "people");
+const spec_people = {
+  name: "people",
+  identifier: peopleIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    person_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
       extensions: {
-        via: undefined,
-        tags: {
-          behavior: undefined
-        }
+        tags: {}
+      }
+    },
+    username: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
       }
     }
-  })
-};
-const peopleCodec = recordCodec({
-  name: "people",
-  identifier: sql.identifier("polymorphic", "people"),
-  attributes: peopleAttributes,
+  }),
   description: undefined,
-  extensions: extensions6,
-  executor
-});
-const extensions7 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "priorities"
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "people"
+    },
+    tags: Object.assign(Object.create(null), {
+      unionMember: "PersonOrOrganization",
+      ref: "applications to:Application",
+      refVia: ["applications via:aws_applications", "applications via:gcp_applications"]
+    }),
+    refDefinitions: Object.assign(Object.create(null), {
+      applications: {
+        singular: false,
+        graphqlType: "Application",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      }
+    })
   },
-  tags: Object.assign(Object.create(null), {
-    omit: "create,update,delete,filter,order",
-    behavior: ["-insert -update -delete -filter -filterBy -order -orderBy"]
-  })
+  executor: executor
 };
-const prioritiesCodec = recordCodec({
+const peopleCodec = recordCodec(spec_people);
+const prioritiesIdentifier = sql.identifier("polymorphic", "priorities");
+const spec_priorities = {
   name: "priorities",
-  identifier: sql.identifier("polymorphic", "priorities"),
+  identifier: prioritiesIdentifier,
   attributes: Object.assign(Object.create(null), {
     id: {
       description: undefined,
@@ -305,9 +308,22 @@ const prioritiesCodec = recordCodec({
     }
   }),
   description: undefined,
-  extensions: extensions7,
-  executor
-});
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "priorities"
+    },
+    tags: Object.assign(Object.create(null), {
+      omit: "create,update,delete,filter,order",
+      behavior: ["-insert -update -delete -filter -filterBy -order -orderBy"]
+    })
+  },
+  executor: executor
+};
+const prioritiesCodec = recordCodec(spec_priorities);
+const relationalChecklistsIdentifier = sql.identifier("polymorphic", "relational_checklists");
 const itemTypeCodec = enumCodec({
   name: "itemType",
   identifier: sql.identifier("polymorphic", "item_type"),
@@ -322,140 +338,139 @@ const itemTypeCodec = enumCodec({
     tags: Object.create(null)
   }
 });
-const relationalChecklistsAttributes = Object.assign(Object.create(null), {
-  checklist_item_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  title: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  id: {
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyChecklistItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: {}
-    }
-  },
-  type: {
-    codec: itemTypeCodec,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyChecklistItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: {}
-    }
-  },
-  parent_id: {
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    via: "relationalItemsByMyChecklistItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: {}
-    }
-  },
-  root_topic_id: {
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    via: "relationalItemsByMyChecklistItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: {}
-    }
-  },
-  author_id: {
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    via: "relationalItemsByMyChecklistItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: {}
-    }
-  },
-  position: {
-    codec: TYPES.bigint,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyChecklistItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: {}
-    }
-  },
-  created_at: {
-    codec: TYPES.timestamptz,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyChecklistItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: {}
-    }
-  },
-  updated_at: {
-    codec: TYPES.timestamptz,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyChecklistItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: {}
-    }
-  },
-  is_explicitly_archived: {
-    codec: TYPES.boolean,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyChecklistItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: {}
-    }
-  },
-  archived_at: {
-    codec: TYPES.timestamptz,
-    notNull: false,
-    hasDefault: false,
-    via: "relationalItemsByMyChecklistItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const relationalChecklistsCodec = recordCodec({
+const spec_relationalChecklists = {
   name: "relationalChecklists",
-  identifier: sql.identifier("polymorphic", "relational_checklists"),
-  attributes: relationalChecklistsAttributes,
+  identifier: relationalChecklistsIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    checklist_item_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    title: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: {}
+      }
+    },
+    type: {
+      codec: itemTypeCodec,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: {}
+      }
+    },
+    parent_id: {
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: {}
+      }
+    },
+    root_topic_id: {
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: {}
+      }
+    },
+    author_id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: {}
+      }
+    },
+    position: {
+      codec: TYPES.bigint,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: {}
+      }
+    },
+    created_at: {
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: {}
+      }
+    },
+    updated_at: {
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: {}
+      }
+    },
+    is_explicitly_archived: {
+      codec: TYPES.boolean,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: {}
+      }
+    },
+    archived_at: {
+      codec: TYPES.timestamptz,
+      notNull: false,
+      hasDefault: false,
+      via: "relationalItemsByMyChecklistItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -467,32 +482,33 @@ const relationalChecklistsCodec = recordCodec({
     tags: Object.create(null),
     relationalInterfaceCodecName: "relationalItems"
   },
-  executor
-});
-const relationalItemRelationCompositePksAttributes = Object.assign(Object.create(null), {
-  parent_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  child_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const relationalItemRelationCompositePksCodec = recordCodec({
+  executor: executor
+};
+const relationalChecklistsCodec = recordCodec(spec_relationalChecklists);
+const relationalItemRelationCompositePksIdentifier = sql.identifier("polymorphic", "relational_item_relation_composite_pks");
+const spec_relationalItemRelationCompositePks = {
   name: "relationalItemRelationCompositePks",
-  identifier: sql.identifier("polymorphic", "relational_item_relation_composite_pks"),
-  attributes: relationalItemRelationCompositePksAttributes,
+  identifier: relationalItemRelationCompositePksIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    parent_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    child_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -503,142 +519,143 @@ const relationalItemRelationCompositePksCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const relationalTopicsAttributes = Object.assign(Object.create(null), {
-  topic_item_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  title: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  id: {
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyTopicItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.id.extensions.tags
-    }
-  },
-  type: {
-    codec: itemTypeCodec,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyTopicItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.type.extensions.tags
-    }
-  },
-  parent_id: {
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    via: "relationalItemsByMyTopicItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.parent_id.extensions.tags
-    }
-  },
-  root_topic_id: {
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    via: "relationalItemsByMyTopicItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.root_topic_id.extensions.tags
-    }
-  },
-  author_id: {
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    via: "relationalItemsByMyTopicItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.author_id.extensions.tags
-    }
-  },
-  position: {
-    codec: TYPES.bigint,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyTopicItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.position.extensions.tags
-    }
-  },
-  created_at: {
-    codec: TYPES.timestamptz,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyTopicItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.created_at.extensions.tags
-    }
-  },
-  updated_at: {
-    codec: TYPES.timestamptz,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyTopicItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.updated_at.extensions.tags
-    }
-  },
-  is_explicitly_archived: {
-    codec: TYPES.boolean,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyTopicItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.is_explicitly_archived.extensions.tags
-    }
-  },
-  archived_at: {
-    codec: TYPES.timestamptz,
-    notNull: false,
-    hasDefault: false,
-    via: "relationalItemsByMyTopicItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.archived_at.extensions.tags
-    }
-  }
-});
-const relationalTopicsCodec = recordCodec({
+  executor: executor
+};
+const relationalItemRelationCompositePksCodec = recordCodec(spec_relationalItemRelationCompositePks);
+const relationalTopicsIdentifier = sql.identifier("polymorphic", "relational_topics");
+const spec_relationalTopics = {
   name: "relationalTopics",
-  identifier: sql.identifier("polymorphic", "relational_topics"),
-  attributes: relationalTopicsAttributes,
+  identifier: relationalTopicsIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    topic_item_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    title: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.id.extensions.tags
+      }
+    },
+    type: {
+      codec: itemTypeCodec,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.type.extensions.tags
+      }
+    },
+    parent_id: {
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.parent_id.extensions.tags
+      }
+    },
+    root_topic_id: {
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.root_topic_id.extensions.tags
+      }
+    },
+    author_id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.author_id.extensions.tags
+      }
+    },
+    position: {
+      codec: TYPES.bigint,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.position.extensions.tags
+      }
+    },
+    created_at: {
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.created_at.extensions.tags
+      }
+    },
+    updated_at: {
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.updated_at.extensions.tags
+      }
+    },
+    is_explicitly_archived: {
+      codec: TYPES.boolean,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.is_explicitly_archived.extensions.tags
+      }
+    },
+    archived_at: {
+      codec: TYPES.timestamptz,
+      notNull: false,
+      hasDefault: false,
+      via: "relationalItemsByMyTopicItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.archived_at.extensions.tags
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -650,32 +667,33 @@ const relationalTopicsCodec = recordCodec({
     tags: Object.create(null),
     relationalInterfaceCodecName: "relationalItems"
   },
-  executor
-});
-const singleTableItemRelationCompositePksAttributes = Object.assign(Object.create(null), {
-  parent_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  child_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const singleTableItemRelationCompositePksCodec = recordCodec({
+  executor: executor
+};
+const relationalTopicsCodec = recordCodec(spec_relationalTopics);
+const singleTableItemRelationCompositePksIdentifier = sql.identifier("polymorphic", "single_table_item_relation_composite_pks");
+const spec_singleTableItemRelationCompositePks = {
   name: "singleTableItemRelationCompositePks",
-  identifier: sql.identifier("polymorphic", "single_table_item_relation_composite_pks"),
-  attributes: singleTableItemRelationCompositePksAttributes,
+  identifier: singleTableItemRelationCompositePksIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    parent_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    child_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -686,151 +704,152 @@ const singleTableItemRelationCompositePksCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const relationalChecklistItemsAttributes = Object.assign(Object.create(null), {
-  checklist_item_item_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  description: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  note: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  id: {
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyChecklistItemItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.id.extensions.tags
-    }
-  },
-  type: {
-    codec: itemTypeCodec,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyChecklistItemItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.type.extensions.tags
-    }
-  },
-  parent_id: {
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    via: "relationalItemsByMyChecklistItemItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.parent_id.extensions.tags
-    }
-  },
-  root_topic_id: {
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    via: "relationalItemsByMyChecklistItemItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.root_topic_id.extensions.tags
-    }
-  },
-  author_id: {
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    via: "relationalItemsByMyChecklistItemItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.author_id.extensions.tags
-    }
-  },
-  position: {
-    codec: TYPES.bigint,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyChecklistItemItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.position.extensions.tags
-    }
-  },
-  created_at: {
-    codec: TYPES.timestamptz,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyChecklistItemItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.created_at.extensions.tags
-    }
-  },
-  updated_at: {
-    codec: TYPES.timestamptz,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyChecklistItemItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.updated_at.extensions.tags
-    }
-  },
-  is_explicitly_archived: {
-    codec: TYPES.boolean,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyChecklistItemItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.is_explicitly_archived.extensions.tags
-    }
-  },
-  archived_at: {
-    codec: TYPES.timestamptz,
-    notNull: false,
-    hasDefault: false,
-    via: "relationalItemsByMyChecklistItemItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.archived_at.extensions.tags
-    }
-  }
-});
-const relationalChecklistItemsCodec = recordCodec({
+  executor: executor
+};
+const singleTableItemRelationCompositePksCodec = recordCodec(spec_singleTableItemRelationCompositePks);
+const relationalChecklistItemsIdentifier = sql.identifier("polymorphic", "relational_checklist_items");
+const spec_relationalChecklistItems = {
   name: "relationalChecklistItems",
-  identifier: sql.identifier("polymorphic", "relational_checklist_items"),
-  attributes: relationalChecklistItemsAttributes,
+  identifier: relationalChecklistItemsIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    checklist_item_item_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    description: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    note: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.id.extensions.tags
+      }
+    },
+    type: {
+      codec: itemTypeCodec,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.type.extensions.tags
+      }
+    },
+    parent_id: {
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.parent_id.extensions.tags
+      }
+    },
+    root_topic_id: {
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.root_topic_id.extensions.tags
+      }
+    },
+    author_id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.author_id.extensions.tags
+      }
+    },
+    position: {
+      codec: TYPES.bigint,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.position.extensions.tags
+      }
+    },
+    created_at: {
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.created_at.extensions.tags
+      }
+    },
+    updated_at: {
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.updated_at.extensions.tags
+      }
+    },
+    is_explicitly_archived: {
+      codec: TYPES.boolean,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.is_explicitly_archived.extensions.tags
+      }
+    },
+    archived_at: {
+      codec: TYPES.timestamptz,
+      notNull: false,
+      hasDefault: false,
+      via: "relationalItemsByMyChecklistItemItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.archived_at.extensions.tags
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -842,151 +861,152 @@ const relationalChecklistItemsCodec = recordCodec({
     tags: Object.create(null),
     relationalInterfaceCodecName: "relationalItems"
   },
-  executor
-});
-const relationalDividersAttributes = Object.assign(Object.create(null), {
-  divider_item_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  title: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  color: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  id: {
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyDividerItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.id.extensions.tags
-    }
-  },
-  type: {
-    codec: itemTypeCodec,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyDividerItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.type.extensions.tags
-    }
-  },
-  parent_id: {
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    via: "relationalItemsByMyDividerItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.parent_id.extensions.tags
-    }
-  },
-  root_topic_id: {
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    via: "relationalItemsByMyDividerItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.root_topic_id.extensions.tags
-    }
-  },
-  author_id: {
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    via: "relationalItemsByMyDividerItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.author_id.extensions.tags
-    }
-  },
-  position: {
-    codec: TYPES.bigint,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyDividerItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.position.extensions.tags
-    }
-  },
-  created_at: {
-    codec: TYPES.timestamptz,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyDividerItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.created_at.extensions.tags
-    }
-  },
-  updated_at: {
-    codec: TYPES.timestamptz,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyDividerItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.updated_at.extensions.tags
-    }
-  },
-  is_explicitly_archived: {
-    codec: TYPES.boolean,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyDividerItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.is_explicitly_archived.extensions.tags
-    }
-  },
-  archived_at: {
-    codec: TYPES.timestamptz,
-    notNull: false,
-    hasDefault: false,
-    via: "relationalItemsByMyDividerItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.archived_at.extensions.tags
-    }
-  }
-});
-const relationalDividersCodec = recordCodec({
+  executor: executor
+};
+const relationalChecklistItemsCodec = recordCodec(spec_relationalChecklistItems);
+const relationalDividersIdentifier = sql.identifier("polymorphic", "relational_dividers");
+const spec_relationalDividers = {
   name: "relationalDividers",
-  identifier: sql.identifier("polymorphic", "relational_dividers"),
-  attributes: relationalDividersAttributes,
+  identifier: relationalDividersIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    divider_item_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    title: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    color: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.id.extensions.tags
+      }
+    },
+    type: {
+      codec: itemTypeCodec,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.type.extensions.tags
+      }
+    },
+    parent_id: {
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.parent_id.extensions.tags
+      }
+    },
+    root_topic_id: {
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.root_topic_id.extensions.tags
+      }
+    },
+    author_id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.author_id.extensions.tags
+      }
+    },
+    position: {
+      codec: TYPES.bigint,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.position.extensions.tags
+      }
+    },
+    created_at: {
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.created_at.extensions.tags
+      }
+    },
+    updated_at: {
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.updated_at.extensions.tags
+      }
+    },
+    is_explicitly_archived: {
+      codec: TYPES.boolean,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.is_explicitly_archived.extensions.tags
+      }
+    },
+    archived_at: {
+      codec: TYPES.timestamptz,
+      notNull: false,
+      hasDefault: false,
+      via: "relationalItemsByMyDividerItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.archived_at.extensions.tags
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -998,41 +1018,42 @@ const relationalDividersCodec = recordCodec({
     tags: Object.create(null),
     relationalInterfaceCodecName: "relationalItems"
   },
-  executor
-});
-const relationalItemRelationsAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  parent_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  child_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const relationalItemRelationsCodec = recordCodec({
+  executor: executor
+};
+const relationalDividersCodec = recordCodec(spec_relationalDividers);
+const relationalItemRelationsIdentifier = sql.identifier("polymorphic", "relational_item_relations");
+const spec_relationalItemRelations = {
   name: "relationalItemRelations",
-  identifier: sql.identifier("polymorphic", "relational_item_relations"),
-  attributes: relationalItemRelationsAttributes,
+  identifier: relationalItemRelationsIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    parent_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    child_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -1043,41 +1064,42 @@ const relationalItemRelationsCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const singleTableItemRelationsAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  parent_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  child_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const singleTableItemRelationsCodec = recordCodec({
+  executor: executor
+};
+const relationalItemRelationsCodec = recordCodec(spec_relationalItemRelations);
+const singleTableItemRelationsIdentifier = sql.identifier("polymorphic", "single_table_item_relations");
+const spec_singleTableItemRelations = {
   name: "singleTableItemRelations",
-  identifier: sql.identifier("polymorphic", "single_table_item_relations"),
-  attributes: singleTableItemRelationsAttributes,
+  identifier: singleTableItemRelationsIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    parent_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    child_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -1088,231 +1110,232 @@ const singleTableItemRelationsCodec = recordCodec({
     },
     tags: Object.create(null)
   },
-  executor
-});
-const logEntriesAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  person_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  organization_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  text: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const extensions17 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "log_entries"
-  },
-  tags: Object.assign(Object.create(null), {
-    ref: "author to:PersonOrOrganization singular",
-    refVia: ["author via:people", "author via:organizations"]
-  }),
-  refDefinitions: Object.assign(Object.create(null), {
-    author: {
-      singular: true,
-      graphqlType: "PersonOrOrganization",
-      sourceGraphqlType: undefined,
+  executor: executor
+};
+const singleTableItemRelationsCodec = recordCodec(spec_singleTableItemRelations);
+const logEntriesIdentifier = sql.identifier("polymorphic", "log_entries");
+const spec_logEntries = {
+  name: "logEntries",
+  identifier: logEntriesIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
       extensions: {
-        via: undefined,
-        tags: {
-          behavior: undefined
-        }
+        tags: {}
+      }
+    },
+    person_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    organization_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    text: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
       }
     }
-  })
-};
-const logEntriesCodec = recordCodec({
-  name: "logEntries",
-  identifier: sql.identifier("polymorphic", "log_entries"),
-  attributes: logEntriesAttributes,
+  }),
   description: undefined,
-  extensions: extensions17,
-  executor
-});
-const relationalPostsAttributes = Object.assign(Object.create(null), {
-  post_item_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "log_entries"
+    },
+    tags: Object.assign(Object.create(null), {
+      ref: "author to:PersonOrOrganization singular",
+      refVia: ["author via:people", "author via:organizations"]
+    }),
+    refDefinitions: Object.assign(Object.create(null), {
+      author: {
+        singular: true,
+        graphqlType: "PersonOrOrganization",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      }
+    })
   },
-  title: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  description: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  note: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  id: {
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyPostItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.id.extensions.tags
-    }
-  },
-  type: {
-    codec: itemTypeCodec,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyPostItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.type.extensions.tags
-    }
-  },
-  parent_id: {
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    via: "relationalItemsByMyPostItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.parent_id.extensions.tags
-    }
-  },
-  root_topic_id: {
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    via: "relationalItemsByMyPostItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.root_topic_id.extensions.tags
-    }
-  },
-  author_id: {
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    via: "relationalItemsByMyPostItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.author_id.extensions.tags
-    }
-  },
-  position: {
-    codec: TYPES.bigint,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyPostItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.position.extensions.tags
-    }
-  },
-  created_at: {
-    codec: TYPES.timestamptz,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyPostItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.created_at.extensions.tags
-    }
-  },
-  updated_at: {
-    codec: TYPES.timestamptz,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyPostItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.updated_at.extensions.tags
-    }
-  },
-  is_explicitly_archived: {
-    codec: TYPES.boolean,
-    notNull: true,
-    hasDefault: true,
-    via: "relationalItemsByMyPostItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.is_explicitly_archived.extensions.tags
-    }
-  },
-  archived_at: {
-    codec: TYPES.timestamptz,
-    notNull: false,
-    hasDefault: false,
-    via: "relationalItemsByMyPostItemId",
-    restrictedAccess: undefined,
-    description: undefined,
-    extensions: {
-      tags: relationalChecklistsAttributes.archived_at.extensions.tags
-    }
-  }
-});
-const relationalPostsCodec = recordCodec({
+  executor: executor
+};
+const logEntriesCodec = recordCodec(spec_logEntries);
+const relationalPostsIdentifier = sql.identifier("polymorphic", "relational_posts");
+const spec_relationalPosts = {
   name: "relationalPosts",
-  identifier: sql.identifier("polymorphic", "relational_posts"),
-  attributes: relationalPostsAttributes,
+  identifier: relationalPostsIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    post_item_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    title: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    description: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    note: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.id.extensions.tags
+      }
+    },
+    type: {
+      codec: itemTypeCodec,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.type.extensions.tags
+      }
+    },
+    parent_id: {
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.parent_id.extensions.tags
+      }
+    },
+    root_topic_id: {
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.root_topic_id.extensions.tags
+      }
+    },
+    author_id: {
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.author_id.extensions.tags
+      }
+    },
+    position: {
+      codec: TYPES.bigint,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.position.extensions.tags
+      }
+    },
+    created_at: {
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.created_at.extensions.tags
+      }
+    },
+    updated_at: {
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.updated_at.extensions.tags
+      }
+    },
+    is_explicitly_archived: {
+      codec: TYPES.boolean,
+      notNull: true,
+      hasDefault: true,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.is_explicitly_archived.extensions.tags
+      }
+    },
+    archived_at: {
+      codec: TYPES.timestamptz,
+      notNull: false,
+      hasDefault: false,
+      via: "relationalItemsByMyPostItemId",
+      restrictedAccess: undefined,
+      description: undefined,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.archived_at.extensions.tags
+      }
+    }
+  }),
   description: undefined,
   extensions: {
     isTableLike: true,
@@ -1324,763 +1347,982 @@ const relationalPostsCodec = recordCodec({
     tags: Object.create(null),
     relationalInterfaceCodecName: "relationalItems"
   },
-  executor
-});
-const firstPartyVulnerabilitiesAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  cvss_score: {
-    description: undefined,
-    codec: TYPES.float,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  team_name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const extensions19 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "first_party_vulnerabilities"
-  },
-  tags: Object.assign(Object.create(null), {
-    implements: "Vulnerability",
-    ref: ["applications to:Application plural", "owners to:PersonOrOrganization plural"],
-    refVia: ["applications via:aws_application_first_party_vulnerabilities;aws_applications", "applications via:gcp_application_first_party_vulnerabilities;gcp_applications", "owners via:aws_application_first_party_vulnerabilities;aws_applications;people", "owners via:aws_application_first_party_vulnerabilities;aws_applications;organizations", "owners via:gcp_application_first_party_vulnerabilities;gcp_applications;people", "owners via:gcp_application_first_party_vulnerabilities;gcp_applications;organizations"]
-  }),
-  refDefinitions: Object.assign(Object.create(null), {
-    applications: {
-      singular: false,
-      graphqlType: "Application",
-      sourceGraphqlType: undefined,
-      extensions: {
-        via: undefined,
-        tags: {
-          behavior: undefined
-        }
-      }
-    },
-    owners: {
-      singular: false,
-      graphqlType: "PersonOrOrganization",
-      sourceGraphqlType: undefined,
-      extensions: {
-        via: undefined,
-        tags: {
-          behavior: undefined
-        }
-      }
-    }
-  })
+  executor: executor
 };
-const firstPartyVulnerabilitiesCodec = recordCodec({
+const relationalPostsCodec = recordCodec(spec_relationalPosts);
+const firstPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "first_party_vulnerabilities");
+const spec_firstPartyVulnerabilities = {
   name: "firstPartyVulnerabilities",
-  identifier: sql.identifier("polymorphic", "first_party_vulnerabilities"),
-  attributes: firstPartyVulnerabilitiesAttributes,
-  description: undefined,
-  extensions: extensions19,
-  executor
-});
-const thirdPartyVulnerabilitiesAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  cvss_score: {
-    description: undefined,
-    codec: TYPES.float,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  vendor_name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const extensions20 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "third_party_vulnerabilities"
-  },
-  tags: Object.assign(Object.create(null), {
-    implements: "Vulnerability",
-    ref: ["applications to:Application plural", "owners to:PersonOrOrganization plural"],
-    refVia: ["applications via:aws_application_third_party_vulnerabilities;aws_applications", "applications via:gcp_application_third_party_vulnerabilities;gcp_applications", "owners via:aws_application_third_party_vulnerabilities;aws_applications;people", "owners via:aws_application_third_party_vulnerabilities;aws_applications;organizations", "owners via:gcp_application_third_party_vulnerabilities;gcp_applications;people", "owners via:gcp_application_third_party_vulnerabilities;gcp_applications;organizations"]
-  }),
-  refDefinitions: Object.assign(Object.create(null), {
-    applications: {
-      singular: false,
-      graphqlType: "Application",
-      sourceGraphqlType: undefined,
+  identifier: firstPartyVulnerabilitiesIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
       extensions: {
-        via: undefined,
-        tags: {
-          behavior: undefined
-        }
+        tags: {}
       }
     },
-    owners: {
-      singular: false,
-      graphqlType: "PersonOrOrganization",
-      sourceGraphqlType: undefined,
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
       extensions: {
-        via: undefined,
-        tags: {
-          behavior: undefined
-        }
+        tags: {}
+      }
+    },
+    cvss_score: {
+      description: undefined,
+      codec: TYPES.float,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    team_name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
       }
     }
-  })
+  }),
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "first_party_vulnerabilities"
+    },
+    tags: Object.assign(Object.create(null), {
+      implements: "Vulnerability",
+      ref: ["applications to:Application plural", "owners to:PersonOrOrganization plural"],
+      refVia: ["applications via:aws_application_first_party_vulnerabilities;aws_applications", "applications via:gcp_application_first_party_vulnerabilities;gcp_applications", "owners via:aws_application_first_party_vulnerabilities;aws_applications;people", "owners via:aws_application_first_party_vulnerabilities;aws_applications;organizations", "owners via:gcp_application_first_party_vulnerabilities;gcp_applications;people", "owners via:gcp_application_first_party_vulnerabilities;gcp_applications;organizations"]
+    }),
+    refDefinitions: Object.assign(Object.create(null), {
+      applications: {
+        singular: false,
+        graphqlType: "Application",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      },
+      owners: {
+        singular: false,
+        graphqlType: "PersonOrOrganization",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      }
+    })
+  },
+  executor: executor
 };
-const thirdPartyVulnerabilitiesCodec = recordCodec({
+const firstPartyVulnerabilitiesCodec = recordCodec(spec_firstPartyVulnerabilities);
+const thirdPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "third_party_vulnerabilities");
+const spec_thirdPartyVulnerabilities = {
   name: "thirdPartyVulnerabilities",
-  identifier: sql.identifier("polymorphic", "third_party_vulnerabilities"),
-  attributes: thirdPartyVulnerabilitiesAttributes,
-  description: undefined,
-  extensions: extensions20,
-  executor
-});
-const awsApplicationsAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  last_deployed: {
-    description: undefined,
-    codec: TYPES.timestamptz,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  person_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  organization_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  aws_id: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const extensions21 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "aws_applications"
-  },
-  tags: Object.assign(Object.create(null), {
-    implements: "Application",
-    ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"],
-    refVia: ["vulnerabilities via:(id)->aws_application_first_party_vulnerabilities(aws_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)", "vulnerabilities via:(id)->aws_application_third_party_vulnerabilities(aws_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)", "owner via:people", "owner via:organizations"]
-  }),
-  refDefinitions: Object.assign(Object.create(null), {
-    vulnerabilities: {
-      singular: false,
-      graphqlType: "Vulnerability",
-      sourceGraphqlType: undefined,
+  identifier: thirdPartyVulnerabilitiesIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
       extensions: {
-        via: undefined,
-        tags: {
-          behavior: undefined
-        }
+        tags: {}
       }
     },
-    owner: {
-      singular: true,
-      graphqlType: "PersonOrOrganization",
-      sourceGraphqlType: undefined,
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
       extensions: {
-        via: undefined,
-        tags: {
-          behavior: undefined
-        }
+        tags: {}
+      }
+    },
+    cvss_score: {
+      description: undefined,
+      codec: TYPES.float,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    vendor_name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
       }
     }
-  })
+  }),
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "third_party_vulnerabilities"
+    },
+    tags: Object.assign(Object.create(null), {
+      implements: "Vulnerability",
+      ref: ["applications to:Application plural", "owners to:PersonOrOrganization plural"],
+      refVia: ["applications via:aws_application_third_party_vulnerabilities;aws_applications", "applications via:gcp_application_third_party_vulnerabilities;gcp_applications", "owners via:aws_application_third_party_vulnerabilities;aws_applications;people", "owners via:aws_application_third_party_vulnerabilities;aws_applications;organizations", "owners via:gcp_application_third_party_vulnerabilities;gcp_applications;people", "owners via:gcp_application_third_party_vulnerabilities;gcp_applications;organizations"]
+    }),
+    refDefinitions: Object.assign(Object.create(null), {
+      applications: {
+        singular: false,
+        graphqlType: "Application",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      },
+      owners: {
+        singular: false,
+        graphqlType: "PersonOrOrganization",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      }
+    })
+  },
+  executor: executor
 };
-const awsApplicationsCodec = recordCodec({
+const thirdPartyVulnerabilitiesCodec = recordCodec(spec_thirdPartyVulnerabilities);
+const awsApplicationsIdentifier = sql.identifier("polymorphic", "aws_applications");
+const spec_awsApplications = {
   name: "awsApplications",
-  identifier: sql.identifier("polymorphic", "aws_applications"),
-  attributes: awsApplicationsAttributes,
-  description: undefined,
-  extensions: extensions21,
-  executor
-});
-const gcpApplicationsAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  last_deployed: {
-    description: undefined,
-    codec: TYPES.timestamptz,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  person_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  organization_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  gcp_id: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const extensions22 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "gcp_applications"
-  },
-  tags: Object.assign(Object.create(null), {
-    implements: "Application",
-    ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"],
-    refVia: ["vulnerabilities via:(id)->gcp_application_first_party_vulnerabilities(gcp_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)", "vulnerabilities via:(id)->gcp_application_third_party_vulnerabilities(gcp_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)", "owner via:people", "owner via:organizations"]
-  }),
-  refDefinitions: Object.assign(Object.create(null), {
-    vulnerabilities: {
-      singular: false,
-      graphqlType: "Vulnerability",
-      sourceGraphqlType: undefined,
+  identifier: awsApplicationsIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
       extensions: {
-        via: undefined,
-        tags: {
-          behavior: undefined
-        }
+        tags: {}
       }
     },
-    owner: {
-      singular: true,
-      graphqlType: "PersonOrOrganization",
-      sourceGraphqlType: undefined,
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
       extensions: {
-        via: undefined,
-        tags: {
-          behavior: undefined
-        }
+        tags: {}
+      }
+    },
+    last_deployed: {
+      description: undefined,
+      codec: TYPES.timestamptz,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    person_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    organization_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    aws_id: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
       }
     }
-  })
+  }),
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "aws_applications"
+    },
+    tags: Object.assign(Object.create(null), {
+      implements: "Application",
+      ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"],
+      refVia: ["vulnerabilities via:(id)->aws_application_first_party_vulnerabilities(aws_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)", "vulnerabilities via:(id)->aws_application_third_party_vulnerabilities(aws_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)", "owner via:people", "owner via:organizations"]
+    }),
+    refDefinitions: Object.assign(Object.create(null), {
+      vulnerabilities: {
+        singular: false,
+        graphqlType: "Vulnerability",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      },
+      owner: {
+        singular: true,
+        graphqlType: "PersonOrOrganization",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      }
+    })
+  },
+  executor: executor
 };
-const gcpApplicationsCodec = recordCodec({
+const awsApplicationsCodec = recordCodec(spec_awsApplications);
+const gcpApplicationsIdentifier = sql.identifier("polymorphic", "gcp_applications");
+const spec_gcpApplications = {
   name: "gcpApplications",
-  identifier: sql.identifier("polymorphic", "gcp_applications"),
-  attributes: gcpApplicationsAttributes,
-  description: undefined,
-  extensions: extensions22,
-  executor
-});
-const singleTableItemsAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  type: {
-    description: undefined,
-    codec: itemTypeCodec,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  parent_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  root_topic_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  author_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  position: {
-    description: undefined,
-    codec: TYPES.bigint,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  created_at: {
-    description: undefined,
-    codec: TYPES.timestamptz,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  updated_at: {
-    description: undefined,
-    codec: TYPES.timestamptz,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  is_explicitly_archived: {
-    description: undefined,
-    codec: TYPES.boolean,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: {}
-    }
-  },
-  archived_at: {
-    description: undefined,
-    codec: TYPES.timestamptz,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  title: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  description: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  note: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  color: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  priority_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
-const extensions23 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "single_table_items"
-  },
-  tags: Object.assign(Object.create(null), {
-    interface: "mode:single type:type",
-    type: ["TOPIC name:SingleTableTopic attributes:title!", "POST name:SingleTablePost attributes:title>subject,description,note,priority_id", "DIVIDER name:SingleTableDivider attributes:title,color", "CHECKLIST name:SingleTableChecklist attributes:title", "CHECKLIST_ITEM name:SingleTableChecklistItem attributes:description,note,priority_id"],
-    ref: ["rootTopic to:SingleTableTopic singular via:(root_topic_id)->polymorphic.single_table_items(id)", "rootChecklistTopic from:SingleTableChecklist to:SingleTableTopic singular via:(root_topic_id)->polymorphic.single_table_items(id)"]
-  }),
-  refDefinitions: Object.assign(Object.create(null), {
-    rootTopic: {
-      singular: true,
-      graphqlType: "SingleTableTopic",
-      sourceGraphqlType: undefined,
+  identifier: gcpApplicationsIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
       extensions: {
-        via: "(root_topic_id)->polymorphic.single_table_items(id)",
+        tags: {}
+      }
+    },
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    last_deployed: {
+      description: undefined,
+      codec: TYPES.timestamptz,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    person_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    organization_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    gcp_id: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "gcp_applications"
+    },
+    tags: Object.assign(Object.create(null), {
+      implements: "Application",
+      ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"],
+      refVia: ["vulnerabilities via:(id)->gcp_application_first_party_vulnerabilities(gcp_application_id);(first_party_vulnerability_id)->first_party_vulnerabilities(id)", "vulnerabilities via:(id)->gcp_application_third_party_vulnerabilities(gcp_application_id);(third_party_vulnerability_id)->third_party_vulnerabilities(id)", "owner via:people", "owner via:organizations"]
+    }),
+    refDefinitions: Object.assign(Object.create(null), {
+      vulnerabilities: {
+        singular: false,
+        graphqlType: "Vulnerability",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      },
+      owner: {
+        singular: true,
+        graphqlType: "PersonOrOrganization",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      }
+    })
+  },
+  executor: executor
+};
+const gcpApplicationsCodec = recordCodec(spec_gcpApplications);
+const singleTableItemsIdentifier = sql.identifier("polymorphic", "single_table_items");
+const spec_singleTableItems = {
+  name: "singleTableItems",
+  identifier: singleTableItemsIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    type: {
+      description: undefined,
+      codec: itemTypeCodec,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    parent_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    root_topic_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    author_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    position: {
+      description: undefined,
+      codec: TYPES.bigint,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    created_at: {
+      description: undefined,
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    updated_at: {
+      description: undefined,
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    is_explicitly_archived: {
+      description: undefined,
+      codec: TYPES.boolean,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    archived_at: {
+      description: undefined,
+      codec: TYPES.timestamptz,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    title: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    description: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    note: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    color: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    priority_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "single_table_items"
+    },
+    tags: Object.assign(Object.create(null), {
+      interface: "mode:single type:type",
+      type: ["TOPIC name:SingleTableTopic attributes:title!", "POST name:SingleTablePost attributes:title>subject,description,note,priority_id", "DIVIDER name:SingleTableDivider attributes:title,color", "CHECKLIST name:SingleTableChecklist attributes:title", "CHECKLIST_ITEM name:SingleTableChecklistItem attributes:description,note,priority_id"],
+      ref: ["rootTopic to:SingleTableTopic singular via:(root_topic_id)->polymorphic.single_table_items(id)", "rootChecklistTopic from:SingleTableChecklist to:SingleTableTopic singular via:(root_topic_id)->polymorphic.single_table_items(id)"]
+    }),
+    refDefinitions: Object.assign(Object.create(null), {
+      rootTopic: {
+        singular: true,
+        graphqlType: "SingleTableTopic",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: "(root_topic_id)->polymorphic.single_table_items(id)",
+          tags: {
+            behavior: undefined
+          }
+        }
+      },
+      rootChecklistTopic: {
+        singular: true,
+        graphqlType: "SingleTableTopic",
+        sourceGraphqlType: "SingleTableChecklist",
+        extensions: {
+          via: "(root_topic_id)->polymorphic.single_table_items(id)",
+          tags: {
+            behavior: undefined
+          }
+        }
+      }
+    })
+  },
+  executor: executor,
+  polymorphism: {
+    mode: "single",
+    commonAttributes: ["id", "type", "parent_id", "root_topic_id", "author_id", "position", "created_at", "updated_at", "is_explicitly_archived", "archived_at"],
+    typeAttributes: ["type"],
+    types: Object.assign(Object.create(null), {
+      TOPIC: {
+        name: "SingleTableTopic",
+        attributes: [{
+          attribute: "title",
+          isNotNull: true,
+          rename: undefined
+        }]
+      },
+      POST: {
+        name: "SingleTablePost",
+        attributes: [{
+          attribute: "title",
+          isNotNull: false,
+          rename: "subject"
+        }, {
+          attribute: "description",
+          isNotNull: false,
+          rename: undefined
+        }, {
+          attribute: "note",
+          isNotNull: false,
+          rename: undefined
+        }, {
+          attribute: "priority_id",
+          isNotNull: false,
+          rename: undefined
+        }]
+      },
+      DIVIDER: {
+        name: "SingleTableDivider",
+        attributes: [{
+          attribute: "title",
+          isNotNull: false,
+          rename: undefined
+        }, {
+          attribute: "color",
+          isNotNull: false,
+          rename: undefined
+        }]
+      },
+      CHECKLIST: {
+        name: "SingleTableChecklist",
+        attributes: [{
+          attribute: "title",
+          isNotNull: false,
+          rename: undefined
+        }]
+      },
+      CHECKLIST_ITEM: {
+        name: "SingleTableChecklistItem",
+        attributes: [{
+          attribute: "description",
+          isNotNull: false,
+          rename: undefined
+        }, {
+          attribute: "note",
+          isNotNull: false,
+          rename: undefined
+        }, {
+          attribute: "priority_id",
+          isNotNull: false,
+          rename: undefined
+        }]
+      }
+    })
+  }
+};
+const singleTableItemsCodec = recordCodec(spec_singleTableItems);
+const relationalItemsIdentifier = sql.identifier("polymorphic", "relational_items");
+const spec_relationalItems = {
+  name: "relationalItems",
+  identifier: relationalItemsIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.id.extensions.tags
+      }
+    },
+    type: {
+      description: undefined,
+      codec: itemTypeCodec,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.type.extensions.tags
+      }
+    },
+    parent_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.parent_id.extensions.tags
+      }
+    },
+    root_topic_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.root_topic_id.extensions.tags
+      }
+    },
+    author_id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.author_id.extensions.tags
+      }
+    },
+    position: {
+      description: undefined,
+      codec: TYPES.bigint,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.position.extensions.tags
+      }
+    },
+    created_at: {
+      description: undefined,
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.created_at.extensions.tags
+      }
+    },
+    updated_at: {
+      description: undefined,
+      codec: TYPES.timestamptz,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.updated_at.extensions.tags
+      }
+    },
+    is_explicitly_archived: {
+      description: undefined,
+      codec: TYPES.boolean,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.is_explicitly_archived.extensions.tags
+      }
+    },
+    archived_at: {
+      description: undefined,
+      codec: TYPES.timestamptz,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: spec_relationalChecklists.attributes.archived_at.extensions.tags
+      }
+    }
+  }),
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "relational_items"
+    },
+    tags: Object.assign(Object.create(null), {
+      interface: "mode:relational",
+      type: ["TOPIC references:relational_topics", "POST references:relational_posts", "DIVIDER references:relational_dividers", "CHECKLIST references:relational_checklists", "CHECKLIST_ITEM references:relational_checklist_items"]
+    })
+  },
+  executor: executor,
+  polymorphism: {
+    mode: "relational",
+    typeAttributes: ["type"],
+    types: Object.assign(Object.create(null), {
+      TOPIC: {
+        name: "RelationalTopic",
+        references: "relational_topics",
+        relationName: "relationalTopicsByTheirTopicItemId"
+      },
+      POST: {
+        name: "RelationalPost",
+        references: "relational_posts",
+        relationName: "relationalPostsByTheirPostItemId"
+      },
+      DIVIDER: {
+        name: "RelationalDivider",
+        references: "relational_dividers",
+        relationName: "relationalDividersByTheirDividerItemId"
+      },
+      CHECKLIST: {
+        name: "RelationalChecklist",
+        references: "relational_checklists",
+        relationName: "relationalChecklistsByTheirChecklistItemId"
+      },
+      CHECKLIST_ITEM: {
+        name: "RelationalChecklistItem",
+        references: "relational_checklist_items",
+        relationName: "relationalChecklistItemsByTheirChecklistItemItemId"
+      }
+    })
+  }
+};
+const relationalItemsCodec = recordCodec(spec_relationalItems);
+const spec_Application = {
+  name: "Application",
+  identifier: sql.identifier("polymorphic", "applications"),
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
         tags: {
-          behavior: undefined
+          notNull: true
         }
       }
     },
-    rootChecklistTopic: {
-      singular: true,
-      graphqlType: "SingleTableTopic",
-      sourceGraphqlType: "SingleTableChecklist",
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
       extensions: {
-        via: "(root_topic_id)->polymorphic.single_table_items(id)",
         tags: {
-          behavior: undefined
+          notNull: true
+        }
+      }
+    },
+    last_deployed: {
+      description: undefined,
+      codec: TYPES.timestamptz,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
+  description: undefined,
+  extensions: {
+    isTableLike: false,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "applications"
+    },
+    tags: Object.assign(Object.create(null), {
+      interface: "mode:union",
+      name: "Application",
+      behavior: "node",
+      ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"]
+    }),
+    refDefinitions: Object.assign(Object.create(null), {
+      vulnerabilities: {
+        singular: false,
+        graphqlType: "Vulnerability",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      },
+      owner: {
+        singular: true,
+        graphqlType: "PersonOrOrganization",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      }
+    })
+  },
+  executor: executor,
+  polymorphism: {
+    mode: "union"
+  }
+};
+const spec_Vulnerability = {
+  name: "Vulnerability",
+  identifier: sql.identifier("polymorphic", "vulnerabilities"),
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          notNull: true
+        }
+      }
+    },
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          notNull: true
+        }
+      }
+    },
+    cvss_score: {
+      description: undefined,
+      codec: TYPES.float,
+      notNull: true,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          notNull: true
         }
       }
     }
-  })
-};
-const singleTableItemsCodec = recordCodec({
-  name: "singleTableItems",
-  identifier: sql.identifier("polymorphic", "single_table_items"),
-  attributes: singleTableItemsAttributes,
+  }),
   description: undefined,
-  extensions: extensions23,
-  executor
-});
-const relationalItemsAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: relationalChecklistsAttributes.id.extensions.tags
-    }
+  extensions: {
+    isTableLike: false,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "vulnerabilities"
+    },
+    tags: Object.assign(Object.create(null), {
+      interface: "mode:union",
+      name: "Vulnerability",
+      behavior: "node",
+      ref: ["applications to:Application plural", "owners to:PersonOrOrganization plural"]
+    }),
+    refDefinitions: Object.assign(Object.create(null), {
+      applications: {
+        singular: false,
+        graphqlType: "Application",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      },
+      owners: {
+        singular: false,
+        graphqlType: "PersonOrOrganization",
+        sourceGraphqlType: undefined,
+        extensions: {
+          via: undefined,
+          tags: {
+            behavior: undefined
+          }
+        }
+      }
+    })
   },
-  type: {
-    description: undefined,
-    codec: itemTypeCodec,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: relationalChecklistsAttributes.type.extensions.tags
-    }
-  },
-  parent_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: relationalChecklistsAttributes.parent_id.extensions.tags
-    }
-  },
-  root_topic_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: relationalChecklistsAttributes.root_topic_id.extensions.tags
-    }
-  },
-  author_id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: relationalChecklistsAttributes.author_id.extensions.tags
-    }
-  },
-  position: {
-    description: undefined,
-    codec: TYPES.bigint,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: relationalChecklistsAttributes.position.extensions.tags
-    }
-  },
-  created_at: {
-    description: undefined,
-    codec: TYPES.timestamptz,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: relationalChecklistsAttributes.created_at.extensions.tags
-    }
-  },
-  updated_at: {
-    description: undefined,
-    codec: TYPES.timestamptz,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: relationalChecklistsAttributes.updated_at.extensions.tags
-    }
-  },
-  is_explicitly_archived: {
-    description: undefined,
-    codec: TYPES.boolean,
-    notNull: true,
-    hasDefault: true,
-    extensions: {
-      tags: relationalChecklistsAttributes.is_explicitly_archived.extensions.tags
-    }
-  },
-  archived_at: {
-    description: undefined,
-    codec: TYPES.timestamptz,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: relationalChecklistsAttributes.archived_at.extensions.tags
-    }
+  executor: executor,
+  polymorphism: {
+    mode: "union"
   }
-});
-const extensions24 = {
-  isTableLike: true,
-  pg: {
-    serviceName: "main",
-    schemaName: "polymorphic",
-    name: "relational_items"
-  },
-  tags: Object.assign(Object.create(null), {
-    interface: "mode:relational",
-    type: ["TOPIC references:relational_topics", "POST references:relational_posts", "DIVIDER references:relational_dividers", "CHECKLIST references:relational_checklists", "CHECKLIST_ITEM references:relational_checklist_items"]
-  })
 };
-const relationalItemsCodec = recordCodec({
-  name: "relationalItems",
-  identifier: sql.identifier("polymorphic", "relational_items"),
-  attributes: relationalItemsAttributes,
+const spec_ZeroImplementation = {
+  name: "ZeroImplementation",
+  identifier: sql.identifier("polymorphic", "zero_implementation"),
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    },
+    name: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
   description: undefined,
-  extensions: extensions24,
-  executor
-});
-const ApplicationAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        notNull: true
-      }
-    }
+  extensions: {
+    isTableLike: false,
+    pg: {
+      serviceName: "main",
+      schemaName: "polymorphic",
+      name: "zero_implementation"
+    },
+    tags: Object.assign(Object.create(null), {
+      interface: "mode:union",
+      name: "ZeroImplementation",
+      behavior: "node"
+    })
   },
-  name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        notNull: true
-      }
-    }
-  },
-  last_deployed: {
-    description: undefined,
-    codec: TYPES.timestamptz,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
+  executor: executor,
+  polymorphism: {
+    mode: "union"
   }
-});
-const VulnerabilityAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        notNull: true
-      }
-    }
-  },
-  name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        notNull: true
-      }
-    }
-  },
-  cvss_score: {
-    description: undefined,
-    codec: TYPES.float,
-    notNull: true,
-    hasDefault: false,
-    extensions: {
-      tags: {
-        notNull: true
-      }
-    }
-  }
-});
-const ZeroImplementationAttributes = Object.assign(Object.create(null), {
-  id: {
-    description: undefined,
-    codec: TYPES.int,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  },
-  name: {
-    description: undefined,
-    codec: TYPES.text,
-    notNull: false,
-    hasDefault: false,
-    extensions: {
-      tags: {}
-    }
-  }
-});
+};
 const registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws_application_first_party_vulnerabilities = {
-  executor,
+  executor: executor,
   name: "aws_application_first_party_vulnerabilities",
   identifier: "main.polymorphic.aws_application_first_party_vulnerabilities",
-  from: awsApplicationFirstPartyVulnerabilitiesCodec.sqlType,
+  from: awsApplicationFirstPartyVulnerabilitiesIdentifier,
   codec: awsApplicationFirstPartyVulnerabilitiesCodec,
   uniques: [{
     isPrimary: true,
@@ -2101,15 +2343,15 @@ const registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws
     },
     tags: {
       omit: true,
-      behavior: extensions.tags.behavior
+      behavior: spec_awsApplicationFirstPartyVulnerabilities.extensions.tags.behavior
     }
   }
 };
 const registryConfig_pgResources_aws_application_third_party_vulnerabilities_aws_application_third_party_vulnerabilities = {
-  executor,
+  executor: executor,
   name: "aws_application_third_party_vulnerabilities",
   identifier: "main.polymorphic.aws_application_third_party_vulnerabilities",
-  from: awsApplicationThirdPartyVulnerabilitiesCodec.sqlType,
+  from: awsApplicationThirdPartyVulnerabilitiesIdentifier,
   codec: awsApplicationThirdPartyVulnerabilitiesCodec,
   uniques: [{
     isPrimary: true,
@@ -2130,15 +2372,15 @@ const registryConfig_pgResources_aws_application_third_party_vulnerabilities_aws
     },
     tags: {
       omit: true,
-      behavior: extensions2.tags.behavior
+      behavior: spec_awsApplicationThirdPartyVulnerabilities.extensions.tags.behavior
     }
   }
 };
 const registryConfig_pgResources_gcp_application_first_party_vulnerabilities_gcp_application_first_party_vulnerabilities = {
-  executor,
+  executor: executor,
   name: "gcp_application_first_party_vulnerabilities",
   identifier: "main.polymorphic.gcp_application_first_party_vulnerabilities",
-  from: gcpApplicationFirstPartyVulnerabilitiesCodec.sqlType,
+  from: gcpApplicationFirstPartyVulnerabilitiesIdentifier,
   codec: gcpApplicationFirstPartyVulnerabilitiesCodec,
   uniques: [{
     isPrimary: true,
@@ -2159,15 +2401,15 @@ const registryConfig_pgResources_gcp_application_first_party_vulnerabilities_gcp
     },
     tags: {
       omit: true,
-      behavior: extensions3.tags.behavior
+      behavior: spec_gcpApplicationFirstPartyVulnerabilities.extensions.tags.behavior
     }
   }
 };
 const registryConfig_pgResources_gcp_application_third_party_vulnerabilities_gcp_application_third_party_vulnerabilities = {
-  executor,
+  executor: executor,
   name: "gcp_application_third_party_vulnerabilities",
   identifier: "main.polymorphic.gcp_application_third_party_vulnerabilities",
-  from: gcpApplicationThirdPartyVulnerabilitiesCodec.sqlType,
+  from: gcpApplicationThirdPartyVulnerabilitiesIdentifier,
   codec: gcpApplicationThirdPartyVulnerabilitiesCodec,
   uniques: [{
     isPrimary: true,
@@ -2188,7 +2430,7 @@ const registryConfig_pgResources_gcp_application_third_party_vulnerabilities_gcp
     },
     tags: {
       omit: true,
-      behavior: extensions4.tags.behavior
+      behavior: spec_gcpApplicationThirdPartyVulnerabilities.extensions.tags.behavior
     }
   }
 };
@@ -2208,10 +2450,10 @@ const organizationsUniques = [{
   }
 }];
 const registryConfig_pgResources_organizations_organizations = {
-  executor,
+  executor: executor,
   name: "organizations",
   identifier: "main.polymorphic.organizations",
-  from: organizationsCodec.sqlType,
+  from: organizationsIdentifier,
   codec: organizationsCodec,
   uniques: organizationsUniques,
   isVirtual: false,
@@ -2244,10 +2486,10 @@ const peopleUniques = [{
   }
 }];
 const registryConfig_pgResources_people_people = {
-  executor,
+  executor: executor,
   name: "people",
   identifier: "main.polymorphic.people",
-  from: peopleCodec.sqlType,
+  from: peopleIdentifier,
   codec: peopleCodec,
   uniques: peopleUniques,
   isVirtual: false,
@@ -2262,15 +2504,15 @@ const registryConfig_pgResources_people_people = {
     tags: {
       unionMember: "PersonOrOrganization",
       ref: "applications to:Application",
-      refVia: extensions6.tags.refVia
+      refVia: spec_people.extensions.tags.refVia
     }
   }
 };
 const registryConfig_pgResources_priorities_priorities = {
-  executor,
+  executor: executor,
   name: "priorities",
   identifier: "main.polymorphic.priorities",
-  from: prioritiesCodec.sqlType,
+  from: prioritiesIdentifier,
   codec: prioritiesCodec,
   uniques: [{
     isPrimary: true,
@@ -2291,7 +2533,7 @@ const registryConfig_pgResources_priorities_priorities = {
     },
     tags: {
       omit: "create,update,delete,filter,order",
-      behavior: extensions7.tags.behavior
+      behavior: spec_priorities.extensions.tags.behavior
     }
   }
 };
@@ -2304,10 +2546,10 @@ const relational_checklistsUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_checklists_relational_checklists = {
-  executor,
+  executor: executor,
   name: "relational_checklists",
   identifier: "main.polymorphic.relational_checklists",
-  from: relationalChecklistsCodec.sqlType,
+  from: relationalChecklistsIdentifier,
   codec: relationalChecklistsCodec,
   uniques: relational_checklistsUniques,
   isVirtual: false,
@@ -2331,10 +2573,10 @@ const relational_item_relation_composite_pksUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_item_relation_composite_pks_relational_item_relation_composite_pks = {
-  executor,
+  executor: executor,
   name: "relational_item_relation_composite_pks",
   identifier: "main.polymorphic.relational_item_relation_composite_pks",
-  from: relationalItemRelationCompositePksCodec.sqlType,
+  from: relationalItemRelationCompositePksIdentifier,
   codec: relationalItemRelationCompositePksCodec,
   uniques: relational_item_relation_composite_pksUniques,
   isVirtual: false,
@@ -2358,10 +2600,10 @@ const relational_topicsUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_topics_relational_topics = {
-  executor,
+  executor: executor,
   name: "relational_topics",
   identifier: "main.polymorphic.relational_topics",
-  from: relationalTopicsCodec.sqlType,
+  from: relationalTopicsIdentifier,
   codec: relationalTopicsCodec,
   uniques: relational_topicsUniques,
   isVirtual: false,
@@ -2385,10 +2627,10 @@ const single_table_item_relation_composite_pksUniques = [{
   }
 }];
 const registryConfig_pgResources_single_table_item_relation_composite_pks_single_table_item_relation_composite_pks = {
-  executor,
+  executor: executor,
   name: "single_table_item_relation_composite_pks",
   identifier: "main.polymorphic.single_table_item_relation_composite_pks",
-  from: singleTableItemRelationCompositePksCodec.sqlType,
+  from: singleTableItemRelationCompositePksIdentifier,
   codec: singleTableItemRelationCompositePksCodec,
   uniques: single_table_item_relation_composite_pksUniques,
   isVirtual: false,
@@ -2412,10 +2654,10 @@ const relational_checklist_itemsUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_checklist_items_relational_checklist_items = {
-  executor,
+  executor: executor,
   name: "relational_checklist_items",
   identifier: "main.polymorphic.relational_checklist_items",
-  from: relationalChecklistItemsCodec.sqlType,
+  from: relationalChecklistItemsIdentifier,
   codec: relationalChecklistItemsCodec,
   uniques: relational_checklist_itemsUniques,
   isVirtual: false,
@@ -2439,10 +2681,10 @@ const relational_dividersUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_dividers_relational_dividers = {
-  executor,
+  executor: executor,
   name: "relational_dividers",
   identifier: "main.polymorphic.relational_dividers",
-  from: relationalDividersCodec.sqlType,
+  from: relationalDividersIdentifier,
   codec: relationalDividersCodec,
   uniques: relational_dividersUniques,
   isVirtual: false,
@@ -2473,10 +2715,10 @@ const relational_item_relationsUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_item_relations_relational_item_relations = {
-  executor,
+  executor: executor,
   name: "relational_item_relations",
   identifier: "main.polymorphic.relational_item_relations",
-  from: relationalItemRelationsCodec.sqlType,
+  from: relationalItemRelationsIdentifier,
   codec: relationalItemRelationsCodec,
   uniques: relational_item_relationsUniques,
   isVirtual: false,
@@ -2507,10 +2749,10 @@ const single_table_item_relationsUniques = [{
   }
 }];
 const registryConfig_pgResources_single_table_item_relations_single_table_item_relations = {
-  executor,
+  executor: executor,
   name: "single_table_item_relations",
   identifier: "main.polymorphic.single_table_item_relations",
-  from: singleTableItemRelationsCodec.sqlType,
+  from: singleTableItemRelationsIdentifier,
   codec: singleTableItemRelationsCodec,
   uniques: single_table_item_relationsUniques,
   isVirtual: false,
@@ -2534,10 +2776,10 @@ const log_entriesUniques = [{
   }
 }];
 const registryConfig_pgResources_log_entries_log_entries = {
-  executor,
+  executor: executor,
   name: "log_entries",
   identifier: "main.polymorphic.log_entries",
-  from: logEntriesCodec.sqlType,
+  from: logEntriesIdentifier,
   codec: logEntriesCodec,
   uniques: log_entriesUniques,
   isVirtual: false,
@@ -2551,7 +2793,7 @@ const registryConfig_pgResources_log_entries_log_entries = {
     },
     tags: {
       ref: "author to:PersonOrOrganization singular",
-      refVia: extensions17.tags.refVia
+      refVia: spec_logEntries.extensions.tags.refVia
     }
   }
 };
@@ -2564,10 +2806,10 @@ const relational_postsUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_posts_relational_posts = {
-  executor,
+  executor: executor,
   name: "relational_posts",
   identifier: "main.polymorphic.relational_posts",
-  from: relationalPostsCodec.sqlType,
+  from: relationalPostsIdentifier,
   codec: relationalPostsCodec,
   uniques: relational_postsUniques,
   isVirtual: false,
@@ -2591,10 +2833,10 @@ const first_party_vulnerabilitiesUniques = [{
   }
 }];
 const registryConfig_pgResources_first_party_vulnerabilities_first_party_vulnerabilities = {
-  executor,
+  executor: executor,
   name: "first_party_vulnerabilities",
   identifier: "main.polymorphic.first_party_vulnerabilities",
-  from: firstPartyVulnerabilitiesCodec.sqlType,
+  from: firstPartyVulnerabilitiesIdentifier,
   codec: firstPartyVulnerabilitiesCodec,
   uniques: first_party_vulnerabilitiesUniques,
   isVirtual: false,
@@ -2608,8 +2850,8 @@ const registryConfig_pgResources_first_party_vulnerabilities_first_party_vulnera
     },
     tags: {
       implements: "Vulnerability",
-      ref: extensions19.tags.ref,
-      refVia: extensions19.tags.refVia
+      ref: spec_firstPartyVulnerabilities.extensions.tags.ref,
+      refVia: spec_firstPartyVulnerabilities.extensions.tags.refVia
     }
   }
 };
@@ -2622,10 +2864,10 @@ const third_party_vulnerabilitiesUniques = [{
   }
 }];
 const registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnerabilities = {
-  executor,
+  executor: executor,
   name: "third_party_vulnerabilities",
   identifier: "main.polymorphic.third_party_vulnerabilities",
-  from: thirdPartyVulnerabilitiesCodec.sqlType,
+  from: thirdPartyVulnerabilitiesIdentifier,
   codec: thirdPartyVulnerabilitiesCodec,
   uniques: third_party_vulnerabilitiesUniques,
   isVirtual: false,
@@ -2639,8 +2881,8 @@ const registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnera
     },
     tags: {
       implements: "Vulnerability",
-      ref: extensions20.tags.ref,
-      refVia: extensions20.tags.refVia
+      ref: spec_thirdPartyVulnerabilities.extensions.tags.ref,
+      refVia: spec_thirdPartyVulnerabilities.extensions.tags.refVia
     }
   }
 };
@@ -2653,10 +2895,10 @@ const aws_applicationsUniques = [{
   }
 }];
 const registryConfig_pgResources_aws_applications_aws_applications = {
-  executor,
+  executor: executor,
   name: "aws_applications",
   identifier: "main.polymorphic.aws_applications",
-  from: awsApplicationsCodec.sqlType,
+  from: awsApplicationsIdentifier,
   codec: awsApplicationsCodec,
   uniques: aws_applicationsUniques,
   isVirtual: false,
@@ -2670,8 +2912,8 @@ const registryConfig_pgResources_aws_applications_aws_applications = {
     },
     tags: {
       implements: "Application",
-      ref: extensions21.tags.ref,
-      refVia: extensions21.tags.refVia
+      ref: spec_awsApplications.extensions.tags.ref,
+      refVia: spec_awsApplications.extensions.tags.refVia
     }
   }
 };
@@ -2684,10 +2926,10 @@ const gcp_applicationsUniques = [{
   }
 }];
 const registryConfig_pgResources_gcp_applications_gcp_applications = {
-  executor,
+  executor: executor,
   name: "gcp_applications",
   identifier: "main.polymorphic.gcp_applications",
-  from: gcpApplicationsCodec.sqlType,
+  from: gcpApplicationsIdentifier,
   codec: gcpApplicationsCodec,
   uniques: gcp_applicationsUniques,
   isVirtual: false,
@@ -2701,8 +2943,8 @@ const registryConfig_pgResources_gcp_applications_gcp_applications = {
     },
     tags: {
       implements: "Application",
-      ref: extensions22.tags.ref,
-      refVia: extensions22.tags.refVia
+      ref: spec_gcpApplications.extensions.tags.ref,
+      refVia: spec_gcpApplications.extensions.tags.refVia
     }
   }
 };
@@ -2716,10 +2958,10 @@ const single_table_itemsUniques = [{
   }
 }];
 const registryConfig_pgResources_single_table_items_single_table_items = {
-  executor,
+  executor: executor,
   name: "single_table_items",
   identifier: "main.polymorphic.single_table_items",
-  from: singleTableItemsCodec.sqlType,
+  from: singleTableItemsIdentifier,
   codec: singleTableItemsCodec,
   uniques: single_table_itemsUniques,
   isVirtual: false,
@@ -2733,8 +2975,8 @@ const registryConfig_pgResources_single_table_items_single_table_items = {
     },
     tags: {
       interface: "mode:single type:type",
-      type: extensions23.tags.type,
-      ref: extensions23.tags.ref
+      type: spec_singleTableItems.extensions.tags.type,
+      ref: spec_singleTableItems.extensions.tags.ref
     }
   }
 };
@@ -2749,10 +2991,10 @@ const relational_itemsUniques = [{
   }
 }];
 const registryConfig_pgResources_relational_items_relational_items = {
-  executor,
+  executor: executor,
   name: "relational_items",
   identifier: "main.polymorphic.relational_items",
-  from: relationalItemsCodec.sqlType,
+  from: relationalItemsIdentifier,
   codec: relationalItemsCodec,
   uniques: relational_itemsUniques,
   isVirtual: false,
@@ -2766,7 +3008,7 @@ const registryConfig_pgResources_relational_items_relational_items = {
     },
     tags: {
       interface: "mode:relational",
-      type: extensions24.tags.type
+      type: spec_relationalItems.extensions.tags.type
     }
   }
 };
@@ -2804,116 +3046,9 @@ const registryConfig = {
     relationalItems: relationalItemsCodec,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
-    Application: recordCodec({
-      name: "Application",
-      identifier: sql.identifier("polymorphic", "applications"),
-      attributes: ApplicationAttributes,
-      description: undefined,
-      extensions: {
-        isTableLike: false,
-        pg: {
-          serviceName: "main",
-          schemaName: "polymorphic",
-          name: "applications"
-        },
-        tags: Object.assign(Object.create(null), {
-          interface: "mode:union",
-          name: "Application",
-          behavior: "node",
-          ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"]
-        }),
-        refDefinitions: Object.assign(Object.create(null), {
-          vulnerabilities: {
-            singular: false,
-            graphqlType: "Vulnerability",
-            sourceGraphqlType: undefined,
-            extensions: {
-              via: undefined,
-              tags: {
-                behavior: undefined
-              }
-            }
-          },
-          owner: {
-            singular: true,
-            graphqlType: "PersonOrOrganization",
-            sourceGraphqlType: undefined,
-            extensions: {
-              via: undefined,
-              tags: {
-                behavior: undefined
-              }
-            }
-          }
-        })
-      },
-      executor
-    }),
-    Vulnerability: recordCodec({
-      name: "Vulnerability",
-      identifier: sql.identifier("polymorphic", "vulnerabilities"),
-      attributes: VulnerabilityAttributes,
-      description: undefined,
-      extensions: {
-        isTableLike: false,
-        pg: {
-          serviceName: "main",
-          schemaName: "polymorphic",
-          name: "vulnerabilities"
-        },
-        tags: Object.assign(Object.create(null), {
-          interface: "mode:union",
-          name: "Vulnerability",
-          behavior: "node",
-          ref: ["applications to:Application plural", "owners to:PersonOrOrganization plural"]
-        }),
-        refDefinitions: Object.assign(Object.create(null), {
-          applications: {
-            singular: false,
-            graphqlType: "Application",
-            sourceGraphqlType: undefined,
-            extensions: {
-              via: undefined,
-              tags: {
-                behavior: undefined
-              }
-            }
-          },
-          owners: {
-            singular: false,
-            graphqlType: "PersonOrOrganization",
-            sourceGraphqlType: undefined,
-            extensions: {
-              via: undefined,
-              tags: {
-                behavior: undefined
-              }
-            }
-          }
-        })
-      },
-      executor
-    }),
-    ZeroImplementation: recordCodec({
-      name: "ZeroImplementation",
-      identifier: sql.identifier("polymorphic", "zero_implementation"),
-      attributes: ZeroImplementationAttributes,
-      description: undefined,
-      extensions: {
-        isTableLike: false,
-        pg: {
-          serviceName: "main",
-          schemaName: "polymorphic",
-          name: "zero_implementation"
-        },
-        tags: Object.assign(Object.create(null), {
-          interface: "mode:union",
-          name: "ZeroImplementation",
-          behavior: "node"
-        })
-      },
-      executor
-    })
+    Application: recordCodec(spec_Application),
+    Vulnerability: recordCodec(spec_Vulnerability),
+    ZeroImplementation: recordCodec(spec_ZeroImplementation)
   }),
   pgResources: Object.assign(Object.create(null), {
     aws_application_first_party_vulnerabilities: registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws_application_first_party_vulnerabilities,
@@ -4103,7 +4238,7 @@ const handler = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4116,22 +4251,30 @@ const handler = {
 const nodeIdCodecs = Object.assign(Object.create(null), {
   raw: {
     name: "raw",
-    encode(value) {
+    encode: Object.assign(function rawEncode(value) {
       return typeof value === "string" ? value : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function rawDecode(value) {
       return typeof value === "string" ? value : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   },
   base64JSON: handler_codec_base64JSON,
   pipeString: {
     name: "pipeString",
-    encode(value) {
+    encode: Object.assign(function pipeStringEncode(value) {
       return Array.isArray(value) ? value.join("|") : null;
-    },
-    decode(value) {
+    }, {
+      isSyncAndSafe: true
+    }),
+    decode: Object.assign(function pipeStringDecode(value) {
       return typeof value === "string" ? value.split("|") : null;
-    }
+    }, {
+      isSyncAndSafe: true
+    })
   }
 });
 const otherSource_peoplePgResource = registry.pgResources["people"];
@@ -4155,6 +4298,9 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
 };
 const otherSource_single_table_item_relationsPgResource = registry.pgResources["single_table_item_relations"];
 const otherSource_single_table_item_relation_composite_pksPgResource = registry.pgResources["single_table_item_relation_composite_pks"];
+function BigIntSerialize(value) {
+  return "" + value;
+}
 const handler2 = {
   typeName: "Person",
   codec: handler_codec_base64JSON,
@@ -4164,7 +4310,7 @@ const handler2 = {
   },
   getSpec($list) {
     return {
-      person_id: access($list, [1])
+      person_id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4223,7 +4369,7 @@ const handler3 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4280,7 +4426,7 @@ const handler4 = {
   },
   getSpec($list) {
     return {
-      organization_id: access($list, [1])
+      organization_id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4299,7 +4445,7 @@ const handler5 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4411,7 +4557,7 @@ const handler6 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4522,7 +4668,7 @@ const handler7 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4542,8 +4688,8 @@ const handler8 = {
   },
   getSpec($list) {
     return {
-      parent_id: access($list, [1]),
-      child_id: access($list, [2])
+      parent_id: inhibitOnNull(access($list, [1])),
+      child_id: inhibitOnNull(access($list, [2]))
     };
   },
   get(spec) {
@@ -4562,7 +4708,7 @@ const handler9 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4581,8 +4727,8 @@ const handler10 = {
   },
   getSpec($list) {
     return {
-      parent_id: access($list, [1]),
-      child_id: access($list, [2])
+      parent_id: inhibitOnNull(access($list, [1])),
+      child_id: inhibitOnNull(access($list, [2]))
     };
   },
   get(spec) {
@@ -4601,7 +4747,7 @@ const handler11 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4621,7 +4767,7 @@ const handler12 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4640,7 +4786,7 @@ const handler13 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4659,7 +4805,7 @@ const handler14 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4678,7 +4824,7 @@ const handler15 = {
   },
   getSpec($list) {
     return {
-      id: access($list, [1])
+      id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4698,7 +4844,7 @@ const handler16 = {
   },
   getSpec($list) {
     return {
-      topic_item_id: access($list, [1])
+      topic_item_id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4721,7 +4867,7 @@ const handler17 = {
   },
   getSpec($list) {
     return {
-      post_item_id: access($list, [1])
+      post_item_id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4740,7 +4886,7 @@ const handler18 = {
   },
   getSpec($list) {
     return {
-      divider_item_id: access($list, [1])
+      divider_item_id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4759,7 +4905,7 @@ const handler19 = {
   },
   getSpec($list) {
     return {
-      checklist_item_id: access($list, [1])
+      checklist_item_id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4778,7 +4924,7 @@ const handler20 = {
   },
   getSpec($list) {
     return {
-      checklist_item_item_id: access($list, [1])
+      checklist_item_item_id: inhibitOnNull(access($list, [1]))
     };
   },
   get(spec) {
@@ -4833,7 +4979,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -4852,7 +4998,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
     },
     getSpec($list) {
       return {
-        id: access($list, [1])
+        id: inhibitOnNull(access($list, [1]))
       };
     },
     get(spec) {
@@ -14255,6 +14401,26 @@ export const plans = {
       });
     }
   },
+  BigInt: {
+    serialize: BigIntSerialize,
+    parseValue: BigIntSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"BigInt" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  Datetime: {
+    serialize: BigIntSerialize,
+    parseValue: BigIntSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
   Person: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
@@ -14562,7 +14728,7 @@ export const plans = {
           }, Object.create(null));
         }
         const $list = pgUnionAll({
-          attributes: ApplicationAttributes,
+          attributes: spec_Application.attributes,
           resourceByTypeName,
           members,
           name: "applications"
@@ -14885,6 +15051,16 @@ export const plans = {
       }
     }
   },
+  Cursor: {
+    serialize: BigIntSerialize,
+    parseValue: BigIntSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
   LogEntriesOrderBy: {
     NATURAL: {
       applyPlan() {}
@@ -15074,7 +15250,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), logEntriesAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_logEntries.attributes.id.codec)}`;
             }
           });
         }
@@ -15097,7 +15273,7 @@ export const plans = {
             type: "attribute",
             attribute: "person_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), logEntriesAttributes.person_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_logEntries.attributes.person_id.codec)}`;
             }
           });
         }
@@ -15120,7 +15296,7 @@ export const plans = {
             type: "attribute",
             attribute: "organization_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), logEntriesAttributes.organization_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_logEntries.attributes.organization_id.codec)}`;
             }
           });
         }
@@ -15143,7 +15319,7 @@ export const plans = {
             type: "attribute",
             attribute: "text",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), logEntriesAttributes.text.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_logEntries.attributes.text.codec)}`;
             }
           });
         }
@@ -15217,7 +15393,7 @@ export const plans = {
           }, Object.create(null));
         }
         const $list = pgUnionAll({
-          attributes: VulnerabilityAttributes,
+          attributes: spec_Vulnerability.attributes,
           resourceByTypeName: resourceByTypeName3,
           members: members3,
           name: "vulnerabilities"
@@ -15524,7 +15700,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), VulnerabilityAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Vulnerability.attributes.id.codec)}`;
             }
           });
         }
@@ -15547,7 +15723,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), VulnerabilityAttributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Vulnerability.attributes.name.codec)}`;
             }
           });
         }
@@ -15570,7 +15746,7 @@ export const plans = {
             type: "attribute",
             attribute: "cvss_score",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), VulnerabilityAttributes.cvss_score.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Vulnerability.attributes.cvss_score.codec)}`;
             }
           });
         }
@@ -15845,7 +16021,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), awsApplicationsAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_awsApplications.attributes.id.codec)}`;
             }
           });
         }
@@ -15868,7 +16044,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), awsApplicationsAttributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_awsApplications.attributes.name.codec)}`;
             }
           });
         }
@@ -15891,7 +16067,7 @@ export const plans = {
             type: "attribute",
             attribute: "last_deployed",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), awsApplicationsAttributes.last_deployed.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_awsApplications.attributes.last_deployed.codec)}`;
             }
           });
         }
@@ -15914,7 +16090,7 @@ export const plans = {
             type: "attribute",
             attribute: "person_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), awsApplicationsAttributes.person_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_awsApplications.attributes.person_id.codec)}`;
             }
           });
         }
@@ -15937,7 +16113,7 @@ export const plans = {
             type: "attribute",
             attribute: "organization_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), awsApplicationsAttributes.organization_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_awsApplications.attributes.organization_id.codec)}`;
             }
           });
         }
@@ -15960,7 +16136,7 @@ export const plans = {
             type: "attribute",
             attribute: "aws_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), awsApplicationsAttributes.aws_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_awsApplications.attributes.aws_id.codec)}`;
             }
           });
         }
@@ -16034,7 +16210,7 @@ export const plans = {
           }, Object.create(null));
         }
         const $list = pgUnionAll({
-          attributes: VulnerabilityAttributes,
+          attributes: spec_Vulnerability.attributes,
           resourceByTypeName: resourceByTypeName5,
           members: members5,
           name: "vulnerabilities"
@@ -16397,7 +16573,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), gcpApplicationsAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_gcpApplications.attributes.id.codec)}`;
             }
           });
         }
@@ -16420,7 +16596,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), gcpApplicationsAttributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_gcpApplications.attributes.name.codec)}`;
             }
           });
         }
@@ -16443,7 +16619,7 @@ export const plans = {
             type: "attribute",
             attribute: "last_deployed",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), gcpApplicationsAttributes.last_deployed.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_gcpApplications.attributes.last_deployed.codec)}`;
             }
           });
         }
@@ -16466,7 +16642,7 @@ export const plans = {
             type: "attribute",
             attribute: "person_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), gcpApplicationsAttributes.person_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_gcpApplications.attributes.person_id.codec)}`;
             }
           });
         }
@@ -16489,7 +16665,7 @@ export const plans = {
             type: "attribute",
             attribute: "organization_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), gcpApplicationsAttributes.organization_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_gcpApplications.attributes.organization_id.codec)}`;
             }
           });
         }
@@ -16512,7 +16688,7 @@ export const plans = {
             type: "attribute",
             attribute: "gcp_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), gcpApplicationsAttributes.gcp_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_gcpApplications.attributes.gcp_id.codec)}`;
             }
           });
         }
@@ -16948,7 +17124,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.id.codec)}`;
             }
           });
         }
@@ -16971,7 +17147,7 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.type.codec)}`;
             }
           });
         }
@@ -16994,7 +17170,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.parent_id.codec)}`;
             }
           });
         }
@@ -17017,7 +17193,7 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.root_topic_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.root_topic_id.codec)}`;
             }
           });
         }
@@ -17040,7 +17216,7 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.author_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.author_id.codec)}`;
             }
           });
         }
@@ -17063,7 +17239,7 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.position.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.position.codec)}`;
             }
           });
         }
@@ -17086,7 +17262,7 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.created_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.created_at.codec)}`;
             }
           });
         }
@@ -17109,7 +17285,7 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.updated_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.updated_at.codec)}`;
             }
           });
         }
@@ -17132,7 +17308,7 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.is_explicitly_archived.codec)}`;
             }
           });
         }
@@ -17155,7 +17331,7 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemsAttributes.archived_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItems.attributes.archived_at.codec)}`;
             }
           });
         }
@@ -17681,7 +17857,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.id.codec)}`;
             }
           });
         }
@@ -17704,7 +17880,7 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.type.codec)}`;
             }
           });
         }
@@ -17727,7 +17903,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.parent_id.codec)}`;
             }
           });
         }
@@ -17750,7 +17926,7 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.root_topic_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.root_topic_id.codec)}`;
             }
           });
         }
@@ -17773,7 +17949,7 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.author_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.author_id.codec)}`;
             }
           });
         }
@@ -17796,7 +17972,7 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.position.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.position.codec)}`;
             }
           });
         }
@@ -17819,7 +17995,7 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.created_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.created_at.codec)}`;
             }
           });
         }
@@ -17842,7 +18018,7 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.updated_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.updated_at.codec)}`;
             }
           });
         }
@@ -17865,7 +18041,7 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.is_explicitly_archived.codec)}`;
             }
           });
         }
@@ -17888,7 +18064,7 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemsAttributes.archived_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.archived_at.codec)}`;
             }
           });
         }
@@ -18020,7 +18196,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), ApplicationAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Application.attributes.id.codec)}`;
             }
           });
         }
@@ -18043,7 +18219,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), ApplicationAttributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Application.attributes.name.codec)}`;
             }
           });
         }
@@ -18066,7 +18242,7 @@ export const plans = {
             type: "attribute",
             attribute: "last_deployed",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), ApplicationAttributes.last_deployed.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Application.attributes.last_deployed.codec)}`;
             }
           });
         }
@@ -18329,7 +18505,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemRelationsAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItemRelations.attributes.id.codec)}`;
             }
           });
         }
@@ -18352,7 +18528,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemRelationsAttributes.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItemRelations.attributes.parent_id.codec)}`;
             }
           });
         }
@@ -18375,7 +18551,7 @@ export const plans = {
             type: "attribute",
             attribute: "child_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemRelationsAttributes.child_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItemRelations.attributes.child_id.codec)}`;
             }
           });
         }
@@ -18505,7 +18681,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemRelationCompositePksAttributes.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItemRelationCompositePks.attributes.parent_id.codec)}`;
             }
           });
         }
@@ -18528,7 +18704,7 @@ export const plans = {
             type: "attribute",
             attribute: "child_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), singleTableItemRelationCompositePksAttributes.child_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_singleTableItemRelationCompositePks.attributes.child_id.codec)}`;
             }
           });
         }
@@ -20662,7 +20838,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemRelationsAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelations.attributes.id.codec)}`;
             }
           });
         }
@@ -20685,7 +20861,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemRelationsAttributes.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelations.attributes.parent_id.codec)}`;
             }
           });
         }
@@ -20708,7 +20884,7 @@ export const plans = {
             type: "attribute",
             attribute: "child_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemRelationsAttributes.child_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelations.attributes.child_id.codec)}`;
             }
           });
         }
@@ -20838,7 +21014,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemRelationCompositePksAttributes.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelationCompositePks.attributes.parent_id.codec)}`;
             }
           });
         }
@@ -20861,7 +21037,7 @@ export const plans = {
             type: "attribute",
             attribute: "child_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalItemRelationCompositePksAttributes.child_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelationCompositePks.attributes.child_id.codec)}`;
             }
           });
         }
@@ -23260,7 +23436,7 @@ export const plans = {
     allVulnerabilities: {
       plan() {
         const $list = pgUnionAll({
-          attributes: VulnerabilityAttributes,
+          attributes: spec_Vulnerability.attributes,
           resourceByTypeName: resourceByTypeName7,
           members: members7,
           name: "Vulnerability"
@@ -23326,7 +23502,7 @@ export const plans = {
     allApplications: {
       plan() {
         const $list = pgUnionAll({
-          attributes: ApplicationAttributes,
+          attributes: spec_Application.attributes,
           resourceByTypeName: resourceByTypeName8,
           members: members8,
           name: "Application"
@@ -23392,7 +23568,7 @@ export const plans = {
     allZeroImplementations: {
       plan() {
         const $list = pgUnionAll({
-          attributes: ZeroImplementationAttributes,
+          attributes: spec_ZeroImplementation.attributes,
           resourceByTypeName: resourceByTypeName9,
           members: members9,
           name: "ZeroImplementation"
@@ -24473,7 +24649,7 @@ export const plans = {
           }, Object.create(null));
         }
         const $list = pgUnionAll({
-          attributes: ApplicationAttributes,
+          attributes: spec_Application.attributes,
           resourceByTypeName: resourceByTypeName10,
           members: members10,
           name: "applications"
@@ -24603,7 +24779,7 @@ export const plans = {
           }, Object.create(null));
         }
         const $list = pgUnionAll({
-          attributes: ApplicationAttributes,
+          attributes: spec_Application.attributes,
           resourceByTypeName: resourceByTypeName12,
           members: members12,
           name: "applications"
@@ -24814,7 +24990,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), ZeroImplementationAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_ZeroImplementation.attributes.id.codec)}`;
             }
           });
         }
@@ -24837,7 +25013,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), ZeroImplementationAttributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_ZeroImplementation.attributes.name.codec)}`;
             }
           });
         }
@@ -24992,7 +25168,7 @@ export const plans = {
             type: "attribute",
             attribute: "organization_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), organizationsAttributes.organization_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_organizations.attributes.organization_id.codec)}`;
             }
           });
         }
@@ -25015,7 +25191,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), organizationsAttributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_organizations.attributes.name.codec)}`;
             }
           });
         }
@@ -25170,7 +25346,7 @@ export const plans = {
             type: "attribute",
             attribute: "person_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), peopleAttributes.person_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_people.attributes.person_id.codec)}`;
             }
           });
         }
@@ -25193,7 +25369,7 @@ export const plans = {
             type: "attribute",
             attribute: "username",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), peopleAttributes.username.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_people.attributes.username.codec)}`;
             }
           });
         }
@@ -25679,7 +25855,7 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.title.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.title.codec)}`;
             }
           });
         }
@@ -25702,7 +25878,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.id.codec)}`;
             }
           });
         }
@@ -25725,7 +25901,7 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.type.codec)}`;
             }
           });
         }
@@ -25748,7 +25924,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.parent_id.codec)}`;
             }
           });
         }
@@ -25771,7 +25947,7 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.root_topic_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.root_topic_id.codec)}`;
             }
           });
         }
@@ -25794,7 +25970,7 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.author_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.author_id.codec)}`;
             }
           });
         }
@@ -25817,7 +25993,7 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.position.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.position.codec)}`;
             }
           });
         }
@@ -25840,7 +26016,7 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.created_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.created_at.codec)}`;
             }
           });
         }
@@ -25863,7 +26039,7 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.updated_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.updated_at.codec)}`;
             }
           });
         }
@@ -25886,7 +26062,7 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.is_explicitly_archived.codec)}`;
             }
           });
         }
@@ -25909,7 +26085,7 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistsAttributes.archived_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklists.attributes.archived_at.codec)}`;
             }
           });
         }
@@ -26370,7 +26546,7 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.title.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.title.codec)}`;
             }
           });
         }
@@ -26393,7 +26569,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.id.codec)}`;
             }
           });
         }
@@ -26416,7 +26592,7 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.type.codec)}`;
             }
           });
         }
@@ -26439,7 +26615,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.parent_id.codec)}`;
             }
           });
         }
@@ -26462,7 +26638,7 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.root_topic_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.root_topic_id.codec)}`;
             }
           });
         }
@@ -26485,7 +26661,7 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.author_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.author_id.codec)}`;
             }
           });
         }
@@ -26508,7 +26684,7 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.position.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.position.codec)}`;
             }
           });
         }
@@ -26531,7 +26707,7 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.created_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.created_at.codec)}`;
             }
           });
         }
@@ -26554,7 +26730,7 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.updated_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.updated_at.codec)}`;
             }
           });
         }
@@ -26577,7 +26753,7 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.is_explicitly_archived.codec)}`;
             }
           });
         }
@@ -26600,7 +26776,7 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalTopicsAttributes.archived_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalTopics.attributes.archived_at.codec)}`;
             }
           });
         }
@@ -27095,7 +27271,7 @@ export const plans = {
             type: "attribute",
             attribute: "description",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.description.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.description.codec)}`;
             }
           });
         }
@@ -27118,7 +27294,7 @@ export const plans = {
             type: "attribute",
             attribute: "note",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.note.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.note.codec)}`;
             }
           });
         }
@@ -27141,7 +27317,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.id.codec)}`;
             }
           });
         }
@@ -27164,7 +27340,7 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.type.codec)}`;
             }
           });
         }
@@ -27187,7 +27363,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.parent_id.codec)}`;
             }
           });
         }
@@ -27210,7 +27386,7 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.root_topic_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.root_topic_id.codec)}`;
             }
           });
         }
@@ -27233,7 +27409,7 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.author_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.author_id.codec)}`;
             }
           });
         }
@@ -27256,7 +27432,7 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.position.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.position.codec)}`;
             }
           });
         }
@@ -27279,7 +27455,7 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.created_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.created_at.codec)}`;
             }
           });
         }
@@ -27302,7 +27478,7 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.updated_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.updated_at.codec)}`;
             }
           });
         }
@@ -27325,7 +27501,7 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.is_explicitly_archived.codec)}`;
             }
           });
         }
@@ -27348,7 +27524,7 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalChecklistItemsAttributes.archived_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalChecklistItems.attributes.archived_at.codec)}`;
             }
           });
         }
@@ -27843,7 +28019,7 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.title.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.title.codec)}`;
             }
           });
         }
@@ -27866,7 +28042,7 @@ export const plans = {
             type: "attribute",
             attribute: "color",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.color.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.color.codec)}`;
             }
           });
         }
@@ -27889,7 +28065,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.id.codec)}`;
             }
           });
         }
@@ -27912,7 +28088,7 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.type.codec)}`;
             }
           });
         }
@@ -27935,7 +28111,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.parent_id.codec)}`;
             }
           });
         }
@@ -27958,7 +28134,7 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.root_topic_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.root_topic_id.codec)}`;
             }
           });
         }
@@ -27981,7 +28157,7 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.author_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.author_id.codec)}`;
             }
           });
         }
@@ -28004,7 +28180,7 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.position.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.position.codec)}`;
             }
           });
         }
@@ -28027,7 +28203,7 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.created_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.created_at.codec)}`;
             }
           });
         }
@@ -28050,7 +28226,7 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.updated_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.updated_at.codec)}`;
             }
           });
         }
@@ -28073,7 +28249,7 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.is_explicitly_archived.codec)}`;
             }
           });
         }
@@ -28096,7 +28272,7 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalDividersAttributes.archived_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalDividers.attributes.archived_at.codec)}`;
             }
           });
         }
@@ -28625,7 +28801,7 @@ export const plans = {
             type: "attribute",
             attribute: "title",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.title.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.title.codec)}`;
             }
           });
         }
@@ -28648,7 +28824,7 @@ export const plans = {
             type: "attribute",
             attribute: "description",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.description.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.description.codec)}`;
             }
           });
         }
@@ -28671,7 +28847,7 @@ export const plans = {
             type: "attribute",
             attribute: "note",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.note.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.note.codec)}`;
             }
           });
         }
@@ -28694,7 +28870,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.id.codec)}`;
             }
           });
         }
@@ -28717,7 +28893,7 @@ export const plans = {
             type: "attribute",
             attribute: "type",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.type.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.type.codec)}`;
             }
           });
         }
@@ -28740,7 +28916,7 @@ export const plans = {
             type: "attribute",
             attribute: "parent_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.parent_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.parent_id.codec)}`;
             }
           });
         }
@@ -28763,7 +28939,7 @@ export const plans = {
             type: "attribute",
             attribute: "root_topic_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.root_topic_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.root_topic_id.codec)}`;
             }
           });
         }
@@ -28786,7 +28962,7 @@ export const plans = {
             type: "attribute",
             attribute: "author_id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.author_id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.author_id.codec)}`;
             }
           });
         }
@@ -28809,7 +28985,7 @@ export const plans = {
             type: "attribute",
             attribute: "position",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.position.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.position.codec)}`;
             }
           });
         }
@@ -28832,7 +29008,7 @@ export const plans = {
             type: "attribute",
             attribute: "created_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.created_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.created_at.codec)}`;
             }
           });
         }
@@ -28855,7 +29031,7 @@ export const plans = {
             type: "attribute",
             attribute: "updated_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.updated_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.updated_at.codec)}`;
             }
           });
         }
@@ -28878,7 +29054,7 @@ export const plans = {
             type: "attribute",
             attribute: "is_explicitly_archived",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.is_explicitly_archived.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.is_explicitly_archived.codec)}`;
             }
           });
         }
@@ -28901,7 +29077,7 @@ export const plans = {
             type: "attribute",
             attribute: "archived_at",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), relationalPostsAttributes.archived_at.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalPosts.attributes.archived_at.codec)}`;
             }
           });
         }
@@ -29124,7 +29300,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), firstPartyVulnerabilitiesAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_firstPartyVulnerabilities.attributes.id.codec)}`;
             }
           });
         }
@@ -29147,7 +29323,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), firstPartyVulnerabilitiesAttributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_firstPartyVulnerabilities.attributes.name.codec)}`;
             }
           });
         }
@@ -29170,7 +29346,7 @@ export const plans = {
             type: "attribute",
             attribute: "cvss_score",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), firstPartyVulnerabilitiesAttributes.cvss_score.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_firstPartyVulnerabilities.attributes.cvss_score.codec)}`;
             }
           });
         }
@@ -29193,7 +29369,7 @@ export const plans = {
             type: "attribute",
             attribute: "team_name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), firstPartyVulnerabilitiesAttributes.team_name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_firstPartyVulnerabilities.attributes.team_name.codec)}`;
             }
           });
         }
@@ -29416,7 +29592,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), thirdPartyVulnerabilitiesAttributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_thirdPartyVulnerabilities.attributes.id.codec)}`;
             }
           });
         }
@@ -29439,7 +29615,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), thirdPartyVulnerabilitiesAttributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_thirdPartyVulnerabilities.attributes.name.codec)}`;
             }
           });
         }
@@ -29462,7 +29638,7 @@ export const plans = {
             type: "attribute",
             attribute: "cvss_score",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), thirdPartyVulnerabilitiesAttributes.cvss_score.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_thirdPartyVulnerabilities.attributes.cvss_score.codec)}`;
             }
           });
         }
@@ -29485,7 +29661,7 @@ export const plans = {
             type: "attribute",
             attribute: "vendor_name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), thirdPartyVulnerabilitiesAttributes.vendor_name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_thirdPartyVulnerabilities.attributes.vendor_name.codec)}`;
             }
           });
         }
@@ -30681,6 +30857,9 @@ export const plans = {
     }
   },
   OrganizationInput: {
+    "__inputPlan": function OrganizationInput_inputPlan() {
+      return object(Object.create(null));
+    },
     organizationId: {
       applyPlan($insert, val) {
         $insert.set("organization_id", val.get());
@@ -30755,6 +30934,9 @@ export const plans = {
     }
   },
   PersonInput: {
+    "__inputPlan": function PersonInput_inputPlan() {
+      return object(Object.create(null));
+    },
     personId: {
       applyPlan($insert, val) {
         $insert.set("person_id", val.get());
@@ -30839,6 +31021,9 @@ export const plans = {
     }
   },
   RelationalItemRelationCompositePkInput: {
+    "__inputPlan": function RelationalItemRelationCompositePkInput_inputPlan() {
+      return object(Object.create(null));
+    },
     parentId: {
       applyPlan($insert, val) {
         $insert.set("parent_id", val.get());
@@ -30923,6 +31108,9 @@ export const plans = {
     }
   },
   SingleTableItemRelationCompositePkInput: {
+    "__inputPlan": function SingleTableItemRelationCompositePkInput_inputPlan() {
+      return object(Object.create(null));
+    },
     parentId: {
       applyPlan($insert, val) {
         $insert.set("parent_id", val.get());
@@ -31007,6 +31195,9 @@ export const plans = {
     }
   },
   RelationalItemRelationInput: {
+    "__inputPlan": function RelationalItemRelationInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -31098,6 +31289,9 @@ export const plans = {
     }
   },
   SingleTableItemRelationInput: {
+    "__inputPlan": function SingleTableItemRelationInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -31189,6 +31383,9 @@ export const plans = {
     }
   },
   LogEntryInput: {
+    "__inputPlan": function LogEntryInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -31277,6 +31474,9 @@ export const plans = {
     }
   },
   FirstPartyVulnerabilityInput: {
+    "__inputPlan": function FirstPartyVulnerabilityInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -31365,6 +31565,9 @@ export const plans = {
     }
   },
   ThirdPartyVulnerabilityInput: {
+    "__inputPlan": function ThirdPartyVulnerabilityInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -31463,6 +31666,9 @@ export const plans = {
     }
   },
   AwsApplicationInput: {
+    "__inputPlan": function AwsApplicationInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -31575,6 +31781,9 @@ export const plans = {
     }
   },
   GcpApplicationInput: {
+    "__inputPlan": function GcpApplicationInput_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -31676,6 +31885,9 @@ export const plans = {
     }
   },
   OrganizationPatch: {
+    "__inputPlan": function OrganizationPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     organizationId: {
       applyPlan($insert, val) {
         $insert.set("organization_id", val.get());
@@ -31777,6 +31989,9 @@ export const plans = {
     }
   },
   PersonPatch: {
+    "__inputPlan": function PersonPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     personId: {
       applyPlan($insert, val) {
         $insert.set("person_id", val.get());
@@ -31888,6 +32103,9 @@ export const plans = {
     }
   },
   RelationalItemRelationCompositePkPatch: {
+    "__inputPlan": function RelationalItemRelationCompositePkPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     parentId: {
       applyPlan($insert, val) {
         $insert.set("parent_id", val.get());
@@ -31986,6 +32204,9 @@ export const plans = {
     }
   },
   SingleTableItemRelationCompositePkPatch: {
+    "__inputPlan": function SingleTableItemRelationCompositePkPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     parentId: {
       applyPlan($insert, val) {
         $insert.set("parent_id", val.get());
@@ -32084,6 +32305,9 @@ export const plans = {
     }
   },
   RelationalItemRelationPatch: {
+    "__inputPlan": function RelationalItemRelationPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -32203,6 +32427,9 @@ export const plans = {
     }
   },
   SingleTableItemRelationPatch: {
+    "__inputPlan": function SingleTableItemRelationPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -32322,6 +32549,9 @@ export const plans = {
     }
   },
   LogEntryPatch: {
+    "__inputPlan": function LogEntryPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -32423,6 +32653,9 @@ export const plans = {
     }
   },
   FirstPartyVulnerabilityPatch: {
+    "__inputPlan": function FirstPartyVulnerabilityPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -32524,6 +32757,9 @@ export const plans = {
     }
   },
   ThirdPartyVulnerabilityPatch: {
+    "__inputPlan": function ThirdPartyVulnerabilityPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -32635,6 +32871,9 @@ export const plans = {
     }
   },
   AwsApplicationPatch: {
+    "__inputPlan": function AwsApplicationPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());
@@ -32760,6 +32999,9 @@ export const plans = {
     }
   },
   GcpApplicationPatch: {
+    "__inputPlan": function GcpApplicationPatch_inputPlan() {
+      return object(Object.create(null));
+    },
     id: {
       applyPlan($insert, val) {
         $insert.set("id", val.get());

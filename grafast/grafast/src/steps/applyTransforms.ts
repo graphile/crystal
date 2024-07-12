@@ -10,8 +10,12 @@ import {
 import type { LayerPlanReasonSubroutine } from "../engine/LayerPlan.js";
 import { LayerPlan } from "../engine/LayerPlan.js";
 import { withGlobalLayerPlan } from "../engine/lib/withGlobalLayerPlan.js";
-import type { GrafastError } from "../error.js";
-import type { ExecutionDetails, GrafastResultsList } from "../interfaces.js";
+import { flagError } from "../error.js";
+import {
+  type ExecutionDetails,
+  FLAG_ERROR,
+  type GrafastResultsList,
+} from "../interfaces.js";
 import type { ListCapableStep } from "../step.js";
 import { ExecutableStep, isListCapableStep } from "../step.js";
 import { __ItemStep } from "./__item.js";
@@ -78,7 +82,7 @@ export class ApplyTransformsStep extends ExecutableStep {
     indexMap,
     values: [values0],
     extra,
-  }: ExecutionDetails<[any[] | null | undefined | GrafastError]>): Promise<
+  }: ExecutionDetails<[any[] | null | undefined | Error]>): Promise<
     GrafastResultsList<any[] | null | undefined>
   > {
     const bucket = extra._bucket;
@@ -140,14 +144,18 @@ export class ApplyTransformsStep extends ExecutableStep {
           iterators[newIndex] = bucket.iterators[originalIndex];
           const ev = store.get(itemStepId)!;
           if (ev.isBatch) {
-            (ev.entries as any[])[newIndex] = list[j];
+            // TODO: check for error?
+            ev._setResult(newIndex, list[j], 0);
           }
-          for (const stepId of copyStepIds) {
-            const ev = store.get(stepId)!;
+          for (const copyStepId of copyStepIds) {
+            const ev = store.get(copyStepId)!;
             if (ev.isBatch) {
-              (ev.entries as any[])[newIndex] = bucket.store
-                .get(stepId)!
-                .at(originalIndex);
+              const orig = bucket.store.get(copyStepId)!;
+              ev._setResult(
+                newIndex,
+                orig.at(originalIndex),
+                orig._flagsAt(originalIndex),
+              );
             }
           }
         }
@@ -160,7 +168,7 @@ export class ApplyTransformsStep extends ExecutableStep {
           layerPlan: childLayerPlan,
           size,
           store,
-          hasErrors: bucket.hasErrors,
+          flagUnion: bucket.flagUnion,
           polymorphicPathList,
           iterators,
         },
@@ -178,16 +186,13 @@ export class ApplyTransformsStep extends ExecutableStep {
       }
       const indexes = map.get(originalIndex);
       if (!Array.isArray(list) || !Array.isArray(indexes)) {
-        // ERRORS: should this be an error?
-        console.warn(
-          `Either list or values was not an array when processing ${this}`,
-        );
-        return null;
+        // Not a list value; just pass it straight through
+        return list as any;
       }
       const values = indexes.map((idx) => {
         const val = depResults.at(idx);
-        if (val instanceof Error) {
-          throw val;
+        if (depResults._flagsAt(idx) & FLAG_ERROR) {
+          return flagError(val);
         }
         return val;
       });

@@ -1,7 +1,7 @@
 ---
 layout: page
 path: /postgraphile/jwt-guide/
-title: PostGraphile JWT Guide
+title: PostGraphile JWT guide
 ---
 
 > This specification was authored by

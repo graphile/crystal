@@ -45,7 +45,7 @@ const config = {
           sidebarPath: require.resolve("./sidebars.js"),
           editUrl,
           versions: {
-            "4.12.0": {
+            "4.x": {
               path: "current",
             },
           },
@@ -101,6 +101,16 @@ const config = {
         path: "./news",
       },
     ],
+    // PostCSS configuration
+    () => {
+      return {
+        name: "configure-postcss-plugin",
+        configurePostCss(postcssOptions) {
+          postcssOptions.plugins.push(require("postcss-nested"));
+          return postcssOptions;
+        },
+      };
+    },
   ],
 
   stylesheets: [

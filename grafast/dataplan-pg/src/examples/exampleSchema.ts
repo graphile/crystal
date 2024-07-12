@@ -144,7 +144,7 @@ export function EXPORTABLE<T, TScope extends any[]>(
 
 // This is the actual runtime context; we should not use a global for this.
 export interface OurGraphQLContext extends Grafast.Context {
-  pgSettings: { [key: string]: string };
+  pgSettings: Record<string, string | undefined>;
   withPgClient: WithPgClient<NodePostgresPgClient>;
   pgSubscriber: PgSubscriber;
 }
@@ -5076,7 +5076,10 @@ export function makeExampleSchema(
             withPgClientTransaction,
           ) =>
             function plan(_$root, { $input: { $a } }) {
-              const $transactionResult = withPgClientTransaction(
+              const $transactionResult = withPgClientTransaction<
+                { a: number | null | undefined },
+                number[]
+              >(
                 relationalPostsResource.executor,
                 object({
                   a: $a as ExecutableStep<number | null | undefined>,

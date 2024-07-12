@@ -1,7 +1,6 @@
 import type { GrafastSubscriber } from "grafast";
 import { exportAsMany } from "grafast";
 
-import type { PgAdaptorOptions } from "./adaptors/pg.js";
 import {
   domainOfCodec,
   enumCodec,
@@ -429,29 +428,35 @@ declare global {
   namespace GraphileConfig {
     interface PgServiceConfiguration<
       TAdaptor extends
-        keyof GraphileConfig.PgDatabaseAdaptorOptions = keyof GraphileConfig.PgDatabaseAdaptorOptions,
+        keyof GraphileConfig.PgAdaptors = keyof GraphileConfig.PgAdaptors,
     > {
       name: string;
       schemas?: string[];
 
-      adaptor: TAdaptor;
-      adaptorSettings?: GraphileConfig.PgDatabaseAdaptorOptions[TAdaptor];
+      adaptor: PgAdaptor<TAdaptor>;
+      adaptorSettings?: GraphileConfig.PgAdaptors[TAdaptor]["adaptorSettings"];
 
       /** The key on 'context' where the withPgClient function will be sourced */
-      withPgClientKey: KeysOfType<Grafast.Context & object, WithPgClient>;
+      withPgClientKey: KeysOfType<
+        Grafast.Context & object,
+        WithPgClient<GraphileConfig.PgAdaptors[TAdaptor]["client"]>
+      >;
 
       /** Return settings to set in the session */
-      pgSettings?: (
-        requestContext: Grafast.RequestContext,
-      ) => { [key: string]: string } | null;
+      pgSettings?:
+        | ((
+            requestContext: Grafast.RequestContext,
+          ) => Record<string, string | undefined>)
+        | Record<string, string | undefined>
+        | null;
 
       /** Settings to set in the session that performs introspection (during gather phase) */
-      pgSettingsForIntrospection?: { [key: string]: string } | null;
+      pgSettingsForIntrospection?: Record<string, string | undefined> | null;
 
       /** The key on 'context' where the pgSettings for this DB will be sourced */
       pgSettingsKey?: KeysOfType<
         Grafast.Context & object,
-        { [key: string]: string } | null | undefined
+        Record<string, string | undefined> | null | undefined
       >;
 
       /** The GrafastSubscriber to use for subscriptions */
@@ -471,12 +476,26 @@ declare global {
     }
 
     interface Preset {
-      pgServices?: ReadonlyArray<PgServiceConfiguration>;
+      pgServices?: ReadonlyArray<
+        {
+          [Key in keyof GraphileConfig.PgAdaptors]: PgServiceConfiguration<Key>;
+        }[keyof GraphileConfig.PgAdaptors]
+      >;
     }
 
-    interface PgDatabaseAdaptorOptions {
-      "@dataplan/pg/adaptors/pg": PgAdaptorOptions;
-      /* Add your own via declaration merging */
+    interface PgAdaptors {
+      /*
+       * Add your adaptor configurations via declaration merging; they should
+       * conform to this:
+       *
+       * ```
+       * [moduleName: string]: {
+       *   adaptorSettings: { ... } | undefined;
+       *   makePgServiceOptions: MakePgServiceOptions & { ... };
+       *   client: PgClient & MyPgClientStuff;
+       * };
+       * ```
+       */
     }
   }
   namespace DataplanPg {

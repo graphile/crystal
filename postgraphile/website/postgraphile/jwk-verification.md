@@ -1,7 +1,7 @@
 ---
 layout: page
 path: /postgraphile/jwk-verification/
-title: PostGraphile JWT/JWK Verification Quickstart
+title: PostGraphile JWT/JWK verification quickstart
 ---
 
 :::caution

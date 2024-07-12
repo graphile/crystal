@@ -1,13 +1,20 @@
 // import type { GraphQLScalarType } from "graphql";
 
+import type { ExecutableStep, GrafastExecutionArgs } from ".";
 import type { LayerPlan } from "./engine/LayerPlan";
 import type { MetaByMetaKey } from "./engine/OperationPlan";
-import type { ExecutionEventEmitter, ExecutionValue } from "./interfaces.js";
+import type {
+  ExecutionEntryFlags,
+  ExecutionEventEmitter,
+  ExecutionValue,
+} from "./interfaces.js";
 
 /**
  * @internal
  */
 export interface RequestTools {
+  /** @internal */
+  args: GrafastExecutionArgs;
   /** The `timeSource.now()` at which the request started executing */
   startTime: number;
   /** The `timeSource.now()` at which the request should stop executing (if a timeout was configured) */
@@ -45,6 +52,9 @@ export interface RequestTools {
  * @internal
  */
 export interface Bucket {
+  /** @internal */
+  toString?(): string;
+
   /**
    * The LayerPlan definition this bucket adheres to
    */
@@ -91,6 +101,13 @@ export interface Bucket {
    */
   store: Map<number, ExecutionValue>;
 
+  setResult(
+    step: ExecutableStep,
+    index: number,
+    value: any,
+    flags: ExecutionEntryFlags,
+  ): void;
+
   /**
    * Set this true when the bucket is fully executed.
    *
@@ -98,15 +115,13 @@ export interface Bucket {
    */
   isComplete: boolean;
 
-  // PERF: we should be able to convert this into a set of planIds that have
-  // errors, then we can use this as we cascade forward to the next bucket.
   /**
-   * If an error occurred at any stage we need to drop down to more careful
-   * (and slower) handling.
+   * A union of all the ExecutionEntryStates in this bucket. Generally, if it's
+   * non-zero then we need to perform careful (and slower) handling.
    *
-   * Initialize it to false.
+   * Initialize it to 0.
    */
-  hasErrors: boolean;
+  flagUnion: ExecutionEntryFlags;
 
   /**
    * The child buckets of this bucket.

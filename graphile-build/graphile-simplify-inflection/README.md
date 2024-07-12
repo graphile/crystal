@@ -101,7 +101,7 @@ const plugin = {
 
             // 👇 Add/customise this line:
             distributor: "distributed",
-          }[baseName] || previous.call(this, baseName)
+          }[baseName] || previous(baseName)
         );
       },
     },

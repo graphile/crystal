@@ -1,4 +1,3 @@
-import type { ExecutionArgs } from "graphql";
 import * as graphql from "graphql";
 import type {
   AsyncExecutionResult,
@@ -28,17 +27,27 @@ import { executeOutputPlan } from "./engine/executeOutputPlan.js";
 import { POLYMORPHIC_ROOT_PATH } from "./engine/OperationPlan.js";
 import type { OutputPlan } from "./engine/OutputPlan.js";
 import { coerceError, getChildBucketAndIndex } from "./engine/OutputPlan.js";
-import { isGrafastError } from "./error.js";
 import { establishOperationPlan } from "./establishOperationPlan.js";
-import type { GrafastPlanJSON, OperationPlan } from "./index.js";
 import type {
+  GrafastExecutionArgs,
+  GrafastPlanJSON,
+  OperationPlan,
+} from "./index.js";
+import type {
+  EstablishOperationPlanEvent,
   GrafastTimeouts,
   JSONValue,
   PromiseOrDirect,
   StreamMaybeMoreableArray,
   StreamMoreableArray,
 } from "./interfaces.js";
-import { $$eventEmitter, $$extensions, $$streamMore } from "./interfaces.js";
+import {
+  $$eventEmitter,
+  $$extensions,
+  $$streamMore,
+  FLAG_ERROR,
+  NO_FLAGS,
+} from "./interfaces.js";
 import { timeSource } from "./timeSource.js";
 import { arrayOfLength, isPromiseLike } from "./utils.js";
 
@@ -253,7 +262,7 @@ function outputBucket(
     childBucketIndex = rootBucketIndex;
   } else {
     const c = getChildBucketAndIndex(
-      outputPlan,
+      outputPlan.layerPlan,
       null,
       rootBucket,
       rootBucketIndex,
@@ -289,6 +298,7 @@ function outputBucket(
 }
 
 function executePreemptive(
+  args: GrafastExecutionArgs,
   operationPlan: OperationPlan,
   variableValues: any,
   context: any,
@@ -305,7 +315,6 @@ function executePreemptive(
   const iterators: Array<Set<AsyncIterator<any> | Iterator<any>>> = [new Set()];
 
   const store: Bucket["store"] = new Map();
-  store.set(operationPlan.rootLayerPlan.rootStep!.id, unaryExecutionValue(0));
   store.set(
     operationPlan.variableValuesStep.id,
     unaryExecutionValue(variableValues),
@@ -318,7 +327,7 @@ function executePreemptive(
       layerPlan: operationPlan.rootLayerPlan,
       size,
       store,
-      hasErrors: false,
+      flagUnion: 0,
       polymorphicPathList,
       iterators,
     },
@@ -328,6 +337,7 @@ function executePreemptive(
   const stopTime =
     executionTimeout !== null ? startTime + executionTimeout : null;
   const requestContext: RequestTools = {
+    args,
     startTime,
     stopTime,
     // toSerialize: [],
@@ -366,7 +376,7 @@ function executePreemptive(
       {
         layerPlan,
         store,
-        hasErrors: rootBucket.hasErrors,
+        flagUnion: rootBucket.flagUnion,
         polymorphicPathList: [POLYMORPHIC_ROOT_PATH],
         iterators: [new Set()],
         size: 1, //store.size
@@ -404,24 +414,25 @@ function executePreemptive(
     // Later we'll need to loop
 
     // If it's a subscription we need to use the stream
-    const bucketRootValue =
+    const bucketRootEValue =
       rootBucket.layerPlan.rootStep != null &&
       rootBucket.layerPlan.rootStep.id != null
-        ? rootBucket.store
-            .get(rootBucket.layerPlan.rootStep.id)!
-            .at(rootBucketIndex)
+        ? rootBucket.store.get(rootBucket.layerPlan.rootStep.id)!
         : null;
-    if (isGrafastError(bucketRootValue)) {
+    const bucketRootValue = bucketRootEValue?.at(rootBucketIndex);
+    const bucketRootFlags =
+      bucketRootEValue?._flagsAt(rootBucketIndex) ?? NO_FLAGS;
+    if (bucketRootFlags & FLAG_ERROR) {
       releaseUnusedIterators(rootBucket, rootBucketIndex, null);
       // Something major went wrong!
       const errors = [
         new GraphQLError(
-          bucketRootValue.originalError.message,
+          bucketRootValue.message,
           operationPlan.rootOutputPlan.locationDetails.node, // node
           undefined, // source
           null, // positions
           null, // path
-          bucketRootValue.originalError, // originalError
+          bucketRootValue, // originalError
           null, // extensions
         ),
       ];
@@ -532,11 +543,23 @@ declare module "./engine/OperationPlan.js" {
   }
 }
 
+function establishOperationPlanFromEvent(event: EstablishOperationPlanEvent) {
+  return establishOperationPlan(
+    event.schema,
+    event.operation,
+    event.fragments,
+    event.variableValues,
+    event.context as any,
+    event.rootValue,
+    event.planningTimeout,
+  );
+}
+
 /**
  * @internal
  */
 export function grafastPrepare(
-  args: ExecutionArgs,
+  args: GrafastExecutionArgs,
   options: GrafastPrepareOptions = {},
 ): PromiseOrDirect<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, void>
@@ -547,6 +570,7 @@ export function grafastPrepare(
     rootValue = Object.create(null),
     // operationName,
     // document,
+    middleware,
   } = args;
   const exeContext = buildExecutionContext(args);
 
@@ -562,15 +586,32 @@ export function grafastPrepare(
   const planningTimeout = options.timeouts?.planning;
   let operationPlan!: OperationPlan;
   try {
-    operationPlan = establishOperationPlan(
-      schema,
-      operation,
-      fragments,
-      variableValues,
-      context as any,
-      rootValue,
-      planningTimeout,
-    );
+    if (middleware != null) {
+      operationPlan = middleware.runSync(
+        "establishOperationPlan",
+        {
+          schema,
+          operation,
+          fragments,
+          variableValues,
+          context: context as any,
+          rootValue,
+          planningTimeout,
+          args,
+        },
+        establishOperationPlanFromEvent,
+      );
+    } else {
+      operationPlan = establishOperationPlan(
+        schema,
+        operation,
+        fragments,
+        variableValues,
+        context as any,
+        rootValue,
+        planningTimeout,
+      );
+    }
   } catch (error) {
     const graphqlError =
       error instanceof GraphQLError
@@ -604,6 +645,7 @@ export function grafastPrepare(
 
   const executionTimeout = options.timeouts?.execution ?? null;
   return executePreemptive(
+    args,
     operationPlan,
     variableValues,
     context,
@@ -789,7 +831,7 @@ async function processStream(
         layerPlan: directLayerPlanChild,
         size,
         store,
-        hasErrors: false,
+        flagUnion: 0,
         polymorphicPathList,
         iterators,
       },
@@ -959,7 +1001,7 @@ function processSingleDeferred(
       layerPlan: outputPlan.layerPlan,
       size,
       store,
-      hasErrors: false,
+      flagUnion: 0,
       polymorphicPathList,
       iterators,
     },

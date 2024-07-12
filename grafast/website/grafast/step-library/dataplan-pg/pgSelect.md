@@ -351,6 +351,24 @@ Returns a `pgSelect` representing the records related via the
 
 Returns a PgClassExpressionStep representing the entire table, useful for debugging or to use with `pgSelectSingleFromRecord`.
 
+Here's a debugging example, we log out the full record to make sure it's the one we wanted:
+
+```ts
+const plans = {
+  Query: {
+    getUserById(_, { $id }) {
+      const $user = usersResource.get({ id: $id });
+
+      // Get the full user object as a record and log it for debugging:
+      const $record = $user.record();
+      sideEffect($record, (user) => console.dir(user));
+
+      return $user;
+    },
+  },
+};
+```
+
 ### $pgSelectSingle.cursor()
 
 Returns a step representing the cursor of this row, typically used for

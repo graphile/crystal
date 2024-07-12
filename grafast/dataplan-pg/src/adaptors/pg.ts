@@ -14,6 +14,7 @@ import type {
   Notification,
   Pool,
   PoolClient,
+  PoolConfig,
   QueryArrayConfig,
   QueryConfig,
 } from "pg";
@@ -27,6 +28,27 @@ import type {
 } from "../executor.js";
 import type { MakePgServiceOptions } from "../interfaces.js";
 import type { PgAdaptor } from "../pgServices.js";
+
+declare global {
+  namespace Grafast {
+    interface Context {
+      pgSettings: Record<string, string | undefined> | null;
+      withPgClient: WithPgClient<NodePostgresPgClient>;
+      pgSubscriber: PgSubscriber | null;
+    }
+  }
+  namespace GraphileConfig {
+    interface PgAdaptors {
+      "@dataplan/pg/adaptors/pg": {
+        adaptorSettings: PgAdaptorSettings | undefined;
+        makePgServiceOptions: PgAdaptorMakePgServiceOptions;
+        client: NodePostgresPgClient;
+      };
+    }
+  }
+}
+
+const PgPool = pg.Pool ?? (pg as any).default?.Pool;
 
 // Set `DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE=0` to disable prepared statements
 const cacheSizeFromEnv = process.env.DATAPLAN_PG_PREPARED_STATEMENT_CACHE_SIZE
@@ -66,7 +88,7 @@ export interface NodePostgresPgClient extends PgClient {
 }
 
 function newNodePostgresPgClient(
-  pgClient: pg.PoolClient,
+  pgClient: PoolClient,
   txLevel: number,
   alwaysQueue: boolean,
   alreadyInTransaction: boolean,
@@ -195,8 +217,8 @@ declare module "pg" {
 }
 
 async function makeNodePostgresWithPgClient_inner<T>(
-  pgClient: pg.PoolClient,
-  pgSettings: { [key: string]: string } | null,
+  pgClient: PoolClient,
+  pgSettings: Record<string, string | undefined> | null,
   callback: (client: NodePostgresPgClient) => T | Promise<T>,
   alwaysQueue: boolean,
   alreadyInTransaction: boolean,
@@ -266,7 +288,7 @@ async function makeNodePostgresWithPgClient_inner<T>(
 }
 
 /**
- * Returns a `withPgClient` for the given `pg.Pool` instance.
+ * Returns a `withPgClient` for the given `Pool` instance.
  */
 export function makePgAdaptorWithPgClient(
   pool: Pool,
@@ -317,12 +339,12 @@ export function makePgAdaptorWithPgClient(
 }
 
 /**
- * Returns a `withPgClient` for the given `pg.PoolClient` instance. ONLY
+ * Returns a `withPgClient` for the given `PoolClient` instance. ONLY
  * SUITABLE FOR TESTS!
  *
  */
 export function makeWithPgClientViaPgClientAlreadyInTransaction(
-  pgClient: pg.PoolClient,
+  pgClient: PoolClient,
   alreadyInTransaction = false,
 ): WithPgClient<NodePostgresPgClient> {
   const release = () => {};
@@ -354,28 +376,35 @@ export function makeWithPgClientViaPgClientAlreadyInTransaction(
   return withPgClient;
 }
 
-export interface PgAdaptorOptions {
+export interface PgAdaptorSettings extends CommonPgAdaptorAndServiceSettings {
   /** ONLY FOR USE IN TESTS! */
-  poolClient?: pg.PoolClient;
+  poolClient?: PoolClient;
   /** ONLY FOR USE IN TESTS! */
   poolClientIsInTransaction?: boolean;
   /** ONLY FOR USE IN TESTS! */
-  superuserPoolClient?: pg.PoolClient;
+  superuserPoolClient?: PoolClient;
   /** ONLY FOR USE IN TESTS! */
   superuserPoolClientIsInTransaction?: boolean;
+}
 
+interface CommonPgAdaptorAndServiceSettings {
   pool?: Pool;
-  poolConfig?: Omit<pg.PoolConfig, "connectionString">;
+  poolConfig?: Omit<PoolConfig, "connectionString">;
   connectionString?: string;
 
   /** For installing the watch fixtures */
   superuserPool?: Pool;
   /** For installing the watch fixtures */
+  superuserPoolConfig?: Omit<PoolConfig, "connectionString">;
+  /** For installing the watch fixtures */
   superuserConnectionString?: string;
 }
 
+/** @deprecated Use PgAdaptorSettings instead. */
+export type PgAdaptorOptions = PgAdaptorSettings;
+
 export function createWithPgClient(
-  options: PgAdaptorOptions = Object.create(null),
+  options: PgAdaptorSettings = Object.create(null),
   variant?: "SUPERUSER" | string | null,
 ): WithPgClient<NodePostgresPgClient> {
   if (variant === "SUPERUSER") {
@@ -387,8 +416,8 @@ export function createWithPgClient(
         options.superuserPoolClientIsInTransaction,
       );
     } else if (options.superuserConnectionString) {
-      const pool = new pg.Pool({
-        ...options.poolConfig,
+      const pool = new PgPool({
+        ...options.superuserPoolConfig,
         connectionString: options.superuserConnectionString,
       });
       const release = () => pool.end();
@@ -404,7 +433,7 @@ export function createWithPgClient(
       options.poolClientIsInTransaction,
     );
   } else {
-    const pool = new pg.Pool({
+    const pool = new PgPool({
       ...options.poolConfig,
       connectionString: options.connectionString,
     });
@@ -414,8 +443,10 @@ export function createWithPgClient(
 }
 
 // This is here as a TypeScript assertion, to ensure we conform to PgAdaptor
-const _testValidAdaptor: PgAdaptor<"@dataplan/pg/adaptors/pg">["createWithPgClient"] =
-  createWithPgClient;
+const adaptor: PgAdaptor<"@dataplan/pg/adaptors/pg"> = {
+  createWithPgClient,
+  makePgService,
+};
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -702,26 +733,48 @@ export class PgSubscriber<
   }
 }
 
-declare global {
-  namespace Grafast {
-    interface Context {
-      pgSettings: {
-        [key: string]: string;
-      } | null;
-      withPgClient: WithPgClient<NodePostgresPgClient>;
-      pgSubscriber: PgSubscriber | null;
-    }
-  }
+export interface PgAdaptorMakePgServiceOptions
+  extends MakePgServiceOptions,
+    CommonPgAdaptorAndServiceSettings {}
+
+function mkpool(
+  name: string,
+  releasers: (() => void | PromiseLike<void>)[],
+  poolConfig: Omit<PoolConfig, "connectionString"> | undefined,
+  connectionString: string | undefined,
+) {
+  const pool = new PgPool({ ...poolConfig, connectionString });
+  releasers.push(() => pool!.end());
+
+  // If you pass your own pool, you're responsible for doing this yourself
+  pool.on("connect", (client) => {
+    client.on("error", (e) => {
+      console.error(`Client error (active, ${name})`, e);
+    });
+  });
+  pool.on("error", (e) => {
+    console.error(`Client error (in pool, ${name})`, e);
+  });
+  return pool;
 }
 
 export function makePgService(
-  options: MakePgServiceOptions & { pool?: pg.Pool },
-): GraphileConfig.PgServiceConfiguration {
+  options: PgAdaptorMakePgServiceOptions,
+): GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg"> {
   const {
     name = "main",
+
+    // Begin: CommonPgAdaptorAndServiceSettings
+    pool: rawPool,
+    poolConfig,
     connectionString,
-    schemas,
+
+    superuserPool: rawSuperuserPool,
+    superuserPoolConfig,
     superuserConnectionString,
+    // End: CommonPgAdaptorAndServiceSettings
+
+    schemas,
     withPgClientKey = name === "main" ? "withPgClient" : `${name}_withPgClient`,
     pgSettingsKey = name === "main" ? "pgSettings" : `${name}_pgSettings`,
     pgSubscriberKey = name === "main" ? "pgSubscriber" : `${name}_pgSubscriber`,
@@ -734,49 +787,49 @@ export function makePgService(
       `makePgService called with pgSettings but no pgSettingsKey - please indicate where the settings should be stored, e.g. 'pgSettingsKey: "pgSettings"' (must be unique across sources)`,
     );
   }
-  const Pool = pg.Pool ?? (pg as any).default?.Pool;
   const releasers: (() => void | PromiseLike<void>)[] = [];
-  let pool = options.pool;
-  if (!pool) {
-    pool = new Pool({ connectionString });
-    releasers.push(() => pool!.end());
-  }
-  if (!options.pool) {
-    // If you pass your own pool, you're responsible for doing this yourself
-    pool.on("connect", (client) => {
-      client.on("error", (e) => {
-        console.error("Client error (active)", e);
-      });
-    });
-    pool.on("error", (e) => {
-      console.error("Client error (in pool)", e);
-    });
-  }
+
+  const pool =
+    rawPool ?? mkpool("pool", releasers, poolConfig, connectionString);
+
+  const superuserPool =
+    rawSuperuserPool ??
+    (superuserConnectionString
+      ? mkpool(
+          "superuserPool",
+          releasers,
+          superuserPoolConfig,
+          superuserConnectionString,
+        )
+      : undefined);
+
   let pgSubscriber = options.pgSubscriber ?? null;
   if (!pgSubscriber && pubsub) {
     pgSubscriber = new PgSubscriber(pool);
     releasers.push(() => pgSubscriber!.release?.());
   }
-  const service: GraphileConfig.PgServiceConfiguration = {
-    name,
-    schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
-    withPgClientKey: withPgClientKey as any,
-    pgSettingsKey: pgSettingsKey as any,
-    pgSubscriberKey: pgSubscriberKey as any,
-    pgSettings,
-    pgSettingsForIntrospection,
-    pgSubscriber,
-    adaptor: "@dataplan/pg/adaptors/pg",
-    adaptorSettings: {
-      pool,
-      superuserConnectionString,
-    },
-    async release() {
-      // Release in reverse order
-      for (const releaser of [...releasers].reverse()) {
-        await releaser();
-      }
-    },
-  };
+
+  const service: GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg"> =
+    {
+      name,
+      schemas: Array.isArray(schemas) ? schemas : [schemas ?? "public"],
+      withPgClientKey: withPgClientKey as any,
+      pgSettingsKey: pgSettingsKey as any,
+      pgSubscriberKey: pgSubscriberKey as any,
+      pgSettings,
+      pgSettingsForIntrospection,
+      pgSubscriber,
+      adaptor,
+      adaptorSettings: {
+        pool,
+        superuserPool,
+      },
+      async release() {
+        // Release in reverse order
+        for (const releaser of [...releasers].reverse()) {
+          await releaser();
+        }
+      },
+    };
   return service;
 }

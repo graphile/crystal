@@ -1,24 +1,21 @@
 // It's helpful to see the full error stack
+
 Error.stackTraceLimit = Infinity;
 
 if (process.env.DEBUG) {
   // When debug is set, outputting the console logs makes the tests slow.
-  jest.setTimeout(30000);
+  jest.setTimeout(60000);
 }
 
 import "graphile-config";
 import "graphile-build-pg";
 
-import type {
-  PgClient,
-  PgClientQuery,
-  PgClientResult,
-  WithPgClient,
-} from "@dataplan/pg";
+import type { PgClientQuery } from "@dataplan/pg";
 import { PgSubscriber } from "@dataplan/pg/adaptors/pg";
+import * as adaptor from "@dataplan/pg/adaptors/pg";
 import { promises as fsp } from "fs";
+import { mkdir, mkdtemp, rmdir, unlink } from "fs/promises";
 import {
-  $$bypassGraphQL,
   execute as grafastExecute,
   hookArgs,
   subscribe as grafastSubscribe,
@@ -41,9 +38,11 @@ import {
 } from "grafast/graphql";
 import { planToMermaid } from "grafast/mermaid";
 import { StreamDeferPlugin } from "graphile-build";
+import { exportSchema } from "graphile-export";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
 import type { JwtPayload } from "jsonwebtoken";
+import * as jsonwebtoken from "jsonwebtoken";
 import { decode } from "jsonwebtoken";
 import { relative } from "path";
 import type { PoolClient } from "pg";
@@ -60,6 +59,21 @@ import { makeV4Preset } from "../src/presets/v4.js";
  * we'll do the default behaviour of comparing to existing snapshots.
  */
 export const UPDATE_SNAPSHOTS = process.env.UPDATE_SNAPSHOTS === "1";
+
+const EXPORT_SCHEMA_MODE = process.env.EXPORT_SCHEMA as
+  | undefined
+  | "graphql-js"
+  | "typeDefs";
+
+if (
+  EXPORT_SCHEMA_MODE &&
+  EXPORT_SCHEMA_MODE !== "graphql-js" &&
+  EXPORT_SCHEMA_MODE !== "typeDefs"
+) {
+  throw new Error(
+    `EXPORT_SCHEMA must be unset, or set to 'graphql-js' or 'typeDefs'`,
+  );
+}
 
 async function getServerVersionNum(pgClient: Pool | PoolClient) {
   const versionResult = await pgClient.query("show server_version_num;");
@@ -160,6 +174,48 @@ export async function withPoolClientTransaction<T>(
   });
 }
 
+// Has to be within `postgraphile` folder otherwise imports won't work
+const TMPDIR = `${__dirname}/../.tests_tmp`;
+
+let mktmpPromise: any;
+function mktmp() {
+  if (!mktmpPromise) {
+    mktmpPromise = (async () => {
+      try {
+        await mkdir(TMPDIR);
+      } catch (e) {
+        if (e.code === "EEXIST") {
+          // NOOP
+        } else {
+          throw e;
+        }
+      }
+    })();
+  }
+  return mktmpPromise;
+}
+
+async function importExportedSchema(schema: GraphQLSchema) {
+  await mktmp();
+  const tempDir = await mkdtemp(`${TMPDIR}/postgraphiletests-`);
+  const targetFile = tempDir + "/schema.js";
+  await exportSchema(schema, targetFile, {
+    mode: EXPORT_SCHEMA_MODE,
+    modules: {
+      jsonwebtoken,
+    },
+  });
+  try {
+    const module = await import(targetFile);
+    await unlink(targetFile);
+    await rmdir(tempDir);
+    return module.schema;
+  } catch (e) {
+    console.log(`Importing ${targetFile} (schema export) failed: ${e}`);
+    throw e;
+  }
+}
+
 export async function runTestQuery(
   source: string,
   config: {
@@ -237,7 +293,7 @@ export async function runTestQuery(
     plugins: [StreamDeferPlugin],
     pgServices: [
       {
-        adaptor: "@dataplan/pg/adaptors/pg",
+        adaptor,
         name: "main",
         withPgClientKey: "withPgClient",
         pgSettingsKey: "pgSettings",
@@ -263,7 +319,7 @@ export async function runTestQuery(
         adaptorSettings: {
           connectionString,
         },
-      } as GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg">,
+      } satisfies GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg">,
     ],
     schema: {
       pgForbidSetofFunctionsToReturnNull:
@@ -278,7 +334,11 @@ export async function runTestQuery(
     },
   };
 
-  if (path.includes("/v4") || path.includes("/polymorphic")) {
+  if (
+    path.includes("/v4") ||
+    path.includes("/polymorphic") ||
+    path.includes("/relay")
+  ) {
     applyV4Stuff(preset, config);
   }
 
@@ -297,7 +357,11 @@ export async function runTestQuery(
     await testPool.query(setupSql);
   }
   try {
-    const { schema, resolvedPreset } = await makeSchema(preset);
+    const { schema: rawSchema, resolvedPreset } = await makeSchema(preset);
+
+    const schema = EXPORT_SCHEMA_MODE
+      ? await importExportedSchema(rawSchema)
+      : rawSchema;
     return await withTestWithPgClient<any>(
       testPool,
       queries,

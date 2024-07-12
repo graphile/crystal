@@ -309,8 +309,8 @@ nitty-gritty: each entry in the list is an object with the following keys (only
 - `name: string` - an arbitrary unique name for this config; please keep it
   alphanumeric! Don't set this unless you have more than one pgService; see
   warning below.
-- `adaptor: string` - the name of the module to use as the postgres adaptor;
-  e.g. `@dataplan/pg/adaptors/pg` for the `pg` module
+- `adaptor: PgAdaptor` - the module to use as the postgres adaptor; e.g. the
+  result of `import("@dataplan/pg/adaptors/pg")` for the `pg` module
 - `adaptorSettings` - options to pass to the adaptor, these are different for
   each adaptor (see [`adaptorSettings`](#adaptorsettings) below)
 - `schemas: string[]` - an array of PostgreSQL schema names to use
@@ -338,6 +338,7 @@ nitty-gritty: each entry in the list is an object with the following keys (only
 
 ```js title="Example manual configuration"
 import * as pg from "pg";
+import * as adaptor from "@dataplan/pg/adaptors/pg";
 
 const pgServices = [
   {
@@ -345,7 +346,7 @@ const pgServices = [
     schemas: ["app_public"],
     pgSettingsKey: "pgSettings",
     withPgClientKey: "withPgClient",
-    adaptor: "@dataplan/pg/adaptors/pg",
+    adaptor,
     adaptorSettings: {
       pool: new pg.Pool({ connectionString: process.env.DATABASE_URL }),
       // superuserConnectionString: process.env.SUPERUSER_DATABASE_URL,
@@ -392,12 +393,14 @@ common set of optional configuration parameters:
 - `schemas`
 - `superuserConnectionString`
 - `pubsub` (create a pgSubscriber entry; should default to `true`)
-- pass-through options (same as in `pgServices` above):
+- pass-through options (a subset of those in `pgServices` above):
   - `name` (default: "main")
-  - `pgSettingsKey` (default with default `name`: `pgSettings`, otherwise: `${name}_pgSettings`)
-  - `withPgClientKey` (default with default `name`: `withPgClient`, otherwise: `${name}_withPgClient`)
-  - `pgSubscriberKey` (default with default `name`: `pgSubscriber`, otherwise: `${name}_pgSubscriber`)
   - `pgSettings`
+  - `pgSettingsKey` (default with default `name`: `pgSettings`, otherwise: `${name}_pgSettings`)
+  - `pgSettingsForIntrospection`
+  - `withPgClientKey` (default with default `name`: `withPgClient`, otherwise: `${name}_withPgClient`)
+  - `pgSubscriber`
+  - `pgSubscriberKey` (default with default `name`: `pgSubscriber`, otherwise: `${name}_pgSubscriber`)
 
 :::info
 
@@ -460,8 +463,6 @@ primarily, it accepts the following options:
 - `pool` - pass your own pre-built `pg.Pool` instance to use, in which case all
   other (non-superuser) options will be ignored. You are responsible for
   releasing this pool!
-- `superuserPool` - as `pool`, but for superuser connections (only needed to
-  install the watch fixtures in watch mode)
 - `connectionString` - the database connection string to use, we'll create a
   pool for you automatically (and handle releasing it) using this connection
   string
@@ -469,10 +470,18 @@ primarily, it accepts the following options:
   `connectionString`) to pass through to `pg.Pool`; see the [pg.Pool
   options](https://node-postgres.com/apis/pool) which inherit the [pg.Client
   options](https://node-postgres.com/apis/client).
-- `superuserConnectionString` - as `connectionString`, but for superuser
-  connections (only needed to install the watch fixtures in watch mode)
 - `pubsub` (default: `true`) - enable LISTEN/NOTIFY via creation of a
   `pgSubscriber`
+- `superuserPool` - as `pool`, but for superuser connections (only used to
+  install the watch fixtures in watch mode)
+- `superuserConnectionString` - as `connectionString`, but for superuser
+  connections (only used to install the watch fixtures in watch mode)
+- `superuserPoolConfig` - as `poolConfig`, but for superuser
+  connections (only used to install the watch fixtures in watch mode)
+
+Note if `pool` is provided then `connectionString` and `poolConfig` should not
+be specified. Similarly if `superuserPool` is provided then
+`superuserConnectionString` and `superuserPoolConfig` should not be specified.
 
 ### `gather` options
 
@@ -723,7 +732,7 @@ export default {
 };
 ```
 
-If you're using the PostGraphile CLI then you won't have middlewares to do the
+If you're using the PostGraphile CLI then you won't have middleware to do the
 heavy lifting for you, but you can still process incoming request headers -
 this more complicated example extracts the user's ID from a JWT and sends that
 and the value of a specific HTTP header to PostgreSQL:

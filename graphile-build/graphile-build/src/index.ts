@@ -8,7 +8,7 @@ import {
   lexicographicSortSchema,
   printSchema,
 } from "grafast/graphql";
-import { applyHooks, AsyncHooks, resolvePresets } from "graphile-config";
+import { AsyncHooks, orderedApply, resolvePresets } from "graphile-config";
 
 import extend from "./extend.js";
 import { makeInitialInflection } from "./inflection.js";
@@ -39,6 +39,7 @@ export {
   constantCase,
   constantCaseAll,
   EXPORTABLE,
+  EXPORTABLE_OBJECT_CLONE,
   formatInsideUnderscores,
   gatherConfig,
   pluralize,
@@ -121,7 +122,7 @@ export const buildInflection = (
     }
 
     // Overwrite the inflectors
-    applyHooks(
+    orderedApply(
       plugins,
       (plugin) => plugin.inflection?.replace,
       (inflectorName, replacementFunction, plugin) => {
@@ -233,7 +234,7 @@ const gatherBase = (
     }
 
     // Register the hooks
-    applyHooks(
+    orderedApply(
       gatherPlugins,
       (p) => p.gather!.hooks,
       (name, fn, plugin) => {
@@ -742,7 +743,12 @@ declare global {
       replace?: {
         [key in keyof GraphileBuild.Inflection]?: (
           this: GraphileBuild.Inflection,
-          previous: GraphileBuild.Inflection[key] | undefined,
+          previous:
+            | // This is specifically so the `this` argument is removed
+            ((
+                ...args: Parameters<GraphileBuild.Inflection[key]>
+              ) => ReturnType<GraphileBuild.Inflection[key]>)
+            | undefined,
           options: ResolvedPreset,
           ...args: Parameters<GraphileBuild.Inflection[key]>
         ) => ReturnType<GraphileBuild.Inflection[key]>;

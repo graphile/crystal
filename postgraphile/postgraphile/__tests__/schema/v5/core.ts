@@ -1,3 +1,4 @@
+import * as adaptor from "@dataplan/pg/adaptors/pg";
 import { writeFile } from "fs/promises";
 import type { PromiseOrDirect } from "grafast";
 import type { GraphQLSchema } from "grafast/graphql";
@@ -13,7 +14,7 @@ import {
   withPoolClientTransaction,
 } from "../../helpers.js";
 
-jest.setTimeout(30000);
+jest.setTimeout(60000);
 
 let countByPath = Object.create(null);
 
@@ -42,7 +43,7 @@ export const test =
         plugins: [StripOidsPlugin],
         pgServices: [
           {
-            adaptor: "@dataplan/pg/adaptors/pg",
+            adaptor,
             name: "main",
             withPgClientKey: "withPgClient",
             pgSettingsKey: "pgSettings",
@@ -52,7 +53,7 @@ export const test =
             adaptorSettings: {
               poolClient: client,
             },
-          } as any, //GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg">,
+          } satisfies GraphileConfig.PgServiceConfiguration<"@dataplan/pg/adaptors/pg">,
         ],
         schema: {
           ...graphileBuildOptions,
