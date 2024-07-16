@@ -9,40 +9,37 @@ graph TD
 
 
     %% plan dependencies
-    Object12{{"Object[12∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access10{{"Access[10∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access11{{"Access[11∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access10 & Access11 --> Object12
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value3 --> Access10
-    __Value3 --> Access11
-    __Value0["__Value[0∈0]"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    PgSelect9[["PgSelect[9∈1]<br />ᐸauthenticate_fail(mutation)ᐳ"]]:::sideeffectplan
-    Object12 --> PgSelect9
-    First13{{"First[13∈1]"}}:::plan
-    PgSelect9 --> First13
-    PgSelectSingle14{{"PgSelectSingle[14∈1]<br />ᐸauthenticate_failᐳ"}}:::plan
-    First13 --> PgSelectSingle14
-    Object15{{"Object[15∈1]<br />ᐸ{result}ᐳ"}}:::plan
-    PgSelectSingle14 --> Object15
-    PgClassExpression16{{"PgClassExpression[16∈2]<br />ᐸ__authenticate_fail__ᐳ"}}:::plan
-    PgSelectSingle14 --> PgClassExpression16
+    Object11{{"Object[11∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access9{{"Access[9∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access10{{"Access[10∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access9 & Access10 --> Object11
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access9
+    __Value2 --> Access10
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    PgSelect8[["PgSelect[8∈1] ➊<br />ᐸauthenticate_fail(mutation)ᐳ"]]:::sideeffectplan
+    Object11 --> PgSelect8
+    First12{{"First[12∈1] ➊"}}:::plan
+    PgSelect8 --> First12
+    PgSelectSingle13{{"PgSelectSingle[13∈1] ➊<br />ᐸauthenticate_failᐳ"}}:::plan
+    First12 --> PgSelectSingle13
+    Object14{{"Object[14∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgSelectSingle13 --> Object14
+    PgClassExpression15{{"PgClassExpression[15∈2] ➊<br />ᐸ__authenticate_fail__ᐳ"}}:::plan
+    PgSelectSingle13 --> PgClassExpression15
 
     %% define steps
 
     subgraph "Buckets for mutations/v4/authenticateFail"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access10,Access11,Object12 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 12<br /><br />1: PgSelect[9]<br />2: <br />ᐳ: 13, 14, 15"):::bucket
+    class Bucket0,__Value2,__Value4,Access9,Access10,Object11 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 11<br /><br />1: PgSelect[8]<br />2: <br />ᐳ: 12, 13, 14"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect9,First13,PgSelectSingle14,Object15 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 14, 15<br /><br />ROOT Object{1}ᐸ{result}ᐳ[15]"):::bucket
+    class Bucket1,PgSelect8,First12,PgSelectSingle13,Object14 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 13, 14<br /><br />ROOT Object{1}ᐸ{result}ᐳ[14]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,PgClassExpression16 bucket2
+    class Bucket2,PgClassExpression15 bucket2
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object12,Access10,Access11,__Value0,__Value3,__Value5,PgSelect9,First13,PgSelectSingle14,Object15,PgClassExpression16 unary
     end

@@ -118,22 +118,22 @@ const parseAndValidate = (
 };
 
 /**
- * @deprecated Second and third parameters should be passed as part of args,
- * specifically `resolvedPreset` and `requestContext`.
- */
-export function grafast(
-  args: GrafastArgs,
-  legacyResolvedPreset?: GraphileConfig.ResolvedPreset,
-  legacyCtx?: Partial<Grafast.RequestContext>,
-): PromiseOrValue<
-  ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
->;
-/**
  * A replacement for GraphQL.js' `graphql` method that calls Grafast's
  * execute instead
  */
 export function grafast(
   args: GrafastArgs,
+): PromiseOrValue<
+  ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
+>;
+/**
+ * @deprecated Second and third parameters should be passed as part of args,
+ * specifically `resolvedPreset` and `requestContext`.
+ */
+export function grafast(
+  args: GrafastArgs,
+  legacyResolvedPreset?: GraphileConfig.ResolvedPreset | undefined,
+  legacyCtx?: Partial<Grafast.RequestContext> | undefined,
 ): PromiseOrValue<
   ExecutionResult | AsyncGenerator<AsyncExecutionResult, void, undefined>
 >;

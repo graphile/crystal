@@ -13,6 +13,7 @@ import { pathToFileURL } from "node:url";
 import { inspect } from "node:util";
 
 import { getWithPgClientFromPgService } from "@dataplan/pg";
+import { makePgService } from "@dataplan/pg/adaptors/pg";
 import { envelop, useExtendContext, useSchema } from "@envelop/core";
 import { useParserCache } from "@envelop/parser-cache";
 import { useValidationCache } from "@envelop/validation-cache";
@@ -56,16 +57,13 @@ pool.on("error", (e) => {
       extends: [graphileBuildPreset, graphileBuildPgPreset],
       plugins: [QueryQueryPlugin, SwallowErrorsPlugin],
       pgServices: [
-        {
+        makePgService({
           name: "main",
           schemas: ["a", "b", "c"],
           pgSettingsKey: "pgSettings",
           withPgClientKey: "withPgClient",
-          adaptor: "@dataplan/pg/adaptors/pg",
-          adaptorSettings: {
-            pool,
-          },
-        },
+          pool,
+        }),
       ],
       gather: {
         pgJwtTypes: "b.jwt_token",

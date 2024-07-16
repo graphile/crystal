@@ -21,20 +21,20 @@ const sidebars = {
     },
     "index",
     // TODO: "examples",
-    {
-      type: "category",
-      label: "Usage",
-      link: {
-        type: "doc",
-        id: "usage",
-      },
-      items: ["usage-cli", "usage-library", "usage-schema", "config"],
-    },
-    "performance",
     "requirements",
+    "usage",
+    "customization-overview",
+    "performance",
     "required-knowledge",
-    "behavior",
-    "exporting-schema",
+    {
+      type: "html",
+      value: "<h4>USAGE</h4>",
+      defaultStyle: false,
+    },
+    "usage-cli",
+    "usage-library",
+    "usage-schema",
+    "config",
     {
       type: "html",
       value: "<h4>OPERATION</h4>",
@@ -81,6 +81,7 @@ const sidebars = {
     "refs",
     "aggregates",
     "postgresql-indexes",
+    "behavior",
     "security",
     {
       type: "category",
@@ -92,6 +93,7 @@ const sidebars = {
       items: ["subscriptions", "live-queries"],
     },
     "background-tasks",
+    "exporting-schema",
     "reserved-keywords",
     "debugging",
     {

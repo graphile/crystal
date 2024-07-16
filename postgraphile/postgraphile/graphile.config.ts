@@ -3,7 +3,11 @@ import type { PgSelectSingleStep } from "@dataplan/pg";
 import { TYPES } from "@dataplan/pg";
 import PersistedPlugin from "@grafserv/persisted";
 import { EXPORTABLE, exportSchema } from "graphile-export";
-import { gql, makeExtendSchemaPlugin } from "graphile-utils";
+import {
+  gql,
+  makeExtendSchemaPlugin,
+  makeWrapPlansPlugin,
+} from "graphile-utils";
 import * as jsonwebtoken from "jsonwebtoken";
 import type {} from "postgraphile";
 import { jsonParse } from "postgraphile/@dataplan/json";
@@ -17,6 +21,7 @@ import {
   lambda,
   listen,
   object,
+  sideEffect,
 } from "postgraphile/grafast";
 import { defaultMaskError } from "postgraphile/grafserv";
 import type {} from "postgraphile/grafserv/node";
@@ -36,6 +41,7 @@ declare global {
   namespace Grafast {
     interface Context {
       mol?: number;
+      number?: number;
     }
   }
 }
@@ -276,6 +282,41 @@ const LeftArmPlugin = makeExtendSchemaPlugin((build) => {
   };
 });
 
+const testResolver = EXPORTABLE(
+  (context, sideEffect) =>
+    function () {
+      const $context = context();
+      sideEffect($context, (context) => (context.number = 3));
+      sideEffect($context, (context) => context.number!++);
+      sideEffect($context, (_context) => {
+        throw new Error("Side effect 3 failed");
+      });
+      sideEffect($context, (context) => context.number!++);
+      sideEffect($context, (context) => context.number!++);
+      return $context.get("number");
+    },
+  [context, sideEffect],
+);
+
+const TestSideEffectCancellingPlugin = makeExtendSchemaPlugin({
+  typeDefs: gql/* GraphQL */ `
+    extend type Query {
+      testSideEffectCancelling: Int
+    }
+    extend type Mutation {
+      testSideEffectCancelling: Int
+    }
+  `,
+  plans: {
+    Mutation: {
+      testSideEffectCancelling: testResolver,
+    },
+    Query: {
+      testSideEffectCancelling: testResolver,
+    },
+  },
+});
+
 const preset: GraphileConfig.Preset = {
   plugins: [
     StreamDeferPlugin,
@@ -291,15 +332,23 @@ const preset: GraphileConfig.Preset = {
           }
           extend type Query {
             throw: Int
+            wrapMe: Int
           }
         `,
         plans: {
           Query: {
+            wrapMe: EXPORTABLE((constant) => () => constant(42), [constant]),
             throw: EXPORTABLE(
               (error) => () => {
                 return error(
-                  new Error(
-                    "You've requested the 'throw' field... which throws!",
+                  Object.assign(
+                    new Error(
+                      "You've requested the 'throw' field... which throws!",
+                    ),
+                    {
+                      metadata: true,
+                      mol: 42,
+                    },
                   ),
                 );
               },
@@ -330,6 +379,18 @@ const preset: GraphileConfig.Preset = {
           },
         },
       };
+    }),
+    makeWrapPlansPlugin({
+      Query: {
+        wrapMe(plan) {
+          return plan();
+        },
+      },
+      Mutation: {
+        updatePost(plan) {
+          return plan();
+        },
+      },
     }),
     makeExtendSchemaPlugin({
       typeDefs: gql`
@@ -384,6 +445,28 @@ const preset: GraphileConfig.Preset = {
         },
       },
     }),
+    makeExtendSchemaPlugin({
+      typeDefs: gql`
+        extend type Subscription {
+          error: Int
+        }
+      `,
+      plans: {
+        Subscription: {
+          error: {
+            subscribePlan: EXPORTABLE(
+              (constant, lambda) =>
+                function subscribePlan() {
+                  return lambda(constant(3), () => {
+                    throw new Error("Testing error");
+                  });
+                },
+              [constant, lambda],
+            ),
+          },
+        },
+      },
+    }),
     // PrimaryKeyMutationsOnlyPlugin,
     PersistedPlugin,
     makeRuruTitlePlugin("<New title text here!>"),
@@ -392,6 +475,7 @@ const preset: GraphileConfig.Preset = {
     RuruQueryParamsPlugin,
     RuruQueryParamsUpdatePlugin,
     ...(Math.random() > 2 ? [LeftArmPlugin] : []),
+    TestSideEffectCancellingPlugin,
   ],
   extends: [
     PostGraphileAmberPreset,

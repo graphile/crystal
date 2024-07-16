@@ -9,69 +9,66 @@ graph TD
 
 
     %% plan dependencies
-    Object18{{"Object[18∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access16{{"Access[16∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access17{{"Access[17∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access16 & Access17 --> Object18
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value3 --> Access16
-    __Value3 --> Access17
-    __Value0["__Value[0∈0]"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection19{{"Connection[19∈0]<br />ᐸ15ᐳ"}}:::plan
-    PgSelect20[["PgSelect[20∈1]<br />ᐸtᐳ"]]:::plan
-    Object18 & Connection19 --> PgSelect20
-    __Item21[/"__Item[21∈2]<br />ᐸ20ᐳ"\]:::itemplan
-    PgSelect20 ==> __Item21
-    PgSelectSingle22{{"PgSelectSingle[22∈2]<br />ᐸtᐳ"}}:::plan
-    __Item21 --> PgSelectSingle22
-    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__t__.”k”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression23
-    PgClassExpression24{{"PgClassExpression[24∈3]<br />ᐸ__t__.”v”ᐳ"}}:::plan
-    PgSelectSingle22 --> PgClassExpression24
-    PgSelect28[["PgSelect[28∈5]<br />ᐸfrmcdc_workHourᐳ"]]:::plan
-    __Item27[/"__Item[27∈5]<br />ᐸ24ᐳ"\]:::itemplan
-    Object18 & __Item27 --> PgSelect28
-    PgClassExpression24 ==> __Item27
-    __Item32[/"__Item[32∈6]<br />ᐸ28ᐳ"\]:::itemplan
-    PgSelect28 ==> __Item32
-    PgSelectSingle33{{"PgSelectSingle[33∈6]<br />ᐸfrmcdc_workHourᐳ"}}:::plan
-    __Item32 --> PgSelectSingle33
-    PgClassExpression34{{"PgClassExpression[34∈6]<br />ᐸ__frmcdc_w...rom_hours”ᐳ"}}:::plan
-    PgSelectSingle33 --> PgClassExpression34
-    PgClassExpression35{{"PgClassExpression[35∈6]<br />ᐸ__frmcdc_w...m_minutes”ᐳ"}}:::plan
-    PgSelectSingle33 --> PgClassExpression35
-    PgClassExpression36{{"PgClassExpression[36∈6]<br />ᐸ__frmcdc_w...”to_hours”ᐳ"}}:::plan
-    PgSelectSingle33 --> PgClassExpression36
-    PgClassExpression37{{"PgClassExpression[37∈6]<br />ᐸ__frmcdc_w...o_minutes”ᐳ"}}:::plan
-    PgSelectSingle33 --> PgClassExpression37
+    Object17{{"Object[17∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access15{{"Access[15∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access16{{"Access[16∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access15 & Access16 --> Object17
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access15
+    __Value2 --> Access16
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection18{{"Connection[18∈0] ➊<br />ᐸ14ᐳ"}}:::plan
+    PgSelect19[["PgSelect[19∈1] ➊<br />ᐸtᐳ"]]:::plan
+    Object17 & Connection18 --> PgSelect19
+    __Item20[/"__Item[20∈2]<br />ᐸ19ᐳ"\]:::itemplan
+    PgSelect19 ==> __Item20
+    PgSelectSingle21{{"PgSelectSingle[21∈2]<br />ᐸtᐳ"}}:::plan
+    __Item20 --> PgSelectSingle21
+    PgClassExpression22{{"PgClassExpression[22∈3]<br />ᐸ__t__.”k”ᐳ"}}:::plan
+    PgSelectSingle21 --> PgClassExpression22
+    PgClassExpression23{{"PgClassExpression[23∈3]<br />ᐸ__t__.”v”ᐳ"}}:::plan
+    PgSelectSingle21 --> PgClassExpression23
+    PgSelect27[["PgSelect[27∈5]<br />ᐸfrmcdc_workHourᐳ"]]:::plan
+    __Item26[/"__Item[26∈5]<br />ᐸ23ᐳ"\]:::itemplan
+    Object17 & __Item26 --> PgSelect27
+    PgClassExpression23 ==> __Item26
+    __Item31[/"__Item[31∈6]<br />ᐸ27ᐳ"\]:::itemplan
+    PgSelect27 ==> __Item31
+    PgSelectSingle32{{"PgSelectSingle[32∈6]<br />ᐸfrmcdc_workHourᐳ"}}:::plan
+    __Item31 --> PgSelectSingle32
+    PgClassExpression33{{"PgClassExpression[33∈6]<br />ᐸ__frmcdc_w...rom_hours”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression33
+    PgClassExpression34{{"PgClassExpression[34∈6]<br />ᐸ__frmcdc_w...m_minutes”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression34
+    PgClassExpression35{{"PgClassExpression[35∈6]<br />ᐸ__frmcdc_w...”to_hours”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression35
+    PgClassExpression36{{"PgClassExpression[36∈6]<br />ᐸ__frmcdc_w...o_minutes”ᐳ"}}:::plan
+    PgSelectSingle32 --> PgClassExpression36
 
     %% define steps
 
     subgraph "Buckets for queries/v4/nested_arrays.select"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Access16,Access17,Object18,Connection19 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 18, 19<br /><br />ROOT Connectionᐸ15ᐳ[19]"):::bucket
+    class Bucket0,__Value2,__Value4,Access15,Access16,Object17,Connection18 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 17, 18<br /><br />ROOT Connectionᐸ14ᐳ[18]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgSelect20 bucket1
-    Bucket2("Bucket 2 (listItem)<br />Deps: 18<br /><br />ROOT __Item{2}ᐸ20ᐳ[21]"):::bucket
+    class Bucket1,PgSelect19 bucket1
+    Bucket2("Bucket 2 (listItem)<br />Deps: 17<br /><br />ROOT __Item{2}ᐸ19ᐳ[20]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item21,PgSelectSingle22 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 22, 18<br /><br />ROOT PgSelectSingle{2}ᐸtᐳ[22]"):::bucket
+    class Bucket2,__Item20,PgSelectSingle21 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 21, 17<br /><br />ROOT PgSelectSingle{2}ᐸtᐳ[21]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression23,PgClassExpression24 bucket3
-    Bucket5("Bucket 5 (listItem)<br />Deps: 18<br /><br />ROOT __Item{5}ᐸ24ᐳ[27]"):::bucket
+    class Bucket3,PgClassExpression22,PgClassExpression23 bucket3
+    Bucket5("Bucket 5 (listItem)<br />Deps: 17<br /><br />ROOT __Item{5}ᐸ23ᐳ[26]"):::bucket
     classDef bucket5 stroke:#7fff00
-    class Bucket5,__Item27,PgSelect28 bucket5
-    Bucket6("Bucket 6 (listItem)<br />ROOT __Item{6}ᐸ28ᐳ[32]"):::bucket
+    class Bucket5,__Item26,PgSelect27 bucket5
+    Bucket6("Bucket 6 (listItem)<br /><br />ROOT __Item{6}ᐸ27ᐳ[31]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,__Item32,PgSelectSingle33,PgClassExpression34,PgClassExpression35,PgClassExpression36,PgClassExpression37 bucket6
+    class Bucket6,__Item31,PgSelectSingle32,PgClassExpression33,PgClassExpression34,PgClassExpression35,PgClassExpression36 bucket6
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     Bucket3 --> Bucket5
     Bucket5 --> Bucket6
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object18,Access16,Access17,__Value0,__Value3,__Value5,Connection19,PgSelect20 unary
     end

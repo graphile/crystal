@@ -9,817 +9,816 @@ graph TD
 
 
     %% plan dependencies
-    Object28{{"Object[28∈0]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access26{{"Access[26∈0]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access27{{"Access[27∈0]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access26 & Access27 --> Object28
-    Lambda22{{"Lambda[22∈0]<br />ᐸdecode_Person_base64JSONᐳ"}}:::plan
-    Constant591{{"Constant[591∈0]<br />ᐸ'WyJwZW9wbGUiLDFd'ᐳ"}}:::plan
-    Constant591 --> Lambda22
-    Access23{{"Access[23∈0]<br />ᐸ22.1ᐳ"}}:::plan
-    Lambda22 --> Access23
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value3 --> Access26
-    __Value3 --> Access27
-    __Value0["__Value[0∈0]"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Constant592{{"Constant[592∈0]<br />ᐸ'John Smith Sr.'ᐳ"}}:::plan
-    Constant593{{"Constant[593∈0]<br />ᐸ'An older John Smith'ᐳ"}}:::plan
-    Constant594{{"Constant[594∈0]<br />ᐸ'graphile-build.issue.27.exists@example.com'ᐳ"}}:::plan
-    Constant595{{"Constant[595∈0]<br />ᐸ'hello'ᐳ"}}:::plan
-    Constant596{{"Constant[596∈0]<br />ᐸ'WyJwZW9wbGUiLDJd'ᐳ"}}:::plan
-    Constant597{{"Constant[597∈0]<br />ᐸ'Sarah Smith'ᐳ"}}:::plan
-    Constant598{{"Constant[598∈0]<br />ᐸ'sarah.smith@email.com'ᐳ"}}:::plan
-    Constant600{{"Constant[600∈0]<br />ᐸ'world'ᐳ"}}:::plan
-    Constant602{{"Constant[602∈0]<br />ᐸ'Now with an “H.”'ᐳ"}}:::plan
-    Constant605{{"Constant[605∈0]<br />ᐸnullᐳ"}}:::plan
-    Constant607{{"Constant[607∈0]<br />ᐸ3ᐳ"}}:::plan
-    Constant608{{"Constant[608∈0]<br />ᐸ'Best Pal'ᐳ"}}:::plan
-    Constant609{{"Constant[609∈0]<br />ᐸ'I have taken over Budd’s account. Hehehe.'ᐳ"}}:::plan
-    Constant611{{"Constant[611∈0]<br />ᐸ'kathryn.ramirez@email.com'ᐳ"}}:::plan
-    Constant612{{"Constant[612∈0]<br />ᐸ'Make art not friends.'ᐳ"}}:::plan
-    Constant614{{"Constant[614∈0]<br />ᐸ'WyJjb21wb3VuZF9rZXlzIiwxLDJd'ᐳ"}}:::plan
-    Constant615{{"Constant[615∈0]<br />ᐸ2ᐳ"}}:::plan
-    Constant616{{"Constant[616∈0]<br />ᐸtrueᐳ"}}:::plan
-    Constant621{{"Constant[621∈0]<br />ᐸfalseᐳ"}}:::plan
-    Constant623{{"Constant[623∈0]<br />ᐸ4ᐳ"}}:::plan
-    Constant627{{"Constant[627∈0]<br />ᐸ'somethingelse@example.com'ᐳ"}}:::plan
-    Constant629{{"Constant[629∈0]<br />ᐸ1ᐳ"}}:::plan
-    Constant632{{"Constant[632∈0]<br />ᐸ'New String'ᐳ"}}:::plan
-    PgUpdateSingle25[["PgUpdateSingle[25∈1]<br />ᐸperson(id;person_full_name,about)ᐳ"]]:::sideeffectplan
-    Object28 -->|rejectNull| PgUpdateSingle25
-    Access23 & Constant592 & Constant593 --> PgUpdateSingle25
-    Object29{{"Object[29∈1]<br />ᐸ{result}ᐳ"}}:::plan
-    PgUpdateSingle25 --> Object29
-    Edge59{{"Edge[59∈2]"}}:::plan
-    PgSelectSingle58{{"PgSelectSingle[58∈2]<br />ᐸpersonᐳ"}}:::plan
-    PgCursor60{{"PgCursor[60∈2]"}}:::plan
-    Connection56{{"Connection[56∈2]<br />ᐸ52ᐳ"}}:::plan
-    PgSelectSingle58 & PgCursor60 & Connection56 --> Edge59
-    PgSelect52[["PgSelect[52∈2]<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression51{{"PgClassExpression[51∈2]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Object28 & PgClassExpression51 --> PgSelect52
-    PgUpdateSingle25 --> PgClassExpression51
-    First57{{"First[57∈2]"}}:::plan
-    PgSelect52 --> First57
-    First57 --> PgSelectSingle58
-    List62{{"List[62∈2]<br />ᐸ61ᐳ"}}:::plan
-    List62 --> PgCursor60
-    PgClassExpression61{{"PgClassExpression[61∈2]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle58 --> PgClassExpression61
-    PgClassExpression61 --> List62
-    Constant30{{"Constant[30∈2]<br />ᐸnullᐳ"}}:::plan
-    Constant31{{"Constant[31∈2]<br />ᐸ'people'ᐳ"}}:::plan
-    PgSelect41[["PgSelect[41∈3]<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression40{{"PgClassExpression[40∈3]<br />ᐸ__person__ᐳ"}}:::plan
-    Object28 & PgClassExpression40 & Constant594 --> PgSelect41
-    List33{{"List[33∈3]<br />ᐸ31,51ᐳ"}}:::plan
-    Constant31 & PgClassExpression51 --> List33
-    Lambda34{{"Lambda[34∈3]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List33 --> Lambda34
-    PgClassExpression36{{"PgClassExpression[36∈3]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgUpdateSingle25 --> PgClassExpression36
-    PgClassExpression37{{"PgClassExpression[37∈3]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    PgUpdateSingle25 --> PgClassExpression37
-    PgClassExpression38{{"PgClassExpression[38∈3]<br />ᐸ__person__.”about”ᐳ"}}:::plan
-    PgUpdateSingle25 --> PgClassExpression38
-    PgUpdateSingle25 --> PgClassExpression40
-    First45{{"First[45∈3]"}}:::plan
-    PgSelect41 --> First45
-    PgSelectSingle46{{"PgSelectSingle[46∈3]<br />ᐸpersonᐳ"}}:::plan
-    First45 --> PgSelectSingle46
-    PgClassExpression48{{"PgClassExpression[48∈3]<br />ᐸ”c”.”perso...lder! */<br />)ᐳ"}}:::plan
-    PgSelectSingle46 --> PgClassExpression48
-    List65{{"List[65∈4]<br />ᐸ31,61ᐳ"}}:::plan
-    Constant31 & PgClassExpression61 --> List65
-    Lambda66{{"Lambda[66∈4]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List65 --> Lambda66
-    Lambda69{{"Lambda[69∈6]<br />ᐸrawEncodeᐳ"}}:::plan
-    Constant68{{"Constant[68∈6]<br />ᐸ'query'ᐳ"}}:::plan
-    Constant68 --> Lambda69
-    PgUpdateSingle88[["PgUpdateSingle[88∈7]<br />ᐸperson(id;person_full_name,email)ᐳ"]]:::sideeffectplan
-    Object91{{"Object[91∈7]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access86{{"Access[86∈7]<br />ᐸ85.1ᐳ"}}:::plan
-    Object91 -->|rejectNull| PgUpdateSingle88
-    Access86 & Constant597 & Constant598 --> PgUpdateSingle88
-    Access89{{"Access[89∈7]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access90{{"Access[90∈7]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access89 & Access90 --> Object91
-    Object92{{"Object[92∈7]<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
-    PgUpdateSingle88 & Constant595 --> Object92
-    Lambda85{{"Lambda[85∈7]<br />ᐸdecode_Person_base64JSONᐳ"}}:::plan
-    Constant596 --> Lambda85
-    Lambda85 --> Access86
-    __Value3 --> Access89
-    __Value3 --> Access90
-    Edge121{{"Edge[121∈8]"}}:::plan
-    PgSelectSingle120{{"PgSelectSingle[120∈8]<br />ᐸpersonᐳ"}}:::plan
-    PgCursor122{{"PgCursor[122∈8]"}}:::plan
-    Connection118{{"Connection[118∈8]<br />ᐸ114ᐳ"}}:::plan
-    PgSelectSingle120 & PgCursor122 & Connection118 --> Edge121
-    PgSelect114[["PgSelect[114∈8]<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression113{{"PgClassExpression[113∈8]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Object91 & PgClassExpression113 --> PgSelect114
-    PgUpdateSingle88 --> PgClassExpression113
-    First119{{"First[119∈8]"}}:::plan
-    PgSelect114 --> First119
-    First119 --> PgSelectSingle120
-    List124{{"List[124∈8]<br />ᐸ123ᐳ"}}:::plan
-    List124 --> PgCursor122
-    PgClassExpression123{{"PgClassExpression[123∈8]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle120 --> PgClassExpression123
-    PgClassExpression123 --> List124
-    Constant93{{"Constant[93∈8]<br />ᐸ'people'ᐳ"}}:::plan
-    PgSelect103[["PgSelect[103∈9]<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression102{{"PgClassExpression[102∈9]<br />ᐸ__person__ᐳ"}}:::plan
-    Object91 & PgClassExpression102 & Constant594 --> PgSelect103
-    List95{{"List[95∈9]<br />ᐸ93,113ᐳ"}}:::plan
-    Constant93 & PgClassExpression113 --> List95
-    Lambda96{{"Lambda[96∈9]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List95 --> Lambda96
-    PgClassExpression98{{"PgClassExpression[98∈9]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgUpdateSingle88 --> PgClassExpression98
-    PgClassExpression99{{"PgClassExpression[99∈9]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    PgUpdateSingle88 --> PgClassExpression99
-    PgClassExpression100{{"PgClassExpression[100∈9]<br />ᐸ__person__.”about”ᐳ"}}:::plan
-    PgUpdateSingle88 --> PgClassExpression100
-    PgUpdateSingle88 --> PgClassExpression102
-    First107{{"First[107∈9]"}}:::plan
-    PgSelect103 --> First107
-    PgSelectSingle108{{"PgSelectSingle[108∈9]<br />ᐸpersonᐳ"}}:::plan
-    First107 --> PgSelectSingle108
-    PgClassExpression110{{"PgClassExpression[110∈9]<br />ᐸ”c”.”perso...lder! */<br />)ᐳ"}}:::plan
-    PgSelectSingle108 --> PgClassExpression110
-    List127{{"List[127∈10]<br />ᐸ93,123ᐳ"}}:::plan
-    Constant93 & PgClassExpression123 --> List127
-    Lambda128{{"Lambda[128∈10]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List127 --> Lambda128
-    Lambda131{{"Lambda[131∈12]<br />ᐸrawEncodeᐳ"}}:::plan
-    Constant130{{"Constant[130∈12]<br />ᐸ'query'ᐳ"}}:::plan
-    Constant130 --> Lambda131
-    PgUpdateSingle150[["PgUpdateSingle[150∈13]<br />ᐸperson(id;about)ᐳ"]]:::sideeffectplan
-    Object153{{"Object[153∈13]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access148{{"Access[148∈13]<br />ᐸ147.1ᐳ"}}:::plan
-    Object153 -->|rejectNull| PgUpdateSingle150
-    Access148 & Constant602 --> PgUpdateSingle150
-    Access151{{"Access[151∈13]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access152{{"Access[152∈13]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access151 & Access152 --> Object153
-    Object154{{"Object[154∈13]<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
-    PgUpdateSingle150 & Constant600 --> Object154
-    Lambda147{{"Lambda[147∈13]<br />ᐸdecode_Person_base64JSONᐳ"}}:::plan
-    Constant596 --> Lambda147
-    Lambda147 --> Access148
-    __Value3 --> Access151
-    __Value3 --> Access152
-    Edge183{{"Edge[183∈14]"}}:::plan
-    PgSelectSingle182{{"PgSelectSingle[182∈14]<br />ᐸpersonᐳ"}}:::plan
-    PgCursor184{{"PgCursor[184∈14]"}}:::plan
-    Connection180{{"Connection[180∈14]<br />ᐸ176ᐳ"}}:::plan
-    PgSelectSingle182 & PgCursor184 & Connection180 --> Edge183
-    PgSelect176[["PgSelect[176∈14]<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression175{{"PgClassExpression[175∈14]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Object153 & PgClassExpression175 --> PgSelect176
-    PgUpdateSingle150 --> PgClassExpression175
-    First181{{"First[181∈14]"}}:::plan
-    PgSelect176 --> First181
-    First181 --> PgSelectSingle182
-    List186{{"List[186∈14]<br />ᐸ185ᐳ"}}:::plan
-    List186 --> PgCursor184
-    PgClassExpression185{{"PgClassExpression[185∈14]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle182 --> PgClassExpression185
-    PgClassExpression185 --> List186
-    Constant155{{"Constant[155∈14]<br />ᐸ'people'ᐳ"}}:::plan
-    PgSelect165[["PgSelect[165∈15]<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression164{{"PgClassExpression[164∈15]<br />ᐸ__person__ᐳ"}}:::plan
-    Object153 & PgClassExpression164 & Constant594 --> PgSelect165
-    List157{{"List[157∈15]<br />ᐸ155,175ᐳ"}}:::plan
-    Constant155 & PgClassExpression175 --> List157
-    Lambda158{{"Lambda[158∈15]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List157 --> Lambda158
-    PgClassExpression160{{"PgClassExpression[160∈15]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgUpdateSingle150 --> PgClassExpression160
-    PgClassExpression161{{"PgClassExpression[161∈15]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    PgUpdateSingle150 --> PgClassExpression161
-    PgClassExpression162{{"PgClassExpression[162∈15]<br />ᐸ__person__.”about”ᐳ"}}:::plan
-    PgUpdateSingle150 --> PgClassExpression162
-    PgUpdateSingle150 --> PgClassExpression164
-    First169{{"First[169∈15]"}}:::plan
-    PgSelect165 --> First169
-    PgSelectSingle170{{"PgSelectSingle[170∈15]<br />ᐸpersonᐳ"}}:::plan
-    First169 --> PgSelectSingle170
-    PgClassExpression172{{"PgClassExpression[172∈15]<br />ᐸ”c”.”perso...lder! */<br />)ᐳ"}}:::plan
-    PgSelectSingle170 --> PgClassExpression172
-    List189{{"List[189∈16]<br />ᐸ155,185ᐳ"}}:::plan
-    Constant155 & PgClassExpression185 --> List189
-    Lambda190{{"Lambda[190∈16]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List189 --> Lambda190
-    Lambda193{{"Lambda[193∈18]<br />ᐸrawEncodeᐳ"}}:::plan
-    Constant192{{"Constant[192∈18]<br />ᐸ'query'ᐳ"}}:::plan
-    Constant192 --> Lambda193
-    PgUpdateSingle212[["PgUpdateSingle[212∈19]<br />ᐸperson(id;about)ᐳ"]]:::sideeffectplan
-    Object215{{"Object[215∈19]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access210{{"Access[210∈19]<br />ᐸ209.1ᐳ"}}:::plan
-    Object215 -->|rejectNull| PgUpdateSingle212
-    Access210 & Constant605 --> PgUpdateSingle212
-    Access213{{"Access[213∈19]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access214{{"Access[214∈19]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access213 & Access214 --> Object215
-    Lambda209{{"Lambda[209∈19]<br />ᐸdecode_Person_base64JSONᐳ"}}:::plan
-    Constant596 --> Lambda209
-    Lambda209 --> Access210
-    __Value3 --> Access213
-    __Value3 --> Access214
-    Object216{{"Object[216∈19]<br />ᐸ{result}ᐳ"}}:::plan
-    PgUpdateSingle212 --> Object216
-    Edge246{{"Edge[246∈20]"}}:::plan
-    PgSelectSingle245{{"PgSelectSingle[245∈20]<br />ᐸpersonᐳ"}}:::plan
-    PgCursor247{{"PgCursor[247∈20]"}}:::plan
-    Connection243{{"Connection[243∈20]<br />ᐸ239ᐳ"}}:::plan
-    PgSelectSingle245 & PgCursor247 & Connection243 --> Edge246
-    PgSelect239[["PgSelect[239∈20]<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression238{{"PgClassExpression[238∈20]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Object215 & PgClassExpression238 --> PgSelect239
-    PgUpdateSingle212 --> PgClassExpression238
-    First244{{"First[244∈20]"}}:::plan
-    PgSelect239 --> First244
-    First244 --> PgSelectSingle245
-    List249{{"List[249∈20]<br />ᐸ248ᐳ"}}:::plan
-    List249 --> PgCursor247
-    PgClassExpression248{{"PgClassExpression[248∈20]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle245 --> PgClassExpression248
-    PgClassExpression248 --> List249
-    Constant217{{"Constant[217∈20]<br />ᐸnullᐳ"}}:::plan
-    Constant218{{"Constant[218∈20]<br />ᐸ'people'ᐳ"}}:::plan
-    PgSelect228[["PgSelect[228∈21]<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression227{{"PgClassExpression[227∈21]<br />ᐸ__person__ᐳ"}}:::plan
-    Object215 & PgClassExpression227 & Constant594 --> PgSelect228
-    List220{{"List[220∈21]<br />ᐸ218,238ᐳ"}}:::plan
-    Constant218 & PgClassExpression238 --> List220
-    Lambda221{{"Lambda[221∈21]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List220 --> Lambda221
-    PgClassExpression223{{"PgClassExpression[223∈21]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgUpdateSingle212 --> PgClassExpression223
-    PgClassExpression224{{"PgClassExpression[224∈21]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    PgUpdateSingle212 --> PgClassExpression224
-    PgClassExpression225{{"PgClassExpression[225∈21]<br />ᐸ__person__.”about”ᐳ"}}:::plan
-    PgUpdateSingle212 --> PgClassExpression225
-    PgUpdateSingle212 --> PgClassExpression227
-    First232{{"First[232∈21]"}}:::plan
-    PgSelect228 --> First232
-    PgSelectSingle233{{"PgSelectSingle[233∈21]<br />ᐸpersonᐳ"}}:::plan
-    First232 --> PgSelectSingle233
-    PgClassExpression235{{"PgClassExpression[235∈21]<br />ᐸ”c”.”perso...lder! */<br />)ᐳ"}}:::plan
-    PgSelectSingle233 --> PgClassExpression235
-    List252{{"List[252∈22]<br />ᐸ218,248ᐳ"}}:::plan
-    Constant218 & PgClassExpression248 --> List252
-    Lambda253{{"Lambda[253∈22]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List252 --> Lambda253
-    Lambda256{{"Lambda[256∈24]<br />ᐸrawEncodeᐳ"}}:::plan
-    Constant255{{"Constant[255∈24]<br />ᐸ'query'ᐳ"}}:::plan
-    Constant255 --> Lambda256
-    PgUpdateSingle272[["PgUpdateSingle[272∈25]<br />ᐸperson(id;person_full_name,about)ᐳ"]]:::sideeffectplan
-    Object275{{"Object[275∈25]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object275 & Constant607 & Constant608 & Constant609 --> PgUpdateSingle272
-    Access273{{"Access[273∈25]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access274{{"Access[274∈25]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access273 & Access274 --> Object275
-    __Value3 --> Access273
-    __Value3 --> Access274
-    Object276{{"Object[276∈25]<br />ᐸ{result}ᐳ"}}:::plan
-    PgUpdateSingle272 --> Object276
-    Edge306{{"Edge[306∈26]"}}:::plan
-    PgSelectSingle305{{"PgSelectSingle[305∈26]<br />ᐸpersonᐳ"}}:::plan
-    PgCursor307{{"PgCursor[307∈26]"}}:::plan
-    Connection303{{"Connection[303∈26]<br />ᐸ299ᐳ"}}:::plan
-    PgSelectSingle305 & PgCursor307 & Connection303 --> Edge306
-    PgSelect299[["PgSelect[299∈26]<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression298{{"PgClassExpression[298∈26]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Object275 & PgClassExpression298 --> PgSelect299
-    PgUpdateSingle272 --> PgClassExpression298
-    First304{{"First[304∈26]"}}:::plan
-    PgSelect299 --> First304
-    First304 --> PgSelectSingle305
-    List309{{"List[309∈26]<br />ᐸ308ᐳ"}}:::plan
-    List309 --> PgCursor307
-    PgClassExpression308{{"PgClassExpression[308∈26]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle305 --> PgClassExpression308
-    PgClassExpression308 --> List309
-    Constant277{{"Constant[277∈26]<br />ᐸnullᐳ"}}:::plan
-    Constant278{{"Constant[278∈26]<br />ᐸ'people'ᐳ"}}:::plan
-    PgSelect288[["PgSelect[288∈27]<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression287{{"PgClassExpression[287∈27]<br />ᐸ__person__ᐳ"}}:::plan
-    Object275 & PgClassExpression287 & Constant594 --> PgSelect288
-    List280{{"List[280∈27]<br />ᐸ278,298ᐳ"}}:::plan
-    Constant278 & PgClassExpression298 --> List280
-    Lambda281{{"Lambda[281∈27]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List280 --> Lambda281
-    PgClassExpression283{{"PgClassExpression[283∈27]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgUpdateSingle272 --> PgClassExpression283
-    PgClassExpression284{{"PgClassExpression[284∈27]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    PgUpdateSingle272 --> PgClassExpression284
-    PgClassExpression285{{"PgClassExpression[285∈27]<br />ᐸ__person__.”about”ᐳ"}}:::plan
-    PgUpdateSingle272 --> PgClassExpression285
-    PgUpdateSingle272 --> PgClassExpression287
-    First292{{"First[292∈27]"}}:::plan
-    PgSelect288 --> First292
-    PgSelectSingle293{{"PgSelectSingle[293∈27]<br />ᐸpersonᐳ"}}:::plan
-    First292 --> PgSelectSingle293
-    PgClassExpression295{{"PgClassExpression[295∈27]<br />ᐸ”c”.”perso...lder! */<br />)ᐳ"}}:::plan
-    PgSelectSingle293 --> PgClassExpression295
-    List312{{"List[312∈28]<br />ᐸ278,308ᐳ"}}:::plan
-    Constant278 & PgClassExpression308 --> List312
-    Lambda313{{"Lambda[313∈28]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List312 --> Lambda313
-    Lambda316{{"Lambda[316∈30]<br />ᐸrawEncodeᐳ"}}:::plan
-    Constant315{{"Constant[315∈30]<br />ᐸ'query'ᐳ"}}:::plan
-    Constant315 --> Lambda316
-    PgUpdateSingle332[["PgUpdateSingle[332∈31]<br />ᐸperson(email;about)ᐳ"]]:::sideeffectplan
-    Object335{{"Object[335∈31]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object335 & Constant611 & Constant612 --> PgUpdateSingle332
-    Access333{{"Access[333∈31]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access334{{"Access[334∈31]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access333 & Access334 --> Object335
-    __Value3 --> Access333
-    __Value3 --> Access334
-    Object336{{"Object[336∈31]<br />ᐸ{result}ᐳ"}}:::plan
-    PgUpdateSingle332 --> Object336
-    Edge366{{"Edge[366∈32]"}}:::plan
-    PgSelectSingle365{{"PgSelectSingle[365∈32]<br />ᐸpersonᐳ"}}:::plan
-    PgCursor367{{"PgCursor[367∈32]"}}:::plan
-    Connection363{{"Connection[363∈32]<br />ᐸ359ᐳ"}}:::plan
-    PgSelectSingle365 & PgCursor367 & Connection363 --> Edge366
-    PgSelect359[["PgSelect[359∈32]<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression358{{"PgClassExpression[358∈32]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Object335 & PgClassExpression358 --> PgSelect359
-    PgUpdateSingle332 --> PgClassExpression358
-    First364{{"First[364∈32]"}}:::plan
-    PgSelect359 --> First364
-    First364 --> PgSelectSingle365
-    List369{{"List[369∈32]<br />ᐸ368ᐳ"}}:::plan
-    List369 --> PgCursor367
-    PgClassExpression368{{"PgClassExpression[368∈32]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle365 --> PgClassExpression368
-    PgClassExpression368 --> List369
-    Constant337{{"Constant[337∈32]<br />ᐸnullᐳ"}}:::plan
-    Constant338{{"Constant[338∈32]<br />ᐸ'people'ᐳ"}}:::plan
-    PgSelect348[["PgSelect[348∈33]<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression347{{"PgClassExpression[347∈33]<br />ᐸ__person__ᐳ"}}:::plan
-    Object335 & PgClassExpression347 & Constant594 --> PgSelect348
-    List340{{"List[340∈33]<br />ᐸ338,358ᐳ"}}:::plan
-    Constant338 & PgClassExpression358 --> List340
-    Lambda341{{"Lambda[341∈33]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List340 --> Lambda341
-    PgClassExpression343{{"PgClassExpression[343∈33]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgUpdateSingle332 --> PgClassExpression343
-    PgClassExpression344{{"PgClassExpression[344∈33]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    PgUpdateSingle332 --> PgClassExpression344
-    PgClassExpression345{{"PgClassExpression[345∈33]<br />ᐸ__person__.”about”ᐳ"}}:::plan
-    PgUpdateSingle332 --> PgClassExpression345
-    PgUpdateSingle332 --> PgClassExpression347
-    First352{{"First[352∈33]"}}:::plan
-    PgSelect348 --> First352
-    PgSelectSingle353{{"PgSelectSingle[353∈33]<br />ᐸpersonᐳ"}}:::plan
-    First352 --> PgSelectSingle353
-    PgClassExpression355{{"PgClassExpression[355∈33]<br />ᐸ”c”.”perso...lder! */<br />)ᐳ"}}:::plan
-    PgSelectSingle353 --> PgClassExpression355
-    List372{{"List[372∈34]<br />ᐸ338,368ᐳ"}}:::plan
-    Constant338 & PgClassExpression368 --> List372
-    Lambda373{{"Lambda[373∈34]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List372 --> Lambda373
-    Lambda376{{"Lambda[376∈36]<br />ᐸrawEncodeᐳ"}}:::plan
-    Constant375{{"Constant[375∈36]<br />ᐸ'query'ᐳ"}}:::plan
-    Constant375 --> Lambda376
-    PgUpdateSingle389[["PgUpdateSingle[389∈37]<br />ᐸcompound_key(person_id_1,person_id_2;person_id_1,extra)ᐳ"]]:::sideeffectplan
-    Object392{{"Object[392∈37]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Access385{{"Access[385∈37]<br />ᐸ384.1ᐳ"}}:::plan
-    Access387{{"Access[387∈37]<br />ᐸ384.2ᐳ"}}:::plan
-    Object392 -->|rejectNull| PgUpdateSingle389
-    Access385 -->|rejectNull| PgUpdateSingle389
-    Access387 & Constant615 & Constant616 --> PgUpdateSingle389
-    Access390{{"Access[390∈37]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access391{{"Access[391∈37]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access390 & Access391 --> Object392
-    Lambda384{{"Lambda[384∈37]<br />ᐸdecode_CompoundKey_base64JSONᐳ"}}:::plan
-    Constant614 --> Lambda384
-    Lambda384 --> Access385
-    Lambda384 --> Access387
-    __Value3 --> Access390
-    __Value3 --> Access391
-    Object393{{"Object[393∈37]<br />ᐸ{result}ᐳ"}}:::plan
-    PgUpdateSingle389 --> Object393
-    Constant394{{"Constant[394∈38]<br />ᐸnullᐳ"}}:::plan
-    List398{{"List[398∈39]<br />ᐸ395,396,397ᐳ"}}:::plan
-    Constant395{{"Constant[395∈39]<br />ᐸ'compound_keys'ᐳ"}}:::plan
-    PgClassExpression396{{"PgClassExpression[396∈39]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
-    PgClassExpression397{{"PgClassExpression[397∈39]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    Constant395 & PgClassExpression396 & PgClassExpression397 --> List398
-    PgSelect404[["PgSelect[404∈39]<br />ᐸpersonᐳ"]]:::plan
-    Object392 & PgClassExpression396 --> PgSelect404
-    PgSelect413[["PgSelect[413∈39]<br />ᐸpersonᐳ"]]:::plan
-    Object392 & PgClassExpression397 --> PgSelect413
-    PgUpdateSingle389 --> PgClassExpression396
-    PgUpdateSingle389 --> PgClassExpression397
-    Lambda399{{"Lambda[399∈39]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List398 --> Lambda399
-    PgClassExpression402{{"PgClassExpression[402∈39]<br />ᐸ__compound...__.”extra”ᐳ"}}:::plan
-    PgUpdateSingle389 --> PgClassExpression402
-    First408{{"First[408∈39]"}}:::plan
-    PgSelect404 --> First408
-    PgSelectSingle409{{"PgSelectSingle[409∈39]<br />ᐸpersonᐳ"}}:::plan
-    First408 --> PgSelectSingle409
-    First417{{"First[417∈39]"}}:::plan
-    PgSelect413 --> First417
-    PgSelectSingle418{{"PgSelectSingle[418∈39]<br />ᐸpersonᐳ"}}:::plan
-    First417 --> PgSelectSingle418
-    PgClassExpression410{{"PgClassExpression[410∈40]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle409 --> PgClassExpression410
-    PgClassExpression411{{"PgClassExpression[411∈40]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle409 --> PgClassExpression411
-    PgClassExpression419{{"PgClassExpression[419∈41]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle418 --> PgClassExpression419
-    PgClassExpression420{{"PgClassExpression[420∈41]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle418 --> PgClassExpression420
-    Lambda422{{"Lambda[422∈42]<br />ᐸrawEncodeᐳ"}}:::plan
-    Constant421{{"Constant[421∈42]<br />ᐸ'query'ᐳ"}}:::plan
-    Constant421 --> Lambda422
-    PgUpdateSingle431[["PgUpdateSingle[431∈43]<br />ᐸcompound_key(person_id_1,person_id_2;person_id_1,extra)ᐳ"]]:::sideeffectplan
-    Object434{{"Object[434∈43]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object434 & Constant615 & Constant615 & Constant607 & Constant621 --> PgUpdateSingle431
-    Access432{{"Access[432∈43]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access433{{"Access[433∈43]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access432 & Access433 --> Object434
-    Object435{{"Object[435∈43]<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
-    PgUpdateSingle431 & Constant595 --> Object435
-    __Value3 --> Access432
-    __Value3 --> Access433
-    List439{{"List[439∈45]<br />ᐸ436,437,438ᐳ"}}:::plan
-    Constant436{{"Constant[436∈45]<br />ᐸ'compound_keys'ᐳ"}}:::plan
-    PgClassExpression437{{"PgClassExpression[437∈45]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
-    PgClassExpression438{{"PgClassExpression[438∈45]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    Constant436 & PgClassExpression437 & PgClassExpression438 --> List439
-    PgSelect445[["PgSelect[445∈45]<br />ᐸpersonᐳ"]]:::plan
-    Object434 & PgClassExpression437 --> PgSelect445
-    PgSelect454[["PgSelect[454∈45]<br />ᐸpersonᐳ"]]:::plan
-    Object434 & PgClassExpression438 --> PgSelect454
-    PgUpdateSingle431 --> PgClassExpression437
-    PgUpdateSingle431 --> PgClassExpression438
-    Lambda440{{"Lambda[440∈45]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List439 --> Lambda440
-    PgClassExpression443{{"PgClassExpression[443∈45]<br />ᐸ__compound...__.”extra”ᐳ"}}:::plan
-    PgUpdateSingle431 --> PgClassExpression443
-    First449{{"First[449∈45]"}}:::plan
-    PgSelect445 --> First449
-    PgSelectSingle450{{"PgSelectSingle[450∈45]<br />ᐸpersonᐳ"}}:::plan
-    First449 --> PgSelectSingle450
-    First458{{"First[458∈45]"}}:::plan
-    PgSelect454 --> First458
-    PgSelectSingle459{{"PgSelectSingle[459∈45]<br />ᐸpersonᐳ"}}:::plan
-    First458 --> PgSelectSingle459
-    PgClassExpression451{{"PgClassExpression[451∈46]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle450 --> PgClassExpression451
-    PgClassExpression452{{"PgClassExpression[452∈46]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle450 --> PgClassExpression452
-    PgClassExpression460{{"PgClassExpression[460∈47]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle459 --> PgClassExpression460
-    PgClassExpression461{{"PgClassExpression[461∈47]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle459 --> PgClassExpression461
-    Lambda463{{"Lambda[463∈48]<br />ᐸrawEncodeᐳ"}}:::plan
-    Constant462{{"Constant[462∈48]<br />ᐸ'query'ᐳ"}}:::plan
-    Constant462 --> Lambda463
-    PgUpdateSingle472[["PgUpdateSingle[472∈49]<br />ᐸcompound_key(person_id_1,person_id_2;extra)ᐳ"]]:::sideeffectplan
-    Object475{{"Object[475∈49]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object475 & Constant623 & Constant607 & Constant621 --> PgUpdateSingle472
-    Access473{{"Access[473∈49]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access474{{"Access[474∈49]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access473 & Access474 --> Object475
-    Object476{{"Object[476∈49]<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
-    PgUpdateSingle472 & Constant600 --> Object476
-    __Value3 --> Access473
-    __Value3 --> Access474
-    List480{{"List[480∈51]<br />ᐸ477,478,479ᐳ"}}:::plan
-    Constant477{{"Constant[477∈51]<br />ᐸ'compound_keys'ᐳ"}}:::plan
-    PgClassExpression478{{"PgClassExpression[478∈51]<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
-    PgClassExpression479{{"PgClassExpression[479∈51]<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
-    Constant477 & PgClassExpression478 & PgClassExpression479 --> List480
-    PgSelect486[["PgSelect[486∈51]<br />ᐸpersonᐳ"]]:::plan
-    Object475 & PgClassExpression478 --> PgSelect486
-    PgSelect495[["PgSelect[495∈51]<br />ᐸpersonᐳ"]]:::plan
-    Object475 & PgClassExpression479 --> PgSelect495
-    PgUpdateSingle472 --> PgClassExpression478
-    PgUpdateSingle472 --> PgClassExpression479
-    Lambda481{{"Lambda[481∈51]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List480 --> Lambda481
-    PgClassExpression484{{"PgClassExpression[484∈51]<br />ᐸ__compound...__.”extra”ᐳ"}}:::plan
-    PgUpdateSingle472 --> PgClassExpression484
-    First490{{"First[490∈51]"}}:::plan
-    PgSelect486 --> First490
-    PgSelectSingle491{{"PgSelectSingle[491∈51]<br />ᐸpersonᐳ"}}:::plan
-    First490 --> PgSelectSingle491
-    First499{{"First[499∈51]"}}:::plan
-    PgSelect495 --> First499
-    PgSelectSingle500{{"PgSelectSingle[500∈51]<br />ᐸpersonᐳ"}}:::plan
-    First499 --> PgSelectSingle500
-    PgClassExpression492{{"PgClassExpression[492∈52]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle491 --> PgClassExpression492
-    PgClassExpression493{{"PgClassExpression[493∈52]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle491 --> PgClassExpression493
-    PgClassExpression501{{"PgClassExpression[501∈53]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle500 --> PgClassExpression501
-    PgClassExpression502{{"PgClassExpression[502∈53]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgSelectSingle500 --> PgClassExpression502
-    Lambda504{{"Lambda[504∈54]<br />ᐸrawEncodeᐳ"}}:::plan
-    Constant503{{"Constant[503∈54]<br />ᐸ'query'ᐳ"}}:::plan
-    Constant503 --> Lambda504
-    PgUpdateSingle520[["PgUpdateSingle[520∈55]<br />ᐸperson(email;email)ᐳ"]]:::sideeffectplan
-    Object523{{"Object[523∈55]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object523 & Constant594 & Constant627 --> PgUpdateSingle520
-    Access521{{"Access[521∈55]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access522{{"Access[522∈55]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access521 & Access522 --> Object523
-    __Value3 --> Access521
-    __Value3 --> Access522
-    Object524{{"Object[524∈55]<br />ᐸ{result}ᐳ"}}:::plan
-    PgUpdateSingle520 --> Object524
-    Edge554{{"Edge[554∈56]"}}:::plan
-    PgSelectSingle553{{"PgSelectSingle[553∈56]<br />ᐸpersonᐳ"}}:::plan
-    PgCursor555{{"PgCursor[555∈56]"}}:::plan
-    Connection551{{"Connection[551∈56]<br />ᐸ547ᐳ"}}:::plan
-    PgSelectSingle553 & PgCursor555 & Connection551 --> Edge554
-    PgSelect547[["PgSelect[547∈56]<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression546{{"PgClassExpression[546∈56]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    Object523 & PgClassExpression546 --> PgSelect547
-    PgUpdateSingle520 --> PgClassExpression546
-    First552{{"First[552∈56]"}}:::plan
-    PgSelect547 --> First552
-    First552 --> PgSelectSingle553
-    List557{{"List[557∈56]<br />ᐸ556ᐳ"}}:::plan
-    List557 --> PgCursor555
-    PgClassExpression556{{"PgClassExpression[556∈56]<br />ᐸ__person__.”id”ᐳ"}}:::plan
-    PgSelectSingle553 --> PgClassExpression556
-    PgClassExpression556 --> List557
-    Constant525{{"Constant[525∈56]<br />ᐸnullᐳ"}}:::plan
-    Constant526{{"Constant[526∈56]<br />ᐸ'people'ᐳ"}}:::plan
-    PgSelect536[["PgSelect[536∈57]<br />ᐸpersonᐳ"]]:::plan
-    PgClassExpression535{{"PgClassExpression[535∈57]<br />ᐸ__person__ᐳ"}}:::plan
-    Object523 & PgClassExpression535 & Constant594 --> PgSelect536
-    List528{{"List[528∈57]<br />ᐸ526,546ᐳ"}}:::plan
-    Constant526 & PgClassExpression546 --> List528
-    Lambda529{{"Lambda[529∈57]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List528 --> Lambda529
-    PgClassExpression531{{"PgClassExpression[531∈57]<br />ᐸ__person__...full_name”ᐳ"}}:::plan
-    PgUpdateSingle520 --> PgClassExpression531
-    PgClassExpression532{{"PgClassExpression[532∈57]<br />ᐸ__person__.”email”ᐳ"}}:::plan
-    PgUpdateSingle520 --> PgClassExpression532
-    PgClassExpression533{{"PgClassExpression[533∈57]<br />ᐸ__person__.”about”ᐳ"}}:::plan
-    PgUpdateSingle520 --> PgClassExpression533
-    PgUpdateSingle520 --> PgClassExpression535
-    First540{{"First[540∈57]"}}:::plan
-    PgSelect536 --> First540
-    PgSelectSingle541{{"PgSelectSingle[541∈57]<br />ᐸpersonᐳ"}}:::plan
-    First540 --> PgSelectSingle541
-    PgClassExpression543{{"PgClassExpression[543∈57]<br />ᐸ”c”.”perso...lder! */<br />)ᐳ"}}:::plan
-    PgSelectSingle541 --> PgClassExpression543
-    List560{{"List[560∈58]<br />ᐸ526,556ᐳ"}}:::plan
-    Constant526 & PgClassExpression556 --> List560
-    Lambda561{{"Lambda[561∈58]<br />ᐸbase64JSONEncodeᐳ"}}:::plan
-    List560 --> Lambda561
-    Lambda564{{"Lambda[564∈60]<br />ᐸrawEncodeᐳ"}}:::plan
-    Constant563{{"Constant[563∈60]<br />ᐸ'query'ᐳ"}}:::plan
-    Constant563 --> Lambda564
-    PgUpdateSingle571[["PgUpdateSingle[571∈61]<br />ᐸdefault_value(id;null_value)ᐳ"]]:::sideeffectplan
-    Object574{{"Object[574∈61]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object574 & Constant629 & Constant605 --> PgUpdateSingle571
-    Access572{{"Access[572∈61]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access573{{"Access[573∈61]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access572 & Access573 --> Object574
-    __Value3 --> Access572
-    __Value3 --> Access573
-    Object575{{"Object[575∈61]<br />ᐸ{result}ᐳ"}}:::plan
-    PgUpdateSingle571 --> Object575
-    PgClassExpression576{{"PgClassExpression[576∈63]<br />ᐸ__default_value__.”id”ᐳ"}}:::plan
-    PgUpdateSingle571 --> PgClassExpression576
-    PgClassExpression577{{"PgClassExpression[577∈63]<br />ᐸ__default_...ull_value”ᐳ"}}:::plan
-    PgUpdateSingle571 --> PgClassExpression577
-    PgUpdateSingle584[["PgUpdateSingle[584∈64]<br />ᐸno_primary_key(id;str)ᐳ"]]:::sideeffectplan
-    Object587{{"Object[587∈64]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Object587 & Constant629 & Constant632 --> PgUpdateSingle584
-    Access585{{"Access[585∈64]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access586{{"Access[586∈64]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access585 & Access586 --> Object587
-    __Value3 --> Access585
-    __Value3 --> Access586
-    Object588{{"Object[588∈64]<br />ᐸ{result}ᐳ"}}:::plan
-    PgUpdateSingle584 --> Object588
-    PgClassExpression589{{"PgClassExpression[589∈66]<br />ᐸ__no_primary_key__.”id”ᐳ"}}:::plan
-    PgUpdateSingle584 --> PgClassExpression589
-    PgClassExpression590{{"PgClassExpression[590∈66]<br />ᐸ__no_prima...ey__.”str”ᐳ"}}:::plan
-    PgUpdateSingle584 --> PgClassExpression590
+    Object27{{"Object[27∈0] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access25{{"Access[25∈0] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access26{{"Access[26∈0] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access25 & Access26 --> Object27
+    Lambda21{{"Lambda[21∈0] ➊<br />ᐸdecode_Person_base64JSONᐳ"}}:::plan
+    Constant590{{"Constant[590∈0] ➊<br />ᐸ'WyJwZW9wbGUiLDFd'ᐳ"}}:::plan
+    Constant590 --> Lambda21
+    Access22{{"Access[22∈0] ➊<br />ᐸ21.1ᐳ"}}:::plan
+    Lambda21 --> Access22
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access25
+    __Value2 --> Access26
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Constant591{{"Constant[591∈0] ➊<br />ᐸ'John Smith Sr.'ᐳ"}}:::plan
+    Constant592{{"Constant[592∈0] ➊<br />ᐸ'An older John Smith'ᐳ"}}:::plan
+    Constant593{{"Constant[593∈0] ➊<br />ᐸ'graphile-build.issue.27.exists@example.com'ᐳ"}}:::plan
+    Constant594{{"Constant[594∈0] ➊<br />ᐸ'hello'ᐳ"}}:::plan
+    Constant595{{"Constant[595∈0] ➊<br />ᐸ'WyJwZW9wbGUiLDJd'ᐳ"}}:::plan
+    Constant596{{"Constant[596∈0] ➊<br />ᐸ'Sarah Smith'ᐳ"}}:::plan
+    Constant597{{"Constant[597∈0] ➊<br />ᐸ'sarah.smith@email.com'ᐳ"}}:::plan
+    Constant599{{"Constant[599∈0] ➊<br />ᐸ'world'ᐳ"}}:::plan
+    Constant601{{"Constant[601∈0] ➊<br />ᐸ'Now with an “H.”'ᐳ"}}:::plan
+    Constant604{{"Constant[604∈0] ➊<br />ᐸnullᐳ"}}:::plan
+    Constant606{{"Constant[606∈0] ➊<br />ᐸ3ᐳ"}}:::plan
+    Constant607{{"Constant[607∈0] ➊<br />ᐸ'Best Pal'ᐳ"}}:::plan
+    Constant608{{"Constant[608∈0] ➊<br />ᐸ'I have taken over Budd’s account. Hehehe.'ᐳ"}}:::plan
+    Constant610{{"Constant[610∈0] ➊<br />ᐸ'kathryn.ramirez@email.com'ᐳ"}}:::plan
+    Constant611{{"Constant[611∈0] ➊<br />ᐸ'Make art not friends.'ᐳ"}}:::plan
+    Constant613{{"Constant[613∈0] ➊<br />ᐸ'WyJjb21wb3VuZF9rZXlzIiwxLDJd'ᐳ"}}:::plan
+    Constant614{{"Constant[614∈0] ➊<br />ᐸ2ᐳ"}}:::plan
+    Constant615{{"Constant[615∈0] ➊<br />ᐸtrueᐳ"}}:::plan
+    Constant620{{"Constant[620∈0] ➊<br />ᐸfalseᐳ"}}:::plan
+    Constant622{{"Constant[622∈0] ➊<br />ᐸ4ᐳ"}}:::plan
+    Constant626{{"Constant[626∈0] ➊<br />ᐸ'somethingelse@example.com'ᐳ"}}:::plan
+    Constant628{{"Constant[628∈0] ➊<br />ᐸ1ᐳ"}}:::plan
+    Constant631{{"Constant[631∈0] ➊<br />ᐸ'New String'ᐳ"}}:::plan
+    PgUpdateSingle24[["PgUpdateSingle[24∈1] ➊<br />ᐸperson(id;person_full_name,about)ᐳ"]]:::sideeffectplan
+    Object27 -->|rejectNull| PgUpdateSingle24
+    Access22 & Constant591 & Constant592 --> PgUpdateSingle24
+    Object28{{"Object[28∈1] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgUpdateSingle24 --> Object28
+    Edge58{{"Edge[58∈2] ➊"}}:::plan
+    PgSelectSingle57{{"PgSelectSingle[57∈2] ➊<br />ᐸpersonᐳ"}}:::plan
+    PgCursor59{{"PgCursor[59∈2] ➊"}}:::plan
+    Connection55{{"Connection[55∈2] ➊<br />ᐸ51ᐳ"}}:::plan
+    PgSelectSingle57 & PgCursor59 & Connection55 --> Edge58
+    PgSelect51[["PgSelect[51∈2] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression50{{"PgClassExpression[50∈2] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Object27 & PgClassExpression50 --> PgSelect51
+    PgUpdateSingle24 --> PgClassExpression50
+    First56{{"First[56∈2] ➊"}}:::plan
+    PgSelect51 --> First56
+    First56 --> PgSelectSingle57
+    List61{{"List[61∈2] ➊<br />ᐸ60ᐳ"}}:::plan
+    List61 --> PgCursor59
+    PgClassExpression60{{"PgClassExpression[60∈2] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle57 --> PgClassExpression60
+    PgClassExpression60 --> List61
+    Constant29{{"Constant[29∈2] ➊<br />ᐸnullᐳ"}}:::plan
+    Constant30{{"Constant[30∈2] ➊<br />ᐸ'people'ᐳ"}}:::plan
+    PgSelect40[["PgSelect[40∈3] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression39{{"PgClassExpression[39∈3] ➊<br />ᐸ__person__ᐳ"}}:::plan
+    Object27 & PgClassExpression39 & Constant593 --> PgSelect40
+    List32{{"List[32∈3] ➊<br />ᐸ30,50ᐳ"}}:::plan
+    Constant30 & PgClassExpression50 --> List32
+    Lambda33{{"Lambda[33∈3] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List32 --> Lambda33
+    PgClassExpression35{{"PgClassExpression[35∈3] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgUpdateSingle24 --> PgClassExpression35
+    PgClassExpression36{{"PgClassExpression[36∈3] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
+    PgUpdateSingle24 --> PgClassExpression36
+    PgClassExpression37{{"PgClassExpression[37∈3] ➊<br />ᐸ__person__.”about”ᐳ"}}:::plan
+    PgUpdateSingle24 --> PgClassExpression37
+    PgUpdateSingle24 --> PgClassExpression39
+    First44{{"First[44∈3] ➊"}}:::plan
+    PgSelect40 --> First44
+    PgSelectSingle45{{"PgSelectSingle[45∈3] ➊<br />ᐸpersonᐳ"}}:::plan
+    First44 --> PgSelectSingle45
+    PgClassExpression47{{"PgClassExpression[47∈3] ➊<br />ᐸ”c”.”perso...lder! */<br />)ᐳ"}}:::plan
+    PgSelectSingle45 --> PgClassExpression47
+    List64{{"List[64∈4] ➊<br />ᐸ30,60ᐳ"}}:::plan
+    Constant30 & PgClassExpression60 --> List64
+    Lambda65{{"Lambda[65∈4] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List64 --> Lambda65
+    Lambda68{{"Lambda[68∈6] ➊<br />ᐸrawEncodeᐳ"}}:::plan
+    Constant67{{"Constant[67∈6] ➊<br />ᐸ'query'ᐳ"}}:::plan
+    Constant67 --> Lambda68
+    PgUpdateSingle87[["PgUpdateSingle[87∈7] ➊<br />ᐸperson(id;person_full_name,email)ᐳ"]]:::sideeffectplan
+    Object90{{"Object[90∈7] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access85{{"Access[85∈7] ➊<br />ᐸ84.1ᐳ"}}:::plan
+    Object90 -->|rejectNull| PgUpdateSingle87
+    Access85 & Constant596 & Constant597 --> PgUpdateSingle87
+    Access88{{"Access[88∈7] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access89{{"Access[89∈7] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access88 & Access89 --> Object90
+    Object91{{"Object[91∈7] ➊<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
+    PgUpdateSingle87 & Constant594 --> Object91
+    Lambda84{{"Lambda[84∈7] ➊<br />ᐸdecode_Person_base64JSONᐳ"}}:::plan
+    Constant595 --> Lambda84
+    Lambda84 --> Access85
+    __Value2 --> Access88
+    __Value2 --> Access89
+    Edge120{{"Edge[120∈8] ➊"}}:::plan
+    PgSelectSingle119{{"PgSelectSingle[119∈8] ➊<br />ᐸpersonᐳ"}}:::plan
+    PgCursor121{{"PgCursor[121∈8] ➊"}}:::plan
+    Connection117{{"Connection[117∈8] ➊<br />ᐸ113ᐳ"}}:::plan
+    PgSelectSingle119 & PgCursor121 & Connection117 --> Edge120
+    PgSelect113[["PgSelect[113∈8] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression112{{"PgClassExpression[112∈8] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Object90 & PgClassExpression112 --> PgSelect113
+    PgUpdateSingle87 --> PgClassExpression112
+    First118{{"First[118∈8] ➊"}}:::plan
+    PgSelect113 --> First118
+    First118 --> PgSelectSingle119
+    List123{{"List[123∈8] ➊<br />ᐸ122ᐳ"}}:::plan
+    List123 --> PgCursor121
+    PgClassExpression122{{"PgClassExpression[122∈8] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle119 --> PgClassExpression122
+    PgClassExpression122 --> List123
+    Constant92{{"Constant[92∈8] ➊<br />ᐸ'people'ᐳ"}}:::plan
+    PgSelect102[["PgSelect[102∈9] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression101{{"PgClassExpression[101∈9] ➊<br />ᐸ__person__ᐳ"}}:::plan
+    Object90 & PgClassExpression101 & Constant593 --> PgSelect102
+    List94{{"List[94∈9] ➊<br />ᐸ92,112ᐳ"}}:::plan
+    Constant92 & PgClassExpression112 --> List94
+    Lambda95{{"Lambda[95∈9] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List94 --> Lambda95
+    PgClassExpression97{{"PgClassExpression[97∈9] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgUpdateSingle87 --> PgClassExpression97
+    PgClassExpression98{{"PgClassExpression[98∈9] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
+    PgUpdateSingle87 --> PgClassExpression98
+    PgClassExpression99{{"PgClassExpression[99∈9] ➊<br />ᐸ__person__.”about”ᐳ"}}:::plan
+    PgUpdateSingle87 --> PgClassExpression99
+    PgUpdateSingle87 --> PgClassExpression101
+    First106{{"First[106∈9] ➊"}}:::plan
+    PgSelect102 --> First106
+    PgSelectSingle107{{"PgSelectSingle[107∈9] ➊<br />ᐸpersonᐳ"}}:::plan
+    First106 --> PgSelectSingle107
+    PgClassExpression109{{"PgClassExpression[109∈9] ➊<br />ᐸ”c”.”perso...lder! */<br />)ᐳ"}}:::plan
+    PgSelectSingle107 --> PgClassExpression109
+    List126{{"List[126∈10] ➊<br />ᐸ92,122ᐳ"}}:::plan
+    Constant92 & PgClassExpression122 --> List126
+    Lambda127{{"Lambda[127∈10] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List126 --> Lambda127
+    Lambda130{{"Lambda[130∈12] ➊<br />ᐸrawEncodeᐳ"}}:::plan
+    Constant129{{"Constant[129∈12] ➊<br />ᐸ'query'ᐳ"}}:::plan
+    Constant129 --> Lambda130
+    PgUpdateSingle149[["PgUpdateSingle[149∈13] ➊<br />ᐸperson(id;about)ᐳ"]]:::sideeffectplan
+    Object152{{"Object[152∈13] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access147{{"Access[147∈13] ➊<br />ᐸ146.1ᐳ"}}:::plan
+    Object152 -->|rejectNull| PgUpdateSingle149
+    Access147 & Constant601 --> PgUpdateSingle149
+    Access150{{"Access[150∈13] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access151{{"Access[151∈13] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access150 & Access151 --> Object152
+    Object153{{"Object[153∈13] ➊<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
+    PgUpdateSingle149 & Constant599 --> Object153
+    Lambda146{{"Lambda[146∈13] ➊<br />ᐸdecode_Person_base64JSONᐳ"}}:::plan
+    Constant595 --> Lambda146
+    Lambda146 --> Access147
+    __Value2 --> Access150
+    __Value2 --> Access151
+    Edge182{{"Edge[182∈14] ➊"}}:::plan
+    PgSelectSingle181{{"PgSelectSingle[181∈14] ➊<br />ᐸpersonᐳ"}}:::plan
+    PgCursor183{{"PgCursor[183∈14] ➊"}}:::plan
+    Connection179{{"Connection[179∈14] ➊<br />ᐸ175ᐳ"}}:::plan
+    PgSelectSingle181 & PgCursor183 & Connection179 --> Edge182
+    PgSelect175[["PgSelect[175∈14] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression174{{"PgClassExpression[174∈14] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Object152 & PgClassExpression174 --> PgSelect175
+    PgUpdateSingle149 --> PgClassExpression174
+    First180{{"First[180∈14] ➊"}}:::plan
+    PgSelect175 --> First180
+    First180 --> PgSelectSingle181
+    List185{{"List[185∈14] ➊<br />ᐸ184ᐳ"}}:::plan
+    List185 --> PgCursor183
+    PgClassExpression184{{"PgClassExpression[184∈14] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle181 --> PgClassExpression184
+    PgClassExpression184 --> List185
+    Constant154{{"Constant[154∈14] ➊<br />ᐸ'people'ᐳ"}}:::plan
+    PgSelect164[["PgSelect[164∈15] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression163{{"PgClassExpression[163∈15] ➊<br />ᐸ__person__ᐳ"}}:::plan
+    Object152 & PgClassExpression163 & Constant593 --> PgSelect164
+    List156{{"List[156∈15] ➊<br />ᐸ154,174ᐳ"}}:::plan
+    Constant154 & PgClassExpression174 --> List156
+    Lambda157{{"Lambda[157∈15] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List156 --> Lambda157
+    PgClassExpression159{{"PgClassExpression[159∈15] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgUpdateSingle149 --> PgClassExpression159
+    PgClassExpression160{{"PgClassExpression[160∈15] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
+    PgUpdateSingle149 --> PgClassExpression160
+    PgClassExpression161{{"PgClassExpression[161∈15] ➊<br />ᐸ__person__.”about”ᐳ"}}:::plan
+    PgUpdateSingle149 --> PgClassExpression161
+    PgUpdateSingle149 --> PgClassExpression163
+    First168{{"First[168∈15] ➊"}}:::plan
+    PgSelect164 --> First168
+    PgSelectSingle169{{"PgSelectSingle[169∈15] ➊<br />ᐸpersonᐳ"}}:::plan
+    First168 --> PgSelectSingle169
+    PgClassExpression171{{"PgClassExpression[171∈15] ➊<br />ᐸ”c”.”perso...lder! */<br />)ᐳ"}}:::plan
+    PgSelectSingle169 --> PgClassExpression171
+    List188{{"List[188∈16] ➊<br />ᐸ154,184ᐳ"}}:::plan
+    Constant154 & PgClassExpression184 --> List188
+    Lambda189{{"Lambda[189∈16] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List188 --> Lambda189
+    Lambda192{{"Lambda[192∈18] ➊<br />ᐸrawEncodeᐳ"}}:::plan
+    Constant191{{"Constant[191∈18] ➊<br />ᐸ'query'ᐳ"}}:::plan
+    Constant191 --> Lambda192
+    PgUpdateSingle211[["PgUpdateSingle[211∈19] ➊<br />ᐸperson(id;about)ᐳ"]]:::sideeffectplan
+    Object214{{"Object[214∈19] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access209{{"Access[209∈19] ➊<br />ᐸ208.1ᐳ"}}:::plan
+    Object214 -->|rejectNull| PgUpdateSingle211
+    Access209 & Constant604 --> PgUpdateSingle211
+    Access212{{"Access[212∈19] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access213{{"Access[213∈19] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access212 & Access213 --> Object214
+    Lambda208{{"Lambda[208∈19] ➊<br />ᐸdecode_Person_base64JSONᐳ"}}:::plan
+    Constant595 --> Lambda208
+    Lambda208 --> Access209
+    __Value2 --> Access212
+    __Value2 --> Access213
+    Object215{{"Object[215∈19] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgUpdateSingle211 --> Object215
+    Edge245{{"Edge[245∈20] ➊"}}:::plan
+    PgSelectSingle244{{"PgSelectSingle[244∈20] ➊<br />ᐸpersonᐳ"}}:::plan
+    PgCursor246{{"PgCursor[246∈20] ➊"}}:::plan
+    Connection242{{"Connection[242∈20] ➊<br />ᐸ238ᐳ"}}:::plan
+    PgSelectSingle244 & PgCursor246 & Connection242 --> Edge245
+    PgSelect238[["PgSelect[238∈20] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression237{{"PgClassExpression[237∈20] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Object214 & PgClassExpression237 --> PgSelect238
+    PgUpdateSingle211 --> PgClassExpression237
+    First243{{"First[243∈20] ➊"}}:::plan
+    PgSelect238 --> First243
+    First243 --> PgSelectSingle244
+    List248{{"List[248∈20] ➊<br />ᐸ247ᐳ"}}:::plan
+    List248 --> PgCursor246
+    PgClassExpression247{{"PgClassExpression[247∈20] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle244 --> PgClassExpression247
+    PgClassExpression247 --> List248
+    Constant216{{"Constant[216∈20] ➊<br />ᐸnullᐳ"}}:::plan
+    Constant217{{"Constant[217∈20] ➊<br />ᐸ'people'ᐳ"}}:::plan
+    PgSelect227[["PgSelect[227∈21] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression226{{"PgClassExpression[226∈21] ➊<br />ᐸ__person__ᐳ"}}:::plan
+    Object214 & PgClassExpression226 & Constant593 --> PgSelect227
+    List219{{"List[219∈21] ➊<br />ᐸ217,237ᐳ"}}:::plan
+    Constant217 & PgClassExpression237 --> List219
+    Lambda220{{"Lambda[220∈21] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List219 --> Lambda220
+    PgClassExpression222{{"PgClassExpression[222∈21] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgUpdateSingle211 --> PgClassExpression222
+    PgClassExpression223{{"PgClassExpression[223∈21] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
+    PgUpdateSingle211 --> PgClassExpression223
+    PgClassExpression224{{"PgClassExpression[224∈21] ➊<br />ᐸ__person__.”about”ᐳ"}}:::plan
+    PgUpdateSingle211 --> PgClassExpression224
+    PgUpdateSingle211 --> PgClassExpression226
+    First231{{"First[231∈21] ➊"}}:::plan
+    PgSelect227 --> First231
+    PgSelectSingle232{{"PgSelectSingle[232∈21] ➊<br />ᐸpersonᐳ"}}:::plan
+    First231 --> PgSelectSingle232
+    PgClassExpression234{{"PgClassExpression[234∈21] ➊<br />ᐸ”c”.”perso...lder! */<br />)ᐳ"}}:::plan
+    PgSelectSingle232 --> PgClassExpression234
+    List251{{"List[251∈22] ➊<br />ᐸ217,247ᐳ"}}:::plan
+    Constant217 & PgClassExpression247 --> List251
+    Lambda252{{"Lambda[252∈22] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List251 --> Lambda252
+    Lambda255{{"Lambda[255∈24] ➊<br />ᐸrawEncodeᐳ"}}:::plan
+    Constant254{{"Constant[254∈24] ➊<br />ᐸ'query'ᐳ"}}:::plan
+    Constant254 --> Lambda255
+    PgUpdateSingle271[["PgUpdateSingle[271∈25] ➊<br />ᐸperson(id;person_full_name,about)ᐳ"]]:::sideeffectplan
+    Object274{{"Object[274∈25] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object274 & Constant606 & Constant607 & Constant608 --> PgUpdateSingle271
+    Access272{{"Access[272∈25] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access273{{"Access[273∈25] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access272 & Access273 --> Object274
+    __Value2 --> Access272
+    __Value2 --> Access273
+    Object275{{"Object[275∈25] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgUpdateSingle271 --> Object275
+    Edge305{{"Edge[305∈26] ➊"}}:::plan
+    PgSelectSingle304{{"PgSelectSingle[304∈26] ➊<br />ᐸpersonᐳ"}}:::plan
+    PgCursor306{{"PgCursor[306∈26] ➊"}}:::plan
+    Connection302{{"Connection[302∈26] ➊<br />ᐸ298ᐳ"}}:::plan
+    PgSelectSingle304 & PgCursor306 & Connection302 --> Edge305
+    PgSelect298[["PgSelect[298∈26] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression297{{"PgClassExpression[297∈26] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Object274 & PgClassExpression297 --> PgSelect298
+    PgUpdateSingle271 --> PgClassExpression297
+    First303{{"First[303∈26] ➊"}}:::plan
+    PgSelect298 --> First303
+    First303 --> PgSelectSingle304
+    List308{{"List[308∈26] ➊<br />ᐸ307ᐳ"}}:::plan
+    List308 --> PgCursor306
+    PgClassExpression307{{"PgClassExpression[307∈26] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle304 --> PgClassExpression307
+    PgClassExpression307 --> List308
+    Constant276{{"Constant[276∈26] ➊<br />ᐸnullᐳ"}}:::plan
+    Constant277{{"Constant[277∈26] ➊<br />ᐸ'people'ᐳ"}}:::plan
+    PgSelect287[["PgSelect[287∈27] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression286{{"PgClassExpression[286∈27] ➊<br />ᐸ__person__ᐳ"}}:::plan
+    Object274 & PgClassExpression286 & Constant593 --> PgSelect287
+    List279{{"List[279∈27] ➊<br />ᐸ277,297ᐳ"}}:::plan
+    Constant277 & PgClassExpression297 --> List279
+    Lambda280{{"Lambda[280∈27] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List279 --> Lambda280
+    PgClassExpression282{{"PgClassExpression[282∈27] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgUpdateSingle271 --> PgClassExpression282
+    PgClassExpression283{{"PgClassExpression[283∈27] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
+    PgUpdateSingle271 --> PgClassExpression283
+    PgClassExpression284{{"PgClassExpression[284∈27] ➊<br />ᐸ__person__.”about”ᐳ"}}:::plan
+    PgUpdateSingle271 --> PgClassExpression284
+    PgUpdateSingle271 --> PgClassExpression286
+    First291{{"First[291∈27] ➊"}}:::plan
+    PgSelect287 --> First291
+    PgSelectSingle292{{"PgSelectSingle[292∈27] ➊<br />ᐸpersonᐳ"}}:::plan
+    First291 --> PgSelectSingle292
+    PgClassExpression294{{"PgClassExpression[294∈27] ➊<br />ᐸ”c”.”perso...lder! */<br />)ᐳ"}}:::plan
+    PgSelectSingle292 --> PgClassExpression294
+    List311{{"List[311∈28] ➊<br />ᐸ277,307ᐳ"}}:::plan
+    Constant277 & PgClassExpression307 --> List311
+    Lambda312{{"Lambda[312∈28] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List311 --> Lambda312
+    Lambda315{{"Lambda[315∈30] ➊<br />ᐸrawEncodeᐳ"}}:::plan
+    Constant314{{"Constant[314∈30] ➊<br />ᐸ'query'ᐳ"}}:::plan
+    Constant314 --> Lambda315
+    PgUpdateSingle331[["PgUpdateSingle[331∈31] ➊<br />ᐸperson(email;about)ᐳ"]]:::sideeffectplan
+    Object334{{"Object[334∈31] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object334 & Constant610 & Constant611 --> PgUpdateSingle331
+    Access332{{"Access[332∈31] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access333{{"Access[333∈31] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access332 & Access333 --> Object334
+    __Value2 --> Access332
+    __Value2 --> Access333
+    Object335{{"Object[335∈31] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgUpdateSingle331 --> Object335
+    Edge365{{"Edge[365∈32] ➊"}}:::plan
+    PgSelectSingle364{{"PgSelectSingle[364∈32] ➊<br />ᐸpersonᐳ"}}:::plan
+    PgCursor366{{"PgCursor[366∈32] ➊"}}:::plan
+    Connection362{{"Connection[362∈32] ➊<br />ᐸ358ᐳ"}}:::plan
+    PgSelectSingle364 & PgCursor366 & Connection362 --> Edge365
+    PgSelect358[["PgSelect[358∈32] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression357{{"PgClassExpression[357∈32] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Object334 & PgClassExpression357 --> PgSelect358
+    PgUpdateSingle331 --> PgClassExpression357
+    First363{{"First[363∈32] ➊"}}:::plan
+    PgSelect358 --> First363
+    First363 --> PgSelectSingle364
+    List368{{"List[368∈32] ➊<br />ᐸ367ᐳ"}}:::plan
+    List368 --> PgCursor366
+    PgClassExpression367{{"PgClassExpression[367∈32] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle364 --> PgClassExpression367
+    PgClassExpression367 --> List368
+    Constant336{{"Constant[336∈32] ➊<br />ᐸnullᐳ"}}:::plan
+    Constant337{{"Constant[337∈32] ➊<br />ᐸ'people'ᐳ"}}:::plan
+    PgSelect347[["PgSelect[347∈33] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression346{{"PgClassExpression[346∈33] ➊<br />ᐸ__person__ᐳ"}}:::plan
+    Object334 & PgClassExpression346 & Constant593 --> PgSelect347
+    List339{{"List[339∈33] ➊<br />ᐸ337,357ᐳ"}}:::plan
+    Constant337 & PgClassExpression357 --> List339
+    Lambda340{{"Lambda[340∈33] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List339 --> Lambda340
+    PgClassExpression342{{"PgClassExpression[342∈33] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgUpdateSingle331 --> PgClassExpression342
+    PgClassExpression343{{"PgClassExpression[343∈33] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
+    PgUpdateSingle331 --> PgClassExpression343
+    PgClassExpression344{{"PgClassExpression[344∈33] ➊<br />ᐸ__person__.”about”ᐳ"}}:::plan
+    PgUpdateSingle331 --> PgClassExpression344
+    PgUpdateSingle331 --> PgClassExpression346
+    First351{{"First[351∈33] ➊"}}:::plan
+    PgSelect347 --> First351
+    PgSelectSingle352{{"PgSelectSingle[352∈33] ➊<br />ᐸpersonᐳ"}}:::plan
+    First351 --> PgSelectSingle352
+    PgClassExpression354{{"PgClassExpression[354∈33] ➊<br />ᐸ”c”.”perso...lder! */<br />)ᐳ"}}:::plan
+    PgSelectSingle352 --> PgClassExpression354
+    List371{{"List[371∈34] ➊<br />ᐸ337,367ᐳ"}}:::plan
+    Constant337 & PgClassExpression367 --> List371
+    Lambda372{{"Lambda[372∈34] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List371 --> Lambda372
+    Lambda375{{"Lambda[375∈36] ➊<br />ᐸrawEncodeᐳ"}}:::plan
+    Constant374{{"Constant[374∈36] ➊<br />ᐸ'query'ᐳ"}}:::plan
+    Constant374 --> Lambda375
+    PgUpdateSingle388[["PgUpdateSingle[388∈37] ➊<br />ᐸcompound_key(person_id_1,person_id_2;person_id_1,extra)ᐳ"]]:::sideeffectplan
+    Object391{{"Object[391∈37] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Access384{{"Access[384∈37] ➊<br />ᐸ383.1ᐳ"}}:::plan
+    Access386{{"Access[386∈37] ➊<br />ᐸ383.2ᐳ"}}:::plan
+    Object391 -->|rejectNull| PgUpdateSingle388
+    Access384 -->|rejectNull| PgUpdateSingle388
+    Access386 & Constant614 & Constant615 --> PgUpdateSingle388
+    Access389{{"Access[389∈37] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access390{{"Access[390∈37] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access389 & Access390 --> Object391
+    Lambda383{{"Lambda[383∈37] ➊<br />ᐸdecode_CompoundKey_base64JSONᐳ"}}:::plan
+    Constant613 --> Lambda383
+    Lambda383 --> Access384
+    Lambda383 --> Access386
+    __Value2 --> Access389
+    __Value2 --> Access390
+    Object392{{"Object[392∈37] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgUpdateSingle388 --> Object392
+    Constant393{{"Constant[393∈38] ➊<br />ᐸnullᐳ"}}:::plan
+    List397{{"List[397∈39] ➊<br />ᐸ394,395,396ᐳ"}}:::plan
+    Constant394{{"Constant[394∈39] ➊<br />ᐸ'compound_keys'ᐳ"}}:::plan
+    PgClassExpression395{{"PgClassExpression[395∈39] ➊<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
+    PgClassExpression396{{"PgClassExpression[396∈39] ➊<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
+    Constant394 & PgClassExpression395 & PgClassExpression396 --> List397
+    PgSelect403[["PgSelect[403∈39] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object391 & PgClassExpression395 --> PgSelect403
+    PgSelect412[["PgSelect[412∈39] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object391 & PgClassExpression396 --> PgSelect412
+    PgUpdateSingle388 --> PgClassExpression395
+    PgUpdateSingle388 --> PgClassExpression396
+    Lambda398{{"Lambda[398∈39] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List397 --> Lambda398
+    PgClassExpression401{{"PgClassExpression[401∈39] ➊<br />ᐸ__compound...__.”extra”ᐳ"}}:::plan
+    PgUpdateSingle388 --> PgClassExpression401
+    First407{{"First[407∈39] ➊"}}:::plan
+    PgSelect403 --> First407
+    PgSelectSingle408{{"PgSelectSingle[408∈39] ➊<br />ᐸpersonᐳ"}}:::plan
+    First407 --> PgSelectSingle408
+    First416{{"First[416∈39] ➊"}}:::plan
+    PgSelect412 --> First416
+    PgSelectSingle417{{"PgSelectSingle[417∈39] ➊<br />ᐸpersonᐳ"}}:::plan
+    First416 --> PgSelectSingle417
+    PgClassExpression409{{"PgClassExpression[409∈40] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle408 --> PgClassExpression409
+    PgClassExpression410{{"PgClassExpression[410∈40] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle408 --> PgClassExpression410
+    PgClassExpression418{{"PgClassExpression[418∈41] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle417 --> PgClassExpression418
+    PgClassExpression419{{"PgClassExpression[419∈41] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle417 --> PgClassExpression419
+    Lambda421{{"Lambda[421∈42] ➊<br />ᐸrawEncodeᐳ"}}:::plan
+    Constant420{{"Constant[420∈42] ➊<br />ᐸ'query'ᐳ"}}:::plan
+    Constant420 --> Lambda421
+    PgUpdateSingle430[["PgUpdateSingle[430∈43] ➊<br />ᐸcompound_key(person_id_1,person_id_2;person_id_1,extra)ᐳ"]]:::sideeffectplan
+    Object433{{"Object[433∈43] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object433 & Constant614 & Constant614 & Constant606 & Constant620 --> PgUpdateSingle430
+    Access431{{"Access[431∈43] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access432{{"Access[432∈43] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access431 & Access432 --> Object433
+    Object434{{"Object[434∈43] ➊<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
+    PgUpdateSingle430 & Constant594 --> Object434
+    __Value2 --> Access431
+    __Value2 --> Access432
+    List438{{"List[438∈45] ➊<br />ᐸ435,436,437ᐳ"}}:::plan
+    Constant435{{"Constant[435∈45] ➊<br />ᐸ'compound_keys'ᐳ"}}:::plan
+    PgClassExpression436{{"PgClassExpression[436∈45] ➊<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
+    PgClassExpression437{{"PgClassExpression[437∈45] ➊<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
+    Constant435 & PgClassExpression436 & PgClassExpression437 --> List438
+    PgSelect444[["PgSelect[444∈45] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object433 & PgClassExpression436 --> PgSelect444
+    PgSelect453[["PgSelect[453∈45] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object433 & PgClassExpression437 --> PgSelect453
+    PgUpdateSingle430 --> PgClassExpression436
+    PgUpdateSingle430 --> PgClassExpression437
+    Lambda439{{"Lambda[439∈45] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List438 --> Lambda439
+    PgClassExpression442{{"PgClassExpression[442∈45] ➊<br />ᐸ__compound...__.”extra”ᐳ"}}:::plan
+    PgUpdateSingle430 --> PgClassExpression442
+    First448{{"First[448∈45] ➊"}}:::plan
+    PgSelect444 --> First448
+    PgSelectSingle449{{"PgSelectSingle[449∈45] ➊<br />ᐸpersonᐳ"}}:::plan
+    First448 --> PgSelectSingle449
+    First457{{"First[457∈45] ➊"}}:::plan
+    PgSelect453 --> First457
+    PgSelectSingle458{{"PgSelectSingle[458∈45] ➊<br />ᐸpersonᐳ"}}:::plan
+    First457 --> PgSelectSingle458
+    PgClassExpression450{{"PgClassExpression[450∈46] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle449 --> PgClassExpression450
+    PgClassExpression451{{"PgClassExpression[451∈46] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle449 --> PgClassExpression451
+    PgClassExpression459{{"PgClassExpression[459∈47] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle458 --> PgClassExpression459
+    PgClassExpression460{{"PgClassExpression[460∈47] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle458 --> PgClassExpression460
+    Lambda462{{"Lambda[462∈48] ➊<br />ᐸrawEncodeᐳ"}}:::plan
+    Constant461{{"Constant[461∈48] ➊<br />ᐸ'query'ᐳ"}}:::plan
+    Constant461 --> Lambda462
+    PgUpdateSingle471[["PgUpdateSingle[471∈49] ➊<br />ᐸcompound_key(person_id_1,person_id_2;extra)ᐳ"]]:::sideeffectplan
+    Object474{{"Object[474∈49] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object474 & Constant622 & Constant606 & Constant620 --> PgUpdateSingle471
+    Access472{{"Access[472∈49] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access473{{"Access[473∈49] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access472 & Access473 --> Object474
+    Object475{{"Object[475∈49] ➊<br />ᐸ{result,clientMutationId}ᐳ"}}:::plan
+    PgUpdateSingle471 & Constant599 --> Object475
+    __Value2 --> Access472
+    __Value2 --> Access473
+    List479{{"List[479∈51] ➊<br />ᐸ476,477,478ᐳ"}}:::plan
+    Constant476{{"Constant[476∈51] ➊<br />ᐸ'compound_keys'ᐳ"}}:::plan
+    PgClassExpression477{{"PgClassExpression[477∈51] ➊<br />ᐸ__compound...rson_id_1”ᐳ"}}:::plan
+    PgClassExpression478{{"PgClassExpression[478∈51] ➊<br />ᐸ__compound...rson_id_2”ᐳ"}}:::plan
+    Constant476 & PgClassExpression477 & PgClassExpression478 --> List479
+    PgSelect485[["PgSelect[485∈51] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object474 & PgClassExpression477 --> PgSelect485
+    PgSelect494[["PgSelect[494∈51] ➊<br />ᐸpersonᐳ"]]:::plan
+    Object474 & PgClassExpression478 --> PgSelect494
+    PgUpdateSingle471 --> PgClassExpression477
+    PgUpdateSingle471 --> PgClassExpression478
+    Lambda480{{"Lambda[480∈51] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List479 --> Lambda480
+    PgClassExpression483{{"PgClassExpression[483∈51] ➊<br />ᐸ__compound...__.”extra”ᐳ"}}:::plan
+    PgUpdateSingle471 --> PgClassExpression483
+    First489{{"First[489∈51] ➊"}}:::plan
+    PgSelect485 --> First489
+    PgSelectSingle490{{"PgSelectSingle[490∈51] ➊<br />ᐸpersonᐳ"}}:::plan
+    First489 --> PgSelectSingle490
+    First498{{"First[498∈51] ➊"}}:::plan
+    PgSelect494 --> First498
+    PgSelectSingle499{{"PgSelectSingle[499∈51] ➊<br />ᐸpersonᐳ"}}:::plan
+    First498 --> PgSelectSingle499
+    PgClassExpression491{{"PgClassExpression[491∈52] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle490 --> PgClassExpression491
+    PgClassExpression492{{"PgClassExpression[492∈52] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle490 --> PgClassExpression492
+    PgClassExpression500{{"PgClassExpression[500∈53] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle499 --> PgClassExpression500
+    PgClassExpression501{{"PgClassExpression[501∈53] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgSelectSingle499 --> PgClassExpression501
+    Lambda503{{"Lambda[503∈54] ➊<br />ᐸrawEncodeᐳ"}}:::plan
+    Constant502{{"Constant[502∈54] ➊<br />ᐸ'query'ᐳ"}}:::plan
+    Constant502 --> Lambda503
+    PgUpdateSingle519[["PgUpdateSingle[519∈55] ➊<br />ᐸperson(email;email)ᐳ"]]:::sideeffectplan
+    Object522{{"Object[522∈55] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object522 & Constant593 & Constant626 --> PgUpdateSingle519
+    Access520{{"Access[520∈55] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access521{{"Access[521∈55] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access520 & Access521 --> Object522
+    __Value2 --> Access520
+    __Value2 --> Access521
+    Object523{{"Object[523∈55] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgUpdateSingle519 --> Object523
+    Edge553{{"Edge[553∈56] ➊"}}:::plan
+    PgSelectSingle552{{"PgSelectSingle[552∈56] ➊<br />ᐸpersonᐳ"}}:::plan
+    PgCursor554{{"PgCursor[554∈56] ➊"}}:::plan
+    Connection550{{"Connection[550∈56] ➊<br />ᐸ546ᐳ"}}:::plan
+    PgSelectSingle552 & PgCursor554 & Connection550 --> Edge553
+    PgSelect546[["PgSelect[546∈56] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression545{{"PgClassExpression[545∈56] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    Object522 & PgClassExpression545 --> PgSelect546
+    PgUpdateSingle519 --> PgClassExpression545
+    First551{{"First[551∈56] ➊"}}:::plan
+    PgSelect546 --> First551
+    First551 --> PgSelectSingle552
+    List556{{"List[556∈56] ➊<br />ᐸ555ᐳ"}}:::plan
+    List556 --> PgCursor554
+    PgClassExpression555{{"PgClassExpression[555∈56] ➊<br />ᐸ__person__.”id”ᐳ"}}:::plan
+    PgSelectSingle552 --> PgClassExpression555
+    PgClassExpression555 --> List556
+    Constant524{{"Constant[524∈56] ➊<br />ᐸnullᐳ"}}:::plan
+    Constant525{{"Constant[525∈56] ➊<br />ᐸ'people'ᐳ"}}:::plan
+    PgSelect535[["PgSelect[535∈57] ➊<br />ᐸpersonᐳ"]]:::plan
+    PgClassExpression534{{"PgClassExpression[534∈57] ➊<br />ᐸ__person__ᐳ"}}:::plan
+    Object522 & PgClassExpression534 & Constant593 --> PgSelect535
+    List527{{"List[527∈57] ➊<br />ᐸ525,545ᐳ"}}:::plan
+    Constant525 & PgClassExpression545 --> List527
+    Lambda528{{"Lambda[528∈57] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List527 --> Lambda528
+    PgClassExpression530{{"PgClassExpression[530∈57] ➊<br />ᐸ__person__...full_name”ᐳ"}}:::plan
+    PgUpdateSingle519 --> PgClassExpression530
+    PgClassExpression531{{"PgClassExpression[531∈57] ➊<br />ᐸ__person__.”email”ᐳ"}}:::plan
+    PgUpdateSingle519 --> PgClassExpression531
+    PgClassExpression532{{"PgClassExpression[532∈57] ➊<br />ᐸ__person__.”about”ᐳ"}}:::plan
+    PgUpdateSingle519 --> PgClassExpression532
+    PgUpdateSingle519 --> PgClassExpression534
+    First539{{"First[539∈57] ➊"}}:::plan
+    PgSelect535 --> First539
+    PgSelectSingle540{{"PgSelectSingle[540∈57] ➊<br />ᐸpersonᐳ"}}:::plan
+    First539 --> PgSelectSingle540
+    PgClassExpression542{{"PgClassExpression[542∈57] ➊<br />ᐸ”c”.”perso...lder! */<br />)ᐳ"}}:::plan
+    PgSelectSingle540 --> PgClassExpression542
+    List559{{"List[559∈58] ➊<br />ᐸ525,555ᐳ"}}:::plan
+    Constant525 & PgClassExpression555 --> List559
+    Lambda560{{"Lambda[560∈58] ➊<br />ᐸbase64JSONEncodeᐳ"}}:::plan
+    List559 --> Lambda560
+    Lambda563{{"Lambda[563∈60] ➊<br />ᐸrawEncodeᐳ"}}:::plan
+    Constant562{{"Constant[562∈60] ➊<br />ᐸ'query'ᐳ"}}:::plan
+    Constant562 --> Lambda563
+    PgUpdateSingle570[["PgUpdateSingle[570∈61] ➊<br />ᐸdefault_value(id;null_value)ᐳ"]]:::sideeffectplan
+    Object573{{"Object[573∈61] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object573 & Constant628 & Constant604 --> PgUpdateSingle570
+    Access571{{"Access[571∈61] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access572{{"Access[572∈61] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access571 & Access572 --> Object573
+    __Value2 --> Access571
+    __Value2 --> Access572
+    Object574{{"Object[574∈61] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgUpdateSingle570 --> Object574
+    PgClassExpression575{{"PgClassExpression[575∈63] ➊<br />ᐸ__default_value__.”id”ᐳ"}}:::plan
+    PgUpdateSingle570 --> PgClassExpression575
+    PgClassExpression576{{"PgClassExpression[576∈63] ➊<br />ᐸ__default_...ull_value”ᐳ"}}:::plan
+    PgUpdateSingle570 --> PgClassExpression576
+    PgUpdateSingle583[["PgUpdateSingle[583∈64] ➊<br />ᐸno_primary_key(id;str)ᐳ"]]:::sideeffectplan
+    Object586{{"Object[586∈64] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Object586 & Constant628 & Constant631 --> PgUpdateSingle583
+    Access584{{"Access[584∈64] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access585{{"Access[585∈64] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access584 & Access585 --> Object586
+    __Value2 --> Access584
+    __Value2 --> Access585
+    Object587{{"Object[587∈64] ➊<br />ᐸ{result}ᐳ"}}:::plan
+    PgUpdateSingle583 --> Object587
+    PgClassExpression588{{"PgClassExpression[588∈66] ➊<br />ᐸ__no_primary_key__.”id”ᐳ"}}:::plan
+    PgUpdateSingle583 --> PgClassExpression588
+    PgClassExpression589{{"PgClassExpression[589∈66] ➊<br />ᐸ__no_prima...ey__.”str”ᐳ"}}:::plan
+    PgUpdateSingle583 --> PgClassExpression589
 
     %% define steps
 
     subgraph "Buckets for mutations/v4/mutation-update"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Lambda22,Access23,Access26,Access27,Object28,Constant591,Constant592,Constant593,Constant594,Constant595,Constant596,Constant597,Constant598,Constant600,Constant602,Constant605,Constant607,Constant608,Constant609,Constant611,Constant612,Constant614,Constant615,Constant616,Constant621,Constant623,Constant627,Constant629,Constant632 bucket0
-    Bucket1("Bucket 1 (mutationField)<br />Deps: 28, 23, 592, 593, 594, 5<br /><br />1: PgUpdateSingle[25]<br />2: <br />ᐳ: Object[29]"):::bucket
+    class Bucket0,__Value2,__Value4,Lambda21,Access22,Access25,Access26,Object27,Constant590,Constant591,Constant592,Constant593,Constant594,Constant595,Constant596,Constant597,Constant599,Constant601,Constant604,Constant606,Constant607,Constant608,Constant610,Constant611,Constant613,Constant614,Constant615,Constant620,Constant622,Constant626,Constant628,Constant631 bucket0
+    Bucket1("Bucket 1 (mutationField)<br />Deps: 27, 22, 591, 592, 593, 4<br /><br />1: PgUpdateSingle[24]<br />2: <br />ᐳ: Object[28]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,PgUpdateSingle25,Object29 bucket1
-    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 25, 28, 29, 594, 5<br /><br />ROOT Object{1}ᐸ{result}ᐳ[29]<br />1: <br />ᐳ: 30, 31, 51, 56<br />2: PgSelect[52]<br />ᐳ: 57, 58, 61, 62, 60, 59"):::bucket
+    class Bucket1,PgUpdateSingle24,Object28 bucket1
+    Bucket2("Bucket 2 (nullableBoundary)<br />Deps: 24, 27, 28, 593, 4<br /><br />ROOT Object{1}ᐸ{result}ᐳ[28]<br />1: <br />ᐳ: 29, 30, 50, 55<br />2: PgSelect[51]<br />ᐳ: 56, 57, 60, 61, 59, 58"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,Constant30,Constant31,PgClassExpression51,PgSelect52,Connection56,First57,PgSelectSingle58,Edge59,PgCursor60,PgClassExpression61,List62 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 31, 51, 25, 28, 594<br /><br />ROOT PgUpdateSingle{1}ᐸperson(id;person_full_name,about)ᐳ[25]<br />1: <br />ᐳ: 33, 36, 37, 38, 40, 34<br />2: PgSelect[41]<br />ᐳ: 45, 46, 48"):::bucket
+    class Bucket2,Constant29,Constant30,PgClassExpression50,PgSelect51,Connection55,First56,PgSelectSingle57,Edge58,PgCursor59,PgClassExpression60,List61 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 30, 50, 24, 27, 593<br /><br />ROOT PgUpdateSingle{1}ᐸperson(id;person_full_name,about)ᐳ[24]<br />1: <br />ᐳ: 32, 35, 36, 37, 39, 33<br />2: PgSelect[40]<br />ᐳ: 44, 45, 47"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,List33,Lambda34,PgClassExpression36,PgClassExpression37,PgClassExpression38,PgClassExpression40,PgSelect41,First45,PgSelectSingle46,PgClassExpression48 bucket3
-    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 31, 61, 59, 58, 60<br /><br />ROOT Edge{2}[59]"):::bucket
+    class Bucket3,List32,Lambda33,PgClassExpression35,PgClassExpression36,PgClassExpression37,PgClassExpression39,PgSelect40,First44,PgSelectSingle45,PgClassExpression47 bucket3
+    Bucket4("Bucket 4 (nullableBoundary)<br />Deps: 30, 60, 58, 57, 59<br /><br />ROOT Edge{2}[58]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,List65,Lambda66 bucket4
-    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 58, 66, 61<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[58]"):::bucket
+    class Bucket4,List64,Lambda65 bucket4
+    Bucket5("Bucket 5 (nullableBoundary)<br />Deps: 57, 65, 60<br /><br />ROOT PgSelectSingle{2}ᐸpersonᐳ[57]"):::bucket
     classDef bucket5 stroke:#7fff00
     class Bucket5 bucket5
-    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
+    Bucket6("Bucket 6 (nullableBoundary)<br />Deps: 4<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     classDef bucket6 stroke:#ff1493
-    class Bucket6,Constant68,Lambda69 bucket6
-    Bucket7("Bucket 7 (mutationField)<br />Deps: 596, 597, 598, 3, 595, 594, 5<br /><br />1: Access[89]<br />2: Access[90]<br />3: Object[91]<br />4: Lambda[85]<br />5: Access[86]<br />6: PgUpdateSingle[88]<br />7: <br />ᐳ: Object[92]"):::bucket
+    class Bucket6,Constant67,Lambda68 bucket6
+    Bucket7("Bucket 7 (mutationField)<br />Deps: 595, 596, 597, 2, 594, 593, 4<br /><br />1: Access[88]<br />2: Access[89]<br />3: Object[90]<br />4: Lambda[84]<br />5: Access[85]<br />6: PgUpdateSingle[87]<br />7: <br />ᐳ: Object[91]"):::bucket
     classDef bucket7 stroke:#808000
-    class Bucket7,Lambda85,Access86,PgUpdateSingle88,Access89,Access90,Object91,Object92 bucket7
-    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 88, 91, 92, 594, 5, 595<br /><br />ROOT Object{7}ᐸ{result,clientMutationId}ᐳ[92]<br />1: <br />ᐳ: 93, 113, 118<br />2: PgSelect[114]<br />ᐳ: 119, 120, 123, 124, 122, 121"):::bucket
+    class Bucket7,Lambda84,Access85,PgUpdateSingle87,Access88,Access89,Object90,Object91 bucket7
+    Bucket8("Bucket 8 (nullableBoundary)<br />Deps: 87, 90, 91, 593, 4, 594<br /><br />ROOT Object{7}ᐸ{result,clientMutationId}ᐳ[91]<br />1: <br />ᐳ: 92, 112, 117<br />2: PgSelect[113]<br />ᐳ: 118, 119, 122, 123, 121, 120"):::bucket
     classDef bucket8 stroke:#dda0dd
-    class Bucket8,Constant93,PgClassExpression113,PgSelect114,Connection118,First119,PgSelectSingle120,Edge121,PgCursor122,PgClassExpression123,List124 bucket8
-    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 93, 113, 88, 91, 594<br /><br />ROOT PgUpdateSingle{7}ᐸperson(id;person_full_name,email)ᐳ[88]<br />1: <br />ᐳ: 95, 98, 99, 100, 102, 96<br />2: PgSelect[103]<br />ᐳ: 107, 108, 110"):::bucket
+    class Bucket8,Constant92,PgClassExpression112,PgSelect113,Connection117,First118,PgSelectSingle119,Edge120,PgCursor121,PgClassExpression122,List123 bucket8
+    Bucket9("Bucket 9 (nullableBoundary)<br />Deps: 92, 112, 87, 90, 593<br /><br />ROOT PgUpdateSingle{7}ᐸperson(id;person_full_name,email)ᐳ[87]<br />1: <br />ᐳ: 94, 97, 98, 99, 101, 95<br />2: PgSelect[102]<br />ᐳ: 106, 107, 109"):::bucket
     classDef bucket9 stroke:#ff0000
-    class Bucket9,List95,Lambda96,PgClassExpression98,PgClassExpression99,PgClassExpression100,PgClassExpression102,PgSelect103,First107,PgSelectSingle108,PgClassExpression110 bucket9
-    Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 93, 123, 121, 120, 122<br /><br />ROOT Edge{8}[121]"):::bucket
+    class Bucket9,List94,Lambda95,PgClassExpression97,PgClassExpression98,PgClassExpression99,PgClassExpression101,PgSelect102,First106,PgSelectSingle107,PgClassExpression109 bucket9
+    Bucket10("Bucket 10 (nullableBoundary)<br />Deps: 92, 122, 120, 119, 121<br /><br />ROOT Edge{8}[120]"):::bucket
     classDef bucket10 stroke:#ffff00
-    class Bucket10,List127,Lambda128 bucket10
-    Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 120, 128, 123<br /><br />ROOT PgSelectSingle{8}ᐸpersonᐳ[120]"):::bucket
+    class Bucket10,List126,Lambda127 bucket10
+    Bucket11("Bucket 11 (nullableBoundary)<br />Deps: 119, 127, 122<br /><br />ROOT PgSelectSingle{8}ᐸpersonᐳ[119]"):::bucket
     classDef bucket11 stroke:#00ffff
     class Bucket11 bucket11
-    Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
+    Bucket12("Bucket 12 (nullableBoundary)<br />Deps: 4<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     classDef bucket12 stroke:#4169e1
-    class Bucket12,Constant130,Lambda131 bucket12
-    Bucket13("Bucket 13 (mutationField)<br />Deps: 596, 602, 3, 600, 594, 5<br /><br />1: Access[151]<br />2: Access[152]<br />3: Object[153]<br />4: Lambda[147]<br />5: Access[148]<br />6: PgUpdateSingle[150]<br />7: <br />ᐳ: Object[154]"):::bucket
+    class Bucket12,Constant129,Lambda130 bucket12
+    Bucket13("Bucket 13 (mutationField)<br />Deps: 595, 601, 2, 599, 593, 4<br /><br />1: Access[150]<br />2: Access[151]<br />3: Object[152]<br />4: Lambda[146]<br />5: Access[147]<br />6: PgUpdateSingle[149]<br />7: <br />ᐳ: Object[153]"):::bucket
     classDef bucket13 stroke:#3cb371
-    class Bucket13,Lambda147,Access148,PgUpdateSingle150,Access151,Access152,Object153,Object154 bucket13
-    Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 150, 153, 154, 594, 5, 600<br /><br />ROOT Object{13}ᐸ{result,clientMutationId}ᐳ[154]<br />1: <br />ᐳ: 155, 175, 180<br />2: PgSelect[176]<br />ᐳ: 181, 182, 185, 186, 184, 183"):::bucket
+    class Bucket13,Lambda146,Access147,PgUpdateSingle149,Access150,Access151,Object152,Object153 bucket13
+    Bucket14("Bucket 14 (nullableBoundary)<br />Deps: 149, 152, 153, 593, 4, 599<br /><br />ROOT Object{13}ᐸ{result,clientMutationId}ᐳ[153]<br />1: <br />ᐳ: 154, 174, 179<br />2: PgSelect[175]<br />ᐳ: 180, 181, 184, 185, 183, 182"):::bucket
     classDef bucket14 stroke:#a52a2a
-    class Bucket14,Constant155,PgClassExpression175,PgSelect176,Connection180,First181,PgSelectSingle182,Edge183,PgCursor184,PgClassExpression185,List186 bucket14
-    Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 155, 175, 150, 153, 594<br /><br />ROOT PgUpdateSingle{13}ᐸperson(id;about)ᐳ[150]<br />1: <br />ᐳ: 157, 160, 161, 162, 164, 158<br />2: PgSelect[165]<br />ᐳ: 169, 170, 172"):::bucket
+    class Bucket14,Constant154,PgClassExpression174,PgSelect175,Connection179,First180,PgSelectSingle181,Edge182,PgCursor183,PgClassExpression184,List185 bucket14
+    Bucket15("Bucket 15 (nullableBoundary)<br />Deps: 154, 174, 149, 152, 593<br /><br />ROOT PgUpdateSingle{13}ᐸperson(id;about)ᐳ[149]<br />1: <br />ᐳ: 156, 159, 160, 161, 163, 157<br />2: PgSelect[164]<br />ᐳ: 168, 169, 171"):::bucket
     classDef bucket15 stroke:#ff00ff
-    class Bucket15,List157,Lambda158,PgClassExpression160,PgClassExpression161,PgClassExpression162,PgClassExpression164,PgSelect165,First169,PgSelectSingle170,PgClassExpression172 bucket15
-    Bucket16("Bucket 16 (nullableBoundary)<br />Deps: 155, 185, 183, 182, 184<br /><br />ROOT Edge{14}[183]"):::bucket
+    class Bucket15,List156,Lambda157,PgClassExpression159,PgClassExpression160,PgClassExpression161,PgClassExpression163,PgSelect164,First168,PgSelectSingle169,PgClassExpression171 bucket15
+    Bucket16("Bucket 16 (nullableBoundary)<br />Deps: 154, 184, 182, 181, 183<br /><br />ROOT Edge{14}[182]"):::bucket
     classDef bucket16 stroke:#f5deb3
-    class Bucket16,List189,Lambda190 bucket16
-    Bucket17("Bucket 17 (nullableBoundary)<br />Deps: 182, 190, 185<br /><br />ROOT PgSelectSingle{14}ᐸpersonᐳ[182]"):::bucket
+    class Bucket16,List188,Lambda189 bucket16
+    Bucket17("Bucket 17 (nullableBoundary)<br />Deps: 181, 189, 184<br /><br />ROOT PgSelectSingle{14}ᐸpersonᐳ[181]"):::bucket
     classDef bucket17 stroke:#696969
     class Bucket17 bucket17
-    Bucket18("Bucket 18 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
+    Bucket18("Bucket 18 (nullableBoundary)<br />Deps: 4<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     classDef bucket18 stroke:#00bfff
-    class Bucket18,Constant192,Lambda193 bucket18
-    Bucket19("Bucket 19 (mutationField)<br />Deps: 596, 605, 3, 594, 5<br /><br />1: Access[213]<br />2: Access[214]<br />3: Object[215]<br />4: Lambda[209]<br />5: Access[210]<br />6: PgUpdateSingle[212]<br />7: <br />ᐳ: Object[216]"):::bucket
+    class Bucket18,Constant191,Lambda192 bucket18
+    Bucket19("Bucket 19 (mutationField)<br />Deps: 595, 604, 2, 593, 4<br /><br />1: Access[212]<br />2: Access[213]<br />3: Object[214]<br />4: Lambda[208]<br />5: Access[209]<br />6: PgUpdateSingle[211]<br />7: <br />ᐳ: Object[215]"):::bucket
     classDef bucket19 stroke:#7f007f
-    class Bucket19,Lambda209,Access210,PgUpdateSingle212,Access213,Access214,Object215,Object216 bucket19
-    Bucket20("Bucket 20 (nullableBoundary)<br />Deps: 212, 215, 216, 594, 5<br /><br />ROOT Object{19}ᐸ{result}ᐳ[216]<br />1: <br />ᐳ: 217, 218, 238, 243<br />2: PgSelect[239]<br />ᐳ: 244, 245, 248, 249, 247, 246"):::bucket
+    class Bucket19,Lambda208,Access209,PgUpdateSingle211,Access212,Access213,Object214,Object215 bucket19
+    Bucket20("Bucket 20 (nullableBoundary)<br />Deps: 211, 214, 215, 593, 4<br /><br />ROOT Object{19}ᐸ{result}ᐳ[215]<br />1: <br />ᐳ: 216, 217, 237, 242<br />2: PgSelect[238]<br />ᐳ: 243, 244, 247, 248, 246, 245"):::bucket
     classDef bucket20 stroke:#ffa500
-    class Bucket20,Constant217,Constant218,PgClassExpression238,PgSelect239,Connection243,First244,PgSelectSingle245,Edge246,PgCursor247,PgClassExpression248,List249 bucket20
-    Bucket21("Bucket 21 (nullableBoundary)<br />Deps: 218, 238, 212, 215, 594<br /><br />ROOT PgUpdateSingle{19}ᐸperson(id;about)ᐳ[212]<br />1: <br />ᐳ: 220, 223, 224, 225, 227, 221<br />2: PgSelect[228]<br />ᐳ: 232, 233, 235"):::bucket
+    class Bucket20,Constant216,Constant217,PgClassExpression237,PgSelect238,Connection242,First243,PgSelectSingle244,Edge245,PgCursor246,PgClassExpression247,List248 bucket20
+    Bucket21("Bucket 21 (nullableBoundary)<br />Deps: 217, 237, 211, 214, 593<br /><br />ROOT PgUpdateSingle{19}ᐸperson(id;about)ᐳ[211]<br />1: <br />ᐳ: 219, 222, 223, 224, 226, 220<br />2: PgSelect[227]<br />ᐳ: 231, 232, 234"):::bucket
     classDef bucket21 stroke:#0000ff
-    class Bucket21,List220,Lambda221,PgClassExpression223,PgClassExpression224,PgClassExpression225,PgClassExpression227,PgSelect228,First232,PgSelectSingle233,PgClassExpression235 bucket21
-    Bucket22("Bucket 22 (nullableBoundary)<br />Deps: 218, 248, 246, 245, 247<br /><br />ROOT Edge{20}[246]"):::bucket
+    class Bucket21,List219,Lambda220,PgClassExpression222,PgClassExpression223,PgClassExpression224,PgClassExpression226,PgSelect227,First231,PgSelectSingle232,PgClassExpression234 bucket21
+    Bucket22("Bucket 22 (nullableBoundary)<br />Deps: 217, 247, 245, 244, 246<br /><br />ROOT Edge{20}[245]"):::bucket
     classDef bucket22 stroke:#7fff00
-    class Bucket22,List252,Lambda253 bucket22
-    Bucket23("Bucket 23 (nullableBoundary)<br />Deps: 245, 253, 248<br /><br />ROOT PgSelectSingle{20}ᐸpersonᐳ[245]"):::bucket
+    class Bucket22,List251,Lambda252 bucket22
+    Bucket23("Bucket 23 (nullableBoundary)<br />Deps: 244, 252, 247<br /><br />ROOT PgSelectSingle{20}ᐸpersonᐳ[244]"):::bucket
     classDef bucket23 stroke:#ff1493
     class Bucket23 bucket23
-    Bucket24("Bucket 24 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
+    Bucket24("Bucket 24 (nullableBoundary)<br />Deps: 4<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     classDef bucket24 stroke:#808000
-    class Bucket24,Constant255,Lambda256 bucket24
-    Bucket25("Bucket 25 (mutationField)<br />Deps: 607, 608, 609, 3, 594, 5<br /><br />1: Access[273]<br />2: Access[274]<br />3: Object[275]<br />4: PgUpdateSingle[272]<br />5: <br />ᐳ: Object[276]"):::bucket
+    class Bucket24,Constant254,Lambda255 bucket24
+    Bucket25("Bucket 25 (mutationField)<br />Deps: 606, 607, 608, 2, 593, 4<br /><br />1: Access[272]<br />2: Access[273]<br />3: Object[274]<br />4: PgUpdateSingle[271]<br />5: <br />ᐳ: Object[275]"):::bucket
     classDef bucket25 stroke:#dda0dd
-    class Bucket25,PgUpdateSingle272,Access273,Access274,Object275,Object276 bucket25
-    Bucket26("Bucket 26 (nullableBoundary)<br />Deps: 272, 275, 276, 594, 5<br /><br />ROOT Object{25}ᐸ{result}ᐳ[276]<br />1: <br />ᐳ: 277, 278, 298, 303<br />2: PgSelect[299]<br />ᐳ: 304, 305, 308, 309, 307, 306"):::bucket
+    class Bucket25,PgUpdateSingle271,Access272,Access273,Object274,Object275 bucket25
+    Bucket26("Bucket 26 (nullableBoundary)<br />Deps: 271, 274, 275, 593, 4<br /><br />ROOT Object{25}ᐸ{result}ᐳ[275]<br />1: <br />ᐳ: 276, 277, 297, 302<br />2: PgSelect[298]<br />ᐳ: 303, 304, 307, 308, 306, 305"):::bucket
     classDef bucket26 stroke:#ff0000
-    class Bucket26,Constant277,Constant278,PgClassExpression298,PgSelect299,Connection303,First304,PgSelectSingle305,Edge306,PgCursor307,PgClassExpression308,List309 bucket26
-    Bucket27("Bucket 27 (nullableBoundary)<br />Deps: 278, 298, 272, 275, 594<br /><br />ROOT PgUpdateSingle{25}ᐸperson(id;person_full_name,about)ᐳ[272]<br />1: <br />ᐳ: 280, 283, 284, 285, 287, 281<br />2: PgSelect[288]<br />ᐳ: 292, 293, 295"):::bucket
+    class Bucket26,Constant276,Constant277,PgClassExpression297,PgSelect298,Connection302,First303,PgSelectSingle304,Edge305,PgCursor306,PgClassExpression307,List308 bucket26
+    Bucket27("Bucket 27 (nullableBoundary)<br />Deps: 277, 297, 271, 274, 593<br /><br />ROOT PgUpdateSingle{25}ᐸperson(id;person_full_name,about)ᐳ[271]<br />1: <br />ᐳ: 279, 282, 283, 284, 286, 280<br />2: PgSelect[287]<br />ᐳ: 291, 292, 294"):::bucket
     classDef bucket27 stroke:#ffff00
-    class Bucket27,List280,Lambda281,PgClassExpression283,PgClassExpression284,PgClassExpression285,PgClassExpression287,PgSelect288,First292,PgSelectSingle293,PgClassExpression295 bucket27
-    Bucket28("Bucket 28 (nullableBoundary)<br />Deps: 278, 308, 306, 305, 307<br /><br />ROOT Edge{26}[306]"):::bucket
+    class Bucket27,List279,Lambda280,PgClassExpression282,PgClassExpression283,PgClassExpression284,PgClassExpression286,PgSelect287,First291,PgSelectSingle292,PgClassExpression294 bucket27
+    Bucket28("Bucket 28 (nullableBoundary)<br />Deps: 277, 307, 305, 304, 306<br /><br />ROOT Edge{26}[305]"):::bucket
     classDef bucket28 stroke:#00ffff
-    class Bucket28,List312,Lambda313 bucket28
-    Bucket29("Bucket 29 (nullableBoundary)<br />Deps: 305, 313, 308<br /><br />ROOT PgSelectSingle{26}ᐸpersonᐳ[305]"):::bucket
+    class Bucket28,List311,Lambda312 bucket28
+    Bucket29("Bucket 29 (nullableBoundary)<br />Deps: 304, 312, 307<br /><br />ROOT PgSelectSingle{26}ᐸpersonᐳ[304]"):::bucket
     classDef bucket29 stroke:#4169e1
     class Bucket29 bucket29
-    Bucket30("Bucket 30 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
+    Bucket30("Bucket 30 (nullableBoundary)<br />Deps: 4<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     classDef bucket30 stroke:#3cb371
-    class Bucket30,Constant315,Lambda316 bucket30
-    Bucket31("Bucket 31 (mutationField)<br />Deps: 611, 612, 3, 594, 5<br /><br />1: Access[333]<br />2: Access[334]<br />3: Object[335]<br />4: PgUpdateSingle[332]<br />5: <br />ᐳ: Object[336]"):::bucket
+    class Bucket30,Constant314,Lambda315 bucket30
+    Bucket31("Bucket 31 (mutationField)<br />Deps: 610, 611, 2, 593, 4<br /><br />1: Access[332]<br />2: Access[333]<br />3: Object[334]<br />4: PgUpdateSingle[331]<br />5: <br />ᐳ: Object[335]"):::bucket
     classDef bucket31 stroke:#a52a2a
-    class Bucket31,PgUpdateSingle332,Access333,Access334,Object335,Object336 bucket31
-    Bucket32("Bucket 32 (nullableBoundary)<br />Deps: 332, 335, 336, 594, 5<br /><br />ROOT Object{31}ᐸ{result}ᐳ[336]<br />1: <br />ᐳ: 337, 338, 358, 363<br />2: PgSelect[359]<br />ᐳ: 364, 365, 368, 369, 367, 366"):::bucket
+    class Bucket31,PgUpdateSingle331,Access332,Access333,Object334,Object335 bucket31
+    Bucket32("Bucket 32 (nullableBoundary)<br />Deps: 331, 334, 335, 593, 4<br /><br />ROOT Object{31}ᐸ{result}ᐳ[335]<br />1: <br />ᐳ: 336, 337, 357, 362<br />2: PgSelect[358]<br />ᐳ: 363, 364, 367, 368, 366, 365"):::bucket
     classDef bucket32 stroke:#ff00ff
-    class Bucket32,Constant337,Constant338,PgClassExpression358,PgSelect359,Connection363,First364,PgSelectSingle365,Edge366,PgCursor367,PgClassExpression368,List369 bucket32
-    Bucket33("Bucket 33 (nullableBoundary)<br />Deps: 338, 358, 332, 335, 594<br /><br />ROOT PgUpdateSingle{31}ᐸperson(email;about)ᐳ[332]<br />1: <br />ᐳ: 340, 343, 344, 345, 347, 341<br />2: PgSelect[348]<br />ᐳ: 352, 353, 355"):::bucket
+    class Bucket32,Constant336,Constant337,PgClassExpression357,PgSelect358,Connection362,First363,PgSelectSingle364,Edge365,PgCursor366,PgClassExpression367,List368 bucket32
+    Bucket33("Bucket 33 (nullableBoundary)<br />Deps: 337, 357, 331, 334, 593<br /><br />ROOT PgUpdateSingle{31}ᐸperson(email;about)ᐳ[331]<br />1: <br />ᐳ: 339, 342, 343, 344, 346, 340<br />2: PgSelect[347]<br />ᐳ: 351, 352, 354"):::bucket
     classDef bucket33 stroke:#f5deb3
-    class Bucket33,List340,Lambda341,PgClassExpression343,PgClassExpression344,PgClassExpression345,PgClassExpression347,PgSelect348,First352,PgSelectSingle353,PgClassExpression355 bucket33
-    Bucket34("Bucket 34 (nullableBoundary)<br />Deps: 338, 368, 366, 365, 367<br /><br />ROOT Edge{32}[366]"):::bucket
+    class Bucket33,List339,Lambda340,PgClassExpression342,PgClassExpression343,PgClassExpression344,PgClassExpression346,PgSelect347,First351,PgSelectSingle352,PgClassExpression354 bucket33
+    Bucket34("Bucket 34 (nullableBoundary)<br />Deps: 337, 367, 365, 364, 366<br /><br />ROOT Edge{32}[365]"):::bucket
     classDef bucket34 stroke:#696969
-    class Bucket34,List372,Lambda373 bucket34
-    Bucket35("Bucket 35 (nullableBoundary)<br />Deps: 365, 373, 368<br /><br />ROOT PgSelectSingle{32}ᐸpersonᐳ[365]"):::bucket
+    class Bucket34,List371,Lambda372 bucket34
+    Bucket35("Bucket 35 (nullableBoundary)<br />Deps: 364, 372, 367<br /><br />ROOT PgSelectSingle{32}ᐸpersonᐳ[364]"):::bucket
     classDef bucket35 stroke:#00bfff
     class Bucket35 bucket35
-    Bucket36("Bucket 36 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
+    Bucket36("Bucket 36 (nullableBoundary)<br />Deps: 4<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     classDef bucket36 stroke:#7f007f
-    class Bucket36,Constant375,Lambda376 bucket36
-    Bucket37("Bucket 37 (mutationField)<br />Deps: 614, 615, 616, 3, 5<br /><br />1: Access[390]<br />2: Access[391]<br />3: Object[392]<br />4: Lambda[384]<br />5: Access[385]<br />6: Access[387]<br />7: PgUpdateSingle[389]<br />8: <br />ᐳ: Object[393]"):::bucket
+    class Bucket36,Constant374,Lambda375 bucket36
+    Bucket37("Bucket 37 (mutationField)<br />Deps: 613, 614, 615, 2, 4<br /><br />1: Access[389]<br />2: Access[390]<br />3: Object[391]<br />4: Lambda[383]<br />5: Access[384]<br />6: Access[386]<br />7: PgUpdateSingle[388]<br />8: <br />ᐳ: Object[392]"):::bucket
     classDef bucket37 stroke:#ffa500
-    class Bucket37,Lambda384,Access385,Access387,PgUpdateSingle389,Access390,Access391,Object392,Object393 bucket37
-    Bucket38("Bucket 38 (nullableBoundary)<br />Deps: 393, 389, 392, 5<br /><br />ROOT Object{37}ᐸ{result}ᐳ[393]"):::bucket
+    class Bucket37,Lambda383,Access384,Access386,PgUpdateSingle388,Access389,Access390,Object391,Object392 bucket37
+    Bucket38("Bucket 38 (nullableBoundary)<br />Deps: 392, 388, 391, 4<br /><br />ROOT Object{37}ᐸ{result}ᐳ[392]"):::bucket
     classDef bucket38 stroke:#0000ff
-    class Bucket38,Constant394 bucket38
-    Bucket39("Bucket 39 (nullableBoundary)<br />Deps: 389, 392<br /><br />ROOT PgUpdateSingle{37}ᐸcompound_key(person_id_1,person_id_2;person_id_1,extra)ᐳ[389]<br />1: <br />ᐳ: 395, 396, 397, 402, 398, 399<br />2: PgSelect[404], PgSelect[413]<br />ᐳ: 408, 409, 417, 418"):::bucket
+    class Bucket38,Constant393 bucket38
+    Bucket39("Bucket 39 (nullableBoundary)<br />Deps: 388, 391<br /><br />ROOT PgUpdateSingle{37}ᐸcompound_key(person_id_1,person_id_2;person_id_1,extra)ᐳ[388]<br />1: <br />ᐳ: 394, 395, 396, 401, 397, 398<br />2: PgSelect[403], PgSelect[412]<br />ᐳ: 407, 408, 416, 417"):::bucket
     classDef bucket39 stroke:#7fff00
-    class Bucket39,Constant395,PgClassExpression396,PgClassExpression397,List398,Lambda399,PgClassExpression402,PgSelect404,First408,PgSelectSingle409,PgSelect413,First417,PgSelectSingle418 bucket39
-    Bucket40("Bucket 40 (nullableBoundary)<br />Deps: 409<br /><br />ROOT PgSelectSingle{39}ᐸpersonᐳ[409]"):::bucket
+    class Bucket39,Constant394,PgClassExpression395,PgClassExpression396,List397,Lambda398,PgClassExpression401,PgSelect403,First407,PgSelectSingle408,PgSelect412,First416,PgSelectSingle417 bucket39
+    Bucket40("Bucket 40 (nullableBoundary)<br />Deps: 408<br /><br />ROOT PgSelectSingle{39}ᐸpersonᐳ[408]"):::bucket
     classDef bucket40 stroke:#ff1493
-    class Bucket40,PgClassExpression410,PgClassExpression411 bucket40
-    Bucket41("Bucket 41 (nullableBoundary)<br />Deps: 418<br /><br />ROOT PgSelectSingle{39}ᐸpersonᐳ[418]"):::bucket
+    class Bucket40,PgClassExpression409,PgClassExpression410 bucket40
+    Bucket41("Bucket 41 (nullableBoundary)<br />Deps: 417<br /><br />ROOT PgSelectSingle{39}ᐸpersonᐳ[417]"):::bucket
     classDef bucket41 stroke:#808000
-    class Bucket41,PgClassExpression419,PgClassExpression420 bucket41
-    Bucket42("Bucket 42 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
+    class Bucket41,PgClassExpression418,PgClassExpression419 bucket41
+    Bucket42("Bucket 42 (nullableBoundary)<br />Deps: 4<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     classDef bucket42 stroke:#dda0dd
-    class Bucket42,Constant421,Lambda422 bucket42
-    Bucket43("Bucket 43 (mutationField)<br />Deps: 615, 607, 621, 3, 595, 5<br /><br />1: Access[432]<br />2: Access[433]<br />3: Object[434]<br />4: PgUpdateSingle[431]<br />5: <br />ᐳ: Object[435]"):::bucket
+    class Bucket42,Constant420,Lambda421 bucket42
+    Bucket43("Bucket 43 (mutationField)<br />Deps: 614, 606, 620, 2, 594, 4<br /><br />1: Access[431]<br />2: Access[432]<br />3: Object[433]<br />4: PgUpdateSingle[430]<br />5: <br />ᐳ: Object[434]"):::bucket
     classDef bucket43 stroke:#ff0000
-    class Bucket43,PgUpdateSingle431,Access432,Access433,Object434,Object435 bucket43
-    Bucket44("Bucket 44 (nullableBoundary)<br />Deps: 435, 431, 434, 5, 595<br /><br />ROOT Object{43}ᐸ{result,clientMutationId}ᐳ[435]"):::bucket
+    class Bucket43,PgUpdateSingle430,Access431,Access432,Object433,Object434 bucket43
+    Bucket44("Bucket 44 (nullableBoundary)<br />Deps: 434, 430, 433, 4, 594<br /><br />ROOT Object{43}ᐸ{result,clientMutationId}ᐳ[434]"):::bucket
     classDef bucket44 stroke:#ffff00
     class Bucket44 bucket44
-    Bucket45("Bucket 45 (nullableBoundary)<br />Deps: 431, 434<br /><br />ROOT PgUpdateSingle{43}ᐸcompound_key(person_id_1,person_id_2;person_id_1,extra)ᐳ[431]<br />1: <br />ᐳ: 436, 437, 438, 443, 439, 440<br />2: PgSelect[445], PgSelect[454]<br />ᐳ: 449, 450, 458, 459"):::bucket
+    Bucket45("Bucket 45 (nullableBoundary)<br />Deps: 430, 433<br /><br />ROOT PgUpdateSingle{43}ᐸcompound_key(person_id_1,person_id_2;person_id_1,extra)ᐳ[430]<br />1: <br />ᐳ: 435, 436, 437, 442, 438, 439<br />2: PgSelect[444], PgSelect[453]<br />ᐳ: 448, 449, 457, 458"):::bucket
     classDef bucket45 stroke:#00ffff
-    class Bucket45,Constant436,PgClassExpression437,PgClassExpression438,List439,Lambda440,PgClassExpression443,PgSelect445,First449,PgSelectSingle450,PgSelect454,First458,PgSelectSingle459 bucket45
-    Bucket46("Bucket 46 (nullableBoundary)<br />Deps: 450<br /><br />ROOT PgSelectSingle{45}ᐸpersonᐳ[450]"):::bucket
+    class Bucket45,Constant435,PgClassExpression436,PgClassExpression437,List438,Lambda439,PgClassExpression442,PgSelect444,First448,PgSelectSingle449,PgSelect453,First457,PgSelectSingle458 bucket45
+    Bucket46("Bucket 46 (nullableBoundary)<br />Deps: 449<br /><br />ROOT PgSelectSingle{45}ᐸpersonᐳ[449]"):::bucket
     classDef bucket46 stroke:#4169e1
-    class Bucket46,PgClassExpression451,PgClassExpression452 bucket46
-    Bucket47("Bucket 47 (nullableBoundary)<br />Deps: 459<br /><br />ROOT PgSelectSingle{45}ᐸpersonᐳ[459]"):::bucket
+    class Bucket46,PgClassExpression450,PgClassExpression451 bucket46
+    Bucket47("Bucket 47 (nullableBoundary)<br />Deps: 458<br /><br />ROOT PgSelectSingle{45}ᐸpersonᐳ[458]"):::bucket
     classDef bucket47 stroke:#3cb371
-    class Bucket47,PgClassExpression460,PgClassExpression461 bucket47
-    Bucket48("Bucket 48 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
+    class Bucket47,PgClassExpression459,PgClassExpression460 bucket47
+    Bucket48("Bucket 48 (nullableBoundary)<br />Deps: 4<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     classDef bucket48 stroke:#a52a2a
-    class Bucket48,Constant462,Lambda463 bucket48
-    Bucket49("Bucket 49 (mutationField)<br />Deps: 623, 607, 621, 3, 600, 5<br /><br />1: Access[473]<br />2: Access[474]<br />3: Object[475]<br />4: PgUpdateSingle[472]<br />5: <br />ᐳ: Object[476]"):::bucket
+    class Bucket48,Constant461,Lambda462 bucket48
+    Bucket49("Bucket 49 (mutationField)<br />Deps: 622, 606, 620, 2, 599, 4<br /><br />1: Access[472]<br />2: Access[473]<br />3: Object[474]<br />4: PgUpdateSingle[471]<br />5: <br />ᐳ: Object[475]"):::bucket
     classDef bucket49 stroke:#ff00ff
-    class Bucket49,PgUpdateSingle472,Access473,Access474,Object475,Object476 bucket49
-    Bucket50("Bucket 50 (nullableBoundary)<br />Deps: 476, 472, 475, 5, 600<br /><br />ROOT Object{49}ᐸ{result,clientMutationId}ᐳ[476]"):::bucket
+    class Bucket49,PgUpdateSingle471,Access472,Access473,Object474,Object475 bucket49
+    Bucket50("Bucket 50 (nullableBoundary)<br />Deps: 475, 471, 474, 4, 599<br /><br />ROOT Object{49}ᐸ{result,clientMutationId}ᐳ[475]"):::bucket
     classDef bucket50 stroke:#f5deb3
     class Bucket50 bucket50
-    Bucket51("Bucket 51 (nullableBoundary)<br />Deps: 472, 475<br /><br />ROOT PgUpdateSingle{49}ᐸcompound_key(person_id_1,person_id_2;extra)ᐳ[472]<br />1: <br />ᐳ: 477, 478, 479, 484, 480, 481<br />2: PgSelect[486], PgSelect[495]<br />ᐳ: 490, 491, 499, 500"):::bucket
+    Bucket51("Bucket 51 (nullableBoundary)<br />Deps: 471, 474<br /><br />ROOT PgUpdateSingle{49}ᐸcompound_key(person_id_1,person_id_2;extra)ᐳ[471]<br />1: <br />ᐳ: 476, 477, 478, 483, 479, 480<br />2: PgSelect[485], PgSelect[494]<br />ᐳ: 489, 490, 498, 499"):::bucket
     classDef bucket51 stroke:#696969
-    class Bucket51,Constant477,PgClassExpression478,PgClassExpression479,List480,Lambda481,PgClassExpression484,PgSelect486,First490,PgSelectSingle491,PgSelect495,First499,PgSelectSingle500 bucket51
-    Bucket52("Bucket 52 (nullableBoundary)<br />Deps: 491<br /><br />ROOT PgSelectSingle{51}ᐸpersonᐳ[491]"):::bucket
+    class Bucket51,Constant476,PgClassExpression477,PgClassExpression478,List479,Lambda480,PgClassExpression483,PgSelect485,First489,PgSelectSingle490,PgSelect494,First498,PgSelectSingle499 bucket51
+    Bucket52("Bucket 52 (nullableBoundary)<br />Deps: 490<br /><br />ROOT PgSelectSingle{51}ᐸpersonᐳ[490]"):::bucket
     classDef bucket52 stroke:#00bfff
-    class Bucket52,PgClassExpression492,PgClassExpression493 bucket52
-    Bucket53("Bucket 53 (nullableBoundary)<br />Deps: 500<br /><br />ROOT PgSelectSingle{51}ᐸpersonᐳ[500]"):::bucket
+    class Bucket52,PgClassExpression491,PgClassExpression492 bucket52
+    Bucket53("Bucket 53 (nullableBoundary)<br />Deps: 499<br /><br />ROOT PgSelectSingle{51}ᐸpersonᐳ[499]"):::bucket
     classDef bucket53 stroke:#7f007f
-    class Bucket53,PgClassExpression501,PgClassExpression502 bucket53
-    Bucket54("Bucket 54 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
+    class Bucket53,PgClassExpression500,PgClassExpression501 bucket53
+    Bucket54("Bucket 54 (nullableBoundary)<br />Deps: 4<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     classDef bucket54 stroke:#ffa500
-    class Bucket54,Constant503,Lambda504 bucket54
-    Bucket55("Bucket 55 (mutationField)<br />Deps: 594, 627, 3, 5<br /><br />1: Access[521]<br />2: Access[522]<br />3: Object[523]<br />4: PgUpdateSingle[520]<br />5: <br />ᐳ: Object[524]"):::bucket
+    class Bucket54,Constant502,Lambda503 bucket54
+    Bucket55("Bucket 55 (mutationField)<br />Deps: 593, 626, 2, 4<br /><br />1: Access[520]<br />2: Access[521]<br />3: Object[522]<br />4: PgUpdateSingle[519]<br />5: <br />ᐳ: Object[523]"):::bucket
     classDef bucket55 stroke:#0000ff
-    class Bucket55,PgUpdateSingle520,Access521,Access522,Object523,Object524 bucket55
-    Bucket56("Bucket 56 (nullableBoundary)<br />Deps: 520, 523, 524, 594, 5<br /><br />ROOT Object{55}ᐸ{result}ᐳ[524]<br />1: <br />ᐳ: 525, 526, 546, 551<br />2: PgSelect[547]<br />ᐳ: 552, 553, 556, 557, 555, 554"):::bucket
+    class Bucket55,PgUpdateSingle519,Access520,Access521,Object522,Object523 bucket55
+    Bucket56("Bucket 56 (nullableBoundary)<br />Deps: 519, 522, 523, 593, 4<br /><br />ROOT Object{55}ᐸ{result}ᐳ[523]<br />1: <br />ᐳ: 524, 525, 545, 550<br />2: PgSelect[546]<br />ᐳ: 551, 552, 555, 556, 554, 553"):::bucket
     classDef bucket56 stroke:#7fff00
-    class Bucket56,Constant525,Constant526,PgClassExpression546,PgSelect547,Connection551,First552,PgSelectSingle553,Edge554,PgCursor555,PgClassExpression556,List557 bucket56
-    Bucket57("Bucket 57 (nullableBoundary)<br />Deps: 526, 546, 520, 523, 594<br /><br />ROOT PgUpdateSingle{55}ᐸperson(email;email)ᐳ[520]<br />1: <br />ᐳ: 528, 531, 532, 533, 535, 529<br />2: PgSelect[536]<br />ᐳ: 540, 541, 543"):::bucket
+    class Bucket56,Constant524,Constant525,PgClassExpression545,PgSelect546,Connection550,First551,PgSelectSingle552,Edge553,PgCursor554,PgClassExpression555,List556 bucket56
+    Bucket57("Bucket 57 (nullableBoundary)<br />Deps: 525, 545, 519, 522, 593<br /><br />ROOT PgUpdateSingle{55}ᐸperson(email;email)ᐳ[519]<br />1: <br />ᐳ: 527, 530, 531, 532, 534, 528<br />2: PgSelect[535]<br />ᐳ: 539, 540, 542"):::bucket
     classDef bucket57 stroke:#ff1493
-    class Bucket57,List528,Lambda529,PgClassExpression531,PgClassExpression532,PgClassExpression533,PgClassExpression535,PgSelect536,First540,PgSelectSingle541,PgClassExpression543 bucket57
-    Bucket58("Bucket 58 (nullableBoundary)<br />Deps: 526, 556, 554, 553, 555<br /><br />ROOT Edge{56}[554]"):::bucket
+    class Bucket57,List527,Lambda528,PgClassExpression530,PgClassExpression531,PgClassExpression532,PgClassExpression534,PgSelect535,First539,PgSelectSingle540,PgClassExpression542 bucket57
+    Bucket58("Bucket 58 (nullableBoundary)<br />Deps: 525, 555, 553, 552, 554<br /><br />ROOT Edge{56}[553]"):::bucket
     classDef bucket58 stroke:#808000
-    class Bucket58,List560,Lambda561 bucket58
-    Bucket59("Bucket 59 (nullableBoundary)<br />Deps: 553, 561, 556<br /><br />ROOT PgSelectSingle{56}ᐸpersonᐳ[553]"):::bucket
+    class Bucket58,List559,Lambda560 bucket58
+    Bucket59("Bucket 59 (nullableBoundary)<br />Deps: 552, 560, 555<br /><br />ROOT PgSelectSingle{56}ᐸpersonᐳ[552]"):::bucket
     classDef bucket59 stroke:#dda0dd
     class Bucket59 bucket59
-    Bucket60("Bucket 60 (nullableBoundary)<br />Deps: 5<br /><br />ROOT __ValueᐸrootValueᐳ[5]"):::bucket
+    Bucket60("Bucket 60 (nullableBoundary)<br />Deps: 4<br /><br />ROOT __ValueᐸrootValueᐳ[4]"):::bucket
     classDef bucket60 stroke:#ff0000
-    class Bucket60,Constant563,Lambda564 bucket60
-    Bucket61("Bucket 61 (mutationField)<br />Deps: 629, 605, 3<br /><br />1: Access[572]<br />2: Access[573]<br />3: Object[574]<br />4: PgUpdateSingle[571]<br />5: <br />ᐳ: Object[575]"):::bucket
+    class Bucket60,Constant562,Lambda563 bucket60
+    Bucket61("Bucket 61 (mutationField)<br />Deps: 628, 604, 2<br /><br />1: Access[571]<br />2: Access[572]<br />3: Object[573]<br />4: PgUpdateSingle[570]<br />5: <br />ᐳ: Object[574]"):::bucket
     classDef bucket61 stroke:#ffff00
-    class Bucket61,PgUpdateSingle571,Access572,Access573,Object574,Object575 bucket61
-    Bucket62("Bucket 62 (nullableBoundary)<br />Deps: 575, 571<br /><br />ROOT Object{61}ᐸ{result}ᐳ[575]"):::bucket
+    class Bucket61,PgUpdateSingle570,Access571,Access572,Object573,Object574 bucket61
+    Bucket62("Bucket 62 (nullableBoundary)<br />Deps: 574, 570<br /><br />ROOT Object{61}ᐸ{result}ᐳ[574]"):::bucket
     classDef bucket62 stroke:#00ffff
     class Bucket62 bucket62
-    Bucket63("Bucket 63 (nullableBoundary)<br />Deps: 571<br /><br />ROOT PgUpdateSingle{61}ᐸdefault_value(id;null_value)ᐳ[571]"):::bucket
+    Bucket63("Bucket 63 (nullableBoundary)<br />Deps: 570<br /><br />ROOT PgUpdateSingle{61}ᐸdefault_value(id;null_value)ᐳ[570]"):::bucket
     classDef bucket63 stroke:#4169e1
-    class Bucket63,PgClassExpression576,PgClassExpression577 bucket63
-    Bucket64("Bucket 64 (mutationField)<br />Deps: 629, 632, 3<br /><br />1: Access[585]<br />2: Access[586]<br />3: Object[587]<br />4: PgUpdateSingle[584]<br />5: <br />ᐳ: Object[588]"):::bucket
+    class Bucket63,PgClassExpression575,PgClassExpression576 bucket63
+    Bucket64("Bucket 64 (mutationField)<br />Deps: 628, 631, 2<br /><br />1: Access[584]<br />2: Access[585]<br />3: Object[586]<br />4: PgUpdateSingle[583]<br />5: <br />ᐳ: Object[587]"):::bucket
     classDef bucket64 stroke:#3cb371
-    class Bucket64,PgUpdateSingle584,Access585,Access586,Object587,Object588 bucket64
-    Bucket65("Bucket 65 (nullableBoundary)<br />Deps: 588, 584<br /><br />ROOT Object{64}ᐸ{result}ᐳ[588]"):::bucket
+    class Bucket64,PgUpdateSingle583,Access584,Access585,Object586,Object587 bucket64
+    Bucket65("Bucket 65 (nullableBoundary)<br />Deps: 587, 583<br /><br />ROOT Object{64}ᐸ{result}ᐳ[587]"):::bucket
     classDef bucket65 stroke:#a52a2a
     class Bucket65 bucket65
-    Bucket66("Bucket 66 (nullableBoundary)<br />Deps: 584<br /><br />ROOT PgUpdateSingle{64}ᐸno_primary_key(id;str)ᐳ[584]"):::bucket
+    Bucket66("Bucket 66 (nullableBoundary)<br />Deps: 583<br /><br />ROOT PgUpdateSingle{64}ᐸno_primary_key(id;str)ᐳ[583]"):::bucket
     classDef bucket66 stroke:#ff00ff
-    class Bucket66,PgClassExpression589,PgClassExpression590 bucket66
+    class Bucket66,PgClassExpression588,PgClassExpression589 bucket66
     Bucket0 --> Bucket1 & Bucket7 & Bucket13 & Bucket19 & Bucket25 & Bucket31 & Bucket37 & Bucket43 & Bucket49 & Bucket55 & Bucket61 & Bucket64
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3 & Bucket4 & Bucket6
@@ -855,6 +854,4 @@ graph TD
     Bucket62 --> Bucket63
     Bucket64 --> Bucket65
     Bucket65 --> Bucket66
-    classDef unary fill:#fafffa,borderWidth:8px
-    class Object28,Lambda22,Access23,Access26,Access27,__Value0,__Value3,__Value5,Constant591,Constant592,Constant593,Constant594,Constant595,Constant596,Constant597,Constant598,Constant600,Constant602,Constant605,Constant607,Constant608,Constant609,Constant611,Constant612,Constant614,Constant615,Constant616,Constant621,Constant623,Constant627,Constant629,Constant632,PgUpdateSingle25,Object29,Edge59,PgSelect52,PgClassExpression51,First57,PgSelectSingle58,PgCursor60,PgClassExpression61,List62,Constant30,Constant31,Connection56,PgSelect41,List33,Lambda34,PgClassExpression36,PgClassExpression37,PgClassExpression38,PgClassExpression40,First45,PgSelectSingle46,PgClassExpression48,List65,Lambda66,Lambda69,Constant68,PgUpdateSingle88,Object91,Object92,Lambda85,Access86,Access89,Access90,Edge121,PgSelect114,PgClassExpression113,First119,PgSelectSingle120,PgCursor122,PgClassExpression123,List124,Constant93,Connection118,PgSelect103,List95,Lambda96,PgClassExpression98,PgClassExpression99,PgClassExpression100,PgClassExpression102,First107,PgSelectSingle108,PgClassExpression110,List127,Lambda128,Lambda131,Constant130,PgUpdateSingle150,Object153,Object154,Lambda147,Access148,Access151,Access152,Edge183,PgSelect176,PgClassExpression175,First181,PgSelectSingle182,PgCursor184,PgClassExpression185,List186,Constant155,Connection180,PgSelect165,List157,Lambda158,PgClassExpression160,PgClassExpression161,PgClassExpression162,PgClassExpression164,First169,PgSelectSingle170,PgClassExpression172,List189,Lambda190,Lambda193,Constant192,PgUpdateSingle212,Object215,Lambda209,Access210,Access213,Access214,Object216,Edge246,PgSelect239,PgClassExpression238,First244,PgSelectSingle245,PgCursor247,PgClassExpression248,List249,Constant217,Constant218,Connection243,PgSelect228,List220,Lambda221,PgClassExpression223,PgClassExpression224,PgClassExpression225,PgClassExpression227,First232,PgSelectSingle233,PgClassExpression235,List252,Lambda253,Lambda256,Constant255,PgUpdateSingle272,Object275,Access273,Access274,Object276,Edge306,PgSelect299,PgClassExpression298,First304,PgSelectSingle305,PgCursor307,PgClassExpression308,List309,Constant277,Constant278,Connection303,PgSelect288,List280,Lambda281,PgClassExpression283,PgClassExpression284,PgClassExpression285,PgClassExpression287,First292,PgSelectSingle293,PgClassExpression295,List312,Lambda313,Lambda316,Constant315,PgUpdateSingle332,Object335,Access333,Access334,Object336,Edge366,PgSelect359,PgClassExpression358,First364,PgSelectSingle365,PgCursor367,PgClassExpression368,List369,Constant337,Constant338,Connection363,PgSelect348,List340,Lambda341,PgClassExpression343,PgClassExpression344,PgClassExpression345,PgClassExpression347,First352,PgSelectSingle353,PgClassExpression355,List372,Lambda373,Lambda376,Constant375,PgUpdateSingle389,Object392,Lambda384,Access385,Access387,Access390,Access391,Object393,Constant394,List398,PgSelect404,PgSelect413,PgClassExpression396,PgClassExpression397,Lambda399,PgClassExpression402,First408,PgSelectSingle409,First417,PgSelectSingle418,Constant395,PgClassExpression410,PgClassExpression411,PgClassExpression419,PgClassExpression420,Lambda422,Constant421,PgUpdateSingle431,Object434,Object435,Access432,Access433,List439,PgSelect445,PgSelect454,PgClassExpression437,PgClassExpression438,Lambda440,PgClassExpression443,First449,PgSelectSingle450,First458,PgSelectSingle459,Constant436,PgClassExpression451,PgClassExpression452,PgClassExpression460,PgClassExpression461,Lambda463,Constant462,PgUpdateSingle472,Object475,Object476,Access473,Access474,List480,PgSelect486,PgSelect495,PgClassExpression478,PgClassExpression479,Lambda481,PgClassExpression484,First490,PgSelectSingle491,First499,PgSelectSingle500,Constant477,PgClassExpression492,PgClassExpression493,PgClassExpression501,PgClassExpression502,Lambda504,Constant503,PgUpdateSingle520,Object523,Access521,Access522,Object524,Edge554,PgSelect547,PgClassExpression546,First552,PgSelectSingle553,PgCursor555,PgClassExpression556,List557,Constant525,Constant526,Connection551,PgSelect536,List528,Lambda529,PgClassExpression531,PgClassExpression532,PgClassExpression533,PgClassExpression535,First540,PgSelectSingle541,PgClassExpression543,List560,Lambda561,Lambda564,Constant563,PgUpdateSingle571,Object574,Access572,Access573,Object575,PgClassExpression576,PgClassExpression577,PgUpdateSingle584,Object587,Access585,Access586,Object588,PgClassExpression589,PgClassExpression590 unary
     end

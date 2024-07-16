@@ -144,7 +144,7 @@ export function EXPORTABLE<T, TScope extends any[]>(
 
 // This is the actual runtime context; we should not use a global for this.
 export interface OurGraphQLContext extends Grafast.Context {
-  pgSettings: { [key: string]: string };
+  pgSettings: Record<string, string | undefined>;
   withPgClient: WithPgClient<NodePostgresPgClient>;
   pgSubscriber: PgSubscriber;
 }

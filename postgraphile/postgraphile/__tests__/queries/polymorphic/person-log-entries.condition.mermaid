@@ -9,60 +9,57 @@ graph TD
 
 
     %% plan dependencies
-    __Value0["__Value[0∈0]"]:::plan
-    __Value3["__Value[3∈0]<br />ᐸcontextᐳ"]:::plan
-    __Value5["__Value[5∈0]<br />ᐸrootValueᐳ"]:::plan
-    Connection21{{"Connection[21∈0]<br />ᐸ17ᐳ"}}:::plan
-    PgSelect22[["PgSelect[22∈1]<br />ᐸpeopleᐳ"]]:::plan
-    Object20{{"Object[20∈1]<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
-    Constant42{{"Constant[42∈1]<br />ᐸ'Dave'ᐳ"}}:::plan
-    Object20 & Constant42 & Connection21 --> PgSelect22
-    Access18{{"Access[18∈1]<br />ᐸ3.pgSettingsᐳ"}}:::plan
-    Access19{{"Access[19∈1]<br />ᐸ3.withPgClientᐳ"}}:::plan
-    Access18 & Access19 --> Object20
-    __Value3 --> Access18
-    __Value3 --> Access19
-    __Item23[/"__Item[23∈2]<br />ᐸ22ᐳ"\]:::itemplan
-    PgSelect22 ==> __Item23
-    PgSelectSingle24{{"PgSelectSingle[24∈2]<br />ᐸpeopleᐳ"}}:::plan
-    __Item23 --> PgSelectSingle24
-    PgClassExpression30{{"PgClassExpression[30∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
-    PgSelectSingle24 --> PgClassExpression30
-    PgClassExpression40{{"PgClassExpression[40∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
-    PgSelectSingle24 --> PgClassExpression40
-    Access41{{"Access[41∈3]<br />ᐸ23.0ᐳ"}}:::plan
-    __Item23 --> Access41
-    __Item35[/"__Item[35∈4]<br />ᐸ41ᐳ"\]:::itemplan
-    Access41 ==> __Item35
-    PgSelectSingle36{{"PgSelectSingle[36∈4]<br />ᐸlog_entriesᐳ"}}:::plan
-    __Item35 --> PgSelectSingle36
-    PgClassExpression37{{"PgClassExpression[37∈4]<br />ᐸ__log_entries__.”text”ᐳ"}}:::plan
-    PgSelectSingle36 --> PgClassExpression37
-    PgClassExpression38{{"PgClassExpression[38∈4]<br />ᐸ__log_entries__.”id”ᐳ"}}:::plan
-    PgSelectSingle36 --> PgClassExpression38
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value4["__Value[4∈0] ➊<br />ᐸrootValueᐳ"]:::plan
+    Connection20{{"Connection[20∈0] ➊<br />ᐸ16ᐳ"}}:::plan
+    PgSelect21[["PgSelect[21∈1] ➊<br />ᐸpeopleᐳ"]]:::plan
+    Object19{{"Object[19∈1] ➊<br />ᐸ{pgSettings,withPgClient}ᐳ"}}:::plan
+    Constant41{{"Constant[41∈1] ➊<br />ᐸ'Dave'ᐳ"}}:::plan
+    Object19 & Constant41 & Connection20 --> PgSelect21
+    Access17{{"Access[17∈1] ➊<br />ᐸ2.pgSettingsᐳ"}}:::plan
+    Access18{{"Access[18∈1] ➊<br />ᐸ2.withPgClientᐳ"}}:::plan
+    Access17 & Access18 --> Object19
+    __Value2 --> Access17
+    __Value2 --> Access18
+    __Item22[/"__Item[22∈2]<br />ᐸ21ᐳ"\]:::itemplan
+    PgSelect21 ==> __Item22
+    PgSelectSingle23{{"PgSelectSingle[23∈2]<br />ᐸpeopleᐳ"}}:::plan
+    __Item22 --> PgSelectSingle23
+    PgClassExpression29{{"PgClassExpression[29∈3]<br />ᐸ__people__.”person_id”ᐳ"}}:::plan
+    PgSelectSingle23 --> PgClassExpression29
+    PgClassExpression39{{"PgClassExpression[39∈3]<br />ᐸ__people__.”username”ᐳ"}}:::plan
+    PgSelectSingle23 --> PgClassExpression39
+    Access40{{"Access[40∈3]<br />ᐸ22.0ᐳ"}}:::plan
+    __Item22 --> Access40
+    __Item34[/"__Item[34∈4]<br />ᐸ40ᐳ"\]:::itemplan
+    Access40 ==> __Item34
+    PgSelectSingle35{{"PgSelectSingle[35∈4]<br />ᐸlog_entriesᐳ"}}:::plan
+    __Item34 --> PgSelectSingle35
+    PgClassExpression36{{"PgClassExpression[36∈4]<br />ᐸ__log_entries__.”text”ᐳ"}}:::plan
+    PgSelectSingle35 --> PgClassExpression36
+    PgClassExpression37{{"PgClassExpression[37∈4]<br />ᐸ__log_entries__.”id”ᐳ"}}:::plan
+    PgSelectSingle35 --> PgClassExpression37
 
     %% define steps
 
     subgraph "Buckets for queries/polymorphic/person-log-entries.condition"
     Bucket0("Bucket 0 (root)"):::bucket
     classDef bucket0 stroke:#696969
-    class Bucket0,__Value0,__Value3,__Value5,Connection21 bucket0
-    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 3, 21<br /><br />ROOT Connectionᐸ17ᐳ[21]<br />1: <br />ᐳ: 18, 19, 42, 20<br />2: PgSelect[22]"):::bucket
+    class Bucket0,__Value2,__Value4,Connection20 bucket0
+    Bucket1("Bucket 1 (nullableBoundary)<br />Deps: 2, 20<br /><br />ROOT Connectionᐸ16ᐳ[20]<br />1: <br />ᐳ: 17, 18, 41, 19<br />2: PgSelect[21]"):::bucket
     classDef bucket1 stroke:#00bfff
-    class Bucket1,Access18,Access19,Object20,PgSelect22,Constant42 bucket1
-    Bucket2("Bucket 2 (listItem)<br />ROOT __Item{2}ᐸ22ᐳ[23]"):::bucket
+    class Bucket1,Access17,Access18,Object19,PgSelect21,Constant41 bucket1
+    Bucket2("Bucket 2 (listItem)<br /><br />ROOT __Item{2}ᐸ21ᐳ[22]"):::bucket
     classDef bucket2 stroke:#7f007f
-    class Bucket2,__Item23,PgSelectSingle24 bucket2
-    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 24, 23<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[24]"):::bucket
+    class Bucket2,__Item22,PgSelectSingle23 bucket2
+    Bucket3("Bucket 3 (nullableBoundary)<br />Deps: 23, 22<br /><br />ROOT PgSelectSingle{2}ᐸpeopleᐳ[23]"):::bucket
     classDef bucket3 stroke:#ffa500
-    class Bucket3,PgClassExpression30,PgClassExpression40,Access41 bucket3
-    Bucket4("Bucket 4 (listItem)<br />ROOT __Item{4}ᐸ41ᐳ[35]"):::bucket
+    class Bucket3,PgClassExpression29,PgClassExpression39,Access40 bucket3
+    Bucket4("Bucket 4 (listItem)<br /><br />ROOT __Item{4}ᐸ40ᐳ[34]"):::bucket
     classDef bucket4 stroke:#0000ff
-    class Bucket4,__Item35,PgSelectSingle36,PgClassExpression37,PgClassExpression38 bucket4
+    class Bucket4,__Item34,PgSelectSingle35,PgClassExpression36,PgClassExpression37 bucket4
     Bucket0 --> Bucket1
     Bucket1 --> Bucket2
     Bucket2 --> Bucket3
     Bucket3 --> Bucket4
-    classDef unary fill:#fafffa,borderWidth:8px
-    class __Value0,__Value3,__Value5,Connection21,PgSelect22,Object20,Access18,Access19,Constant42 unary
     end

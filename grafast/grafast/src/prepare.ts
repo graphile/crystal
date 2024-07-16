@@ -262,7 +262,7 @@ function outputBucket(
     childBucketIndex = rootBucketIndex;
   } else {
     const c = getChildBucketAndIndex(
-      outputPlan,
+      outputPlan.layerPlan,
       null,
       rootBucket,
       rootBucketIndex,
@@ -427,12 +427,12 @@ function executePreemptive(
       // Something major went wrong!
       const errors = [
         new GraphQLError(
-          bucketRootValue.originalError.message,
+          bucketRootValue.message,
           operationPlan.rootOutputPlan.locationDetails.node, // node
           undefined, // source
           null, // positions
           null, // path
-          bucketRootValue.originalError, // originalError
+          bucketRootValue, // originalError
           null, // extensions
         ),
       ];

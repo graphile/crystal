@@ -1,3 +1,4 @@
+import type { GrafastResultsList } from "../index.js";
 import { $$noExec, ExecutableStep } from "../step.js";
 import type { AccessStep } from "./access.js";
 import { access } from "./access.js";
@@ -32,7 +33,7 @@ export class __ValueStep<TData> extends ExecutableStep<TData> {
     }
   }
 
-  execute(): never {
+  execute(): GrafastResultsList<TData> {
     // This is still an "executable plan"; we just side-step execution internally.
     throw new Error(
       `GrafastInternalError<7696a514-f452-4d47-92d3-85aeb5b23f48>: ${this} is a __ValueStep and thus must never execute`,

@@ -134,19 +134,10 @@ export abstract class BaseStep {
   public _isUnaryLocked: boolean;
   public debug: boolean;
 
-  // ENHANCE: change hasSideEffects to getter/setter, forbid setting after a
-  // particular phase.
-  /**
-   * Set this true for plans that implement mutations; this will prevent them
-   * from being tree-shaken.
-   */
-  public hasSideEffects: boolean;
-
   constructor() {
     this.isArgumentsFinalized = false;
     this.isFinalized = false;
     this.debug = getDebug();
-    this.hasSideEffects = false;
     const layerPlan = currentLayerPlan();
     this.layerPlan = layerPlan;
     this.operationPlan = layerPlan.operationPlan;
@@ -232,6 +223,13 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    */
   protected readonly dependencies: ReadonlyArray<ExecutableStep>;
   /**
+   * If this step follows a side effects, it must implicitly depend on it (so
+   * that any errors the side effect generated will be respected).
+   *
+   * @internal
+   */
+  public readonly implicitSideEffectStep: ExecutableStep | null;
+  /**
    * What execution entry flags we can't handle for the given indexed dependency
    * (default = this.defaultForbiddenFlags)
    */
@@ -296,8 +294,43 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
    */
   public optimizeMetaKey: number | string | symbol | undefined;
 
+  /**
+   * Set this true for plans that implement mutations; this will prevent them
+   * from being tree-shaken.
+   */
+  public hasSideEffects: boolean;
+
   constructor() {
     super();
+    this.implicitSideEffectStep = null;
+    this.hasSideEffects ??= false;
+    let hasSideEffects = false;
+    Object.defineProperty(this, "hasSideEffects", {
+      get() {
+        return hasSideEffects;
+      },
+      set(value) {
+        if (
+          this.id ===
+          this.layerPlan.operationPlan.stepTracker.stepCount - 1
+        ) {
+          hasSideEffects = value;
+          if (value === true) {
+            this.layerPlan.latestSideEffectStep = this;
+          } else if (value !== true && hasSideEffects === true) {
+            throw new Error(
+              `Cannot mark a step has having no side effects after having set it to have side effects.`,
+            );
+          }
+        } else {
+          throw new Error(
+            "You must mark a step as having side effects immediately after creating it, before any other steps are created.",
+          );
+        }
+      },
+      enumerable: true,
+      configurable: false,
+    });
     this.dependencies = [];
     this.dependencyForbiddenFlags = [];
     this.dependencyOnReject = [];
@@ -307,6 +340,8 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     this._stepOptions = { stream: null };
     this.store = true;
     this.polymorphicPaths = currentPolymorphicPaths();
+
+    // Important: MUST come after `this.layerPlan = ...`
     this.id = this.layerPlan._addStep(this);
   }
 
@@ -361,12 +396,11 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     return chalk.bold.blue(
       `${this.constructor.name.replace(/Step$/, "")}${
         this.layerPlan.id === 0 ? "" : chalk.grey(`{${this.layerPlan.id}}`)
-      }${meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""}[${inspect(
-        this.id,
-        {
-          colors: true,
-        },
-      )}]`,
+      }${this._isUnary ? "➊" : ""}${
+        meta != null && meta.length ? chalk.grey(`<${meta}>`) : ""
+      }[${inspect(this.id, {
+        colors: true,
+      })}]`,
     );
   }
 

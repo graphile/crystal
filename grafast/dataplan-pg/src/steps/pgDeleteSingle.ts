@@ -48,8 +48,6 @@ export class PgDeleteSingleStep<
   };
   isSyncAndSafe = false;
 
-  hasSideEffects = true;
-
   /**
    * Tells us what we're dealing with - data type, columns, where to delete it
    * from, what it's called, etc.
@@ -111,6 +109,7 @@ export class PgDeleteSingleStep<
     >,
   ) {
     super();
+    this.hasSideEffects = true;
     this.resource = resource;
     this.name = resource.name;
     this.symbol = Symbol(this.name);

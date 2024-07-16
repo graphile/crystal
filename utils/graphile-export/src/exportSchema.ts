@@ -1031,13 +1031,13 @@ function _convertToAST(
     return func(file, thing as AnyFunction, locationHint, nameHint);
   } else if (isSchema(thing)) {
     throw new Error(
-      "Attempted to export GraphQLSchema directly from `_convertToAST`; this is currently unsupported.",
+      `Attempted to export GraphQLSchema directly from \`_convertToAST\` (at ${locationHint}); this is currently unsupported.`,
     );
   } else if (typeof thing === "object" && thing != null) {
     const prototype = Object.getPrototypeOf(thing);
     if (prototype !== null && prototype !== Object.prototype) {
       throw new Error(
-        `Attempting to export an instance of a class; you should wrap this definition in EXPORTABLE! (Class: ${thing.constructor})`,
+        `Attempting to export an instance of a class (at ${locationHint}); you should wrap this definition in EXPORTABLE! (Class: ${thing.constructor})`,
       );
     }
     const propertyPairs: Array<
@@ -1092,7 +1092,9 @@ function _convertToAST(
       }
     } else {
       if (hasUnsafeKeys) {
-        throw new Error(`Unexportable key found on non-null-prototype object`);
+        throw new Error(
+          `Unexportable key found on non-null-prototype object (at ${locationHint})`,
+        );
       } else {
         const obj = t.objectExpression(
           propertyPairs.map(([key, val]) => t.objectProperty(key, val)),

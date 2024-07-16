@@ -130,6 +130,7 @@ export interface SelectionSetDigest {
   label: string | undefined;
   fields: Map<string, FieldNode[]>;
   deferred: SelectionSetDigest[] | undefined;
+  resolverEmulation: boolean;
 }
 
 const processFragment = (
@@ -166,6 +167,7 @@ const processFragment = (
           label,
           fields: new Map(),
           deferred: undefined,
+          resolverEmulation: selectionSetDigest.resolverEmulation,
         }
       : null;
   if (deferredDigest !== null) {
@@ -180,11 +182,20 @@ const processFragment = (
     parentStepId,
     objectType,
     fragmentSelectionSet.selections,
+    deferredDigest ?? selectionSetDigest,
     isMutation,
     visitedFragments,
-    deferredDigest ?? selectionSetDigest,
   );
 };
+
+export function newSelectionSetDigest(resolverEmulation: boolean) {
+  return {
+    label: undefined,
+    fields: new Map(),
+    deferred: undefined,
+    resolverEmulation,
+  };
+}
 
 /**
  * Implements the `GraphQLCollectFields` algorithm - like `CollectFields` the
@@ -199,14 +210,10 @@ export function graphqlCollectFields(
   parentStepId: number,
   objectType: graphql.GraphQLObjectType,
   selections: readonly SelectionNode[],
+  selectionSetDigest: SelectionSetDigest,
   isMutation = false,
   // This is significantly faster than an array or a Set
   visitedFragments: { [fragmentName: string]: true } = Object.create(null),
-  selectionSetDigest: SelectionSetDigest = {
-    label: undefined,
-    fields: new Map(),
-    deferred: undefined,
-  },
 ): SelectionSetDigest {
   // const objectTypeFields = objectType.getFields();
   const trackedVariableValuesStep = operationPlan.trackedVariableValuesStep;
