@@ -35,6 +35,15 @@ interface ExistsConstraint {
 }
 
 /**
+ * Asserts that the value at the given path has the exact same keys.
+ */
+interface KeysConstraint {
+  type: "keys";
+  path: (string | number)[];
+  keys: string[];
+}
+
+/**
  * If `expectedLength` is null: asserts that there is no value at the given
  * path.
  *
@@ -66,7 +75,8 @@ export type Constraint =
   | EqualityConstraint
   | ExistsConstraint
   | LengthConstraint
-  | IsEmptyConstraint;
+  | IsEmptyConstraint
+  | KeysConstraint;
 
 function valueAtPath(
   object: unknown,
@@ -116,6 +126,33 @@ function matchesConstraint(constraint: Constraint, object: unknown): boolean {
         value !== null &&
         Object.keys(value).length === 0;
       return isEmpty === constraint.isEmpty;
+    }
+    case "keys": {
+      if (constraint.keys === null) {
+        return value === null || typeof value !== "object";
+      }
+
+      if (!value || typeof value !== "object" || !constraint.keys) {
+        return false;
+      }
+
+      const keys = [];
+      const rawKeys = Object.keys(value);
+      for (let i = 0; i < rawKeys.length; i++) {
+        const key = rawKeys[i];
+        if ((value as any)[key] !== undefined) {
+          keys.push(key);
+        }
+      }
+
+      for (let i = 0; i < constraint.keys?.length; i++) {
+        // keys are always in order of the gql type; see coerceInputValue and __InputObjectStep ctor
+        if (constraint.keys[i] !== keys[i]) {
+          return false;
+        }
+      }
+
+      return true;
     }
     default: {
       const never: never = constraint;

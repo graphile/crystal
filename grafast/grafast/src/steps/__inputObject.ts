@@ -173,6 +173,38 @@ export class __InputObjectStep<
     }
     return !this.inputFields[attrName].step.evalIs(undefined);
   }
+
+  /**
+   * Evaluates if the current value is an object with the given key, and adds a
+   * constraint to the OpPlan to ensure that all future evaluations of this
+   * check will always return the same result.
+   *
+   * **WARNING**: avoid using this where possible, it causes OpPlans to split.
+   */
+  evalKeys(): Array<
+    (keyof TInputType & string) | `${keyof TInputType & number}`
+  > {
+    if (this.inputValues?.kind !== "ObjectValue") {
+      throw new Error("evalKeys must only be called for object types");
+    }
+
+    const keys = new Array<
+      (keyof TInputType & string) | `${keyof TInputType & number}`
+    >();
+    const inputFieldKeys = Object.keys(this.inputFields);
+    for (let i = 0; i < inputFieldKeys.length; i++) {
+      const inputFieldPlan = this.inputFields[inputFieldKeys[i]].step;
+      if (inputFieldPlan.eval() !== undefined) {
+        keys.push(
+          inputFieldKeys[i] as
+            | (keyof TInputType & string)
+            | `${keyof TInputType & number}`,
+        );
+      }
+    }
+
+    return keys;
+  }
 }
 
 export type __InputObjectStepWithDollars<

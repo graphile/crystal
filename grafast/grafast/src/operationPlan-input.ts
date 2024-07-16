@@ -236,7 +236,7 @@ export function withFieldArgsForArguments<
               $val = $val.get(pathSegment);
             } else {
               throw new Error(
-                `GrafastInternalError<91e1e80d-cf24-4828-a749-3f24156c7b9c>: Processing input object type, but '${$val}' has no .get() method.`,
+                `GrafastInternalError<b9e9a57a-bbdd-486c-bdcf-25cf99bf0243>: Processing input object type, but '${$val}' has no .get() method.`,
               );
             }
           } else if (
@@ -424,9 +424,13 @@ export function withFieldArgsForArguments<
           (!subpath || (Array.isArray(subpath) && subpath.length === 0))
         ) {
           if (isInputObjectType(nullableEntityType)) {
-            for (const fieldName of Object.keys(
-              nullableEntityType.getFields(),
-            )) {
+            const raw = this.getRaw();
+            if (!("evalKeys" in raw)) {
+              throw new Error(
+                `GrafastInternalError<d782160e-7a99-4a12-b690-435c1ab7b676>: Expected ${$input} to be a __InputObjectStep or __TrackedValueStep (i.e. to have 'evalKeys')`,
+              );
+            }
+            for (const fieldName of raw.evalKeys()) {
               const $target =
                 typeof targetStepOrCallback === "function"
                   ? targetStepOrCallback()

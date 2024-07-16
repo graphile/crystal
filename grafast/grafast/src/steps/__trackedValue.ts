@@ -367,6 +367,42 @@ export class __TrackedValueStep<
   }
 
   /**
+   * Evaluates if the current value is an object with the given key, and adds a
+   * constraint to the OpPlan to ensure that all future evaluations of this
+   * check will always return the same result.
+   *
+   * **WARNING**: avoid using this where possible, it causes OpPlans to split.
+   */
+  evalKeys(): Array<(keyof TData & string) | `${keyof TData & number}`> {
+    const { value, path } = this;
+
+    const keys = new Array<
+      (keyof TData & string) | `${keyof TData & number}`
+    >();
+    if (!isInputObjectType(this.nullableGraphQLType) || !value) {
+      throw new Error("evalKeys must only be called for object types");
+    }
+    const keysOfType = Object.keys(this.nullableGraphQLType.getFields() ?? {});
+    for (let i = 0; i < keysOfType.length; i++) {
+      const key = keysOfType[i];
+      // NOTE: `key in value` would be more performant here, but we cannot trust
+      // users not to pass `{foo: undefined}` so we must do the more expensive
+      // `value[key] !== undefined` check.
+      if ((value as any)[key] !== undefined) {
+        keys.push(key as (keyof TData & string) | `${keyof TData & number}`);
+      }
+    }
+
+    this.constraints.push({
+      type: "keys",
+      path,
+      keys,
+    });
+
+    return keys;
+  }
+
+  /**
    * Evaluates the length of the current value (assumed to be an array), and
    * adds a constraint to the OpPlan to ensure that all future values will have
    * the same length.
