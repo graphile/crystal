@@ -33,12 +33,18 @@ const resolvedPreset = resolvePresets([preset]);
 async function runTestQuery(basePath) {
   const source = await readFile(`${basePath}.test.graphql`, "utf8");
   const expectedData = JSON5.parse(await readFile(`${basePath}.json5`, "utf8"));
+  let variableValues = undefined;
+  const variableMatches = source.match(/(?:^|\n)#> variableValues: ([^\n]+)\n/);
+  if (variableMatches) {
+    variableValues = JSON5.parse(variableMatches[1]);
+  }
 
   const result = await grafast({
     schema,
     source,
     resolvedPreset,
     requestContext: {},
+    variableValues,
   });
   const operationType = "query";
 
