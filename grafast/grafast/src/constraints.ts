@@ -115,7 +115,8 @@ function matchesConstraint(constraint: Constraint, object: unknown): boolean {
   const value = valueAtPath(object, constraint.path);
   switch (constraint.type) {
     case "length": {
-      return Array.isArray(value) && value.length === constraint.expectedLength;
+      const actualLength = Array.isArray(value) ? value.length : null;
+      return actualLength === constraint.expectedLength;
     }
     case "exists": {
       return (value !== undefined) === constraint.exists;
@@ -134,31 +135,46 @@ function matchesConstraint(constraint: Constraint, object: unknown): boolean {
       return isEmpty === constraint.isEmpty;
     }
     case "keys": {
-      if (constraint.keys === null) {
-        return value === null || typeof value !== "object";
-      }
-
-      if (!value || typeof value !== "object" || !constraint.keys) {
+      const { keys: expectedKeys } = constraint;
+      if (expectedKeys === null) {
+        return value == null || typeof value !== "object";
+      } else if (value == null || typeof value !== "object") {
         return false;
-      }
-
-      const keys = [];
-      const rawKeys = Object.keys(value);
-      for (let i = 0; i < rawKeys.length; i++) {
-        const key = rawKeys[i];
-        if ((value as any)[key] !== undefined) {
-          keys.push(key);
-        }
-      }
-
-      for (let i = 0; i < constraint.keys?.length; i++) {
+      } else {
         // keys are always in order of the gql type; see coerceInputValue and __InputObjectStep ctor
-        if (constraint.keys[i] !== keys[i]) {
+        const valueKeys = Object.keys(value) as Array<keyof typeof value>;
+
+        const rawLength = valueKeys.length;
+        const expectedLength = expectedKeys.length;
+
+        // Optimization: early bail
+        if (rawLength < expectedLength) {
           return false;
         }
-      }
 
-      return true;
+        /**
+         * This is `i` but adjusted so that `undefined` doesn't increment it.
+         * Should match index in `expectedKeys`.
+         */
+        let definedRawKeyCount = 0;
+
+        for (let i = 0; i < rawLength; i++) {
+          const valueKey = valueKeys[i];
+          if (value[valueKey] !== undefined) {
+            if (valueKey !== expectedKeys[definedRawKeyCount]) {
+              return false;
+            }
+            definedRawKeyCount++;
+          }
+        }
+
+        // Make sure there aren't any additional expected keys
+        if (definedRawKeyCount !== expectedLength) {
+          return false;
+        }
+
+        return true;
+      }
     }
     default: {
       const never: never = constraint;
