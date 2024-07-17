@@ -1,0 +1,17 @@
+{
+  forums: [
+    {
+      name: "Postgres",
+      messagesList: [
+        {
+          body: "Postgres = awesome -- Alice",
+          featured: false,
+        },
+        {
+          body: "Postgres = awesome -- Cecilia",
+          featured: false,
+        },
+      ],
+    },
+  ],
+}

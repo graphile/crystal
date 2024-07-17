@@ -3,15 +3,16 @@
 ## expect(data.forums[0].messagesList).toHaveLength(2);
 ## expect(data.forums[0].messagesList[0].featured).toBe(false);
 ## expect(data.forums[0].messagesList[1].featured).toBe(false);
-#> variableValues: {"forumFilter": {"messages": {"some": {"featured": {"equalTo": true}}}}, "messagesFilter": {"featured": {"notEqualTo": true}}}
+#> variableValues: {"some": { "featured": { "equalTo": true } }, "featured": { notEqualTo: true } }
 # NOTE: This query should return the same data as `complex-filter.test.graphql`
 query NonFeaturedMessagesInForumsWithFeaturedMessage(
-  $forumFilter: ForumFilter
-  $messagesFilter: MessageFilter
+  $some: MessageFilter
+  $featured: BooleanFilter
+  $isArchived: BooleanFilter
 ) {
-  forums(filter: $forumFilter) {
+  forums(filter: { messages: { some: $some } }) {
     name
-    messagesList(filter: $messagesFilter) {
+    messagesList(filter: { featured: $featured, isArchived: $isArchived }) {
       body
       featured
     }
