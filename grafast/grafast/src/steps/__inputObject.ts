@@ -1,4 +1,5 @@
 import type { GraphQLInputObjectType } from "graphql";
+import * as graphql from "graphql";
 import te from "tamedevil";
 
 import { inputStep } from "../input.js";
@@ -10,6 +11,8 @@ import type {
 import { UnbatchedExecutableStep } from "../step.js";
 import { defaultValueToValueNode } from "../utils.js";
 import { constant } from "./constant.js";
+
+const { Kind } = graphql;
 
 /**
  * Implements `InputObjectStep`
@@ -174,29 +177,40 @@ export class __InputObjectStep<
     return !this.inputFields[attrName].step.evalIs(undefined);
   }
 
-  evalKeys(): Array<
-    (keyof TInputType & string) | `${keyof TInputType & number}`
-  > {
-    if (this.inputValues?.kind !== "ObjectValue") {
+  evalKeys(): ReadonlyArray<keyof TInputType & string> | null {
+    if (this.inputValues === undefined) {
+      return null;
+    } else if (this.inputValues.kind === Kind.NULL) {
+      return null;
+    } else if (this.inputValues.kind !== Kind.OBJECT) {
       throw new Error("evalKeys must only be called for object types");
     }
 
-    const keys = new Array<
-      (keyof TInputType & string) | `${keyof TInputType & number}`
-    >();
+    const keys: string[] = [];
     const inputFieldKeys = Object.keys(this.inputFields);
     for (let i = 0; i < inputFieldKeys.length; i++) {
-      const inputFieldPlan = this.inputFields[inputFieldKeys[i]].step;
-      if (inputFieldPlan.eval() !== undefined) {
-        keys.push(
-          inputFieldKeys[i] as
-            | (keyof TInputType & string)
-            | `${keyof TInputType & number}`,
-        );
+      const key = inputFieldKeys[i];
+      const inputFieldPlan = this.inputFields[key].step;
+
+      // This evalIs() is required. With __inputObject we know that it's an
+      // explicit input object (not variable) in the GraphQL document, but the
+      // values of each key may still be undefined if they're a variable that
+      // isn't supplied and has no default. In these cases we do not wish to
+      // return these keys (since the input object is not seen as having those
+      // keys set), but that will differ on an operation-to-operation basis,
+      // and thus we must evaluate whether or not they are undefined. Note that
+      // this implicitly adds constraints for these values; we do not need to
+      // explicitly add any constraint for the object itself because the
+      // document itself guarantees it will always be present.
+      //
+      // PERF: We should not need to .evalIs(undefined) for any input field
+      // that is declared as non-nullable, I think?
+      if (!inputFieldPlan.evalIs(undefined)) {
+        keys.push(key);
       }
     }
 
-    return keys;
+    return keys as ReadonlyArray<keyof TInputType & string>;
   }
 }
 

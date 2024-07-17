@@ -35,12 +35,18 @@ interface ExistsConstraint {
 }
 
 /**
- * Asserts that the value at the given path has the exact same keys.
+ * If `keys` is null: asserts that there is no value at the given
+ * path.
+ *
+ * Otherwise: asserts that the value at the given path has the exact same keys.
  */
 interface KeysConstraint {
   type: "keys";
   path: (string | number)[];
-  keys: string[];
+  /**
+   * If this is null it implies that the object did not exist.
+   */
+  keys: ReadonlyArray<string> | null;
 }
 
 /**

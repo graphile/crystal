@@ -373,23 +373,33 @@ export class __TrackedValueStep<
    *
    * **WARNING**: avoid using this where possible, it causes OpPlans to split.
    */
-  evalKeys(): Array<(keyof TData & string) | `${keyof TData & number}`> {
+  evalKeys(): ReadonlyArray<keyof TData & string> | null {
     const { value, path } = this;
-
-    const keys = new Array<
-      (keyof TData & string) | `${keyof TData & number}`
-    >();
-    if (!isInputObjectType(this.nullableGraphQLType) || !value) {
+    if (!isInputObjectType(this.nullableGraphQLType)) {
       throw new Error("evalKeys must only be called for object types");
     }
-    const keysOfType = Object.keys(this.nullableGraphQLType.getFields() ?? {});
+    if (value == null) {
+      this.constraints.push({
+        type: "keys",
+        path,
+        keys: null,
+      });
+      return null;
+    }
+
+    const keys: Array<keyof TData & string> = [];
+    const keysOfType = Object.keys(
+      this.nullableGraphQLType.getFields(),
+    ) as Array<keyof TData & string>;
+    // NOTE: it's important that we loop through the fields in their defined
+    // order, this ensures the `keys` array always has consistent ordering.
     for (let i = 0; i < keysOfType.length; i++) {
       const key = keysOfType[i];
       // NOTE: `key in value` would be more performant here, but we cannot trust
       // users not to pass `{foo: undefined}` so we must do the more expensive
       // `value[key] !== undefined` check.
-      if ((value as any)[key] !== undefined) {
-        keys.push(key as (keyof TData & string) | `${keyof TData & number}`);
+      if (value[key] !== undefined) {
+        keys.push(key);
       }
     }
 
@@ -398,7 +408,6 @@ export class __TrackedValueStep<
       path,
       keys,
     });
-
     return keys;
   }
 
