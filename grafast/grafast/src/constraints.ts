@@ -144,11 +144,11 @@ function matchesConstraint(constraint: Constraint, object: unknown): boolean {
         // keys are always in order of the gql type; see coerceInputValue and __InputObjectStep ctor
         const valueKeys = Object.keys(value) as Array<keyof typeof value>;
 
-        const rawLength = valueKeys.length;
-        const expectedLength = expectedKeys.length;
+        const valueKeyCount = valueKeys.length;
+        const expectedKeyCount = expectedKeys.length;
 
         // Optimization: early bail
-        if (rawLength < expectedLength) {
+        if (valueKeyCount < expectedKeyCount) {
           return false;
         }
 
@@ -158,7 +158,7 @@ function matchesConstraint(constraint: Constraint, object: unknown): boolean {
          */
         let definedRawKeyCount = 0;
 
-        for (let i = 0; i < rawLength; i++) {
+        for (let i = 0; i < valueKeyCount; i++) {
           const valueKey = valueKeys[i];
           if (value[valueKey] !== undefined) {
             if (valueKey !== expectedKeys[definedRawKeyCount]) {
@@ -169,7 +169,7 @@ function matchesConstraint(constraint: Constraint, object: unknown): boolean {
         }
 
         // Make sure there aren't any additional expected keys
-        if (definedRawKeyCount !== expectedLength) {
+        if (definedRawKeyCount !== expectedKeyCount) {
           return false;
         }
 
