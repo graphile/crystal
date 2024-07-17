@@ -1,15 +1,16 @@
 #!/usr/bin/env node
+import { strict as assert } from "node:assert";
+
+import { PgContextPlugin } from "@dataplan/pg";
+import { makePgService } from "@dataplan/pg/adaptors/pg";
 import { readFile } from "fs/promises";
 import { sync as globSync } from "glob";
 import { grafast } from "grafast";
+import { resolvePresets } from "graphile-config";
 import { isAsyncIterable } from "iterall";
 import JSON5 from "json5";
-import { strict as assert } from "node:assert";
 
 import { schema } from "./exampleSchemaExport.mjs";
-import { resolvePresets } from "graphile-config";
-import { PgContextPlugin } from "@dataplan/pg";
-import { makePgService } from "@dataplan/pg/adaptors/pg";
 
 const connectionString =
   process.env.TEST_DATABASE_URL || "postgres:///graphile_crystal";
