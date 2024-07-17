@@ -174,13 +174,6 @@ export class __InputObjectStep<
     return !this.inputFields[attrName].step.evalIs(undefined);
   }
 
-  /**
-   * Evaluates if the current value is an object with the given key, and adds a
-   * constraint to the OpPlan to ensure that all future evaluations of this
-   * check will always return the same result.
-   *
-   * **WARNING**: avoid using this where possible, it causes OpPlans to split.
-   */
   evalKeys(): Array<
     (keyof TInputType & string) | `${keyof TInputType & number}`
   > {

@@ -367,7 +367,7 @@ export class __TrackedValueStep<
   }
 
   /**
-   * Evaluates if the current value is an object with the given key, and adds a
+   * Evaluates the keys of the current value, and adds a
    * constraint to the OpPlan to ensure that all future evaluations of this
    * check will always return the same result.
    *
