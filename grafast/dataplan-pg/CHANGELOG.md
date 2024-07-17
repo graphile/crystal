@@ -1,5 +1,73 @@
 # @dataplan/pg
 
+## 0.0.1-beta.23
+
+### Patch Changes
+
+- [#2121](https://github.com/graphile/crystal/pull/2121)
+  [`8bdc553b7`](https://github.com/graphile/crystal/commit/8bdc553b79aae21a27d22a4e1f1e57ee2e5d1d3f)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for accepting
+  poolConfig via makePgService
+
+- [#2128](https://github.com/graphile/crystal/pull/2128)
+  [`4e102b1a1`](https://github.com/graphile/crystal/commit/4e102b1a1cd232e6f6703df0706415f01831dab2)
+  Thanks [@adamni21](https://github.com/adamni21)! - Reduce planning cost of
+  large input object trees by evaluating keys up front (thanks to @adamni21).
+
+- [#2121](https://github.com/graphile/crystal/pull/2121)
+  [`1cabbd311`](https://github.com/graphile/crystal/commit/1cabbd311bdefd7ce78f8dacbf61a42237a6c73c)
+  Thanks [@benjie](https://github.com/benjie)! - Superuser connection now uses
+  `superuserPoolConfig` rather than `poolConfig` when creating a pool.
+
+- [#2091](https://github.com/graphile/crystal/pull/2091)
+  [`590b6fdf5`](https://github.com/graphile/crystal/commit/590b6fdf5d04a392c4cc9e8bdad83278377c547b)
+  Thanks [@benjie](https://github.com/benjie)! - Allow `PgClassExpressionStep`
+  instances to be embedded directly into SQL expressions.
+
+- [#1985](https://github.com/graphile/crystal/pull/1985)
+  [`d6102714e`](https://github.com/graphile/crystal/commit/d6102714e4fec35952784c988c1617c789eee0cd)
+  Thanks [@hannesj](https://github.com/hannesj)! - 🚨 PostgreSQL adaptor is no
+  longer loaded via string value; instead you must pass the adaptor instance
+  directly. If you have `adaptor: "@dataplan/pg/adaptors/pg"` then replace it
+  with `adaptor: await import("@dataplan/pg/adaptors/pg")`. (This shouldn't
+  cause you issues because you _should_ be using `makePgService` to construct
+  your `pgServices` rather than building raw objects.)
+
+  🚨 If you've implemented a custom PgAdaptor, talk to Benjie about how to port
+  it. (Should be straightforward, but no point me figuring it out if no-one has
+  done it yet 🤷)
+
+  This change improves bundle-ability by reducing the number of dynamic imports.
+
+  Also: `PgAdaptorOptions` has been renamed to `PgAdaptorSettings`, so please do
+  a global find and replace for that.
+
+- [#2120](https://github.com/graphile/crystal/pull/2120)
+  [`925123497`](https://github.com/graphile/crystal/commit/925123497cf17b5e145ab80f62fa9de768a977ae)
+  Thanks [@benjie](https://github.com/benjie)! - Internal refactoring of pg
+  adaptor.
+
+- [#2119](https://github.com/graphile/crystal/pull/2119)
+  [`aa0474755`](https://github.com/graphile/crystal/commit/aa0474755142a758fc58c5c1a30b8c754bc84e7c)
+  Thanks [@benjie](https://github.com/benjie)! - Reflect in types that
+  `pgSettings` object keys may be undefined.
+
+- Updated dependencies
+  [[`1bd50b61e`](https://github.com/graphile/crystal/commit/1bd50b61ebb10b7d09b3612c2e2767c41cca3b78),
+  [`4e102b1a1`](https://github.com/graphile/crystal/commit/4e102b1a1cd232e6f6703df0706415f01831dab2),
+  [`7bb1573ba`](https://github.com/graphile/crystal/commit/7bb1573ba45a4d8b7fa9ad53cdd79686d2641383),
+  [`18addb385`](https://github.com/graphile/crystal/commit/18addb3852525aa91019a36d58fa2fecd8b5b443),
+  [`6ed615e55`](https://github.com/graphile/crystal/commit/6ed615e557b2ab1fb57f1e68c06730a8e3da7175),
+  [`b25cc539c`](https://github.com/graphile/crystal/commit/b25cc539c00aeda7a943c37509aaae4dc7812317),
+  [`867f33136`](https://github.com/graphile/crystal/commit/867f331365346fc46ed1e0d23c79719846e398f4),
+  [`cf535c210`](https://github.com/graphile/crystal/commit/cf535c21078da06c14dd12f30e9b4378da4ded03),
+  [`acf99b190`](https://github.com/graphile/crystal/commit/acf99b190954e3c5926e820daed68dfe8eb3ee1f),
+  [`4967a197f`](https://github.com/graphile/crystal/commit/4967a197fd2c71ee2a581fe29470ee9f30e74de5),
+  [`1908e1ba1`](https://github.com/graphile/crystal/commit/1908e1ba11883a34dac66f985fc20ab160e572b1),
+  [`084d80be6`](https://github.com/graphile/crystal/commit/084d80be6e17187c9a9932bcf079e3f460368782)]:
+  - grafast@0.1.1-beta.12
+  - @dataplan/json@0.0.1-beta.21
+
 ## 0.0.1-beta.22
 
 ### Patch Changes

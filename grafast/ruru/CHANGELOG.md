@@ -1,5 +1,19 @@
 # ruru
 
+## 2.0.0-beta.14
+
+### Patch Changes
+
+- [#2125](https://github.com/graphile/crystal/pull/2125)
+  [`18addb385`](https://github.com/graphile/crystal/commit/18addb3852525aa91019a36d58fa2fecd8b5b443)
+  Thanks [@benjie](https://github.com/benjie)! - Change how unary steps are
+  rendered to plan diagrams, fixing the rendering of side-effect steps.
+
+- [#2124](https://github.com/graphile/crystal/pull/2124)
+  [`cf535c210`](https://github.com/graphile/crystal/commit/cf535c21078da06c14dd12f30e9b4378da4ded03)
+  Thanks [@benjie](https://github.com/benjie)! - Render implicit side effects as
+  dependencies on plan diagram
+
 ## 2.0.0-beta.13
 
 ### Patch Changes

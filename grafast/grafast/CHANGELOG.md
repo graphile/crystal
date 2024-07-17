@@ -1,5 +1,76 @@
 # grafast
 
+## 0.1.1-beta.12
+
+### Patch Changes
+
+- [#2129](https://github.com/graphile/crystal/pull/2129)
+  [`1bd50b61e`](https://github.com/graphile/crystal/commit/1bd50b61ebb10b7d09b3612c2e2767c41cca3b78)
+  Thanks [@benjie](https://github.com/benjie)! - `constant()` steps now have an
+  `evalLength()` method.
+
+- [#2128](https://github.com/graphile/crystal/pull/2128)
+  [`4e102b1a1`](https://github.com/graphile/crystal/commit/4e102b1a1cd232e6f6703df0706415f01831dab2)
+  Thanks [@adamni21](https://github.com/adamni21)! - Reduce planning cost of
+  large input object trees by evaluating keys up front (thanks to @adamni21).
+
+- [#2095](https://github.com/graphile/crystal/pull/2095)
+  [`7bb1573ba`](https://github.com/graphile/crystal/commit/7bb1573ba45a4d8b7fa9ad53cdd79686d2641383)
+  Thanks [@purge](https://github.com/purge)! - Fix inference for `loadOne`,
+  `loadMany` and similar steps by removing `@internal` from some of the types,
+  thereby making `.d.ts` files valid again.
+
+- [#2125](https://github.com/graphile/crystal/pull/2125)
+  [`18addb385`](https://github.com/graphile/crystal/commit/18addb3852525aa91019a36d58fa2fecd8b5b443)
+  Thanks [@benjie](https://github.com/benjie)! - Change how unary steps are
+  rendered to plan diagrams, fixing the rendering of side-effect steps.
+
+- [#2113](https://github.com/graphile/crystal/pull/2113)
+  [`6ed615e55`](https://github.com/graphile/crystal/commit/6ed615e557b2ab1fb57f1e68c06730a8e3da7175)
+  Thanks [@benjie](https://github.com/benjie)! - Doesn't clone the context
+  object unless it's write protected.
+
+- [#2127](https://github.com/graphile/crystal/pull/2127)
+  [`b25cc539c`](https://github.com/graphile/crystal/commit/b25cc539c00aeda7a943c37509aaae4dc7812317)
+  Thanks [@benjie](https://github.com/benjie)! - GraphQL resolver emulation now
+  cascades to ancestors, fixing issues with polymorphic fields using default
+  Grafast plan resolvers and breaking rather than using the default GraphQL.js
+  resolution process as they should. (Pure Grafast schemas should not be
+  affected, this only matters where resolvers are used.)
+
+- [#2112](https://github.com/graphile/crystal/pull/2112)
+  [`867f33136`](https://github.com/graphile/crystal/commit/867f331365346fc46ed1e0d23c79719846e398f4)
+  Thanks [@benjie](https://github.com/benjie)! - Fix TypeScript inference in
+  more places
+
+- [#2124](https://github.com/graphile/crystal/pull/2124)
+  [`cf535c210`](https://github.com/graphile/crystal/commit/cf535c21078da06c14dd12f30e9b4378da4ded03)
+  Thanks [@benjie](https://github.com/benjie)! - Render implicit side effects as
+  dependencies on plan diagram
+
+- [#2116](https://github.com/graphile/crystal/pull/2116)
+  [`acf99b190`](https://github.com/graphile/crystal/commit/acf99b190954e3c5926e820daed68dfe8eb3ee1f)
+  Thanks [@benjie](https://github.com/benjie)! - Step 0 has been removed, so
+  expect significant shift in the numbering of your plan diagrams (everything
+  has been renumbered down 1).
+
+- [#2126](https://github.com/graphile/crystal/pull/2126)
+  [`4967a197f`](https://github.com/graphile/crystal/commit/4967a197fd2c71ee2a581fe29470ee9f30e74de5)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug where resolvers would
+  incorrectly deduplicate (cannot deduplicate because ResolveInfo may or may not
+  be used, and that is different for every field).
+
+- [#2114](https://github.com/graphile/crystal/pull/2114)
+  [`1908e1ba1`](https://github.com/graphile/crystal/commit/1908e1ba11883a34dac66f985fc20ab160e572b1)
+  Thanks [@benjie](https://github.com/benjie)! - IMPORTANT: if your step class
+  has `hasSideEffects = true` as a public field declaration, you need to move
+  this to be inside the `constructor()` as `this.hasSideEffects = true`.
+
+- [#2081](https://github.com/graphile/crystal/pull/2081)
+  [`084d80be6`](https://github.com/graphile/crystal/commit/084d80be6e17187c9a9932bcf079e3f460368782)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug handling an error
+  raised in subscribePlan execution that was resulting in websocket closure.
+
 ## 0.1.1-beta.11
 
 ### Patch Changes
