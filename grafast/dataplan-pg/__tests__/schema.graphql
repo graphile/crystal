@@ -1,23 +1,302 @@
+"""
+Directs the executor to defer this fragment when the `if` argument is true or undefined.
+"""
+directive @defer(
+  """Deferred when true or undefined."""
+  if: Boolean
+
+  """Unique name"""
+  label: String
+) on FRAGMENT_SPREAD | INLINE_FRAGMENT
+
+"""
+Directs the executor to stream plural fields when the `if` argument is true or undefined.
+"""
+directive @stream(
+  """Stream when true or undefined."""
+  if: Boolean
+
+  """Unique name"""
+  label: String
+
+  """Number of items to return immediately"""
+  initialCount: Int = 0
+) on FIELD
+
+type SingleTableTopic implements SingleTableItem {
+  id: Int
+  type: String
+  type2: EnumTableItemType
+  parent: SingleTableItem
+  author: Person
+  position: String
+  createdAt: String
+  updatedAt: String
+  isExplicitlyArchived: Boolean
+  archivedAt: String
+  title: String
+}
+
+interface SingleTableItem {
+  id: Int
+  type: String
+  type2: EnumTableItemType
+  parent: SingleTableItem
+  author: Person
+  position: String
+  createdAt: String
+  updatedAt: String
+  isExplicitlyArchived: Boolean
+  archivedAt: String
+}
+
+enum EnumTableItemType {
+  TOPIC
+  POST
+  DIVIDER
+  CHECKLIST
+  CHECKLIST_ITEM
+}
+
+type Person {
+  personId: Int
+  username: String
+  singleTableItemsList: [SingleTableItem]
+  relationalItemsList: [RelationalItem]
+  personBookmarksList: [PersonBookmark]
+}
+
+interface RelationalItem {
+  id: Int
+  type: String
+  type2: EnumTableItemType
+  parent: RelationalItem
+  author: Person
+  position: String
+  createdAt: String
+  updatedAt: String
+  isExplicitlyArchived: Boolean
+  archivedAt: String
+}
+
+type PersonBookmark {
+  id: Int
+  person: Person
+  bookmarkedEntity: Entity
+}
+
+union Entity = Person | Post | Comment
+
+type Post {
+  postId: Int
+  body: String
+  author: Person
+}
+
+type Comment {
+  commentId: Int
+  author: Person
+  post: Post
+  body: String
+}
+
+type SingleTablePost implements SingleTableItem {
+  id: Int
+  type: String
+  type2: EnumTableItemType
+  parent: SingleTableItem
+  author: Person
+  position: String
+  createdAt: String
+  updatedAt: String
+  isExplicitlyArchived: Boolean
+  archivedAt: String
+  title: String
+  description: String
+  note: String
+}
+
+type SingleTableDivider implements SingleTableItem {
+  id: Int
+  type: String
+  type2: EnumTableItemType
+  parent: SingleTableItem
+  author: Person
+  position: String
+  createdAt: String
+  updatedAt: String
+  isExplicitlyArchived: Boolean
+  archivedAt: String
+  title: String
+  color: String
+}
+
+type SingleTableChecklist implements SingleTableItem {
+  id: Int
+  type: String
+  type2: EnumTableItemType
+  parent: SingleTableItem
+  author: Person
+  position: String
+  createdAt: String
+  updatedAt: String
+  isExplicitlyArchived: Boolean
+  archivedAt: String
+  title: String
+}
+
+type SingleTableChecklistItem implements SingleTableItem {
+  id: Int
+  type: String
+  type2: EnumTableItemType
+  parent: SingleTableItem
+  author: Person
+  position: String
+  createdAt: String
+  updatedAt: String
+  isExplicitlyArchived: Boolean
+  archivedAt: String
+  description: String
+  note: String
+}
+
+type RelationalTopic implements RelationalItem {
+  id: Int
+  type: String
+  type2: EnumTableItemType
+  parent: RelationalItem
+  author: Person
+  position: String
+  createdAt: String
+  updatedAt: String
+  isExplicitlyArchived: Boolean
+  archivedAt: String
+  title: String
+}
+
+type RelationalPost implements RelationalItem & RelationalCommentable {
+  id: Int
+  type: String
+  type2: EnumTableItemType
+  parent: RelationalItem
+  author: Person
+  position: String
+  createdAt: String
+  updatedAt: String
+  isExplicitlyArchived: Boolean
+  archivedAt: String
+  title: String
+  description: String
+  note: String
+  titleLower: String
+}
+
+interface RelationalCommentable {
+  id: Int
+  type: String
+  type2: EnumTableItemType
+}
+
+type RelationalDivider implements RelationalItem {
+  id: Int
+  type: String
+  type2: EnumTableItemType
+  parent: RelationalItem
+  author: Person
+  position: String
+  createdAt: String
+  updatedAt: String
+  isExplicitlyArchived: Boolean
+  archivedAt: String
+  title: String
+  color: String
+}
+
+type RelationalChecklist implements RelationalItem & RelationalCommentable {
+  id: Int
+  type: String
+  type2: EnumTableItemType
+  parent: RelationalItem
+  author: Person
+  position: String
+  createdAt: String
+  updatedAt: String
+  isExplicitlyArchived: Boolean
+  archivedAt: String
+  title: String
+}
+
+type RelationalChecklistItem implements RelationalItem & RelationalCommentable {
+  id: Int
+  type: String
+  type2: EnumTableItemType
+  parent: RelationalItem
+  author: Person
+  position: String
+  createdAt: String
+  updatedAt: String
+  isExplicitlyArchived: Boolean
+  archivedAt: String
+  description: String
+  note: String
+}
+
+type FirstPartyVulnerability implements Vulnerability {
+  id: Int!
+  name: String!
+  cvssScore: Float
+  teamName: String
+}
+
+interface Vulnerability {
+  cvssScore: Float
+}
+
+type ThirdPartyVulnerability implements Vulnerability {
+  id: Int!
+  name: String!
+  cvssScore: Float
+  vendorName: String
+}
+
 type Query {
-  forums(
-    first: Int
-    includeArchived: IncludeArchived = INHERIT
-    condition: ForumCondition
-    filter: ForumFilter
-  ): [Forum]
+  forums(first: Int, includeArchived: IncludeArchived = INHERIT, condition: ForumCondition, filter: ForumFilter): [Forum]
   forum(id: String!): Forum
-  allMessagesConnection(
-    condition: MessageCondition
-    filter: MessageFilter
-    includeArchived: IncludeArchived = INHERIT
-    first: Int
-    last: Int
-    after: String
-    before: String
-    orderBy: [MessagesOrderBy!]
-  ): MessagesConnection
+  message(id: String!): Message
+  allMessagesConnection(condition: MessageCondition, filter: MessageFilter, includeArchived: IncludeArchived = INHERIT, first: Int, last: Int, after: String, before: String, orderBy: [MessagesOrderBy!]): MessagesConnection
   uniqueAuthorCount(featured: Boolean): Int
+  forumNames: [String]
+  forumNamesArray: [String]
+  forumNamesCasesList: [[String]]
+
+  """Like forumNames, only we convert them all to upper case"""
+  FORUM_NAMES: [String]
   randomUser: User
+  randomUserArray: [User]
+  randomUserArraySet: [[User]]
+  featuredMessages: [Message]
+  people: [Person]
+  singleTableItemById(id: Int!): SingleTableItem
+  singleTableTopicById(id: Int!): SingleTableTopic
+  relationalItemById(id: Int!): RelationalItem
+  relationalTopicById(id: Int!): RelationalTopic
+  allRelationalCommentablesList(first: Int): [RelationalCommentable!]
+  unionItemById(id: Int!): UnionItem
+  unionTopicById(id: Int!): UnionTopic
+  allUnionItemsList: [UnionItem!]
+  searchEntities(query: String!): [Entity!]
+  personByPersonId(personId: Int!): Person
+
+  """
+  Claims to be non-nullable, but always returns null. Used to test root-level null handling.
+  """
+  nonNullableNull: Int!
+
+  """Non-nullable, always throws. Used to test root-level null handling."""
+  nonNullableError: Int!
+  deepObject: DeepObject
+  vulnerabilities(first: Int, offset: Int): [Vulnerability]
+  vulnerabilitiesConnection(condition: VulnerabilityCondition, first: Int, last: Int, offset: Int, after: String, before: String, orderBy: [VulnerabilitiesOrderBy!]): VulnerabilitiesConnection
 }
 
 type Forum {
@@ -26,25 +305,20 @@ type Forum {
   isArchived: Boolean
   archivedAtIsNotNull: Boolean
   self: Forum
-  messagesList(
-    first: Int
-    condition: MessageCondition
-    filter: MessageFilter
-    includeArchived: IncludeArchived = INHERIT
-  ): [Message]
-  messagesConnection(
-    first: Int
-    condition: MessageCondition
-    filter: MessageFilter
-    includeArchived: IncludeArchived = INHERIT
-  ): MessagesConnection
+  messagesList(first: Int, condition: MessageCondition, filter: MessageFilter, includeArchived: IncludeArchived = INHERIT): [Message]
+  messagesConnection(first: Int, last: Int, condition: MessageCondition, filter: MessageFilter, includeArchived: IncludeArchived = INHERIT): MessagesConnection
   uniqueAuthorCount(featured: Boolean): Int
   randomUser: User
+  featuredMessages: [Message]
+  messagesListSet: [[Message]]
+  messagesWithManyTransforms: [[Message]]
 }
 
 type Message {
+  id: String
   featured: Boolean
   body: String
+  forum: Forum
   author: User
   isArchived: Boolean
 }
@@ -52,6 +326,24 @@ type Message {
 type User {
   username: String
   gravatarUrl: String
+  mostRecentForum: Forum
+  usernameHash(hashType: HashType!): String
+  usernameHashes: Hashes
+}
+
+enum HashType {
+  MD5
+  SHA1
+  SHA256
+}
+
+type Hashes {
+  md5: String
+  sha1: String
+  throwNonNullError: String!
+  throwTestError: String
+  sha256: String
+  self: Hashes
 }
 
 input MessageCondition {
@@ -60,6 +352,7 @@ input MessageCondition {
 
 input MessageFilter {
   featured: BooleanFilter
+  isArchived: BooleanFilter
 }
 
 input BooleanFilter {
@@ -77,11 +370,20 @@ enum IncludeArchived {
 type MessagesConnection {
   edges: [MessageEdge]
   nodes: [Message]
+  pageInfo: PageInfo!
+  totalCount: Int!
 }
 
 type MessageEdge {
   cursor: String
   node: Message
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
 }
 
 input ForumCondition {
@@ -101,4 +403,139 @@ enum MessagesOrderBy {
   BODY_DESC
   AUTHOR_USERNAME_ASC
   AUTHOR_USERNAME_DESC
+}
+
+union UnionItem = UnionTopic | UnionPost | UnionDivider | UnionChecklist | UnionChecklistItem
+
+type UnionTopic {
+  id: Int
+  title: String
+}
+
+type UnionPost {
+  id: Int
+  title: String
+  description: String
+  note: String
+}
+
+type UnionDivider {
+  id: Int
+  title: String
+  color: String
+}
+
+type UnionChecklist {
+  id: Int
+  title: String
+}
+
+type UnionChecklistItem {
+  id: Int
+  description: String
+  note: String
+}
+
+type DeepObject {
+  number: Int
+  numbers: [Int]
+  friend: DeepObjectFriend
+}
+
+type DeepObjectFriend {
+  name: String
+  occupation: String
+  status: String
+}
+
+type VulnerabilitiesConnection {
+  edges: [VulnerabilityEdge]
+  pageInfo: PageInfo!
+}
+
+type VulnerabilityEdge {
+  cursor: String
+  node: Vulnerability
+}
+
+input VulnerabilityCondition {
+  todo: String
+}
+
+enum VulnerabilitiesOrderBy {
+  CVSS_SCORE_ASC
+  CVSS_SCORE_DESC
+}
+
+type Mutation {
+  createRelationalPost(input: CreateRelationalPostInput!): CreateRelationalPostPayload
+
+  """
+  This silly mutation is specifically to ensure that mutation plans are not tree-shaken - we never want to throw away mutation side effects.
+  """
+  createThreeRelationalPosts: CreateRelationalPostPayload
+
+  """
+  This silly mutation is specifically to ensure that mutation plans are not tree-shaken even if they use plans that are normally side-effect free - we never want to throw away mutation side effects.
+  """
+  createThreeRelationalPostsComputed: CreateRelationalPostPayload
+  updateRelationalPostById(input: UpdateRelationalPostByIdInput!): UpdateRelationalPostByIdPayload
+  deleteRelationalPostById(input: DeleteRelationalPostByIdInput!): DeleteRelationalPostByIdPayload
+  multipleActions(input: MultipleActionsInput!): MultipleActionsPayload
+}
+
+type CreateRelationalPostPayload {
+  post: RelationalPost
+  id: Int
+  query: Query
+}
+
+input CreateRelationalPostInput {
+  title: String!
+  description: String
+  note: String
+}
+
+type UpdateRelationalPostByIdPayload {
+  post: RelationalPost
+  id: Int
+  query: Query
+}
+
+input UpdateRelationalPostByIdInput {
+  id: Int!
+  patch: RelationalPostPatch!
+}
+
+input RelationalPostPatch {
+  title: String
+  description: String
+  note: String
+}
+
+type DeleteRelationalPostByIdPayload {
+  post: RelationalPost
+  id: Int
+  query: Query
+}
+
+input DeleteRelationalPostByIdInput {
+  id: Int!
+}
+
+type MultipleActionsPayload {
+  i: [Int!]
+}
+
+input MultipleActionsInput {
+  a: Int
+}
+
+type Subscription {
+  forumMessage(forumId: String!): ForumMessageSubscriptionPayload
+}
+
+type ForumMessageSubscriptionPayload {
+  operationType: String
+  message: Message
 }

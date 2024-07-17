@@ -5263,7 +5263,7 @@ export function makeExampleSchema(
 }
 
 async function main() {
-  const filePath = `${__dirname}/schema.graphql`;
+  const filePath = `${__dirname}/../../__tests__/schema.graphql`;
   const schema = makeExampleSchema();
   writeFileSync(
     filePath,
