@@ -147,7 +147,7 @@ export function inputStep(
     return new __InputObjectStep(
       inputType,
       inputValue,
-    ) as __InputObjectStepWithDollars<any>;
+    ) as __InputObjectStepWithDollars;
   } else {
     const never: never = inputType;
     throw new Error(`Unsupported type in inputPlan: '${inspect(never)}'`);

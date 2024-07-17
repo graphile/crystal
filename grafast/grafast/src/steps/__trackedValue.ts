@@ -367,6 +367,51 @@ export class __TrackedValueStep<
   }
 
   /**
+   * Evaluates the keys of the current value, and adds a
+   * constraint to the OpPlan to ensure that all future evaluations of this
+   * check will always return the same result.
+   *
+   * **WARNING**: avoid using this where possible, it causes OpPlans to split.
+   */
+  evalKeys(): ReadonlyArray<keyof TData & string> | null {
+    const { value, path } = this;
+    if (!isInputObjectType(this.nullableGraphQLType)) {
+      throw new Error("evalKeys must only be called for object types");
+    }
+    if (value == null) {
+      this.constraints.push({
+        type: "keys",
+        path,
+        keys: null,
+      });
+      return null;
+    }
+
+    const keys: Array<keyof TData & string> = [];
+    const keysOfType = Object.keys(
+      this.nullableGraphQLType.getFields(),
+    ) as Array<keyof TData & string>;
+    // NOTE: it's important that we loop through the fields in their defined
+    // order, this ensures the `keys` array always has consistent ordering.
+    for (let i = 0; i < keysOfType.length; i++) {
+      const key = keysOfType[i];
+      // NOTE: `key in value` would be more performant here, but we cannot trust
+      // users not to pass `{foo: undefined}` so we must do the more expensive
+      // `value[key] !== undefined` check.
+      if (value[key] !== undefined) {
+        keys.push(key);
+      }
+    }
+
+    this.constraints.push({
+      type: "keys",
+      path,
+      keys,
+    });
+    return keys;
+  }
+
+  /**
    * Evaluates the length of the current value (assumed to be an array), and
    * adds a constraint to the OpPlan to ensure that all future values will have
    * the same length.

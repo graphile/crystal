@@ -35,6 +35,21 @@ interface ExistsConstraint {
 }
 
 /**
+ * If `keys` is null: asserts that there is no value at the given
+ * path.
+ *
+ * Otherwise: asserts that the value at the given path has the exact same keys.
+ */
+interface KeysConstraint {
+  type: "keys";
+  path: (string | number)[];
+  /**
+   * If this is null it implies that the object did not exist.
+   */
+  keys: ReadonlyArray<string> | null;
+}
+
+/**
  * If `expectedLength` is null: asserts that there is no value at the given
  * path.
  *
@@ -66,7 +81,8 @@ export type Constraint =
   | EqualityConstraint
   | ExistsConstraint
   | LengthConstraint
-  | IsEmptyConstraint;
+  | IsEmptyConstraint
+  | KeysConstraint;
 
 function valueAtPath(
   object: unknown,
@@ -99,7 +115,8 @@ function matchesConstraint(constraint: Constraint, object: unknown): boolean {
   const value = valueAtPath(object, constraint.path);
   switch (constraint.type) {
     case "length": {
-      return Array.isArray(value) && value.length === constraint.expectedLength;
+      const actualLength = Array.isArray(value) ? value.length : null;
+      return actualLength === constraint.expectedLength;
     }
     case "exists": {
       return (value !== undefined) === constraint.exists;
@@ -116,6 +133,48 @@ function matchesConstraint(constraint: Constraint, object: unknown): boolean {
         value !== null &&
         Object.keys(value).length === 0;
       return isEmpty === constraint.isEmpty;
+    }
+    case "keys": {
+      const { keys: expectedKeys } = constraint;
+      if (expectedKeys === null) {
+        return value == null || typeof value !== "object";
+      } else if (value == null || typeof value !== "object") {
+        return false;
+      } else {
+        // keys are always in order of the gql type; see coerceInputValue and __InputObjectStep ctor
+        const valueKeys = Object.keys(value) as Array<keyof typeof value>;
+
+        const valueKeyCount = valueKeys.length;
+        const expectedKeyCount = expectedKeys.length;
+
+        // Optimization: early bail
+        if (valueKeyCount < expectedKeyCount) {
+          return false;
+        }
+
+        /**
+         * This is `i` but adjusted so that `undefined` doesn't increment it.
+         * Should match index in `expectedKeys`.
+         */
+        let definedRawKeyCount = 0;
+
+        for (let i = 0; i < valueKeyCount; i++) {
+          const valueKey = valueKeys[i];
+          if (value[valueKey] !== undefined) {
+            if (valueKey !== expectedKeys[definedRawKeyCount]) {
+              return false;
+            }
+            definedRawKeyCount++;
+          }
+        }
+
+        // Make sure there aren't any additional expected keys
+        if (definedRawKeyCount !== expectedKeyCount) {
+          return false;
+        }
+
+        return true;
+      }
     }
     default: {
       const never: never = constraint;

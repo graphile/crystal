@@ -2346,6 +2346,25 @@ export function makeExampleSchema(
           [PgBooleanFilterStep, sql],
         ),
       },
+      isArchived: {
+        type: BooleanFilter,
+        applyPlan: EXPORTABLE(
+          (BooleanFilterStep, sql) =>
+            function plan($messageFilter, arg) {
+              const $value = arg.getRaw();
+              if ($value.evalIs(null)) {
+                // Ignore
+              } else {
+                const plan = new BooleanFilterStep(
+                  $messageFilter,
+                  sql`${$messageFilter}.is_archived`,
+                );
+                arg.apply(plan);
+              }
+            },
+          [PgBooleanFilterStep, sql],
+        ),
+      },
     },
   });
 
@@ -5244,7 +5263,7 @@ export function makeExampleSchema(
 }
 
 async function main() {
-  const filePath = `${__dirname}/schema.graphql`;
+  const filePath = `${__dirname}/../../__tests__/schema.graphql`;
   const schema = makeExampleSchema();
   writeFileSync(
     filePath,

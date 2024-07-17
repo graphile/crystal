@@ -424,9 +424,16 @@ export function withFieldArgsForArguments<
           (!subpath || (Array.isArray(subpath) && subpath.length === 0))
         ) {
           if (isInputObjectType(nullableEntityType)) {
-            for (const fieldName of Object.keys(
-              nullableEntityType.getFields(),
-            )) {
+            if (!("evalKeys" in $input)) {
+              throw new Error(
+                `GrafastInternalError<d782160e-7a99-4a12-b690-435c1ab7b676>: Expected ${$input} to be a __InputObjectStep or __TrackedValueStep (i.e. to have 'evalKeys')`,
+              );
+            }
+            const keys = $input.evalKeys();
+            if (keys == null) {
+              return;
+            }
+            for (const fieldName of keys) {
               const $target =
                 typeof targetStepOrCallback === "function"
                   ? targetStepOrCallback()
