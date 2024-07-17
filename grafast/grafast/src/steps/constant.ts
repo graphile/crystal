@@ -56,6 +56,17 @@ export class ConstantStep<TData> extends UnbatchedExecutableStep<TData> {
     return Array.isArray(this.data) ? this.data.length : null;
   }
 
+  evalKeys(): ReadonlyArray<keyof TData & string> | null {
+    if (this.data == null || typeof this.data !== "object") {
+      return null;
+    } else {
+      const data = this.data;
+      return (Object.keys(data) as Array<keyof typeof data>).filter(
+        (k) => data[k] !== undefined,
+      ) as ReadonlyArray<keyof TData & string>;
+    }
+  }
+
   unbatchedExecute() {
     return this.data;
   }
