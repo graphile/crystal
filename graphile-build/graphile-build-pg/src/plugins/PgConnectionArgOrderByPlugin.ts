@@ -233,14 +233,16 @@ export const applyOrderToPlan = EXPORTABLE(
       $value: InputStep,
       TableOrderByType: GraphQLEnumType,
     ) => {
-      const val = $value.eval();
-      if (val == null) {
+      if (!("evalLength" in $value)) {
         return;
       }
-      if (!Array.isArray(val)) {
-        throw new Error("Invalid!");
+      const length = $value.evalLength();
+      if (length == null) {
+        return;
       }
-      val.forEach((order) => {
+      for (let i = 0; i < length; i++) {
+        const order = $value.at(i).eval();
+        if (order == null) continue;
         const config = getEnumValueConfig(TableOrderByType, order);
         const plan = config?.extensions?.grafast?.applyPlan;
         if (typeof plan !== "function") {
@@ -254,7 +256,7 @@ export const applyOrderToPlan = EXPORTABLE(
           );
         }
         plan($select);
-      });
+      }
     },
   [SafeError, getEnumValueConfig, inspect],
 );
