@@ -52,6 +52,10 @@ export class ConstantStep<TData> extends UnbatchedExecutableStep<TData> {
     );
   }
 
+  evalLength() {
+    return Array.isArray(this.data) ? this.data.length : null;
+  }
+
   unbatchedExecute() {
     return this.data;
   }

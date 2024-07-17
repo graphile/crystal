@@ -733,14 +733,16 @@ const fetcher4 = (handler => {
   return fn;
 })(nodeIdHandlerByTypeName.Type);
 const applyOrderToPlan = ($select, $value, TableOrderByType) => {
-  const val = $value.eval();
-  if (val == null) {
+  if (!("evalLength" in $value)) {
     return;
   }
-  if (!Array.isArray(val)) {
-    throw new Error("Invalid!");
+  const length = $value.evalLength();
+  if (length == null) {
+    return;
   }
-  val.forEach(order => {
+  for (let i = 0; i < length; i++) {
+    const order = $value.at(i).eval();
+    if (order == null) continue;
     const config = getEnumValueConfig(TableOrderByType, order);
     const plan = config?.extensions?.grafast?.applyPlan;
     if (typeof plan !== "function") {
@@ -748,7 +750,7 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
       throw new SafeError("Internal server error: invalid orderBy configuration");
     }
     plan($select);
-  });
+  }
 };
 function InternetAddressSerialize(value) {
   return "" + value;
