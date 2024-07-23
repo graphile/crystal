@@ -1848,6 +1848,7 @@ export class OperationPlan {
     const parentStep = this.stepTracker.getStepById(rawParentStep.id);
 
     const previousStepCount = this.stepTracker.stepCount;
+    const previousSideEffectStep = layerPlan.latestSideEffectStep;
 
     if (this.loc !== null) this.loc.push(`planField(${path.join(".")})`);
     try {
@@ -1951,6 +1952,7 @@ export class OperationPlan {
 
       try {
         this.stepTracker.purgeBackTo(previousStepCount);
+        layerPlan.latestSideEffectStep = previousSideEffectStep;
       } catch (e2) {
         console.error(
           `Cleanup error occurred whilst trying to recover from field planning error: ${e2.stack}`,
