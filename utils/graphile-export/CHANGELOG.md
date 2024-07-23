@@ -1,5 +1,13 @@
 # graphile-export
 
+## 0.0.2-beta.18
+
+### Patch Changes
+
+- Updated dependencies
+  [[`807650035`](https://github.com/graphile/crystal/commit/8076500354a3e2bc2de1b6c4e947bd710cc5bddc)]:
+  - grafast@0.1.1-beta.13
+
 ## 0.0.2-beta.17
 
 ### Patch Changes

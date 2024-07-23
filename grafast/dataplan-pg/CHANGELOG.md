@@ -1,5 +1,22 @@
 # @dataplan/pg
 
+## 0.0.1-beta.24
+
+### Patch Changes
+
+- [#2132](https://github.com/graphile/crystal/pull/2132)
+  [`807650035`](https://github.com/graphile/crystal/commit/8076500354a3e2bc2de1b6c4e947bd710cc5bddc)
+  Thanks [@benjie](https://github.com/benjie)! - Fix issue where planning errors
+  occurring after side-effects would result in GrafastInternalError being
+  thrown. Further, fix issue causing `$step.hasSideEffects=true` to throw a
+  planning error if `$step` had created other steps (as dependencies) during its
+  construction. (Notably, `withPgClient` suffered from this.) Thanks to @purge
+  for reporting the issue and creating a reproduction.
+- Updated dependencies
+  [[`807650035`](https://github.com/graphile/crystal/commit/8076500354a3e2bc2de1b6c4e947bd710cc5bddc)]:
+  - grafast@0.1.1-beta.13
+  - @dataplan/json@0.0.1-beta.22
+
 ## 0.0.1-beta.23
 
 ### Patch Changes
