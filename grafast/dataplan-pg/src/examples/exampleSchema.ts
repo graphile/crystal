@@ -5138,6 +5138,10 @@ export function makeExampleSchema(
                   return rows2.map((row) => row.i);
                 },
               );
+
+              // This line is critical to test setting hasSideEffects on a withPgClient call
+              $transactionResult.hasSideEffects = true;
+
               return $transactionResult;
             },
           [
