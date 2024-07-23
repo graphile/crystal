@@ -38,7 +38,7 @@ import {
   DEFAULT_FORBIDDEN_FLAGS,
 } from "./interfaces.js";
 import type { __ItemStep } from "./steps/index.js";
-import { stepAMayDependOnStepB } from "./utils.js";
+import { stepADependsOnStepB, stepAMayDependOnStepB } from "./utils.js";
 
 /**
  * This indicates that a step never executes (e.g. __ItemStep and __ValueStep)
@@ -305,26 +305,48 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
     this.implicitSideEffectStep = null;
     this.hasSideEffects ??= false;
     let hasSideEffects = false;
+    const stepTracker = this.layerPlan.operationPlan.stepTracker;
     Object.defineProperty(this, "hasSideEffects", {
-      get() {
+      get(this: ExecutableStep<TData>) {
         return hasSideEffects;
       },
-      set(value) {
-        if (
-          this.id ===
-          this.layerPlan.operationPlan.stepTracker.stepCount - 1
-        ) {
+      set(this: ExecutableStep<TData>, value) {
+        /**
+         * If steps were created after this step, an this step doesn't depend
+         * on them, then it's no longer safe to change hasSideEffects.
+         */
+        let nonDependentSteps: ExecutableStep[] | null = null;
+
+        const maxStepId = stepTracker.stepCount - 1;
+        if (this.id === maxStepId) {
+          // All good - no more steps were created
+        } else {
+          // If the step created them during initialization and is dependent on
+          // them, that's fine too.
+          for (let id = this.id + 1; id <= maxStepId; id++) {
+            const step = stepTracker.getStepById(id);
+            if (stepADependsOnStepB(this, step)) continue;
+            if (nonDependentSteps === null) {
+              nonDependentSteps = [step];
+            } else {
+              nonDependentSteps.push(step);
+            }
+          }
+        }
+        if (nonDependentSteps === null) {
           hasSideEffects = value;
           if (value === true) {
             this.layerPlan.latestSideEffectStep = this;
           } else if (value !== true && hasSideEffects === true) {
             throw new Error(
-              `Cannot mark a step has having no side effects after having set it to have side effects.`,
+              `Cannot mark ${this} as having no side effects after having set it to have side effects.`,
             );
           }
         } else {
           throw new Error(
-            "You must mark a step as having side effects immediately after creating it, before any other steps are created.",
+            `Attempted to mark ${this} as having side effects, but other non-dependent steps (${nonDependentSteps
+              .map(String)
+              .join(", ")}) have already been created.`,
           );
         }
       },
