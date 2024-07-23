@@ -56,6 +56,8 @@ And please give some love to our featured sponsors 🤩:
 <td align="center"><a href="https://dovetailapp.com/"><img src="https://graphile.org/images/sponsors/dovetail.png" width="90" height="90" alt="Dovetail" /><br />Dovetail</a> *</td>
 <td align="center"><a href="https://stellate.co/"><img src="https://graphile.org/images/sponsors/Stellate.png" width="90" height="90" alt="Stellate" /><br />Stellate</a> *</td>
 <td align="center"><a href="https://gosteelhead.com/"><img src="https://graphile.org/images/sponsors/steelhead.svg" width="90" height="90" alt="Steelhead" /><br />Steelhead</a> *</td>
+</tr><tr>
+<td align="center"><a href=""><img src="https://graphile.org/images/sponsors/latchbio.jpg" width="90" height="90" alt="LatchBio" /><br />LatchBio</a> *</td>
 </tr></table>
 
 <em>\* Sponsors the entire Graphile suite</em>
@@ -318,7 +320,7 @@ If `obj` is potentially expensive code and you need to reference it multiple
 times (e.g. `` te`(${obj}.foo === 3 ? ${obj}.bar : ${obj}.baz)` ``) then you can
 use `tmp` to create a temporary variable that stores reference to it and return
 the result of calling `callback` passing this temporary reference. E.g.
-``te.tmp(obj, tmp => te`(${tmp}.foo === 3 ? ${tmp}.bar : ${tmp}.baz)`)`` means
+`` te.tmp(obj, tmp => te`(${tmp}.foo === 3 ? ${tmp}.bar : ${tmp}.baz)`) `` means
 that the potentially expensive expression in the original `obj` variable only
 need to be evaluated once, not 3 times.
 

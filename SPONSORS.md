@@ -10,30 +10,30 @@ Graphile ecosystem. Find out
 - Dovetail
 - Stellate
 - Steelhead
+- LatchBio
 
 ## Leaders
 
 - Robert Claypool
+- nigelrmtaylor
 - Principia Mentis
 - Luxor Labs
-- nigelrmtaylor
 - Axinom
 - Taiste
 - Notably
 - Nathanael Beisiegel
 - Trigger.dev
-- Ian Stewart
 - BairesDev
-- Cintra
 - Two Bit Solutions
 - Dimply
 - Ndustrial
+- Cintra
 - Beacon
 - deliver.media
 - Seam
-- Upowr
 - Ravio
 - OpenPipe
+- Apollo
 
 ## Supporters
 
@@ -41,9 +41,9 @@ Graphile ecosystem. Find out
 - stlbucket
 - Simon Elliott
 - Matt Bretl
-- Keith Layne
-- Paul Melnikow
 - Alvin Ali Khaled
+- Paul Melnikow
+- Keith Layne
 - nullachtvierzehn
 - Zymego
 - IFCHOR GROUP
@@ -52,15 +52,15 @@ Graphile ecosystem. Find out
 - The Outbound Collective
 - Charlie Hadden
 - Kiron Open Higher Education
-- urtho
 - Andrew Joseph
+- urtho
 - SIED 70
 - Peter C. Romano
 - mateo
 - Gus Becciu
 - Dialo
+- kontakto-fi
 - Tailos, Inc.
 - sheilamosaik
-- kontakto-fi
 - Miguel O. Carvajal
 - Jovi De Croock
