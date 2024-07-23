@@ -324,7 +324,7 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
           }
         } else {
           throw new Error(
-            "You must mark a step as having side effects immediately after creating it, before any other steps are created.",
+            `Attempted to mark ${this} as having side effects, but other steps have already been created.`,
           );
         }
       },
