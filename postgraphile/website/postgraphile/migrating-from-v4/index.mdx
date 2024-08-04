@@ -274,6 +274,12 @@ Other changes:
 
 - The values generated for `cursor` differ. This is not deemed to be a breaking
   change, as these may change from one release to the next (even patch versions).
+- The behavior of `hasPreviousPage` / `hasNextPage` differs from V4.
+  While in V4 `hasPreviousPage` in combination with `first` returns `true`,
+  if there's an edge, with a cursor before or equal to the `before` cursor.
+  In V5 `hasPreviousPage` will always return `false` if `first` is specified,
+  as in this case, we cannot efficiently determine, whether or not there's is a previous page.
+  The same applies to `hasNextPage` in combination with `last`.
 - In some circumstances the location where a `null` is returned or an error is
   thrown may differ slightly between V4 and V5; this will still respect the
   GraphQL schema though, of course.
