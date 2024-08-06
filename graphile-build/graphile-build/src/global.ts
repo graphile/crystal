@@ -733,9 +733,13 @@ declare global {
     interface ScopeEnumValues extends ScopeEnum {}
     interface ContextEnumValues extends ContextEnum {
       scope: ScopeEnumValues;
+      // TODO: replace this with GraphQLEnumType once we can require GraphQL v16.9+
+      Self: { name: string };
     }
 
-    interface ScopeEnumValuesValue extends ScopeEnumValues {}
+    interface ScopeEnumValuesValue extends ScopeEnumValues {
+      valueName: string;
+    }
     interface ContextEnumValuesValue extends ContextEnumValues {
       scope: ScopeEnumValuesValue;
     }

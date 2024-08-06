@@ -738,26 +738,41 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             `|${rawSpec.name}`,
           );
 
+          const valuesContext: GraphileBuild.ContextEnumValues = {
+            ...enumContext,
+            Self: { name: finalSpec.name },
+          };
+
           finalSpec.values = builder.applyHooks(
             "GraphQLEnumType_values",
             finalSpec.values,
             build,
-            enumContext,
+            valuesContext,
             `|${finalSpec.name}`,
           );
 
           const values = finalSpec.values;
           finalSpec.values = Object.entries(values).reduce(
-            (memo, [valueKey, value]) => {
+            (memo, [valueName, value]) => {
+              const finalValueScope: GraphileBuild.ScopeEnumValuesValue =
+                build.extend(
+                  { valueName },
+                  scope,
+                  `Extending scope for value '${valueName}' within context for GraphQLEnumType '${rawSpec.name}'`,
+                );
+              const valueContext: GraphileBuild.ContextEnumValuesValue = {
+                ...valuesContext,
+                scope: finalValueScope,
+              };
               const newValue = builder.applyHooks(
                 "GraphQLEnumType_values_value",
                 value,
                 build,
-                enumContext,
-                `|${finalSpec.name}|${valueKey}`,
+                valueContext,
+                `|${finalSpec.name}|${valueName}`,
               );
 
-              memo[valueKey] = newValue;
+              memo[valueName] = newValue;
               return memo;
             },
             Object.create(null),
