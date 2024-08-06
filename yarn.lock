@@ -12062,7 +12062,6 @@ __metadata:
     zx: "npm:^7.2.3"
   peerDependencies:
     "@envelop/core": ^5.0.0
-    graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
     tamedevil: "workspace:^"
   peerDependenciesMeta:
@@ -19289,7 +19288,6 @@ __metadata:
     "@types/react": "npm:^18.2.21"
     "@types/react-dom": "npm:^18.2.7"
     grafast: "workspace:^"
-    graphile-config: "workspace:^"
     graphiql: "npm:^3.1.1-canary-64994e0e.0"
     graphql: "npm:16.1.0-experimental-stream-defer.6"
     graphql-ws: "npm:^5.14.0"
