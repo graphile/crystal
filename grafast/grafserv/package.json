@@ -92,7 +92,7 @@
     "@envelop/core": "^5.0.0",
     "grafast": "workspace:^",
     "graphile-config": "workspace:^",
-    "graphql": "^16.1.0-experimental-stream-defer.6",
+    "graphql": "^16.9.0",
     "h3": "^1.7.1",
     "ws": "^8.12.1"
   },

@@ -46,7 +46,7 @@
   "dependencies": {
     "@emotion/is-prop-valid": "^1.2.1",
     "graphile-config": "workspace:^",
-    "graphql": "^16.1.0-experimental-stream-defer.6",
+    "graphql": "^16.9.0",
     "http-proxy": "^1.18.1",
     "tslib": "^2.6.2",
     "yargs": "^17.7.2"
@@ -56,7 +56,7 @@
   },
   "peerDependencies": {
     "graphile-config": "workspace:^",
-    "graphql": "^16.1.0-experimental-stream-defer.6"
+    "graphql": "^16.9.0"
   },
   "files": [
     "dist",
@@ -69,7 +69,7 @@
     "@types/yargs": "^17.0.24",
     "css-loader": "^6.8.1",
     "file-loader": "^6.2.0",
-    "graphql": "16.1.0-experimental-stream-defer.6",
+    "graphql": "^16.9.0",
     "ruru-components": "workspace:^",
     "style-loader": "^3.3.3",
     "svg-inline-loader": "^0.8.2",

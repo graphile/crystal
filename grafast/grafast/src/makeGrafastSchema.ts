@@ -122,6 +122,7 @@ export function makeGrafastSchema(details: {
   const { typeDefs, plans, enableDeferStream = false } = details;
 
   const astSchema = buildASTSchema(parse(typeDefs), {
+    // @ts-ignore
     enableDeferStream,
   });
   const schemaConfig = astSchema.toConfig() as graphql.GraphQLSchemaConfig & {

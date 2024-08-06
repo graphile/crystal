@@ -7,6 +7,7 @@ import type {
 import { inputObjectFieldSpec, objectSpec } from "grafast";
 import type {
   GraphQLEnumTypeConfig,
+  GraphQLEnumValueConfigMap,
   GraphQLFieldConfig,
   GraphQLInputFieldConfig,
   GraphQLInputFieldConfigMap,
@@ -730,7 +731,7 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             scope,
           };
 
-          const finalSpec = builder.applyHooks(
+          const baseSpec = builder.applyHooks(
             "GraphQLEnumType",
             rawSpec,
             build,
@@ -738,30 +739,43 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             `|${rawSpec.name}`,
           );
 
-          finalSpec.values = builder.applyHooks(
-            "GraphQLEnumType_values",
-            finalSpec.values,
-            build,
-            enumContext,
-            `|${finalSpec.name}`,
-          );
-
-          const values = finalSpec.values;
-          finalSpec.values = Object.entries(values).reduce(
-            (memo, [valueKey, value]) => {
-              const newValue = builder.applyHooks(
-                "GraphQLEnumType_values_value",
-                value,
+          const finalSpec = {
+            ...baseSpec,
+            values() {
+              const rawValues =
+                typeof rawSpec.values === "function"
+                  ? rawSpec.values()
+                  : rawSpec.values;
+              const valuesList: typeof rawValues = build.extend(
+                Object.create(null),
+                rawValues,
+                `Default field included in newWithHooks call for '${
+                  rawSpec.name
+                }'. ${inScope.__origin || ""}`,
+              );
+              const valuesSpec: GraphQLEnumValueConfigMap = builder.applyHooks(
+                "GraphQLEnumType_values",
+                valuesList,
                 build,
                 enumContext,
-                `|${finalSpec.name}|${valueKey}`,
+                `|${Self.name}`,
               );
 
-              memo[valueKey] = newValue;
-              return memo;
+              for (const [valueKey, value] of Object.entries(valuesSpec)) {
+                const newValue = builder.applyHooks(
+                  "GraphQLEnumType_values_value",
+                  value,
+                  build,
+                  enumContext,
+                  `|${finalSpec.name}|${valueKey}`,
+                );
+
+                valuesSpec[valueKey] = newValue;
+              }
+
+              return valuesSpec;
             },
-            Object.create(null),
-          );
+          };
 
           const Self = new GraphQLEnumType(finalSpec);
           return Self;

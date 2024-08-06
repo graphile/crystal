@@ -29,7 +29,7 @@
   "dependencies": {
     "grafast": "workspace:^",
     "graphile-config": "workspace:^",
-    "graphql": "^16.1.0-experimental-stream-defer.6",
+    "graphql": "^16.9.0",
     "tslib": "^2.6.2"
   },
   "engines": {
