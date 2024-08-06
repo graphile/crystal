@@ -1247,7 +1247,11 @@ and ${sql.indent(sql.parens(condition(i + 1)))}`}
             : EMPTY_ARRAY,
       };
     });
-    const executionResult = await this.resource.executeWithCache(specs, {
+    const executeMethod =
+      this.operationPlan.operation.operation === "query"
+        ? "executeWithCache"
+        : "executeWithoutCache";
+    const executionResult = await this.resource[executeMethod](specs, {
       text,
       textForSingle,
       rawSqlValues,

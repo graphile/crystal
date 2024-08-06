@@ -1969,7 +1969,11 @@ ${lateralText};`;
             : EMPTY_ARRAY,
       };
     });
-    const executionResult = await this.executor.executeWithCache(specs, {
+    const executeMethod =
+      this.operationPlan.operation.operation === "query"
+        ? "executeWithCache"
+        : "executeWithoutCache";
+    const executionResult = await this.executor[executeMethod](specs, {
       text,
       rawSqlValues,
       identifierIndex,
