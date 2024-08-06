@@ -1,16 +1,26 @@
 /* eslint-disable graphile-export/exhaustive-deps, graphile-export/export-methods, graphile-export/export-instances, graphile-export/export-subclasses, graphile-export/no-nested */
 import { expect } from "chai";
-import type { AsyncExecutionResult } from "graphql";
+import type { AsyncExecutionResult, ExecutionResult } from "graphql";
 import { it } from "mocha";
 
 import type { ExecutionDetails, PromiseOrDirect } from "../dist/index.js";
 import {
   constant,
+  context,
   ExecutableStep,
   grafast,
   lambda,
   makeGrafastSchema,
+  sideEffect,
 } from "../dist/index.js";
+
+declare global {
+  namespace Grafast {
+    interface Context {
+      mol?: number;
+    }
+  }
+}
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -57,12 +67,22 @@ const schema = makeGrafastSchema({
     }
     type Query {
       list: [Thing!]
+      sideEffectListCheck(arr: [String]!): Int
     }
   `,
   plans: {
     Query: {
       list() {
         return constant([1, 2]);
+      },
+      sideEffectListCheck(_, fieldArgs) {
+        const $mol = context().get("mol");
+        sideEffect($mol, () => {});
+        const $count = lambda(fieldArgs.get("arr"), (arr) => {
+          return arr.length;
+        });
+        $count.hasSideEffects = true;
+        return $count;
       },
     },
     Thing: {
@@ -120,14 +140,14 @@ it(
         }
       }
     `;
-    const stream = (await grafast(
-      {
-        schema,
-        source,
+    const stream = (await grafast({
+      schema,
+      source,
+      requestContext: {
+        mol: 42,
       },
-      {},
-      {},
-    )) as AsyncGenerator<AsyncExecutionResult>;
+      resolvedPreset: {},
+    })) as AsyncGenerator<AsyncExecutionResult>;
     let payloads: AsyncExecutionResult[] = [];
     for await (const payload of stream) {
       payloads.push(payload);
@@ -147,6 +167,30 @@ it(
     expect(result.errors![1]).to.deep.include({
       message: "ERROR",
       path: ["list", 1, "throw"],
+    });
+  }),
+);
+
+it(
+  "doesn't confuse ListStep with additional dependencies",
+  throwOnUnhandledRejections(async () => {
+    const source = /* GraphQL */ `
+      query MyQuery($arr: [String]!) {
+        sideEffectListCheck(arr: $arr)
+      }
+    `;
+    const result = (await grafast({
+      schema,
+      source,
+      variableValues: {
+        arr: ["A", "b"],
+      },
+      requestContext: {},
+      resolvedPreset: {},
+    })) as ExecutionResult;
+    expect(result.errors).to.be.undefined;
+    expect(result.data).to.deep.equal({
+      sideEffectListCheck: 2,
     });
   }),
 );
