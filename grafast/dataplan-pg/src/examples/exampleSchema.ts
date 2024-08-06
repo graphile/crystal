@@ -5363,6 +5363,7 @@ export function makeExampleSchema(
         ],
       },
     },
+    // @ts-ignore
     enableDeferStream: true,
   });
 }

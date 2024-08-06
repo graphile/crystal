@@ -22,6 +22,7 @@ export const StreamDeferPlugin: GraphileConfig.Plugin = {
     hooks: {
       GraphQLSchema: {
         callback: (schema) => {
+          // @ts-ignore
           schema.enableDeferStream = true;
           return schema;
         },

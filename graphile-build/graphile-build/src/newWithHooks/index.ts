@@ -2,6 +2,7 @@ import type { BaseGraphQLArguments, GrafastFieldConfig, Step } from "grafast";
 import { inputObjectFieldSpec, objectSpec } from "grafast";
 import type {
   GraphQLEnumTypeConfig,
+  GraphQLEnumValueConfigMap,
   GraphQLFieldConfig,
   GraphQLInputFieldConfig,
   GraphQLInputFieldConfigMap,
@@ -838,61 +839,72 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             `Attempted to define an enum type with invalid name $0.`,
           );
 
-          const valuesContext: GraphileBuild.ContextEnumValues = {
-            ...enumContext,
-            Self: { name: typeName },
-          };
-
           const finalSpec = {
             name: typeName,
             ...restOfConfig,
-            values: (() => {
-              const values = builder.applyHooks(
+            values() {
+              const valuesContext: GraphileBuild.ContextEnumValues = {
+                ...enumContext,
+                Self,
+              };
+
+              const rawValues =
+                typeof baseValues === "function" ? baseValues() : baseValues;
+
+              // Mark up the values with an origin
+              const intermediateValues: typeof rawValues = build.extend(
+                Object.create(null),
+                rawValues,
+                `Default field included in newWithHooks call for '${
+                  baseName
+                }'. ${inScope.__origin || ""}`,
+              );
+
+              const finalValues = builder.applyHooks(
                 "GraphQLEnumType_values",
-                baseValues,
+                intermediateValues,
                 build,
                 valuesContext,
                 `|${typeName}`,
               );
-              return Object.entries(values).reduce(
-                (memo, [rawValueName, value]) => {
-                  const valueName = build.assertValidName(
-                    rawValueName,
-                    `Enum type '$1' attempted to define a value with invalid name $0.`,
-                    [typeName],
-                  );
-                  const finalValueScope: GraphileBuild.ScopeEnumValuesValue =
-                    build.extend(
-                      { valueName },
-                      scope,
-                      `Extending scope for value '${valueName}' within context for GraphQLEnumType '${typeName}'`,
-                    );
-                  const valueContext: GraphileBuild.ContextEnumValuesValue = {
-                    ...valuesContext,
-                    scope: finalValueScope,
-                  };
-                  const newValue = builder.applyHooks(
-                    "GraphQLEnumType_values_value",
-                    value,
-                    build,
-                    valueContext,
-                    `|${typeName}|${valueName}`,
-                  );
 
-                  // TODO: remove this code
-                  const ext = newValue.extensions?.grafast;
-                  if (ext && ext.applyPlan) {
-                    throw new Error(
-                      `Enum value ${typeName}.${valueName} has applyPlan set; this property no longer does anything and should be removed.`,
-                    );
-                  }
+              // Hook each value
+              for (const [valueKey, value] of Object.entries(finalValues)) {
+                const valueName = build.assertValidName(
+                  valueKey,
+                  `Enum type '$1' attempted to define a value with invalid name $0.`,
+                  [typeName],
+                );
+                const finalValueScope: GraphileBuild.ScopeEnumValuesValue =
+                  build.extend(
+                    { valueName },
+                    scope,
+                    `Extending scope for value '${valueName}' within context for GraphQLEnumType '${typeName}'`,
+                  );
+                const valueContext: GraphileBuild.ContextEnumValuesValue = {
+                  ...valuesContext,
+                  scope: finalValueScope,
+                };
+                const newValue = builder.applyHooks(
+                  "GraphQLEnumType_values_value",
+                  value,
+                  build,
+                  valueContext,
+                  `|${typeName}|${valueName}`,
+                );
 
-                  memo[valueName] = newValue;
-                  return memo;
-                },
-                Object.create(null),
-              );
-            })(),
+                // TODO: remove this code
+                const ext = newValue.extensions?.grafast;
+                if (ext && ext.applyPlan) {
+                  throw new Error(
+                    `Enum value ${typeName}.${valueName} has applyPlan set; this property no longer does anything and should be removed.`,
+                  );
+                }
+
+                finalValues[valueKey] = newValue;
+              }
+              return finalValues;
+            },
           };
 
           const Self = new GraphQLEnumType(finalSpec);

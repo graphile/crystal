@@ -745,6 +745,9 @@ class CodegenFile {
             `${config.name}.extensions`,
             `${config.name}.extensions`,
           ),
+          isOneOf: config.isOneOf
+            ? t.booleanLiteral(true)
+            : t.identifier("undefined"),
           fields: t.arrowFunctionExpression(
             [],
             this.makeInputObjectFields(config.fields, config.name),
@@ -1537,9 +1540,12 @@ function exportSchemaGraphQLJS({
         "schema.extensions",
         "schema.extensions",
       ),
+      // @ts-ignore
       enableDeferStream:
+        // @ts-ignore
         config.enableDeferStream != null
-          ? t.booleanLiteral(config.enableDeferStream)
+          ? // @ts-ignore
+            t.booleanLiteral(config.enableDeferStream)
           : null,
       assumeValid: null, // TODO: t.booleanLiteral(true),
     }),
@@ -2048,6 +2054,7 @@ export async function exportSchemaAsString(
     config.directives.some((d) => d.name === "defer" || d.name === "skip")
   ) {
     // Ref: https://github.com/graphql/graphql-js/pull/3450
+    // @ts-ignore
     config.enableDeferStream = true;
   }
 

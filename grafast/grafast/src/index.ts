@@ -5,9 +5,11 @@ import debugFactory from "debug";
 import type { MiddlewareHandlers } from "graphile-config";
 import type {
   DocumentNode,
+  ExecutionResult,
   GraphQLError,
   OperationDefinitionNode,
 } from "graphql";
+import type { ObjMap } from "graphql/jsutils/ObjMap";
 
 import type { __InputDynamicScalarStep } from "./steps/__inputDynamicScalar.js";
 import type { DataFromObjectSteps } from "./steps/object.js";
@@ -1080,4 +1082,34 @@ declare module "graphql" {
   interface GraphQLSchemaExtensions {
     grafast?: Grafast.SchemaExtensions;
   }
+}
+
+declare module "graphql/execution/execute" {
+  interface ExecutionPatchResult<
+    TData = ObjMap<unknown> | unknown,
+    TExtensions = ObjMap<unknown>,
+  > {
+    errors?: ReadonlyArray<GraphQLError>;
+    data?: TData | null;
+    path?: ReadonlyArray<string | number>;
+    label?: string;
+    hasNext: boolean;
+    extensions?: TExtensions;
+  }
+  type AsyncExecutionResult = ExecutionResult | ExecutionPatchResult;
+}
+
+declare module "graphql" {
+  interface ExecutionPatchResult<
+    TData = ObjMap<unknown> | unknown,
+    TExtensions = ObjMap<unknown>,
+  > {
+    errors?: ReadonlyArray<GraphQLError>;
+    data?: TData | null;
+    path?: ReadonlyArray<string | number>;
+    label?: string;
+    hasNext: boolean;
+    extensions?: TExtensions;
+  }
+  type AsyncExecutionResult = ExecutionResult | ExecutionPatchResult;
 }

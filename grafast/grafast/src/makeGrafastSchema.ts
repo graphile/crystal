@@ -265,6 +265,7 @@ export function makeGrafastSchema(details: GrafastSchemaConfig): GraphQLSchema {
   }
 
   const astSchema = buildASTSchema(document, {
+    // @ts-ignore
     enableDeferStream,
   });
 
