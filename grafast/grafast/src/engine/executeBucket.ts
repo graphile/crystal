@@ -1017,7 +1017,7 @@ export function executeBucket(
         : reallyExecuteStepWithoutFiltering(
             step._isUnary ? 1 : size,
             step,
-            dependencies,
+            $sideEffect ? dependencies.slice(0, depCount) : dependencies,
             extra,
           );
       if (isPromiseLike(result)) {
