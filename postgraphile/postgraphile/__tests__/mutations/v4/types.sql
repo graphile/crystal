@@ -877,3 +877,16 @@ lateral (
     __post__."id" = __post_identifiers__."id0"
   )
 ) as __post_result__;
+
+select __post_result__.*
+from (select 0 as idx, $1::"int4" as "id0") as __post_identifiers__,
+lateral (
+  select
+    __post__."id"::text as "0",
+    __post__."headline" as "1",
+    __post_identifiers__.idx as "2"
+  from "a"."post" as __post__
+  where (
+    __post__."id" = __post_identifiers__."id0"
+  )
+) as __post_result__;
