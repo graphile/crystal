@@ -6,7 +6,10 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
-import type { OperationPlan } from "./engine/OperationPlan.js";
+import type {
+  OperationPlan,
+  OperationPlanPhase,
+} from "./engine/OperationPlan.js";
 import { __InputObjectStep, __TrackedValueStep } from "./index.js";
 import type {
   FieldArgs,
@@ -35,6 +38,14 @@ type ApplyAfterModeInput =
   | "autoApplyAfterParentApplyPlan"
   | "autoApplyAfterParentInputPlan";
 type ApplyAfterMode = ApplyAfterModeArg | ApplyAfterModeInput;
+
+function assertNotRuntime(operationPlan: OperationPlan, description: string) {
+  if (operationPlan.phase === "ready") {
+    throw new Error(
+      `${description} may only be called at planning time; however you have code that has attempted to call it during execution time. Please revisit your plan resolvers to locate the issue.`,
+    );
+  }
+}
 
 export function withFieldArgsForArguments<
   T extends ExecutableStep,
@@ -65,6 +76,7 @@ export function withFieldArgsForArguments<
 
   const fieldArgs: FieldArgs = {
     getRaw(path) {
+      assertNotRuntime(operationPlan, `fieldArgs.getRaw()`);
       if (typeof path === "string") {
         return $all.get(path);
       } else if (Array.isArray(path)) {
@@ -90,6 +102,7 @@ export function withFieldArgsForArguments<
       }
     },
     get(inPath) {
+      assertNotRuntime(operationPlan, `fieldArgs.get()`);
       const path = Array.isArray(inPath)
         ? (inPath as ReadonlyArray<string | number>)
         : inPath
@@ -200,6 +213,7 @@ export function withFieldArgsForArguments<
       }
     },
     apply(targetStepOrCallback, inPath) {
+      assertNotRuntime(operationPlan, `fieldArgs.apply()`);
       const path = Array.isArray(inPath) ? inPath : inPath ? [inPath] : [];
       const pathString = path.join(".");
       const $existing = applied.get(pathString);
@@ -343,9 +357,11 @@ export function withFieldArgsForArguments<
     const nullableEntityType = getNullableType(entityType);
     const localFieldArgs: FieldArgs = {
       getRaw(subpath) {
+        assertNotRuntime(operationPlan, `fieldArgs.getRaw()`);
         return fieldArgs.getRaw(concatPath(path, subpath));
       },
       get(subpath) {
+        assertNotRuntime(operationPlan, `fieldArgs.get()`);
         if (!subpath || (Array.isArray(subpath) && subpath.length === 0)) {
           if (isListType(nullableEntityType)) {
             if (!("evalLength" in $input)) {
@@ -419,6 +435,7 @@ export function withFieldArgsForArguments<
         return fieldArgs.get(concatPath(path, subpath));
       },
       apply(targetStepOrCallback, subpath) {
+        assertNotRuntime(operationPlan, `fieldArgs.apply()`);
         if (
           mode === "apply" &&
           (!subpath || (Array.isArray(subpath) && subpath.length === 0))
