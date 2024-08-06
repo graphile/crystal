@@ -27,12 +27,12 @@
   },
   "homepage": "https://github.com/graphile/crystal/tree/main/utils/jest-serializer-graphql-schema",
   "peerDependencies": {
-    "graphql": ">=15 <17"
+    "graphql": "^16.11.0"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/node": "^22.16.3",
-    "graphql": "16.1.0-experimental-stream-defer.6",
+    "graphql": "^16.11.0",
     "jest": "^30.0.4",
     "pretty-format": "^30.0.2",
     "ts-node": "^10.9.2",

@@ -2743,7 +2743,7 @@ __metadata:
     grafast: "workspace:^"
     grafserv: "workspace:^"
     graphile-export: "workspace:^"
-    graphql: "npm:16.1.0-experimental-stream-defer.6"
+    graphql: "npm:^16.11.0"
     graphql-codegen-grafast: "workspace:^"
     iterall: "npm:^1.3.0"
     jest: "npm:^30.0.4"
@@ -2767,7 +2767,7 @@ __metadata:
     "@dataplan/json": "workspace:^"
     grafast: "workspace:^"
     graphile-config: "workspace:^"
-    graphql: ^16.1.0-experimental-stream-defer.6
+    graphql: ^16.11.0
     pg: ^8.7.1
     pg-sql2: "workspace:^"
   peerDependenciesMeta:
@@ -3838,7 +3838,7 @@ __metadata:
     grafast: "workspace:^"
     grafserv: "workspace:^"
     graphile-config: "workspace:^"
-    graphql: "npm:^16.1.0-experimental-stream-defer.6"
+    graphql: "npm:^16.11.0"
     jest: "npm:^30.0.4"
     jest-serializer-graphql-schema: "workspace:^"
     ts-node: "npm:^10.9.2"
@@ -3848,7 +3848,7 @@ __metadata:
     grafast: "workspace:^"
     grafserv: "workspace:^"
     graphile-config: "workspace:^"
-    graphql: ^16.1.0-experimental-stream-defer.6
+    graphql: ^16.11.0
   peerDependenciesMeta:
     graphile-config:
       optional: true
@@ -5219,7 +5219,7 @@ __metadata:
     glob: "npm:^11.0.3"
     grafast: "workspace:^"
     graphile-config: "workspace:^"
-    graphql: "npm:^16.1.0-experimental-stream-defer.6"
+    graphql: "npm:^16.11.0"
     nodemon: "npm:^3.1.10"
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.8.1"
@@ -5256,7 +5256,7 @@ __metadata:
     codemirror: "npm:^6.0.2"
     dataloader: "npm:^2.2.3"
     grafast: "workspace:^"
-    graphql: "npm:^16.1.0-experimental-stream-defer.6"
+    graphql: "npm:^16.11.0"
     mermaid: "npm:^11.10.0"
     prism-react-renderer: "npm:^2.4.1"
     react: "npm:^19.1.0"
@@ -13817,7 +13817,7 @@ __metadata:
     debug: "npm:^4.4.1"
     eventemitter3: "npm:^5.0.1"
     graphile-config: "workspace:^"
-    graphql: "npm:16.1.0-experimental-stream-defer.6"
+    graphql: "npm:^16.11.0"
     iterall: "npm:^1.3.0"
     jest: "npm:^30.0.4"
     lodash: "npm:^4.17.21"
@@ -13834,7 +13834,7 @@ __metadata:
     zx: "npm:^8.6.2"
   peerDependencies:
     "@envelop/core": ^5.0.0
-    graphql: ^16.1.0-experimental-stream-defer.6
+    graphql: ^16.11.0
   peerDependenciesMeta:
     "@envelop/core":
       optional: true
@@ -13863,7 +13863,7 @@ __metadata:
     fastify: "npm:^4.29.1"
     grafast: "workspace:^"
     graphile-config: "workspace:^"
-    graphql: "npm:^16.1.0-experimental-stream-defer.6"
+    graphql: "npm:^16.11.0"
     graphql-http: "npm:^1.22.4"
     graphql-ws: "npm:^6.0.5"
     h3: "npm:^1.15.3"
@@ -13883,7 +13883,7 @@ __metadata:
     "@whatwg-node/server": ^0.9.64
     grafast: "workspace:^"
     graphile-config: "workspace:^"
-    graphql: ^16.1.0-experimental-stream-defer.6
+    graphql: ^16.11.0
     h3: ^1.13.0
     hono: ^4.6.15
     ws: ^8.12.1
@@ -13929,7 +13929,7 @@ __metadata:
     grafserv: "workspace:^"
     graphile-config: "workspace:^"
     graphile-export: "workspace:^"
-    graphql: "npm:16.1.0-experimental-stream-defer.6"
+    graphql: "npm:^16.11.0"
     graphql-helix: "npm:^1.13.0"
     graphql-ws: "npm:^6.0.5"
     jest: "npm:^30.0.4"
@@ -13947,7 +13947,7 @@ __metadata:
     grafast: "workspace:^"
     graphile-build: "workspace:^"
     graphile-config: "workspace:^"
-    graphql: ^16.1.0-experimental-stream-defer.6
+    graphql: ^16.11.0
     pg: ^8.7.1
     pg-sql2: "workspace:^"
     tamedevil: "workspace:^"
@@ -13971,7 +13971,7 @@ __metadata:
     grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphile-export: "workspace:^"
-    graphql: "npm:16.1.0-experimental-stream-defer.6"
+    graphql: "npm:^16.11.0"
     jest: "npm:^30.0.4"
     lodash: "npm:^4.17.21"
     pluralize: "npm:^7.0.0"
@@ -13983,7 +13983,7 @@ __metadata:
   peerDependencies:
     grafast: "workspace:^"
     graphile-config: "workspace:^"
-    graphql: ^16.1.0-experimental-stream-defer.6
+    graphql: ^16.11.0
   languageName: unknown
   linkType: soft
 
@@ -14051,7 +14051,7 @@ __metadata:
     graphile-build: "workspace:^"
     graphile-build-pg: "workspace:^"
     graphile-config: "workspace:^"
-    graphql: "npm:^16.1.0-experimental-stream-defer.6"
+    graphql: "npm:^16.11.0"
     jest: "npm:^30.0.4"
     jest-serializer-graphql-schema: "workspace:^"
     json5: "npm:^2.2.3"
@@ -14067,7 +14067,7 @@ __metadata:
     graphile-build: "workspace:^"
     graphile-build-pg: "workspace:^"
     graphile-config: "workspace:^"
-    graphql: ^16.1.0-experimental-stream-defer.6
+    graphql: ^16.11.0
     tamedevil: "workspace:^"
   peerDependenciesMeta:
     graphile-build-pg:
@@ -14135,10 +14135,10 @@ __metadata:
   dependencies:
     "@graphql-codegen/plugin-helpers": "npm:^5.1.1"
     "@graphql-codegen/visitor-plugin-common": "npm:^5.8.0"
-    graphql: "npm:^16.1.0-experimental-stream-defer.6"
+    graphql: "npm:^16.11.0"
     typescript: "npm:^5.8.3"
   peerDependencies:
-    graphql: ^16.1.0-experimental-stream-defer.6
+    graphql: ^16.11.0
   languageName: unknown
   linkType: soft
 
@@ -14256,10 +14256,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphql@npm:16.1.0-experimental-stream-defer.6":
-  version: 16.1.0-experimental-stream-defer.6
-  resolution: "graphql@npm:16.1.0-experimental-stream-defer.6"
-  checksum: 10/d3fabeab841c68a9d58d4c858926c93ae30a525ea35530ed7a547b6e8b67e21ecae4f25395ea2f5defa7ec57e1e98d87aaa4e6cd3943963fa46f22bb817ad40c
+"graphql@npm:^16.11.0":
+  version: 16.11.0
+  resolution: "graphql@npm:16.11.0"
+  checksum: 10/e3e1633d0b464bbb3fa41283fae938bd3bac801c350555b3f1a129d99fb3cfe157fa69c1389229dba902731942eb08bdea4b29f1271965feee8779576b26ef01
   languageName: node
   linkType: hard
 
@@ -16191,14 +16191,14 @@ __metadata:
   dependencies:
     "@types/jest": "npm:^30.0.0"
     "@types/node": "npm:^22.16.3"
-    graphql: "npm:16.1.0-experimental-stream-defer.6"
+    graphql: "npm:^16.11.0"
     jest: "npm:^30.0.4"
     pretty-format: "npm:^30.0.2"
     ts-node: "npm:^10.9.2"
     tslib: "npm:^2.8.1"
     typescript: "npm:^5.8.3"
   peerDependencies:
-    graphql: ">=15 <17"
+    graphql: ^16.11.0
   languageName: unknown
   linkType: soft
 
@@ -19799,7 +19799,7 @@ __metadata:
     graphile-build: "workspace:^"
     graphile-build-pg: "workspace:^"
     graphile-config: "workspace:^"
-    graphql: "npm:16.1.0-experimental-stream-defer.6"
+    graphql: "npm:^16.11.0"
     iterall: "npm:^1.3.0"
     jest: "npm:^30.0.4"
     jsonwebtoken: "npm:^9.0.2"
@@ -20925,7 +20925,7 @@ __metadata:
     graphile-config: "workspace:^"
     graphile-export: "workspace:^"
     graphile-utils: "workspace:^"
-    graphql: "npm:^16.1.0-experimental-stream-defer.6"
+    graphql: "npm:^16.11.0"
     iterall: "npm:^1.3.0"
     jest: "npm:^30.0.4"
     jsonwebtoken: "npm:^9.0.2"
@@ -20946,7 +20946,7 @@ __metadata:
     graphile-build: "workspace:^"
     graphile-build-pg: "workspace:^"
     graphile-config: "workspace:^"
-    graphql: ^16.1.0-experimental-stream-defer.6
+    graphql: ^16.11.0
     pg: ^8.7.1
     pg-sql2: "workspace:^"
     tamedevil: "workspace:^"
@@ -22256,7 +22256,7 @@ __metadata:
     eslint_d: "npm:^14.3.0"
     glob: "npm:^11.0.3"
     globals: "npm:^16.3.0"
-    graphql: "npm:16.1.0-experimental-stream-defer.6"
+    graphql: "npm:^16.11.0"
     graphql-ws: "npm:^6.0.5"
     jest: "npm:^30.0.4"
     jscodeshift: "npm:^17.3.0"
@@ -22332,7 +22332,7 @@ __metadata:
     "@types/react-dom": "npm:^19.1.6"
     grafast: "workspace:^"
     graphiql: "npm:^5.2.0"
-    graphql: "npm:16.1.0-experimental-stream-defer.6"
+    graphql: "npm:^16.11.0"
     graphql-ws: "npm:^6.0.5"
     jest: "npm:^30.0.4"
     mermaid: "npm:^11.10.0"
@@ -22343,7 +22343,7 @@ __metadata:
     tslib: "npm:^2.8.1"
     typescript: "npm:^5.8.3"
   peerDependencies:
-    graphql: ^16.1.0-experimental-stream-defer.6
+    graphql: ^16.11.0
   languageName: unknown
   linkType: soft
 
@@ -22358,7 +22358,7 @@ __metadata:
     css-loader: "npm:^7.1.2"
     file-loader: "npm:^6.2.0"
     graphile-config: "workspace:^"
-    graphql: "npm:16.1.0-experimental-stream-defer.6"
+    graphql: "npm:^16.11.0"
     http-proxy: "npm:^1.18.1"
     mini-css-extract-plugin: "npm:^2.9.2"
     ruru-components: "workspace:^"
@@ -22373,7 +22373,7 @@ __metadata:
     yargs: "npm:^17.7.2"
   peerDependencies:
     graphile-config: "workspace:^"
-    graphql: ^16.1.0-experimental-stream-defer.6
+    graphql: ^16.11.0
   bin:
     ruru: ./dist/cli-run.js
   languageName: unknown

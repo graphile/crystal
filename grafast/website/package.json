@@ -47,7 +47,7 @@
     "@lezer/highlight": "^1.2.1",
     "@types/react": "^19.1.8",
     "dataloader": "^2.2.3",
-    "graphql": "^16.1.0-experimental-stream-defer.6",
+    "graphql": "^16.11.0",
     "mermaid": "^11.10.0",
     "sqlite3": "^5.1.7"
   },
