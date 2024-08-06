@@ -70,6 +70,22 @@ lateral (
     )
 ) as __messages_result__;
 
+select __forums_result__.*
+from (select 0 as idx, $1::"uuid" as "id0") as __forums_identifiers__,
+lateral (
+  select
+    __forums__."name" as "0",
+    (__forums__.archived_at is not null)::text as "1",
+    __forums_identifiers__.idx as "2"
+  from app_public.forums as __forums__
+  where
+    (
+      true /* authorization checks */
+    ) and (
+      __forums__."id" = __forums_identifiers__."id0"
+    )
+) as __forums_result__;
+
 select __users_result__.*
 from (select 0 as idx, $1::"uuid" as "id0") as __users_identifiers__,
 lateral (
