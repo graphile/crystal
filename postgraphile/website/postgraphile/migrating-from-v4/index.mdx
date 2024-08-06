@@ -274,12 +274,22 @@ Other changes:
 
 - The values generated for `cursor` differ. This is not deemed to be a breaking
   change, as these may change from one release to the next (even patch versions).
-- The behavior of `hasPreviousPage` / `hasNextPage` differs from V4.
-  While in V4 `hasPreviousPage` in combination with `first` returns `true`,
-  if there's an edge, with a cursor before or equal to the `before` cursor.
-  In V5 `hasPreviousPage` will always return `false` if `first` is specified,
-  as in this case, we cannot efficiently determine, whether or not there's is a previous page.
-  The same applies to `hasNextPage` in combination with `last`.
+- The behavior of `PageInfo`'s `hasPreviousPage` and `hasNextPage` differs from
+  V4. In V4 when paginating forwards (via `first` and `after` arguments) the
+  `hasPreviousPage` field would run an additional subquery to determine if a
+  previous page existed. The Cursor Connections Specification explicitly states
+  you _may_ do this
+  [_if_ it's efficient to do so](https://relay.dev/graphql/connections.htm#sel-EALFJCRIDSAF2nW).
+  Since adding a subquery isn't efficient, in V5 we follow the specification and
+  always return `false` for `hasPreviousPage` when paginating forwards. In
+  general, if you have an `after` cursor then you can imply there's probably a
+  previous page, so no need for the system to check. (The same applies to
+  `hasNextPage` when paginating backwards via `last` and `before` arguments.)
+  For clarity; when paginating forwards you can use `hasNextPage` to determine
+  if there is a next page (and should not request `hasPreviousPage`); when
+  paginating backwards you should use `hasPreviousPage` to determine if there is
+  a previous page (and should not request `hasNextPage`).
+
 - In some circumstances the location where a `null` is returned or an error is
   thrown may differ slightly between V4 and V5; this will still respect the
   GraphQL schema though, of course.
