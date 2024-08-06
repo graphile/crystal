@@ -588,7 +588,7 @@ export function executeBucket(
                   // First error wins, ignore this second error.
                 }
                 // End "f2b3b1b3" block
-              } else {
+              } else if (forceIndexValue === undefined) {
                 const depVal = depExecutionVal.at(dataIndex);
                 let depFlags;
                 if (
@@ -1017,7 +1017,7 @@ export function executeBucket(
         : reallyExecuteStepWithoutFiltering(
             step._isUnary ? 1 : size,
             step,
-            dependencies,
+            $sideEffect ? dependencies.slice(0, depCount) : dependencies,
             extra,
           );
       if (isPromiseLike(result)) {
