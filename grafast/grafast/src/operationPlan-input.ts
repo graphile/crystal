@@ -6,10 +6,7 @@ import type {
 } from "graphql";
 import * as graphql from "graphql";
 
-import type {
-  OperationPlan,
-  OperationPlanPhase,
-} from "./engine/OperationPlan.js";
+import type { OperationPlan } from "./engine/OperationPlan.js";
 import { __InputObjectStep, __TrackedValueStep } from "./index.js";
 import type {
   FieldArgs,
