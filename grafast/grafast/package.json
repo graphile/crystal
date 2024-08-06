@@ -66,6 +66,7 @@
     "chalk": "^4.1.2",
     "debug": "^4.3.4",
     "eventemitter3": "^5.0.1",
+    "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "iterall": "^1.3.0",
     "tamedevil": "workspace:^",
@@ -73,15 +74,11 @@
   },
   "peerDependencies": {
     "@envelop/core": "^5.0.0",
-    "graphile-config": "workspace:^",
     "graphql": "^16.1.0-experimental-stream-defer.6",
     "tamedevil": "workspace:^"
   },
   "peerDependenciesMeta": {
     "@envelop/core": {
-      "optional": true
-    },
-    "graphile-config": {
       "optional": true
     }
   },
