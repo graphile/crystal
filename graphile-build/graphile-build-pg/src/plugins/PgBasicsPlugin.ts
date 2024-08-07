@@ -111,7 +111,7 @@ declare global {
         unique: PgResourceUnique,
       ];
       pgCodecRelation: PgCodecRelation;
-      pgCodecRef: PgCodecRef;
+      pgCodecRef: [codec: PgCodec, refName: string];
       pgRefDefinition: PgRefDefinition;
     }
     interface GatherOptions {
@@ -239,7 +239,11 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
       pgCodecRef: {
         after: ["default", "inferred"],
         provides: ["override"],
-        callback(behavior, ref) {
+        callback(behavior, [codec, refName]) {
+          const ref = codec.refs?.[refName];
+          if (!ref) {
+            throw new Error(`Codec ${codec.name} has no ref '${refName}'`);
+          }
           return [
             behavior,
             getBehavior([ref.definition.extensions, ref.extensions]),

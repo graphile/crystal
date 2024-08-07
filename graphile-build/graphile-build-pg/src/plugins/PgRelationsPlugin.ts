@@ -519,8 +519,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         provides: ["inferred"],
         before: ["override"],
         after: ["default"],
-        callback(behavior, entity) {
-          if (entity.definition.singular) {
+        callback(behavior, [codec, refName]) {
+          const ref = codec.refs?.[refName];
+          if (ref?.definition.singular) {
             return [
               behavior,
               "single -singularRelation:resource:list -singularRelation:resource:connection",
@@ -751,10 +752,10 @@ function addRelations(
 
   // Don't use refs on mutation payloads
   const refDefinitionList: Array<{
+    codec: PgCodecWithAttributes;
     refName: string;
     refDefinition: PgRefDefinition;
     ref?: PgCodecRef;
-    codec?: PgCodec;
   }> = isMutationPayload
     ? []
     : codec.refs
@@ -765,6 +766,7 @@ function addRelations(
             spec.definition.sourceGraphqlType === context.Self.name,
         )
         .map(([refName, spec]) => ({
+          codec,
           refName,
           refDefinition: spec.definition,
           ref: spec,
@@ -779,9 +781,9 @@ function addRelations(
             refDefinition.sourceGraphqlType === context.Self.name,
         )
         .map(([refName, refDefinition]) => ({
+          codec,
           refName,
           refDefinition,
-          codec,
         }));
 
   type Digest = {
@@ -923,6 +925,7 @@ function addRelations(
 
   // Digest refs
   for (const {
+    codec,
     refName: identifier,
     refDefinition: refSpec,
     ref,
@@ -1004,12 +1007,12 @@ function addRelations(
       behavior = hasExactlyOneSource
         ? `${build.behavior.pgResourceBehavior(
             firstSource,
-          )} ${build.behavior.pgCodecRefBehavior(ref, false)}`
+          )} ${build.behavior.pgCodecRefBehavior([codec, identifier], false)}`
         : sharedCodec
         ? `${build.behavior.pgCodecBehavior(
             sharedCodec,
-          )} ${build.behavior.pgCodecRefBehavior(ref, false)}`
-        : build.behavior.pgCodecRefBehavior(ref);
+          )} ${build.behavior.pgCodecRefBehavior([codec, identifier], false)}`
+        : build.behavior.pgCodecRefBehavior([codec, identifier]);
 
       // Shortcut simple relation alias
       ({ singleRecordPlan, listPlan, connectionPlan } = (() => {
