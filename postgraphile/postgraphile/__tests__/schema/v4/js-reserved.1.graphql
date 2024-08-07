@@ -3150,16 +3150,6 @@ type RelationalStatus implements Node & RelationalItem {
   """
   nodeId: ID!
   note: String
-
-  """
-  Reads a single `RelationalStatus` that is related to this `RelationalStatus`.
-  """
-  relationalStatusById: RelationalStatus
-
-  """
-  Reads a single `RelationalTopic` that is related to this `RelationalStatus`.
-  """
-  relationalTopicById: RelationalTopic
   type: ItemType!
 }
 
@@ -3239,16 +3229,6 @@ type RelationalTopic implements Node & RelationalItem {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
-
-  """
-  Reads a single `RelationalStatus` that is related to this `RelationalTopic`.
-  """
-  relationalStatusById: RelationalStatus
-
-  """
-  Reads a single `RelationalTopic` that is related to this `RelationalTopic`.
-  """
-  relationalTopicById: RelationalTopic
   title: String!
   type: ItemType!
 }

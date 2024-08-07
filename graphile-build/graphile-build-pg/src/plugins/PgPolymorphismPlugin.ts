@@ -510,6 +510,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           >;
           const poly = (resource.codec as PgCodec).polymorphism;
           if (poly?.mode === "relational") {
+            const polyRelationNames = Object.values(poly.types).map(
+              (t) => t.relationName,
+            );
             // Copy common attributes to implementations
             for (const spec of Object.values(poly.types)) {
               const [schemaName, tableName] = parseDatabaseIdentifier(
@@ -588,6 +591,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               for (const [relationName, relationSpec] of Object.entries(
                 relations,
               )) {
+                // Skip over the polymorphic relations
+                if (polyRelationNames.includes(relationName)) continue;
+
                 // TODO: normally we wouldn't call `getBehavior` anywhere
                 // except in an entityBehavior definition... Should this be
                 // solved a different way?

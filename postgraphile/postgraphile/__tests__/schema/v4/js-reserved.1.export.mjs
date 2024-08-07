@@ -1518,7 +1518,6 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
 });
 const building_buildingPgResource = registry.pgResources["building"];
 const relational_items_relational_itemsPgResource = registry.pgResources["relational_items"];
-const relational_status_relational_statusPgResource = registry.pgResources["relational_status"];
 const handler2 = {
   typeName: "Building",
   codec: handler_codec_base64JSON,
@@ -1599,6 +1598,7 @@ const specFromRecord3 = $record => {
 function CursorSerialize(value) {
   return "" + value;
 }
+const pgResource_relational_statusPgResource = registry.pgResources["relational_status"];
 const handler4 = {
   typeName: "RelationalStatus",
   codec: handler_codec_base64JSON,
@@ -1612,7 +1612,7 @@ const handler4 = {
     };
   },
   get(spec) {
-    return relational_status_relational_statusPgResource.get(spec);
+    return pgResource_relational_statusPgResource.get(spec);
   },
   match(obj) {
     return obj[0] === "relational_statuses";
@@ -2388,16 +2388,6 @@ export const typeDefs = /* GraphQL */`type RelationalTopic implements Node & Rel
 
   """Reads a single \`Building\` that is related to this \`RelationalTopic\`."""
   buildingByConstructor: Building
-
-  """
-  Reads a single \`RelationalTopic\` that is related to this \`RelationalTopic\`.
-  """
-  relationalTopicById: RelationalTopic
-
-  """
-  Reads a single \`RelationalStatus\` that is related to this \`RelationalTopic\`.
-  """
-  relationalStatusById: RelationalStatus
 }
 
 """An object with a globally unique \`ID\`."""
@@ -2679,16 +2669,6 @@ type RelationalStatus implements Node & RelationalItem {
 
   """Reads a single \`Building\` that is related to this \`RelationalStatus\`."""
   buildingByConstructor: Building
-
-  """
-  Reads a single \`RelationalTopic\` that is related to this \`RelationalStatus\`.
-  """
-  relationalTopicById: RelationalTopic
-
-  """
-  Reads a single \`RelationalStatus\` that is related to this \`RelationalStatus\`.
-  """
-  relationalStatusById: RelationalStatus
 }
 
 """The root query type which gives access points into the data universe."""
@@ -6743,34 +6723,6 @@ export const plans = {
       previousAlias = relational_itemsAlias;
       $buildings.where(sql`${previousAlias}.${sql.identifier("id")} = ${$buildings.placeholder($record.get("id"))}`);
       return $buildings.single();
-    },
-    relationalTopicById($record) {
-      const $relational_topics = pgResource_relational_topicsPgResource.find();
-      let previousAlias = $relational_topics.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_topics.join({
-        type: "inner",
-        from: relational_items_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_topics.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_topics.placeholder($record.get("id"))}`);
-      return $relational_topics.single();
-    },
-    relationalStatusById($record) {
-      const $relational_statuses = relational_status_relational_statusPgResource.find();
-      let previousAlias = $relational_statuses.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_statuses.join({
-        type: "inner",
-        from: relational_items_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_statuses.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_statuses.placeholder($record.get("id"))}`);
-      return $relational_statuses.single();
     }
   },
   Building: {
@@ -7509,34 +7461,6 @@ export const plans = {
       previousAlias = relational_itemsAlias;
       $buildings.where(sql`${previousAlias}.${sql.identifier("id")} = ${$buildings.placeholder($record.get("id"))}`);
       return $buildings.single();
-    },
-    relationalTopicById($record) {
-      const $relational_topics = pgResource_relational_topicsPgResource.find();
-      let previousAlias = $relational_topics.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_topics.join({
-        type: "inner",
-        from: relational_items_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_topics.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_topics.placeholder($record.get("id"))}`);
-      return $relational_topics.single();
-    },
-    relationalStatusById($record) {
-      const $relational_statuses = relational_status_relational_statusPgResource.find();
-      let previousAlias = $relational_statuses.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_statuses.join({
-        type: "inner",
-        from: relational_items_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_statuses.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_statuses.placeholder($record.get("id"))}`);
-      return $relational_statuses.single();
     }
   },
   Query: {
@@ -7758,7 +7682,7 @@ export const plans = {
     },
     relationalStatusById: {
       plan(_$root, args) {
-        return relational_status_relational_statusPgResource.get({
+        return pgResource_relational_statusPgResource.get({
           id: args.get("id")
         });
       },
@@ -8746,7 +8670,7 @@ export const plans = {
     },
     allRelationalStatusesList: {
       plan() {
-        return relational_status_relational_statusPgResource.find();
+        return pgResource_relational_statusPgResource.find();
       },
       args: {
         first: {
@@ -8779,7 +8703,7 @@ export const plans = {
     },
     allRelationalStatuses: {
       plan() {
-        return connection(relational_status_relational_statusPgResource.find());
+        return connection(pgResource_relational_statusPgResource.find());
       },
       args: {
         first: {
