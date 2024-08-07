@@ -332,12 +332,15 @@ export class PgUnionAllSingleStep
       const typeKey = this.typeKey;
       return values0.isBatch
         ? values0.entries.map((v) => {
+            if (v == null) return null;
             const type = v[typeKey];
             return polymorphicWrap(type, v);
           })
         : arrayOfLength(
             count,
-            polymorphicWrap(values0.value[typeKey], values0.value),
+            values0.value == null
+              ? null
+              : polymorphicWrap(values0.value[typeKey], values0.value),
           );
     } else {
       return values0.isBatch
