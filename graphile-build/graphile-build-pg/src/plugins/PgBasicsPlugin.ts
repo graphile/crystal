@@ -3,7 +3,6 @@ import "graphile-config";
 
 import type {
   PgCodec,
-  PgCodecRef,
   PgCodecRelation,
   PgCodecWithAttributes,
   PgRefDefinition,
