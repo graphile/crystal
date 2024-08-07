@@ -4279,6 +4279,52 @@ export function makeExampleSchema(
         ),
       },
 
+      unionItemByIdViaUnionAll: {
+        type: UnionItem,
+        args: {
+          id: {
+            type: new GraphQLNonNull(GraphQLInt),
+          },
+        },
+        plan: EXPORTABLE(
+          (
+            TYPES,
+            pgUnionAll,
+            sql,
+            unionChecklistItemsResource,
+            unionChecklistsResource,
+            unionDividersResource,
+            unionPostsResource,
+            unionTopicsResource,
+          ) =>
+            function plan(_$root, { $id }) {
+              const $items = pgUnionAll({
+                resourceByTypeName: {
+                  UnionTopic: unionTopicsResource,
+                  UnionPost: unionPostsResource,
+                  UnionDivider: unionDividersResource,
+                  UnionChecklist: unionChecklistsResource,
+                  UnionChecklistItem: unionChecklistItemsResource,
+                },
+              });
+              $items.where(
+                sql`${$items}.id = ${$items.placeholder($id, TYPES.int)}`,
+              );
+              return $items.single();
+            },
+          [
+            TYPES,
+            pgUnionAll,
+            sql,
+            unionChecklistItemsResource,
+            unionChecklistsResource,
+            unionDividersResource,
+            unionPostsResource,
+            unionTopicsResource,
+          ],
+        ),
+      },
+
       unionTopicById: {
         type: UnionTopic,
         args: {
