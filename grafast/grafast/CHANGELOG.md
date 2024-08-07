@@ -1,5 +1,25 @@
 # grafast
 
+## 0.1.1-beta.14
+
+### Patch Changes
+
+- [#2141](https://github.com/graphile/crystal/pull/2141)
+  [`871d32b2a`](https://github.com/graphile/crystal/commit/871d32b2a18df0d257880fc54a61d9e68c4607d6)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug in side effect handling
+  causing steps to be passed an additional dependency under some circumstances.
+
+- [#2144](https://github.com/graphile/crystal/pull/2144)
+  [`a26e3a30c`](https://github.com/graphile/crystal/commit/a26e3a30c02f963f8f5e9c9d021e871f33689e1b)
+  Thanks [@benjie](https://github.com/benjie)! - Proactively detects calls to
+  fieldArgs.get(), .getRaw() and .apply() during execution time and throws an
+  error.
+
+- [#2145](https://github.com/graphile/crystal/pull/2145)
+  [`02c11a4d4`](https://github.com/graphile/crystal/commit/02c11a4d42bf434dffc9354b300e8d791c4eeb2d)
+  Thanks [@benjie](https://github.com/benjie)! - `graphile-config` is needed by
+  grafast; it's no longer optional.
+
 ## 0.1.1-beta.13
 
 ### Patch Changes

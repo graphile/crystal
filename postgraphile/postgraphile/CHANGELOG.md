@@ -1,5 +1,31 @@
 # postgraphile
 
+## 5.0.0-beta.29
+
+### Patch Changes
+
+- [#2149](https://github.com/graphile/crystal/pull/2149)
+  [`52ef49ca9`](https://github.com/graphile/crystal/commit/52ef49ca9357e63d0aa5c06ac089bf57ee991c73)
+  Thanks [@benjie](https://github.com/benjie)! - Fixed a bug in 'relational'
+  polymorphism where relations to each of the concrete types would
+  non-sensically be added to each of the concrete types.
+- Updated dependencies
+  [[`52ef49ca9`](https://github.com/graphile/crystal/commit/52ef49ca9357e63d0aa5c06ac089bf57ee991c73),
+  [`82ce02cd9`](https://github.com/graphile/crystal/commit/82ce02cd93df3df3c9570c3528483c4f720ff9bb),
+  [`871d32b2a`](https://github.com/graphile/crystal/commit/871d32b2a18df0d257880fc54a61d9e68c4607d6),
+  [`e8a0c4441`](https://github.com/graphile/crystal/commit/e8a0c4441cd04402974cd0af6b80816c9cda91e7),
+  [`d9d07b97b`](https://github.com/graphile/crystal/commit/d9d07b97b41c928033b9a920931ae0ccccf88e82),
+  [`a26e3a30c`](https://github.com/graphile/crystal/commit/a26e3a30c02f963f8f5e9c9d021e871f33689e1b),
+  [`eca7e62e2`](https://github.com/graphile/crystal/commit/eca7e62e2a09af77f4f166a281dab81d009d9ec1),
+  [`02c11a4d4`](https://github.com/graphile/crystal/commit/02c11a4d42bf434dffc9354b300e8d791c4eeb2d)]:
+  - graphile-build-pg@5.0.0-beta.28
+  - @dataplan/pg@0.0.1-beta.25
+  - grafast@0.1.1-beta.14
+  - graphile-build@5.0.0-beta.24
+  - graphile-utils@5.0.0-beta.28
+  - @dataplan/json@0.0.1-beta.23
+  - grafserv@0.1.1-beta.16
+
 ## 5.0.0-beta.28
 
 ### Patch Changes

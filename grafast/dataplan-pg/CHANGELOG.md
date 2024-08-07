@@ -1,5 +1,26 @@
 # @dataplan/pg
 
+## 0.0.1-beta.25
+
+### Patch Changes
+
+- [#2150](https://github.com/graphile/crystal/pull/2150)
+  [`82ce02cd9`](https://github.com/graphile/crystal/commit/82ce02cd93df3df3c9570c3528483c4f720ff9bb)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug selecting single row
+  via pgUnionAll where no rows were selected.
+
+- [#2146](https://github.com/graphile/crystal/pull/2146)
+  [`eca7e62e2`](https://github.com/graphile/crystal/commit/eca7e62e2a09af77f4f166a281dab81d009d9ec1)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug causing out of date
+  information to be displayed via subscriptions
+
+- Updated dependencies
+  [[`871d32b2a`](https://github.com/graphile/crystal/commit/871d32b2a18df0d257880fc54a61d9e68c4607d6),
+  [`a26e3a30c`](https://github.com/graphile/crystal/commit/a26e3a30c02f963f8f5e9c9d021e871f33689e1b),
+  [`02c11a4d4`](https://github.com/graphile/crystal/commit/02c11a4d42bf434dffc9354b300e8d791c4eeb2d)]:
+  - grafast@0.1.1-beta.14
+  - @dataplan/json@0.0.1-beta.23
+
 ## 0.0.1-beta.24
 
 ### Patch Changes

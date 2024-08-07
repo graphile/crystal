@@ -1,5 +1,19 @@
 # graphile-build
 
+## 5.0.0-beta.24
+
+### Patch Changes
+
+- [#2143](https://github.com/graphile/crystal/pull/2143)
+  [`e8a0c4441`](https://github.com/graphile/crystal/commit/e8a0c4441cd04402974cd0af6b80816c9cda91e7)
+  Thanks [@benjie](https://github.com/benjie)! - Add `Self.name` and
+  `scope.valueName` to context for `GraphQLEnumType_values_value` hook
+- Updated dependencies
+  [[`871d32b2a`](https://github.com/graphile/crystal/commit/871d32b2a18df0d257880fc54a61d9e68c4607d6),
+  [`a26e3a30c`](https://github.com/graphile/crystal/commit/a26e3a30c02f963f8f5e9c9d021e871f33689e1b),
+  [`02c11a4d4`](https://github.com/graphile/crystal/commit/02c11a4d42bf434dffc9354b300e8d791c4eeb2d)]:
+  - grafast@0.1.1-beta.14
+
 ## 5.0.0-beta.23
 
 ### Patch Changes
