@@ -1,0 +1,37 @@
+## expect(errors).toBeFalsy()
+## expect(data.nx).toEqual(null);
+{
+  nx: unionItemById(id: 987654321) {
+    ...Item
+  }
+  nx2: unionItemByIdViaUnionAll(id: 987654321) {
+    ...Item
+  }
+}
+
+fragment Item on UnionItem {
+  ... on UnionTopic {
+    id
+    title
+  }
+  ... on UnionPost {
+    id
+    title
+    description
+    note
+  }
+  ... on UnionDivider {
+    id
+    title
+    color
+  }
+  ... on UnionChecklist {
+    id
+    title
+  }
+  ... on UnionChecklistItem {
+    id
+    description
+    note
+  }
+}
