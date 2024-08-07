@@ -588,6 +588,14 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               for (const [relationName, relationSpec] of Object.entries(
                 relations,
               )) {
+                // TODO: normally we wouldn't call `getBehavior` anywhere
+                // except in an entityBehavior definition... Should this be
+                // solved a different way?
+                const behavior = getBehavior([
+                  relationSpec.remoteResource.codec.extensions,
+                  relationSpec.remoteResource.extensions,
+                  relationSpec.extensions,
+                ]);
                 const relationDetails: GraphileBuild.PgRelationsPluginRelationDetails =
                   {
                     registry: resource.registry,
@@ -607,7 +615,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                   listFieldName,
                   connectionFieldName,
                   extensions: {
-                    tags: {},
+                    tags: {
+                      behavior,
+                    },
                   },
                 };
                 const ref: PgCodecRef = {
