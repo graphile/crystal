@@ -1,13 +1,11 @@
 ## expect(errors).toBeFalsy()
-## expect(data.item18.id).toEqual(18);
-## expect(data.item18.description).toEqual('Has an optimisation phase');
-## expect(data.item18ViaUnionAll.id).toEqual(18);
-## expect(data.item18ViaUnionAll.description).toEqual('Has an optimisation phase');
+## expect(data.nx).toEqual(null);
+## expect(data.nx2).toEqual(null);
 {
-  item18: unionItemById(id: 18) {
+  nx: unionItemById(id: 987654321) {
     ...Item
   }
-  item18ViaUnionAll: unionItemByIdViaUnionAll(id: 18) {
+  nx2: unionItemByIdViaUnionAll(id: 987654321) {
     ...Item
   }
 }

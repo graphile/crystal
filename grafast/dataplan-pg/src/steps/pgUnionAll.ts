@@ -29,7 +29,7 @@ import {
 } from "grafast";
 import type { GraphQLObjectType } from "grafast/graphql";
 import type { SQL, SQLRawValue } from "pg-sql2";
-import { $$symbolToIdentifier, sql } from "pg-sql2";
+import { $$symbolToIdentifier, $$toSQL, sql } from "pg-sql2";
 
 import type { PgCodecAttributes } from "../codecs.js";
 import { TYPES } from "../codecs.js";
@@ -332,12 +332,15 @@ export class PgUnionAllSingleStep
       const typeKey = this.typeKey;
       return values0.isBatch
         ? values0.entries.map((v) => {
+            if (v == null) return null;
             const type = v[typeKey];
             return polymorphicWrap(type, v);
           })
         : arrayOfLength(
             count,
-            polymorphicWrap(values0.value[typeKey], values0.value),
+            values0.value == null
+              ? null
+              : polymorphicWrap(values0.value[typeKey], values0.value),
           );
     } else {
       return values0.isBatch
@@ -2011,6 +2014,10 @@ ${lateralText};`;
       }
       return orderedRows;
     });
+  }
+
+  [$$toSQL]() {
+    return this.alias;
   }
 }
 
