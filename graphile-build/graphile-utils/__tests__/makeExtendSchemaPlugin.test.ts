@@ -93,9 +93,12 @@ const ExtendPlugin = makeExtendSchemaPlugin({
 });
 
 it("supports scalars", async () => {
-  const schema = buildSchema({
-    plugins: [QueryPlugin, ExtendPlugin],
-  });
+  const schema = buildSchema(
+    {
+      plugins: [QueryPlugin, ExtendPlugin],
+    },
+    {} as any,
+  );
   const result = await grafast({
     schema,
     source: /* GraphQL */ `
