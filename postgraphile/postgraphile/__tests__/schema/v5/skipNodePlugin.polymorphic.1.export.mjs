@@ -4863,12 +4863,12 @@ const resourceByTypeName10 = Object.assign(Object.create(null), {
 });
 const otherSource_prioritiesPgResource = registry.pgResources["priorities"];
 const relational_topics_relational_topicsPgResource = registry.pgResources["relational_topics"];
-const relational_posts_relational_postsPgResource = registry.pgResources["relational_posts"];
-const relational_dividers_relational_dividersPgResource = registry.pgResources["relational_dividers"];
-const relational_checklists_relational_checklistsPgResource = registry.pgResources["relational_checklists"];
-const relational_checklist_items_relational_checklist_itemsPgResource = registry.pgResources["relational_checklist_items"];
 const relational_item_relations_relational_item_relationsPgResource = registry.pgResources["relational_item_relations"];
 const relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource = registry.pgResources["relational_item_relation_composite_pks"];
+const resource_relational_checklistsPgResource = registry.pgResources["relational_checklists"];
+const resource_relational_checklist_itemsPgResource = registry.pgResources["relational_checklist_items"];
+const resource_relational_dividersPgResource = registry.pgResources["relational_dividers"];
+const resource_relational_postsPgResource = registry.pgResources["relational_posts"];
 const argDetailsSimple = [];
 const makeArgs = (args, path = []) => {
   const selectArgs = [];
@@ -8188,31 +8188,6 @@ type RelationalTopic implements RelationalItem {
   ): RelationalItemConnection!
 
   """
-  Reads a single \`RelationalTopic\` that is related to this \`RelationalTopic\`.
-  """
-  relationalTopicByTopicItemId: RelationalTopic
-
-  """
-  Reads a single \`RelationalPost\` that is related to this \`RelationalTopic\`.
-  """
-  relationalPostByPostItemId: RelationalPost
-
-  """
-  Reads a single \`RelationalDivider\` that is related to this \`RelationalTopic\`.
-  """
-  relationalDividerByDividerItemId: RelationalDivider
-
-  """
-  Reads a single \`RelationalChecklist\` that is related to this \`RelationalTopic\`.
-  """
-  relationalChecklistByChecklistItemId: RelationalChecklist
-
-  """
-  Reads a single \`RelationalChecklistItem\` that is related to this \`RelationalTopic\`.
-  """
-  relationalChecklistItemByChecklistItemItemId: RelationalChecklistItem
-
-  """
   Reads and enables pagination through a set of \`RelationalItemRelation\`.
   """
   relationalItemRelationsByChildId(
@@ -8446,31 +8421,6 @@ type RelationalPost implements RelationalItem {
   ): RelationalItemConnection!
 
   """
-  Reads a single \`RelationalTopic\` that is related to this \`RelationalPost\`.
-  """
-  relationalTopicByTopicItemId: RelationalTopic
-
-  """
-  Reads a single \`RelationalPost\` that is related to this \`RelationalPost\`.
-  """
-  relationalPostByPostItemId: RelationalPost
-
-  """
-  Reads a single \`RelationalDivider\` that is related to this \`RelationalPost\`.
-  """
-  relationalDividerByDividerItemId: RelationalDivider
-
-  """
-  Reads a single \`RelationalChecklist\` that is related to this \`RelationalPost\`.
-  """
-  relationalChecklistByChecklistItemId: RelationalChecklist
-
-  """
-  Reads a single \`RelationalChecklistItem\` that is related to this \`RelationalPost\`.
-  """
-  relationalChecklistItemByChecklistItemItemId: RelationalChecklistItem
-
-  """
   Reads and enables pagination through a set of \`RelationalItemRelation\`.
   """
   relationalItemRelationsByChildId(
@@ -8652,31 +8602,6 @@ type RelationalDivider implements RelationalItem {
   ): RelationalItemConnection!
 
   """
-  Reads a single \`RelationalTopic\` that is related to this \`RelationalDivider\`.
-  """
-  relationalTopicByTopicItemId: RelationalTopic
-
-  """
-  Reads a single \`RelationalPost\` that is related to this \`RelationalDivider\`.
-  """
-  relationalPostByPostItemId: RelationalPost
-
-  """
-  Reads a single \`RelationalDivider\` that is related to this \`RelationalDivider\`.
-  """
-  relationalDividerByDividerItemId: RelationalDivider
-
-  """
-  Reads a single \`RelationalChecklist\` that is related to this \`RelationalDivider\`.
-  """
-  relationalChecklistByChecklistItemId: RelationalChecklist
-
-  """
-  Reads a single \`RelationalChecklistItem\` that is related to this \`RelationalDivider\`.
-  """
-  relationalChecklistItemByChecklistItemItemId: RelationalChecklistItem
-
-  """
   Reads and enables pagination through a set of \`RelationalItemRelation\`.
   """
   relationalItemRelationsByChildId(
@@ -8855,31 +8780,6 @@ type RelationalChecklist implements RelationalItem {
     """
     condition: RelationalItemCondition
   ): RelationalItemConnection!
-
-  """
-  Reads a single \`RelationalTopic\` that is related to this \`RelationalChecklist\`.
-  """
-  relationalTopicByTopicItemId: RelationalTopic
-
-  """
-  Reads a single \`RelationalPost\` that is related to this \`RelationalChecklist\`.
-  """
-  relationalPostByPostItemId: RelationalPost
-
-  """
-  Reads a single \`RelationalDivider\` that is related to this \`RelationalChecklist\`.
-  """
-  relationalDividerByDividerItemId: RelationalDivider
-
-  """
-  Reads a single \`RelationalChecklist\` that is related to this \`RelationalChecklist\`.
-  """
-  relationalChecklistByChecklistItemId: RelationalChecklist
-
-  """
-  Reads a single \`RelationalChecklistItem\` that is related to this \`RelationalChecklist\`.
-  """
-  relationalChecklistItemByChecklistItemItemId: RelationalChecklistItem
 
   """
   Reads and enables pagination through a set of \`RelationalItemRelation\`.
@@ -9063,31 +8963,6 @@ type RelationalChecklistItem implements RelationalItem {
     """
     condition: RelationalItemCondition
   ): RelationalItemConnection!
-
-  """
-  Reads a single \`RelationalTopic\` that is related to this \`RelationalChecklistItem\`.
-  """
-  relationalTopicByTopicItemId: RelationalTopic
-
-  """
-  Reads a single \`RelationalPost\` that is related to this \`RelationalChecklistItem\`.
-  """
-  relationalPostByPostItemId: RelationalPost
-
-  """
-  Reads a single \`RelationalDivider\` that is related to this \`RelationalChecklistItem\`.
-  """
-  relationalDividerByDividerItemId: RelationalDivider
-
-  """
-  Reads a single \`RelationalChecklist\` that is related to this \`RelationalChecklistItem\`.
-  """
-  relationalChecklistByChecklistItemId: RelationalChecklist
-
-  """
-  Reads a single \`RelationalChecklistItem\` that is related to this \`RelationalChecklistItem\`.
-  """
-  relationalChecklistItemByChecklistItemItemId: RelationalChecklistItem
 
   """
   Reads and enables pagination through a set of \`RelationalItemRelation\`.
@@ -21383,76 +21258,6 @@ export const plans = {
         }
       }
     },
-    relationalTopicByTopicItemId($record) {
-      const $relational_topics = relational_topics_relational_topicsPgResource.find();
-      let previousAlias = $relational_topics.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_topics.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("topic_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_topics.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_topics.placeholder($record.get("topic_item_id"))}`);
-      return $relational_topics.single();
-    },
-    relationalPostByPostItemId($record) {
-      const $relational_posts = relational_posts_relational_postsPgResource.find();
-      let previousAlias = $relational_posts.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_posts.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("post_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_posts.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_posts.placeholder($record.get("topic_item_id"))}`);
-      return $relational_posts.single();
-    },
-    relationalDividerByDividerItemId($record) {
-      const $relational_dividers = relational_dividers_relational_dividersPgResource.find();
-      let previousAlias = $relational_dividers.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_dividers.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("divider_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_dividers.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_dividers.placeholder($record.get("topic_item_id"))}`);
-      return $relational_dividers.single();
-    },
-    relationalChecklistByChecklistItemId($record) {
-      const $relational_checklists = relational_checklists_relational_checklistsPgResource.find();
-      let previousAlias = $relational_checklists.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_checklists.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("checklist_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_checklists.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_checklists.placeholder($record.get("topic_item_id"))}`);
-      return $relational_checklists.single();
-    },
-    relationalChecklistItemByChecklistItemItemId($record) {
-      const $relational_checklist_items = relational_checklist_items_relational_checklist_itemsPgResource.find();
-      let previousAlias = $relational_checklist_items.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_checklist_items.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("checklist_item_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_checklist_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_checklist_items.placeholder($record.get("topic_item_id"))}`);
-      return $relational_checklist_items.single();
-    },
     relationalItemRelationsByChildId: {
       plan($record) {
         const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
@@ -22220,76 +22025,6 @@ export const plans = {
         }
       }
     },
-    relationalTopicByTopicItemId($record) {
-      const $relational_topics = relational_topics_relational_topicsPgResource.find();
-      let previousAlias = $relational_topics.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_topics.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("topic_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_topics.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_topics.placeholder($record.get("post_item_id"))}`);
-      return $relational_topics.single();
-    },
-    relationalPostByPostItemId($record) {
-      const $relational_posts = relational_posts_relational_postsPgResource.find();
-      let previousAlias = $relational_posts.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_posts.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("post_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_posts.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_posts.placeholder($record.get("post_item_id"))}`);
-      return $relational_posts.single();
-    },
-    relationalDividerByDividerItemId($record) {
-      const $relational_dividers = relational_dividers_relational_dividersPgResource.find();
-      let previousAlias = $relational_dividers.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_dividers.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("divider_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_dividers.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_dividers.placeholder($record.get("post_item_id"))}`);
-      return $relational_dividers.single();
-    },
-    relationalChecklistByChecklistItemId($record) {
-      const $relational_checklists = relational_checklists_relational_checklistsPgResource.find();
-      let previousAlias = $relational_checklists.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_checklists.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("checklist_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_checklists.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_checklists.placeholder($record.get("post_item_id"))}`);
-      return $relational_checklists.single();
-    },
-    relationalChecklistItemByChecklistItemItemId($record) {
-      const $relational_checklist_items = relational_checklist_items_relational_checklist_itemsPgResource.find();
-      let previousAlias = $relational_checklist_items.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_checklist_items.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("checklist_item_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_checklist_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_checklist_items.placeholder($record.get("post_item_id"))}`);
-      return $relational_checklist_items.single();
-    },
     relationalItemRelationsByChildId: {
       plan($record) {
         const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
@@ -22691,76 +22426,6 @@ export const plans = {
         }
       }
     },
-    relationalTopicByTopicItemId($record) {
-      const $relational_topics = relational_topics_relational_topicsPgResource.find();
-      let previousAlias = $relational_topics.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_topics.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("topic_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_topics.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_topics.placeholder($record.get("divider_item_id"))}`);
-      return $relational_topics.single();
-    },
-    relationalPostByPostItemId($record) {
-      const $relational_posts = relational_posts_relational_postsPgResource.find();
-      let previousAlias = $relational_posts.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_posts.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("post_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_posts.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_posts.placeholder($record.get("divider_item_id"))}`);
-      return $relational_posts.single();
-    },
-    relationalDividerByDividerItemId($record) {
-      const $relational_dividers = relational_dividers_relational_dividersPgResource.find();
-      let previousAlias = $relational_dividers.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_dividers.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("divider_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_dividers.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_dividers.placeholder($record.get("divider_item_id"))}`);
-      return $relational_dividers.single();
-    },
-    relationalChecklistByChecklistItemId($record) {
-      const $relational_checklists = relational_checklists_relational_checklistsPgResource.find();
-      let previousAlias = $relational_checklists.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_checklists.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("checklist_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_checklists.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_checklists.placeholder($record.get("divider_item_id"))}`);
-      return $relational_checklists.single();
-    },
-    relationalChecklistItemByChecklistItemItemId($record) {
-      const $relational_checklist_items = relational_checklist_items_relational_checklist_itemsPgResource.find();
-      let previousAlias = $relational_checklist_items.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_checklist_items.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("checklist_item_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_checklist_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_checklist_items.placeholder($record.get("divider_item_id"))}`);
-      return $relational_checklist_items.single();
-    },
     relationalItemRelationsByChildId: {
       plan($record) {
         const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
@@ -23158,76 +22823,6 @@ export const plans = {
           }
         }
       }
-    },
-    relationalTopicByTopicItemId($record) {
-      const $relational_topics = relational_topics_relational_topicsPgResource.find();
-      let previousAlias = $relational_topics.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_topics.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("topic_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_topics.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_topics.placeholder($record.get("checklist_item_id"))}`);
-      return $relational_topics.single();
-    },
-    relationalPostByPostItemId($record) {
-      const $relational_posts = relational_posts_relational_postsPgResource.find();
-      let previousAlias = $relational_posts.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_posts.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("post_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_posts.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_posts.placeholder($record.get("checklist_item_id"))}`);
-      return $relational_posts.single();
-    },
-    relationalDividerByDividerItemId($record) {
-      const $relational_dividers = relational_dividers_relational_dividersPgResource.find();
-      let previousAlias = $relational_dividers.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_dividers.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("divider_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_dividers.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_dividers.placeholder($record.get("checklist_item_id"))}`);
-      return $relational_dividers.single();
-    },
-    relationalChecklistByChecklistItemId($record) {
-      const $relational_checklists = relational_checklists_relational_checklistsPgResource.find();
-      let previousAlias = $relational_checklists.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_checklists.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("checklist_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_checklists.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_checklists.placeholder($record.get("checklist_item_id"))}`);
-      return $relational_checklists.single();
-    },
-    relationalChecklistItemByChecklistItemItemId($record) {
-      const $relational_checklist_items = relational_checklist_items_relational_checklist_itemsPgResource.find();
-      let previousAlias = $relational_checklist_items.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_checklist_items.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("checklist_item_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_checklist_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_checklist_items.placeholder($record.get("checklist_item_id"))}`);
-      return $relational_checklist_items.single();
     },
     relationalItemRelationsByChildId: {
       plan($record) {
@@ -23630,76 +23225,6 @@ export const plans = {
         }
       }
     },
-    relationalTopicByTopicItemId($record) {
-      const $relational_topics = relational_topics_relational_topicsPgResource.find();
-      let previousAlias = $relational_topics.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_topics.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("topic_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_topics.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_topics.placeholder($record.get("checklist_item_item_id"))}`);
-      return $relational_topics.single();
-    },
-    relationalPostByPostItemId($record) {
-      const $relational_posts = relational_posts_relational_postsPgResource.find();
-      let previousAlias = $relational_posts.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_posts.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("post_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_posts.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_posts.placeholder($record.get("checklist_item_item_id"))}`);
-      return $relational_posts.single();
-    },
-    relationalDividerByDividerItemId($record) {
-      const $relational_dividers = relational_dividers_relational_dividersPgResource.find();
-      let previousAlias = $relational_dividers.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_dividers.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("divider_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_dividers.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_dividers.placeholder($record.get("checklist_item_item_id"))}`);
-      return $relational_dividers.single();
-    },
-    relationalChecklistByChecklistItemId($record) {
-      const $relational_checklists = relational_checklists_relational_checklistsPgResource.find();
-      let previousAlias = $relational_checklists.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_checklists.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("checklist_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_checklists.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_checklists.placeholder($record.get("checklist_item_item_id"))}`);
-      return $relational_checklists.single();
-    },
-    relationalChecklistItemByChecklistItemItemId($record) {
-      const $relational_checklist_items = relational_checklist_items_relational_checklist_itemsPgResource.find();
-      let previousAlias = $relational_checklist_items.alias;
-      const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
-      $relational_checklist_items.join({
-        type: "inner",
-        from: otherSource_relational_itemsPgResource.from,
-        alias: relational_itemsAlias,
-        conditions: [sql`${previousAlias}.${sql.identifier("checklist_item_item_id")} = ${relational_itemsAlias}.${sql.identifier("id")}`]
-      });
-      previousAlias = relational_itemsAlias;
-      $relational_checklist_items.where(sql`${previousAlias}.${sql.identifier("id")} = ${$relational_checklist_items.placeholder($record.get("checklist_item_item_id"))}`);
-      return $relational_checklist_items.single();
-    },
     relationalItemRelationsByChildId: {
       plan($record) {
         const $relational_item_relations = relational_item_relations_relational_item_relationsPgResource.find();
@@ -24064,7 +23589,7 @@ export const plans = {
     },
     relationalChecklistByChecklistItemId: {
       plan(_$root, args) {
-        return relational_checklists_relational_checklistsPgResource.get({
+        return resource_relational_checklistsPgResource.get({
           checklist_item_id: args.get("checklistItemId")
         });
       },
@@ -24108,7 +23633,7 @@ export const plans = {
     },
     relationalChecklistItemByChecklistItemItemId: {
       plan(_$root, args) {
-        return relational_checklist_items_relational_checklist_itemsPgResource.get({
+        return resource_relational_checklist_itemsPgResource.get({
           checklist_item_item_id: args.get("checklistItemItemId")
         });
       },
@@ -24118,7 +23643,7 @@ export const plans = {
     },
     relationalDividerByDividerItemId: {
       plan(_$root, args) {
-        return relational_dividers_relational_dividersPgResource.get({
+        return resource_relational_dividersPgResource.get({
           divider_item_id: args.get("dividerItemId")
         });
       },
@@ -24182,7 +23707,7 @@ export const plans = {
     },
     relationalPostByPostItemId: {
       plan(_$root, args) {
-        return relational_posts_relational_postsPgResource.get({
+        return resource_relational_postsPgResource.get({
           post_item_id: args.get("postItemId")
         });
       },
@@ -24846,7 +24371,7 @@ export const plans = {
     },
     allRelationalChecklists: {
       plan() {
-        return connection(relational_checklists_relational_checklistsPgResource.find());
+        return connection(resource_relational_checklistsPgResource.find());
       },
       args: {
         first: {
@@ -25058,7 +24583,7 @@ export const plans = {
     },
     allRelationalChecklistItems: {
       plan() {
-        return connection(relational_checklist_items_relational_checklist_itemsPgResource.find());
+        return connection(resource_relational_checklist_itemsPgResource.find());
       },
       args: {
         first: {
@@ -25111,7 +24636,7 @@ export const plans = {
     },
     allRelationalDividers: {
       plan() {
-        return connection(relational_dividers_relational_dividersPgResource.find());
+        return connection(resource_relational_dividersPgResource.find());
       },
       args: {
         first: {
@@ -25323,7 +24848,7 @@ export const plans = {
     },
     allRelationalPosts: {
       plan() {
-        return connection(relational_posts_relational_postsPgResource.find());
+        return connection(resource_relational_postsPgResource.find());
       },
       args: {
         first: {
