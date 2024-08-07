@@ -1,5 +1,6 @@
 ## expect(errors).toBeFalsy()
 ## expect(data.nx).toEqual(null);
+## expect(data.nx2).toEqual(null);
 {
   nx: unionItemById(id: 987654321) {
     ...Item
