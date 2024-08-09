@@ -1,6 +1,7 @@
 import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
+  __InputStaticLeafStep,
   ConnectionCapableStep,
   ConnectionStep,
   ExecutionDetails,
@@ -16,14 +17,12 @@ import type {
 import {
   __InputListStep,
   __InputObjectStep,
-  __InputStaticLeafStep,
   __ItemStep,
   __TrackedValueStep,
   access,
   applyTransforms,
   arrayOfLength,
   constant,
-  ConstantStep,
   ExecutableStep,
   exportAs,
   first,
@@ -102,21 +101,6 @@ function parseCursor(cursor: string | null) {
   }
 }
 parseCursor.isSyncAndSafe = true; // Optimization
-
-function isStaticInputStep(
-  dep: ExecutableStep,
-): dep is
-  | __InputListStep
-  | __InputStaticLeafStep
-  | __InputObjectStep
-  | ConstantStep<any> {
-  return (
-    dep instanceof __InputListStep ||
-    dep instanceof __InputStaticLeafStep ||
-    dep instanceof __InputObjectStep ||
-    dep instanceof ConstantStep
-  );
-}
 
 const debugPlan = debugFactory("@dataplan/pg:PgSelectStep:plan");
 // const debugExecute = debugFactory("@dataplan/pg:PgSelectStep:execute");
@@ -2634,15 +2618,11 @@ ${lateralText};`;
                   return sql`${step.toSQL()}::${
                     codec.sqlType
                   } = ${identifierMatch}`;
-                } else if (isStaticInputStep(step)) {
+                } else {
                   return sql`${this.placeholder(
                     step,
                     codec,
                   )} = ${identifierMatch}`;
-                } else {
-                  throw new Error(
-                    `Expected ${step} (${i}th dependency of ${this}; step with id ${dependencyIndex}) to be a PgClassExpressionStep`,
-                  );
                 }
               }),
               // Note the WHERE is now part of the JOIN condition (since
@@ -2705,13 +2685,9 @@ ${lateralText};`;
               return this.where(
                 sql`${step.toSQL()}::${codec.sqlType} = ${identifierMatch}`,
               );
-            } else if (isStaticInputStep(step)) {
+            } else {
               return this.where(
                 sql`${this.placeholder(step, codec)} = ${identifierMatch}`,
-              );
-            } else {
-              throw new Error(
-                `Expected ${step} (${i}th dependency of ${this}; step with id ${dependencyIndex}) to be a PgClassExpressionStep`,
               );
             }
           });
