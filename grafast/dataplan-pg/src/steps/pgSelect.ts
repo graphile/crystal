@@ -1,6 +1,7 @@
 import { createHash } from "crypto";
 import debugFactory from "debug";
 import type {
+  __InputStaticLeafStep,
   ConnectionCapableStep,
   ConnectionStep,
   ExecutionDetails,
@@ -16,14 +17,12 @@ import type {
 import {
   __InputListStep,
   __InputObjectStep,
-  __InputStaticLeafStep,
   __ItemStep,
   __TrackedValueStep,
   access,
   applyTransforms,
   arrayOfLength,
   constant,
-  ConstantStep,
   ExecutableStep,
   exportAs,
   first,
@@ -102,21 +101,6 @@ function parseCursor(cursor: string | null) {
   }
 }
 parseCursor.isSyncAndSafe = true; // Optimization
-
-function isStaticInputStep(
-  dep: ExecutableStep,
-): dep is
-  | __InputListStep
-  | __InputStaticLeafStep
-  | __InputObjectStep
-  | ConstantStep<any> {
-  return (
-    dep instanceof __InputListStep ||
-    dep instanceof __InputStaticLeafStep ||
-    dep instanceof __InputObjectStep ||
-    dep instanceof ConstantStep
-  );
-}
 
 const debugPlan = debugFactory("@dataplan/pg:PgSelectStep:plan");
 // const debugExecute = debugFactory("@dataplan/pg:PgSelectStep:execute");
