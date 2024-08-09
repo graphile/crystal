@@ -1,0 +1,12 @@
+{
+  forum: {
+    name: "Cats",
+    message: {
+      body: "Cats = awesome -- Alice",
+      author: {
+        username: "Alice",
+        gravatarUrl: null,
+      },
+    },
+  },
+}

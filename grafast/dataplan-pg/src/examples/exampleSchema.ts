@@ -2493,6 +2493,29 @@ export function makeExampleSchema(
           [],
         ),
       },
+      message: {
+        type: Message,
+        args: {
+          id: {
+            type: new GraphQLNonNull(GraphQLString),
+          },
+        },
+        plan: EXPORTABLE(
+          (deoptimizeIfAppropriate, messageResource) =>
+            function plan($forum, fieldArgs) {
+              const $forumId = $forum.get("id");
+              // Deliberately using `.get()` rather than `.getRaw()` here to ensure a certain bug doesn't resurface
+              const $messageId = fieldArgs.get("id");
+              const $message = messageResource.get({
+                forum_id: $forumId,
+                id: $messageId,
+              });
+              deoptimizeIfAppropriate($message);
+              return $message;
+            },
+          [deoptimizeIfAppropriate, messageResource],
+        ),
+      },
       messagesList: {
         type: new GraphQLList(Message),
         args: {
