@@ -102,7 +102,7 @@ export default makeAddPgTableConditionPlugin(
           from app_public.posts as ${sqlIdentifier}
           where ${sqlIdentifier}.forum_id = ${$condition.alias}.id
           and ${sqlIdentifier}.user_id = ${$condition.placeholder(
-            value,
+            value.get(),
             TYPES.int,
           )}
         )`);
