@@ -80,7 +80,7 @@ those where a particular user has posted in (posts are stored in
 
 ```ts
 import { makeAddPgTableConditionPlugin } from "postgraphile/utils";
-import { TYPES } from 'postgraphile/@dataplan/pg';
+import { TYPES } from "postgraphile/@dataplan/pg";
 
 export default makeAddPgTableConditionPlugin(
   { schemaName: "app_public", tableName: "forums" },
