@@ -80,8 +80,8 @@ those where a particular user has posted in (posts are stored in
 
 ```ts
 import { makeAddPgTableConditionPlugin } from "postgraphile/utils";
+import { TYPES } from '@dataplan/pg';
 
-/* TODO: test this plugin works! */
 export default makeAddPgTableConditionPlugin(
   { schemaName: "app_public", tableName: "forums" },
   "containsPostsByUserId",
