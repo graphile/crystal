@@ -9180,17 +9180,11 @@ type Query {
     """Only read the first \`n\` values of the set."""
     first: Int
 
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
     """
     Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
     based pagination. May not be used with \`last\`.
     """
     offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
@@ -23775,22 +23769,10 @@ export const plans = {
             $connection.setFirst(arg.getRaw());
           }
         },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
-        },
         offset: {
           autoApplyAfterParentPlan: true,
           applyPlan(_, $connection, val) {
             $connection.setOffset(val.getRaw());
-          }
-        },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
           }
         },
         after: {
