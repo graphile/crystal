@@ -147,7 +147,10 @@ PostGraphile/graphile-build/graphile-build-pg plugins utilise:
 - `resource:list` - "list" field for a resource at any level
 - `resource:connection` - "connection" field for a resource at any level
 - `resource:list:filter` - can we filter this resource's results (when represented as a list)?
+- `resource:list:order` - can we order this resource's results (when represented as a list)?
 - `resource:connection:filter` - can we filter this resource's results (when represented as a connection)?
+- `resource:connection:order`- can we order this resource's results (when represented as a connection)?
+- `resource:connection:backwards` - can we paginate backwards through this resource's results (when represented as a connection)?
 - `resource:aggregates` - does this resource support aggregates across its attributes (i.e. does the `aggregates` field get added to connections)
 - `resource:groupedAggregates` - does this resource support grouped aggregates across its attributes (i.e. does the `groupedAggregates` field get added to connections)
 - `resource:groupedAggregates:having` - can groupedAggregates on this resource have a 'having' clause?

@@ -673,4 +673,21 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
       },
     },
   }),
+  schema: {
+    entityBehavior: {
+      pgResource: {
+        after: ["PgFirstLastBeforeAfterArgsPlugin"],
+        provides: ["default"],
+        before: ["inferred", "override"],
+        callback(behavior, resource, build) {
+          if (resource.parameters) {
+            // Default to no backwards pagination for functions
+            return [behavior, "-resource:connection:backwards"];
+          } else {
+            return behavior;
+          }
+        },
+      },
+    },
+  },
 };

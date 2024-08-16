@@ -94,7 +94,11 @@ function processTags(
 ): void {
   processUniqueKey(tags);
   processOmit(tags);
-  convertBoolean(tags, "sortable", "orderBy order");
+  convertBoolean(
+    tags,
+    "sortable",
+    "orderBy order resource:connection:backwards",
+  );
   convertBoolean(tags, "filterable", "filter filterBy");
   // convertBoolean(tags, "enum", "enum");
   processSimpleCollections(tags);

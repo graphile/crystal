@@ -38,6 +38,15 @@ export const PgFirstLastBeforeAfterArgsPlugin: GraphileConfig.Plugin = {
   version: version,
 
   schema: {
+    entityBehavior: {
+      pgResource: {
+        provides: ["default"],
+        before: ["inferred", "override"],
+        callback(behavior, resource, build) {
+          return ["resource:connection:backwards", behavior];
+        },
+      },
+    },
     hooks: {
       GraphQLObjectType_fields_field_args: commonFn,
       GraphQLInterfaceType_fields_field_args: commonFn,
@@ -84,6 +93,14 @@ function commonFn(
 
   const Cursor = getTypeByName("Cursor");
 
+  const canPaginateBackwards =
+    isPgFieldConnection &&
+    (!pgResource ||
+      build.behavior.pgResourceMatches(
+        pgResource,
+        "resource:connection:backwards",
+      ));
+
   return extend(
     args,
     {
@@ -110,7 +127,7 @@ function commonFn(
           [],
         ),
       },
-      ...(isPgFieldConnection
+      ...(canPaginateBackwards
         ? {
             last: {
               description: build.wrapDescription(
@@ -162,7 +179,7 @@ function commonFn(
           [],
         ),
       },
-      ...(isPgFieldConnection
+      ...(canPaginateBackwards
         ? {
             before: {
               description: build.wrapDescription(
@@ -187,6 +204,10 @@ function commonFn(
                 [],
               ),
             },
+          }
+        : null),
+      ...(isPgFieldConnection
+        ? {
             after: {
               description: build.wrapDescription(
                 "Read all values in the set after (below) this cursor.",
