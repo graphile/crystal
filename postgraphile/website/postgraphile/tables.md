@@ -101,3 +101,10 @@ We strongly [advise against](./requirements.md) using column-based
 separate tables and join them with one-to-one relations.
 
 :::
+
+### Unlogged tables
+
+If you have an unlogged table (created via `CREATE UNLOGGED TABLE`),
+PostGraphile will not add it to the GraphQL schema by default. You can override
+this by explicitly giving the unlogged table the required
+[behaviors](./behavior.md) via [smart tags](./smart-tags.md) or similar.
