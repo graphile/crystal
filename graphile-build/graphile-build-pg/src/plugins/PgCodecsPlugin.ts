@@ -83,6 +83,10 @@ declare global {
       PgCodecsPlugin: true;
     }
 
+    interface Provides {
+      PgCodecs: true;
+    }
+
     interface GatherHelpers {
       pgCodecs: {
         getCodecFromClass(

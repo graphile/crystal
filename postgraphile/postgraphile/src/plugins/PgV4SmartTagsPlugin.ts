@@ -9,6 +9,11 @@ declare global {
     interface Plugins {
       PgV4SmartTagsPlugin: true;
     }
+
+    interface Provides {
+      "smart-tags": true;
+    }
+
     interface GatherHelpers {
       pgV4SmartTags: Record<string, never>;
     }

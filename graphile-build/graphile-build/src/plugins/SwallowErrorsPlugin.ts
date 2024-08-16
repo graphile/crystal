@@ -8,6 +8,10 @@ declare global {
     interface Plugins {
       SwallowErrorsPlugin: true;
     }
+
+    interface Provides {
+      SwallowErrors: true;
+    }
   }
 }
 

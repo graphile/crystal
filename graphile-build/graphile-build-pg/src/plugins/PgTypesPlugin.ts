@@ -14,6 +14,10 @@ declare global {
     interface Plugins {
       PgTypesPlugin: true;
     }
+
+    interface Provides {
+      "pg-standard-types": true;
+    }
   }
   namespace GraphileBuild {
     interface ScopeObject {

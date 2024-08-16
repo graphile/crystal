@@ -8,6 +8,10 @@ declare global {
     interface Plugins {
       CursorTypePlugin: true;
     }
+
+    interface Provides {
+      Cursor: true;
+    }
   }
 
   namespace GraphileBuild {

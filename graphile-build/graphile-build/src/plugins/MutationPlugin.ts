@@ -10,6 +10,9 @@ declare global {
     interface Plugins {
       MutationPlugin: true;
     }
+    interface Provides {
+      Mutation: true;
+    }
   }
 }
 

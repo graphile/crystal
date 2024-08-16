@@ -9,6 +9,9 @@ declare global {
     interface Plugins {
       QueryPlugin: true;
     }
+    interface Provides {
+      Query: true;
+    }
   }
 }
 

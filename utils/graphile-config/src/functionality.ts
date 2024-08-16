@@ -27,9 +27,9 @@ export function orderedApply<
   type FullFunctionalitySpec = {
     id: string;
     plugin: GraphileConfig.Plugin;
-    provides: string[];
-    before: string[];
-    after: string[];
+    provides: (keyof GraphileConfig.Plugins | keyof GraphileConfig.Provides)[];
+    before: (keyof GraphileConfig.Plugins | keyof GraphileConfig.Provides)[];
+    after: (keyof GraphileConfig.Plugins | keyof GraphileConfig.Provides)[];
     callback: UnwrapCallback<TFunctionality[keyof TFunctionality]>;
   };
   // Normalize all the hooks and gather them into collections

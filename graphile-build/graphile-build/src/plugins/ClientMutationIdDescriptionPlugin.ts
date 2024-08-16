@@ -5,6 +5,10 @@ declare global {
     interface Plugins {
       ClientMutationIdDescriptionPlugin: true;
     }
+
+    interface Provides {
+      ClientMutationIdDescription: true;
+    }
   }
 }
 

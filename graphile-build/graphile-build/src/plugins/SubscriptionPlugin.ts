@@ -10,6 +10,10 @@ declare global {
     interface Plugins {
       SubscriptionPlugin: true;
     }
+
+    interface Provides {
+      Subscription: true;
+    }
   }
 }
 

@@ -45,7 +45,7 @@ declare global {
      * Expand this through declaration merging to get TypeScript
      * auto-completion of things that plugins can provide.
      */
-    interface PluginProvides {
+    interface Provides {
       [key: string & {}]: true;
     }
 
@@ -56,16 +56,10 @@ declare global {
       description?: string;
       provides?: (
         | keyof GraphileConfig.Plugins
-        | keyof GraphileConfig.PluginProvides
+        | keyof GraphileConfig.Provides
       )[];
-      after?: (
-        | keyof GraphileConfig.Plugins
-        | keyof GraphileConfig.PluginProvides
-      )[];
-      before?: (
-        | keyof GraphileConfig.Plugins
-        | keyof GraphileConfig.PluginProvides
-      )[];
+      after?: (keyof GraphileConfig.Plugins | keyof GraphileConfig.Provides)[];
+      before?: (keyof GraphileConfig.Plugins | keyof GraphileConfig.Provides)[];
     }
 
     /**

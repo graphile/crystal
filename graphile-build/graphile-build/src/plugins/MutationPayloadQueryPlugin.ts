@@ -10,6 +10,10 @@ declare global {
     interface Plugins {
       MutationPayloadQueryPlugin: true;
     }
+
+    interface Provides {
+      MutationPayloadQuery: true;
+    }
   }
 }
 
