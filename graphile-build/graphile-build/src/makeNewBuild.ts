@@ -289,7 +289,7 @@ export default function makeNewBuild(
     assertTypeName(typeName) {
       if (!this.status.isBuildPhaseComplete) {
         throw new Error(
-          "Must not call build.assertTypeName before 'build' phase is complete",
+          "Must not call build.assertTypeName before 'build' phase is complete; use 'init' phase instead",
         );
       }
       if (typeName in allTypesSources) {
@@ -304,7 +304,7 @@ export default function makeNewBuild(
     getTypeMetaByName(typeName) {
       if (!this.status.isBuildPhaseComplete) {
         throw new Error(
-          "Must not call build.getTypeMetaByName before 'build' phase is complete",
+          "Must not call build.getTypeMetaByName before 'build' phase is complete; use 'init' phase instead",
         );
       }
       // Meta for builtins
@@ -367,9 +367,7 @@ style for these configuration options (e.g. change \`interfaces: \
         );
       }
       if (!this.status.isInitPhaseComplete) {
-        throw new Error(
-          "Must not call build.getTypeByName before 'init' phase is complete",
-        );
+        throw new Error(mustUseThunkMessage("build.getTypeByName"));
       }
       if (typeName in allTypes) {
         return allTypes[typeName];
@@ -445,9 +443,7 @@ style for these configuration options (e.g. change \`interfaces: \
     },
     getInputTypeByName(typeName) {
       if (!this.status.isInitPhaseComplete) {
-        throw new Error(
-          "Must not call build.getInputTypeByName before 'init' phase is complete",
-        );
+        throw new Error(mustUseThunkMessage("build.getInputTypeByName"));
       }
       const type = this.getTypeByName(typeName);
       if (!type) {
@@ -470,9 +466,7 @@ style for these configuration options (e.g. change \`interfaces: \
     },
     getOutputTypeByName(typeName) {
       if (!this.status.isInitPhaseComplete) {
-        throw new Error(
-          "Must not call build.getOutputTypeByName before 'init' phase is complete",
-        );
+        throw new Error(mustUseThunkMessage("build.getOutputTypeByName"));
       }
       const type = this.getTypeByName(typeName);
       if (!type) {
@@ -518,4 +512,14 @@ function generateSpecFromDetails(details: TypeDetails) {
   } finally {
     currentTypeDetails = null;
   }
+}
+
+function mustUseThunkMessage(fn: string) {
+  return (
+    "Must not call " +
+    fn +
+    " before 'init' phase is complete; please be sure to use the 'thunk' configuration method for GraphQL types (e.g. instead of `fields: { /* ... */ }` use `fields: () => ({ /* ... */ })`), and be sure to only call " +
+    fn +
+    " from inside a thunk."
+  );
 }
