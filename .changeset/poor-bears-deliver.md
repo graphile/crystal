@@ -4,4 +4,4 @@
 "@dataplan/pg": patch
 ---
 
-PostGraphile now ignores unlogged database tables by default.
+🚨 PostGraphile now ignores unlogged database tables by default.
