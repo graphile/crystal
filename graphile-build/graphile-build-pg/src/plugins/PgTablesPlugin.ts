@@ -585,7 +585,11 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 ? ["resource:insert", "resource:update", "resource:delete"]
                 : []),
               behavior,
-              ...(isUnloggedOrTemp ? ["-*"] : []),
+              ...(isUnloggedOrTemp
+                ? [
+                    "-resource:select -resource:insert -resource:update -resource:delete",
+                  ]
+                : []),
             ];
           } else {
             return [behavior];
@@ -603,7 +607,11 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           return [
             ...(!isFunction && !isUnloggedOrTemp ? ["resource:select"] : []),
             behavior,
-            ...(isUnloggedOrTemp ? ["-*"] : []),
+            ...(isUnloggedOrTemp
+              ? [
+                  "-resource:select -resource:insert -resource:update -resource:delete",
+                ]
+              : []),
           ];
         },
       },
