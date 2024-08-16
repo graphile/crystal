@@ -461,7 +461,7 @@ you do have a resource representing the target database, you can extract the
 executor for that DB from the resource, for example:
 
 ```ts
-const { executor } = channels;
+const executor = channels.executor;
 ```
 
 ### Example
