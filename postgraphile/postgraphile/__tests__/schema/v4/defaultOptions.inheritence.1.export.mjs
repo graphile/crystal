@@ -65,7 +65,6 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
-const fileIdentifier = sql.identifier("inheritence", "file");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -76,6 +75,7 @@ const executor = new PgExecutor({
     });
   }
 });
+const fileIdentifier = sql.identifier("inheritence", "file");
 const spec_file = {
   name: "file",
   identifier: fileIdentifier,
@@ -258,6 +258,9 @@ const registryConfig_pgResources_user_file_user_file = {
   }
 };
 const registry = makeRegistry({
+  pgExecutors: Object.assign(Object.create(null), {
+    main: executor
+  }),
   pgCodecs: Object.assign(Object.create(null), {
     text: TYPES.text,
     varchar: TYPES.varchar,

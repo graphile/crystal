@@ -65,7 +65,6 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
-const employeeIdentifier = sql.identifier("index_expressions", "employee");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -76,6 +75,7 @@ const executor = new PgExecutor({
     });
   }
 });
+const employeeIdentifier = sql.identifier("index_expressions", "employee");
 const spec_employee = {
   name: "employee",
   identifier: employeeIdentifier,
@@ -130,6 +130,9 @@ const employeeUniques = [{
   }
 }];
 const pgResource_employeePgResource = makeRegistry({
+  pgExecutors: Object.assign(Object.create(null), {
+    main: executor
+  }),
   pgCodecs: Object.assign(Object.create(null), {
     text: TYPES.text,
     varchar: TYPES.varchar,

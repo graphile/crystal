@@ -252,7 +252,12 @@ export class PgResource<
   TParameters extends readonly PgResourceParameter[] | undefined =
     | readonly PgResourceParameter[]
     | undefined,
-  TRegistry extends PgRegistry<any, any, any> = PgRegistry<any, any, any>,
+  TRegistry extends PgRegistry<any, any, any, any> = PgRegistry<
+    any,
+    any,
+    any,
+    any
+  >,
 > {
   public readonly registry: TRegistry;
   public readonly codec: TCodec;
@@ -858,11 +863,25 @@ export interface PgRegistryBuilder<
       >;
     };
   },
+  TExecutors extends {
+    [name in string]: PgExecutor<any>;
+  },
 > {
   getRegistryConfig(): PgRegistryConfig<
     Expand<TCodecs>,
     Expand<TResources>,
-    Expand<TRelations>
+    Expand<TRelations>,
+    Expand<TExecutors>
+  >;
+  addExecutor<const TExecutor extends PgExecutor>(
+    codec: TExecutor,
+  ): PgRegistryBuilder<
+    TCodecs,
+    TResources,
+    TRelations,
+    TExecutors & {
+      [name in TExecutor["name"]]: TExecutor;
+    }
   >;
   addCodec<const TCodec extends PgCodec>(
     codec: TCodec,
@@ -871,7 +890,8 @@ export interface PgRegistryBuilder<
       [name in TCodec["name"]]: TCodec;
     },
     TResources,
-    TRelations
+    TRelations,
+    TExecutors
   >;
 
   addResource<const TResource extends PgResourceOptions<any, any, any, any>>(
@@ -883,7 +903,8 @@ export interface PgRegistryBuilder<
     TResources & {
       [name in TResource["name"]]: TResource;
     },
-    TRelations
+    TRelations,
+    TExecutors
   >;
 
   addRelation<
@@ -909,10 +930,16 @@ export interface PgRegistryBuilder<
           remoteResourceOptions: TRemoteResource;
         };
       };
-    }
+    },
+    TExecutors
   >;
 
-  build(): PgRegistry<Expand<TCodecs>, Expand<TResources>, Expand<TRelations>>;
+  build(): PgRegistry<
+    Expand<TCodecs>,
+    Expand<TResources>,
+    Expand<TRelations>,
+    Expand<TExecutors>
+  >;
 }
 
 export function makeRegistry<
@@ -943,34 +970,87 @@ export function makeRegistry<
       >;
     };
   },
+  TExecutors extends {
+    [name in string]: PgExecutor;
+  },
 >(
-  config: PgRegistryConfig<TCodecs, TResourceOptions, TRelations>,
-): PgRegistry<TCodecs, TResourceOptions, TRelations> {
-  const registry: PgRegistry<TCodecs, TResourceOptions, TRelations> = {
+  config: PgRegistryConfig<TCodecs, TResourceOptions, TRelations, TExecutors>,
+): PgRegistry<TCodecs, TResourceOptions, TRelations, TExecutors> {
+  const registry: PgRegistry<
+    TCodecs,
+    TResourceOptions,
+    TRelations,
+    TExecutors
+  > = {
+    pgExecutors: Object.create(null) as any,
     pgCodecs: Object.create(null) as any,
     pgResources: Object.create(null) as any,
     pgRelations: Object.create(null) as any,
   };
 
   // Tell the system to read the built pgCodecs, pgResources, pgRelations from the registry
+  Object.defineProperties(registry.pgExecutors, {
+    $exporter$args: { value: [registry] },
+    $exporter$factory: {
+      value: (registry: PgRegistry<any, any, any, any>) => registry.pgExecutors,
+    },
+  });
   Object.defineProperties(registry.pgCodecs, {
     $exporter$args: { value: [registry] },
     $exporter$factory: {
-      value: (registry: PgRegistry<any, any, any>) => registry.pgCodecs,
+      value: (registry: PgRegistry<any, any, any, any>) => registry.pgCodecs,
     },
   });
   Object.defineProperties(registry.pgResources, {
     $exporter$args: { value: [registry] },
     $exporter$factory: {
-      value: (registry: PgRegistry<any, any, any>) => registry.pgResources,
+      value: (registry: PgRegistry<any, any, any, any>) => registry.pgResources,
     },
   });
   Object.defineProperties(registry.pgRelations, {
     $exporter$args: { value: [registry] },
     $exporter$factory: {
-      value: (registry: PgRegistry<any, any, any>) => registry.pgRelations,
+      value: (registry: PgRegistry<any, any, any, any>) => registry.pgRelations,
     },
   });
+
+  let addExecutorForbidden = false;
+  function addExecutor(executor: PgExecutor): PgExecutor {
+    if (addExecutorForbidden) {
+      throw new Error(`It's too late to call addExecutor now`);
+    }
+    const executorName = executor.name;
+    if (registry.pgExecutors[executorName]) {
+      if (registry.pgExecutors[executorName] !== executor) {
+        console.dir({
+          existing: registry.pgExecutors[executorName],
+          new: executor,
+        });
+        throw new Error(
+          `Executor named '${executorName}' is already registered; you cannot have two executors with the same name`,
+        );
+      }
+      return executor;
+    } else {
+      // Custom spec, pin it back to the registry
+      registry.pgExecutors[executorName as keyof TExecutors] = executor as any;
+
+      if (!(executor as any).$$export && !(executor as any).$exporter$factory) {
+        // Tell the system to read the built executor from the registry
+        Object.defineProperties(executor, {
+          $exporter$args: { value: [registry, executorName] },
+          $exporter$factory: {
+            value: (
+              registry: PgRegistry<any, any, any, any>,
+              executorName: string,
+            ) => registry.pgExecutors[executorName],
+          },
+        });
+      }
+
+      return executor;
+    }
+  }
 
   let addCodecForbidden = false;
   function addCodec(codec: PgCodec): PgCodec {
@@ -985,7 +1065,7 @@ export function makeRegistry<
           new: codec,
         });
         throw new Error(
-          `Codec named '${codecName}' is already registsred; you cannot have two codecs with the same name`,
+          `Codec named '${codecName}' is already registered; you cannot have two codecs with the same name`,
         );
       }
       return codec;
@@ -1016,8 +1096,10 @@ export function makeRegistry<
       Object.defineProperties(codec, {
         $exporter$args: { value: [registry, codecName] },
         $exporter$factory: {
-          value: (registry: PgRegistry<any, any, any>, codecName: string) =>
-            registry.pgCodecs[codecName],
+          value: (
+            registry: PgRegistry<any, any, any, any>,
+            codecName: string,
+          ) => registry.pgCodecs[codecName],
         },
       });
 
@@ -1025,11 +1107,22 @@ export function makeRegistry<
     }
   }
 
-  for (const [codecName, codecSpec] of Object.entries(config.pgCodecs)) {
-    if (codecName !== codecSpec.name) {
+  for (const [executorName, executor] of Object.entries(config.pgExecutors)) {
+    if (executorName !== executor.name) {
+      throw new Error(
+        `Executor added to registry with wrong name; ${JSON.stringify(
+          executorName,
+        )} !== ${JSON.stringify(executor.name)}`,
+      );
+    }
+    addExecutor(executor);
+  }
+
+  for (const [codecName, codec] of Object.entries(config.pgCodecs)) {
+    if (codecName !== codec.name) {
       throw new Error(`Codec added to registry with wrong name`);
     }
-    addCodec(codecSpec);
+    addCodec(codec);
   }
 
   for (const [resourceName, rawConfig] of Object.entries(
@@ -1037,6 +1130,7 @@ export function makeRegistry<
   ) as [keyof TResourceOptions, PgResourceOptions<any, any, any, any>][]) {
     const resourceConfig = {
       ...rawConfig,
+      executor: addExecutor(rawConfig.executor),
       codec: addCodec(rawConfig.codec),
       parameters: rawConfig.parameters
         ? (rawConfig.parameters as readonly PgResourceParameter[]).map((p) => ({
@@ -1053,8 +1147,10 @@ export function makeRegistry<
     Object.defineProperties(resource, {
       $exporter$args: { value: [registry, resourceName] },
       $exporter$factory: {
-        value: (registry: PgRegistry<any, any, any>, resourceName: string) =>
-          registry.pgResources[resourceName],
+        value: (
+          registry: PgRegistry<any, any, any, any>,
+          resourceName: string,
+        ) => registry.pgResources[resourceName],
       },
     });
 
@@ -1083,6 +1179,7 @@ export function makeRegistry<
 
   // DO NOT CALL addCodec BELOW HERE
   addCodecForbidden = true;
+  addExecutorForbidden = true;
 
   /**
    * If the user uses a codec with attributes as a column type (or an array of
@@ -1163,8 +1260,10 @@ export function makeRegistry<
       Object.defineProperties(resource, {
         $exporter$args: { value: [registry, resourceName] },
         $exporter$factory: {
-          value: (registry: PgRegistry<any, any, any>, resourceName: string) =>
-            registry.pgResources[resourceName],
+          value: (
+            registry: PgRegistry<any, any, any, any>,
+            resourceName: string,
+          ) => registry.pgResources[resourceName],
         },
       });
 
@@ -1186,7 +1285,7 @@ export function makeRegistry<
     Object.defineProperties(builtRelations, {
       $exporter$args: { value: [registry, codecName] },
       $exporter$factory: {
-        value: (registry: PgRegistry<any, any, any>, codecName: string) =>
+        value: (registry: PgRegistry<any, any, any, any>, codecName: string) =>
           registry.pgRelations[codecName],
       },
     });
@@ -1213,7 +1312,7 @@ export function makeRegistry<
         $exporter$args: { value: [registry, codecName, relationName] },
         $exporter$factory: {
           value: (
-            registry: PgRegistry<any, any, any>,
+            registry: PgRegistry<any, any, any, any>,
             codecName: string,
             relationName: string,
           ) => registry.pgRelations[codecName][relationName],
@@ -1232,7 +1331,7 @@ export function makeRegistry<
 }
 exportAs("@dataplan/pg", makeRegistry, "makeRegistry");
 
-function validateRelations(registry: PgRegistry<any, any, any>): void {
+function validateRelations(registry: PgRegistry<any, any, any, any>): void {
   // PERF: skip this if not isDev?
 
   const reg = registry as PgRegistry;
@@ -1279,16 +1378,33 @@ function validateRelations(registry: PgRegistry<any, any, any>): void {
 }
 
 // eslint-disable-next-line @typescript-eslint/ban-types
-export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
+export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}, {}> {
   const registryConfig: PgRegistryConfig<any, any, any> = {
+    pgExecutors: Object.create(null),
     pgCodecs: Object.create(null),
     pgResources: Object.create(null),
     pgRelations: Object.create(null),
   };
 
-  const builder: PgRegistryBuilder<any, any, any> = {
+  const builder: PgRegistryBuilder<any, any, any, any> = {
     getRegistryConfig() {
       return registryConfig;
+    },
+
+    addExecutor(executor) {
+      const existing = registryConfig.pgExecutors[executor.name];
+      if (existing) {
+        if (existing !== executor) {
+          throw new Error(
+            `Attempted to add a second executor named '${
+              executor.name
+            }' (existing: ${inspect(existing)}, new: ${inspect(executor)})`,
+          );
+        }
+        return builder;
+      }
+      registryConfig.pgExecutors[executor.name] = executor;
+      return builder;
     },
 
     addCodec(codec) {
@@ -1322,6 +1438,7 @@ export function makeRegistryBuilder(): PgRegistryBuilder<{}, {}, {}> {
     },
 
     addResource(resource) {
+      this.addExecutor(resource.executor);
       const existing = registryConfig.pgResources[resource.name] as
         | PgResourceOptions
         | undefined;

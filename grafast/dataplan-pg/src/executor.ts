@@ -135,13 +135,13 @@ export type PgExecutorSubscribeOptions = {
  * can exist in the same schema. PgExecutor is also responsible for things like
  * caching.
  */
-export class PgExecutor<TSettings = any> {
-  public name: string;
+export class PgExecutor<const TName extends string = string, TSettings = any> {
+  public name: TName;
   private contextCallback: () => ObjectStep<PgExecutorContextPlans<TSettings>>;
   private $$cache: symbol;
 
   constructor(options: {
-    name: string;
+    name: TName;
     context: () => ObjectStep<PgExecutorContextPlans<TSettings>>;
   }) {
     const { name, context } = options;

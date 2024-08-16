@@ -66,6 +66,16 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
+const executor = new PgExecutor({
+  name: "main",
+  context() {
+    const ctx = context();
+    return object({
+      pgSettings: "pgSettings" != null ? ctx.get("pgSettings") : constant(null),
+      withPgClient: ctx.get("withPgClient")
+    });
+  }
+});
 const guidCodec = domainOfCodec(TYPES.varchar, "guid", sql.identifier("b", "guid"), {
   description: undefined,
   extensions: {
@@ -79,16 +89,6 @@ const guidCodec = domainOfCodec(TYPES.varchar, "guid", sql.identifier("b", "guid
   notNull: false
 });
 const updatableViewIdentifier = sql.identifier("b", "updatable_view");
-const executor = new PgExecutor({
-  name: "main",
-  context() {
-    const ctx = context();
-    return object({
-      pgSettings: "pgSettings" != null ? ctx.get("pgSettings") : constant(null),
-      withPgClient: ctx.get("withPgClient")
-    });
-  }
-});
 const spec_updatableView = {
   name: "updatableView",
   identifier: updatableViewIdentifier,
@@ -1151,6 +1151,9 @@ const type_function_mutationFunctionIdentifer = sql.identifier("b", "type_functi
 const type_function_listFunctionIdentifer = sql.identifier("b", "type_function_list");
 const type_function_list_mutationFunctionIdentifer = sql.identifier("b", "type_function_list_mutation");
 const registry = makeRegistry({
+  pgExecutors: Object.assign(Object.create(null), {
+    main: executor
+  }),
   pgCodecs: Object.assign(Object.create(null), {
     int4: TYPES.int,
     guid: guidCodec,

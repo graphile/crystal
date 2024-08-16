@@ -65,7 +65,6 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
-const peopleIdentifier = sql.identifier("simple_collections", "people");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -76,6 +75,7 @@ const executor = new PgExecutor({
     });
   }
 });
+const peopleIdentifier = sql.identifier("simple_collections", "people");
 const spec_people = {
   name: "people",
   identifier: peopleIdentifier,
@@ -214,6 +214,9 @@ const registryConfig_pgResources_pets_pets = {
 };
 const people_odd_petsFunctionIdentifer = sql.identifier("simple_collections", "people_odd_pets");
 const registry = makeRegistry({
+  pgExecutors: Object.assign(Object.create(null), {
+    main: executor
+  }),
   pgCodecs: Object.assign(Object.create(null), {
     people: peopleCodec,
     int4: TYPES.int,

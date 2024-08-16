@@ -65,7 +65,6 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
-const usersIdentifier = sql.identifier("partitions", "users");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -76,6 +75,7 @@ const executor = new PgExecutor({
     });
   }
 });
+const usersIdentifier = sql.identifier("partitions", "users");
 const spec_users = {
   name: "users",
   identifier: usersIdentifier,
@@ -222,6 +222,9 @@ const registryConfig_pgResources_measurements_measurements = {
   }
 };
 const registry = makeRegistry({
+  pgExecutors: Object.assign(Object.create(null), {
+    main: executor
+  }),
   pgCodecs: Object.assign(Object.create(null), {
     users: usersCodec,
     int4: TYPES.int,

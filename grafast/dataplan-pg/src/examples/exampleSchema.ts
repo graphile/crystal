@@ -159,7 +159,7 @@ export function makeExampleSchema(
   const executor = EXPORTABLE(
     (PgExecutor, context, object) =>
       new PgExecutor({
-        name: "default",
+        name: "main",
         context: () => {
           const $context = context<OurGraphQLContext>();
           return object<
@@ -1127,6 +1127,7 @@ export function makeExampleSchema(
       });
 
       return makeRegistryBuilder()
+        .addExecutor(executor)
         .addCodec(forumCodec)
         .addCodec(userCodec)
         .addCodec(messagesCodec)
@@ -5156,19 +5157,13 @@ export function makeExampleSchema(
         },
         type: MultipleActionsPayload,
         plan: EXPORTABLE(
-          (
-            object,
-            relationalPostsResource,
-            sleep,
-            sql,
-            withPgClientTransaction,
-          ) =>
+          (executor, object, sleep, sql, withPgClientTransaction) =>
             function plan(_$root, { $input: { $a } }) {
               const $transactionResult = withPgClientTransaction<
                 { a: number | null | undefined },
                 number[]
               >(
-                relationalPostsResource.executor,
+                executor,
                 object({
                   a: $a as ExecutableStep<number | null | undefined>,
                 }),
@@ -5213,13 +5208,7 @@ export function makeExampleSchema(
 
               return $transactionResult;
             },
-          [
-            object,
-            relationalPostsResource,
-            sleep,
-            sql,
-            withPgClientTransaction,
-          ],
+          [executor, object, sleep, sql, withPgClientTransaction],
         ),
       },
     },

@@ -65,7 +65,6 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
-const networkIdentifier = sql.identifier("network_types", "network");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -76,6 +75,7 @@ const executor = new PgExecutor({
     });
   }
 });
+const networkIdentifier = sql.identifier("network_types", "network");
 const spec_network = {
   name: "network",
   identifier: networkIdentifier,
@@ -139,6 +139,9 @@ const networkUniques = [{
   }
 }];
 const pgResource_networkPgResource = makeRegistry({
+  pgExecutors: Object.assign(Object.create(null), {
+    main: executor
+  }),
   pgCodecs: Object.assign(Object.create(null), {
     text: TYPES.text,
     varchar: TYPES.varchar,

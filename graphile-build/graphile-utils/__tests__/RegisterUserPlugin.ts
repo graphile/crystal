@@ -16,7 +16,7 @@ import { gql, makeExtendSchemaPlugin } from "../src/index.js";
 
 export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
   const { users } = build.input.pgRegistry.pgResources;
-  const { executor } = users;
+  const executor = build.input.pgRegistry.pgExecutors.main;
   return {
     typeDefs: gql`
       extend type Mutation {

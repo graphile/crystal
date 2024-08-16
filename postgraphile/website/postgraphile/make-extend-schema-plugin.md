@@ -448,11 +448,20 @@ database.
 
 **How do I get an executor?**
 
-You can get the executor from any resource representing the target database,
-for example:
+Executors are available in the registry; by default there's one executor called
+`main` which you can access like this:
 
 ```ts
-const { executor } = channels;
+const executor = build.input.pgRegistry.pgExecutors.main;
+```
+
+However, PostGraphile can handle multiple sources, or custom source/executor
+names, via `preset.pgServices`. If you don't know the name of the executor but
+you do have a resource representing the target database, you can extract the
+executor for that DB from the resource, for example:
+
+```ts
+const executor = channels.executor;
 ```
 
 ### Example
@@ -468,7 +477,8 @@ import { withPgClient } from "postgraphile/@dataplan/pg";
 
 export const MyChannelsPlugin = makeExtendSchemaPlugin((build) => {
   const { channels } = build.input.pgRegistry.pgResources;
-  const { executor } = channels;
+  const executor = build.input.pgRegistry.pgExecutors.main;
+  // or: `const executor = channels.executor;`
 
   return {
     typeDefs: gql`
@@ -610,6 +620,7 @@ export const MyRegisterUserMutationPlugin = makeExtendSchemaPlugin((build) => {
   const { sql } = build;
   const { users } = build.input.pgRegistry.pgResources;
   const { executor } = users;
+  // Or: `const executor = build.input.pgRegistry.pgExecutors.main;`
   return {
     typeDefs: gql`
       input RegisterUserInput {
@@ -712,6 +723,7 @@ const DeleteItemByNodeIdPlugin = makeExtendSchemaPlugin((build) => {
   // Extract the executor from the items resource
   const { items } = build.input.pgRegistry.pgResources;
   const { executor } = items;
+  // Or: `const executor = build.input.pgRegistry.pgExecutors.main;`
 
   return {
     typeDefs: gql`
@@ -800,6 +812,7 @@ import { DatabaseError } from "pg";
 export const RegisterUserPlugin = makeExtendSchemaPlugin((build) => {
   const { users } = build.input.pgRegistry.pgResources;
   const { executor } = users;
+  // Or: `const executor = build.input.pgRegistry.pgExecutors.main;`
   return {
     typeDefs: gql`
       extend type Mutation {

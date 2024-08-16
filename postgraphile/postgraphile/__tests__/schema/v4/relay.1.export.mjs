@@ -65,7 +65,6 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
-const flambleIdentifier = sql.identifier("d", "flibble");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -76,6 +75,7 @@ const executor = new PgExecutor({
     });
   }
 });
+const flambleIdentifier = sql.identifier("d", "flibble");
 const flambleCodec = recordCodec({
   name: "flamble",
   identifier: flambleIdentifier,
@@ -674,6 +674,9 @@ const registryConfig_pgResources_person_person = {
   }
 };
 const registryConfig = {
+  pgExecutors: Object.assign(Object.create(null), {
+    main: executor
+  }),
   pgCodecs: Object.assign(Object.create(null), {
     int4: TYPES.int,
     flamble: flambleCodec,
