@@ -107,6 +107,10 @@ declare global {
   }
 
   namespace GraphileConfig {
+    interface Plugins {
+      PgRelationsPlugin: true;
+    }
+
     interface GatherHelpers {
       pgRelations: {
         addRelation(

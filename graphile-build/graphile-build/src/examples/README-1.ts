@@ -17,6 +17,12 @@ import { buildSchema, defaultPreset, EXPORTABLE } from "../index.js";
  */
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      MyRandomFieldPlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface SchemaOptions {
       myDefaultMin?: number;

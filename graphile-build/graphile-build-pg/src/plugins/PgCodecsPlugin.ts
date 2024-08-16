@@ -79,6 +79,14 @@ declare global {
   }
 
   namespace GraphileConfig {
+    interface Plugins {
+      PgCodecsPlugin: true;
+    }
+
+    interface Provides {
+      PgCodecs: true;
+    }
+
     interface GatherHelpers {
       pgCodecs: {
         getCodecFromClass(

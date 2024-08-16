@@ -4,6 +4,17 @@ import { __ValueStep } from "grafast";
 
 import { isValidObjectType } from "../utils.js";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      QueryPlugin: true;
+    }
+    interface Provides {
+      Query: true;
+    }
+  }
+}
+
 /**
  * This plugin registers the operation type for the 'query' operation; the
  * GraphQL spec current requires GraphQL schemas to have an object type for the

@@ -1,5 +1,13 @@
 import "graphile-config";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      NodeIdCodecPipeStringPlugin: true;
+    }
+  }
+}
+
 function pipeStringEncode(value: any): string | null {
   return Array.isArray(value) ? value.join("|") : null;
 }

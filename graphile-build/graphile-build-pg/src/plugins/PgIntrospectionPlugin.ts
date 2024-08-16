@@ -61,6 +61,10 @@ declare global {
   }
 
   namespace GraphileConfig {
+    interface Plugins {
+      PgIntrospectionPlugin: true;
+    }
+
     interface GatherHelpers {
       pgIntrospection: {
         getIntrospection(): PromiseOrDirect<IntrospectionResults>;

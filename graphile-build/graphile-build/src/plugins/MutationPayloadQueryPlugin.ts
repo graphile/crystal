@@ -5,6 +5,18 @@ import { rootValue } from "grafast";
 import { EXPORTABLE } from "../utils.js";
 import { version } from "../version.js";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      MutationPayloadQueryPlugin: true;
+    }
+
+    interface Provides {
+      MutationPayloadQuery: true;
+    }
+  }
+}
+
 /**
  * Adds a 'query' field to each mutation payload object type; this often turns
  * out to be quite helpful but if you don't want it in your schema then it's

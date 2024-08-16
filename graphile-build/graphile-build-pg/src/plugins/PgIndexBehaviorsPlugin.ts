@@ -1,5 +1,13 @@
 import { addBehaviorToTags } from "../utils.js";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgIndexBehaviorsPlugin: true;
+    }
+  }
+}
+
 export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
   name: "PgIndexBehaviorsPlugin",
   version: "0.0.0",

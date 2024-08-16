@@ -580,7 +580,7 @@ export function makeJSONPgSmartTagsPlugin(
 
 export const makePgSmartTagsFromFilePlugin = (
   tagsFile = process.cwd() + "/postgraphile.tags.json5",
-  name?: string,
+  name?: keyof GraphileConfig.Plugins,
 ): GraphileConfig.Plugin => {
   /*
    * We're wrapping the `smartTagsPlugin` defined below with a plugin wrapper
@@ -640,3 +640,11 @@ export const TagsFilePlugin = makePgSmartTagsFromFilePlugin(
   undefined,
   "TagsFilePlugin",
 );
+
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      TagsFilePlugin: true;
+    }
+  }
+}

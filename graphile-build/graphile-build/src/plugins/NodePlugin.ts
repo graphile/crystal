@@ -7,6 +7,11 @@ import type { GraphQLObjectType } from "grafast/graphql";
 import { EXPORTABLE } from "../utils.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      NodePlugin: true;
+    }
+  }
   namespace GraphileBuild {
     interface Inflection {
       nodeIdFieldName(this: Inflection): string;

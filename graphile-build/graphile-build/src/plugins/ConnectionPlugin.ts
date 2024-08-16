@@ -11,6 +11,12 @@ import { EXPORTABLE } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      ConnectionPlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface RegisterCursorConnectionOptions {
       typeName: string;

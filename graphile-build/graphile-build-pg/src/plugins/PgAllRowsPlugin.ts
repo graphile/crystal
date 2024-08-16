@@ -10,6 +10,12 @@ import { tagToString } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgAllRowsPlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface Inflection {
       /**

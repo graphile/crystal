@@ -15,6 +15,12 @@ import type { GraphQLFieldConfigArgumentMap } from "graphql";
 import { version } from "../version.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgPolymorphismOnlyArgumentPlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface Inflection {
       pgPolymorphismEnumType(pgCodec: PgCodec): string;

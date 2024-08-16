@@ -59,6 +59,10 @@ declare global {
   }
 
   namespace GraphileConfig {
+    interface Plugins {
+      PgProceduresPlugin: true;
+    }
+
     interface GatherHelpers {
       pgProcedures: {
         getResourceOptions(

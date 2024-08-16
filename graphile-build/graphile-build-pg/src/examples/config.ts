@@ -37,6 +37,14 @@ export function getPool() {
   return pool;
 }
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      EnumManglingPlugin: true;
+    }
+  }
+}
+
 const EnumManglingPlugin: GraphileConfig.Plugin = {
   name: "EnumManglingPlugin",
   description:

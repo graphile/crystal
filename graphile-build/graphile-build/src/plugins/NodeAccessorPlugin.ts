@@ -7,6 +7,12 @@ import { EXPORTABLE } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      NodeAccessorPlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     type NodeFetcher = {
       ($nodeId: ExecutableStep<string>): ExecutableStep<any>;

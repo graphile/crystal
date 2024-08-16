@@ -10,6 +10,14 @@ interface State {
   ltreeArrayCodec: PgCodec;
 }
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgLtreePlugin: true;
+    }
+  }
+}
+
 export const PgLtreePlugin: GraphileConfig.Plugin = {
   name: "PgLtreePlugin",
   version,

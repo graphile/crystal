@@ -14,6 +14,12 @@ import { tagToString } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgRowByUniquePlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface Inflection {
       rowByUnique(

@@ -18,6 +18,14 @@ declare global {
   }
 }
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      GrafservEnvelopPlugin: true;
+    }
+  }
+}
+
 export const GrafservEnvelopPlugin: GraphileConfig.Plugin = {
   name: "GrafservEnvelopPlugin",
   version,

@@ -4,6 +4,14 @@ import { constant, rootValue } from "grafast";
 
 import { EXPORTABLE } from "../utils.js";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      RegisterQueryNodePlugin: true;
+    }
+  }
+}
+
 export const RegisterQueryNodePlugin: GraphileConfig.Plugin = {
   name: "RegisterQueryNodePlugin",
   version: "1.0.0",

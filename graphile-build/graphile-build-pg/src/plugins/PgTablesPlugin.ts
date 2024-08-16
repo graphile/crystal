@@ -160,10 +160,12 @@ declare global {
       isPgFieldSimpleCollection?: boolean;
     }
   }
-}
 
-declare global {
   namespace GraphileConfig {
+    interface Plugins {
+      PgTablesPlugin: true;
+    }
+
     interface GatherHelpers {
       pgTables: {
         getResourceOptions(

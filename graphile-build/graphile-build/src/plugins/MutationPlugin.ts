@@ -5,6 +5,17 @@ import { __ValueStep } from "grafast";
 import { isValidObjectType } from "../utils.js";
 import { version } from "../version.js";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      MutationPlugin: true;
+    }
+    interface Provides {
+      Mutation: true;
+    }
+  }
+}
+
 /**
  * This plugin registers the operation type for the 'mutation' operation, and
  * if that type adds at least one field then it will be added to the GraphQL

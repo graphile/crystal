@@ -1,9 +1,9 @@
 export type AnyCallback = (...args: any[]) => any;
 
 export type CallbackDescriptor<T extends AnyCallback> = {
-  provides?: string[];
-  before?: string[];
-  after?: string[];
+  provides?: (keyof GraphileConfig.Plugins | keyof GraphileConfig.Provides)[];
+  before?: (keyof GraphileConfig.Plugins | keyof GraphileConfig.Provides)[];
+  after?: (keyof GraphileConfig.Plugins | keyof GraphileConfig.Provides)[];
   callback: T;
 };
 

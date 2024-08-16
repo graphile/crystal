@@ -27,6 +27,12 @@ import { tagToString } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgMutationUpdateDeletePlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface ScopeObject {
       isPgUpdatePayloadType?: boolean;

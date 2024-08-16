@@ -5,6 +5,14 @@ import type { GraphQLEnumType } from "grafast/graphql";
 
 import { version } from "../version.js";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgConnectionArgOrderByDefaultValuePlugin: true;
+    }
+  }
+}
+
 export const PgConnectionArgOrderByDefaultValuePlugin: GraphileConfig.Plugin = {
   name: "PgConnectionArgOrderByDefaultValuePlugin",
   description: "Sets the default 'orderBy' for a table",

@@ -43,6 +43,14 @@ const pool = new Pool({
 });
 const withPgClient: WithPgClient = makePgAdaptorWithPgClient(pool);
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      UseRelationNamesPlugin: true;
+    }
+  }
+}
+
 async function main() {
   // Create our GraphQL schema by applying all the plugins
   const executor = EXPORTABLE(

@@ -701,6 +701,11 @@ export { version } from "./version.js";
 
 declare global {
   namespace GraphileConfig {
+    interface Provides {
+      default: true;
+      inferred: true;
+      override: true;
+    }
     interface Preset {
       /**
        * The inflection phase is the first phase that occurs when building a

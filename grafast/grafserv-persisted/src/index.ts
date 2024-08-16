@@ -14,6 +14,14 @@ import LRU from "@graphile/lru";
 import type { PersistedOperationGetter } from "./interfaces.js";
 import { version } from "./version.js";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PersistedPlugin: true;
+    }
+  }
+}
+
 const PersistedPlugin: GraphileConfig.Plugin = {
   name: "PersistedPlugin",
   description: "Enables persisted operations in Grafserv",

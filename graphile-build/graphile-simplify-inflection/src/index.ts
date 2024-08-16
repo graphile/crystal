@@ -3,6 +3,14 @@ import type {} from "graphile-build";
 import type {} from "graphile-build-pg";
 import type { GraphileConfig } from "graphile-config";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgSimplifyInflectionPlugin: true;
+    }
+  }
+}
+
 /**
  * Returns true if array1 and array2 have the same length, and every pair of
  * values within them pass the `comparator` check (which defaults to `===`).

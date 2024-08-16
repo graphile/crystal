@@ -14,6 +14,12 @@ import { EXPORTABLE } from "graphile-build";
 import { version } from "../version.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgInterfaceModeUnionAllRowsPlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface Inflection {
       /**

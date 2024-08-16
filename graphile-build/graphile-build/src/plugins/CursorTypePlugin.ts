@@ -4,6 +4,16 @@ import { stringTypeSpec } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      CursorTypePlugin: true;
+    }
+
+    interface Provides {
+      Cursor: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface ScopeScalar extends Scope {
       isCursorType?: boolean;

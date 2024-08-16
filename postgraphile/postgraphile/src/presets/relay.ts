@@ -13,6 +13,14 @@ const RELAY_HIDDEN_COLUMN_BEHAVIORS = [
   "-orderBy",
 ] as const;
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgRelayPlugin: true;
+    }
+  }
+}
+
 /** @experimental */
 export const PgRelayPlugin: GraphileConfig.Plugin = {
   name: "PgRelayPlugin",
