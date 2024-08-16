@@ -15,8 +15,8 @@ Like `lambda`, `withPgClient` is an escape hatch and does not use batching.
 You need to pass three arguments to `withPgClient`:
 
 - `executor` - this is needed to connect to the database; you can grab the
-  executor from any of the [resources](./registry/resources) that you have in
-  the same database
+  executor from the registry directly or any of the
+  [resources](./registry/resources) that you have in the same database
 - `$data` - an arbitrary step representing the data that your `callback` needs;
   set this to `constant(null)` if you don't need anything
 - `callback(client, data)` - the (async) function to be called with the
@@ -27,29 +27,34 @@ for it to return, and then release the client again, ultimately resolving to
 the return result of your callback.
 
 ```ts
-// import withPgClient step
 import { withPgClient } from "@dataplan/pg";
+import { constant } from "grafast";
+import { registry } from "./myRegistry";
 
-// Grab executor from any resource
-const { executor } = usersResource;
+// Grab executor from the registry
+const executor = pgRegistry.pgExecutors.main;
 
-// Arbitrary data for our callback to use
-const $twenty = constant(20);
+function meaningOfLifePlan() {
+  // Arbitrary data for our callback to use
+  const $twenty = constant(20);
 
-// 20 + 22 = 42
-const $meaningOfLife = withPgClient(
-  executor,
-  $twenty,
-  async (client, twenty) => {
-    // The client that you receive will be dependent on the adaptor you're
-    // using, but must have a `query` method:
-    const {
-      rows: [{ num }],
-    } = await client.query({ text: `select 22 as num` });
+  // 20 + 22 = 42
+  const $meaningOfLife = withPgClient(
+    executor,
+    $twenty,
+    async (client, twenty) => {
+      // The client that you receive will be dependent on the adaptor you're
+      // using, but must have a `query` method:
+      const {
+        rows: [{ num }],
+      } = await client.query({ text: `select 22 as num` });
 
-    return twenty + parseInt(num, 10);
-  },
-);
+      return twenty + parseInt(num, 10);
+    },
+  );
+
+  return $meaningOfLife;
+}
 ```
 
 ## withPgClientTransaction(executor, $data, callback)

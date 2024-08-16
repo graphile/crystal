@@ -268,10 +268,11 @@ export default makeExtendSchemaPlugin((build) => {
   const { sql } = build;
   /**
    * The 'executor' tells us which database we're talking to.
-   * You can get this from any source via `pgResource.executor`; here we use the
-   * executor from the 'users' source.
+   * You can get this from the registry, the default executor name is `main`
+   * but you can override this and add extra sources/executors via the
+   * `pgServices` configuration option.
    */
-  const executor = build.input.pgRegistry.pgResources.users.executor;
+  const executor = build.input.pgRegistry.pgExecutors.main;
 
   return {
     typeDefs: /* GraphQL */ `

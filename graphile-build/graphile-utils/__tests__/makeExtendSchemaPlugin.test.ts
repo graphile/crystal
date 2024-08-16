@@ -184,7 +184,7 @@ it("supports unary steps in loadOne", async () => {
     plugins: [
       makeExtendSchemaPlugin((build) => {
         const { loadOne } = build.grafast;
-        const { users } = build.input.pgRegistry.pgResources;
+        const { main } = build.input.pgRegistry.pgExecutors;
         return {
           typeDefs: gql`
             extend type User {
@@ -195,7 +195,7 @@ it("supports unary steps in loadOne", async () => {
             User: {
               uppercaseName($user) {
                 const $name = $user.get("name");
-                const $executorContext = users.executor.context();
+                const $executorContext = main.context();
                 return loadOne(
                   $name,
                   $executorContext,
