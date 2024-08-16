@@ -4184,7 +4184,7 @@ const registry = makeRegistry({
           notNull: true,
           sortable: true,
           filterable: true,
-          behavior: ["-queryField -mutationField typeField", "-filter -order", "filter filterBy", "orderBy order"]
+          behavior: ["-queryField -mutationField typeField", "-filter -order", "filter filterBy", "orderBy order resource:connection:backwards"]
         },
         singleOutputParameterName: "o1"
       },
@@ -4215,7 +4215,7 @@ const registry = makeRegistry({
         },
         tags: {
           sortable: true,
-          behavior: ["-queryField -mutationField typeField", "-filter -order", "orderBy order"]
+          behavior: ["-queryField -mutationField typeField", "-filter -order", "orderBy order resource:connection:backwards"]
         }
       },
       description: "The first name of the person."
@@ -4740,7 +4740,7 @@ const registry = makeRegistry({
         tags: {
           sortable: true,
           filterable: true,
-          behavior: ["queryField -mutationField -typeField", "-filter -order", "filter filterBy", "orderBy order"]
+          behavior: ["queryField -mutationField -typeField", "-filter -order", "filter filterBy", "orderBy order resource:connection:backwards"]
         }
       },
       description: undefined
@@ -4818,7 +4818,7 @@ const registry = makeRegistry({
         },
         tags: {
           sortable: true,
-          behavior: ["-queryField -mutationField typeField", "-filter -order", "orderBy order"]
+          behavior: ["-queryField -mutationField typeField", "-filter -order", "orderBy order resource:connection:backwards"]
         }
       },
       description: undefined
