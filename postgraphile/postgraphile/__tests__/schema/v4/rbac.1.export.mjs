@@ -840,6 +840,47 @@ const spec_personSecret = {
   executor: executor
 };
 const personSecretCodec = recordCodec(spec_personSecret);
+const unloggedIdentifier = sql.identifier("c", "unlogged");
+const unloggedCodec = recordCodec({
+  name: "unlogged",
+  identifier: unloggedIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {
+          behavior: ["-insert -update"]
+        }
+      }
+    },
+    nonsense: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {
+          behavior: ["-insert -update"]
+        }
+      }
+    }
+  }),
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "c",
+      name: "unlogged",
+      persistence: "u"
+    },
+    tags: Object.create(null)
+  },
+  executor: executor
+});
 const foreignKeyIdentifier = sql.identifier("a", "foreign_key");
 const foreignKeyCodec = recordCodec({
   name: "foreignKey",
@@ -3686,6 +3727,7 @@ const registry = makeRegistry({
     uniqueForeignKey: uniqueForeignKeyCodec,
     myTable: myTableCodec,
     personSecret: personSecretCodec,
+    unlogged: unloggedCodec,
     foreignKey: foreignKeyCodec,
     testview: testviewCodec,
     viewTable: viewTableCodec,
@@ -6069,6 +6111,35 @@ const registry = makeRegistry({
       }
     },
     person_secret: registryConfig_pgResources_person_secret_person_secret,
+    unlogged: {
+      executor: executor,
+      name: "unlogged",
+      identifier: "main.c.unlogged",
+      from: unloggedIdentifier,
+      codec: unloggedCodec,
+      uniques: [{
+        isPrimary: true,
+        attributes: ["id"],
+        description: undefined,
+        extensions: {
+          tags: Object.create(null)
+        }
+      }],
+      isVirtual: false,
+      description: undefined,
+      extensions: {
+        description: undefined,
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "unlogged",
+          persistence: "u"
+        },
+        tags: {
+          behavior: ["-select -single -list -connection -insert -update -delete"]
+        }
+      }
+    },
     foreign_key: registryConfig_pgResources_foreign_key_foreign_key,
     testview: {
       executor: executor,

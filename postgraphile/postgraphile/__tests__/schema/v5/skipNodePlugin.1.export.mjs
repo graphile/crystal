@@ -848,6 +848,43 @@ const spec_cPersonSecret = {
   executor: executor
 };
 const cPersonSecretCodec = recordCodec(spec_cPersonSecret);
+const cUnloggedIdentifier = sql.identifier("c", "unlogged");
+const cUnloggedCodec = recordCodec({
+  name: "cUnlogged",
+  identifier: cUnloggedIdentifier,
+  attributes: Object.assign(Object.create(null), {
+    id: {
+      description: undefined,
+      codec: TYPES.int,
+      notNull: true,
+      hasDefault: true,
+      extensions: {
+        tags: {}
+      }
+    },
+    nonsense: {
+      description: undefined,
+      codec: TYPES.text,
+      notNull: false,
+      hasDefault: false,
+      extensions: {
+        tags: {}
+      }
+    }
+  }),
+  description: undefined,
+  extensions: {
+    isTableLike: true,
+    pg: {
+      serviceName: "main",
+      schemaName: "c",
+      name: "unlogged",
+      persistence: "u"
+    },
+    tags: Object.create(null)
+  },
+  executor: executor
+});
 const viewTableIdentifier = sql.identifier("a", "view_table");
 const spec_viewTable = {
   name: "viewTable",
@@ -3497,6 +3534,7 @@ const registry = makeRegistry({
     uniqueForeignKey: uniqueForeignKeyCodec,
     cMyTable: cMyTableCodec,
     cPersonSecret: cPersonSecretCodec,
+    cUnlogged: cUnloggedCodec,
     viewTable: viewTableCodec,
     bUpdatableView: bUpdatableViewCodec,
     cCompoundKey: cCompoundKeyCodec,
@@ -5833,6 +5871,33 @@ const registry = makeRegistry({
       }
     },
     c_person_secret: registryConfig_pgResources_c_person_secret_c_person_secret,
+    c_unlogged: {
+      executor: executor,
+      name: "c_unlogged",
+      identifier: "main.c.unlogged",
+      from: cUnloggedIdentifier,
+      codec: cUnloggedCodec,
+      uniques: [{
+        isPrimary: true,
+        attributes: ["id"],
+        description: undefined,
+        extensions: {
+          tags: Object.create(null)
+        }
+      }],
+      isVirtual: false,
+      description: undefined,
+      extensions: {
+        description: undefined,
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "unlogged",
+          persistence: "u"
+        },
+        tags: {}
+      }
+    },
     view_table: {
       executor: executor,
       name: "view_table",
