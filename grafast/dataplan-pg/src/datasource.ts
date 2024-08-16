@@ -1014,6 +1014,44 @@ export function makeRegistry<
     },
   });
 
+  let addExecutorForbidden = false;
+  function addExecutor(executor: PgExecutor): PgExecutor {
+    if (addExecutorForbidden) {
+      throw new Error(`It's too late to call addExecutor now`);
+    }
+    const executorName = executor.name;
+    if (registry.pgExecutors[executorName]) {
+      if (registry.pgExecutors[executorName] !== executor) {
+        console.dir({
+          existing: registry.pgExecutors[executorName],
+          new: executor,
+        });
+        throw new Error(
+          `Executor named '${executorName}' is already registered; you cannot have two executors with the same name`,
+        );
+      }
+      return executor;
+    } else {
+      // Custom spec, pin it back to the registry
+      registry.pgExecutors[executorName as keyof TExecutors] = executor as any;
+
+      if (!(executor as any).$$export && !(executor as any).$exporter$factory) {
+        // Tell the system to read the built executor from the registry
+        Object.defineProperties(executor, {
+          $exporter$args: { value: [registry, executorName] },
+          $exporter$factory: {
+            value: (
+              registry: PgRegistry<any, any, any, any>,
+              executorName: string,
+            ) => registry.pgExecutors[executorName],
+          },
+        });
+      }
+
+      return executor;
+    }
+  }
+
   let addCodecForbidden = false;
   function addCodec(codec: PgCodec): PgCodec {
     if (addCodecForbidden) {
@@ -1027,7 +1065,7 @@ export function makeRegistry<
           new: codec,
         });
         throw new Error(
-          `Codec named '${codecName}' is already registsred; you cannot have two codecs with the same name`,
+          `Codec named '${codecName}' is already registered; you cannot have two codecs with the same name`,
         );
       }
       return codec;
@@ -1069,11 +1107,22 @@ export function makeRegistry<
     }
   }
 
-  for (const [codecName, codecSpec] of Object.entries(config.pgCodecs)) {
-    if (codecName !== codecSpec.name) {
+  for (const [executorName, executor] of Object.entries(config.pgExecutors)) {
+    if (executorName !== executor.name) {
+      throw new Error(
+        `Executor added to registry with wrong name; ${JSON.stringify(
+          executorName,
+        )} !== ${JSON.stringify(executor.name)}`,
+      );
+    }
+    addExecutor(executor);
+  }
+
+  for (const [codecName, codec] of Object.entries(config.pgCodecs)) {
+    if (codecName !== codec.name) {
       throw new Error(`Codec added to registry with wrong name`);
     }
-    addCodec(codecSpec);
+    addCodec(codec);
   }
 
   for (const [resourceName, rawConfig] of Object.entries(
@@ -1081,6 +1130,7 @@ export function makeRegistry<
   ) as [keyof TResourceOptions, PgResourceOptions<any, any, any, any>][]) {
     const resourceConfig = {
       ...rawConfig,
+      executor: addExecutor(rawConfig.executor),
       codec: addCodec(rawConfig.codec),
       parameters: rawConfig.parameters
         ? (rawConfig.parameters as readonly PgResourceParameter[]).map((p) => ({
@@ -1129,6 +1179,7 @@ export function makeRegistry<
 
   // DO NOT CALL addCodec BELOW HERE
   addCodecForbidden = true;
+  addExecutorForbidden = true;
 
   /**
    * If the user uses a codec with attributes as a column type (or an array of
