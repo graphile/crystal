@@ -159,7 +159,7 @@ export function makeExampleSchema(
   const executor = EXPORTABLE(
     (PgExecutor, context, object) =>
       new PgExecutor({
-        name: "default",
+        name: "main",
         context: () => {
           const $context = context<OurGraphQLContext>();
           return object<
@@ -1127,6 +1127,7 @@ export function makeExampleSchema(
       });
 
       return makeRegistryBuilder()
+        .addExecutor(executor)
         .addCodec(forumCodec)
         .addCodec(userCodec)
         .addCodec(messagesCodec)

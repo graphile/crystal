@@ -25,6 +25,9 @@ declare global {
       pgRegistry_PgRegistryBuilder_init(event: {
         registryBuilder: PgRegistryBuilder<any, any, any, any>;
       }): PromiseOrDirect<void>;
+      pgRegistry_PgRegistryBuilder_pgExecutors(event: {
+        registryBuilder: PgRegistryBuilder<any, any, any, any>;
+      }): PromiseOrDirect<void>;
       pgRegistry_PgRegistryBuilder_pgCodecs(event: {
         registryBuilder: PgRegistryBuilder<any, any, any, any>;
       }): PromiseOrDirect<void>;
@@ -75,6 +78,9 @@ export const PgRegistryPlugin: GraphileConfig.Plugin = {
             const registryBuilder =
               await info.helpers.pgRegistry.getRegistryBuilder();
             await info.process("pgRegistry_PgRegistryBuilder_init", {
+              registryBuilder,
+            });
+            await info.process("pgRegistry_PgRegistryBuilder_pgExecutors", {
               registryBuilder,
             });
             await info.process("pgRegistry_PgRegistryBuilder_pgCodecs", {

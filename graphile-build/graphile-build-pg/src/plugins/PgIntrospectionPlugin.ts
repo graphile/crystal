@@ -385,6 +385,7 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
           ],
           serviceName === "main" ? `executor` : `${serviceName}Executor`,
         );
+
         info.state.executors[serviceName] = executor;
         return executor;
       },
@@ -622,6 +623,14 @@ export const PgIntrospectionPlugin: GraphileConfig.Plugin = {
     hooks: {
       async pgRegistry_PgRegistryBuilder_init(info, _event) {
         await info.helpers.pgIntrospection.getIntrospection();
+      },
+      pgRegistry_PgRegistryBuilder_pgExecutors(info, event) {
+        for (const pgService of info.resolvedPreset.pgServices ?? []) {
+          const executor = info.helpers.pgIntrospection.getExecutorForService(
+            pgService.name,
+          );
+          event.registryBuilder.addExecutor(executor);
+        }
       },
     },
 
