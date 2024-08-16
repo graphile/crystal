@@ -556,7 +556,13 @@ export interface PgRegistryConfig<
       >;
     };
   },
+  TExecutors extends {
+    [executorName in string]: PgExecutor<any>;
+  } = {
+    [executorName: string]: PgExecutor<any>;
+  },
 > {
+  pgExecutors: TExecutors;
   pgCodecs: TCodecs;
   pgResources: TResourceOptions;
   pgRelations: TRelations;
@@ -632,7 +638,13 @@ export interface PgRegistry<
       >
     >
   >,
+  TExecutors extends {
+    [executorName in string]: PgExecutor<any>;
+  } = {
+    [executorName: string]: PgExecutor<any>;
+  },
 > {
+  pgExecutors: TExecutors;
   pgCodecs: TCodecs;
   pgResources: {
     [name in keyof TResourceOptions]: TResourceOptions[name] extends PgResourceOptions<
@@ -676,14 +688,16 @@ export interface PgRegistry<
   };
 }
 
-export type GetPgRegistryCodecs<TRegistry extends PgRegistry<any, any, any>> =
-  TRegistry["pgCodecs"];
+export type GetPgRegistryCodecs<
+  TRegistry extends PgRegistry<any, any, any, any>,
+> = TRegistry["pgCodecs"];
 
-export type GetPgRegistrySources<TRegistry extends PgRegistry<any, any, any>> =
-  TRegistry["pgResources"];
+export type GetPgRegistrySources<
+  TRegistry extends PgRegistry<any, any, any, any>,
+> = TRegistry["pgResources"];
 
 export type GetPgRegistryCodecRelations<
-  TRegistry extends PgRegistry<any, any, any>,
+  TRegistry extends PgRegistry<any, any, any, any>,
   TCodec extends PgCodec<any, any, any, any, any, any, any>,
 > = TRegistry["pgRelations"][TCodec["name"]];
 

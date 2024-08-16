@@ -14,29 +14,31 @@ declare global {
 
     interface GatherHelpers {
       pgRegistry: {
-        getRegistryBuilder(): PromiseOrDirect<PgRegistryBuilder<any, any, any>>;
-        getRegistry(): PromiseOrDirect<PgRegistry<any, any, any>>;
+        getRegistryBuilder(): PromiseOrDirect<
+          PgRegistryBuilder<any, any, any, any>
+        >;
+        getRegistry(): PromiseOrDirect<PgRegistry<any, any, any, any>>;
       };
     }
 
     interface GatherHooks {
       pgRegistry_PgRegistryBuilder_init(event: {
-        registryBuilder: PgRegistryBuilder<any, any, any>;
+        registryBuilder: PgRegistryBuilder<any, any, any, any>;
       }): PromiseOrDirect<void>;
       pgRegistry_PgRegistryBuilder_pgCodecs(event: {
-        registryBuilder: PgRegistryBuilder<any, any, any>;
+        registryBuilder: PgRegistryBuilder<any, any, any, any>;
       }): PromiseOrDirect<void>;
       pgRegistry_PgRegistryBuilder_pgResources(event: {
-        registryBuilder: PgRegistryBuilder<any, any, any>;
+        registryBuilder: PgRegistryBuilder<any, any, any, any>;
       }): PromiseOrDirect<void>;
       pgRegistry_PgRegistryBuilder_pgRelations(event: {
-        registryBuilder: PgRegistryBuilder<any, any, any>;
+        registryBuilder: PgRegistryBuilder<any, any, any, any>;
       }): PromiseOrDirect<void>;
       pgRegistry_PgRegistryBuilder_finalize(event: {
-        registryBuilder: PgRegistryBuilder<any, any, any>;
+        registryBuilder: PgRegistryBuilder<any, any, any, any>;
       }): PromiseOrDirect<void>;
       pgRegistry_PgRegistry(event: {
-        registry: PgRegistry<any, any, any>;
+        registry: PgRegistry<any, any, any, any>;
       }): PromiseOrDirect<void>;
     }
   }
@@ -45,8 +47,8 @@ declare global {
 interface Cache {}
 
 interface State {
-  registryBuilder: PgRegistryBuilder<any, any, any>;
-  registry: PromiseOrDirect<PgRegistry<any, any, any>> | null;
+  registryBuilder: PgRegistryBuilder<any, any, any, any>;
+  registry: PromiseOrDirect<PgRegistry<any, any, any, any>> | null;
 }
 
 export const PgRegistryPlugin: GraphileConfig.Plugin = {
