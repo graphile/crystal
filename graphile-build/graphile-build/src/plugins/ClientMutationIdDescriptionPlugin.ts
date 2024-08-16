@@ -1,5 +1,13 @@
 import { version } from "../version.js";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      ClientMutationIdDescriptionPlugin: true;
+    }
+  }
+}
+
 /**
  * Adds generic descriptions (where not already present) to:
  *

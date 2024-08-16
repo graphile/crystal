@@ -5,6 +5,14 @@ import { __ValueStep } from "grafast";
 import { isValidObjectType } from "../utils.js";
 import { version } from "../version.js";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      SubscriptionPlugin: true;
+    }
+  }
+}
+
 /**
  * This plugin registers the operation type for the 'subscription' operation, and
  * if that type adds at least one field then it will be added to the GraphQL

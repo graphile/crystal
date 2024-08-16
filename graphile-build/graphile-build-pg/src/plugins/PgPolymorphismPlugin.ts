@@ -61,6 +61,10 @@ function isNotNullish<T>(v: T | null | undefined): v is T {
 
 declare global {
   namespace GraphileConfig {
+    interface Plugins {
+      PgPolymorphismPlugin: true;
+    }
+
     interface GatherHelpers {
       pgPolymorphism: Record<string, never>;
     }

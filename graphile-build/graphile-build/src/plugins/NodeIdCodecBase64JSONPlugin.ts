@@ -1,5 +1,13 @@
 import "graphile-config";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      NodeIdCodecBase64JSONPlugin: true;
+    }
+  }
+}
+
 export const NodeIdCodecBase64JSONPlugin: GraphileConfig.Plugin = {
   name: "NodeIdCodecBase64JSONPlugin",
   version: "1.0.0",

@@ -21,6 +21,14 @@ declare global {
   }
 }
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      GrafservPgJWTPlugin: true;
+    }
+  }
+}
+
 const GrafservPgJWTPlugin: GraphileConfig.Plugin = {
   name: "GrafservPgJWTPlugin",
   version,

@@ -8,6 +8,10 @@ import { version } from "../version.js";
 
 declare global {
   namespace GraphileConfig {
+    interface Plugins {
+      PgRBACPlugin: true;
+    }
+
     interface GatherHelpers {
       pgRBAC: Record<string, never>;
     }

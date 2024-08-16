@@ -16,6 +16,12 @@ import { version } from "../version.js";
 import { applyOrderToPlan } from "./PgConnectionArgOrderByPlugin.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgMutationPayloadEdgePlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface Inflection {
       tableEdgeField(this: Inflection, codec: PgCodecWithAttributes): string;

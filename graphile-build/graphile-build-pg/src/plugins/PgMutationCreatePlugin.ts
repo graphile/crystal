@@ -11,6 +11,12 @@ import { tagToString } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgMutationCreatePlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface ScopeObject {
       isPgCreatePayloadType?: boolean;

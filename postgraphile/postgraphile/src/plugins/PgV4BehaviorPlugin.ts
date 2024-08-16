@@ -7,6 +7,10 @@ import { inspect } from "util";
 
 declare global {
   namespace GraphileConfig {
+    interface Plugins {
+      PgV4BehaviorPlugin: true;
+    }
+
     interface GatherHelpers {
       pgV4SmartTags: Record<string, never>;
     }

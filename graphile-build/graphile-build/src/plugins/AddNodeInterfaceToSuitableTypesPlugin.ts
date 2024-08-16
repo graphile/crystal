@@ -7,6 +7,14 @@ import type { GraphQLInterfaceType } from "grafast/graphql";
 import { EXPORTABLE } from "../utils.js";
 import { NODE_ID_CODECS, NODE_ID_HANDLER_BY_TYPE_NAME } from "./NodePlugin.js";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      AddNodeInterfaceToSuitableTypesPlugin: true;
+    }
+  }
+}
+
 export const AddNodeInterfaceToSuitableTypesPlugin: GraphileConfig.Plugin = {
   name: "AddNodeInterfaceToSuitableTypesPlugin",
   version: "1.0.0",

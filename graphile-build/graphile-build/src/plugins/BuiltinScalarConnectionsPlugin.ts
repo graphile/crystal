@@ -3,6 +3,14 @@ import "graphile-config";
 
 import { version } from "../version.js";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      BuiltinScalarConnectionsPlugin: true;
+    }
+  }
+}
+
 export const BuiltinScalarConnectionsPlugin: GraphileConfig.Plugin = {
   name: "BuiltinScalarConnectionsPlugin",
   description: "Adds connection types for builtin scalars",

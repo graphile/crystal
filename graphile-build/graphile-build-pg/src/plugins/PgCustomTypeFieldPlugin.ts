@@ -54,6 +54,12 @@ const $$rootMutation = Symbol("PgCustomTypeFieldPluginRootMutationSources");
 const $$computed = Symbol("PgCustomTypeFieldPluginComputedSources");
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgCustomTypeFieldPlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface Build {
       pgGetArgDetailsFromParameters(

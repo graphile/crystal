@@ -12,6 +12,12 @@ import { EXPORTABLE } from "graphile-build";
 import { version } from "../version.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgFirstLastBeforeAfterArgsPlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface Inflection {
       conditionType(this: Inflection, typeName: string): string;

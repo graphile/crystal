@@ -11,6 +11,12 @@ import { EXPORTABLE } from "graphile-build";
 import { version } from "../version.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgConditionCustomFieldsPlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface ScopeInputObjectFieldsField {
       isPgConnectionConditionInputField?: boolean;

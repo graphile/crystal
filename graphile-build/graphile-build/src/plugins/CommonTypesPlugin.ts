@@ -9,6 +9,12 @@ import { EXPORTABLE } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      CommonTypesPlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface ScopeScalar {}
     interface SchemaOptions {

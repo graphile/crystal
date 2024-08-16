@@ -7,6 +7,10 @@ import { version } from "../version.js";
 
 declare global {
   namespace GraphileConfig {
+    interface Plugins {
+      PgRemoveExtensionResourcesPlugin: true;
+    }
+
     interface GatherHelpers {
       pgRemoveExtensionResources: Record<string, never>;
     }

@@ -14,6 +14,10 @@ import { version } from "../version.js";
 
 declare global {
   namespace GraphileConfig {
+    interface Plugins {
+      PgFakeConstraintsPlugin: true;
+    }
+
     interface GatherHelpers {
       pgFakeConstraints: Record<string, never>;
     }

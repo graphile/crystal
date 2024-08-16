@@ -21,6 +21,12 @@ import { getCodecMetaLookupFromInput, makePgCodecMeta } from "../inputUtils.js";
 import { version } from "../version.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgBasicsPlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface BuildVersions {
       "graphile-build-pg": string;

@@ -14,6 +14,10 @@ import { version } from "../version.js";
 
 declare global {
   namespace GraphileConfig {
+    interface Plugins {
+      PgEnumTablesPlugin: true;
+    }
+
     interface GatherHelpers {
       pgEnumTables: {
         isEnumConstraint(pgConstraint: PgConstraint): boolean;

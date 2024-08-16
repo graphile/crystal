@@ -20,6 +20,12 @@ import { inspect } from "util";
 import { version } from "../version.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgConnectionArgOrderByPlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface Inflection {
       orderByType(this: Inflection, typeName: string): string;

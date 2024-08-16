@@ -5,6 +5,14 @@ import { rootValue } from "grafast";
 import { EXPORTABLE } from "../utils.js";
 import { version } from "../version.js";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      QueryQueryPlugin: true;
+    }
+  }
+}
+
 /**
  * Adds the Query.query field to the Query type for Relay 1 compatibility. This
  * is a vestigial field, you probably don't want it.

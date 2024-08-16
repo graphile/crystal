@@ -7,6 +7,14 @@ import type {
   GraphQLInputFieldConfig,
 } from "grafast/graphql";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      TrimEmptyDescriptionsPlugin: true;
+    }
+  }
+}
+
 /**
  * Sets the 'description' attribute to null if it's the empty string; useful
  * for cleaning up the schema as printing a schema with a lot of empty string

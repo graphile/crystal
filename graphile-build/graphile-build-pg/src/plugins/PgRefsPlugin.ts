@@ -20,6 +20,10 @@ import { version } from "../version.js";
 
 declare global {
   namespace GraphileConfig {
+    interface Plugins {
+      PgRefsPlugin: true;
+    }
+
     interface GatherHelpers {
       pgRefs: Record<string, never>;
     }

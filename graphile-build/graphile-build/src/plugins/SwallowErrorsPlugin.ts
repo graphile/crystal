@@ -3,6 +3,14 @@ import "graphile-config";
 import swallowError from "../swallowError.js";
 import { version } from "../version.js";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      SwallowErrorsPlugin: true;
+    }
+  }
+}
+
 /**
  * This plugin changes the default handling for "recoverable" errors from
  * throwing the error to instead logging it and carrying on.  We do not

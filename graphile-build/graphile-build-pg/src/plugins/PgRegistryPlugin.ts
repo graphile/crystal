@@ -8,6 +8,10 @@ import { version } from "../version.js";
 
 declare global {
   namespace GraphileConfig {
+    interface Plugins {
+      PgRegistryPlugin: true;
+    }
+
     interface GatherHelpers {
       pgRegistry: {
         getRegistryBuilder(): PromiseOrDirect<PgRegistryBuilder<any, any, any>>;

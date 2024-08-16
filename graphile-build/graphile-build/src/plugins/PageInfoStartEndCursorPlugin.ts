@@ -6,6 +6,12 @@ import { EXPORTABLE } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PageInfoStartEndCursorPlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface ScopeObjectFieldsField {
       isPageInfoStartCursorField?: boolean;

@@ -1,5 +1,13 @@
 import "graphile-config";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      StreamDeferPlugin: true;
+    }
+  }
+}
+
 /**
  * Enables stream/defer on the schema.
  *

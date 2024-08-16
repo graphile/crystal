@@ -42,6 +42,10 @@ declare global {
 
 declare global {
   namespace GraphileConfig {
+    interface Plugins {
+      PgJWTPlugin: true;
+    }
+
     interface GatherHelpers {
       pgJWT: Record<string, never>;
     }

@@ -3,6 +3,9 @@ import "graphile-build-pg";
 
 declare global {
   namespace GraphileConfig {
+    interface Plugins {
+      PgV4InflectionPlugin: true;
+    }
     interface GatherHelpers {
       pgV4SmartTags: Record<string, never>;
     }

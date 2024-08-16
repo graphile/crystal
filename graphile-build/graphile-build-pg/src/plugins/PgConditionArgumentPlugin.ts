@@ -13,6 +13,12 @@ import type { GraphQLInputObjectType } from "grafast/graphql";
 import { version } from "../version.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgConditionArgumentPlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface Inflection {
       conditionType(this: Inflection, typeName: string): string;

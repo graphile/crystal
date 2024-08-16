@@ -10,6 +10,11 @@ import { EXPORTABLE } from "graphile-build";
 import { version } from "../version.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgOrderAllAttributesPlugin: true;
+    }
+  }
   namespace GraphileBuild {
     interface Inflection {
       orderByAttributeEnum(

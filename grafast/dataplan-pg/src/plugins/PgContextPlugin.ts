@@ -8,6 +8,14 @@ export const EMPTY_OBJECT: Record<string, never> = Object.freeze(
   Object.create(null),
 );
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgContextPlugin: true;
+    }
+  }
+}
+
 export const PgContextPlugin: GraphileConfig.Plugin = {
   name: "PgContextPlugin",
   description:

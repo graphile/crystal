@@ -2,6 +2,14 @@ import "graphile-config";
 
 import { version } from "../version.js";
 
+declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgAttributeDeprecationPlugin: true;
+    }
+  }
+}
+
 export const PgAttributeDeprecationPlugin: GraphileConfig.Plugin = {
   name: "PgAttributeDeprecationPlugin",
   description: "Marks a attribute as deprecated if it has the deprecated tag",

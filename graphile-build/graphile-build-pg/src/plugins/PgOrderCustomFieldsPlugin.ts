@@ -12,6 +12,12 @@ import { version } from "../version.js";
 import { isSimpleScalarComputedColumnLike } from "./PgConditionCustomFieldsPlugin.js";
 
 declare global {
+  namespace GraphileConfig {
+    interface Plugins {
+      PgOrderCustomFieldsPlugin: true;
+    }
+  }
+
   namespace GraphileBuild {
     interface Inflection {
       computedAttributeOrder(
