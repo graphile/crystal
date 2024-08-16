@@ -65,7 +65,6 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
-const alwaysAsIdentityIdentifier = sql.identifier("pg11", "always_as_identity");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -76,6 +75,7 @@ const executor = new PgExecutor({
     });
   }
 });
+const alwaysAsIdentityIdentifier = sql.identifier("pg11", "always_as_identity");
 const spec_alwaysAsIdentity = {
   name: "alwaysAsIdentity",
   identifier: alwaysAsIdentityIdentifier,
@@ -492,6 +492,9 @@ const typesUniques = [{
   }
 }];
 const registry = makeRegistry({
+  pgExecutors: Object.assign(Object.create(null), {
+    main: executor
+  }),
   pgCodecs: Object.assign(Object.create(null), {
     alwaysAsIdentity: alwaysAsIdentityCodec,
     int4: TYPES.int,

@@ -65,7 +65,6 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
-const post_tableIdentifier = sql.identifier("smart_comment_relations", "post");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -76,6 +75,7 @@ const executor = new PgExecutor({
     });
   }
 });
+const post_tableIdentifier = sql.identifier("smart_comment_relations", "post");
 const spec_post_table = {
   name: "post_table",
   identifier: post_tableIdentifier,
@@ -778,6 +778,9 @@ const registryConfig_pgResources_buildings_buildings = {
   }
 };
 const registry = makeRegistry({
+  pgExecutors: Object.assign(Object.create(null), {
+    main: executor
+  }),
   pgCodecs: Object.assign(Object.create(null), {
     post_table: post_tableCodec,
     text: TYPES.text,

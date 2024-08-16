@@ -20,7 +20,6 @@ const handler_codec_base64JSON = {
     return base64JSONDecode;
   })()
 };
-const awsApplicationFirstPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "aws_application_first_party_vulnerabilities");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -31,6 +30,7 @@ const executor = new PgExecutor({
     });
   }
 });
+const awsApplicationFirstPartyVulnerabilitiesIdentifier = sql.identifier("polymorphic", "aws_application_first_party_vulnerabilities");
 const spec_awsApplicationFirstPartyVulnerabilities = {
   name: "awsApplicationFirstPartyVulnerabilities",
   identifier: awsApplicationFirstPartyVulnerabilitiesIdentifier,
@@ -3013,6 +3013,9 @@ const registryConfig_pgResources_relational_items_relational_items = {
   }
 };
 const registryConfig = {
+  pgExecutors: Object.assign(Object.create(null), {
+    main: executor
+  }),
   pgCodecs: Object.assign(Object.create(null), {
     awsApplicationFirstPartyVulnerabilities: awsApplicationFirstPartyVulnerabilitiesCodec,
     int4: TYPES.int,

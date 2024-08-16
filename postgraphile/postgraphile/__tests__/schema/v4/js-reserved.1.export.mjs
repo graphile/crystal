@@ -20,6 +20,16 @@ const handler_codec_base64JSON = {
     return base64JSONDecode;
   })()
 };
+const executor = new PgExecutor({
+  name: "main",
+  context() {
+    const ctx = context();
+    return object({
+      pgSettings: "pgSettings" != null ? ctx.get("pgSettings") : constant(null),
+      withPgClient: ctx.get("withPgClient")
+    });
+  }
+});
 const relationalTopicsIdentifier = sql.identifier("js_reserved", "relational_topics");
 const itemTypeCodec = enumCodec({
   name: "itemType",
@@ -33,16 +43,6 @@ const itemTypeCodec = enumCodec({
       name: "item_type"
     },
     tags: Object.create(null)
-  }
-});
-const executor = new PgExecutor({
-  name: "main",
-  context() {
-    const ctx = context();
-    return object({
-      pgSettings: "pgSettings" != null ? ctx.get("pgSettings") : constant(null),
-      withPgClient: ctx.get("withPgClient")
-    });
   }
 });
 const spec_relationalTopics = {
@@ -1010,6 +1010,9 @@ const registryConfig_pgResources_relational_items_relational_items = {
   }
 };
 const registryConfig = {
+  pgExecutors: Object.assign(Object.create(null), {
+    main: executor
+  }),
   pgCodecs: Object.fromEntries([["int4", TYPES.int], ["relationalTopics", relationalTopicsCodec], ["text", TYPES.text], ["__proto__", __proto__Codec], ["building", buildingCodec], ["constructor", constructorCodec], ["crop", cropCodec], ["machine", machineCodec], ["material", materialCodec], ["null", nullCodec], ["project", projectCodec], ["relationalStatus", relationalStatusCodec], ["yield", yieldCodec], ["reserved", reservedCodec], ["relationalItems", relationalItemsCodec], ["itemType", itemTypeCodec], ["varchar", TYPES.varchar], ["bpchar", TYPES.bpchar]]),
   pgResources: Object.fromEntries([["await", {
     executor,

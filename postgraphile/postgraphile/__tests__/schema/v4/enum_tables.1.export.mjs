@@ -65,7 +65,6 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
     })
   }
 });
-const abcdIdentifier = sql.identifier("enum_tables", "abcd");
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -76,6 +75,7 @@ const executor = new PgExecutor({
     });
   }
 });
+const abcdIdentifier = sql.identifier("enum_tables", "abcd");
 const spec_abcd = {
   name: "abcd",
   identifier: abcdIdentifier,
@@ -764,6 +764,9 @@ const registryConfig_pgResources_lots_of_enums_lots_of_enums = {
   }
 };
 const registry = makeRegistry({
+  pgExecutors: Object.assign(Object.create(null), {
+    main: executor
+  }),
   pgCodecs: Object.assign(Object.create(null), {
     abcd: abcdCodec,
     text: TYPES.text,

@@ -2516,6 +2516,9 @@ const person_type_function_connectionFunctionIdentifer = sql.identifier("c", "pe
 const person_type_functionFunctionIdentifer = sql.identifier("c", "person_type_function");
 const person_type_function_listFunctionIdentifer = sql.identifier("c", "person_type_function_list");
 const registry = makeRegistry({
+  pgExecutors: Object.assign(Object.create(null), {
+    main: executor
+  }),
   pgCodecs: Object.assign(Object.create(null), {
     int4: TYPES.int,
     json: TYPES.json,

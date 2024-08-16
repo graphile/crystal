@@ -3530,6 +3530,9 @@ const type_function_listFunctionIdentifer = sql.identifier("b", "type_function_l
 const type_function_list_mutationFunctionIdentifer = sql.identifier("b", "type_function_list_mutation");
 const person_type_function_listFunctionIdentifer = sql.identifier("c", "person_type_function_list");
 const registry = makeRegistry({
+  pgExecutors: Object.assign(Object.create(null), {
+    main: executor
+  }),
   pgCodecs: Object.assign(Object.create(null), {
     int4: TYPES.int,
     void: TYPES.void,
