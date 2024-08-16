@@ -38,6 +38,7 @@ declare global {
      * auto-completion of plugin names in the relevant places.
      */
     interface Plugins {
+      // eslint-disable-next-line @typescript-eslint/ban-types
       [key: string & {}]: true;
     }
 
@@ -46,6 +47,7 @@ declare global {
      * auto-completion of things that plugins can provide.
      */
     interface Provides {
+      // eslint-disable-next-line @typescript-eslint/ban-types
       [key: string & {}]: true;
     }
 
