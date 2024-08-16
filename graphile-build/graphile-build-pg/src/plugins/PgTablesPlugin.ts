@@ -466,7 +466,11 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
               serviceName,
               schemaName: pgClass.getNamespace()!.nspname,
               name: pgClass.relname,
-              persistence: pgClass.relpersistence,
+              ...(pgClass.relpersistence !== "p"
+                ? {
+                    persistence: pgClass.relpersistence,
+                  }
+                : null),
             },
             tags: {
               ...tags,
