@@ -5157,7 +5157,8 @@ export function makeExampleSchema(
         },
         type: MultipleActionsPayload,
         plan: EXPORTABLE(
-          (executor, object, sleep, sql, withPgClientTransaction) => function plan(_$root, { $input: { $a } }) {
+          (executor, object, sleep, sql, withPgClientTransaction) =>
+            function plan(_$root, { $input: { $a } }) {
               const $transactionResult = withPgClientTransaction<
                 { a: number | null | undefined },
                 number[]
