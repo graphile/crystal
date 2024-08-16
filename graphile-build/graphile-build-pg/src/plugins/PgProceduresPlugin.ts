@@ -684,7 +684,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           "inferred",
           "override",
         ],
-        callback(behavior, resource, build) {
+        callback(behavior, resource) {
           if (resource.parameters) {
             // Default to no backwards pagination for functions
             return ["-resource:connection:backwards", behavior];

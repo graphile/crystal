@@ -42,7 +42,7 @@ export const PgFirstLastBeforeAfterArgsPlugin: GraphileConfig.Plugin = {
       pgResource: {
         provides: ["default"],
         before: ["inferred", "override"],
-        callback(behavior, resource, build) {
+        callback(behavior) {
           return ["resource:connection:backwards", behavior];
         },
       },
