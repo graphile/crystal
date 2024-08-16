@@ -420,6 +420,11 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
               serviceName,
               schemaName: pgClass.getNamespace()!.nspname,
               name: pgClass.relname,
+              ...(pgClass.relpersistence !== "p"
+                ? {
+                    persistence: pgClass.relpersistence,
+                  }
+                : null),
             },
             tags,
           };

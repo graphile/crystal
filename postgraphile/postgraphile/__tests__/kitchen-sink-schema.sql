@@ -72,6 +72,11 @@ create table c.person (
   created_at timestamp default current_timestamp
 );
 
+create unlogged table c.unlogged (
+  id serial primary key,
+  nonsense text
+);
+
 do $_$
 begin
 if current_setting('server_version_num')::int >= 90500 then

@@ -107,6 +107,7 @@ declare global {
    */
   namespace DataplanPg {
     interface PgResourceExtensions {
+      description?: string;
       tags: Partial<GraphileBuild.PgResourceTags>;
       singleOutputParameterName?: string;
       /** For v4 compatibility, what's the name of the actual table. */
@@ -114,6 +115,13 @@ declare global {
         serviceName: string;
         schemaName: string;
         name: string;
+        /**
+         * - p = permanent table/sequence
+         * - u = unlogged table/sequence
+         * - t = temporary table/sequence
+         */
+        // eslint-disable-next-line @typescript-eslint/ban-types
+        persistence?: "p" | "u" | "t" | (string & {}) | null;
       };
     }
 
@@ -137,6 +145,18 @@ declare global {
       /** If false but the codec has attributes then it's probably a composite type */
       isTableLike?: boolean;
       tags: Partial<GraphileBuild.PgCodecTags>;
+      pg?: {
+        serviceName: string;
+        schemaName: string;
+        name: string;
+        /**
+         * - p = permanent table/sequence
+         * - u = unlogged table/sequence
+         * - t = temporary table/sequence
+         */
+        // eslint-disable-next-line @typescript-eslint/ban-types
+        persistence?: "p" | "u" | "t" | (string & {}) | null;
+      };
     }
   }
 }

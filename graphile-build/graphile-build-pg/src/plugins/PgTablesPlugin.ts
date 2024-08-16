@@ -2,6 +2,7 @@ import type {
   PgCodec,
   PgCodecAttribute,
   PgResource,
+  PgResourceExtensions,
   PgResourceOptions,
   PgResourceUnique,
 } from "@dataplan/pg";
@@ -459,12 +460,17 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           const isVirtual = !["r", "v", "m", "f", "p"].includes(
             pgClass.relkind,
           );
-          const extensions = {
+          const extensions: PgResourceExtensions = {
             description,
             pg: {
               serviceName,
               schemaName: pgClass.getNamespace()!.nspname,
               name: pgClass.relname,
+              ...(pgClass.relpersistence !== "p"
+                ? {
+                    persistence: pgClass.relpersistence,
+                  }
+                : null),
             },
             tags: {
               ...tags,
@@ -568,23 +574,44 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         provides: ["default"],
         before: ["inferred", "override"],
         callback(behavior, codec) {
-          return [
-            "resource:select",
-            "table",
-            ...(!codec.isAnonymous
-              ? ["resource:insert", "resource:update", "resource:delete"]
-              : []),
-            behavior,
-          ];
+          if (codec.attributes) {
+            const isUnloggedOrTemp =
+              codec.extensions?.pg?.persistence === "u" ||
+              codec.extensions?.pg?.persistence === "t";
+            return [
+              "resource:select",
+              "table",
+              ...(!codec.isAnonymous
+                ? ["resource:insert", "resource:update", "resource:delete"]
+                : []),
+              behavior,
+              ...(isUnloggedOrTemp
+                ? [
+                    "-resource:select -resource:insert -resource:update -resource:delete",
+                  ]
+                : []),
+            ];
+          } else {
+            return [behavior];
+          }
         },
       },
       pgResource: {
         provides: ["default"],
         before: ["inferred", "override"],
         callback(behavior, resource) {
+          const isFunction = !!resource.parameters;
+          const isUnloggedOrTemp =
+            resource.extensions?.pg?.persistence === "u" ||
+            resource.extensions?.pg?.persistence === "t";
           return [
-            ...(!resource.parameters ? ["resource:select"] : []),
+            ...(!isFunction && !isUnloggedOrTemp ? ["resource:select"] : []),
             behavior,
+            ...(isUnloggedOrTemp
+              ? [
+                  "-resource:select -resource:insert -resource:update -resource:delete",
+                ]
+              : []),
           ];
         },
       },

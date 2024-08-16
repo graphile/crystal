@@ -505,11 +505,6 @@ declare global {
      */
     interface PgCodecExtensions {
       oid?: string;
-      pg?: {
-        serviceName: string;
-        schemaName: string;
-        name: string;
-      };
       listItemNonNull?: boolean;
       isEnumTableEnum?: boolean;
     }
