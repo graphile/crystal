@@ -74,7 +74,7 @@ export type PluginHookObject<T extends (...args: any[]) => any> =
 /** @deprecated Use CallbackOrDescriptor */
 export type PluginHook<
   T extends (...args: any[]) => PromiseOrDirect<UnwrapCallback<any> | void>,
-> = CallbackOrDescriptor<T>;
+> = CallbackOrDescriptor<T> | readonly CallbackDescriptor<T>[];
 /** @deprecated Use UnwrapCallback */
 export type PluginHookCallback<
   T extends CallbackOrDescriptor<(...args: any[]) => any>,
