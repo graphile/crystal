@@ -34,6 +34,13 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      "constraint:resource:update": true;
+      "constraint:resource:delete": true;
+      "update:resource:select": true;
+      "delete:resource:nodeId": true;
+      "delete:resource:select": true;
+    }
     interface ScopeObject {
       isPgUpdatePayloadType?: boolean;
       isPgDeletePayloadType?: boolean;
@@ -239,10 +246,24 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "constraint:resource:update": {},
+        "constraint:resource:delete": {},
+        "update:resource:select": {},
+        "delete:resource:nodeId": {},
+        "delete:resource:select": {},
+      },
+    },
     entityBehavior: {
-      pgResource:
-        "update delete update:resource:select delete:resource:nodeId -delete:resource:select",
-      pgResourceUnique: "update delete",
+      pgResource: [
+        "update",
+        "delete",
+        "update:resource:select",
+        "delete:resource:nodeId",
+        "-delete:resource:select",
+      ],
+      pgResourceUnique: ["update", "delete"],
     },
 
     hooks: {

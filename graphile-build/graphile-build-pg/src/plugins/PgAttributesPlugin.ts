@@ -28,6 +28,15 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      "-condition:attribute:filterBy": true;
+      "-attribute:select": true;
+      "-attribute:base": true;
+      "-attribute:insert": true;
+      "-attribute:update": true;
+      "-attribute:filterBy": true;
+      "-attribute:orderBy": true;
+    }
     interface Build {
       pgResolveOutputType(
         codec: PgCodec,
@@ -288,13 +297,30 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "-condition:attribute:filterBy": {},
+        "-attribute:select": {},
+        "-attribute:base": {},
+        "-attribute:insert": {},
+        "-attribute:update": {},
+        "-attribute:filterBy": {},
+        "-attribute:orderBy": {},
+      },
+    },
+
     entityBehavior: {
       pgCodecAttribute: {
         provides: ["default"],
         before: ["inferred", "override"],
         callback(behavior, [codec, attributeName]) {
-          const behaviors = new Set([
-            "select base update insert filterBy orderBy",
+          const behaviors = new Set<GraphileBuild.BehaviorString>([
+            "select",
+            "base",
+            "update",
+            "insert",
+            "filterBy",
+            "orderBy",
           ]);
           const attribute = codec.attributes[attributeName];
           function walk(codec: PgCodec) {

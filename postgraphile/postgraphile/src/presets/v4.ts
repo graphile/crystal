@@ -160,7 +160,7 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
         return `${behavior} ${simpleCollectionsBehavior} -singularRelation:resource:connection -singularRelation:resource:list +condition:attribute:filterBy +attribute:orderBy +resource:connection:backwards`;
       },
       entityBehavior: {
-        pgResource: "+delete:resource:select",
+        pgResource: "delete:resource:select",
         pgCodecAttribute(behavior, [codec, attributeName]) {
           const attribute = codec.attributes[attributeName];
           const underlyingCodec =

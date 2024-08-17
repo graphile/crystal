@@ -73,7 +73,7 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
         before: ["inferred", "override"],
         callback(behavior, entity) {
           if (entity.polymorphism?.mode === "union") {
-            return ["connection -list", behavior];
+            return ["connection", "-list", behavior];
           } else {
             return behavior;
           }

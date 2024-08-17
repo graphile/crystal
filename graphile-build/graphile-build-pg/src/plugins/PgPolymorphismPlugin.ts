@@ -663,7 +663,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
           return [
             "select",
             "table",
-            ...(!codec.isAnonymous ? ["insert", "update"] : []),
+            ...((!codec.isAnonymous
+              ? ["insert", "update"]
+              : []) as GraphileBuild.BehaviorString[]),
             behavior,
           ];
         },
@@ -698,7 +700,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               if (
                 arraysMatch(relation.remoteAttributes, entity.localAttributes)
               ) {
-                return [behavior, "-connection -list -single"];
+                return [behavior, "-connection", "-list", "-single"];
               }
             }
           }
@@ -709,7 +711,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
               (t) => pgRelations[localCodec.name]?.[t.relationName],
             );
             if (relations.includes(entity)) {
-              return [behavior, "-connection -list -single"];
+              return [behavior, "-connection", "-list", "-single"];
             }
           }
 
@@ -742,7 +744,10 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 ) {
                   return [
                     behavior,
-                    "-attribute:select -attribute:update -attribute:filterBy -attribute:orderBy",
+                    "-attribute:select",
+                    "-attribute:update",
+                    "-attribute:filterBy",
+                    "-attribute:orderBy",
                   ];
                 }
               }
@@ -767,7 +772,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             if ((resource.codec as PgCodec).polymorphism) {
               // This is a polymorphic type
               newBehavior.push(
-                "-resource:insert -resource:update -resource:delete",
+                "-resource:insert",
+                "-resource:update",
+                "-resource:delete",
               );
             } else {
               const resourceTypeName = build.inflection.tableType(
@@ -795,7 +802,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 ) {
                   // This is part of a relational polymorphic type
                   newBehavior.push(
-                    "-resource:insert -resource:update -resource:delete",
+                    "-resource:insert",
+                    "-resource:update",
+                    "-resource:delete",
                   );
                 }
               }

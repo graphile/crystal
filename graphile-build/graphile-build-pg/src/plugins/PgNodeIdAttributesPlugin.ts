@@ -22,6 +22,13 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      "nodeId:insert": true;
+      "nodeId:update": true;
+      "nodeId:delete": true;
+      "nodeId:base": true;
+      "nodeId:filterBy": true;
+    }
     interface Inflection {
       /**
        * The name of the attribute used as an `ID` input representing a related
@@ -55,10 +62,24 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "nodeId:insert": {},
+        "nodeId:update": {},
+        "nodeId:delete": {},
+        "nodeId:base": {},
+        "nodeId:filterBy": {},
+      },
+    },
+
     entityBehavior: {
       // By default, column attributes will be present, so we don't want this to also be set
-      pgCodecRelation:
-        "-nodeId:insert -nodeId:update -nodeId:base -nodeId:filterBy",
+      pgCodecRelation: [
+        "-nodeId:insert",
+        "-nodeId:update",
+        "-nodeId:base",
+        "-nodeId:filterBy",
+      ],
     },
     hooks: {
       GraphQLInputObjectType_fields(fields, build, context) {

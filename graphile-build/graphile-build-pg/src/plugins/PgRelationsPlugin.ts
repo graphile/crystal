@@ -34,6 +34,10 @@ const ref_sql = te.ref(sql, "sql");
 
 declare global {
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      "singularRelation:resource:list": true;
+      "singularRelation:resource:connection": true;
+    }
     interface SchemaOptions {
       pgMutationPayloadRelations?: boolean;
     }
@@ -503,19 +507,27 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
   }),
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "singularRelation:resource:list": {},
+        "singularRelation:resource:connection": {},
+      },
+    },
     entityBehavior: {
       pgCodecRelation: {
         provides: ["inferred"],
         before: ["override"],
         after: ["default"],
-        callback(behavior, entity) {
+        callback(behavior, entity): GraphileBuild.BehaviorString[] {
           if (entity.isUnique) {
             return [
               behavior,
-              "single -singularRelation:resource:list -singularRelation:resource:connection",
+              "single",
+              "-singularRelation:resource:list",
+              "-singularRelation:resource:connection",
             ];
           } else {
-            return behavior;
+            return [behavior];
           }
         },
       },
@@ -528,7 +540,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           if (ref?.definition.singular) {
             return [
               behavior,
-              "single -singularRelation:resource:list -singularRelation:resource:connection",
+              "single",
+              "-singularRelation:resource:list",
+              "-singularRelation:resource:connection",
             ];
           } else {
             return behavior;
@@ -543,7 +557,9 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
           if (entity.singular) {
             return [
               behavior,
-              "single -singularRelation:resource:list -singularRelation:resource:connection",
+              "single",
+              "-singularRelation:resource:list",
+              "-singularRelation:resource:connection",
             ];
           } else {
             return behavior;

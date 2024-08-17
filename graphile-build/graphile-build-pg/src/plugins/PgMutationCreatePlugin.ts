@@ -18,6 +18,10 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      "insert:resource:select": true;
+      record: true;
+    }
     interface ScopeObject {
       isPgCreatePayloadType?: boolean;
     }
@@ -77,12 +81,24 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "insert:resource:select": {},
+        record: {
+          description: "record type used for insert",
+        },
+      },
+    },
+
     entityBehavior: {
       pgResource: {
         provides: ["default"],
         before: ["inferred", "override"],
         callback(behavior, resource) {
-          const newBehavior = [behavior, "+insert:resource:select"];
+          const newBehavior: GraphileBuild.BehaviorString[] = [
+            behavior,
+            "insert:resource:select",
+          ];
           if (
             !resource.parameters &&
             !!resource.codec.attributes &&

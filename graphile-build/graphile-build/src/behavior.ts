@@ -19,8 +19,10 @@ const getEntityBehaviorHooks = (plugin: GraphileConfig.Plugin) => {
   const entries = Object.entries(val);
   let changed = false;
   for (const entry of entries) {
-    const lhs = entry[1];
-    if (typeof lhs === "string") {
+    const lhs = entry[1] as GraphileBuild.BehaviorString;
+    const isArrayOfStrings =
+      Array.isArray(lhs) && lhs.every((t) => typeof t === "string");
+    if (isArrayOfStrings || typeof lhs === "string") {
       const hook: Exclude<
         NonNullable<
           NonNullable<GraphileConfig.Plugin["schema"]>["entityBehavior"]
@@ -29,7 +31,9 @@ const getEntityBehaviorHooks = (plugin: GraphileConfig.Plugin) => {
       > = {
         provides: ["default"],
         before: ["inferred", "override"],
-        callback: (behavior) => [lhs, behavior],
+        callback: isArrayOfStrings
+          ? (behavior) => [...lhs, behavior]
+          : (behavior) => [lhs, behavior],
       };
       entry[1] = hook;
       changed = true;
@@ -57,6 +61,7 @@ export type BehaviorDynamicMethods = {
 export class Behavior {
   private behaviorEntities: {
     [entityType in keyof GraphileBuild.BehaviorEntities]: {
+      behaviorStrings: Record<string, { description: string }>;
       behaviorCallbacks: Array<
         [
           source: string,
@@ -156,6 +161,7 @@ export class Behavior {
     }
     this.behaviorEntityTypes.push(entityType);
     this.behaviorEntities[entityType] = {
+      behaviorStrings: Object.create(null),
       behaviorCallbacks: [],
       listCache: new Map(),
       cacheWithDefault: new Map(),

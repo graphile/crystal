@@ -32,6 +32,17 @@ declare global {
       "graphile-build-pg": string;
       "@dataplan/pg": string;
     }
+    interface BehaviorStrings {
+      select: true;
+      insert: true;
+      update: true;
+      delete: true;
+      base: true;
+      filter: true;
+      filterBy: true;
+      order: true;
+      orderBy: true;
+    }
     type HasGraphQLTypeForPgCodec = (
       codec: PgCodec<any, any, any, any, any, any, any>,
       situation?: string,
@@ -177,6 +188,23 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
 
   schema: {
     globalBehavior: "connection -list",
+    behaviorRegistry: {
+      add: {
+        select: {
+          description:
+            "can select this resource/column/etc. Note this does not necessarily mean you can do select * from users but it might mean that it's possible to see details about a users when it's returned by a function or similar. (In this case the codec has select but the resource has -select.)",
+          entities: ["pgCodec", "pgResource"],
+        },
+        insert: { description: "", entities: [] },
+        update: { description: "", entities: [] },
+        delete: { description: "", entities: [] },
+        base: { description: "", entities: [] },
+        filter: { description: "", entities: [] },
+        filterBy: { description: "", entities: [] },
+        order: { description: "", entities: [] },
+        orderBy: { description: "", entities: [] },
+      },
+    },
     entityBehavior: {
       pgCodec: {
         after: ["default", "inferred"],

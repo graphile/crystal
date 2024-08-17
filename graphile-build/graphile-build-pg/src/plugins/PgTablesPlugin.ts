@@ -20,6 +20,13 @@ import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      table: true;
+      "resource:select": true;
+      "resource:insert": true;
+      "resource:update": true;
+      "resource:delete": true;
+    }
     interface SchemaOptions {
       /**
        * If true, setof functions cannot return null, so our list and
@@ -569,6 +576,30 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
   }),
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "resource:select": {
+          description: "can select rows from this resource",
+          entities: ["pgCodec", "pgResource"],
+        },
+        "resource:insert": {
+          description: "can insert into this resource",
+          entities: ["pgCodec", "pgResource"],
+        },
+        "resource:update": {
+          description: "can update a record in this resource",
+          entities: ["pgCodec", "pgResource"],
+        },
+        "resource:delete": {
+          description: "can delete a record in this resource",
+          entities: ["pgCodec", "pgResource"],
+        },
+        table: {
+          description: "is this codec table-like?",
+          entities: ["pgCodec"],
+        },
+      },
+    },
     entityBehavior: {
       pgCodec: {
         provides: ["default"],
@@ -581,15 +612,18 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             return [
               "resource:select",
               "table",
-              ...(!codec.isAnonymous
+              ...((!codec.isAnonymous
                 ? ["resource:insert", "resource:update", "resource:delete"]
-                : []),
+                : []) as GraphileBuild.BehaviorString[]),
               behavior,
-              ...(isUnloggedOrTemp
+              ...((isUnloggedOrTemp
                 ? [
-                    "-resource:select -resource:insert -resource:update -resource:delete",
+                    "-resource:select",
+                    "-resource:insert",
+                    "-resource:update",
+                    "-resource:delete",
                   ]
-                : []),
+                : []) as GraphileBuild.BehaviorString[]),
             ];
           } else {
             return [behavior];
@@ -605,13 +639,15 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             resource.extensions?.pg?.persistence === "u" ||
             resource.extensions?.pg?.persistence === "t";
           return [
-            ...(!isFunction && !isUnloggedOrTemp ? ["resource:select"] : []),
+            ...((!isFunction && !isUnloggedOrTemp
+              ? ["resource:select"]
+              : []) as GraphileBuild.BehaviorString[]),
             behavior,
-            ...(isUnloggedOrTemp
+            ...((isUnloggedOrTemp
               ? [
                   "-resource:select -resource:insert -resource:update -resource:delete",
                 ]
-              : []),
+              : []) as GraphileBuild.BehaviorString[]),
           ];
         },
       },

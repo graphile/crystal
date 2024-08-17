@@ -61,6 +61,11 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      queryField: true;
+      mutationField: true;
+      typeField: true;
+    }
     interface Build {
       pgGetArgDetailsFromParameters(
         resource: PgResource<any, any, any, any, any>,
@@ -189,8 +194,8 @@ function shouldUseCustomConnection(
 
 function defaultProcSourceBehavior(
   s: PgResource<any, any, any, any, any>,
-): string {
-  const behavior = [];
+): GraphileBuild.BehaviorString {
+  const behavior: GraphileBuild.BehaviorString[] = [];
   const firstParameter = (
     s as PgResource<any, any, any, readonly PgResourceParameter[], any>
   ).parameters[0];
@@ -228,11 +233,11 @@ function defaultProcSourceBehavior(
     const canUseConnection =
       !s.sqlPartitionByIndex && !s.isList && !s.codec.arrayOfCodec;
     if (!canUseConnection) {
-      behavior.push("-connection +list");
+      behavior.push("-connection", "list");
     }
   }
 
-  return behavior.join(" ");
+  return behavior.join(" ") as GraphileBuild.BehaviorString;
 }
 
 function hasRecord(
@@ -338,6 +343,13 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        queryField: {},
+        mutationField: {},
+        typeField: {},
+      },
+    },
     entityBehavior: {
       pgResource: {
         provides: ["inferred"],

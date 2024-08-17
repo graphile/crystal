@@ -18,6 +18,9 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      "proc:filterBy": true;
+    }
     interface ScopeInputObjectFieldsField {
       isPgConnectionConditionInputField?: boolean;
       pgFieldSource?: PgResource<any, any, any, any, any>;
@@ -51,6 +54,11 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
   after: ["PgAttributesPlugin"],
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "proc:filterBy": {},
+      },
+    },
     entityBehavior: {
       pgResource: {
         provides: ["inferred"],

@@ -26,6 +26,9 @@ import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      "resource:connection:backwards": true;
+    }
     interface Inflection {
       functionResourceName(
         this: Inflection,
@@ -674,6 +677,12 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
     },
   }),
   schema: {
+    behaviorRegistry: {
+      add: {
+        "resource:connection:backwards": {},
+      },
+    },
+
     entityBehavior: {
       pgResource: {
         provides: ["default"],

@@ -1,6 +1,7 @@
 import { AddNodeInterfaceToSuitableTypesPlugin } from "./AddNodeInterfaceToSuitableTypesPlugin.js";
 import { BuiltinScalarConnectionsPlugin } from "./BuiltinScalarConnectionsPlugin.js";
 import { ClientMutationIdDescriptionPlugin } from "./ClientMutationIdDescriptionPlugin.js";
+import { CommonBehaviorsPlugin } from "./CommonBehaviorsPlugin.js";
 import { CommonTypesPlugin } from "./CommonTypesPlugin.js";
 import { ConnectionPlugin } from "./ConnectionPlugin.js";
 import { CursorTypePlugin } from "./CursorTypePlugin.js";
@@ -23,6 +24,7 @@ export {
   AddNodeInterfaceToSuitableTypesPlugin,
   BuiltinScalarConnectionsPlugin,
   ClientMutationIdDescriptionPlugin,
+  CommonBehaviorsPlugin,
   CommonTypesPlugin,
   ConnectionPlugin,
   CursorTypePlugin,

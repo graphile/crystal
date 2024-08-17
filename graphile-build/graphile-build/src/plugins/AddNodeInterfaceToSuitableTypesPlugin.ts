@@ -5,6 +5,7 @@ import { lambda } from "grafast";
 import type { GraphQLInterfaceType } from "grafast/graphql";
 
 import { EXPORTABLE } from "../utils.js";
+import { version } from "../version.js";
 import { NODE_ID_CODECS, NODE_ID_HANDLER_BY_TYPE_NAME } from "./NodePlugin.js";
 
 declare global {
@@ -17,7 +18,7 @@ declare global {
 
 export const AddNodeInterfaceToSuitableTypesPlugin: GraphileConfig.Plugin = {
   name: "AddNodeInterfaceToSuitableTypesPlugin",
-  version: "1.0.0",
+  version,
   description: `Adds the 'Node' interface to all types that have registered a Node ID handler`,
 
   schema: {

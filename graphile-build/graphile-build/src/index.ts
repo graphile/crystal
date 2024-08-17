@@ -16,6 +16,7 @@ import {
   AddNodeInterfaceToSuitableTypesPlugin,
   BuiltinScalarConnectionsPlugin,
   ClientMutationIdDescriptionPlugin,
+  CommonBehaviorsPlugin,
   CommonTypesPlugin,
   CursorTypePlugin,
   MutationPayloadQueryPlugin,
@@ -504,6 +505,7 @@ export {
   AddNodeInterfaceToSuitableTypesPlugin,
   BuiltinScalarConnectionsPlugin,
   ClientMutationIdDescriptionPlugin,
+  CommonBehaviorsPlugin,
   CommonTypesPlugin,
   CursorTypePlugin,
   MutationPayloadQueryPlugin,
@@ -853,6 +855,18 @@ declare global {
               build: GraphileBuild.Build,
             ) => string | string[]);
 
+        behaviorRegistry?: {
+          add?: Partial<
+            Record<
+              keyof GraphileBuild.BehaviorStrings,
+              {
+                description?: string;
+                entities?: (keyof GraphileBuild.BehaviorEntities)[];
+              }
+            >
+          >;
+        };
+
         /**
          * You should use `before`, `after` and `provides` to ensure that the entity
          * behaviors apply in order. The order should be roughly:
@@ -863,13 +877,16 @@ declare global {
          */
         entityBehavior?: {
           [entityType in keyof GraphileBuild.BehaviorEntities]?:
-            | string
+            | GraphileBuild.BehaviorString
+            | GraphileBuild.BehaviorString[]
             | PluginHook<
                 (
-                  behavior: string,
+                  behavior: GraphileBuild.BehaviorString,
                   entity: GraphileBuild.BehaviorEntities[entityType],
                   build: GraphileBuild.Build,
-                ) => string | string[]
+                ) =>
+                  | GraphileBuild.BehaviorString
+                  | GraphileBuild.BehaviorString[]
               >;
         };
 

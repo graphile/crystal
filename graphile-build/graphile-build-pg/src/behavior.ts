@@ -26,9 +26,9 @@ export function getBehavior(
       >
     | undefined
   >,
-): string {
+): GraphileBuild.BehaviorString {
   const allExtensions = Array.isArray(extensions) ? extensions : [extensions];
-  const behaviors: string[] = [];
+  const behaviors: GraphileBuild.BehaviorString[] = [];
   for (const extensions of allExtensions) {
     // LOGGING: all of these are just for user convenience, users should be guided not to use them.
     add(extensions?.tags?.behaviours);
@@ -38,7 +38,7 @@ export function getBehavior(
     // This is the real one
     add(extensions?.tags?.behavior);
   }
-  return behaviors.join(" ");
+  return behaviors.join(" ") as GraphileBuild.BehaviorString;
 
   function add(
     rawBehavior: (string | true)[] | string | true | null | undefined,
@@ -56,7 +56,9 @@ export function getBehavior(
           )}`,
         );
       }
-      behaviors.push(behavior.join(" "));
+      for (const b of behavior) {
+        behaviors.push(b as GraphileBuild.BehaviorString);
+      }
       return;
     }
     if (isValidBehavior(behavior)) {
@@ -79,7 +81,9 @@ export function getBehavior(
  *
  * @internal
  */
-function isValidBehavior(behavior: unknown): behavior is string {
+function isValidBehavior(
+  behavior: unknown,
+): behavior is GraphileBuild.BehaviorString {
   return (
     typeof behavior === "string" &&
     /^[+-]?([a-zA-Z](?:[_:]?[a-zA-Z0-9])+|\*)(?:\s+[+-]?(?:[a-zA-Z]([_:]?[a-zA-Z0-9])+|\*))*$/.test(

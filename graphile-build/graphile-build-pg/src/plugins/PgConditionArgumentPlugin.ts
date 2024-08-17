@@ -20,6 +20,9 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      filter: true;
+    }
     interface Inflection {
       conditionType(this: Inflection, typeName: string): string;
     }
@@ -46,13 +49,19 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        filter: {},
+      },
+    },
+
     entityBehavior: {
-      pgCodec: "select filter",
+      pgCodec: ["select", "filter"],
       pgResource: {
         provides: ["default"],
         before: ["inferred", "override"],
         callback(behavior, resource) {
-          return [resource.parameters ? "" : "filter", behavior];
+          return resource.parameters ? [behavior] : ["filter", behavior];
         },
       },
     },
