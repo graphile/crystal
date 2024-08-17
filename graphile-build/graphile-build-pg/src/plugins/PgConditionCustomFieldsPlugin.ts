@@ -56,7 +56,11 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
   schema: {
     behaviorRegistry: {
       add: {
-        "proc:filterBy": {},
+        "proc:filterBy": {
+          description:
+            "can we filter by the result of this proc (function resource)",
+          entities: ["pgResource"],
+        },
       },
     },
     entityBehavior: {

@@ -679,7 +679,11 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
   schema: {
     behaviorRegistry: {
       add: {
-        "resource:connection:backwards": {},
+        "resource:connection:backwards": {
+          description:
+            "can we paginate backwards through this collection's connection?",
+          entities: ["pgResource"],
+        },
       },
     },
 

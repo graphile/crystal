@@ -860,8 +860,8 @@ declare global {
             Record<
               keyof GraphileBuild.BehaviorStrings,
               {
-                description?: string;
-                entities?: (keyof GraphileBuild.BehaviorEntities)[];
+                description: string;
+                entities: (keyof GraphileBuild.BehaviorEntities)[];
               }
             >
           >;

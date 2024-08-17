@@ -345,9 +345,19 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
   schema: {
     behaviorRegistry: {
       add: {
-        queryField: {},
-        mutationField: {},
-        typeField: {},
+        queryField: {
+          description: 'a "custom query function"',
+          entities: ["pgResource"],
+        },
+        mutationField: {
+          description: 'a "custom mutation function"',
+          entities: ["pgResource"],
+        },
+        typeField: {
+          description:
+            'a "custom field function" - add it to a specific type (aka "computed column")',
+          entities: ["pgResource"],
+        },
       },
     },
     entityBehavior: {

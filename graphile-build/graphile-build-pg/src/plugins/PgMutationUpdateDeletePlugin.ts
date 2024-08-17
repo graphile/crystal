@@ -248,11 +248,28 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
   schema: {
     behaviorRegistry: {
       add: {
-        "constraint:resource:update": {},
-        "constraint:resource:delete": {},
-        "update:resource:select": {},
-        "delete:resource:nodeId": {},
-        "delete:resource:select": {},
+        "constraint:resource:update": {
+          description: "can update a record by this constraint",
+          entities: ["pgResourceUnique"],
+        },
+        "constraint:resource:delete": {
+          description: "can delete a record by this constraint",
+          entities: ["pgResourceUnique"],
+        },
+        "delete:resource:nodeId": {
+          description: "can delete a record by its Node ID",
+          entities: ["pgResource"],
+        },
+        "update:resource:select": {
+          description:
+            "can you select the record that was updated on the mutation payload?",
+          entities: ["pgResource"],
+        },
+        "delete:resource:select": {
+          description:
+            "can you select the record that was deleted on the mutation payload?",
+          entities: ["pgResource"],
+        },
       },
     },
     entityBehavior: {

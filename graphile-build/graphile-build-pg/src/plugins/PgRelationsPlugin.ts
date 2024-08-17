@@ -35,6 +35,7 @@ const ref_sql = te.ref(sql, "sql");
 declare global {
   namespace GraphileBuild {
     interface BehaviorStrings {
+      "singularRelation:resource:single": true;
       "singularRelation:resource:list": true;
       "singularRelation:resource:connection": true;
     }
@@ -509,8 +510,21 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
   schema: {
     behaviorRegistry: {
       add: {
-        "singularRelation:resource:list": {},
-        "singularRelation:resource:connection": {},
+        "singularRelation:resource:single": {
+          description:
+            "can we get a single one of these (resource) from a type?",
+          entities: ["pgCodecRelation", "pgCodecRef"],
+        },
+        "singularRelation:resource:list": {
+          description:
+            "should we add a list field to navigate this singular relationship (when we know there can be at most one)?",
+          entities: ["pgCodecRelation", "pgCodecRef"],
+        },
+        "singularRelation:resource:connection": {
+          description:
+            "should we add a connection field to navigate this singular relationship (when we know there can be at most one)?",
+          entities: ["pgCodecRelation", "pgCodecRef"],
+        },
       },
     },
     entityBehavior: {

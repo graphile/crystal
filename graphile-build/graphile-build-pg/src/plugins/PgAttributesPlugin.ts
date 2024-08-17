@@ -299,13 +299,35 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
   schema: {
     behaviorRegistry: {
       add: {
-        "-condition:attribute:filterBy": {},
-        "-attribute:select": {},
-        "-attribute:base": {},
-        "-attribute:insert": {},
-        "-attribute:update": {},
-        "-attribute:filterBy": {},
-        "-attribute:orderBy": {},
+        "-attribute:select": {
+          description: "can this attribute be selected?",
+          entities: ["pgCodecAttribute"],
+        },
+        "-attribute:insert": {
+          description: "can this attribute be written on create?",
+          entities: ["pgCodecAttribute"],
+        },
+        "-attribute:update": {
+          description: "can this attribute be updated?",
+          entities: ["pgCodecAttribute"],
+        },
+        "-attribute:base": {
+          description: "should we add this attribute to the 'base' input type?",
+          entities: ["pgCodecAttribute"],
+        },
+        "-attribute:filterBy": {
+          description: "can we filter by this attribute?",
+          entities: ["pgCodecAttribute"],
+        },
+        "-condition:attribute:filterBy": {
+          description:
+            "can we filter by this attribute in the `condition` argument?",
+          entities: ["pgCodecAttribute"],
+        },
+        "-attribute:orderBy": {
+          description: "can we order by this attribute?",
+          entities: ["pgCodecAttribute"],
+        },
       },
     },
 

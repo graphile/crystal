@@ -25,7 +25,6 @@ declare global {
     interface BehaviorStrings {
       "nodeId:insert": true;
       "nodeId:update": true;
-      "nodeId:delete": true;
       "nodeId:base": true;
       "nodeId:filterBy": true;
     }
@@ -64,11 +63,26 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
   schema: {
     behaviorRegistry: {
       add: {
-        "nodeId:insert": {},
-        "nodeId:update": {},
-        "nodeId:delete": {},
-        "nodeId:base": {},
-        "nodeId:filterBy": {},
+        "nodeId:insert": {
+          description:
+            "can we insert to the columns represented by this nodeId which represents a table related via foreign key constraint?",
+          entities: ["pgCodecRelation"],
+        },
+        "nodeId:update": {
+          description:
+            "can we update the columns represented by this nodeId which represents a table related via foreign key constraint?",
+          entities: ["pgCodecRelation"],
+        },
+        "nodeId:base": {
+          description:
+            'should we add a nodeId input representing this foreign key constraint to the "base" input type?',
+          entities: ["pgCodecRelation"],
+        },
+        "nodeId:filterBy": {
+          description:
+            "can we filter by the columns represented by this nodeId which represents a table related via foreign key constraint?",
+          entities: ["pgCodecRelation"],
+        },
       },
     },
 

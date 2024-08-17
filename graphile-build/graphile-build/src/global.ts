@@ -96,7 +96,9 @@ interface RegisterObjectType {
 declare global {
   namespace GraphileBuild {
     type BehaviorString =
-      | (string & { __incomingBehaviorString: true })
+      | (string & {
+          /* lies; just for TS */ readonly __incomingBehaviorString: unique symbol;
+        })
       | `${"" | "-"}${keyof GraphileBuild.BehaviorStrings}`;
 
     /**

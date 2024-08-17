@@ -42,7 +42,10 @@ export const PgConnectionTotalCountPlugin: GraphileConfig.Plugin = {
   schema: {
     behaviorRegistry: {
       add: {
-        totalCount: {},
+        totalCount: {
+          description: "on a codec, should we add the totalCount field?",
+          entities: ["pgCodec"],
+        },
       },
     },
 

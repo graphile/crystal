@@ -83,9 +83,14 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
   schema: {
     behaviorRegistry: {
       add: {
-        "insert:resource:select": {},
+        "insert:resource:select": {
+          description:
+            "can select the row that was inserted (on the mutation payload)",
+          entities: ["pgResource"],
+        },
         record: {
           description: "record type used for insert",
+          entities: ["pgResource"],
         },
       },
     },

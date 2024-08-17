@@ -51,7 +51,10 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
   schema: {
     behaviorRegistry: {
       add: {
-        filter: {},
+        filter: {
+          description: "can we filter this resource/codec",
+          entities: ["pgCodec", "pgResource"],
+        },
       },
     },
 
