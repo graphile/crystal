@@ -404,3 +404,14 @@ expect, instead it uses a tuple with entries for each of the selected
 attributes. The makeup of this tuple will vary depending on which attributes
 you requested, and in which order, so you must not rely on its structure. To
 get an attribute you should use `$pgSelectSingle.get(attr)` or similar
+
+## Using the Underlying Data of a PgSelect Step
+
+Although PgSelect is an opaque step, there are a few ways to modify the keys and values of that are returned in the plan. 
+
+For altering the returned keys of the object, see the documentation for [`each`](../standard-steps/each.md)
+
+For altering the values of the returned object, see the documentation for [`applyTransforms`](../standard-steps/applyTransforms.md)
+
+
+
