@@ -72,7 +72,7 @@
     "typedoc": "^0.25.0",
     "typedoc-monorepo-link-types": "^0.0.4",
     "typescript": "^5.2.2",
-    "webpack": "^5.88.2",
+    "webpack": "^5.94.0",
     "zx": "^7.2.3"
   },
   "workspaces": [
