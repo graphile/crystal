@@ -407,11 +407,8 @@ get an attribute you should use `$pgSelectSingle.get(attr)` or similar
 
 ## Using the Underlying Data of a PgSelect Step
 
-Although PgSelect is an opaque step, there are a few ways to modify the keys and values of that are returned in the plan. 
+Although PgSelect is an opaque step, there are a few ways to modify the keys and values of that are returned in the plan.
 
 For altering the returned keys of the object, see the documentation for [`each`](../standard-steps/each.md)
 
 For altering the values of the returned object, see the documentation for [`applyTransforms`](../standard-steps/applyTransforms.md)
-
-
-

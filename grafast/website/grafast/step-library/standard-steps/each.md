@@ -33,10 +33,10 @@ In order to map these values to new keys, you could use something like this:
 
 ```ts
 // return $users;
-return each($users, ($user) => 
-    object({
-        currentUsername: $user.get('username'),
-        currentEmail: $user.get('email')
-    })
-)
+return each($users, ($user) =>
+  object({
+    currentUsername: $user.get("username"),
+    currentEmail: $user.get("email"),
+  }),
+);
 ```
