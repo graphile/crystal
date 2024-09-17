@@ -5,11 +5,14 @@ Takes a step as the first argument and returns a step that guarantees all
 
 ## When to use
 
-This step is designed for use when another step needs the full transformed
-value of the step (which isn't normally the case when you're relying on Grafast
-to resolve lists for you in your GraphQL operation). An example of this would
-be if you want to transform a list of users into usernames to send to a remote
-service:
+It is rare that you need `applyTransforms()`; it is designed for use when
+another step needs to depend on the full transformed value of the step.
+Normally this kind of dependency wouldn't exist - you'd return your
+(transformed) list step from your plan resolver, and Grafast would handle the
+transforms when iterating over the resulting list.
+
+An example of where you might need `applyTransforms()` is transforming a list
+of users into usernames to send to a remote service:
 
 ```ts
 // This step still represents a list of user objects until it is paginated by
@@ -21,6 +24,30 @@ const $untransformed = each($users, ($user) => $user.get("username"));
 // represents a list of usernames and is safe to pass as a dependency to other
 // steps.
 const $usernames = applyTransforms($untransformed);
+
+return performRemoteRequestWithUsernames($usernames);
+```
+
+You should **not** use `applyTransforms()` when returning a list step from a
+plan resolver for a list field. Grafast will automatically apply the transforms
+when it iterates over the list, to `applyTransforms()` beforehand would force
+this iteration to execute twice, which is inefficient.
+
+```ts
+const typeDefs = gql`
+  type Organization {
+    usernames: [String!]
+  }
+`;
+const plans = {
+  Organization: {
+    usernames($org) {
+      const $users = users.find({ organization_id: $org.get("id") });
+      // No need to transform here:
+      return each($users, ($user) => $user.get("username"));
+    },
+  },
+};
 ```
 
 ## Type
@@ -29,7 +56,7 @@ const $usernames = applyTransforms($untransformed);
 function applyTransforms($step: ExecutableStep): ExecutableStep;
 ```
 
-### Example
+## Example
 
 Imagine you want to generate a greeting string for all of the users
 in a particular organization. Your first try might be something like:

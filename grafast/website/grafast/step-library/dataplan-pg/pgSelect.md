@@ -431,7 +431,7 @@ steps such as:
   `const $admins = filter($users, $user => $user.get('is_admin'))`
 - [`first`](../standard-steps/first.md) / [`last`](../standard-steps/last.md) -
   get the first/last entry from the list:
-  `const $firstUser = first($users);`
+  `const $firstUser = $users.row(first($users));`
 - [`groupBy`](../standard-steps/groupBy.md) - group the records into a map
   containing sub-lists keyed by a shared value, for example "posts by author":
   `const $postsByUser = groupBy($posts, $post => $post.get('author_id'))`
