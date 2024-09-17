@@ -3829,17 +3829,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@jridgewell/trace-mapping@npm:^0.3.12, @jridgewell/trace-mapping@npm:^0.3.17, @jridgewell/trace-mapping@npm:^0.3.18, @jridgewell/trace-mapping@npm:^0.3.9":
-  version: 0.3.19
-  resolution: "@jridgewell/trace-mapping@npm:0.3.19"
-  dependencies:
-    "@jridgewell/resolve-uri": "npm:^3.1.0"
-    "@jridgewell/sourcemap-codec": "npm:^1.4.14"
-  checksum: fe222e6d9fe918a62f5de94f52870ebdf56d6409ec4b07855d380aed498179f336d7bb89e6ef59c152f594bd87af949fcaec1575c584e2c6fba94f5a1228aa42
-  languageName: node
-  linkType: hard
-
-"@jridgewell/trace-mapping@npm:^0.3.20":
+"@jridgewell/trace-mapping@npm:^0.3.12, @jridgewell/trace-mapping@npm:^0.3.17, @jridgewell/trace-mapping@npm:^0.3.18, @jridgewell/trace-mapping@npm:^0.3.20, @jridgewell/trace-mapping@npm:^0.3.9":
   version: 0.3.25
   resolution: "@jridgewell/trace-mapping@npm:0.3.25"
   dependencies:
@@ -5339,14 +5329,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/estree@npm:*, @types/estree@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "@types/estree@npm:1.0.1"
-  checksum: 76f967f120d15b8b8747312bff3a3016e480662d9a3dc0b1deb8bfb565898edc4c195bf924bc1398426c0a736844e7b4923cf176900fb4c7d5531907b01d2411
-  languageName: node
-  linkType: hard
-
-"@types/estree@npm:^1.0.5":
+"@types/estree@npm:*, @types/estree@npm:^1.0.1, @types/estree@npm:^1.0.5":
   version: 1.0.5
   resolution: "@types/estree@npm:1.0.5"
   checksum: 0735ebe7af7c1fa6e94a5a86f57308fc0f1cc736961f29c079b515e259c4c3830f8503146e466b27d3acdc121e9210fab0bbaf4309b629fb52375297ba11393f
@@ -10035,17 +10018,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"enhanced-resolve@npm:^5.0.0":
-  version: 5.15.0
-  resolution: "enhanced-resolve@npm:5.15.0"
-  dependencies:
-    graceful-fs: "npm:^4.2.4"
-    tapable: "npm:^2.2.0"
-  checksum: 80df14e9d11ae561b7477866cf5d475aaf5988de7f118ef5a05b94722a107ab58928e3e2cd5a270f696a4f6a16308661872bd6f27cccb2dbe4d8283eee39f62d
-  languageName: node
-  linkType: hard
-
-"enhanced-resolve@npm:^5.17.1":
+"enhanced-resolve@npm:^5.0.0, enhanced-resolve@npm:^5.17.1":
   version: 5.17.1
   resolution: "enhanced-resolve@npm:5.17.1"
   dependencies:
@@ -20550,7 +20523,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"terser-webpack-plugin@npm:^5.3.10":
+"terser-webpack-plugin@npm:^5.3.10, terser-webpack-plugin@npm:^5.3.3, terser-webpack-plugin@npm:^5.3.9":
   version: 5.3.10
   resolution: "terser-webpack-plugin@npm:5.3.10"
   dependencies:
@@ -20572,43 +20545,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"terser-webpack-plugin@npm:^5.3.3, terser-webpack-plugin@npm:^5.3.9":
-  version: 5.3.9
-  resolution: "terser-webpack-plugin@npm:5.3.9"
-  dependencies:
-    "@jridgewell/trace-mapping": "npm:^0.3.17"
-    jest-worker: "npm:^27.4.5"
-    schema-utils: "npm:^3.1.1"
-    serialize-javascript: "npm:^6.0.1"
-    terser: "npm:^5.16.8"
-  peerDependencies:
-    webpack: ^5.1.0
-  peerDependenciesMeta:
-    "@swc/core":
-      optional: true
-    esbuild:
-      optional: true
-    uglify-js:
-      optional: true
-  checksum: c9e69dfff60a2bc95e8b4d24bcf9979be9f411b614617ad75a56eefa6be67a69b465c80e060ff9bc7baaf2f8dcff277b756be9219085d1c3930440f3447a1f26
-  languageName: node
-  linkType: hard
-
-"terser@npm:^5.10.0, terser@npm:^5.16.8":
-  version: 5.19.3
-  resolution: "terser@npm:5.19.3"
-  dependencies:
-    "@jridgewell/source-map": "npm:^0.3.3"
-    acorn: "npm:^8.8.2"
-    commander: "npm:^2.20.0"
-    source-map-support: "npm:~0.5.20"
-  bin:
-    terser: bin/terser
-  checksum: 5c2c8815ecccab087e18e482ad2223cb95c28ac76e713ca7174995b5760666ebfad5dee7efe557528b13dd5cee5434f64d145f16f3315bd052f5be9c896c2b64
-  languageName: node
-  linkType: hard
-
-"terser@npm:^5.26.0":
+"terser@npm:^5.10.0, terser@npm:^5.26.0":
   version: 5.31.6
   resolution: "terser@npm:5.31.6"
   dependencies:
