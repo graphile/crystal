@@ -8,35 +8,30 @@ Usage:
 const $newList = each($oldList, ($listItem) => doSomethingWith($listItem));
 ```
 
-## Extended Usage with `object`
+## Example generating a list of objects
 
-You may end up in a scenario where you need to alter the return value of an opaque step. For example, when using a `PgSelect` step, you may end up with something like this in your plan:
-
-```ts
-const $users = usersResource.find();
-const tbl = $users.alias;
-$users.where(sql`${tbl}.username = 'Benjie'`);
-return $users;
-```
-
-For this example, lets say you have a field you want to resolve to with a type that does not match the schema of the DB:
-
-```graphql
-type UsernameMapping {
-  currentUsername: String!;
-  currentEmail: String!;
-}
-
-```
-
-In order to map these values to new keys, you could use something like this:
+Sometimes you have a step representing a collection of resources, `$list`, and
+you need to build a list of derivative objects from them. For example, the
+items in your collection might have `x` and `y` properties, and you might want
+to turn them into `lng` and `lat` attributes; which might look like this:
 
 ```ts
-// return $users;
-return each($users, ($user) =>
+const $derivatives = each($list, ($item) =>
   object({
-    currentUsername: $user.get("username"),
-    currentEmail: $user.get("email"),
+    name: $item.get("name"),
+    lng: $item.get("x"),
+    lat: $item.get("y"),
   }),
 );
+return $derivatives;
 ```
+
+:::warn `applyTransforms()` if passing to another step
+
+If you aren't returning the result of `each()` from a plan resolver, but are
+instead feeding it into another step, you will likely need to perform
+`applyTransforms()` to force the list transforms to take place before the
+dependent step receives the resulting values. Read more in
+[applyTransforms()](./applyTransforms.md).
+
+:::

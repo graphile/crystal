@@ -1,57 +1,72 @@
 # applyTransforms
 
-Takes a step as the first argument and returns a step that guarantees all `listItem` transforms have occurred.
+Takes a step as the first argument and returns a step that guarantees all
+`listItem` transforms (especially `each()`) have been applied.
 
-This step is useful for when you need all of:
+## When to use
 
-- the `listItem` transforms to have already taken place (e.g. you're going to
-- send the result to an external service) rather than processing them through
-- the GraphQL response
+This step is designed for use when another step needs the full transformed
+value of the step (which isn't normally the case when you're relying on Grafast
+to resolve lists for you in your GraphQL operation). An example of this would
+be if you want to transform a list of users into usernames to send to a remote
+service:
 
-This is very useful for modifying the values of an opaque step!
+```ts
+// This step still represents a list of user objects until it is paginated by
+// GraphQL; so if you pass it to another step as a dependency, that step will
+// receive the untransformed user objects.
+const $untransformed = each($users, ($user) => $user.get("username"));
+
+// This step forces the `listItem` transforms to take place, so now it truly
+// represents a list of usernames and is safe to pass as a dependency to other
+// steps.
+const $usernames = applyTransforms($untransformed);
+```
 
 ## Type
 
 ```ts
-function applyTransforms($step: ExecutableStep): ExecutableStep<any>;
+function applyTransforms($step: ExecutableStep): ExecutableStep;
 ```
 
 ### Example
 
-Let's say you have a `PgSelect` step and you want to apply logic to the values of said step. You may be inclined to do something like this:
+Imagine you want to generate a greeting string for all of the users
+in a particular organization. Your first try might be something like:
 
 ```ts
+// ❗ COUNTER-EXAMPLE!
 const $users = usersResource.find();
-const tbl = $users.alias;
-$users.where(sql`${tbl}.username = 'Benjie'`);
-// Options that could be used here include: loadOne, loadMany, lambda
+$users.where(sql`${$users}.organization_name = 'Graphile'`);
+const $usernames = each($users, ($user) => $user.get("username"));
 return lambda(
-  $users,
-  (users) => {
-    return users.map((user) => ({
-      username: "USER-" + user.username,
-      ...user,
-    }));
-  },
+  // UNSAFE! $usernames has not been transformed yet, it still represents the
+  // same collection as $users.
+  $usernames,
+  (usernames) => `Hello ${usernames.join(", ")}!`,
   true,
 );
 ```
 
-Due to `PgSelect` being an opaque step, this will not work! The values of `$users` will not be loaded by the time the `lambda` step is run. In order to guarantee that those values are available, you can wrap the `$users` step in an `applyTransforms`!
+This will output confusing data, since `$usernames` was not actually transformed yet
+(it would only be transformed if we walked over it via a GraphQL list field) - you
+might end up with `Hello [object Object], [object Object]!` or similar.
+
+Instead, we must use `applyTransforms()` to force the tranforms to be applied
+before passing the step as a dependency to `lambda()`:
 
 ```ts
 const $users = usersResource.find();
-const tbl = $users.alias;
-$users.where(sql`${tbl}.username = 'Benjie'`);
-// By using applyTransforms, it guarantees these values will be available
+$users.where(sql`${$users}.organization_name = 'Graphile'`);
+const $untransformed = each($users, ($user) => $user.get("username"));
+
+// Force the `listItem` transforms to be applied, so `lambda` can depend on the
+// transformed values.
+const $usernames = applyTransforms($untransformed);
+
 return lambda(
-  applyTransforms($users),
-  (users) => {
-    return users.map((user) => ({
-      username: "USER-" + user.username,
-      ...user,
-    }));
-  },
+  $usernames,
+  (usernames) => `Hello ${usernames.join(", ")}!`,
   true,
 );
 ```
