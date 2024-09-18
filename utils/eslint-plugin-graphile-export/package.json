@@ -37,7 +37,7 @@
     "dist"
   ],
   "devDependencies": {
-    "@babel/types": "^7.22.11",
+    "@babel/types": "^7.25.6",
     "@types/eslint": "^8.44.2",
     "@types/estree": "^1.0.1",
     "@types/jest": "^29.5.4",
