@@ -235,7 +235,6 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
           }
 
           targetPath.replaceWith(expr);
-          binding.path.remove();
           binding.path.scope.removeBinding(bindingName);
         }
       },
