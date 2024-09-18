@@ -170,47 +170,59 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
       },
     },
     Program: {
-      exit(path) {
-        // Replace all things that are only referenced once
-        for (const [bindingName, binding] of Object.entries(
-          path.scope.bindings,
-        )) {
-          if (
-            !t.isVariableDeclarator(binding.path.node) &&
-            !t.isFunctionDeclaration(binding.path.node)
-          ) {
-            continue;
+      exit(exitPath) {
+        // Make sure our scope information is up to date!
+        exitPath.scope.crawl();
+
+        // Replace all things that are only referenced once.
+        // This nested traversal approach inspired by https://github.com/babel/babel/issues/15544#issuecomment-1540542863
+        exitPath.traverse({
+          VariableDeclarator: visitSubpath,
+          FunctionDeclaration: visitSubpath,
+        });
+        function visitSubpath(
+          path:
+            | NodePath<t.VariableDeclarator>
+            | NodePath<t.FunctionDeclaration>,
+        ) {
+          if (!t.isIdentifier(path.node.id)) {
+            return;
           }
-          if (!t.isIdentifier(binding.path.node.id)) {
-            continue;
+          const bindingName = path.node.id.name;
+          const scope = t.isFunctionDeclaration(path.node)
+            ? path.scope.parent
+            : path.scope;
+          const binding = scope.bindings[bindingName];
+          if (!binding) {
+            return;
           }
-          const expr = t.isFunctionDeclaration(binding.path.node)
+          const expr = t.isFunctionDeclaration(path.node)
             ? // Convert function to expression
               t.functionExpression(
-                binding.path.node.id,
-                binding.path.node.params,
-                binding.path.node.body,
-                binding.path.node.generator,
-                binding.path.node.async,
+                path.node.id,
+                path.node.params,
+                path.node.body,
+                path.node.generator,
+                path.node.async,
               )
-            : binding.path.node.init;
+            : path.node.init;
           if (!expr) {
-            continue;
+            return;
           }
 
           // Skip if it's an export
-          const statementPath = binding.path.getStatementParent();
+          const statementPath = path.getStatementParent();
           if (
             !statementPath ||
             t.isExportNamedDeclaration(statementPath.node) ||
             t.isExportDefaultDeclaration(statementPath.node)
           ) {
-            continue;
+            return;
           }
 
           // Only replace if it's only referenced once (we don't want duplicates)
           if (binding.referencePaths.length !== 1) {
-            continue;
+            return;
           }
           const targetPath = binding.referencePaths[0];
           const parent = targetPath.parent;
@@ -222,7 +234,7 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
             parent.callee === targetPath.node &&
             (!t.isArrowFunctionExpression(expr) || t.isBlock(expr.body))
           ) {
-            continue;
+            return;
           }
 
           // It's allowed if:
@@ -231,11 +243,14 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
           const targetFunctionParent = targetPath.getFunctionParent();
           const sourceFunctionParent = path.getFunctionParent();
           if (targetFunctionParent !== sourceFunctionParent) {
-            continue;
+            return;
           }
 
           targetPath.replaceWith(expr);
-          binding.path.scope.removeBinding(bindingName);
+          // This stopping is important to avoid 'Container is falsy' errors.
+          targetPath.stop();
+          scope.removeBinding(bindingName);
+          path.remove();
         }
       },
     },
