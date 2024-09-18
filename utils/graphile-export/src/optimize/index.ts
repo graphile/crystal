@@ -192,6 +192,10 @@ export const optimize = (inAst: t.File, runs = 1): t.File => {
           const scope = t.isFunctionDeclaration(path.node)
             ? path.scope.parent
             : path.scope;
+          // Only optimize at top level
+          if (scope !== exitPath.scope) {
+            return;
+          }
           const binding = scope.bindings[bindingName];
           if (!binding) {
             return;
