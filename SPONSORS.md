@@ -17,23 +17,23 @@ Graphile ecosystem. Find out
 - Robert Claypool
 - nigelrmtaylor
 - Principia Mentis
-- Luxor Labs
 - Axinom
 - Taiste
 - Notably
-- Nathanael Beisiegel
 - Trigger.dev
+- Cintra
 - BairesDev
 - Two Bit Solutions
 - Dimply
 - Ndustrial
-- Cintra
 - Beacon
 - deliver.media
+- Spear AI
 - Seam
+- Apollo
 - Ravio
 - OpenPipe
-- Apollo
+- dotcom-monitor
 
 ## Supporters
 
@@ -44,23 +44,25 @@ Graphile ecosystem. Find out
 - Alvin Ali Khaled
 - Paul Melnikow
 - Keith Layne
-- nullachtvierzehn
 - Zymego
+- nullachtvierzehn
 - IFCHOR GROUP
 - Nate Smith
+- Vizcom
+- Ether
 - garpulon
 - The Outbound Collective
 - Charlie Hadden
 - Kiron Open Higher Education
 - Andrew Joseph
-- urtho
 - SIED 70
 - Peter C. Romano
 - mateo
-- Gus Becciu
 - Dialo
+- Gus Becciu
 - kontakto-fi
 - Tailos, Inc.
 - sheilamosaik
 - Miguel O. Carvajal
 - Jovi De Croock
+- Graphite
