@@ -21,7 +21,7 @@ function makeWellKnownFromOptions(options: ExportOptions) {
     preferViaDefault = false,
   ) {
     for (const exportName of Object.keys(obj)) {
-      if (exportName !== "default" && !wellKnownMap.has(obj[exportName])) {
+      if (!wellKnownMap.has(obj[exportName])) {
         /**
          * ESM is still a bit flaky, so though `import { foo } from 'bar';` may
          * work in some contexts, in raw Node it's often required to do
