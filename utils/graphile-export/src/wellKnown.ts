@@ -11,6 +11,7 @@ interface $$Export {
 }
 
 function makeWellKnownFromOptions(options: ExportOptions) {
+  const namespaces = Object.create(null);
   const wellKnownMap = new Map<unknown, $$Export>();
 
   function exportAll(
@@ -18,6 +19,7 @@ function makeWellKnownFromOptions(options: ExportOptions) {
     moduleName: string,
     preferViaDefault = false,
   ) {
+    namespaces[moduleName] = moduleStar;
     for (const exportName of Object.keys(moduleStar)) {
       if (!wellKnownMap.has(moduleStar[exportName])) {
         /**
@@ -62,13 +64,10 @@ function makeWellKnownFromOptions(options: ExportOptions) {
     }
   }
 
-  const namespaces = Object.assign(Object.create(null), { crypto: _crypto });
-
   // Now process options
   if (options.modules) {
     for (const [moduleName, moduleStar] of Object.entries(options.modules)) {
       exportAll(moduleStar, moduleName, true);
-      namespaces[moduleName] = moduleStar;
     }
   }
 
