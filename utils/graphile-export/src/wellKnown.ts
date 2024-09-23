@@ -1,9 +1,7 @@
-import crypto from "crypto";
-// eslint-disable-next-line import/no-duplicates
-import * as _crypto from "crypto";
+import * as cryptoStar from "crypto";
 import * as grafastStar from "grafast";
 import * as graphqlStar from "grafast/graphql";
-import util, * as utilStar from "util";
+import * as utilStar from "util";
 
 import type { ExportOptions } from "./interfaces.js";
 
@@ -13,15 +11,17 @@ interface $$Export {
 }
 
 function makeWellKnownFromOptions(options: ExportOptions) {
+  const namespaces = Object.create(null);
   const wellKnownMap = new Map<unknown, $$Export>();
 
   function exportAll(
-    obj: Record<string, any>,
+    moduleStar: Record<string, any>,
     moduleName: string,
     preferViaDefault = false,
   ) {
-    for (const exportName of Object.keys(obj)) {
-      if (exportName !== "default" && !wellKnownMap.has(obj[exportName])) {
+    namespaces[moduleName] = moduleStar;
+    for (const exportName of Object.keys(moduleStar)) {
+      if (!wellKnownMap.has(moduleStar[exportName])) {
         /**
          * ESM is still a bit flaky, so though `import { foo } from 'bar';` may
          * work in some contexts, in raw Node it's often required to do
@@ -29,17 +29,21 @@ function makeWellKnownFromOptions(options: ExportOptions) {
          * if this latter approach is desired.
          */
         const viaDefault =
-          preferViaDefault && obj[exportName] === obj["default"]?.[exportName];
-        wellKnownMap.set(obj[exportName], {
+          preferViaDefault &&
+          exportName !== "default" &&
+          moduleStar[exportName] === moduleStar["default"]?.[exportName];
+        wellKnownMap.set(moduleStar[exportName], {
           moduleName,
           exportName: viaDefault ? ["default", exportName] : exportName,
         });
       }
     }
+    if (!wellKnownMap.has(moduleStar)) {
+      wellKnownMap.set(moduleStar, { moduleName, exportName: "*" });
+    }
   }
 
-  wellKnownMap.set(crypto, { moduleName: "crypto", exportName: "default" });
-  wellKnownMap.set(util, { moduleName: "util", exportName: "default" });
+  exportAll(cryptoStar, "crypto");
   exportAll(grafastStar, "grafast");
   exportAll(graphqlStar, "graphql");
   exportAll(utilStar, "util");
@@ -60,13 +64,10 @@ function makeWellKnownFromOptions(options: ExportOptions) {
     }
   }
 
-  const namespaces = Object.assign(Object.create(null), { crypto: _crypto });
-
   // Now process options
   if (options.modules) {
     for (const [moduleName, moduleStar] of Object.entries(options.modules)) {
       exportAll(moduleStar, moduleName, true);
-      namespaces[moduleName] = moduleStar;
     }
   }
 
