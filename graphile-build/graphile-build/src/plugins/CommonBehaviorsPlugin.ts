@@ -5,8 +5,13 @@ import { version } from "../version.js";
 declare global {
   namespace GraphileBuild {
     interface BehaviorStrings {
+      // 'connection' and 'list' are for connection-capable collections. If
+      // your collection is not connection-capable, it should use 'array'
+      // instead.
       connection: true;
       list: true;
+      array: true;
+
       single: true;
 
       "interface:node": true;
@@ -28,7 +33,13 @@ export const CommonBehaviorsPlugin: GraphileConfig.Plugin = {
           entities: [],
         },
         list: {
-          description: "represent collection as a list (simple collections)",
+          description:
+            "represent collection as a list - only use with collections that can be represented as a connection too",
+          entities: [],
+        },
+        array: {
+          description:
+            "represent an array as a list - use with collections which are not connection-capable (otherwise use list)",
           entities: [],
         },
         single: {

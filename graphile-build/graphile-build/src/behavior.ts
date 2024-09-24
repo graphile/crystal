@@ -165,7 +165,10 @@ export class Behavior {
         for (const [behaviorString, spec] of Object.entries(
           this.behaviorRegistry,
         )) {
-          if (spec.entities[entityType]) {
+          if (
+            spec.entities[entityType] ||
+            true /* This ` || true` is because of inheritance (e.g. unique inherits from resource inherits from codec); it causes a headache if we factor it in */
+          ) {
             const parts = behaviorString.split(":");
             const l = parts.length;
             for (let i = 0; i < l; i++) {
@@ -216,7 +219,7 @@ export class Behavior {
                     // ... then remove everything ...
                     "-*",
                     // ... then replace it with what we actually want.
-                    multiplyBehavior(defaultBehavior, behavior),
+                    multiplyBehavior(defaultBehavior, behavior, entityType),
                   ];
                 },
               },
@@ -487,17 +490,19 @@ export class Behavior {
     }
     for (const { scope } of result) {
       const behavior = scope.join(":") as keyof GraphileBuild.BehaviorStrings;
-      if (!this.behaviorRegistry[behavior]) {
+      if (
+        !Object.keys(this.behaviorRegistry).some((bhv) =>
+          stringMatches(bhv, behavior),
+        )
+      ) {
         console.trace(
           `Behavior '${behavior}' has not been registered! (Source: ${source})`,
         );
       }
 
       if (
-        !Object.entries(this.behaviorRegistry).some(
-          ([bhv, { entities }]) =>
-            (entities[entityType] && bhv === behavior) ||
-            bhv.endsWith(":" + behavior),
+        !Object.entries(this.behaviorRegistry).some(([bhv, { entities }]) =>
+          /*entities[entityType] &&*/ stringMatches(bhv, behavior),
         )
       ) {
         console.trace(
@@ -704,7 +709,11 @@ export function isValidBehaviorString(
  * - Result: concatenate these:
  *   - "-connection -resource:connection +query:resource:connection -list +resource:list -query:resource:list"
  */
-function multiplyBehavior(preferences: string, inferred: string) {
+function multiplyBehavior(
+  preferences: string,
+  inferred: string,
+  entityType: string,
+) {
   const pref = parseSpecs(preferences);
   const inf = parseSpecs(inferred);
   const result = inf.flatMap((infEntry) => {

@@ -65,6 +65,14 @@ declare global {
       queryField: true;
       mutationField: true;
       typeField: true;
+      "typeField:resource:connection": true;
+      "typeField:resource:list": true;
+      "typeField:resource:array": true;
+      "queryField:resource:connection": true;
+      "queryField:resource:list": true;
+      "queryField:resource:array": true;
+      "typeField:single": true;
+      "queryField:single": true;
     }
     interface Build {
       pgGetArgDetailsFromParameters(
@@ -195,7 +203,7 @@ function shouldUseCustomConnection(
 function defaultProcSourceBehavior(
   s: PgResource<any, any, any, any, any>,
 ): GraphileBuild.BehaviorString {
-  const behavior: GraphileBuild.BehaviorString[] = [];
+  const behavior: GraphileBuild.BehaviorString[] = ["-array"];
   const firstParameter = (
     s as PgResource<any, any, any, readonly PgResourceParameter[], any>
   ).parameters[0];
@@ -233,7 +241,7 @@ function defaultProcSourceBehavior(
     const canUseConnection =
       !s.sqlPartitionByIndex && !s.isList && !s.codec.arrayOfCodec;
     if (!canUseConnection) {
-      behavior.push("-connection", "list");
+      behavior.push("-connection", "-list", "array");
     }
   }
 
@@ -356,6 +364,30 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
         typeField: {
           description:
             'a "custom field function" - add it to a specific type (aka "computed column")',
+          entities: ["pgResource"],
+        },
+        "typeField:resource:connection": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "typeField:resource:list": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "queryField:resource:connection": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "queryField:resource:list": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "typeField:single": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "queryField:single": {
+          description: "",
           entities: ["pgResource"],
         },
       },
@@ -1154,7 +1186,9 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
 
                 const baseScope = isRootQuery ? `queryField` : `typeField`;
                 const connectionFieldBehaviorScope = `${baseScope}:resource:connection`;
-                const listFieldBehaviorScope = `${baseScope}:resource:list`;
+                const listFieldBehaviorScope = canUseConnection
+                  ? `${baseScope}:resource:list`
+                  : `${baseScope}:resource:array`;
                 if (
                   canUseConnection &&
                   build.behavior.pgResourceMatches(
