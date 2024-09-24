@@ -35,6 +35,15 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
   after: ["PgTablesPlugin", "PgPolymorphismPlugin"],
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "type:node": {
+          entities: ["pgCodec"],
+          description:
+            "should the GraphQLObjectType (`type`) this codec represents implement the GraphQL Global Object Identification specification",
+        },
+      },
+    },
     entityBehavior: {
       pgCodec: {
         provides: ["default"],

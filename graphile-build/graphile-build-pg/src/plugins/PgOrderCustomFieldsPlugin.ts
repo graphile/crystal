@@ -19,6 +19,9 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      "proc:orderBy": true;
+    }
     interface Inflection {
       computedAttributeOrder(
         this: Inflection,
@@ -54,6 +57,15 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "proc:orderBy": {
+          entities: ["pgResource"],
+          description:
+            "can we order by the result of this functional resource?",
+        },
+      },
+    },
     entityBehavior: {
       pgResource: {
         provides: ["inferred"],

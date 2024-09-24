@@ -380,11 +380,11 @@ export class Behavior {
         }
       }
       const i = behaviorString.indexOf(oldBehavior);
-      const rawPrefix = behaviorString.substring(0, i);
-      const rawSuffix = behaviorString.substring(i + oldBehavior.length);
-      if (rawPrefix !== "" || rawSuffix !== "") {
-        const prefix = this.validateBehavior(entityType, source, rawPrefix);
-        const suffix = this.validateBehavior(entityType, source, rawSuffix);
+      const prefix = behaviorString.substring(0, i);
+      const suffix = behaviorString.substring(i + oldBehavior.length);
+      if (prefix !== "" || suffix !== "") {
+        this.validateBehavior(entityType, source, prefix);
+        this.validateBehavior(entityType, source, suffix);
         stack.push({ source, prefix, suffix });
       }
     }
@@ -400,28 +400,27 @@ export class Behavior {
   private validateBehavior(
     entityType: keyof GraphileBuild.BehaviorEntities | null,
     source: string,
-    rawBehaviorString: string,
-  ): GraphileBuild.BehaviorString {
-    const behaviorString = rawBehaviorString.trim();
-    if (behaviorString == "") {
-      return "" as GraphileBuild.BehaviorString;
+    behaviorString: string,
+  ): void /*asserts behaviorString is GraphileBuild.BehaviorString*/ {
+    const result = this.parseBehaviorString(behaviorString);
+    if (!entityType) {
+      return;
     }
-    if (!isValidBehaviorString(behaviorString)) {
-      throw new Error(
-        `Expected ${JSON.stringify(
-          behaviorString,
-        )} to be a behavior string (source: ${source}).`,
-      );
-    }
-    if (!entityType) return behaviorString;
-    const parts = behaviorString.split(/\s+/);
-    for (const part of parts) {
-      const behavior = part as keyof GraphileBuild.BehaviorStrings;
+    for (const { scope } of result) {
+      const behavior = scope.join(":") as keyof GraphileBuild.BehaviorStrings;
       if (!this.behaviorRegistry[behavior]) {
         console.trace(
           `Behavior '${behavior}' has not been registered! (Source: ${source})`,
         );
-      } else if (!this.behaviorRegistry[behavior].entities[entityType]) {
+      }
+
+      if (
+        !Object.entries(this.behaviorRegistry).some(
+          ([bhv, { entities }]) =>
+            (entities[entityType] && bhv === behavior) ||
+            bhv.endsWith(":" + behavior),
+        )
+      ) {
         console.trace(
           `Behavior '${behavior}' is not registered for entity type '${entityType}'; it's only expected to be used with '${Object.keys(
             this.behaviorRegistry[behavior].entities,
@@ -429,7 +428,6 @@ export class Behavior {
         );
       }
     }
-    return behaviorString;
   }
 }
 

@@ -29,13 +29,13 @@ declare global {
 
   namespace GraphileBuild {
     interface BehaviorStrings {
-      "-condition:attribute:filterBy": true;
-      "-attribute:select": true;
-      "-attribute:base": true;
-      "-attribute:insert": true;
-      "-attribute:update": true;
-      "-attribute:filterBy": true;
-      "-attribute:orderBy": true;
+      "condition:attribute:filterBy": true;
+      "attribute:select": true;
+      "attribute:base": true;
+      "attribute:insert": true;
+      "attribute:update": true;
+      "attribute:filterBy": true;
+      "attribute:orderBy": true;
     }
     interface Build {
       pgResolveOutputType(
@@ -299,32 +299,32 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
   schema: {
     behaviorRegistry: {
       add: {
-        "-attribute:select": {
+        "attribute:select": {
           description: "can this attribute be selected?",
           entities: ["pgCodecAttribute"],
         },
-        "-attribute:insert": {
+        "attribute:insert": {
           description: "can this attribute be written on create?",
           entities: ["pgCodecAttribute"],
         },
-        "-attribute:update": {
+        "attribute:update": {
           description: "can this attribute be updated?",
           entities: ["pgCodecAttribute"],
         },
-        "-attribute:base": {
+        "attribute:base": {
           description: "should we add this attribute to the 'base' input type?",
           entities: ["pgCodecAttribute"],
         },
-        "-attribute:filterBy": {
+        "attribute:filterBy": {
           description: "can we filter by this attribute?",
           entities: ["pgCodecAttribute"],
         },
-        "-condition:attribute:filterBy": {
+        "condition:attribute:filterBy": {
           description:
             "can we filter by this attribute in the `condition` argument?",
           entities: ["pgCodecAttribute"],
         },
-        "-attribute:orderBy": {
+        "attribute:orderBy": {
           description: "can we order by this attribute?",
           entities: ["pgCodecAttribute"],
         },
