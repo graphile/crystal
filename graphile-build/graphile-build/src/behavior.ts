@@ -148,7 +148,7 @@ export class Behavior {
     }
 
     const initialBehavior = resolvedPreset.schema?.defaultBehavior ?? "";
-    this.globalDefaultBehavior = resolveBehavior(
+    this.globalDefaultBehavior = this.resolveBehavior(
       initialBehavior
         ? {
             behaviorString: initialBehavior,
@@ -289,7 +289,7 @@ export class Behavior {
       return existing;
     }
     const behaviorEntity = this.behaviorEntities[entityType];
-    const behavior = resolveBehavior(
+    const behavior = this.resolveBehavior(
       applyDefaultBehavior ? this.globalDefaultBehavior : NULL_BEHAVIOR,
       behaviorEntity.behaviorCallbacks,
       entity,
@@ -333,6 +333,63 @@ export class Behavior {
 
   parseScope(filter: string) {
     return parseScope(filter);
+  }
+
+  private resolveBehavior<TArgs extends [...any[]]>(
+    initialBehavior: ResolvedBehavior,
+    // Misnomer; also allows strings or nothings
+    callbacks: ReadonlyArray<
+      [
+        source: string,
+        callback:
+          | string
+          | null
+          | undefined
+          | ((behavior: string, ...args: TArgs) => string | string[]),
+      ]
+    >,
+    ...args: TArgs
+  ) {
+    let behaviorString = initialBehavior.behaviorString;
+    const stack: Array<StackItem> = [...initialBehavior.stack];
+
+    for (const [source, g] of callbacks) {
+      const oldBehavior = behaviorString;
+      if (typeof g === "string") {
+        if (g === "") {
+          continue;
+        } else if (behaviorString === "") {
+          behaviorString = g;
+        } else {
+          behaviorString = g + " " + behaviorString;
+        }
+      } else if (typeof g === "function") {
+        const newBehavior = g(oldBehavior, ...args);
+        if (!newBehavior.includes(oldBehavior)) {
+          throw new Error(
+            `${source} callback must return a list that contains the current (passed in) behavior in addition to any other behaviors you wish to set.`,
+          );
+        }
+        if (Array.isArray(newBehavior)) {
+          behaviorString = joinBehaviors(newBehavior);
+        } else {
+          behaviorString = newBehavior;
+        }
+      }
+      const i = behaviorString.indexOf(oldBehavior);
+      const prefix = behaviorString.substring(0, i);
+      const suffix = behaviorString.substring(i + oldBehavior.length);
+      if (prefix !== "" || suffix !== "") {
+        stack.push({ source, prefix, suffix });
+      }
+    }
+    return {
+      stack,
+      behaviorString,
+      toString() {
+        return behaviorString;
+      },
+    };
   }
 }
 
@@ -444,63 +501,6 @@ interface StackItem {
 interface ResolvedBehavior {
   stack: ReadonlyArray<StackItem>;
   behaviorString: string;
-}
-
-function resolveBehavior<TArgs extends [...any[]]>(
-  initialBehavior: ResolvedBehavior,
-  // Misnomer; also allows strings or nothings
-  callbacks: ReadonlyArray<
-    [
-      source: string,
-      callback:
-        | string
-        | null
-        | undefined
-        | ((behavior: string, ...args: TArgs) => string | string[]),
-    ]
-  >,
-  ...args: TArgs
-) {
-  let behaviorString = initialBehavior.behaviorString;
-  const stack: Array<StackItem> = [...initialBehavior.stack];
-
-  for (const [source, g] of callbacks) {
-    const oldBehavior = behaviorString;
-    if (typeof g === "string") {
-      if (g === "") {
-        continue;
-      } else if (behaviorString === "") {
-        behaviorString = g;
-      } else {
-        behaviorString = g + " " + behaviorString;
-      }
-    } else if (typeof g === "function") {
-      const newBehavior = g(oldBehavior, ...args);
-      if (!newBehavior.includes(oldBehavior)) {
-        throw new Error(
-          `${source} callback must return a list that contains the current (passed in) behavior in addition to any other behaviors you wish to set.`,
-        );
-      }
-      if (Array.isArray(newBehavior)) {
-        behaviorString = joinBehaviors(newBehavior);
-      } else {
-        behaviorString = newBehavior;
-      }
-    }
-    const i = behaviorString.indexOf(oldBehavior);
-    const prefix = behaviorString.substring(0, i);
-    const suffix = behaviorString.substring(i + oldBehavior.length);
-    if (prefix !== "" || suffix !== "") {
-      stack.push({ source, prefix, suffix });
-    }
-  }
-  return {
-    stack,
-    behaviorString,
-    toString() {
-      return behaviorString;
-    },
-  };
 }
 
 function getCachedEntity<T extends any[]>(
