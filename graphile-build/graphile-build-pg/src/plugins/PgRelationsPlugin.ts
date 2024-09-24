@@ -38,6 +38,8 @@ declare global {
       "singularRelation:resource:single": true;
       "singularRelation:resource:list": true;
       "singularRelation:resource:connection": true;
+      "manyRelation:resource:list": true;
+      "manyRelation:resource:connection": true;
     }
     interface SchemaOptions {
       pgMutationPayloadRelations?: boolean;
@@ -523,6 +525,16 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         "singularRelation:resource:connection": {
           description:
             "should we add a connection field to navigate this singular relationship (when we know there can be at most one)?",
+          entities: ["pgCodecRelation", "pgCodecRef"],
+        },
+        "manyRelation:resource:list": {
+          description:
+            "should we add a list field to navigate this relationship?",
+          entities: ["pgCodecRelation", "pgCodecRef"],
+        },
+        "manyRelation:resource:connection": {
+          description:
+            "should we add a connection field to navigate this relationship?",
           entities: ["pgCodecRelation", "pgCodecRef"],
         },
       },

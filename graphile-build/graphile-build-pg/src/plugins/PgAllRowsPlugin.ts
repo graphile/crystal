@@ -79,11 +79,11 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
         "query:resource:connection": {
           description:
             '"connection" field for a resource at the root Query level',
-          entities: ["pgCodec"],
+          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
         },
         "query:resource:list": {
           description: '"list" field for a resource at the root Query level',
-          entities: ["pgCodec"],
+          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
         },
       },
     },
