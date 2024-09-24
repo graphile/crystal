@@ -149,6 +149,7 @@ export class Behavior {
 
     const initialBehavior = resolvedPreset.schema?.defaultBehavior ?? "";
     this.globalDefaultBehavior = this.resolveBehavior(
+      null,
       initialBehavior
         ? {
             behaviorString: initialBehavior,
@@ -290,6 +291,7 @@ export class Behavior {
     }
     const behaviorEntity = this.behaviorEntities[entityType];
     const behavior = this.resolveBehavior(
+      entityType,
       applyDefaultBehavior ? this.globalDefaultBehavior : NULL_BEHAVIOR,
       behaviorEntity.behaviorCallbacks,
       entity,
@@ -336,6 +338,7 @@ export class Behavior {
   }
 
   private resolveBehavior<TArgs extends [...any[]]>(
+    entityType: keyof GraphileBuild.BehaviorEntities | null,
     initialBehavior: ResolvedBehavior,
     // Misnomer; also allows strings or nothings
     callbacks: ReadonlyArray<
@@ -377,9 +380,11 @@ export class Behavior {
         }
       }
       const i = behaviorString.indexOf(oldBehavior);
-      const prefix = behaviorString.substring(0, i);
-      const suffix = behaviorString.substring(i + oldBehavior.length);
-      if (prefix !== "" || suffix !== "") {
+      const rawPrefix = behaviorString.substring(0, i);
+      const rawSuffix = behaviorString.substring(i + oldBehavior.length);
+      if (rawPrefix !== "" || rawSuffix !== "") {
+        const prefix = this.validateBehavior(entityType, source, rawPrefix);
+        const suffix = this.validateBehavior(entityType, source, rawSuffix);
         stack.push({ source, prefix, suffix });
       }
     }
@@ -390,6 +395,41 @@ export class Behavior {
         return behaviorString;
       },
     };
+  }
+
+  private validateBehavior(
+    entityType: keyof GraphileBuild.BehaviorEntities | null,
+    source: string,
+    rawBehaviorString: string,
+  ): GraphileBuild.BehaviorString {
+    const behaviorString = rawBehaviorString.trim();
+    if (behaviorString == "") {
+      return "" as GraphileBuild.BehaviorString;
+    }
+    if (!isValidBehaviorString(behaviorString)) {
+      throw new Error(
+        `Expected ${JSON.stringify(
+          behaviorString,
+        )} to be a behavior string (source: ${source}).`,
+      );
+    }
+    if (!entityType) return behaviorString;
+    const parts = behaviorString.split(/\s+/);
+    for (const part of parts) {
+      const behavior = part as keyof GraphileBuild.BehaviorStrings;
+      if (!this.behaviorRegistry[behavior]) {
+        console.trace(
+          `Behavior '${behavior}' has not been registered! (Source: ${source})`,
+        );
+      } else if (!this.behaviorRegistry[behavior].entities[entityType]) {
+        console.trace(
+          `Behavior '${behavior}' is not registered for entity type '${entityType}'; it's only expected to be used with '${Object.keys(
+            this.behaviorRegistry[behavior].entities,
+          ).join("', '")}'. (Source: ${source})`,
+        );
+      }
+    }
+    return behaviorString;
   }
 }
 
