@@ -199,7 +199,10 @@ export class Behavior {
                 provides: ["preferences"],
                 callback(behavior, entity) {
                   const defaultBehavior = getDefaultBehaviorFor(entityType);
-                  return multiplyBehavior(defaultBehavior, behavior);
+                  return [
+                    behavior,
+                    multiplyBehavior(defaultBehavior, behavior),
+                  ];
                 },
               },
             ];
@@ -429,12 +432,7 @@ export class Behavior {
         }
       } else if (typeof g === "function") {
         const newBehavior = g(oldBehavior, ...args);
-        if (
-          !newBehavior.includes(oldBehavior) &&
-          !source.startsWith(
-            "_GraphileBuildBehaviorSystemApplyPreferencesPlugin",
-          )
-        ) {
+        if (!newBehavior.includes(oldBehavior)) {
           throw new Error(
             `${source} callback must return a list that contains the current (passed in) behavior in addition to any other behaviors you wish to set.`,
           );
