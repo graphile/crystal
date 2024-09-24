@@ -794,6 +794,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             }
 
             if (
+              selectable &&
               !codec.isAnonymous
               // Even without the 'connection' behavior we may still need the connection type in specific circumstances
               // && build.behavior.pgCodecMatches(codec, "*:connection")

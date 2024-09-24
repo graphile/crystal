@@ -84,13 +84,26 @@ export class Behavior {
     };
   };
 
+  private behaviorRegistry: {
+    [behavior in keyof GraphileBuild.BehaviorStrings]: {
+      entities: {
+        [entity in keyof GraphileBuild.BehaviorEntities]?: {
+          description: string;
+          pluginName: string;
+        };
+      };
+    };
+  };
+
   public behaviorEntityTypes: (keyof GraphileBuild.BehaviorEntities)[] = [];
 
   private globalDefaultBehavior: ResolvedBehavior;
+
   constructor(
     private resolvedPreset: GraphileConfig.ResolvedPreset,
     private build: GraphileBuild.Build,
   ) {
+    this.behaviorRegistry = Object.create(null);
     this.behaviorEntities = Object.create(null);
     this.registerEntity("string");
     // This will be overwritten in freeze
@@ -103,6 +116,36 @@ export class Behavior {
   public freeze(): Behavior & BehaviorDynamicMethods {
     const { resolvedPreset, build } = this;
     const plugins = sortedPlugins(resolvedPreset.plugins);
+
+    for (const plugin of plugins) {
+      const r = plugin.schema?.behaviorRegistry;
+      if (r?.add) {
+        for (const [key, spec] of Object.entries(r.add)) {
+          const behaviorString = key as keyof GraphileBuild.BehaviorStrings;
+          if (!this.behaviorRegistry[behaviorString]) {
+            this.behaviorRegistry[behaviorString] = {
+              entities: {},
+            };
+          }
+          const { description } = spec;
+          for (const entityType of spec.entities) {
+            if (!this.behaviorRegistry[behaviorString].entities[entityType]) {
+              this.behaviorRegistry[behaviorString].entities[entityType] = {
+                description,
+                pluginName: plugin.name,
+              };
+            } else {
+              console.warn(
+                `Behavior string '${behaviorString}' for entity type '${entityType}' has been registered by more than one plugin! First registered by ${
+                  this.behaviorRegistry[behaviorString].entities[entityType]!
+                    .pluginName
+                }; and then later again by ${plugin.name}`,
+              );
+            }
+          }
+        }
+      }
+    }
 
     const initialBehavior = resolvedPreset.schema?.defaultBehavior ?? "";
     this.globalDefaultBehavior = resolveBehavior(
