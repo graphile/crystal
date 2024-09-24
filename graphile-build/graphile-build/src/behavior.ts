@@ -160,17 +160,28 @@ export class Behavior {
       entityType: keyof GraphileBuild.BehaviorEntities,
     ) => {
       if (!defaultBehaviorByEntityTypeCache.has(entityType)) {
-        const supportedBehaviors = (
-          Object.keys(
-            this.behaviorRegistry,
-          ) as (keyof GraphileBuild.BehaviorStrings)[]
-        ).filter((k) => this.behaviorRegistry[k].entities[entityType]);
+        const supportedBehaviors = new Set<string>();
+
+        for (const [behaviorString, spec] of Object.entries(
+          this.behaviorRegistry,
+        )) {
+          if (spec.entities[entityType]) {
+            const parts = behaviorString.split(":");
+            const l = parts.length;
+            for (let i = 0; i < l; i++) {
+              const subparts = parts.slice(i, l);
+              // We need to add all of the parent behaviors, e.g. `foo:bar:baz`
+              // should also add `bar:baz` and `baz`
+              supportedBehaviors.add(subparts.join(":"));
+            }
+          }
+        }
 
         // TODO: scope this on an entity basis
         const defaultBehaviors = this.globalDefaultBehavior;
 
         const behaviorString = (
-          supportedBehaviors.join(" ") +
+          [...supportedBehaviors].sort().join(" ") +
           " " +
           defaultBehaviors.behaviorString
         ).trim();
