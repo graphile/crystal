@@ -192,17 +192,29 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
       add: {
         select: {
           description:
-            "can select this resource/column/etc. Note this does not necessarily mean you can do select * from users but it might mean that it's possible to see details about a users when it's returned by a function or similar. (In this case the codec has select but the resource has -select.)",
+            "can select this resource/column/etc. Note this does not necessarily mean you can do `select * from users` but it might mean that it's possible to see details about a `users` when it's returned by a function or similar. (In this case the `codec` has `select` but the `resource` has `-select`.)",
           entities: ["pgCodec", "pgResource"],
         },
-        insert: { description: "", entities: [] },
-        update: { description: "", entities: [] },
-        delete: { description: "", entities: [] },
-        base: { description: "", entities: [] },
-        filter: { description: "", entities: [] },
-        filterBy: { description: "", entities: [] },
-        order: { description: "", entities: [] },
-        orderBy: { description: "", entities: [] },
+        insert: {
+          description: "can insert into this resource/column/etc",
+          entities: [],
+        },
+        update: {
+          description: "can update a record in a resource/a column/etc",
+          entities: [],
+        },
+        delete: {
+          description: "can delete a record in a resource",
+          entities: [],
+        },
+        base: {
+          description: 'should we add this attribute to the "base" input type?',
+          entities: [],
+        },
+        // filter: { description: "can we filter these results?", entities: [] },
+        filterBy: { description: "can we filter by this thing?", entities: [] },
+        order: { description: "can we order these results?", entities: [] },
+        orderBy: { description: "can we order by this thing?", entities: [] },
       },
     },
     entityBehavior: {
