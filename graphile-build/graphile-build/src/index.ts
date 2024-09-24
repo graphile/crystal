@@ -10,6 +10,7 @@ import {
 } from "grafast/graphql";
 import { AsyncHooks, orderedApply, resolvePresets } from "graphile-config";
 
+export { isValidBehaviorString } from "./behavior.js";
 import extend from "./extend.js";
 import { makeInitialInflection } from "./inflection.js";
 import {

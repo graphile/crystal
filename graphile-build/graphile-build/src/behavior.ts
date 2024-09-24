@@ -544,3 +544,20 @@ function stringMatches(
   }
   return undefined;
 }
+
+/**
+ * We're strict with this because we want to be able to expand this in future.
+ * For example I want to allow `@behavior all some` to operate the same as
+ * `@behavior all\n@behavior some`. I also want to be able to add
+ * `@behavior -all` to remove a previously enabled behavior.
+ */
+export function isValidBehaviorString(
+  behavior: unknown,
+): behavior is GraphileBuild.BehaviorString {
+  return (
+    typeof behavior === "string" &&
+    /^[+-]?([a-zA-Z](?:[_:]?[a-zA-Z0-9])+|\*)(?:\s+[+-]?(?:[a-zA-Z]([_:]?[a-zA-Z0-9])+|\*))*$/.test(
+      behavior,
+    )
+  );
+}

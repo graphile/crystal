@@ -5,6 +5,7 @@ import type {
   PgResourceExtensions,
 } from "@dataplan/pg";
 import { isDev } from "grafast";
+import { isValidBehaviorString } from "graphile-build";
 import { inspect } from "util";
 
 // NOTE: 'behaviour' is the correct spelling in UK English; we try and stick to
@@ -49,7 +50,7 @@ export function getBehavior(
       return;
     }
     if (Array.isArray(behavior)) {
-      if (isDev && !behavior.every(isValidBehavior)) {
+      if (isDev && !behavior.every(isValidBehaviorString)) {
         throw new Error(
           `Invalid value for behavior; expected a string or string array using simple alphanumeric strings, but found ${inspect(
             behavior,
@@ -61,7 +62,7 @@ export function getBehavior(
       }
       return;
     }
-    if (isValidBehavior(behavior)) {
+    if (isValidBehaviorString(behavior)) {
       behaviors.push(behavior);
       return;
     }
@@ -71,23 +72,4 @@ export function getBehavior(
       )}`,
     );
   }
-}
-
-/**
- * We're strict with this because we want to be able to expand this in future.
- * For example I want to allow `@behavior all some` to operate the same as
- * `@behavior all\n@behavior some`. I also want to be able to add
- * `@behavior -all` to remove a previously enabled behavior.
- *
- * @internal
- */
-function isValidBehavior(
-  behavior: unknown,
-): behavior is GraphileBuild.BehaviorString {
-  return (
-    typeof behavior === "string" &&
-    /^[+-]?([a-zA-Z](?:[_:]?[a-zA-Z0-9])+|\*)(?:\s+[+-]?(?:[a-zA-Z]([_:]?[a-zA-Z0-9])+|\*))*$/.test(
-      behavior,
-    )
-  );
 }
