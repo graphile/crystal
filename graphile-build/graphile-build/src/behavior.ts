@@ -1,6 +1,8 @@
 import { arraysMatch } from "grafast";
 import { orderedApply, sortedPlugins } from "graphile-config";
 
+import { version } from "./version.js";
+
 type BehaviorScope = string[];
 interface BehaviorSpec {
   positive: boolean;
@@ -117,6 +119,8 @@ export class Behavior {
     const { resolvedPreset, build } = this;
     const plugins = sortedPlugins(resolvedPreset.plugins);
 
+    const allEntities = new Set<keyof GraphileBuild.BehaviorEntities>();
+
     for (const plugin of plugins) {
       const r = plugin.schema?.behaviorRegistry;
       if (r?.add) {
@@ -129,6 +133,7 @@ export class Behavior {
           }
           const { description } = spec;
           for (const entityType of spec.entities) {
+            allEntities.add(entityType);
             if (!this.behaviorRegistry[behaviorString].entities[entityType]) {
               this.behaviorRegistry[behaviorString].entities[entityType] = {
                 description,
@@ -146,6 +151,62 @@ export class Behavior {
         }
       }
     }
+
+    const defaultBehaviorByEntityTypeCache = new Map<
+      keyof GraphileBuild.BehaviorEntities,
+      string
+    >();
+    const getDefaultBehaviorFor = (
+      entityType: keyof GraphileBuild.BehaviorEntities,
+    ) => {
+      if (!defaultBehaviorByEntityTypeCache.has(entityType)) {
+        const supportedBehaviors = (
+          Object.keys(
+            this.behaviorRegistry,
+          ) as (keyof GraphileBuild.BehaviorStrings)[]
+        ).filter((k) => this.behaviorRegistry[k].entities[entityType]);
+
+        // TODO: scope this on an entity basis
+        const defaultBehaviors = this.globalDefaultBehavior;
+
+        const behaviorString = (
+          supportedBehaviors.join(" ") +
+          " " +
+          defaultBehaviors.behaviorString
+        ).trim();
+        defaultBehaviorByEntityTypeCache.set(entityType, behaviorString);
+        return behaviorString;
+      }
+      return defaultBehaviorByEntityTypeCache.get(entityType)!;
+    };
+
+    plugins.unshift({
+      name: "_GraphileBuildBehaviorSystemApplyPreferencesPlugin",
+      version,
+      description:
+        "This is a built-in plugin designed to apply preferences to the systems" +
+        " inferred behaviors; it runs for each `entityBehavior` after 'default'" +
+        " and 'inferred', but before 'override'.",
+
+      schema: {
+        entityBehavior: Object.fromEntries(
+          [...allEntities].map((entityType) => {
+            return [
+              entityType,
+              {
+                after: ["default", "inferred"],
+                before: ["override"],
+                provides: ["preferences"],
+                callback(behavior, entity) {
+                  const defaultBehavior = getDefaultBehaviorFor(entityType);
+                  return multiplyBehavior(defaultBehavior, behavior);
+                },
+              },
+            ];
+          }),
+        ),
+      },
+    });
 
     const initialBehavior = resolvedPreset.schema?.defaultBehavior ?? "";
     this.globalDefaultBehavior = this.resolveBehavior(
@@ -170,7 +231,7 @@ export class Behavior {
     );
 
     orderedApply(
-      resolvedPreset.plugins,
+      plugins,
       getEntityBehaviorHooks,
       (hookName, hookFn, plugin) => {
         const entityType = hookName as keyof GraphileBuild.BehaviorEntities;
@@ -368,7 +429,12 @@ export class Behavior {
         }
       } else if (typeof g === "function") {
         const newBehavior = g(oldBehavior, ...args);
-        if (!newBehavior.includes(oldBehavior)) {
+        if (
+          !newBehavior.includes(oldBehavior) &&
+          !source.startsWith(
+            "_GraphileBuildBehaviorSystemApplyPreferencesPlugin",
+          )
+        ) {
           throw new Error(
             `${source} callback must return a list that contains the current (passed in) behavior in addition to any other behaviors you wish to set.`,
           );
@@ -598,4 +664,76 @@ export function isValidBehaviorString(
       behavior,
     )
   );
+}
+
+/*
+ * 1. Take each behavior from inferred
+ * 2. Find the matching behaviors from preferences
+ * 3. Output for the behavior a list of behaviors formed by combining the
+ *    matching behaviors. The result needs to remain at least as constrained as
+ *    it already is.
+ *
+ * For example:
+ * - Preferences: "-* +resource:list -resource:connection +query:resource:connection -query:resource:list"
+ *   - AKA: turn everything off, use connections at the root, lists elsewhere
+ * - Inferred: "+connection +list"
+ * - Split to ["+connection", "+list"]
+ * - For "+connection" (which is equivalent to `+*:*:*:connection`, remember):
+ *   - "-*" becomes "-connection" (needs to remain at least as constrained as it already is)
+ *   - "-resource:connection" matches and is kept
+ *   - "+query:resource:connection" matches and is kept
+ *   - all other behaviors ignored (don't match)
+ * - For "+list":
+ *   - "-*" becomes "-list"
+ *   - "+resource:list" kept
+ *   - "-query:resource:list" kept
+ *   - all others don't match
+ * - Result: concatenate these:
+ *   - "-connection -resource:connection +query:resource:connection -list +resource:list -query:resource:list"
+ */
+function multiplyBehavior(preferences: string, inferred: string) {
+  const pref = parseSpecs(preferences);
+  const inf = parseSpecs(inferred);
+  const result = inf.flatMap((infEntry) => {
+    const final: BehaviorSpec[] = [];
+    nextPref: for (const prefEntry of pref) {
+      // If it matches; new scope must be at least as constrainted as old scope
+      const newScope: BehaviorScope = [];
+      const l = Math.max(prefEntry.scope.length, infEntry.scope.length);
+      // Does it match? Loop backwards through scope keys ensuring matches
+      for (let i = 1; i <= l; i++) {
+        const infScope =
+          i <= infEntry.scope.length
+            ? infEntry.scope[infEntry.scope.length - i]
+            : "*";
+        const prefScope =
+          i <= prefEntry.scope.length
+            ? prefEntry.scope[prefEntry.scope.length - i]
+            : "*";
+        const match =
+          infScope === "*" || prefScope === "*" || infScope == prefScope;
+
+        if (!match) {
+          // No match! Skip to next preference
+          continue nextPref;
+        }
+
+        // There was a match; ensure we're suitably constrained
+        const scopeText = infScope == "*" ? prefScope : infScope;
+        newScope.unshift(scopeText);
+      }
+
+      // If we get here, it must match; add our new behavior
+      final.push({
+        scope: newScope,
+        positive: prefEntry.positive && infEntry.positive,
+      });
+    }
+    return final;
+  });
+
+  const behaviorString = result
+    .map((r) => `${r.positive ? "" : "-"}${r.scope.join(":")}`)
+    .join(" ");
+  return behaviorString;
 }
