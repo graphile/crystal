@@ -200,7 +200,11 @@ export class Behavior {
                 callback(behavior, entity) {
                   const defaultBehavior = getDefaultBehaviorFor(entityType);
                   return [
+                    // We must include the previous behavior; so let's keep everything...
                     behavior,
+                    // ... then remove everything ...
+                    "-*",
+                    // ... then replace it with what we actually want.
                     multiplyBehavior(defaultBehavior, behavior),
                   ];
                 },
