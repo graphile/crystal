@@ -1,8 +1,6 @@
 import { arraysMatch, isDev } from "grafast";
 import { orderedApply, sortedPlugins } from "graphile-config";
 
-import { version } from "./version.js";
-
 type BehaviorScope = string[];
 interface BehaviorSpec {
   positive: boolean;
@@ -622,8 +620,9 @@ export class Behavior {
       }
 
       if (
-        !Object.entries(this.behaviorRegistry).some(([bhv, { entities }]) =>
-          /*entities[entityType] &&*/ stringMatches(bhv, behavior),
+        !Object.entries(this.behaviorRegistry).some(
+          ([bhv /*, { entities } */]) =>
+            /*entities[entityType] &&*/ stringMatches(bhv, behavior),
         )
       ) {
         console.trace(
@@ -646,10 +645,13 @@ export class Behavior {
       for (const [behaviorString, spec] of Object.entries(
         this.behaviorRegistry,
       )) {
-        if (
-          spec.entities[entityType] ||
-          true /* This ` || true` is because of inheritance (e.g. unique inherits from resource inherits from codec); it causes a headache if we factor it in */
-        ) {
+        /*
+         * This is `true` because of inheritance (e.g. unique inherits from
+         * resource inherits from codec); it causes a headache if we factor it
+         * in.
+         */
+        const applyBehaviorsFromAllEntities = true;
+        if (spec.entities[entityType] || applyBehaviorsFromAllEntities) {
           const parts = behaviorString.split(":");
           const l = parts.length;
           for (let i = 0; i < l; i++) {
