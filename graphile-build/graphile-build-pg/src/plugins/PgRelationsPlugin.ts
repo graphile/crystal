@@ -565,7 +565,12 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
               "-singularRelation:resource:connection",
             ];
           } else {
-            return behavior;
+            return [
+              behavior,
+              "-single",
+              "manyRelation:resource:connection",
+              "manyRelation:resource:list",
+            ];
           }
         },
       },
