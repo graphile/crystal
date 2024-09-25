@@ -65,10 +65,7 @@ export const PgConditionCustomFieldsPlugin: GraphileConfig.Plugin = {
     },
     entityBehavior: {
       pgResource: {
-        provides: ["inferred"],
-        after: ["default"],
-        before: ["override"],
-        callback(behavior, entity) {
+        inferred(behavior, entity) {
           if (isSimpleScalarComputedColumnLike(entity)) {
             return [behavior, "-proc:filterBy"];
           } else {

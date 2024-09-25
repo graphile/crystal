@@ -394,10 +394,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
     },
     entityBehavior: {
       pgResource: {
-        provides: ["inferred"],
-        after: ["defaults"],
-        before: ["overrides"],
-        callback(behavior, entity) {
+        inferred(behavior, entity) {
           if (entity.parameters) {
             return [behavior, defaultProcSourceBehavior(entity)];
           } else {

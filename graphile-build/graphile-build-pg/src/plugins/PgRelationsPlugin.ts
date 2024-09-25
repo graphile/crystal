@@ -541,10 +541,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
     },
     entityBehavior: {
       pgCodecRelation: {
-        provides: ["inferred"],
-        before: ["override"],
-        after: ["default"],
-        callback(behavior, entity): GraphileBuild.BehaviorString[] {
+        inferred(behavior, entity): GraphileBuild.BehaviorString[] {
           if (entity.isUnique) {
             return [
               behavior,
@@ -558,10 +555,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         },
       },
       pgCodecRef: {
-        provides: ["inferred"],
-        before: ["override"],
-        after: ["default"],
-        callback(behavior, [codec, refName]) {
+        inferred(behavior, [codec, refName]) {
           const ref = codec.refs?.[refName];
           if (ref?.definition.singular) {
             return [
@@ -576,10 +570,7 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
         },
       },
       pgRefDefinition: {
-        provides: ["inferred"],
-        before: ["override"],
-        after: ["default"],
-        callback(behavior, entity) {
+        inferred(behavior, entity) {
           if (entity.singular) {
             return [
               behavior,

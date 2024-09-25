@@ -602,53 +602,57 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
     },
     entityBehavior: {
       pgCodec: {
-        provides: ["default"],
-        before: ["inferred", "override"],
-        callback(behavior, codec) {
-          if (codec.attributes) {
+        inferred: {
+          provides: ["default"],
+          before: ["inferred", "override"],
+          callback(behavior, codec) {
+            if (codec.attributes) {
+              const isUnloggedOrTemp =
+                codec.extensions?.pg?.persistence === "u" ||
+                codec.extensions?.pg?.persistence === "t";
+              return [
+                "resource:select",
+                "table",
+                ...((!codec.isAnonymous
+                  ? ["resource:insert", "resource:update", "resource:delete"]
+                  : []) as GraphileBuild.BehaviorString[]),
+                behavior,
+                ...((isUnloggedOrTemp
+                  ? [
+                      "-resource:select",
+                      "-resource:insert",
+                      "-resource:update",
+                      "-resource:delete",
+                    ]
+                  : []) as GraphileBuild.BehaviorString[]),
+              ];
+            } else {
+              return [behavior];
+            }
+          },
+        },
+      },
+      pgResource: {
+        inferred: {
+          provides: ["default"],
+          before: ["inferred", "override"],
+          callback(behavior, resource) {
+            const isFunction = !!resource.parameters;
             const isUnloggedOrTemp =
-              codec.extensions?.pg?.persistence === "u" ||
-              codec.extensions?.pg?.persistence === "t";
+              resource.extensions?.pg?.persistence === "u" ||
+              resource.extensions?.pg?.persistence === "t";
             return [
-              "resource:select",
-              "table",
-              ...((!codec.isAnonymous
-                ? ["resource:insert", "resource:update", "resource:delete"]
+              ...((!isFunction && !isUnloggedOrTemp
+                ? ["resource:select"]
                 : []) as GraphileBuild.BehaviorString[]),
               behavior,
               ...((isUnloggedOrTemp
                 ? [
-                    "-resource:select",
-                    "-resource:insert",
-                    "-resource:update",
-                    "-resource:delete",
+                    "-resource:select -resource:insert -resource:update -resource:delete",
                   ]
                 : []) as GraphileBuild.BehaviorString[]),
             ];
-          } else {
-            return [behavior];
-          }
-        },
-      },
-      pgResource: {
-        provides: ["default"],
-        before: ["inferred", "override"],
-        callback(behavior, resource) {
-          const isFunction = !!resource.parameters;
-          const isUnloggedOrTemp =
-            resource.extensions?.pg?.persistence === "u" ||
-            resource.extensions?.pg?.persistence === "t";
-          return [
-            ...((!isFunction && !isUnloggedOrTemp
-              ? ["resource:select"]
-              : []) as GraphileBuild.BehaviorString[]),
-            behavior,
-            ...((isUnloggedOrTemp
-              ? [
-                  "-resource:select -resource:insert -resource:update -resource:delete",
-                ]
-              : []) as GraphileBuild.BehaviorString[]),
-          ];
+          },
         },
       },
     },

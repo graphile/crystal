@@ -16,6 +16,7 @@ declare global {
 
       "interface:node": true;
       "type:node": true;
+      node: true;
     }
   }
 }
@@ -52,6 +53,11 @@ export const CommonBehaviorsPlugin: GraphileConfig.Plugin = {
           entities: [],
         },
         "type:node": {
+          description: "should this type implement the Node interface?",
+          entities: [],
+        },
+
+        node: {
           description: "should this type implement the Node interface?",
           entities: [],
         },

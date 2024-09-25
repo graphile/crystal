@@ -68,10 +68,7 @@ export const PgOrderCustomFieldsPlugin: GraphileConfig.Plugin = {
     },
     entityBehavior: {
       pgResource: {
-        provides: ["inferred"],
-        after: ["default"],
-        before: ["override"],
-        callback(behavior, resource) {
+        inferred(behavior, resource) {
           if (isSimpleScalarComputedColumnLike(resource)) {
             return [behavior, "-orderBy"];
           } else {

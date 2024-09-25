@@ -333,44 +333,46 @@ export const PgAttributesPlugin: GraphileConfig.Plugin = {
 
     entityBehavior: {
       pgCodecAttribute: {
-        provides: ["default"],
-        before: ["inferred", "override"],
-        callback(behavior, [codec, attributeName]) {
-          const behaviors = new Set<GraphileBuild.BehaviorString>([
-            "select",
-            "base",
-            "update",
-            "insert",
-            "filterBy",
-            "orderBy",
-          ]);
-          const attribute = codec.attributes[attributeName];
-          function walk(codec: PgCodec) {
-            if (codec.arrayOfCodec) {
-              behaviors.add("-condition:attribute:filterBy");
-              behaviors.add(`-attribute:orderBy`);
-              walk(codec.arrayOfCodec);
-            } else if (codec.rangeOfCodec) {
-              behaviors.add(`-condition:attribute:filterBy`);
-              behaviors.add(`-attribute:orderBy`);
-              walk(codec.rangeOfCodec);
-            } else if (codec.domainOfCodec) {
-              // No need to add a behavior for domain
-              walk(codec.domainOfCodec);
-            } else if (codec.attributes) {
-              behaviors.add(`-condition:attribute:filterBy`);
-              behaviors.add(`-attribute:orderBy`);
-            } else if (codec.isBinary) {
-              // Never filter, not in condition plugin nor any other
-              behaviors.add(`-attribute:filterBy`);
-              behaviors.add(`-attribute:orderBy`);
-            } else {
-              // Done
+        inferred: {
+          provides: ["default"],
+          before: ["inferred", "override"],
+          callback(behavior, [codec, attributeName]) {
+            const behaviors = new Set<GraphileBuild.BehaviorString>([
+              "select",
+              "base",
+              "update",
+              "insert",
+              "filterBy",
+              "orderBy",
+            ]);
+            const attribute = codec.attributes[attributeName];
+            function walk(codec: PgCodec) {
+              if (codec.arrayOfCodec) {
+                behaviors.add("-condition:attribute:filterBy");
+                behaviors.add(`-attribute:orderBy`);
+                walk(codec.arrayOfCodec);
+              } else if (codec.rangeOfCodec) {
+                behaviors.add(`-condition:attribute:filterBy`);
+                behaviors.add(`-attribute:orderBy`);
+                walk(codec.rangeOfCodec);
+              } else if (codec.domainOfCodec) {
+                // No need to add a behavior for domain
+                walk(codec.domainOfCodec);
+              } else if (codec.attributes) {
+                behaviors.add(`-condition:attribute:filterBy`);
+                behaviors.add(`-attribute:orderBy`);
+              } else if (codec.isBinary) {
+                // Never filter, not in condition plugin nor any other
+                behaviors.add(`-attribute:filterBy`);
+                behaviors.add(`-attribute:orderBy`);
+              } else {
+                // Done
+              }
             }
-          }
-          walk(attribute.codec);
+            walk(attribute.codec);
 
-          return [...behaviors, behavior];
+            return [...behaviors, behavior];
+          },
         },
       },
     },

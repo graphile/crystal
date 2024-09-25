@@ -71,14 +71,16 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
     entityBehavior: {
       pgCodec: "order",
       pgResource: {
-        provides: ["default"],
-        before: ["inferred", "override"],
-        callback(behavior, resource) {
-          if (resource.parameters) {
-            return behavior;
-          } else {
-            return ["order", behavior];
-          }
+        inferred: {
+          provides: ["default"],
+          before: ["inferred", "override"],
+          callback(behavior, resource) {
+            if (resource.parameters) {
+              return behavior;
+            } else {
+              return ["order", behavior];
+            }
+          },
         },
       },
     },

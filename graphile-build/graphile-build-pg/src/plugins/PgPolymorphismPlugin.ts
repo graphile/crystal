@@ -657,24 +657,23 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
   schema: {
     entityBehavior: {
       pgCodec: {
-        provides: ["default"],
-        before: ["inferred", "override"],
-        callback(behavior, codec) {
-          return [
-            "select",
-            "table",
-            ...((!codec.isAnonymous
-              ? ["insert", "update"]
-              : []) as GraphileBuild.BehaviorString[]),
-            behavior,
-          ];
+        inferred: {
+          provides: ["default"],
+          before: ["inferred", "override"],
+          callback(behavior, codec) {
+            return [
+              "select",
+              "table",
+              ...((!codec.isAnonymous
+                ? ["insert", "update"]
+                : []) as GraphileBuild.BehaviorString[]),
+              behavior,
+            ];
+          },
         },
       },
       pgCodecRelation: {
-        provides: ["inferred"],
-        after: ["default", "PgRelationsPlugin"],
-        before: ["override"],
-        callback(behavior, entity, build) {
+        inferred(behavior, entity, build) {
           const {
             input: {
               pgRegistry: { pgRelations },
@@ -719,10 +718,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         },
       },
       pgCodecAttribute: {
-        provides: ["inferred"],
-        after: ["default"],
-        before: ["override"],
-        callback(behavior, [codec, attributeName], build) {
+        inferred(behavior, [codec, attributeName], build) {
           // If this is the primary key of a related table of a
           // `@interface mode:relational` table, then omit it from the schema
           const tbl = build.pgTableResource(codec);
@@ -758,10 +754,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         },
       },
       pgResource: {
-        provides: ["inferred"],
-        after: ["default"],
-        before: ["override"],
-        callback(behavior, resource, build) {
+        inferred(behavior, resource, build) {
           // Disable insert/update/delete on relational tables
           const newBehavior = [behavior];
           if (

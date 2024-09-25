@@ -69,14 +69,17 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
   schema: {
     entityBehavior: {
       pgCodec: {
-        provides: ["default"],
-        before: ["inferred", "override"],
-        callback(behavior, entity) {
-          if (entity.polymorphism?.mode === "union") {
-            return ["connection", "-list", behavior];
-          } else {
-            return behavior;
-          }
+        inferred: {
+          provides: ["default"],
+          before: ["inferred"],
+          callback(behavior, entity) {
+            if (entity.polymorphism?.mode === "union") {
+              // TODO: explain why this exists! Also, why is it default and not inferred?
+              return ["connection", "-list", behavior];
+            } else {
+              return behavior;
+            }
+          },
         },
       },
     },

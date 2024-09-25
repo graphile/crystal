@@ -703,6 +703,17 @@ export async function watchSchema(
 export { version } from "./version.js";
 
 declare global {
+  namespace GraphileBuild {
+    type EntityBehaviorHook<
+      entityType extends keyof GraphileBuild.BehaviorEntities,
+    > = PluginHook<
+      (
+        behavior: GraphileBuild.BehaviorString,
+        entity: GraphileBuild.BehaviorEntities[entityType],
+        build: GraphileBuild.Build,
+      ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[]
+    >;
+  }
   namespace GraphileConfig {
     interface Provides {
       default: true;
@@ -880,15 +891,10 @@ declare global {
           [entityType in keyof GraphileBuild.BehaviorEntities]?:
             | GraphileBuild.BehaviorString
             | GraphileBuild.BehaviorString[]
-            | PluginHook<
-                (
-                  behavior: GraphileBuild.BehaviorString,
-                  entity: GraphileBuild.BehaviorEntities[entityType],
-                  build: GraphileBuild.Build,
-                ) =>
-                  | GraphileBuild.BehaviorString
-                  | GraphileBuild.BehaviorString[]
-              >;
+            | {
+                inferred?: GraphileBuild.EntityBehaviorHook<entityType>;
+                override?: GraphileBuild.EntityBehaviorHook<entityType>;
+              };
         };
 
         hooks?: {

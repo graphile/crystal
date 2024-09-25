@@ -161,25 +161,27 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
       },
       entityBehavior: {
         pgResource: "delete:resource:select",
-        pgCodecAttribute(behavior, [codec, attributeName]) {
-          const attribute = codec.attributes[attributeName];
-          const underlyingCodec =
-            attribute.codec.domainOfCodec ?? attribute.codec;
-          const newBehavior = [behavior];
-          if (
-            underlyingCodec.arrayOfCodec ||
-            underlyingCodec.isBinary ||
-            underlyingCodec.rangeOfCodec
-          ) {
-            newBehavior.push("-attribute:orderBy");
-          }
-          if (
-            underlyingCodec.isBinary ||
-            underlyingCodec.arrayOfCodec?.isBinary
-          ) {
-            newBehavior.push("-condition:attribute:filterBy");
-          }
-          return newBehavior;
+        pgCodecAttribute: {
+          inferred(behavior, [codec, attributeName]) {
+            const attribute = codec.attributes[attributeName];
+            const underlyingCodec =
+              attribute.codec.domainOfCodec ?? attribute.codec;
+            const newBehavior = [behavior];
+            if (
+              underlyingCodec.arrayOfCodec ||
+              underlyingCodec.isBinary ||
+              underlyingCodec.rangeOfCodec
+            ) {
+              newBehavior.push("-attribute:orderBy");
+            }
+            if (
+              underlyingCodec.isBinary ||
+              underlyingCodec.arrayOfCodec?.isBinary
+            ) {
+              newBehavior.push("-condition:attribute:filterBy");
+            }
+            return newBehavior;
+          },
         },
       },
     },

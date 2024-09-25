@@ -689,21 +689,23 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
 
     entityBehavior: {
       pgResource: {
-        provides: ["default"],
-        before: [
-          // By running before this, we actually override it because it
-          // prefixes further back in the behavior chain
-          "PgFirstLastBeforeAfterArgsPlugin",
-          "inferred",
-          "override",
-        ],
-        callback(behavior, resource) {
-          if (resource.parameters) {
-            // Default to no backwards pagination for functions
-            return ["-resource:connection:backwards", behavior];
-          } else {
-            return behavior;
-          }
+        inferred: {
+          provides: ["default"],
+          before: [
+            // By running before this, we actually override it because it
+            // prefixes further back in the behavior chain
+            "PgFirstLastBeforeAfterArgsPlugin",
+            "inferred",
+            "override",
+          ],
+          callback(behavior, resource) {
+            if (resource.parameters) {
+              // Default to no backwards pagination for functions
+              return ["-resource:connection:backwards", behavior];
+            } else {
+              return behavior;
+            }
+          },
         },
       },
     },

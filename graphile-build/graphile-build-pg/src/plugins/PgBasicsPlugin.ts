@@ -219,16 +219,12 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
     },
     entityBehavior: {
       pgCodec: {
-        after: ["default", "inferred"],
-        provides: ["override"],
-        callback(behavior, codec) {
+        override(behavior, codec) {
           return [behavior, getBehavior(codec.extensions)];
         },
       },
       pgCodecAttribute: {
-        after: ["default", "inferred"],
-        provides: ["override"],
-        callback(behavior, [codec, attributeName]) {
+        override(behavior, [codec, attributeName]) {
           if (typeof attributeName !== "string") {
             throw new Error(
               `pgCodecAttribute no longer accepts (codec, attribute) - it now accepts (codec, attributeName). Please update your code. Sorry! (Changed in PostGraphile V5 alpha 13.)`,
@@ -242,9 +238,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         },
       },
       pgResource: {
-        after: ["default", "inferred"],
-        provides: ["override"],
-        callback(behavior, resource) {
+        override(behavior, resource) {
           return [
             behavior,
             getBehavior([resource.codec.extensions, resource.extensions]),
@@ -252,9 +246,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         },
       },
       pgResourceUnique: {
-        after: ["default", "inferred"],
-        provides: ["override"],
-        callback(behavior, [resource, unique]) {
+        override(behavior, [resource, unique]) {
           return [
             behavior,
             getBehavior([
@@ -266,9 +258,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         },
       },
       pgCodecRelation: {
-        after: ["default", "inferred"],
-        provides: ["override"],
-        callback(behavior, relationSpec) {
+        override(behavior, relationSpec) {
           return [
             behavior,
             // The behavior is the relation behavior PLUS the remote table
@@ -282,9 +272,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         },
       },
       pgCodecRef: {
-        after: ["default", "inferred"],
-        provides: ["override"],
-        callback(behavior, [codec, refName]) {
+        override(behavior, [codec, refName]) {
           const ref = codec.refs?.[refName];
           if (!ref) {
             throw new Error(`Codec ${codec.name} has no ref '${refName}'`);
@@ -296,9 +284,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         },
       },
       pgRefDefinition: {
-        after: ["default", "inferred"],
-        provides: ["override"],
-        callback(behavior, refSpec) {
+        override(behavior, refSpec) {
           return [behavior, getBehavior(refSpec.extensions)];
         },
       },

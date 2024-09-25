@@ -39,13 +39,7 @@ export const PgFirstLastBeforeAfterArgsPlugin: GraphileConfig.Plugin = {
 
   schema: {
     entityBehavior: {
-      pgResource: {
-        provides: ["default"],
-        before: ["inferred", "override"],
-        callback(behavior) {
-          return ["resource:connection:backwards", behavior];
-        },
-      },
+      pgResource: "resource:connection:backwards",
     },
     hooks: {
       GraphQLObjectType_fields_field_args: commonFn,
