@@ -623,14 +623,11 @@ export class Behavior {
           /*entities[entityType] &&*/ stringMatches(bhv, behavior),
         )
       ) {
-        ARGH(source, behavior, entityType);
-        /*
         console.trace(
           `Behavior '${behavior}' is not registered for entity type '${entityType}'; it's only expected to be used with '${Object.keys(
             this.behaviorRegistry[behavior].entities,
           ).join("', '")}'. (Source: ${source})`,
         );
-        */
       }
     }
   }
@@ -674,7 +671,6 @@ export class Behavior {
     }
     return this._defaultBehaviorByEntityTypeCache.get(entityType)!;
   }
-}
 }
 
 /**
