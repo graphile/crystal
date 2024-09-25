@@ -389,7 +389,9 @@ export class Behavior {
     }
     const behavior = this.resolveBehavior(
       entityType,
-      NULL_BEHAVIOR,
+      // TODO: this should be NULL_BEHAVIOR, but we had to hack it due to a bug
+      // in the way that refs used to work.
+      this.globalDefaultBehavior,
       callbacks,
       entity,
       this.build,
