@@ -141,8 +141,8 @@ const forumCodec = recordCodec({
 ### Example
 
 For example, in this hypothetical E-commerce scenario, `listOfCodec` is used
-in combination with the `$pgSelect.placeholder` method to return a SQL
-expression that allows the transformed list of `$order_ids` to be referenced
+in combination with the `$pgSelect.placeholder()` method to return a SQL
+expression that allows the transformed list of `$orderIds` to be referenced
 inside the step for selecting the associated order items.
 
 ```ts
@@ -150,13 +150,13 @@ const $orders = orders.find({
   customer_id: context().get("customerId"),
 });
 
-const $order_ids = applyTransforms(each($orders, ($order) => $order.get("id")));
+const $orderIds = applyTransforms(each($orders, ($order) => $order.get("id")));
 
-const $order_items = order_items.find();
+const $orderItems = registry.pgResources.order_items.find();
 
-$order_items.where(
-  sql`${$order_items}.order_id = ANY (${$order_items.placeholder(
-    $order_ids,
+$orderItems.where(
+  sql`${$orderItems}.order_id = ANY (${$orderItems.placeholder(
+    $orderIds,
     listOfCodec(TYPES.uuid),
   )})`,
 );
