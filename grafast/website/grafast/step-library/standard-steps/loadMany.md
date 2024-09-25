@@ -115,20 +115,47 @@ stateDiagram
 
 ## Usage
 
-### Basic usage
-
-```ts
-const $userId = $user.get("id");
-const $friendships = loadMany($userId, getFriendshipsByUserIds);
+```
+loadMany($spec, [$unaryStep,] [ioEquivalence,] callback)
 ```
 
 `loadMany` accepts two to four arguments, the first is the step that specifies
 which records to load (the _specifier step_), and the last is the callback
 function called with these specs responsible for loading them.
 
-The callback function is called with two arguments, the first is a list of the
-values from the _specifier step_ and the second is options that may affect the
-fetching of the records.
+```ts
+// Basic usage:
+const $records = loadMany($spec, callback);
+
+// Advanced usage:
+const $records = loadMany($spec, $unaryStep, ioEquivalence, callback);
+const $records = loadMany($spec, $unaryStep, callback);
+const $records = loadMany($spec, ioEquivalence, callback);
+```
+
+Where:
+
+- `$spec` is any step
+- `$unaryStep` is any _unary_ step - see [Unary step usage](#unary-step-usage) below
+- `ioEquivalence` is either `null`, a string, an array of strings, or a string-string object map - see [ioEquivalence usage](#ioequivalence-usage) below
+- and `callback` is a callback function responsible for fetching the data.
+
+### Callback
+
+The `callback` function is called with two arguments, the first is
+a list of the values from the _specifier step_ `$spec` and the second is options that
+may affect the fetching of the records.
+
+```ts
+function callback(
+  specs: ReadonlyArray<unknown>,
+  options: {
+    unary: unknown;
+    attributes: ReadonlyArray<string>;
+    params: Record<string, unknown>;
+  },
+): PromiseOrDirect<ReadonlyArray<unknown>>;
+```
 
 :::tip
 
@@ -137,6 +164,39 @@ in a common location so that it can be reused over and over again, rather than
 defined inline. This will allow LoadManyStep to optimise calls to this function.
 
 :::
+
+Within this definition of `callback`:
+
+- `specs` is the runtime values of each value that `$spec` represented
+- `options` is an object containing:
+  - `unary`: the runtime value that `$unaryStep` (if any) represented
+  - `attributes`: the list of keys that have been accessed via
+    `$record.get('<key>')` for each of the records in `$records`
+  - `params`: the params set via `$records.setParam('<key>', <value>)`
+
+`specs` is deduplicated using strict equality; so it is best to keep `$spec`
+simple - typically it should only represent a single scalar value - which is
+why `$unaryStep` exists...
+
+`options.unary` is very useful to keep specs simple (so that fetch
+deduplication can work optimally) whilst passing in global values that you may
+need such as a database or API client.
+
+`options.attributes` is useful for optimizing your fetch - e.g. if the user
+only ever requested `$record.get('id')` and `$record.get('avatarUrl')` then
+there's no need to fetch all the other attributes from your datasource.
+
+`options.params` can be used to pass additional context to your callback
+function, perhaps options like "should we include archived records" or "should
+we expand 'customer' into a full object rather than just returning the
+identifier".
+
+### Basic usage
+
+```ts
+const $userId = $user.get("id");
+const $friendships = loadMany($userId, getFriendshipsByUserIds);
+```
 
 An example of the callback function might be:
 
@@ -151,8 +211,33 @@ const friendshipsByUserIdCallback = (ids, { attributes }) => {
 
 [dataloader]: https://github.com/graphql/dataloader
 
-Optionally a penultimate argument (2nd of 3 arguments, or 3rd of 4 arguments)
-can indicate the input/output equivalence - this can be:
+### Unary step usage
+
+(a step that only ever represents one value, e.g. simple derivatives of `context()`, `fieldArgs`, or `constant()`)
+
+In addition to the forms seen in "Basic usage" above, you can pass a second
+step to `loadMany`. This second step must be a [**unary
+step**](../../step-classes.md#addUnaryDependency), meaning that it must represent
+exactly one value across the entire request (not a batch of values like most
+steps).
+
+```ts
+const $userId = $user.get("id");
+const $dbClient = context().get("dbClient");
+const $friendships = loadMany($userId, $dbClient, getFriendshipsByUserIds);
+```
+
+Since we know it will have exactly one value, we can pass it into the
+callback as a single value and our callback will be able to use it directly
+without having to perform any manual grouping.
+
+This unary dependency is useful for fixed values (for example, those from
+GraphQL field arguments) and values on the GraphQL context such as clients to
+various APIs and other data sources.
+
+### ioEquivalence usage
+
+The `ioEquivalence` optional parameter can accept the following values:
 
 - `null` to indicate no input/output equivalence
 - a string to indicate that the same named property on the output is equivalent
@@ -164,43 +249,45 @@ can indicate the input/output equivalence - this can be:
   the attributes of the object and the key(s) in the output that are equivalent
   to the given entry on the input
 
+```ts title="Example for a scalar step"
+const $posts = loadMany(
+  $userId,
+
+  // States that $post.get('user_id') should return $userId directly, since it
+  // will have the same value.
+  "user_id",
+
+  friendshipsByUserIdCallback,
+);
+```
+
 ```ts title="Example for a list step"
 const $posts = loadMany(
   list([$organizationId, $userId]),
+
+  // States that:
+  // - $post.get('organization_id') should return $organizationId directly, and
+  // - $post.get('user_id') should return $userId directly
   ["organization_id", "user_id"],
+
   batchGetMemberPostsByOrganizationIdAndUserId,
 );
 ```
 
 ```ts title="Example for an object step"
 const $posts = loadMany(
-  list({ oid: $organizationId, uid: $userId }),
+  object({ oid: $organizationId, uid: $userId }),
+
+  // States that:
+  // - $post.get('organization_id') should return $organizationId directly (the value for the `oid` input), and
+  // - $post.get('user_id') should return $userId directly (the value for the `uid` input
   { oid: "organization_id", uid: "user_id" },
+
   batchGetMemberPostsByOrganizationIdAndUserId,
 );
 ```
 
-### Advanced usage
-
-```ts
-const $userId = $user.get("id");
-const $dbClient = context().get("dbClient");
-const $friendships = loadMany($userId, $dbClient, getFriendshipsByUserIds);
-```
-
-In addition to the forms seen in "Basic usage" above, you can pass a second
-step to `loadMany`. This second step must be a [**unary
-step**](../../step-classes.md#addUnaryDependency), meaning that it must represent
-exactly one value across the entire request (not a batch of values like most
-steps). Since we know it will have exactly one value, we can pass it into the
-callback as a single value and our callback will be able to use it directly
-without having to perform any manual grouping.
-
-This unary dependency is useful for fixed values (for example, those from
-GraphQL field arguments) and values on the GraphQL context such as clients to
-various APIs and other data sources.
-
-## Multiple steps
+### Passing multiple steps
 
 The [`list()`](./list) or [`object()`](./object) step can be used if you need
 to pass the value of more than one step into your callback:
@@ -211,3 +298,12 @@ const $result = loadMany(list([$a, $b, $c]), callback);
 
 The first argument to `callback` will then be an array of all the tuples of
 values from these plans: `ReadonlyArray<[a: AValue, b: BValue, c: CValue]>`.
+
+:::tip Performance impact from using list/object
+
+Using `list()` / `object()` like this will likely reduce the effectiveness of
+loadMany's built in deduplication; to address this a stable object/list is
+required - please track this issue:
+https://github.com/graphile/crystal/issues/2170
+
+:::
