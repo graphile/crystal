@@ -509,7 +509,7 @@ export class Behavior {
       stack: [
         ...inferredBehavior.stack,
         {
-          source: "__ApplyBehaviors__",
+          source: `__ApplyBehaviors_${entityType}__`,
           prefix: "",
           suffix: `-* ${inferredBehaviorWithPreferencesApplied}`,
         },

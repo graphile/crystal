@@ -673,48 +673,56 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         },
       },
       pgCodecRelation: {
-        inferred(behavior, entity, build) {
-          const {
-            input: {
-              pgRegistry: { pgRelations },
-            },
-            grafast: { arraysMatch },
-          } = build;
-          const { localCodec, remoteResource, isUnique, isReferencee } = entity;
-          const remoteCodec = remoteResource.codec;
+        inferred: {
+          provides: ["inferred"],
+          after: ["default", "PgRelationsPlugin"],
+          callback(behavior, entity, build) {
+            const {
+              input: {
+                pgRegistry: { pgRelations },
+              },
+              grafast: { arraysMatch },
+            } = build;
+            const { localCodec, remoteResource, isUnique, isReferencee } =
+              entity;
+            const remoteCodec = remoteResource.codec;
 
-          // Hide relation from a concrete type back to the abstract root table.
-          if (
-            isUnique &&
-            !isReferencee &&
-            remoteCodec.polymorphism?.mode === "relational"
-          ) {
-            const localTypeName = build.inflection.tableType(localCodec);
-            const polymorphicTypeDefinitionEntry = Object.entries(
-              remoteCodec.polymorphism.types,
-            ).find(([, val]) => val.name === localTypeName);
-            if (polymorphicTypeDefinitionEntry) {
-              const [, { relationName }] = polymorphicTypeDefinitionEntry;
-              const relation = pgRelations[remoteCodec.name]?.[relationName];
-              if (
-                arraysMatch(relation.remoteAttributes, entity.localAttributes)
-              ) {
+            // Hide relation from a concrete type back to the abstract root table.
+            if (
+              isUnique &&
+              !isReferencee &&
+              remoteCodec.polymorphism?.mode === "relational"
+            ) {
+              const localTypeName = build.inflection.tableType(localCodec);
+              const polymorphicTypeDefinitionEntry = Object.entries(
+                remoteCodec.polymorphism.types,
+              ).find(([, val]) => val.name === localTypeName);
+              if (polymorphicTypeDefinitionEntry) {
+                const [, { relationName }] = polymorphicTypeDefinitionEntry;
+                const relation = pgRelations[remoteCodec.name]?.[relationName];
+                if (
+                  arraysMatch(relation.remoteAttributes, entity.localAttributes)
+                ) {
+                  return [behavior, "-connection", "-list", "-single"];
+                }
+              }
+            }
+
+            // Hide relation from abstract root table to related elements
+            if (
+              isReferencee &&
+              localCodec.polymorphism?.mode === "relational"
+            ) {
+              const relations = Object.values(
+                localCodec.polymorphism.types,
+              ).map((t) => pgRelations[localCodec.name]?.[t.relationName]);
+              if (relations.includes(entity)) {
                 return [behavior, "-connection", "-list", "-single"];
               }
             }
-          }
 
-          // Hide relation from abstract root table to related elements
-          if (isReferencee && localCodec.polymorphism?.mode === "relational") {
-            const relations = Object.values(localCodec.polymorphism.types).map(
-              (t) => pgRelations[localCodec.name]?.[t.relationName],
-            );
-            if (relations.includes(entity)) {
-              return [behavior, "-connection", "-list", "-single"];
-            }
-          }
-
-          return behavior;
+            return behavior;
+          },
         },
       },
       pgCodecAttribute: {
