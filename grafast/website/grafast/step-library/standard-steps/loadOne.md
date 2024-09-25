@@ -65,7 +65,7 @@ const plans = {
 };
 ```
 
-In it's current state the system doesn't know that the `$user.get("id")` is
+In its current state the system doesn't know that the `$user.get("id")` is
 equivalent to the `context().get("userId")`, so this would result in a chained
 fetch:
 
@@ -114,12 +114,8 @@ stateDiagram
 
 ## Usage
 
-### Basic usage
-
-```ts
-const $userId = $post.get("author_id");
-const $user = loadOne($userId, batchGetUserById);
-// OR: const $user = loadOne($userId, 'id', batchGetUserById);
+```
+loadOne($spec, [$unaryStep,] [ioEquivalence,] callback)
 ```
 
 `loadOne` accepts two to four arguments. The first is the step that specifies
@@ -134,7 +130,7 @@ fetching of the records.
 
 For optimal results, we strongly recommend that the callback function is defined
 in a common location so that it can be reused over and over again, rather than
-defined inline. This will allow LoadOneStep to optimise calls to this function.
+defined inline. This will allow `LoadOneStep` to optimize calls to this function.
 
 :::
 
