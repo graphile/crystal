@@ -618,6 +618,9 @@ export class Behavior {
         console.trace(
           `Behavior '${behavior}' has not been registered! (Source: ${source})`,
         );
+        this.behaviorRegistry[behavior] = {
+          entities: {},
+        };
       }
 
       if (
