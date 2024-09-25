@@ -12,7 +12,7 @@ read many results from your business logic layer. To load just one, see
 
 ## Enhancements over DataLoader
 
-Thanks to the planning system in Gra*fast*, `loadOne` can expose features that
+Thanks to the planning system in Gra*fast*, `loadMany` can expose features that
 are not possible in DataLoader.
 
 ### Attribute and parameter tracking
@@ -66,7 +66,7 @@ const plans = {
 };
 ```
 
-In it's current state the system doesn't know that the
+In its current state the system doesn't know that the
 `$user.get("organization_id")` is equivalent to the `id` argument to our
 `usersByOrganizationId` field, so this would result in a chained fetch:
 
@@ -80,7 +80,7 @@ stateDiagram
 `} />
 
 However, we can indicate that the output of the `loadMany` step's records'
-`organization_id` property (`$user.get("organization_id")`) is equivalent to it's input
+`organization_id` property (`$user.get("organization_id")`) is equivalent to its input
 (`$id`):
 
 ```diff {4-5}
@@ -161,7 +161,7 @@ function callback(
 
 For optimal results, we strongly recommend that the callback function is defined
 in a common location so that it can be reused over and over again, rather than
-defined inline. This will allow LoadManyStep to optimise calls to this function.
+defined inline. This will allow `LoadManyStep` to optimize calls to this function.
 
 :::
 
@@ -176,7 +176,7 @@ Within this definition of `callback`:
 
 `specs` is deduplicated using strict equality; so it is best to keep `$spec`
 simple - typically it should only represent a single scalar value - which is
-why `$unaryStep` exists...
+why `$unaryStep` exists.
 
 `options.unary` is very useful to keep specs simple (so that fetch
 deduplication can work optimally) whilst passing in global values that you may
@@ -203,8 +203,8 @@ An example of the callback function might be:
 ```ts
 const friendshipsByUserIdCallback = (ids, { attributes }) => {
   // Your business logic would be called here; e.g. this might be the same
-  // function that your DataLoaders would call, except we can pass additional
-  // information to it:
+  // function that your DataLoaders would call, except additional information
+  // can be passed to it:
   return getFriendshipsByUserIds(ids, { attributes });
 };
 ```
@@ -302,7 +302,7 @@ values from these plans: `ReadonlyArray<[a: AValue, b: BValue, c: CValue]>`.
 :::tip Performance impact from using list/object
 
 Using `list()` / `object()` like this will likely reduce the effectiveness of
-loadMany's built in deduplication; to address this a stable object/list is
+`loadMany`'s built in deduplication; to address this a stable object/list is
 required - please track this issue:
 https://github.com/graphile/crystal/issues/2170
 
