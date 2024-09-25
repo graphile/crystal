@@ -389,7 +389,7 @@ export class Behavior {
     }
     const behavior = this.resolveBehavior(
       entityType,
-      NULL_BEHAVIOR,
+      this.globalDefaultBehavior,
       callbacks,
       entity,
       this.build,
