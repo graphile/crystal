@@ -196,45 +196,21 @@ export class Behavior {
       }
     }
 
-    /*
-    plugins.unshift({
-      name: "_GraphileBuildBehaviorSystemApplyPreferencesPlugin",
-      version,
-      description:
-        "This is a built-in plugin designed to apply preferences to the systems" +
-        " inferred behaviors; it runs for each `entityBehavior` after 'default'" +
-        " and 'inferred', but before 'override'.",
-
-      schema: {
-        entityBehavior: Object.fromEntries(
-          [...allEntities].map((entityType) => {
-            return [
-              entityType,
-              {
-                after: ["default", "inferred"],
-                before: ["override"],
-                provides: ["preferences"],
-                callback(behavior, entity) {
-                  const defaultBehavior = getDefaultBehaviorFor(entityType);
-                  return [
-                    // We must include the previous behavior; so let's keep everything...
-                    behavior,
-                    // ... then remove everything ...
-                    "-*",
-                    // ... then replace it with what we actually want.
-                    multiplyBehavior(defaultBehavior, behavior, entityType),
-                  ];
-                },
-              },
-            ];
-          }),
-        ),
-      },
-    });
-    */
-
+    const defaultBehaviorFromPreset =
+      this.resolvedPreset.schema?.defaultBehavior ?? "";
+    const resolvedDefaultBehavior: ResolvedBehavior = {
+      behaviorString: defaultBehaviorFromPreset as GraphileBuild.BehaviorString,
+      stack: [
+        {
+          source: "preset.schema.defaultBehavior",
+          prefix: defaultBehaviorFromPreset,
+          suffix: "",
+        },
+      ],
+    };
     this.globalDefaultBehavior = this.resolveBehavior(
       null,
+      resolvedDefaultBehavior,
       plugins.map((p) => [
         `${p.name}.schema.globalBehavior`,
         p.schema?.globalBehavior,
@@ -413,6 +389,7 @@ export class Behavior {
     }
     const behavior = this.resolveBehavior(
       entityType,
+      NULL_BEHAVIOR,
       callbacks,
       entity,
       this.build,
@@ -441,6 +418,7 @@ export class Behavior {
     }
     const behavior = this.resolveBehavior(
       entityType,
+      NULL_BEHAVIOR,
       callbacks,
       entity,
       this.build,
@@ -561,6 +539,7 @@ export class Behavior {
 
   private resolveBehavior<TArgs extends [...any[]]>(
     entityType: keyof GraphileBuild.BehaviorEntities | null,
+    initialBehavior: ResolvedBehavior,
     // Misnomer; also allows strings or nothings
     callbacks: ReadonlyArray<
       [
@@ -574,25 +553,6 @@ export class Behavior {
     >,
     ...args: TArgs
   ): ResolvedBehavior {
-    const defaultBehaviorFromPreset =
-      this.resolvedPreset.schema?.defaultBehavior ?? "";
-    const initialBehavior = NULL_BEHAVIOR;
-    /*
-    applyDefaultBehavior
-      ? this.globalDefaultBehavior
-      : applyDefaultBehavior === null
-      ? {
-          behaviorString: defaultBehaviorFromPreset,
-          stack: [
-            {
-              source: "preset.schema.defaultBehavior",
-              prefix: defaultBehaviorFromPreset,
-              suffix: "",
-            },
-          ],
-        }
-      : NULL_BEHAVIOR;
-    */
     let behaviorString: string = initialBehavior.behaviorString;
     const stack: Array<StackItem> = [...initialBehavior.stack];
 
