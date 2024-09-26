@@ -234,13 +234,20 @@ class SchemaBuilder<
     finalBuild.behavior.freeze();
 
     finalBuild.status.isBuildPhaseComplete = true;
+    return finalBuild;
+  }
+
+  initBuild(build: TBuild) {
+    if (build.status.isInitPhaseComplete) {
+      return build;
+    }
     const initContext: GraphileBuild.ContextInit = {
       scope: Object.create(null),
       type: "init",
     };
-    this.applyHooks("init", INIT_OBJECT, finalBuild, initContext);
-    finalBuild.status.isInitPhaseComplete = true;
-    return finalBuild;
+    this.applyHooks("init", INIT_OBJECT, build, initContext);
+    build.status.isInitPhaseComplete = true;
+    return build;
   }
 
   /**
@@ -248,7 +255,7 @@ class SchemaBuilder<
    * schema synchronously.
    */
   buildSchema(input: GraphileBuild.BuildInput): GraphQLSchema {
-    const build = this.createBuild(input);
+    const build = this.initBuild(this.createBuild(input));
     const schemaSpec: Partial<GraphQLSchemaConfig> = {
       directives: [...build.graphql.specifiedDirectives],
     };
