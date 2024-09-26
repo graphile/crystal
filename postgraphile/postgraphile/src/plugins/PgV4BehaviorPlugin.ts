@@ -3,7 +3,6 @@ import "graphile-build-pg";
 
 import type { PgResource, PgResourceOptions } from "@dataplan/pg";
 import type { PgProc } from "graphile-build-pg/pg-introspection";
-import { inspect } from "util";
 
 declare global {
   namespace GraphileConfig {
@@ -33,26 +32,6 @@ const v4ComputedAttributeChecks = (s: PgResource): boolean => {
       firstArg.codec.extensions?.pg?.name + "_",
     )
   ) {
-    return false;
-  }
-
-  return true;
-};
-
-const v4ComputedAttributeChecks_ = (
-  _s: PgResourceOptions,
-  pgProc: PgProc,
-): boolean => {
-  const args = pgProc.getArguments();
-  const firstArg = args[0];
-
-  // Has to be in same schema
-  if (firstArg.type.typnamespace !== pgProc.pronamespace) {
-    return false;
-  }
-
-  // Has to start with the name prefix
-  if (!pgProc.proname.startsWith(firstArg.type.typname + "_")) {
     return false;
   }
 
