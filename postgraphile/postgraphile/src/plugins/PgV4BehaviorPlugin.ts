@@ -1,8 +1,7 @@
 import "graphile-config";
 import "graphile-build-pg";
 
-import type { PgResource, PgResourceOptions } from "@dataplan/pg";
-import type { PgProc } from "graphile-build-pg/pg-introspection";
+import type { PgResource } from "@dataplan/pg";
 
 declare global {
   namespace GraphileConfig {
