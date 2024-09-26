@@ -194,27 +194,29 @@ export class Behavior {
       }
     }
 
-    const defaultBehaviorFromPreset =
-      this.resolvedPreset.schema?.defaultBehavior ?? "";
-    const resolvedDefaultBehavior: ResolvedBehavior = {
-      behaviorString: defaultBehaviorFromPreset as GraphileBuild.BehaviorString,
-      stack: [
-        {
-          source: "preset.schema.defaultBehavior",
-          prefix: defaultBehaviorFromPreset,
-          suffix: "",
-        },
-      ],
-    };
-    this.globalDefaultBehavior = this.resolveBehavior(
+    const pluginDefaultBehavior = this.resolveBehavior(
       null,
-      resolvedDefaultBehavior,
+      NULL_BEHAVIOR,
       plugins.map((p) => [
         `${p.name}.schema.globalBehavior`,
         p.schema?.globalBehavior,
       ]),
       build,
     );
+    const defaultBehaviorFromPreset =
+      this.resolvedPreset.schema?.defaultBehavior ?? "";
+    this.globalDefaultBehavior = {
+      behaviorString:
+        `${pluginDefaultBehavior.behaviorString} ${defaultBehaviorFromPreset}` as GraphileBuild.BehaviorString,
+      stack: [
+        ...pluginDefaultBehavior.stack,
+        {
+          source: "preset.schema.defaultBehavior",
+          prefix: "",
+          suffix: defaultBehaviorFromPreset,
+        },
+      ],
+    };
 
     orderedApply(
       plugins,
