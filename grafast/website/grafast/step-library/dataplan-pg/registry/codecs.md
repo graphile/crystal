@@ -138,6 +138,30 @@ const forumCodec = recordCodec({
 
 - `identifier` - the database name for this type
 
+### Example
+
+For example, in this hypothetical E-commerce scenario, `listOfCodec` is used
+in combination with the `$pgSelect.placeholder()` method to return a SQL
+expression that allows the transformed list of `$orderIds` to be referenced
+inside the step for selecting the associated order items.
+
+```ts
+const $orders = orders.find({
+  customer_id: context().get("customerId"),
+});
+
+const $orderIds = applyTransforms(each($orders, ($order) => $order.get("id")));
+
+const $orderItems = registry.pgResources.order_items.find();
+
+$orderItems.where(
+  sql`${$orderItems}.order_id = ANY (${$orderItems.placeholder(
+    $orderIds,
+    listOfCodec(TYPES.uuid),
+  )})`,
+);
+```
+
 ## rangeOfCodec(innerCodec, name, identifier)
 
 `rangeOfCodec` returns a new codec that represents a range of the given
