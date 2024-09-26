@@ -211,7 +211,11 @@ const friendshipsByUserIdCallback = (ids, { attributes }) => {
 
 ### Unary step usage
 
-(a step that only ever represents one value, e.g. simple derivatives of `context()`, `fieldArgs`, or `constant()`)
+:::info
+
+A unary step is a step that only ever represents one value, e.g. simple derivatives of `context()`, `fieldArgs`, or `constant()`.
+
+:::
 
 In addition to the forms seen in "Basic usage" above, you can pass a second
 step to `loadMany`. This second step must be a [**unary
