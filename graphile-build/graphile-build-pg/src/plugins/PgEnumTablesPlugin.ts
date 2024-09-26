@@ -394,6 +394,20 @@ Original error: ${e.message}
   }),
   schema: {
     entityBehavior: {
+      pgCodec: {
+        inferred: {
+          // We want to turn off all inferred behaviors on enum tables
+          after: ["inferred"],
+          provides: ["postInferred"],
+          callback(behavior, codec) {
+            const e = codec.extensions?.tags?.enum;
+            if (e === true || typeof e === "string") {
+              return [behavior, "-*"];
+            }
+            return behavior;
+          },
+        },
+      },
       pgResource: {
         inferred: {
           // We want to turn off all inferred behaviors on enum tables
