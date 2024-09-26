@@ -22,13 +22,17 @@ const v4ComputedAttributeChecks = (s: PgResource): boolean => {
 
   // Has to be in same schema
   if (
-    firstArg.codec.extensions?.pg?.schemaName === s.extensions?.pg?.schemaName
+    firstArg.codec.extensions?.pg?.schemaName !== s.extensions?.pg?.schemaName
   ) {
     return false;
   }
 
   // Has to start with the name prefix
-  if (!firstArg.name?.startsWith(firstArg.codec.extensions?.pg?.name + "_")) {
+  if (
+    !s.extensions?.pg?.name?.startsWith(
+      firstArg.codec.extensions?.pg?.name + "_",
+    )
+  ) {
     return false;
   }
 
