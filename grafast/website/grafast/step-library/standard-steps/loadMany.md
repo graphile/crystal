@@ -154,7 +154,7 @@ function callback(
     attributes: ReadonlyArray<string>;
     params: Record<string, unknown>;
   },
-): PromiseOrDirect<ReadonlyArray<unknown>>;
+): PromiseOrDirect<ReadonlyArray<ReadonlyArray<unknown>>>;
 ```
 
 :::tip
