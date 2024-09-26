@@ -108,9 +108,6 @@ declare global {
     interface PgResourceExtensions {
       description?: string;
       tags: Partial<GraphileBuild.PgResourceTags>;
-      isInsertable?: boolean;
-      isUpdatable?: boolean;
-      isDeletable?: boolean;
       singleOutputParameterName?: string;
       /** For v4 compatibility, what's the name of the actual table. */
       pg?: {
