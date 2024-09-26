@@ -861,7 +861,7 @@ export function isValidBehaviorString(
 ): behavior is GraphileBuild.BehaviorString {
   return (
     typeof behavior === "string" &&
-    /^[+-]?([a-zA-Z](?:[_:]?[a-zA-Z0-9])+|\*)(?:\s+[+-]?(?:[a-zA-Z]([_:]?[a-zA-Z0-9])+|\*))*$/.test(
+    /^\s*[+-]?([a-zA-Z](?:[_:]?[a-zA-Z0-9])+|\*)(?:\s+[+-]?(?:[a-zA-Z]([_:]?[a-zA-Z0-9])+|\*))*\s*$/.test(
       behavior,
     )
   );
