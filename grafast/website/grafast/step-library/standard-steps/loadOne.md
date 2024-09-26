@@ -170,8 +170,8 @@ Within this definition of `callback`:
 - `options` is an object containing:
   - `unary`: the runtime value that `$unaryStep` (if any) represented
   - `attributes`: the list of keys that have been accessed via
-    `$record.get('<key>')` for each of the records in `$records`
-  - `params`: the params set via `$records.setParam('<key>', <value>)`
+    `$record.get('<key>')`
+  - `params`: the params set via `$record.setParam('<key>', <value>)`
 
 `specs` is deduplicated using strict equality; so it is best to keep `$spec`
 simple - typically it should only represent a single scalar value - which is
@@ -219,7 +219,11 @@ async function batchGetUserById(ids, { attributes }) {
 
 ### Unary step usage
 
-(a step that only ever represents one value, e.g. simple derivatives of `context()`, `fieldArgs`, or `constant()`)
+:::info
+
+A unary step is a step that only ever represents one value, e.g. simple derivatives of `context()`, `fieldArgs`, or `constant()`.
+
+:::
 
 In addition to the forms seen in "Basic usage" above, you can pass a second
 step to `loadOne`. This second step must be a [**unary
@@ -339,7 +343,7 @@ This technique can also be used with the unary step in advanced usage.
 :::tip Performance impact from using list/object
 
 Using `list()` / `object()` like this will likely reduce the effectiveness of
-`loadMany`'s built in deduplication; to address this a stable object/list is
+`loadOne`'s built in deduplication; to address this a stable object/list is
 required - please track this issue:
 https://github.com/graphile/crystal/issues/2170
 
