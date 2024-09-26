@@ -182,6 +182,9 @@ const registryConfig_pgResources_people_people = {
       schemaName: "simple_collections",
       name: "people"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -209,6 +212,9 @@ const registryConfig_pgResources_pets_pets = {
       schemaName: "simple_collections",
       name: "pets"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -251,7 +257,7 @@ const registry = makeRegistry({
         },
         tags: {
           simpleCollections: "only",
-          behavior: ["-queryField -mutationField typeField", "-filter -order", "+list -connection"]
+          behavior: ["+list -connection"]
         }
       },
       description: undefined

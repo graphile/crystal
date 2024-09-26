@@ -86,9 +86,9 @@ const spec_alwaysAsIdentity = {
       notNull: true,
       hasDefault: true,
       extensions: {
-        tags: {
-          behavior: ["-attribute:insert -attribute:update"]
-        }
+        tags: {},
+        isInsertable: false,
+        isUpdatable: false
       }
     },
     t: {
@@ -539,6 +539,9 @@ const registry = makeRegistry({
           schemaName: "pg11",
           name: "always_as_identity"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -558,6 +561,9 @@ const registry = makeRegistry({
           schemaName: "pg11",
           name: "by_default_as_identity"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -577,6 +583,9 @@ const registry = makeRegistry({
           schemaName: "pg11",
           name: "network"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -596,6 +605,9 @@ const registry = makeRegistry({
           schemaName: "pg11",
           name: "types"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     }

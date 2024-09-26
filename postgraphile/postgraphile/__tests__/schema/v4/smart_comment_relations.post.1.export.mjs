@@ -529,6 +529,9 @@ const registryConfig_pgResources_post_table_post_table = {
       schemaName: "smart_comment_relations",
       name: "post"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       name: "post_table",
       omit: true,
@@ -567,6 +570,9 @@ const registryConfig_pgResources_offer_table_offer_table = {
       schemaName: "smart_comment_relations",
       name: "offer"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       name: "offer_table",
       omit: true,
@@ -598,6 +604,9 @@ const registryConfig_pgResources_offers_offers = {
       schemaName: "smart_comment_relations",
       name: "offer_view"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       name: "offers",
       primaryKey: "id",
@@ -636,6 +645,9 @@ const registryConfig_pgResources_streets_streets = {
       schemaName: "smart_comment_relations",
       name: "streets"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       unique: "name"
     }
@@ -665,6 +677,9 @@ const registryConfig_pgResources_properties_properties = {
       schemaName: "smart_comment_relations",
       name: "properties"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -692,6 +707,9 @@ const registryConfig_pgResources_street_property_street_property = {
       schemaName: "smart_comment_relations",
       name: "street_property"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -719,10 +737,12 @@ const registryConfig_pgResources_houses_houses = {
       schemaName: "smart_comment_relations",
       name: "houses"
     },
+    isInsertable: false,
+    isUpdatable: false,
+    isDeletable: false,
     tags: {
       primaryKey: "street_id,property_id",
-      foreignKey: spec_houses.extensions.tags.foreignKey,
-      behavior: ["-insert", "-update", "-delete"]
+      foreignKey: spec_houses.extensions.tags.foreignKey
     }
   }
 };
@@ -750,6 +770,9 @@ const registryConfig_pgResources_buildings_buildings = {
       schemaName: "smart_comment_relations",
       name: "buildings"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       foreignKey: "(name) references streets (name)|@fieldName namedAfterStreet|@foreignFieldName buildingsNamedAfterStreet|@foreignSimpleFieldName buildingsNamedAfterStreetList"
     }
@@ -793,6 +816,9 @@ const registry = makeRegistry({
           schemaName: "smart_comment_relations",
           name: "post_view"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {
           name: "posts",
           primaryKey: "id"

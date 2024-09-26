@@ -227,6 +227,9 @@ const registryConfig_pgResources_user_user = {
       schemaName: "inheritence",
       name: "user"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -254,6 +257,9 @@ const registryConfig_pgResources_user_file_user_file = {
       schemaName: "inheritence",
       name: "user_file"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -287,6 +293,9 @@ const registry = makeRegistry({
           schemaName: "inheritence",
           name: "file"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },

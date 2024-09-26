@@ -191,6 +191,9 @@ const registryConfig_pgResources_people_people = {
       schemaName: "refs",
       name: "people"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -218,6 +221,9 @@ const registryConfig_pgResources_posts_posts = {
       schemaName: "refs",
       name: "posts"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       ref: "author via:(user_id)->people(id) singular"
     }
