@@ -161,7 +161,7 @@ function callback(
 
 For optimal results, we strongly recommend that the callback function is defined
 in a common location so that it can be reused over and over again, rather than
-defined inline. This will allow `LoadManyStep` to optimize calls to this function.
+defined inline. This will allow the underlying steps to optimize calls to this function.
 
 :::
 
@@ -208,8 +208,6 @@ const friendshipsByUserIdCallback = (ids, { attributes }) => {
   return getFriendshipsByUserIds(ids, { attributes });
 };
 ```
-
-[dataloader]: https://github.com/graphql/dataloader
 
 ### Unary step usage
 
@@ -307,3 +305,5 @@ required - please track this issue:
 https://github.com/graphile/crystal/issues/2170
 
 :::
+
+[dataloader]: https://github.com/graphql/dataloader
