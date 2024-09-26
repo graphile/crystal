@@ -2,7 +2,6 @@ import "graphile-config";
 
 import { gatherConfig } from "graphile-build";
 
-import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {

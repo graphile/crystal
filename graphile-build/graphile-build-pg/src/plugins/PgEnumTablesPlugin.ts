@@ -9,7 +9,6 @@ import type {
 } from "pg-introspection";
 import { sql } from "pg-sql2";
 
-import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
@@ -235,11 +234,6 @@ Original error: ${e.message}
           const isEnumTable =
             tags.enum === true || typeof tags.enum === "string";
 
-          if (isEnumTable) {
-            // Prevent the table being recognised as a table
-            addBehaviorToTags(tags, "-*", true);
-          }
-
           // By this point, even views should have "fake" constraints we can use
           // (e.g. `@primaryKey`)
           const enumConstraints = pgClass
@@ -398,4 +392,22 @@ Original error: ${e.message}
       },
     },
   }),
+  schema: {
+    entityBehavior: {
+      pgResource: {
+        inferred: {
+          // We want to turn off all inferred behaviors on enum tables
+          after: ["inferred"],
+          provides: ["postInferred"],
+          callback(behavior, resource) {
+            const e = resource.extensions?.tags?.enum;
+            if (e === true || typeof e === "string") {
+              return [behavior, "-*"];
+            }
+            return behavior;
+          },
+        },
+      },
+    },
+  },
 };

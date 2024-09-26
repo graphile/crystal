@@ -110,6 +110,7 @@ declare global {
     }
 
     interface BehaviorStrings {
+      "*": true;
       // Expand me through declaration merging
     }
 

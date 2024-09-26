@@ -21,7 +21,7 @@ import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { PgProc, PgProcArgument } from "pg-introspection";
 import sql from "pg-sql2";
 
-import { addBehaviorToTags, exportNameHint } from "../utils.js";
+import { exportNameHint } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
@@ -425,8 +425,6 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             [sql, sqlFromArgDigests, sqlIdent],
           );
 
-          addBehaviorToTags(tags, "-filter -order", true);
-
           const extensions: PgResourceExtensions = {
             pg: {
               serviceName,
@@ -701,7 +699,12 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           callback(behavior, resource) {
             if (resource.parameters) {
               // Default to no backwards pagination for functions
-              return ["-resource:connection:backwards", behavior];
+              return [
+                "-resource:connection:backwards",
+                "-filter",
+                "-order",
+                behavior,
+              ];
             } else {
               return behavior;
             }
