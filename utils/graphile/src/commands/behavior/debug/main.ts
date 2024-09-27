@@ -240,7 +240,7 @@ function getEntities(
         if (!resource.uniques) continue;
         for (let i = 0, l = resource.uniques.length; i < l; i++) {
           const unique = resource.uniques[i];
-          memo[`${resourceName}.${i}`] = unique;
+          memo[`${resourceName}.${i}`] = [resource, unique];
         }
       }
       return memo;
