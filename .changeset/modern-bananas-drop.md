@@ -12,7 +12,7 @@ removing many hacks and workarounds, and ultimately meaning that
 `plugin.schema.entityBehaviors` to indicate behaviors as shown in this PR - do
 not mod the tags directly unless they're explicitly meant to be overrides.
 
-Technically this is a breaking change (besides the removal of the
+Technically this is a significant breaking change (besides the removal of the
 `addBehaviorToTags()` helper) because the order in which behaviors are applied
 has changed, and so a different behavior might ultimately "win". This shows up
 in places where there is ambiguity, for example if you add `@filterable` to a
@@ -26,3 +26,9 @@ on.
 Be sure to print your schema before and after this update and look for changes;
 if there are changes then you likely need to fix the relevant behaviors/smart
 tags. (Hopefully there's no changes for you!)
+
+You'll also need to change any places where you're specifying behaviors that
+will be type checked; you can either cast your existing strings e.g.
+`defaultBehavior: "+connection -list" as GraphileBuild.BehaviorString`, or
+preferably you can specify your behaviors as an array, which should give you
+auto-complete on each entry; e.g. `defaultBehavior: ["connection", "-list"]`.
