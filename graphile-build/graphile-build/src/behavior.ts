@@ -605,14 +605,11 @@ export class Behavior {
       const oldBehavior = behaviorString;
       const g = typeof rawG === "string" ? [rawG] : rawG;
       if (Array.isArray(g)) {
-        for (const str of g) {
-          if (str === "") {
-            continue;
-          } else if (behaviorString === "") {
-            behaviorString = str;
-          } else {
-            behaviorString = str + " " + behaviorString;
-          }
+        if (g.length === 0) continue;
+        if (behaviorString === "") {
+          behaviorString = g.join(" ");
+        } else {
+          behaviorString = g.join(" ") + " " + behaviorString;
         }
       } else if (typeof g === "function") {
         const newBehavior: string | string[] = g(
