@@ -374,11 +374,19 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
           description: "",
           entities: ["pgResource"],
         },
+        "typeField:resource:array": {
+          description: "",
+          entities: ["pgResource"],
+        },
         "queryField:resource:connection": {
           description: "",
           entities: ["pgResource"],
         },
         "queryField:resource:list": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "queryField:resource:array": {
           description: "",
           entities: ["pgResource"],
         },

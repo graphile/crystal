@@ -215,9 +215,20 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         },
         // filter: { description: "can we filter these results?", entities: [] },
         filterBy: { description: "can we filter by this thing?", entities: [] },
-        order: { description: "can we order these results?", entities: [] },
+        order: {
+          description: "can we order these results?",
+          entities: ["pgCodec", "pgResource"],
+        },
         orderBy: { description: "can we order by this thing?", entities: [] },
 
+        connection: {
+          description: "should we use a connection field for this?",
+          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+        },
+        list: {
+          description: "should we use a list field for this?",
+          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+        },
         "resource:connection": {
           description: "should we use a connection field for this?",
           entities: ["pgCodec", "pgResource", "pgResourceUnique"],

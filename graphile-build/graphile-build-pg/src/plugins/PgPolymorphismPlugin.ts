@@ -655,6 +655,15 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
     },
   }),
   schema: {
+    behaviorRegistry: {
+      add: {
+        "interface:node": {
+          description:
+            "should this codec representing a polymorphic interface implement the Node interface?",
+          entities: ["pgCodec"],
+        },
+      },
+    },
     entityBehavior: {
       pgCodec: {
         inferred: {

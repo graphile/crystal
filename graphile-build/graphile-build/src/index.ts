@@ -874,7 +874,7 @@ declare global {
               keyof GraphileBuild.BehaviorStrings,
               {
                 description: string;
-                entities: (keyof GraphileBuild.BehaviorEntities)[];
+                entities: ReadonlyArray<keyof GraphileBuild.BehaviorEntities>;
               }
             >
           >;
