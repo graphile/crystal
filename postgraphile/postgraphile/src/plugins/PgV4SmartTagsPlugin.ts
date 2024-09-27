@@ -199,11 +199,11 @@ function processOmit(
     return;
   }
   const behavior: string[] = [];
-  const processOmit = (omit: true | string): void => {
-    if (omit === true || omit === "*") {
-      behavior.push("-*");
-      return;
-    }
+  const processOmit = (rawOmit: true | string): void => {
+    const omit =
+      rawOmit === true || rawOmit === "*"
+        ? "create,read,update,delete,execute,filter,order,all,many,manyToMany"
+        : rawOmit;
     if (typeof omit !== "string") {
       throw new Error(
         `Issue in smart tags; expected omit to be true/string/string[], but found something unexpected: ${inspect(
@@ -219,7 +219,7 @@ function processOmit(
           break;
         }
         case "read": {
-          behavior.push("-select -node");
+          behavior.push("-select -node -connection -list -array -single");
           break;
         }
         case "update": {

@@ -170,7 +170,7 @@ const spec_films = {
     },
     tags: Object.assign(Object.create(null), {
       omit: "*",
-      behavior: ["-*"]
+      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
     })
   },
   executor: executor
@@ -348,7 +348,7 @@ const spec_tvShows = {
     },
     tags: Object.assign(Object.create(null), {
       omit: true,
-      behavior: ["-*"]
+      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
     })
   },
   executor: executor
@@ -511,7 +511,7 @@ const spec_person = {
       extensions: {
         tags: {
           omit: true,
-          behavior: ["-*"]
+          behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
         }
       }
     }

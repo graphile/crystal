@@ -64,7 +64,7 @@ const spec_awsApplicationFirstPartyVulnerabilities = {
     },
     tags: Object.assign(Object.create(null), {
       omit: true,
-      behavior: ["-*"]
+      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
     })
   },
   executor: executor
@@ -104,7 +104,7 @@ const spec_awsApplicationThirdPartyVulnerabilities = {
     },
     tags: Object.assign(Object.create(null), {
       omit: true,
-      behavior: ["-*"]
+      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
     })
   },
   executor: executor
@@ -144,7 +144,7 @@ const spec_gcpApplicationFirstPartyVulnerabilities = {
     },
     tags: Object.assign(Object.create(null), {
       omit: true,
-      behavior: ["-*"]
+      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
     })
   },
   executor: executor
@@ -184,7 +184,7 @@ const spec_gcpApplicationThirdPartyVulnerabilities = {
     },
     tags: Object.assign(Object.create(null), {
       omit: true,
-      behavior: ["-*"]
+      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
     })
   },
   executor: executor

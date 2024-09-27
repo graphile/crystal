@@ -44,6 +44,8 @@ declare global {
       orderBy: true;
       "resource:connection": true;
       "resource:list": true;
+      "resource:array": true;
+      "resource:single": true;
     }
     type HasGraphQLTypeForPgCodec = (
       codec: PgCodec<any, any, any, any, any, any, any>,
@@ -237,6 +239,15 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           description: "should we use a list field for this?",
           entities: ["pgCodec", "pgResource", "pgResourceUnique"],
         },
+        "resource:array": {
+          description:
+            "should we use a list field for this non-connection-capable thing?",
+          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+        },
+        "resource:single": {
+          description: "can we get one of this thing?",
+          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+        },
       },
     },
     entityBehavior: {
@@ -255,7 +266,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           const attribute = codec.attributes[attributeName];
           return [
             behavior,
-            getBehavior([codec.extensions, attribute.extensions]),
+            getBehavior([attribute.codec.extensions, attribute.extensions]),
           ];
         },
       },
@@ -263,7 +274,12 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         override(behavior, resource) {
           return [
             behavior,
-            getBehavior([resource.codec.extensions, resource.extensions]),
+            getBehavior(
+              resource.parameters
+                ? // Functions should not inherit from their codec
+                  [resource.extensions]
+                : [resource.codec.extensions, resource.extensions],
+            ),
           ];
         },
       },

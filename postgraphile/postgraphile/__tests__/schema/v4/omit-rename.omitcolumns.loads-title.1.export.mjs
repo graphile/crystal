@@ -324,7 +324,7 @@ const spec_tvShows = {
       extensions: {
         tags: {
           omit: "read,create,update,delete,all,many",
-          behavior: ["-select -node -insert -update -delete -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection"]
+          behavior: ["-select -node -connection -list -array -single -insert -update -delete -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection"]
         }
       }
     },
@@ -508,7 +508,7 @@ const spec_person = {
       extensions: {
         tags: {
           omit: true,
-          behavior: ["-*"]
+          behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
         }
       }
     }
