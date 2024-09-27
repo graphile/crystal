@@ -219,7 +219,7 @@ function processOmit(
           break;
         }
         case "read": {
-          behavior.push("-select -node");
+          behavior.push("-select -node -connection -list -array -single");
           break;
         }
         case "update": {
