@@ -689,12 +689,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
               return;
             }
 
-            const selectable = build.behavior.pgCodecMatches(
-              codec,
-              "resource:select",
-            );
-
-            if (selectable) {
+            if (isTable) {
               build.registerObjectType(
                 tableTypeName,
                 {
@@ -721,8 +716,8 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 {
                   pgCodec: codec,
                   isInputType: true,
-                  isPgRowType: selectable,
-                  isPgCompoundType: !selectable,
+                  isPgRowType: isTable,
+                  isPgCompoundType: !isTable,
                 },
                 () => ({
                   description: `An input for mutations affecting \`${tableTypeName}\``,
@@ -754,8 +749,8 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 {
                   pgCodec: codec,
                   isPgPatch: true,
-                  isPgRowType: selectable,
-                  isPgCompoundType: !selectable,
+                  isPgRowType: isTable,
+                  isPgCompoundType: !isTable,
                 },
                 () => ({
                   description: `Represents an update to a \`${tableTypeName}\`. Fields that are set will be updated.`,
@@ -783,8 +778,8 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                 {
                   pgCodec: codec,
                   isPgBaseInput: true,
-                  isPgRowType: selectable,
-                  isPgCompoundType: !selectable,
+                  isPgRowType: isTable,
+                  isPgCompoundType: !isTable,
                 },
                 () => ({
                   description: `An input representation of \`${tableTypeName}\` with nullable fields.`,
@@ -806,7 +801,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             }
 
             if (
-              selectable &&
+              isTable &&
               !codec.isAnonymous
               // Even without the 'connection' behavior we may still need the connection type in specific circumstances
               // && build.behavior.pgCodecMatches(codec, "*:connection")
