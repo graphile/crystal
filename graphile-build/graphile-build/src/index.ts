@@ -861,11 +861,12 @@ declare global {
 
       schema?: {
         globalBehavior?:
-          | string
+          | GraphileBuild.BehaviorString
+          | GraphileBuild.BehaviorString[]
           | ((
-              behavior: string,
+              behavior: GraphileBuild.BehaviorString,
               build: GraphileBuild.Build,
-            ) => string | string[]);
+            ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[]);
 
         behaviorRegistry?: {
           add?: Partial<

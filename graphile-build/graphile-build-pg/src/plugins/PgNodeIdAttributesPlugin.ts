@@ -159,7 +159,7 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                 ? "filterBy"
                 : "insert";
 
-              const fieldBehaviorScope = `nodeId:${action}`;
+              const fieldBehaviorScope = `nodeId:${action}` as const;
               if (
                 !build.behavior.pgCodecRelationMatches(
                   relation,

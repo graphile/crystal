@@ -37,6 +37,8 @@ declare global {
     interface BehaviorStrings {
       "constraint:resource:update": true;
       "constraint:resource:delete": true;
+      "nodeId:resource:update": true;
+      "nodeId:resource:delete": true;
       "update:resource:select": true;
       "delete:resource:nodeId": true;
       "delete:resource:select": true;
@@ -256,6 +258,15 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
           description: "can delete a record by this constraint",
           entities: ["pgResourceUnique"],
         },
+        "nodeId:resource:update": {
+          description: "can update a record by this nodeId",
+          entities: ["pgResourceUnique"],
+        },
+        "nodeId:resource:delete": {
+          description: "can delete a record by this nodeId",
+          entities: ["pgResourceUnique"],
+        },
+        // TODO: should this exist?! Perhaps the `-nodeId` behavior should imply `-nodeId:*:*` in the behavior registry?
         "delete:resource:nodeId": {
           description: "can delete a record by its Node ID",
           entities: ["pgResource"],
@@ -942,11 +953,11 @@ function getSpecs(
   const primaryUnique = resource.uniques.find(
     (u: PgResourceUnique) => u.isPrimary,
   );
-  const constraintMode = `constraint:${mode}`;
+  const constraintMode = `constraint:${mode}` as const;
   const specs = [
     ...(primaryUnique &&
     build.getNodeIdCodec !== undefined &&
-    build.behavior.pgCodecMatches(resource.codec, `nodeId:${mode}`)
+    build.behavior.pgCodecMatches(resource.codec, `nodeId:${mode}` as const)
       ? [{ unique: primaryUnique, uniqueMode: "node" }]
       : []),
     ...resource.uniques

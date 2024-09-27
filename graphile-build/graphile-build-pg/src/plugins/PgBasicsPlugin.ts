@@ -42,6 +42,8 @@ declare global {
       filterBy: true;
       order: true;
       orderBy: true;
+      "resource:connection": true;
+      "resource:list": true;
     }
     type HasGraphQLTypeForPgCodec = (
       codec: PgCodec<any, any, any, any, any, any, any>,
@@ -187,7 +189,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
   }),
 
   schema: {
-    globalBehavior: "connection -list",
+    globalBehavior: ["connection", "-list"],
     behaviorRegistry: {
       add: {
         select: {
@@ -215,6 +217,15 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         filterBy: { description: "can we filter by this thing?", entities: [] },
         order: { description: "can we order these results?", entities: [] },
         orderBy: { description: "can we order by this thing?", entities: [] },
+
+        "resource:connection": {
+          description: "should we use a connection field for this?",
+          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+        },
+        "resource:list": {
+          description: "should we use a list field for this?",
+          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+        },
       },
     },
     entityBehavior: {

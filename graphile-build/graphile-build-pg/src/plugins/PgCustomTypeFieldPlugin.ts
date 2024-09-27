@@ -1182,10 +1182,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   !resource.sqlPartitionByIndex && !resource.isList;
 
                 const baseScope = isRootQuery ? `queryField` : `typeField`;
-                const connectionFieldBehaviorScope = `${baseScope}:resource:connection`;
+                const connectionFieldBehaviorScope =
+                  `${baseScope}:resource:connection` as const;
                 const listFieldBehaviorScope = canUseConnection
-                  ? `${baseScope}:resource:list`
-                  : `${baseScope}:resource:array`;
+                  ? (`${baseScope}:resource:list` as const)
+                  : (`${baseScope}:resource:array` as const);
                 if (
                   canUseConnection &&
                   build.behavior.pgResourceMatches(

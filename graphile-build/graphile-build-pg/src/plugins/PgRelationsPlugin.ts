@@ -926,7 +926,7 @@ function addRelations(
         isUnique &&
         build.behavior.pgCodecRelationMatches(
           relation,
-          `${relationTypeScope}:resource:single`,
+          `${relationTypeScope as "singularRelation"}:resource:single` as const,
         );
       const shouldAddConnectionField = build.behavior.pgCodecRelationMatches(
         relation,
@@ -1353,7 +1353,7 @@ function addRelations(
       isUnique &&
       build.behavior.stringMatches(
         behavior,
-        `${relationTypeScope}:resource:single`,
+        `${relationTypeScope as "singularRelation"}:resource:single`,
       );
     const shouldAddConnectionField = build.behavior.stringMatches(
       behavior,

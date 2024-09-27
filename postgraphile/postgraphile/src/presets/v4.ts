@@ -108,19 +108,19 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
       `The 'defaultRole' V4 option is not currently supported in V5; please use the \`preset.grafast.context\` callback instead.`,
     );
   }
-  const simpleCollectionsBehavior = (() => {
+  const simpleCollectionsBehavior = ((): GraphileBuild.BehaviorString[] => {
     switch (options.simpleCollections) {
       case "both": {
-        return "+connection +resource:connection +list +resource:list";
+        return ["connection", "resource:connection", "list", "resource:list"];
       }
       case "only": {
-        return "-connection -resource:connection +list +resource:list";
+        return ["-connection", "-resource:connection", "list", "resource:list"];
       }
       case "omit": {
-        return "+connection +resource:connection -list -resource:list";
+        return ["connection", "resource:connection", "-list", "-resource:list"];
       }
       default: {
-        return "";
+        return [];
       }
     }
   })();
@@ -157,7 +157,15 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
     schema: {
       // We could base this on the legacy relations setting; but how to set deprecated?
       globalBehavior(behavior) {
-        return `${behavior} ${simpleCollectionsBehavior} -singularRelation:resource:connection -singularRelation:resource:list +condition:attribute:filterBy +attribute:orderBy +resource:connection:backwards`;
+        return [
+          behavior,
+          ...simpleCollectionsBehavior,
+          "-singularRelation:resource:connection",
+          "-singularRelation:resource:list",
+          "condition:attribute:filterBy",
+          "attribute:orderBy",
+          "resource:connection:backwards",
+        ];
       },
       entityBehavior: {
         pgResource: "delete:resource:select",

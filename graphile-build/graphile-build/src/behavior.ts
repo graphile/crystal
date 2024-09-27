@@ -80,7 +80,7 @@ const getEntityBehaviorOverrideHooks = (plugin: GraphileConfig.Plugin) => {
 export type BehaviorDynamicMethods = {
   [entityType in keyof GraphileBuild.BehaviorEntities as `${entityType}Matches`]: (
     entity: GraphileBuild.BehaviorEntities[entityType],
-    filter: string,
+    filter: keyof GraphileBuild.BehaviorStrings,
   ) => boolean | undefined;
 } & {
   [entityType in keyof GraphileBuild.BehaviorEntities as `${entityType}Behavior`]: (
@@ -96,20 +96,20 @@ export class Behavior {
         [
           source: string,
           callback: (
-            behavior: string,
+            behavior: GraphileBuild.BehaviorString,
             entity: GraphileBuild.BehaviorEntities[entityType],
             build: GraphileBuild.Build,
-          ) => string | string[],
+          ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[],
         ]
       >;
       overrideBehaviorCallbacks: Array<
         [
           source: string,
           callback: (
-            behavior: string,
+            behavior: GraphileBuild.BehaviorString,
             entity: GraphileBuild.BehaviorEntities[entityType],
             build: GraphileBuild.Build,
-          ) => string | string[],
+          ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[],
         ]
       >;
       listCache: Map<number, any[][]>;
@@ -133,7 +133,7 @@ export class Behavior {
       entities: {
         [entity in keyof GraphileBuild.BehaviorEntities]?: {
           description: string;
-          pluginName: string;
+          pluginName: string | null;
         };
       };
     };
@@ -280,8 +280,8 @@ export class Behavior {
     };
     (this as this & BehaviorDynamicMethods)[`${entityType}Matches`] = (
       entity: GraphileBuild.BehaviorEntities[TEntityType],
-      behavior: string,
-    ): boolean | undefined => this.entityMatches(entityType, entity, behavior);
+      filter: keyof GraphileBuild.BehaviorStrings,
+    ): boolean | undefined => this.entityMatches(entityType, entity, filter);
     (this as this & BehaviorDynamicMethods)[`${entityType}Behavior`] = (
       entity: GraphileBuild.BehaviorEntities[TEntityType],
     ): string => this.getBehaviorForEntity(entityType, entity).behaviorString;
@@ -311,11 +311,52 @@ export class Behavior {
    */
   public entityMatches<
     TEntityType extends keyof GraphileBuild.BehaviorEntities,
+    TFilter extends keyof GraphileBuild.BehaviorStrings,
   >(
     entityType: TEntityType,
     entity: GraphileBuild.BehaviorEntities[TEntityType],
-    filter: string,
+    filter: TFilter,
   ): boolean | undefined {
+    if (!this.behaviorRegistry[filter]) {
+      console.trace(
+        `Behavior '${filter}' is not registered; please be sure to register it within a plugin via \`plugin.schema.behaviorRegistry.add[${JSON.stringify(
+          filter,
+        )}] = { description: "...", entities: [${JSON.stringify(
+          entityType,
+        )}] }\`.`,
+      );
+      // Register it so we don't see this warning again
+      this.behaviorRegistry[filter] = {
+        entities: {
+          [entityType]: {
+            description: "Unregistered.",
+            pluginName: null,
+          },
+        },
+      };
+    } else if (
+      !Object.entries(this.behaviorRegistry).some(
+        ([bhv, { entities }]) =>
+          entities[entityType] && stringMatches(bhv, filter),
+      )
+    ) {
+      console.trace(
+        `Behavior '${filter}' is not registered for entity type '${entityType}'; it's only expected to be used with '${Object.keys(
+          this.behaviorRegistry[filter].entities,
+        ).join(
+          "', '",
+        )}'; if this usage is valid, register it within a plugin with \`plugin.schema.behaviorRegistry.add[${JSON.stringify(
+          filter,
+        )}] = { description: "...", entities: [${JSON.stringify(
+          entityType,
+        )}] }\`.`,
+      );
+      // Register it so we don't see this warning again
+      this.behaviorRegistry[filter].entities[entityType] = {
+        description: "Unregistered!",
+        pluginName: null,
+      };
+    }
     const finalString = this.getBehaviorForEntity(
       entityType,
       entity,
@@ -545,10 +586,14 @@ export class Behavior {
       [
         source: string,
         callback:
-          | string
+          | GraphileBuild.BehaviorString
+          | GraphileBuild.BehaviorString[]
           | null
           | undefined
-          | ((behavior: string, ...args: TArgs) => string | string[]),
+          | ((
+              behavior: GraphileBuild.BehaviorString,
+              ...args: TArgs
+            ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[]),
       ]
     >,
     ...args: TArgs
@@ -556,18 +601,24 @@ export class Behavior {
     let behaviorString: string = initialBehavior.behaviorString;
     const stack: Array<StackItem> = [...initialBehavior.stack];
 
-    for (const [source, g] of callbacks) {
+    for (const [source, rawG] of callbacks) {
       const oldBehavior = behaviorString;
-      if (typeof g === "string") {
-        if (g === "") {
-          continue;
-        } else if (behaviorString === "") {
-          behaviorString = g;
-        } else {
-          behaviorString = g + " " + behaviorString;
+      const g = typeof rawG === "string" ? [rawG] : rawG;
+      if (Array.isArray(g)) {
+        for (const str of g) {
+          if (str === "") {
+            continue;
+          } else if (behaviorString === "") {
+            behaviorString = str;
+          } else {
+            behaviorString = str + " " + behaviorString;
+          }
         }
       } else if (typeof g === "function") {
-        const newBehavior = g(oldBehavior, ...args);
+        const newBehavior: string | string[] = g(
+          oldBehavior as GraphileBuild.BehaviorString,
+          ...args,
+        );
         if (!newBehavior.includes(oldBehavior)) {
           throw new Error(
             `${source} callback must return a list that contains the current (passed in) behavior in addition to any other behaviors you wish to set.`,
@@ -601,38 +652,18 @@ export class Behavior {
     entityType: keyof GraphileBuild.BehaviorEntities | null,
     source: string,
     behaviorString: string,
-  ): void /*asserts behaviorString is GraphileBuild.BehaviorString*/ {
-    const result = this.parseBehaviorString(behaviorString);
-    if (!entityType) {
-      return;
-    }
-    for (const { scope } of result) {
-      const behavior = scope.join(":") as keyof GraphileBuild.BehaviorStrings;
-      if (
-        !Object.keys(this.behaviorRegistry).some((bhv) =>
-          stringMatches(bhv, behavior),
-        )
-      ) {
-        console.trace(
-          `Behavior '${behavior}' has not been registered! (Source: ${source})`,
-        );
-        this.behaviorRegistry[behavior] = {
-          entities: {},
-        };
+  ): asserts behaviorString is GraphileBuild.BehaviorString {
+    try {
+      this.parseBehaviorString(behaviorString);
+      if (!entityType) {
+        return;
       }
-
-      if (
-        !Object.entries(this.behaviorRegistry).some(
-          ([bhv /*, { entities } */]) =>
-            /*entities[entityType] &&*/ stringMatches(bhv, behavior),
-        )
-      ) {
-        console.trace(
-          `Behavior '${behavior}' is not registered for entity type '${entityType}'; it's only expected to be used with '${Object.keys(
-            this.behaviorRegistry[behavior].entities,
-          ).join("', '")}'. (Source: ${source})`,
-        );
-      }
+    } catch (e) {
+      throw new Error(
+        `Failed parsing behavior string ${JSON.stringify(
+          behaviorString,
+        )} from '${source}': ${e.message}`,
+      );
     }
   }
 

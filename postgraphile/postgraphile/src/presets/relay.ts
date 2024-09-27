@@ -45,17 +45,20 @@ export const PgRelayPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
-    globalBehavior: `\
-+node \
-+connection -list \
--query:resource:single \
-+nodeId:filterBy \
-+nodeId:resource:update -constraint:resource:update \
-+nodeId:resource:delete -constraint:resource:delete \
-+nodeId:insert \
-+nodeId:update \
-+nodeId:base \
-`,
+    globalBehavior: [
+      "node",
+      "connection",
+      "-list",
+      "-query:resource:single",
+      "nodeId:filterBy",
+      "nodeId:resource:update",
+      "constraint:resource:update",
+      "nodeId:resource:delete",
+      "constraint:resource:delete",
+      "nodeId:insert",
+      "nodeId:update",
+      "nodeId:base",
+    ],
     entityBehavior: {
       pgCodecAttribute: {
         inferred(behavior, [codec, attributeName], build) {

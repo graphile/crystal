@@ -140,7 +140,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
         }
 
         const desiredBehavior = fieldBehaviorScope
-          ? `${fieldBehaviorScope}:filter`
+          ? (`${fieldBehaviorScope}:filter` as keyof GraphileBuild.BehaviorStrings)
           : `filter`;
         if (
           pgResource
