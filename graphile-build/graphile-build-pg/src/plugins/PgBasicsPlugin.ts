@@ -44,6 +44,8 @@ declare global {
       orderBy: true;
       "resource:connection": true;
       "resource:list": true;
+      "resource:array": true;
+      "resource:single": true;
     }
     type HasGraphQLTypeForPgCodec = (
       codec: PgCodec<any, any, any, any, any, any, any>,
@@ -235,6 +237,15 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         },
         "resource:list": {
           description: "should we use a list field for this?",
+          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+        },
+        "resource:array": {
+          description:
+            "should we use a list field for this non-connection-capable thing?",
+          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+        },
+        "resource:single": {
+          description: "can we get one of this thing?",
           entities: ["pgCodec", "pgResource", "pgResourceUnique"],
         },
       },

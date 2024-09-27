@@ -2,7 +2,6 @@ import type {
   PgCodec,
   PgCodecAttribute,
   PgResource,
-  PgResourceExtensions,
   PgResourceOptions,
   PgResourceUnique,
 } from "@dataplan/pg";
@@ -468,7 +467,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           const isVirtual = !["r", "v", "m", "f", "p"].includes(
             pgClass.relkind,
           );
-          const extensions: PgResourceExtensions = {
+          const extensions: DataplanPg.PgResourceExtensions = {
             description,
             pg: {
               serviceName,
@@ -611,24 +610,13 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           before: ["inferred", "override"],
           callback(behavior, codec) {
             if (codec.attributes) {
-              const isUnloggedOrTemp =
-                codec.extensions?.pg?.persistence === "u" ||
-                codec.extensions?.pg?.persistence === "t";
               return [
                 "resource:select",
                 "table",
                 ...((!codec.isAnonymous
                   ? ["resource:insert", "resource:update", "resource:delete"]
                   : []) as GraphileBuild.BehaviorString[]),
-                behavior,
-                ...((isUnloggedOrTemp
-                  ? [
-                      "-resource:select",
-                      "-resource:insert",
-                      "-resource:update",
-                      "-resource:delete",
-                    ]
-                  : []) as GraphileBuild.BehaviorString[]),
+                ...unloggedOrTempBehaviors(codec.extensions, behavior, null),
               ];
             } else {
               return [behavior];
@@ -641,25 +629,26 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           provides: ["default"],
           before: ["inferred", "override"],
           callback(behavior, resource) {
-            const isFunction = !!resource.parameters;
             const ext = resource.extensions;
-            const isUnloggedOrTemp =
-              ext?.pg?.persistence === "u" || ext?.pg?.persistence === "t";
             return [
               ...(ext?.isInsertable === false ? ["-resource:insert"] : []),
               ...(ext?.isUpdatable === false ? ["-resource:update"] : []),
               ...(ext?.isDeletable === false ? ["-resource:delete"] : []),
-              ...(!isFunction && !isUnloggedOrTemp ? ["resource:select"] : []),
-              behavior,
-              ...(isUnloggedOrTemp
-                ? [
-                    "-resource:select",
-                    "-resource:insert",
-                    "-resource:update",
-                    "-resource:delete",
-                  ]
-                : []),
+              ...unloggedOrTempBehaviors(ext, behavior, resource),
             ] as GraphileBuild.BehaviorString[];
+          },
+        },
+      },
+      pgResourceUnique: {
+        inferred: {
+          provides: ["default"],
+          before: ["inferred", "override"],
+          callback(behavior, [resource, unique]) {
+            return unloggedOrTempBehaviors(
+              resource.extensions,
+              behavior,
+              resource,
+            );
           },
         },
       },
@@ -825,3 +814,31 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
     },
   },
 };
+
+function unloggedOrTempBehaviors(
+  extensions:
+    | Partial<DataplanPg.PgCodecExtensions>
+    | Partial<DataplanPg.PgResourceExtensions>
+    | undefined,
+  behavior: GraphileBuild.BehaviorString,
+  resource: PgResource | null,
+): GraphileBuild.BehaviorString[] {
+  const isUnloggedOrTemp =
+    extensions?.pg?.persistence === "u" || extensions?.pg?.persistence === "t";
+  return [
+    ...(resource && !resource.parameters ? ["resource:select" as const] : []),
+    behavior,
+    ...(isUnloggedOrTemp
+      ? ([
+          "-resource:select",
+          "-resource:connection",
+          "-resource:list",
+          "-resource:array",
+          "-resource:single",
+          "-resource:insert",
+          "-resource:update",
+          "-resource:delete",
+        ] as const)
+      : []),
+  ];
+}
