@@ -261,15 +261,15 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
       },
       pgResource: {
         override(behavior, resource) {
-          if (!resource.parameters) {
-            // Functions should not inherit from their codec
-            return [
-              behavior,
-              getBehavior([resource.codec.extensions, resource.extensions]),
-            ];
-          } else {
-            return behavior;
-          }
+          return [
+            behavior,
+            getBehavior(
+              resource.parameters
+                ? // Functions should not inherit from their codec
+                  [resource.extensions]
+                : [resource.codec.extensions, resource.extensions],
+            ),
+          ];
         },
       },
       pgResourceUnique: {
