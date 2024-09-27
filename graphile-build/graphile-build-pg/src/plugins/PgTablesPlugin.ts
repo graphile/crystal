@@ -643,7 +643,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
         inferred: {
           provides: ["default"],
           before: ["inferred", "override"],
-          callback(behavior, [resource, unique]) {
+          callback(behavior, [resource, _unique]) {
             return unloggedOrTempBehaviors(
               resource.extensions,
               behavior,
