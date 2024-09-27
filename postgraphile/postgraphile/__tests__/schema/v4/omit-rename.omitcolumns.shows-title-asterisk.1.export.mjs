@@ -278,7 +278,7 @@ const spec_tvEpisodes = {
       extensions: {
         tags: {
           omit: true,
-          behavior: ["-*"]
+          behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
         }
       }
     },
@@ -327,7 +327,7 @@ const spec_tvShows = {
       extensions: {
         tags: {
           omit: "*",
-          behavior: ["-*"]
+          behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
         }
       }
     },
@@ -511,7 +511,7 @@ const spec_person = {
       extensions: {
         tags: {
           omit: true,
-          behavior: ["-*"]
+          behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
         }
       }
     }

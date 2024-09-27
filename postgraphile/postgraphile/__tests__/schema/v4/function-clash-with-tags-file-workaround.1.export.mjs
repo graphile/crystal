@@ -15369,16 +15369,22 @@ const makeArgs119 = (args, path = []) => {
 };
 const resource_table_mutationPgResource = registry.pgResources["table_mutation"];
 const argDetailsSimple120 = [{
-  graphqlArgName: "object",
-  postgresArgName: "object",
-  pgCodec: compoundTypeCodec,
+  graphqlArgName: "post",
+  postgresArgName: "post",
+  pgCodec: postCodec,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "suffix",
+  postgresArgName: "suffix",
+  pgCodec: TYPES.text,
   required: true,
   fetcher: null
 }];
 const makeArgs120 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 2; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -15419,7 +15425,7 @@ const makeArgs120 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_compound_type_arrayPgResource = registry.pgResources["mutation_compound_type_array"];
+const resource_post_with_suffixPgResource = registry.pgResources["post_with_suffix"];
 const argDetailsSimple121 = [{
   graphqlArgName: "object",
   postgresArgName: "object",
@@ -15471,24 +15477,18 @@ const makeArgs121 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_compound_type_array_mutationPgResource = registry.pgResources["compound_type_array_mutation"];
+const resource_mutation_compound_type_arrayPgResource = registry.pgResources["mutation_compound_type_array"];
 const argDetailsSimple122 = [{
-  graphqlArgName: "a",
-  postgresArgName: "a",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "b",
-  postgresArgName: "b",
-  pgCodec: TYPES.text,
+  graphqlArgName: "object",
+  postgresArgName: "object",
+  pgCodec: compoundTypeCodec,
   required: true,
   fetcher: null
 }];
 const makeArgs122 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 1; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -15529,24 +15529,18 @@ const makeArgs122 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_complexPgResource = registry.pgResources["mutation_out_complex"];
+const resource_compound_type_array_mutationPgResource = registry.pgResources["compound_type_array_mutation"];
 const argDetailsSimple123 = [{
-  graphqlArgName: "a",
-  postgresArgName: "a",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "b",
-  postgresArgName: "b",
-  pgCodec: TYPES.text,
+  graphqlArgName: "posts",
+  postgresArgName: "posts",
+  pgCodec: postArrayCodec,
   required: true,
   fetcher: null
 }];
 const makeArgs123 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 1; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -15587,12 +15581,24 @@ const makeArgs123 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_complex_setofPgResource = registry.pgResources["mutation_out_complex_setof"];
-const argDetailsSimple124 = [];
+const resource_post_manyPgResource = registry.pgResources["post_many"];
+const argDetailsSimple124 = [{
+  graphqlArgName: "a",
+  postgresArgName: "a",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "b",
+  postgresArgName: "b",
+  pgCodec: TYPES.text,
+  required: true,
+  fetcher: null
+}];
 const makeArgs124 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 2; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -15633,12 +15639,24 @@ const makeArgs124 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_tablePgResource = registry.pgResources["mutation_out_table"];
-const argDetailsSimple125 = [];
+const resource_mutation_out_complexPgResource = registry.pgResources["mutation_out_complex"];
+const argDetailsSimple125 = [{
+  graphqlArgName: "a",
+  postgresArgName: "a",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "b",
+  postgresArgName: "b",
+  pgCodec: TYPES.text,
+  required: true,
+  fetcher: null
+}];
 const makeArgs125 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 2; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -15679,7 +15697,7 @@ const makeArgs125 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_table_setofPgResource = registry.pgResources["mutation_out_table_setof"];
+const resource_mutation_out_complex_setofPgResource = registry.pgResources["mutation_out_complex_setof"];
 const argDetailsSimple126 = [];
 const makeArgs126 = (args, path = []) => {
   const selectArgs = [];
@@ -15725,7 +15743,7 @@ const makeArgs126 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_table_set_mutationPgResource = registry.pgResources["table_set_mutation"];
+const resource_mutation_out_tablePgResource = registry.pgResources["mutation_out_table"];
 const argDetailsSimple127 = [];
 const makeArgs127 = (args, path = []) => {
   const selectArgs = [];
@@ -15771,18 +15789,12 @@ const makeArgs127 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_type_function_connection_mutationPgResource = registry.pgResources["type_function_connection_mutation"];
-const argDetailsSimple128 = [{
-  graphqlArgName: "id",
-  postgresArgName: "id",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}];
+const resource_mutation_out_table_setofPgResource = registry.pgResources["mutation_out_table_setof"];
+const argDetailsSimple128 = [];
 const makeArgs128 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -15823,7 +15835,7 @@ const makeArgs128 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_type_function_mutationPgResource = registry.pgResources["type_function_mutation"];
+const resource_table_set_mutationPgResource = registry.pgResources["table_set_mutation"];
 const argDetailsSimple129 = [];
 const makeArgs129 = (args, path = []) => {
   const selectArgs = [];
@@ -15836,6 +15848,104 @@ const makeArgs129 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple129[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
+const resource_type_function_connection_mutationPgResource = registry.pgResources["type_function_connection_mutation"];
+const argDetailsSimple130 = [{
+  graphqlArgName: "id",
+  postgresArgName: "id",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}];
+const makeArgs130 = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 1; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple130[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
+const resource_type_function_mutationPgResource = registry.pgResources["type_function_mutation"];
+const argDetailsSimple131 = [];
+const makeArgs131 = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 0; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple131[i];
     const $raw = args.getRaw([...path, graphqlArgName]);
     let step;
     if ($raw.evalIs(undefined)) {
@@ -20412,6 +20522,12 @@ type Mutation {
     """
     input: TableMutationInput!
   ): TableMutationPayload
+  postWithSuffix(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PostWithSuffixInput!
+  ): PostWithSuffixPayload @deprecated(reason: "This is deprecated (comment on function a.post_with_suffix).")
   mutationCompoundTypeArray(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -20424,6 +20540,12 @@ type Mutation {
     """
     input: CompoundTypeArrayMutationInput!
   ): CompoundTypeArrayMutationPayload
+  postMany(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PostManyInput!
+  ): PostManyPayload
   mutationOutComplex(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -22518,6 +22640,51 @@ input TableMutationInput {
   id: Int
 }
 
+"""The output of our \`postWithSuffix\` mutation."""
+type PostWithSuffixPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  post: Post
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Post\`. May be used by Relay 1."""
+  postEdge(
+    """The method to use when ordering \`Post\`."""
+    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PostsEdge
+
+  """Reads a single \`Person\` that is related to this \`Post\`."""
+  personByAuthorId: Person
+}
+
+"""All input for the \`postWithSuffix\` mutation."""
+input PostWithSuffixInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  post: PostInput
+  suffix: String
+}
+
+"""An input for mutations affecting \`Post\`"""
+input PostInput {
+  id: Int
+  headline: String!
+  body: String
+  authorId: Int
+  enums: [AnEnum]
+  comptypes: [ComptypeInput]
+}
+
 """The output of our \`mutationCompoundTypeArray\` mutation."""
 type MutationCompoundTypeArrayPayload {
   """
@@ -22566,6 +22733,31 @@ input CompoundTypeArrayMutationInput {
   """
   clientMutationId: String
   object: CompoundTypeInput
+}
+
+"""The output of our \`postMany\` mutation."""
+type PostManyPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  posts: [Post]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`postMany\` mutation."""
+input PostManyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  posts: [PostInput]
 }
 
 """The output of our \`mutationOutComplex\` mutation."""
@@ -39941,9 +40133,26 @@ export const plans = {
         }
       }
     },
-    mutationCompoundTypeArray: {
+    postWithSuffix: {
       plan($root, args, _info) {
         const selectArgs = makeArgs120(args, ["input"]);
+        const $result = resource_post_with_suffixPgResource.execute(selectArgs, "mutation");
+        return object({
+          result: $result
+        });
+      },
+      args: {
+        input: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $object) {
+            return $object;
+          }
+        }
+      }
+    },
+    mutationCompoundTypeArray: {
+      plan($root, args, _info) {
+        const selectArgs = makeArgs121(args, ["input"]);
         const $result = resource_mutation_compound_type_arrayPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -39960,8 +40169,25 @@ export const plans = {
     },
     compoundTypeArrayMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs121(args, ["input"]);
+        const selectArgs = makeArgs122(args, ["input"]);
         const $result = resource_compound_type_array_mutationPgResource.execute(selectArgs, "mutation");
+        return object({
+          result: $result
+        });
+      },
+      args: {
+        input: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $object) {
+            return $object;
+          }
+        }
+      }
+    },
+    postMany: {
+      plan($root, args, _info) {
+        const selectArgs = makeArgs123(args, ["input"]);
+        const $result = resource_post_manyPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
         });
@@ -39977,7 +40203,7 @@ export const plans = {
     },
     mutationOutComplex: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs122(args, ["input"]);
+        const selectArgs = makeArgs124(args, ["input"]);
         const $result = resource_mutation_out_complexPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -39994,7 +40220,7 @@ export const plans = {
     },
     mutationOutComplexSetof: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs123(args, ["input"]);
+        const selectArgs = makeArgs125(args, ["input"]);
         const $result = resource_mutation_out_complex_setofPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -40011,7 +40237,7 @@ export const plans = {
     },
     mutationOutTable: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs124(args, ["input"]);
+        const selectArgs = makeArgs126(args, ["input"]);
         const $result = resource_mutation_out_tablePgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -40028,7 +40254,7 @@ export const plans = {
     },
     mutationOutTableSetof: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs125(args, ["input"]);
+        const selectArgs = makeArgs127(args, ["input"]);
         const $result = resource_mutation_out_table_setofPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -40045,7 +40271,7 @@ export const plans = {
     },
     tableSetMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs126(args, ["input"]);
+        const selectArgs = makeArgs128(args, ["input"]);
         const $result = resource_table_set_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -40062,7 +40288,7 @@ export const plans = {
     },
     typeFunctionConnectionMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs127(args, ["input"]);
+        const selectArgs = makeArgs129(args, ["input"]);
         const $result = resource_type_function_connection_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -40079,7 +40305,7 @@ export const plans = {
     },
     typeFunctionMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs128(args, ["input"]);
+        const selectArgs = makeArgs130(args, ["input"]);
         const $result = resource_type_function_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -40096,7 +40322,7 @@ export const plans = {
     },
     typeFunctionListMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs129(args, ["input"]);
+        const selectArgs = makeArgs131(args, ["input"]);
         const $result = resource_type_function_list_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -43058,6 +43284,111 @@ export const plans = {
     },
     id: undefined
   },
+  PostWithSuffixPayload: {
+    __assertStep: ObjectStep,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
+    post($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
+    postEdge: {
+      plan($mutation, args, info) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = postUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return pgResource_postPgResource.find(spec);
+          }
+        })();
+        // Perform ordering
+        const $value = args.getRaw("orderBy");
+        applyOrderToPlan($select, $value, info.schema.getType("PostsOrderBy"));
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      args: {
+        orderBy: undefined
+      }
+    },
+    personByAuthorId($record) {
+      return pgResource_personPgResource.get({
+        id: $record.get("result").get("author_id")
+      });
+    }
+  },
+  PostWithSuffixInput: {
+    clientMutationId: {
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
+      autoApplyAfterParentApplyPlan: true
+    },
+    post: undefined,
+    suffix: undefined
+  },
+  PostInput: {
+    "__inputPlan": function PostInput_inputPlan() {
+      return object(Object.create(null));
+    },
+    id: {
+      applyPlan($insert, val) {
+        $insert.set("id", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    headline: {
+      applyPlan($insert, val) {
+        $insert.set("headline", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    body: {
+      applyPlan($insert, val) {
+        $insert.set("body", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    authorId: {
+      applyPlan($insert, val) {
+        $insert.set("author_id", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    enums: {
+      applyPlan($insert, val) {
+        $insert.set("enums", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    comptypes: {
+      applyPlan($insert, val) {
+        $insert.set("comptypes", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
   MutationCompoundTypeArrayPayload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
@@ -43099,6 +43430,27 @@ export const plans = {
       autoApplyAfterParentApplyPlan: true
     },
     object: undefined
+  },
+  PostManyPayload: {
+    __assertStep: ObjectStep,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
+    posts($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    }
+  },
+  PostManyInput: {
+    clientMutationId: {
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
+      autoApplyAfterParentApplyPlan: true
+    },
+    posts: undefined
   },
   MutationOutComplexPayload: {
     __assertStep: ObjectStep,
