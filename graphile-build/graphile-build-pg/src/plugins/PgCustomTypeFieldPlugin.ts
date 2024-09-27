@@ -61,6 +61,19 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      queryField: true;
+      mutationField: true;
+      typeField: true;
+      "typeField:resource:connection": true;
+      "typeField:resource:list": true;
+      "typeField:resource:array": true;
+      "queryField:resource:connection": true;
+      "queryField:resource:list": true;
+      "queryField:resource:array": true;
+      "typeField:single": true;
+      "queryField:single": true;
+    }
     interface Build {
       pgGetArgDetailsFromParameters(
         resource: PgResource<any, any, any, any, any>,
@@ -189,8 +202,8 @@ function shouldUseCustomConnection(
 
 function defaultProcSourceBehavior(
   s: PgResource<any, any, any, any, any>,
-): string {
-  const behavior = [];
+): GraphileBuild.BehaviorString {
+  const behavior: GraphileBuild.BehaviorString[] = ["-array"];
   const firstParameter = (
     s as PgResource<any, any, any, readonly PgResourceParameter[], any>
   ).parameters[0];
@@ -228,11 +241,11 @@ function defaultProcSourceBehavior(
     const canUseConnection =
       !s.sqlPartitionByIndex && !s.isList && !s.codec.arrayOfCodec;
     if (!canUseConnection) {
-      behavior.push("-connection +list");
+      behavior.push("-connection", "-list", "array");
     }
   }
 
-  return behavior.join(" ");
+  return behavior.join(" ") as GraphileBuild.BehaviorString;
 }
 
 function hasRecord(
@@ -338,12 +351,58 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        queryField: {
+          description: 'a "custom query function"',
+          entities: ["pgResource"],
+        },
+        mutationField: {
+          description: 'a "custom mutation function"',
+          entities: ["pgResource"],
+        },
+        typeField: {
+          description:
+            'a "custom field function" - add it to a specific type (aka "computed column")',
+          entities: ["pgResource"],
+        },
+        "typeField:resource:connection": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "typeField:resource:list": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "typeField:resource:array": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "queryField:resource:connection": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "queryField:resource:list": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "queryField:resource:array": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "typeField:single": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "queryField:single": {
+          description: "",
+          entities: ["pgResource"],
+        },
+      },
+    },
     entityBehavior: {
       pgResource: {
-        provides: ["inferred"],
-        after: ["defaults"],
-        before: ["overrides"],
-        callback(behavior, entity) {
+        inferred(behavior, entity) {
           if (entity.parameters) {
             return [behavior, defaultProcSourceBehavior(entity)];
           } else {
@@ -1131,8 +1190,11 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                   !resource.sqlPartitionByIndex && !resource.isList;
 
                 const baseScope = isRootQuery ? `queryField` : `typeField`;
-                const connectionFieldBehaviorScope = `${baseScope}:resource:connection`;
-                const listFieldBehaviorScope = `${baseScope}:resource:list`;
+                const connectionFieldBehaviorScope =
+                  `${baseScope}:resource:connection` as const;
+                const listFieldBehaviorScope = canUseConnection
+                  ? (`${baseScope}:resource:list` as const)
+                  : (`${baseScope}:resource:array` as const);
                 if (
                   canUseConnection &&
                   build.behavior.pgResourceMatches(

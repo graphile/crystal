@@ -103,7 +103,10 @@ ${chalk.whiteBright.underline(entry.source)}:
   }
 
   const matchText = filterString
-    ? build.behavior.stringMatches(finalString, filterString)
+    ? build.behavior.stringMatches(
+        finalString,
+        filterString as keyof GraphileBuild.BehaviorStrings,
+      )
       ? chalk.whiteBright.bold(`Positive match`)
       : chalk.red.bold(`Negative match`)
     : null;
@@ -155,7 +158,10 @@ function debugAndSimplify(
 
       const isOverridden = hasExisting(spec.scope);
       const isMatch = filterString
-        ? build.behavior.stringMatches(spec.scope.join(":"), filterString)
+        ? build.behavior.stringMatches(
+            spec.scope.join(":"),
+            filterString as keyof GraphileBuild.BehaviorStrings,
+          )
         : false;
 
       const highlightedScopeStringBase = (

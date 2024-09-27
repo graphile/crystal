@@ -21,6 +21,9 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      "query:resource:single": true;
+    }
     interface Inflection {
       rowByUnique(
         this: Inflection,
@@ -62,6 +65,15 @@ export const PgRowByUniquePlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "query:resource:single": {
+          entities: ["pgResourceUnique"],
+          description:
+            "should we add a root level Query field to get just one record by this unique cosntraint?",
+        },
+      },
+    },
     entityBehavior: {
       pgResourceUnique: "single",
     },

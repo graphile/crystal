@@ -34,11 +34,7 @@ export { PgTableNodePlugin } from "./plugins/PgTableNodePlugin.js";
 export { PgTablesPlugin } from "./plugins/PgTablesPlugin.js";
 export { PgTypesPlugin } from "./plugins/PgTypesPlugin.js";
 export { defaultPreset } from "./preset.js";
-export {
-  addBehaviorToTags,
-  parseDatabaseIdentifier,
-  parseDatabaseIdentifiers,
-} from "./utils.js";
+export { parseDatabaseIdentifier, parseDatabaseIdentifiers } from "./utils.js";
 export { version } from "./version.js";
 
 declare global {
@@ -57,6 +53,9 @@ declare global {
       deprecated: string | string[];
       /** For functions returning polymorphic type, which type to choose? */
       returnType: string;
+
+      /** For enum tables; we shouldn't expose these through GraphQL */
+      enum: string | true;
     }
 
     interface PgResourceUniqueTags extends PgSmartTagsDict {

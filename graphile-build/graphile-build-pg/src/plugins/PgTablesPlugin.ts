@@ -15,11 +15,18 @@ import {
 } from "graphile-build";
 import type { PgClass, PgConstraint, PgNamespace } from "pg-introspection";
 
-import { addBehaviorToTags, exportNameHint } from "../utils.js";
+import { exportNameHint } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      table: true;
+      "resource:select": true;
+      "resource:insert": true;
+      "resource:update": true;
+      "resource:delete": true;
+    }
     interface SchemaOptions {
       /**
        * If true, setof functions cannot return null, so our list and
@@ -204,6 +211,16 @@ declare global {
         pgClass: PgClass;
         resourceOptions: PgResourceOptions;
       }): Promise<void> | void;
+    }
+  }
+  namespace DataplanPg {
+    interface PgResourceExtensions {
+      /** Checks capabilities of this resource to see if INSERT is even possible */
+      isInsertable?: boolean;
+      /** Checks capabilities of this resource to see if UPDATE is even possible */
+      isUpdatable?: boolean;
+      /** Checks capabilities of this resource to see if DELETE is even possible */
+      isDeletable?: boolean;
     }
   }
 }
@@ -444,18 +461,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
           const { tags, description } = pgClass.getTagsAndDescription();
 
           const mask = pgClass.updatable_mask ?? 2 ** 8 - 1;
-          const isInsertable = mask & (1 << 3);
-          const isUpdatable = mask & (1 << 2);
-          const isDeletable = mask & (1 << 4);
-          if (!isInsertable) {
-            addBehaviorToTags(tags, "-insert");
-          }
-          if (!isUpdatable) {
-            addBehaviorToTags(tags, "-update");
-          }
-          if (!isDeletable) {
-            addBehaviorToTags(tags, "-delete");
-          }
+          const isInsertable = (mask & (1 << 3)) > 0;
+          const isUpdatable = (mask & (1 << 2)) > 0;
+          const isDeletable = (mask & (1 << 4)) > 0;
 
           const isVirtual = !["r", "v", "m", "f", "p"].includes(
             pgClass.relkind,
@@ -472,6 +480,9 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
                   }
                 : null),
             },
+            isInsertable,
+            isUpdatable,
+            isDeletable,
             tags: {
               ...tags,
             },
@@ -569,50 +580,87 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
   }),
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "resource:select": {
+          description: "can select rows from this resource",
+          entities: ["pgCodec", "pgResource"],
+        },
+        "resource:insert": {
+          description: "can insert into this resource",
+          entities: ["pgCodec", "pgResource"],
+        },
+        "resource:update": {
+          description: "can update a record in this resource",
+          entities: ["pgCodec", "pgResource"],
+        },
+        "resource:delete": {
+          description: "can delete a record in this resource",
+          entities: ["pgCodec", "pgResource"],
+        },
+        table: {
+          description: "is this codec table-like?",
+          entities: ["pgCodec"],
+        },
+      },
+    },
     entityBehavior: {
       pgCodec: {
-        provides: ["default"],
-        before: ["inferred", "override"],
-        callback(behavior, codec) {
-          if (codec.attributes) {
-            const isUnloggedOrTemp =
-              codec.extensions?.pg?.persistence === "u" ||
-              codec.extensions?.pg?.persistence === "t";
-            return [
-              "resource:select",
-              "table",
-              ...(!codec.isAnonymous
-                ? ["resource:insert", "resource:update", "resource:delete"]
-                : []),
-              behavior,
-              ...(isUnloggedOrTemp
-                ? [
-                    "-resource:select -resource:insert -resource:update -resource:delete",
-                  ]
-                : []),
-            ];
-          } else {
-            return [behavior];
-          }
+        inferred: {
+          provides: ["default"],
+          before: ["inferred", "override"],
+          callback(behavior, codec) {
+            if (codec.attributes) {
+              const isUnloggedOrTemp =
+                codec.extensions?.pg?.persistence === "u" ||
+                codec.extensions?.pg?.persistence === "t";
+              return [
+                "resource:select",
+                "table",
+                ...((!codec.isAnonymous
+                  ? ["resource:insert", "resource:update", "resource:delete"]
+                  : []) as GraphileBuild.BehaviorString[]),
+                behavior,
+                ...((isUnloggedOrTemp
+                  ? [
+                      "-resource:select",
+                      "-resource:insert",
+                      "-resource:update",
+                      "-resource:delete",
+                    ]
+                  : []) as GraphileBuild.BehaviorString[]),
+              ];
+            } else {
+              return [behavior];
+            }
+          },
         },
       },
       pgResource: {
-        provides: ["default"],
-        before: ["inferred", "override"],
-        callback(behavior, resource) {
-          const isFunction = !!resource.parameters;
-          const isUnloggedOrTemp =
-            resource.extensions?.pg?.persistence === "u" ||
-            resource.extensions?.pg?.persistence === "t";
-          return [
-            ...(!isFunction && !isUnloggedOrTemp ? ["resource:select"] : []),
-            behavior,
-            ...(isUnloggedOrTemp
-              ? [
-                  "-resource:select -resource:insert -resource:update -resource:delete",
-                ]
-              : []),
-          ];
+        inferred: {
+          provides: ["default"],
+          before: ["inferred", "override"],
+          callback(behavior, resource) {
+            const isFunction = !!resource.parameters;
+            const ext = resource.extensions;
+            const isUnloggedOrTemp =
+              ext?.pg?.persistence === "u" || ext?.pg?.persistence === "t";
+            return [
+              ...(ext?.isInsertable === false ? ["-resource:insert"] : []),
+              ...(ext?.isUpdatable === false ? ["-resource:update"] : []),
+              ...(ext?.isDeletable === false ? ["-resource:delete"] : []),
+              ...(!isFunction && !isUnloggedOrTemp ? ["resource:select"] : []),
+              behavior,
+              ...(isUnloggedOrTemp
+                ? [
+                    "-resource:select",
+                    "-resource:insert",
+                    "-resource:update",
+                    "-resource:delete",
+                  ]
+                : []),
+            ] as GraphileBuild.BehaviorString[];
+          },
         },
       },
     },
@@ -758,6 +806,7 @@ export const PgTablesPlugin: GraphileConfig.Plugin = {
             }
 
             if (
+              selectable &&
               !codec.isAnonymous
               // Even without the 'connection' behavior we may still need the connection type in specific circumstances
               // && build.behavior.pgCodecMatches(codec, "*:connection")

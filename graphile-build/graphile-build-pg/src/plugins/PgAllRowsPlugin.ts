@@ -17,6 +17,11 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      "query:resource:connection": true;
+      "query:resource:list": true;
+    }
+
     interface Inflection {
       /**
        * The base inflector used by `allRowsConnection` and `allRowsList`.
@@ -69,6 +74,19 @@ export const PgAllRowsPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "query:resource:connection": {
+          description:
+            '"connection" field for a resource at the root Query level',
+          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+        },
+        "query:resource:list": {
+          description: '"list" field for a resource at the root Query level',
+          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+        },
+      },
+    },
     hooks: {
       GraphQLObjectType_fields(fields, build, context) {
         const {

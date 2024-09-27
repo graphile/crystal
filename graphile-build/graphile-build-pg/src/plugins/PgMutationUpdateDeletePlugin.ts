@@ -34,6 +34,15 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      "constraint:resource:update": true;
+      "constraint:resource:delete": true;
+      "nodeId:resource:update": true;
+      "nodeId:resource:delete": true;
+      "update:resource:select": true;
+      "delete:resource:nodeId": true;
+      "delete:resource:select": true;
+    }
     interface ScopeObject {
       isPgUpdatePayloadType?: boolean;
       isPgDeletePayloadType?: boolean;
@@ -239,10 +248,50 @@ export const PgMutationUpdateDeletePlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "constraint:resource:update": {
+          description: "can update a record by this constraint",
+          entities: ["pgResourceUnique"],
+        },
+        "constraint:resource:delete": {
+          description: "can delete a record by this constraint",
+          entities: ["pgResourceUnique"],
+        },
+        "nodeId:resource:update": {
+          description: "can update a record by this nodeId",
+          entities: ["pgResourceUnique"],
+        },
+        "nodeId:resource:delete": {
+          description: "can delete a record by this nodeId",
+          entities: ["pgResourceUnique"],
+        },
+        // TODO: should this exist?! Perhaps the `-nodeId` behavior should imply `-nodeId:*:*` in the behavior registry?
+        "delete:resource:nodeId": {
+          description: "can delete a record by its Node ID",
+          entities: ["pgResource"],
+        },
+        "update:resource:select": {
+          description:
+            "can you select the record that was updated on the mutation payload?",
+          entities: ["pgResource"],
+        },
+        "delete:resource:select": {
+          description:
+            "can you select the record that was deleted on the mutation payload?",
+          entities: ["pgResource"],
+        },
+      },
+    },
     entityBehavior: {
-      pgResource:
-        "update delete update:resource:select delete:resource:nodeId -delete:resource:select",
-      pgResourceUnique: "update delete",
+      pgResource: [
+        "update",
+        "delete",
+        "update:resource:select",
+        "delete:resource:nodeId",
+        "-delete:resource:select",
+      ],
+      pgResourceUnique: ["update", "delete"],
     },
 
     hooks: {
@@ -904,11 +953,11 @@ function getSpecs(
   const primaryUnique = resource.uniques.find(
     (u: PgResourceUnique) => u.isPrimary,
   );
-  const constraintMode = `constraint:${mode}`;
+  const constraintMode = `constraint:${mode}` as const;
   const specs = [
     ...(primaryUnique &&
     build.getNodeIdCodec !== undefined &&
-    build.behavior.pgCodecMatches(resource.codec, `nodeId:${mode}`)
+    build.behavior.pgCodecMatches(resource.codec, `nodeId:${mode}` as const)
       ? [{ unique: primaryUnique, uniqueMode: "node" }]
       : []),
     ...resource.uniques

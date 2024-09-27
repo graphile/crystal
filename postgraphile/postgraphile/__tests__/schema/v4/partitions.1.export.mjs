@@ -191,6 +191,9 @@ const registryConfig_pgResources_users_users = {
       schemaName: "partitions",
       name: "users"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -218,6 +221,9 @@ const registryConfig_pgResources_measurements_measurements = {
       schemaName: "partitions",
       name: "measurements"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };

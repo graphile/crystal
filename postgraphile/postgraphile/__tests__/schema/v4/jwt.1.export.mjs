@@ -1101,9 +1101,10 @@ const resourceConfig_jwt_token = {
       schemaName: "b",
       name: "jwt_token"
     },
-    tags: {
-      behavior: ["-insert", "-update", "-delete"]
-    }
+    isInsertable: false,
+    isUpdatable: false,
+    isDeletable: false,
+    tags: {}
   }
 };
 const authenticateFunctionIdentifer = sql.identifier("b", "authenticate");
@@ -1139,6 +1140,9 @@ const registryConfig_pgResources_types_types = {
       schemaName: "b",
       name: "types"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       foreignKey: spec_types.extensions.tags.foreignKey
     }
@@ -1307,9 +1311,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "mult_1"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -1341,9 +1343,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "mult_2"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -1375,9 +1375,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "mult_3"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -1409,9 +1407,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "mult_4"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -1438,9 +1434,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "guid_fn"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -1469,6 +1463,9 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "updatable_view"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {
           uniqueKey: "x",
           unique: "x|@behavior -single -update -delete"
@@ -1491,9 +1488,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "authenticate_fail"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -1528,9 +1523,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "authenticate"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -1567,9 +1560,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "list_bde_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -1604,9 +1595,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "authenticate_many"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -1626,9 +1615,11 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "auth_payload"
         },
+        isInsertable: false,
+        isUpdatable: false,
+        isDeletable: false,
         tags: {
-          foreignKey: "(id) references c.person",
-          behavior: ["-insert", "-update", "-delete"]
+          foreignKey: "(id) references c.person"
         }
       }
     }, {
@@ -1662,9 +1653,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "authenticate_payload"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -1692,9 +1681,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "compound_type_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -1722,9 +1709,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "compound_type_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -1752,9 +1737,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "compound_type_set_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -1782,9 +1765,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "compound_type_array_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -1812,9 +1793,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "compound_type_array_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -1835,9 +1814,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "type_function_connection"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -1857,9 +1834,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "type_function_connection_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -1884,9 +1859,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "type_function"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -1911,9 +1884,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "type_function_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -1933,9 +1904,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "type_function_list"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -1955,9 +1924,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "type_function_list_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     })

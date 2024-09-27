@@ -645,12 +645,16 @@ type PeopleEdge {
 enum PeopleOrderBy {
   ABOUT_ASC
   ABOUT_DESC
+  COMPUTED_OUT_ASC
+  COMPUTED_OUT_DESC
   CONFIG_ASC
   CONFIG_DESC
   CREATED_AT_ASC
   CREATED_AT_DESC
   EMAIL_ASC
   EMAIL_DESC
+  FIRST_NAME_ASC
+  FIRST_NAME_DESC
   ID_ASC
   ID_DESC
   LAST_LOGIN_FROM_IP_ASC
@@ -736,6 +740,9 @@ input PersonCondition {
 
   """Checks for equality with the object’s `aliases` field."""
   aliases: [String]
+
+  """Checks for equality with the object’s `computedOut` field."""
+  computedOut: String
 
   """Checks for equality with the object’s `config` field."""
   config: KeyValueHash
@@ -884,6 +891,9 @@ input PostCondition {
   """Checks for equality with the object’s `body` field."""
   body: String
 
+  """Checks for equality with the object’s `computedWithOptionalArg` field."""
+  computedWithOptionalArg: Int
+
   """Checks for equality with the object’s `headline` field."""
   headline: String
 
@@ -923,6 +933,8 @@ enum PostsOrderBy {
   AUTHOR_ID_DESC
   BODY_ASC
   BODY_DESC
+  COMPUTED_WITH_OPTIONAL_ARG_ASC
+  COMPUTED_WITH_OPTIONAL_ARG_DESC
   HEADLINE_ASC
   HEADLINE_DESC
   ID_ASC

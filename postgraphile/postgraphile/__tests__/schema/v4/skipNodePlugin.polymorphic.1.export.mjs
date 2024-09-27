@@ -2324,6 +2324,9 @@ const registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws
       schemaName: "polymorphic",
       name: "aws_application_first_party_vulnerabilities"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       omit: true,
       behavior: spec_awsApplicationFirstPartyVulnerabilities.extensions.tags.behavior
@@ -2353,6 +2356,9 @@ const registryConfig_pgResources_aws_application_third_party_vulnerabilities_aws
       schemaName: "polymorphic",
       name: "aws_application_third_party_vulnerabilities"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       omit: true,
       behavior: spec_awsApplicationThirdPartyVulnerabilities.extensions.tags.behavior
@@ -2382,6 +2388,9 @@ const registryConfig_pgResources_gcp_application_first_party_vulnerabilities_gcp
       schemaName: "polymorphic",
       name: "gcp_application_first_party_vulnerabilities"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       omit: true,
       behavior: spec_gcpApplicationFirstPartyVulnerabilities.extensions.tags.behavior
@@ -2411,6 +2420,9 @@ const registryConfig_pgResources_gcp_application_third_party_vulnerabilities_gcp
       schemaName: "polymorphic",
       name: "gcp_application_third_party_vulnerabilities"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       omit: true,
       behavior: spec_gcpApplicationThirdPartyVulnerabilities.extensions.tags.behavior
@@ -2448,6 +2460,9 @@ const registryConfig_pgResources_organizations_organizations = {
       schemaName: "polymorphic",
       name: "organizations"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       unionMember: "PersonOrOrganization"
     }
@@ -2484,6 +2499,9 @@ const registryConfig_pgResources_people_people = {
       schemaName: "polymorphic",
       name: "people"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       unionMember: "PersonOrOrganization",
       ref: "applications to:Application",
@@ -2514,6 +2532,9 @@ const registryConfig_pgResources_priorities_priorities = {
       schemaName: "polymorphic",
       name: "priorities"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       omit: "create,update,delete,filter,order",
       behavior: spec_priorities.extensions.tags.behavior
@@ -2544,6 +2565,9 @@ const registryConfig_pgResources_relational_checklists_relational_checklists = {
       schemaName: "polymorphic",
       name: "relational_checklists"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -2571,6 +2595,9 @@ const registryConfig_pgResources_relational_item_relation_composite_pks_relation
       schemaName: "polymorphic",
       name: "relational_item_relation_composite_pks"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -2598,6 +2625,9 @@ const registryConfig_pgResources_relational_topics_relational_topics = {
       schemaName: "polymorphic",
       name: "relational_topics"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -2625,6 +2655,9 @@ const registryConfig_pgResources_single_table_item_relation_composite_pks_single
       schemaName: "polymorphic",
       name: "single_table_item_relation_composite_pks"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -2652,6 +2685,9 @@ const registryConfig_pgResources_relational_checklist_items_relational_checklist
       schemaName: "polymorphic",
       name: "relational_checklist_items"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -2679,6 +2715,9 @@ const registryConfig_pgResources_relational_dividers_relational_dividers = {
       schemaName: "polymorphic",
       name: "relational_dividers"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -2713,6 +2752,9 @@ const registryConfig_pgResources_relational_item_relations_relational_item_relat
       schemaName: "polymorphic",
       name: "relational_item_relations"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -2747,6 +2789,9 @@ const registryConfig_pgResources_single_table_item_relations_single_table_item_r
       schemaName: "polymorphic",
       name: "single_table_item_relations"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -2774,6 +2819,9 @@ const registryConfig_pgResources_log_entries_log_entries = {
       schemaName: "polymorphic",
       name: "log_entries"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       ref: "author to:PersonOrOrganization singular",
       refVia: spec_logEntries.extensions.tags.refVia
@@ -2804,6 +2852,9 @@ const registryConfig_pgResources_relational_posts_relational_posts = {
       schemaName: "polymorphic",
       name: "relational_posts"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -2831,6 +2882,9 @@ const registryConfig_pgResources_first_party_vulnerabilities_first_party_vulnera
       schemaName: "polymorphic",
       name: "first_party_vulnerabilities"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       implements: "Vulnerability",
       ref: spec_firstPartyVulnerabilities.extensions.tags.ref,
@@ -2862,6 +2916,9 @@ const registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnera
       schemaName: "polymorphic",
       name: "third_party_vulnerabilities"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       implements: "Vulnerability",
       ref: spec_thirdPartyVulnerabilities.extensions.tags.ref,
@@ -2893,6 +2950,9 @@ const registryConfig_pgResources_aws_applications_aws_applications = {
       schemaName: "polymorphic",
       name: "aws_applications"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       implements: "Application",
       ref: spec_awsApplications.extensions.tags.ref,
@@ -2924,6 +2984,9 @@ const registryConfig_pgResources_gcp_applications_gcp_applications = {
       schemaName: "polymorphic",
       name: "gcp_applications"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       implements: "Application",
       ref: spec_gcpApplications.extensions.tags.ref,
@@ -2956,6 +3019,9 @@ const registryConfig_pgResources_single_table_items_single_table_items = {
       schemaName: "polymorphic",
       name: "single_table_items"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       interface: "mode:single type:type",
       type: spec_singleTableItems.extensions.tags.type,
@@ -2989,6 +3055,9 @@ const registryConfig_pgResources_relational_items_relational_items = {
       schemaName: "polymorphic",
       name: "relational_items"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       interface: "mode:relational",
       type: spec_relationalItems.extensions.tags.type
@@ -3085,8 +3154,7 @@ const registryConfig = {
           name: "custom_delete_relational_item"
         },
         tags: {
-          arg0variant: "nodeId",
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+          arg0variant: "nodeId"
         }
       },
       description: undefined
@@ -3108,9 +3176,7 @@ const registryConfig = {
           schemaName: "polymorphic",
           name: "all_single_tables"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -3136,8 +3202,7 @@ const registryConfig = {
           name: "get_single_table_topic_by_id"
         },
         tags: {
-          returnType: "SingleTableTopic",
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
+          returnType: "SingleTableTopic"
         }
       },
       description: undefined

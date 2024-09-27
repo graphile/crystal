@@ -21,6 +21,11 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      "query:interface:connection": true;
+      "query:interface:list": true;
+    }
+
     interface Inflection {
       /**
        * The base inflector used by allInterfaceModeUnionRowsConnection and
@@ -67,16 +72,33 @@ export const PgInterfaceModeUnionAllRowsPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "query:interface:connection": {
+          description:
+            "Should we add a root-level query field to fetch a connection over all rows matching this codec interface?",
+          entities: ["pgCodec"],
+        },
+        "query:interface:list": {
+          description:
+            "Should we add a root-level query field to fetch all rows matching this codec interface?",
+          entities: ["pgCodec"],
+        },
+      },
+    },
     entityBehavior: {
       pgCodec: {
-        provides: ["default"],
-        before: ["inferred", "override"],
-        callback(behavior, entity) {
-          if (entity.polymorphism?.mode === "union") {
-            return ["connection -list", behavior];
-          } else {
-            return behavior;
-          }
+        inferred: {
+          provides: ["default"],
+          before: ["inferred"],
+          callback(behavior, entity) {
+            if (entity.polymorphism?.mode === "union") {
+              // TODO: explain why this exists! Also, why is it default and not inferred?
+              return ["connection", "-list", behavior];
+            } else {
+              return behavior;
+            }
+          },
         },
       },
     },

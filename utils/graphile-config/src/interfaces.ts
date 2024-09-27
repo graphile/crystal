@@ -13,10 +13,18 @@ export type CallbackOrDescriptor<T extends AnyCallback> =
   | T
   | CallbackDescriptor<T>;
 
-export type UnwrapCallback<T extends CallbackOrDescriptor<AnyCallback>> =
-  T extends CallbackOrDescriptor<infer U> ? U : never;
+export type UnwrapCallback<
+  T extends
+    | CallbackOrDescriptor<AnyCallback>
+    | ReadonlyArray<CallbackDescriptor<AnyCallback>>,
+> = T extends CallbackOrDescriptor<infer U>
+  ? U
+  : T extends ReadonlyArray<CallbackDescriptor<infer U>>
+  ? U
+  : never;
 
 export type FunctionalityObject<T> = Record<
   keyof T,
-  CallbackOrDescriptor<AnyCallback>
+  | CallbackOrDescriptor<AnyCallback>
+  | ReadonlyArray<CallbackDescriptor<AnyCallback>>
 >;

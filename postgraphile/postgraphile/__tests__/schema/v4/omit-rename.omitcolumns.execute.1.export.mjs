@@ -557,6 +557,9 @@ const registryConfig_pgResources_studios_studios = {
       schemaName: "d",
       name: "studios"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -584,6 +587,9 @@ const registryConfig_pgResources_post_post = {
       schemaName: "d",
       name: "post"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -611,6 +617,9 @@ const registryConfig_pgResources_tv_episodes_tv_episodes = {
       schemaName: "d",
       name: "tv_episodes"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -638,6 +647,9 @@ const registryConfig_pgResources_tv_shows_tv_shows = {
       schemaName: "d",
       name: "tv_shows"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -670,6 +682,9 @@ const registryConfig_pgResources_person_person = {
       schemaName: "d",
       name: "person"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -712,8 +727,7 @@ const registry = makeRegistry({
           name: "original_function"
         },
         tags: {
-          name: "renamed_function",
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
+          name: "renamed_function"
         }
       },
       description: undefined
@@ -734,9 +748,11 @@ const registry = makeRegistry({
           schemaName: "d",
           name: "flibble"
         },
+        isInsertable: false,
+        isUpdatable: false,
+        isDeletable: false,
         tags: {
-          name: "flamble",
-          behavior: ["-insert", "-update", "-delete"]
+          name: "flamble"
         }
       }
     }, {
@@ -755,9 +771,7 @@ const registry = makeRegistry({
           schemaName: "d",
           name: "getflamble"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -777,6 +791,9 @@ const registry = makeRegistry({
           schemaName: "d",
           name: "original_table"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {
           name: "renamed_table"
         }
@@ -798,6 +815,9 @@ const registry = makeRegistry({
           schemaName: "d",
           name: "films"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -821,9 +841,10 @@ const registry = makeRegistry({
           schemaName: "d",
           name: "jwt_token"
         },
-        tags: {
-          behavior: ["-insert", "-update", "-delete"]
-        }
+        isInsertable: false,
+        isUpdatable: false,
+        isDeletable: false,
+        tags: {}
       }
     }, {
       name: "login",
@@ -848,8 +869,7 @@ const registry = makeRegistry({
         },
         tags: {
           name: "login",
-          resultFieldName: "token",
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+          resultFieldName: "token"
         }
       },
       description: undefined
@@ -879,7 +899,7 @@ const registry = makeRegistry({
         },
         tags: {
           omit: "execute",
-          behavior: ["-queryField -mutationField typeField", "-filter -order", "-queryField -mutationField -typeField"]
+          behavior: ["-queryField -mutationField -typeField"]
         }
       },
       description: undefined
@@ -906,8 +926,7 @@ const registry = makeRegistry({
           name: "search_posts"
         },
         tags: {
-          name: "returnPostsMatching",
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
+          name: "returnPostsMatching"
         }
       },
       description: undefined

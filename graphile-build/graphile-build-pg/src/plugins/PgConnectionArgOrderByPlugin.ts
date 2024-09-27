@@ -27,6 +27,10 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      "resource:connection:order": true;
+      "resource:list:order": true;
+    }
     interface Inflection {
       orderByType(this: Inflection, typeName: string): string;
     }
@@ -52,17 +56,31 @@ export const PgConnectionArgOrderByPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "resource:connection:order": {
+          entities: ["pgResource"],
+          description: "",
+        },
+        "resource:list:order": {
+          entities: ["pgResource"],
+          description: "",
+        },
+      },
+    },
     entityBehavior: {
       pgCodec: "order",
       pgResource: {
-        provides: ["default"],
-        before: ["inferred", "override"],
-        callback(behavior, resource) {
-          if (resource.parameters) {
-            return behavior;
-          } else {
-            return ["order", behavior];
-          }
+        inferred: {
+          provides: ["default"],
+          before: ["inferred", "override"],
+          callback(behavior, resource) {
+            if (resource.parameters) {
+              return behavior;
+            } else {
+              return ["order", behavior];
+            }
+          },
         },
       },
     },

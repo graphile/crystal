@@ -95,12 +95,23 @@ interface RegisterObjectType {
 
 declare global {
   namespace GraphileBuild {
+    type BehaviorString =
+      | (string & {
+          /* lies; just for TS */ readonly __incomingBehaviorString: unique symbol;
+        })
+      | `${"" | "-"}${keyof GraphileBuild.BehaviorStrings}`;
+
     /**
      * Input to the 'schema build' phase, this is typically the output of the
      * gather phase.
      */
     interface BuildInput {
       // Expand this interface with declaration merging
+    }
+
+    interface BehaviorStrings {
+      "*": true;
+      // Expand me through declaration merging
     }
 
     interface BehaviorEntities {

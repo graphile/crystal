@@ -169,6 +169,9 @@ const pgResource_networkPgResource = makeRegistry({
           schemaName: "network_types",
           name: "network"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     }

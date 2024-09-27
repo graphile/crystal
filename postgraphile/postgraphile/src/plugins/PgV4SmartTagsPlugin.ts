@@ -1,7 +1,7 @@
 import "graphile-config";
 
 import { gatherConfig } from "graphile-build";
-import { addBehaviorToTags } from "graphile-build-pg";
+import type { PgSmartTagsDict } from "graphile-build-pg/pg-introspection";
 import { inspect } from "util";
 
 declare global {
@@ -281,4 +281,28 @@ function processOmit(
   }
 
   addBehaviorToTags(tags, behavior.join(" "), true);
+}
+
+function addBehaviorToTags(
+  tags: Partial<PgSmartTagsDict>,
+  behavior: string,
+  prepend = false,
+): void {
+  if (Array.isArray(tags.behavior)) {
+    if (prepend) {
+      tags.behavior = [behavior, ...tags.behavior];
+    } else {
+      tags.behavior = [...tags.behavior, behavior];
+    }
+  } else if (typeof tags.behavior === "string") {
+    tags.behavior = prepend
+      ? [behavior, tags.behavior]
+      : [tags.behavior, behavior];
+  } else if (!tags.behavior) {
+    tags.behavior = [behavior];
+  } else {
+    throw new Error(
+      `Did not understand tags.behavior - it wasn't an array or a string`,
+    );
+  }
 }

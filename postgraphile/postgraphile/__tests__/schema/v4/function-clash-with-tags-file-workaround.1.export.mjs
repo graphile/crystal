@@ -3172,6 +3172,9 @@ const registryConfig_pgResources_foreign_key_foreign_key = {
       schemaName: "a",
       name: "foreign_key"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -3198,6 +3201,9 @@ const registryConfig_pgResources_unique_foreign_key_unique_foreign_key = {
       schemaName: "a",
       name: "unique_foreign_key"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       omit: "create,update,delete,all,order,filter",
       behavior: spec_uniqueForeignKey.extensions.tags.behavior
@@ -3236,6 +3242,9 @@ const registryConfig_pgResources_person_secret_person_secret = {
       schemaName: "c",
       name: "person_secret"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       deprecated: "This is deprecated (comment on table c.person_secret)."
     }
@@ -3273,6 +3282,9 @@ const registryConfig_pgResources_compound_key_compound_key = {
       schemaName: "c",
       name: "compound_key"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -3334,6 +3346,9 @@ const registryConfig_pgResources_left_arm_left_arm = {
       schemaName: "c",
       name: "left_arm"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -3354,9 +3369,10 @@ const resourceConfig_jwt_token = {
       schemaName: "b",
       name: "jwt_token"
     },
-    tags: {
-      behavior: ["-insert", "-update", "-delete"]
-    }
+    isInsertable: false,
+    isUpdatable: false,
+    isDeletable: false,
+    tags: {}
   }
 };
 const authenticateFunctionIdentifer = sql.identifier("b", "authenticate");
@@ -3384,6 +3400,9 @@ const registryConfig_pgResources_issue756_issue756 = {
       schemaName: "c",
       name: "issue756"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -3430,6 +3449,9 @@ const registryConfig_pgResources_post_post = {
       schemaName: "a",
       name: "post"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       omit: "create",
       behavior: spec_post.extensions.tags.behavior
@@ -3453,9 +3475,10 @@ const resourceConfig_compound_type = {
       schemaName: "c",
       name: "compound_type"
     },
-    tags: {
-      behavior: ["-insert", "-update", "-delete"]
-    }
+    isInsertable: false,
+    isUpdatable: false,
+    isDeletable: false,
+    tags: {}
   }
 };
 const compound_type_mutationFunctionIdentifer = sql.identifier("b", "compound_type_mutation");
@@ -3515,6 +3538,9 @@ const registryConfig_pgResources_person_person = {
       schemaName: "c",
       name: "person"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -3552,6 +3578,9 @@ const registryConfig_pgResources_types_types = {
       schemaName: "b",
       name: "types"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       foreignKey: spec_types.extensions.tags.foreignKey
     }
@@ -3905,9 +3934,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "current_user_id"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -3929,9 +3956,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "o"
       },
       description: undefined
@@ -3954,9 +3979,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_setof"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "o"
       },
       description: undefined
@@ -3979,9 +4002,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_unnamed"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4003,9 +4024,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "o"
       },
       description: undefined
@@ -4028,9 +4047,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_setof"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "o"
       },
       description: undefined
@@ -4053,9 +4070,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_unnamed"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4077,9 +4092,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "no_args_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4101,9 +4114,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "no_args_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4125,9 +4136,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "return_void_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4149,9 +4158,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "mutation_interval_set"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4173,9 +4180,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "query_interval_set"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4197,9 +4202,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "static_big_integer"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4226,9 +4229,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_in_out"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "o"
       },
       description: undefined
@@ -4256,9 +4257,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_returns_table_one_col"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "col1"
       },
       description: undefined
@@ -4286,9 +4285,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_in_out"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "o"
       },
       description: undefined
@@ -4316,9 +4313,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_returns_table_one_col"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "col1"
       },
       description: undefined
@@ -4346,9 +4341,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "assert_something"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4377,7 +4370,7 @@ const registry = makeRegistry({
         },
         tags: {
           omit: "execute",
-          behavior: ["queryField -mutationField -typeField", "-filter -order", "-queryField -mutationField -typeField"]
+          behavior: ["-queryField -mutationField -typeField"]
         }
       },
       description: undefined
@@ -4405,9 +4398,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "json_identity"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4434,9 +4425,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "json_identity_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4463,9 +4452,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "jsonb_identity"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4492,9 +4479,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "jsonb_identity_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4521,9 +4506,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "jsonb_identity_mutation_plpgsql"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4550,9 +4533,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "jsonb_identity_mutation_plpgsql_with_default"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4584,9 +4565,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_1_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: "lol, add some stuff 1 mutation"
     },
@@ -4618,9 +4597,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_1_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: "lol, add some stuff 1 query"
     },
@@ -4652,9 +4629,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_2_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: "lol, add some stuff 2 mutation"
     },
@@ -4686,9 +4661,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_2_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: "lol, add some stuff 2 query"
     },
@@ -4720,9 +4693,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_3_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: "lol, add some stuff 3 mutation"
     },
@@ -4754,9 +4725,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_3_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: "lol, add some stuff 3 query"
     },
@@ -4788,9 +4757,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_4_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: "lol, add some stuff 4 mutation"
     },
@@ -4822,9 +4789,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_4_mutation_error"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4856,9 +4821,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_4_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: "lol, add some stuff 4 query"
     },
@@ -4890,9 +4853,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "mult_1"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4924,9 +4885,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "mult_2"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4958,9 +4917,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "mult_3"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4992,9 +4949,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "mult_4"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5026,9 +4981,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_in_inout"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "ino"
       },
       description: undefined
@@ -5051,9 +5004,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_out"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5075,9 +5026,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_out_setof"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5099,9 +5048,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_out_unnamed"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5133,9 +5080,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_in_inout"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "ino"
       },
       description: undefined
@@ -5158,9 +5103,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_out"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5182,9 +5125,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_out_setof"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5206,9 +5147,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_out_unnamed"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5232,7 +5171,7 @@ const registry = makeRegistry({
         },
         tags: {
           simpleCollections: "only",
-          behavior: ["queryField -mutationField -typeField", "-filter -order", "+list -connection"]
+          behavior: ["+list -connection"]
         }
       },
       description: undefined
@@ -5270,9 +5209,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "optional_missing_middle_1"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5309,9 +5246,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "optional_missing_middle_2"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5348,9 +5283,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "optional_missing_middle_3"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5387,9 +5320,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "optional_missing_middle_4"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5426,9 +5357,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "optional_missing_middle_5"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5450,9 +5379,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_unnamed_out_out_unnamed"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5479,9 +5406,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_returns_table_multi_col"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5518,9 +5443,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "int_set_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5557,9 +5480,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "int_set_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5581,9 +5502,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_unnamed_out_out_unnamed"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5610,9 +5529,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_returns_table_multi_col"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5639,9 +5556,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "guid_fn"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5663,9 +5578,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "mutation_interval_array"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5687,9 +5600,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "query_interval_array"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5711,9 +5622,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "mutation_text_array"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5735,9 +5644,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "query_text_array"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5757,9 +5664,10 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "non_updatable_view"
         },
-        tags: {
-          behavior: ["-insert", "-update", "-delete"]
-        }
+        isInsertable: false,
+        isUpdatable: false,
+        isDeletable: false,
+        tags: {}
       }
     },
     inputs: {
@@ -5778,6 +5686,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "inputs"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5797,6 +5708,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "patchs"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5816,6 +5730,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "reserved"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5835,6 +5752,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "reservedPatchs"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5854,6 +5774,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "reserved_input"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5873,6 +5796,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "default_value"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5900,6 +5826,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "no_primary_key"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5919,6 +5848,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "testview"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5939,6 +5871,9 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "my_table"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5967,6 +5902,9 @@ const registry = makeRegistry({
           name: "unlogged",
           persistence: "u"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5986,6 +5924,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "view_table"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -6006,6 +5947,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "similar_table_1"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -6025,6 +5969,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "similar_table_2"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -6053,6 +6000,9 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "updatable_view"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {
           uniqueKey: "x",
           unique: "x|@behavior -single -update -delete"
@@ -6075,6 +6025,9 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "null_test_record"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -6101,9 +6054,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "edge_case_computed"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6123,9 +6074,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "return_table_without_grants"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -6162,9 +6111,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "list_bde_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6184,6 +6131,9 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "edge_case"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -6204,9 +6154,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "authenticate_fail"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -6241,9 +6189,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "authenticate"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -6274,8 +6220,7 @@ const registry = makeRegistry({
         },
         tags: {
           arg0variant: "base",
-          resultFieldName: "leftArm",
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+          resultFieldName: "leftArm"
         }
       },
       description: undefined
@@ -6296,9 +6241,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "issue756_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -6318,9 +6261,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "issue756_set_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -6355,9 +6296,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "authenticate_many"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -6377,9 +6316,11 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "auth_payload"
         },
+        isInsertable: false,
+        isUpdatable: false,
+        isDeletable: false,
         tags: {
-          foreignKey: "(id) references c.person",
-          behavior: ["-insert", "-update", "-delete"]
+          foreignKey: "(id) references c.person"
         }
       }
     }, {
@@ -6413,9 +6354,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "authenticate_payload"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -6467,9 +6406,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "types_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6521,9 +6458,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "types_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6550,9 +6485,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "compound_type_computed_field"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6579,9 +6512,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_computed_interval_set"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6608,9 +6539,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_computed_interval_array"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6637,9 +6566,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_computed_text_array"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6674,7 +6601,7 @@ const registry = makeRegistry({
         tags: {
           sortable: true,
           filterable: true,
-          behavior: ["-queryField -mutationField typeField", "-filter -order", "filter filterBy", "orderBy order resource:connection:backwards"]
+          behavior: ["filter filterBy", "orderBy order resource:connection:backwards"]
         }
       },
       description: undefined
@@ -6710,7 +6637,7 @@ const registry = makeRegistry({
         tags: {
           sortable: true,
           filterable: true,
-          behavior: ["-queryField -mutationField typeField", "-filter -order", "filter filterBy", "orderBy order resource:connection:backwards"]
+          behavior: ["filter filterBy", "orderBy order resource:connection:backwards"]
         }
       },
       description: undefined
@@ -6738,9 +6665,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_out_compound_type"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6767,9 +6692,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_out_compound_type"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6806,9 +6729,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_headline_trimmed"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6845,9 +6766,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_headline_trimmed_no_defaults"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6884,9 +6803,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_headline_trimmed_strict"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6923,9 +6840,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "query_output_two_rows"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6946,9 +6861,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "compound_type_set_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -6973,9 +6886,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "compound_type_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7000,9 +6911,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "compound_type_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7027,9 +6936,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "compound_type_set_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7054,9 +6961,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "create_post"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7081,9 +6986,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "table_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7108,9 +7011,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "table_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7141,8 +7042,7 @@ const registry = makeRegistry({
           name: "post_with_suffix"
         },
         tags: {
-          deprecated: "This is deprecated (comment on function a.post_with_suffix).",
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+          deprecated: "This is deprecated (comment on function a.post_with_suffix)."
         }
       },
       description: undefined
@@ -7168,9 +7068,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "mutation_compound_type_array"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7195,9 +7093,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "query_compound_type_array"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7222,9 +7118,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "compound_type_array_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7249,9 +7143,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "compound_type_array_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7281,9 +7173,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_computed_compound_type_array"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7308,9 +7198,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_many"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7341,7 +7229,7 @@ const registry = makeRegistry({
           notNull: true,
           sortable: true,
           filterable: true,
-          behavior: ["-queryField -mutationField typeField", "-filter -order", "filter filterBy", "orderBy order resource:connection:backwards"]
+          behavior: ["filter filterBy", "orderBy order resource:connection:backwards"]
         },
         singleOutputParameterName: "o1"
       },
@@ -7372,7 +7260,7 @@ const registry = makeRegistry({
         },
         tags: {
           sortable: true,
-          behavior: ["-queryField -mutationField typeField", "-filter -order", "orderBy order resource:connection:backwards"]
+          behavior: ["orderBy order resource:connection:backwards"]
         }
       },
       description: "The first name of the person."
@@ -7400,9 +7288,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_computed_out_out"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -7434,9 +7320,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_computed_inout"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "ino"
       },
       description: undefined
@@ -7469,9 +7353,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_computed_inout_out"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -7504,8 +7386,7 @@ const registry = makeRegistry({
           name: "person_exists"
         },
         tags: {
-          deprecated: "This is deprecated (comment on function c.person_exists).",
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
+          deprecated: "This is deprecated (comment on function c.person_exists)."
         }
       },
       description: undefined
@@ -7533,9 +7414,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_computed_first_arg_inout_out"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -7567,9 +7446,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_complex"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -7601,9 +7478,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_complex_setof"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -7635,9 +7510,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_complex"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -7669,9 +7542,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_complex_setof"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -7708,9 +7579,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_computed_complex"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -7735,9 +7604,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_first_post"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: "The first post by the person."
     }),
@@ -7759,8 +7626,7 @@ const registry = makeRegistry({
           name: "badly_behaved_function"
         },
         tags: {
-          deprecated: "This is deprecated (comment on function c.badly_behaved_function).",
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
+          deprecated: "This is deprecated (comment on function c.badly_behaved_function)."
         }
       },
       description: undefined
@@ -7781,9 +7647,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_table"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7803,9 +7667,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_table_setof"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7825,9 +7687,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_table"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7847,9 +7707,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_table_setof"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7869,9 +7727,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "table_set_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7894,7 +7750,7 @@ const registry = makeRegistry({
         tags: {
           sortable: true,
           filterable: true,
-          behavior: ["queryField -mutationField -typeField", "-filter -order", "filter filterBy", "orderBy order resource:connection:backwards"]
+          behavior: ["filter filterBy", "orderBy order resource:connection:backwards"]
         }
       },
       description: undefined
@@ -7915,9 +7771,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "table_set_query_plpgsql"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7942,9 +7796,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_computed_first_arg_inout"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "person"
       },
       description: undefined
@@ -7972,7 +7824,7 @@ const registry = makeRegistry({
         },
         tags: {
           sortable: true,
-          behavior: ["-queryField -mutationField typeField", "-filter -order", "orderBy order resource:connection:backwards"]
+          behavior: ["orderBy order resource:connection:backwards"]
         }
       },
       description: undefined
@@ -7994,9 +7846,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "type_function_connection"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -8016,9 +7866,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "type_function_connection_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -8043,9 +7891,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "type_function"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -8070,9 +7916,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "type_function_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -8097,9 +7941,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_type_function_connection"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -8129,9 +7971,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_type_function"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -8151,9 +7991,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "type_function_list"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -8173,9 +8011,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "type_function_list_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -8200,9 +8036,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_type_function_list"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     })

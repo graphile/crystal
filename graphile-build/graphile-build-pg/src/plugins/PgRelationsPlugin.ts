@@ -34,6 +34,13 @@ const ref_sql = te.ref(sql, "sql");
 
 declare global {
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      "singularRelation:resource:single": true;
+      "singularRelation:resource:list": true;
+      "singularRelation:resource:connection": true;
+      "manyRelation:resource:list": true;
+      "manyRelation:resource:connection": true;
+    }
     interface SchemaOptions {
       pgMutationPayloadRelations?: boolean;
     }
@@ -503,47 +510,78 @@ export const PgRelationsPlugin: GraphileConfig.Plugin = {
   }),
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "singularRelation:resource:single": {
+          description:
+            "can we get a single one of these (resource) from a type?",
+          entities: ["pgCodecRelation", "pgCodecRef"],
+        },
+        "singularRelation:resource:list": {
+          description:
+            "should we add a list field to navigate this singular relationship (when we know there can be at most one)?",
+          entities: ["pgCodecRelation", "pgCodecRef"],
+        },
+        "singularRelation:resource:connection": {
+          description:
+            "should we add a connection field to navigate this singular relationship (when we know there can be at most one)?",
+          entities: ["pgCodecRelation", "pgCodecRef"],
+        },
+        "manyRelation:resource:list": {
+          description:
+            "should we add a list field to navigate this relationship?",
+          entities: ["pgCodecRelation", "pgCodecRef"],
+        },
+        "manyRelation:resource:connection": {
+          description:
+            "should we add a connection field to navigate this relationship?",
+          entities: ["pgCodecRelation", "pgCodecRef"],
+        },
+      },
+    },
     entityBehavior: {
       pgCodecRelation: {
-        provides: ["inferred"],
-        before: ["override"],
-        after: ["default"],
-        callback(behavior, entity) {
+        inferred(behavior, entity): GraphileBuild.BehaviorString[] {
           if (entity.isUnique) {
             return [
               behavior,
-              "single -singularRelation:resource:list -singularRelation:resource:connection",
+              "single",
+              "-singularRelation:resource:list",
+              "-singularRelation:resource:connection",
             ];
           } else {
-            return behavior;
+            return [behavior];
           }
         },
       },
       pgCodecRef: {
-        provides: ["inferred"],
-        before: ["override"],
-        after: ["default"],
-        callback(behavior, [codec, refName]) {
+        inferred(behavior, [codec, refName]) {
           const ref = codec.refs?.[refName];
           if (ref?.definition.singular) {
             return [
               behavior,
-              "single -singularRelation:resource:list -singularRelation:resource:connection",
+              "single",
+              "-singularRelation:resource:list",
+              "-singularRelation:resource:connection",
             ];
           } else {
-            return behavior;
+            return [
+              behavior,
+              "-single",
+              "manyRelation:resource:connection",
+              "manyRelation:resource:list",
+            ];
           }
         },
       },
       pgRefDefinition: {
-        provides: ["inferred"],
-        before: ["override"],
-        after: ["default"],
-        callback(behavior, entity) {
+        inferred(behavior, entity) {
           if (entity.singular) {
             return [
               behavior,
-              "single -singularRelation:resource:list -singularRelation:resource:connection",
+              "single",
+              "-singularRelation:resource:list",
+              "-singularRelation:resource:connection",
             ];
           } else {
             return behavior;
@@ -888,7 +926,7 @@ function addRelations(
         isUnique &&
         build.behavior.pgCodecRelationMatches(
           relation,
-          `${relationTypeScope}:resource:single`,
+          `${relationTypeScope as "singularRelation"}:resource:single` as const,
         );
       const shouldAddConnectionField = build.behavior.pgCodecRelationMatches(
         relation,
@@ -1008,15 +1046,15 @@ function addRelations(
 
       // const isUnique = paths.every((p) => p.isUnique);
 
-      behavior = hasExactlyOneSource
-        ? `${build.behavior.pgResourceBehavior(
-            firstSource,
-          )} ${build.behavior.pgCodecRefBehavior([codec, identifier], false)}`
-        : sharedCodec
-        ? `${build.behavior.pgCodecBehavior(
-            sharedCodec,
-          )} ${build.behavior.pgCodecRefBehavior([codec, identifier], false)}`
-        : build.behavior.pgCodecRefBehavior([codec, identifier]);
+      const behaviorObj = build.behavior.getCombinedBehaviorForEntities(
+        "pgCodecRef",
+        {
+          ...(sharedCodec ? { pgCodec: sharedCodec } : null),
+          ...(hasExactlyOneSource ? { pgResource: firstSource } : null),
+          pgCodecRef: [codec, identifier],
+        },
+      );
+      behavior = behaviorObj.behaviorString;
 
       // Shortcut simple relation alias
       ({ singleRecordPlan, listPlan, connectionPlan } = (() => {
@@ -1315,7 +1353,7 @@ function addRelations(
       isUnique &&
       build.behavior.stringMatches(
         behavior,
-        `${relationTypeScope}:resource:single`,
+        `${relationTypeScope as "singularRelation"}:resource:single`,
       );
     const shouldAddConnectionField = build.behavior.stringMatches(
       behavior,

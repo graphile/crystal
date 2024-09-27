@@ -20,6 +20,19 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      filter: true;
+      "query:resource:list:filter": true;
+      "query:resource:connection:filter": true;
+      "manyRelation:resource:list:filter": true;
+      "manyRelation:resource:connection:filter": true;
+      "singularRelation:resource:list:filter": true;
+      "singularRelation:resource:connection:filter": true;
+      "typeField:resource:list:filter": true;
+      "typeField:resource:connection:filter": true;
+      "queryField:resource:list:filter": true;
+      "queryField:resource:connection:filter": true;
+    }
     interface Inflection {
       conditionType(this: Inflection, typeName: string): string;
     }
@@ -31,6 +44,11 @@ declare global {
     }
   }
 }
+
+const FILTER_DEF = {
+  description: "can we filter this resource/codec",
+  entities: ["pgCodec", "pgResource"],
+} as const;
 
 export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
   name: "PgConditionArgumentPlugin",
@@ -46,13 +64,31 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        filter: FILTER_DEF,
+        "query:resource:list:filter": FILTER_DEF,
+        "query:resource:connection:filter": FILTER_DEF,
+        "manyRelation:resource:list:filter": FILTER_DEF,
+        "manyRelation:resource:connection:filter": FILTER_DEF,
+        "singularRelation:resource:list:filter": FILTER_DEF,
+        "singularRelation:resource:connection:filter": FILTER_DEF,
+        "typeField:resource:list:filter": FILTER_DEF,
+        "typeField:resource:connection:filter": FILTER_DEF,
+        "queryField:resource:list:filter": FILTER_DEF,
+        "queryField:resource:connection:filter": FILTER_DEF,
+      },
+    },
+
     entityBehavior: {
-      pgCodec: "select filter",
+      pgCodec: ["select", "filter"],
       pgResource: {
-        provides: ["default"],
-        before: ["inferred", "override"],
-        callback(behavior, resource) {
-          return [resource.parameters ? "" : "filter", behavior];
+        inferred: {
+          provides: ["default"],
+          before: ["inferred", "override"],
+          callback(behavior, resource) {
+            return resource.parameters ? [behavior] : ["filter", behavior];
+          },
         },
       },
     },
@@ -126,7 +162,7 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
         }
 
         const desiredBehavior = fieldBehaviorScope
-          ? `${fieldBehaviorScope}:filter`
+          ? (`${fieldBehaviorScope}:filter` as keyof GraphileBuild.BehaviorStrings)
           : `filter`;
         if (
           pgResource
