@@ -12,6 +12,11 @@ declare global {
       isIndexed?: boolean;
     }
   }
+  namespace GraphileBuild {
+    interface BehaviorStrings {
+      manyToMany: true;
+    }
+  }
 }
 
 export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
@@ -87,6 +92,15 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
     },
   },
   schema: {
+    behaviorRegistry: {
+      add: {
+        // HACK: this impacts a community plugin and isn't part of core.
+        manyToMany: {
+          entities: [],
+          description: "(Legacy support hack - many-to-many relationship)",
+        },
+      },
+    },
     entityBehavior: {
       pgCodecAttribute: {
         inferred: {
@@ -115,7 +129,7 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
                 "-single",
 
                 // HACK: this impacts a community plugin and isn't part of core.
-                "-manyToMany" as GraphileBuild.BehaviorString,
+                "-manyToMany",
               );
             }
             return newBehavior;
