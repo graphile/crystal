@@ -57,9 +57,22 @@ export function isResolvedPreset(
  * ResolvedPreset (which does not have any `extends`).
  */
 export function resolvePresets(presets: ReadonlyArray<GraphileConfig.Preset>) {
-  // TODO: seenPlugins is wrong; the plugins should only ever grow, and disablePlugins itself should apply at the very end.
+  if (presets.length === 1) {
+    // Maybe it's already resolved?
+    const preset = presets[0];
+    if (preset && isResolvedPreset(preset)) {
+      return preset;
+    }
+  }
+
   const seenPlugins = new Set<GraphileConfig.Plugin>();
   const resolvedPreset = resolvePresetsInternal(presets, seenPlugins, 0);
+  if (resolvedPreset.plugins) {
+    resolvedPreset.plugins = sortWithBeforeAfterProvides(
+      resolvedPreset.plugins,
+      "name",
+    );
+  }
 
   const seenNames = [...seenPlugins].map((p) => p.name);
   const disabledButNotSeen = resolvedPreset.disablePlugins?.filter(
@@ -83,15 +96,7 @@ function resolvePresetsInternal(
   seenPlugins: Set<GraphileConfig.Plugin>,
   depth: number,
 ): GraphileConfig.ResolvedPreset {
-  if (presets.length === 1) {
-    // Maybe it's already resolved?
-    const preset = presets[0];
-    if (preset && isResolvedPreset(preset)) {
-      return preset;
-    }
-  }
   const finalPreset = blankResolvedPreset();
-  let presetIndex = 0;
   for (const preset of presets) {
     const resolvedPreset = resolvePresetInternal(
       preset,
@@ -99,16 +104,7 @@ function resolvePresetsInternal(
       depth + 1,
     );
     mergePreset(finalPreset, resolvedPreset, seenPlugins, depth);
-    presetIndex++;
   }
-
-  if (finalPreset.plugins) {
-    finalPreset.plugins = sortWithBeforeAfterProvides(
-      finalPreset.plugins,
-      "name",
-    );
-  }
-
   return finalPreset;
 }
 
@@ -256,13 +252,19 @@ function mergePreset(
   targetPreset: GraphileConfig.ResolvedPreset,
   sourcePreset: GraphileConfig.ResolvedPreset,
   seenPlugins: Set<GraphileConfig.Plugin>,
-  depth: number,
+  _depth: number,
 ): void {
+  const sourcePluginNames: string[] = [];
+  if (sourcePreset.plugins) {
+    for (const plugin of sourcePreset.plugins) {
+      seenPlugins.add(plugin);
+      sourcePluginNames.push(plugin.name);
+    }
+  }
   if (targetPreset.extends != null && targetPreset.extends.length !== 0) {
     throw new Error("First argument to mergePreset must be a resolved preset");
   }
 
-  const sourcePluginNames = sourcePreset.plugins?.map((p) => p.name) ?? [];
   const addedAndDisabled = sourcePreset.disablePlugins
     ? sourcePluginNames.filter((addedPluginName) =>
         sourcePreset.disablePlugins!.includes(addedPluginName),
@@ -292,11 +294,6 @@ function mergePreset(
     ...(targetPreset.plugins || []),
     ...(sourcePreset.plugins || []),
   ]);
-  if (sourcePreset.plugins) {
-    for (const plugin of sourcePreset.plugins) {
-      seenPlugins.add(plugin);
-    }
-  }
 
   // Copy the unique plugins that are not disabled
   targetPreset.plugins = [...plugins].filter(
