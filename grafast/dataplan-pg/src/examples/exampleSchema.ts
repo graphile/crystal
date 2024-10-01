@@ -2781,16 +2781,7 @@ export function makeExampleSchema(
       messagesWithManyTransforms: {
         type: new GraphQLList(new GraphQLList(Message)),
         plan: EXPORTABLE(
-          (
-            deoptimizeIfAppropriate,
-            each,
-            filter,
-            groupBy,
-            lambda,
-            list,
-            messageResource,
-          ) =>
-            function plan($forum) {
+          (deoptimizeIfAppropriate, each, filter, groupBy, lambda, messageResource) => function plan($forum) {
               // This is a deliberately convoluted plan to ensure that multiple
               // filter plans work well together.
 
@@ -2801,7 +2792,7 @@ export function makeExampleSchema(
               // Filter messages to those _not_ in this forum
               const $messagesFromOtherForums = filter($messages, ($message) =>
                 lambda(
-                  list([$message.get("forum_id"), $forum.get("id")]),
+                  [$message.get("forum_id"), $forum.get("id")],
                   ([messageForumId, forumId]) => messageForumId !== forumId,
                   true,
                 ),
@@ -2824,15 +2815,7 @@ export function makeExampleSchema(
                 each($group, ($item) => $messages.listItem($item)),
               );
             },
-          [
-            deoptimizeIfAppropriate,
-            each,
-            filter,
-            groupBy,
-            lambda,
-            list,
-            messageResource,
-          ],
+          [deoptimizeIfAppropriate, each, filter, groupBy, lambda, messageResource],
         ),
       },
     }),

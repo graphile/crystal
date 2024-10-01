@@ -1391,7 +1391,7 @@ and ${condition(i + 1)}`}
           : constant(null);
 
       const limitAndOffsetLambda = lambda(
-        list([$lower, $upper]),
+        [$lower, $upper],
         ([cursorLower, cursorUpper]) => {
           /** lower bound - exclusive (1-indexed) */
           let lower = 0;

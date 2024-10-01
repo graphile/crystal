@@ -101,14 +101,14 @@ const makeSchema = (useStreamableStep = false) => {
         },
         thingByIdObj(_, { $id }) {
           return loadOne(
-            object({ identifier: $id as ExecutableStep<number> }),
+            { identifier: $id as ExecutableStep<number> },
             { identifier: "id" },
             loadThingByIdentifierObjs,
           );
         },
         thingByIdList(_, { $id }) {
           return loadOne(
-            list([$id as ExecutableStep<number>]),
+            [$id as ExecutableStep<number>],
             ["id"],
             loadThingByIdentifierLists,
           );

@@ -91,7 +91,7 @@ const $oneBasedIndex = loadOne($zeroBasedIndex, (allN) =>
   allN.map((n) => n + 1),
 );
 
-const $aPlusB = loadOne(list([$a, $b]), (allAsAndBs) =>
+const $aPlusB = loadOne([$a, $b], (allAsAndBs) =>
   allAsAndBs.map(([a, b]) => a + b),
 );
 ```
