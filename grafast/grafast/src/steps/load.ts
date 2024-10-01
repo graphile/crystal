@@ -550,14 +550,11 @@ export function loadMany<
         TParams,
         UnwrapMultistep<TUnaryMultistep>
       >
-    | null
-    | string
+    | IOEquivalence<TMultistep>
     | TUnaryMultistep,
   loadCallbackOrIoEquivalence?:
     | LoadManyCallback<UnwrapMultistep<TMultistep>, TItem, TParams>
-    | null
-    | string
-    | { [key in keyof UnwrapMultistep<TMultistep>]?: string | null },
+    | IOEquivalence<TMultistep>,
   loadCallbackOnly?: LoadManyCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
@@ -671,19 +668,21 @@ export function loadOne<
   const TMultistep extends Multistep,
   TItem,
   TParams extends Record<string, any> = Record<string, any>,
+  const TUnaryMultistep extends Multistep = never,
 >(
   spec: TMultistep,
   loadCallback: LoadOneCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
     TParams,
-    never
+    UnwrapMultistep<TUnaryMultistep>
   >,
 ): LoadedRecordStep<TItem, TParams>;
 export function loadOne<
   const TMultistep extends Multistep,
   TItem,
   TParams extends Record<string, any> = Record<string, any>,
+  const TUnaryMultistep extends Multistep = never,
 >(
   spec: TMultistep,
   ioEquivalence: IOEquivalence<TMultistep>,
@@ -691,7 +690,7 @@ export function loadOne<
     UnwrapMultistep<TMultistep>,
     TItem,
     TParams,
-    never
+    UnwrapMultistep<TUnaryMultistep>
   >,
 ): LoadedRecordStep<TItem, TParams>;
 export function loadOne<
@@ -739,9 +738,7 @@ export function loadOne<
         TParams,
         UnwrapMultistep<TUnaryMultistep>
       >
-    | null
-    | string
-    | { [key in keyof UnwrapMultistep<TMultistep>]?: string | null }
+    | IOEquivalence<TMultistep>
     | TUnaryMultistep,
   loadCallbackOrIoEquivalence?:
     | LoadOneCallback<
@@ -750,9 +747,7 @@ export function loadOne<
         TParams,
         UnwrapMultistep<TUnaryMultistep>
       >
-    | null
-    | string
-    | { [key in keyof UnwrapMultistep<TMultistep>]?: string | null },
+    | IOEquivalence<TMultistep>,
   loadCallbackOnly?: LoadOneCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
