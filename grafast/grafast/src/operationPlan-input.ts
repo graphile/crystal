@@ -19,6 +19,7 @@ import type { __ItemStep } from "./steps/__item.js";
 import { constant, ConstantStep } from "./steps/constant.js";
 import { list } from "./steps/list.js";
 import { object } from "./steps/object.js";
+import { assertNotAsync, assertNotPromise } from "./utils.js";
 
 const {
   getNullableType,
@@ -180,20 +181,34 @@ export function withFieldArgsForArguments<
         if (rest.length === 0) {
           // Argument
           const arg = entity as GraphQLArgument;
-          result = arg.extensions.grafast?.inputPlan
-            ? arg.extensions.grafast.inputPlan($parent, childFieldArgs, {
-                schema,
-                entity: arg,
-              })
+          const argInputPlan = arg.extensions.grafast?.inputPlan;
+          const fnDescription = `???.${field.name}(${arg.name}:).inputPlan`;
+          assertNotAsync(argInputPlan, fnDescription);
+          result = argInputPlan
+            ? assertNotPromise(
+                argInputPlan($parent, childFieldArgs, {
+                  schema,
+                  entity: arg,
+                }),
+                argInputPlan,
+                fnDescription,
+              )
             : childFieldArgs.get();
         } else {
           // Input field
           const inputField = entity as GraphQLInputField | undefined;
-          result = inputField?.extensions.grafast?.inputPlan
-            ? inputField.extensions.grafast.inputPlan(childFieldArgs, {
-                schema,
-                entity: inputField,
-              })
+          const inputFieldInputPlan = inputField?.extensions.grafast?.inputPlan;
+          const fnDescription = `???.${inputField?.name}.inputPlan`;
+          assertNotAsync(inputFieldInputPlan, fnDescription);
+          result = inputFieldInputPlan
+            ? assertNotPromise(
+                inputFieldInputPlan(childFieldArgs, {
+                  schema,
+                  entity: inputField,
+                }),
+                inputFieldInputPlan,
+                fnDescription,
+              )
             : childFieldArgs.get();
         }
         const nullableType = getNullableType(entityType);
@@ -289,28 +304,34 @@ export function withFieldArgsForArguments<
             if (rest.length === 0) {
               // Argument
               const arg = entity as GraphQLArgument;
-              result = arg.extensions.grafast?.applyPlan
-                ? arg.extensions.grafast.applyPlan(
-                    $parent,
-                    $target,
-                    childFieldArgs,
-                    {
+              const argApplyPlan = arg.extensions.grafast?.applyPlan;
+              const fnDescription = `???.${field.name}(${arg.name}:).applyPlan`;
+              assertNotAsync(argApplyPlan, fnDescription);
+              result = argApplyPlan
+                ? assertNotPromise(
+                    argApplyPlan($parent, $target, childFieldArgs, {
                       schema,
                       entity: arg,
-                    },
+                    }),
+                    argApplyPlan,
+                    fnDescription,
                   )
                 : undefined;
             } else if (entity) {
               // input field
               const inputField = entity as GraphQLInputField;
-              result = inputField.extensions.grafast?.applyPlan
-                ? inputField.extensions.grafast.applyPlan(
-                    $target,
-                    childFieldArgs,
-                    {
+              const inputFieldApplyPlan =
+                inputField.extensions.grafast?.applyPlan;
+              const fnDescription = `???.${inputField.name}.applyPlan`;
+              assertNotAsync(inputFieldApplyPlan, fnDescription);
+              result = inputFieldApplyPlan
+                ? assertNotPromise(
+                    inputFieldApplyPlan($target, childFieldArgs, {
                       schema,
                       entity: inputField,
-                    },
+                    }),
+                    inputFieldApplyPlan,
+                    fnDescription,
                   )
                 : undefined;
             } else {
@@ -380,12 +401,18 @@ export function withFieldArgsForArguments<
             const typeResolver =
               nullableEntityType.extensions.grafast?.inputPlan ||
               defaultInputObjectTypeInputPlanResolver;
-            const resolvedResult = typeResolver(
-              getFieldArgsForPath(path, nullableEntityType, $input, "input"),
-              {
-                schema,
-                type: nullableEntityType,
-              },
+            const fnDescription = `${nullableEntityType}.inputPlan`;
+            assertNotAsync(typeResolver, fnDescription);
+            const resolvedResult = assertNotPromise(
+              typeResolver(
+                getFieldArgsForPath(path, nullableEntityType, $input, "input"),
+                {
+                  schema,
+                  type: nullableEntityType,
+                },
+              ),
+              typeResolver,
+              fnDescription,
             );
             if (mode === "apply") {
               // NOTE: if mode === 'input' then `.get()` won't need a
@@ -403,11 +430,17 @@ export function withFieldArgsForArguments<
           } else if (isScalarType(nullableEntityType)) {
             const scalarResolver =
               nullableEntityType.extensions.grafast?.inputPlan;
+            const fnDescription = `${nullableEntityType}.inputPlan`;
+            assertNotAsync(scalarResolver, fnDescription);
             if (scalarResolver !== undefined) {
-              return scalarResolver($input, {
-                schema,
-                type: nullableEntityType,
-              });
+              return assertNotPromise(
+                scalarResolver($input, {
+                  schema,
+                  type: nullableEntityType,
+                }),
+                scalarResolver,
+                fnDescription,
+              );
             } else {
               return $input;
             }
@@ -480,13 +513,21 @@ export function withFieldArgsForArguments<
             const enumValue = nullableEntityType
               .getValues()
               .find((v) => v.value === value);
-            const enumResolver = enumValue?.extensions.grafast?.applyPlan;
-            if (enumResolver !== undefined) {
-              const $target =
-                typeof targetStepOrCallback === "function"
-                  ? targetStepOrCallback()
-                  : targetStepOrCallback;
-              enumResolver($target);
+            if (enumValue) {
+              const enumResolver = enumValue.extensions.grafast?.applyPlan;
+              const fnDescription = `${nullableEntityType.name}.${enumValue.name}.applyPlan`;
+              assertNotAsync(enumResolver, fnDescription);
+              if (enumResolver !== undefined) {
+                const $target =
+                  typeof targetStepOrCallback === "function"
+                    ? targetStepOrCallback()
+                    : targetStepOrCallback;
+                assertNotPromise(
+                  enumResolver($target),
+                  enumResolver,
+                  fnDescription,
+                );
+              }
             }
           } else {
             const never: never = nullableEntityType;
@@ -533,6 +574,7 @@ export function withFieldArgsForArguments<
   }
 
   const result = callback(fieldArgs);
+  assertNotPromise(result, callback, operationPlan.loc?.join(">") ?? "???");
 
   if (!explicitlyApplied) {
     processAfter(fieldArgs, [], result, args, applyAfterMode);

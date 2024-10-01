@@ -78,6 +78,8 @@ import { graphqlResolver } from "../steps/graphqlResolver.js";
 import { timeSource } from "../timeSource.js";
 import type { Sudo } from "../utils.js";
 import {
+  assertNotAsync,
+  assertNotPromise,
   defaultValueToValueNode,
   findVariableNamesUsed,
   hasItemPlan,
@@ -1050,12 +1052,9 @@ export class OperationPlan {
         const rawPlanResolver = objectField.extensions?.grafast?.plan;
         if (rawPlanResolver) {
           resolverEmulation = false;
-        }
-        if (rawPlanResolver?.constructor?.name === "AsyncFunction") {
-          throw new Error(
-            `Plans must be synchronous, but this schema has an async function at '${
-              objectType.name
-            }.${fieldName}.plan': ${rawPlanResolver.toString()}`,
+          assertNotAsync(
+            rawPlanResolver,
+            `${objectType.name}.${fieldName}.plan`,
           );
         }
         const namedReturnType = getNamedType(fieldType);
@@ -1441,24 +1440,23 @@ export class OperationPlan {
       }
     } else if (isScalarType(nullableFieldType)) {
       const scalarPlanResolver = nullableFieldType.extensions?.grafast?.plan;
-      if (scalarPlanResolver?.constructor?.name === "AsyncFunction") {
-        throw new Error(
-          `Plans must be synchronous, but this schema has an async function at '${
-            nullableFieldType.name
-          }.plan': ${scalarPlanResolver.toString()}`,
-        );
-      }
+      const fnDescription = `${nullableFieldType.name}.plan`;
+      assertNotAsync(scalarPlanResolver, fnDescription);
       const $sideEffect = parentLayerPlan.latestSideEffectStep;
       try {
         const $leaf =
           typeof scalarPlanResolver === "function"
-            ? withGlobalLayerPlan(
-                parentLayerPlan,
-                polymorphicPaths,
+            ? assertNotPromise(
+                withGlobalLayerPlan(
+                  parentLayerPlan,
+                  polymorphicPaths,
+                  scalarPlanResolver,
+                  null,
+                  $step,
+                  this.scalarPlanInfo,
+                ),
                 scalarPlanResolver,
-                null,
-                $step,
-                this.scalarPlanInfo,
+                fnDescription,
               )
             : $step;
 
