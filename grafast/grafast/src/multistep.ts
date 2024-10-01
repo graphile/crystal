@@ -61,7 +61,10 @@ export function isMultistep<const TMultistepSpec extends Multistep>(
     return true;
   } else if (isTuple(spec) && spec.every((s) => s instanceof ExecutableStep)) {
     return true;
-  } else if (Object.values(spec).every((s) => s instanceof ExecutableStep)) {
+  } else if (
+    typeof spec === "object" &&
+    Object.values(spec).every((s) => s instanceof ExecutableStep)
+  ) {
     return true;
   } else {
     return false;
