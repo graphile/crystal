@@ -574,6 +574,7 @@ export function withFieldArgsForArguments<
   }
 
   const result = callback(fieldArgs);
+  assertNotPromise(result, callback, operationPlan.loc?.join(">") ?? "???");
 
   if (!explicitlyApplied) {
     processAfter(fieldArgs, [], result, args, applyAfterMode);
