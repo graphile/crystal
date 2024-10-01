@@ -3,33 +3,54 @@ import { constant } from "./steps/constant.js";
 import { list } from "./steps/list.js";
 import { object } from "./steps/object.js";
 
-export type PlansList<TList> = TList extends [...any[]]
-  ? { [index in keyof TList]: ExecutableStep<TList[index]> }
-  : never;
-
-export type PlansObject<TObject> = TObject extends Record<string, any>
-  ? TObject extends ExecutableStep<any>
-    ? never
-    : { [key in keyof TObject]: ExecutableStep<TObject[key]> }
-  : never;
-
-export type PlanOrPlans<TData> =
-  | PlansList<TData>
-  | PlansObject<TData>
-  | ExecutableStep<TData>
+/**
+ * When using this, always use `const`! Otherwise tuples will show up as arrays
+ * and break things.
+ */
+export type PlanOrPlans =
   | null
-  | undefined;
+  | undefined
+  | ExecutableStep
+  | readonly [...(readonly ExecutableStep[])]
+  | Record<string, ExecutableStep>;
 
-export function planOrPlansToStep<TData>(
-  planOrPlans: PlanOrPlans<TData>,
-): ExecutableStep<TData> {
+export type UnwrapPlanOrPlans<TPlanOrPlans extends PlanOrPlans> =
+  TPlanOrPlans extends null
+    ? null
+    : TPlanOrPlans extends undefined
+    ? undefined
+    : TPlanOrPlans extends ExecutableStep<infer U>
+    ? U
+    : TPlanOrPlans extends readonly [...(readonly any[])]
+    ? {
+        [index in keyof TPlanOrPlans]: TPlanOrPlans[index] extends ExecutableStep<
+          infer V
+        >
+          ? V
+          : never;
+      }
+    : {
+        [key in keyof TPlanOrPlans]: TPlanOrPlans[key] extends ExecutableStep<
+          infer V
+        >
+          ? V
+          : never;
+      };
+
+export function planOrPlansToStep<const TPlanOrPlans extends PlanOrPlans>(
+  planOrPlans: TPlanOrPlans,
+): ExecutableStep<UnwrapPlanOrPlans<TPlanOrPlans>> {
   if (planOrPlans == null) {
-    return constant(planOrPlans) as ExecutableStep<TData>;
+    return constant(planOrPlans) as any;
   } else if (planOrPlans instanceof ExecutableStep) {
     return planOrPlans;
-  } else if (Array.isArray(planOrPlans)) {
-    return list(planOrPlans) as ExecutableStep<TData>;
+  } else if (isTuple(planOrPlans)) {
+    return list(planOrPlans) as any;
   } else {
-    return object(planOrPlans) as ExecutableStep<TData>;
+    return object(planOrPlans) as any;
   }
+}
+
+function isTuple<T extends readonly [...(readonly any[])]>(t: any | T): t is T {
+  return Array.isArray(t);
 }

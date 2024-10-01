@@ -3,7 +3,7 @@ import type {
   UnbatchedExecutionExtra,
   UnwrapPlanTuple,
 } from "../interfaces.js";
-import type { PlanOrPlans } from "../planOrPlans.js";
+import type { PlanOrPlans, UnwrapPlanOrPlans } from "../planOrPlans.js";
 import { planOrPlansToStep } from "../planOrPlans.js";
 import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
@@ -57,36 +57,23 @@ export class LambdaStep<TIn, TOut> extends UnbatchedExecutableStep<TOut> {
   }
 }
 
-/*
-function lambda<const TIn extends readonly ExecutableStep[], TOut>(
-  plans: TIn,
-  fn: (value: UnwrapPlanTuple<TIn>) => PromiseOrDirect<TOut>,
-  isSyncAndSafe?: boolean,
-): LambdaStep<UnwrapPlanTuple<TIn>, TOut>;
-function lambda<const TIn, TOut>(
-  $plan: ExecutableStep<TIn> | null | undefined,
-  fn: (value: TIn) => PromiseOrDirect<TOut>,
-  isSyncAndSafe?: boolean,
-): LambdaStep<TIn, TOut>;
-*/
-
 /**
  * A plan that takes the input `$plan` and feeds each value through the `fn`
  * callback. Note: if you need to pass more than one value, pass a `ListStep`
  * as the `$plan` argument.
  */
-function lambda<TIn, TOut>(
-  planOrPlans: PlanOrPlans<TIn>,
-  fn: (value: any) => any,
+function lambda<const TInputPlans extends PlanOrPlans, TOut>(
+  planOrPlans: TInputPlans,
+  fn: (value: UnwrapPlanOrPlans<TInputPlans>) => PromiseOrDirect<TOut>,
   isSyncAndSafe = false,
-): LambdaStep<TIn, TOut> {
+): LambdaStep<UnwrapPlanOrPlans<TInputPlans>, TOut> {
   if (fn.length > 1) {
     throw new Error(
       "lambda callback should accept one argument, perhaps you forgot to destructure the arguments?",
     );
   }
   const $in = planOrPlansToStep(planOrPlans);
-  const $lambda = new LambdaStep<TIn, TOut>($in, fn);
+  const $lambda = new LambdaStep<UnwrapPlanOrPlans<TInputPlans>, TOut>($in, fn);
   if ((fn as any).hasSideEffects) {
     console.trace(
       `You passed a function with \`hasSideEffects = true\` to \`lambda()\`, you should use \`sideEffect()\` instead (it has the same signature). We've automatically corrected this, but you should fix it in your code so the types are correct.`,
