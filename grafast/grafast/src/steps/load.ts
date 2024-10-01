@@ -208,9 +208,10 @@ export class LoadStep<
     >,
   ) {
     super();
-    const $spec = multistep(spec);
+    const $spec = multistep(spec, "load");
     this.addDependency($spec);
-    const $unarySpec = unarySpec == null ? null : multistep(unarySpec);
+    const $unarySpec =
+      unarySpec == null ? null : multistep(unarySpec, "loadUnary");
     if ($unarySpec) {
       this.unaryDepId = this.addUnaryDependency($unarySpec);
     }

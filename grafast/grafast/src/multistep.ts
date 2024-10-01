@@ -40,15 +40,28 @@ export type UnwrapMultistep<TMultistepSpec extends Multistep> =
 
 export function multistep<const TMultistepSpec extends Multistep>(
   spec: TMultistepSpec,
+  stable?: string | true,
 ): ExecutableStep<UnwrapMultistep<TMultistepSpec>> {
   if (spec == null) {
     return constant(spec) as any;
   } else if (spec instanceof ExecutableStep) {
     return spec;
   } else if (isTuple(spec)) {
-    return list(spec) as any;
+    const $step = list(spec);
+    if (typeof stable === "string") {
+      $step.metaKey = `${stable}|list|${spec.length}`;
+    } else if (stable === true) {
+      $step.metaKey = `multistep|list|${spec.length}`;
+    }
+    return $step as any;
   } else {
-    return object(spec) as any;
+    const $step = object(spec);
+    if (typeof stable === "string") {
+      $step.metaKey = `${stable}|object|${JSON.stringify(Object.keys(spec))}`;
+    } else if (stable === true) {
+      $step.metaKey = `multistep|object|${JSON.stringify(Object.keys(spec))}`;
+    }
+    return $step as any;
   }
 }
 
