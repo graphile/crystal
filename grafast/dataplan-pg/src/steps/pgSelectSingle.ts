@@ -625,7 +625,11 @@ export function pgSelectFromRecord<
   >,
 >(
   resource: TResource,
-  $record: PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>,
+  $record:
+    | PgClassExpressionStep<GetPgResourceCodec<TResource>, TResource>
+    | ExecutableStep<{
+        [Attr in keyof TResource["codec"]["attributes"]]: ExecutableStep;
+      }>,
 ): PgSelectStep<TResource> {
   return new PgSelectStep<TResource>({
     resource: resource,
