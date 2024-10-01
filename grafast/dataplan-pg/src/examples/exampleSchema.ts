@@ -2781,7 +2781,15 @@ export function makeExampleSchema(
       messagesWithManyTransforms: {
         type: new GraphQLList(new GraphQLList(Message)),
         plan: EXPORTABLE(
-          (deoptimizeIfAppropriate, each, filter, groupBy, lambda, messageResource) => function plan($forum) {
+          (
+            deoptimizeIfAppropriate,
+            each,
+            filter,
+            groupBy,
+            lambda,
+            messageResource,
+          ) =>
+            function plan($forum) {
               // This is a deliberately convoluted plan to ensure that multiple
               // filter plans work well together.
 
@@ -2815,7 +2823,14 @@ export function makeExampleSchema(
                 each($group, ($item) => $messages.listItem($item)),
               );
             },
-          [deoptimizeIfAppropriate, each, filter, groupBy, lambda, messageResource],
+          [
+            deoptimizeIfAppropriate,
+            each,
+            filter,
+            groupBy,
+            lambda,
+            messageResource,
+          ],
         ),
       },
     }),
