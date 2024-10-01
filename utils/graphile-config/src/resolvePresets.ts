@@ -40,17 +40,23 @@ try {
 export function isResolvedPreset(
   preset: GraphileConfig.Preset,
 ): preset is GraphileConfig.ResolvedPreset {
-  return (preset.plugins && preset.extends?.length === 0) || false;
+  return (
+    (preset.plugins &&
+      preset.extends?.length === 0 &&
+      (!preset.disablePlugins ||
+        !preset.plugins ||
+        !preset.plugins.some((p) =>
+          preset.disablePlugins!.includes(p.name),
+        ))) ||
+    false
+  );
 }
 
 /**
  * Given a list of presets, resolves the presets and returns the resulting
  * ResolvedPreset (which does not have any `extends`).
  */
-export function resolvePresets(
-  presets: ReadonlyArray<GraphileConfig.Preset>,
-  withAssertions = true,
-): GraphileConfig.ResolvedPreset {
+export function resolvePresets(presets: ReadonlyArray<GraphileConfig.Preset>) {
   if (presets.length === 1) {
     // Maybe it's already resolved?
     const preset = presets[0];
@@ -58,10 +64,44 @@ export function resolvePresets(
       return preset;
     }
   }
+
+  const seenPluginNames = new Set<string>();
+  const resolvedPreset = resolvePresetsInternal(presets, seenPluginNames, 0);
+
+  const disabledButNotSeen = resolvedPreset.disablePlugins?.filter(
+    (n) => !seenPluginNames.has(n),
+  );
+  if (disabledButNotSeen?.length) {
+    console.warn(
+      `One or more of the plugin(s) entered in your preset's 'disablePlugins' list was never seen - perhaps you have misspelled them?\n${disabledButNotSeen
+        .map((p) => `  - ${p}`)
+        .join("\n")}\nThe list of know plugins is:\n  ${
+        [...seenPluginNames].join(", ") ?? "-"
+      }`,
+    );
+  }
+
+  return resolvedPreset;
+}
+
+function resolvePresetsInternal(
+  presets: ReadonlyArray<GraphileConfig.Preset>,
+  seenPluginNames: Set<string>,
+  depth: number,
+): GraphileConfig.ResolvedPreset {
   const finalPreset = blankResolvedPreset();
   for (const preset of presets) {
-    const resolvedPreset = resolvePreset(preset);
-    mergePreset(finalPreset, resolvedPreset);
+    if (isResolvedPreset(preset) && preset.disablePlugins) {
+      for (const p of preset.disablePlugins) {
+        seenPluginNames.add(p);
+      }
+    }
+    const resolvedPreset = resolvePresetInternal(
+      preset,
+      seenPluginNames,
+      depth + 1,
+    );
+    mergePreset(finalPreset, resolvedPreset, seenPluginNames, depth);
   }
 
   if (finalPreset.plugins) {
@@ -69,18 +109,6 @@ export function resolvePresets(
       finalPreset.plugins,
       "name",
     );
-  }
-
-  if (withAssertions) {
-    if (finalPreset.disablePlugins && finalPreset.disablePlugins.length > 0) {
-      console.warn(
-        `One or more of the plugin(s) entered in your preset's 'disablePlugins' list was not found:\n${finalPreset.disablePlugins
-          .map((p) => `  - ${p}`)
-          .join("\n")}\nThe list of know plugins is:\n  ${
-          finalPreset.plugins?.map((p) => p.name).join(", ") ?? "-"
-        }`,
-      );
-    }
   }
 
   return finalPreset;
@@ -163,8 +191,10 @@ function isForbiddenPluginKey(key: string): boolean {
  *
  * @internal
  */
-function resolvePreset(
+function resolvePresetInternal(
   preset: GraphileConfig.Preset,
+  seenPluginNames: Set<string>,
+  depth: number,
 ): GraphileConfig.ResolvedPreset {
   if (!isGraphileConfigPreset(preset)) {
     throw new Error(
@@ -197,28 +227,31 @@ function resolvePreset(
         );
       }
     }
-    const { extends: presets = [] } = preset;
-    const basePreset = resolvePresets(presets, false);
-    mergePreset(basePreset, preset);
+  } catch (e) {
+    throw new Error(
+      `Error occurred when resolving preset:\n  ${String(e).replace(
+        /\n/g,
+        "\n  ",
+      )}\nPreset: ${inspect(preset)}`,
+    );
+  }
 
-    const disabled = basePreset.disablePlugins;
-    if (disabled) {
-      const plugins = new Set(basePreset.plugins);
-      const remaining = new Set(disabled);
-      for (const plugin of plugins) {
-        assertPlugin(plugin);
-        if (remaining.has(plugin.name)) {
-          remaining.delete(plugin.name);
-          plugins.delete(plugin);
-        }
-      }
-      basePreset.plugins = [...plugins];
-      basePreset.disablePlugins = [...remaining];
-    }
+  const { extends: presets = [], ...rest } = preset;
+  const basePreset = resolvePresetsInternal(
+    presets,
+    seenPluginNames,
+    depth + 1,
+  );
+
+  try {
+    mergePreset(basePreset, rest, seenPluginNames, depth);
     return basePreset;
   } catch (e) {
     throw new Error(
-      `Error occurred when resolving preset: ${e}\nPreset: ${inspect(preset)}`,
+      `Error occurred when resolving preset:\n  ${String(e).replace(
+        /\n/g,
+        "\n  ",
+      )}\nPreset: ${inspect(preset)}`,
     );
   }
 }
@@ -233,24 +266,56 @@ function resolvePreset(
  */
 function mergePreset(
   targetPreset: GraphileConfig.ResolvedPreset,
-  sourcePreset: GraphileConfig.Preset,
+  sourcePreset: GraphileConfig.ResolvedPreset,
+  seenPluginNames: Set<string>,
+  _depth: number,
 ): void {
+  const sourcePluginNames: string[] = [];
+  if (sourcePreset.plugins) {
+    for (const plugin of sourcePreset.plugins) {
+      assertPlugin(plugin);
+      seenPluginNames.add(plugin.name);
+      sourcePluginNames.push(plugin.name);
+    }
+  }
   if (targetPreset.extends != null && targetPreset.extends.length !== 0) {
     throw new Error("First argument to mergePreset must be a resolved preset");
   }
+
+  const addedAndDisabled = sourcePreset.disablePlugins
+    ? sourcePluginNames.filter((addedPluginName) =>
+        sourcePreset.disablePlugins!.includes(addedPluginName),
+      )
+    : [];
+  if (addedAndDisabled.length > 0) {
+    throw new Error(
+      `A preset may not both add a plugin and disable that same plugin ('${addedAndDisabled.join(
+        "', '",
+      )}')`,
+    );
+  }
+
+  const disablePlugins = [
+    ...new Set([
+      // Remove the previously disabled plugins where we've explicitly re-added the plugin
+      ...(targetPreset.disablePlugins?.filter(
+        (pluginName) => !sourcePluginNames.includes(pluginName),
+      ) ?? []),
+      // Explicitly add our new disablePlugins
+      ...(sourcePreset.disablePlugins ?? []),
+    ]),
+  ];
+  targetPreset.disablePlugins = disablePlugins;
+
   const plugins = new Set([
     ...(targetPreset.plugins || []),
     ...(sourcePreset.plugins || []),
   ]);
-  targetPreset.plugins = [...plugins];
-  if (sourcePreset.disablePlugins) {
-    targetPreset.disablePlugins = [
-      ...new Set([
-        ...(targetPreset.disablePlugins ?? []),
-        ...(sourcePreset.disablePlugins ?? []),
-      ]),
-    ];
-  }
+
+  // Copy the unique plugins that are not disabled
+  targetPreset.plugins = [...plugins].filter(
+    (p) => !disablePlugins.includes(p.name),
+  );
   const targetScopes = Object.keys(targetPreset).filter(isScopeKeyForPreset);
   const sourceScopes = Object.keys(sourcePreset).filter(isScopeKeyForPreset);
   const scopes = [...new Set([...targetScopes, ...sourceScopes])];
