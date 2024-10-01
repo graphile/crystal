@@ -54,3 +54,19 @@ export function multistep<const TMultistepSpec extends Multistep>(
 function isTuple<T extends readonly [...(readonly any[])]>(t: any | T): t is T {
   return Array.isArray(t);
 }
+
+export function isMultistep<const TMultistepSpec extends Multistep>(
+  spec: any,
+): spec is TMultistepSpec {
+  if (spec == null) {
+    return true;
+  } else if (spec instanceof ExecutableStep) {
+    return true;
+  } else if (isTuple(spec) && spec.every((s) => s instanceof ExecutableStep)) {
+    return true;
+  } else if (Object.values(spec).every((s) => s instanceof ExecutableStep)) {
+    return true;
+  } else {
+    return false;
+  }
+}
