@@ -79,6 +79,7 @@ import { timeSource } from "../timeSource.js";
 import type { Sudo } from "../utils.js";
 import {
   assertNotAsync,
+  assertNotPromise,
   defaultValueToValueNode,
   findVariableNamesUsed,
   hasItemPlan,
@@ -1439,18 +1440,23 @@ export class OperationPlan {
       }
     } else if (isScalarType(nullableFieldType)) {
       const scalarPlanResolver = nullableFieldType.extensions?.grafast?.plan;
-      assertNotAsync(scalarPlanResolver, `${nullableFieldType.name}.plan`);
+      const fnDescription = `${nullableFieldType.name}.plan`;
+      assertNotAsync(scalarPlanResolver, fnDescription);
       const $sideEffect = parentLayerPlan.latestSideEffectStep;
       try {
         const $leaf =
           typeof scalarPlanResolver === "function"
-            ? withGlobalLayerPlan(
-                parentLayerPlan,
-                polymorphicPaths,
+            ? assertNotPromise(
+                withGlobalLayerPlan(
+                  parentLayerPlan,
+                  polymorphicPaths,
+                  scalarPlanResolver,
+                  null,
+                  $step,
+                  this.scalarPlanInfo,
+                ),
                 scalarPlanResolver,
-                null,
-                $step,
-                this.scalarPlanInfo,
+                fnDescription,
               )
             : $step;
 
