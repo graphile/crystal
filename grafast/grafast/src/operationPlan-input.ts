@@ -181,8 +181,13 @@ export function withFieldArgsForArguments<
         if (rest.length === 0) {
           // Argument
           const arg = entity as GraphQLArgument;
-          result = arg.extensions.grafast?.inputPlan
-            ? arg.extensions.grafast.inputPlan($parent, childFieldArgs, {
+          const argInputPlan = arg.extensions.grafast?.inputPlan;
+          assertNotAsync(
+            argInputPlan,
+            `???.${field.name}(${arg.name}:).inputPlan`,
+          );
+          result = argInputPlan
+            ? argInputPlan($parent, childFieldArgs, {
                 schema,
                 entity: arg,
               })
@@ -190,8 +195,13 @@ export function withFieldArgsForArguments<
         } else {
           // Input field
           const inputField = entity as GraphQLInputField | undefined;
-          result = inputField?.extensions.grafast?.inputPlan
-            ? inputField.extensions.grafast.inputPlan(childFieldArgs, {
+          const inputFieldInputPlan = inputField?.extensions.grafast?.inputPlan;
+          assertNotAsync(
+            inputFieldInputPlan,
+            `???.${inputField?.name}.inputPlan`,
+          );
+          result = inputFieldInputPlan
+            ? inputFieldInputPlan(childFieldArgs, {
                 schema,
                 entity: inputField,
               })
@@ -383,6 +393,7 @@ export function withFieldArgsForArguments<
             const typeResolver =
               nullableEntityType.extensions.grafast?.inputPlan ||
               defaultInputObjectTypeInputPlanResolver;
+            assertNotAsync(typeResolver, `${nullableEntityType}.inputPlan`);
             const resolvedResult = typeResolver(
               getFieldArgsForPath(path, nullableEntityType, $input, "input"),
               {
@@ -406,6 +417,7 @@ export function withFieldArgsForArguments<
           } else if (isScalarType(nullableEntityType)) {
             const scalarResolver =
               nullableEntityType.extensions.grafast?.inputPlan;
+            assertNotAsync(scalarResolver, `${nullableEntityType}.inputPlan`);
             if (scalarResolver !== undefined) {
               return scalarResolver($input, {
                 schema,
