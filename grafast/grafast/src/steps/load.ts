@@ -1,5 +1,5 @@
 import type { __ItemStep, Deferred, ExecutionDetails } from "../index.js";
-import { defer, isExecutableStep } from "../index.js";
+import { defer } from "../index.js";
 import type {
   GrafastResultsList,
   Maybe,
