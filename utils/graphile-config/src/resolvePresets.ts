@@ -103,12 +103,14 @@ function resolvePresetsInternal(
     );
     mergePreset(finalPreset, resolvedPreset, seenPluginNames, depth);
   }
+
   if (finalPreset.plugins) {
     finalPreset.plugins = sortWithBeforeAfterProvides(
       finalPreset.plugins,
       "name",
     );
   }
+
   return finalPreset;
 }
 
@@ -227,7 +229,10 @@ function resolvePresetInternal(
     }
   } catch (e) {
     throw new Error(
-      `Error occurred when resolving preset: ${e}\nPreset: ${inspect(preset)}`,
+      `Error occurred when resolving preset:\n  ${String(e).replace(
+        /\n/g,
+        "\n  ",
+      )}\nPreset: ${inspect(preset)}`,
     );
   }
 
@@ -243,7 +248,10 @@ function resolvePresetInternal(
     return basePreset;
   } catch (e) {
     throw new Error(
-      `Error occurred when resolving preset: ${e}\nPreset: ${inspect(preset)}`,
+      `Error occurred when resolving preset:\n  ${String(e).replace(
+        /\n/g,
+        "\n  ",
+      )}\nPreset: ${inspect(preset)}`,
     );
   }
 }
