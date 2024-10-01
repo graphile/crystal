@@ -700,7 +700,15 @@ export function loadOne<
   ioEquivalence:
     | null
     | string
-    | { [key in keyof UnwrapMultistep<TMultistep>]?: string | null },
+    | (UnwrapMultistep<TMultistep> extends readonly [...(readonly any[])]
+        ? {
+            [key in Exclude<keyof UnwrapMultistep<TMultistep>, keyof any[]>]:
+              | string
+              | null;
+          }
+        : UnwrapMultistep<TMultistep> extends Record<string, any>
+        ? { [key in keyof UnwrapMultistep<TMultistep>]?: string | null }
+        : never),
   loadCallback: LoadOneCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
