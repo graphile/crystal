@@ -1129,3 +1129,9 @@ export function exportNameHint(obj: any, nameHint: string): void {
     }
   }
 }
+
+export function isTuple<T extends readonly [...(readonly any[])]>(
+  t: any | T,
+): t is T {
+  return Array.isArray(t);
+}

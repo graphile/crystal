@@ -8,7 +8,7 @@ import type {
 import type { Multistep, UnwrapMultistep } from "../multistep.js";
 import { isMultistep, multistep } from "../multistep.js";
 import { ExecutableStep, isListLikeStep, isObjectLikeStep } from "../step.js";
-import { arrayOfLength, canonicalJSONStringify } from "../utils.js";
+import { arrayOfLength, canonicalJSONStringify, isTuple } from "../utils.js";
 import { access } from "./access.js";
 
 export interface LoadOptions<
@@ -198,10 +198,7 @@ export class LoadStep<
   constructor(
     spec: TMultistep,
     unarySpec: TUnaryMultistep | null,
-    private ioEquivalence:
-      | null
-      | string
-      | { [key in keyof UnwrapMultistep<TMultistep>]?: string | null },
+    private ioEquivalence: IOEquivalence<TMultistep>,
     private load: LoadCallback<
       UnwrapMultistep<TMultistep>,
       TItem,
@@ -229,7 +226,7 @@ export class LoadStep<
     } else if (typeof this.ioEquivalence === "string") {
       map[this.ioEquivalence] = $spec;
       return map;
-    } else if (Array.isArray(this.ioEquivalence)) {
+    } else if (isTuple(this.ioEquivalence)) {
       for (let i = 0, l = this.ioEquivalence.length; i < l; i++) {
         const key = this.ioEquivalence[i];
         map[key] = isListLikeStep($spec) ? $spec.at(i) : access($spec, [i]);
@@ -237,8 +234,7 @@ export class LoadStep<
       return map;
     } else if (typeof this.ioEquivalence === "object") {
       for (const key of Object.keys(this.ioEquivalence)) {
-        const attr =
-          this.ioEquivalence[key as keyof UnwrapMultistep<TMultistep>];
+        const attr = this.ioEquivalence[key as any];
         if (attr != null) {
           map[attr] = isObjectLikeStep($spec)
             ? $spec.get(key)
@@ -444,10 +440,7 @@ function load<
 >(
   spec: TMultistep,
   unarySpec: TUnaryMultistep | null,
-  ioEquivalence:
-    | null
-    | string
-    | { [key in keyof UnwrapMultistep<TMultistep>]?: string | null },
+  ioEquivalence: IOEquivalence<TMultistep>,
   loadCallback: LoadCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
@@ -486,14 +479,7 @@ export function loadMany<
   const TUnaryMultistep extends Multistep = never,
 >(
   spec: TMultistep,
-  ioEquivalence:
-    | null
-    | string
-    | (UnwrapMultistep<TMultistep> extends [...any[]]
-        ? { [key in keyof UnwrapMultistep<TMultistep>]: string | null }
-        : UnwrapMultistep<TMultistep> extends Record<string, any>
-        ? { [key in keyof UnwrapMultistep<TMultistep>]?: string | null }
-        : never),
+  ioEquivalence: IOEquivalence<TMultistep>,
   loadCallback: LoadManyCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
@@ -536,14 +522,7 @@ export function loadMany<
 >(
   spec: TMultistep,
   unarySpec: TUnaryMultistep | null,
-  ioEquivalence:
-    | null
-    | string
-    | (UnwrapMultistep<TMultistep> extends [...any[]]
-        ? { [key in keyof UnwrapMultistep<TMultistep>]: string | null }
-        : UnwrapMultistep<TMultistep> extends Record<string, any>
-        ? { [key in keyof UnwrapMultistep<TMultistep>]?: string | null }
-        : never),
+  ioEquivalence: IOEquivalence<TMultistep>,
   loadCallback: LoadManyCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
@@ -596,10 +575,7 @@ export function loadMany<
     return load(
       spec,
       loadCallbackOrIoEquivalenceOrUnarySpec as TUnaryMultistep | null,
-      loadCallbackOrIoEquivalence as
-        | null
-        | string
-        | { [key in keyof UnwrapMultistep<TMultistep>]?: string | null },
+      loadCallbackOrIoEquivalence as IOEquivalence<TMultistep>,
       loadCallbackOnly as LoadManyCallback<
         UnwrapMultistep<TMultistep>,
         TItem,
@@ -641,7 +617,7 @@ export function loadMany<
     return load(
       spec,
       null,
-      loadCallbackOrIoEquivalenceOrUnarySpec,
+      loadCallbackOrIoEquivalenceOrUnarySpec as IOEquivalence<TMultistep>,
       loadCallbackOrIoEquivalence as LoadManyCallback<
         UnwrapMultistep<TMultistep>,
         TItem,
@@ -678,6 +654,19 @@ export function loadMany<
   }
 }
 
+type IOEquivalence<TMultistep extends Multistep> =
+  | null
+  | string
+  | (UnwrapMultistep<TMultistep> extends readonly [...(readonly any[])]
+      ? {
+          [key in Exclude<keyof UnwrapMultistep<TMultistep>, keyof any[]>]:
+            | string
+            | null;
+        }
+      : UnwrapMultistep<TMultistep> extends Record<string, any>
+      ? { [key in keyof UnwrapMultistep<TMultistep>]?: string | null }
+      : never);
+
 export function loadOne<
   const TMultistep extends Multistep,
   TItem,
@@ -697,18 +686,7 @@ export function loadOne<
   TParams extends Record<string, any> = Record<string, any>,
 >(
   spec: TMultistep,
-  ioEquivalence:
-    | null
-    | string
-    | (UnwrapMultistep<TMultistep> extends readonly [...(readonly any[])]
-        ? {
-            [key in Exclude<keyof UnwrapMultistep<TMultistep>, keyof any[]>]:
-              | string
-              | null;
-          }
-        : UnwrapMultistep<TMultistep> extends Record<string, any>
-        ? { [key in keyof UnwrapMultistep<TMultistep>]?: string | null }
-        : never),
+  ioEquivalence: IOEquivalence<TMultistep>,
   loadCallback: LoadOneCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
@@ -739,10 +717,7 @@ export function loadOne<
 >(
   spec: TMultistep,
   unarySpec: TUnaryMultistep | null,
-  ioEquivalence:
-    | null
-    | string
-    | { [key in keyof UnwrapMultistep<TMultistep>]?: string | null },
+  ioEquivalence: IOEquivalence<TMultistep>,
   loadCallback: LoadOneCallback<
     UnwrapMultistep<TMultistep>,
     TItem,
@@ -789,10 +764,7 @@ export function loadOne<
     return load(
       spec,
       loadCallbackOrIoEquivalenceOrUnarySpec as TUnaryMultistep | null,
-      loadCallbackOrIoEquivalence as
-        | null
-        | string
-        | { [key in keyof UnwrapMultistep<TMultistep>]?: string | null },
+      loadCallbackOrIoEquivalence as IOEquivalence<TMultistep>,
       loadCallbackOnly as LoadOneCallback<
         UnwrapMultistep<TMultistep>,
         TItem,
@@ -822,7 +794,7 @@ export function loadOne<
     return load(
       spec,
       null,
-      loadCallbackOrIoEquivalenceOrUnarySpec,
+      loadCallbackOrIoEquivalenceOrUnarySpec as IOEquivalence<TMultistep>,
       loadCallbackOrIoEquivalence as LoadOneCallback<
         UnwrapMultistep<TMultistep>,
         TItem,

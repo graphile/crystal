@@ -2,6 +2,7 @@ import { ExecutableStep } from "./step.js";
 import { constant } from "./steps/constant.js";
 import { list } from "./steps/list.js";
 import { object } from "./steps/object.js";
+import { isTuple } from "./utils.js";
 
 /**
  * When using this, always use `const`! Otherwise tuples will show up as arrays
@@ -49,10 +50,6 @@ export function multistep<const TMultistepSpec extends Multistep>(
   } else {
     return object(spec) as any;
   }
-}
-
-function isTuple<T extends readonly [...(readonly any[])]>(t: any | T): t is T {
-  return Array.isArray(t);
 }
 
 export function isMultistep<const TMultistepSpec extends Multistep>(
