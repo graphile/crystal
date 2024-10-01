@@ -67,12 +67,6 @@ export function resolvePresets(presets: ReadonlyArray<GraphileConfig.Preset>) {
 
   const seenPlugins = new Set<GraphileConfig.Plugin>();
   const resolvedPreset = resolvePresetsInternal(presets, seenPlugins, 0);
-  if (resolvedPreset.plugins) {
-    resolvedPreset.plugins = sortWithBeforeAfterProvides(
-      resolvedPreset.plugins,
-      "name",
-    );
-  }
 
   const seenNames = [...seenPlugins].map((p) => p.name);
   const disabledButNotSeen = resolvedPreset.disablePlugins?.filter(
@@ -104,6 +98,12 @@ function resolvePresetsInternal(
       depth + 1,
     );
     mergePreset(finalPreset, resolvedPreset, seenPlugins, depth);
+  }
+  if (finalPreset.plugins) {
+    finalPreset.plugins = sortWithBeforeAfterProvides(
+      finalPreset.plugins,
+      "name",
+    );
   }
   return finalPreset;
 }
