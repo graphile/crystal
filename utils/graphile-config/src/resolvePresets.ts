@@ -257,6 +257,7 @@ function mergePreset(
   const sourcePluginNames: string[] = [];
   if (sourcePreset.plugins) {
     for (const plugin of sourcePreset.plugins) {
+      assertPlugin(plugin);
       seenPlugins.add(plugin);
       sourcePluginNames.push(plugin.name);
     }
