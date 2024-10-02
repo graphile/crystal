@@ -81,6 +81,12 @@ export function evalDirectiveArgDirect<T = unknown>(
       case "IntValue": {
         return parseInt(value.value, 10) as any;
       }
+      case "FloatValue": {
+        return parseFloat(value.value) as any;
+      }
+      case "StringValue": {
+        return value.value as any;
+      }
       case "NullValue": {
         return null as any;
       }
