@@ -1960,12 +1960,12 @@ type CLeftArmIdentityPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
+  leftArm: CLeftArm
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  result: CLeftArm
 }
 
 """An input for mutations affecting `CLeftArm`"""

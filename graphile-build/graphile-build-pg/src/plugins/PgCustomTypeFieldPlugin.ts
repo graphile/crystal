@@ -344,8 +344,8 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
       scalarFunctionEdgeType(options, details) {
         return this.edgeType(this.upperCamelCase(this._functionName(details)));
       },
-      functionMutationResultFieldName(_options, _details) {
-        return "result";
+      functionMutationResultFieldName(_options, details) {
+        return details.resource.extensions?.tags?.resultFieldName ?? "result";
       },
     },
   },
