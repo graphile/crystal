@@ -78,6 +78,7 @@ strings and not numbers.
 """
 scalar BigInt
 
+"""Represents the colours red, green and blue."""
 enum Color {
   BLUE
   GREEN

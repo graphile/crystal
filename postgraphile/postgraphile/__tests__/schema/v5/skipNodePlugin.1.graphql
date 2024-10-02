@@ -315,6 +315,7 @@ type BAuthenticatePayloadPayload {
   result: BAuthPayload
 }
 
+"""Represents the colours red, green and blue."""
 enum BColor {
   blue
   green

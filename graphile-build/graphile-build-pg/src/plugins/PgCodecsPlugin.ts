@@ -1196,6 +1196,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 typeName,
                 {},
                 () => ({
+                  description: build.wrapDescription(codec.description, "type"),
                   values,
                 }),
                 "PgCodecsPlugin",

@@ -181,6 +181,8 @@ create type b.color as enum ('red', 'green', 'blue');
 create type b.enum_caps as enum ('FOO_BAR', 'BAR_FOO', 'BAZ_QUX', '0_BAR');
 create type b.enum_with_empty_string as enum ('', 'one', 'two');
 
+comment on type b.color is E'Represents the colours red, green and blue.';
+
 create type c.compound_type as (
   a int,
   b text,

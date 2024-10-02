@@ -1479,7 +1479,7 @@ const colorCodec = enumCodec({
   name: "color",
   identifier: sql.identifier("b", "color"),
   values: ["red", "green", "blue"],
-  description: undefined,
+  description: "Represents the colours red, green and blue.",
   extensions: {
     pg: {
       serviceName: "main",
@@ -16798,6 +16798,7 @@ type CompoundType {
   fooBar: Int
 }
 
+"""Represents the colours red, green and blue."""
 enum Color {
   RED
   GREEN

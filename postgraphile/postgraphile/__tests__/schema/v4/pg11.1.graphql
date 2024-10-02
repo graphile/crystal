@@ -148,6 +148,7 @@ input ByDefaultAsIdentityPatch {
   t: String
 }
 
+"""Represents the colours red, green and blue."""
 enum Color {
   BLUE
   GREEN
