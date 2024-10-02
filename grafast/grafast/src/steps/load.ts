@@ -97,7 +97,7 @@ let loadCounter = 0;
  */
 export class LoadedRecordStep<
   TItem,
-  TParams extends Record<string, any>,
+  TParams extends Record<string, any> = Record<string, any>,
 > extends ExecutableStep<TItem> {
   static $$export = {
     moduleName: "grafast",
@@ -208,9 +208,10 @@ export class LoadStep<
     >,
   ) {
     super();
-    const $spec = multistep(spec);
+    const $spec = multistep(spec, "load");
     this.addDependency($spec);
-    const $unarySpec = unarySpec == null ? null : multistep(unarySpec);
+    const $unarySpec =
+      unarySpec == null ? null : multistep(unarySpec, "loadUnary");
     if ($unarySpec) {
       this.unaryDepId = this.addUnaryDependency($unarySpec);
     }

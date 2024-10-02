@@ -38,17 +38,37 @@ export type UnwrapMultistep<TMultistepSpec extends Multistep> =
           : never;
       };
 
+interface MultistepCacheConfig {
+  identifier: string;
+  cacheSize: number;
+}
+
 export function multistep<const TMultistepSpec extends Multistep>(
   spec: TMultistepSpec,
+  stable?: string | true | MultistepCacheConfig,
 ): ExecutableStep<UnwrapMultistep<TMultistepSpec>> {
   if (spec == null) {
     return constant(spec) as any;
   } else if (spec instanceof ExecutableStep) {
     return spec;
   } else if (isTuple(spec)) {
-    return list(spec) as any;
+    const config =
+      stable === true
+        ? { identifier: `multistep` }
+        : typeof stable === "string"
+        ? { identifier: stable }
+        : stable;
+    const $step = list(spec, config);
+    return $step as any;
   } else {
-    return object(spec) as any;
+    const config =
+      stable === true
+        ? { identifier: `multistep` }
+        : typeof stable === "string"
+        ? { identifier: stable }
+        : stable;
+    const $step = object(spec, config);
+    return $step as any;
   }
 }
 
