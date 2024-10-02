@@ -37,6 +37,11 @@ export interface ObjectPlanMeta<
   results: Results<TSteps>;
 }
 
+interface ObjectStepCacheConfig {
+  identifier?: string;
+  cacheSize?: number;
+}
+
 /**
  * A plan that represents an object using the keys given and the values being
  * the results of the associated plans.
@@ -59,10 +64,14 @@ export class ObjectStep<
 
   // Optimize needs the same 'meta' for all ObjectSteps
   optimizeMetaKey = "ObjectStep";
+  private cacheSize: number;
 
-  constructor(obj: TPlans) {
+  constructor(obj: TPlans, cacheConfig?: ObjectStepCacheConfig) {
     super();
-    this.metaKey = this.id;
+    this.metaKey = cacheConfig?.identifier
+      ? `object|${JSON.stringify(Object.keys(obj))}|${cacheConfig.identifier}`
+      : this.id;
+    this.cacheSize = cacheConfig?.cacheSize ?? 10;
     this.keys = Object.keys(obj);
     for (let i = 0, l = this.keys.length; i < l; i++) {
       this.addDependency({ step: obj[this.keys[i]], skipDeduplication: true });
@@ -172,12 +181,13 @@ ${te.join(
   "",
 )}\
 `;
-    return te.runInBatch<Parameters<typeof callback>[0]>(
-      te`\
+    if (this.cacheSize > 0) {
+      return te.runInBatch<Parameters<typeof callback>[0]>(
+        te`\
 (function ({ meta }, ${te.join(
-        this.keys.map((_k, i) => te.identifier(`val${i}`)),
-        ", ",
-      )}) {
+          this.keys.map((_k, i) => te.identifier(`val${i}`)),
+          ", ",
+        )}) {
   if (meta.nextIndex) {
     for (let i = 0, l = meta.results.length; i < l; i++) {
       const [values, obj] = meta.results[i];
@@ -202,11 +212,26 @@ ${inner}
     ",",
   )}], newObj];
   // Only cache 10 results, use a round-robin
-  meta.nextIndex = meta.nextIndex === 9 ? 0 : meta.nextIndex + 1;
+  meta.nextIndex = meta.nextIndex === ${te.lit(
+    this.cacheSize - 1,
+  )} ? 0 : meta.nextIndex + 1;
   return newObj;
 })`,
-      callback,
-    );
+        callback,
+      );
+    } else {
+      return te.runInBatch<Parameters<typeof callback>[0]>(
+        te`\
+(function (_, ${te.join(
+          this.keys.map((_k, i) => te.identifier(`val${i}`)),
+          ", ",
+        )}) {
+${inner}
+  return newObj;
+})`,
+        callback,
+      );
+    }
   }
 
   finalize() {
@@ -295,6 +320,7 @@ ${inner}
  */
 export function object<TPlans extends { [key: string]: ExecutableStep }>(
   obj: TPlans,
+  cacheConfig?: ObjectStepCacheConfig,
 ): ObjectStep<TPlans> {
-  return new ObjectStep<TPlans>(obj);
+  return new ObjectStep<TPlans>(obj, cacheConfig);
 }

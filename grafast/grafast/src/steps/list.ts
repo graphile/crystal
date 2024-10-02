@@ -8,6 +8,11 @@ import type { ExecutableStep } from "../step.js";
 import { UnbatchedExecutableStep } from "../step.js";
 import { constant, ConstantStep } from "./constant.js";
 
+interface ListStepCacheConfig {
+  identifier?: string;
+  cacheSize?: number;
+}
+
 export class ListStep<
   const TPlanTuple extends readonly ExecutableStep[],
 > extends UnbatchedExecutableStep<UnwrapPlanTuple<TPlanTuple>> {
@@ -18,9 +23,14 @@ export class ListStep<
   isSyncAndSafe = true;
   allowMultipleOptimizations = true;
   optimizeMetaKey = "ListStep";
+  private cacheSize: number;
 
-  constructor(list: TPlanTuple) {
+  constructor(list: TPlanTuple, cacheConfig?: ListStepCacheConfig) {
     super();
+    this.metaKey = cacheConfig?.identifier
+      ? `list|${list.length}|${cacheConfig.identifier}`
+      : this.id;
+    this.cacheSize = cacheConfig?.cacheSize ?? 10;
     for (let i = 0, l = list.length; i < l; i++) {
       this.addDependency({ step: list[i], skipDeduplication: true });
     }
@@ -103,6 +113,7 @@ export class ListStep<
  */
 export function list<const TPlanTuple extends readonly ExecutableStep[]>(
   list: TPlanTuple,
+  cacheConfig?: ListStepCacheConfig,
 ): ListStep<TPlanTuple> {
-  return new ListStep<TPlanTuple>(list);
+  return new ListStep<TPlanTuple>(list, cacheConfig);
 }
