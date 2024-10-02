@@ -90,6 +90,60 @@ enum ApplicationsOrderBy {
   NATURAL
 }
 
+type AwsApplication implements Application {
+  awsId: String
+  id: Int!
+  lastDeployed: Datetime
+  name: String!
+
+  """
+  Reads a single `Organization` that is related to this `AwsApplication`.
+  """
+  organizationByOrganizationId: Organization
+  organizationId: Int
+
+  """
+  Reads a single `PersonOrOrganization` that is related to this `AwsApplication`.
+  """
+  owner: PersonOrOrganization
+
+  """Reads a single `Person` that is related to this `AwsApplication`."""
+  personByPersonId: Person
+  personId: Int
+
+  """Reads and enables pagination through a set of `Vulnerability`."""
+  vulnerabilities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: VulnerabilityCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering `Vulnerability`."""
+    orderBy: [VulnerabilitiesOrderBy!]
+  ): VulnerabilitiesConnection!
+}
+
 """
 A signed eight-byte integer. The upper big integer values are greater than the
 max value for a JavaScript number. Therefore all big integers will be output as
@@ -108,6 +162,101 @@ that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
 to unexpected results.
 """
 scalar Datetime
+
+type FirstPartyVulnerability implements Vulnerability {
+  """Reads and enables pagination through a set of `Application`."""
+  applications(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering `Application`."""
+    orderBy: [ApplicationsOrderBy!]
+  ): ApplicationsConnection!
+  cvssScore: Float!
+  id: Int!
+  name: String!
+
+  """Reads and enables pagination through a set of `PersonOrOrganization`."""
+  owners: PersonOrOrganizationConnection!
+  teamName: String
+}
+
+type GcpApplication implements Application {
+  gcpId: String
+  id: Int!
+  lastDeployed: Datetime
+  name: String!
+
+  """
+  Reads a single `Organization` that is related to this `GcpApplication`.
+  """
+  organizationByOrganizationId: Organization
+  organizationId: Int
+
+  """
+  Reads a single `PersonOrOrganization` that is related to this `GcpApplication`.
+  """
+  owner: PersonOrOrganization
+
+  """Reads a single `Person` that is related to this `GcpApplication`."""
+  personByPersonId: Person
+  personId: Int
+
+  """Reads and enables pagination through a set of `Vulnerability`."""
+  vulnerabilities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: VulnerabilityCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering `Vulnerability`."""
+    orderBy: [VulnerabilitiesOrderBy!]
+  ): VulnerabilitiesConnection!
+}
 
 enum ItemType {
   CHECKLIST
@@ -4235,6 +4384,47 @@ type SingleTableTopic implements SingleTableItem {
   title: String!
   type: ItemType!
   updatedAt: Datetime!
+}
+
+type ThirdPartyVulnerability implements Vulnerability {
+  """Reads and enables pagination through a set of `Application`."""
+  applications(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering `Application`."""
+    orderBy: [ApplicationsOrderBy!]
+  ): ApplicationsConnection!
+  cvssScore: Float!
+  id: Int!
+  name: String!
+
+  """Reads and enables pagination through a set of `PersonOrOrganization`."""
+  owners: PersonOrOrganizationConnection!
+  vendorName: String
 }
 
 """A connection to a list of `Vulnerability` values."""

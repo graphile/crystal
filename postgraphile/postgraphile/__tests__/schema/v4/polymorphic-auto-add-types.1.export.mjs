@@ -3,6 +3,39 @@ import { ConnectionStep, SafeError, assertEdgeCapableStep, assertPageInfoCapable
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
+const ApplicationAttributes = Object.assign(Object.create(null), {
+  id: {
+    description: undefined,
+    codec: TYPES.int,
+    notNull: true,
+    hasDefault: false,
+    extensions: {
+      tags: {
+        notNull: true
+      }
+    }
+  },
+  name: {
+    description: undefined,
+    codec: TYPES.text,
+    notNull: true,
+    hasDefault: false,
+    extensions: {
+      tags: {
+        notNull: true
+      }
+    }
+  },
+  last_deployed: {
+    description: undefined,
+    codec: TYPES.timestamptz,
+    notNull: false,
+    hasDefault: false,
+    extensions: {
+      tags: {}
+    }
+  }
+});
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -2097,86 +2130,6 @@ const spec_relationalItems = {
   }
 };
 const relationalItemsCodec = recordCodec(spec_relationalItems);
-const spec_Application = {
-  name: "Application",
-  identifier: sql.identifier("polymorphic", "applications"),
-  attributes: Object.assign(Object.create(null), {
-    id: {
-      description: undefined,
-      codec: TYPES.int,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {
-          notNull: true
-        }
-      }
-    },
-    name: {
-      description: undefined,
-      codec: TYPES.text,
-      notNull: true,
-      hasDefault: false,
-      extensions: {
-        tags: {
-          notNull: true
-        }
-      }
-    },
-    last_deployed: {
-      description: undefined,
-      codec: TYPES.timestamptz,
-      notNull: false,
-      hasDefault: false,
-      extensions: {
-        tags: {}
-      }
-    }
-  }),
-  description: undefined,
-  extensions: {
-    isTableLike: false,
-    pg: {
-      serviceName: "main",
-      schemaName: "polymorphic",
-      name: "applications"
-    },
-    tags: Object.assign(Object.create(null), {
-      interface: "mode:union",
-      name: "Application",
-      behavior: "node",
-      ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"]
-    }),
-    refDefinitions: Object.assign(Object.create(null), {
-      vulnerabilities: {
-        singular: false,
-        graphqlType: "Vulnerability",
-        sourceGraphqlType: undefined,
-        extensions: {
-          via: undefined,
-          tags: {
-            behavior: undefined
-          }
-        }
-      },
-      owner: {
-        singular: true,
-        graphqlType: "PersonOrOrganization",
-        sourceGraphqlType: undefined,
-        extensions: {
-          via: undefined,
-          tags: {
-            behavior: undefined
-          }
-        }
-      }
-    })
-  },
-  executor: executor,
-  polymorphism: {
-    mode: "union"
-  }
-};
 const spec_Vulnerability = {
   name: "Vulnerability",
   identifier: sql.identifier("polymorphic", "vulnerabilities"),
@@ -3097,7 +3050,54 @@ const registryConfig = {
     relationalItems: relationalItemsCodec,
     varchar: TYPES.varchar,
     bpchar: TYPES.bpchar,
-    Application: recordCodec(spec_Application),
+    Application: recordCodec({
+      name: "Application",
+      identifier: sql.identifier("polymorphic", "applications"),
+      attributes: ApplicationAttributes,
+      description: undefined,
+      extensions: {
+        isTableLike: false,
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "applications"
+        },
+        tags: Object.assign(Object.create(null), {
+          interface: "mode:union",
+          name: "Application",
+          behavior: "node",
+          ref: ["vulnerabilities to:Vulnerability plural", "owner to:PersonOrOrganization singular"]
+        }),
+        refDefinitions: Object.assign(Object.create(null), {
+          vulnerabilities: {
+            singular: false,
+            graphqlType: "Vulnerability",
+            sourceGraphqlType: undefined,
+            extensions: {
+              via: undefined,
+              tags: {
+                behavior: undefined
+              }
+            }
+          },
+          owner: {
+            singular: true,
+            graphqlType: "PersonOrOrganization",
+            sourceGraphqlType: undefined,
+            extensions: {
+              via: undefined,
+              tags: {
+                behavior: undefined
+              }
+            }
+          }
+        })
+      },
+      executor: executor,
+      polymorphism: {
+        mode: "union"
+      }
+    }),
     Vulnerability: recordCodec(spec_Vulnerability),
     ZeroImplementation: recordCodec(spec_ZeroImplementation)
   }),
@@ -4275,8 +4275,62 @@ const registryConfig = {
   })
 };
 const registry = makeRegistry(registryConfig);
-const otherSource_peoplePgResource = registry.pgResources["people"];
-const otherSource_single_table_itemsPgResource = registry.pgResources["single_table_items"];
+const members_0_resource_aws_application_first_party_vulnerabilitiesPgResource = registry.pgResources["aws_application_first_party_vulnerabilities"];
+const members_1_resource_gcp_application_first_party_vulnerabilitiesPgResource = registry.pgResources["gcp_application_first_party_vulnerabilities"];
+const members = [{
+  resource: members_0_resource_aws_application_first_party_vulnerabilitiesPgResource,
+  typeName: "AwsApplication",
+  path: [{
+    relationName: "awsApplicationsByMyAwsApplicationId"
+  }]
+}, {
+  resource: members_1_resource_gcp_application_first_party_vulnerabilitiesPgResource,
+  typeName: "GcpApplication",
+  path: [{
+    relationName: "gcpApplicationsByMyGcpApplicationId"
+  }]
+}];
+const paths_0_resource_aws_applicationsPgResource = registry.pgResources["aws_applications"];
+const paths_1_resource_gcp_applicationsPgResource = registry.pgResources["gcp_applications"];
+const paths = [{
+  resource: paths_0_resource_aws_applicationsPgResource,
+  hasReferencee: true,
+  isUnique: false,
+  layers: [{
+    relationName: "awsApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId",
+    localAttributes: registryConfig.pgRelations.firstPartyVulnerabilities.awsApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.firstPartyVulnerabilities.awsApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId.remoteAttributes,
+    resource: members_0_resource_aws_application_first_party_vulnerabilitiesPgResource,
+    isUnique: false
+  }, {
+    relationName: "awsApplicationsByMyAwsApplicationId",
+    localAttributes: registryConfig.pgRelations.awsApplicationFirstPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.awsApplicationFirstPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.remoteAttributes,
+    resource: paths_0_resource_aws_applicationsPgResource,
+    isUnique: true
+  }]
+}, {
+  resource: paths_1_resource_gcp_applicationsPgResource,
+  hasReferencee: true,
+  isUnique: false,
+  layers: [{
+    relationName: "gcpApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId",
+    localAttributes: registryConfig.pgRelations.firstPartyVulnerabilities.gcpApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.firstPartyVulnerabilities.gcpApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId.remoteAttributes,
+    resource: members_1_resource_gcp_application_first_party_vulnerabilitiesPgResource,
+    isUnique: false
+  }, {
+    relationName: "gcpApplicationsByMyGcpApplicationId",
+    localAttributes: registryConfig.pgRelations.gcpApplicationFirstPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.gcpApplicationFirstPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.remoteAttributes,
+    resource: paths_1_resource_gcp_applicationsPgResource,
+    isUnique: true
+  }]
+}];
+const resourceByTypeName = Object.assign(Object.create(null), {
+  AwsApplication: paths_0_resource_aws_applicationsPgResource,
+  GcpApplication: paths_1_resource_gcp_applicationsPgResource
+});
 const applyOrderToPlan = ($select, $value, TableOrderByType) => {
   if (!("evalLength" in $value)) {
     return;
@@ -4297,89 +4351,585 @@ const applyOrderToPlan = ($select, $value, TableOrderByType) => {
     plan($select);
   }
 };
-const otherSource_single_table_item_relationsPgResource = registry.pgResources["single_table_item_relations"];
-const otherSource_single_table_item_relation_composite_pksPgResource = registry.pgResources["single_table_item_relation_composite_pks"];
-function BigIntSerialize(value) {
+const attributes = {};
+const members2 = [{
+  resource: members_0_resource_aws_application_first_party_vulnerabilitiesPgResource,
+  typeName: "Person",
+  path: [{
+    relationName: "awsApplicationsByMyAwsApplicationId"
+  }, {
+    relationName: "peopleByMyPersonId"
+  }]
+}, {
+  resource: members_0_resource_aws_application_first_party_vulnerabilitiesPgResource,
+  typeName: "Organization",
+  path: [{
+    relationName: "awsApplicationsByMyAwsApplicationId"
+  }, {
+    relationName: "organizationsByMyOrganizationId"
+  }]
+}, {
+  resource: members_1_resource_gcp_application_first_party_vulnerabilitiesPgResource,
+  typeName: "Person",
+  path: [{
+    relationName: "gcpApplicationsByMyGcpApplicationId"
+  }, {
+    relationName: "peopleByMyPersonId"
+  }]
+}, {
+  resource: members_1_resource_gcp_application_first_party_vulnerabilitiesPgResource,
+  typeName: "Organization",
+  path: [{
+    relationName: "gcpApplicationsByMyGcpApplicationId"
+  }, {
+    relationName: "organizationsByMyOrganizationId"
+  }]
+}];
+const paths_0_resource_peoplePgResource = registry.pgResources["people"];
+const paths_1_resource_organizationsPgResource = registry.pgResources["organizations"];
+const paths2 = [{
+  resource: paths_0_resource_peoplePgResource,
+  hasReferencee: true,
+  isUnique: false,
+  layers: [{
+    relationName: "awsApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId",
+    localAttributes: registryConfig.pgRelations.firstPartyVulnerabilities.awsApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.firstPartyVulnerabilities.awsApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId.remoteAttributes,
+    resource: members_0_resource_aws_application_first_party_vulnerabilitiesPgResource,
+    isUnique: false
+  }, {
+    relationName: "awsApplicationsByMyAwsApplicationId",
+    localAttributes: registryConfig.pgRelations.awsApplicationFirstPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.awsApplicationFirstPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.remoteAttributes,
+    resource: paths_0_resource_aws_applicationsPgResource,
+    isUnique: true
+  }, {
+    relationName: "peopleByMyPersonId",
+    localAttributes: registryConfig.pgRelations.awsApplications.peopleByMyPersonId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.awsApplications.peopleByMyPersonId.remoteAttributes,
+    resource: paths_0_resource_peoplePgResource,
+    isUnique: true
+  }]
+}, {
+  resource: paths_1_resource_organizationsPgResource,
+  hasReferencee: true,
+  isUnique: false,
+  layers: [{
+    relationName: "awsApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId",
+    localAttributes: registryConfig.pgRelations.firstPartyVulnerabilities.awsApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.firstPartyVulnerabilities.awsApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId.remoteAttributes,
+    resource: members_0_resource_aws_application_first_party_vulnerabilitiesPgResource,
+    isUnique: false
+  }, {
+    relationName: "awsApplicationsByMyAwsApplicationId",
+    localAttributes: registryConfig.pgRelations.awsApplicationFirstPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.awsApplicationFirstPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.remoteAttributes,
+    resource: paths_0_resource_aws_applicationsPgResource,
+    isUnique: true
+  }, {
+    relationName: "organizationsByMyOrganizationId",
+    localAttributes: registryConfig.pgRelations.awsApplications.organizationsByMyOrganizationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.awsApplications.organizationsByMyOrganizationId.remoteAttributes,
+    resource: paths_1_resource_organizationsPgResource,
+    isUnique: true
+  }]
+}, {
+  resource: paths_0_resource_peoplePgResource,
+  hasReferencee: true,
+  isUnique: false,
+  layers: [{
+    relationName: "gcpApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId",
+    localAttributes: registryConfig.pgRelations.firstPartyVulnerabilities.gcpApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.firstPartyVulnerabilities.gcpApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId.remoteAttributes,
+    resource: members_1_resource_gcp_application_first_party_vulnerabilitiesPgResource,
+    isUnique: false
+  }, {
+    relationName: "gcpApplicationsByMyGcpApplicationId",
+    localAttributes: registryConfig.pgRelations.gcpApplicationFirstPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.gcpApplicationFirstPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.remoteAttributes,
+    resource: paths_1_resource_gcp_applicationsPgResource,
+    isUnique: true
+  }, {
+    relationName: "peopleByMyPersonId",
+    localAttributes: registryConfig.pgRelations.gcpApplications.peopleByMyPersonId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.gcpApplications.peopleByMyPersonId.remoteAttributes,
+    resource: paths_0_resource_peoplePgResource,
+    isUnique: true
+  }]
+}, {
+  resource: paths_1_resource_organizationsPgResource,
+  hasReferencee: true,
+  isUnique: false,
+  layers: [{
+    relationName: "gcpApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId",
+    localAttributes: registryConfig.pgRelations.firstPartyVulnerabilities.gcpApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.firstPartyVulnerabilities.gcpApplicationFirstPartyVulnerabilitiesByTheirFirstPartyVulnerabilityId.remoteAttributes,
+    resource: members_1_resource_gcp_application_first_party_vulnerabilitiesPgResource,
+    isUnique: false
+  }, {
+    relationName: "gcpApplicationsByMyGcpApplicationId",
+    localAttributes: registryConfig.pgRelations.gcpApplicationFirstPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.gcpApplicationFirstPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.remoteAttributes,
+    resource: paths_1_resource_gcp_applicationsPgResource,
+    isUnique: true
+  }, {
+    relationName: "organizationsByMyOrganizationId",
+    localAttributes: registryConfig.pgRelations.gcpApplications.organizationsByMyOrganizationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.gcpApplications.organizationsByMyOrganizationId.remoteAttributes,
+    resource: paths_1_resource_organizationsPgResource,
+    isUnique: true
+  }]
+}];
+const resourceByTypeName2 = Object.assign(Object.create(null), {
+  Person: paths_0_resource_peoplePgResource,
+  Organization: paths_1_resource_organizationsPgResource
+});
+function DatetimeSerialize(value) {
   return "" + value;
 }
 const otherSource_log_entriesPgResource = registry.pgResources["log_entries"];
-const otherSource_relational_itemsPgResource = registry.pgResources["relational_items"];
-const members_0_resource_aws_applicationsPgResource = registry.pgResources["aws_applications"];
-const members_1_resource_gcp_applicationsPgResource = registry.pgResources["gcp_applications"];
-const members = [{
-  resource: members_0_resource_aws_applicationsPgResource,
-  typeName: "AwsApplication",
-  path: []
-}, {
-  resource: members_1_resource_gcp_applicationsPgResource,
-  typeName: "GcpApplication",
-  path: []
-}];
-const paths = [{
-  resource: members_0_resource_aws_applicationsPgResource,
-  hasReferencee: true,
-  isUnique: false,
-  layers: [{
-    relationName: "awsApplicationsByTheirPersonId",
-    localAttributes: registryConfig.pgRelations.people.awsApplicationsByTheirPersonId.localAttributes,
-    remoteAttributes: registryConfig.pgRelations.people.awsApplicationsByTheirPersonId.remoteAttributes,
-    resource: members_0_resource_aws_applicationsPgResource,
-    isUnique: false
-  }]
-}, {
-  resource: members_1_resource_gcp_applicationsPgResource,
-  hasReferencee: true,
-  isUnique: false,
-  layers: [{
-    relationName: "gcpApplicationsByTheirPersonId",
-    localAttributes: registryConfig.pgRelations.people.gcpApplicationsByTheirPersonId.localAttributes,
-    remoteAttributes: registryConfig.pgRelations.people.gcpApplicationsByTheirPersonId.remoteAttributes,
-    resource: members_1_resource_gcp_applicationsPgResource,
-    isUnique: false
-  }]
-}];
-const resourceByTypeName = Object.assign(Object.create(null), {
-  AwsApplication: members_0_resource_aws_applicationsPgResource,
-  GcpApplication: members_1_resource_gcp_applicationsPgResource
-});
-const otherSource_organizationsPgResource = registry.pgResources["organizations"];
-const attributes = {};
-const members2 = [{
-  resource: otherSource_peoplePgResource,
+const attributes2 = {};
+const members3 = [{
+  resource: paths_0_resource_peoplePgResource,
   typeName: "Person",
   path: []
 }, {
-  resource: otherSource_organizationsPgResource,
+  resource: paths_1_resource_organizationsPgResource,
   typeName: "Organization",
   path: []
 }];
-const paths2 = [{
-  resource: otherSource_peoplePgResource,
+const paths3 = [{
+  resource: paths_0_resource_peoplePgResource,
   hasReferencee: false,
   isUnique: true,
   layers: [{
     relationName: "peopleByMyPersonId",
     localAttributes: registryConfig.pgRelations.logEntries.peopleByMyPersonId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.logEntries.peopleByMyPersonId.remoteAttributes,
-    resource: otherSource_peoplePgResource,
+    resource: paths_0_resource_peoplePgResource,
     isUnique: true
   }]
 }, {
-  resource: otherSource_organizationsPgResource,
+  resource: paths_1_resource_organizationsPgResource,
   hasReferencee: false,
   isUnique: true,
   layers: [{
     relationName: "organizationsByMyOrganizationId",
     localAttributes: registryConfig.pgRelations.logEntries.organizationsByMyOrganizationId.localAttributes,
     remoteAttributes: registryConfig.pgRelations.logEntries.organizationsByMyOrganizationId.remoteAttributes,
-    resource: otherSource_organizationsPgResource,
+    resource: paths_1_resource_organizationsPgResource,
     isUnique: true
   }]
 }];
-const resourceByTypeName2 = Object.assign(Object.create(null), {
-  Person: otherSource_peoplePgResource,
-  Organization: otherSource_organizationsPgResource
+const resourceByTypeName3 = Object.assign(Object.create(null), {
+  Person: paths_0_resource_peoplePgResource,
+  Organization: paths_1_resource_organizationsPgResource
 });
+const otherSource_single_table_itemsPgResource = registry.pgResources["single_table_items"];
+const otherSource_relational_itemsPgResource = registry.pgResources["relational_items"];
+const members4 = [{
+  resource: paths_0_resource_aws_applicationsPgResource,
+  typeName: "AwsApplication",
+  path: []
+}, {
+  resource: paths_1_resource_gcp_applicationsPgResource,
+  typeName: "GcpApplication",
+  path: []
+}];
+const paths4 = [{
+  resource: paths_0_resource_aws_applicationsPgResource,
+  hasReferencee: true,
+  isUnique: false,
+  layers: [{
+    relationName: "awsApplicationsByTheirPersonId",
+    localAttributes: registryConfig.pgRelations.people.awsApplicationsByTheirPersonId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.people.awsApplicationsByTheirPersonId.remoteAttributes,
+    resource: paths_0_resource_aws_applicationsPgResource,
+    isUnique: false
+  }]
+}, {
+  resource: paths_1_resource_gcp_applicationsPgResource,
+  hasReferencee: true,
+  isUnique: false,
+  layers: [{
+    relationName: "gcpApplicationsByTheirPersonId",
+    localAttributes: registryConfig.pgRelations.people.gcpApplicationsByTheirPersonId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.people.gcpApplicationsByTheirPersonId.remoteAttributes,
+    resource: paths_1_resource_gcp_applicationsPgResource,
+    isUnique: false
+  }]
+}];
+const resourceByTypeName4 = Object.assign(Object.create(null), {
+  AwsApplication: paths_0_resource_aws_applicationsPgResource,
+  GcpApplication: paths_1_resource_gcp_applicationsPgResource
+});
+const members_1_resource_gcp_application_third_party_vulnerabilitiesPgResource = registry.pgResources["gcp_application_third_party_vulnerabilities"];
+const members5 = [{
+  resource: members_1_resource_gcp_application_first_party_vulnerabilitiesPgResource,
+  typeName: "FirstPartyVulnerability",
+  path: [{
+    relationName: "firstPartyVulnerabilitiesByMyFirstPartyVulnerabilityId"
+  }]
+}, {
+  resource: members_1_resource_gcp_application_third_party_vulnerabilitiesPgResource,
+  typeName: "ThirdPartyVulnerability",
+  path: [{
+    relationName: "thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId"
+  }]
+}];
+const paths_0_resource_first_party_vulnerabilitiesPgResource = registry.pgResources["first_party_vulnerabilities"];
+const paths_1_resource_third_party_vulnerabilitiesPgResource = registry.pgResources["third_party_vulnerabilities"];
+const paths5 = [{
+  resource: paths_0_resource_first_party_vulnerabilitiesPgResource,
+  hasReferencee: true,
+  isUnique: false,
+  layers: [{
+    relationName: "gcpApplicationFirstPartyVulnerabilitiesByTheirGcpApplicationId",
+    localAttributes: registryConfig.pgRelations.gcpApplications.gcpApplicationFirstPartyVulnerabilitiesByTheirGcpApplicationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.gcpApplications.gcpApplicationFirstPartyVulnerabilitiesByTheirGcpApplicationId.remoteAttributes,
+    resource: members_1_resource_gcp_application_first_party_vulnerabilitiesPgResource,
+    isUnique: false
+  }, {
+    relationName: "firstPartyVulnerabilitiesByMyFirstPartyVulnerabilityId",
+    localAttributes: registryConfig.pgRelations.gcpApplicationFirstPartyVulnerabilities.firstPartyVulnerabilitiesByMyFirstPartyVulnerabilityId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.gcpApplicationFirstPartyVulnerabilities.firstPartyVulnerabilitiesByMyFirstPartyVulnerabilityId.remoteAttributes,
+    resource: paths_0_resource_first_party_vulnerabilitiesPgResource,
+    isUnique: true
+  }]
+}, {
+  resource: paths_1_resource_third_party_vulnerabilitiesPgResource,
+  hasReferencee: true,
+  isUnique: false,
+  layers: [{
+    relationName: "gcpApplicationThirdPartyVulnerabilitiesByTheirGcpApplicationId",
+    localAttributes: registryConfig.pgRelations.gcpApplications.gcpApplicationThirdPartyVulnerabilitiesByTheirGcpApplicationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.gcpApplications.gcpApplicationThirdPartyVulnerabilitiesByTheirGcpApplicationId.remoteAttributes,
+    resource: members_1_resource_gcp_application_third_party_vulnerabilitiesPgResource,
+    isUnique: false
+  }, {
+    relationName: "thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId",
+    localAttributes: registryConfig.pgRelations.gcpApplicationThirdPartyVulnerabilities.thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.gcpApplicationThirdPartyVulnerabilities.thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId.remoteAttributes,
+    resource: paths_1_resource_third_party_vulnerabilitiesPgResource,
+    isUnique: true
+  }]
+}];
+const resourceByTypeName5 = Object.assign(Object.create(null), {
+  FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
+  ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
+});
+const attributes3 = {};
+const members6 = [{
+  resource: paths_0_resource_peoplePgResource,
+  typeName: "Person",
+  path: []
+}, {
+  resource: paths_1_resource_organizationsPgResource,
+  typeName: "Organization",
+  path: []
+}];
+const paths6 = [{
+  resource: paths_0_resource_peoplePgResource,
+  hasReferencee: false,
+  isUnique: true,
+  layers: [{
+    relationName: "peopleByMyPersonId",
+    localAttributes: registryConfig.pgRelations.gcpApplications.peopleByMyPersonId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.gcpApplications.peopleByMyPersonId.remoteAttributes,
+    resource: paths_0_resource_peoplePgResource,
+    isUnique: true
+  }]
+}, {
+  resource: paths_1_resource_organizationsPgResource,
+  hasReferencee: false,
+  isUnique: true,
+  layers: [{
+    relationName: "organizationsByMyOrganizationId",
+    localAttributes: registryConfig.pgRelations.gcpApplications.organizationsByMyOrganizationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.gcpApplications.organizationsByMyOrganizationId.remoteAttributes,
+    resource: paths_1_resource_organizationsPgResource,
+    isUnique: true
+  }]
+}];
+const resourceByTypeName6 = Object.assign(Object.create(null), {
+  Person: paths_0_resource_peoplePgResource,
+  Organization: paths_1_resource_organizationsPgResource
+});
+const members_1_resource_aws_application_third_party_vulnerabilitiesPgResource = registry.pgResources["aws_application_third_party_vulnerabilities"];
+const members7 = [{
+  resource: members_0_resource_aws_application_first_party_vulnerabilitiesPgResource,
+  typeName: "FirstPartyVulnerability",
+  path: [{
+    relationName: "firstPartyVulnerabilitiesByMyFirstPartyVulnerabilityId"
+  }]
+}, {
+  resource: members_1_resource_aws_application_third_party_vulnerabilitiesPgResource,
+  typeName: "ThirdPartyVulnerability",
+  path: [{
+    relationName: "thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId"
+  }]
+}];
+const paths7 = [{
+  resource: paths_0_resource_first_party_vulnerabilitiesPgResource,
+  hasReferencee: true,
+  isUnique: false,
+  layers: [{
+    relationName: "awsApplicationFirstPartyVulnerabilitiesByTheirAwsApplicationId",
+    localAttributes: registryConfig.pgRelations.awsApplications.awsApplicationFirstPartyVulnerabilitiesByTheirAwsApplicationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.awsApplications.awsApplicationFirstPartyVulnerabilitiesByTheirAwsApplicationId.remoteAttributes,
+    resource: members_0_resource_aws_application_first_party_vulnerabilitiesPgResource,
+    isUnique: false
+  }, {
+    relationName: "firstPartyVulnerabilitiesByMyFirstPartyVulnerabilityId",
+    localAttributes: registryConfig.pgRelations.awsApplicationFirstPartyVulnerabilities.firstPartyVulnerabilitiesByMyFirstPartyVulnerabilityId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.awsApplicationFirstPartyVulnerabilities.firstPartyVulnerabilitiesByMyFirstPartyVulnerabilityId.remoteAttributes,
+    resource: paths_0_resource_first_party_vulnerabilitiesPgResource,
+    isUnique: true
+  }]
+}, {
+  resource: paths_1_resource_third_party_vulnerabilitiesPgResource,
+  hasReferencee: true,
+  isUnique: false,
+  layers: [{
+    relationName: "awsApplicationThirdPartyVulnerabilitiesByTheirAwsApplicationId",
+    localAttributes: registryConfig.pgRelations.awsApplications.awsApplicationThirdPartyVulnerabilitiesByTheirAwsApplicationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.awsApplications.awsApplicationThirdPartyVulnerabilitiesByTheirAwsApplicationId.remoteAttributes,
+    resource: members_1_resource_aws_application_third_party_vulnerabilitiesPgResource,
+    isUnique: false
+  }, {
+    relationName: "thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId",
+    localAttributes: registryConfig.pgRelations.awsApplicationThirdPartyVulnerabilities.thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.awsApplicationThirdPartyVulnerabilities.thirdPartyVulnerabilitiesByMyThirdPartyVulnerabilityId.remoteAttributes,
+    resource: paths_1_resource_third_party_vulnerabilitiesPgResource,
+    isUnique: true
+  }]
+}];
+const resourceByTypeName7 = Object.assign(Object.create(null), {
+  FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
+  ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
+});
+const attributes4 = {};
+const members8 = [{
+  resource: paths_0_resource_peoplePgResource,
+  typeName: "Person",
+  path: []
+}, {
+  resource: paths_1_resource_organizationsPgResource,
+  typeName: "Organization",
+  path: []
+}];
+const paths8 = [{
+  resource: paths_0_resource_peoplePgResource,
+  hasReferencee: false,
+  isUnique: true,
+  layers: [{
+    relationName: "peopleByMyPersonId",
+    localAttributes: registryConfig.pgRelations.awsApplications.peopleByMyPersonId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.awsApplications.peopleByMyPersonId.remoteAttributes,
+    resource: paths_0_resource_peoplePgResource,
+    isUnique: true
+  }]
+}, {
+  resource: paths_1_resource_organizationsPgResource,
+  hasReferencee: false,
+  isUnique: true,
+  layers: [{
+    relationName: "organizationsByMyOrganizationId",
+    localAttributes: registryConfig.pgRelations.awsApplications.organizationsByMyOrganizationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.awsApplications.organizationsByMyOrganizationId.remoteAttributes,
+    resource: paths_1_resource_organizationsPgResource,
+    isUnique: true
+  }]
+}];
+const resourceByTypeName8 = Object.assign(Object.create(null), {
+  Person: paths_0_resource_peoplePgResource,
+  Organization: paths_1_resource_organizationsPgResource
+});
+const members9 = [{
+  resource: members_1_resource_aws_application_third_party_vulnerabilitiesPgResource,
+  typeName: "AwsApplication",
+  path: [{
+    relationName: "awsApplicationsByMyAwsApplicationId"
+  }]
+}, {
+  resource: members_1_resource_gcp_application_third_party_vulnerabilitiesPgResource,
+  typeName: "GcpApplication",
+  path: [{
+    relationName: "gcpApplicationsByMyGcpApplicationId"
+  }]
+}];
+const paths9 = [{
+  resource: paths_0_resource_aws_applicationsPgResource,
+  hasReferencee: true,
+  isUnique: false,
+  layers: [{
+    relationName: "awsApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId",
+    localAttributes: registryConfig.pgRelations.thirdPartyVulnerabilities.awsApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.thirdPartyVulnerabilities.awsApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId.remoteAttributes,
+    resource: members_1_resource_aws_application_third_party_vulnerabilitiesPgResource,
+    isUnique: false
+  }, {
+    relationName: "awsApplicationsByMyAwsApplicationId",
+    localAttributes: registryConfig.pgRelations.awsApplicationThirdPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.awsApplicationThirdPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.remoteAttributes,
+    resource: paths_0_resource_aws_applicationsPgResource,
+    isUnique: true
+  }]
+}, {
+  resource: paths_1_resource_gcp_applicationsPgResource,
+  hasReferencee: true,
+  isUnique: false,
+  layers: [{
+    relationName: "gcpApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId",
+    localAttributes: registryConfig.pgRelations.thirdPartyVulnerabilities.gcpApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.thirdPartyVulnerabilities.gcpApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId.remoteAttributes,
+    resource: members_1_resource_gcp_application_third_party_vulnerabilitiesPgResource,
+    isUnique: false
+  }, {
+    relationName: "gcpApplicationsByMyGcpApplicationId",
+    localAttributes: registryConfig.pgRelations.gcpApplicationThirdPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.gcpApplicationThirdPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.remoteAttributes,
+    resource: paths_1_resource_gcp_applicationsPgResource,
+    isUnique: true
+  }]
+}];
+const resourceByTypeName9 = Object.assign(Object.create(null), {
+  AwsApplication: paths_0_resource_aws_applicationsPgResource,
+  GcpApplication: paths_1_resource_gcp_applicationsPgResource
+});
+const attributes5 = {};
+const members10 = [{
+  resource: members_1_resource_aws_application_third_party_vulnerabilitiesPgResource,
+  typeName: "Person",
+  path: [{
+    relationName: "awsApplicationsByMyAwsApplicationId"
+  }, {
+    relationName: "peopleByMyPersonId"
+  }]
+}, {
+  resource: members_1_resource_aws_application_third_party_vulnerabilitiesPgResource,
+  typeName: "Organization",
+  path: [{
+    relationName: "awsApplicationsByMyAwsApplicationId"
+  }, {
+    relationName: "organizationsByMyOrganizationId"
+  }]
+}, {
+  resource: members_1_resource_gcp_application_third_party_vulnerabilitiesPgResource,
+  typeName: "Person",
+  path: [{
+    relationName: "gcpApplicationsByMyGcpApplicationId"
+  }, {
+    relationName: "peopleByMyPersonId"
+  }]
+}, {
+  resource: members_1_resource_gcp_application_third_party_vulnerabilitiesPgResource,
+  typeName: "Organization",
+  path: [{
+    relationName: "gcpApplicationsByMyGcpApplicationId"
+  }, {
+    relationName: "organizationsByMyOrganizationId"
+  }]
+}];
+const paths10 = [{
+  resource: paths_0_resource_peoplePgResource,
+  hasReferencee: true,
+  isUnique: false,
+  layers: [{
+    relationName: "awsApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId",
+    localAttributes: registryConfig.pgRelations.thirdPartyVulnerabilities.awsApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.thirdPartyVulnerabilities.awsApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId.remoteAttributes,
+    resource: members_1_resource_aws_application_third_party_vulnerabilitiesPgResource,
+    isUnique: false
+  }, {
+    relationName: "awsApplicationsByMyAwsApplicationId",
+    localAttributes: registryConfig.pgRelations.awsApplicationThirdPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.awsApplicationThirdPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.remoteAttributes,
+    resource: paths_0_resource_aws_applicationsPgResource,
+    isUnique: true
+  }, {
+    relationName: "peopleByMyPersonId",
+    localAttributes: registryConfig.pgRelations.awsApplications.peopleByMyPersonId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.awsApplications.peopleByMyPersonId.remoteAttributes,
+    resource: paths_0_resource_peoplePgResource,
+    isUnique: true
+  }]
+}, {
+  resource: paths_1_resource_organizationsPgResource,
+  hasReferencee: true,
+  isUnique: false,
+  layers: [{
+    relationName: "awsApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId",
+    localAttributes: registryConfig.pgRelations.thirdPartyVulnerabilities.awsApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.thirdPartyVulnerabilities.awsApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId.remoteAttributes,
+    resource: members_1_resource_aws_application_third_party_vulnerabilitiesPgResource,
+    isUnique: false
+  }, {
+    relationName: "awsApplicationsByMyAwsApplicationId",
+    localAttributes: registryConfig.pgRelations.awsApplicationThirdPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.awsApplicationThirdPartyVulnerabilities.awsApplicationsByMyAwsApplicationId.remoteAttributes,
+    resource: paths_0_resource_aws_applicationsPgResource,
+    isUnique: true
+  }, {
+    relationName: "organizationsByMyOrganizationId",
+    localAttributes: registryConfig.pgRelations.awsApplications.organizationsByMyOrganizationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.awsApplications.organizationsByMyOrganizationId.remoteAttributes,
+    resource: paths_1_resource_organizationsPgResource,
+    isUnique: true
+  }]
+}, {
+  resource: paths_0_resource_peoplePgResource,
+  hasReferencee: true,
+  isUnique: false,
+  layers: [{
+    relationName: "gcpApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId",
+    localAttributes: registryConfig.pgRelations.thirdPartyVulnerabilities.gcpApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.thirdPartyVulnerabilities.gcpApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId.remoteAttributes,
+    resource: members_1_resource_gcp_application_third_party_vulnerabilitiesPgResource,
+    isUnique: false
+  }, {
+    relationName: "gcpApplicationsByMyGcpApplicationId",
+    localAttributes: registryConfig.pgRelations.gcpApplicationThirdPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.gcpApplicationThirdPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.remoteAttributes,
+    resource: paths_1_resource_gcp_applicationsPgResource,
+    isUnique: true
+  }, {
+    relationName: "peopleByMyPersonId",
+    localAttributes: registryConfig.pgRelations.gcpApplications.peopleByMyPersonId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.gcpApplications.peopleByMyPersonId.remoteAttributes,
+    resource: paths_0_resource_peoplePgResource,
+    isUnique: true
+  }]
+}, {
+  resource: paths_1_resource_organizationsPgResource,
+  hasReferencee: true,
+  isUnique: false,
+  layers: [{
+    relationName: "gcpApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId",
+    localAttributes: registryConfig.pgRelations.thirdPartyVulnerabilities.gcpApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.thirdPartyVulnerabilities.gcpApplicationThirdPartyVulnerabilitiesByTheirThirdPartyVulnerabilityId.remoteAttributes,
+    resource: members_1_resource_gcp_application_third_party_vulnerabilitiesPgResource,
+    isUnique: false
+  }, {
+    relationName: "gcpApplicationsByMyGcpApplicationId",
+    localAttributes: registryConfig.pgRelations.gcpApplicationThirdPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.gcpApplicationThirdPartyVulnerabilities.gcpApplicationsByMyGcpApplicationId.remoteAttributes,
+    resource: paths_1_resource_gcp_applicationsPgResource,
+    isUnique: true
+  }, {
+    relationName: "organizationsByMyOrganizationId",
+    localAttributes: registryConfig.pgRelations.gcpApplications.organizationsByMyOrganizationId.localAttributes,
+    remoteAttributes: registryConfig.pgRelations.gcpApplications.organizationsByMyOrganizationId.remoteAttributes,
+    resource: paths_1_resource_organizationsPgResource,
+    isUnique: true
+  }]
+}];
+const resourceByTypeName10 = Object.assign(Object.create(null), {
+  Person: paths_0_resource_peoplePgResource,
+  Organization: paths_1_resource_organizationsPgResource
+});
+const otherSource_single_table_item_relationsPgResource = registry.pgResources["single_table_item_relations"];
+const otherSource_single_table_item_relation_composite_pksPgResource = registry.pgResources["single_table_item_relation_composite_pks"];
 const otherSource_prioritiesPgResource = registry.pgResources["priorities"];
 const relational_topics_relational_topicsPgResource = registry.pgResources["relational_topics"];
 const relational_item_relations_relational_item_relationsPgResource = registry.pgResources["relational_item_relations"];
@@ -4490,55 +5040,321 @@ const makeArgs2 = (args, path = []) => {
   return selectArgs;
 };
 const resource_get_single_table_topic_by_idPgResource = registry.pgResources["get_single_table_topic_by_id"];
-const members_0_resource_first_party_vulnerabilitiesPgResource = registry.pgResources["first_party_vulnerabilities"];
-const members_1_resource_third_party_vulnerabilitiesPgResource = registry.pgResources["third_party_vulnerabilities"];
-const members3 = [{
-  resource: members_0_resource_first_party_vulnerabilitiesPgResource,
+const members11 = [{
+  resource: paths_0_resource_first_party_vulnerabilitiesPgResource,
   typeName: "FirstPartyVulnerability"
 }, {
-  resource: members_1_resource_third_party_vulnerabilitiesPgResource,
+  resource: paths_1_resource_third_party_vulnerabilitiesPgResource,
   typeName: "ThirdPartyVulnerability"
 }];
-const resourceByTypeName3 = Object.assign(Object.create(null), {
-  FirstPartyVulnerability: members_0_resource_first_party_vulnerabilitiesPgResource,
-  ThirdPartyVulnerability: members_1_resource_third_party_vulnerabilitiesPgResource
+const resourceByTypeName11 = Object.assign(Object.create(null), {
+  FirstPartyVulnerability: paths_0_resource_first_party_vulnerabilitiesPgResource,
+  ThirdPartyVulnerability: paths_1_resource_third_party_vulnerabilitiesPgResource
 });
-const members4 = [{
-  resource: members_0_resource_aws_applicationsPgResource,
+const members12 = [{
+  resource: paths_0_resource_aws_applicationsPgResource,
   typeName: "AwsApplication"
 }, {
-  resource: members_1_resource_gcp_applicationsPgResource,
+  resource: paths_1_resource_gcp_applicationsPgResource,
   typeName: "GcpApplication"
 }];
-const resourceByTypeName4 = Object.assign(Object.create(null), {
-  AwsApplication: members_0_resource_aws_applicationsPgResource,
-  GcpApplication: members_1_resource_gcp_applicationsPgResource
+const resourceByTypeName12 = Object.assign(Object.create(null), {
+  AwsApplication: paths_0_resource_aws_applicationsPgResource,
+  GcpApplication: paths_1_resource_gcp_applicationsPgResource
 });
-const members5 = [];
-const resourceByTypeName5 = Object.create(null);
-export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTableItem {
+const members13 = [];
+const resourceByTypeName13 = Object.create(null);
+export const typeDefs = /* GraphQL */`type FirstPartyVulnerability implements Vulnerability {
   id: Int!
-  type: ItemType!
-  parentId: Int
-  rootTopicId: Int
-  authorId: Int!
-  position: BigInt!
-  createdAt: Datetime!
-  updatedAt: Datetime!
-  isExplicitlyArchived: Boolean!
-  archivedAt: Datetime
-  title: String!
+  name: String!
+  cvssScore: Float!
+  teamName: String
 
-  """Reads a single \`Person\` that is related to this \`SingleTableItem\`."""
-  personByAuthorId: Person
+  """Reads and enables pagination through a set of \`Application\`."""
+  applications(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`Application\`."""
+    orderBy: [ApplicationsOrderBy!]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ApplicationCondition
+
+    """Filter results to only those of the given types"""
+    only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+  ): ApplicationsConnection!
+
+  """Reads and enables pagination through a set of \`PersonOrOrganization\`."""
+  owners: PersonOrOrganizationConnection!
+}
+
+interface Vulnerability {
+  id: Int!
+  name: String!
+  cvssScore: Float!
+
+  """Reads and enables pagination through a set of \`Application\`."""
+  applications(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Filter results to only those of the given types"""
+    only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+  ): ApplicationsConnection!
+
+  """Reads and enables pagination through a set of \`PersonOrOrganization\`."""
+  owners: PersonOrOrganizationConnection!
+}
+
+"""A connection to a list of \`Application\` values."""
+type ApplicationsConnection {
+  """A list of \`Application\` objects."""
+  nodes: [Application]!
 
   """
-  Reads a single \`SingleTableItem\` that is related to this \`SingleTableItem\`.
+  A list of edges which contains the \`Application\` and cursor to aid in pagination.
   """
-  singleTableItemByParentId: SingleTableItem
+  edges: [ApplicationsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Application\` you could get from the connection."""
+  totalCount: Int!
+}
+
+interface Application {
+  id: Int!
+  name: String!
+  lastDeployed: Datetime
+
+  """Reads and enables pagination through a set of \`Vulnerability\`."""
+  vulnerabilities(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Filter results to only those of the given types"""
+    only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
+  ): VulnerabilitiesConnection!
+
+  """
+  Reads a single \`PersonOrOrganization\` that is related to this \`Application\`.
+  """
+  owner: PersonOrOrganization
+}
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
+3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
+that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
+to unexpected results.
+"""
+scalar Datetime
+
+"""A connection to a list of \`Vulnerability\` values."""
+type VulnerabilitiesConnection {
+  """A list of \`Vulnerability\` objects."""
+  nodes: [Vulnerability]!
+
+  """
+  A list of edges which contains the \`Vulnerability\` and cursor to aid in pagination.
+  """
+  edges: [VulnerabilitiesEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Vulnerability\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`Vulnerability\` edge in the connection."""
+type VulnerabilitiesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Vulnerability\` at the end of the edge."""
+  node: Vulnerability
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+}
+
+enum VulnerabilityType {
+  FirstPartyVulnerability
+  ThirdPartyVulnerability
+}
+
+union PersonOrOrganization = Organization | Person
+
+type Organization {
+  organizationId: Int!
+  name: String!
+
+  """Reads and enables pagination through a set of \`LogEntry\`."""
+  logEntriesByOrganizationId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`LogEntry\`."""
+    orderBy: [LogEntriesOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LogEntryCondition
+  ): LogEntriesConnection!
+}
+
+"""A connection to a list of \`LogEntry\` values."""
+type LogEntriesConnection {
+  """A list of \`LogEntry\` objects."""
+  nodes: [LogEntry]!
+
+  """
+  A list of edges which contains the \`LogEntry\` and cursor to aid in pagination.
+  """
+  edges: [LogEntriesEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`LogEntry\` you could get from the connection."""
+  totalCount: Int!
+}
+
+type LogEntry {
+  id: Int!
+  personId: Int
+  organizationId: Int
+  text: String!
+
+  """Reads a single \`Organization\` that is related to this \`LogEntry\`."""
+  organizationByOrganizationId: Organization
+
+  """Reads a single \`Person\` that is related to this \`LogEntry\`."""
+  personByPersonId: Person
+
+  """
+  Reads a single \`PersonOrOrganization\` that is related to this \`LogEntry\`.
+  """
+  author: PersonOrOrganization
+}
+
+type Person {
+  personId: Int!
+  username: String!
+
+  """Reads and enables pagination through a set of \`LogEntry\`."""
+  logEntriesByPersonId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`LogEntry\`."""
+    orderBy: [LogEntriesOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LogEntryCondition
+  ): LogEntriesConnection!
 
   """Reads and enables pagination through a set of \`SingleTableItem\`."""
-  singleTableItemsByParentId(
+  singleTableItemsByAuthorId(
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -4566,10 +5382,8 @@ export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTab
     condition: SingleTableItemCondition
   ): SingleTableItemsConnection!
 
-  """
-  Reads and enables pagination through a set of \`SingleTableItemRelation\`.
-  """
-  singleTableItemRelationsByChildId(
+  """Reads and enables pagination through a set of \`RelationalItem\`."""
+  relationalItemsByAuthorId(
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -4588,19 +5402,17 @@ export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTab
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelation\`."""
-    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+    """The method to use when ordering \`RelationalItem\`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
 
     """
     A condition to be used in determining which values should be returned by the collection.
     """
-    condition: SingleTableItemRelationCondition
-  ): SingleTableItemRelationsConnection!
+    condition: RelationalItemCondition
+  ): RelationalItemsConnection!
 
-  """
-  Reads and enables pagination through a set of \`SingleTableItemRelation\`.
-  """
-  singleTableItemRelationsByParentId(
+  """Reads and enables pagination through a set of \`Application\`."""
+  applications(
     """Only read the first \`n\` values of the set."""
     first: Int
 
@@ -4619,81 +5431,69 @@ export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTab
     """Read all values in the set after (below) this cursor."""
     after: Cursor
 
-    """The method to use when ordering \`SingleTableItemRelation\`."""
-    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+    """The method to use when ordering \`Application\`."""
+    orderBy: [ApplicationsOrderBy!]
 
     """
     A condition to be used in determining which values should be returned by the collection.
     """
-    condition: SingleTableItemRelationCondition
-  ): SingleTableItemRelationsConnection!
+    condition: ApplicationCondition
+
+    """Filter results to only those of the given types"""
+    only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+  ): ApplicationsConnection!
+}
+
+"""Methods to use when ordering \`LogEntry\`."""
+enum LogEntriesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  ORGANIZATION_ID_ASC
+  ORGANIZATION_ID_DESC
+  TEXT_ASC
+  TEXT_DESC
+}
+
+"""
+A condition to be used against \`LogEntry\` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input LogEntryCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`personId\` field."""
+  personId: Int
+
+  """Checks for equality with the object’s \`organizationId\` field."""
+  organizationId: Int
+
+  """Checks for equality with the object’s \`text\` field."""
+  text: String
+}
+
+"""A connection to a list of \`SingleTableItem\` values."""
+type SingleTableItemsConnection {
+  """A list of \`SingleTableItem\` objects."""
+  nodes: [SingleTableItem]!
 
   """
-  Reads and enables pagination through a set of \`SingleTableItemRelationCompositePk\`.
+  A list of edges which contains the \`SingleTableItem\` and cursor to aid in pagination.
   """
-  singleTableItemRelationCompositePksByChildId(
-    """Only read the first \`n\` values of the set."""
-    first: Int
+  edges: [SingleTableItemsEdge]!
 
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
-    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: SingleTableItemRelationCompositePkCondition
-  ): SingleTableItemRelationCompositePksConnection!
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
 
   """
-  Reads and enables pagination through a set of \`SingleTableItemRelationCompositePk\`.
+  The count of *all* \`SingleTableItem\` you could get from the connection.
   """
-  singleTableItemRelationCompositePksByParentId(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
-    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: SingleTableItemRelationCompositePkCondition
-  ): SingleTableItemRelationCompositePksConnection!
-
-  """
-  Reads a single \`SingleTableTopic\` that is related to this \`SingleTableTopic\`.
-  """
-  rootTopic: SingleTableTopic
+  totalCount: Int!
 }
 
 interface SingleTableItem {
@@ -4850,287 +5650,91 @@ strings and not numbers.
 """
 scalar BigInt
 
-"""
-A point in time as described by the [ISO
-8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
-3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
-that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
-to unexpected results.
-"""
-scalar Datetime
-
-type Person {
-  personId: Int!
-  username: String!
-
-  """Reads and enables pagination through a set of \`LogEntry\`."""
-  logEntriesByPersonId(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering \`LogEntry\`."""
-    orderBy: [LogEntriesOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: LogEntryCondition
-  ): LogEntriesConnection!
-
-  """Reads and enables pagination through a set of \`SingleTableItem\`."""
-  singleTableItemsByAuthorId(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering \`SingleTableItem\`."""
-    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: SingleTableItemCondition
-  ): SingleTableItemsConnection!
-
-  """Reads and enables pagination through a set of \`RelationalItem\`."""
-  relationalItemsByAuthorId(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering \`RelationalItem\`."""
-    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: RelationalItemCondition
-  ): RelationalItemsConnection!
-
-  """Reads and enables pagination through a set of \`Application\`."""
-  applications(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering \`Application\`."""
-    orderBy: [ApplicationsOrderBy!]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: ApplicationCondition
-
-    """Filter results to only those of the given types"""
-    only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
-  ): ApplicationsConnection!
-}
-
-"""A connection to a list of \`LogEntry\` values."""
-type LogEntriesConnection {
-  """A list of \`LogEntry\` objects."""
-  nodes: [LogEntry]!
+"""A connection to a list of \`SingleTableItemRelation\` values."""
+type SingleTableItemRelationsConnection {
+  """A list of \`SingleTableItemRelation\` objects."""
+  nodes: [SingleTableItemRelation]!
 
   """
-  A list of edges which contains the \`LogEntry\` and cursor to aid in pagination.
+  A list of edges which contains the \`SingleTableItemRelation\` and cursor to aid in pagination.
   """
-  edges: [LogEntriesEdge]!
+  edges: [SingleTableItemRelationsEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
-  """The count of *all* \`LogEntry\` you could get from the connection."""
+  """
+  The count of *all* \`SingleTableItemRelation\` you could get from the connection.
+  """
   totalCount: Int!
 }
 
-type LogEntry {
+type SingleTableItemRelation {
   id: Int!
-  personId: Int
-  organizationId: Int
-  text: String!
-
-  """Reads a single \`Organization\` that is related to this \`LogEntry\`."""
-  organizationByOrganizationId: Organization
-
-  """Reads a single \`Person\` that is related to this \`LogEntry\`."""
-  personByPersonId: Person
+  parentId: Int!
+  childId: Int!
 
   """
-  Reads a single \`PersonOrOrganization\` that is related to this \`LogEntry\`.
+  Reads a single \`SingleTableItem\` that is related to this \`SingleTableItemRelation\`.
   """
-  author: PersonOrOrganization
+  singleTableItemByChildId: SingleTableItem
+
+  """
+  Reads a single \`SingleTableItem\` that is related to this \`SingleTableItemRelation\`.
+  """
+  singleTableItemByParentId: SingleTableItem
 }
 
-type Organization {
-  organizationId: Int!
-  name: String!
-
-  """Reads and enables pagination through a set of \`LogEntry\`."""
-  logEntriesByOrganizationId(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering \`LogEntry\`."""
-    orderBy: [LogEntriesOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: LogEntryCondition
-  ): LogEntriesConnection!
-}
-
-"""A location in a connection that can be used for resuming pagination."""
-scalar Cursor
-
-"""Methods to use when ordering \`LogEntry\`."""
-enum LogEntriesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  PERSON_ID_ASC
-  PERSON_ID_DESC
-  ORGANIZATION_ID_ASC
-  ORGANIZATION_ID_DESC
-  TEXT_ASC
-  TEXT_DESC
-}
-
-"""
-A condition to be used against \`LogEntry\` object types. All fields are tested
-for equality and combined with a logical ‘and.’
-"""
-input LogEntryCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-
-  """Checks for equality with the object’s \`personId\` field."""
-  personId: Int
-
-  """Checks for equality with the object’s \`organizationId\` field."""
-  organizationId: Int
-
-  """Checks for equality with the object’s \`text\` field."""
-  text: String
-}
-
-union PersonOrOrganization = Organization | Person
-
-"""A \`LogEntry\` edge in the connection."""
-type LogEntriesEdge {
+"""A \`SingleTableItemRelation\` edge in the connection."""
+type SingleTableItemRelationsEdge {
   """A cursor for use in pagination."""
   cursor: Cursor
 
-  """The \`LogEntry\` at the end of the edge."""
-  node: LogEntry
+  """The \`SingleTableItemRelation\` at the end of the edge."""
+  node: SingleTableItemRelation
 }
 
-"""Information about pagination in a connection."""
-type PageInfo {
-  """When paginating forwards, are there more items?"""
-  hasNextPage: Boolean!
-
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-
-  """When paginating backwards, the cursor to continue."""
-  startCursor: Cursor
-
-  """When paginating forwards, the cursor to continue."""
-  endCursor: Cursor
-}
-
-"""A connection to a list of \`SingleTableItem\` values."""
-type SingleTableItemsConnection {
-  """A list of \`SingleTableItem\` objects."""
-  nodes: [SingleTableItem]!
+"""A connection to a list of \`SingleTableItemRelationCompositePk\` values."""
+type SingleTableItemRelationCompositePksConnection {
+  """A list of \`SingleTableItemRelationCompositePk\` objects."""
+  nodes: [SingleTableItemRelationCompositePk]!
 
   """
-  A list of edges which contains the \`SingleTableItem\` and cursor to aid in pagination.
+  A list of edges which contains the \`SingleTableItemRelationCompositePk\` and cursor to aid in pagination.
   """
-  edges: [SingleTableItemsEdge]!
+  edges: [SingleTableItemRelationCompositePksEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
 
   """
-  The count of *all* \`SingleTableItem\` you could get from the connection.
+  The count of *all* \`SingleTableItemRelationCompositePk\` you could get from the connection.
   """
   totalCount: Int!
+}
+
+type SingleTableItemRelationCompositePk {
+  parentId: Int!
+  childId: Int!
+
+  """
+  Reads a single \`SingleTableItem\` that is related to this \`SingleTableItemRelationCompositePk\`.
+  """
+  singleTableItemByChildId: SingleTableItem
+
+  """
+  Reads a single \`SingleTableItem\` that is related to this \`SingleTableItemRelationCompositePk\`.
+  """
+  singleTableItemByParentId: SingleTableItem
+}
+
+"""A \`SingleTableItemRelationCompositePk\` edge in the connection."""
+type SingleTableItemRelationCompositePksEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`SingleTableItemRelationCompositePk\` at the end of the edge."""
+  node: SingleTableItemRelationCompositePk
 }
 
 """A \`SingleTableItem\` edge in the connection."""
@@ -5520,159 +6124,6 @@ input RelationalItemCondition {
   archivedAt: Datetime
 }
 
-"""A connection to a list of \`Application\` values."""
-type ApplicationsConnection {
-  """A list of \`Application\` objects."""
-  nodes: [Application]!
-
-  """
-  A list of edges which contains the \`Application\` and cursor to aid in pagination.
-  """
-  edges: [ApplicationsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`Application\` you could get from the connection."""
-  totalCount: Int!
-}
-
-interface Application {
-  id: Int!
-  name: String!
-  lastDeployed: Datetime
-
-  """Reads and enables pagination through a set of \`Vulnerability\`."""
-  vulnerabilities(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Filter results to only those of the given types"""
-    only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
-  ): VulnerabilitiesConnection!
-
-  """
-  Reads a single \`PersonOrOrganization\` that is related to this \`Application\`.
-  """
-  owner: PersonOrOrganization
-}
-
-"""A connection to a list of \`Vulnerability\` values."""
-type VulnerabilitiesConnection {
-  """A list of \`Vulnerability\` objects."""
-  nodes: [Vulnerability]!
-
-  """
-  A list of edges which contains the \`Vulnerability\` and cursor to aid in pagination.
-  """
-  edges: [VulnerabilitiesEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`Vulnerability\` you could get from the connection."""
-  totalCount: Int!
-}
-
-interface Vulnerability {
-  id: Int!
-  name: String!
-  cvssScore: Float!
-
-  """Reads and enables pagination through a set of \`Application\`."""
-  applications(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """Filter results to only those of the given types"""
-    only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
-  ): ApplicationsConnection!
-
-  """Reads and enables pagination through a set of \`PersonOrOrganization\`."""
-  owners: PersonOrOrganizationConnection!
-}
-
-enum ApplicationType {
-  AwsApplication
-  GcpApplication
-}
-
-"""A connection to a list of \`PersonOrOrganization\` values."""
-type PersonOrOrganizationConnection {
-  """A list of \`PersonOrOrganization\` objects."""
-  nodes: [PersonOrOrganization]!
-
-  """
-  A list of edges which contains the \`PersonOrOrganization\` and cursor to aid in pagination.
-  """
-  edges: [PersonOrOrganizationEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-}
-
-"""A \`PersonOrOrganization\` edge in the connection."""
-type PersonOrOrganizationEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`PersonOrOrganization\` at the end of the edge."""
-  node: PersonOrOrganization
-}
-
-"""A \`Vulnerability\` edge in the connection."""
-type VulnerabilitiesEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`Vulnerability\` at the end of the edge."""
-  node: Vulnerability
-}
-
-enum VulnerabilityType {
-  FirstPartyVulnerability
-  ThirdPartyVulnerability
-}
-
-"""A \`Application\` edge in the connection."""
-type ApplicationsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`Application\` at the end of the edge."""
-  node: Application
-}
-
 """Methods to use when ordering \`Application\`."""
 enum ApplicationsOrderBy {
   NATURAL
@@ -5699,91 +6150,277 @@ input ApplicationCondition {
   lastDeployed: Datetime
 }
 
-"""A connection to a list of \`SingleTableItemRelation\` values."""
-type SingleTableItemRelationsConnection {
-  """A list of \`SingleTableItemRelation\` objects."""
-  nodes: [SingleTableItemRelation]!
+enum ApplicationType {
+  AwsApplication
+  GcpApplication
+}
+
+"""A \`LogEntry\` edge in the connection."""
+type LogEntriesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`LogEntry\` at the end of the edge."""
+  node: LogEntry
+}
+
+"""A \`Application\` edge in the connection."""
+type ApplicationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Application\` at the end of the edge."""
+  node: Application
+}
+
+"""A connection to a list of \`PersonOrOrganization\` values."""
+type PersonOrOrganizationConnection {
+  """A list of \`PersonOrOrganization\` objects."""
+  nodes: [PersonOrOrganization]!
 
   """
-  A list of edges which contains the \`SingleTableItemRelation\` and cursor to aid in pagination.
+  A list of edges which contains the \`PersonOrOrganization\` and cursor to aid in pagination.
   """
-  edges: [SingleTableItemRelationsEdge]!
+  edges: [PersonOrOrganizationEdge]!
 
   """Information to aid in pagination."""
   pageInfo: PageInfo!
-
-  """
-  The count of *all* \`SingleTableItemRelation\` you could get from the connection.
-  """
-  totalCount: Int!
 }
 
-type SingleTableItemRelation {
+"""A \`PersonOrOrganization\` edge in the connection."""
+type PersonOrOrganizationEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`PersonOrOrganization\` at the end of the edge."""
+  node: PersonOrOrganization
+}
+
+type GcpApplication implements Application {
   id: Int!
-  parentId: Int!
-  childId: Int!
+  name: String!
+  lastDeployed: Datetime
+  personId: Int
+  organizationId: Int
+  gcpId: String
 
   """
-  Reads a single \`SingleTableItem\` that is related to this \`SingleTableItemRelation\`.
+  Reads a single \`Organization\` that is related to this \`GcpApplication\`.
   """
-  singleTableItemByChildId: SingleTableItem
+  organizationByOrganizationId: Organization
+
+  """Reads a single \`Person\` that is related to this \`GcpApplication\`."""
+  personByPersonId: Person
+
+  """Reads and enables pagination through a set of \`Vulnerability\`."""
+  vulnerabilities(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`Vulnerability\`."""
+    orderBy: [VulnerabilitiesOrderBy!]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: VulnerabilityCondition
+
+    """Filter results to only those of the given types"""
+    only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
+  ): VulnerabilitiesConnection!
 
   """
-  Reads a single \`SingleTableItem\` that is related to this \`SingleTableItemRelation\`.
+  Reads a single \`PersonOrOrganization\` that is related to this \`GcpApplication\`.
   """
-  singleTableItemByParentId: SingleTableItem
+  owner: PersonOrOrganization
 }
 
-"""A \`SingleTableItemRelation\` edge in the connection."""
-type SingleTableItemRelationsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`SingleTableItemRelation\` at the end of the edge."""
-  node: SingleTableItemRelation
+"""Methods to use when ordering \`Vulnerability\`."""
+enum VulnerabilitiesOrderBy {
+  NATURAL
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  CVSS_SCORE_ASC
+  CVSS_SCORE_DESC
 }
 
-"""A connection to a list of \`SingleTableItemRelationCompositePk\` values."""
-type SingleTableItemRelationCompositePksConnection {
-  """A list of \`SingleTableItemRelationCompositePk\` objects."""
-  nodes: [SingleTableItemRelationCompositePk]!
+"""
+A condition to be used against \`Vulnerability\` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input VulnerabilityCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
 
-  """
-  A list of edges which contains the \`SingleTableItemRelationCompositePk\` and cursor to aid in pagination.
-  """
-  edges: [SingleTableItemRelationCompositePksEdge]!
+  """Checks for equality with the object’s \`name\` field."""
+  name: String
 
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """
-  The count of *all* \`SingleTableItemRelationCompositePk\` you could get from the connection.
-  """
-  totalCount: Int!
+  """Checks for equality with the object’s \`cvssScore\` field."""
+  cvssScore: Float
 }
 
-type SingleTableItemRelationCompositePk {
-  parentId: Int!
-  childId: Int!
+type AwsApplication implements Application {
+  id: Int!
+  name: String!
+  lastDeployed: Datetime
+  personId: Int
+  organizationId: Int
+  awsId: String
 
   """
-  Reads a single \`SingleTableItem\` that is related to this \`SingleTableItemRelationCompositePk\`.
+  Reads a single \`Organization\` that is related to this \`AwsApplication\`.
   """
-  singleTableItemByChildId: SingleTableItem
+  organizationByOrganizationId: Organization
+
+  """Reads a single \`Person\` that is related to this \`AwsApplication\`."""
+  personByPersonId: Person
+
+  """Reads and enables pagination through a set of \`Vulnerability\`."""
+  vulnerabilities(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`Vulnerability\`."""
+    orderBy: [VulnerabilitiesOrderBy!]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: VulnerabilityCondition
+
+    """Filter results to only those of the given types"""
+    only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
+  ): VulnerabilitiesConnection!
 
   """
-  Reads a single \`SingleTableItem\` that is related to this \`SingleTableItemRelationCompositePk\`.
+  Reads a single \`PersonOrOrganization\` that is related to this \`AwsApplication\`.
   """
-  singleTableItemByParentId: SingleTableItem
+  owner: PersonOrOrganization
 }
 
-"""A \`SingleTableItemRelationCompositePk\` edge in the connection."""
-type SingleTableItemRelationCompositePksEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
+type ThirdPartyVulnerability implements Vulnerability {
+  id: Int!
+  name: String!
+  cvssScore: Float!
+  vendorName: String
 
-  """The \`SingleTableItemRelationCompositePk\` at the end of the edge."""
-  node: SingleTableItemRelationCompositePk
+  """Reads and enables pagination through a set of \`Application\`."""
+  applications(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`Application\`."""
+    orderBy: [ApplicationsOrderBy!]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ApplicationCondition
+
+    """Filter results to only those of the given types"""
+    only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+  ): ApplicationsConnection!
+
+  """Reads and enables pagination through a set of \`PersonOrOrganization\`."""
+  owners: PersonOrOrganizationConnection!
+}
+
+"""Methods to use when ordering \`RelationalItemRelation\`."""
+enum RelationalItemRelationsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  CHILD_ID_ASC
+  CHILD_ID_DESC
+}
+
+"""
+A condition to be used against \`RelationalItemRelation\` object types. All fields
+are tested for equality and combined with a logical ‘and.’
+"""
+input RelationalItemRelationCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`parentId\` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s \`childId\` field."""
+  childId: Int
+}
+
+"""Methods to use when ordering \`RelationalItemRelationCompositePk\`."""
+enum RelationalItemRelationCompositePksOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  CHILD_ID_ASC
+  CHILD_ID_DESC
+}
+
+"""
+A condition to be used against \`RelationalItemRelationCompositePk\` object types.
+All fields are tested for equality and combined with a logical ‘and.’
+"""
+input RelationalItemRelationCompositePkCondition {
+  """Checks for equality with the object’s \`parentId\` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s \`childId\` field."""
+  childId: Int
 }
 
 """Methods to use when ordering \`SingleTableItemRelation\`."""
@@ -5835,6 +6472,186 @@ input SingleTableItemRelationCompositePkCondition {
 
   """Checks for equality with the object’s \`childId\` field."""
   childId: Int
+}
+
+type SingleTableTopic implements SingleTableItem {
+  id: Int!
+  type: ItemType!
+  parentId: Int
+  rootTopicId: Int
+  authorId: Int!
+  position: BigInt!
+  createdAt: Datetime!
+  updatedAt: Datetime!
+  isExplicitlyArchived: Boolean!
+  archivedAt: Datetime
+  title: String!
+
+  """Reads a single \`Person\` that is related to this \`SingleTableItem\`."""
+  personByAuthorId: Person
+
+  """
+  Reads a single \`SingleTableItem\` that is related to this \`SingleTableItem\`.
+  """
+  singleTableItemByParentId: SingleTableItem
+
+  """Reads and enables pagination through a set of \`SingleTableItem\`."""
+  singleTableItemsByParentId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`SingleTableItem\`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+  ): SingleTableItemsConnection!
+
+  """
+  Reads and enables pagination through a set of \`SingleTableItemRelation\`.
+  """
+  singleTableItemRelationsByChildId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`SingleTableItemRelation\`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+  ): SingleTableItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of \`SingleTableItemRelation\`.
+  """
+  singleTableItemRelationsByParentId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`SingleTableItemRelation\`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+  ): SingleTableItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of \`SingleTableItemRelationCompositePk\`.
+  """
+  singleTableItemRelationCompositePksByChildId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+  ): SingleTableItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of \`SingleTableItemRelationCompositePk\`.
+  """
+  singleTableItemRelationCompositePksByParentId(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`SingleTableItemRelationCompositePk\`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+  ): SingleTableItemRelationCompositePksConnection!
+
+  """
+  Reads a single \`SingleTableTopic\` that is related to this \`SingleTableTopic\`.
+  """
+  rootTopic: SingleTableTopic
 }
 
 type SingleTablePost implements SingleTableItem {
@@ -6815,57 +7632,6 @@ type RelationalTopic implements RelationalItem {
     """
     condition: RelationalItemRelationCompositePkCondition
   ): RelationalItemRelationCompositePksConnection!
-}
-
-"""Methods to use when ordering \`RelationalItemRelation\`."""
-enum RelationalItemRelationsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  CHILD_ID_ASC
-  CHILD_ID_DESC
-}
-
-"""
-A condition to be used against \`RelationalItemRelation\` object types. All fields
-are tested for equality and combined with a logical ‘and.’
-"""
-input RelationalItemRelationCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-
-  """Checks for equality with the object’s \`parentId\` field."""
-  parentId: Int
-
-  """Checks for equality with the object’s \`childId\` field."""
-  childId: Int
-}
-
-"""Methods to use when ordering \`RelationalItemRelationCompositePk\`."""
-enum RelationalItemRelationCompositePksOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  PARENT_ID_ASC
-  PARENT_ID_DESC
-  CHILD_ID_ASC
-  CHILD_ID_DESC
-}
-
-"""
-A condition to be used against \`RelationalItemRelationCompositePk\` object types.
-All fields are tested for equality and combined with a logical ‘and.’
-"""
-input RelationalItemRelationCompositePkCondition {
-  """Checks for equality with the object’s \`parentId\` field."""
-  parentId: Int
-
-  """Checks for equality with the object’s \`childId\` field."""
-  childId: Int
 }
 
 type RelationalPost implements RelationalItem {
@@ -8200,32 +8966,6 @@ type Query {
   ): RelationalItemsConnection
 }
 
-"""Methods to use when ordering \`Vulnerability\`."""
-enum VulnerabilitiesOrderBy {
-  NATURAL
-  ID_ASC
-  ID_DESC
-  NAME_ASC
-  NAME_DESC
-  CVSS_SCORE_ASC
-  CVSS_SCORE_DESC
-}
-
-"""
-A condition to be used against \`Vulnerability\` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input VulnerabilityCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-
-  """Checks for equality with the object’s \`name\` field."""
-  name: String
-
-  """Checks for equality with the object’s \`cvssScore\` field."""
-  cvssScore: Float
-}
-
 """A connection to a list of \`ZeroImplementation\` values."""
 type ZeroImplementationsConnection {
   """A list of \`ZeroImplementation\` objects."""
@@ -8901,355 +9641,339 @@ input RelationalPostCondition {
   archivedAt: Datetime
 }`;
 export const plans = {
-  SingleTableTopic: {
+  FirstPartyVulnerability: {
     __assertStep: assertPgClassSingleStep,
     id($record) {
       return $record.get("id");
     },
-    type($record) {
-      return $record.get("type");
+    name($record) {
+      return $record.get("name");
     },
-    parentId($record) {
-      return $record.get("parent_id");
+    cvssScore($record) {
+      return $record.get("cvss_score");
     },
-    rootTopicId($record) {
-      return $record.get("root_topic_id");
+    teamName($record) {
+      return $record.get("team_name");
     },
-    authorId($record) {
-      return $record.get("author_id");
+    applications: {
+      plan($parent) {
+        const $record = undefined ? $parent.get("result") : $parent;
+        for (let i = 0, l = paths.length; i < l; i++) {
+          const path = paths[i];
+          const firstLayer = path.layers[0];
+          const member = members[i];
+          member.match = firstLayer.localAttributes.reduce((memo, col, idx) => {
+            memo[firstLayer.remoteAttributes[idx]] = {
+              step: $record.get(col)
+            };
+            return memo;
+          }, Object.create(null));
+        }
+        const $list = pgUnionAll({
+          attributes: ApplicationAttributes,
+          resourceByTypeName,
+          members,
+          name: "applications"
+        });
+        if (true) {
+          return connection($list);
+        } else if (false) {
+          return $list.single();
+        } else {
+          return $list;
+        }
+      },
+      args: {
+        first: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
+        },
+        last: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
+        },
+        offset: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        },
+        before: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
+        },
+        after: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
+        },
+        orderBy: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val, info) {
+            const $value = val.getRaw();
+            const $select = $connection.getSubplan();
+            applyOrderToPlan($select, $value, info.schema.getType("ApplicationsOrderBy"));
+            return null;
+          }
+        },
+        condition: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_condition, $connection) {
+            const $select = $connection.getSubplan();
+            return $select.wherePlan();
+          }
+        },
+        only: {
+          autoApplyAfterParentPlan: true,
+          applyPlan($parent, $connection, fieldArgs) {
+            const $union = $connection.getSubplan();
+            $union.limitToTypes(fieldArgs.getRaw().eval());
+          }
+        }
+      }
     },
-    position($record) {
-      return $record.get("position");
-    },
-    createdAt($record) {
-      return $record.get("created_at");
-    },
-    updatedAt($record) {
-      return $record.get("updated_at");
-    },
-    isExplicitlyArchived($record) {
-      return $record.get("is_explicitly_archived");
-    },
-    archivedAt($record) {
-      return $record.get("archived_at");
-    },
-    title($record) {
-      return $record.get("title");
-    },
-    personByAuthorId($record) {
-      return otherSource_peoplePgResource.get({
-        person_id: $record.get("author_id")
+    owners($parent) {
+      const $record = undefined ? $parent.get("result") : $parent;
+      for (let i = 0, l = paths2.length; i < l; i++) {
+        const path = paths2[i];
+        const firstLayer = path.layers[0];
+        const member = members2[i];
+        member.match = firstLayer.localAttributes.reduce((memo, col, idx) => {
+          memo[firstLayer.remoteAttributes[idx]] = {
+            step: $record.get(col)
+          };
+          return memo;
+        }, Object.create(null));
+      }
+      const $list = pgUnionAll({
+        attributes,
+        resourceByTypeName: resourceByTypeName2,
+        members: members2,
+        name: "owners"
       });
-    },
-    singleTableItemByParentId($record) {
-      return otherSource_single_table_itemsPgResource.get({
-        id: $record.get("parent_id")
-      });
-    },
-    singleTableItemsByParentId: {
-      plan($record) {
-        const $records = otherSource_single_table_itemsPgResource.find({
-          parent_id: $record.get("id")
-        });
-        return connection($records);
-      },
-      args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
-        },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
-        },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
-        },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemsOrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
-        }
+      if (true) {
+        return connection($list);
+      } else if (false) {
+        return $list.single();
+      } else {
+        return $list;
       }
-    },
-    singleTableItemRelationsByChildId: {
-      plan($record) {
-        const $records = otherSource_single_table_item_relationsPgResource.find({
-          child_id: $record.get("id")
-        });
-        return connection($records);
-      },
-      args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
-        },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
-        },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
-        },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationsOrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
-        }
-      }
-    },
-    singleTableItemRelationsByParentId: {
-      plan($record) {
-        const $records = otherSource_single_table_item_relationsPgResource.find({
-          parent_id: $record.get("id")
-        });
-        return connection($records);
-      },
-      args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
-        },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
-        },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
-        },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationsOrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
-        }
-      }
-    },
-    singleTableItemRelationCompositePksByChildId: {
-      plan($record) {
-        const $records = otherSource_single_table_item_relation_composite_pksPgResource.find({
-          child_id: $record.get("id")
-        });
-        return connection($records);
-      },
-      args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
-        },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
-        },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
-        },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationCompositePksOrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
-        }
-      }
-    },
-    singleTableItemRelationCompositePksByParentId: {
-      plan($record) {
-        const $records = otherSource_single_table_item_relation_composite_pksPgResource.find({
-          parent_id: $record.get("id")
-        });
-        return connection($records);
-      },
-      args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
-        },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
-        },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
-        },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationCompositePksOrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
-        }
-      }
-    },
-    rootTopic($record) {
-      return otherSource_single_table_itemsPgResource.get({
-        id: $record.get("root_topic_id")
-      });
     }
   },
-  BigInt: {
-    serialize: BigIntSerialize,
-    parseValue: BigIntSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"BigInt" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
+  ApplicationsConnection: {
+    __assertStep: ConnectionStep,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
+    totalCount($connection) {
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
   },
   Datetime: {
-    serialize: BigIntSerialize,
-    parseValue: BigIntSerialize,
+    serialize: DatetimeSerialize,
+    parseValue: DatetimeSerialize,
     parseLiteral(ast) {
       if (ast.kind !== Kind.STRING) {
         throw new GraphQLError(`${"Datetime" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
       }
       return ast.value;
+    }
+  },
+  VulnerabilitiesConnection: {
+    __assertStep: ConnectionStep,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
+    totalCount($connection) {
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+    }
+  },
+  VulnerabilitiesEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
+  },
+  Cursor: {
+    serialize: DatetimeSerialize,
+    parseValue: DatetimeSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  PageInfo: {
+    __assertStep: assertPageInfoCapableStep,
+    hasNextPage($pageInfo) {
+      return $pageInfo.hasNextPage();
+    },
+    hasPreviousPage($pageInfo) {
+      return $pageInfo.hasPreviousPage();
+    },
+    startCursor($pageInfo) {
+      return $pageInfo.startCursor();
+    },
+    endCursor($pageInfo) {
+      return $pageInfo.endCursor();
+    }
+  },
+  Organization: {
+    __assertStep: assertPgClassSingleStep,
+    organizationId($record) {
+      return $record.get("organization_id");
+    },
+    name($record) {
+      return $record.get("name");
+    },
+    logEntriesByOrganizationId: {
+      plan($record) {
+        const $records = otherSource_log_entriesPgResource.find({
+          organization_id: $record.get("organization_id")
+        });
+        return connection($records);
+      },
+      args: {
+        first: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
+        },
+        last: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
+        },
+        offset: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        },
+        before: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
+        },
+        after: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
+        },
+        orderBy: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val, info) {
+            const $value = val.getRaw();
+            const $select = $connection.getSubplan();
+            applyOrderToPlan($select, $value, info.schema.getType("LogEntriesOrderBy"));
+            return null;
+          }
+        },
+        condition: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_condition, $connection) {
+            const $select = $connection.getSubplan();
+            return $select.wherePlan();
+          }
+        }
+      }
+    }
+  },
+  LogEntriesConnection: {
+    __assertStep: ConnectionStep,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
+    totalCount($connection) {
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+    }
+  },
+  LogEntry: {
+    __assertStep: assertPgClassSingleStep,
+    id($record) {
+      return $record.get("id");
+    },
+    personId($record) {
+      return $record.get("person_id");
+    },
+    organizationId($record) {
+      return $record.get("organization_id");
+    },
+    text($record) {
+      return $record.get("text");
+    },
+    organizationByOrganizationId($record) {
+      return paths_1_resource_organizationsPgResource.get({
+        organization_id: $record.get("organization_id")
+      });
+    },
+    personByPersonId($record) {
+      return paths_0_resource_peoplePgResource.get({
+        person_id: $record.get("person_id")
+      });
+    },
+    author($parent) {
+      const $record = undefined ? $parent.get("result") : $parent;
+      for (let i = 0, l = paths3.length; i < l; i++) {
+        const path = paths3[i];
+        const firstLayer = path.layers[0];
+        const member = members3[i];
+        member.match = firstLayer.localAttributes.reduce((memo, col, idx) => {
+          memo[firstLayer.remoteAttributes[idx]] = {
+            step: $record.get(col)
+          };
+          return memo;
+        }, Object.create(null));
+      }
+      const $list = pgUnionAll({
+        attributes: attributes2,
+        resourceByTypeName: resourceByTypeName3,
+        members: members3,
+        name: "author"
+      });
+      if (false) {
+        return connection($list);
+      } else if (true) {
+        return $list.single();
+      } else {
+        return $list;
+      }
     }
   },
   Person: {
@@ -9431,10 +10155,10 @@ export const plans = {
     applications: {
       plan($parent) {
         const $record = undefined ? $parent.get("result") : $parent;
-        for (let i = 0, l = paths.length; i < l; i++) {
-          const path = paths[i];
+        for (let i = 0, l = paths4.length; i < l; i++) {
+          const path = paths4[i];
           const firstLayer = path.layers[0];
-          const member = members[i];
+          const member = members4[i];
           member.match = firstLayer.localAttributes.reduce((memo, col, idx) => {
             memo[firstLayer.remoteAttributes[idx]] = {
               step: $record.get(col)
@@ -9443,9 +10167,9 @@ export const plans = {
           }, Object.create(null));
         }
         const $list = pgUnionAll({
-          attributes: spec_Application.attributes,
-          resourceByTypeName,
-          members,
+          attributes: ApplicationAttributes,
+          resourceByTypeName: resourceByTypeName4,
+          members: members4,
           name: "applications"
         });
         if (true) {
@@ -9511,149 +10235,6 @@ export const plans = {
           }
         }
       }
-    }
-  },
-  LogEntriesConnection: {
-    __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
-    }
-  },
-  LogEntry: {
-    __assertStep: assertPgClassSingleStep,
-    id($record) {
-      return $record.get("id");
-    },
-    personId($record) {
-      return $record.get("person_id");
-    },
-    organizationId($record) {
-      return $record.get("organization_id");
-    },
-    text($record) {
-      return $record.get("text");
-    },
-    organizationByOrganizationId($record) {
-      return otherSource_organizationsPgResource.get({
-        organization_id: $record.get("organization_id")
-      });
-    },
-    personByPersonId($record) {
-      return otherSource_peoplePgResource.get({
-        person_id: $record.get("person_id")
-      });
-    },
-    author($parent) {
-      const $record = undefined ? $parent.get("result") : $parent;
-      for (let i = 0, l = paths2.length; i < l; i++) {
-        const path = paths2[i];
-        const firstLayer = path.layers[0];
-        const member = members2[i];
-        member.match = firstLayer.localAttributes.reduce((memo, col, idx) => {
-          memo[firstLayer.remoteAttributes[idx]] = {
-            step: $record.get(col)
-          };
-          return memo;
-        }, Object.create(null));
-      }
-      const $list = pgUnionAll({
-        attributes,
-        resourceByTypeName: resourceByTypeName2,
-        members: members2,
-        name: "author"
-      });
-      if (false) {
-        return connection($list);
-      } else if (true) {
-        return $list.single();
-      } else {
-        return $list;
-      }
-    }
-  },
-  Organization: {
-    __assertStep: assertPgClassSingleStep,
-    organizationId($record) {
-      return $record.get("organization_id");
-    },
-    name($record) {
-      return $record.get("name");
-    },
-    logEntriesByOrganizationId: {
-      plan($record) {
-        const $records = otherSource_log_entriesPgResource.find({
-          organization_id: $record.get("organization_id")
-        });
-        return connection($records);
-      },
-      args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
-        },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
-        },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
-        },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("LogEntriesOrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
-        }
-      }
-    }
-  },
-  Cursor: {
-    serialize: BigIntSerialize,
-    parseValue: BigIntSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
     }
   },
   LogEntriesOrderBy: {
@@ -9923,30 +10504,6 @@ export const plans = {
       autoApplyAfterParentApplyPlan: true
     }
   },
-  LogEntriesEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  PageInfo: {
-    __assertStep: assertPageInfoCapableStep,
-    hasNextPage($pageInfo) {
-      return $pageInfo.hasNextPage();
-    },
-    hasPreviousPage($pageInfo) {
-      return $pageInfo.hasPreviousPage();
-    },
-    startCursor($pageInfo) {
-      return $pageInfo.startCursor();
-    },
-    endCursor($pageInfo) {
-      return $pageInfo.endCursor();
-    }
-  },
   SingleTableItemsConnection: {
     __assertStep: ConnectionStep,
     nodes($connection) {
@@ -9961,6 +10518,107 @@ export const plans = {
     },
     totalCount($connection) {
       return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+    }
+  },
+  BigInt: {
+    serialize: DatetimeSerialize,
+    parseValue: DatetimeSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"BigInt" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  SingleTableItemRelationsConnection: {
+    __assertStep: ConnectionStep,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
+    totalCount($connection) {
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+    }
+  },
+  SingleTableItemRelation: {
+    __assertStep: assertPgClassSingleStep,
+    id($record) {
+      return $record.get("id");
+    },
+    parentId($record) {
+      return $record.get("parent_id");
+    },
+    childId($record) {
+      return $record.get("child_id");
+    },
+    singleTableItemByChildId($record) {
+      return otherSource_single_table_itemsPgResource.get({
+        id: $record.get("child_id")
+      });
+    },
+    singleTableItemByParentId($record) {
+      return otherSource_single_table_itemsPgResource.get({
+        id: $record.get("parent_id")
+      });
+    }
+  },
+  SingleTableItemRelationsEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
+  },
+  SingleTableItemRelationCompositePksConnection: {
+    __assertStep: ConnectionStep,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
+    totalCount($connection) {
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+    }
+  },
+  SingleTableItemRelationCompositePk: {
+    __assertStep: assertPgClassSingleStep,
+    parentId($record) {
+      return $record.get("parent_id");
+    },
+    childId($record) {
+      return $record.get("child_id");
+    },
+    singleTableItemByChildId($record) {
+      return otherSource_single_table_itemsPgResource.get({
+        id: $record.get("child_id")
+      });
+    },
+    singleTableItemByParentId($record) {
+      return otherSource_single_table_itemsPgResource.get({
+        id: $record.get("parent_id")
+      });
+    }
+  },
+  SingleTableItemRelationCompositePksEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
     }
   },
   SingleTableItemsEdge: {
@@ -11306,78 +11964,6 @@ export const plans = {
       autoApplyAfterParentApplyPlan: true
     }
   },
-  ApplicationsConnection: {
-    __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
-    }
-  },
-  VulnerabilitiesConnection: {
-    __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
-    }
-  },
-  PersonOrOrganizationConnection: {
-    __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    }
-  },
-  PersonOrOrganizationEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  VulnerabilitiesEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  ApplicationsEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
   ApplicationsOrderBy: {
     NATURAL: {
       applyPlan() {}
@@ -11501,7 +12087,7 @@ export const plans = {
             type: "attribute",
             attribute: "id",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Application.attributes.id.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), ApplicationAttributes.id.codec)}`;
             }
           });
         }
@@ -11524,7 +12110,7 @@ export const plans = {
             type: "attribute",
             attribute: "name",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Application.attributes.name.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), ApplicationAttributes.name.codec)}`;
             }
           });
         }
@@ -11547,7 +12133,7 @@ export const plans = {
             type: "attribute",
             attribute: "last_deployed",
             callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Application.attributes.last_deployed.codec)}`;
+              return sql`${expression} = ${$condition.placeholder(val.get(), ApplicationAttributes.last_deployed.codec)}`;
             }
           });
         }
@@ -11556,7 +12142,25 @@ export const plans = {
       autoApplyAfterParentApplyPlan: true
     }
   },
-  SingleTableItemRelationsConnection: {
+  LogEntriesEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
+  },
+  ApplicationsEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
+  },
+  PersonOrOrganizationConnection: {
     __assertStep: ConnectionStep,
     nodes($connection) {
       return $connection.nodes();
@@ -11567,84 +12171,966 @@ export const plans = {
     pageInfo($connection) {
       // TYPES: why is this a TypeScript issue without the 'any'?
       return $connection.pageInfo();
-    },
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
     }
   },
-  SingleTableItemRelation: {
+  PersonOrOrganizationEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
+  },
+  GcpApplication: {
     __assertStep: assertPgClassSingleStep,
     id($record) {
       return $record.get("id");
     },
-    parentId($record) {
-      return $record.get("parent_id");
+    name($record) {
+      return $record.get("name");
     },
-    childId($record) {
-      return $record.get("child_id");
+    lastDeployed($record) {
+      return $record.get("last_deployed");
     },
-    singleTableItemByChildId($record) {
-      return otherSource_single_table_itemsPgResource.get({
-        id: $record.get("child_id")
+    personId($record) {
+      return $record.get("person_id");
+    },
+    organizationId($record) {
+      return $record.get("organization_id");
+    },
+    gcpId($record) {
+      return $record.get("gcp_id");
+    },
+    organizationByOrganizationId($record) {
+      return paths_1_resource_organizationsPgResource.get({
+        organization_id: $record.get("organization_id")
       });
     },
-    singleTableItemByParentId($record) {
-      return otherSource_single_table_itemsPgResource.get({
-        id: $record.get("parent_id")
+    personByPersonId($record) {
+      return paths_0_resource_peoplePgResource.get({
+        person_id: $record.get("person_id")
       });
+    },
+    vulnerabilities: {
+      plan($parent) {
+        const $record = undefined ? $parent.get("result") : $parent;
+        for (let i = 0, l = paths5.length; i < l; i++) {
+          const path = paths5[i];
+          const firstLayer = path.layers[0];
+          const member = members5[i];
+          member.match = firstLayer.localAttributes.reduce((memo, col, idx) => {
+            memo[firstLayer.remoteAttributes[idx]] = {
+              step: $record.get(col)
+            };
+            return memo;
+          }, Object.create(null));
+        }
+        const $list = pgUnionAll({
+          attributes: spec_Vulnerability.attributes,
+          resourceByTypeName: resourceByTypeName5,
+          members: members5,
+          name: "vulnerabilities"
+        });
+        if (true) {
+          return connection($list);
+        } else if (false) {
+          return $list.single();
+        } else {
+          return $list;
+        }
+      },
+      args: {
+        first: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
+        },
+        last: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
+        },
+        offset: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        },
+        before: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
+        },
+        after: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
+        },
+        orderBy: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val, info) {
+            const $value = val.getRaw();
+            const $select = $connection.getSubplan();
+            applyOrderToPlan($select, $value, info.schema.getType("VulnerabilitiesOrderBy"));
+            return null;
+          }
+        },
+        condition: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_condition, $connection) {
+            const $select = $connection.getSubplan();
+            return $select.wherePlan();
+          }
+        },
+        only: {
+          autoApplyAfterParentPlan: true,
+          applyPlan($parent, $connection, fieldArgs) {
+            const $union = $connection.getSubplan();
+            $union.limitToTypes(fieldArgs.getRaw().eval());
+          }
+        }
+      }
+    },
+    owner($parent) {
+      const $record = undefined ? $parent.get("result") : $parent;
+      for (let i = 0, l = paths6.length; i < l; i++) {
+        const path = paths6[i];
+        const firstLayer = path.layers[0];
+        const member = members6[i];
+        member.match = firstLayer.localAttributes.reduce((memo, col, idx) => {
+          memo[firstLayer.remoteAttributes[idx]] = {
+            step: $record.get(col)
+          };
+          return memo;
+        }, Object.create(null));
+      }
+      const $list = pgUnionAll({
+        attributes: attributes3,
+        resourceByTypeName: resourceByTypeName6,
+        members: members6,
+        name: "owner"
+      });
+      if (false) {
+        return connection($list);
+      } else if (true) {
+        return $list.single();
+      } else {
+        return $list;
+      }
     }
   },
-  SingleTableItemRelationsEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
+  VulnerabilitiesOrderBy: {
+    NATURAL: {
+      applyPlan() {}
     },
-    node($edge) {
-      return $edge.node();
+    ID_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "id",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    ID_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "id",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    NAME_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "name",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    NAME_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "name",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    CVSS_SCORE_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "cvss_score",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    CVSS_SCORE_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "cvss_score",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
     }
   },
-  SingleTableItemRelationCompositePksConnection: {
-    __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
+  VulnerabilityCondition: {
+    id: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Vulnerability.attributes.id.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
     },
-    edges($connection) {
-      return $connection.edges();
+    name: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "name",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "name",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Vulnerability.attributes.name.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
     },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+    cvssScore: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "cvss_score",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "cvss_score",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Vulnerability.attributes.cvss_score.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
     }
   },
-  SingleTableItemRelationCompositePk: {
+  AwsApplication: {
     __assertStep: assertPgClassSingleStep,
-    parentId($record) {
-      return $record.get("parent_id");
+    id($record) {
+      return $record.get("id");
     },
-    childId($record) {
-      return $record.get("child_id");
+    name($record) {
+      return $record.get("name");
     },
-    singleTableItemByChildId($record) {
-      return otherSource_single_table_itemsPgResource.get({
-        id: $record.get("child_id")
+    lastDeployed($record) {
+      return $record.get("last_deployed");
+    },
+    personId($record) {
+      return $record.get("person_id");
+    },
+    organizationId($record) {
+      return $record.get("organization_id");
+    },
+    awsId($record) {
+      return $record.get("aws_id");
+    },
+    organizationByOrganizationId($record) {
+      return paths_1_resource_organizationsPgResource.get({
+        organization_id: $record.get("organization_id")
       });
     },
-    singleTableItemByParentId($record) {
-      return otherSource_single_table_itemsPgResource.get({
-        id: $record.get("parent_id")
+    personByPersonId($record) {
+      return paths_0_resource_peoplePgResource.get({
+        person_id: $record.get("person_id")
       });
+    },
+    vulnerabilities: {
+      plan($parent) {
+        const $record = undefined ? $parent.get("result") : $parent;
+        for (let i = 0, l = paths7.length; i < l; i++) {
+          const path = paths7[i];
+          const firstLayer = path.layers[0];
+          const member = members7[i];
+          member.match = firstLayer.localAttributes.reduce((memo, col, idx) => {
+            memo[firstLayer.remoteAttributes[idx]] = {
+              step: $record.get(col)
+            };
+            return memo;
+          }, Object.create(null));
+        }
+        const $list = pgUnionAll({
+          attributes: spec_Vulnerability.attributes,
+          resourceByTypeName: resourceByTypeName7,
+          members: members7,
+          name: "vulnerabilities"
+        });
+        if (true) {
+          return connection($list);
+        } else if (false) {
+          return $list.single();
+        } else {
+          return $list;
+        }
+      },
+      args: {
+        first: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
+        },
+        last: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
+        },
+        offset: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        },
+        before: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
+        },
+        after: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
+        },
+        orderBy: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val, info) {
+            const $value = val.getRaw();
+            const $select = $connection.getSubplan();
+            applyOrderToPlan($select, $value, info.schema.getType("VulnerabilitiesOrderBy"));
+            return null;
+          }
+        },
+        condition: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_condition, $connection) {
+            const $select = $connection.getSubplan();
+            return $select.wherePlan();
+          }
+        },
+        only: {
+          autoApplyAfterParentPlan: true,
+          applyPlan($parent, $connection, fieldArgs) {
+            const $union = $connection.getSubplan();
+            $union.limitToTypes(fieldArgs.getRaw().eval());
+          }
+        }
+      }
+    },
+    owner($parent) {
+      const $record = undefined ? $parent.get("result") : $parent;
+      for (let i = 0, l = paths8.length; i < l; i++) {
+        const path = paths8[i];
+        const firstLayer = path.layers[0];
+        const member = members8[i];
+        member.match = firstLayer.localAttributes.reduce((memo, col, idx) => {
+          memo[firstLayer.remoteAttributes[idx]] = {
+            step: $record.get(col)
+          };
+          return memo;
+        }, Object.create(null));
+      }
+      const $list = pgUnionAll({
+        attributes: attributes4,
+        resourceByTypeName: resourceByTypeName8,
+        members: members8,
+        name: "owner"
+      });
+      if (false) {
+        return connection($list);
+      } else if (true) {
+        return $list.single();
+      } else {
+        return $list;
+      }
     }
   },
-  SingleTableItemRelationCompositePksEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
+  ThirdPartyVulnerability: {
+    __assertStep: assertPgClassSingleStep,
+    id($record) {
+      return $record.get("id");
     },
-    node($edge) {
-      return $edge.node();
+    name($record) {
+      return $record.get("name");
+    },
+    cvssScore($record) {
+      return $record.get("cvss_score");
+    },
+    vendorName($record) {
+      return $record.get("vendor_name");
+    },
+    applications: {
+      plan($parent) {
+        const $record = undefined ? $parent.get("result") : $parent;
+        for (let i = 0, l = paths9.length; i < l; i++) {
+          const path = paths9[i];
+          const firstLayer = path.layers[0];
+          const member = members9[i];
+          member.match = firstLayer.localAttributes.reduce((memo, col, idx) => {
+            memo[firstLayer.remoteAttributes[idx]] = {
+              step: $record.get(col)
+            };
+            return memo;
+          }, Object.create(null));
+        }
+        const $list = pgUnionAll({
+          attributes: ApplicationAttributes,
+          resourceByTypeName: resourceByTypeName9,
+          members: members9,
+          name: "applications"
+        });
+        if (true) {
+          return connection($list);
+        } else if (false) {
+          return $list.single();
+        } else {
+          return $list;
+        }
+      },
+      args: {
+        first: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
+        },
+        last: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
+        },
+        offset: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        },
+        before: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
+        },
+        after: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
+        },
+        orderBy: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val, info) {
+            const $value = val.getRaw();
+            const $select = $connection.getSubplan();
+            applyOrderToPlan($select, $value, info.schema.getType("ApplicationsOrderBy"));
+            return null;
+          }
+        },
+        condition: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_condition, $connection) {
+            const $select = $connection.getSubplan();
+            return $select.wherePlan();
+          }
+        },
+        only: {
+          autoApplyAfterParentPlan: true,
+          applyPlan($parent, $connection, fieldArgs) {
+            const $union = $connection.getSubplan();
+            $union.limitToTypes(fieldArgs.getRaw().eval());
+          }
+        }
+      }
+    },
+    owners($parent) {
+      const $record = undefined ? $parent.get("result") : $parent;
+      for (let i = 0, l = paths10.length; i < l; i++) {
+        const path = paths10[i];
+        const firstLayer = path.layers[0];
+        const member = members10[i];
+        member.match = firstLayer.localAttributes.reduce((memo, col, idx) => {
+          memo[firstLayer.remoteAttributes[idx]] = {
+            step: $record.get(col)
+          };
+          return memo;
+        }, Object.create(null));
+      }
+      const $list = pgUnionAll({
+        attributes: attributes5,
+        resourceByTypeName: resourceByTypeName10,
+        members: members10,
+        name: "owners"
+      });
+      if (true) {
+        return connection($list);
+      } else if (false) {
+        return $list.single();
+      } else {
+        return $list;
+      }
+    }
+  },
+  RelationalItemRelationsOrderBy: {
+    NATURAL: {
+      applyPlan() {}
+    },
+    PRIMARY_KEY_ASC: {
+      applyPlan(step) {
+        relational_item_relationsUniques[0].attributes.forEach(attributeName => {
+          const attribute = relationalItemRelationsCodec.attributes[attributeName];
+          step.orderBy({
+            codec: attribute.codec,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
+            direction: "ASC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+        });
+        step.setOrderIsUnique();
+      }
+    },
+    PRIMARY_KEY_DESC: {
+      applyPlan(step) {
+        relational_item_relationsUniques[0].attributes.forEach(attributeName => {
+          const attribute = relationalItemRelationsCodec.attributes[attributeName];
+          step.orderBy({
+            codec: attribute.codec,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
+            direction: "DESC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+        });
+        step.setOrderIsUnique();
+      }
+    },
+    ID_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "id",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (true) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    ID_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "id",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (true) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    PARENT_ID_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "parent_id",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (true) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    PARENT_ID_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "parent_id",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (true) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    CHILD_ID_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "child_id",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    CHILD_ID_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "child_id",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    }
+  },
+  RelationalItemRelationCondition: {
+    id: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelations.attributes.id.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    parentId: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "parent_id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "parent_id",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelations.attributes.parent_id.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    childId: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "child_id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "child_id",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelations.attributes.child_id.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
+  RelationalItemRelationCompositePksOrderBy: {
+    NATURAL: {
+      applyPlan() {}
+    },
+    PRIMARY_KEY_ASC: {
+      applyPlan(step) {
+        relational_item_relation_composite_pksUniques[0].attributes.forEach(attributeName => {
+          const attribute = relationalItemRelationCompositePksCodec.attributes[attributeName];
+          step.orderBy({
+            codec: attribute.codec,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
+            direction: "ASC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+        });
+        step.setOrderIsUnique();
+      }
+    },
+    PRIMARY_KEY_DESC: {
+      applyPlan(step) {
+        relational_item_relation_composite_pksUniques[0].attributes.forEach(attributeName => {
+          const attribute = relationalItemRelationCompositePksCodec.attributes[attributeName];
+          step.orderBy({
+            codec: attribute.codec,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
+            direction: "DESC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+        });
+        step.setOrderIsUnique();
+      }
+    },
+    PARENT_ID_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "parent_id",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (true) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    PARENT_ID_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "parent_id",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (true) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    CHILD_ID_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "child_id",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    CHILD_ID_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "child_id",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    }
+  },
+  RelationalItemRelationCompositePkCondition: {
+    parentId: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "parent_id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "parent_id",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelationCompositePks.attributes.parent_id.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    childId: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "child_id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "child_id",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelationCompositePks.attributes.child_id.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
     }
   },
   SingleTableItemRelationsOrderBy: {
@@ -12010,6 +13496,337 @@ export const plans = {
       autoApplyAfterParentApplyPlan: true
     }
   },
+  SingleTableTopic: {
+    __assertStep: assertPgClassSingleStep,
+    id($record) {
+      return $record.get("id");
+    },
+    type($record) {
+      return $record.get("type");
+    },
+    parentId($record) {
+      return $record.get("parent_id");
+    },
+    rootTopicId($record) {
+      return $record.get("root_topic_id");
+    },
+    authorId($record) {
+      return $record.get("author_id");
+    },
+    position($record) {
+      return $record.get("position");
+    },
+    createdAt($record) {
+      return $record.get("created_at");
+    },
+    updatedAt($record) {
+      return $record.get("updated_at");
+    },
+    isExplicitlyArchived($record) {
+      return $record.get("is_explicitly_archived");
+    },
+    archivedAt($record) {
+      return $record.get("archived_at");
+    },
+    title($record) {
+      return $record.get("title");
+    },
+    personByAuthorId($record) {
+      return paths_0_resource_peoplePgResource.get({
+        person_id: $record.get("author_id")
+      });
+    },
+    singleTableItemByParentId($record) {
+      return otherSource_single_table_itemsPgResource.get({
+        id: $record.get("parent_id")
+      });
+    },
+    singleTableItemsByParentId: {
+      plan($record) {
+        const $records = otherSource_single_table_itemsPgResource.find({
+          parent_id: $record.get("id")
+        });
+        return connection($records);
+      },
+      args: {
+        first: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
+        },
+        last: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
+        },
+        offset: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        },
+        before: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
+        },
+        after: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
+        },
+        orderBy: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val, info) {
+            const $value = val.getRaw();
+            const $select = $connection.getSubplan();
+            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemsOrderBy"));
+            return null;
+          }
+        },
+        condition: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_condition, $connection) {
+            const $select = $connection.getSubplan();
+            return $select.wherePlan();
+          }
+        }
+      }
+    },
+    singleTableItemRelationsByChildId: {
+      plan($record) {
+        const $records = otherSource_single_table_item_relationsPgResource.find({
+          child_id: $record.get("id")
+        });
+        return connection($records);
+      },
+      args: {
+        first: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
+        },
+        last: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
+        },
+        offset: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        },
+        before: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
+        },
+        after: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
+        },
+        orderBy: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val, info) {
+            const $value = val.getRaw();
+            const $select = $connection.getSubplan();
+            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationsOrderBy"));
+            return null;
+          }
+        },
+        condition: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_condition, $connection) {
+            const $select = $connection.getSubplan();
+            return $select.wherePlan();
+          }
+        }
+      }
+    },
+    singleTableItemRelationsByParentId: {
+      plan($record) {
+        const $records = otherSource_single_table_item_relationsPgResource.find({
+          parent_id: $record.get("id")
+        });
+        return connection($records);
+      },
+      args: {
+        first: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
+        },
+        last: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
+        },
+        offset: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        },
+        before: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
+        },
+        after: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
+        },
+        orderBy: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val, info) {
+            const $value = val.getRaw();
+            const $select = $connection.getSubplan();
+            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationsOrderBy"));
+            return null;
+          }
+        },
+        condition: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_condition, $connection) {
+            const $select = $connection.getSubplan();
+            return $select.wherePlan();
+          }
+        }
+      }
+    },
+    singleTableItemRelationCompositePksByChildId: {
+      plan($record) {
+        const $records = otherSource_single_table_item_relation_composite_pksPgResource.find({
+          child_id: $record.get("id")
+        });
+        return connection($records);
+      },
+      args: {
+        first: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
+        },
+        last: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
+        },
+        offset: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        },
+        before: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
+        },
+        after: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
+        },
+        orderBy: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val, info) {
+            const $value = val.getRaw();
+            const $select = $connection.getSubplan();
+            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationCompositePksOrderBy"));
+            return null;
+          }
+        },
+        condition: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_condition, $connection) {
+            const $select = $connection.getSubplan();
+            return $select.wherePlan();
+          }
+        }
+      }
+    },
+    singleTableItemRelationCompositePksByParentId: {
+      plan($record) {
+        const $records = otherSource_single_table_item_relation_composite_pksPgResource.find({
+          parent_id: $record.get("id")
+        });
+        return connection($records);
+      },
+      args: {
+        first: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
+        },
+        last: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
+        },
+        offset: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        },
+        before: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
+        },
+        after: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
+        },
+        orderBy: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val, info) {
+            const $value = val.getRaw();
+            const $select = $connection.getSubplan();
+            applyOrderToPlan($select, $value, info.schema.getType("SingleTableItemRelationCompositePksOrderBy"));
+            return null;
+          }
+        },
+        condition: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_condition, $connection) {
+            const $select = $connection.getSubplan();
+            return $select.wherePlan();
+          }
+        }
+      }
+    },
+    rootTopic($record) {
+      return otherSource_single_table_itemsPgResource.get({
+        id: $record.get("root_topic_id")
+      });
+    }
+  },
   SingleTablePost: {
     __assertStep: assertPgClassSingleStep,
     id($record) {
@@ -12055,7 +13872,7 @@ export const plans = {
       return $record.get("priority_id");
     },
     personByAuthorId($record) {
-      return otherSource_peoplePgResource.get({
+      return paths_0_resource_peoplePgResource.get({
         person_id: $record.get("author_id")
       });
     },
@@ -12459,7 +14276,7 @@ export const plans = {
       return $record.get("color");
     },
     personByAuthorId($record) {
-      return otherSource_peoplePgResource.get({
+      return paths_0_resource_peoplePgResource.get({
         person_id: $record.get("author_id")
       });
     },
@@ -12790,7 +14607,7 @@ export const plans = {
       return $record.get("title");
     },
     personByAuthorId($record) {
-      return otherSource_peoplePgResource.get({
+      return paths_0_resource_peoplePgResource.get({
         person_id: $record.get("author_id")
       });
     },
@@ -13132,7 +14949,7 @@ export const plans = {
       return $record.get("priority_id");
     },
     personByAuthorId($record) {
-      return otherSource_peoplePgResource.get({
+      return paths_0_resource_peoplePgResource.get({
         person_id: $record.get("author_id")
       });
     },
@@ -13524,7 +15341,7 @@ export const plans = {
       }
     },
     personByAuthorId($record) {
-      const $people = otherSource_peoplePgResource.find();
+      const $people = paths_0_resource_peoplePgResource.find();
       let previousAlias = $people.alias;
       const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
       $people.join({
@@ -13886,369 +15703,6 @@ export const plans = {
       }
     }
   },
-  RelationalItemRelationsOrderBy: {
-    NATURAL: {
-      applyPlan() {}
-    },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        relational_item_relationsUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalItemRelationsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        relational_item_relationsUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalItemRelationsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PARENT_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PARENT_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CHILD_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "child_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CHILD_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "child_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    }
-  },
-  RelationalItemRelationCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelations.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelations.attributes.parent_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    childId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "child_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "child_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelations.attributes.child_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    }
-  },
-  RelationalItemRelationCompositePksOrderBy: {
-    NATURAL: {
-      applyPlan() {}
-    },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        relational_item_relation_composite_pksUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalItemRelationCompositePksCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        relational_item_relation_composite_pksUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalItemRelationCompositePksCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    PARENT_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    PARENT_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "parent_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CHILD_ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "child_id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CHILD_ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "child_id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    }
-  },
-  RelationalItemRelationCompositePkCondition: {
-    parentId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "parent_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelationCompositePks.attributes.parent_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    childId: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "child_id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "child_id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItemRelationCompositePks.attributes.child_id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    }
-  },
   RelationalPost: {
     __assertStep: assertPgClassSingleStep,
     title($record) {
@@ -14291,7 +15745,7 @@ export const plans = {
       return $record.get("archived_at");
     },
     personByAuthorId($record) {
-      const $people = otherSource_peoplePgResource.find();
+      const $people = paths_0_resource_peoplePgResource.find();
       let previousAlias = $people.alias;
       const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
       $people.join({
@@ -14692,7 +16146,7 @@ export const plans = {
       return $record.get("archived_at");
     },
     personByAuthorId($record) {
-      const $people = otherSource_peoplePgResource.find();
+      const $people = paths_0_resource_peoplePgResource.find();
       let previousAlias = $people.alias;
       const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
       $people.join({
@@ -15090,7 +16544,7 @@ export const plans = {
       return $record.get("archived_at");
     },
     personByAuthorId($record) {
-      const $people = otherSource_peoplePgResource.find();
+      const $people = paths_0_resource_peoplePgResource.find();
       let previousAlias = $people.alias;
       const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
       $people.join({
@@ -15491,7 +16945,7 @@ export const plans = {
       return $record.get("archived_at");
     },
     personByAuthorId($record) {
-      const $people = otherSource_peoplePgResource.find();
+      const $people = paths_0_resource_peoplePgResource.find();
       let previousAlias = $people.alias;
       const relational_itemsAlias = sql.identifier(Symbol("relational_items"));
       $people.join({
@@ -15862,7 +17316,7 @@ export const plans = {
     },
     organizationByOrganizationId: {
       plan(_$root, args) {
-        return otherSource_organizationsPgResource.get({
+        return paths_1_resource_organizationsPgResource.get({
           organization_id: args.get("organizationId")
         });
       },
@@ -15872,7 +17326,7 @@ export const plans = {
     },
     organizationByName: {
       plan(_$root, args) {
-        return otherSource_organizationsPgResource.get({
+        return paths_1_resource_organizationsPgResource.get({
           name: args.get("name")
         });
       },
@@ -15882,7 +17336,7 @@ export const plans = {
     },
     personByPersonId: {
       plan(_$root, args) {
-        return otherSource_peoplePgResource.get({
+        return paths_0_resource_peoplePgResource.get({
           person_id: args.get("personId")
         });
       },
@@ -15892,7 +17346,7 @@ export const plans = {
     },
     personByUsername: {
       plan(_$root, args) {
-        return otherSource_peoplePgResource.get({
+        return paths_0_resource_peoplePgResource.get({
           username: args.get("username")
         });
       },
@@ -16094,8 +17548,8 @@ export const plans = {
       plan() {
         const $list = pgUnionAll({
           attributes: spec_Vulnerability.attributes,
-          resourceByTypeName: resourceByTypeName3,
-          members: members3,
+          resourceByTypeName: resourceByTypeName11,
+          members: members11,
           name: "Vulnerability"
         });
         return true ? connection($list) : $list;
@@ -16159,9 +17613,9 @@ export const plans = {
     allApplications: {
       plan() {
         const $list = pgUnionAll({
-          attributes: spec_Application.attributes,
-          resourceByTypeName: resourceByTypeName4,
-          members: members4,
+          attributes: ApplicationAttributes,
+          resourceByTypeName: resourceByTypeName12,
+          members: members12,
           name: "Application"
         });
         return true ? connection($list) : $list;
@@ -16226,8 +17680,8 @@ export const plans = {
       plan() {
         const $list = pgUnionAll({
           attributes: spec_ZeroImplementation.attributes,
-          resourceByTypeName: resourceByTypeName5,
-          members: members5,
+          resourceByTypeName: resourceByTypeName13,
+          members: members13,
           name: "ZeroImplementation"
         });
         return true ? connection($list) : $list;
@@ -16283,7 +17737,7 @@ export const plans = {
     },
     allOrganizations: {
       plan() {
-        return connection(otherSource_organizationsPgResource.find());
+        return connection(paths_1_resource_organizationsPgResource.find());
       },
       args: {
         first: {
@@ -16336,7 +17790,7 @@ export const plans = {
     },
     allPeople: {
       plan() {
-        return connection(otherSource_peoplePgResource.find());
+        return connection(paths_0_resource_peoplePgResource.find());
       },
       args: {
         first: {
@@ -17059,184 +18513,6 @@ export const plans = {
           }
         }
       }
-    }
-  },
-  VulnerabilitiesOrderBy: {
-    NATURAL: {
-      applyPlan() {}
-    },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    NAME_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    NAME_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "name",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CVSS_SCORE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "cvss_score",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CVSS_SCORE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "cvss_score",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    }
-  },
-  VulnerabilityCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Vulnerability.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    name: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "name",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Vulnerability.attributes.name.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    cvssScore: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "cvss_score",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "cvss_score",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_Vulnerability.attributes.cvss_score.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
     }
   },
   ZeroImplementationsConnection: {
