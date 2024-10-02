@@ -21047,7 +21047,7 @@ type CLeftArmIdentityPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  result: CLeftArm
+  leftArm: CLeftArm
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -39657,7 +39657,7 @@ export const plans = {
     clientMutationId($object) {
       return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
     },
-    result($object) {
+    leftArm($object) {
       return $object.get("result");
     },
     query() {
