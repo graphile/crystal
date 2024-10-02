@@ -5687,6 +5687,7 @@ type SingleTableChecklist implements Node & SingleTableItem {
   createdAt: Datetime!
   id: Int!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
 
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -5878,6 +5879,7 @@ type SingleTableChecklistItem implements Node & SingleTableItem {
   description: String
   id: Int!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
 
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -6068,6 +6070,7 @@ type SingleTableDivider implements Node & SingleTableItem {
   createdAt: Datetime!
   id: Int!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
 
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -6667,6 +6670,7 @@ type SingleTablePost implements Node & SingleTableItem {
   description: String
   id: Int!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
 
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -6857,6 +6861,7 @@ type SingleTableTopic implements Node & SingleTableItem {
   createdAt: Datetime!
   id: Int!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
 
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
