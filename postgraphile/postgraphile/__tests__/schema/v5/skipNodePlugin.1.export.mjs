@@ -4492,7 +4492,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_1_mutation"
         },
-        tags: {}
+        tags: {
+          notNull: true
+        }
       },
       description: "lol, add some stuff 1 mutation"
     },
@@ -20452,7 +20454,7 @@ type Add1MutationPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  result: Int
+  result: Int!
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
