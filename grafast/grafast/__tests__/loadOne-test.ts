@@ -209,7 +209,8 @@ const makeSchema = (useStreamableStep = false) => {
           const $orgId = context().get("orgId");
           return loadOne(
             [$orgId, $regNo],
-            ["orgId", "orgRegNo"],
+            // Deliberately not using ioEquivalence here to test stable object/tuple creation
+            //["orgId", "orgRegNo"],
             loadThingByOrgIdRegNoTuples,
           );
         },
@@ -217,7 +218,8 @@ const makeSchema = (useStreamableStep = false) => {
           const $orgId = context().get("orgId");
           return loadOne(
             { orgId: $orgId, regNo: $regNo },
-            { orgId: "orgId", regNo: "orgRegNo" },
+            // Deliberately not using ioEquivalence here to test stable object/tuple creation
+            //{ orgId: "orgId", regNo: "orgRegNo" },
             loadThingByOrgIdRegNoObjs,
           );
         },
@@ -544,7 +546,7 @@ it("uses stable identifiers to avoid the need for double-fetches (tuple)", async
     },
   });
   expect(CALLS).to.have.length(1);
-  expect(CALLS[0].attributes).to.deep.equal(["id", "name"]);
+  expect(CALLS[0].attributes).to.deep.equal(["id", "name", "orgId"]);
 });
 
 it("uses stable identifiers to avoid the need for double-fetches (obj)", async () => {
@@ -593,5 +595,5 @@ it("uses stable identifiers to avoid the need for double-fetches (obj)", async (
     },
   });
   expect(CALLS).to.have.length(1);
-  expect(CALLS[0].attributes).to.deep.equal(["id", "name"]);
+  expect(CALLS[0].attributes).to.deep.equal(["id", "name", "orgId"]);
 });
