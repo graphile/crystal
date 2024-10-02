@@ -21,8 +21,9 @@ export const CollectReferencedTypesPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       GraphQLSchema_types(types, build, context) {
-        const set = new Set<GraphQLNamedType>();
+        const set = new Set<GraphQLNamedType>(types);
         for (const type of types) {
+          set.delete(type);
           collectReferencedTypes(type, set);
         }
         const { config } = context;
