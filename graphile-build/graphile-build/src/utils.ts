@@ -169,9 +169,12 @@ function breakLine(line: string, maxLen: number): Array<string> {
  * descriptions that contain code blocks or long inline code strings.
  */
 export const wrapDescription = (
-  description: string,
+  description: string | null | undefined,
   position: "root" | "type" | "field" | "arg",
-): string => {
+): string | null => {
+  if (description == null) {
+    return null;
+  }
   const indentationLength =
     position === "root"
       ? 0
@@ -204,7 +207,7 @@ export const wrapDescription = (
  * given description/coercion.
  */
 export const stringTypeSpec = (
-  description: string,
+  description: string | null,
   coerce?: (input: string) => string,
   name?: string,
 ): Omit<GraphQLScalarTypeConfig<any, any>, "name"> => ({
