@@ -2787,7 +2787,6 @@ export function makeExampleSchema(
             filter,
             groupBy,
             lambda,
-            list,
             messageResource,
           ) =>
             function plan($forum) {
@@ -2801,7 +2800,7 @@ export function makeExampleSchema(
               // Filter messages to those _not_ in this forum
               const $messagesFromOtherForums = filter($messages, ($message) =>
                 lambda(
-                  list([$message.get("forum_id"), $forum.get("id")]),
+                  [$message.get("forum_id"), $forum.get("id")],
                   ([messageForumId, forumId]) => messageForumId !== forumId,
                   true,
                 ),
@@ -2830,7 +2829,6 @@ export function makeExampleSchema(
             filter,
             groupBy,
             lambda,
-            list,
             messageResource,
           ],
         ),

@@ -106,6 +106,8 @@ import {
   UnbatchedExecutionExtra,
 } from "./interfaces.js";
 import { getGrafastMiddleware } from "./middleware.js";
+import type { Multistep, UnwrapMultistep } from "./multistep.js";
+import { multistep } from "./multistep.js";
 import { polymorphicWrap } from "./polymorphic.js";
 import {
   assertExecutableStep,
@@ -405,6 +407,8 @@ export {
   makeGrafastSchema,
   Maybe,
   ModifierStep,
+  Multistep,
+  multistep,
   newGrafastFieldConfigBuilder,
   newInputObjectTypeBuilder,
   newObjectTypeBuilder,
@@ -471,6 +475,7 @@ export {
   TypedEventEmitter,
   UnbatchedExecutableStep,
   UnbatchedExecutionExtra,
+  UnwrapMultistep,
 };
 
 exportAsMany("grafast", {
@@ -597,6 +602,7 @@ exportAsMany("grafast", {
   flagError,
   SafeError,
   isUnaryStep,
+  multistep,
 });
 
 export { hookArgs } from "./args.js";
