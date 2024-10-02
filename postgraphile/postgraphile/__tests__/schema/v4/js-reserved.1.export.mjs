@@ -1552,8 +1552,88 @@ const nodeIdCodecs = Object.assign(Object.create(null), {
 });
 const building_buildingPgResource = registry.pgResources["building"];
 const relational_items_relational_itemsPgResource = registry.pgResources["relational_items"];
-const pgResource_relational_statusPgResource = registry.pgResources["relational_status"];
 const handler2 = {
+  typeName: "Building",
+  codec: handler_codec_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("buildings", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  get(spec) {
+    return building_buildingPgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "buildings";
+  }
+};
+const otherSource_machinePgResource = registry.pgResources["machine"];
+const specFromRecord = $record => {
+  return registryConfig.pgRelations.building.machinesByTheirConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
+    memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.building.machinesByTheirConstructor.localAttributes[i]);
+    return memo;
+  }, Object.create(null));
+};
+const applyOrderToPlan = ($select, $value, TableOrderByType) => {
+  if (!("evalLength" in $value)) {
+    return;
+  }
+  const length = $value.evalLength();
+  if (length == null) {
+    return;
+  }
+  for (let i = 0; i < length; i++) {
+    const order = $value.at(i).eval();
+    if (order == null) continue;
+    const config = getEnumValueConfig(TableOrderByType, order);
+    const plan = config?.extensions?.grafast?.applyPlan;
+    if (typeof plan !== "function") {
+      console.error(`Internal server error: invalid orderBy configuration: expected function, but received ${inspect(plan)}`);
+      throw new SafeError("Internal server error: invalid orderBy configuration");
+    }
+    plan($select);
+  }
+};
+const specFromRecord2 = $record => {
+  return registryConfig.pgRelations.building.relationalItemsByTheirConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
+    memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.building.relationalItemsByTheirConstructor.localAttributes[i]);
+    return memo;
+  }, Object.create(null));
+};
+const handler3 = {
+  typeName: "Machine",
+  codec: handler_codec_base64JSON,
+  deprecationReason: undefined,
+  plan($record) {
+    return list([constant("machines", false), $record.get("id")]);
+  },
+  getSpec($list) {
+    return {
+      id: inhibitOnNull(access($list, [1]))
+    };
+  },
+  get(spec) {
+    return otherSource_machinePgResource.get(spec);
+  },
+  match(obj) {
+    return obj[0] === "machines";
+  }
+};
+const specFromRecord3 = $record => {
+  return registryConfig.pgRelations.machine.buildingByMyConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
+    memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.machine.buildingByMyConstructor.localAttributes[i]);
+    return memo;
+  }, Object.create(null));
+};
+function CursorSerialize(value) {
+  return "" + value;
+}
+const pgResource_relational_statusPgResource = registry.pgResources["relational_status"];
+const handler4 = {
   typeName: "RelationalStatus",
   codec: handler_codec_base64JSON,
   deprecationReason: undefined,
@@ -1572,7 +1652,7 @@ const handler2 = {
     return obj[0] === "relational_statuses";
   }
 };
-const handler3 = {
+const handler5 = {
   typeName: "Query",
   codec: nodeIdCodecs.raw,
   match(specifier) {
@@ -1591,14 +1671,13 @@ const handler3 = {
 const pgResource___proto__PgResource = registry.pgResources["__proto__"];
 const pgResource_constructorPgResource = registry.pgResources["constructor"];
 const pgResource_cropPgResource = registry.pgResources["crop"];
-const pgResource_machinePgResource = registry.pgResources["machine"];
 const pgResource_materialPgResource = registry.pgResources["material"];
 const pgResource_nullPgResource = registry.pgResources["null"];
 const pgResource_projectPgResource = registry.pgResources["project"];
 const pgResource_yieldPgResource = registry.pgResources["yield"];
 const pgResource_reservedPgResource = registry.pgResources["reserved"];
 const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
-  Query: handler3,
+  Query: handler5,
   RelationalTopic: handler,
   _Proto__: {
     typeName: "_Proto__",
@@ -1621,25 +1700,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
       return obj[0] === "__proto__S";
     }
   },
-  Building: {
-    typeName: "Building",
-    codec: handler_codec_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("buildings", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    get(spec) {
-      return building_buildingPgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "buildings";
-    }
-  },
+  Building: handler2,
   Constructor: {
     typeName: "Constructor",
     codec: handler_codec_base64JSON,
@@ -1678,25 +1739,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
       return obj[0] === "crops";
     }
   },
-  Machine: {
-    typeName: "Machine",
-    codec: handler_codec_base64JSON,
-    deprecationReason: undefined,
-    plan($record) {
-      return list([constant("machines", false), $record.get("id")]);
-    },
-    getSpec($list) {
-      return {
-        id: inhibitOnNull(access($list, [1]))
-      };
-    },
-    get(spec) {
-      return pgResource_machinePgResource.get(spec);
-    },
-    match(obj) {
-      return obj[0] === "machines";
-    }
-  },
+  Machine: handler3,
   Material: {
     typeName: "Material",
     codec: handler_codec_base64JSON,
@@ -1754,7 +1797,7 @@ const nodeIdHandlerByTypeName = Object.assign(Object.create(null), {
       return obj[0] === "projects";
     }
   },
-  RelationalStatus: handler2,
+  RelationalStatus: handler4,
   Yield: {
     typeName: "Yield",
     codec: handler_codec_base64JSON,
@@ -2067,7 +2110,7 @@ const fetcher3 = (handler => {
   };
   fn.deprecationReason = handler.deprecationReason;
   return fn;
-})(nodeIdHandlerByTypeName.Building);
+})(handler2);
 const fetcher4 = (handler => {
   const fn = $nodeId => {
     const $decoded = lambda($nodeId, specForHandler(handler));
@@ -2091,7 +2134,7 @@ const fetcher6 = (handler => {
   };
   fn.deprecationReason = handler.deprecationReason;
   return fn;
-})(nodeIdHandlerByTypeName.Machine);
+})(handler3);
 const fetcher7 = (handler => {
   const fn = $nodeId => {
     const $decoded = lambda($nodeId, specForHandler(handler));
@@ -2123,7 +2166,7 @@ const fetcher10 = (handler => {
   };
   fn.deprecationReason = handler.deprecationReason;
   return fn;
-})(handler2);
+})(handler4);
 const fetcher11 = (handler => {
   const fn = $nodeId => {
     const $decoded = lambda($nodeId, specForHandler(handler));
@@ -2140,47 +2183,6 @@ const fetcher12 = (handler => {
   fn.deprecationReason = handler.deprecationReason;
   return fn;
 })(nodeIdHandlerByTypeName.Reserved);
-const applyOrderToPlan = ($select, $value, TableOrderByType) => {
-  if (!("evalLength" in $value)) {
-    return;
-  }
-  const length = $value.evalLength();
-  if (length == null) {
-    return;
-  }
-  for (let i = 0; i < length; i++) {
-    const order = $value.at(i).eval();
-    if (order == null) continue;
-    const config = getEnumValueConfig(TableOrderByType, order);
-    const plan = config?.extensions?.grafast?.applyPlan;
-    if (typeof plan !== "function") {
-      console.error(`Internal server error: invalid orderBy configuration: expected function, but received ${inspect(plan)}`);
-      throw new SafeError("Internal server error: invalid orderBy configuration");
-    }
-    plan($select);
-  }
-};
-const specFromRecord = $record => {
-  return registryConfig.pgRelations.building.machinesByTheirConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
-    memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.building.machinesByTheirConstructor.localAttributes[i]);
-    return memo;
-  }, Object.create(null));
-};
-const specFromRecord2 = $record => {
-  return registryConfig.pgRelations.building.relationalItemsByTheirConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
-    memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.building.relationalItemsByTheirConstructor.localAttributes[i]);
-    return memo;
-  }, Object.create(null));
-};
-const specFromRecord3 = $record => {
-  return registryConfig.pgRelations.machine.buildingByMyConstructor.remoteAttributes.reduce((memo, remoteAttributeName, i) => {
-    memo[remoteAttributeName] = $record.get(registryConfig.pgRelations.machine.buildingByMyConstructor.localAttributes[i]);
-    return memo;
-  }, Object.create(null));
-};
-function CursorSerialize(value) {
-  return "" + value;
-}
 function hasRecord($row) {
   return "record" in $row && typeof $row.record === "function";
 }
@@ -2260,7 +2262,7 @@ const specFromArgs = args => {
 };
 const specFromArgs2 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Building, $nodeId);
+  return specFromNodeId(handler2, $nodeId);
 };
 const uniqueAttributes = [["constructor", "constructor"]];
 const specFromArgs3 = args => {
@@ -2279,7 +2281,7 @@ const specFromArgs5 = args => {
 };
 const specFromArgs6 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Machine, $nodeId);
+  return specFromNodeId(handler3, $nodeId);
 };
 const specFromArgs7 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
@@ -2328,7 +2330,7 @@ const specFromArgs15 = args => {
 };
 const specFromArgs16 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Building, $nodeId);
+  return specFromNodeId(handler2, $nodeId);
 };
 const uniqueAttributes5 = [["constructor", "constructor"]];
 const specFromArgs17 = args => {
@@ -2347,7 +2349,7 @@ const specFromArgs19 = args => {
 };
 const specFromArgs20 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
-  return specFromNodeId(nodeIdHandlerByTypeName.Machine, $nodeId);
+  return specFromNodeId(handler3, $nodeId);
 };
 const specFromArgs21 = args => {
   const $nodeId = args.get(["input", "nodeId"]);
@@ -2420,6 +2422,272 @@ export const typeDefs = /* GraphQL */`type RelationalTopic implements Node & Rel
 
   """Reads a single \`Building\` that is related to this \`RelationalTopic\`."""
   buildingByConstructor: Building
+}
+
+"""An object with a globally unique \`ID\`."""
+interface Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+}
+
+interface RelationalItem implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  type: ItemType!
+  constructor: String
+
+  """Reads a single \`Building\` that is related to this \`RelationalItem\`."""
+  buildingByConstructor: Building
+}
+
+enum ItemType {
+  TOPIC
+  STATUS
+}
+
+type Building implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  name: String
+  constructor: String
+
+  """Reads and enables pagination through a set of \`Machine\`."""
+  machinesByConstructor(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`Machine\`."""
+    orderBy: [MachinesOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: MachineCondition
+  ): MachinesConnection!
+
+  """Reads and enables pagination through a set of \`Machine\`."""
+  machinesByConstructorList(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Skip the first \`n\` values."""
+    offset: Int
+
+    """The method to use when ordering \`Machine\`."""
+    orderBy: [MachinesOrderBy!]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: MachineCondition
+  ): [Machine!]!
+
+  """Reads and enables pagination through a set of \`RelationalItem\`."""
+  relationalItemsByConstructor(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Only read the last \`n\` values of the set."""
+    last: Int
+
+    """
+    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
+    based pagination. May not be used with \`last\`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """The method to use when ordering \`RelationalItem\`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+  ): RelationalItemsConnection!
+
+  """Reads and enables pagination through a set of \`RelationalItem\`."""
+  relationalItemsByConstructorList(
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Skip the first \`n\` values."""
+    offset: Int
+
+    """The method to use when ordering \`RelationalItem\`."""
+    orderBy: [RelationalItemsOrderBy!]
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+  ): [RelationalItem!]!
+}
+
+"""A connection to a list of \`Machine\` values."""
+type MachinesConnection {
+  """A list of \`Machine\` objects."""
+  nodes: [Machine]!
+
+  """
+  A list of edges which contains the \`Machine\` and cursor to aid in pagination.
+  """
+  edges: [MachinesEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`Machine\` you could get from the connection."""
+  totalCount: Int!
+}
+
+type Machine implements Node {
+  """
+  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
+  """
+  nodeId: ID!
+  id: Int!
+  input: String
+  constructor: String
+
+  """Reads a single \`Building\` that is related to this \`Machine\`."""
+  buildingByConstructor: Building
+}
+
+"""A \`Machine\` edge in the connection."""
+type MachinesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`Machine\` at the end of the edge."""
+  node: Machine
+}
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+}
+
+"""Methods to use when ordering \`Machine\`."""
+enum MachinesOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  INPUT_ASC
+  INPUT_DESC
+  CONSTRUCTOR_ASC
+  CONSTRUCTOR_DESC
+}
+
+"""
+A condition to be used against \`Machine\` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input MachineCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`input\` field."""
+  input: String
+
+  """Checks for equality with the object’s \`constructor\` field."""
+  constructor: String
+}
+
+"""A connection to a list of \`RelationalItem\` values."""
+type RelationalItemsConnection {
+  """A list of \`RelationalItem\` objects."""
+  nodes: [RelationalItem]!
+
+  """
+  A list of edges which contains the \`RelationalItem\` and cursor to aid in pagination.
+  """
+  edges: [RelationalItemsEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* \`RelationalItem\` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A \`RelationalItem\` edge in the connection."""
+type RelationalItemsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The \`RelationalItem\` at the end of the edge."""
+  node: RelationalItem
+}
+
+"""Methods to use when ordering \`RelationalItem\`."""
+enum RelationalItemsOrderBy {
+  NATURAL
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ID_ASC
+  ID_DESC
+  TYPE_ASC
+  TYPE_DESC
+  CONSTRUCTOR_ASC
+  CONSTRUCTOR_DESC
+}
+
+"""
+A condition to be used against \`RelationalItem\` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input RelationalItemCondition {
+  """Checks for equality with the object’s \`id\` field."""
+  id: Int
+
+  """Checks for equality with the object’s \`type\` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s \`constructor\` field."""
+  constructor: String
 }
 
 type RelationalStatus implements Node & RelationalItem {
@@ -3214,14 +3482,6 @@ type Query implements Node {
   ): RelationalItemsConnection
 }
 
-"""An object with a globally unique \`ID\`."""
-interface Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-}
-
 type _Proto__ implements Node {
   """
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
@@ -3230,264 +3490,6 @@ type _Proto__ implements Node {
   id: Int!
   name: String
   brand: String
-}
-
-type Building implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  id: Int!
-  name: String
-  constructor: String
-
-  """Reads and enables pagination through a set of \`Machine\`."""
-  machinesByConstructor(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering \`Machine\`."""
-    orderBy: [MachinesOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: MachineCondition
-  ): MachinesConnection!
-
-  """Reads and enables pagination through a set of \`Machine\`."""
-  machinesByConstructorList(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Skip the first \`n\` values."""
-    offset: Int
-
-    """The method to use when ordering \`Machine\`."""
-    orderBy: [MachinesOrderBy!]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: MachineCondition
-  ): [Machine!]!
-
-  """Reads and enables pagination through a set of \`RelationalItem\`."""
-  relationalItemsByConstructor(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Only read the last \`n\` values of the set."""
-    last: Int
-
-    """
-    Skip the first \`n\` values from our \`after\` cursor, an alternative to cursor
-    based pagination. May not be used with \`last\`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-
-    """The method to use when ordering \`RelationalItem\`."""
-    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: RelationalItemCondition
-  ): RelationalItemsConnection!
-
-  """Reads and enables pagination through a set of \`RelationalItem\`."""
-  relationalItemsByConstructorList(
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Skip the first \`n\` values."""
-    offset: Int
-
-    """The method to use when ordering \`RelationalItem\`."""
-    orderBy: [RelationalItemsOrderBy!]
-
-    """
-    A condition to be used in determining which values should be returned by the collection.
-    """
-    condition: RelationalItemCondition
-  ): [RelationalItem!]!
-}
-
-"""A connection to a list of \`Machine\` values."""
-type MachinesConnection {
-  """A list of \`Machine\` objects."""
-  nodes: [Machine]!
-
-  """
-  A list of edges which contains the \`Machine\` and cursor to aid in pagination.
-  """
-  edges: [MachinesEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`Machine\` you could get from the connection."""
-  totalCount: Int!
-}
-
-type Machine implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  id: Int!
-  input: String
-  constructor: String
-
-  """Reads a single \`Building\` that is related to this \`Machine\`."""
-  buildingByConstructor: Building
-}
-
-"""A \`Machine\` edge in the connection."""
-type MachinesEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`Machine\` at the end of the edge."""
-  node: Machine
-}
-
-"""A location in a connection that can be used for resuming pagination."""
-scalar Cursor
-
-"""Information about pagination in a connection."""
-type PageInfo {
-  """When paginating forwards, are there more items?"""
-  hasNextPage: Boolean!
-
-  """When paginating backwards, are there more items?"""
-  hasPreviousPage: Boolean!
-
-  """When paginating backwards, the cursor to continue."""
-  startCursor: Cursor
-
-  """When paginating forwards, the cursor to continue."""
-  endCursor: Cursor
-}
-
-"""Methods to use when ordering \`Machine\`."""
-enum MachinesOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  INPUT_ASC
-  INPUT_DESC
-  CONSTRUCTOR_ASC
-  CONSTRUCTOR_DESC
-}
-
-"""
-A condition to be used against \`Machine\` object types. All fields are tested for equality and combined with a logical ‘and.’
-"""
-input MachineCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-
-  """Checks for equality with the object’s \`input\` field."""
-  input: String
-
-  """Checks for equality with the object’s \`constructor\` field."""
-  constructor: String
-}
-
-"""A connection to a list of \`RelationalItem\` values."""
-type RelationalItemsConnection {
-  """A list of \`RelationalItem\` objects."""
-  nodes: [RelationalItem]!
-
-  """
-  A list of edges which contains the \`RelationalItem\` and cursor to aid in pagination.
-  """
-  edges: [RelationalItemsEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* \`RelationalItem\` you could get from the connection."""
-  totalCount: Int!
-}
-
-interface RelationalItem implements Node {
-  """
-  A globally unique identifier. Can be used in various places throughout the system to identify this single value.
-  """
-  nodeId: ID!
-  id: Int!
-  type: ItemType!
-  constructor: String
-
-  """Reads a single \`Building\` that is related to this \`RelationalItem\`."""
-  buildingByConstructor: Building
-}
-
-enum ItemType {
-  TOPIC
-  STATUS
-}
-
-"""A \`RelationalItem\` edge in the connection."""
-type RelationalItemsEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The \`RelationalItem\` at the end of the edge."""
-  node: RelationalItem
-}
-
-"""Methods to use when ordering \`RelationalItem\`."""
-enum RelationalItemsOrderBy {
-  NATURAL
-  PRIMARY_KEY_ASC
-  PRIMARY_KEY_DESC
-  ID_ASC
-  ID_DESC
-  TYPE_ASC
-  TYPE_DESC
-  CONSTRUCTOR_ASC
-  CONSTRUCTOR_DESC
-}
-
-"""
-A condition to be used against \`RelationalItem\` object types. All fields are
-tested for equality and combined with a logical ‘and.’
-"""
-input RelationalItemCondition {
-  """Checks for equality with the object’s \`id\` field."""
-  id: Int
-
-  """Checks for equality with the object’s \`type\` field."""
-  type: ItemType
-
-  """Checks for equality with the object’s \`constructor\` field."""
-  constructor: String
 }
 
 type Constructor implements Node {
@@ -6757,11 +6759,713 @@ export const plans = {
       return $buildings.single();
     }
   },
-  RelationalStatus: {
+  Building: {
     __assertStep: assertPgClassSingleStep,
     nodeId($parent) {
       const specifier = handler2.plan($parent);
       return lambda(specifier, nodeIdCodecs[handler2.codec.name].encode);
+    },
+    id($record) {
+      return $record.get("id");
+    },
+    name($record) {
+      return $record.get("name");
+    },
+    constructor($record) {
+      return $record.get("constructor");
+    },
+    machinesByConstructor: {
+      plan($record) {
+        return connection(otherSource_machinePgResource.find(specFromRecord($record)));
+      },
+      args: {
+        first: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
+        },
+        last: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
+        },
+        offset: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        },
+        before: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
+        },
+        after: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
+        },
+        orderBy: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val, info) {
+            const $value = val.getRaw();
+            const $select = $connection.getSubplan();
+            applyOrderToPlan($select, $value, info.schema.getType("MachinesOrderBy"));
+            return null;
+          }
+        },
+        condition: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_condition, $connection) {
+            const $select = $connection.getSubplan();
+            return $select.wherePlan();
+          }
+        }
+      }
+    },
+    machinesByConstructorList: {
+      plan($record) {
+        return otherSource_machinePgResource.find(specFromRecord($record));
+      },
+      args: {
+        first: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
+        },
+        offset: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        },
+        orderBy: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $select, val, info) {
+            const $value = val.getRaw();
+            applyOrderToPlan($select, $value, info.schema.getType("MachinesOrderBy"));
+            return null;
+          }
+        },
+        condition: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_condition, $select) {
+            return $select.wherePlan();
+          }
+        }
+      }
+    },
+    relationalItemsByConstructor: {
+      plan($record) {
+        return connection(relational_items_relational_itemsPgResource.find(specFromRecord2($record)));
+      },
+      args: {
+        first: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
+        },
+        last: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setLast(val.getRaw());
+          }
+        },
+        offset: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        },
+        before: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setBefore(val.getRaw());
+          }
+        },
+        after: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setAfter(val.getRaw());
+          }
+        },
+        orderBy: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val, info) {
+            const $value = val.getRaw();
+            const $select = $connection.getSubplan();
+            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemsOrderBy"));
+            return null;
+          }
+        },
+        condition: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_condition, $connection) {
+            const $select = $connection.getSubplan();
+            return $select.wherePlan();
+          }
+        }
+      }
+    },
+    relationalItemsByConstructorList: {
+      plan($record) {
+        return relational_items_relational_itemsPgResource.find(specFromRecord2($record));
+      },
+      args: {
+        first: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, arg) {
+            $connection.setFirst(arg.getRaw());
+          }
+        },
+        offset: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $connection, val) {
+            $connection.setOffset(val.getRaw());
+          }
+        },
+        orderBy: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $select, val, info) {
+            const $value = val.getRaw();
+            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemsOrderBy"));
+            return null;
+          }
+        },
+        condition: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_condition, $select) {
+            return $select.wherePlan();
+          }
+        }
+      }
+    }
+  },
+  MachinesConnection: {
+    __assertStep: ConnectionStep,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
+    totalCount($connection) {
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+    }
+  },
+  Machine: {
+    __assertStep: assertPgClassSingleStep,
+    nodeId($parent) {
+      const specifier = handler3.plan($parent);
+      return lambda(specifier, nodeIdCodecs[handler3.codec.name].encode);
+    },
+    id($record) {
+      return $record.get("id");
+    },
+    input($record) {
+      return $record.get("input");
+    },
+    constructor($record) {
+      return $record.get("constructor");
+    },
+    buildingByConstructor($record) {
+      return building_buildingPgResource.get(specFromRecord3($record));
+    }
+  },
+  MachinesEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
+  },
+  Cursor: {
+    serialize: CursorSerialize,
+    parseValue: CursorSerialize,
+    parseLiteral(ast) {
+      if (ast.kind !== Kind.STRING) {
+        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
+      }
+      return ast.value;
+    }
+  },
+  PageInfo: {
+    __assertStep: assertPageInfoCapableStep,
+    hasNextPage($pageInfo) {
+      return $pageInfo.hasNextPage();
+    },
+    hasPreviousPage($pageInfo) {
+      return $pageInfo.hasPreviousPage();
+    },
+    startCursor($pageInfo) {
+      return $pageInfo.startCursor();
+    },
+    endCursor($pageInfo) {
+      return $pageInfo.endCursor();
+    }
+  },
+  MachinesOrderBy: {
+    NATURAL: {
+      applyPlan() {}
+    },
+    PRIMARY_KEY_ASC: {
+      applyPlan(step) {
+        machineUniques[0].attributes.forEach(attributeName => {
+          const attribute = machineCodec.attributes[attributeName];
+          step.orderBy({
+            codec: attribute.codec,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
+            direction: "ASC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+        });
+        step.setOrderIsUnique();
+      }
+    },
+    PRIMARY_KEY_DESC: {
+      applyPlan(step) {
+        machineUniques[0].attributes.forEach(attributeName => {
+          const attribute = machineCodec.attributes[attributeName];
+          step.orderBy({
+            codec: attribute.codec,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
+            direction: "DESC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+        });
+        step.setOrderIsUnique();
+      }
+    },
+    ID_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "id",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (true) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    ID_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "id",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (true) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    INPUT_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "input",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    INPUT_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "input",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    CONSTRUCTOR_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "constructor",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    CONSTRUCTOR_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "constructor",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    }
+  },
+  MachineCondition: {
+    id: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_machine.attributes.id.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    input: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "input",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "input",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_machine.attributes.input.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    constructor: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "constructor",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "constructor",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_machine.attributes.constructor.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
+  RelationalItemsConnection: {
+    __assertStep: ConnectionStep,
+    nodes($connection) {
+      return $connection.nodes();
+    },
+    edges($connection) {
+      return $connection.edges();
+    },
+    pageInfo($connection) {
+      // TYPES: why is this a TypeScript issue without the 'any'?
+      return $connection.pageInfo();
+    },
+    totalCount($connection) {
+      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
+    }
+  },
+  RelationalItemsEdge: {
+    __assertStep: assertEdgeCapableStep,
+    cursor($edge) {
+      return $edge.cursor();
+    },
+    node($edge) {
+      return $edge.node();
+    }
+  },
+  RelationalItemsOrderBy: {
+    NATURAL: {
+      applyPlan() {}
+    },
+    PRIMARY_KEY_ASC: {
+      applyPlan(step) {
+        relational_itemsUniques[0].attributes.forEach(attributeName => {
+          const attribute = relationalItemsCodec.attributes[attributeName];
+          step.orderBy({
+            codec: attribute.codec,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
+            direction: "ASC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+        });
+        step.setOrderIsUnique();
+      }
+    },
+    PRIMARY_KEY_DESC: {
+      applyPlan(step) {
+        relational_itemsUniques[0].attributes.forEach(attributeName => {
+          const attribute = relationalItemsCodec.attributes[attributeName];
+          step.orderBy({
+            codec: attribute.codec,
+            fragment: sql`${step}.${sql.identifier(attributeName)}`,
+            direction: "DESC",
+            ...(undefined != null ? {
+              nulls: undefined ? "LAST" : "FIRST"
+            } : null)
+          });
+        });
+        step.setOrderIsUnique();
+      }
+    },
+    ID_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "id",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (true) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    ID_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "id",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (true) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    TYPE_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "type",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    TYPE_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "type",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    CONSTRUCTOR_ASC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "constructor",
+          direction: "ASC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    },
+    CONSTRUCTOR_DESC: {
+      applyPlan(plan) {
+        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
+          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
+        }
+        plan.orderBy({
+          attribute: "constructor",
+          direction: "DESC",
+          ...(undefined != null ? {
+            nulls: undefined ? "LAST" : "FIRST"
+          } : null)
+        });
+        if (false) {
+          plan.setOrderIsUnique();
+        }
+      }
+    }
+  },
+  RelationalItemCondition: {
+    id: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "id",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.id.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    type: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "type",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "type",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.type.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    constructor: {
+      applyPlan($condition, val) {
+        if (val.getRaw().evalIs(null)) {
+          $condition.where({
+            type: "attribute",
+            attribute: "constructor",
+            callback(expression) {
+              return sql`${expression} is null`;
+            }
+          });
+        } else {
+          $condition.where({
+            type: "attribute",
+            attribute: "constructor",
+            callback(expression) {
+              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.constructor.codec)}`;
+            }
+          });
+        }
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
+  RelationalStatus: {
+    __assertStep: assertPgClassSingleStep,
+    nodeId($parent) {
+      const specifier = handler4.plan($parent);
+      return lambda(specifier, nodeIdCodecs[handler4.codec.name].encode);
     },
     id($record) {
       return $record.get("id");
@@ -6801,8 +7505,8 @@ export const plans = {
       return rootValue();
     },
     nodeId($parent) {
-      const specifier = handler3.plan($parent);
-      return lambda(specifier, nodeIdCodecs[handler3.codec.name].encode);
+      const specifier = handler5.plan($parent);
+      return lambda(specifier, nodeIdCodecs[handler5.codec.name].encode);
     },
     node: {
       plan(_$root, args) {
@@ -6916,7 +7620,7 @@ export const plans = {
     },
     machineById: {
       plan(_$root, args) {
-        return pgResource_machinePgResource.get({
+        return otherSource_machinePgResource.get({
           id: args.get("id")
         });
       },
@@ -7656,7 +8360,7 @@ export const plans = {
     },
     allMachinesList: {
       plan() {
-        return pgResource_machinePgResource.find();
+        return otherSource_machinePgResource.find();
       },
       args: {
         first: {
@@ -7689,7 +8393,7 @@ export const plans = {
     },
     allMachines: {
       plan() {
-        return connection(pgResource_machinePgResource.find());
+        return connection(otherSource_machinePgResource.find());
       },
       args: {
         first: {
@@ -8357,708 +9061,6 @@ export const plans = {
     },
     brand($record) {
       return $record.get("brand");
-    }
-  },
-  Building: {
-    __assertStep: assertPgClassSingleStep,
-    nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.Building.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Building.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    name($record) {
-      return $record.get("name");
-    },
-    constructor($record) {
-      return $record.get("constructor");
-    },
-    machinesByConstructor: {
-      plan($record) {
-        return connection(pgResource_machinePgResource.find(specFromRecord($record)));
-      },
-      args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
-        },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
-        },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
-        },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("MachinesOrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
-        }
-      }
-    },
-    machinesByConstructorList: {
-      plan($record) {
-        return pgResource_machinePgResource.find(specFromRecord($record));
-      },
-      args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $select, val, info) {
-            const $value = val.getRaw();
-            applyOrderToPlan($select, $value, info.schema.getType("MachinesOrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $select) {
-            return $select.wherePlan();
-          }
-        }
-      }
-    },
-    relationalItemsByConstructor: {
-      plan($record) {
-        return connection(relational_items_relational_itemsPgResource.find(specFromRecord2($record)));
-      },
-      args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
-        },
-        last: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setLast(val.getRaw());
-          }
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
-        },
-        before: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setBefore(val.getRaw());
-          }
-        },
-        after: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setAfter(val.getRaw());
-          }
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val, info) {
-            const $value = val.getRaw();
-            const $select = $connection.getSubplan();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemsOrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $connection) {
-            const $select = $connection.getSubplan();
-            return $select.wherePlan();
-          }
-        }
-      }
-    },
-    relationalItemsByConstructorList: {
-      plan($record) {
-        return relational_items_relational_itemsPgResource.find(specFromRecord2($record));
-      },
-      args: {
-        first: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, arg) {
-            $connection.setFirst(arg.getRaw());
-          }
-        },
-        offset: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $connection, val) {
-            $connection.setOffset(val.getRaw());
-          }
-        },
-        orderBy: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $select, val, info) {
-            const $value = val.getRaw();
-            applyOrderToPlan($select, $value, info.schema.getType("RelationalItemsOrderBy"));
-            return null;
-          }
-        },
-        condition: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_condition, $select) {
-            return $select.wherePlan();
-          }
-        }
-      }
-    }
-  },
-  MachinesConnection: {
-    __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
-    }
-  },
-  Machine: {
-    __assertStep: assertPgClassSingleStep,
-    nodeId($parent) {
-      const specifier = nodeIdHandlerByTypeName.Machine.plan($parent);
-      return lambda(specifier, nodeIdCodecs[nodeIdHandlerByTypeName.Machine.codec.name].encode);
-    },
-    id($record) {
-      return $record.get("id");
-    },
-    input($record) {
-      return $record.get("input");
-    },
-    constructor($record) {
-      return $record.get("constructor");
-    },
-    buildingByConstructor($record) {
-      return building_buildingPgResource.get(specFromRecord3($record));
-    }
-  },
-  MachinesEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  Cursor: {
-    serialize: CursorSerialize,
-    parseValue: CursorSerialize,
-    parseLiteral(ast) {
-      if (ast.kind !== Kind.STRING) {
-        throw new GraphQLError(`${"Cursor" ?? "This scalar"} can only parse string values (kind='${ast.kind}')`);
-      }
-      return ast.value;
-    }
-  },
-  PageInfo: {
-    __assertStep: assertPageInfoCapableStep,
-    hasNextPage($pageInfo) {
-      return $pageInfo.hasNextPage();
-    },
-    hasPreviousPage($pageInfo) {
-      return $pageInfo.hasPreviousPage();
-    },
-    startCursor($pageInfo) {
-      return $pageInfo.startCursor();
-    },
-    endCursor($pageInfo) {
-      return $pageInfo.endCursor();
-    }
-  },
-  MachinesOrderBy: {
-    NATURAL: {
-      applyPlan() {}
-    },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        machineUniques[0].attributes.forEach(attributeName => {
-          const attribute = machineCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        machineUniques[0].attributes.forEach(attributeName => {
-          const attribute = machineCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    INPUT_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "input",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    INPUT_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "input",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CONSTRUCTOR_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "constructor",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CONSTRUCTOR_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "constructor",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    }
-  },
-  MachineCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_machine.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    input: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "input",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "input",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_machine.attributes.input.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    constructor: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "constructor",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "constructor",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_machine.attributes.constructor.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    }
-  },
-  RelationalItemsConnection: {
-    __assertStep: ConnectionStep,
-    nodes($connection) {
-      return $connection.nodes();
-    },
-    edges($connection) {
-      return $connection.edges();
-    },
-    pageInfo($connection) {
-      // TYPES: why is this a TypeScript issue without the 'any'?
-      return $connection.pageInfo();
-    },
-    totalCount($connection) {
-      return $connection.cloneSubplanWithoutPagination("aggregate").singleAsRecord().select(sql`count(*)`, TYPES.bigint);
-    }
-  },
-  RelationalItemsEdge: {
-    __assertStep: assertEdgeCapableStep,
-    cursor($edge) {
-      return $edge.cursor();
-    },
-    node($edge) {
-      return $edge.node();
-    }
-  },
-  RelationalItemsOrderBy: {
-    NATURAL: {
-      applyPlan() {}
-    },
-    PRIMARY_KEY_ASC: {
-      applyPlan(step) {
-        relational_itemsUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalItemsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "ASC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    PRIMARY_KEY_DESC: {
-      applyPlan(step) {
-        relational_itemsUniques[0].attributes.forEach(attributeName => {
-          const attribute = relationalItemsCodec.attributes[attributeName];
-          step.orderBy({
-            codec: attribute.codec,
-            fragment: sql`${step}.${sql.identifier(attributeName)}`,
-            direction: "DESC",
-            ...(undefined != null ? {
-              nulls: undefined ? "LAST" : "FIRST"
-            } : null)
-          });
-        });
-        step.setOrderIsUnique();
-      }
-    },
-    ID_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    ID_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "id",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (true) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    TYPE_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "type",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    TYPE_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "type",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CONSTRUCTOR_ASC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "constructor",
-          direction: "ASC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    },
-    CONSTRUCTOR_DESC: {
-      applyPlan(plan) {
-        if (!(plan instanceof PgSelectStep) && !(plan instanceof PgUnionAllStep)) {
-          throw new Error("Expected a PgSelectStep or PgUnionAllStep when applying ordering value");
-        }
-        plan.orderBy({
-          attribute: "constructor",
-          direction: "DESC",
-          ...(undefined != null ? {
-            nulls: undefined ? "LAST" : "FIRST"
-          } : null)
-        });
-        if (false) {
-          plan.setOrderIsUnique();
-        }
-      }
-    }
-  },
-  RelationalItemCondition: {
-    id: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "id",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.id.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    type: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "type",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "type",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.type.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
-    },
-    constructor: {
-      applyPlan($condition, val) {
-        if (val.getRaw().evalIs(null)) {
-          $condition.where({
-            type: "attribute",
-            attribute: "constructor",
-            callback(expression) {
-              return sql`${expression} is null`;
-            }
-          });
-        } else {
-          $condition.where({
-            type: "attribute",
-            attribute: "constructor",
-            callback(expression) {
-              return sql`${expression} = ${$condition.placeholder(val.get(), spec_relationalItems.attributes.constructor.codec)}`;
-            }
-          });
-        }
-      },
-      autoApplyAfterParentInputPlan: true,
-      autoApplyAfterParentApplyPlan: true
     }
   },
   Constructor: {
@@ -12104,7 +12106,7 @@ export const plans = {
     createMachine: {
       plan(_, args) {
         const plan = object({
-          result: pgInsertSingle(pgResource_machinePgResource, Object.create(null))
+          result: pgInsertSingle(otherSource_machinePgResource, Object.create(null))
         });
         args.apply(plan);
         return plan;
@@ -12430,7 +12432,7 @@ export const plans = {
     updateMachine: {
       plan(_$root, args) {
         const plan = object({
-          result: pgUpdateSingle(pgResource_machinePgResource, specFromArgs6(args))
+          result: pgUpdateSingle(otherSource_machinePgResource, specFromArgs6(args))
         });
         args.apply(plan);
         return plan;
@@ -12446,7 +12448,7 @@ export const plans = {
     updateMachineById: {
       plan(_$root, args) {
         const plan = object({
-          result: pgUpdateSingle(pgResource_machinePgResource, {
+          result: pgUpdateSingle(otherSource_machinePgResource, {
             id: args.get(['input', "id"])
           })
         });
@@ -13014,7 +13016,7 @@ export const plans = {
     deleteMachine: {
       plan(_$root, args) {
         const plan = object({
-          result: pgDeleteSingle(pgResource_machinePgResource, specFromArgs20(args))
+          result: pgDeleteSingle(otherSource_machinePgResource, specFromArgs20(args))
         });
         args.apply(plan);
         return plan;
@@ -13030,7 +13032,7 @@ export const plans = {
     deleteMachineById: {
       plan(_$root, args) {
         const plan = object({
-          result: pgDeleteSingle(pgResource_machinePgResource, {
+          result: pgDeleteSingle(otherSource_machinePgResource, {
             id: args.get(['input', "id"])
           })
         });
@@ -13733,7 +13735,7 @@ export const plans = {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
-            return pgResource_machinePgResource.find(spec);
+            return otherSource_machinePgResource.find(spec);
           }
         })();
         // Perform ordering
@@ -14706,7 +14708,7 @@ export const plans = {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
-            return pgResource_machinePgResource.find(spec);
+            return otherSource_machinePgResource.find(spec);
           }
         })();
         // Perform ordering
@@ -15482,7 +15484,7 @@ export const plans = {
     },
     deletedBuildingId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.Building.plan($record);
+      const specifier = handler2.plan($record);
       return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query() {
@@ -15706,7 +15708,7 @@ export const plans = {
     },
     deletedMachineId($object) {
       const $record = $object.getStepForKey("result");
-      const specifier = nodeIdHandlerByTypeName.Machine.plan($record);
+      const specifier = handler3.plan($record);
       return lambda(specifier, handler_codec_base64JSON.encode);
     },
     query() {
@@ -15726,7 +15728,7 @@ export const plans = {
               memo[attributeName] = $result.get(attributeName);
               return memo;
             }, Object.create(null));
-            return pgResource_machinePgResource.find(spec);
+            return otherSource_machinePgResource.find(spec);
           }
         })();
         // Perform ordering
