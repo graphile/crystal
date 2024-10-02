@@ -498,7 +498,7 @@ it("supports no ioEquivalence", async () => {
   expect(CALLS[2].attributes).to.deep.equal(["name"]);
 });
 
-it("uses stable identifiers to avoid the need for double-fetches", async () => {
+it("uses stable identifiers to avoid the need for double-fetches (tuple)", async () => {
   const source = /* GraphQL */ `
     {
       t1: thingByOrgIdRegNoTuple(regNo: 987) {
@@ -507,6 +507,55 @@ it("uses stable identifiers to avoid the need for double-fetches", async () => {
         org {
           id
           t1: thingByTuple(regNo: 987) {
+            id
+            name
+          }
+        }
+      }
+    }
+  `;
+  const schema = makeSchema(false);
+
+  CALLS = [];
+  const result = (await grafast(
+    {
+      schema,
+      source,
+      contextValue: {
+        orgId: 27,
+      },
+    },
+    {},
+    {},
+  )) as ExecutionResult;
+  expect(result).to.deep.equal({
+    data: {
+      t1: {
+        id: 2003,
+        name: "Eye D. Tree",
+        org: {
+          id: 27,
+          t1: {
+            id: 2003,
+            name: "Eye D. Tree",
+          },
+        },
+      },
+    },
+  });
+  expect(CALLS).to.have.length(1);
+  expect(CALLS[0].attributes).to.deep.equal(["id", "name"]);
+});
+
+it("uses stable identifiers to avoid the need for double-fetches (obj)", async () => {
+  const source = /* GraphQL */ `
+    {
+      t1: thingByOrgIdRegNoObj(regNo: 987) {
+        id
+        name
+        org {
+          id
+          t1: thingByObj(regNo: 987) {
             id
             name
           }
