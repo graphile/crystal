@@ -596,6 +596,7 @@ declare global {
     interface ScopeSchemaTypes extends ScopeSchema {}
     interface ContextSchemaTypes extends ContextSchema {
       scope: ScopeSchemaTypes;
+      config: GraphQLSchemaConfig;
     }
 
     interface ScopeScalar extends Scope {}

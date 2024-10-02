@@ -124,7 +124,10 @@ export function makeNewWithHooks({ builder }: MakeNewWithHooksOptions): {
             "GraphQLSchema_types",
             [...(finalSpec.types ?? [])],
             build,
-            context,
+            {
+              ...context,
+              config: finalSpec,
+            },
           );
           const Self = new GraphQLSchema(finalSpec);
           return Self;

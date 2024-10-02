@@ -1465,32 +1465,35 @@ return function (access, inhibitOnNull) {
         }
         return interfaces;
       },
-      GraphQLSchema_types(types, build, _context) {
-        for (const type of Object.values(build.getAllTypes())) {
-          if (build.graphql.isInterfaceType(type)) {
-            const scope = build.scopeByType.get(type) as
-              | GraphileBuild.ScopeInterface
-              | undefined;
-            if (scope) {
-              const polymorphism = scope.pgPolymorphism;
-              if (polymorphism) {
-                switch (polymorphism.mode) {
-                  case "relational":
-                  case "single": {
-                    for (const type of Object.values(polymorphism.types)) {
-                      // Force the type to be built
-                      const t = build.getTypeByName(
-                        type.name,
-                      ) as GraphQLNamedType;
-                      types.push(t);
+      GraphQLSchema_types: {
+        after: ["CollectReferencedTypesPlugin"],
+        callback(types, build, _context) {
+          for (const type of Object.values(build.getAllTypes())) {
+            if (build.graphql.isInterfaceType(type)) {
+              const scope = build.scopeByType.get(type) as
+                | GraphileBuild.ScopeInterface
+                | undefined;
+              if (scope) {
+                const polymorphism = scope.pgPolymorphism;
+                if (polymorphism) {
+                  switch (polymorphism.mode) {
+                    case "relational":
+                    case "single": {
+                      for (const type of Object.values(polymorphism.types)) {
+                        // Force the type to be built
+                        const t = build.getTypeByName(
+                          type.name,
+                        ) as GraphQLNamedType;
+                        types.push(t);
+                      }
                     }
                   }
                 }
               }
             }
           }
-        }
-        return types;
+          return types;
+        },
       },
     },
   },
