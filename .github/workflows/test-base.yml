@@ -48,7 +48,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        postgres-version: [12] #, 11, 13, 14, 15]
+        postgres-version: [12, 17] #, 11, 13, 14, 15]
         node-version: [20.x] #, 18.x]
 
     services:
@@ -82,8 +82,9 @@ jobs:
           docker restart postgres
       - name: Install pg_dump
         run: |
-          sudo bash -c "echo deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main >> /etc/apt/sources.list.d/pgdg.list"
-          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+          sudo mkdir -p /usr/share/keyrings
+          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor > /usr/share/keyrings/pgdg-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/pgdg-archive-keyring.gpg] http://apt.postgresql.org/pub/repos/apt/ jammy-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
           sudo apt-get update
           sudo apt-get -yqq install postgresql-client-${{ matrix.postgres-version }}
 

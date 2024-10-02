@@ -5,7 +5,7 @@ set -e
 # https://github.com/debezium/docker-images/blob/master/postgres/11/Dockerfile
 
 PROTOC_VERSION=1.3
-WAL2JSON_COMMIT_ID=c54d89649c3fe5e0aa79c3a87493935232e962a7
+WAL2JSON_COMMIT_ID=wal2json_2_6
 USE_PGXS=1
 export PGUSER=postgres
 export PGPASSWORD=postgres

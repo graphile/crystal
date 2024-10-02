@@ -116,6 +116,11 @@ export interface AclObject {
   temporary?: boolean;
   /** T* */
   temporaryGrant?: boolean;
+
+  /** m */
+  maintain?: boolean;
+  /** m* */
+  maintainGrant?: boolean;
 }
 
 export type ResolvedPermissions = Omit<AclObject, "role" | "granter">;
@@ -136,7 +141,7 @@ const parseIdentifier = (str: string): string =>
 export function parseAcl(aclString: string): AclObject {
   // https://www.postgresql.org/docs/current/ddl-priv.html#PRIVILEGE-ABBREVS-TABLE
 
-  const matches = aclString.match(/^([^=]*)=([rwadDxtXUCcT*]*)\/([^=]+)$/);
+  const matches = aclString.match(/^([^=]*)=([rwadDxtXUCcTm*]*)\/([^=]+)$/);
 
   if (!matches) {
     throw new Error(`Could not parse ACL string '${aclString}'`);
@@ -170,6 +175,8 @@ export function parseAcl(aclString: string): AclObject {
   const connectGrant = permissions.includes("c*");
   const temporary = permissions.includes("T");
   const temporaryGrant = permissions.includes("T*");
+  const maintain = permissions.includes("m");
+  const maintainGrant = permissions.includes("m*");
 
   const acl = {
     role: role || "public",
@@ -198,6 +205,8 @@ export function parseAcl(aclString: string): AclObject {
     connectGrant,
     temporary,
     temporaryGrant,
+    maintain,
+    maintainGrant,
   };
   return acl;
 }
@@ -244,6 +253,9 @@ export function serializeAcl(acl: AclObject) {
 
   if (acl.temporaryGrant) permissions += "T*";
   else if (acl.temporary) permissions += "T";
+
+  if (acl.maintainGrant) permissions += "m*";
+  else if (acl.maintain) permissions += "m";
 
   permissions += `/${acl.granter}`;
 
@@ -294,6 +306,7 @@ const ACL_TRIGGER = "t";
 const ACL_CREATE = "C";
 const ACL_CONNECT = "c";
 const ACL_CREATE_TEMP = "T";
+const ACL_MAINTAIN = "m";
 const ACL_EXECUTE = "X";
 const ACL_USAGE = "U";
 // const ACL_SET = "s";
@@ -310,7 +323,8 @@ const ACL_ALL_RIGHTS_RELATION =
   ACL_DELETE +
   ACL_TRUNCATE +
   ACL_REFERENCES +
-  ACL_TRIGGER;
+  ACL_TRIGGER +
+  ACL_MAINTAIN;
 const ACL_ALL_RIGHTS_SEQUENCE = ACL_USAGE + ACL_SELECT + ACL_UPDATE;
 const ACL_ALL_RIGHTS_DATABASE = ACL_CREATE + ACL_CREATE_TEMP + ACL_CONNECT;
 const ACL_ALL_RIGHTS_FDW = ACL_USAGE;
@@ -444,6 +458,8 @@ export const Permission = {
   connectGrant: "connectGrant",
   temporary: "temporary",
   temporaryGrant: "temporaryGrant",
+  maintain: "maintain",
+  maintainGrant: "maintainGrant",
 } as const;
 
 /**
@@ -542,6 +558,8 @@ export function resolvePermissions(
     connectGrant: grantAll,
     temporary: grantAll,
     temporaryGrant: grantAll,
+    maintain: grantAll,
+    maintainGrant: grantAll,
   };
 
   if (grantAll) {
@@ -583,6 +601,9 @@ export function resolvePermissions(
       permissions.temporary = permissions.temporary || acl.temporary;
       permissions.temporaryGrant =
         permissions.temporaryGrant || acl.temporaryGrant;
+      permissions.maintain = permissions.maintain || acl.maintain;
+      permissions.maintainGrant =
+        permissions.maintainGrant || acl.maintainGrant;
     }
   }
 

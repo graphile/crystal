@@ -362,10 +362,10 @@ create function b.mult_2(int, int) returns int as $$ select $1 * $2 $$ language 
 create function b.mult_3(int, int) returns int as $$ select $1 * $2 $$ language sql returns null on null input;
 create function b.mult_4(int, int) returns int as $$ select $1 * $2 $$ language sql strict;
 
-create function c.json_identity(json json) returns json as $$ select json $$ language sql immutable;
-create function c.json_identity_mutation(json json) returns json as $$ select json $$ language sql;
-create function c.jsonb_identity(json jsonb) returns jsonb as $$ select json $$ language sql immutable;
-create function c.jsonb_identity_mutation(json jsonb) returns jsonb as $$ select json $$ language sql;
+create function c.json_identity("json" json) returns json as $$ select "json" $$ language sql immutable;
+create function c.json_identity_mutation("json" json) returns json as $$ select "json" $$ language sql;
+create function c.jsonb_identity("json" jsonb) returns jsonb as $$ select "json" $$ language sql immutable;
+create function c.jsonb_identity_mutation("json" jsonb) returns jsonb as $$ select "json" $$ language sql;
 create function c.jsonb_identity_mutation_plpgsql(_the_json jsonb) returns jsonb as $$ declare begin return _the_json; end; $$ language plpgsql strict security definer;
 create function c.jsonb_identity_mutation_plpgsql_with_default(_the_json jsonb default '[]') returns jsonb as $$ declare begin return _the_json; end; $$ language plpgsql strict security definer;
 create function c.types_query(a bigint, b boolean, c varchar, d integer[], e json, f c.floatrange) returns boolean as $$ select false $$ language sql stable strict;
