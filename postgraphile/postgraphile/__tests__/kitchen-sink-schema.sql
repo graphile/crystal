@@ -1379,6 +1379,9 @@ comment on table polymorphic.single_table_items is $$
   @ref rootChecklistTopic from:SingleTableChecklist to:SingleTableTopic singular via:(root_topic_id)->polymorphic.single_table_items(id)
   $$;
 
+create function polymorphic.single_table_items_meaning_of_life(sti polymorphic.single_table_items) returns int as $$
+select 42;
+$$ language sql stable;
 
 create function polymorphic.all_single_tables ()
 returns setof polymorphic.single_table_items as $$
@@ -1470,6 +1473,10 @@ comment on table polymorphic.relational_items is $$
   @type CHECKLIST references:relational_checklists
   @type CHECKLIST_ITEM references:relational_checklist_items
   $$;
+
+create function polymorphic.relational_items_meaning_of_life(ri polymorphic.relational_items) returns int as $$
+select 42;
+$$ language sql stable;
 
 CREATE FUNCTION polymorphic.custom_delete_relational_item("nodeId" polymorphic.relational_items)
 RETURNS boolean
