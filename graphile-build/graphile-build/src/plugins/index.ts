@@ -1,3 +1,4 @@
+import { AddInterfaceSubtypesToTypesPlugin } from "./AddInterfaceSubtypesToTypesPlugin.js";
 import { AddNodeInterfaceToSuitableTypesPlugin } from "./AddNodeInterfaceToSuitableTypesPlugin.js";
 import { BuiltinScalarConnectionsPlugin } from "./BuiltinScalarConnectionsPlugin.js";
 import { ClientMutationIdDescriptionPlugin } from "./ClientMutationIdDescriptionPlugin.js";
@@ -21,6 +22,7 @@ import { SwallowErrorsPlugin } from "./SwallowErrorsPlugin.js";
 import { TrimEmptyDescriptionsPlugin } from "./TrimEmptyDescriptionsPlugin.js";
 
 export {
+  AddInterfaceSubtypesToTypesPlugin,
   AddNodeInterfaceToSuitableTypesPlugin,
   BuiltinScalarConnectionsPlugin,
   ClientMutationIdDescriptionPlugin,

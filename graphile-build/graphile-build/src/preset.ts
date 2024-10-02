@@ -2,6 +2,7 @@ import "./interfaces.js";
 import "graphile-config";
 
 import {
+  AddInterfaceSubtypesToTypesPlugin,
   AddNodeInterfaceToSuitableTypesPlugin,
   BuiltinScalarConnectionsPlugin,
   ClientMutationIdDescriptionPlugin,
@@ -45,5 +46,6 @@ export const defaultPreset: GraphileConfig.Preset = {
     NodeIdCodecPipeStringPlugin,
     RegisterQueryNodePlugin,
     NodeAccessorPlugin,
+    AddInterfaceSubtypesToTypesPlugin,
   ],
 };
