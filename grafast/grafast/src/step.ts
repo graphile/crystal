@@ -437,6 +437,11 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
       stepOrOptions instanceof ExecutableStep
         ? { step: stepOrOptions, skipDeduplication: false }
         : stepOrOptions;
+    if (options.step.layerPlan.id > this.layerPlan.id) {
+      throw new Error(
+        `Cannot add dependency ${options.step} to ${this} since the former is in a deeper layerPlan (creates a catch-22)`,
+      );
+    }
     return this.operationPlan.stepTracker.addStepDependency(this, options);
   }
 
@@ -453,6 +458,11 @@ export /* abstract */ class ExecutableStep<TData = any> extends BaseStep {
       stepOrOptions instanceof ExecutableStep
         ? { step: stepOrOptions }
         : stepOrOptions;
+    if (options.step.layerPlan.id > this.layerPlan.id) {
+      throw new Error(
+        `Cannot add dependency ${options.step} to ${this} since the former is in a deeper layerPlan (creates a catch-22)`,
+      );
+    }
     return this.operationPlan.stepTracker.addStepUnaryDependency(this, options);
   }
 
