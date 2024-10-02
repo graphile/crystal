@@ -985,11 +985,17 @@ function modFields(
     // Interface:
     isPgPolymorphicTableType,
     pgPolymorphism,
-  } = scope as {} & Partial<GraphileBuild.ScopeObjectFields> &
+  } = scope as Partial<GraphileBuild.ScopeObjectFields> &
     Partial<GraphileBuild.ScopeInterfaceFields>;
   const SelfName = Self.name;
   if (isInterface) {
-    if (!isPgPolymorphicTableType) {
+    if (!isPgPolymorphicTableType || !pgPolymorphism) {
+      return fields;
+    }
+    if (
+      pgPolymorphism.mode !== "single" &&
+      pgPolymorphism.mode !== "relational"
+    ) {
       return fields;
     }
     // TODO: remove this and fix issue where computed columns are not added to polymorphic types
