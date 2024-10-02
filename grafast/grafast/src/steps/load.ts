@@ -97,7 +97,7 @@ let loadCounter = 0;
  */
 export class LoadedRecordStep<
   TItem,
-  TParams extends Record<string, any>,
+  TParams extends Record<string, any> = Record<string, any>,
 > extends ExecutableStep<TItem> {
   static $$export = {
     moduleName: "grafast",
