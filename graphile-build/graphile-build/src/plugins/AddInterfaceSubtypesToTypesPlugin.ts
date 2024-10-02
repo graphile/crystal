@@ -30,7 +30,8 @@ export const AddInterfaceSubtypesToTypesPlugin: GraphileConfig.Plugin = {
             if (
               t != null &&
               t instanceof GraphQLObjectType &&
-              t.getInterfaces().length !== 0
+              t.getInterfaces().length !== 0 &&
+              !types.includes(t)
             ) {
               types.push(t);
             }

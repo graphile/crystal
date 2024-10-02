@@ -1466,7 +1466,7 @@ return function (access, inhibitOnNull) {
         return interfaces;
       },
       GraphQLSchema_types: {
-        after: ["CollectReferencedTypesPlugin"],
+        before: ["CollectReferencedTypesPlugin"],
         callback(types, build, _context) {
           for (const type of Object.values(build.getAllTypes())) {
             if (build.graphql.isInterfaceType(type)) {
