@@ -1,5 +1,7 @@
 import "graphile-config";
 
+import type { GraphQLNamedType } from "graphql";
+
 import { collectReferencedTypes } from "../vendor/collectReferencedTypes.js";
 import { version } from "../version.js";
 
@@ -19,7 +21,10 @@ export const CollectReferencedTypesPlugin: GraphileConfig.Plugin = {
   schema: {
     hooks: {
       GraphQLSchema_types(types, build, context) {
-        const set = new Set(types);
+        const set = new Set<GraphQLNamedType>();
+        for (const type of types) {
+          collectReferencedTypes(type, set);
+        }
         const { config } = context;
         if (config.query) {
           collectReferencedTypes(config.query, set);
