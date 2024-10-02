@@ -1,7 +1,5 @@
 import "graphile-config";
 
-import { GraphQLNamedType } from "graphql";
-
 import { version } from "../version.js";
 
 declare global {

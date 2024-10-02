@@ -1,7 +1,5 @@
 import "graphile-config";
 
-import { GraphQLNamedType } from "graphql";
-
 import { collectReferencedTypes } from "../vendor/collectReferencedTypes.js";
 import { version } from "../version.js";
 
