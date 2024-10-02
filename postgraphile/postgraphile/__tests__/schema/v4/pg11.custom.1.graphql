@@ -151,6 +151,7 @@ input ByDefaultAsIdentityPatch {
 """An IPv4 or IPv6 CIDR address."""
 scalar CidrAddress
 
+"""Represents the colours red, green and blue."""
 enum Color {
   BLUE
   GREEN

@@ -1642,6 +1642,7 @@ type CompoundType {
   fooBar: Int
 }
 
+"""Represents the colours red, green and blue."""
 enum Color {
   RED
   GREEN
