@@ -54,7 +54,7 @@ export function multistep<const TMultistepSpec extends Multistep>(
   } else if (isTuple(spec)) {
     const config =
       stable === true
-        ? { identifier: `multistep-list` }
+        ? { identifier: `multistep` }
         : typeof stable === "string"
         ? { identifier: stable }
         : stable;
@@ -63,7 +63,7 @@ export function multistep<const TMultistepSpec extends Multistep>(
   } else {
     const config =
       stable === true
-        ? { identifier: `multistep-obj` }
+        ? { identifier: `multistep` }
         : typeof stable === "string"
         ? { identifier: stable }
         : stable;
