@@ -4872,7 +4872,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_1_mutation"
         },
-        tags: {},
+        tags: {
+          notNull: true
+        },
         canExecute: false
       },
       description: "lol, add some stuff 1 mutation"

@@ -893,7 +893,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               ),
                             );
                         fields[resultFieldName] = {
-                          type,
+                          type: build.nullableIf(
+                            !resource.extensions?.tags?.notNull,
+                            type,
+                          ),
                           plan: EXPORTABLE(
                             () =>
                               (
@@ -1117,10 +1120,7 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                     deprecationReason: tagToString(
                       resource.extensions?.tags?.deprecated,
                     ),
-                    type: build.nullableIf(
-                      !resource.extensions?.tags?.notNull,
-                      payloadType,
-                    ),
+                    type: payloadType,
                     args: {
                       input: {
                         type: new GraphQLNonNull(inputType),
