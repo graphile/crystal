@@ -955,7 +955,7 @@ declare global {
           GraphQLSchema_types?: PluginHook<
             GraphileBuild.Hook<
               GraphQLNamedType[],
-              GraphileBuild.ContextSchema,
+              GraphileBuild.ContextSchemaTypes,
               GraphileBuild.Build
             >
           >;

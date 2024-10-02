@@ -1,6 +1,8 @@
+import { AddInterfaceSubtypesToTypesPlugin } from "./AddInterfaceSubtypesToTypesPlugin.js";
 import { AddNodeInterfaceToSuitableTypesPlugin } from "./AddNodeInterfaceToSuitableTypesPlugin.js";
 import { BuiltinScalarConnectionsPlugin } from "./BuiltinScalarConnectionsPlugin.js";
 import { ClientMutationIdDescriptionPlugin } from "./ClientMutationIdDescriptionPlugin.js";
+import { CollectReferencedTypesPlugin } from "./CollectReferencedTypesPlugin.js";
 import { CommonBehaviorsPlugin } from "./CommonBehaviorsPlugin.js";
 import { CommonTypesPlugin } from "./CommonTypesPlugin.js";
 import { ConnectionPlugin } from "./ConnectionPlugin.js";
@@ -21,9 +23,11 @@ import { SwallowErrorsPlugin } from "./SwallowErrorsPlugin.js";
 import { TrimEmptyDescriptionsPlugin } from "./TrimEmptyDescriptionsPlugin.js";
 
 export {
+  AddInterfaceSubtypesToTypesPlugin,
   AddNodeInterfaceToSuitableTypesPlugin,
   BuiltinScalarConnectionsPlugin,
   ClientMutationIdDescriptionPlugin,
+  CollectReferencedTypesPlugin,
   CommonBehaviorsPlugin,
   CommonTypesPlugin,
   ConnectionPlugin,

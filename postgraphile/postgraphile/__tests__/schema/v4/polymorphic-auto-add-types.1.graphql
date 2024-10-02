@@ -1,0 +1,4571 @@
+interface Application {
+  id: Int!
+  lastDeployed: Datetime
+  name: String!
+
+  """
+  Reads a single `PersonOrOrganization` that is related to this `Application`.
+  """
+  owner: PersonOrOrganization
+
+  """Reads and enables pagination through a set of `Vulnerability`."""
+  vulnerabilities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
+  ): VulnerabilitiesConnection!
+}
+
+"""
+A condition to be used against `Application` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input ApplicationCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `lastDeployed` field."""
+  lastDeployed: Datetime
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+}
+
+enum ApplicationType {
+  AwsApplication
+  GcpApplication
+}
+
+"""A connection to a list of `Application` values."""
+type ApplicationsConnection {
+  """
+  A list of edges which contains the `Application` and cursor to aid in pagination.
+  """
+  edges: [ApplicationsEdge]!
+
+  """A list of `Application` objects."""
+  nodes: [Application]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Application` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Application` edge in the connection."""
+type ApplicationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Application` at the end of the edge."""
+  node: Application
+}
+
+"""Methods to use when ordering `Application`."""
+enum ApplicationsOrderBy {
+  ID_ASC
+  ID_DESC
+  LAST_DEPLOYED_ASC
+  LAST_DEPLOYED_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+}
+
+type AwsApplication implements Application {
+  awsId: String
+  id: Int!
+  lastDeployed: Datetime
+  name: String!
+
+  """
+  Reads a single `Organization` that is related to this `AwsApplication`.
+  """
+  organizationByOrganizationId: Organization
+  organizationId: Int
+
+  """
+  Reads a single `PersonOrOrganization` that is related to this `AwsApplication`.
+  """
+  owner: PersonOrOrganization
+
+  """Reads a single `Person` that is related to this `AwsApplication`."""
+  personByPersonId: Person
+  personId: Int
+
+  """Reads and enables pagination through a set of `Vulnerability`."""
+  vulnerabilities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: VulnerabilityCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering `Vulnerability`."""
+    orderBy: [VulnerabilitiesOrderBy!]
+  ): VulnerabilitiesConnection!
+}
+
+"""
+A signed eight-byte integer. The upper big integer values are greater than the
+max value for a JavaScript number. Therefore all big integers will be output as
+strings and not numbers.
+"""
+scalar BigInt
+
+"""A location in a connection that can be used for resuming pagination."""
+scalar Cursor
+
+"""
+A point in time as described by the [ISO
+8601](https://en.wikipedia.org/wiki/ISO_8601) and, if it has a timezone, [RFC
+3339](https://datatracker.ietf.org/doc/html/rfc3339) standards. Input values
+that do not conform to both ISO 8601 and RFC 3339 may be coerced, which may lead
+to unexpected results.
+"""
+scalar Datetime
+
+type FirstPartyVulnerability implements Vulnerability {
+  """Reads and enables pagination through a set of `Application`."""
+  applications(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering `Application`."""
+    orderBy: [ApplicationsOrderBy!]
+  ): ApplicationsConnection!
+  cvssScore: Float!
+  id: Int!
+  name: String!
+
+  """Reads and enables pagination through a set of `PersonOrOrganization`."""
+  owners: PersonOrOrganizationConnection!
+  teamName: String
+}
+
+type GcpApplication implements Application {
+  gcpId: String
+  id: Int!
+  lastDeployed: Datetime
+  name: String!
+
+  """
+  Reads a single `Organization` that is related to this `GcpApplication`.
+  """
+  organizationByOrganizationId: Organization
+  organizationId: Int
+
+  """
+  Reads a single `PersonOrOrganization` that is related to this `GcpApplication`.
+  """
+  owner: PersonOrOrganization
+
+  """Reads a single `Person` that is related to this `GcpApplication`."""
+  personByPersonId: Person
+  personId: Int
+
+  """Reads and enables pagination through a set of `Vulnerability`."""
+  vulnerabilities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: VulnerabilityCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering `Vulnerability`."""
+    orderBy: [VulnerabilitiesOrderBy!]
+  ): VulnerabilitiesConnection!
+}
+
+enum ItemType {
+  CHECKLIST
+  CHECKLIST_ITEM
+  DIVIDER
+  POST
+  TOPIC
+}
+
+"""A connection to a list of `LogEntry` values."""
+type LogEntriesConnection {
+  """
+  A list of edges which contains the `LogEntry` and cursor to aid in pagination.
+  """
+  edges: [LogEntriesEdge]!
+
+  """A list of `LogEntry` objects."""
+  nodes: [LogEntry]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `LogEntry` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `LogEntry` edge in the connection."""
+type LogEntriesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `LogEntry` at the end of the edge."""
+  node: LogEntry
+}
+
+"""Methods to use when ordering `LogEntry`."""
+enum LogEntriesOrderBy {
+  ID_ASC
+  ID_DESC
+  NATURAL
+  ORGANIZATION_ID_ASC
+  ORGANIZATION_ID_DESC
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  TEXT_ASC
+  TEXT_DESC
+}
+
+type LogEntry {
+  """
+  Reads a single `PersonOrOrganization` that is related to this `LogEntry`.
+  """
+  author: PersonOrOrganization
+  id: Int!
+
+  """Reads a single `Organization` that is related to this `LogEntry`."""
+  organizationByOrganizationId: Organization
+  organizationId: Int
+
+  """Reads a single `Person` that is related to this `LogEntry`."""
+  personByPersonId: Person
+  personId: Int
+  text: String!
+}
+
+"""
+A condition to be used against `LogEntry` object types. All fields are tested
+for equality and combined with a logical ‘and.’
+"""
+input LogEntryCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `organizationId` field."""
+  organizationId: Int
+
+  """Checks for equality with the object’s `personId` field."""
+  personId: Int
+
+  """Checks for equality with the object’s `text` field."""
+  text: String
+}
+
+type Organization {
+  """Reads and enables pagination through a set of `LogEntry`."""
+  logEntriesByOrganizationId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LogEntryCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `LogEntry`."""
+    orderBy: [LogEntriesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LogEntriesConnection!
+  name: String!
+  organizationId: Int!
+}
+
+"""
+A condition to be used against `Organization` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input OrganizationCondition {
+  """Checks for equality with the object’s `name` field."""
+  name: String
+
+  """Checks for equality with the object’s `organizationId` field."""
+  organizationId: Int
+}
+
+"""A connection to a list of `Organization` values."""
+type OrganizationsConnection {
+  """
+  A list of edges which contains the `Organization` and cursor to aid in pagination.
+  """
+  edges: [OrganizationsEdge]!
+
+  """A list of `Organization` objects."""
+  nodes: [Organization]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Organization` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Organization` edge in the connection."""
+type OrganizationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Organization` at the end of the edge."""
+  node: Organization
+}
+
+"""Methods to use when ordering `Organization`."""
+enum OrganizationsOrderBy {
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+  ORGANIZATION_ID_ASC
+  ORGANIZATION_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, the cursor to continue."""
+  endCursor: Cursor
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: Cursor
+}
+
+"""A connection to a list of `Person` values."""
+type PeopleConnection {
+  """
+  A list of edges which contains the `Person` and cursor to aid in pagination.
+  """
+  edges: [PeopleEdge]!
+
+  """A list of `Person` objects."""
+  nodes: [Person]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Person` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Person` edge in the connection."""
+type PeopleEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Person` at the end of the edge."""
+  node: Person
+}
+
+"""Methods to use when ordering `Person`."""
+enum PeopleOrderBy {
+  NATURAL
+  PERSON_ID_ASC
+  PERSON_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  USERNAME_ASC
+  USERNAME_DESC
+}
+
+type Person {
+  """Reads and enables pagination through a set of `Application`."""
+  applications(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering `Application`."""
+    orderBy: [ApplicationsOrderBy!]
+  ): ApplicationsConnection!
+
+  """Reads and enables pagination through a set of `LogEntry`."""
+  logEntriesByPersonId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LogEntryCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `LogEntry`."""
+    orderBy: [LogEntriesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LogEntriesConnection!
+  personId: Int!
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  relationalItemsByAuthorId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  singleTableItemsByAuthorId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItem`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemsConnection!
+  username: String!
+}
+
+"""
+A condition to be used against `Person` object types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input PersonCondition {
+  """Checks for equality with the object’s `personId` field."""
+  personId: Int
+
+  """Checks for equality with the object’s `username` field."""
+  username: String
+}
+
+union PersonOrOrganization = Organization | Person
+
+"""A connection to a list of `PersonOrOrganization` values."""
+type PersonOrOrganizationConnection {
+  """
+  A list of edges which contains the `PersonOrOrganization` and cursor to aid in pagination.
+  """
+  edges: [PersonOrOrganizationEdge]!
+
+  """A list of `PersonOrOrganization` objects."""
+  nodes: [PersonOrOrganization]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+}
+
+"""A `PersonOrOrganization` edge in the connection."""
+type PersonOrOrganizationEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `PersonOrOrganization` at the end of the edge."""
+  node: PersonOrOrganization
+}
+
+"""A connection to a list of `Priority` values."""
+type PrioritiesConnection {
+  """
+  A list of edges which contains the `Priority` and cursor to aid in pagination.
+  """
+  edges: [PrioritiesEdge]!
+
+  """A list of `Priority` objects."""
+  nodes: [Priority]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Priority` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Priority` edge in the connection."""
+type PrioritiesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Priority` at the end of the edge."""
+  node: Priority
+}
+
+type Priority {
+  id: Int!
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  singleTableItemsByPriorityId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItem`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemsConnection!
+  title: String!
+}
+
+"""The root query type which gives access points into the data universe."""
+type Query {
+  allApplications(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering `Application`."""
+    orderBy: [ApplicationsOrderBy!]
+  ): ApplicationsConnection
+
+  """Reads and enables pagination through a set of `LogEntry`."""
+  allLogEntries(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: LogEntryCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `LogEntry`."""
+    orderBy: [LogEntriesOrderBy!] = [PRIMARY_KEY_ASC]
+  ): LogEntriesConnection
+
+  """Reads and enables pagination through a set of `Organization`."""
+  allOrganizations(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: OrganizationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Organization`."""
+    orderBy: [OrganizationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): OrganizationsConnection
+
+  """Reads and enables pagination through a set of `Person`."""
+  allPeople(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: PersonCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `Person`."""
+    orderBy: [PeopleOrderBy!] = [PRIMARY_KEY_ASC]
+  ): PeopleConnection
+
+  """Reads and enables pagination through a set of `Priority`."""
+  allPriorities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): PrioritiesConnection
+
+  """
+  Reads and enables pagination through a set of `RelationalChecklistItem`.
+  """
+  allRelationalChecklistItems(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalChecklistItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalChecklistItem`."""
+    orderBy: [RelationalChecklistItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalChecklistItemsConnection
+
+  """Reads and enables pagination through a set of `RelationalChecklist`."""
+  allRelationalChecklists(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalChecklistCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalChecklist`."""
+    orderBy: [RelationalChecklistsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalChecklistsConnection
+
+  """Reads and enables pagination through a set of `RelationalDivider`."""
+  allRelationalDividers(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalDividerCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalDivider`."""
+    orderBy: [RelationalDividersOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalDividersConnection
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  allRelationalItemRelationCompositePks(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePksConnection
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  allRelationalItemRelations(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationsConnection
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  allRelationalItems(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection
+
+  """Reads and enables pagination through a set of `RelationalPost`."""
+  allRelationalPosts(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalPostCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalPost`."""
+    orderBy: [RelationalPostsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalPostsConnection
+
+  """Reads and enables pagination through a set of `RelationalTopic`."""
+  allRelationalTopics(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalTopicCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalTopic`."""
+    orderBy: [RelationalTopicsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalTopicsConnection
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  allSingleTableItemRelationCompositePks(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePksConnection
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  allSingleTableItemRelations(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  allSingleTableItems(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItem`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemsConnection
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  allSingleTables(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTableItemsConnection
+  allVulnerabilities(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: VulnerabilityCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [VulnerabilityType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering `Vulnerability`."""
+    orderBy: [VulnerabilitiesOrderBy!]
+  ): VulnerabilitiesConnection
+  allZeroImplementations(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ZeroImplementationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `ZeroImplementation`."""
+    orderBy: [ZeroImplementationsOrderBy!]
+  ): ZeroImplementationsConnection
+  getSingleTableTopicById(id: Int): SingleTableTopic
+
+  """Get a single `LogEntry`."""
+  logEntryById(id: Int!): LogEntry
+
+  """Get a single `Organization`."""
+  organizationByName(name: String!): Organization
+
+  """Get a single `Organization`."""
+  organizationByOrganizationId(organizationId: Int!): Organization
+
+  """Get a single `Person`."""
+  personByPersonId(personId: Int!): Person
+
+  """Get a single `Person`."""
+  personByUsername(username: String!): Person
+
+  """Get a single `Priority`."""
+  priorityById(id: Int!): Priority
+
+  """
+  Exposes the root query type nested one level down. This is helpful for Relay 1
+  which can only query top level fields if they are in a particular form.
+  """
+  query: Query!
+
+  """Get a single `RelationalChecklist`."""
+  relationalChecklistByChecklistItemId(checklistItemId: Int!): RelationalChecklist
+
+  """Get a single `RelationalChecklistItem`."""
+  relationalChecklistItemByChecklistItemItemId(checklistItemItemId: Int!): RelationalChecklistItem
+
+  """Get a single `RelationalDivider`."""
+  relationalDividerByDividerItemId(dividerItemId: Int!): RelationalDivider
+
+  """Get a single `RelationalItemRelation`."""
+  relationalItemRelationById(id: Int!): RelationalItemRelation
+
+  """Get a single `RelationalItemRelation`."""
+  relationalItemRelationByParentIdAndChildId(childId: Int!, parentId: Int!): RelationalItemRelation
+
+  """Get a single `RelationalItemRelationCompositePk`."""
+  relationalItemRelationCompositePkByParentIdAndChildId(childId: Int!, parentId: Int!): RelationalItemRelationCompositePk
+
+  """Get a single `RelationalPost`."""
+  relationalPostByPostItemId(postItemId: Int!): RelationalPost
+
+  """Get a single `RelationalTopic`."""
+  relationalTopicByTopicItemId(topicItemId: Int!): RelationalTopic
+
+  """Get a single `SingleTableItemRelation`."""
+  singleTableItemRelationById(id: Int!): SingleTableItemRelation
+
+  """Get a single `SingleTableItemRelation`."""
+  singleTableItemRelationByParentIdAndChildId(childId: Int!, parentId: Int!): SingleTableItemRelation
+
+  """Get a single `SingleTableItemRelationCompositePk`."""
+  singleTableItemRelationCompositePkByParentIdAndChildId(childId: Int!, parentId: Int!): SingleTableItemRelationCompositePk
+}
+
+type RelationalChecklist implements RelationalItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `RelationalChecklist`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalChecklist`.
+  """
+  relationalItemByParentId: RelationalItem
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationsConnection!
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  relationalItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalChecklist`.
+  """
+  relationalTopicByRootTopicId: RelationalTopic
+  rootTopicId: Int
+  title: String!
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+"""
+A condition to be used against `RelationalChecklist` object types. All fields
+are tested for equality and combined with a logical ‘and.’
+"""
+input RelationalChecklistCondition {
+  """Checks for equality with the object’s `archivedAt` field."""
+  archivedAt: Datetime
+
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s `createdAt` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `isExplicitlyArchived` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s `position` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s `rootTopicId` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s `title` field."""
+  title: String
+
+  """Checks for equality with the object’s `type` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s `updatedAt` field."""
+  updatedAt: Datetime
+}
+
+type RelationalChecklistItem implements RelationalItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  description: String!
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  note: String
+  parentId: Int
+
+  """
+  Reads a single `Person` that is related to this `RelationalChecklistItem`.
+  """
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalChecklistItem`.
+  """
+  relationalItemByParentId: RelationalItem
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationsConnection!
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  relationalItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalChecklistItem`.
+  """
+  relationalTopicByRootTopicId: RelationalTopic
+  rootTopicId: Int
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+"""
+A condition to be used against `RelationalChecklistItem` object types. All
+fields are tested for equality and combined with a logical ‘and.’
+"""
+input RelationalChecklistItemCondition {
+  """Checks for equality with the object’s `archivedAt` field."""
+  archivedAt: Datetime
+
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s `createdAt` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s `description` field."""
+  description: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `isExplicitlyArchived` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s `note` field."""
+  note: String
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s `position` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s `rootTopicId` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s `type` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s `updatedAt` field."""
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `RelationalChecklistItem` values."""
+type RelationalChecklistItemsConnection {
+  """
+  A list of edges which contains the `RelationalChecklistItem` and cursor to aid in pagination.
+  """
+  edges: [RelationalChecklistItemsEdge]!
+
+  """A list of `RelationalChecklistItem` objects."""
+  nodes: [RelationalChecklistItem]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `RelationalChecklistItem` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `RelationalChecklistItem` edge in the connection."""
+type RelationalChecklistItemsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalChecklistItem` at the end of the edge."""
+  node: RelationalChecklistItem
+}
+
+"""Methods to use when ordering `RelationalChecklistItem`."""
+enum RelationalChecklistItemsOrderBy {
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  NATURAL
+  NOTE_ASC
+  NOTE_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  TYPE_ASC
+  TYPE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+"""A connection to a list of `RelationalChecklist` values."""
+type RelationalChecklistsConnection {
+  """
+  A list of edges which contains the `RelationalChecklist` and cursor to aid in pagination.
+  """
+  edges: [RelationalChecklistsEdge]!
+
+  """A list of `RelationalChecklist` objects."""
+  nodes: [RelationalChecklist]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `RelationalChecklist` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `RelationalChecklist` edge in the connection."""
+type RelationalChecklistsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalChecklist` at the end of the edge."""
+  node: RelationalChecklist
+}
+
+"""Methods to use when ordering `RelationalChecklist`."""
+enum RelationalChecklistsOrderBy {
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ID_ASC
+  ID_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  TITLE_ASC
+  TITLE_DESC
+  TYPE_ASC
+  TYPE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+type RelationalDivider implements RelationalItem {
+  archivedAt: Datetime
+  authorId: Int!
+  color: String
+  createdAt: Datetime!
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `RelationalDivider`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalDivider`.
+  """
+  relationalItemByParentId: RelationalItem
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationsConnection!
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  relationalItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalDivider`.
+  """
+  relationalTopicByRootTopicId: RelationalTopic
+  rootTopicId: Int
+  title: String
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+"""
+A condition to be used against `RelationalDivider` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input RelationalDividerCondition {
+  """Checks for equality with the object’s `archivedAt` field."""
+  archivedAt: Datetime
+
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s `color` field."""
+  color: String
+
+  """Checks for equality with the object’s `createdAt` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `isExplicitlyArchived` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s `position` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s `rootTopicId` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s `title` field."""
+  title: String
+
+  """Checks for equality with the object’s `type` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s `updatedAt` field."""
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `RelationalDivider` values."""
+type RelationalDividersConnection {
+  """
+  A list of edges which contains the `RelationalDivider` and cursor to aid in pagination.
+  """
+  edges: [RelationalDividersEdge]!
+
+  """A list of `RelationalDivider` objects."""
+  nodes: [RelationalDivider]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `RelationalDivider` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `RelationalDivider` edge in the connection."""
+type RelationalDividersEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalDivider` at the end of the edge."""
+  node: RelationalDivider
+}
+
+"""Methods to use when ordering `RelationalDivider`."""
+enum RelationalDividersOrderBy {
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  COLOR_ASC
+  COLOR_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ID_ASC
+  ID_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  TITLE_ASC
+  TITLE_DESC
+  TYPE_ASC
+  TYPE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+interface RelationalItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `RelationalItem`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalItem`.
+  """
+  relationalItemByParentId: RelationalItem
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): RelationalItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): RelationalItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): RelationalItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): RelationalItemRelationsConnection!
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  relationalItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): RelationalItemsConnection!
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalItem`.
+  """
+  relationalTopicByRootTopicId: RelationalTopic
+  rootTopicId: Int
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+"""
+A condition to be used against `RelationalItem` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input RelationalItemCondition {
+  """Checks for equality with the object’s `archivedAt` field."""
+  archivedAt: Datetime
+
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s `createdAt` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `isExplicitlyArchived` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s `position` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s `rootTopicId` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s `type` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s `updatedAt` field."""
+  updatedAt: Datetime
+}
+
+type RelationalItemRelation {
+  childId: Int!
+  id: Int!
+  parentId: Int!
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalItemRelation`.
+  """
+  relationalItemByChildId: RelationalItem
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalItemRelation`.
+  """
+  relationalItemByParentId: RelationalItem
+}
+
+type RelationalItemRelationCompositePk {
+  childId: Int!
+  parentId: Int!
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalItemRelationCompositePk`.
+  """
+  relationalItemByChildId: RelationalItem
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalItemRelationCompositePk`.
+  """
+  relationalItemByParentId: RelationalItem
+}
+
+"""
+A condition to be used against `RelationalItemRelationCompositePk` object types.
+All fields are tested for equality and combined with a logical ‘and.’
+"""
+input RelationalItemRelationCompositePkCondition {
+  """Checks for equality with the object’s `childId` field."""
+  childId: Int
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+}
+
+"""A connection to a list of `RelationalItemRelationCompositePk` values."""
+type RelationalItemRelationCompositePksConnection {
+  """
+  A list of edges which contains the `RelationalItemRelationCompositePk` and cursor to aid in pagination.
+  """
+  edges: [RelationalItemRelationCompositePksEdge]!
+
+  """A list of `RelationalItemRelationCompositePk` objects."""
+  nodes: [RelationalItemRelationCompositePk]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `RelationalItemRelationCompositePk` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `RelationalItemRelationCompositePk` edge in the connection."""
+type RelationalItemRelationCompositePksEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalItemRelationCompositePk` at the end of the edge."""
+  node: RelationalItemRelationCompositePk
+}
+
+"""Methods to use when ordering `RelationalItemRelationCompositePk`."""
+enum RelationalItemRelationCompositePksOrderBy {
+  CHILD_ID_ASC
+  CHILD_ID_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `RelationalItemRelation` object types. All fields
+are tested for equality and combined with a logical ‘and.’
+"""
+input RelationalItemRelationCondition {
+  """Checks for equality with the object’s `childId` field."""
+  childId: Int
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+}
+
+"""A connection to a list of `RelationalItemRelation` values."""
+type RelationalItemRelationsConnection {
+  """
+  A list of edges which contains the `RelationalItemRelation` and cursor to aid in pagination.
+  """
+  edges: [RelationalItemRelationsEdge]!
+
+  """A list of `RelationalItemRelation` objects."""
+  nodes: [RelationalItemRelation]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `RelationalItemRelation` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `RelationalItemRelation` edge in the connection."""
+type RelationalItemRelationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalItemRelation` at the end of the edge."""
+  node: RelationalItemRelation
+}
+
+"""Methods to use when ordering `RelationalItemRelation`."""
+enum RelationalItemRelationsOrderBy {
+  CHILD_ID_ASC
+  CHILD_ID_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""A connection to a list of `RelationalItem` values."""
+type RelationalItemsConnection {
+  """
+  A list of edges which contains the `RelationalItem` and cursor to aid in pagination.
+  """
+  edges: [RelationalItemsEdge]!
+
+  """A list of `RelationalItem` objects."""
+  nodes: [RelationalItem]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `RelationalItem` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `RelationalItem` edge in the connection."""
+type RelationalItemsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalItem` at the end of the edge."""
+  node: RelationalItem
+}
+
+"""Methods to use when ordering `RelationalItem`."""
+enum RelationalItemsOrderBy {
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ID_ASC
+  ID_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  TYPE_ASC
+  TYPE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+type RelationalPost implements RelationalItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  description: String
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  note: String
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `RelationalPost`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalPost`.
+  """
+  relationalItemByParentId: RelationalItem
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationsConnection!
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  relationalItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalPost`.
+  """
+  relationalTopicByRootTopicId: RelationalTopic
+  rootTopicId: Int
+  title: String!
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+"""
+A condition to be used against `RelationalPost` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input RelationalPostCondition {
+  """Checks for equality with the object’s `archivedAt` field."""
+  archivedAt: Datetime
+
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s `createdAt` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s `description` field."""
+  description: String
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `isExplicitlyArchived` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s `note` field."""
+  note: String
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s `position` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s `rootTopicId` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s `title` field."""
+  title: String
+
+  """Checks for equality with the object’s `type` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s `updatedAt` field."""
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `RelationalPost` values."""
+type RelationalPostsConnection {
+  """
+  A list of edges which contains the `RelationalPost` and cursor to aid in pagination.
+  """
+  edges: [RelationalPostsEdge]!
+
+  """A list of `RelationalPost` objects."""
+  nodes: [RelationalPost]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `RelationalPost` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `RelationalPost` edge in the connection."""
+type RelationalPostsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalPost` at the end of the edge."""
+  node: RelationalPost
+}
+
+"""Methods to use when ordering `RelationalPost`."""
+enum RelationalPostsOrderBy {
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  DESCRIPTION_ASC
+  DESCRIPTION_DESC
+  ID_ASC
+  ID_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  NATURAL
+  NOTE_ASC
+  NOTE_DESC
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  TITLE_ASC
+  TITLE_DESC
+  TYPE_ASC
+  TYPE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+type RelationalTopic implements RelationalItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `RelationalTopic`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `RelationalItem` that is related to this `RelationalTopic`.
+  """
+  relationalItemByParentId: RelationalItem
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelationCompositePk`.
+  """
+  relationalItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelationCompositePk`."""
+    orderBy: [RelationalItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of `RelationalItemRelation`.
+  """
+  relationalItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItemRelation`."""
+    orderBy: [RelationalItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemRelationsConnection!
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  relationalItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
+
+  """Reads and enables pagination through a set of `RelationalItem`."""
+  relationalItemsByRootTopicId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: RelationalItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `RelationalItem`."""
+    orderBy: [RelationalItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): RelationalItemsConnection!
+
+  """
+  Reads a single `RelationalTopic` that is related to this `RelationalTopic`.
+  """
+  relationalTopicByRootTopicId: RelationalTopic
+  rootTopicId: Int
+  title: String!
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+"""
+A condition to be used against `RelationalTopic` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input RelationalTopicCondition {
+  """Checks for equality with the object’s `archivedAt` field."""
+  archivedAt: Datetime
+
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s `createdAt` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `isExplicitlyArchived` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s `position` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s `rootTopicId` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s `title` field."""
+  title: String
+
+  """Checks for equality with the object’s `type` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s `updatedAt` field."""
+  updatedAt: Datetime
+}
+
+"""A connection to a list of `RelationalTopic` values."""
+type RelationalTopicsConnection {
+  """
+  A list of edges which contains the `RelationalTopic` and cursor to aid in pagination.
+  """
+  edges: [RelationalTopicsEdge]!
+
+  """A list of `RelationalTopic` objects."""
+  nodes: [RelationalTopic]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `RelationalTopic` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `RelationalTopic` edge in the connection."""
+type RelationalTopicsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `RelationalTopic` at the end of the edge."""
+  node: RelationalTopic
+}
+
+"""Methods to use when ordering `RelationalTopic`."""
+enum RelationalTopicsOrderBy {
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ID_ASC
+  ID_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  TITLE_ASC
+  TITLE_DESC
+  TYPE_ASC
+  TYPE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+type SingleTableChecklist implements SingleTableItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `SingleTableItem`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTableChecklist`.
+  """
+  rootChecklistTopic: SingleTableTopic
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTableChecklist`.
+  """
+  rootTopic: SingleTableTopic
+  rootTopicId: Int
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItem`.
+  """
+  singleTableItemByParentId: SingleTableItem
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  singleTableItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItem`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemsConnection!
+  title: String
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+type SingleTableChecklistItem implements SingleTableItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  description: String
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  note: String
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `SingleTableItem`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """Reads a single `Priority` that is related to this `SingleTableItem`."""
+  priorityByPriorityId: Priority
+  priorityId: Int
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTableChecklistItem`.
+  """
+  rootTopic: SingleTableTopic
+  rootTopicId: Int
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItem`.
+  """
+  singleTableItemByParentId: SingleTableItem
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  singleTableItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItem`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemsConnection!
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+type SingleTableDivider implements SingleTableItem {
+  archivedAt: Datetime
+  authorId: Int!
+  color: String
+  createdAt: Datetime!
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `SingleTableItem`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTableDivider`.
+  """
+  rootTopic: SingleTableTopic
+  rootTopicId: Int
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItem`.
+  """
+  singleTableItemByParentId: SingleTableItem
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  singleTableItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItem`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemsConnection!
+  title: String
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+interface SingleTableItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `SingleTableItem`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTableItem`.
+  """
+  rootTopic: SingleTableTopic
+  rootTopicId: Int
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItem`.
+  """
+  singleTableItemByParentId: SingleTableItem
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTableItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTableItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTableItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTableItemRelationsConnection!
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  singleTableItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+  ): SingleTableItemsConnection!
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+"""
+A condition to be used against `SingleTableItem` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input SingleTableItemCondition {
+  """Checks for equality with the object’s `archivedAt` field."""
+  archivedAt: Datetime
+
+  """Checks for equality with the object’s `authorId` field."""
+  authorId: Int
+
+  """Checks for equality with the object’s `createdAt` field."""
+  createdAt: Datetime
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `isExplicitlyArchived` field."""
+  isExplicitlyArchived: Boolean
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+
+  """Checks for equality with the object’s `position` field."""
+  position: BigInt
+
+  """Checks for equality with the object’s `rootTopicId` field."""
+  rootTopicId: Int
+
+  """Checks for equality with the object’s `type` field."""
+  type: ItemType
+
+  """Checks for equality with the object’s `updatedAt` field."""
+  updatedAt: Datetime
+}
+
+type SingleTableItemRelation {
+  childId: Int!
+  id: Int!
+  parentId: Int!
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItemRelation`.
+  """
+  singleTableItemByChildId: SingleTableItem
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItemRelation`.
+  """
+  singleTableItemByParentId: SingleTableItem
+}
+
+type SingleTableItemRelationCompositePk {
+  childId: Int!
+  parentId: Int!
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemByChildId: SingleTableItem
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemByParentId: SingleTableItem
+}
+
+"""
+A condition to be used against `SingleTableItemRelationCompositePk` object
+types. All fields are tested for equality and combined with a logical ‘and.’
+"""
+input SingleTableItemRelationCompositePkCondition {
+  """Checks for equality with the object’s `childId` field."""
+  childId: Int
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+}
+
+"""A connection to a list of `SingleTableItemRelationCompositePk` values."""
+type SingleTableItemRelationCompositePksConnection {
+  """
+  A list of edges which contains the `SingleTableItemRelationCompositePk` and cursor to aid in pagination.
+  """
+  edges: [SingleTableItemRelationCompositePksEdge]!
+
+  """A list of `SingleTableItemRelationCompositePk` objects."""
+  nodes: [SingleTableItemRelationCompositePk]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `SingleTableItemRelationCompositePk` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `SingleTableItemRelationCompositePk` edge in the connection."""
+type SingleTableItemRelationCompositePksEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `SingleTableItemRelationCompositePk` at the end of the edge."""
+  node: SingleTableItemRelationCompositePk
+}
+
+"""Methods to use when ordering `SingleTableItemRelationCompositePk`."""
+enum SingleTableItemRelationCompositePksOrderBy {
+  CHILD_ID_ASC
+  CHILD_ID_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""
+A condition to be used against `SingleTableItemRelation` object types. All
+fields are tested for equality and combined with a logical ‘and.’
+"""
+input SingleTableItemRelationCondition {
+  """Checks for equality with the object’s `childId` field."""
+  childId: Int
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `parentId` field."""
+  parentId: Int
+}
+
+"""A connection to a list of `SingleTableItemRelation` values."""
+type SingleTableItemRelationsConnection {
+  """
+  A list of edges which contains the `SingleTableItemRelation` and cursor to aid in pagination.
+  """
+  edges: [SingleTableItemRelationsEdge]!
+
+  """A list of `SingleTableItemRelation` objects."""
+  nodes: [SingleTableItemRelation]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `SingleTableItemRelation` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `SingleTableItemRelation` edge in the connection."""
+type SingleTableItemRelationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `SingleTableItemRelation` at the end of the edge."""
+  node: SingleTableItemRelation
+}
+
+"""Methods to use when ordering `SingleTableItemRelation`."""
+enum SingleTableItemRelationsOrderBy {
+  CHILD_ID_ASC
+  CHILD_ID_DESC
+  ID_ASC
+  ID_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+}
+
+"""A connection to a list of `SingleTableItem` values."""
+type SingleTableItemsConnection {
+  """
+  A list of edges which contains the `SingleTableItem` and cursor to aid in pagination.
+  """
+  edges: [SingleTableItemsEdge]!
+
+  """A list of `SingleTableItem` objects."""
+  nodes: [SingleTableItem]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `SingleTableItem` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `SingleTableItem` edge in the connection."""
+type SingleTableItemsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `SingleTableItem` at the end of the edge."""
+  node: SingleTableItem
+}
+
+"""Methods to use when ordering `SingleTableItem`."""
+enum SingleTableItemsOrderBy {
+  ARCHIVED_AT_ASC
+  ARCHIVED_AT_DESC
+  AUTHOR_ID_ASC
+  AUTHOR_ID_DESC
+  CREATED_AT_ASC
+  CREATED_AT_DESC
+  ID_ASC
+  ID_DESC
+  IS_EXPLICITLY_ARCHIVED_ASC
+  IS_EXPLICITLY_ARCHIVED_DESC
+  NATURAL
+  PARENT_ID_ASC
+  PARENT_ID_DESC
+  POSITION_ASC
+  POSITION_DESC
+  PRIMARY_KEY_ASC
+  PRIMARY_KEY_DESC
+  ROOT_TOPIC_ID_ASC
+  ROOT_TOPIC_ID_DESC
+  TYPE_ASC
+  TYPE_DESC
+  UPDATED_AT_ASC
+  UPDATED_AT_DESC
+}
+
+type SingleTablePost implements SingleTableItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  description: String
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  note: String
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `SingleTableItem`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """Reads a single `Priority` that is related to this `SingleTableItem`."""
+  priorityByPriorityId: Priority
+  priorityId: Int
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTablePost`.
+  """
+  rootTopic: SingleTableTopic
+  rootTopicId: Int
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItem`.
+  """
+  singleTableItemByParentId: SingleTableItem
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  singleTableItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItem`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemsConnection!
+  subject: String
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+type SingleTableTopic implements SingleTableItem {
+  archivedAt: Datetime
+  authorId: Int!
+  createdAt: Datetime!
+  id: Int!
+  isExplicitlyArchived: Boolean!
+  parentId: Int
+
+  """Reads a single `Person` that is related to this `SingleTableItem`."""
+  personByAuthorId: Person
+  position: BigInt!
+
+  """
+  Reads a single `SingleTableTopic` that is related to this `SingleTableTopic`.
+  """
+  rootTopic: SingleTableTopic
+  rootTopicId: Int
+
+  """
+  Reads a single `SingleTableItem` that is related to this `SingleTableItem`.
+  """
+  singleTableItemByParentId: SingleTableItem
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelationCompositePk`.
+  """
+  singleTableItemRelationCompositePksByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCompositePkCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelationCompositePk`."""
+    orderBy: [SingleTableItemRelationCompositePksOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationCompositePksConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByChildId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
+  """
+  Reads and enables pagination through a set of `SingleTableItemRelation`.
+  """
+  singleTableItemRelationsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemRelationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItemRelation`."""
+    orderBy: [SingleTableItemRelationsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemRelationsConnection!
+
+  """Reads and enables pagination through a set of `SingleTableItem`."""
+  singleTableItemsByParentId(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: SingleTableItemCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """The method to use when ordering `SingleTableItem`."""
+    orderBy: [SingleTableItemsOrderBy!] = [PRIMARY_KEY_ASC]
+  ): SingleTableItemsConnection!
+  title: String!
+  type: ItemType!
+  updatedAt: Datetime!
+}
+
+type ThirdPartyVulnerability implements Vulnerability {
+  """Reads and enables pagination through a set of `Application`."""
+  applications(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """
+    A condition to be used in determining which values should be returned by the collection.
+    """
+    condition: ApplicationCondition
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+
+    """The method to use when ordering `Application`."""
+    orderBy: [ApplicationsOrderBy!]
+  ): ApplicationsConnection!
+  cvssScore: Float!
+  id: Int!
+  name: String!
+
+  """Reads and enables pagination through a set of `PersonOrOrganization`."""
+  owners: PersonOrOrganizationConnection!
+  vendorName: String
+}
+
+"""A connection to a list of `Vulnerability` values."""
+type VulnerabilitiesConnection {
+  """
+  A list of edges which contains the `Vulnerability` and cursor to aid in pagination.
+  """
+  edges: [VulnerabilitiesEdge]!
+
+  """A list of `Vulnerability` objects."""
+  nodes: [Vulnerability]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Vulnerability` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Vulnerability` edge in the connection."""
+type VulnerabilitiesEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Vulnerability` at the end of the edge."""
+  node: Vulnerability
+}
+
+"""Methods to use when ordering `Vulnerability`."""
+enum VulnerabilitiesOrderBy {
+  CVSS_SCORE_ASC
+  CVSS_SCORE_DESC
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+}
+
+interface Vulnerability {
+  """Reads and enables pagination through a set of `Application`."""
+  applications(
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Filter results to only those of the given types"""
+    only: [ApplicationType!] @deprecated(reason: "EXPERIMENTAL")
+  ): ApplicationsConnection!
+  cvssScore: Float!
+  id: Int!
+  name: String!
+
+  """Reads and enables pagination through a set of `PersonOrOrganization`."""
+  owners: PersonOrOrganizationConnection!
+}
+
+"""
+A condition to be used against `Vulnerability` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input VulnerabilityCondition {
+  """Checks for equality with the object’s `cvssScore` field."""
+  cvssScore: Float
+
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+}
+
+enum VulnerabilityType {
+  FirstPartyVulnerability
+  ThirdPartyVulnerability
+}
+
+interface ZeroImplementation {
+  id: Int
+  name: String
+}
+
+"""
+A condition to be used against `ZeroImplementation` object types. All fields are
+tested for equality and combined with a logical ‘and.’
+"""
+input ZeroImplementationCondition {
+  """Checks for equality with the object’s `id` field."""
+  id: Int
+
+  """Checks for equality with the object’s `name` field."""
+  name: String
+}
+
+"""A connection to a list of `ZeroImplementation` values."""
+type ZeroImplementationsConnection {
+  """
+  A list of edges which contains the `ZeroImplementation` and cursor to aid in pagination.
+  """
+  edges: [ZeroImplementationsEdge]!
+
+  """A list of `ZeroImplementation` objects."""
+  nodes: [ZeroImplementation]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """
+  The count of *all* `ZeroImplementation` you could get from the connection.
+  """
+  totalCount: Int!
+}
+
+"""A `ZeroImplementation` edge in the connection."""
+type ZeroImplementationsEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `ZeroImplementation` at the end of the edge."""
+  node: ZeroImplementation
+}
+
+"""Methods to use when ordering `ZeroImplementation`."""
+enum ZeroImplementationsOrderBy {
+  ID_ASC
+  ID_DESC
+  NAME_ASC
+  NAME_DESC
+  NATURAL
+}
