@@ -129,13 +129,26 @@ let testPool: Pool | null = null;
 let connectionString = "";
 let databaseName = "";
 
-async function runSqlAsRoot(sql: string) {
-  const rootClient = new Client(
-    `postgres:///${process.env.OWNER_DATABASE ?? "postgres"}`,
-  );
-  await rootClient.connect();
-  await rootClient.query(sql);
-  await rootClient.end();
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+async function runSqlAsRoot(sql: string, maxAttempts = 1) {
+  let error: Error | undefined;
+  for (let attempts = 0; attempts < maxAttempts; attempts++) {
+    if (attempts > 0) {
+      await sleep(attempts * 100);
+    }
+    try {
+      const rootClient = new Client(
+        `postgres:///${process.env.OWNER_DATABASE ?? "postgres"}`,
+      );
+      await rootClient.connect();
+      await rootClient.query(sql);
+      await rootClient.end();
+      return;
+    } catch (e) {
+      error = e;
+    }
+  }
+  throw error ?? new Error("Failed to run SQL as root");
 }
 
 beforeAll(async () => {
@@ -143,6 +156,7 @@ beforeAll(async () => {
 
   await runSqlAsRoot(
     `create database ${databaseName} with owner graphilecrystaltest template = graphilecrystaltest_template;`,
+    5,
   );
 
   connectionString = `postgres:///${databaseName}`;
@@ -156,7 +170,7 @@ beforeAll(async () => {
   testPool.on("error", (e) => {
     console.error("Pool error:", e);
   });
-});
+}, 30000);
 
 afterAll(async () => {
   await testPool!.end();
@@ -166,7 +180,7 @@ afterAll(async () => {
     console.warn(`Warning: ${p._clients.length} clients are still in the pool`);
   }
   testPool = null;
-});
+}, 30000);
 
 export async function withPoolClient<T>(
   callback: (client: PoolClient) => Promise<T>,
