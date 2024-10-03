@@ -44,7 +44,9 @@ psql -Xqv ON_ERROR_STOP=1 -d "graphilecrystaltest_template" \
   -f grafast/dataplan-pg/__tests__/sequence_reset.sql \
   -f postgraphile/postgraphile/__tests__/kitchen-sink-schema.sql \
   -f postgraphile/postgraphile/__tests__/kitchen-sink-permissions.sql \
+  -f postgraphile/postgraphile/__tests__/kitchen-sink-data.sql \
   -f postgraphile/postgraphile/__tests__/pg11-schema.sql \
+  -f postgraphile/postgraphile/__tests__/pg11-data.sql \
   -f graphile-build/graphile-utils/__tests__/utils-schema.sql \
   "$TEMPLATE_DATABASE_URL"
 #psql -Xqv ON_ERROR_STOP=1 -f packages/pg-pubsub/__tests__/schema.sql "$TEMPLATE_DATABASE_URL"
