@@ -13,6 +13,7 @@ import "graphile-build-pg";
 import type { PgClientQuery } from "@dataplan/pg";
 import { PgSubscriber } from "@dataplan/pg/adaptors/pg";
 import * as adaptor from "@dataplan/pg/adaptors/pg";
+import { randomBytes } from "crypto";
 import { promises as fsp } from "fs";
 import { mkdir, mkdtemp, rmdir, unlink } from "fs/promises";
 import {
@@ -46,7 +47,7 @@ import * as jsonwebtoken from "jsonwebtoken";
 import { decode } from "jsonwebtoken";
 import { relative } from "path";
 import type { PoolClient } from "pg";
-import { Pool } from "pg";
+import { Client, Pool } from "pg";
 
 import { withTestWithPgClient } from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.js";
 import { makeSchema } from "../src/index.js";
@@ -125,10 +126,26 @@ const pathCompare = (
 
 /** Postgres pool */
 let testPool: Pool | null = null;
+let connectionString = "";
+let databaseName = "";
 
-export const connectionString = process.env.TEST_DATABASE_URL || "pggql_test";
+async function runSqlAsRoot(sql: string) {
+  const rootClient = new Client(
+    `postgres:///${process.env.OWNER_DATABASE ?? "postgres"}`,
+  );
+  await rootClient.connect();
+  await rootClient.query(sql);
+  await rootClient.end();
+}
 
-beforeAll(() => {
+beforeAll(async () => {
+  databaseName = `gctestdb_${randomBytes(8).toString("hex")}`;
+
+  await runSqlAsRoot(
+    `create database ${databaseName} with owner graphilecrystaltest template = graphilecrystaltest_template;`,
+  );
+
+  connectionString = `postgres:///${databaseName}`;
   testPool = new Pool({
     connectionString,
   });
@@ -142,7 +159,8 @@ beforeAll(() => {
 });
 
 afterAll(async () => {
-  await testPool.end();
+  await testPool!.end();
+  await runSqlAsRoot(`drop database ${databaseName};`);
   const p = testPool as any;
   if (p._clients.length > 0) {
     console.warn(`Warning: ${p._clients.length} clients are still in the pool`);
