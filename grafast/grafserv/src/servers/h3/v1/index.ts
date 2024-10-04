@@ -1,11 +1,12 @@
 import { PassThrough } from "node:stream";
 
 //@ts-expect-error type imports.
-import type { Hooks, Peer } from 'crossws';
-import { GRAPHQL_TRANSPORT_WS_PROTOCOL, makeServer } from 'graphql-ws';
+import type { Hooks, Peer } from "crossws";
+import { GRAPHQL_TRANSPORT_WS_PROTOCOL, makeServer } from "graphql-ws";
 import type { App, H3Event } from "h3";
 import {
   createRouter,
+  defineWebSocketHandler,
   eventHandler,
   getQuery,
   getRequestHeaders,
@@ -227,6 +228,11 @@ export class H3Grafserv extends GrafservBase {
         : ["post"],
     );
 
+    app.use(
+      this.dynamicOptions.graphqlPath,
+      defineWebSocketHandler(this.makeWsHandler()),
+    );
+
     if (dynamicOptions.graphiql) {
       router.get(
         this.dynamicOptions.graphiqlPath,
@@ -248,7 +254,7 @@ export class H3Grafserv extends GrafservBase {
       handleMessage?: (data: string) => Promise<void>;
       closed?: (code?: number, reason?: string) => Promise<void>;
     }
-  
+
     const clients = new WeakMap<Peer, Client>();
     return {
       open: async (peer) => {
@@ -263,12 +269,14 @@ export class H3Grafserv extends GrafservBase {
             close: (code, reason) => peer.close(code, reason), // there are protocol standard closures
             onMessage: (cb) => (client.handleMessage = cb),
           },
-          { socket: peer.websocket, request: peer.request }
+          { socket: peer.websocket, request: peer.request },
         );
         clients.set(peer, client);
       },
-      message: (peer, message) => clients.get(peer)?.handleMessage?.(message.text()),
-      close: (peer, details) => clients.get(peer)?.closed?.(details.code, details.reason),
+      message: (peer, message) =>
+        clients.get(peer)?.handleMessage?.(message.text()),
+      close: (peer, details) =>
+        clients.get(peer)?.closed?.(details.code, details.reason),
     };
   }
 }
