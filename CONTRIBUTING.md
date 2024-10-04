@@ -28,8 +28,8 @@ yarn watch # or 'yarn build'
 **TODO:** check the following instructions work on a clean checkout.
 
 We assume you have a local PostgreSQL server running in "trust" authentication
-mode. Other options may or may not work - you may need to set `PGHOST` or
-similar config variables.
+mode. Other options may or may not work - you may need to set `PGHOST`,
+`PGUSER`, `PGPASSWORD` and/or similar config variables.
 
 Run the tests with `yarn test`
 
