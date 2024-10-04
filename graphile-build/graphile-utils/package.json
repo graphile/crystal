@@ -12,7 +12,7 @@
     }
   },
   "scripts": {
-    "test": "jest -i",
+    "test": "jest",
     "prepack": "tsc -b tsconfig.build.json"
   },
   "repository": {

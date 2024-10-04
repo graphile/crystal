@@ -48,7 +48,11 @@ import { relative } from "path";
 import type { PoolClient } from "pg";
 import { Pool } from "pg";
 
-import { withTestWithPgClient } from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.js";
+import {
+  createTestDatabase,
+  dropTestDatabase,
+  withTestWithPgClient,
+} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.js";
 import { makeSchema } from "../src/index.js";
 import AmberPreset from "../src/presets/amber.js";
 import { makeV4Preset } from "../src/presets/v4.js";
@@ -124,36 +128,38 @@ const pathCompare = (
 };
 
 /** Postgres pool */
-let testPool: Pool | null = null;
+let pgPool: Pool | null = null;
+let connectionString = "";
+let databaseName = "";
 
-export const connectionString = process.env.TEST_DATABASE_URL || "pggql_test";
-
-beforeAll(() => {
-  testPool = new Pool({
+beforeAll(async () => {
+  ({ connectionString, databaseName } = await createTestDatabase());
+  pgPool = new Pool({
     connectionString,
   });
-  testPool.on("connect", (client) => {
+  pgPool.on("connect", (client) => {
     client.on("error", () => {});
     client.query(`set TimeZone to '+04:00'`).catch(() => {});
   });
-  testPool.on("error", (e) => {
+  pgPool.on("error", (e) => {
     console.error("Pool error:", e);
   });
-});
+}, 30000);
 
 afterAll(async () => {
-  await testPool.end();
-  const p = testPool as any;
+  await pgPool!.end();
+  await dropTestDatabase(databaseName);
+  const p = pgPool as any;
   if (p._clients.length > 0) {
     console.warn(`Warning: ${p._clients.length} clients are still in the pool`);
   }
-  testPool = null;
-});
+  pgPool = null;
+}, 30000);
 
 export async function withPoolClient<T>(
   callback: (client: PoolClient) => Promise<T>,
 ): Promise<T> {
-  const poolClient = await testPool.connect();
+  const poolClient = await pgPool!.connect();
   try {
     return await callback(poolClient);
   } finally {
@@ -342,19 +348,19 @@ export async function runTestQuery(
     applyV4Stuff(preset, config);
   }
 
-  if (!testPool) {
+  if (!pgPool) {
     throw new Error("No pool!");
   }
 
   // Load test data
-  await testPool.query(await kitchenSinkData());
-  const serverVersionNum = await getServerVersionNum(testPool);
+  await pgPool.query(await kitchenSinkData());
+  const serverVersionNum = await getServerVersionNum(pgPool);
   if (serverVersionNum >= 110000) {
-    await testPool.query(await pg11Data());
+    await pgPool.query(await pg11Data());
   }
 
   if (setupSql) {
-    await testPool.query(setupSql);
+    await pgPool.query(setupSql);
   }
   try {
     const { schema: rawSchema, resolvedPreset } = await makeSchema(preset);
@@ -363,11 +369,11 @@ export async function runTestQuery(
       ? await importExportedSchema(rawSchema)
       : rawSchema;
     return await withTestWithPgClient<any>(
-      testPool,
+      pgPool,
       queries,
       Boolean(config.directPg),
       async (withPgClient) => {
-        const pgSubscriber = new PgSubscriber(testPool);
+        const pgSubscriber = new PgSubscriber(pgPool);
         try {
           const document = parse(source);
           const args: ExecutionArgs = {
@@ -448,7 +454,7 @@ export async function runTestQuery(
               if (!config.directPg) {
                 throw new Error("Can only use callback in directPg mode");
               }
-              const poolClient = await testPool.connect();
+              const poolClient = await pgPool.connect();
               try {
                 await options.callback(poolClient, originalPayloads);
               } catch (e) {
@@ -559,7 +565,7 @@ export async function runTestQuery(
     );
   } finally {
     if (cleanupSql) {
-      await testPool.query(cleanupSql);
+      await pgPool.query(cleanupSql);
     }
   }
 }

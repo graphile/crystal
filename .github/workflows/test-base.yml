@@ -22,11 +22,6 @@ on:
         type: string
         default: ""
         required: false
-      exportSchema:
-        description: Optional mode for graphile-export
-        type: string
-        default: ""
-        required: false
 
 jobs:
   build:
@@ -34,11 +29,11 @@ jobs:
 
     env:
       CI: true
+      JEST_MAX_WORKERS: 4
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGHOST: localhost
       PGVERSION: ${{ matrix.postgres-version}}
-      ROOT_DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
-      TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/graphileengine_test
-      TEST_PG_URL: postgres://postgres:postgres@localhost:5432/postgraphile_test
-      LDS_TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/lds_test
       TEST_SIMPLIFY_DATABASE_URL: postgres://postgres:postgres@localhost:5432/pg_simplify_inflectors
       TERM: xterm
       FORCE_COLOR: 1
@@ -105,8 +100,6 @@ jobs:
           run prepack
 
       - name: "Test Project"
-        env:
-          EXPORT_SCHEMA: ${{ inputs.exportSchema }}
         run:
           yarn run pretest && yarn workspaces foreach -vp --jobs 2 --from '${{
           inputs.package }}' run ${{ inputs.testcommand }} ${{ inputs.args }}

@@ -12,8 +12,13 @@ import JSON5 from "json5";
 
 import { schema } from "./exampleSchemaExport.mjs";
 
-const connectionString =
-  process.env.TEST_DATABASE_URL || "postgres:///graphile_crystal";
+const databaseName = "graphilecrystaltest";
+const host = process.env.PGHOST ?? "localhost";
+const connectionString = host.includes("/")
+  ? `socket://graphilecrystaltest:test@${host}?db=${encodeURIComponent(
+      databaseName,
+    )}`
+  : `postgres://graphilecrystaltest:test@${host}/${databaseName}`;
 const pgService = makePgService({ connectionString });
 const preset = {
   plugins: [PgContextPlugin],
