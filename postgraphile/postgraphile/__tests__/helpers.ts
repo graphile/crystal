@@ -134,14 +134,14 @@ let databaseName = "";
 
 beforeAll(async () => {
   ({ connectionString, databaseName } = await createTestDatabase());
-  const testPool = new Pool({
+  pgPool = new Pool({
     connectionString,
   });
-  testPool.on("connect", (client) => {
+  pgPool.on("connect", (client) => {
     client.on("error", () => {});
     client.query(`set TimeZone to '+04:00'`).catch(() => {});
   });
-  testPool.on("error", (e) => {
+  pgPool.on("error", (e) => {
     console.error("Pool error:", e);
   });
 }, 30000);
