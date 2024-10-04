@@ -34,6 +34,7 @@ jobs:
 
     env:
       CI: true
+      PGHOST: localhost
       PGVERSION: ${{ matrix.postgres-version}}
       ROOT_DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
       TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/graphileengine_test
