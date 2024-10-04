@@ -12,100 +12,13 @@ jobs:
       testcommand: "test"
       args: "--ci"
 
-  postgraphile_queries_v4:
-    name: PostGraphile v4 queries tests
+  postgraphile:
+    name: PostGraphile tests
     uses: ./.github/workflows/test-base.yml
     with:
       prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
       package: "postgraphile"
-      testcommand: "test:operations:v4"
-      args: "--ci"
-
-  postgraphile_queries_v4_export_typeDefs:
-    name: PostGraphile v4 queries tests (exported as typeDefs)
-    uses: ./.github/workflows/test-base.yml
-    with:
-      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
-      package: "postgraphile"
-      testcommand: "test:operations:v4"
-      args: "--ci"
-      exportSchema: "typeDefs"
-
-  postgraphile_queries_v4_export_graphqljs:
-    name: PostGraphile v4 queries tests (exported as graphql-js)
-    uses: ./.github/workflows/test-base.yml
-    with:
-      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
-      package: "postgraphile"
-      testcommand: "test:operations:v4"
-      args: "--ci"
-      exportSchema: "graphql-js"
-
-  postgraphile_queries_polymorphic:
-    name: PostGraphile polymorphic query tests
-    uses: ./.github/workflows/test-base.yml
-    with:
-      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
-      package: "postgraphile"
-      testcommand: "test:operations:polymorphic_etc"
-      args: "--ci"
-
-  postgraphile_queries_polymorphic_export_typeDefs:
-    name: PostGraphile polymorphic query tests (exported as typeDefs)
-    uses: ./.github/workflows/test-base.yml
-    with:
-      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
-      package: "postgraphile"
-      testcommand: "test:operations:polymorphic_etc"
-      args: "--ci"
-      exportSchema: "typeDefs"
-
-  postgraphile_queries_polymorphic_export_graphqljs:
-    name: PostGraphile polymorphic query tests (exported as graphql-js)
-    uses: ./.github/workflows/test-base.yml
-    with:
-      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
-      package: "postgraphile"
-      testcommand: "test:operations:polymorphic_etc"
-      args: "--ci"
-      exportSchema: "graphql-js"
-
-  postgraphile_mutations:
-    name: PostGraphile mutation tests
-    uses: ./.github/workflows/test-base.yml
-    with:
-      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
-      package: "postgraphile"
-      testcommand: "test:operations:mutations"
-      args: "--ci"
-
-  postgraphile_mutations_export_typeDefs:
-    name: PostGraphile mutation tests (exported as typeDefs)
-    uses: ./.github/workflows/test-base.yml
-    with:
-      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
-      package: "postgraphile"
-      testcommand: "test:operations:mutations"
-      args: "--ci"
-      exportSchema: "typeDefs"
-
-  postgraphile_mutations_export_graphqljs:
-    name: PostGraphile mutation tests (exported as graphql-js)
-    uses: ./.github/workflows/test-base.yml
-    with:
-      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
-      package: "postgraphile"
-      testcommand: "test:operations:mutations"
-      args: "--ci"
-      exportSchema: "graphql-js"
-
-  postgraphile_schemas:
-    name: PostGraphile schema tests
-    uses: ./.github/workflows/test-base.yml
-    with:
-      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
-      package: "postgraphile"
-      testcommand: "test:schema"
+      testcommand: "test"
       args: "--ci"
 
   small_packages:
