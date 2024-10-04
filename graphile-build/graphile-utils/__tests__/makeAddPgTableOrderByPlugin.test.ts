@@ -36,7 +36,7 @@ beforeAll(async () => {
 
 afterAll(async () => {
   if (pgPool) {
-    pgPool.end();
+    await pgPool.end();
     pgPool = null;
     await dropTestDatabase(databaseName);
   }

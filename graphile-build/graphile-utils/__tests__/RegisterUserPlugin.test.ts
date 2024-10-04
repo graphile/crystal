@@ -38,10 +38,10 @@ alter sequence graphile_utils_2.users_id_seq restart with 1;
 
 afterAll(async () => {
   if (pgPool) {
-    pgPool.end();
+    await pgPool.end();
     pgPool = null;
-    await dropTestDatabase(databaseName);
   }
+  await dropTestDatabase(databaseName);
 });
 
 it("supports scalars", async () => {

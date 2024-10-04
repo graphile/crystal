@@ -156,7 +156,8 @@ async function runSqlAsRoot(sql: string, maxAttempts = 1) {
   let error: Error | undefined;
   for (let attempts = 0; attempts < maxAttempts; attempts++) {
     if (attempts > 0) {
-      await sleep(attempts * 100);
+      // Randomize to avoid thundering herd
+      await sleep((0.5 + Math.random()) * attempts * 200);
     }
     try {
       const rootClient = new Client(
@@ -192,5 +193,10 @@ export async function createTestDatabase() {
 }
 
 export async function dropTestDatabase(databaseName: string) {
-  await runSqlAsRoot(`drop database ${databaseName};`);
+  if (!databaseName) return;
+  try {
+    await runSqlAsRoot(`drop database ${databaseName};`, 2);
+  } catch {
+    // Noop
+  }
 }
