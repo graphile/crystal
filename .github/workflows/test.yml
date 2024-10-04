@@ -12,13 +12,40 @@ jobs:
       testcommand: "test"
       args: "--ci"
 
-  postgraphile:
-    name: PostGraphile tests
+  postgraphile_jest:
+    name: PostGraphile jest tests
     uses: ./.github/workflows/test-base.yml
     with:
       prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
       package: "postgraphile"
-      testcommand: "test"
+      testcommand: "test:jest"
+      args: "--ci"
+
+  postgraphile_schema_exports:
+    name: PostGraphile schema export tests
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
+      package: "postgraphile"
+      testcommand: "test:schema-exports"
+      args: "--ci"
+
+  postgraphile_export_typeDefs:
+    name: PostGraphile tests (exported as typeDefs)
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
+      package: "postgraphile"
+      testcommand: "test:operations-exports:typeDefs"
+      args: "--ci"
+
+  postgraphile_export_graphqljs:
+    name: PostGraphile tests (exported as graphql-js)
+    uses: ./.github/workflows/test-base.yml
+    with:
+      prepackPackages: "{pg-sql2,tamedevil,postgraphile}"
+      package: "postgraphile"
+      testcommand: "test:operations-exports:graphql-js"
       args: "--ci"
 
   small_packages:

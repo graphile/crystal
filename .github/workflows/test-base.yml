@@ -22,11 +22,6 @@ on:
         type: string
         default: ""
         required: false
-      exportSchema:
-        description: Optional mode for graphile-export
-        type: string
-        default: ""
-        required: false
 
 jobs:
   build:
@@ -105,8 +100,6 @@ jobs:
           run prepack
 
       - name: "Test Project"
-        env:
-          EXPORT_SCHEMA: ${{ inputs.exportSchema }}
         run:
           yarn run pretest && yarn workspaces foreach -vp --jobs 2 --from '${{
           inputs.package }}' run ${{ inputs.testcommand }} ${{ inputs.args }}
