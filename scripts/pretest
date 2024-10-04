@@ -11,6 +11,7 @@ fi;
 
 SERVER_VERSION_NUM=$(psql -XAqtv ON_ERROR_STOP=1 -d "${OWNER_DATABASE:-postgres}" -c "show server_version_num;")
 
+psql -Xqv ON_ERROR_STOP=1 -d "${OWNER_DATABASE:-postgres}" -c "drop database graphilecrystaltest;" || true
 for DBNAME in $(psql -XAqtv ON_ERROR_STOP=1 -d "${OWNER_DATABASE:-postgres}" -c "select datname from pg_database where datname like 'gctestdb_%' and datname = format('%I', datname);"); do
   echo "DEL $DBNAME"
   psql -Xqv ON_ERROR_STOP=1 -d "${OWNER_DATABASE:-postgres}" -c "drop database $DBNAME;"
@@ -56,6 +57,8 @@ PGPASSWORD=test psql -Xqv ON_ERROR_STOP=1 -d "graphilecrystaltest_template" -U g
 #CREATE DATABASE lds_test;
 #HERE
 #psql -X1v ON_ERROR_STOP=1 -v VERBOSITY=verbose -d lds_test -f utils/lds/__tests__/schema.sql
+
+psql -Xqv ON_ERROR_STOP=1 -d "${OWNER_DATABASE:-postgres}" -c "create database graphilecrystaltest with template = graphilecrystaltest_template owner = graphilecrystaltest;"
 
 clear
 echo "Database reset successfully ✅"

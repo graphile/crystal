@@ -5,8 +5,7 @@ const { createWithPgClient } = require("./dist/adaptors/pg");
 
 const schema = makeExampleSchema();
 const withPgClient = createWithPgClient({
-  connectionString:
-    process.env.TEST_DATABASE_URL || "postgres:///graphile_crystal",
+  connectionString: "postgres:///graphilecrystaltest",
 });
 const serv = grafserv({
   preset: { grafast: { context: { withPgClient }, explain: true } },
