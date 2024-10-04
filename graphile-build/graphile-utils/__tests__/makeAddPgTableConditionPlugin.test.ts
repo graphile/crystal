@@ -9,6 +9,10 @@ import { makeSchema } from "postgraphile";
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
+import {
+  createTestDatabase,
+  dropTestDatabase,
+} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.js";
 import { makeAddPgTableConditionPlugin } from "../src/index.js";
 
 const clean = (data: any): any => {
@@ -32,17 +36,28 @@ const clean = (data: any): any => {
 };
 
 let pgPool: Pool | null = null;
+let connectionString = "";
+let databaseName = "";
 
-beforeAll(() => {
+beforeAll(async () => {
+  ({ connectionString, databaseName } = await createTestDatabase());
   pgPool = new pg.Pool({
-    connectionString: process.env.TEST_DATABASE_URL,
+    connectionString,
+  });
+  pgPool.on("connect", (client) => {
+    client.on("error", () => {});
+    client.query(`set TimeZone to '+04:00'`).catch(() => {});
+  });
+  pgPool.on("error", (e) => {
+    console.error("Pool error:", e);
   });
 });
 
-afterAll(() => {
+afterAll(async () => {
   if (pgPool) {
     pgPool.end();
     pgPool = null;
+    await dropTestDatabase(databaseName);
   }
 });
 

@@ -6,14 +6,29 @@ import pg from "pg";
 import { PostGraphileAmberPreset } from "postgraphile/presets/amber";
 import { makeV4Preset } from "postgraphile/presets/v4";
 
+import {
+  createTestDatabase,
+  dropTestDatabase,
+} from "../../../grafast/dataplan-pg/__tests__/sharedHelpers.js";
 import { RegisterUserPlugin } from "./RegisterUserPlugin.js";
 
 let pgPool: Pool | null = null;
+let connectionString = "";
+let databaseName = "";
 
 beforeAll(async () => {
+  ({ connectionString, databaseName } = await createTestDatabase());
   pgPool = new pg.Pool({
-    connectionString: process.env.TEST_DATABASE_URL,
+    connectionString,
   });
+  pgPool.on("connect", (client) => {
+    client.on("error", () => {});
+    client.query(`set TimeZone to '+04:00'`).catch(() => {});
+  });
+  pgPool.on("error", (e) => {
+    console.error("Pool error:", e);
+  });
+
   await pgPool.query(`\
 delete from graphile_utils_2.user_emails;
 delete from graphile_utils_2.users;
@@ -21,10 +36,11 @@ alter sequence graphile_utils_2.users_id_seq restart with 1;
 `);
 });
 
-afterAll(() => {
+afterAll(async () => {
   if (pgPool) {
     pgPool.end();
     pgPool = null;
+    await dropTestDatabase(databaseName);
   }
 });
 

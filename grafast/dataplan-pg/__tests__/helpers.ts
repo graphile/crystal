@@ -38,7 +38,11 @@ import { PgSubscriber } from "../src/adaptors/pg.js";
 import { makeExampleSchema } from "../src/examples/exampleSchema.js";
 //import prettier from "prettier";
 import type { PgClientQuery } from "../src/index.js";
-import { withTestWithPgClient } from "./sharedHelpers.js";
+import {
+  withTestWithPgClient,
+  dropTestDatabase,
+  createTestDatabase,
+} from "./sharedHelpers.js";
 
 /**
  * We go beyond what Jest snapshots allow; so we have to manage it ourselves.
@@ -87,12 +91,15 @@ let optimizedSchema!: GraphQLSchema;
 let deoptimizedSchema!: GraphQLSchema;
 /** Postgres pool */
 let testPool!: Pool;
+let connectionString = "";
+let databaseName = "";
 
-beforeAll(() => {
+beforeAll(async () => {
   optimizedSchema = makeExampleSchema();
   deoptimizedSchema = makeExampleSchema({ deoptimize: true });
+  ({ connectionString, databaseName } = await createTestDatabase());
   testPool = new Pool({
-    connectionString: process.env.TEST_DATABASE_URL || "graphile_grafast",
+    connectionString,
   });
   testPool.on("connect", (client) => {
     client.query(`set TimeZone to 'UTC'`);
@@ -110,6 +117,7 @@ afterAll(async () => {
   }
   testPool = null as any;
   optimizedSchema = deoptimizedSchema = null as any;
+  await dropTestDatabase(databaseName);
 });
 
 async function resetSequences() {

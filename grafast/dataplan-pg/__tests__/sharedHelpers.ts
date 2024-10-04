@@ -1,6 +1,8 @@
 // Shared with postgraphile
 
+import { randomBytes } from "crypto";
 import type { Pool } from "pg";
+import { Client } from "pg";
 
 import type { PgClientQuery, WithPgClient } from "../src";
 import { createWithPgClient } from "../src/adaptors/pg.js";
@@ -146,4 +148,49 @@ export async function withTestWithPgClient<T>(
     poolClient.query = oldQuery;
     poolClient.release();
   }
+}
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+async function runSqlAsRoot(sql: string, maxAttempts = 1) {
+  let error: Error | undefined;
+  for (let attempts = 0; attempts < maxAttempts; attempts++) {
+    if (attempts > 0) {
+      await sleep(attempts * 100);
+    }
+    try {
+      const rootClient = new Client(
+        `postgres:///${process.env.OWNER_DATABASE ?? "postgres"}`,
+      );
+      await rootClient.connect();
+      await rootClient.query(sql);
+      await rootClient.end();
+      return;
+    } catch (e) {
+      error = e;
+    }
+  }
+  throw error ?? new Error("Failed to run SQL as root");
+}
+
+export async function createTestDatabase() {
+  const databaseName = `gctestdb_${randomBytes(8).toString("hex")}`;
+
+  await runSqlAsRoot(
+    `create database ${databaseName} with owner graphilecrystaltest template = graphilecrystaltest_template;`,
+    5,
+  );
+
+  const host = process.env.PGHOST ?? "localhost";
+
+  const connectionString = host.includes("/")
+    ? `socket://graphilecrystaltest:test@${host}?db=${encodeURIComponent(
+        databaseName,
+      )}`
+    : `postgres://graphilecrystaltest:test@${host}/${databaseName}`;
+  return { databaseName, connectionString };
+}
+
+export async function dropTestDatabase(databaseName: string) {
+  await runSqlAsRoot(`drop database ${databaseName};`);
 }

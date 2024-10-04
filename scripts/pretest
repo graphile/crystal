@@ -11,7 +11,6 @@ fi;
 
 SERVER_VERSION_NUM=$(psql -XAqtv ON_ERROR_STOP=1 -d "${OWNER_DATABASE:-postgres}" -c "show server_version_num;")
 
-# Import latest schema (throw on error)
 for DBNAME in $(psql -XAqtv ON_ERROR_STOP=1 -d "${OWNER_DATABASE:-postgres}" -c "select datname from pg_database where datname like 'gctestdb_%' and datname = format('%I', datname);"); do
   echo "DEL $DBNAME"
   psql -Xqv ON_ERROR_STOP=1 -d "${OWNER_DATABASE:-postgres}" -c "drop database $DBNAME;"
@@ -38,8 +37,7 @@ grant postgraphile_test_user1 to postgraphile_test_authenticator;
 grant postgraphile_test_user2 to postgraphile_test_authenticator;
 HERE
 
-#psql -Xqv ON_ERROR_STOP=1 -f packages/graphile-utils/__tests__/utils-schema.sql "$TEMPLATE_DATABASE_URL"
-psql -Xqv ON_ERROR_STOP=1 -d "graphilecrystaltest_template" \
+PGPASSWORD=test psql -Xqv ON_ERROR_STOP=1 -d "graphilecrystaltest_template" -U graphilecrystaltest \
   -f grafast/dataplan-pg/__tests__/schema.sql \
   -f grafast/dataplan-pg/__tests__/sequence_reset.sql \
   -f postgraphile/postgraphile/__tests__/kitchen-sink-schema.sql \
@@ -47,35 +45,16 @@ psql -Xqv ON_ERROR_STOP=1 -d "graphilecrystaltest_template" \
   -f postgraphile/postgraphile/__tests__/kitchen-sink-data.sql \
   -f postgraphile/postgraphile/__tests__/pg11-schema.sql \
   -f postgraphile/postgraphile/__tests__/pg11-data.sql \
-  -f graphile-build/graphile-utils/__tests__/utils-schema.sql \
-  "$TEMPLATE_DATABASE_URL"
-#psql -Xqv ON_ERROR_STOP=1 -f packages/pg-pubsub/__tests__/schema.sql "$TEMPLATE_DATABASE_URL"
-#
+  -f graphile-build/graphile-utils/__tests__/utils-schema.sql
 #if [ $SERVER_VERSION_NUM -ge 100000 ]; then
-#  psql -Xqv ON_ERROR_STOP=1 -f packages/postgraphile-core/__tests__/pg10-schema.sql "$TEMPLATE_DATABASE_URL"
+#  psql -Xqv ON_ERROR_STOP=1 -d "graphilecrystaltest_template" -f postgraphile/postgraphile/__tests__/pg10-data.sql
 #fi;
 
-#psql -Xqv ON_ERROR_STOP=1 "$TEST_OWNER_DATABASE_URL" <<HERE
+#psql -Xqv ON_ERROR_STOP=1 -d "${OWNER_DATABASE:-postgres}" <<HERE
 #DROP DATABASE IF EXISTS lds_test;
 #CREATE DATABASE lds_test;
-#DROP DATABASE IF EXISTS pg_simplify_inflectors;
-#CREATE DATABASE pg_simplify_inflectors;
 #HERE
-#psql -X1v ON_ERROR_STOP=1 -v VERBOSITY=verbose -f utils/lds/__tests__/schema.sql "$LDS_TEST_DATABASE_URL"
+#psql -X1v ON_ERROR_STOP=1 -v VERBOSITY=verbose -d lds_test -f utils/lds/__tests__/schema.sql
 
 clear
 echo "Database reset successfully ✅"
-
-# # Now run the tests
-# if [ $SERVER_VERSION_NUM -ge 100000 ]; then
-#   jest --forceExit -i $@
-# else
-#   jest --forceExit -i -t "^((?!pg10).)*$" $@
-# fi;
-
-# Finally re-populate the database to aid debugging
-#psql -Xqv ON_ERROR_STOP=1 -f __tests__/kitchen-sink-data.sql "$TEST_DATABASE_URL"
-#
-#if [ $SERVER_VERSION_NUM -ge 100000 ]; then
-#  psql -Xqv ON_ERROR_STOP=1 -f __tests__/pg10-data.sql "$TEST_DATABASE_URL"
-#fi;
