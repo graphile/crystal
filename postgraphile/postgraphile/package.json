@@ -168,16 +168,9 @@
   },
   "bin": "./dist/cli-run.js",
   "scripts": {
-    "test": "jest",
-    "test:legacy": "yarn test:operations && yarn test:schema && yarn test:schema-exports && yarn test:operations-exports",
-    "test:operations": "yarn test:operations:v4 && yarn test:operations:polymorphic_etc && yarn test:operations:mutations",
-    "test:operations:v4": "jest -i __tests__/queries/v4",
-    "test:operations:polymorphic_etc": "jest -i __tests__/queries/polymorphic __tests__/queries/relay",
-    "test:operations:mutations": "jest -i __tests__/mutations",
-    "test:schema": "jest -i __tests__/schema",
+    "test": "jest && yarn test:schema-exports && yarn test:operations-exports",
     "test:schema-exports": "node scripts/test-schema-exports.mjs",
-    "test:operations-exports": "yarn test:operations-exports:typeDefs",
-    "test:operations-exports:typeDefs": "EXPORT_SCHEMA=typeDefs yarn test:operations",
+    "test:operations-exports": "EXPORT_SCHEMA=typeDefs yarn jest __tests__/queries __tests__/mutations",
     "prepack": "tsc -b tsconfig.build.json"
   },
   "repository": {
