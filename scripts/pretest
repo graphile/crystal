@@ -18,7 +18,7 @@ done
 psql -Xqv ON_ERROR_STOP=1 -d "${OWNER_DATABASE:-postgres}" -c 'alter database graphilecrystaltest_template with is_template = false;' || true
 psql -Xqv ON_ERROR_STOP=1 -d "${OWNER_DATABASE:-postgres}" -c 'drop database graphilecrystaltest_template;' || true
 psql -Xqv ON_ERROR_STOP=1 -d "${OWNER_DATABASE:-postgres}" -c 'drop user graphilecrystaltest;' || true
-psql -Xqv ON_ERROR_STOP=1 -d "${OWNER_DATABASE:-postgres}" -c "create user graphilecrystaltest with login password 'test';"
+psql -Xqv ON_ERROR_STOP=1 -d "${OWNER_DATABASE:-postgres}" -c "create user graphilecrystaltest with superuser login password 'test';"
 psql -Xqv ON_ERROR_STOP=1 -d "${OWNER_DATABASE:-postgres}" -c "create database graphilecrystaltest_template with owner graphilecrystaltest;"
 
 psql -Xqv ON_ERROR_STOP=1 -d "${OWNER_DATABASE:-postgres}" <<HERE
