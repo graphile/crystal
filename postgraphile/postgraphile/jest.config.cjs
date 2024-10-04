@@ -8,4 +8,6 @@ module.exports = {
     "^.+\\.graphql$": "<rootDir>/__tests__/transform-graphql.mjs",
   },
   moduleFileExtensions: [...rootConfig.moduleFileExtensions, "graphql"],
+  workerIdleMemoryLimit: '1GiB',
+  maxWorkers: '75%',
 };
