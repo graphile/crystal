@@ -1,5 +1,27 @@
 # graphile-export
 
+## 0.0.2-beta.20
+
+### Patch Changes
+
+- [#2175](https://github.com/graphile/crystal/pull/2175)
+  [`c69b2fdec`](https://github.com/graphile/crystal/commit/c69b2fdec2d73f1101440eb96fe126f9ad77db98)
+  Thanks [@benjie](https://github.com/benjie)! - Fix 'Container is falsy' error
+  message the latest Babel patch release would cause.
+
+- [#2180](https://github.com/graphile/crystal/pull/2180)
+  [`4a4daf5ec`](https://github.com/graphile/crystal/commit/4a4daf5ec4c7002a561f4b6516257fc63e491cce)
+  Thanks [@nckswt](https://github.com/nckswt)! - Fix bug in graphile-export
+  handing modules where default export (`import mod from 'mod'`) differed from
+  wildcard export (`import * as mod from 'mod'`).
+- Updated dependencies
+  [[`d5834def1`](https://github.com/graphile/crystal/commit/d5834def1fb84f3e2c0c0a6f146f8249a6df890a),
+  [`42b982463`](https://github.com/graphile/crystal/commit/42b9824637a6c05e02935f2b05b5e8e0c61965a6),
+  [`884a4b429`](https://github.com/graphile/crystal/commit/884a4b4297af90fdadaf73addd524f1fbbcfdcce),
+  [`38835313a`](https://github.com/graphile/crystal/commit/38835313ad93445206dccdd4cf07b90c5a6e4377),
+  [`b0865d169`](https://github.com/graphile/crystal/commit/b0865d1691105b5419009954c98c8109a27a5d81)]:
+  - grafast@0.1.1-beta.15
+
 ## 0.0.2-beta.19
 
 ### Patch Changes

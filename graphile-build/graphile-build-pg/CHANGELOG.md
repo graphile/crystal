@@ -1,5 +1,137 @@
 # graphile-build-pg
 
+## 5.0.0-beta.29
+
+### Patch Changes
+
+- [#2197](https://github.com/graphile/crystal/pull/2197)
+  [`d7e6e714f`](https://github.com/graphile/crystal/commit/d7e6e714f0cc5656112703484298b77538b2dccc)
+  Thanks [@benjie](https://github.com/benjie)! - Amber preset now supports
+  `@resultFieldName` on mutation functions, like V4 preset does.
+
+- [#2187](https://github.com/graphile/crystal/pull/2187)
+  [`bb006ec7b`](https://github.com/graphile/crystal/commit/bb006ec7bdab24192c84f093ce3f92969aeb7279)
+  Thanks [@benjie](https://github.com/benjie)! - Fix behavior inheritance
+  especially around functions incorrectly inheriting from their underlying
+  codecs, bugs in unlogged/temp table behavior, and incorrect skipping of
+  generating table types. You may find after this change you have fields
+  appearing in your schema that were not present before, typically these will
+  represent database functions where you `@omit`'d the underlying table -
+  omitting the table should not prevent a function from accessing it. Further,
+  fix behavior of `@omit read` emulation to add
+  `-connection -list -array -single`.
+
+- [#2156](https://github.com/graphile/crystal/pull/2156)
+  [`6fdc6cad8`](https://github.com/graphile/crystal/commit/6fdc6cad8f8d1230202df533d05cc2bd80538f09)
+  Thanks [@benjie](https://github.com/benjie)! - Added `pgRegistry.pgExecutors`
+  so executors don't need to be looked up from a resource (this causes
+  confusion) - instead they can be referenced directly. By default there's one
+  executor called `main`, i.e. `build.input.pgRegistry.pgExecutors.main`.
+
+- [#2189](https://github.com/graphile/crystal/pull/2189)
+  [`0df171123`](https://github.com/graphile/crystal/commit/0df17112300a8ea391dfd220c5f05d362ceaa58a)
+  Thanks [@benjie](https://github.com/benjie)! - Fix issue with manyToMany
+  behavior warnings
+
+- [#2158](https://github.com/graphile/crystal/pull/2158)
+  [`dfac43992`](https://github.com/graphile/crystal/commit/dfac43992019b0b6c1d113d2490a87eb03d103d7)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 Amber preset no longer
+  enables backward pagination options (`before`, `last`) on functions by
+  default - add `+backwards` behavior to these functions to enable. If you're
+  using the V4 preset you should be unaffected by this change because it enables
+  `+backwards` by default.
+
+- [#2160](https://github.com/graphile/crystal/pull/2160)
+  [`426e9320e`](https://github.com/graphile/crystal/commit/426e9320e76ef95927eebb6fe4072050b6208771)
+  Thanks [@benjie](https://github.com/benjie)! - Massive overhaul of the
+  behavior system which now has a centralized registry of known behaviors and
+  applies behaviors in a more careful and nuanced way, removing many hacks and
+  workarounds, and ultimately meaning that `defaultBehavior: "-*"` should now
+  operate correctly. Importantly, `addBehaviorToTags()` has been removed - you
+  should use `plugin.schema.entityBehaviors` to indicate behaviors as shown in
+  this PR - do not mod the tags directly unless they're explicitly meant to be
+  overrides.
+
+  Technically this is a significant breaking change (besides the removal of the
+  `addBehaviorToTags()` helper) because the order in which behaviors are applied
+  has changed, and so a different behavior might ultimately "win". This shows up
+  in places where there is ambiguity, for example if you add `@filterable` to a
+  function that you don't have execute permissions on, that function will now
+  show up in the schema since user overrides (smart tags) "win" versus inferred
+  behaviors such as introspected permissions; this wasn't the case before.
+  Hopefully most users will not notice any difference, and for those who do, the
+  `graphile behavior debug` CLI may be able to help you figure out what's going
+  on.
+
+  Be sure to print your schema before and after this update and look for
+  changes; if there are changes then you likely need to fix the relevant
+  behaviors/smart tags. (Hopefully there's no changes for you!)
+
+  You'll also need to change any places where you're specifying behaviors that
+  will be type checked; you can either cast your existing strings e.g.
+  `defaultBehavior: "+connection -list" as GraphileBuild.BehaviorString`, or
+  preferably you can specify your behaviors as an array, which should give you
+  auto-complete on each entry; e.g. `defaultBehavior: ["connection", "-list"]`.
+
+- [#2188](https://github.com/graphile/crystal/pull/2188)
+  [`cc0941731`](https://github.com/graphile/crystal/commit/cc0941731a1679bc04ce7b7fd4254009bb5f1f62)
+  Thanks [@benjie](https://github.com/benjie)! - Overhaul the way in which
+  `graphile-config` presets work such that including a preset at two different
+  layers shouldn't result in unexpected behavior.
+
+- [#2157](https://github.com/graphile/crystal/pull/2157)
+  [`50f6ce456`](https://github.com/graphile/crystal/commit/50f6ce456de3edd084869b54ee9f2eaf51a7fa0c)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 PostGraphile now ignores
+  unlogged database tables by default.
+
+- [#2199](https://github.com/graphile/crystal/pull/2199)
+  [`3b09b414f`](https://github.com/graphile/crystal/commit/3b09b414ff43c34593373fa1f242481b0c7ada70)
+  Thanks [@benjie](https://github.com/benjie)! - Database enum comments are now
+  reflected in the schema.
+
+- [#2196](https://github.com/graphile/crystal/pull/2196)
+  [`b7b6dd64f`](https://github.com/graphile/crystal/commit/b7b6dd64fcc07f2ca15528fd39d61297d743dcc6)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 `@notNull` on a volatile
+  function now results in the field on the payload becoming non-null, not the
+  mutation field itself.
+
+- [#2155](https://github.com/graphile/crystal/pull/2155)
+  [`8b472cd51`](https://github.com/graphile/crystal/commit/8b472cd51cd66d8227f9f2722d09c0a774792b0f)
+  Thanks [@benjie](https://github.com/benjie)! - `disablePlugins` now supports
+  TypeScript auto-completion of known plugin names. Other names are still
+  accepted without error, so this is just a minor DX improvement rather than
+  type safety.
+
+- [#2198](https://github.com/graphile/crystal/pull/2198)
+  [`ba637b56d`](https://github.com/graphile/crystal/commit/ba637b56d79a14f82fe555739921724eab0c07f7)
+  Thanks [@benjie](https://github.com/benjie)! - Ensure that interface subtypes
+  are added to schema even if not referenced directly.
+- Updated dependencies
+  [[`d5834def1`](https://github.com/graphile/crystal/commit/d5834def1fb84f3e2c0c0a6f146f8249a6df890a),
+  [`653929af0`](https://github.com/graphile/crystal/commit/653929af0a99a8a4d52b66e66c736be668b8700a),
+  [`6fdc6cad8`](https://github.com/graphile/crystal/commit/6fdc6cad8f8d1230202df533d05cc2bd80538f09),
+  [`42b982463`](https://github.com/graphile/crystal/commit/42b9824637a6c05e02935f2b05b5e8e0c61965a6),
+  [`eb69c7361`](https://github.com/graphile/crystal/commit/eb69c7361fc7bf8c5b1ce342eeb698bd28c9e013),
+  [`54054b873`](https://github.com/graphile/crystal/commit/54054b8733236ba7b2f2fa47d84e085f7196e3f9),
+  [`884a4b429`](https://github.com/graphile/crystal/commit/884a4b4297af90fdadaf73addd524f1fbbcfdcce),
+  [`1eac03ec2`](https://github.com/graphile/crystal/commit/1eac03ec2e9da65c64b7754c04292f43da82c40b),
+  [`38835313a`](https://github.com/graphile/crystal/commit/38835313ad93445206dccdd4cf07b90c5a6e4377),
+  [`426e9320e`](https://github.com/graphile/crystal/commit/426e9320e76ef95927eebb6fe4072050b6208771),
+  [`2efadc0f8`](https://github.com/graphile/crystal/commit/2efadc0f80c3a0c172fb94c770afecc5447e832b),
+  [`e8a9fd424`](https://github.com/graphile/crystal/commit/e8a9fd4243981b892364148eca1df66620ddeb87),
+  [`cc0941731`](https://github.com/graphile/crystal/commit/cc0941731a1679bc04ce7b7fd4254009bb5f1f62),
+  [`50f6ce456`](https://github.com/graphile/crystal/commit/50f6ce456de3edd084869b54ee9f2eaf51a7fa0c),
+  [`b0865d169`](https://github.com/graphile/crystal/commit/b0865d1691105b5419009954c98c8109a27a5d81),
+  [`3b09b414f`](https://github.com/graphile/crystal/commit/3b09b414ff43c34593373fa1f242481b0c7ada70),
+  [`8b472cd51`](https://github.com/graphile/crystal/commit/8b472cd51cd66d8227f9f2722d09c0a774792b0f),
+  [`ba637b56d`](https://github.com/graphile/crystal/commit/ba637b56d79a14f82fe555739921724eab0c07f7),
+  [`9cd9bb522`](https://github.com/graphile/crystal/commit/9cd9bb5222a9f0398ee4b8bfa4f741b6de2a2192)]:
+  - grafast@0.1.1-beta.15
+  - graphile-build@5.0.0-beta.25
+  - @dataplan/pg@0.0.1-beta.26
+  - pg-introspection@0.0.1-beta.9
+  - graphile-config@0.0.1-beta.10
+
 ## 5.0.0-beta.28
 
 ### Patch Changes

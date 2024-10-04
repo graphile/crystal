@@ -1,5 +1,43 @@
 # grafast
 
+## 0.1.1-beta.15
+
+### Patch Changes
+
+- [#2195](https://github.com/graphile/crystal/pull/2195)
+  [`d5834def1`](https://github.com/graphile/crystal/commit/d5834def1fb84f3e2c0c0a6f146f8249a6df890a)
+  Thanks [@benjie](https://github.com/benjie)! - Throws an error earlier when
+  you attempt to add a dependency on a step that's in a deeper layerPlan than
+  yourself.
+
+- [#2193](https://github.com/graphile/crystal/pull/2193)
+  [`42b982463`](https://github.com/graphile/crystal/commit/42b9824637a6c05e02935f2b05b5e8e0c61965a6)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for stable
+  deduplication of object/list arguments to loadOne/loadMany, reducing redundant
+  fetches.
+
+- [#2192](https://github.com/graphile/crystal/pull/2192)
+  [`884a4b429`](https://github.com/graphile/crystal/commit/884a4b4297af90fdadaf73addd524f1fbbcfdcce)
+  Thanks [@benjie](https://github.com/benjie)! - Overhaul the interaction of
+  loadOne, loadMany, lambda and sideEffect with multiple steps to make passing
+  multiple steps to these functions more ergonomic and consistent without as
+  much of a TypeScript headache.
+
+- [#2194](https://github.com/graphile/crystal/pull/2194)
+  [`38835313a`](https://github.com/graphile/crystal/commit/38835313ad93445206dccdd4cf07b90c5a6e4377)
+  Thanks [@benjie](https://github.com/benjie)! - Allow eval-ing String and Float
+  directive argument types.
+
+- [#2190](https://github.com/graphile/crystal/pull/2190)
+  [`b0865d169`](https://github.com/graphile/crystal/commit/b0865d1691105b5419009954c98c8109a27a5d81)
+  Thanks [@benjie](https://github.com/benjie)! - Apply `assertNotAsync` and
+  `assertNotPromise` in more places to detect plan resolvers returning promises.
+- Updated dependencies
+  [[`cc0941731`](https://github.com/graphile/crystal/commit/cc0941731a1679bc04ce7b7fd4254009bb5f1f62),
+  [`8b472cd51`](https://github.com/graphile/crystal/commit/8b472cd51cd66d8227f9f2722d09c0a774792b0f),
+  [`9cd9bb522`](https://github.com/graphile/crystal/commit/9cd9bb5222a9f0398ee4b8bfa4f741b6de2a2192)]:
+  - graphile-config@0.0.1-beta.10
+
 ## 0.1.1-beta.14
 
 ### Patch Changes
