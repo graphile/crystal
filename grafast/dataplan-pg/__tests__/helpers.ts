@@ -39,9 +39,9 @@ import { makeExampleSchema } from "../src/examples/exampleSchema.js";
 //import prettier from "prettier";
 import type { PgClientQuery } from "../src/index.js";
 import {
-  withTestWithPgClient,
-  dropTestDatabase,
   createTestDatabase,
+  dropTestDatabase,
+  withTestWithPgClient,
 } from "./sharedHelpers.js";
 
 /**
