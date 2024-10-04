@@ -34,6 +34,7 @@ jobs:
 
     env:
       CI: true
+      JEST_MAX_WORKERS: 4
       PGUSER: postgres
       PGPASSWORD: postgres
       PGHOST: localhost
