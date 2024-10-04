@@ -35,6 +35,7 @@ grant postgraphile_test_visitor to postgraphile_test_user1;
 grant postgraphile_test_visitor to postgraphile_test_user2;
 grant postgraphile_test_user1 to postgraphile_test_authenticator;
 grant postgraphile_test_user2 to postgraphile_test_authenticator;
+grant postgraphile_test_authenticator to graphilecrystaltest;
 HERE
 
 PGPASSWORD=test psql -Xqv ON_ERROR_STOP=1 -d "graphilecrystaltest_template" -U graphilecrystaltest \
