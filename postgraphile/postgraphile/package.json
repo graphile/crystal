@@ -171,7 +171,9 @@
     "test": "yarn test:jest && yarn test:schema-exports && yarn test:operations-exports",
     "test:jest": "jest",
     "test:schema-exports": "node scripts/test-schema-exports.mjs",
-    "test:operations-exports": "EXPORT_SCHEMA=typeDefs yarn jest __tests__/queries __tests__/mutations",
+    "test:operations-exports": "yarn test:operations-exports:typeDefs && yarn test:operations-exports:graphql-js",
+    "test:operations-exports:typeDefs": "EXPORT_SCHEMA=typeDefs jest __tests__/queries __tests__/mutations",
+    "test:operations-exports:graphql-js": "EXPORT_SCHEMA=graphql-js jest __tests__/queries __tests__/mutations",
     "prepack": "tsc -b tsconfig.build.json"
   },
   "repository": {
