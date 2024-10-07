@@ -61,10 +61,30 @@ const getEntityBehaviorHooks = (
       } else {
         // noop
       }
-    } else {
+    } else if (rhs.inferred || rhs.override) {
       const hook = rhs[type];
       if (hook) {
         result[entityType as keyof GraphileBuild.BehaviorEntities] = hook;
+      }
+    } else {
+      console.warn(
+        `Plugin ${
+          plugin.name
+        } is using a deprecated or unsupported form of 'plugin.schema.entityBehavior[${JSON.stringify(
+          entityType,
+        )}]' definition - if this is an object it should have only the keys 'inferred' and/or 'override'. This changed in graphile-build@5.0.0-beta.25.`,
+      );
+      const rhsAny = rhs as any;
+      if (rhsAny.callback) {
+        if (rhsAny.provides?.includes?.("override")) {
+          if (type === "override") {
+            result[entityType as keyof GraphileBuild.BehaviorEntities] = rhsAny;
+          }
+        } else {
+          if (type === "inferred") {
+            result[entityType as keyof GraphileBuild.BehaviorEntities] = rhsAny;
+          }
+        }
       }
     }
   }
