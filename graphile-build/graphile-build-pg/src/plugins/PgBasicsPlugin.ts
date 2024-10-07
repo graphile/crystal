@@ -197,7 +197,12 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         select: {
           description:
             "can select this resource/column/etc. Note this does not necessarily mean you can do `select * from users` but it might mean that it's possible to see details about a `users` when it's returned by a function or similar. (In this case the `codec` has `select` but the `resource` has `-select`.)",
-          entities: ["pgCodec", "pgResource"],
+          entities: [
+            "pgCodec",
+            "pgCodecAttribute",
+            "pgCodecRelation",
+            "pgResource",
+          ],
         },
         insert: {
           description: "can insert into this resource/column/etc",
@@ -229,15 +234,30 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         },
         list: {
           description: "should we use a list field for this?",
-          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+          entities: [
+            "pgCodec",
+            "pgCodecRelation",
+            "pgResource",
+            "pgResourceUnique",
+          ],
         },
         "resource:connection": {
           description: "should we use a connection field for this?",
-          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+          entities: [
+            "pgCodec",
+            "pgCodecRelation",
+            "pgResource",
+            "pgResourceUnique",
+          ],
         },
         "resource:list": {
           description: "should we use a list field for this?",
-          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+          entities: [
+            "pgCodec",
+            "pgCodecRelation",
+            "pgResource",
+            "pgResourceUnique",
+          ],
         },
         "resource:array": {
           description:
@@ -246,7 +266,12 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         },
         "resource:single": {
           description: "can we get one of this thing?",
-          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+          entities: [
+            "pgCodec",
+            "pgCodecRelation",
+            "pgResource",
+            "pgResourceUnique",
+          ],
         },
       },
     },

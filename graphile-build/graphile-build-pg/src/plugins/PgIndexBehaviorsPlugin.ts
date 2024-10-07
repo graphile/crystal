@@ -96,7 +96,7 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
       add: {
         // HACK: this impacts a community plugin and isn't part of core.
         manyToMany: {
-          entities: [],
+          entities: ["pgResource", "pgCodecRelation"],
           description: "(Legacy support hack - many-to-many relationship)",
         },
       },
