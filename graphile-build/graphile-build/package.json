@@ -1,6 +1,6 @@
 {
   "name": "graphile-build",
-  "version": "5.0.0-beta.25",
+  "version": "5.0.0-beta.26",
   "description": "Build a GraphQL schema from plugins",
   "type": "commonjs",
   "main": "./dist/index.js",

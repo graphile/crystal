@@ -1,5 +1,18 @@
 # graphile-build-pg
 
+## 5.0.0-beta.30
+
+### Patch Changes
+
+- [#2207](https://github.com/graphile/crystal/pull/2207)
+  [`0b1f7b577`](https://github.com/graphile/crystal/commit/0b1f7b577114a49b8e3283823845ec6e37484240)
+  Thanks [@benjie](https://github.com/benjie)! - Fix overwhelming logs and
+  errors being output by the new behavior system
+
+- Updated dependencies
+  [[`0b1f7b577`](https://github.com/graphile/crystal/commit/0b1f7b577114a49b8e3283823845ec6e37484240)]:
+  - graphile-build@5.0.0-beta.26
+
 ## 5.0.0-beta.29
 
 ### Patch Changes
