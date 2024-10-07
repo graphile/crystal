@@ -152,8 +152,7 @@ export class Behavior {
     [behavior in keyof GraphileBuild.BehaviorStrings]: {
       entities: {
         [entity in keyof GraphileBuild.BehaviorEntities]?: {
-          description: string;
-          pluginName: string | null;
+          registeredBy: Array<{ pluginName: string; description: string }>;
         };
       };
     };
@@ -198,16 +197,20 @@ export class Behavior {
             allEntities.add(entityType);
             if (!this.behaviorRegistry[behaviorString].entities[entityType]) {
               this.behaviorRegistry[behaviorString].entities[entityType] = {
-                description,
-                pluginName: plugin.name,
+                registeredBy: [
+                  {
+                    description,
+                    pluginName: plugin.name,
+                  },
+                ],
               };
             } else {
-              console.warn(
-                `Behavior string '${behaviorString}' for entity type '${entityType}' has been registered by more than one plugin! First registered by ${
-                  this.behaviorRegistry[behaviorString].entities[entityType]!
-                    .pluginName
-                }; and then later again by ${plugin.name}`,
-              );
+              this.behaviorRegistry[behaviorString].entities[
+                entityType
+              ]!.registeredBy.push({
+                description,
+                pluginName: plugin.name,
+              });
             }
           }
         }
@@ -338,19 +341,21 @@ export class Behavior {
     filter: TFilter,
   ): boolean | undefined {
     if (!this.behaviorRegistry[filter]) {
-      console.warn(
-        `Behavior '${filter}' is not registered; please be sure to register it within a plugin via \`plugin.schema.behaviorRegistry.add[${JSON.stringify(
-          filter,
-        )}] = { description: "...", entities: [${JSON.stringify(
-          entityType,
-        )}] }\`.`,
-      );
+      // DIAGNOSTIC: enable for all filters (`if (true) {`)
+      if (false) {
+        console.warn(
+          `Behavior '${filter}' is not registered; please be sure to register it within a plugin via \`plugin.schema.behaviorRegistry.add[${JSON.stringify(
+            filter,
+          )}] = { description: "...", entities: [${JSON.stringify(
+            entityType,
+          )}] }\`.`,
+        );
+      }
       // Register it so we don't see this warning again
       this.behaviorRegistry[filter] = {
         entities: {
           [entityType]: {
-            description: "Unregistered.",
-            pluginName: null,
+            registeredBy: [],
           },
         },
       };
@@ -373,8 +378,7 @@ export class Behavior {
       );
       // Register it so we don't see this warning again
       this.behaviorRegistry[filter].entities[entityType] = {
-        description: "Unregistered!",
-        pluginName: null,
+        registeredBy: [],
       };
     }
     const finalString = this.getBehaviorForEntity(

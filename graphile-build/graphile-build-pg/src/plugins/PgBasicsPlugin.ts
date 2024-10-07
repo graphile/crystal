@@ -241,7 +241,10 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           description: "can we order these results?",
           entities: ["pgCodec", "pgResource"],
         },
-        orderBy: { description: "can we order by this thing?", entities: [] },
+        orderBy: {
+          description: "can we order by this thing?",
+          entities: ["pgCodecAttribute", "pgResource" /* < computed column */],
+        },
 
         connection: {
           description: "should we use a connection field for this?",
