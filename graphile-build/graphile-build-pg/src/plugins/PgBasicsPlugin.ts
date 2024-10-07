@@ -153,6 +153,11 @@ declare global {
   }
 }
 
+const FILTER_DEF = {
+  description: "can we filter this resource/codec",
+  entities: ["pgCodec", "pgResource"],
+} as const;
+
 export const PgBasicsPlugin: GraphileConfig.Plugin = {
   name: "PgBasicsPlugin",
   description:
@@ -220,7 +225,17 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           description: 'should we add this attribute to the "base" input type?',
           entities: [],
         },
-        // filter: { description: "can we filter these results?", entities: [] },
+        filter: FILTER_DEF,
+        "query:resource:list:filter": FILTER_DEF,
+        "query:resource:connection:filter": FILTER_DEF,
+        "manyRelation:resource:list:filter": FILTER_DEF,
+        "manyRelation:resource:connection:filter": FILTER_DEF,
+        "singularRelation:resource:list:filter": FILTER_DEF,
+        "singularRelation:resource:connection:filter": FILTER_DEF,
+        "typeField:resource:list:filter": FILTER_DEF,
+        "typeField:resource:connection:filter": FILTER_DEF,
+        "queryField:resource:list:filter": FILTER_DEF,
+        "queryField:resource:connection:filter": FILTER_DEF,
         filterBy: { description: "can we filter by this thing?", entities: [] },
         order: {
           description: "can we order these results?",
@@ -230,7 +245,12 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
 
         connection: {
           description: "should we use a connection field for this?",
-          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+          entities: [
+            "pgCodec",
+            "pgCodecRelation",
+            "pgResource",
+            "pgResourceUnique",
+          ],
         },
         list: {
           description: "should we use a list field for this?",
