@@ -341,17 +341,17 @@ export class Behavior {
     filter: TFilter,
   ): boolean | undefined {
     if (!this.behaviorRegistry[filter]) {
-      // DIAGNOSTIC: enable for all filters (`if (true) {`)
-      if (false) {
-        console.warn(
-          `Behavior '${filter}' is not registered; please be sure to register it within a plugin via \`plugin.schema.behaviorRegistry.add[${JSON.stringify(
-            filter,
-          )}] = { description: "...", entities: [${JSON.stringify(
-            entityType,
-          )}] }\`.`,
-        );
-      }
+      // DIAGNOSTIC: enable for all filters
+      /*
+      console.warn(
+        `Behavior '${filter}' is not registered; please be sure to register it within a plugin via \`plugin.schema.behaviorRegistry.add[${JSON.stringify(
+          filter,
+        )}] = { description: "...", entities: [${JSON.stringify(
+          entityType,
+        )}] }\`.`,
+      );
       // Register it so we don't see this warning again
+      */
       this.behaviorRegistry[filter] = {
         entities: {
           [entityType]: {
