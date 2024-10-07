@@ -318,7 +318,7 @@ export class Behavior {
     filter: TFilter,
   ): boolean | undefined {
     if (!this.behaviorRegistry[filter]) {
-      console.trace(
+      console.warn(
         `Behavior '${filter}' is not registered; please be sure to register it within a plugin via \`plugin.schema.behaviorRegistry.add[${JSON.stringify(
           filter,
         )}] = { description: "...", entities: [${JSON.stringify(
@@ -340,7 +340,7 @@ export class Behavior {
           entities[entityType] && stringMatches(bhv, filter),
       )
     ) {
-      console.trace(
+      console.warn(
         `Behavior '${filter}' is not registered for entity type '${entityType}'; it's only expected to be used with '${Object.keys(
           this.behaviorRegistry[filter].entities,
         ).join(
@@ -895,6 +895,8 @@ export function isValidBehaviorString(
   );
 }
 
+const warnedBehaviors: string[] = [];
+
 /*
  * 1. Take each behavior from inferred
  * 2. Find the matching behaviors from preferences
@@ -963,11 +965,13 @@ function multiplyBehavior(
       });
     }
     if (final.length === 0) {
-      console.warn(
-        `No matches for behavior '${infEntry.scope.join(
-          ":",
-        )}' - please ensure that this behavior is registered for entity type '${entityType}'`,
-      );
+      const behavior = infEntry.scope.join(":");
+      if (!warnedBehaviors.includes(behavior)) {
+        warnedBehaviors.push(behavior);
+        console.warn(
+          `No matches for behavior '${behavior}' - please ensure that this behavior is registered for entity type '${entityType}'`,
+        );
+      }
     }
     return final;
   });
