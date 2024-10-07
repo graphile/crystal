@@ -1,5 +1,17 @@
 # graphile-build-pg
 
+## 5.0.0-beta.31
+
+### Patch Changes
+
+- [#2208](https://github.com/graphile/crystal/pull/2208)
+  [`632691409`](https://github.com/graphile/crystal/commit/6326914098af55f20ac85ccf3537e75910a7dafa)
+  Thanks [@benjie](https://github.com/benjie)! - Behaviors can now be registered
+  by more than one plugin. Apply behaviors to more entities. Don't log so much.
+- Updated dependencies
+  [[`632691409`](https://github.com/graphile/crystal/commit/6326914098af55f20ac85ccf3537e75910a7dafa)]:
+  - graphile-build@5.0.0-beta.27
+
 ## 5.0.0-beta.30
 
 ### Patch Changes

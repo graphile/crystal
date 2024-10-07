@@ -1,5 +1,14 @@
 # graphile
 
+## 5.0.0-beta.32
+
+### Patch Changes
+
+- Updated dependencies
+  [[`632691409`](https://github.com/graphile/crystal/commit/6326914098af55f20ac85ccf3537e75910a7dafa)]:
+  - graphile-build@5.0.0-beta.27
+  - postgraphile@5.0.0-beta.32
+
 ## 5.0.0-beta.31
 
 ### Patch Changes
