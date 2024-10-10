@@ -146,6 +146,7 @@ const sidebars = {
     "jwk-verification",
     "default-role",
     "testing-jest",
+    "limit-eval",
     "bundling-webpack",
     "multiple-schemas",
     "running-postgraphile-in-docker",
