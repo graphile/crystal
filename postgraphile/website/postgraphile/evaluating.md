@@ -1,8 +1,8 @@
 ---
 layout: page
 path: /postgraphile/evaluating/
-title: Evaluating
-fullTitle: Evaluating PostGraphile For Your Project
+title: Adoption Analysis
+fullTitle: PostGraphile Adoption Analysis
 ---
 
 Hopefully you’ve been convinced that PostGraphile serves an awesome GraphQL API,
