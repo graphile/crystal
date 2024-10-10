@@ -103,6 +103,11 @@ figure figcaption {
   background-color: var(--docusaurus-highlighted-code-line-bg);
 }
 */
+.theme-doc-sidebar-item-link h4 {
+  margin-bottom: 5px;
+  margin-top: 5px;
+  padding-top: 5px;
+}
 .ul-check li {
   background-image: url("../../static/img/check.svg");
   background-repeat: no-repeat;
