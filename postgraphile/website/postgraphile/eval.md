@@ -22,6 +22,6 @@ Results in one plan being generated for each length of the list being used.
 
 :::info
 
-We are currently _evaulating_ whether to remove `eval()` completely from PostGraphile and Grafast in a future version (after Version 5). This is another reason why you should choose one of the alternatives above!
+We are currently _evaulating_ whether to remove `eval()` completely from PostGraphile and Grafast in a future version (after Version 5), see [issue #2060](https://github.com/graphile/crystal/issues/2060). This is another reason why you should choose one of the alternatives above!
 
 :::
