@@ -82,12 +82,7 @@ export.
 :::tip
 
 We **highly recommend** that plugin authors (both for internal project plugins
-and plugins distributed via `npm`) use the
-[eslint-plugin-graphile-export](http://www.npmjs.com/package/eslint-plugin-graphile-export)
-ESLint plugin to ensure that your methods are correctly exported. This plugin
-is still experimental so limit it to only running against your plugin code, but
-it really helps to catch a variety of issues that may prevent your schema from
-being exported correctly.
+and plugins distributed via `npm`) consult the [graphile-export](https://star.graphile.org/graphile-export/) documentation in full.
 
 :::
 

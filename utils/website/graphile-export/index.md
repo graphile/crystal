@@ -4,73 +4,24 @@ sidebar_position: 1
 
 # Graphile Export
 
-Graphile Export enables you to export a GraphQL Schema (or other code) as executable JavaScript code. You must, however, write your code in a way that makes it exportable; we have ESLint plugins to make this less onerous.
+Graphile Export enables you to export a GraphQL Schema (or other code) as
+executable JavaScript code. 
 
-## How it works
+The key reason to export your schema is to move schema introspection of postgres
+from runtime to build time. This results in:
 
-The system works by converting values in memory into source code strings. One of
-the key things that's challenging to export is functions (and function-derived
-things such as classes). In JavaScript you can see the source code of a function
-by calling `.toString()` on it:
+- Faster startup time
+- Reduced thundering herd on the database in the event of an outage
+- Much faster cold starts for Lambda
+- And probably more
 
-```js
-> (function add(a, b) { return a + b }).toString()
-'function add(a, b) { return a + b }'
-```
+Previously, in Postgraphile 4, export took the form of encoding the Postgres
+schema to JSON. Postgraphile 5 takes this further and generates runtime code,
+further cutting startup times.
 
-However this quickly falls down if you are using values from a parent closure:
+This feature, however, is in early stages and is to be adopted with care and
+caution. For example, not all Postgraphile plugins are compatible with
+graphile-export. Most notably, this includes your own plugins.
 
-```js
-> const a = 7;
-undefined
-> function add(b) { return a + b };
-undefined
-> add(3)
-10
-> add.toString()
-'function add(b) { return a + b }'
-```
-
-See how the function definition string `add.toString()` returns its definition,
-but you cannot determine from that what the value of `a` is. This is a problem.
-
-Graphile Export solves this by having you define your functions a bit like React
-hooks - you must state the dependencies explicitly:
-
-```js
-> const { EXPORTABLE } = require("graphile-export")
-undefined
-> const a = 7;
-undefined
-> const add = EXPORTABLE((a) => function add(b) { return a + b; }, [a]);
-undefined
-```
-
-When you do so, the `add` function is augmented with the properties
-`$exporter$factory` and `$exporter$args` that represent the first and second
-arguments to the `EXPORTABLE(factory, args, nameHint)` function respectively.
-
-The function still works as before:
-
-```js
-> add(3)
-10
-> add.toString()
-'function add(b) { return a + b; }'
-```
-
-But `graphile-export` can access these special properties when it writes the
-code out, and now it can see the value of that "invisible" `a=7`:
-
-```js
-> add.$exporter$factory.toString()
-'(a) => function add(b) { return a + b; }'
-> add.$exporter$args
-[ 7 ]
-```
-
-Thus everything that can have these kinds of hidden properties must be wrapped
-in an `EXPORTABLE` call. Sometimes the inputs to the `EXPORTABLE` call
-themselves also have to be wrapped in an `EXPORTABLE` call. You'll figure out
-which things need wrapping by looking at the exported code and seeing where
-references are broken.
+Please read this documentation and consult the Discord for questions, help and
+suggestions.
