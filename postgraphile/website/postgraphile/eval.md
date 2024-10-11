@@ -1,6 +1,6 @@
 ---
 layout: page
-path: /postgraphile/limit-eval/
-title: Limit eval()
+path: /postgraphile/eval/
+title: Eval()
 fullTitle: Limitations of using eval()
 ---
