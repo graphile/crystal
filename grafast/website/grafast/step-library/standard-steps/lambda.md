@@ -17,7 +17,7 @@ If you are 100% certain that your callback function:
 3. will not throw an error
 
 then for the very best performance, you can pass the third argument,
-`isSyncAndSafe`, as the value `true`. Do not do this unless you are certain!
+[`isSyncAndSafe`](../../step-classes.md#issyncandsafe), as the value `true`. Do not do this unless you are certain!
 
 ## Single dependency version
 
