@@ -8,3 +8,9 @@ Usage:
 ```ts
 const $abTuple = list([$a, $b]);
 ```
+
+```ts
+abTuple.at(0); // returns $a
+abTuple.first(); // returns $a
+abTuple.last(); // returns $b
+```
