@@ -287,6 +287,7 @@ export class H3Grafserv extends GrafservBase {
       },
       close(peer, details) {
         clients.get(peer)?.closed?.(details.code, details.reason);
+        clients.delete(peer);
       },
     };
   }
