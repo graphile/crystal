@@ -261,8 +261,8 @@ export class H3Grafserv extends GrafservBase {
     return {
       open(peer) {
         const client: Client = {};
-        //@ts-expect-error Close code and reason are optional for close (https://github.com/enisdenjo/graphql-ws/pull/573)
-        client.closed = graphqlWsServer.opened(
+        clients.set(peer, client);
+        const onClose = graphqlWsServer.opened(
           {
             protocol: peer.websocket.protocol ?? GRAPHQL_TRANSPORT_WS_PROTOCOL, // will be validated
             send(data) {
@@ -277,7 +277,10 @@ export class H3Grafserv extends GrafservBase {
           },
           { socket: peer.websocket, request: peer.request },
         );
-        clients.set(peer, client);
+        client.closed = async (code, reason) => {
+          // @ts-expect-error fixed in unreleased https://github.com/enisdenjo/graphql-ws/pull/573
+          onClose(code, reason);
+        };
       },
       message(peer, message) {
         clients.get(peer)?.handleMessage?.(message.text());
