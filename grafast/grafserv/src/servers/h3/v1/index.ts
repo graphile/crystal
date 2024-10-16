@@ -259,26 +259,32 @@ export class H3Grafserv extends GrafservBase {
 
     const clients = new WeakMap<Peer, Client>();
     return {
-      open: async (peer) => {
+      open(peer) {
         const client: Client = {};
         //@ts-expect-error Close code and reason are optional for close (https://github.com/enisdenjo/graphql-ws/pull/573)
         client.closed = graphqlWsServer.opened(
           {
             protocol: peer.websocket.protocol ?? GRAPHQL_TRANSPORT_WS_PROTOCOL, // will be validated
-            send: (data) => {
+            send(data) {
               peer.send(data);
             },
-            close: (code, reason) => peer.close(code, reason), // there are protocol standard closures
-            onMessage: (cb) => (client.handleMessage = cb),
+            close(code, reason) {
+              peer.close(code, reason); // there are protocol standard closures
+            },
+            onMessage(cb) {
+              client.handleMessage = cb;
+            },
           },
           { socket: peer.websocket, request: peer.request },
         );
         clients.set(peer, client);
       },
-      message: (peer, message) =>
-        clients.get(peer)?.handleMessage?.(message.text()),
-      close: (peer, details) =>
-        clients.get(peer)?.closed?.(details.code, details.reason),
+      message(peer, message) {
+        clients.get(peer)?.handleMessage?.(message.text());
+      },
+      close(peer, details) {
+        clients.get(peer)?.closed?.(details.code, details.reason);
+      },
     };
   }
 }
