@@ -228,10 +228,12 @@ export class H3Grafserv extends GrafservBase {
         : ["post"],
     );
 
-    app.use(
-      this.dynamicOptions.graphqlPath,
-      defineWebSocketHandler(this.makeWsHandler()),
-    );
+    if (this.resolvedPreset.grafserv?.websockets) {
+      app.use(
+        this.dynamicOptions.graphqlPath,
+        defineWebSocketHandler(this.makeWsHandler()),
+      );
+    }
 
     if (dynamicOptions.graphiql) {
       router.get(
