@@ -92,7 +92,6 @@ const sidebars = {
       },
       items: ["subscriptions", "live-queries"],
     },
-    "eval",
     "background-tasks",
     "exporting-schema",
     "reserved-keywords",
