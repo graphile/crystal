@@ -43,6 +43,7 @@ export default eventHandler((event) => serv.handleEventStreamEvent(event));
 ## Websocket support (need h3@^1.13.0)
 
 ```ts title="server/api/graphql-ws.ts"
+import { defineWebSocketHandler } from "h3";
 import { serv } from "@/server/grafserv/serv";
 
 // Create and export the `/api/graphql` websocket handler
