@@ -153,6 +153,11 @@ declare global {
   }
 }
 
+const FILTER_DEF = {
+  description: "can we filter this resource/codec",
+  entities: ["pgCodec", "pgResource"],
+} as const;
+
 export const PgBasicsPlugin: GraphileConfig.Plugin = {
   name: "PgBasicsPlugin",
   description:
@@ -197,7 +202,12 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         select: {
           description:
             "can select this resource/column/etc. Note this does not necessarily mean you can do `select * from users` but it might mean that it's possible to see details about a `users` when it's returned by a function or similar. (In this case the `codec` has `select` but the `resource` has `-select`.)",
-          entities: ["pgCodec", "pgResource"],
+          entities: [
+            "pgCodec",
+            "pgCodecAttribute",
+            "pgCodecRelation",
+            "pgResource",
+          ],
         },
         insert: {
           description: "can insert into this resource/column/etc",
@@ -215,29 +225,62 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           description: 'should we add this attribute to the "base" input type?',
           entities: [],
         },
-        // filter: { description: "can we filter these results?", entities: [] },
+        filter: FILTER_DEF,
+        "query:resource:list:filter": FILTER_DEF,
+        "query:resource:connection:filter": FILTER_DEF,
+        "manyRelation:resource:list:filter": FILTER_DEF,
+        "manyRelation:resource:connection:filter": FILTER_DEF,
+        "singularRelation:resource:list:filter": FILTER_DEF,
+        "singularRelation:resource:connection:filter": FILTER_DEF,
+        "typeField:resource:list:filter": FILTER_DEF,
+        "typeField:resource:connection:filter": FILTER_DEF,
+        "queryField:resource:list:filter": FILTER_DEF,
+        "queryField:resource:connection:filter": FILTER_DEF,
         filterBy: { description: "can we filter by this thing?", entities: [] },
         order: {
           description: "can we order these results?",
           entities: ["pgCodec", "pgResource"],
         },
-        orderBy: { description: "can we order by this thing?", entities: [] },
+        orderBy: {
+          description: "can we order by this thing?",
+          entities: ["pgCodecAttribute", "pgResource" /* < computed column */],
+        },
 
         connection: {
           description: "should we use a connection field for this?",
-          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+          entities: [
+            "pgCodec",
+            "pgCodecRelation",
+            "pgResource",
+            "pgResourceUnique",
+          ],
         },
         list: {
           description: "should we use a list field for this?",
-          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+          entities: [
+            "pgCodec",
+            "pgCodecRelation",
+            "pgResource",
+            "pgResourceUnique",
+          ],
         },
         "resource:connection": {
           description: "should we use a connection field for this?",
-          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+          entities: [
+            "pgCodec",
+            "pgCodecRelation",
+            "pgResource",
+            "pgResourceUnique",
+          ],
         },
         "resource:list": {
           description: "should we use a list field for this?",
-          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+          entities: [
+            "pgCodec",
+            "pgCodecRelation",
+            "pgResource",
+            "pgResourceUnique",
+          ],
         },
         "resource:array": {
           description:
@@ -246,7 +289,12 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         },
         "resource:single": {
           description: "can we get one of this thing?",
-          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+          entities: [
+            "pgCodec",
+            "pgCodecRelation",
+            "pgResource",
+            "pgResourceUnique",
+          ],
         },
       },
     },

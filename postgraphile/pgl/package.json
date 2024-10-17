@@ -1,6 +1,6 @@
 {
   "name": "pgl",
-  "version": "5.0.0-beta.29",
+  "version": "5.0.0-beta.32",
   "description": "Automatic, high performance, and highly customizable GraphQL API for PostgreSQL",
   "type": "commonjs",
   "exports": {

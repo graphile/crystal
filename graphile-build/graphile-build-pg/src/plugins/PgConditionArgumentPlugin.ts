@@ -45,11 +45,6 @@ declare global {
   }
 }
 
-const FILTER_DEF = {
-  description: "can we filter this resource/codec",
-  entities: ["pgCodec", "pgResource"],
-} as const;
-
 export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
   name: "PgConditionArgumentPlugin",
   description: "Adds the 'condition' argument to connections and lists",
@@ -64,22 +59,6 @@ export const PgConditionArgumentPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
-    behaviorRegistry: {
-      add: {
-        filter: FILTER_DEF,
-        "query:resource:list:filter": FILTER_DEF,
-        "query:resource:connection:filter": FILTER_DEF,
-        "manyRelation:resource:list:filter": FILTER_DEF,
-        "manyRelation:resource:connection:filter": FILTER_DEF,
-        "singularRelation:resource:list:filter": FILTER_DEF,
-        "singularRelation:resource:connection:filter": FILTER_DEF,
-        "typeField:resource:list:filter": FILTER_DEF,
-        "typeField:resource:connection:filter": FILTER_DEF,
-        "queryField:resource:list:filter": FILTER_DEF,
-        "queryField:resource:connection:filter": FILTER_DEF,
-      },
-    },
-
     entityBehavior: {
       pgCodec: ["select", "filter"],
       pgResource: {

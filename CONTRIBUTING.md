@@ -28,18 +28,10 @@ yarn watch # or 'yarn build'
 **TODO:** check the following instructions work on a clean checkout.
 
 We assume you have a local PostgreSQL server running in "trust" authentication
-mode. Other options may or may not work.
+mode. Other options may or may not work - you may need to set `PGHOST`,
+`PGUSER`, `PGPASSWORD` and/or similar config variables.
 
-First, create a database for running the tests: `createdb graphile_graphql_test`
-
-Then tell our system this is the database you're using (you'll need to do this
-each time you run the tests in a new terminal):
-
-```bash
-export TEST_DATABASE_URL="postgres:///graphile_graphql_test"
-```
-
-Then run the tests with `yarn test`
+Run the tests with `yarn test`
 
 If the above succeeds, you're good to go! If not, please try again after running
 `yarn install --force` and always feel free to reach out via

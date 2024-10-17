@@ -1,6 +1,6 @@
 {
   "name": "graphile-build-pg",
-  "version": "5.0.0-beta.28",
+  "version": "5.0.0-beta.31",
   "description": "PostgreSQL plugins for Graphile Build - build a supercharged GraphQL schema by reflection over a PostgreSQL database and executed by Grafast.",
   "type": "commonjs",
   "main": "./dist/index.js",
@@ -17,7 +17,7 @@
     }
   },
   "scripts": {
-    "test": "jest -i",
+    "test": "jest",
     "prepack": "tsc -b && cp src/.npmignore dist/.npmignore"
   },
   "repository": {

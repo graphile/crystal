@@ -1,0 +1,129 @@
+---
+title: Plan branching via `.eval*()`
+sidebar_position: 13
+---
+
+import Mermaid from "@theme/Mermaid";
+
+Input steps (that is: steps that represent inputs to your GraphQL operations
+such as `context()` and steps representing field arguments accessed through
+`FieldArgs`) have a suite of `eval*` methods used to constrain query plans
+based on the concrete values seen at runtime. For example, if the user has used
+the `@skip` or `@include` directives to turn on/off sections of their query,
+it's more efficient to have separate plans for this so that we don't overfetch
+data:
+
+```graphql
+query GetUserDetails($includeFriends: Boolean! = false) {
+  currentUser {
+    name
+    avatarUrl
+    friends(first: 100) @include(if: $includeFriends) {
+      name
+      avatarUrl
+    }
+  }
+}
+```
+
+<Mermaid
+  chart={String.raw`%%{init: {'themeVariables': { 'fontSize': '12px'}}}%%
+flowchart TD
+    classDef path fill:#eee,stroke:#000,color:#000
+    classDef plan fill:#fff,stroke-width:1px,color:#000
+    classDef itemplan fill:#fff,stroke-width:2px,color:#000
+    classDef unbatchedplan fill:#dff,stroke-width:1px,color:#000
+    classDef sideeffectplan fill:#fcc,stroke-width:2px,color:#000
+    classDef bucket fill:#f6f6f6,color:#000,stroke-width:2px,text-align:left
+    subgraph "includeFriends=false"
+    ZAccess6{{"Access[6∈0] ➊<br />ᐸ2.currentUserIdᐳ"}}:::plan
+    Z__Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    Z__Value2 --> ZAccess6
+    ZLoad7[["Load[7∈0] ➊<br />ᐸuserByIdᐳ"]]:::plan
+    ZAccess6 --> ZLoad7
+    end
+    subgraph "includeFriends=true"
+    Access6{{"Access[6∈0] ➊<br />ᐸ2.currentUserIdᐳ"}}:::plan
+    __Value2["__Value[2∈0] ➊<br />ᐸcontextᐳ"]:::plan
+    __Value2 --> Access6
+    Load7[["Load[7∈0] ➊<br />ᐸuserByIdᐳ"]]:::plan
+    Access6 --> Load7
+    Load10[["Load[10∈0] ➊<br />ᐸfriendshipsByUserIdᐳ"]]:::plan
+    Access6 --> Load10
+    __Item14[/"__Item[14∈3]<br />ᐸ10ᐳ"\]:::itemplan
+    Load10 ==> __Item14
+    Access16{{"Access[16∈3]<br />ᐸ14.friend_idᐳ"}}:::plan
+    __Item14 --> Access16
+    Load17[["Load[17∈3]<br />ᐸuserByIdᐳ"]]:::plan
+    Access16 --> Load17
+    end
+    classDef bucket0 stroke:#696969
+    class Bucket0,__Value2,__Value4,Access6,Load7,Load10 bucket0
+    class ZAccess6,Z__Value2,ZLoad7 bucket0
+    classDef bucket1 stroke:#00bfff
+    class Bucket1 bucket1
+    classDef bucket3 stroke:#ffa500
+    class Bucket3,__Item14,Access16,Load17 bucket3
+    classDef bucket4 stroke:#0000ff
+    class Bucket4 bucket4
+`}
+/>
+
+Grafast does this branching automatically by evaluating whether the value of
+`$includeFriends` is `true` or not (`$includeFriends.evalIs(true)`) before
+deciding which plan resolvers to call. This requirement is then stored as a
+constraint on the plan, such that the next request may reuse the plan only if
+the result of `$includeFriends.evalIs(true)` retains the same value. Thus this
+allows the same operation to actually generate two plans, one for
+`includeFriends=false` and one for `includeFriends=true`.
+
+:::note Plans are established on demand
+
+Grafast doesn't plan all possible values of `includeFriends` up front; instead
+it just evaluates the version it's currently handling (e.g.
+`includeFriends=false`) and will only plan the alternative when a request comes
+through for it (e.g. with `includeFriends=true`).
+
+:::
+
+Note that this can result in up to 2<sup>x</sup> potential plans being
+generated for the same operation, where `x` is the number of unique
+`@skip`/`@include` variables. This reduces the "reusability" of the operation
+plans - each time a new request comes through that doesn't match the
+constraints of any pre-existing plans, we have to plan the entire operation
+again from scratch.
+
+## The `.eval*()` family
+
+It is possible, **but recommended against**, for user plan resolvers to use
+this functionality baked into Grafast. All the eval methods have a cost; being
+specific about the exact circumstances under which the plan should fork reduces
+the number of potential branches and reduces the resulting planning time and
+code complexity.
+
+Note that only input-related steps implement any of these methods, and even
+then these steps only implement the methods appropriate to them. Tread
+carefully.
+
+- `.evalIs(val)` - Branches the plan into two forks: one where `$__inputStep`'s
+  value `=== val`, and one where it isn't.
+- `.evalHas(key)` - Branches the plan into two forks based on whether the
+  specified `key` is set or not.
+- `.evalLength()` - Branches the plan into a fork for each length of the list
+  seen at runtime.
+- `.evalIsEmpty()` - Branches the plan into a fork based on whether the step
+  represents an "empty" object (an object with no attributes) or not.
+- `.eval()` - Branches the plan into a fork for every possible value - **you
+  should almost never use `.eval()` in your plan resolvers**, instead choose one
+  of the more specific options above (or, better, avoid `.eval*()` altogether!)
+
+:::info `.eval*()` might be going away!
+
+We are currently _evaulating_ whether to remove `.eval*()` completely from
+Grafast in a future version, see [issue
+#2060](https://github.com/graphile/crystal/issues/2060).
+
+**If possible, you should avoid branching the plan and instead incorporate the
+required logic into your step classes directly.**
+
+:::

@@ -61,10 +61,30 @@ const getEntityBehaviorHooks = (
       } else {
         // noop
       }
-    } else {
+    } else if (rhs.inferred || rhs.override) {
       const hook = rhs[type];
       if (hook) {
         result[entityType as keyof GraphileBuild.BehaviorEntities] = hook;
+      }
+    } else {
+      console.warn(
+        `Plugin ${
+          plugin.name
+        } is using a deprecated or unsupported form of 'plugin.schema.entityBehavior[${JSON.stringify(
+          entityType,
+        )}]' definition - if this is an object it should have only the keys 'inferred' and/or 'override'. This changed in graphile-build@5.0.0-beta.25.`,
+      );
+      const rhsAny = rhs as any;
+      if (rhsAny.callback) {
+        if (rhsAny.provides?.includes?.("override")) {
+          if (type === "override") {
+            result[entityType as keyof GraphileBuild.BehaviorEntities] = rhsAny;
+          }
+        } else {
+          if (type === "inferred") {
+            result[entityType as keyof GraphileBuild.BehaviorEntities] = rhsAny;
+          }
+        }
       }
     }
   }
@@ -132,8 +152,7 @@ export class Behavior {
     [behavior in keyof GraphileBuild.BehaviorStrings]: {
       entities: {
         [entity in keyof GraphileBuild.BehaviorEntities]?: {
-          description: string;
-          pluginName: string | null;
+          registeredBy: Array<{ pluginName: string; description: string }>;
         };
       };
     };
@@ -178,16 +197,20 @@ export class Behavior {
             allEntities.add(entityType);
             if (!this.behaviorRegistry[behaviorString].entities[entityType]) {
               this.behaviorRegistry[behaviorString].entities[entityType] = {
-                description,
-                pluginName: plugin.name,
+                registeredBy: [
+                  {
+                    description,
+                    pluginName: plugin.name,
+                  },
+                ],
               };
             } else {
-              console.warn(
-                `Behavior string '${behaviorString}' for entity type '${entityType}' has been registered by more than one plugin! First registered by ${
-                  this.behaviorRegistry[behaviorString].entities[entityType]!
-                    .pluginName
-                }; and then later again by ${plugin.name}`,
-              );
+              this.behaviorRegistry[behaviorString].entities[
+                entityType
+              ]!.registeredBy.push({
+                description,
+                pluginName: plugin.name,
+              });
             }
           }
         }
@@ -318,7 +341,9 @@ export class Behavior {
     filter: TFilter,
   ): boolean | undefined {
     if (!this.behaviorRegistry[filter]) {
-      console.trace(
+      // DIAGNOSTIC: enable for all filters
+      /*
+      console.warn(
         `Behavior '${filter}' is not registered; please be sure to register it within a plugin via \`plugin.schema.behaviorRegistry.add[${JSON.stringify(
           filter,
         )}] = { description: "...", entities: [${JSON.stringify(
@@ -326,11 +351,11 @@ export class Behavior {
         )}] }\`.`,
       );
       // Register it so we don't see this warning again
+      */
       this.behaviorRegistry[filter] = {
         entities: {
           [entityType]: {
-            description: "Unregistered.",
-            pluginName: null,
+            registeredBy: [],
           },
         },
       };
@@ -340,7 +365,7 @@ export class Behavior {
           entities[entityType] && stringMatches(bhv, filter),
       )
     ) {
-      console.trace(
+      console.warn(
         `Behavior '${filter}' is not registered for entity type '${entityType}'; it's only expected to be used with '${Object.keys(
           this.behaviorRegistry[filter].entities,
         ).join(
@@ -353,8 +378,7 @@ export class Behavior {
       );
       // Register it so we don't see this warning again
       this.behaviorRegistry[filter].entities[entityType] = {
-        description: "Unregistered!",
-        pluginName: null,
+        registeredBy: [],
       };
     }
     const finalString = this.getBehaviorForEntity(
@@ -895,6 +919,8 @@ export function isValidBehaviorString(
   );
 }
 
+const warnedBehaviors: string[] = [];
+
 /*
  * 1. Take each behavior from inferred
  * 2. Find the matching behaviors from preferences
@@ -963,11 +989,13 @@ function multiplyBehavior(
       });
     }
     if (final.length === 0) {
-      console.warn(
-        `No matches for behavior '${infEntry.scope.join(
-          ":",
-        )}' - please ensure that this behavior is registered for entity type '${entityType}'`,
-      );
+      const behavior = infEntry.scope.join(":");
+      if (!warnedBehaviors.includes(behavior)) {
+        warnedBehaviors.push(behavior);
+        console.warn(
+          `No matches for behavior '${behavior}' - please ensure that this behavior is registered for entity type '${entityType}'`,
+        );
+      }
     }
     return final;
   });

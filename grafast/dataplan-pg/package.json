@@ -1,6 +1,6 @@
 {
   "name": "@dataplan/pg",
-  "version": "0.0.1-beta.25",
+  "version": "0.0.1-beta.26",
   "description": "PostgreSQL step classes for Grafast",
   "type": "commonjs",
   "main": "dist/index.js",
@@ -19,8 +19,7 @@
   },
   "scripts": {
     "update-schema": "ts-node ./src/examples/exampleSchema.ts",
-    "test:install-schema": "psql -X1v ON_ERROR_STOP=1 -f __tests__/schema.sql -f __tests__/sequence_reset.sql \"${TEST_DATABASE_URL:-graphile_crystal}\"",
-    "test": "GRAPHILE_ENV=test yarn test:install-schema && jest -i",
+    "test": "GRAPHILE_ENV=test jest",
     "posttest": "yarn test:exportSchema:graphql-js && yarn test:exportSchema:typeDefs",
     "test:exportSchema:graphql-js": "ts-node ./scripts/exportExampleSchema.ts graphql-js && node ./scripts/runExampleSchema.mjs",
     "test:exportSchema:typeDefs": "ts-node ./scripts/exportExampleSchema.ts typeDefs && node ./scripts/runExampleSchema.mjs",

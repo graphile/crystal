@@ -1,5 +1,28 @@
 # graphile-config
 
+## 0.0.1-beta.10
+
+### Patch Changes
+
+- [#2188](https://github.com/graphile/crystal/pull/2188)
+  [`cc0941731`](https://github.com/graphile/crystal/commit/cc0941731a1679bc04ce7b7fd4254009bb5f1f62)
+  Thanks [@benjie](https://github.com/benjie)! - Overhaul the way in which
+  `graphile-config` presets work such that including a preset at two different
+  layers shouldn't result in unexpected behavior.
+
+- [#2155](https://github.com/graphile/crystal/pull/2155)
+  [`8b472cd51`](https://github.com/graphile/crystal/commit/8b472cd51cd66d8227f9f2722d09c0a774792b0f)
+  Thanks [@benjie](https://github.com/benjie)! - `disablePlugins` now supports
+  TypeScript auto-completion of known plugin names. Other names are still
+  accepted without error, so this is just a minor DX improvement rather than
+  type safety.
+
+- [#2160](https://github.com/graphile/crystal/pull/2160)
+  [`9cd9bb522`](https://github.com/graphile/crystal/commit/9cd9bb5222a9f0398ee4b8bfa4f741b6de2a2192)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for lists of hook
+  objects, so that the same hook can be applied multiple times in the same
+  plugin but with different priorities.
+
 ## 0.0.1-beta.9
 
 ### Patch Changes
