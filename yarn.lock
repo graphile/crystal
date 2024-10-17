@@ -8430,10 +8430,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cookie-es@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "cookie-es@npm:1.0.0"
-  checksum: 65be48df23a6286c73aac8e8b8e2c8a2bca6c85ba32b42215ca447bebe8ffe752a18d1c46c79700f5cb057ebb4b7bcb7f3114893329dfac484cb52a7551e4c8a
+"cookie-es@npm:^1.2.2":
+  version: 1.2.2
+  resolution: "cookie-es@npm:1.2.2"
+  checksum: 8318f7251c43835744cf5421fe5cdb6f92695d0a6234d39af616ff2b692d3c05019517c8b56afe726ff8d6a2462c35247d6c6d1db18dbf2816cba2150036ce6e
   languageName: node
   linkType: hard
 
@@ -8696,6 +8696,15 @@ __metadata:
     shebang-command: "npm:^2.0.0"
     which: "npm:^2.0.1"
   checksum: 37ec685f91f04d4719892f305fa6f632aae256df7f2f3f98d5c36f2197651ad7b77851aaa2d397d19a9555f0fb89fa18f9bb3ff4b440535cc0fb4fe0a72004b9
+  languageName: node
+  linkType: hard
+
+"crossws@npm:>=0.2.0 <0.4.0":
+  version: 0.3.1
+  resolution: "crossws@npm:0.3.1"
+  dependencies:
+    uncrypto: "npm:^0.1.3"
+  checksum: d6551e6037ca337e1ee32331d13c793ff28ef54080402e081dc7461f5f9dcb4eb5143d2729b847cebbefc477578bc433798aa83a133d81d8c551390a1c3fab89
   languageName: node
   linkType: hard
 
@@ -9591,10 +9600,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"defu@npm:^6.1.2":
-  version: 6.1.2
-  resolution: "defu@npm:6.1.2"
-  checksum: edaea3395b6d39c6ec724600d257c7f49176044c5a14dbe3870197347079ca162e1155425b3612d1162966db3bad1e453c4f4ca5cf259efaf29ccb5045829d2e
+"defu@npm:^6.1.4":
+  version: 6.1.4
+  resolution: "defu@npm:6.1.4"
+  checksum: 81c57b057389c0a8f99267c84a4e93d296a266a72e6ef0ac8288b5947444bdf3e450672a56e767d91d6be7efd7f2412b278087cc88f936a6ef9fdffd76d12f34
   languageName: node
   linkType: hard
 
@@ -9658,10 +9667,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"destr@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "destr@npm:2.0.1"
-  checksum: 115d03532278d70350591e31bda4a6ca3031782d2c92d665e11b3f3d22602c8c0e7a4caa76f624f7124b3f9f76b75adabe7b87c75b7192e8af6a6166b52a26f4
+"destr@npm:^2.0.3":
+  version: 2.0.3
+  resolution: "destr@npm:2.0.3"
+  checksum: 7f6367774e3d0364551d325f21f4a04c784a62a870ba80ee06b8cdf72a593972dc26439ddfe56c76000d3360f3a508e1e7f027b70e6400863b03ab9a81e3713d
   languageName: node
   linkType: hard
 
@@ -11973,7 +11982,7 @@ __metadata:
     graphile-config: "workspace:^"
     graphql-http: "npm:^1.22.0"
     graphql-ws: "npm:^5.14.0"
-    h3: "npm:^1.8.1"
+    h3: "npm:^1.13.0"
     jest: "npm:^29.6.4"
     jest-serializer-graphql-schema: "workspace:^"
     koa: "npm:^2.14.2"
@@ -11988,7 +11997,7 @@ __metadata:
     grafast: "workspace:^"
     graphile-config: "workspace:^"
     graphql: ^16.1.0-experimental-stream-defer.6
-    h3: ^1.7.1
+    h3: ^1.13.0
     ws: ^8.12.1
   peerDependenciesMeta:
     "@envelop/core":
@@ -12327,19 +12336,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"h3@npm:^1.8.1":
-  version: 1.8.1
-  resolution: "h3@npm:1.8.1"
+"h3@npm:^1.13.0":
+  version: 1.13.0
+  resolution: "h3@npm:1.13.0"
   dependencies:
-    cookie-es: "npm:^1.0.0"
-    defu: "npm:^6.1.2"
-    destr: "npm:^2.0.1"
-    iron-webcrypto: "npm:^0.8.0"
-    radix3: "npm:^1.1.0"
-    ufo: "npm:^1.3.0"
+    cookie-es: "npm:^1.2.2"
+    crossws: "npm:>=0.2.0 <0.4.0"
+    defu: "npm:^6.1.4"
+    destr: "npm:^2.0.3"
+    iron-webcrypto: "npm:^1.2.1"
+    ohash: "npm:^1.1.4"
+    radix3: "npm:^1.1.2"
+    ufo: "npm:^1.5.4"
     uncrypto: "npm:^0.1.3"
-    unenv: "npm:^1.7.4"
-  checksum: 79339b4f1e3adb239a9e75c2534d49848c69575cdb64e7794e5fdc95f14c4869515b618032cc78687e0693cbae874e1d86cad096142a25764aad6a1805e55115
+    unenv: "npm:^1.10.0"
+  checksum: 87bc9d10eff6c1fece20f1f3616828be429e2a51e14855a066093000b6557f08c698768d39a68ac15e869a2f214f7a708c7cad1f8fdc70551b4ee48c70757e5d
   languageName: node
   linkType: hard
 
@@ -13097,10 +13108,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"iron-webcrypto@npm:^0.8.0":
-  version: 0.8.2
-  resolution: "iron-webcrypto@npm:0.8.2"
-  checksum: 8b345cf37e80574abbe48cdeb96ae3949fb757adbe862e9feade36ee3aa45cb9a5cc1b8a462fd9366250dacdadd223c5a1d57b32603afaf8775534e617f5e377
+"iron-webcrypto@npm:^1.2.1":
+  version: 1.2.1
+  resolution: "iron-webcrypto@npm:1.2.1"
+  checksum: 3eef80d46c3d9bf51bdd267b98f3b65fbd3e69c4da1d0811fe9332497e9053e5a5cf7965e3c8cf9e008487833aed219e919aa377b0122686d32685640f64f39b
   languageName: node
   linkType: hard
 
@@ -16143,10 +16154,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-fetch-native@npm:^1.4.0":
-  version: 1.4.0
-  resolution: "node-fetch-native@npm:1.4.0"
-  checksum: 1cb840bd1341060aa8fcd0a3b9d445b539b045451886f99e1ed5a0ab8acfafa88d9cc885db0b1363bb8818dea11dcbe2a10a9bc286bf00f0dcdff44773f3f92c
+"node-fetch-native@npm:^1.6.4":
+  version: 1.6.4
+  resolution: "node-fetch-native@npm:1.6.4"
+  checksum: d37c8fbb30f31eac6fa941082bcaacc4047c79114d32ff2242e1c1ff3c7f622cd314d9a69a91065c45259f3d86d089047b0ee78cdc132898b7b23b2f52b2d5de
   languageName: node
   linkType: hard
 
@@ -16510,6 +16521,13 @@ __metadata:
   version: 1.1.2
   resolution: "obuf@npm:1.1.2"
   checksum: 6b70a0520bda98a6f8fffefd74f0f9cfcec34d4dcf2b7bcdd11b3622db81067b971adecd3bf4be79a289bbb40cd0c08de23370bf6ba8510dbe0c91ca971443f5
+  languageName: node
+  linkType: hard
+
+"ohash@npm:^1.1.4":
+  version: 1.1.4
+  resolution: "ohash@npm:1.1.4"
+  checksum: f9c2b2dd9498e41f79e170bc6b6d630f31888239941d6057364327b045f390b91ef37651fbcc1e6213461d0abfd0274d15602a97104508db89672e5014d86dd7
   languageName: node
   linkType: hard
 
@@ -16908,10 +16926,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pathe@npm:^1.1.1":
-  version: 1.1.1
-  resolution: "pathe@npm:1.1.1"
-  checksum: 8bca7eccd68b0076cbcffdc74490cce9515ec88e6d9ba94860a7766a03345170d3d1b36ca43083960dfbd2aa59f9dba0a07e2a27075818da7f19b1cce2985f47
+"pathe@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "pathe@npm:1.1.2"
+  checksum: 3ee799ed8a7515cbb180a619e5533443a7428607804e5bb06a5494b241dd38ae4c0b32df35bb69dce014e3d4bc31f62ff12f2d7506ad12e3c497762ffbfd0cca
   languageName: node
   linkType: hard
 
@@ -18164,10 +18182,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"radix3@npm:^1.1.0":
-  version: 1.1.0
-  resolution: "radix3@npm:1.1.0"
-  checksum: e0427bcfed1adc041b5244a6260cb10d17c78fe174ed6acc92925f010e799fb2135c9bc7d15d31fb3df309be705d6334576a43e7e3d4c777eaddcd3bbc27ce89
+"radix3@npm:^1.1.2":
+  version: 1.1.2
+  resolution: "radix3@npm:1.1.2"
+  checksum: 9644282fb1549548e28fb475bfcdd366c38ab6231f319715108c7dbe056540b0c95c0eadbd8cf4ba11e9466d236a41588c40f5b776524c60ac36a17d9c9bb83f
   languageName: node
   linkType: hard
 
@@ -21173,10 +21191,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ufo@npm:^1.3.0":
-  version: 1.3.0
-  resolution: "ufo@npm:1.3.0"
-  checksum: fdc3368988816f6727060281eb0a01dbc341f031e4d52f9f43add6f54237cc6fcdddc03a958dbba75057f2d21847f56023dcce58c994b88e0a68f05610132d19
+"ufo@npm:^1.5.4":
+  version: 1.5.4
+  resolution: "ufo@npm:1.5.4"
+  checksum: af0457d95f443bb92f0be1118b7831c3c18f59fb56aeb3873fc914f70b65981a18bb3834b54f2879cae254dd40cc287dc63e2a0c3f9ea37b55c734b3614e9358
   languageName: node
   linkType: hard
 
@@ -21216,16 +21234,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"unenv@npm:^1.7.4":
-  version: 1.7.4
-  resolution: "unenv@npm:1.7.4"
+"unenv@npm:^1.10.0":
+  version: 1.10.0
+  resolution: "unenv@npm:1.10.0"
   dependencies:
     consola: "npm:^3.2.3"
-    defu: "npm:^6.1.2"
+    defu: "npm:^6.1.4"
     mime: "npm:^3.0.0"
-    node-fetch-native: "npm:^1.4.0"
-    pathe: "npm:^1.1.1"
-  checksum: 09d2d5bad1dbeefb4a4acd368ef607928bd81d11b405129cae8f2cf185877b311c3f4eb44f609534071df40958ed81cc57635d63a69bb7bb133d2ffaa703bc62
+    node-fetch-native: "npm:^1.6.4"
+    pathe: "npm:^1.1.2"
+  checksum: 4980e55fb92e7309deceeba81a6e2ced2360cc53803e58821248f40a9776b467fd8a81c305535356b1b1f6c68bcde32835058c091eaee5e9b9037a6cb69cc8bc
   languageName: node
   linkType: hard
 

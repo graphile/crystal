@@ -1,11 +1,12 @@
-import type { IncomingMessage, Server as HTTPServer } from "node:http";
-import type { Server as HTTPSServer } from "node:https";
-import type { Duplex } from "node:stream";
 import { PassThrough } from "node:stream";
 
+//@ts-expect-error type imports.
+import type { Hooks, Peer } from "crossws";
+import { GRAPHQL_TRANSPORT_WS_PROTOCOL, makeServer } from "graphql-ws";
 import type { App, H3Event } from "h3";
 import {
   createRouter,
+  defineWebSocketHandler,
   eventHandler,
   getQuery,
   getRequestHeaders,
@@ -20,6 +21,7 @@ import {
 import {
   convertHandlerResultToResult,
   GrafservBase,
+  makeGraphQLWSConfig,
   normalizeRequest,
   processHeaders,
 } from "../../../index.js";
@@ -30,7 +32,6 @@ import type {
   RequestDigest,
   Result,
 } from "../../../interfaces.js";
-import { makeNodeUpgradeHandler } from "../../node/index.js";
 
 declare global {
   namespace Grafast {
@@ -227,6 +228,13 @@ export class H3Grafserv extends GrafservBase {
         : ["post"],
     );
 
+    if (this.resolvedPreset.grafserv?.websockets) {
+      app.use(
+        this.dynamicOptions.graphqlPath,
+        defineWebSocketHandler(this.makeWsHandler()),
+      );
+    }
+
     if (dynamicOptions.graphiql) {
       router.get(
         this.dynamicOptions.graphiqlPath,
@@ -242,58 +250,49 @@ export class H3Grafserv extends GrafservBase {
     }
   }
 
-  async getUpgradeHandler_experimental() {
-    if (this.resolvedPreset.grafserv?.websockets) {
-      return makeNodeUpgradeHandler(this);
-    } else {
-      return null;
+  public makeWsHandler(): Partial<Hooks> {
+    const graphqlWsServer = makeServer(makeGraphQLWSConfig(this));
+    interface Client {
+      handleMessage?: (data: string) => Promise<void>;
+      closed?: (code?: number, reason?: string) => Promise<void>;
     }
-  }
 
-  shouldHandleUpgrade_experimental(
-    req: IncomingMessage,
-    _socket: Duplex,
-    _head: Buffer,
-  ) {
-    const fullUrl = req.url;
-    if (!fullUrl) {
-      return false;
-    }
-    const q = fullUrl.indexOf("?");
-    const url = q >= 0 ? fullUrl.substring(0, q) : fullUrl;
-    const graphqlPath = this.dynamicOptions.graphqlPath;
-    return url === graphqlPath;
-  }
-
-  public async addTo_experimental(
-    app: App,
-    server: HTTPServer | HTTPSServer | undefined,
-    addExclusiveWebsocketHandler = true,
-  ) {
-    this.addTo(app);
-
-    if (addExclusiveWebsocketHandler && server) {
-      await this.attachWebsocketsToServer_experimental(server);
-    }
-  }
-
-  public async attachWebsocketsToServer_experimental(
-    server: HTTPServer | HTTPSServer,
-  ) {
-    const grafservUpgradeHandler = await this.getUpgradeHandler_experimental();
-    if (grafservUpgradeHandler) {
-      const upgrade = (req: IncomingMessage, socket: Duplex, head: Buffer) => {
-        if (this.shouldHandleUpgrade_experimental(req, socket, head)) {
-          grafservUpgradeHandler(req, socket, head);
-        } else {
-          socket.destroy();
-        }
-      };
-      server.on("upgrade", upgrade);
-      this.onRelease(() => {
-        server.off("upgrade", upgrade);
-      });
-    }
+    const clients = new Map<Peer, Client>();
+    return {
+      open(peer) {
+        const client: Client = {};
+        clients.set(peer, client);
+        const onClose = graphqlWsServer.opened(
+          {
+            protocol: peer.websocket.protocol ?? GRAPHQL_TRANSPORT_WS_PROTOCOL, // will be validated
+            send(data) {
+              peer.send(data);
+            },
+            close(code, reason) {
+              peer.close(code, reason); // there are protocol standard closures
+            },
+            onMessage(cb) {
+              client.handleMessage = cb;
+            },
+          },
+          { socket: peer.websocket, request: peer.request },
+        );
+        client.closed = async (code, reason) => {
+          // @ts-expect-error fixed in unreleased https://github.com/enisdenjo/graphql-ws/pull/573
+          onClose(code, reason);
+        };
+      },
+      message(peer, message) {
+        clients.get(peer)?.handleMessage?.(message.text());
+      },
+      close(peer, details) {
+        clients.get(peer)?.closed?.(details.code, details.reason);
+        clients.delete(peer);
+      },
+      error(peer, _error) {
+        clients.delete(peer);
+      },
+    };
   }
 }
 
