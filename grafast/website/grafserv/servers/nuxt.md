@@ -17,42 +17,24 @@ import schema from "./schema.mjs";
 export const serv = grafserv({ schema, preset });
 ```
 
-and the API routes :
+## API routes
+
+### Graphql endpoint
+
+_without websockets_
 
 ```ts title="server/api/graphql.ts"
+import { eventHandler } from "h3";
 import { serv } from "@/server/grafserv/serv";
 
 // Create and export the `/api/graphql` route handler
 export default eventHandler((event) => serv.handleGraphQLEvent(event));
 ```
 
-```ts title="pages/routes/ruru.ts"
-import { serv } from "@/server/grafserv/serv";
-
-// Create and export the `/ruru` route handler
-export default eventHandler((event) => serv.handleGraphiqlEvent(event));
-```
-
-```ts title="pages/api/graphql/stream.ts"
-import { serv } from "@/server/grafserv/serv";
-
-// Create and export the `/api/graphql/stream` route handler
-export default eventHandler((event) => serv.handleEventStreamEvent(event));
-```
-
-## Websocket support (need h3@^1.13.0)
-
-```ts title="server/api/graphql-ws.ts"
-import { defineWebSocketHandler } from "h3";
-import { serv } from "@/server/grafserv/serv";
-
-// Create and export the `/api/graphql` websocket handler
-export default defineWebSocketHandler(serv.makeWsHandler());
-```
-
-If the ws endpoint and the graphql endpoint share the same path:
+_or with websockets enabled_ (need h3@^1.13.0):
 
 ```ts title="server/api/graphql.ts"
+import { eventHandler } from "h3";
 import { serv } from "@/server/grafserv/serv";
 
 export default eventHandler({
@@ -61,4 +43,24 @@ export default eventHandler({
   // Create and export the `/api/graphql` websocket handler
   websocket: serv.makeWsHandler(),
 });
+```
+
+### Ruru endpoint
+
+```ts title="pages/routes/ruru.ts"
+import { eventHandler } from "h3";
+import { serv } from "@/server/grafserv/serv";
+
+// Create and export the `/ruru` route handler
+export default eventHandler((event) => serv.handleGraphiqlEvent(event));
+```
+
+### EventStream endpoint
+
+```ts title="pages/api/graphql/stream.ts"
+import { eventHandler } from "h3";
+import { serv } from "@/server/grafserv/serv";
+
+// Create and export the `/api/graphql/stream` route handler
+export default eventHandler((event) => serv.handleEventStreamEvent(event));
 ```
