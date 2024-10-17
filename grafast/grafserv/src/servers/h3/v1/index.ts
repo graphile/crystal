@@ -257,7 +257,7 @@ export class H3Grafserv extends GrafservBase {
       closed?: (code?: number, reason?: string) => Promise<void>;
     }
 
-    const clients = new WeakMap<Peer, Client>();
+    const clients = new Map<Peer, Client>();
     return {
       open(peer) {
         const client: Client = {};
@@ -289,8 +289,8 @@ export class H3Grafserv extends GrafservBase {
         clients.get(peer)?.closed?.(details.code, details.reason);
         clients.delete(peer);
       },
-      error(peer, error) {
-        // clients.delete(peer)?
+      error(peer, _error) {
+        clients.delete(peer);
       },
     };
   }
