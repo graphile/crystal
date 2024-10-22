@@ -159,6 +159,54 @@ console.log("$a = " + $a.toString());
 You may override this to add additional data to the `toString` method (the data
 that would occur between the triangular brackets).
 
+## Access methods
+
+When writing a step class, you should implement either `.at()` or `.get()` depending on
+if the step represents a list, array, or an objet.
+
+### at
+
+Implement `.at()` if your step represents a list or an array. It should accept a single argument, an
+integer, which represents the index within the list-like value which should be accessed.
+
+Usage:
+
+```ts
+const $abTuple = list([$a, $b]);
+
+// abTuple.at(0) returns $a
+```
+
+### get
+
+Implement `.get()` if your step represents an object. It should accept a single argument, a
+string, which represents an attribute to access an object-like value.
+
+### access
+
+If optimization isn't a concern, you can defer to `access` while implementing `get` or `at`. This
+means you can refactor and optimize at a later stage without affecting code using that step class.
+
+```ts
+class MyStep extends ExecutableStep {
+  // ...
+
+  // For steps representing objects:
+  get(key) { return access(this, key); }
+
+  // For steps representing lists:
+  at(index) { return access(this, index); }
+```
+
+:::caution
+
+If your step implements `.at()` or `.get()`, make sure it conforms to the expectations of
+those methods: ie it correctly accepts a single argument of either an integer or string.
+&ZeroWidthSpace;<grafast /> relies on these assumptions; unanticipated behaviours may result
+from steps which don't adhere to these expectations.
+
+:::
+
 ## Lifecycle methods
 
 ### execute
