@@ -3958,7 +3958,7 @@ __metadata:
     codemirror-graphql: "npm:^2.0.10"
     dataloader: "npm:^2.2.2"
     grafast: "workspace:^"
-    mermaid: "npm:^9.4.3"
+    mermaid: "npm:^10.9.3"
     prism-react-renderer: "npm:^2.0.6"
     react: "npm:^18.2.0"
     react-dom: "npm:^18.2.0"
@@ -8972,6 +8972,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"cytoscape@npm:^3.28.1":
+  version: 3.30.2
+  resolution: "cytoscape@npm:3.30.2"
+  checksum: 3dc8eade30b107132392c76cc1939d96cd5d752a15d4c1a5aaa2157684fc6f1f5afc8542538a451dc91657e09c26c96913183db899dba6016754ef034965a533
+  languageName: node
+  linkType: hard
+
 "d3-array@npm:1 - 2":
   version: 2.12.1
   resolution: "d3-array@npm:2.12.1"
@@ -9897,6 +9904,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dompurify@npm:^3.0.5 <3.1.7":
+  version: 3.1.6
+  resolution: "dompurify@npm:3.1.6"
+  checksum: 903a99bdb0e8181a6b70e91ff291c96dcee15cc35775b256f9648cbece390c5759fb57c8c3c8e39323c69afa1ebbc1becdac11f12aa9ab0f8c7332782cfe531c
+  languageName: node
+  linkType: hard
+
 "domutils@npm:^2.5.2, domutils@npm:^2.8.0":
   version: 2.8.0
   resolution: "domutils@npm:2.8.0"
@@ -9993,6 +10007,13 @@ __metadata:
   version: 0.8.2
   resolution: "elkjs@npm:0.8.2"
   checksum: 633c0fda9bb08e542c485fa1ec1e2fb9a49b884f4c8ef64c0e983e0a3d3b3eed4f7fc780d247cec1227834db205f3528154dd02341addbdee398d55d5f2be07b
+  languageName: node
+  linkType: hard
+
+"elkjs@npm:^0.9.0":
+  version: 0.9.3
+  resolution: "elkjs@npm:0.9.3"
+  checksum: 01b3da523e66153f7bf07c5d14f67da12bfe637aba6c13c8c50fe1820257e68560d4ed2a24ed613e3b9a6406cf2aa677937066dc0e0682b42270b6729e146749
   languageName: node
   linkType: hard
 
@@ -11931,7 +11952,7 @@ __metadata:
     iterall: "npm:^1.3.0"
     jest: "npm:^29.6.4"
     lodash: "npm:^4.17.21"
-    mermaid: "npm:^9.4.3"
+    mermaid: "npm:^10.9.3"
     mocha: "npm:^10.2.0"
     nodemon: "npm:^3.0.1"
     pg-sql2: "workspace:^"
@@ -14456,6 +14477,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"katex@npm:^0.16.9":
+  version: 0.16.11
+  resolution: "katex@npm:0.16.11"
+  dependencies:
+    commander: "npm:^8.3.0"
+  bin:
+    katex: cli.js
+  checksum: 21d8f745ec92c42bd5db241124ac17995b119b2996ee584a0d1ad3bacae2b9bd81effce1bb0122754a5c0da4e0a6d714254f7c3e78601218e809fdd74ddbb63a
+  languageName: node
+  linkType: hard
+
 "keygrip@npm:~1.1.0":
   version: 1.1.0
   resolution: "keygrip@npm:1.1.0"
@@ -15380,7 +15412,35 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mermaid@npm:^9.2.2, mermaid@npm:^9.4.3":
+"mermaid@npm:^10.9.3":
+  version: 10.9.3
+  resolution: "mermaid@npm:10.9.3"
+  dependencies:
+    "@braintree/sanitize-url": "npm:^6.0.1"
+    "@types/d3-scale": "npm:^4.0.3"
+    "@types/d3-scale-chromatic": "npm:^3.0.0"
+    cytoscape: "npm:^3.28.1"
+    cytoscape-cose-bilkent: "npm:^4.1.0"
+    d3: "npm:^7.4.0"
+    d3-sankey: "npm:^0.12.3"
+    dagre-d3-es: "npm:7.0.10"
+    dayjs: "npm:^1.11.7"
+    dompurify: "npm:^3.0.5 <3.1.7"
+    elkjs: "npm:^0.9.0"
+    katex: "npm:^0.16.9"
+    khroma: "npm:^2.0.0"
+    lodash-es: "npm:^4.17.21"
+    mdast-util-from-markdown: "npm:^1.3.0"
+    non-layered-tidy-tree-layout: "npm:^2.0.2"
+    stylis: "npm:^4.1.3"
+    ts-dedent: "npm:^2.2.0"
+    uuid: "npm:^9.0.0"
+    web-worker: "npm:^1.2.0"
+  checksum: 64598d839fde655091367fbf44021a06413b5b06f062e1c70095b26f102ab105db3934e7f360243b5dcd3af8de3124751fa352d208bbd4008f002fa3c4f3df73
+  languageName: node
+  linkType: hard
+
+"mermaid@npm:^9.2.2":
   version: 9.4.3
   resolution: "mermaid@npm:9.4.3"
   dependencies:
