@@ -122,8 +122,24 @@
         "make-pg-smart-tags-plugin",
         "make-plugin-by-combining-plugins",
         "extending-raw",
-        "plugin-gallery",
-        "community-plugins"
+        "community-plugins",
+        {
+          "type": "category",
+          "label": "Plugin Gallery",
+          "link": {
+            "type": "doc",
+            "id": "plugin-gallery/index"
+          },
+          "items": [
+            "plugin-gallery/inflector",
+            "plugin-gallery/types",
+            "plugin-gallery/relations",
+            "plugin-gallery/mutations",
+            "plugin-gallery/custom-queries",
+            "plugin-gallery/custom-mutations",
+            "plugin-gallery/computed-columns"
+          ]
+        }
       ]
     },
     "plugins",
