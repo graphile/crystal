@@ -151,8 +151,8 @@ app.use(
   postgraphile(process.env.DATABASE_URL, process.env.DB_SCHEMA, {
     pgSettings: (req) => {
       const settings = {};
-      if (req.user) {
-        settings["user.permissions"] = req.user.scopes;
+      if (req.auth) {
+        settings["user.permissions"] = req.auth.scope;
       }
       return settings;
     },
