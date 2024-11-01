@@ -1690,7 +1690,7 @@ export class OperationPlan {
           try {
             /* TODO: this $oldStep / $step dance turned out to be necessary
              * because `$step` was being replaced in the following query against
-             * the pggql_test `polymorpic` schema; but I'm not sure this is the
+             * the graphilecrystaltest `polymorpic` schema; but I'm not sure this is the
              * right behavior - shouldn't deduplication have been temporarily
              * disabled during this?
              *

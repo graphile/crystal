@@ -16,7 +16,7 @@ installing all the peerDependencies for you. It's intended specifically for
 compatibility with `npx`:
 
 ```
-npx pgl@beta -P pgl/amber -c my_db
+npx pgl@beta -P pgl/amber -c postgres:///my_db
 
 # Or: npx pgl@beta -P postgraphile/preset/amber -c postgres://user:pass@host:port/dbname -s my_schema
 ```

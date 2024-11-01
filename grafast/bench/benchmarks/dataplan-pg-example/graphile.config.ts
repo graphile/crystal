@@ -4,7 +4,7 @@ import "../../src/index.js";
 import { createWithPgClient } from "@dataplan/pg/adaptors/pg";
 
 export const withPgClient = createWithPgClient({
-  connectionString: "postgres:///pggql_test",
+  connectionString: "postgres:///graphilecrystaltest",
 });
 
 declare module "../../src/interfaces.js" {
@@ -20,7 +20,7 @@ const preset: GraphileConfig.Preset = {
     // operations: `${__dirname}/../../../dataplan-pg/__tests__/queries/interfaces-relational/nested-more-fragments.test.graphql`,
     setup() {
       const withPgClient = createWithPgClient({
-        connectionString: "postgres:///pggql_test",
+        connectionString: "postgres:///graphilecrystaltest",
       });
       return { withPgClient };
     },

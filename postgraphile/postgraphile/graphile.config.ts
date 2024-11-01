@@ -18,6 +18,7 @@ import {
   constant,
   context,
   error,
+  isAsyncIterable,
   lambda,
   listen,
   object,
@@ -317,6 +318,26 @@ const TestSideEffectCancellingPlugin = makeExtendSchemaPlugin({
   },
 });
 
+const AddToResponseExtensionsPropertyPlugin: GraphileConfig.Plugin = {
+  name: "AddToResponseExtensionsPropertyPlugin",
+
+  grafast: {
+    middleware: {
+      execute(next, event) {
+        return next.callback((error, result) => {
+          if (error) throw error;
+          const context = (event.args.contextValue ?? {}) as Grafast.Context;
+          if (!isAsyncIterable(result)) {
+            if (!result.extensions) result.extensions = {};
+            result.extensions.number = context.number;
+          }
+          return result;
+        });
+      },
+    },
+  },
+};
+
 const preset: GraphileConfig.Preset = {
   plugins: [
     StreamDeferPlugin,
@@ -476,6 +497,7 @@ const preset: GraphileConfig.Preset = {
     RuruQueryParamsUpdatePlugin,
     ...(Math.random() > 2 ? [LeftArmPlugin] : []),
     TestSideEffectCancellingPlugin,
+    AddToResponseExtensionsPropertyPlugin,
   ],
   extends: [
     PostGraphileAmberPreset,
@@ -528,6 +550,7 @@ const preset: GraphileConfig.Preset = {
   grafast: {
     context(requestContext, args) {
       return {
+        number: -1,
         pgSettings: {
           // role: "postgres",
           ...args.contextValue?.pgSettings,
@@ -540,7 +563,8 @@ const preset: GraphileConfig.Preset = {
   pgServices: [
     makePgService({
       // Database connection string:
-      connectionString: process.env.DATABASE_URL ?? "postgres:///pggql_test",
+      connectionString:
+        process.env.DATABASE_URL ?? "postgres:///graphilecrystaltest",
       // List of schemas to expose:
       schemas:
         process.env.DATABASE_SCHEMAS?.split(",") ??
