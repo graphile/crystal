@@ -44,7 +44,7 @@ import * as ws from "ws";
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 
 const pool = new Pool({
-  connectionString: "pggql_test",
+  connectionString: "graphilecrystaltest",
 });
 pool.on("error", (e) => {
   console.log("Client error", e);

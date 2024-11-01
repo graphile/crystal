@@ -540,7 +540,8 @@ const preset: GraphileConfig.Preset = {
   pgServices: [
     makePgService({
       // Database connection string:
-      connectionString: process.env.DATABASE_URL ?? "postgres:///pggql_test",
+      connectionString:
+        process.env.DATABASE_URL ?? "postgres:///graphilecrystaltest",
       // List of schemas to expose:
       schemas:
         process.env.DATABASE_SCHEMAS?.split(",") ??

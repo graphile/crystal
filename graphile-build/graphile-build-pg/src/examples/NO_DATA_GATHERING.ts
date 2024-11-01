@@ -39,7 +39,7 @@ import sql from "pg-sql2";
 import { defaultPreset as graphileBuildPgPreset } from "../index.js";
 
 const pool = new Pool({
-  connectionString: "pggql_test",
+  connectionString: "graphilecrystaltest",
 });
 const withPgClient: WithPgClient = makePgAdaptorWithPgClient(pool);
 
