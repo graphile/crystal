@@ -125,6 +125,7 @@ function matchesConstraint(constraint: Constraint, object: unknown): boolean {
       return (value === constraint.expectedValue) === constraint.pass;
     }
     case "value": {
+      console.log(value, constraint.value);
       return value === constraint.value;
     }
     case "isEmpty": {
