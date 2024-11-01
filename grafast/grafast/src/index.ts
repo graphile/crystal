@@ -785,10 +785,7 @@ declare global {
             GrafastMiddleware[key] extends (
               ...args: infer UArgs
             ) => infer UResult
-              ? (
-                  next: MiddlewareNext<Awaited<UResult>>,
-                  ...args: UArgs
-                ) => UResult
+              ? (next: MiddlewareNext<UResult>, ...args: UArgs) => UResult
               : never
           >;
         };
