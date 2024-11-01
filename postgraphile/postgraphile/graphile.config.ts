@@ -1,6 +1,4 @@
 /* eslint-disable import/no-unresolved */
-import { isPromise } from "node:util/types";
-
 import type { PgSelectSingleStep } from "@dataplan/pg";
 import { TYPES } from "@dataplan/pg";
 import PersistedPlugin from "@grafserv/persisted";
