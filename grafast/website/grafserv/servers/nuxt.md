@@ -19,7 +19,7 @@ export const serv = grafserv({ schema, preset });
 
 ## API routes
 
-### Graphql endpoint
+### GraphQL endpoint
 
 _without websockets_
 
