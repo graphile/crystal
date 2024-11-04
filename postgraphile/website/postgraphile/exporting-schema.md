@@ -82,7 +82,7 @@ export.
 
 :::
 
-:::tip
+:::tip Use eslint-plugin-graphile-export when writing plugins
 
 We **highly recommend** that plugin authors (both for internal project plugins
 and plugins distributed via `npm`) consult the
@@ -90,7 +90,10 @@ and plugins distributed via `npm`) consult the
 full. In particular, you should use the
 [`eslint-plugin-graphile-export`](http://www.npmjs.com/package/eslint-plugin-graphile-export)
 rules to help ensure that the plan resolvers and similar that you add are
-themselves exportable.
+themselves exportable. (This plugin is still experimental so we recommend that
+you only enable this ruleset on the files that contain PostGraphile plugins,
+and that you commit early and often so that any unintended changes to your
+codebase can be reverted.)
 
 :::
 
