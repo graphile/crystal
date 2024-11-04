@@ -85,7 +85,12 @@ export.
 :::tip
 
 We **highly recommend** that plugin authors (both for internal project plugins
-and plugins distributed via `npm`) consult the [graphile-export](https://star.graphile.org/graphile-export/) documentation in full.
+and plugins distributed via `npm`) consult the
+[graphile-export](https://star.graphile.org/graphile-export/) documentation in
+full. In particular, you should use the
+[`eslint-plugin-graphile-export`](http://www.npmjs.com/package/eslint-plugin-graphile-export)
+rules to help ensure that the plan resolvers and similar that you add are
+themselves exportable.
 
 :::
 
