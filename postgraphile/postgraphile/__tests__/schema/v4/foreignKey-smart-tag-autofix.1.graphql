@@ -3650,8 +3650,11 @@ type Query implements Node {
   Reads and enables pagination through a set of `FuncReturnsTableMultiColRecord`.
   """
   funcReturnsTableMultiCol(
+    a: Int
+
     """Read all values in the set after (below) this cursor."""
     after: Cursor
+    b: Int
 
     """Read all values in the set before (above) this cursor."""
     before: Cursor

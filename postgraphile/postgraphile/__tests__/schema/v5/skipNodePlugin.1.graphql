@@ -7303,8 +7303,11 @@ type Query {
   Reads and enables pagination through a set of `CFuncReturnsTableMultiColRecord`.
   """
   cFuncReturnsTableMultiCol(
+    a: Int
+
     """Read all values in the set after (below) this cursor."""
     after: Cursor
+    b: Int
 
     """Only read the first `n` values of the set."""
     first: Int

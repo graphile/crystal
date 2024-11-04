@@ -2858,6 +2858,9 @@ type Query implements Node {
   funcOutUnnamed: Int
   funcOutUnnamedOutOutUnnamed: FuncOutUnnamedOutOutUnnamedRecord
   funcReturnsTableMultiColList(
+    a: Int
+    b: Int
+
     """Only read the first `n` values of the set."""
     first: Int
     i: Int

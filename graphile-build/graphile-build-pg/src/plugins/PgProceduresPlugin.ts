@@ -332,8 +332,11 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
           const isStrict = pgProc.proisstrict ?? false;
           const isStrictish =
             isStrict || info.options.pgStrictFunctions === true;
+          const numberOfInputArguments = pgProc.pronargs ?? 0;
           const numberOfRequiredArguments =
-            numberOfArguments - numberOfArgumentsWithDefaults;
+            numberOfInputArguments - numberOfArgumentsWithDefaults;
+          /** Because only input arguments count against pronargdefaults */
+          let inputIndex = -1;
           for (let i = 0, l = numberOfArguments; i < l; i++) {
             const argType = allArgTypes[i];
             const argName = pgProc.proargnames?.[i] ?? null;
@@ -363,6 +366,8 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
             }
 
             if (argMode === "i" || argMode === "b") {
+              // This is an input argument, not an output argument
+              inputIndex++;
               // Generate a parameter for this argument
               const argCodec = await info.helpers.pgCodecs.getCodecFromType(
                 serviceName,
@@ -380,9 +385,8 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 );
                 return null;
               }
-              const required = i < numberOfRequiredArguments;
-              const notNull =
-                isStrict || (isStrictish && i < numberOfRequiredArguments);
+              const required = inputIndex < numberOfRequiredArguments;
+              const notNull = isStrict || (isStrictish && required);
               /*
               if (!processedFirstInputArg) {
                 processedFirstInputArg = true;
