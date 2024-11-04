@@ -63,4 +63,12 @@ query {
       computed
     }
   }
+  personById(id: 1) {
+    optionalMissingMiddle1(arg0: 1, c: 7) # expect 10 (b defaults to 2)
+    optionalMissingMiddle1_2: optionalMissingMiddle1(arg0: 1, b: 8, c: 7) # expect 16
+    optionalMissingMiddle2(a: 1, c: 7) # expect 10 (b defaults to 2)
+    optionalMissingMiddle3(a: 1, c: 7) # expect 10 because we can specify $1 positionally and $3 via name, and b defaults to 2
+    optionalMissingMiddle4(arg0: 1, arg2: 7) # expect null because we can't specify $3 without specifying $2 (= null)
+    optionalMissingMiddle5(a: 1, arg2: 7) # expect null because we can't specify $3 without specifying $2 (= null)
+  }
 }
