@@ -386,10 +386,7 @@ export const PgProceduresPlugin: GraphileConfig.Plugin = {
                 return null;
               }
               const required = inputIndex < numberOfRequiredArguments;
-
-              const notNull =
-                isStrict ||
-                (isStrictish && inputIndex < numberOfRequiredArguments);
+              const notNull = isStrict || (isStrictish && required);
               /*
               if (!processedFirstInputArg) {
                 processedFirstInputArg = true;
