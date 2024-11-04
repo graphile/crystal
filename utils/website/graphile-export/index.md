@@ -12,9 +12,11 @@ in a way so as to be compatible (see [exportable/importable](./exportable.md))
 and is not specific to GraphQL schemas generated via the Graphile suite of open
 source tools.
 
-The key reason to export your schema as executable code is to move schema build
-processes such as introspection, looping, computation, transformation, and so
-on from startup time to build time. This results in:
+The key reason to export your schema as executable code is to move intensive
+schema build processes such as introspection, looping, computation,
+transformation, and so on from startup time to build time; then at run time you
+just need to run the final code without any of the underlying computations that
+shaped it. This has many benefits:
 
 - Faster startup time (build the schema directly without any computation)
 - Reduced thundering herd in the event of mass server restarts (no need to consult external data sources on startup)
