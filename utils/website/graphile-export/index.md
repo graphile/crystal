@@ -4,24 +4,35 @@ sidebar_position: 1
 
 # Graphile Export
 
-Graphile Export enables you to export a GraphQL Schema (or other code) as
-executable JavaScript code. 
+Graphile Export enables you to export a GraphQL schema (or other code) as
+executable JavaScript code. It is primarily intended to be used with GraphQL
+schemas (or code) that have been automatically generated in memory via some
+kind of framework. It can be used with any GraphQL schema that has been written
+in a way so as to be compatible (see [exportable/importable](./exportable.md))
+and is not specific to GraphQL schemas generated via the Graphile suite of open
+source tools.
 
-The key reason to export your schema is to move schema introspection of postgres
-from runtime to build time. This results in:
+The key reason to export your schema as executable code is to move schema build
+processes such as introspection, looping, computation, transformation, and so
+on from startup time to build time. This results in:
 
-- Faster startup time
-- Reduced thundering herd in the event of mass server restarts
+- Faster startup time (build the schema directly without any computation)
+- Reduced thundering herd in the event of mass server restarts (no need to consult external data sources on startup)
+- Lower CPU/memory usage (code only required to compute the schema does not need to be loaded into memory or executed in production)
+- Fewer runtime dependencies (build systems can be omitted from the bundle)
 - Much faster cold starts for serverless environments such as AWS Lambda
 - And probably more
 
-Previously, in Postgraphile 4, export took the form of encoding the Postgres
-schema to JSON. Postgraphile 5 takes this further and generates runtime code,
-further cutting startup times.
+:::warning Graphile Export is experimental
 
-This feature, however, is in early stages and is to be adopted with care and
-caution. For example, not all Postgraphile plugins are compatible with
-graphile-export. Most notably, this includes your own plugins.
+This feature is in the early stages and is to be adopted with care and caution.
+It is being used in production by a handful of PostGraphile V5 users but has
+yet to be solidly battle-tested. If you're using Graphile Export, please
+file an issue telling us how you're getting on &mdash; good or bad!
 
-Please read this documentation and consult the Discord for questions, help and
-suggestions.
+Please read this documentation and consult [the Graphile
+Discord](https://discord.gg/graphile) for questions, help and suggestions.
+
+:::
+
+Next up, [find out how Graphile Export works](./how-it-works.md)!

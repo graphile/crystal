@@ -10,8 +10,8 @@ external libraries.
 
 Generally speaking there are 2 methods of acheiving this, used in unison:
 
-1. All functions and their scope dependencies must be made exportable by
-   wrapping in an `EXPORTABLE()` call, or be made importable via the special
+1. All non-pure functions and their scope dependencies must be made exportable
+   by wrapping in an `EXPORTABLE()` call, or be made importable via the special
    `$$export` property
 2. If a dependency cannot be made exportable/importable then instead of
    depending on it via the JavaScript scope, it should be passed at runtime via
@@ -19,6 +19,16 @@ Generally speaking there are 2 methods of acheiving this, used in unison:
    resolver, or via the
    [context()](https://grafast.org/grafast/step-library/standard-steps/context)
    step in Gra*fast*)
+
+:::info Pure functions
+
+A pure function is a function that, given the same inputs, always produces the
+same output and has no side effects. This means it doesn't modify any external
+state or depend on variables outside its local scope. Pure functions are
+deterministic and isolated from their surrounding context, making them ideal
+for exportable functions as they don’t rely on external dependencies.
+
+:::
 
 ## Making a value EXPORTABLE
 
@@ -329,3 +339,7 @@ Alternatively, explicitly change the `moduleResolution` setting to `Node16` or `
   }
 }
 ```
+
+---
+
+Wrapping `EXPORTABLE(() => ...)` around our functions isn't too hard, but scanning through them to spot all the external dependencies can be time consuming and error prone. Let's find out how we can [use the Graphile Export ESLint plugin to autofix our EXPORTABLEs](./eslint.md).
