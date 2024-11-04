@@ -52,7 +52,7 @@ Most commonly this is a table, but it also includes views, materialized views
 and functions. You can even build resources for custom SQL expressions should
 you wish.
 
-PostGraphile automatically build resources for you based on all your tables,
+PostGraphile automatically builds resources for you based on all your tables,
 views, materialized views and functions.
 
 There are two main classes of resources. "Table-like" resources don't accept
