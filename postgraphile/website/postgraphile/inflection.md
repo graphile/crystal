@@ -65,7 +65,7 @@ export default {
       },
     }
   }
-);
+};
 ```
 
 In this example, `previous` is the previous inflector (in case you only want to
