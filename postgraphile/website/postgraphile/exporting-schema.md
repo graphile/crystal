@@ -45,7 +45,7 @@ executable schema. You'll notice that this schema does not import
 graphile-build, graphile-build-pg, etc - it just imports what it needs from
 `graphql`, `grafast` and similar runtime modules.
 
-:::warning
+:::warning For a schema to be exported, all plugins must support exporting
 
 Not all PostGraphile plugins support exporting the schema, if you use plugins
 that don't support exporting then your exported schema is likely to have
@@ -54,7 +54,7 @@ your exported schema before relying on it.
 
 :::
 
-:::warning
+:::warning Test your exported schema thoroughly
 
 Exporting a GraphQL schema is error-prone, so you should test your exported
 schema thoroughly. The main failure mode for exported schemas is runtime errors
@@ -66,9 +66,12 @@ but you should be careful to ensure that every function that will be exported
 is either wrapped with `EXPORTABLE` (with the correct args) or is from a
 declared module - see the `graphile-export` documentation.
 
+TODO: update this warning, since this is less of an issue now that
+graphile-export does its own internal consistency checks.
+
 :::
 
-:::tip
+:::tip Use your exported schema in dev and CI too
 
 If you will be exporting your GraphQL schema we **highly recommend** that you
 adopt the exported schema into every facet of your development lifecycle: you
@@ -79,15 +82,18 @@ export.
 
 :::
 
-:::tip
+:::tip Use eslint-plugin-graphile-export when writing plugins
 
 We **highly recommend** that plugin authors (both for internal project plugins
-and plugins distributed via `npm`) use the
-[eslint-plugin-graphile-export](http://www.npmjs.com/package/eslint-plugin-graphile-export)
-ESLint plugin to ensure that your methods are correctly exported. This plugin
-is still experimental so limit it to only running against your plugin code, but
-it really helps to catch a variety of issues that may prevent your schema from
-being exported correctly.
+and plugins distributed via `npm`) consult the
+[graphile-export](https://star.graphile.org/graphile-export/) documentation in
+full. In particular, you should use the
+[`eslint-plugin-graphile-export`](http://www.npmjs.com/package/eslint-plugin-graphile-export)
+rules to help ensure that the plan resolvers and similar that you add are
+themselves exportable. (This plugin is still experimental so we recommend that
+you only enable this ruleset on the files that contain PostGraphile plugins,
+and that you commit early and often so that any unintended changes to your
+codebase can be reverted.)
 
 :::
 
