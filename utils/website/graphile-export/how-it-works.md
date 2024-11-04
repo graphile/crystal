@@ -63,7 +63,7 @@ code out, and now it can see the value of that "invisible" `a=7`:
 [ 7 ]
 ```
 
-Thus everything that can have these kinds of hidden properties must be wrapped
+Thus everything that can reference values from a parent scope must be wrapped
 in an `EXPORTABLE` call. Sometimes the inputs to the `EXPORTABLE` call
 themselves also have to be wrapped in an `EXPORTABLE` call. You'll figure out
 which things need wrapping by looking at the exported code and seeing where

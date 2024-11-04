@@ -11,8 +11,8 @@ The key reason to export your schema is to move schema introspection of postgres
 from runtime to build time. This results in:
 
 - Faster startup time
-- Reduced thundering herd on the database in the event of an outage
-- Much faster cold starts for Lambda
+- Reduced thundering herd in the event of mass server restarts
+- Much faster cold starts for serverless environments such as AWS Lambda
 - And probably more
 
 Previously, in Postgraphile 4, export took the form of encoding the Postgres
