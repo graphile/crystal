@@ -2980,6 +2980,11 @@ type Person implements Node {
 
   """The person’s name"""
   name: String!
+  optionalMissingMiddle1(arg0: Int!, b: Int, c: Int): Int
+  optionalMissingMiddle2(a: Int!, b: Int, c: Int): Int
+  optionalMissingMiddle3(a: Int!, arg1: Int, c: Int): Int
+  optionalMissingMiddle4(arg0: Int!, arg2: Int, b: Int): Int
+  optionalMissingMiddle5(a: Int!, arg1: Int, arg2: Int): Int
 
   """This `Person`'s `PersonSecret`."""
   personSecretByPersonId: PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")

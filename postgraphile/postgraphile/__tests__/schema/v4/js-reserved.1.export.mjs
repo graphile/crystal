@@ -9136,18 +9136,28 @@ export const plans = {
         }, ...extraSelectArgs];
         if (resource_null_yieldPgResource.isUnique && !resource_null_yieldPgResource.codec.attributes && typeof resource_null_yieldPgResource.from === "function") {
           // This is a scalar computed attribute, let's inline the expression
-          const placeholders = selectArgs.map((arg, i) => {
+          const newSelectArgs = selectArgs.map((arg, i) => {
+            const {
+              name
+            } = arg;
             if (i === 0) {
-              return $row.getClassStep().alias;
+              return {
+                name,
+                placeholder: $row.getClassStep().alias
+              };
             } else if ("pgCodec" in arg && arg.pgCodec) {
-              return $row.placeholder(arg.step, arg.pgCodec);
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step, arg.pgCodec)
+              };
             } else {
-              return $row.placeholder(arg.step);
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step)
+              };
             }
           });
-          return pgClassExpression($row, resource_null_yieldPgResource.codec)`${resource_null_yieldPgResource.from(...placeholders.map(placeholder => ({
-            placeholder
-          })))}`;
+          return pgClassExpression($row, resource_null_yieldPgResource.codec)`${resource_null_yieldPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_null_yieldPgResource.execute(selectArgs);

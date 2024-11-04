@@ -3776,6 +3776,11 @@ const person_computed_inoutFunctionIdentifer = sql.identifier("c", "person_compu
 const person_computed_inout_outFunctionIdentifer = sql.identifier("c", "person_computed_inout_out");
 const person_existsFunctionIdentifer = sql.identifier("c", "person_exists");
 const person_computed_first_arg_inout_outFunctionIdentifer = sql.identifier("c", "person_computed_first_arg_inout_out");
+const person_optional_missing_middle_1FunctionIdentifer = sql.identifier("c", "person_optional_missing_middle_1");
+const person_optional_missing_middle_2FunctionIdentifer = sql.identifier("c", "person_optional_missing_middle_2");
+const person_optional_missing_middle_3FunctionIdentifer = sql.identifier("c", "person_optional_missing_middle_3");
+const person_optional_missing_middle_4FunctionIdentifer = sql.identifier("c", "person_optional_missing_middle_4");
+const person_optional_missing_middle_5FunctionIdentifer = sql.identifier("c", "person_optional_missing_middle_5");
 const func_out_complexFunctionIdentifer = sql.identifier("c", "func_out_complex");
 const func_out_complex_setofFunctionIdentifer = sql.identifier("c", "func_out_complex_setof");
 const mutation_out_complexFunctionIdentifer = sql.identifier("c", "mutation_out_complex");
@@ -7923,6 +7928,221 @@ const registry = makeRegistry({
           serviceName: "main",
           schemaName: "c",
           name: "person_computed_first_arg_inout_out"
+        },
+        tags: {},
+        canExecute: false
+      },
+      description: undefined
+    },
+    person_optional_missing_middle_1: {
+      executor,
+      name: "person_optional_missing_middle_1",
+      identifier: "main.c.person_optional_missing_middle_1(c.person,int4,int4,int4)",
+      from(...args) {
+        return sql`${person_optional_missing_middle_1FunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "p",
+        required: true,
+        notNull: true,
+        codec: personCodec
+      }, {
+        name: "",
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "b",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "c",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "person_optional_missing_middle_1"
+        },
+        tags: {},
+        canExecute: false
+      },
+      description: undefined
+    },
+    person_optional_missing_middle_2: {
+      executor,
+      name: "person_optional_missing_middle_2",
+      identifier: "main.c.person_optional_missing_middle_2(c.person,int4,int4,int4)",
+      from(...args) {
+        return sql`${person_optional_missing_middle_2FunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "p",
+        required: true,
+        notNull: true,
+        codec: personCodec
+      }, {
+        name: "a",
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "b",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "c",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "person_optional_missing_middle_2"
+        },
+        tags: {},
+        canExecute: false
+      },
+      description: undefined
+    },
+    person_optional_missing_middle_3: {
+      executor,
+      name: "person_optional_missing_middle_3",
+      identifier: "main.c.person_optional_missing_middle_3(c.person,int4,int4,int4)",
+      from(...args) {
+        return sql`${person_optional_missing_middle_3FunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "p",
+        required: true,
+        notNull: true,
+        codec: personCodec
+      }, {
+        name: "a",
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "c",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "person_optional_missing_middle_3"
+        },
+        tags: {},
+        canExecute: false
+      },
+      description: undefined
+    },
+    person_optional_missing_middle_4: {
+      executor,
+      name: "person_optional_missing_middle_4",
+      identifier: "main.c.person_optional_missing_middle_4(c.person,int4,int4,int4)",
+      from(...args) {
+        return sql`${person_optional_missing_middle_4FunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "p",
+        required: true,
+        notNull: true,
+        codec: personCodec
+      }, {
+        name: "",
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "b",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "person_optional_missing_middle_4"
+        },
+        tags: {},
+        canExecute: false
+      },
+      description: undefined
+    },
+    person_optional_missing_middle_5: {
+      executor,
+      name: "person_optional_missing_middle_5",
+      identifier: "main.c.person_optional_missing_middle_5(c.person,int4,int4,int4)",
+      from(...args) {
+        return sql`${person_optional_missing_middle_5FunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "p",
+        required: true,
+        notNull: true,
+        codec: personCodec
+      }, {
+        name: "a",
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "person_optional_missing_middle_5"
         },
         tags: {},
         canExecute: false
