@@ -55,17 +55,17 @@ example might look like:
 
 ```js
 export default {
-  name: 'ReplacePatchTypeInflectorPlugin',
-  version: '0.0.0',
+  name: "ReplacePatchTypeInflectorPlugin",
+  version: "0.0.0",
 
   inflection: {
     replace: {
       patchType(previous, resolvedPreset, typeName) {
         return this.upperCamelCase(`${typeName}-change-set`);
       },
-    }
-  }
-);
+    },
+  },
+};
 ```
 
 In this example, `previous` is the previous inflector (in case you only want to

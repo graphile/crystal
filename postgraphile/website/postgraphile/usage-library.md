@@ -18,7 +18,7 @@ methods you can use depending on what you're trying to do.
 
 ```js title="pgl.js"
 import preset from "./graphile.config.js";
-import postgraphile from "postgraphile";
+import { postgraphile } from "postgraphile";
 
 // Our PostGraphile instance:
 export const pgl = postgraphile(preset);
