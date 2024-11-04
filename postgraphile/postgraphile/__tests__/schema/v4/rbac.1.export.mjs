@@ -5866,12 +5866,12 @@ const registry = makeRegistry({
         codec: TYPES.int
       }, {
         name: "a",
-        required: true,
+        required: false,
         notNull: false,
         codec: TYPES.int
       }, {
         name: "b",
-        required: true,
+        required: false,
         notNull: false,
         codec: TYPES.int
       }],

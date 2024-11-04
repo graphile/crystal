@@ -3520,12 +3520,12 @@ const registry = makeRegistry({
         codec: TYPES.int
       }, {
         name: "a",
-        required: true,
+        required: false,
         notNull: false,
         codec: TYPES.int
       }, {
         name: "b",
-        required: true,
+        required: false,
         notNull: false,
         codec: TYPES.int
       }],
@@ -6114,13 +6114,13 @@ const argDetailsSimple16 = [{
   graphqlArgName: "a",
   postgresArgName: "a",
   pgCodec: TYPES.int,
-  required: true,
+  required: false,
   fetcher: null
 }, {
   graphqlArgName: "b",
   postgresArgName: "b",
   pgCodec: TYPES.int,
-  required: true,
+  required: false,
   fetcher: null
 }];
 const makeArgs16 = (args, path = []) => {

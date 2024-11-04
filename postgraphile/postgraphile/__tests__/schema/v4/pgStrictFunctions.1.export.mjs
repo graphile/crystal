@@ -5520,13 +5520,13 @@ const registry = makeRegistry({
         codec: TYPES.int
       }, {
         name: "a",
-        required: true,
-        notNull: true,
+        required: false,
+        notNull: false,
         codec: TYPES.int
       }, {
         name: "b",
-        required: true,
-        notNull: true,
+        required: false,
+        notNull: false,
         codec: TYPES.int
       }],
       isUnique: !true,
@@ -10410,13 +10410,13 @@ const argDetailsSimple28 = [{
   graphqlArgName: "a",
   postgresArgName: "a",
   pgCodec: TYPES.int,
-  required: true,
+  required: false,
   fetcher: null
 }, {
   graphqlArgName: "b",
   postgresArgName: "b",
   pgCodec: TYPES.int,
-  required: true,
+  required: false,
   fetcher: null
 }];
 const makeArgs28 = (args, path = []) => {
@@ -16887,8 +16887,8 @@ type Query implements Node {
   """
   funcReturnsTableMultiCol(
     i: Int!
-    a: Int!
-    b: Int!
+    a: Int
+    b: Int
 
     """Only read the first \`n\` values of the set."""
     first: Int
