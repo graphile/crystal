@@ -54,8 +54,8 @@ type Add2MutationPayload {
 
 """All input for the `add3Mutation` mutation."""
 input Add3MutationInput {
-  a: Int
-  arg1: Int
+  a: Int!
+  arg1: Int!
 
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -81,7 +81,7 @@ type Add3MutationPayload {
 
 """All input for the `add4MutationError` mutation."""
 input Add4MutationErrorInput {
-  arg0: Int
+  arg0: Int!
   b: Int
 
   """
@@ -108,7 +108,7 @@ type Add4MutationErrorPayload {
 
 """All input for the `add4Mutation` mutation."""
 input Add4MutationInput {
-  arg0: Int
+  arg0: Int!
   b: Int
 
   """
@@ -233,9 +233,9 @@ type AuthenticateFailPayload {
 
 """All input for the `authenticate` mutation."""
 input AuthenticateInput {
-  a: Int
-  b: BigFloat
-  c: BigInt
+  a: Int!
+  b: BigFloat!
+  c: BigInt!
 
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -246,9 +246,9 @@ input AuthenticateInput {
 
 """All input for the `authenticateMany` mutation."""
 input AuthenticateManyInput {
-  a: Int
-  b: BigFloat
-  c: BigInt
+  a: Int!
+  b: BigFloat!
+  c: BigInt!
 
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -289,9 +289,9 @@ type AuthenticatePayload {
 
 """All input for the `authenticatePayload` mutation."""
 input AuthenticatePayloadInput {
-  a: Int
-  b: BigFloat
-  c: BigInt
+  a: Int!
+  b: BigFloat!
+  c: BigInt!
 
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -522,7 +522,7 @@ input CompoundTypeArrayMutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  object: CompoundTypeInput
+  object: CompoundTypeInput!
 }
 
 """The output of our `compoundTypeArrayMutation` mutation."""
@@ -559,7 +559,7 @@ input CompoundTypeMutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  object: CompoundTypeInput
+  object: CompoundTypeInput!
 }
 
 """The output of our `compoundTypeMutation` mutation."""
@@ -584,7 +584,7 @@ input CompoundTypeSetMutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  object: CompoundTypeInput
+  object: CompoundTypeInput!
 }
 
 """The output of our `compoundTypeSetMutation` mutation."""
@@ -2864,7 +2864,7 @@ input GuidFnInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  g: Guid
+  g: Guid!
 }
 
 """The output of our `guidFn` mutation."""
@@ -2954,9 +2954,9 @@ input IntSetMutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  x: Int
-  y: Int
-  z: Int
+  x: Int!
+  y: Int!
+  z: Int!
 }
 
 """The output of our `intSetMutation` mutation."""
@@ -3196,7 +3196,7 @@ input JsonIdentityMutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  json: JSON
+  json: JSON!
 }
 
 """The output of our `jsonIdentityMutation` mutation."""
@@ -3221,7 +3221,7 @@ input JsonbIdentityMutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  json: JSON
+  json: JSON!
 }
 
 """The output of our `jsonbIdentityMutation` mutation."""
@@ -3357,7 +3357,7 @@ input LeftArmIdentityInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  leftArm: LeftArmBaseInput
+  leftArm: LeftArmBaseInput!
 }
 
 """The output of our `leftArmIdentity` mutation."""
@@ -3445,15 +3445,15 @@ enum LeftArmsOrderBy {
 
 """All input for the `listBdeMutation` mutation."""
 input ListBdeMutationInput {
-  b: [String]
+  b: [String]!
 
   """
   An arbitrary string value with no semantic meaning. Will be included in the
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  d: String
-  e: String
+  d: String!
+  e: String!
 }
 
 """The output of our `listBdeMutation` mutation."""
@@ -3473,8 +3473,8 @@ type ListBdeMutationPayload {
 
 """All input for the `mult1` mutation."""
 input Mult1Input {
-  arg0: Int
-  arg1: Int
+  arg0: Int!
+  arg1: Int!
 
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -3500,8 +3500,8 @@ type Mult1Payload {
 
 """All input for the `mult2` mutation."""
 input Mult2Input {
-  arg0: Int
-  arg1: Int
+  arg0: Int!
+  arg1: Int!
 
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -4759,7 +4759,7 @@ input MutationCompoundTypeArrayInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  object: CompoundTypeInput
+  object: CompoundTypeInput!
 }
 
 """The output of our `mutationCompoundTypeArray` mutation."""
@@ -4784,8 +4784,8 @@ input MutationInInoutInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  i: Int
-  ino: Int
+  i: Int!
+  ino: Int!
 }
 
 """The output of our `mutationInInout` mutation."""
@@ -4810,7 +4810,7 @@ input MutationInOutInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  i: Int
+  i: Int!
 }
 
 """The output of our `mutationInOut` mutation."""
@@ -4878,8 +4878,8 @@ type MutationIntervalSetPayload {
 
 """All input for the `mutationOutComplex` mutation."""
 input MutationOutComplexInput {
-  a: Int
-  b: String
+  a: Int!
+  b: String!
 
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -4911,8 +4911,8 @@ type MutationOutComplexRecord {
 
 """All input for the `mutationOutComplexSetof` mutation."""
 input MutationOutComplexSetofInput {
-  a: Int
-  b: String
+  a: Int!
+  b: String!
 
   """
   An arbitrary string value with no semantic meaning. Will be included in the
@@ -4958,7 +4958,7 @@ input MutationOutOutCompoundTypeInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  i1: Int
+  i1: Int!
 }
 
 """The output of our `mutationOutOutCompoundType` mutation."""
@@ -5222,7 +5222,7 @@ input MutationReturnsTableMultiColInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  i: Int
+  i: Int!
 }
 
 """The output of our `mutationReturnsTableMultiCol` mutation."""
@@ -5252,7 +5252,7 @@ input MutationReturnsTableOneColInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  i: Int
+  i: Int!
 }
 
 """The output of our `mutationReturnsTableOneCol` mutation."""
@@ -5817,17 +5817,17 @@ type Person implements Node {
     """The method to use when ordering `CompoundKey`."""
     orderBy: [CompoundKeysOrderBy!] = [PRIMARY_KEY_ASC]
   ): CompoundKeysConnection!
-  computedComplex(a: Int, b: String): PersonComputedComplexRecord
+  computedComplex(a: Int!, b: String!): PersonComputedComplexRecord
   computedFirstArgInout: Person
   computedFirstArgInoutOut: PersonComputedFirstArgInoutOutRecord
-  computedInout(ino: String): String
-  computedInoutOut(ino: String): PersonComputedInoutOutRecord
+  computedInout(ino: String!): String
+  computedInoutOut(ino: String!): PersonComputedInoutOutRecord
   computedOut: String!
   computedOutOut: PersonComputedOutOutRecord
   config: KeyValueHash
   createdAt: Datetime
   email: Email!
-  exists(email: Email): Boolean @deprecated(reason: "This is deprecated (comment on function c.person_exists).")
+  exists(email: Email!): Boolean @deprecated(reason: "This is deprecated (comment on function c.person_exists).")
 
   """The first name of the person."""
   firstName: String
@@ -5941,7 +5941,7 @@ type Person implements Node {
     orderBy: [PostsOrderBy!] = [PRIMARY_KEY_ASC]
   ): PostsConnection!
   site: WrappedUrl @deprecated(reason: "Don’t use me")
-  typeFunction(id: Int): Type
+  typeFunction(id: Int!): Type
 
   """Reads and enables pagination through a set of `Type`."""
   typeFunctionConnection(
@@ -6167,7 +6167,7 @@ type Post implements Node {
   authorId: Int
   body: String
   comptypes: [Comptype]
-  computedCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
+  computedCompoundTypeArray(object: CompoundTypeInput!): [CompoundType]
   computedIntervalArray: [Interval]
 
   """Reads and enables pagination through a set of `Interval`."""
@@ -6196,7 +6196,7 @@ type Post implements Node {
   enums: [AnEnum]
   headline: String!
   headlineTrimmed(length: Int, omission: String): String
-  headlineTrimmedNoDefaults(length: Int, omission: String): String
+  headlineTrimmedNoDefaults(length: Int!, omission: String!): String
   headlineTrimmedStrict(length: Int, omission: String): String
   id: Int!
 
@@ -6310,7 +6310,7 @@ input PostManyInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  posts: [PostInput]
+  posts: [PostInput]!
 }
 
 """The output of our `postMany` mutation."""
@@ -6345,8 +6345,8 @@ input PostWithSuffixInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  post: PostInput
-  suffix: String
+  post: PostInput!
+  suffix: String!
 }
 
 """The output of our `postWithSuffix` mutation."""
@@ -6425,10 +6425,10 @@ type Query implements Node {
   add2Query(a: Int!, b: Int): Int
 
   """lol, add some stuff 3 query"""
-  add3Query(a: Int, arg1: Int): Int
+  add3Query(a: Int!, arg1: Int!): Int
 
   """lol, add some stuff 4 query"""
-  add4Query(arg0: Int, b: Int): Int
+  add4Query(arg0: Int!, b: Int): Int
 
   """Reads and enables pagination through a set of `CompoundKey`."""
   allCompoundKeys(
@@ -7157,8 +7157,8 @@ type Query implements Node {
 
   """Get a single `CompoundKey`."""
   compoundKeyByPersonId1AndPersonId2(personId1: Int!, personId2: Int!): CompoundKey
-  compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
-  compoundTypeQuery(object: CompoundTypeInput): CompoundType
+  compoundTypeArrayQuery(object: CompoundTypeInput!): [CompoundType]
+  compoundTypeQuery(object: CompoundTypeInput!): CompoundType
 
   """Reads and enables pagination through a set of `CompoundType`."""
   compoundTypeSetQuery(
@@ -7192,20 +7192,20 @@ type Query implements Node {
 
   """Get a single `DefaultValue`."""
   defaultValueById(id: Int!): DefaultValue
-  funcInInout(i: Int, ino: Int): Int
-  funcInOut(i: Int): Int
+  funcInInout(i: Int!, ino: Int!): Int
+  funcInOut(i: Int!): Int
   funcOut: Int
-  funcOutComplex(a: Int, b: String): FuncOutComplexRecord
+  funcOutComplex(a: Int!, b: String!): FuncOutComplexRecord
 
   """
   Reads and enables pagination through a set of `FuncOutComplexSetofRecord`.
   """
   funcOutComplexSetof(
-    a: Int
+    a: Int!
 
     """Read all values in the set after (below) this cursor."""
     after: Cursor
-    b: String
+    b: String!
 
     """Read all values in the set before (above) this cursor."""
     before: Cursor
@@ -7223,7 +7223,7 @@ type Query implements Node {
     offset: Int
   ): FuncOutComplexSetofConnection
   funcOutOut: FuncOutOutRecord
-  funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
+  funcOutOutCompoundType(i1: Int!): FuncOutOutCompoundTypeRecord
 
   """Reads and enables pagination through a set of `FuncOutOutSetofRecord`."""
   funcOutOutSetof(
@@ -7307,7 +7307,7 @@ type Query implements Node {
 
     """Only read the first `n` values of the set."""
     first: Int
-    i: Int
+    i: Int!
 
     """Only read the last `n` values of the set."""
     last: Int
@@ -7329,7 +7329,7 @@ type Query implements Node {
 
     """Only read the first `n` values of the set."""
     first: Int
-    i: Int
+    i: Int!
 
     """Only read the last `n` values of the set."""
     last: Int
@@ -7369,9 +7369,9 @@ type Query implements Node {
     based pagination. May not be used with `last`.
     """
     offset: Int
-    x: Int
-    y: Int
-    z: Int
+    x: Int!
+    y: Int!
+    z: Int!
   ): IntSetQueryConnection
 
   """Reads a single `Issue756` using its globally unique `ID`."""
@@ -7382,8 +7382,8 @@ type Query implements Node {
 
   """Get a single `Issue756`."""
   issue756ById(id: Int!): Issue756
-  jsonIdentity(json: JSON): JSON
-  jsonbIdentity(json: JSON): JSON
+  jsonIdentity(json: JSON!): JSON
+  jsonbIdentity(json: JSON!): JSON
 
   """Reads a single `LeftArm` using its globally unique `ID`."""
   leftArm(
@@ -7483,7 +7483,7 @@ type Query implements Node {
   which can only query top level fields if they are in a particular form.
   """
   query: Query!
-  queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
+  queryCompoundTypeArray(object: CompoundTypeInput!): [CompoundType]
   queryIntervalArray: [Interval]
 
   """Reads and enables pagination through a set of `Interval`."""
@@ -7506,7 +7506,7 @@ type Query implements Node {
     """
     offset: Int
   ): QueryIntervalSetConnection
-  queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
+  queryOutputTwoRows(leftArmId: Int!, postId: Int!, txt: String!): QueryOutputTwoRowsRecord
   queryTextArray: [String]
 
   """Reads a single `Reserved` using its globally unique `ID`."""
@@ -7590,7 +7590,7 @@ type Query implements Node {
     """
     offset: Int
   ): StaticBigIntegerConnection
-  tableQuery(id: Int): Post
+  tableQuery(id: Int!): Post
 
   """Reads and enables pagination through a set of `Person`."""
   tableSetQuery(
@@ -7650,7 +7650,7 @@ type Query implements Node {
 
   """Get a single `Type`."""
   typeById(id: Int!): Type
-  typeFunction(id: Int): Type
+  typeFunction(id: Int!): Type
 
   """Reads and enables pagination through a set of `Type`."""
   typeFunctionConnection(
@@ -8188,7 +8188,7 @@ input TableMutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  id: Int
+  id: Int!
 }
 
 """The output of our `tableMutation` mutation."""
@@ -8575,7 +8575,7 @@ input TypeFunctionMutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  id: Int
+  id: Int!
 }
 
 """The output of our `typeFunctionMutation` mutation."""

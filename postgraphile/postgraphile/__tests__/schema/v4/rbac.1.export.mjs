@@ -323,36 +323,6 @@ const registryConfig_pgCodecs_FuncOutUnnamedOutOutUnnamedRecord_FuncOutUnnamedOu
   executor,
   isAnonymous: true
 });
-const registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord = recordCodec({
-  name: "FuncReturnsTableMultiColRecord",
-  identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
-  attributes: Object.assign(Object.create(null), {
-    col1: {
-      notNull: false,
-      codec: TYPES.int,
-      extensions: {
-        argIndex: 1,
-        argName: "col1"
-      }
-    },
-    col2: {
-      notNull: false,
-      codec: TYPES.text,
-      extensions: {
-        argIndex: 2,
-        argName: "col2"
-      }
-    }
-  }),
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
-  },
-  executor,
-  isAnonymous: true
-});
 const registryConfig_pgCodecs_MutationOutUnnamedOutOutUnnamedRecord_MutationOutUnnamedOutOutUnnamedRecord = recordCodec({
   name: "MutationOutUnnamedOutOutUnnamedRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
@@ -408,6 +378,36 @@ const registryConfig_pgCodecs_MutationReturnsTableMultiColRecord_MutationReturns
       codec: TYPES.text,
       extensions: {
         argIndex: 2,
+        argName: "col2"
+      }
+    }
+  }),
+  description: undefined,
+  extensions: {
+    /* `The return type of our \`${name}\` ${
+      pgProc.provolatile === "v" ? "mutation" : "query"
+    }.`, */
+  },
+  executor,
+  isAnonymous: true
+});
+const registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord = recordCodec({
+  name: "FuncReturnsTableMultiColRecord",
+  identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
+  attributes: Object.assign(Object.create(null), {
+    col1: {
+      notNull: false,
+      codec: TYPES.int,
+      extensions: {
+        argIndex: 3,
+        argName: "col1"
+      }
+    },
+    col2: {
+      notNull: false,
+      codec: TYPES.text,
+      extensions: {
+        argIndex: 4,
         argName: "col2"
       }
     }
@@ -3439,11 +3439,11 @@ const optional_missing_middle_3FunctionIdentifer = sql.identifier("a", "optional
 const optional_missing_middle_4FunctionIdentifer = sql.identifier("a", "optional_missing_middle_4");
 const optional_missing_middle_5FunctionIdentifer = sql.identifier("a", "optional_missing_middle_5");
 const func_out_unnamed_out_out_unnamedFunctionIdentifer = sql.identifier("c", "func_out_unnamed_out_out_unnamed");
-const func_returns_table_multi_colFunctionIdentifer = sql.identifier("c", "func_returns_table_multi_col");
 const int_set_mutationFunctionIdentifer = sql.identifier("c", "int_set_mutation");
 const int_set_queryFunctionIdentifer = sql.identifier("c", "int_set_query");
 const mutation_out_unnamed_out_out_unnamedFunctionIdentifer = sql.identifier("c", "mutation_out_unnamed_out_out_unnamed");
 const mutation_returns_table_multi_colFunctionIdentifer = sql.identifier("c", "mutation_returns_table_multi_col");
+const func_returns_table_multi_colFunctionIdentifer = sql.identifier("c", "func_returns_table_multi_col");
 const guid_fnFunctionIdentifer = sql.identifier("b", "guid_fn");
 const mutation_interval_arrayFunctionIdentifer = sql.identifier("a", "mutation_interval_array");
 const query_interval_arrayFunctionIdentifer = sql.identifier("a", "query_interval_array");
@@ -3776,6 +3776,11 @@ const person_computed_inoutFunctionIdentifer = sql.identifier("c", "person_compu
 const person_computed_inout_outFunctionIdentifer = sql.identifier("c", "person_computed_inout_out");
 const person_existsFunctionIdentifer = sql.identifier("c", "person_exists");
 const person_computed_first_arg_inout_outFunctionIdentifer = sql.identifier("c", "person_computed_first_arg_inout_out");
+const person_optional_missing_middle_1FunctionIdentifer = sql.identifier("c", "person_optional_missing_middle_1");
+const person_optional_missing_middle_2FunctionIdentifer = sql.identifier("c", "person_optional_missing_middle_2");
+const person_optional_missing_middle_3FunctionIdentifer = sql.identifier("c", "person_optional_missing_middle_3");
+const person_optional_missing_middle_4FunctionIdentifer = sql.identifier("c", "person_optional_missing_middle_4");
+const person_optional_missing_middle_5FunctionIdentifer = sql.identifier("c", "person_optional_missing_middle_5");
 const func_out_complexFunctionIdentifer = sql.identifier("c", "func_out_complex");
 const func_out_complex_setofFunctionIdentifer = sql.identifier("c", "func_out_complex_setof");
 const mutation_out_complexFunctionIdentifer = sql.identifier("c", "mutation_out_complex");
@@ -3897,9 +3902,9 @@ const registry = makeRegistry({
     MutationOutOutUnnamedRecord: registryConfig_pgCodecs_MutationOutOutUnnamedRecord_MutationOutOutUnnamedRecord,
     SearchTestSummariesRecord: registryConfig_pgCodecs_SearchTestSummariesRecord_SearchTestSummariesRecord,
     FuncOutUnnamedOutOutUnnamedRecord: registryConfig_pgCodecs_FuncOutUnnamedOutOutUnnamedRecord_FuncOutUnnamedOutOutUnnamedRecord,
-    FuncReturnsTableMultiColRecord: registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord,
     MutationOutUnnamedOutOutUnnamedRecord: registryConfig_pgCodecs_MutationOutUnnamedOutOutUnnamedRecord_MutationOutUnnamedOutOutUnnamedRecord,
     MutationReturnsTableMultiColRecord: registryConfig_pgCodecs_MutationReturnsTableMultiColRecord_MutationReturnsTableMultiColRecord,
+    FuncReturnsTableMultiColRecord: registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord,
     guid: guidCodec,
     varchar: TYPES.varchar,
     intervalArray: intervalArrayCodec,
@@ -5720,34 +5725,6 @@ const registry = makeRegistry({
       },
       description: undefined
     },
-    func_returns_table_multi_col: {
-      executor,
-      name: "func_returns_table_multi_col",
-      identifier: "main.c.func_returns_table_multi_col(int4,int4,text)",
-      from(...args) {
-        return sql`${func_returns_table_multi_colFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "i",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
-      }],
-      isUnique: !true,
-      codec: registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord,
-      uniques: [],
-      isMutation: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "func_returns_table_multi_col"
-        },
-        tags: {},
-        canExecute: false
-      },
-      description: undefined
-    },
     int_set_mutation: {
       executor,
       name: "int_set_mutation",
@@ -5869,6 +5846,44 @@ const registry = makeRegistry({
           serviceName: "main",
           schemaName: "c",
           name: "mutation_returns_table_multi_col"
+        },
+        tags: {},
+        canExecute: false
+      },
+      description: undefined
+    },
+    func_returns_table_multi_col: {
+      executor,
+      name: "func_returns_table_multi_col",
+      identifier: "main.c.func_returns_table_multi_col(int4,int4,int4,int4,text)",
+      from(...args) {
+        return sql`${func_returns_table_multi_colFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "i",
+        required: true,
+        notNull: false,
+        codec: TYPES.int
+      }, {
+        name: "a",
+        required: false,
+        notNull: false,
+        codec: TYPES.int
+      }, {
+        name: "b",
+        required: false,
+        notNull: false,
+        codec: TYPES.int
+      }],
+      isUnique: !true,
+      codec: registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "func_returns_table_multi_col"
         },
         tags: {},
         canExecute: false
@@ -7923,6 +7938,221 @@ const registry = makeRegistry({
           serviceName: "main",
           schemaName: "c",
           name: "person_computed_first_arg_inout_out"
+        },
+        tags: {},
+        canExecute: false
+      },
+      description: undefined
+    },
+    person_optional_missing_middle_1: {
+      executor,
+      name: "person_optional_missing_middle_1",
+      identifier: "main.c.person_optional_missing_middle_1(c.person,int4,int4,int4)",
+      from(...args) {
+        return sql`${person_optional_missing_middle_1FunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "p",
+        required: true,
+        notNull: true,
+        codec: personCodec
+      }, {
+        name: "",
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "b",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "c",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "person_optional_missing_middle_1"
+        },
+        tags: {},
+        canExecute: false
+      },
+      description: undefined
+    },
+    person_optional_missing_middle_2: {
+      executor,
+      name: "person_optional_missing_middle_2",
+      identifier: "main.c.person_optional_missing_middle_2(c.person,int4,int4,int4)",
+      from(...args) {
+        return sql`${person_optional_missing_middle_2FunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "p",
+        required: true,
+        notNull: true,
+        codec: personCodec
+      }, {
+        name: "a",
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "b",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "c",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "person_optional_missing_middle_2"
+        },
+        tags: {},
+        canExecute: false
+      },
+      description: undefined
+    },
+    person_optional_missing_middle_3: {
+      executor,
+      name: "person_optional_missing_middle_3",
+      identifier: "main.c.person_optional_missing_middle_3(c.person,int4,int4,int4)",
+      from(...args) {
+        return sql`${person_optional_missing_middle_3FunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "p",
+        required: true,
+        notNull: true,
+        codec: personCodec
+      }, {
+        name: "a",
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "c",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "person_optional_missing_middle_3"
+        },
+        tags: {},
+        canExecute: false
+      },
+      description: undefined
+    },
+    person_optional_missing_middle_4: {
+      executor,
+      name: "person_optional_missing_middle_4",
+      identifier: "main.c.person_optional_missing_middle_4(c.person,int4,int4,int4)",
+      from(...args) {
+        return sql`${person_optional_missing_middle_4FunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "p",
+        required: true,
+        notNull: true,
+        codec: personCodec
+      }, {
+        name: "",
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "b",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "person_optional_missing_middle_4"
+        },
+        tags: {},
+        canExecute: false
+      },
+      description: undefined
+    },
+    person_optional_missing_middle_5: {
+      executor,
+      name: "person_optional_missing_middle_5",
+      identifier: "main.c.person_optional_missing_middle_5(c.person,int4,int4,int4)",
+      from(...args) {
+        return sql`${person_optional_missing_middle_5FunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "p",
+        required: true,
+        notNull: true,
+        codec: personCodec
+      }, {
+        name: "a",
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "person_optional_missing_middle_5"
         },
         tags: {},
         canExecute: false

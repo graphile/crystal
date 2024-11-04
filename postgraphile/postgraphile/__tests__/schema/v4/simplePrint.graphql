@@ -225,31 +225,6 @@ type Query implements Node {
   optionalMissingMiddle5(a: Int!, arg1: Int, arg2: Int): Int
   funcOutUnnamedOutOutUnnamed: FuncOutUnnamedOutOutUnnamedRecord
 
-  """
-  Reads and enables pagination through a set of `FuncReturnsTableMultiColRecord`.
-  """
-  funcReturnsTableMultiCol(
-    i: Int
-
-    """Only read the first `n` values of the set."""
-    first: Int
-
-    """Only read the last `n` values of the set."""
-    last: Int
-
-    """
-    Skip the first `n` values from our `after` cursor, an alternative to cursor
-    based pagination. May not be used with `last`.
-    """
-    offset: Int
-
-    """Read all values in the set before (above) this cursor."""
-    before: Cursor
-
-    """Read all values in the set after (below) this cursor."""
-    after: Cursor
-  ): FuncReturnsTableMultiColConnection
-
   """Reads and enables pagination through a set of `Int4`."""
   intSetQuery(
     x: Int
@@ -274,6 +249,33 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): IntSetQueryConnection
+
+  """
+  Reads and enables pagination through a set of `FuncReturnsTableMultiColRecord`.
+  """
+  funcReturnsTableMultiCol(
+    i: Int
+    a: Int
+    b: Int
+
+    """Only read the first `n` values of the set."""
+    first: Int
+
+    """Only read the last `n` values of the set."""
+    last: Int
+
+    """
+    Skip the first `n` values from our `after` cursor, an alternative to cursor
+    based pagination. May not be used with `last`.
+    """
+    offset: Int
+
+    """Read all values in the set before (above) this cursor."""
+    before: Cursor
+
+    """Read all values in the set after (below) this cursor."""
+    after: Cursor
+  ): FuncReturnsTableMultiColConnection
   queryIntervalArray: [Interval]
   queryTextArray: [String]
   returnTableWithoutGrants: CompoundKey
@@ -1415,6 +1417,11 @@ type Person implements Node {
   computedInoutOut(ino: String): PersonComputedInoutOutRecord
   exists(email: Email): Boolean @deprecated(reason: "This is deprecated (comment on function c.person_exists).")
   computedFirstArgInoutOut: PersonComputedFirstArgInoutOutRecord
+  optionalMissingMiddle1(arg0: Int!, b: Int, c: Int): Int
+  optionalMissingMiddle2(a: Int!, b: Int, c: Int): Int
+  optionalMissingMiddle3(a: Int!, arg1: Int, c: Int): Int
+  optionalMissingMiddle4(arg0: Int!, b: Int, arg2: Int): Int
+  optionalMissingMiddle5(a: Int!, arg1: Int, arg2: Int): Int
   computedComplex(a: Int, b: String): PersonComputedComplexRecord
 
   """The first post by the person."""
@@ -2927,6 +2934,32 @@ type FuncOutUnnamedOutOutUnnamedRecord {
   arg3: Int
 }
 
+"""A connection to a list of `Int` values."""
+type IntSetQueryConnection {
+  """A list of `Int` objects."""
+  nodes: [Int]!
+
+  """
+  A list of edges which contains the `Int` and cursor to aid in pagination.
+  """
+  edges: [IntSetQueryEdge]!
+
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """The count of *all* `Int` you could get from the connection."""
+  totalCount: Int!
+}
+
+"""A `Int` edge in the connection."""
+type IntSetQueryEdge {
+  """A cursor for use in pagination."""
+  cursor: Cursor
+
+  """The `Int` at the end of the edge."""
+  node: Int
+}
+
 """A connection to a list of `FuncReturnsTableMultiColRecord` values."""
 type FuncReturnsTableMultiColConnection {
   """A list of `FuncReturnsTableMultiColRecord` objects."""
@@ -2958,32 +2991,6 @@ type FuncReturnsTableMultiColEdge {
 
   """The `FuncReturnsTableMultiColRecord` at the end of the edge."""
   node: FuncReturnsTableMultiColRecord
-}
-
-"""A connection to a list of `Int` values."""
-type IntSetQueryConnection {
-  """A list of `Int` objects."""
-  nodes: [Int]!
-
-  """
-  A list of edges which contains the `Int` and cursor to aid in pagination.
-  """
-  edges: [IntSetQueryEdge]!
-
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """The count of *all* `Int` you could get from the connection."""
-  totalCount: Int!
-}
-
-"""A `Int` edge in the connection."""
-type IntSetQueryEdge {
-  """A cursor for use in pagination."""
-  cursor: Cursor
-
-  """The `Int` at the end of the edge."""
-  node: Int
 }
 
 """A range of `Float`."""

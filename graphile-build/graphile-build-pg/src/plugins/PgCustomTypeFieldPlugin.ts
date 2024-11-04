@@ -12,6 +12,7 @@ import type {
   PgInsertSingleStep,
   PgResource,
   PgResourceParameter,
+  PgSelectArgumentDigest,
   PgSelectArgumentSpec,
   PgSelectStep,
   PgTypedExecutableStep,
@@ -1100,25 +1101,42 @@ function modFields(
                     typeof resource.from === "function"
                   ) {
                     // This is a scalar computed attribute, let's inline the expression
-                    const placeholders = selectArgs.map((arg, i) => {
-                      if (i === 0) {
-                        return $row.getClassStep().alias;
-                      } else if ("pgCodec" in arg && arg.pgCodec) {
-                        return $row.placeholder(arg.step, arg.pgCodec);
-                      } else {
-                        return $row.placeholder(
-                          arg.step as PgTypedExecutableStep<any>,
-                        );
-                      }
-                    });
+                    const newSelectArgs = selectArgs.map(
+                      (
+                        arg,
+                        i,
+                      ): PgSelectArgumentDigest & {
+                        // We _MUST_ set `name` if we're told one
+                        name: string | undefined;
+                      } => {
+                        const { name } = arg;
+                        if (i === 0) {
+                          return {
+                            name,
+                            placeholder: $row.getClassStep().alias,
+                          };
+                        } else if ("pgCodec" in arg && arg.pgCodec) {
+                          return {
+                            name,
+                            placeholder: $row.placeholder(
+                              arg.step,
+                              arg.pgCodec,
+                            ),
+                          };
+                        } else {
+                          return {
+                            name,
+                            placeholder: $row.placeholder(
+                              arg.step as PgTypedExecutableStep<any>,
+                            ),
+                          };
+                        }
+                      },
+                    );
                     return pgClassExpression(
                       $row,
                       resource.codec,
-                    )`${resource.from(
-                      ...placeholders.map((placeholder) => ({
-                        placeholder,
-                      })),
-                    )}`;
+                    )`${resource.from(...newSelectArgs)}`;
                   }
                   // PERF: or here, if scalar add select to `$row`?
                   return resource.execute(selectArgs);

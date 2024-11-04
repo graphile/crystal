@@ -1,3 +1,54 @@
+select __person_result__.*
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"int4" as "id2", $4::"int4" as "id3", $5::"int4" as "id4", $6::"int4" as "id5", $7::"int4" as "id6", $8::"int4" as "id7", $9::"int4" as "id8", $10::"int4" as "id9", $11::"int4" as "id10", $12::"int4" as "id11", $13::"int4" as "id12", $14::"int4" as "id13", $15::"int4" as "id14") as __person_identifiers__,
+lateral (
+  select
+    ("c"."person_optional_missing_middle_4"(
+      __person__,
+      __person_identifiers__."id10",
+      __person_identifiers__."id11",
+      __person_identifiers__."id12"
+    ))::text as "0",
+    __person__."id"::text as "1",
+    ("c"."person_optional_missing_middle_5"(
+      __person_2,
+      __person_identifiers__."id13",
+      __person_identifiers__."id11",
+      __person_identifiers__."id14"
+    ))::text as "2",
+    __person_2."id"::text as "3",
+    ("c"."person_optional_missing_middle_1"(
+      __person_3,
+      __person_identifiers__."id1",
+      "c" := __person_identifiers__."id2"
+    ))::text as "4",
+    ("c"."person_optional_missing_middle_1"(
+      __person_3,
+      __person_identifiers__."id3",
+      __person_identifiers__."id4",
+      __person_identifiers__."id5"
+    ))::text as "5",
+    ("c"."person_optional_missing_middle_2"(
+      __person_3,
+      __person_identifiers__."id6",
+      "c" := __person_identifiers__."id7"
+    ))::text as "6",
+    ("c"."person_optional_missing_middle_3"(
+      __person_3,
+      __person_identifiers__."id8",
+      "c" := __person_identifiers__."id9"
+    ))::text as "7",
+    __person_3."id"::text as "8",
+    __person_identifiers__.idx as "9"
+  from "c"."person" as __person_3
+  left outer join lateral (select (__person_3).*) as __person__
+  on TRUE
+  left outer join lateral (select (__person_3).*) as __person_2
+  on TRUE
+  where (
+    __person_3."id" = __person_identifiers__."id0"
+  )
+) as __person_result__;
+
 select
   __frmcdc_compound_type__."a"::text as "0",
   __frmcdc_compound_type__."foo_bar"::text as "1",

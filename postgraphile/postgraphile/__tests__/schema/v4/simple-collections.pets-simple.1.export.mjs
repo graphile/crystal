@@ -463,18 +463,28 @@ const getSelectPlanFromParentAndArgs = ($in, args, _info) => {
   }, ...extraSelectArgs];
   if (resource_people_odd_petsPgResource.isUnique && !resource_people_odd_petsPgResource.codec.attributes && typeof resource_people_odd_petsPgResource.from === "function") {
     // This is a scalar computed attribute, let's inline the expression
-    const placeholders = selectArgs.map((arg, i) => {
+    const newSelectArgs = selectArgs.map((arg, i) => {
+      const {
+        name
+      } = arg;
       if (i === 0) {
-        return $row.getClassStep().alias;
+        return {
+          name,
+          placeholder: $row.getClassStep().alias
+        };
       } else if ("pgCodec" in arg && arg.pgCodec) {
-        return $row.placeholder(arg.step, arg.pgCodec);
+        return {
+          name,
+          placeholder: $row.placeholder(arg.step, arg.pgCodec)
+        };
       } else {
-        return $row.placeholder(arg.step);
+        return {
+          name,
+          placeholder: $row.placeholder(arg.step)
+        };
       }
     });
-    return pgClassExpression($row, resource_people_odd_petsPgResource.codec)`${resource_people_odd_petsPgResource.from(...placeholders.map(placeholder => ({
-      placeholder
-    })))}`;
+    return pgClassExpression($row, resource_people_odd_petsPgResource.codec)`${resource_people_odd_petsPgResource.from(...newSelectArgs)}`;
   }
   // PERF: or here, if scalar add select to `$row`?
   return resource_people_odd_petsPgResource.execute(selectArgs);

@@ -402,6 +402,14 @@ create function c.person_friends(person c.person) returns setof c.person as $$ s
 comment on function c.person_friends(c.person) is E'@sortable';
 create function c.person_first_post(person c.person) returns a.post as $$ select * from a.post where a.post.author_id = person.id order by id asc limit 1 $$ language sql stable;
 comment on function c.person_first_post(c.person) is 'The first post by the person.';
+
+-- Same as optional_missing_middle_* functions above, but computed column
+create function c.person_optional_missing_middle_1(p c.person, int, b int default 2, c int default 3) returns int as $$ select $2 + $3 + $4 $$ language sql immutable strict;
+create function c.person_optional_missing_middle_2(p c.person, a int, b int default 2, c int default 3) returns int as $$ select $2 + $3 + $4 $$ language sql immutable strict;
+create function c.person_optional_missing_middle_3(p c.person, a int, int default 2, c int default 3) returns int as $$ select $2 + $3 + $4 $$ language sql immutable strict;
+create function c.person_optional_missing_middle_4(p c.person, int, b int default 2, int default 3) returns int as $$ select $2 + $3 + $4 $$ language sql immutable strict;
+create function c.person_optional_missing_middle_5(p c.person, a int, int default 2, int default 3) returns int as $$ select $2 + $3 + $4 $$ language sql immutable strict;
+
 create function c.compound_type_computed_field(compound_type c.compound_type) returns integer as $$ select compound_type.a + compound_type.foo_bar $$ language sql stable;
 create function a.post_headline_trimmed(post a.post, length int default 10, omission text default '…') returns text as $$ select substr(post.headline, 0, length) || omission $$ language sql stable;
 create function a.post_headline_trimmed_strict(post a.post, length int default 10, omission text default '…') returns text as $$ select substr(post.headline, 0, length) || omission $$ language sql stable strict;
@@ -719,10 +727,10 @@ create function c.func_returns_table_one_col(i int) returns table (col1 int) as 
   select i + 43 as col1;
 $$ language sql stable;
 
-create function c.func_returns_table_multi_col(i int) returns table (col1 int, col2 text) as $$
-  select i + 42 as col1, 'out'::text as col2
+create function c.func_returns_table_multi_col(i int, a int default null, b int default null) returns table (col1 int, col2 text) as $$
+  select i + 42 + coalesce(a, 0) + coalesce(b, 0) as col1, 'out'::text as col2
   union
-  select i + 43 as col1, 'out2'::text as col2;
+  select i + 43 + coalesce(a, 0) + coalesce(b, 0) as col1, 'out2'::text as col2;
 $$ language sql stable;
 
 create function c.mutation_in_inout(i int, inout ino int) as $$

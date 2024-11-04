@@ -3020,6 +3020,11 @@ type Person implements Node {
   A globally unique identifier. Can be used in various places throughout the system to identify this single value.
   """
   nodeId: ID!
+  optionalMissingMiddle1(arg0: Int!, b: Int, c: Int): Int
+  optionalMissingMiddle2(a: Int!, b: Int, c: Int): Int
+  optionalMissingMiddle3(a: Int!, arg1: Int, c: Int): Int
+  optionalMissingMiddle4(arg0: Int!, arg2: Int, b: Int): Int
+  optionalMissingMiddle5(a: Int!, arg1: Int, arg2: Int): Int
 
   """This `Person`'s `PersonSecret`."""
   personSecretByPersonId: PersonSecret @deprecated(reason: "This is deprecated (comment on table c.person_secret).")
@@ -3672,8 +3677,11 @@ type Query implements Node {
   Reads and enables pagination through a set of `FuncReturnsTableMultiColRecord`.
   """
   funcReturnsTableMultiCol(
+    a: Int
+
     """Read all values in the set after (below) this cursor."""
     after: Cursor
+    b: Int
 
     """Read all values in the set before (above) this cursor."""
     before: Cursor

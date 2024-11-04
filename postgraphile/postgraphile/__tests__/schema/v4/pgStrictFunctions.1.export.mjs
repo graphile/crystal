@@ -1871,10 +1871,7 @@ const spec_post = {
       schemaName: "a",
       name: "post"
     },
-    tags: Object.assign(Object.create(null), {
-      omit: "create",
-      behavior: ["-insert"]
-    })
+    tags: Object.create(null)
   },
   executor: executor
 };
@@ -3452,10 +3449,7 @@ const registryConfig_pgResources_post_post = {
     isInsertable: true,
     isUpdatable: true,
     isDeletable: true,
-    tags: {
-      omit: "create",
-      behavior: spec_post.extensions.tags.behavior
-    }
+    tags: {}
   }
 };
 const compound_type_set_queryFunctionIdentifer = sql.identifier("c", "compound_type_set_query");
@@ -3484,7 +3478,6 @@ const resourceConfig_compound_type = {
 const compound_type_mutationFunctionIdentifer = sql.identifier("b", "compound_type_mutation");
 const compound_type_queryFunctionIdentifer = sql.identifier("b", "compound_type_query");
 const compound_type_set_mutationFunctionIdentifer = sql.identifier("b", "compound_type_set_mutation");
-const create_postFunctionIdentifer = sql.identifier("a", "create_post");
 const table_mutationFunctionIdentifer = sql.identifier("c", "table_mutation");
 const table_queryFunctionIdentifer = sql.identifier("c", "table_query");
 const post_with_suffixFunctionIdentifer = sql.identifier("a", "post_with_suffix");
@@ -4221,7 +4214,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "i",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       isUnique: !false,
@@ -4249,7 +4242,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "i",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       isUnique: !true,
@@ -4277,7 +4270,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "i",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       isUnique: !false,
@@ -4305,7 +4298,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "i",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       isUnique: !true,
@@ -4333,7 +4326,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "in_arg",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.text
       }],
       isUnique: !false,
@@ -4360,7 +4353,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "in_arg",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.text
       }],
       isUnique: !false,
@@ -4390,7 +4383,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "json",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.json
       }],
       isUnique: !false,
@@ -4417,7 +4410,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "json",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.json
       }],
       isUnique: !false,
@@ -4444,7 +4437,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "json",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.jsonb
       }],
       isUnique: !false,
@@ -4471,7 +4464,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "json",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.jsonb
       }],
       isUnique: !false,
@@ -4682,12 +4675,12 @@ const registry = makeRegistry({
       parameters: [{
         name: "a",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       isUnique: !false,
@@ -4714,12 +4707,12 @@ const registry = makeRegistry({
       parameters: [{
         name: "a",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       isUnique: !false,
@@ -4746,7 +4739,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "b",
@@ -4778,7 +4771,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "b",
@@ -4810,7 +4803,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "b",
@@ -4842,12 +4835,12 @@ const registry = makeRegistry({
       parameters: [{
         name: null,
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: null,
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       isUnique: !false,
@@ -4874,12 +4867,12 @@ const registry = makeRegistry({
       parameters: [{
         name: null,
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: null,
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       isUnique: !false,
@@ -4970,12 +4963,12 @@ const registry = makeRegistry({
       parameters: [{
         name: "i",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "ino",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       isUnique: !false,
@@ -5069,12 +5062,12 @@ const registry = makeRegistry({
       parameters: [{
         name: "i",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "ino",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       isUnique: !false,
@@ -5400,17 +5393,17 @@ const registry = makeRegistry({
       parameters: [{
         name: "x",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "y",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "z",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       isUnique: !true,
@@ -5437,17 +5430,17 @@ const registry = makeRegistry({
       parameters: [{
         name: "x",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "y",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "z",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       isUnique: !true,
@@ -5496,7 +5489,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "i",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       isUnique: !true,
@@ -5523,7 +5516,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "i",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "a",
@@ -5560,7 +5553,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "g",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: guidCodec
       }],
       isUnique: !false,
@@ -6058,7 +6051,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "edge_case",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: edgeCaseCodec
       }],
       isUnique: !false,
@@ -6105,17 +6098,17 @@ const registry = makeRegistry({
       parameters: [{
         name: "b",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: textArrayCodec
       }, {
         name: "d",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.text
       }, {
         name: "e",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.text
       }],
       isUnique: !false,
@@ -6184,17 +6177,17 @@ const registry = makeRegistry({
       parameters: [{
         name: "a",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "b",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.numeric
       }, {
         name: "c",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.bigint
       }],
       returnsArray: false,
@@ -6220,7 +6213,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "left_arm",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: leftArmCodec,
         extensions: {
           variant: "base"
@@ -6291,17 +6284,17 @@ const registry = makeRegistry({
       parameters: [{
         name: "a",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "b",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.numeric
       }, {
         name: "c",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.bigint
       }],
       returnsArray: true,
@@ -6349,17 +6342,17 @@ const registry = makeRegistry({
       parameters: [{
         name: "a",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "b",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.numeric
       }, {
         name: "c",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.bigint
       }],
       returnsArray: false,
@@ -6489,7 +6482,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "compound_type",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: compoundTypeCodec
       }],
       isUnique: !false,
@@ -6516,7 +6509,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "post",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: postCodec
       }],
       isUnique: !true,
@@ -6543,7 +6536,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "post",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: postCodec
       }],
       isUnique: !false,
@@ -6570,7 +6563,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "post",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: postCodec
       }],
       isUnique: !false,
@@ -6669,7 +6662,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "i1",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       isUnique: !false,
@@ -6696,7 +6689,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "i1",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       isUnique: !false,
@@ -6723,7 +6716,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "post",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: postCodec
       }, {
         name: "length",
@@ -6760,17 +6753,17 @@ const registry = makeRegistry({
       parameters: [{
         name: "post",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: postCodec
       }, {
         name: "length",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "omission",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.text
       }],
       isUnique: !false,
@@ -6834,17 +6827,17 @@ const registry = makeRegistry({
       parameters: [{
         name: "left_arm_id",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "post_id",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "txt",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.text
       }],
       isUnique: !false,
@@ -6891,7 +6884,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "object",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: compoundTypeCodec
       }],
       returnsArray: false,
@@ -6916,7 +6909,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "object",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: compoundTypeCodec
       }],
       returnsArray: false,
@@ -6941,7 +6934,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "object",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: compoundTypeCodec
       }],
       returnsArray: false,
@@ -6957,31 +6950,6 @@ const registry = makeRegistry({
       },
       description: undefined
     }),
-    create_post: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, {
-      name: "create_post",
-      identifier: "main.a.create_post(text)",
-      from(...args) {
-        return sql`${create_postFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "t",
-        required: true,
-        notNull: false,
-        codec: TYPES.text
-      }],
-      returnsArray: false,
-      returnsSetof: false,
-      isMutation: true,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "a",
-          name: "create_post"
-        },
-        tags: {}
-      },
-      description: undefined
-    }),
     table_mutation: PgResource.functionResourceOptions(registryConfig_pgResources_post_post, {
       name: "table_mutation",
       identifier: "main.c.table_mutation(int4)",
@@ -6991,7 +6959,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "id",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       returnsArray: false,
@@ -7016,7 +6984,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "id",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       returnsArray: false,
@@ -7041,12 +7009,12 @@ const registry = makeRegistry({
       parameters: [{
         name: "post",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: postCodec
       }, {
         name: "suffix",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.text
       }],
       returnsArray: false,
@@ -7073,7 +7041,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "object",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: compoundTypeCodec
       }],
       returnsArray: true,
@@ -7098,7 +7066,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "object",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: compoundTypeCodec
       }],
       returnsArray: true,
@@ -7123,7 +7091,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "object",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: compoundTypeCodec
       }],
       returnsArray: true,
@@ -7148,7 +7116,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "object",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: compoundTypeCodec
       }],
       returnsArray: true,
@@ -7173,12 +7141,12 @@ const registry = makeRegistry({
       parameters: [{
         name: "post",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: postCodec
       }, {
         name: "object",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: compoundTypeCodec
       }],
       returnsArray: true,
@@ -7203,7 +7171,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "posts",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: postArrayCodec
       }],
       returnsArray: false,
@@ -7229,7 +7197,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "person",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: personCodec
       }],
       isUnique: !false,
@@ -7262,7 +7230,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "person",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: personCodec
       }],
       isUnique: !false,
@@ -7292,7 +7260,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "person",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: personCodec
       }],
       isUnique: !false,
@@ -7319,12 +7287,12 @@ const registry = makeRegistry({
       parameters: [{
         name: "person",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: personCodec
       }, {
         name: "ino",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.text
       }],
       isUnique: !false,
@@ -7352,12 +7320,12 @@ const registry = makeRegistry({
       parameters: [{
         name: "person",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: personCodec
       }, {
         name: "ino",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.text
       }],
       isUnique: !false,
@@ -7384,12 +7352,12 @@ const registry = makeRegistry({
       parameters: [{
         name: "person",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: personCodec
       }, {
         name: "email",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: emailCodec
       }],
       isUnique: !false,
@@ -7418,7 +7386,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "person",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: personCodec
       }],
       isUnique: !false,
@@ -7655,12 +7623,12 @@ const registry = makeRegistry({
       parameters: [{
         name: "a",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "b",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.text
       }],
       isUnique: !false,
@@ -7687,12 +7655,12 @@ const registry = makeRegistry({
       parameters: [{
         name: "a",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "b",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.text
       }],
       isUnique: !true,
@@ -7719,12 +7687,12 @@ const registry = makeRegistry({
       parameters: [{
         name: "a",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "b",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.text
       }],
       isUnique: !false,
@@ -7751,12 +7719,12 @@ const registry = makeRegistry({
       parameters: [{
         name: "a",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "b",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.text
       }],
       isUnique: !true,
@@ -7783,17 +7751,17 @@ const registry = makeRegistry({
       parameters: [{
         name: "person",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: personCodec
       }, {
         name: "a",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }, {
         name: "b",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.text
       }],
       isUnique: !false,
@@ -7819,7 +7787,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "person",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: personCodec
       }],
       returnsArray: false,
@@ -8011,7 +7979,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "person",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: personCodec
       }],
       returnsArray: false,
@@ -8037,7 +8005,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "person",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: personCodec
       }],
       returnsArray: false,
@@ -8106,7 +8074,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "id",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       returnsArray: false,
@@ -8131,7 +8099,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "id",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       returnsArray: false,
@@ -8156,7 +8124,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "p",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: personCodec
       }],
       returnsArray: false,
@@ -8181,12 +8149,12 @@ const registry = makeRegistry({
       parameters: [{
         name: "p",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: personCodec
       }, {
         name: "id",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: TYPES.int
       }],
       returnsArray: false,
@@ -8251,7 +8219,7 @@ const registry = makeRegistry({
       parameters: [{
         name: "p",
         required: true,
-        notNull: false,
+        notNull: true,
         codec: personCodec
       }],
       returnsArray: true,
@@ -15854,9 +15822,9 @@ const makeArgs122 = (args, path = []) => {
 };
 const resource_compound_type_set_mutationPgResource = registry.pgResources["compound_type_set_mutation"];
 const argDetailsSimple123 = [{
-  graphqlArgName: "t",
-  postgresArgName: "t",
-  pgCodec: TYPES.text,
+  graphqlArgName: "id",
+  postgresArgName: "id",
+  pgCodec: TYPES.int,
   required: true,
   fetcher: null
 }];
@@ -15904,18 +15872,24 @@ const makeArgs123 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_create_postPgResource = registry.pgResources["create_post"];
+const resource_table_mutationPgResource = registry.pgResources["table_mutation"];
 const argDetailsSimple124 = [{
-  graphqlArgName: "id",
-  postgresArgName: "id",
-  pgCodec: TYPES.int,
+  graphqlArgName: "post",
+  postgresArgName: "post",
+  pgCodec: postCodec,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "suffix",
+  postgresArgName: "suffix",
+  pgCodec: TYPES.text,
   required: true,
   fetcher: null
 }];
 const makeArgs124 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 2; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -15956,24 +15930,18 @@ const makeArgs124 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_table_mutationPgResource = registry.pgResources["table_mutation"];
+const resource_post_with_suffixPgResource = registry.pgResources["post_with_suffix"];
 const argDetailsSimple125 = [{
-  graphqlArgName: "post",
-  postgresArgName: "post",
-  pgCodec: postCodec,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "suffix",
-  postgresArgName: "suffix",
-  pgCodec: TYPES.text,
+  graphqlArgName: "object",
+  postgresArgName: "object",
+  pgCodec: compoundTypeCodec,
   required: true,
   fetcher: null
 }];
 const makeArgs125 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 1; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -16014,7 +15982,7 @@ const makeArgs125 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_post_with_suffixPgResource = registry.pgResources["post_with_suffix"];
+const resource_mutation_compound_type_arrayPgResource = registry.pgResources["mutation_compound_type_array"];
 const argDetailsSimple126 = [{
   graphqlArgName: "object",
   postgresArgName: "object",
@@ -16066,11 +16034,11 @@ const makeArgs126 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_compound_type_arrayPgResource = registry.pgResources["mutation_compound_type_array"];
+const resource_compound_type_array_mutationPgResource = registry.pgResources["compound_type_array_mutation"];
 const argDetailsSimple127 = [{
-  graphqlArgName: "object",
-  postgresArgName: "object",
-  pgCodec: compoundTypeCodec,
+  graphqlArgName: "posts",
+  postgresArgName: "posts",
+  pgCodec: postArrayCodec,
   required: true,
   fetcher: null
 }];
@@ -16118,18 +16086,24 @@ const makeArgs127 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_compound_type_array_mutationPgResource = registry.pgResources["compound_type_array_mutation"];
+const resource_post_manyPgResource = registry.pgResources["post_many"];
 const argDetailsSimple128 = [{
-  graphqlArgName: "posts",
-  postgresArgName: "posts",
-  pgCodec: postArrayCodec,
+  graphqlArgName: "a",
+  postgresArgName: "a",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "b",
+  postgresArgName: "b",
+  pgCodec: TYPES.text,
   required: true,
   fetcher: null
 }];
 const makeArgs128 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 2; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -16170,7 +16144,7 @@ const makeArgs128 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_post_manyPgResource = registry.pgResources["post_many"];
+const resource_mutation_out_complexPgResource = registry.pgResources["mutation_out_complex"];
 const argDetailsSimple129 = [{
   graphqlArgName: "a",
   postgresArgName: "a",
@@ -16228,24 +16202,12 @@ const makeArgs129 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_complexPgResource = registry.pgResources["mutation_out_complex"];
-const argDetailsSimple130 = [{
-  graphqlArgName: "a",
-  postgresArgName: "a",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "b",
-  postgresArgName: "b",
-  pgCodec: TYPES.text,
-  required: true,
-  fetcher: null
-}];
+const resource_mutation_out_complex_setofPgResource = registry.pgResources["mutation_out_complex_setof"];
+const argDetailsSimple130 = [];
 const makeArgs130 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -16286,7 +16248,7 @@ const makeArgs130 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_complex_setofPgResource = registry.pgResources["mutation_out_complex_setof"];
+const resource_mutation_out_tablePgResource = registry.pgResources["mutation_out_table"];
 const argDetailsSimple131 = [];
 const makeArgs131 = (args, path = []) => {
   const selectArgs = [];
@@ -16332,7 +16294,7 @@ const makeArgs131 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_tablePgResource = registry.pgResources["mutation_out_table"];
+const resource_mutation_out_table_setofPgResource = registry.pgResources["mutation_out_table_setof"];
 const argDetailsSimple132 = [];
 const makeArgs132 = (args, path = []) => {
   const selectArgs = [];
@@ -16378,7 +16340,7 @@ const makeArgs132 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_table_setofPgResource = registry.pgResources["mutation_out_table_setof"];
+const resource_table_set_mutationPgResource = registry.pgResources["table_set_mutation"];
 const argDetailsSimple133 = [];
 const makeArgs133 = (args, path = []) => {
   const selectArgs = [];
@@ -16424,12 +16386,18 @@ const makeArgs133 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_table_set_mutationPgResource = registry.pgResources["table_set_mutation"];
-const argDetailsSimple134 = [];
+const resource_type_function_connection_mutationPgResource = registry.pgResources["type_function_connection_mutation"];
+const argDetailsSimple134 = [{
+  graphqlArgName: "id",
+  postgresArgName: "id",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}];
 const makeArgs134 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 1; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -16470,61 +16438,9 @@ const makeArgs134 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_type_function_connection_mutationPgResource = registry.pgResources["type_function_connection_mutation"];
-const argDetailsSimple135 = [{
-  graphqlArgName: "id",
-  postgresArgName: "id",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}];
-const makeArgs135 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 1; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple135[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
-    } else {
-      step = args.get([...path, graphqlArgName]);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
 const resource_type_function_mutationPgResource = registry.pgResources["type_function_mutation"];
-const argDetailsSimple136 = [];
-const makeArgs136 = (args, path = []) => {
+const argDetailsSimple135 = [];
+const makeArgs135 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
   for (let i = 0; i < 0; i++) {
@@ -16534,7 +16450,7 @@ const makeArgs136 = (args, path = []) => {
       pgCodec,
       required,
       fetcher
-    } = argDetailsSimple136[i];
+    } = argDetailsSimple135[i];
     const $raw = args.getRaw([...path, graphqlArgName]);
     let step;
     if ($raw.evalIs(undefined)) {
@@ -16865,11 +16781,11 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): StaticBigIntegerConnection
-  funcInOut(i: Int): Int
+  funcInOut(i: Int!): Int
 
   """Reads and enables pagination through a set of \`Int4\`."""
   funcReturnsTableOneCol(
-    i: Int
+    i: Int!
 
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -16889,8 +16805,8 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): FuncReturnsTableOneColConnection
-  jsonIdentity(json: JSON): JSON
-  jsonbIdentity(json: JSON): JSON
+  jsonIdentity(json: JSON!): JSON
+  jsonbIdentity(json: JSON!): JSON
 
   """lol, add some stuff 1 query"""
   add1Query(arg0: Int!, arg1: Int!): Int
@@ -16899,11 +16815,11 @@ type Query implements Node {
   add2Query(a: Int!, b: Int): Int
 
   """lol, add some stuff 3 query"""
-  add3Query(a: Int, arg1: Int): Int
+  add3Query(a: Int!, arg1: Int!): Int
 
   """lol, add some stuff 4 query"""
-  add4Query(arg0: Int, b: Int): Int
-  funcInInout(i: Int, ino: Int): Int
+  add4Query(arg0: Int!, b: Int): Int
+  funcInInout(i: Int!, ino: Int!): Int
   funcOutOut: FuncOutOutRecord
 
   """Reads and enables pagination through a set of \`FuncOutOutSetofRecord\`."""
@@ -16943,9 +16859,9 @@ type Query implements Node {
 
   """Reads and enables pagination through a set of \`Int4\`."""
   intSetQuery(
-    x: Int
-    y: Int
-    z: Int
+    x: Int!
+    y: Int!
+    z: Int!
 
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -16970,7 +16886,7 @@ type Query implements Node {
   Reads and enables pagination through a set of \`FuncReturnsTableMultiColRecord\`.
   """
   funcReturnsTableMultiCol(
-    i: Int
+    i: Int!
     a: Int
     b: Int
 
@@ -16996,8 +16912,8 @@ type Query implements Node {
   queryTextArray: [String]
   returnTableWithoutGrants: CompoundKey
   typesQuery(a: BigInt!, b: Boolean!, c: String!, d: [Int]!, e: JSON!, f: FloatRangeInput!): Boolean
-  funcOutOutCompoundType(i1: Int): FuncOutOutCompoundTypeRecord
-  queryOutputTwoRows(leftArmId: Int, postId: Int, txt: String): QueryOutputTwoRowsRecord
+  funcOutOutCompoundType(i1: Int!): FuncOutOutCompoundTypeRecord
+  queryOutputTwoRows(leftArmId: Int!, postId: Int!, txt: String!): QueryOutputTwoRowsRecord
 
   """Reads and enables pagination through a set of \`CompoundType\`."""
   compoundTypeSetQuery(
@@ -17019,18 +16935,18 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): CompoundTypesConnection
-  compoundTypeQuery(object: CompoundTypeInput): CompoundType
-  tableQuery(id: Int): Post
-  queryCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
-  compoundTypeArrayQuery(object: CompoundTypeInput): [CompoundType]
-  funcOutComplex(a: Int, b: String): FuncOutComplexRecord
+  compoundTypeQuery(object: CompoundTypeInput!): CompoundType
+  tableQuery(id: Int!): Post
+  queryCompoundTypeArray(object: CompoundTypeInput!): [CompoundType]
+  compoundTypeArrayQuery(object: CompoundTypeInput!): [CompoundType]
+  funcOutComplex(a: Int!, b: String!): FuncOutComplexRecord
 
   """
   Reads and enables pagination through a set of \`FuncOutComplexSetofRecord\`.
   """
   funcOutComplexSetof(
-    a: Int
-    b: String
+    a: Int!
+    b: String!
 
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -17164,7 +17080,7 @@ type Query implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): TypesConnection
-  typeFunction(id: Int): Type
+  typeFunction(id: Int!): Type
   typeFunctionList: [Type]
 
   """Reads a single \`Input\` using its globally unique \`ID\`."""
@@ -18129,16 +18045,16 @@ type Person implements Node {
   """The first name of the person."""
   firstName: String
   computedOutOut: PersonComputedOutOutRecord
-  computedInout(ino: String): String
-  computedInoutOut(ino: String): PersonComputedInoutOutRecord
-  exists(email: Email): Boolean @deprecated(reason: "This is deprecated (comment on function c.person_exists).")
+  computedInout(ino: String!): String
+  computedInoutOut(ino: String!): PersonComputedInoutOutRecord
+  exists(email: Email!): Boolean @deprecated(reason: "This is deprecated (comment on function c.person_exists).")
   computedFirstArgInoutOut: PersonComputedFirstArgInoutOutRecord
   optionalMissingMiddle1(arg0: Int!, b: Int, c: Int): Int
   optionalMissingMiddle2(a: Int!, b: Int, c: Int): Int
   optionalMissingMiddle3(a: Int!, arg1: Int, c: Int): Int
   optionalMissingMiddle4(arg0: Int!, b: Int, arg2: Int): Int
   optionalMissingMiddle5(a: Int!, arg1: Int, arg2: Int): Int
-  computedComplex(a: Int, b: String): PersonComputedComplexRecord
+  computedComplex(a: Int!, b: String!): PersonComputedComplexRecord
 
   """The first post by the person."""
   firstPost: Post
@@ -18188,7 +18104,7 @@ type Person implements Node {
     """Read all values in the set after (below) this cursor."""
     after: Cursor
   ): TypesConnection!
-  typeFunction(id: Int): Type
+  typeFunction(id: Int!): Type
   typeFunctionList: [Type]
 
   """The primary unique identifier for the person"""
@@ -18448,9 +18364,9 @@ type Post implements Node {
   computedWithOptionalArg(i: Int): Int
   computedWithRequiredArg(i: Int!): Int
   headlineTrimmed(length: Int, omission: String): String
-  headlineTrimmedNoDefaults(length: Int, omission: String): String
+  headlineTrimmedNoDefaults(length: Int!, omission: String!): String
   headlineTrimmedStrict(length: Int, omission: String): String
-  computedCompoundTypeArray(object: CompoundTypeInput): [CompoundType]
+  computedCompoundTypeArray(object: CompoundTypeInput!): [CompoundType]
   id: Int!
   headline: String!
   body: String
@@ -21107,12 +21023,6 @@ type Mutation {
     """
     input: CompoundTypeSetMutationInput!
   ): CompoundTypeSetMutationPayload
-  createPost(
-    """
-    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
-    """
-    input: CreatePostInput!
-  ): CreatePostPayload
   tableMutation(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -21351,6 +21261,14 @@ type Mutation {
     """
     input: CreateIssue756Input!
   ): CreateIssue756Payload
+
+  """Creates a single \`Post\`."""
+  createPost(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: CreatePostInput!
+  ): CreatePostPayload
 
   """Creates a single \`Person\`."""
   createPerson(
@@ -22174,7 +22092,7 @@ input MutationInOutInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  i: Int
+  i: Int!
 }
 
 """The output of our \`mutationReturnsTableOneCol\` mutation."""
@@ -22199,7 +22117,7 @@ input MutationReturnsTableOneColInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  i: Int
+  i: Int!
 }
 
 """The output of our \`jsonIdentityMutation\` mutation."""
@@ -22224,7 +22142,7 @@ input JsonIdentityMutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  json: JSON
+  json: JSON!
 }
 
 """The output of our \`jsonbIdentityMutation\` mutation."""
@@ -22249,7 +22167,7 @@ input JsonbIdentityMutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  json: JSON
+  json: JSON!
 }
 
 """The output of our \`jsonbIdentityMutationPlpgsql\` mutation."""
@@ -22376,8 +22294,8 @@ input Add3MutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  a: Int
-  arg1: Int
+  a: Int!
+  arg1: Int!
 }
 
 """The output of our \`add4Mutation\` mutation."""
@@ -22402,7 +22320,7 @@ input Add4MutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  arg0: Int
+  arg0: Int!
   b: Int
 }
 
@@ -22428,7 +22346,7 @@ input Add4MutationErrorInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  arg0: Int
+  arg0: Int!
   b: Int
 }
 
@@ -22454,8 +22372,8 @@ input Mult1Input {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  arg0: Int
-  arg1: Int
+  arg0: Int!
+  arg1: Int!
 }
 
 """The output of our \`mult2\` mutation."""
@@ -22480,8 +22398,8 @@ input Mult2Input {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  arg0: Int
-  arg1: Int
+  arg0: Int!
+  arg1: Int!
 }
 
 """The output of our \`mult3\` mutation."""
@@ -22558,8 +22476,8 @@ input MutationInInoutInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  i: Int
-  ino: Int
+  i: Int!
+  ino: Int!
 }
 
 """The output of our \`mutationOutOut\` mutation."""
@@ -22671,9 +22589,9 @@ input IntSetMutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  x: Int
-  y: Int
-  z: Int
+  x: Int!
+  y: Int!
+  z: Int!
 }
 
 """The output of our \`mutationOutUnnamedOutOutUnnamed\` mutation."""
@@ -22733,7 +22651,7 @@ input MutationReturnsTableMultiColInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  i: Int
+  i: Int!
 }
 
 """The output of our \`guidFn\` mutation."""
@@ -22760,7 +22678,7 @@ input GuidFnInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  g: Guid
+  g: Guid!
 }
 
 """The output of our \`mutationIntervalArray\` mutation."""
@@ -22833,9 +22751,9 @@ input ListBdeMutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  b: [String]
-  d: String
-  e: String
+  b: [String]!
+  d: String!
+  e: String!
 }
 
 """The output of our \`authenticateFail\` mutation."""
@@ -22892,9 +22810,9 @@ input AuthenticateInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  a: Int
-  b: BigFloat
-  c: BigInt
+  a: Int!
+  b: BigFloat!
+  c: BigInt!
 }
 
 """The output of our \`leftArmIdentity\` mutation."""
@@ -22928,7 +22846,7 @@ input LeftArmIdentityInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  leftArm: LeftArmBaseInput
+  leftArm: LeftArmBaseInput!
 }
 
 """An input representation of \`LeftArm\` with nullable fields."""
@@ -23015,9 +22933,9 @@ input AuthenticateManyInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  a: Int
-  b: BigFloat
-  c: BigInt
+  a: Int!
+  b: BigFloat!
+  c: BigInt!
 }
 
 """The output of our \`authenticatePayload\` mutation."""
@@ -23054,9 +22972,9 @@ input AuthenticatePayloadInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  a: Int
-  b: BigFloat
-  c: BigInt
+  a: Int!
+  b: BigFloat!
+  c: BigInt!
 }
 
 """The output of our \`typesMutation\` mutation."""
@@ -23116,7 +23034,7 @@ input MutationOutOutCompoundTypeInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  i1: Int
+  i1: Int!
 }
 
 """The output of our \`compoundTypeMutation\` mutation."""
@@ -23141,7 +23059,7 @@ input CompoundTypeMutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  object: CompoundTypeInput
+  object: CompoundTypeInput!
 }
 
 """The output of our \`compoundTypeSetMutation\` mutation."""
@@ -23166,41 +23084,7 @@ input CompoundTypeSetMutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  object: CompoundTypeInput
-}
-
-"""The output of our \`createPost\` mutation."""
-type CreatePostPayload {
-  """
-  The exact same \`clientMutationId\` that was provided in the mutation input,
-  unchanged and unused. May be used by a client to track mutations.
-  """
-  clientMutationId: String
-  post: Post
-
-  """
-  Our root query field type. Allows us to run any query from our mutation payload.
-  """
-  query: Query
-
-  """An edge for our \`Post\`. May be used by Relay 1."""
-  postEdge(
-    """The method to use when ordering \`Post\`."""
-    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
-  ): PostsEdge
-
-  """Reads a single \`Person\` that is related to this \`Post\`."""
-  personByAuthorId: Person
-}
-
-"""All input for the \`createPost\` mutation."""
-input CreatePostInput {
-  """
-  An arbitrary string value with no semantic meaning. Will be included in the
-  payload verbatim. May be used to track mutations by the client.
-  """
-  clientMutationId: String
-  t: String
+  object: CompoundTypeInput!
 }
 
 """The output of our \`tableMutation\` mutation."""
@@ -23234,7 +23118,7 @@ input TableMutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  id: Int
+  id: Int!
 }
 
 """The output of our \`postWithSuffix\` mutation."""
@@ -23268,8 +23152,8 @@ input PostWithSuffixInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  post: PostInput
-  suffix: String
+  post: PostInput!
+  suffix: String!
 }
 
 """An input for mutations affecting \`Post\`"""
@@ -23304,7 +23188,7 @@ input MutationCompoundTypeArrayInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  object: CompoundTypeInput
+  object: CompoundTypeInput!
 }
 
 """The output of our \`compoundTypeArrayMutation\` mutation."""
@@ -23329,7 +23213,7 @@ input CompoundTypeArrayMutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  object: CompoundTypeInput
+  object: CompoundTypeInput!
 }
 
 """The output of our \`postMany\` mutation."""
@@ -23354,7 +23238,7 @@ input PostManyInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  posts: [PostInput]
+  posts: [PostInput]!
 }
 
 """The output of our \`mutationOutComplex\` mutation."""
@@ -23385,8 +23269,8 @@ input MutationOutComplexInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  a: Int
-  b: String
+  a: Int!
+  b: String!
 }
 
 """The output of our \`mutationOutComplexSetof\` mutation."""
@@ -23417,8 +23301,8 @@ input MutationOutComplexSetofInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  a: Int
-  b: String
+  a: Int!
+  b: String!
 }
 
 """The output of our \`mutationOutTable\` mutation."""
@@ -23557,7 +23441,7 @@ input TypeFunctionMutationInput {
   payload verbatim. May be used to track mutations by the client.
   """
   clientMutationId: String
-  id: Int
+  id: Int!
 }
 
 """The output of our \`typeFunctionListMutation\` mutation."""
@@ -24404,6 +24288,44 @@ input CreateIssue756Input {
 input Issue756Input {
   id: Int
   ts: NotNullTimestamp
+}
+
+"""The output of our create \`Post\` mutation."""
+type CreatePostPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+
+  """The \`Post\` that was created by this mutation."""
+  post: Post
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Post\`. May be used by Relay 1."""
+  postEdge(
+    """The method to use when ordering \`Post\`."""
+    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PostsEdge
+
+  """Reads a single \`Person\` that is related to this \`Post\`."""
+  personByAuthorId: Person
+}
+
+"""All input for the create \`Post\` mutation."""
+input CreatePostInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+
+  """The \`Post\` to be created by this mutation."""
+  post: PostInput!
 }
 
 """The output of our create \`Person\` mutation."""
@@ -41173,26 +41095,9 @@ export const plans = {
         }
       }
     },
-    createPost: {
-      plan($root, args, _info) {
-        const selectArgs = makeArgs123(args, ["input"]);
-        const $result = resource_create_postPgResource.execute(selectArgs, "mutation");
-        return object({
-          result: $result
-        });
-      },
-      args: {
-        input: {
-          autoApplyAfterParentPlan: true,
-          applyPlan(_, $object) {
-            return $object;
-          }
-        }
-      }
-    },
     tableMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs124(args, ["input"]);
+        const selectArgs = makeArgs123(args, ["input"]);
         const $result = resource_table_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -41209,7 +41114,7 @@ export const plans = {
     },
     postWithSuffix: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs125(args, ["input"]);
+        const selectArgs = makeArgs124(args, ["input"]);
         const $result = resource_post_with_suffixPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -41226,7 +41131,7 @@ export const plans = {
     },
     mutationCompoundTypeArray: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs126(args, ["input"]);
+        const selectArgs = makeArgs125(args, ["input"]);
         const $result = resource_mutation_compound_type_arrayPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -41243,7 +41148,7 @@ export const plans = {
     },
     compoundTypeArrayMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs127(args, ["input"]);
+        const selectArgs = makeArgs126(args, ["input"]);
         const $result = resource_compound_type_array_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -41260,7 +41165,7 @@ export const plans = {
     },
     postMany: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs128(args, ["input"]);
+        const selectArgs = makeArgs127(args, ["input"]);
         const $result = resource_post_manyPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -41277,7 +41182,7 @@ export const plans = {
     },
     mutationOutComplex: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs129(args, ["input"]);
+        const selectArgs = makeArgs128(args, ["input"]);
         const $result = resource_mutation_out_complexPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -41294,7 +41199,7 @@ export const plans = {
     },
     mutationOutComplexSetof: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs130(args, ["input"]);
+        const selectArgs = makeArgs129(args, ["input"]);
         const $result = resource_mutation_out_complex_setofPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -41311,7 +41216,7 @@ export const plans = {
     },
     mutationOutTable: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs131(args, ["input"]);
+        const selectArgs = makeArgs130(args, ["input"]);
         const $result = resource_mutation_out_tablePgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -41328,7 +41233,7 @@ export const plans = {
     },
     mutationOutTableSetof: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs132(args, ["input"]);
+        const selectArgs = makeArgs131(args, ["input"]);
         const $result = resource_mutation_out_table_setofPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -41345,7 +41250,7 @@ export const plans = {
     },
     tableSetMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs133(args, ["input"]);
+        const selectArgs = makeArgs132(args, ["input"]);
         const $result = resource_table_set_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -41362,7 +41267,7 @@ export const plans = {
     },
     typeFunctionConnectionMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs134(args, ["input"]);
+        const selectArgs = makeArgs133(args, ["input"]);
         const $result = resource_type_function_connection_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -41379,7 +41284,7 @@ export const plans = {
     },
     typeFunctionMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs135(args, ["input"]);
+        const selectArgs = makeArgs134(args, ["input"]);
         const $result = resource_type_function_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -41396,7 +41301,7 @@ export const plans = {
     },
     typeFunctionListMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs136(args, ["input"]);
+        const selectArgs = makeArgs135(args, ["input"]);
         const $result = resource_type_function_list_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -41738,6 +41643,23 @@ export const plans = {
       plan(_, args) {
         const plan = object({
           result: pgInsertSingle(pgResource_issue756PgResource, Object.create(null))
+        });
+        args.apply(plan);
+        return plan;
+      },
+      args: {
+        input: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $object) {
+            return $object;
+          }
+        }
+      }
+    },
+    createPost: {
+      plan(_, args) {
+        const plan = object({
+          result: pgInsertSingle(pgResource_postPgResource, Object.create(null))
         });
         args.apply(plan);
         return plan;
@@ -44244,63 +44166,6 @@ export const plans = {
     },
     object: undefined
   },
-  CreatePostPayload: {
-    __assertStep: ObjectStep,
-    clientMutationId($object) {
-      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
-    },
-    post($object) {
-      return $object.get("result");
-    },
-    query() {
-      return rootValue();
-    },
-    postEdge: {
-      plan($mutation, args, info) {
-        const $result = $mutation.getStepForKey("result", true);
-        if (!$result) {
-          return constant(null);
-        }
-        const $select = (() => {
-          if ($result instanceof PgDeleteSingleStep) {
-            return pgSelectFromRecord($result.resource, $result.record());
-          } else {
-            const spec = postUniques[0].attributes.reduce((memo, attributeName) => {
-              memo[attributeName] = $result.get(attributeName);
-              return memo;
-            }, Object.create(null));
-            return pgResource_postPgResource.find(spec);
-          }
-        })();
-        // Perform ordering
-        const $value = args.getRaw("orderBy");
-        applyOrderToPlan($select, $value, info.schema.getType("PostsOrderBy"));
-        const $connection = connection($select);
-        // NOTE: you must not use `$single = $select.single()`
-        // here because doing so will mark the row as unique, and
-        // then the ordering logic (and thus cursor) will differ.
-        const $single = $select.row(first($select));
-        return new EdgeStep($connection, $single);
-      },
-      args: {
-        orderBy: undefined
-      }
-    },
-    personByAuthorId($record) {
-      return pgResource_personPgResource.get({
-        id: $record.get("result").get("author_id")
-      });
-    }
-  },
-  CreatePostInput: {
-    clientMutationId: {
-      applyPlan($input, val) {
-        $input.set("clientMutationId", val.get());
-      },
-      autoApplyAfterParentApplyPlan: true
-    },
-    t: undefined
-  },
   TableMutationPayload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
@@ -46294,6 +46159,69 @@ export const plans = {
         $insert.set("ts", val.get());
       },
       autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
+  CreatePostPayload: {
+    __assertStep: assertExecutableStep,
+    clientMutationId($mutation) {
+      return $mutation.getStepForKey("clientMutationId", true) ?? constant(null);
+    },
+    post($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
+    postEdge: {
+      plan($mutation, args, info) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = postUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return pgResource_postPgResource.find(spec);
+          }
+        })();
+        // Perform ordering
+        const $value = args.getRaw("orderBy");
+        applyOrderToPlan($select, $value, info.schema.getType("PostsOrderBy"));
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      args: {
+        orderBy: undefined
+      }
+    },
+    personByAuthorId($record) {
+      return pgResource_personPgResource.get({
+        id: $record.get("result").get("author_id")
+      });
+    }
+  },
+  CreatePostInput: {
+    clientMutationId: {
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
+      autoApplyAfterParentApplyPlan: true
+    },
+    post: {
+      applyPlan($object) {
+        const $record = $object.getStepForKey("result");
+        return $record.setPlan();
+      },
       autoApplyAfterParentApplyPlan: true
     }
   },
