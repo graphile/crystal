@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-title: EXPORTABLE
+title: Exportable/importable
 ---
 
 As explained in [how it works](./how-it-works.md), your GraphQL schema must be
@@ -10,16 +10,17 @@ external libraries.
 
 Generally speaking there are 2 methods of acheiving this, used in unison:
 
-1. All functions and their scope dependencies must be correctly wrapped in
-   `EXPORTABLE`
-2. If a dependency cannot be made `EXPORTABLE` then instead of depending on it
-   via the JavaScript scope, it should be passed at runtime via the GraphQL
-   `context` and referenced from there (the third argument to a resolver, or via
-   the
+1. All functions and their scope dependencies must be made exportable by
+   wrapping in an `EXPORTABLE()` call, or be made importable via the special
+   `$$export` property
+2. If a dependency cannot be made exportable/importable then instead of
+   depending on it via the JavaScript scope, it should be passed at runtime via
+   the GraphQL `context` and referenced from there (the third argument to a
+   resolver, or via the
    [context()](https://grafast.org/grafast/step-library/standard-steps/context)
    step in Gra*fast*)
 
-## Using EXPORTABLE
+## Making a value EXPORTABLE
 
 You can import `EXPORTABLE` from `graphile-export/helpers` to avoid loading
 unnecessary code into memory:
@@ -33,6 +34,8 @@ that accepts a list of the target functions scope dependencies and returns the
 target function, and a list of the values for those dependencies. By convention
 we maintain the names of the dependencies (i.e. we explicitly shadow the
 variables) so that adding (or removing) EXPORTABLE causes minimal code changes.
+
+### Simple EXPORTABLE example
 
 For example, this simple `getExportTime()` function has one external variable,
 `EXPORT_TIME`:
@@ -96,7 +99,7 @@ to generate it.
 
 :::
 
-### GraphQL Example
+### GraphQL EXPORTABLE example
 
 Imagine that you have a resolver such as the `User.friends` resolver shown here:
 
@@ -106,16 +109,19 @@ import { db } from "../runtime/db";
 const resolvers = {
   User: {
     async friends(user, args, context, resolveInfo) {
+      // highlight-next-line
       return await db.friends.loadMany(user.id, context);
     },
   },
 };
 ```
 
-To wrap this with `EXPORTABLE` we must rewrite this from a method into a property:
+Note that this resolver has a dependency on `db` from a higher JavaScript
+scope. To wrap this with `EXPORTABLE` we must rewrite this from a method into a
+property:
 
 ```diff
--    async friends(user, args, context, resolveInfo) {
+-    async friends  (user, args, context, resolveInfo)    {
 +    friends: async (user, args, context, resolveInfo) => {
        return await db.friends.loadMany(user.id, context);
      },
@@ -124,10 +130,10 @@ To wrap this with `EXPORTABLE` we must rewrite this from a method into a propert
 Then we insert `EXPORTABLE(() =>` before the arrow function, and `)` after it:
 
 ```diff
--    friends: async (user, args, context, resolveInfo) => {
+-    friends:                  async (user, args, context, resolveInfo) => {
 +    friends: EXPORTABLE(() => async (user, args, context, resolveInfo) => {
        return await db.friends.loadMany(user.id, context);
--    },
+-    } ,
 +    }),
 ```
 
@@ -143,31 +149,48 @@ provides the `user` and `context` variables via the function arguments, the
 it:
 
 ```diff
--    friends: EXPORTABLE(() => async (user, args, context, resolveInfo) => {
+-    friends: EXPORTABLE((  ) => async (user, args, context, resolveInfo) => {
 +    friends: EXPORTABLE((db) => async (user, args, context, resolveInfo) => {
        return await db.friends.loadMany(user.id, context);
--    }),
+-    }      ),
 +    }, [db]),
 ```
 
-Finally, `db` itself needs to be "exportable". We could do this in the same
-way, but we'd need to do this all the way down and typically we need to break
-the pattern somewhere (unless we only depend on "simple" values). One approach
-is to mark the `db` as something that is exported such that the exported code
-will emit an `import` statement for it:
+## Making a value importable with `$$export`
 
-```diff title="runtime/db.ts"
- export const db = new DatabaseConnection();
+In the example above, `db` itself needs to be "exportable". We could do this in
+the same way, but we'd need to do this all the way down and typically we need
+to break the pattern somewhere unless we only depend on "simple" values.
 
-+ // Detail from where this value can be imported so that our exported schema
-+ // can import it at runtime.
-+ db.$$export = { moduleName: "./runtime/db", exportName: "db" }
+The `$$export` special property can be added to a JavaScript
+object/function/array/instance to tell Graphile Export that rather than trying
+to write out the code for the entity itself, it should instead just import that
+value from the given location. The `$$export` property on the entity should be
+set to an object with two keys: `moduleName` which outlines the source of the
+`import` statement (this is typically an `npm` module name, though it can also
+be a path to a local file relative to where the exported code will be located),
+and `exportName` which details which value should be imported (use `default` for
+the default export).
+
+### $$export example
+
+For the example above, we might do this in the `runtime/db.ts` file like this:
+
+```ts title="runtime/db.ts"
+export const db = new DatabaseConnection();
+
+// highlight-start
+// Detail from where this value can be imported so that our exported schema
+// can import it at runtime.
+db.$$export = { moduleName: "./runtime/db", exportName: "db" };
+// highlight-end
 ```
 
 When we export the schema, we should then see something like:
 
 ```js
 import { GraphQLObjectType } from "graphql";
+// highlight-next-line
 import { db } from "./runtime/db";
 
 /* ... */
@@ -179,6 +202,7 @@ const User = new GraphQLObjectType({
     friends: {
       /* ... */
       async resolve(user, args, context, resolveInfo) {
+        // highlight-next-line
         return await db.friends.loadMany(user.id, context);
       },
     },
@@ -186,7 +210,7 @@ const User = new GraphQLObjectType({
 });
 ```
 
-## Using context
+## Making resolvers pure via context
 
 An alternative to wrapping everything in `EXPORTABLE` is to ensure that your
 functions are pure. For resolvers, this can be achieved by never relying on
@@ -197,8 +221,10 @@ context. Our example above could instead have been:
 const resolvers = {
   User: {
     async friends(user, args, context, resolveInfo) {
+      // highlight-start
       // Extract the dependency from the GraphQL context
       const { db } = context;
+      // highlight-end
       return await db.friends.loadMany(user.id, context);
     },
   },
@@ -211,24 +237,22 @@ thus is already exportable without requiring an `EXPORTABLE()` wrapper.
 How to pass values to the GraphQL context at runtime will differ depending on
 what server framework you are using. For Grafast it might look something like:
 
-```ts
+```ts title="graphile.config.ts"
 import type {} from "grafast";
+// highlight-next-line
 import { db } from "./runtime/db";
 
 export const preset: GraphileConfig.Preset = {
   grafast: {
-    context(ctx) {
-      return {
-        db,
-      };
-    },
+    // highlight-next-line
+    context: (ctx) => ({ db }),
   },
 };
 ```
 
-# Troubleshooting
+## Troubleshooting
 
-## undefined variable `EXPORTABLE`
+### undefined variable `EXPORTABLE`
 
 Our ESLint plugin isn't smart enough to actually `import` the `EXPORTABLE`
 helper, so after running the autofix you might end up with "undefined variable
@@ -278,10 +302,13 @@ export function EXPORTABLE(factory, args, nameHint) {
 
 )
 
-## Cannot find module 'graphile-export/helpers' or its corresponding type declarations.
+### Cannot find module 'graphile-export/helpers'
 
-You're living in the past! This error happens because your `tsconfig.json` is
-configured as if you were living in Node.js v14 (or before) times!
+If TypeScript gives you the error
+`Cannot find module 'graphile-export/helpers' or its corresponding type declarations.`
+then it's likely you're living in the past! This error happens because your
+`tsconfig.json` is configured as if you were living in Node.js v14 (or before)
+times!
 
 The easiest solution is to use a really simple TSConfig.json such as the
 `@tsconfig/node20` default which already configures TypeScript to support this:
