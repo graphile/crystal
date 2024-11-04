@@ -1102,7 +1102,13 @@ function modFields(
                   ) {
                     // This is a scalar computed attribute, let's inline the expression
                     const newSelectArgs = selectArgs.map(
-                      (arg, i): PgSelectArgumentDigest => {
+                      (
+                        arg,
+                        i,
+                      ): PgSelectArgumentDigest & {
+                        // We _MUST_ set `name` if we're told one
+                        name: string | undefined;
+                      } => {
                         const { name } = arg;
                         if (i === 0) {
                           return {
