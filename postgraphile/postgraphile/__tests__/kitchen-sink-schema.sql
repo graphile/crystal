@@ -727,10 +727,10 @@ create function c.func_returns_table_one_col(i int) returns table (col1 int) as 
   select i + 43 as col1;
 $$ language sql stable;
 
-create function c.func_returns_table_multi_col(i int) returns table (col1 int, col2 text) as $$
-  select i + 42 as col1, 'out'::text as col2
+create function c.func_returns_table_multi_col(i int, a int default null, b int default null) returns table (col1 int, col2 text) as $$
+  select i + 42 + coalesce(a, 0) + coalesce(b, 0) as col1, 'out'::text as col2
   union
-  select i + 43 as col1, 'out2'::text as col2;
+  select i + 43 + coalesce(a, 0) + coalesce(b, 0) as col1, 'out2'::text as col2;
 $$ language sql stable;
 
 create function c.mutation_in_inout(i int, inout ino int) as $$
