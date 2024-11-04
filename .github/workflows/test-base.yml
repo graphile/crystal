@@ -22,11 +22,6 @@ on:
         type: string
         default: ""
         required: false
-      exportSchema:
-        description: Optional mode for graphile-export
-        type: string
-        default: ""
-        required: false
 
 jobs:
   build:
@@ -34,11 +29,11 @@ jobs:
 
     env:
       CI: true
+      JEST_MAX_WORKERS: 4
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGHOST: localhost
       PGVERSION: ${{ matrix.postgres-version}}
-      ROOT_DATABASE_URL: postgres://postgres:postgres@localhost:5432/postgres
-      TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/graphileengine_test
-      TEST_PG_URL: postgres://postgres:postgres@localhost:5432/postgraphile_test
-      LDS_TEST_DATABASE_URL: postgres://postgres:postgres@localhost:5432/lds_test
       TEST_SIMPLIFY_DATABASE_URL: postgres://postgres:postgres@localhost:5432/pg_simplify_inflectors
       TERM: xterm
       FORCE_COLOR: 1
@@ -48,7 +43,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        postgres-version: [12] #, 11, 13, 14, 15]
+        postgres-version: [12, 17] #, 11, 13, 14, 15]
         node-version: [20.x] #, 18.x]
 
     services:
@@ -82,8 +77,9 @@ jobs:
           docker restart postgres
       - name: Install pg_dump
         run: |
-          sudo bash -c "echo deb http://apt.postgresql.org/pub/repos/apt/ focal-pgdg main >> /etc/apt/sources.list.d/pgdg.list"
-          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+          sudo mkdir -p /usr/share/keyrings
+          wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor > /usr/share/keyrings/pgdg-archive-keyring.gpg
+          echo "deb [signed-by=/usr/share/keyrings/pgdg-archive-keyring.gpg] http://apt.postgresql.org/pub/repos/apt/ jammy-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list > /dev/null
           sudo apt-get update
           sudo apt-get -yqq install postgresql-client-${{ matrix.postgres-version }}
 
@@ -104,8 +100,6 @@ jobs:
           run prepack
 
       - name: "Test Project"
-        env:
-          EXPORT_SCHEMA: ${{ inputs.exportSchema }}
         run:
           yarn run pretest && yarn workspaces foreach -vp --jobs 2 --from '${{
           inputs.package }}' run ${{ inputs.testcommand }} ${{ inputs.args }}

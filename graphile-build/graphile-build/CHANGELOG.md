@@ -1,5 +1,107 @@
 # graphile-build
 
+## 5.0.0-beta.27
+
+### Patch Changes
+
+- [#2208](https://github.com/graphile/crystal/pull/2208)
+  [`632691409`](https://github.com/graphile/crystal/commit/6326914098af55f20ac85ccf3537e75910a7dafa)
+  Thanks [@benjie](https://github.com/benjie)! - Behaviors can now be registered
+  by more than one plugin. Apply behaviors to more entities. Don't log so much.
+
+## 5.0.0-beta.26
+
+### Patch Changes
+
+- [#2207](https://github.com/graphile/crystal/pull/2207)
+  [`0b1f7b577`](https://github.com/graphile/crystal/commit/0b1f7b577114a49b8e3283823845ec6e37484240)
+  Thanks [@benjie](https://github.com/benjie)! - Fix overwhelming logs and
+  errors being output by the new behavior system
+
+## 5.0.0-beta.25
+
+### Patch Changes
+
+- [#2156](https://github.com/graphile/crystal/pull/2156)
+  [`653929af0`](https://github.com/graphile/crystal/commit/653929af0a99a8a4d52b66e66c736be668b8700a)
+  Thanks [@benjie](https://github.com/benjie)! - Improve error message when
+  `build.getTypeByName` and related methods are called before the 'init' phase
+  is complete.
+
+- [#2198](https://github.com/graphile/crystal/pull/2198)
+  [`eb69c7361`](https://github.com/graphile/crystal/commit/eb69c7361fc7bf8c5b1ce342eeb698bd28c9e013)
+  Thanks [@benjie](https://github.com/benjie)! - Fix incorrect context type used
+  for GraphQLSchema_types hook, and add `config` to same context.
+
+- [#2160](https://github.com/graphile/crystal/pull/2160)
+  [`54054b873`](https://github.com/graphile/crystal/commit/54054b8733236ba7b2f2fa47d84e085f7196e3f9)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug where creating the
+  build object also initialized it; this is incorrect since if you just want the
+  build object you don't necessarily want to register all of the GraphQL types
+  (and potentially discover naming conflicts) at that moment. Introduced new
+  `schemaBuilder.initBuild(schemaBuilder.createBuild(input))` API to explicitly
+  handle initing if you need an initialized build object.
+
+- [#2160](https://github.com/graphile/crystal/pull/2160)
+  [`426e9320e`](https://github.com/graphile/crystal/commit/426e9320e76ef95927eebb6fe4072050b6208771)
+  Thanks [@benjie](https://github.com/benjie)! - Massive overhaul of the
+  behavior system which now has a centralized registry of known behaviors and
+  applies behaviors in a more careful and nuanced way, removing many hacks and
+  workarounds, and ultimately meaning that `defaultBehavior: "-*"` should now
+  operate correctly. Importantly, `addBehaviorToTags()` has been removed - you
+  should use `plugin.schema.entityBehaviors` to indicate behaviors as shown in
+  this PR - do not mod the tags directly unless they're explicitly meant to be
+  overrides.
+
+  Technically this is a significant breaking change (besides the removal of the
+  `addBehaviorToTags()` helper) because the order in which behaviors are applied
+  has changed, and so a different behavior might ultimately "win". This shows up
+  in places where there is ambiguity, for example if you add `@filterable` to a
+  function that you don't have execute permissions on, that function will now
+  show up in the schema since user overrides (smart tags) "win" versus inferred
+  behaviors such as introspected permissions; this wasn't the case before.
+  Hopefully most users will not notice any difference, and for those who do, the
+  `graphile behavior debug` CLI may be able to help you figure out what's going
+  on.
+
+  Be sure to print your schema before and after this update and look for
+  changes; if there are changes then you likely need to fix the relevant
+  behaviors/smart tags. (Hopefully there's no changes for you!)
+
+  You'll also need to change any places where you're specifying behaviors that
+  will be type checked; you can either cast your existing strings e.g.
+  `defaultBehavior: "+connection -list" as GraphileBuild.BehaviorString`, or
+  preferably you can specify your behaviors as an array, which should give you
+  auto-complete on each entry; e.g. `defaultBehavior: ["connection", "-list"]`.
+
+- [#2199](https://github.com/graphile/crystal/pull/2199)
+  [`3b09b414f`](https://github.com/graphile/crystal/commit/3b09b414ff43c34593373fa1f242481b0c7ada70)
+  Thanks [@benjie](https://github.com/benjie)! - Database enum comments are now
+  reflected in the schema.
+
+- [#2155](https://github.com/graphile/crystal/pull/2155)
+  [`8b472cd51`](https://github.com/graphile/crystal/commit/8b472cd51cd66d8227f9f2722d09c0a774792b0f)
+  Thanks [@benjie](https://github.com/benjie)! - `disablePlugins` now supports
+  TypeScript auto-completion of known plugin names. Other names are still
+  accepted without error, so this is just a minor DX improvement rather than
+  type safety.
+
+- [#2198](https://github.com/graphile/crystal/pull/2198)
+  [`ba637b56d`](https://github.com/graphile/crystal/commit/ba637b56d79a14f82fe555739921724eab0c07f7)
+  Thanks [@benjie](https://github.com/benjie)! - Ensure that interface subtypes
+  are added to schema even if not referenced directly.
+- Updated dependencies
+  [[`d5834def1`](https://github.com/graphile/crystal/commit/d5834def1fb84f3e2c0c0a6f146f8249a6df890a),
+  [`42b982463`](https://github.com/graphile/crystal/commit/42b9824637a6c05e02935f2b05b5e8e0c61965a6),
+  [`884a4b429`](https://github.com/graphile/crystal/commit/884a4b4297af90fdadaf73addd524f1fbbcfdcce),
+  [`38835313a`](https://github.com/graphile/crystal/commit/38835313ad93445206dccdd4cf07b90c5a6e4377),
+  [`cc0941731`](https://github.com/graphile/crystal/commit/cc0941731a1679bc04ce7b7fd4254009bb5f1f62),
+  [`b0865d169`](https://github.com/graphile/crystal/commit/b0865d1691105b5419009954c98c8109a27a5d81),
+  [`8b472cd51`](https://github.com/graphile/crystal/commit/8b472cd51cd66d8227f9f2722d09c0a774792b0f),
+  [`9cd9bb522`](https://github.com/graphile/crystal/commit/9cd9bb5222a9f0398ee4b8bfa4f741b6de2a2192)]:
+  - grafast@0.1.1-beta.15
+  - graphile-config@0.0.1-beta.10
+
 ## 5.0.0-beta.24
 
 ### Patch Changes

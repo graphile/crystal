@@ -1,5 +1,14 @@
 # eslint-plugin-graphile-export
 
+## 0.0.2-beta.5
+
+### Patch Changes
+
+- [#2175](https://github.com/graphile/crystal/pull/2175)
+  [`c69b2fdec`](https://github.com/graphile/crystal/commit/c69b2fdec2d73f1101440eb96fe126f9ad77db98)
+  Thanks [@benjie](https://github.com/benjie)! - Fix 'Container is falsy' error
+  message the latest Babel patch release would cause.
+
 ## 0.0.2-beta.4
 
 ### Patch Changes

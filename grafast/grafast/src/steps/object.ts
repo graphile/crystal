@@ -14,6 +14,8 @@ import { UnbatchedExecutableStep } from "../step.js";
 import { constant, ConstantStep } from "./constant.js";
 import type { SetterCapableStep } from "./setter.js";
 
+const DEFAULT_CACHE_SIZE = 100;
+
 const EMPTY_OBJECT = Object.freeze(Object.create(null));
 
 // const debugObjectPlan = debugFactory("grafast:ObjectStep");
@@ -35,6 +37,11 @@ export interface ObjectPlanMeta<
   TSteps extends { [key: string]: ExecutableStep },
 > {
   results: Results<TSteps>;
+}
+
+interface ObjectStepCacheConfig {
+  identifier?: string;
+  cacheSize?: number;
 }
 
 /**
@@ -59,10 +66,19 @@ export class ObjectStep<
 
   // Optimize needs the same 'meta' for all ObjectSteps
   optimizeMetaKey = "ObjectStep";
+  private cacheSize: number;
 
-  constructor(obj: TPlans) {
+  constructor(obj: TPlans, cacheConfig?: ObjectStepCacheConfig) {
     super();
-    this.metaKey = this.id;
+    this.cacheSize =
+      cacheConfig?.cacheSize ??
+      (cacheConfig?.identifier ? DEFAULT_CACHE_SIZE : 0);
+    this.metaKey =
+      this.cacheSize <= 0
+        ? undefined
+        : cacheConfig?.identifier
+        ? `object|${JSON.stringify(Object.keys(obj))}|${cacheConfig.identifier}`
+        : this.id;
     this.keys = Object.keys(obj);
     for (let i = 0, l = this.keys.length; i < l; i++) {
       this.addDependency({ step: obj[this.keys[i]], skipDeduplication: true });
@@ -172,13 +188,15 @@ ${te.join(
   "",
 )}\
 `;
-    return te.runInBatch<Parameters<typeof callback>[0]>(
-      te`\
-(function ({ meta }, ${te.join(
-        this.keys.map((_k, i) => te.identifier(`val${i}`)),
-        ", ",
-      )}) {
-  if (meta.nextIndex) {
+    const vals = te.join(
+      this.keys.map((_k, i) => te.identifier(`val${i}`)),
+      ", ",
+    );
+    if (this.cacheSize > 0) {
+      return te.runInBatch<Parameters<typeof callback>[0]>(
+        te`\
+(function ({ meta }, ${vals}) {
+  if (meta.nextIndex != null) {
     for (let i = 0, l = meta.results.length; i < l; i++) {
       const [values, obj] = meta.results[i];
       if (${te.join(
@@ -192,21 +210,31 @@ ${te.join(
     }
   } else {
     meta.nextIndex = 0;
-    if (!meta.results) {
-      meta.results = [];
-    }
+    meta.results = [];
   }
 ${inner}
   meta.results[meta.nextIndex] = [[${te.join(
     this.keys.map((_key, i) => te.identifier(`val${i}`)),
     ",",
   )}], newObj];
-  // Only cache 10 results, use a round-robin
-  meta.nextIndex = meta.nextIndex === 9 ? 0 : meta.nextIndex + 1;
+  // Only cache ${te.lit(this.cacheSize)} results, use a round-robin
+  meta.nextIndex = meta.nextIndex === ${te.lit(
+    this.cacheSize - 1,
+  )} ? 0 : meta.nextIndex + 1;
   return newObj;
 })`,
-      callback,
-    );
+        callback,
+      );
+    } else {
+      return te.runInBatch<Parameters<typeof callback>[0]>(
+        te`\
+(function (_, ${vals}) {
+${inner}
+  return newObj;
+})`,
+        callback,
+      );
+    }
   }
 
   finalize() {
@@ -295,6 +323,7 @@ ${inner}
  */
 export function object<TPlans extends { [key: string]: ExecutableStep }>(
   obj: TPlans,
+  cacheConfig?: ObjectStepCacheConfig,
 ): ObjectStep<TPlans> {
-  return new ObjectStep<TPlans>(obj);
+  return new ObjectStep<TPlans>(obj, cacheConfig);
 }

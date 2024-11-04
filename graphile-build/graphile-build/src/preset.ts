@@ -2,9 +2,12 @@ import "./interfaces.js";
 import "graphile-config";
 
 import {
+  AddInterfaceSubtypesToTypesPlugin,
   AddNodeInterfaceToSuitableTypesPlugin,
   BuiltinScalarConnectionsPlugin,
   ClientMutationIdDescriptionPlugin,
+  CollectReferencedTypesPlugin,
+  CommonBehaviorsPlugin,
   CommonTypesPlugin,
   ConnectionPlugin,
   CursorTypePlugin,
@@ -25,10 +28,13 @@ import {
 // TODO: version this
 export const defaultPreset: GraphileConfig.Preset = {
   plugins: [
+    // Must come first
+    CollectReferencedTypesPlugin,
     QueryPlugin,
     MutationPlugin,
     SubscriptionPlugin,
     // StreamDeferPlugin,
+    CommonBehaviorsPlugin,
     ClientMutationIdDescriptionPlugin,
     MutationPayloadQueryPlugin,
     CursorTypePlugin,
@@ -43,5 +49,6 @@ export const defaultPreset: GraphileConfig.Preset = {
     NodeIdCodecPipeStringPlugin,
     RegisterQueryNodePlugin,
     NodeAccessorPlugin,
+    AddInterfaceSubtypesToTypesPlugin,
   ],
 };

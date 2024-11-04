@@ -397,10 +397,50 @@ Equivalent to `pgSelectFromRecord(resource, $record).single()`.
 
 `pgSelect` and `pgSelectSingle` are what we call "opaque steps" - that is you
 are not intended to use their underlying data directly, instead you use their
-methods to extract the data you need to use with other steps.
+methods to extract the data you need to use with other steps - for example
+`$user.get('username')` to extract the username, or `$user.record()` to turn a
+pgSelectSingle step into a step representing a record object.
+
+:::info Opaque step specifics
 
 Currently a `pgSelectSingle` doesn't use the object representation you might
 expect, instead it uses a tuple with entries for each of the selected
 attributes. The makeup of this tuple will vary depending on which attributes
-you requested, and in which order, so you must not rely on its structure. To
-get an attribute you should use `$pgSelectSingle.get(attr)` or similar
+you requested, and in which order, so you must not rely on its structure; this
+approach makes pgSelectSingle very efficient, but it can cause confusion for
+people trying to "print out" a user object and just seeing an array containing
+some assorted values. Use `$pgSelectSingle.get(attrName)` or
+`$pgSelectSingle.record()` to get a step representing a value more suitable for
+logging/debugging.
+
+:::
+
+### Transforming the results from a PgSelect step
+
+A PgSelect step represents a collection of opaque tuples; sometimes you may
+want to transform these in some way, which you can do with list manipulation
+steps such as:
+
+- [`each`](../standard-steps/each.md) - maps over the list and builds a new
+  representation of each item (e.g. turning a list of users into a list of
+  usernames: `const $usernames = each($users, $user => $user.get('username'))`)
+- [`filter`](../standard-steps/filter.md) - reduces the number of items in the
+  list by performing filtering in your JavaScript runtime; typically you'd want
+  to use `$pgSelect.where(...)` instead in order to filter on the database side
+  for efficiency, but `filter()` can be useful:
+  `const $admins = filter($users, $user => $user.get('is_admin'))`
+- [`first`](../standard-steps/first.md) / [`last`](../standard-steps/last.md) -
+  get the first/last entry from the list:
+  `const $firstUser = $users.row(first($users));`
+- [`groupBy`](../standard-steps/groupBy.md) - group the records into a map
+  containing sub-lists keyed by a shared value, for example "posts by author":
+  `const $postsByUser = groupBy($posts, $post => $post.get('author_id'))`
+
+Note that if you perform this kind of transformation, it does not always take
+place immediately - sometimes the transforms are only applied when the step is
+paginated over. If you then use this step as a dependency of another step, you
+may get the raw (untransformed) values, causing confusion and bugs. To solve
+this, for now, you should use
+[`applyTransforms`](../standard-steps/applyTransforms.md) to force the
+transform to take place at the current level, such that depending on the
+transformed values is safe.

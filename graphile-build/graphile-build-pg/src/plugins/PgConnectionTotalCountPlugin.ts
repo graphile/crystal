@@ -22,6 +22,9 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      totalCount: true;
+    }
     interface ScopeObjectFieldsField {
       /**
        * 'true' if this field is the 'totalCount' field on a connection as
@@ -37,6 +40,15 @@ export const PgConnectionTotalCountPlugin: GraphileConfig.Plugin = {
   description: "Add 'totalCount' field to connections",
   version,
   schema: {
+    behaviorRegistry: {
+      add: {
+        totalCount: {
+          description: "on a codec, should we add the totalCount field?",
+          entities: ["pgCodec"],
+        },
+      },
+    },
+
     entityBehavior: {
       pgCodec: "totalCount",
     },

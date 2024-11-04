@@ -61,6 +61,19 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      queryField: true;
+      mutationField: true;
+      typeField: true;
+      "typeField:resource:connection": true;
+      "typeField:resource:list": true;
+      "typeField:resource:array": true;
+      "queryField:resource:connection": true;
+      "queryField:resource:list": true;
+      "queryField:resource:array": true;
+      "typeField:single": true;
+      "queryField:single": true;
+    }
     interface Build {
       pgGetArgDetailsFromParameters(
         resource: PgResource<any, any, any, any, any>,
@@ -189,8 +202,8 @@ function shouldUseCustomConnection(
 
 function defaultProcSourceBehavior(
   s: PgResource<any, any, any, any, any>,
-): string {
-  const behavior = [];
+): GraphileBuild.BehaviorString {
+  const behavior: GraphileBuild.BehaviorString[] = ["-array"];
   const firstParameter = (
     s as PgResource<any, any, any, readonly PgResourceParameter[], any>
   ).parameters[0];
@@ -228,11 +241,11 @@ function defaultProcSourceBehavior(
     const canUseConnection =
       !s.sqlPartitionByIndex && !s.isList && !s.codec.arrayOfCodec;
     if (!canUseConnection) {
-      behavior.push("-connection +list");
+      behavior.push("-connection", "-list", "array");
     }
   }
 
-  return behavior.join(" ");
+  return behavior.join(" ") as GraphileBuild.BehaviorString;
 }
 
 function hasRecord(
@@ -331,19 +344,65 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
       scalarFunctionEdgeType(options, details) {
         return this.edgeType(this.upperCamelCase(this._functionName(details)));
       },
-      functionMutationResultFieldName(_options, _details) {
-        return "result";
+      functionMutationResultFieldName(_options, details) {
+        return details.resource.extensions?.tags?.resultFieldName ?? "result";
       },
     },
   },
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        queryField: {
+          description: 'a "custom query function"',
+          entities: ["pgResource"],
+        },
+        mutationField: {
+          description: 'a "custom mutation function"',
+          entities: ["pgResource"],
+        },
+        typeField: {
+          description:
+            'a "custom field function" - add it to a specific type (aka "computed column")',
+          entities: ["pgResource"],
+        },
+        "typeField:resource:connection": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "typeField:resource:list": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "typeField:resource:array": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "queryField:resource:connection": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "queryField:resource:list": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "queryField:resource:array": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "typeField:single": {
+          description: "",
+          entities: ["pgResource"],
+        },
+        "queryField:single": {
+          description: "",
+          entities: ["pgResource"],
+        },
+      },
+    },
     entityBehavior: {
       pgResource: {
-        provides: ["inferred"],
-        after: ["defaults"],
-        before: ["overrides"],
-        callback(behavior, entity) {
+        inferred(behavior, entity) {
           if (entity.parameters) {
             return [behavior, defaultProcSourceBehavior(entity)];
           } else {
@@ -834,7 +893,10 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
                               ),
                             );
                         fields[resultFieldName] = {
-                          type,
+                          type: build.nullableIf(
+                            !resource.extensions?.tags?.notNull,
+                            type,
+                          ),
                           plan: EXPORTABLE(
                             () =>
                               (
@@ -882,411 +944,438 @@ export const PgCustomTypeFieldPlugin: GraphileConfig.Plugin = {
       },
 
       GraphQLObjectType_fields(fields, build, context) {
-        const {
-          graphql: {
-            GraphQLList,
-            GraphQLNonNull,
-            GraphQLObjectType,
-            GraphQLInputObjectType,
-          },
-          inflection,
-          options,
-          pgGetArgDetailsFromParameters,
-        } = build;
-        const {
-          Self,
-          scope: { isPgClassType, pgCodec, isRootQuery, isRootMutation },
-          fieldWithHooks,
-        } = context;
-        const SelfName = Self.name;
-        if (!(isPgClassType && pgCodec) && !isRootQuery && !isRootMutation) {
-          return fields;
-        }
-        const procSources = isRootQuery
-          ? build[$$rootQuery]
-          : isRootMutation
-          ? build[$$rootMutation]
-          : pgCodec
-          ? build[$$computed].get(pgCodec) ?? []
-          : [];
-        if (procSources.length === 0) {
-          return fields;
-        }
-
-        return procSources.reduce(
-          (memo, resource) =>
-            build.recoverable(memo, () => {
-              // "Computed attributes" skip a parameter
-              const remainingParameters = (
-                isRootMutation || isRootQuery
-                  ? resource.parameters
-                  : resource.parameters.slice(1)
-              ) as PgResourceParameter[];
-
-              const { makeArgs, makeFieldArgs } = pgGetArgDetailsFromParameters(
-                resource,
-                remainingParameters,
-              );
-
-              const getSelectPlanFromParentAndArgs: FieldPlanResolver<
-                any,
-                ExecutableStep,
-                any
-              > = isRootQuery
-                ? // Not computed
-                  EXPORTABLE(
-                    (makeArgs, resource) => ($root, args, _info) => {
-                      const selectArgs = makeArgs(args);
-                      return resource.execute(selectArgs);
-                    },
-                    [makeArgs, resource],
-                  )
-                : isRootMutation
-                ? // Mutation uses 'args.input' rather than 'args'
-                  EXPORTABLE(
-                    (makeArgs, object, resource) => ($root, args, _info) => {
-                      const selectArgs = makeArgs(args, ["input"]);
-                      const $result = resource.execute(selectArgs, "mutation");
-                      return object({
-                        result: $result,
-                      });
-                    },
-                    [makeArgs, object, resource],
-                  )
-                : // Otherwise computed:
-                  EXPORTABLE(
-                    (
-                      PgSelectSingleStep,
-                      hasRecord,
-                      makeArgs,
-                      pgClassExpression,
-                      pgSelectSingleFromRecord,
-                      resource,
-                      stepAMayDependOnStepB,
-                    ) =>
-                      ($in, args, _info) => {
-                        if (!hasRecord($in)) {
-                          throw new Error(
-                            `Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`,
-                          );
-                        }
-                        const extraSelectArgs = makeArgs(args);
-                        /**
-                         * An optimisation - if all our dependencies are
-                         * compatible with the expression's class plan then we
-                         * can inline ourselves into that, otherwise we must
-                         * issue the query separately.
-                         */
-                        const canUseExpressionDirectly =
-                          $in instanceof PgSelectSingleStep &&
-                          extraSelectArgs.every((a) =>
-                            stepAMayDependOnStepB($in.getClassStep(), a.step),
-                          );
-                        const $row = canUseExpressionDirectly
-                          ? $in
-                          : pgSelectSingleFromRecord(
-                              $in.resource,
-                              $in.record(),
-                            );
-                        const selectArgs: PgSelectArgumentSpec[] = [
-                          { step: $row.record() },
-                          ...extraSelectArgs,
-                        ];
-                        if (
-                          resource.isUnique &&
-                          !resource.codec.attributes &&
-                          typeof resource.from === "function"
-                        ) {
-                          // This is a scalar computed attribute, let's inline the expression
-                          const placeholders = selectArgs.map((arg, i) => {
-                            if (i === 0) {
-                              return $row.getClassStep().alias;
-                            } else if ("pgCodec" in arg && arg.pgCodec) {
-                              return $row.placeholder(arg.step, arg.pgCodec);
-                            } else {
-                              return $row.placeholder(
-                                arg.step as PgTypedExecutableStep<any>,
-                              );
-                            }
-                          });
-                          return pgClassExpression(
-                            $row,
-                            resource.codec,
-                          )`${resource.from(
-                            ...placeholders.map((placeholder) => ({
-                              placeholder,
-                            })),
-                          )}`;
-                        }
-                        // PERF: or here, if scalar add select to `$row`?
-                        return resource.execute(selectArgs);
-                      },
-                    [
-                      PgSelectSingleStep,
-                      hasRecord,
-                      makeArgs,
-                      pgClassExpression,
-                      pgSelectSingleFromRecord,
-                      resource,
-                      stepAMayDependOnStepB,
-                    ],
-                  );
-
-              if (isRootMutation) {
-                // mutation type
-                const fieldName = inflection.customMutationField({
-                  resource,
-                });
-                const payloadTypeName = inflection.customMutationPayload({
-                  resource,
-                });
-                const payloadType = build.getTypeByName(payloadTypeName);
-                const inputTypeName = inflection.customMutationInput({
-                  resource,
-                });
-                const inputType = build.getTypeByName(inputTypeName);
-                if (!(payloadType instanceof GraphQLObjectType)) {
-                  return memo;
-                }
-                if (!(inputType instanceof GraphQLInputObjectType)) {
-                  return memo;
-                }
-                memo[fieldName] = fieldWithHooks(
-                  { fieldName, fieldBehaviorScope: "mutationField" },
-                  {
-                    description: resource.description,
-                    deprecationReason: tagToString(
-                      resource.extensions?.tags?.deprecated,
-                    ),
-                    type: build.nullableIf(
-                      !resource.extensions?.tags?.notNull,
-                      payloadType,
-                    ),
-                    args: {
-                      input: {
-                        type: new GraphQLNonNull(inputType),
-                        autoApplyAfterParentPlan: true,
-                        applyPlan: EXPORTABLE(
-                          () =>
-                            function plan(_: any, $object: ObjectStep<any>) {
-                              return $object;
-                            },
-                          [],
-                        ),
-                      },
-                    },
-                    plan: getSelectPlanFromParentAndArgs as any,
-                  },
-                );
-              } else if (resource.isUnique) {
-                // NOTE: just because it's unique doesn't mean it doesn't
-                // return a list.
-
-                const type = getFunctionSourceReturnGraphQLType(
-                  build,
-                  resource,
-                );
-                if (!type) {
-                  return memo;
-                }
-
-                const fieldName = isRootQuery
-                  ? inflection.customQueryField({ resource })
-                  : inflection.computedAttributeField({ resource });
-                memo[fieldName] = fieldWithHooks(
-                  {
-                    fieldName,
-                    fieldBehaviorScope: isRootQuery
-                      ? "queryField:single"
-                      : "typeField:single",
-                  },
-                  {
-                    description: resource.description,
-                    deprecationReason: tagToString(
-                      resource.extensions?.tags?.deprecated,
-                    ),
-                    type: build.nullableIf(
-                      !resource.extensions?.tags?.notNull,
-                      type!,
-                    ),
-                    args: makeFieldArgs(),
-                    plan: getSelectPlanFromParentAndArgs as any,
-                  },
-                );
-              } else {
-                const type = getFunctionSourceReturnGraphQLType(
-                  build,
-                  resource,
-                );
-                if (!type) {
-                  return memo;
-                }
-
-                // isUnique is false => this is a 'setof' resource.
-
-                // If the resource still has an array type, then it's a 'setof
-                // foo[]' which __MUST NOT USE__ GraphQL connections; see:
-                // https://relay.dev/graphql/connections.htm#sec-Node
-                const canUseConnection =
-                  !resource.sqlPartitionByIndex && !resource.isList;
-
-                const baseScope = isRootQuery ? `queryField` : `typeField`;
-                const connectionFieldBehaviorScope = `${baseScope}:resource:connection`;
-                const listFieldBehaviorScope = `${baseScope}:resource:list`;
-                if (
-                  canUseConnection &&
-                  build.behavior.pgResourceMatches(
-                    resource,
-                    connectionFieldBehaviorScope,
-                  )
-                ) {
-                  const fieldName = isRootQuery
-                    ? inflection.customQueryConnectionField({
-                        resource,
-                      })
-                    : inflection.computedAttributeConnectionField({
-                        resource,
-                      });
-
-                  const namedType = build.graphql.getNamedType(type!);
-                  const connectionTypeName = shouldUseCustomConnection(resource)
-                    ? resource.codec.attributes
-                      ? inflection.recordFunctionConnectionType({
-                          resource,
-                        })
-                      : inflection.scalarFunctionConnectionType({
-                          resource,
-                        })
-                    : resource.codec.attributes
-                    ? inflection.tableConnectionType(resource.codec)
-                    : namedType
-                    ? inflection.connectionType(namedType.name)
-                    : null;
-
-                  const ConnectionType = connectionTypeName
-                    ? build.getOutputTypeByName(connectionTypeName)
-                    : null;
-
-                  if (ConnectionType) {
-                    memo = build.recoverable(memo, () =>
-                      build.extend(
-                        memo,
-                        {
-                          [fieldName]: fieldWithHooks(
-                            {
-                              fieldName,
-                              fieldBehaviorScope: connectionFieldBehaviorScope,
-                              isPgFieldConnection: true,
-                              pgFieldResource: resource,
-                            },
-                            {
-                              description:
-                                resource.description ??
-                                `Reads and enables pagination through a set of \`${inflection.tableType(
-                                  resource.codec,
-                                )}\`.`,
-                              deprecationReason: tagToString(
-                                resource.extensions?.tags?.deprecated,
-                              ),
-                              type: build.nullableIf(
-                                isRootQuery ?? false,
-                                ConnectionType,
-                              ),
-                              args: makeFieldArgs(),
-                              plan: EXPORTABLE(
-                                (connection, getSelectPlanFromParentAndArgs) =>
-                                  function plan(
-                                    $parent: ExecutableStep,
-                                    args: FieldArgs,
-                                    info: FieldInfo,
-                                  ) {
-                                    const $select =
-                                      getSelectPlanFromParentAndArgs(
-                                        $parent,
-                                        args,
-                                        info,
-                                      ) as PgSelectStep;
-                                    return connection($select, {
-                                      // nodePlan: ($item) => $item,
-                                      cursorPlan: ($item: any) =>
-                                        $item.getParentStep
-                                          ? $item.getParentStep().cursor()
-                                          : $item.cursor(),
-                                    });
-                                  },
-                                [connection, getSelectPlanFromParentAndArgs],
-                              ),
-                            },
-                          ),
-                        },
-                        `Adding field '${fieldName}' to '${SelfName}' from function resource '${resource.name}'`,
-                      ),
-                    );
-                  }
-                }
-
-                if (
-                  build.behavior.pgResourceMatches(
-                    resource,
-                    listFieldBehaviorScope,
-                  )
-                ) {
-                  const fieldName = isRootQuery
-                    ? resource.isList
-                      ? inflection.customQueryField({ resource })
-                      : inflection.customQueryListField({ resource })
-                    : resource.isList
-                    ? inflection.computedAttributeField({ resource })
-                    : inflection.computedAttributeListField({
-                        resource,
-                      });
-                  memo = build.recoverable(memo, () =>
-                    build.extend(
-                      memo,
-                      {
-                        [fieldName]: fieldWithHooks(
-                          {
-                            fieldName,
-                            fieldBehaviorScope: listFieldBehaviorScope,
-                            isPgFieldSimpleCollection: resource.isList
-                              ? false // No pagination if it returns an array - just return it.
-                              : true,
-                            pgFieldResource: resource,
-                          },
-                          {
-                            description: resource.description,
-                            deprecationReason: tagToString(
-                              resource.extensions?.tags?.deprecated,
-                            ),
-                            type: build.nullableIf(
-                              !resource.extensions?.tags?.notNull,
-                              new GraphQLList(
-                                build.nullableIf(
-                                  !resource.extensions?.tags?.notNull &&
-                                    (resource.isList ||
-                                      !options.pgForbidSetofFunctionsToReturnNull),
-                                  type!,
-                                ),
-                              ),
-                            ),
-                            args: makeFieldArgs(),
-                            plan: getSelectPlanFromParentAndArgs as any,
-                          },
-                        ),
-                      },
-                      `Adding list field '${fieldName}' to ${SelfName} from function resource '${resource.name}'`,
-                    ),
-                  );
-                }
-              }
-              return memo;
-            }),
-          fields,
-        );
+        return modFields(fields, build, context, false);
+      },
+      GraphQLInterfaceType_fields(fields, build, context) {
+        return modFields(fields, build, context, true);
       },
     },
   },
 };
+
+function modFields(
+  fields: GraphileBuild.GrafastFieldConfigMap<any, any>,
+  build: GraphileBuild.Build,
+  context:
+    | GraphileBuild.ContextObjectFields
+    | GraphileBuild.ContextInterfaceFields,
+  isInterface: boolean,
+) {
+  const {
+    graphql: {
+      GraphQLList,
+      GraphQLNonNull,
+      GraphQLObjectType,
+      GraphQLInputObjectType,
+    },
+    inflection,
+    options,
+    pgGetArgDetailsFromParameters,
+  } = build;
+  const { Self, scope, fieldWithHooks } = context;
+  const {
+    // Shared
+    pgCodec,
+
+    // Object:
+    isPgClassType,
+    isRootQuery,
+    isRootMutation,
+
+    // Interface:
+    isPgPolymorphicTableType,
+    pgPolymorphism,
+  } = scope as Partial<GraphileBuild.ScopeObjectFields> &
+    Partial<GraphileBuild.ScopeInterfaceFields>;
+  const SelfName = Self.name;
+  if (isInterface) {
+    if (!isPgPolymorphicTableType || !pgPolymorphism) {
+      return fields;
+    }
+    if (
+      pgPolymorphism.mode !== "single" &&
+      pgPolymorphism.mode !== "relational"
+    ) {
+      return fields;
+    }
+    // TODO: remove this and fix issue where computed columns are not added to polymorphic types
+    return fields;
+  } else {
+    if (!(isPgClassType && pgCodec) && !isRootQuery && !isRootMutation) {
+      return fields;
+    }
+  }
+
+  // TODO: factor in where computed column is added to `mode:relational` base (shared) table
+  const procSources = isRootQuery
+    ? build[$$rootQuery]
+    : isRootMutation
+    ? build[$$rootMutation]
+    : pgCodec
+    ? build[$$computed].get(pgCodec) ?? []
+    : [];
+  if (procSources.length === 0) {
+    return fields;
+  }
+
+  return procSources.reduce(
+    (memo, resource) =>
+      build.recoverable(memo, () => {
+        // "Computed attributes" skip a parameter
+        const remainingParameters = (
+          isRootMutation || isRootQuery
+            ? resource.parameters
+            : resource.parameters.slice(1)
+        ) as PgResourceParameter[];
+
+        const { makeArgs, makeFieldArgs } = pgGetArgDetailsFromParameters(
+          resource,
+          remainingParameters,
+        );
+
+        const getSelectPlanFromParentAndArgs: FieldPlanResolver<
+          any,
+          ExecutableStep,
+          any
+        > = isRootQuery
+          ? // Not computed
+            EXPORTABLE(
+              (makeArgs, resource) => ($root, args, _info) => {
+                const selectArgs = makeArgs(args);
+                return resource.execute(selectArgs);
+              },
+              [makeArgs, resource],
+            )
+          : isRootMutation
+          ? // Mutation uses 'args.input' rather than 'args'
+            EXPORTABLE(
+              (makeArgs, object, resource) => ($root, args, _info) => {
+                const selectArgs = makeArgs(args, ["input"]);
+                const $result = resource.execute(selectArgs, "mutation");
+                return object({
+                  result: $result,
+                });
+              },
+              [makeArgs, object, resource],
+            )
+          : // Otherwise computed:
+            EXPORTABLE(
+              (
+                PgSelectSingleStep,
+                hasRecord,
+                makeArgs,
+                pgClassExpression,
+                pgSelectSingleFromRecord,
+                resource,
+                stepAMayDependOnStepB,
+              ) =>
+                ($in, args, _info) => {
+                  if (!hasRecord($in)) {
+                    throw new Error(
+                      `Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`,
+                    );
+                  }
+                  const extraSelectArgs = makeArgs(args);
+                  /**
+                   * An optimisation - if all our dependencies are
+                   * compatible with the expression's class plan then we
+                   * can inline ourselves into that, otherwise we must
+                   * issue the query separately.
+                   */
+                  const canUseExpressionDirectly =
+                    $in instanceof PgSelectSingleStep &&
+                    extraSelectArgs.every((a) =>
+                      stepAMayDependOnStepB($in.getClassStep(), a.step),
+                    );
+                  const $row = canUseExpressionDirectly
+                    ? $in
+                    : pgSelectSingleFromRecord($in.resource, $in.record());
+                  const selectArgs: PgSelectArgumentSpec[] = [
+                    { step: $row.record() },
+                    ...extraSelectArgs,
+                  ];
+                  if (
+                    resource.isUnique &&
+                    !resource.codec.attributes &&
+                    typeof resource.from === "function"
+                  ) {
+                    // This is a scalar computed attribute, let's inline the expression
+                    const placeholders = selectArgs.map((arg, i) => {
+                      if (i === 0) {
+                        return $row.getClassStep().alias;
+                      } else if ("pgCodec" in arg && arg.pgCodec) {
+                        return $row.placeholder(arg.step, arg.pgCodec);
+                      } else {
+                        return $row.placeholder(
+                          arg.step as PgTypedExecutableStep<any>,
+                        );
+                      }
+                    });
+                    return pgClassExpression(
+                      $row,
+                      resource.codec,
+                    )`${resource.from(
+                      ...placeholders.map((placeholder) => ({
+                        placeholder,
+                      })),
+                    )}`;
+                  }
+                  // PERF: or here, if scalar add select to `$row`?
+                  return resource.execute(selectArgs);
+                },
+              [
+                PgSelectSingleStep,
+                hasRecord,
+                makeArgs,
+                pgClassExpression,
+                pgSelectSingleFromRecord,
+                resource,
+                stepAMayDependOnStepB,
+              ],
+            );
+
+        if (isRootMutation) {
+          // mutation type
+          const fieldName = inflection.customMutationField({
+            resource,
+          });
+          const payloadTypeName = inflection.customMutationPayload({
+            resource,
+          });
+          const payloadType = build.getTypeByName(payloadTypeName);
+          const inputTypeName = inflection.customMutationInput({
+            resource,
+          });
+          const inputType = build.getTypeByName(inputTypeName);
+          if (!(payloadType instanceof GraphQLObjectType)) {
+            return memo;
+          }
+          if (!(inputType instanceof GraphQLInputObjectType)) {
+            return memo;
+          }
+          memo[fieldName] = fieldWithHooks(
+            { fieldName, fieldBehaviorScope: "mutationField" },
+            {
+              description: resource.description,
+              deprecationReason: tagToString(
+                resource.extensions?.tags?.deprecated,
+              ),
+              type: payloadType,
+              args: {
+                input: {
+                  type: new GraphQLNonNull(inputType),
+                  autoApplyAfterParentPlan: true,
+                  applyPlan: EXPORTABLE(
+                    () =>
+                      function plan(_: any, $object: ObjectStep<any>) {
+                        return $object;
+                      },
+                    [],
+                  ),
+                },
+              },
+              plan: getSelectPlanFromParentAndArgs as any,
+            },
+          );
+        } else if (resource.isUnique) {
+          // NOTE: just because it's unique doesn't mean it doesn't
+          // return a list.
+
+          const type = getFunctionSourceReturnGraphQLType(build, resource);
+          if (!type) {
+            return memo;
+          }
+
+          const fieldName = isRootQuery
+            ? inflection.customQueryField({ resource })
+            : inflection.computedAttributeField({ resource });
+          memo[fieldName] = fieldWithHooks(
+            {
+              fieldName,
+              fieldBehaviorScope: isRootQuery
+                ? "queryField:single"
+                : "typeField:single",
+            },
+            {
+              description: resource.description,
+              deprecationReason: tagToString(
+                resource.extensions?.tags?.deprecated,
+              ),
+              type: build.nullableIf(
+                !resource.extensions?.tags?.notNull,
+                type!,
+              ),
+              args: makeFieldArgs(),
+              plan: getSelectPlanFromParentAndArgs as any,
+            },
+          );
+        } else {
+          const type = getFunctionSourceReturnGraphQLType(build, resource);
+          if (!type) {
+            return memo;
+          }
+
+          // isUnique is false => this is a 'setof' resource.
+
+          // If the resource still has an array type, then it's a 'setof
+          // foo[]' which __MUST NOT USE__ GraphQL connections; see:
+          // https://relay.dev/graphql/connections.htm#sec-Node
+          const canUseConnection =
+            !resource.sqlPartitionByIndex && !resource.isList;
+
+          const baseScope = isRootQuery ? `queryField` : `typeField`;
+          const connectionFieldBehaviorScope =
+            `${baseScope}:resource:connection` as const;
+          const listFieldBehaviorScope = canUseConnection
+            ? (`${baseScope}:resource:list` as const)
+            : (`${baseScope}:resource:array` as const);
+          if (
+            canUseConnection &&
+            build.behavior.pgResourceMatches(
+              resource,
+              connectionFieldBehaviorScope,
+            )
+          ) {
+            const fieldName = isRootQuery
+              ? inflection.customQueryConnectionField({
+                  resource,
+                })
+              : inflection.computedAttributeConnectionField({
+                  resource,
+                });
+
+            const namedType = build.graphql.getNamedType(type!);
+            const connectionTypeName = shouldUseCustomConnection(resource)
+              ? resource.codec.attributes
+                ? inflection.recordFunctionConnectionType({
+                    resource,
+                  })
+                : inflection.scalarFunctionConnectionType({
+                    resource,
+                  })
+              : resource.codec.attributes
+              ? inflection.tableConnectionType(resource.codec)
+              : namedType
+              ? inflection.connectionType(namedType.name)
+              : null;
+
+            const ConnectionType = connectionTypeName
+              ? build.getOutputTypeByName(connectionTypeName)
+              : null;
+
+            if (ConnectionType) {
+              memo = build.recoverable(memo, () =>
+                build.extend(
+                  memo,
+                  {
+                    [fieldName]: fieldWithHooks(
+                      {
+                        fieldName,
+                        fieldBehaviorScope: connectionFieldBehaviorScope,
+                        isPgFieldConnection: true,
+                        pgFieldResource: resource,
+                      },
+                      {
+                        description:
+                          resource.description ??
+                          `Reads and enables pagination through a set of \`${inflection.tableType(
+                            resource.codec,
+                          )}\`.`,
+                        deprecationReason: tagToString(
+                          resource.extensions?.tags?.deprecated,
+                        ),
+                        type: build.nullableIf(
+                          isRootQuery ?? false,
+                          ConnectionType,
+                        ),
+                        args: makeFieldArgs(),
+                        plan: EXPORTABLE(
+                          (connection, getSelectPlanFromParentAndArgs) =>
+                            function plan(
+                              $parent: ExecutableStep,
+                              args: FieldArgs,
+                              info: FieldInfo,
+                            ) {
+                              const $select = getSelectPlanFromParentAndArgs(
+                                $parent,
+                                args,
+                                info,
+                              ) as PgSelectStep;
+                              return connection($select, {
+                                // nodePlan: ($item) => $item,
+                                cursorPlan: ($item: any) =>
+                                  $item.getParentStep
+                                    ? $item.getParentStep().cursor()
+                                    : $item.cursor(),
+                              });
+                            },
+                          [connection, getSelectPlanFromParentAndArgs],
+                        ),
+                      },
+                    ),
+                  },
+                  `Adding field '${fieldName}' to '${SelfName}' from function resource '${resource.name}'`,
+                ),
+              );
+            }
+          }
+
+          if (
+            build.behavior.pgResourceMatches(resource, listFieldBehaviorScope)
+          ) {
+            const fieldName = isRootQuery
+              ? resource.isList
+                ? inflection.customQueryField({ resource })
+                : inflection.customQueryListField({ resource })
+              : resource.isList
+              ? inflection.computedAttributeField({ resource })
+              : inflection.computedAttributeListField({
+                  resource,
+                });
+            memo = build.recoverable(memo, () =>
+              build.extend(
+                memo,
+                {
+                  [fieldName]: fieldWithHooks(
+                    {
+                      fieldName,
+                      fieldBehaviorScope: listFieldBehaviorScope,
+                      isPgFieldSimpleCollection: resource.isList
+                        ? false // No pagination if it returns an array - just return it.
+                        : true,
+                      pgFieldResource: resource,
+                    },
+                    {
+                      description: resource.description,
+                      deprecationReason: tagToString(
+                        resource.extensions?.tags?.deprecated,
+                      ),
+                      type: build.nullableIf(
+                        !resource.extensions?.tags?.notNull,
+                        new GraphQLList(
+                          build.nullableIf(
+                            !resource.extensions?.tags?.notNull &&
+                              (resource.isList ||
+                                !options.pgForbidSetofFunctionsToReturnNull),
+                            type!,
+                          ),
+                        ),
+                      ),
+                      args: makeFieldArgs(),
+                      plan: getSelectPlanFromParentAndArgs as any,
+                    },
+                  ),
+                },
+                `Adding list field '${fieldName}' to ${SelfName} from function resource '${resource.name}'`,
+              ),
+            );
+          }
+        }
+        return memo;
+      }),
+    fields,
+  );
+}
 
 function getPreferredType(
   build: GraphileBuild.Build,

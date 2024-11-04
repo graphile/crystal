@@ -1,8 +1,56 @@
-import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgUnionAll, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
-import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, makeGrafastSchema, object, rootValue } from "grafast";
+import { PgDeleteSingleStep, PgExecutor, PgResource, PgSelectSingleStep, PgSelectStep, PgUnionAllStep, TYPES, assertPgClassSingleStep, enumCodec, makeRegistry, pgClassExpression, pgDeleteSingle, pgInsertSingle, pgSelectFromRecord, pgSelectSingleFromRecord, pgUnionAll, pgUpdateSingle, recordCodec, sqlFromArgDigests } from "@dataplan/pg";
+import { ConnectionStep, EdgeStep, ObjectStep, SafeError, __ValueStep, assertEdgeCapableStep, assertExecutableStep, assertPageInfoCapableStep, connection, constant, context, first, getEnumValueConfig, makeGrafastSchema, object, rootValue, stepAMayDependOnStepB } from "grafast";
 import { GraphQLError, Kind } from "graphql";
 import { sql } from "pg-sql2";
 import { inspect } from "util";
+function hasRecord($row) {
+  return "record" in $row && typeof $row.record === "function";
+}
+const argDetailsSimple = [];
+const makeArgs = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 0; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
 const executor = new PgExecutor({
   name: "main",
   context() {
@@ -2320,6 +2368,9 @@ const registryConfig_pgResources_aws_application_first_party_vulnerabilities_aws
       schemaName: "polymorphic",
       name: "aws_application_first_party_vulnerabilities"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       omit: true
     }
@@ -2349,6 +2400,9 @@ const registryConfig_pgResources_aws_application_third_party_vulnerabilities_aws
       schemaName: "polymorphic",
       name: "aws_application_third_party_vulnerabilities"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       omit: true
     }
@@ -2378,6 +2432,9 @@ const registryConfig_pgResources_gcp_application_first_party_vulnerabilities_gcp
       schemaName: "polymorphic",
       name: "gcp_application_first_party_vulnerabilities"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       omit: true
     }
@@ -2407,6 +2464,9 @@ const registryConfig_pgResources_gcp_application_third_party_vulnerabilities_gcp
       schemaName: "polymorphic",
       name: "gcp_application_third_party_vulnerabilities"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       omit: true
     }
@@ -2443,6 +2503,9 @@ const registryConfig_pgResources_organizations_organizations = {
       schemaName: "polymorphic",
       name: "organizations"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       unionMember: "PersonOrOrganization"
     }
@@ -2479,6 +2542,9 @@ const registryConfig_pgResources_people_people = {
       schemaName: "polymorphic",
       name: "people"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       unionMember: "PersonOrOrganization",
       ref: "applications to:Application",
@@ -2510,6 +2576,9 @@ const registryConfig_pgResources_priorities_priorities = {
       schemaName: "polymorphic",
       name: "priorities"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       omit: "create,update,delete,filter,order"
     }
@@ -2539,6 +2608,9 @@ const registryConfig_pgResources_relational_checklists_relational_checklists = {
       schemaName: "polymorphic",
       name: "relational_checklists"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -2566,6 +2638,9 @@ const registryConfig_pgResources_relational_item_relation_composite_pks_relation
       schemaName: "polymorphic",
       name: "relational_item_relation_composite_pks"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -2593,6 +2668,9 @@ const registryConfig_pgResources_relational_topics_relational_topics = {
       schemaName: "polymorphic",
       name: "relational_topics"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -2620,6 +2698,9 @@ const registryConfig_pgResources_single_table_item_relation_composite_pks_single
       schemaName: "polymorphic",
       name: "single_table_item_relation_composite_pks"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -2647,6 +2728,9 @@ const registryConfig_pgResources_relational_checklist_items_relational_checklist
       schemaName: "polymorphic",
       name: "relational_checklist_items"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -2674,6 +2758,9 @@ const registryConfig_pgResources_relational_dividers_relational_dividers = {
       schemaName: "polymorphic",
       name: "relational_dividers"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -2708,6 +2795,9 @@ const registryConfig_pgResources_relational_item_relations_relational_item_relat
       schemaName: "polymorphic",
       name: "relational_item_relations"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -2742,6 +2832,9 @@ const registryConfig_pgResources_single_table_item_relations_single_table_item_r
       schemaName: "polymorphic",
       name: "single_table_item_relations"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -2769,6 +2862,9 @@ const registryConfig_pgResources_log_entries_log_entries = {
       schemaName: "polymorphic",
       name: "log_entries"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       ref: "author to:PersonOrOrganization singular",
       refVia: spec_logEntries.extensions.tags.refVia
@@ -2799,6 +2895,9 @@ const registryConfig_pgResources_relational_posts_relational_posts = {
       schemaName: "polymorphic",
       name: "relational_posts"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -2826,6 +2925,9 @@ const registryConfig_pgResources_first_party_vulnerabilities_first_party_vulnera
       schemaName: "polymorphic",
       name: "first_party_vulnerabilities"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       implements: "Vulnerability",
       ref: spec_firstPartyVulnerabilities.extensions.tags.ref,
@@ -2857,6 +2959,9 @@ const registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnera
       schemaName: "polymorphic",
       name: "third_party_vulnerabilities"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       implements: "Vulnerability",
       ref: spec_thirdPartyVulnerabilities.extensions.tags.ref,
@@ -2888,6 +2993,9 @@ const registryConfig_pgResources_aws_applications_aws_applications = {
       schemaName: "polymorphic",
       name: "aws_applications"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       implements: "Application",
       ref: spec_awsApplications.extensions.tags.ref,
@@ -2919,6 +3027,9 @@ const registryConfig_pgResources_gcp_applications_gcp_applications = {
       schemaName: "polymorphic",
       name: "gcp_applications"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       implements: "Application",
       ref: spec_gcpApplications.extensions.tags.ref,
@@ -2926,7 +3037,9 @@ const registryConfig_pgResources_gcp_applications_gcp_applications = {
     }
   }
 };
+const single_table_items_meaning_of_lifeFunctionIdentifer = sql.identifier("polymorphic", "single_table_items_meaning_of_life");
 const custom_delete_relational_itemFunctionIdentifer = sql.identifier("polymorphic", "custom_delete_relational_item");
+const relational_items_meaning_of_lifeFunctionIdentifer = sql.identifier("polymorphic", "relational_items_meaning_of_life");
 const single_table_itemsUniques = [{
   isPrimary: true,
   attributes: ["id"],
@@ -2951,6 +3064,9 @@ const registryConfig_pgResources_single_table_items_single_table_items = {
       schemaName: "polymorphic",
       name: "single_table_items"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       interface: "mode:single type:type",
       type: spec_singleTableItems.extensions.tags.type,
@@ -2984,6 +3100,9 @@ const registryConfig_pgResources_relational_items_relational_items = {
       schemaName: "polymorphic",
       name: "relational_items"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       interface: "mode:relational",
       type: spec_relationalItems.extensions.tags.type
@@ -3053,6 +3172,33 @@ const registryConfig = {
     third_party_vulnerabilities: registryConfig_pgResources_third_party_vulnerabilities_third_party_vulnerabilities,
     aws_applications: registryConfig_pgResources_aws_applications_aws_applications,
     gcp_applications: registryConfig_pgResources_gcp_applications_gcp_applications,
+    single_table_items_meaning_of_life: {
+      executor,
+      name: "single_table_items_meaning_of_life",
+      identifier: "main.polymorphic.single_table_items_meaning_of_life(polymorphic.single_table_items)",
+      from(...args) {
+        return sql`${single_table_items_meaning_of_lifeFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "sti",
+        required: true,
+        notNull: false,
+        codec: singleTableItemsCodec
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "single_table_items_meaning_of_life"
+        },
+        tags: {}
+      },
+      description: undefined
+    },
     custom_delete_relational_item: {
       executor,
       name: "custom_delete_relational_item",
@@ -3080,9 +3226,35 @@ const registryConfig = {
           name: "custom_delete_relational_item"
         },
         tags: {
-          arg0variant: "nodeId",
-          behavior: ["-filter -order"]
+          arg0variant: "nodeId"
         }
+      },
+      description: undefined
+    },
+    relational_items_meaning_of_life: {
+      executor,
+      name: "relational_items_meaning_of_life",
+      identifier: "main.polymorphic.relational_items_meaning_of_life(polymorphic.relational_items)",
+      from(...args) {
+        return sql`${relational_items_meaning_of_lifeFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "ri",
+        required: true,
+        notNull: false,
+        codec: relationalItemsCodec
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "polymorphic",
+          name: "relational_items_meaning_of_life"
+        },
+        tags: {}
       },
       description: undefined
     },
@@ -3103,9 +3275,7 @@ const registryConfig = {
           schemaName: "polymorphic",
           name: "all_single_tables"
         },
-        tags: {
-          behavior: ["-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -3131,8 +3301,7 @@ const registryConfig = {
           name: "get_single_table_topic_by_id"
         },
         tags: {
-          returnType: "SingleTableTopic",
-          behavior: ["-filter -order"]
+          returnType: "SingleTableTopic"
         }
       },
       description: undefined
@@ -4209,6 +4378,7 @@ const registryConfig = {
   })
 };
 const registry = makeRegistry(registryConfig);
+const resource_single_table_items_meaning_of_lifePgResource = registry.pgResources["single_table_items_meaning_of_life"];
 const otherSource_peoplePgResource = registry.pgResources["people"];
 const otherSource_single_table_itemsPgResource = registry.pgResources["single_table_items"];
 const applyOrderToPlan = ($select, $value, TableOrderByType) => {
@@ -4864,16 +5034,8 @@ const resourceByTypeName10 = Object.assign(Object.create(null), {
   Person: otherSource_peoplePgResource,
   Organization: otherSource_organizationsPgResource
 });
-const otherSource_prioritiesPgResource = registry.pgResources["priorities"];
-const relational_topics_relational_topicsPgResource = registry.pgResources["relational_topics"];
-const relational_item_relations_relational_item_relationsPgResource = registry.pgResources["relational_item_relations"];
-const relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource = registry.pgResources["relational_item_relation_composite_pks"];
-const resource_relational_checklistsPgResource = registry.pgResources["relational_checklists"];
-const resource_relational_checklist_itemsPgResource = registry.pgResources["relational_checklist_items"];
-const resource_relational_dividersPgResource = registry.pgResources["relational_dividers"];
-const resource_relational_postsPgResource = registry.pgResources["relational_posts"];
-const argDetailsSimple = [];
-const makeArgs = (args, path = []) => {
+const argDetailsSimple2 = [];
+const makeArgs2 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
   for (let i = 0; i < 0; i++) {
@@ -4883,7 +5045,195 @@ const makeArgs = (args, path = []) => {
       pgCodec,
       required,
       fetcher
-    } = argDetailsSimple[i];
+    } = argDetailsSimple2[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
+const otherSource_prioritiesPgResource = registry.pgResources["priorities"];
+const argDetailsSimple3 = [];
+const makeArgs3 = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 0; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple3[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
+const argDetailsSimple4 = [];
+const makeArgs4 = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 0; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple4[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
+const argDetailsSimple5 = [];
+const makeArgs5 = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 0; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple5[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
+const relational_topics_relational_topicsPgResource = registry.pgResources["relational_topics"];
+const relational_item_relations_relational_item_relationsPgResource = registry.pgResources["relational_item_relations"];
+const relational_item_relation_composite_pks_relational_item_relation_composite_pksPgResource = registry.pgResources["relational_item_relation_composite_pks"];
+const resource_relational_checklistsPgResource = registry.pgResources["relational_checklists"];
+const resource_relational_checklist_itemsPgResource = registry.pgResources["relational_checklist_items"];
+const resource_relational_dividersPgResource = registry.pgResources["relational_dividers"];
+const resource_relational_postsPgResource = registry.pgResources["relational_posts"];
+const argDetailsSimple6 = [];
+const makeArgs6 = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 0; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple6[i];
     const $raw = args.getRaw([...path, graphqlArgName]);
     let step;
     if ($raw.evalIs(undefined)) {
@@ -4919,17 +5269,17 @@ const makeArgs = (args, path = []) => {
 };
 const resource_all_single_tablesPgResource = registry.pgResources["all_single_tables"];
 const getSelectPlanFromParentAndArgs = ($root, args, _info) => {
-  const selectArgs = makeArgs(args);
+  const selectArgs = makeArgs6(args);
   return resource_all_single_tablesPgResource.execute(selectArgs);
 };
-const argDetailsSimple2 = [{
+const argDetailsSimple7 = [{
   graphqlArgName: "id",
   postgresArgName: "id",
   pgCodec: TYPES.int,
   required: true,
   fetcher: null
 }];
-const makeArgs2 = (args, path = []) => {
+const makeArgs7 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
   for (let i = 0; i < 1; i++) {
@@ -4939,7 +5289,7 @@ const makeArgs2 = (args, path = []) => {
       pgCodec,
       required,
       fetcher
-    } = argDetailsSimple2[i];
+    } = argDetailsSimple7[i];
     const $raw = args.getRaw([...path, graphqlArgName]);
     let step;
     if ($raw.evalIs(undefined)) {
@@ -4999,6 +5349,7 @@ const resourceByTypeName12 = Object.assign(Object.create(null), {
 const members13 = [];
 const resourceByTypeName13 = Object.create(null);
 export const typeDefs = /* GraphQL */`type SingleTableTopic implements SingleTableItem {
+  meaningOfLife: Int
   rowId: Int!
   type: ItemType!
   parentId: Int
@@ -7336,6 +7687,7 @@ input SingleTableItemRelationCompositePkCondition {
 }
 
 type SingleTablePost implements SingleTableItem {
+  meaningOfLife: Int
   rowId: Int!
   type: ItemType!
   parentId: Int
@@ -7556,6 +7908,7 @@ type Priority {
 }
 
 type SingleTableDivider implements SingleTableItem {
+  meaningOfLife: Int
   rowId: Int!
   type: ItemType!
   parentId: Int
@@ -7737,6 +8090,7 @@ type SingleTableDivider implements SingleTableItem {
 }
 
 type SingleTableChecklist implements SingleTableItem {
+  meaningOfLife: Int
   rowId: Int!
   type: ItemType!
   parentId: Int
@@ -7922,6 +8276,7 @@ type SingleTableChecklist implements SingleTableItem {
 }
 
 type SingleTableChecklistItem implements SingleTableItem {
+  meaningOfLife: Int
   rowId: Int!
   type: ItemType!
   parentId: Int
@@ -13543,6 +13898,40 @@ input DeleteGcpApplicationByRowIdInput {
 export const plans = {
   SingleTableTopic: {
     __assertStep: assertPgClassSingleStep,
+    meaningOfLife($in, args, _info) {
+      if (!hasRecord($in)) {
+        throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
+      }
+      const extraSelectArgs = makeArgs(args);
+      /**
+       * An optimisation - if all our dependencies are
+       * compatible with the expression's class plan then we
+       * can inline ourselves into that, otherwise we must
+       * issue the query separately.
+       */
+      const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
+      const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
+      const selectArgs = [{
+        step: $row.record()
+      }, ...extraSelectArgs];
+      if (resource_single_table_items_meaning_of_lifePgResource.isUnique && !resource_single_table_items_meaning_of_lifePgResource.codec.attributes && typeof resource_single_table_items_meaning_of_lifePgResource.from === "function") {
+        // This is a scalar computed attribute, let's inline the expression
+        const placeholders = selectArgs.map((arg, i) => {
+          if (i === 0) {
+            return $row.getClassStep().alias;
+          } else if ("pgCodec" in arg && arg.pgCodec) {
+            return $row.placeholder(arg.step, arg.pgCodec);
+          } else {
+            return $row.placeholder(arg.step);
+          }
+        });
+        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...placeholders.map(placeholder => ({
+          placeholder
+        })))}`;
+      }
+      // PERF: or here, if scalar add select to `$row`?
+      return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
+    },
     rowId($record) {
       return $record.get("id");
     },
@@ -19638,6 +20027,40 @@ export const plans = {
   },
   SingleTablePost: {
     __assertStep: assertPgClassSingleStep,
+    meaningOfLife($in, args, _info) {
+      if (!hasRecord($in)) {
+        throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
+      }
+      const extraSelectArgs = makeArgs2(args);
+      /**
+       * An optimisation - if all our dependencies are
+       * compatible with the expression's class plan then we
+       * can inline ourselves into that, otherwise we must
+       * issue the query separately.
+       */
+      const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
+      const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
+      const selectArgs = [{
+        step: $row.record()
+      }, ...extraSelectArgs];
+      if (resource_single_table_items_meaning_of_lifePgResource.isUnique && !resource_single_table_items_meaning_of_lifePgResource.codec.attributes && typeof resource_single_table_items_meaning_of_lifePgResource.from === "function") {
+        // This is a scalar computed attribute, let's inline the expression
+        const placeholders = selectArgs.map((arg, i) => {
+          if (i === 0) {
+            return $row.getClassStep().alias;
+          } else if ("pgCodec" in arg && arg.pgCodec) {
+            return $row.placeholder(arg.step, arg.pgCodec);
+          } else {
+            return $row.placeholder(arg.step);
+          }
+        });
+        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...placeholders.map(placeholder => ({
+          placeholder
+        })))}`;
+      }
+      // PERF: or here, if scalar add select to `$row`?
+      return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
+    },
     rowId($record) {
       return $record.get("id");
     },
@@ -20048,6 +20471,40 @@ export const plans = {
   },
   SingleTableDivider: {
     __assertStep: assertPgClassSingleStep,
+    meaningOfLife($in, args, _info) {
+      if (!hasRecord($in)) {
+        throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
+      }
+      const extraSelectArgs = makeArgs3(args);
+      /**
+       * An optimisation - if all our dependencies are
+       * compatible with the expression's class plan then we
+       * can inline ourselves into that, otherwise we must
+       * issue the query separately.
+       */
+      const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
+      const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
+      const selectArgs = [{
+        step: $row.record()
+      }, ...extraSelectArgs];
+      if (resource_single_table_items_meaning_of_lifePgResource.isUnique && !resource_single_table_items_meaning_of_lifePgResource.codec.attributes && typeof resource_single_table_items_meaning_of_lifePgResource.from === "function") {
+        // This is a scalar computed attribute, let's inline the expression
+        const placeholders = selectArgs.map((arg, i) => {
+          if (i === 0) {
+            return $row.getClassStep().alias;
+          } else if ("pgCodec" in arg && arg.pgCodec) {
+            return $row.placeholder(arg.step, arg.pgCodec);
+          } else {
+            return $row.placeholder(arg.step);
+          }
+        });
+        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...placeholders.map(placeholder => ({
+          placeholder
+        })))}`;
+      }
+      // PERF: or here, if scalar add select to `$row`?
+      return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
+    },
     rowId($record) {
       return $record.get("id");
     },
@@ -20382,6 +20839,40 @@ export const plans = {
   },
   SingleTableChecklist: {
     __assertStep: assertPgClassSingleStep,
+    meaningOfLife($in, args, _info) {
+      if (!hasRecord($in)) {
+        throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
+      }
+      const extraSelectArgs = makeArgs4(args);
+      /**
+       * An optimisation - if all our dependencies are
+       * compatible with the expression's class plan then we
+       * can inline ourselves into that, otherwise we must
+       * issue the query separately.
+       */
+      const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
+      const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
+      const selectArgs = [{
+        step: $row.record()
+      }, ...extraSelectArgs];
+      if (resource_single_table_items_meaning_of_lifePgResource.isUnique && !resource_single_table_items_meaning_of_lifePgResource.codec.attributes && typeof resource_single_table_items_meaning_of_lifePgResource.from === "function") {
+        // This is a scalar computed attribute, let's inline the expression
+        const placeholders = selectArgs.map((arg, i) => {
+          if (i === 0) {
+            return $row.getClassStep().alias;
+          } else if ("pgCodec" in arg && arg.pgCodec) {
+            return $row.placeholder(arg.step, arg.pgCodec);
+          } else {
+            return $row.placeholder(arg.step);
+          }
+        });
+        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...placeholders.map(placeholder => ({
+          placeholder
+        })))}`;
+      }
+      // PERF: or here, if scalar add select to `$row`?
+      return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
+    },
     rowId($record) {
       return $record.get("id");
     },
@@ -20718,6 +21209,40 @@ export const plans = {
   },
   SingleTableChecklistItem: {
     __assertStep: assertPgClassSingleStep,
+    meaningOfLife($in, args, _info) {
+      if (!hasRecord($in)) {
+        throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
+      }
+      const extraSelectArgs = makeArgs5(args);
+      /**
+       * An optimisation - if all our dependencies are
+       * compatible with the expression's class plan then we
+       * can inline ourselves into that, otherwise we must
+       * issue the query separately.
+       */
+      const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
+      const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
+      const selectArgs = [{
+        step: $row.record()
+      }, ...extraSelectArgs];
+      if (resource_single_table_items_meaning_of_lifePgResource.isUnique && !resource_single_table_items_meaning_of_lifePgResource.codec.attributes && typeof resource_single_table_items_meaning_of_lifePgResource.from === "function") {
+        // This is a scalar computed attribute, let's inline the expression
+        const placeholders = selectArgs.map((arg, i) => {
+          if (i === 0) {
+            return $row.getClassStep().alias;
+          } else if ("pgCodec" in arg && arg.pgCodec) {
+            return $row.placeholder(arg.step, arg.pgCodec);
+          } else {
+            return $row.placeholder(arg.step);
+          }
+        });
+        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...placeholders.map(placeholder => ({
+          placeholder
+        })))}`;
+      }
+      // PERF: or here, if scalar add select to `$row`?
+      return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
+    },
     rowId($record) {
       return $record.get("id");
     },
@@ -23785,7 +24310,7 @@ export const plans = {
     },
     getSingleTableTopicById: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs2(args);
+        const selectArgs = makeArgs7(args);
         return resource_get_single_table_topic_by_idPgResource.execute(selectArgs);
       },
       args: {

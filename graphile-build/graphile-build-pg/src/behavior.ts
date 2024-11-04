@@ -5,6 +5,7 @@ import type {
   PgResourceExtensions,
 } from "@dataplan/pg";
 import { isDev } from "grafast";
+import { isValidBehaviorString } from "graphile-build";
 import { inspect } from "util";
 
 // NOTE: 'behaviour' is the correct spelling in UK English; we try and stick to
@@ -26,9 +27,9 @@ export function getBehavior(
       >
     | undefined
   >,
-): string {
+): GraphileBuild.BehaviorString {
   const allExtensions = Array.isArray(extensions) ? extensions : [extensions];
-  const behaviors: string[] = [];
+  const behaviors: GraphileBuild.BehaviorString[] = [];
   for (const extensions of allExtensions) {
     // LOGGING: all of these are just for user convenience, users should be guided not to use them.
     add(extensions?.tags?.behaviours);
@@ -38,7 +39,7 @@ export function getBehavior(
     // This is the real one
     add(extensions?.tags?.behavior);
   }
-  return behaviors.join(" ");
+  return behaviors.join(" ") as GraphileBuild.BehaviorString;
 
   function add(
     rawBehavior: (string | true)[] | string | true | null | undefined,
@@ -49,17 +50,19 @@ export function getBehavior(
       return;
     }
     if (Array.isArray(behavior)) {
-      if (isDev && !behavior.every(isValidBehavior)) {
+      if (isDev && !behavior.every(isValidBehaviorString)) {
         throw new Error(
           `Invalid value for behavior; expected a string or string array using simple alphanumeric strings, but found ${inspect(
             behavior,
           )}`,
         );
       }
-      behaviors.push(behavior.join(" "));
+      for (const b of behavior) {
+        behaviors.push(b as GraphileBuild.BehaviorString);
+      }
       return;
     }
-    if (isValidBehavior(behavior)) {
+    if (isValidBehaviorString(behavior)) {
       behaviors.push(behavior);
       return;
     }
@@ -69,21 +72,4 @@ export function getBehavior(
       )}`,
     );
   }
-}
-
-/**
- * We're strict with this because we want to be able to expand this in future.
- * For example I want to allow `@behavior all some` to operate the same as
- * `@behavior all\n@behavior some`. I also want to be able to add
- * `@behavior -all` to remove a previously enabled behavior.
- *
- * @internal
- */
-function isValidBehavior(behavior: unknown): behavior is string {
-  return (
-    typeof behavior === "string" &&
-    /^[+-]?([a-zA-Z](?:[_:]?[a-zA-Z0-9])+|\*)(?:\s+[+-]?(?:[a-zA-Z]([_:]?[a-zA-Z0-9])+|\*))*$/.test(
-      behavior,
-    )
-  );
 }

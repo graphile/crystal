@@ -10,6 +10,10 @@ import { version } from "../version.js";
 
 declare global {
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      jwt: true;
+    }
+
     interface SchemaOptions {
       pgJwtSecret?: Secret;
       pgJwtSignOptions?: SignOptions;
@@ -38,9 +42,7 @@ declare global {
       pgCodec?: PgCodec;
     }
   }
-}
 
-declare global {
   namespace GraphileConfig {
     interface Plugins {
       PgJWTPlugin: true;
@@ -108,6 +110,8 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
           // It's a JWT type!
           pgCodec.extensions ||= Object.create(null);
           pgCodec.extensions!.tags ||= Object.create(null);
+          // TODO: the -table should be achieved via behavior dependencies
+          // (i.e. `jwt` automatically disables `table`)
           pgCodec.extensions!.tags!.behavior = ["-table", "jwt"];
         }
       },
@@ -115,6 +119,14 @@ export const PgJWTPlugin: GraphileConfig.Plugin = {
   }),
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        jwt: {
+          description: "Does this codec represent a JWT?",
+          entities: ["pgCodec"],
+        },
+      },
+    },
     hooks: {
       init(_, build) {
         const {

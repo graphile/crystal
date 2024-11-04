@@ -103,7 +103,10 @@ ${chalk.whiteBright.underline(entry.source)}:
   }
 
   const matchText = filterString
-    ? build.behavior.stringMatches(finalString, filterString)
+    ? build.behavior.stringMatches(
+        finalString,
+        filterString as keyof GraphileBuild.BehaviorStrings,
+      )
       ? chalk.whiteBright.bold(`Positive match`)
       : chalk.red.bold(`Negative match`)
     : null;
@@ -155,7 +158,10 @@ function debugAndSimplify(
 
       const isOverridden = hasExisting(spec.scope);
       const isMatch = filterString
-        ? build.behavior.stringMatches(spec.scope.join(":"), filterString)
+        ? build.behavior.stringMatches(
+            spec.scope.join(":"),
+            filterString as keyof GraphileBuild.BehaviorStrings,
+          )
         : false;
 
       const highlightedScopeStringBase = (
@@ -234,7 +240,7 @@ function getEntities(
         if (!resource.uniques) continue;
         for (let i = 0, l = resource.uniques.length; i < l; i++) {
           const unique = resource.uniques[i];
-          memo[`${resourceName}.${i}`] = unique;
+          memo[`${resourceName}.${i}`] = [resource, unique];
         }
       }
       return memo;

@@ -1,5 +1,50 @@
 # @dataplan/pg
 
+## 0.0.1-beta.26
+
+### Patch Changes
+
+- [#2156](https://github.com/graphile/crystal/pull/2156)
+  [`6fdc6cad8`](https://github.com/graphile/crystal/commit/6fdc6cad8f8d1230202df533d05cc2bd80538f09)
+  Thanks [@benjie](https://github.com/benjie)! - Added `pgRegistry.pgExecutors`
+  so executors don't need to be looked up from a resource (this causes
+  confusion) - instead they can be referenced directly. By default there's one
+  executor called `main`, i.e. `build.input.pgRegistry.pgExecutors.main`.
+
+- [#2193](https://github.com/graphile/crystal/pull/2193)
+  [`42b982463`](https://github.com/graphile/crystal/commit/42b9824637a6c05e02935f2b05b5e8e0c61965a6)
+  Thanks [@benjie](https://github.com/benjie)! - Add support for stable
+  deduplication of object/list arguments to loadOne/loadMany, reducing redundant
+  fetches.
+
+- [#2191](https://github.com/graphile/crystal/pull/2191)
+  [`1eac03ec2`](https://github.com/graphile/crystal/commit/1eac03ec2e9da65c64b7754c04292f43da82c40b)
+  Thanks [@benjie](https://github.com/benjie)! - Broaden types around
+  `pgSelectSingleFromRecord`
+
+- [#2151](https://github.com/graphile/crystal/pull/2151)
+  [`e8a9fd424`](https://github.com/graphile/crystal/commit/e8a9fd4243981b892364148eca1df66620ddeb87)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug preventing using
+  certain steps as input to `resource.find({...})` and `resource.get({...})`.
+
+- [#2157](https://github.com/graphile/crystal/pull/2157)
+  [`50f6ce456`](https://github.com/graphile/crystal/commit/50f6ce456de3edd084869b54ee9f2eaf51a7fa0c)
+  Thanks [@benjie](https://github.com/benjie)! - 🚨 PostGraphile now ignores
+  unlogged database tables by default.
+
+- Updated dependencies
+  [[`d5834def1`](https://github.com/graphile/crystal/commit/d5834def1fb84f3e2c0c0a6f146f8249a6df890a),
+  [`42b982463`](https://github.com/graphile/crystal/commit/42b9824637a6c05e02935f2b05b5e8e0c61965a6),
+  [`884a4b429`](https://github.com/graphile/crystal/commit/884a4b4297af90fdadaf73addd524f1fbbcfdcce),
+  [`38835313a`](https://github.com/graphile/crystal/commit/38835313ad93445206dccdd4cf07b90c5a6e4377),
+  [`cc0941731`](https://github.com/graphile/crystal/commit/cc0941731a1679bc04ce7b7fd4254009bb5f1f62),
+  [`b0865d169`](https://github.com/graphile/crystal/commit/b0865d1691105b5419009954c98c8109a27a5d81),
+  [`8b472cd51`](https://github.com/graphile/crystal/commit/8b472cd51cd66d8227f9f2722d09c0a774792b0f),
+  [`9cd9bb522`](https://github.com/graphile/crystal/commit/9cd9bb5222a9f0398ee4b8bfa4f741b6de2a2192)]:
+  - grafast@0.1.1-beta.15
+  - graphile-config@0.0.1-beta.10
+  - @dataplan/json@0.0.1-beta.24
+
 ## 0.0.1-beta.25
 
 ### Patch Changes

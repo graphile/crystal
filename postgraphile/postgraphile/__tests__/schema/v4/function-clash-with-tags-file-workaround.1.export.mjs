@@ -1541,7 +1541,7 @@ const colorCodec = enumCodec({
   name: "color",
   identifier: sql.identifier("b", "color"),
   values: ["red", "green", "blue"],
-  description: undefined,
+  description: "Represents the colours red, green and blue.",
   extensions: {
     pg: {
       serviceName: "main",
@@ -3172,6 +3172,9 @@ const registryConfig_pgResources_foreign_key_foreign_key = {
       schemaName: "a",
       name: "foreign_key"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -3198,6 +3201,9 @@ const registryConfig_pgResources_unique_foreign_key_unique_foreign_key = {
       schemaName: "a",
       name: "unique_foreign_key"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       omit: "create,update,delete,all,order,filter",
       behavior: spec_uniqueForeignKey.extensions.tags.behavior
@@ -3236,6 +3242,9 @@ const registryConfig_pgResources_person_secret_person_secret = {
       schemaName: "c",
       name: "person_secret"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       deprecated: "This is deprecated (comment on table c.person_secret)."
     }
@@ -3273,6 +3282,9 @@ const registryConfig_pgResources_compound_key_compound_key = {
       schemaName: "c",
       name: "compound_key"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -3334,6 +3346,9 @@ const registryConfig_pgResources_left_arm_left_arm = {
       schemaName: "c",
       name: "left_arm"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -3354,9 +3369,10 @@ const resourceConfig_jwt_token = {
       schemaName: "b",
       name: "jwt_token"
     },
-    tags: {
-      behavior: ["-insert", "-update", "-delete"]
-    }
+    isInsertable: false,
+    isUpdatable: false,
+    isDeletable: false,
+    tags: {}
   }
 };
 const authenticateFunctionIdentifer = sql.identifier("b", "authenticate");
@@ -3384,6 +3400,9 @@ const registryConfig_pgResources_issue756_issue756 = {
       schemaName: "c",
       name: "issue756"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -3430,6 +3449,9 @@ const registryConfig_pgResources_post_post = {
       schemaName: "a",
       name: "post"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       omit: "create",
       behavior: spec_post.extensions.tags.behavior
@@ -3453,9 +3475,10 @@ const resourceConfig_compound_type = {
       schemaName: "c",
       name: "compound_type"
     },
-    tags: {
-      behavior: ["-insert", "-update", "-delete"]
-    }
+    isInsertable: false,
+    isUpdatable: false,
+    isDeletable: false,
+    tags: {}
   }
 };
 const compound_type_mutationFunctionIdentifer = sql.identifier("b", "compound_type_mutation");
@@ -3515,6 +3538,9 @@ const registryConfig_pgResources_person_person = {
       schemaName: "c",
       name: "person"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -3552,6 +3578,9 @@ const registryConfig_pgResources_types_types = {
       schemaName: "b",
       name: "types"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       foreignKey: spec_types.extensions.tags.foreignKey
     }
@@ -3905,9 +3934,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "current_user_id"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -3929,9 +3956,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "o"
       },
       description: undefined
@@ -3954,9 +3979,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_setof"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "o"
       },
       description: undefined
@@ -3979,9 +4002,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_unnamed"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4003,9 +4024,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "o"
       },
       description: undefined
@@ -4028,9 +4047,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_setof"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "o"
       },
       description: undefined
@@ -4053,9 +4070,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_unnamed"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4077,9 +4092,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "no_args_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4101,9 +4114,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "no_args_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4125,9 +4136,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "return_void_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4149,9 +4158,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "mutation_interval_set"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4173,9 +4180,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "query_interval_set"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4197,9 +4202,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "static_big_integer"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4226,9 +4229,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_in_out"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "o"
       },
       description: undefined
@@ -4256,9 +4257,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_returns_table_one_col"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "col1"
       },
       description: undefined
@@ -4286,9 +4285,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_in_out"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "o"
       },
       description: undefined
@@ -4316,9 +4313,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_returns_table_one_col"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "col1"
       },
       description: undefined
@@ -4346,9 +4341,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "assert_something"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4377,7 +4370,7 @@ const registry = makeRegistry({
         },
         tags: {
           omit: "execute",
-          behavior: ["queryField -mutationField -typeField", "-filter -order", "-queryField -mutationField -typeField"]
+          behavior: ["-queryField -mutationField -typeField"]
         }
       },
       description: undefined
@@ -4405,9 +4398,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "json_identity"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4434,9 +4425,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "json_identity_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4463,9 +4452,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "jsonb_identity"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4492,9 +4479,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "jsonb_identity_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4521,9 +4506,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "jsonb_identity_mutation_plpgsql"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4550,9 +4533,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "jsonb_identity_mutation_plpgsql_with_default"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4585,7 +4566,7 @@ const registry = makeRegistry({
           name: "add_1_mutation"
         },
         tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+          notNull: true
         }
       },
       description: "lol, add some stuff 1 mutation"
@@ -4618,9 +4599,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_1_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: "lol, add some stuff 1 query"
     },
@@ -4652,9 +4631,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_2_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: "lol, add some stuff 2 mutation"
     },
@@ -4686,9 +4663,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_2_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: "lol, add some stuff 2 query"
     },
@@ -4720,9 +4695,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_3_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: "lol, add some stuff 3 mutation"
     },
@@ -4754,9 +4727,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_3_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: "lol, add some stuff 3 query"
     },
@@ -4788,9 +4759,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_4_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: "lol, add some stuff 4 mutation"
     },
@@ -4822,9 +4791,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_4_mutation_error"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4856,9 +4823,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "add_4_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: "lol, add some stuff 4 query"
     },
@@ -4890,9 +4855,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "mult_1"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4924,9 +4887,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "mult_2"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4958,9 +4919,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "mult_3"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -4992,9 +4951,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "mult_4"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5026,9 +4983,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_in_inout"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "ino"
       },
       description: undefined
@@ -5051,9 +5006,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_out"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5075,9 +5028,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_out_setof"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5099,9 +5050,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_out_unnamed"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5133,9 +5082,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_in_inout"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "ino"
       },
       description: undefined
@@ -5158,9 +5105,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_out"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5182,9 +5127,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_out_setof"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5206,9 +5149,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_out_unnamed"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5232,7 +5173,7 @@ const registry = makeRegistry({
         },
         tags: {
           simpleCollections: "only",
-          behavior: ["queryField -mutationField -typeField", "-filter -order", "+list -connection"]
+          behavior: ["+list -connection"]
         }
       },
       description: undefined
@@ -5270,9 +5211,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "optional_missing_middle_1"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5309,9 +5248,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "optional_missing_middle_2"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5348,9 +5285,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "optional_missing_middle_3"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5387,9 +5322,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "optional_missing_middle_4"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5426,9 +5359,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "optional_missing_middle_5"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5450,9 +5381,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_unnamed_out_out_unnamed"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5479,9 +5408,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_returns_table_multi_col"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5518,9 +5445,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "int_set_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5557,9 +5482,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "int_set_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5581,9 +5504,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_unnamed_out_out_unnamed"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5610,9 +5531,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_returns_table_multi_col"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5639,9 +5558,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "guid_fn"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5663,9 +5580,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "mutation_interval_array"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5687,9 +5602,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "query_interval_array"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5711,9 +5624,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "mutation_text_array"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5735,9 +5646,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "query_text_array"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -5757,9 +5666,10 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "non_updatable_view"
         },
-        tags: {
-          behavior: ["-insert", "-update", "-delete"]
-        }
+        isInsertable: false,
+        isUpdatable: false,
+        isDeletable: false,
+        tags: {}
       }
     },
     inputs: {
@@ -5778,6 +5688,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "inputs"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5797,6 +5710,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "patchs"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5816,6 +5732,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "reserved"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5835,6 +5754,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "reservedPatchs"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5854,6 +5776,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "reserved_input"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5873,6 +5798,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "default_value"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5900,6 +5828,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "no_primary_key"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5919,6 +5850,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "testview"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5939,6 +5873,9 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "my_table"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5967,6 +5904,9 @@ const registry = makeRegistry({
           name: "unlogged",
           persistence: "u"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -5986,6 +5926,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "view_table"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -6006,6 +5949,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "similar_table_1"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -6025,6 +5971,9 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "similar_table_2"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -6053,6 +6002,9 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "updatable_view"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {
           uniqueKey: "x",
           unique: "x|@behavior -single -update -delete"
@@ -6075,6 +6027,9 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "null_test_record"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -6101,9 +6056,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "edge_case_computed"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6123,9 +6076,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "return_table_without_grants"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -6162,9 +6113,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "list_bde_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6184,6 +6133,9 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "edge_case"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     },
@@ -6204,9 +6156,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "authenticate_fail"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -6241,9 +6191,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "authenticate"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -6274,8 +6222,7 @@ const registry = makeRegistry({
         },
         tags: {
           arg0variant: "base",
-          resultFieldName: "leftArm",
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+          resultFieldName: "leftArm"
         }
       },
       description: undefined
@@ -6296,9 +6243,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "issue756_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -6318,9 +6263,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "issue756_set_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -6355,9 +6298,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "authenticate_many"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -6377,9 +6318,11 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "auth_payload"
         },
+        isInsertable: false,
+        isUpdatable: false,
+        isDeletable: false,
         tags: {
-          foreignKey: "(id) references c.person",
-          behavior: ["-insert", "-update", "-delete"]
+          foreignKey: "(id) references c.person"
         }
       }
     }, {
@@ -6413,9 +6356,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "authenticate_payload"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -6467,9 +6408,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "types_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6521,9 +6460,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "types_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6550,9 +6487,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "compound_type_computed_field"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6579,9 +6514,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_computed_interval_set"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6608,9 +6541,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_computed_interval_array"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6637,9 +6568,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_computed_text_array"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6674,7 +6603,7 @@ const registry = makeRegistry({
         tags: {
           sortable: true,
           filterable: true,
-          behavior: ["-queryField -mutationField typeField", "-filter -order", "filter filterBy", "orderBy order resource:connection:backwards"]
+          behavior: ["filter filterBy", "orderBy order resource:connection:backwards"]
         }
       },
       description: undefined
@@ -6710,7 +6639,7 @@ const registry = makeRegistry({
         tags: {
           sortable: true,
           filterable: true,
-          behavior: ["-queryField -mutationField typeField", "-filter -order", "filter filterBy", "orderBy order resource:connection:backwards"]
+          behavior: ["filter filterBy", "orderBy order resource:connection:backwards"]
         }
       },
       description: undefined
@@ -6738,9 +6667,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_out_compound_type"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6767,9 +6694,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_out_compound_type"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6806,9 +6731,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_headline_trimmed"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6845,9 +6768,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_headline_trimmed_no_defaults"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6884,9 +6805,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_headline_trimmed_strict"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6923,9 +6842,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "query_output_two_rows"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -6946,9 +6863,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "compound_type_set_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -6973,9 +6888,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "compound_type_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7000,9 +6913,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "compound_type_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7027,9 +6938,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "compound_type_set_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7054,9 +6963,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "create_post"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7081,9 +6988,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "table_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7108,9 +7013,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "table_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7141,8 +7044,7 @@ const registry = makeRegistry({
           name: "post_with_suffix"
         },
         tags: {
-          deprecated: "This is deprecated (comment on function a.post_with_suffix).",
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
+          deprecated: "This is deprecated (comment on function a.post_with_suffix)."
         }
       },
       description: undefined
@@ -7168,9 +7070,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "mutation_compound_type_array"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7195,9 +7095,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "query_compound_type_array"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7222,9 +7120,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "compound_type_array_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7249,9 +7145,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "compound_type_array_query"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7281,9 +7175,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_computed_compound_type_array"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7308,9 +7200,7 @@ const registry = makeRegistry({
           schemaName: "a",
           name: "post_many"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7341,7 +7231,7 @@ const registry = makeRegistry({
           notNull: true,
           sortable: true,
           filterable: true,
-          behavior: ["-queryField -mutationField typeField", "-filter -order", "filter filterBy", "orderBy order resource:connection:backwards"]
+          behavior: ["filter filterBy", "orderBy order resource:connection:backwards"]
         },
         singleOutputParameterName: "o1"
       },
@@ -7372,7 +7262,7 @@ const registry = makeRegistry({
         },
         tags: {
           sortable: true,
-          behavior: ["-queryField -mutationField typeField", "-filter -order", "orderBy order resource:connection:backwards"]
+          behavior: ["orderBy order resource:connection:backwards"]
         }
       },
       description: "The first name of the person."
@@ -7400,9 +7290,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_computed_out_out"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -7434,9 +7322,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_computed_inout"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "ino"
       },
       description: undefined
@@ -7469,9 +7355,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_computed_inout_out"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -7504,8 +7388,7 @@ const registry = makeRegistry({
           name: "person_exists"
         },
         tags: {
-          deprecated: "This is deprecated (comment on function c.person_exists).",
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
+          deprecated: "This is deprecated (comment on function c.person_exists)."
         }
       },
       description: undefined
@@ -7533,9 +7416,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_computed_first_arg_inout_out"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -7567,9 +7448,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_complex"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -7601,9 +7480,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_complex_setof"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -7635,9 +7512,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_complex"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -7669,9 +7544,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_complex_setof"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -7708,9 +7581,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_computed_complex"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -7735,9 +7606,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_first_post"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: "The first post by the person."
     }),
@@ -7759,8 +7628,7 @@ const registry = makeRegistry({
           name: "badly_behaved_function"
         },
         tags: {
-          deprecated: "This is deprecated (comment on function c.badly_behaved_function).",
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
+          deprecated: "This is deprecated (comment on function c.badly_behaved_function)."
         }
       },
       description: undefined
@@ -7781,9 +7649,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_table"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7803,9 +7669,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "func_out_table_setof"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7825,9 +7689,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_table"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7847,9 +7709,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "mutation_out_table_setof"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7869,9 +7729,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "table_set_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7894,7 +7752,7 @@ const registry = makeRegistry({
         tags: {
           sortable: true,
           filterable: true,
-          behavior: ["queryField -mutationField -typeField", "-filter -order", "filter filterBy", "orderBy order resource:connection:backwards"]
+          behavior: ["filter filterBy", "orderBy order resource:connection:backwards"]
         }
       },
       description: undefined
@@ -7915,9 +7773,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "table_set_query_plpgsql"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -7942,9 +7798,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_computed_first_arg_inout"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        },
+        tags: {},
         singleOutputParameterName: "person"
       },
       description: undefined
@@ -7972,7 +7826,7 @@ const registry = makeRegistry({
         },
         tags: {
           sortable: true,
-          behavior: ["-queryField -mutationField typeField", "-filter -order", "orderBy order resource:connection:backwards"]
+          behavior: ["orderBy order resource:connection:backwards"]
         }
       },
       description: undefined
@@ -7994,9 +7848,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "type_function_connection"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -8016,9 +7868,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "type_function_connection_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -8043,9 +7893,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "type_function"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -8070,9 +7918,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "type_function_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -8097,9 +7943,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_type_function_connection"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -8129,9 +7973,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_type_function"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -8151,9 +7993,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "type_function_list"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -8173,9 +8013,7 @@ const registry = makeRegistry({
           schemaName: "b",
           name: "type_function_list_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     }),
@@ -8200,9 +8038,7 @@ const registry = makeRegistry({
           schemaName: "c",
           name: "person_type_function_list"
         },
-        tags: {
-          behavior: ["-queryField -mutationField typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     })
@@ -15535,16 +15371,22 @@ const makeArgs119 = (args, path = []) => {
 };
 const resource_table_mutationPgResource = registry.pgResources["table_mutation"];
 const argDetailsSimple120 = [{
-  graphqlArgName: "object",
-  postgresArgName: "object",
-  pgCodec: compoundTypeCodec,
+  graphqlArgName: "post",
+  postgresArgName: "post",
+  pgCodec: postCodec,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "suffix",
+  postgresArgName: "suffix",
+  pgCodec: TYPES.text,
   required: true,
   fetcher: null
 }];
 const makeArgs120 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 2; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -15585,7 +15427,7 @@ const makeArgs120 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_compound_type_arrayPgResource = registry.pgResources["mutation_compound_type_array"];
+const resource_post_with_suffixPgResource = registry.pgResources["post_with_suffix"];
 const argDetailsSimple121 = [{
   graphqlArgName: "object",
   postgresArgName: "object",
@@ -15637,24 +15479,18 @@ const makeArgs121 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_compound_type_array_mutationPgResource = registry.pgResources["compound_type_array_mutation"];
+const resource_mutation_compound_type_arrayPgResource = registry.pgResources["mutation_compound_type_array"];
 const argDetailsSimple122 = [{
-  graphqlArgName: "a",
-  postgresArgName: "a",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "b",
-  postgresArgName: "b",
-  pgCodec: TYPES.text,
+  graphqlArgName: "object",
+  postgresArgName: "object",
+  pgCodec: compoundTypeCodec,
   required: true,
   fetcher: null
 }];
 const makeArgs122 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 1; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -15695,24 +15531,18 @@ const makeArgs122 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_complexPgResource = registry.pgResources["mutation_out_complex"];
+const resource_compound_type_array_mutationPgResource = registry.pgResources["compound_type_array_mutation"];
 const argDetailsSimple123 = [{
-  graphqlArgName: "a",
-  postgresArgName: "a",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "b",
-  postgresArgName: "b",
-  pgCodec: TYPES.text,
+  graphqlArgName: "posts",
+  postgresArgName: "posts",
+  pgCodec: postArrayCodec,
   required: true,
   fetcher: null
 }];
 const makeArgs123 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 1; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -15753,12 +15583,24 @@ const makeArgs123 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_complex_setofPgResource = registry.pgResources["mutation_out_complex_setof"];
-const argDetailsSimple124 = [];
+const resource_post_manyPgResource = registry.pgResources["post_many"];
+const argDetailsSimple124 = [{
+  graphqlArgName: "a",
+  postgresArgName: "a",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "b",
+  postgresArgName: "b",
+  pgCodec: TYPES.text,
+  required: true,
+  fetcher: null
+}];
 const makeArgs124 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 2; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -15799,12 +15641,24 @@ const makeArgs124 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_tablePgResource = registry.pgResources["mutation_out_table"];
-const argDetailsSimple125 = [];
+const resource_mutation_out_complexPgResource = registry.pgResources["mutation_out_complex"];
+const argDetailsSimple125 = [{
+  graphqlArgName: "a",
+  postgresArgName: "a",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "b",
+  postgresArgName: "b",
+  pgCodec: TYPES.text,
+  required: true,
+  fetcher: null
+}];
 const makeArgs125 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 2; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -15845,7 +15699,7 @@ const makeArgs125 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_table_setofPgResource = registry.pgResources["mutation_out_table_setof"];
+const resource_mutation_out_complex_setofPgResource = registry.pgResources["mutation_out_complex_setof"];
 const argDetailsSimple126 = [];
 const makeArgs126 = (args, path = []) => {
   const selectArgs = [];
@@ -15891,7 +15745,7 @@ const makeArgs126 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_table_set_mutationPgResource = registry.pgResources["table_set_mutation"];
+const resource_mutation_out_tablePgResource = registry.pgResources["mutation_out_table"];
 const argDetailsSimple127 = [];
 const makeArgs127 = (args, path = []) => {
   const selectArgs = [];
@@ -15937,18 +15791,12 @@ const makeArgs127 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_type_function_connection_mutationPgResource = registry.pgResources["type_function_connection_mutation"];
-const argDetailsSimple128 = [{
-  graphqlArgName: "id",
-  postgresArgName: "id",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}];
+const resource_mutation_out_table_setofPgResource = registry.pgResources["mutation_out_table_setof"];
+const argDetailsSimple128 = [];
 const makeArgs128 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -15989,7 +15837,7 @@ const makeArgs128 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_type_function_mutationPgResource = registry.pgResources["type_function_mutation"];
+const resource_table_set_mutationPgResource = registry.pgResources["table_set_mutation"];
 const argDetailsSimple129 = [];
 const makeArgs129 = (args, path = []) => {
   const selectArgs = [];
@@ -16002,6 +15850,104 @@ const makeArgs129 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple129[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
+const resource_type_function_connection_mutationPgResource = registry.pgResources["type_function_connection_mutation"];
+const argDetailsSimple130 = [{
+  graphqlArgName: "id",
+  postgresArgName: "id",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}];
+const makeArgs130 = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 1; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple130[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
+const resource_type_function_mutationPgResource = registry.pgResources["type_function_mutation"];
+const argDetailsSimple131 = [];
+const makeArgs131 = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 0; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple131[i];
     const $raw = args.getRaw([...path, graphqlArgName]);
     let step;
     if ($raw.evalIs(undefined)) {
@@ -17825,6 +17771,7 @@ type CompoundType {
   fooBar: Int
 }
 
+"""Represents the colours red, green and blue."""
 enum Color {
   RED
   GREEN
@@ -20578,6 +20525,12 @@ type Mutation {
     """
     input: TableMutationInput!
   ): TableMutationPayload
+  postWithSuffix(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PostWithSuffixInput!
+  ): PostWithSuffixPayload @deprecated(reason: "This is deprecated (comment on function a.post_with_suffix).")
   mutationCompoundTypeArray(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -20590,6 +20543,12 @@ type Mutation {
     """
     input: CompoundTypeArrayMutationInput!
   ): CompoundTypeArrayMutationPayload
+  postMany(
+    """
+    The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
+    """
+    input: PostManyInput!
+  ): PostManyPayload
   mutationOutComplex(
     """
     The exclusive input argument for this mutation. An object type, make sure to see documentation for this object’s fields.
@@ -21756,7 +21715,7 @@ type Add1MutationPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
-  integer: Int
+  integer: Int!
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
@@ -22684,6 +22643,51 @@ input TableMutationInput {
   id: Int
 }
 
+"""The output of our \`postWithSuffix\` mutation."""
+type PostWithSuffixPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  post: Post
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+
+  """An edge for our \`Post\`. May be used by Relay 1."""
+  postEdge(
+    """The method to use when ordering \`Post\`."""
+    orderBy: [PostsOrderBy!]! = [PRIMARY_KEY_ASC]
+  ): PostsEdge
+
+  """Reads a single \`Person\` that is related to this \`Post\`."""
+  personByAuthorId: Person
+}
+
+"""All input for the \`postWithSuffix\` mutation."""
+input PostWithSuffixInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  post: PostInput
+  suffix: String
+}
+
+"""An input for mutations affecting \`Post\`"""
+input PostInput {
+  id: Int
+  headline: String!
+  body: String
+  authorId: Int
+  enums: [AnEnum]
+  comptypes: [ComptypeInput]
+}
+
 """The output of our \`mutationCompoundTypeArray\` mutation."""
 type MutationCompoundTypeArrayPayload {
   """
@@ -22732,6 +22736,31 @@ input CompoundTypeArrayMutationInput {
   """
   clientMutationId: String
   object: CompoundTypeInput
+}
+
+"""The output of our \`postMany\` mutation."""
+type PostManyPayload {
+  """
+  The exact same \`clientMutationId\` that was provided in the mutation input,
+  unchanged and unused. May be used by a client to track mutations.
+  """
+  clientMutationId: String
+  posts: [Post]
+
+  """
+  Our root query field type. Allows us to run any query from our mutation payload.
+  """
+  query: Query
+}
+
+"""All input for the \`postMany\` mutation."""
+input PostManyInput {
+  """
+  An arbitrary string value with no semantic meaning. Will be included in the
+  payload verbatim. May be used to track mutations by the client.
+  """
+  clientMutationId: String
+  posts: [PostInput]
 }
 
 """The output of our \`mutationOutComplex\` mutation."""
@@ -40107,9 +40136,26 @@ export const plans = {
         }
       }
     },
-    mutationCompoundTypeArray: {
+    postWithSuffix: {
       plan($root, args, _info) {
         const selectArgs = makeArgs120(args, ["input"]);
+        const $result = resource_post_with_suffixPgResource.execute(selectArgs, "mutation");
+        return object({
+          result: $result
+        });
+      },
+      args: {
+        input: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $object) {
+            return $object;
+          }
+        }
+      }
+    },
+    mutationCompoundTypeArray: {
+      plan($root, args, _info) {
+        const selectArgs = makeArgs121(args, ["input"]);
         const $result = resource_mutation_compound_type_arrayPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -40126,8 +40172,25 @@ export const plans = {
     },
     compoundTypeArrayMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs121(args, ["input"]);
+        const selectArgs = makeArgs122(args, ["input"]);
         const $result = resource_compound_type_array_mutationPgResource.execute(selectArgs, "mutation");
+        return object({
+          result: $result
+        });
+      },
+      args: {
+        input: {
+          autoApplyAfterParentPlan: true,
+          applyPlan(_, $object) {
+            return $object;
+          }
+        }
+      }
+    },
+    postMany: {
+      plan($root, args, _info) {
+        const selectArgs = makeArgs123(args, ["input"]);
+        const $result = resource_post_manyPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
         });
@@ -40143,7 +40206,7 @@ export const plans = {
     },
     mutationOutComplex: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs122(args, ["input"]);
+        const selectArgs = makeArgs124(args, ["input"]);
         const $result = resource_mutation_out_complexPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -40160,7 +40223,7 @@ export const plans = {
     },
     mutationOutComplexSetof: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs123(args, ["input"]);
+        const selectArgs = makeArgs125(args, ["input"]);
         const $result = resource_mutation_out_complex_setofPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -40177,7 +40240,7 @@ export const plans = {
     },
     mutationOutTable: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs124(args, ["input"]);
+        const selectArgs = makeArgs126(args, ["input"]);
         const $result = resource_mutation_out_tablePgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -40194,7 +40257,7 @@ export const plans = {
     },
     mutationOutTableSetof: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs125(args, ["input"]);
+        const selectArgs = makeArgs127(args, ["input"]);
         const $result = resource_mutation_out_table_setofPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -40211,7 +40274,7 @@ export const plans = {
     },
     tableSetMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs126(args, ["input"]);
+        const selectArgs = makeArgs128(args, ["input"]);
         const $result = resource_table_set_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -40228,7 +40291,7 @@ export const plans = {
     },
     typeFunctionConnectionMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs127(args, ["input"]);
+        const selectArgs = makeArgs129(args, ["input"]);
         const $result = resource_type_function_connection_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -40245,7 +40308,7 @@ export const plans = {
     },
     typeFunctionMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs128(args, ["input"]);
+        const selectArgs = makeArgs130(args, ["input"]);
         const $result = resource_type_function_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -40262,7 +40325,7 @@ export const plans = {
     },
     typeFunctionListMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs129(args, ["input"]);
+        const selectArgs = makeArgs131(args, ["input"]);
         const $result = resource_type_function_list_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -43224,6 +43287,111 @@ export const plans = {
     },
     id: undefined
   },
+  PostWithSuffixPayload: {
+    __assertStep: ObjectStep,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
+    post($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    },
+    postEdge: {
+      plan($mutation, args, info) {
+        const $result = $mutation.getStepForKey("result", true);
+        if (!$result) {
+          return constant(null);
+        }
+        const $select = (() => {
+          if ($result instanceof PgDeleteSingleStep) {
+            return pgSelectFromRecord($result.resource, $result.record());
+          } else {
+            const spec = postUniques[0].attributes.reduce((memo, attributeName) => {
+              memo[attributeName] = $result.get(attributeName);
+              return memo;
+            }, Object.create(null));
+            return pgResource_postPgResource.find(spec);
+          }
+        })();
+        // Perform ordering
+        const $value = args.getRaw("orderBy");
+        applyOrderToPlan($select, $value, info.schema.getType("PostsOrderBy"));
+        const $connection = connection($select);
+        // NOTE: you must not use `$single = $select.single()`
+        // here because doing so will mark the row as unique, and
+        // then the ordering logic (and thus cursor) will differ.
+        const $single = $select.row(first($select));
+        return new EdgeStep($connection, $single);
+      },
+      args: {
+        orderBy: undefined
+      }
+    },
+    personByAuthorId($record) {
+      return pgResource_personPgResource.get({
+        id: $record.get("result").get("author_id")
+      });
+    }
+  },
+  PostWithSuffixInput: {
+    clientMutationId: {
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
+      autoApplyAfterParentApplyPlan: true
+    },
+    post: undefined,
+    suffix: undefined
+  },
+  PostInput: {
+    "__inputPlan": function PostInput_inputPlan() {
+      return object(Object.create(null));
+    },
+    id: {
+      applyPlan($insert, val) {
+        $insert.set("id", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    headline: {
+      applyPlan($insert, val) {
+        $insert.set("headline", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    body: {
+      applyPlan($insert, val) {
+        $insert.set("body", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    authorId: {
+      applyPlan($insert, val) {
+        $insert.set("author_id", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    enums: {
+      applyPlan($insert, val) {
+        $insert.set("enums", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    },
+    comptypes: {
+      applyPlan($insert, val) {
+        $insert.set("comptypes", val.get());
+      },
+      autoApplyAfterParentInputPlan: true,
+      autoApplyAfterParentApplyPlan: true
+    }
+  },
   MutationCompoundTypeArrayPayload: {
     __assertStep: ObjectStep,
     clientMutationId($object) {
@@ -43265,6 +43433,27 @@ export const plans = {
       autoApplyAfterParentApplyPlan: true
     },
     object: undefined
+  },
+  PostManyPayload: {
+    __assertStep: ObjectStep,
+    clientMutationId($object) {
+      return $object.getStepForKey("clientMutationId", true) ?? constant(undefined);
+    },
+    posts($object) {
+      return $object.get("result");
+    },
+    query() {
+      return rootValue();
+    }
+  },
+  PostManyInput: {
+    clientMutationId: {
+      applyPlan($input, val) {
+        $input.set("clientMutationId", val.get());
+      },
+      autoApplyAfterParentApplyPlan: true
+    },
+    posts: undefined
   },
   MutationOutComplexPayload: {
     __assertStep: ObjectStep,

@@ -733,6 +733,9 @@ const registryConfig_pgResources_relational_topics_relational_topics = {
       schemaName: "js_reserved",
       name: "relational_topics"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -782,6 +785,9 @@ const registryConfig_pgResources_building_building = {
       schemaName: "js_reserved",
       name: "building"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -846,6 +852,9 @@ const registryConfig_pgResources_machine_machine = {
       schemaName: "js_reserved",
       name: "machine"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -932,6 +941,9 @@ const registryConfig_pgResources_relational_status_relational_status = {
       schemaName: "js_reserved",
       name: "relational_status"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -1003,6 +1015,9 @@ const registryConfig_pgResources_relational_items_relational_items = {
       schemaName: "js_reserved",
       name: "relational_items"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       interface: "mode:relational type:type",
       type: spec_relationalItems.extensions.tags.type
@@ -1052,9 +1067,7 @@ const registryConfig = {
         schemaName: "js_reserved",
         name: "await"
       },
-      tags: {
-        behavior: ["queryField -mutationField -typeField", "-filter -order"]
-      }
+      tags: {}
     },
     description: undefined
   }], ["case", {
@@ -1095,9 +1108,7 @@ const registryConfig = {
         schemaName: "js_reserved",
         name: "case"
       },
-      tags: {
-        behavior: ["queryField -mutationField -typeField", "-filter -order"]
-      }
+      tags: {}
     },
     description: undefined
   }], ["valueOf", {
@@ -1138,9 +1149,7 @@ const registryConfig = {
         schemaName: "js_reserved",
         name: "valueOf"
       },
-      tags: {
-        behavior: ["queryField -mutationField -typeField", "-filter -order"]
-      }
+      tags: {}
     },
     description: undefined
   }], ["null_yield", {
@@ -1186,9 +1195,7 @@ const registryConfig = {
         schemaName: "js_reserved",
         name: "null_yield"
       },
-      tags: {
-        behavior: ["-queryField -mutationField typeField", "-filter -order"]
-      }
+      tags: {}
     },
     description: undefined
   }], ["relational_topics", registryConfig_pgResources_relational_topics_relational_topics], ["__proto__", {
@@ -1207,6 +1214,9 @@ const registryConfig = {
         schemaName: "js_reserved",
         name: "__proto__"
       },
+      isInsertable: true,
+      isUpdatable: true,
+      isDeletable: true,
       tags: {}
     }
   }], ["building", registryConfig_pgResources_building_building], ["constructor", {
@@ -1225,6 +1235,9 @@ const registryConfig = {
         schemaName: "js_reserved",
         name: "constructor"
       },
+      isInsertable: true,
+      isUpdatable: true,
+      isDeletable: true,
       tags: {}
     }
   }], ["crop", {
@@ -1243,6 +1256,9 @@ const registryConfig = {
         schemaName: "js_reserved",
         name: "crop"
       },
+      isInsertable: true,
+      isUpdatable: true,
+      isDeletable: true,
       tags: {}
     }
   }], ["machine", registryConfig_pgResources_machine_machine], ["material", {
@@ -1261,6 +1277,9 @@ const registryConfig = {
         schemaName: "js_reserved",
         name: "material"
       },
+      isInsertable: true,
+      isUpdatable: true,
+      isDeletable: true,
       tags: {}
     }
   }], ["null", {
@@ -1279,6 +1298,9 @@ const registryConfig = {
         schemaName: "js_reserved",
         name: "null"
       },
+      isInsertable: true,
+      isUpdatable: true,
+      isDeletable: true,
       tags: {}
     }
   }], ["project", {
@@ -1297,6 +1319,9 @@ const registryConfig = {
         schemaName: "js_reserved",
         name: "project"
       },
+      isInsertable: true,
+      isUpdatable: true,
+      isDeletable: true,
       tags: {}
     }
   }], ["relational_status", registryConfig_pgResources_relational_status_relational_status], ["yield", {
@@ -1315,6 +1340,9 @@ const registryConfig = {
         schemaName: "js_reserved",
         name: "yield"
       },
+      isInsertable: true,
+      isUpdatable: true,
+      isDeletable: true,
       tags: {}
     }
   }], ["reserved", {
@@ -1333,6 +1361,9 @@ const registryConfig = {
         schemaName: "js_reserved",
         name: "reserved"
       },
+      isInsertable: true,
+      isUpdatable: true,
+      isDeletable: true,
       tags: {}
     }
   }], ["relational_items", registryConfig_pgResources_relational_items_relational_items]]),

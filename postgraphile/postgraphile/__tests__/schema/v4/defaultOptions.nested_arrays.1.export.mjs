@@ -279,9 +279,7 @@ const registry = makeRegistry({
           schemaName: "nested_arrays",
           name: "check_work_hours"
         },
-        tags: {
-          behavior: ["queryField -mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },
@@ -301,6 +299,9 @@ const registry = makeRegistry({
           schemaName: "nested_arrays",
           name: "t"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     }

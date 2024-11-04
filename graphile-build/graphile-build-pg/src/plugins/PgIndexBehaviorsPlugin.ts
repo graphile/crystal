@@ -1,9 +1,20 @@
-import { addBehaviorToTags } from "../utils.js";
-
 declare global {
   namespace GraphileConfig {
     interface Plugins {
       PgIndexBehaviorsPlugin: true;
+    }
+  }
+  namespace DataplanPg {
+    interface PgCodecAttributeExtensions {
+      isIndexed?: boolean;
+    }
+    interface PgCodecRelationExtensions {
+      isIndexed?: boolean;
+    }
+  }
+  namespace GraphileBuild {
+    interface BehaviorStrings {
+      manyToMany: true;
     }
   }
 }
@@ -50,16 +61,9 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
           });
           if (!isIndexed) {
             if (!relation.extensions) {
-              relation.extensions = { tags: Object.create(null) };
+              relation.extensions = Object.create(null);
             }
-            if (!relation.extensions.tags) {
-              relation.extensions.tags = Object.create(null);
-            }
-            addBehaviorToTags(
-              relation.extensions.tags,
-              "-list -connection -single -manyToMany",
-              true,
-            );
+            relation.extensions!.isIndexed = false;
           }
         }
       },
@@ -82,15 +86,55 @@ export const PgIndexBehaviorsPlugin: GraphileConfig.Plugin = {
           if (!attribute.extensions) {
             attribute.extensions = Object.create(null);
           }
-          if (!attribute.extensions!.tags) {
-            attribute.extensions!.tags = Object.create(null);
-          }
-          addBehaviorToTags(
-            attribute.extensions!.tags!,
-            "-filterBy -orderBy",
-            true,
-          );
+          attribute.extensions!.isIndexed = false;
         }
+      },
+    },
+  },
+  schema: {
+    behaviorRegistry: {
+      add: {
+        // HACK: this impacts a community plugin and isn't part of core.
+        manyToMany: {
+          entities: ["pgResource", "pgCodecRelation"],
+          description: "(Legacy support hack - many-to-many relationship)",
+        },
+      },
+    },
+    entityBehavior: {
+      pgCodecAttribute: {
+        inferred: {
+          after: ["inferred"],
+          provides: ["postInferred"],
+          callback(behavior, [codec, attributeName]) {
+            const newBehavior = [behavior];
+            const attr = codec.attributes[attributeName];
+            if (attr.extensions?.isIndexed === false) {
+              newBehavior.push("-filterBy", "-orderBy");
+            }
+            return newBehavior;
+          },
+        },
+      },
+      pgCodecRelation: {
+        inferred: {
+          after: ["inferred"],
+          provides: ["postInferred"],
+          callback(behavior, relation) {
+            const newBehavior = [behavior];
+            if (relation.extensions?.isIndexed === false) {
+              newBehavior.push(
+                "-list",
+                "-connection",
+                "-single",
+
+                // HACK: this impacts a community plugin and isn't part of core.
+                "-manyToMany",
+              );
+            }
+            return newBehavior;
+          },
+        },
       },
     },
   },

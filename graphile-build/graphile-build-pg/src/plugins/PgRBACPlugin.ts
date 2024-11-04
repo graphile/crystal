@@ -1,9 +1,9 @@
 import "graphile-config";
 
+import type { PgResource } from "@dataplan/pg";
 import { gatherConfig } from "graphile-build";
 import { entityPermissions } from "pg-introspection";
 
-import { addBehaviorToTags } from "../utils.js";
 import { version } from "../version.js";
 
 declare global {
@@ -14,6 +14,29 @@ declare global {
 
     interface GatherHelpers {
       pgRBAC: Record<string, never>;
+    }
+  }
+
+  namespace DataplanPg {
+    interface PgCodecAttributeExtensions {
+      /** Checks permissions to see if SELECTing this attribute is allowed */
+      canSelect?: boolean;
+      /** Checks permissions to see if INSERTing into this attribute is allowed */
+      canInsert?: boolean;
+      /** Checks permissions to see if UPDATEing this attribute is allowed */
+      canUpdate?: boolean;
+    }
+    interface PgResourceExtensions {
+      /** Checks permissions to see if SELECTing this resource is allowed */
+      canSelect?: boolean;
+      /** Checks permissions to see if INSERTing this resource is allowed */
+      canInsert?: boolean;
+      /** Checks permissions to see if UPDATEing this resource is allowed */
+      canUpdate?: boolean;
+      /** Checks permissions to see if DELETEing this resource is allowed */
+      canDelete?: boolean;
+      /** Checks permissions to see if EXECUTEing the function is allowed */
+      canExecute?: boolean;
     }
   }
 }
@@ -67,36 +90,12 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           attributePermissions.insert || tablePermissions.insert;
         const canUpdate =
           attributePermissions.update || tablePermissions.update;
-        const parts: string[] = [];
-        if (!canSelect) {
-          // Only remove `select` privileges if at least one sibling attribute has
-          // a grant - otherwise assume that this is behind a function or
-          // similar and all attributes are allowed you just can't select
-          // directly.
-          const hasSiblingWithSelect = pgClass
-            .getAttributes()
-            .some(
-              (att) =>
-                att.attnum > 0 &&
-                entityPermissions(introspection, att, introspectionRole, true)
-                  .select,
-            );
-          if (hasSiblingWithSelect) {
-            parts.push("-select -filterBy -orderBy");
-          }
-        }
-        if (!canInsert) {
-          parts.push("-insert");
-        }
-        if (!canUpdate) {
-          parts.push("-update");
-        }
-        if (parts.length > 0) {
-          attribute.extensions = attribute.extensions || Object.create(null);
-          attribute.extensions!.tags =
-            attribute.extensions!.tags || Object.create(null);
-          addBehaviorToTags(attribute.extensions!.tags!, parts.join(" "));
-        }
+        attribute.extensions = attribute.extensions || Object.create(null);
+        Object.assign(attribute.extensions!, {
+          canSelect,
+          canInsert,
+          canUpdate,
+        });
       },
       async pgProcedures_PgResourceOptions(info, event) {
         const { pgProc, serviceName, resourceOptions } = event;
@@ -114,16 +113,9 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           introspectionRole,
           true,
         );
-        if (!permissions.execute) {
-          resourceOptions.extensions =
-            resourceOptions.extensions || Object.create(null);
-          resourceOptions.extensions!.tags =
-            resourceOptions.extensions!.tags || Object.create(null);
-          addBehaviorToTags(
-            resourceOptions.extensions!.tags!,
-            "-queryField -mutationField -typeField -orderBy -filterBy",
-          );
-        }
+        resourceOptions.extensions =
+          resourceOptions.extensions || Object.create(null);
+        resourceOptions.extensions!.canExecute = permissions.execute ?? false;
       },
       async pgTables_PgResourceOptions(info, event) {
         const { pgClass, resourceOptions, serviceName } = event;
@@ -134,8 +126,6 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
         const { introspection } = db;
         resourceOptions.extensions =
           resourceOptions.extensions || Object.create(null);
-        resourceOptions.extensions!.tags =
-          resourceOptions.extensions!.tags || Object.create(null);
 
         const introspectionRole = introspection.getCurrentUser();
         if (!introspectionRole) {
@@ -149,10 +139,10 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
           true,
         );
 
-        let canSelect = tablePermissions.select;
-        let canInsert = tablePermissions.insert;
-        let canUpdate = tablePermissions.update;
-        const canDelete = tablePermissions.delete;
+        let canSelect = tablePermissions.select ?? false;
+        let canInsert = tablePermissions.insert ?? false;
+        let canUpdate = tablePermissions.update ?? false;
+        const canDelete = tablePermissions.delete ?? false;
         if (!canInsert || !canUpdate || !canSelect) {
           // PERF: this is computationally expensive; we should really make this more efficient.
           // Need to check the attributes
@@ -163,32 +153,131 @@ export const PgRBACPlugin: GraphileConfig.Plugin = {
               entityPermissions(introspection, att, introspectionRole, true),
             );
           for (const attributePermission of attributePermissions) {
-            canSelect = canSelect || attributePermission.select;
-            canInsert = canInsert || attributePermission.insert;
-            canUpdate = canUpdate || attributePermission.update;
+            canSelect = canSelect || (attributePermission.select ?? false);
+            canInsert = canInsert || (attributePermission.insert ?? false);
+            canUpdate = canUpdate || (attributePermission.update ?? false);
           }
         }
-
-        const parts: string[] = [];
-        if (!canSelect) {
-          // TODO: just `-select` should be sufficient, but it's not because we
-          // don't check it in enough places. Maybe certain behaviors should
-          // require others?
-          parts.push("-select -single -list -connection");
-        }
-        if (!canInsert) {
-          parts.push("-insert");
-        }
-        if (!canUpdate) {
-          parts.push("-update");
-        }
-        if (!canDelete) {
-          parts.push("-delete");
-        }
-        if (parts.length > 0) {
-          addBehaviorToTags(resourceOptions.extensions!.tags!, parts.join(" "));
-        }
+        Object.assign(resourceOptions.extensions!, {
+          canSelect,
+          canInsert,
+          canUpdate,
+          canDelete,
+        });
       },
     },
   }),
+
+  schema: {
+    entityBehavior: {
+      pgCodecAttribute: {
+        inferred: {
+          after: ["inferred"],
+          provides: ["postInferred"],
+          callback(behavior, [codec, attributeName]) {
+            const attr = codec.attributes[attributeName];
+            const newBehavior = [behavior];
+            if (attr.extensions?.canSelect === false) {
+              // Only remove `select` privileges if at least one sibling attribute has
+              // a grant - otherwise assume that this is behind a function or
+              // similar and all attributes are allowed you just can't select
+              // directly.
+              const hasSiblingWithSelect = Object.entries(
+                codec.attributes,
+              ).some(
+                ([otherAttrName, otherAttr]) =>
+                  otherAttrName !== attributeName &&
+                  otherAttr.extensions?.canSelect !== false,
+              );
+              if (hasSiblingWithSelect) {
+                newBehavior.push("-select", "-filterBy", "-orderBy");
+              }
+            }
+            if (attr.extensions?.canInsert === false) {
+              newBehavior.push("-insert");
+            }
+            if (attr.extensions?.canUpdate === false) {
+              newBehavior.push("-update");
+            }
+            return newBehavior;
+          },
+        },
+      },
+      pgCodecRelation: {
+        inferred: {
+          after: ["inferred"],
+          provides: ["postInferred"],
+          callback(behavior, relation) {
+            const resource = relation.remoteResource;
+            return modBehaviorForResource(behavior, resource);
+          },
+        },
+      },
+      pgResource: {
+        inferred: {
+          after: ["inferred"],
+          provides: ["postInferred"],
+          callback(behavior, resource) {
+            return modBehaviorForResource(behavior, resource);
+          },
+        },
+      },
+      pgResourceUnique: {
+        inferred: {
+          after: ["inferred"],
+          provides: ["postInferred"],
+          callback(behavior, [resource, _unique]) {
+            return modBehaviorForResource(behavior, resource);
+          },
+        },
+      },
+    },
+  },
 };
+
+function modBehaviorForResource(
+  behavior: GraphileBuild.BehaviorString,
+  resource: PgResource<any, any, any, any, any>,
+): GraphileBuild.BehaviorString[] {
+  const newBehavior = [behavior];
+  const {
+    canSelect = true,
+    canInsert = true,
+    canUpdate = true,
+    canDelete = true,
+    canExecute = true,
+  } = resource.extensions ?? {};
+  if (!canExecute) {
+    newBehavior.push(
+      "-queryField",
+      "-mutationField",
+      "-typeField",
+      "-orderBy",
+      "-filterBy",
+    );
+  }
+  if (!canSelect) {
+    // TODO: just `-select` should be sufficient, but it's not because we
+    // don't check it in enough places. Maybe certain behaviors should
+    // require others?
+    newBehavior.push(
+      "-select",
+      "-single",
+      "-list",
+      "-connection",
+      "-typeField",
+      "-queryField",
+      "-mutationField",
+    );
+  }
+  if (!canInsert) {
+    newBehavior.push("-insert");
+  }
+  if (!canUpdate) {
+    newBehavior.push("-update");
+  }
+  if (!canDelete) {
+    newBehavior.push("-delete");
+  }
+  return newBehavior;
+}

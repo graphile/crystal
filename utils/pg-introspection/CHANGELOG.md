@@ -1,5 +1,13 @@
 # pg-introspection
 
+## 0.0.1-beta.9
+
+### Patch Changes
+
+- [#2202](https://github.com/graphile/crystal/pull/2202)
+  [`2efadc0f8`](https://github.com/graphile/crystal/commit/2efadc0f80c3a0c172fb94c770afecc5447e832b)
+  Thanks [@benjie](https://github.com/benjie)! - Postgres v17 support
+
 ## 0.0.1-beta.8
 
 ### Patch Changes

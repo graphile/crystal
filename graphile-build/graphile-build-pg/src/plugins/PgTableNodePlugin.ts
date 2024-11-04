@@ -35,33 +35,44 @@ export const PgTableNodePlugin: GraphileConfig.Plugin = {
   after: ["PgTablesPlugin", "PgPolymorphismPlugin"],
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "type:node": {
+          entities: ["pgCodec"],
+          description:
+            "should the GraphQLObjectType (`type`) this codec represents implement the GraphQL Global Object Identification specification",
+        },
+      },
+    },
     entityBehavior: {
       pgCodec: {
-        provides: ["default"],
-        before: ["inferred", "override"],
-        callback(behavior, codec, build) {
-          const newBehavior = [behavior];
-          if (
-            !codec.isAnonymous &&
-            !!codec.attributes &&
-            (!codec.polymorphism ||
-              codec.polymorphism.mode === "single" ||
-              codec.polymorphism.mode === "relational")
-          ) {
-            const resource = build.pgTableResource(
-              codec as PgCodecWithAttributes,
-            );
-            if (resource && resource.uniques?.length >= 1) {
-              if (codec.polymorphism) {
-                newBehavior.push("interface:node");
+        inferred: {
+          provides: ["default"],
+          before: ["inferred"],
+          callback(behavior, codec, build) {
+            const newBehavior = [behavior];
+            if (
+              !codec.isAnonymous &&
+              !!codec.attributes &&
+              (!codec.polymorphism ||
+                codec.polymorphism.mode === "single" ||
+                codec.polymorphism.mode === "relational")
+            ) {
+              const resource = build.pgTableResource(
+                codec as PgCodecWithAttributes,
+              );
+              if (resource && resource.uniques?.length >= 1) {
+                if (codec.polymorphism) {
+                  newBehavior.push("interface:node");
+                } else {
+                  newBehavior.push("type:node");
+                }
               } else {
-                newBehavior.push("type:node");
+                // Meh
               }
-            } else {
-              // Meh
             }
-          }
-          return newBehavior;
+            return newBehavior;
+          },
         },
       },
     },

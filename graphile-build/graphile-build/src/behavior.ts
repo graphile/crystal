@@ -1,4 +1,4 @@
-import { arraysMatch } from "grafast";
+import { arraysMatch, isDev } from "grafast";
 import { orderedApply, sortedPlugins } from "graphile-config";
 
 type BehaviorScope = string[];
@@ -8,84 +8,165 @@ interface BehaviorSpec {
 }
 
 const NULL_BEHAVIOR: ResolvedBehavior = Object.freeze({
-  behaviorString: "",
+  behaviorString: "" as GraphileBuild.BehaviorString,
   stack: Object.freeze([]),
 });
 
-const getEntityBehaviorHooks = (plugin: GraphileConfig.Plugin) => {
+const getEntityBehaviorHooks = (
+  plugin: GraphileConfig.Plugin,
+  type: "inferred" | "override",
+) => {
   const val = plugin.schema?.entityBehavior;
   if (!val) return val;
   // These might not all be hooks, some might be strings. We need to convert the strings into hooks.
-  const entries = Object.entries(val);
-  let changed = false;
-  for (const entry of entries) {
-    const lhs = entry[1];
-    if (typeof lhs === "string") {
-      const hook: Exclude<
-        NonNullable<
-          NonNullable<GraphileConfig.Plugin["schema"]>["entityBehavior"]
-        >[keyof GraphileBuild.BehaviorEntities],
-        string
-      > = {
-        provides: ["default"],
-        before: ["inferred", "override"],
-        callback: (behavior) => [lhs, behavior],
-      };
-      entry[1] = hook;
-      changed = true;
+  const result: {
+    [entityType in keyof GraphileBuild.BehaviorEntities]: GraphileBuild.EntityBehaviorHook<entityType>;
+  } = Object.create(null);
+  for (const [entityType, rhs] of Object.entries(val)) {
+    const isArrayOfStrings =
+      Array.isArray(rhs) && rhs.every((t) => typeof t === "string");
+    if (isArrayOfStrings || typeof rhs === "string") {
+      if (type === "inferred") {
+        const hook: GraphileBuild.EntityBehaviorHook<
+          keyof GraphileBuild.BehaviorEntities
+        > = {
+          provides: ["default"],
+          before: ["inferred"],
+          callback: isArrayOfStrings
+            ? (behavior) => [...rhs, behavior]
+            : (behavior) => [rhs as GraphileBuild.BehaviorString, behavior],
+        };
+        result[entityType as keyof GraphileBuild.BehaviorEntities] = hook;
+      } else {
+        // noop
+      }
+    } else if (Array.isArray(rhs)) {
+      if (type === "inferred") {
+        throw new Error(
+          `Behavior of '${entityType}' was specified as an array, but not every element of the array was a string (plugin: ${plugin.name})`,
+        );
+      } else {
+        // noop
+      }
+    } else if (typeof rhs === "function") {
+      if (type === "inferred") {
+        const hook: GraphileBuild.EntityBehaviorHook<
+          keyof GraphileBuild.BehaviorEntities
+        > = {
+          provides: ["inferred"],
+          after: ["default"],
+          callback: rhs,
+        };
+        result[entityType as keyof GraphileBuild.BehaviorEntities] = hook;
+      } else {
+        // noop
+      }
+    } else if (rhs.inferred || rhs.override) {
+      const hook = rhs[type];
+      if (hook) {
+        result[entityType as keyof GraphileBuild.BehaviorEntities] = hook;
+      }
+    } else {
+      console.warn(
+        `Plugin ${
+          plugin.name
+        } is using a deprecated or unsupported form of 'plugin.schema.entityBehavior[${JSON.stringify(
+          entityType,
+        )}]' definition - if this is an object it should have only the keys 'inferred' and/or 'override'. This changed in graphile-build@5.0.0-beta.25.`,
+      );
+      const rhsAny = rhs as any;
+      if (rhsAny.callback) {
+        if (rhsAny.provides?.includes?.("override")) {
+          if (type === "override") {
+            result[entityType as keyof GraphileBuild.BehaviorEntities] = rhsAny;
+          }
+        } else {
+          if (type === "inferred") {
+            result[entityType as keyof GraphileBuild.BehaviorEntities] = rhsAny;
+          }
+        }
+      }
     }
   }
-  if (changed) {
-    return Object.fromEntries(entries) as any;
-  } else {
-    return val;
-  }
+  return result;
+};
+const getEntityBehaviorInferredHooks = (plugin: GraphileConfig.Plugin) => {
+  return getEntityBehaviorHooks(plugin, "inferred");
+};
+const getEntityBehaviorOverrideHooks = (plugin: GraphileConfig.Plugin) => {
+  return getEntityBehaviorHooks(plugin, "override");
 };
 
 export type BehaviorDynamicMethods = {
   [entityType in keyof GraphileBuild.BehaviorEntities as `${entityType}Matches`]: (
     entity: GraphileBuild.BehaviorEntities[entityType],
-    filter: string,
+    filter: keyof GraphileBuild.BehaviorStrings,
   ) => boolean | undefined;
 } & {
   [entityType in keyof GraphileBuild.BehaviorEntities as `${entityType}Behavior`]: (
     entity: GraphileBuild.BehaviorEntities[entityType],
-    applyDefaultBehavior?: boolean,
   ) => string;
 };
 
 export class Behavior {
   private behaviorEntities: {
     [entityType in keyof GraphileBuild.BehaviorEntities]: {
-      behaviorCallbacks: Array<
+      behaviorStrings: Record<string, { description: string }>;
+      inferredBehaviorCallbacks: Array<
         [
           source: string,
           callback: (
-            behavior: string,
+            behavior: GraphileBuild.BehaviorString,
             entity: GraphileBuild.BehaviorEntities[entityType],
             build: GraphileBuild.Build,
-          ) => string | string[],
+          ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[],
+        ]
+      >;
+      overrideBehaviorCallbacks: Array<
+        [
+          source: string,
+          callback: (
+            behavior: GraphileBuild.BehaviorString,
+            entity: GraphileBuild.BehaviorEntities[entityType],
+            build: GraphileBuild.Build,
+          ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[],
         ]
       >;
       listCache: Map<number, any[][]>;
-      cacheWithDefault: Map<
+      inferredCache: Map<
         GraphileBuild.BehaviorEntities[entityType],
         ResolvedBehavior
       >;
-      cacheWithoutDefault: Map<
+      overrideCache: Map<
+        GraphileBuild.BehaviorEntities[entityType],
+        ResolvedBehavior
+      >;
+      fullCache: Map<
         GraphileBuild.BehaviorEntities[entityType],
         ResolvedBehavior
       >;
     };
   };
 
+  private behaviorRegistry: {
+    [behavior in keyof GraphileBuild.BehaviorStrings]: {
+      entities: {
+        [entity in keyof GraphileBuild.BehaviorEntities]?: {
+          registeredBy: Array<{ pluginName: string; description: string }>;
+        };
+      };
+    };
+  };
+
   public behaviorEntityTypes: (keyof GraphileBuild.BehaviorEntities)[] = [];
 
   private globalDefaultBehavior: ResolvedBehavior;
+
   constructor(
     private resolvedPreset: GraphileConfig.ResolvedPreset,
     private build: GraphileBuild.Build,
   ) {
+    this.behaviorRegistry = Object.create(null);
     this.behaviorEntities = Object.create(null);
     this.registerEntity("string");
     // This will be overwritten in freeze
@@ -99,38 +180,94 @@ export class Behavior {
     const { resolvedPreset, build } = this;
     const plugins = sortedPlugins(resolvedPreset.plugins);
 
-    const initialBehavior = resolvedPreset.schema?.defaultBehavior ?? "";
-    this.globalDefaultBehavior = resolveBehavior(
-      initialBehavior
-        ? {
-            behaviorString: initialBehavior,
-            stack: [
-              {
-                source: "preset.schema.defaultBehavior",
-                prefix: initialBehavior,
-                suffix: "",
-              },
-            ],
+    const allEntities = new Set<keyof GraphileBuild.BehaviorEntities>();
+
+    for (const plugin of plugins) {
+      const r = plugin.schema?.behaviorRegistry;
+      if (r?.add) {
+        for (const [key, spec] of Object.entries(r.add)) {
+          const behaviorString = key as keyof GraphileBuild.BehaviorStrings;
+          if (!this.behaviorRegistry[behaviorString]) {
+            this.behaviorRegistry[behaviorString] = {
+              entities: {},
+            };
           }
-        : { behaviorString: "", stack: [] },
+          const { description } = spec;
+          for (const entityType of spec.entities) {
+            allEntities.add(entityType);
+            if (!this.behaviorRegistry[behaviorString].entities[entityType]) {
+              this.behaviorRegistry[behaviorString].entities[entityType] = {
+                registeredBy: [
+                  {
+                    description,
+                    pluginName: plugin.name,
+                  },
+                ],
+              };
+            } else {
+              this.behaviorRegistry[behaviorString].entities[
+                entityType
+              ]!.registeredBy.push({
+                description,
+                pluginName: plugin.name,
+              });
+            }
+          }
+        }
+      }
+    }
+
+    const pluginDefaultBehavior = this.resolveBehavior(
+      null,
+      NULL_BEHAVIOR,
       plugins.map((p) => [
         `${p.name}.schema.globalBehavior`,
         p.schema?.globalBehavior,
       ]),
       build,
     );
+    const defaultBehaviorFromPreset =
+      this.resolvedPreset.schema?.defaultBehavior ?? "";
+    this.globalDefaultBehavior = {
+      behaviorString:
+        `${pluginDefaultBehavior.behaviorString} ${defaultBehaviorFromPreset}` as GraphileBuild.BehaviorString,
+      stack: [
+        ...pluginDefaultBehavior.stack,
+        {
+          source: "preset.schema.defaultBehavior",
+          prefix: "",
+          suffix: defaultBehaviorFromPreset,
+        },
+      ],
+    };
 
     orderedApply(
-      resolvedPreset.plugins,
-      getEntityBehaviorHooks,
+      plugins,
+      getEntityBehaviorInferredHooks,
       (hookName, hookFn, plugin) => {
         const entityType = hookName as keyof GraphileBuild.BehaviorEntities;
         if (!this.behaviorEntities[entityType]) {
           this.registerEntity(entityType);
         }
         const t = this.behaviorEntities[entityType];
-        t.behaviorCallbacks.push([
-          `${plugin.name}.schema.entityBehavior.${entityType}`,
+        t.inferredBehaviorCallbacks.push([
+          `${plugin.name}.schema.entityBehavior.${entityType}.inferred`,
+          hookFn,
+        ]);
+      },
+    );
+
+    orderedApply(
+      plugins,
+      getEntityBehaviorOverrideHooks,
+      (hookName, hookFn, plugin) => {
+        const entityType = hookName as keyof GraphileBuild.BehaviorEntities;
+        if (!this.behaviorEntities[entityType]) {
+          this.registerEntity(entityType);
+        }
+        const t = this.behaviorEntities[entityType];
+        t.overrideBehaviorCallbacks.push([
+          `${plugin.name}.schema.entityBehavior.${entityType}.override`,
           hookFn,
         ]);
       },
@@ -156,21 +293,21 @@ export class Behavior {
     }
     this.behaviorEntityTypes.push(entityType);
     this.behaviorEntities[entityType] = {
-      behaviorCallbacks: [],
+      behaviorStrings: Object.create(null),
+      inferredBehaviorCallbacks: [],
+      overrideBehaviorCallbacks: [],
       listCache: new Map(),
-      cacheWithDefault: new Map(),
-      cacheWithoutDefault: new Map(),
+      inferredCache: new Map(),
+      overrideCache: new Map(),
+      fullCache: new Map(),
     };
     (this as this & BehaviorDynamicMethods)[`${entityType}Matches`] = (
       entity: GraphileBuild.BehaviorEntities[TEntityType],
-      behavior: string,
-    ): boolean | undefined => this.entityMatches(entityType, entity, behavior);
+      filter: keyof GraphileBuild.BehaviorStrings,
+    ): boolean | undefined => this.entityMatches(entityType, entity, filter);
     (this as this & BehaviorDynamicMethods)[`${entityType}Behavior`] = (
       entity: GraphileBuild.BehaviorEntities[TEntityType],
-      applyDefaultBehavior = true,
-    ): string =>
-      this.getBehaviorForEntity(entityType, entity, applyDefaultBehavior)
-        .behaviorString;
+    ): string => this.getBehaviorForEntity(entityType, entity).behaviorString;
   }
 
   private assertEntity<
@@ -197,11 +334,53 @@ export class Behavior {
    */
   public entityMatches<
     TEntityType extends keyof GraphileBuild.BehaviorEntities,
+    TFilter extends keyof GraphileBuild.BehaviorStrings,
   >(
     entityType: TEntityType,
     entity: GraphileBuild.BehaviorEntities[TEntityType],
-    filter: string,
+    filter: TFilter,
   ): boolean | undefined {
+    if (!this.behaviorRegistry[filter]) {
+      // DIAGNOSTIC: enable for all filters
+      /*
+      console.warn(
+        `Behavior '${filter}' is not registered; please be sure to register it within a plugin via \`plugin.schema.behaviorRegistry.add[${JSON.stringify(
+          filter,
+        )}] = { description: "...", entities: [${JSON.stringify(
+          entityType,
+        )}] }\`.`,
+      );
+      // Register it so we don't see this warning again
+      */
+      this.behaviorRegistry[filter] = {
+        entities: {
+          [entityType]: {
+            registeredBy: [],
+          },
+        },
+      };
+    } else if (
+      !Object.entries(this.behaviorRegistry).some(
+        ([bhv, { entities }]) =>
+          entities[entityType] && stringMatches(bhv, filter),
+      )
+    ) {
+      console.warn(
+        `Behavior '${filter}' is not registered for entity type '${entityType}'; it's only expected to be used with '${Object.keys(
+          this.behaviorRegistry[filter].entities,
+        ).join(
+          "', '",
+        )}'; if this usage is valid, register it within a plugin with \`plugin.schema.behaviorRegistry.add[${JSON.stringify(
+          filter,
+        )}] = { description: "...", entities: [${JSON.stringify(
+          entityType,
+        )}] }\`.`,
+      );
+      // Register it so we don't see this warning again
+      this.behaviorRegistry[filter].entities[entityType] = {
+        registeredBy: [],
+      };
+    }
     const finalString = this.getBehaviorForEntity(
       entityType,
       entity,
@@ -226,27 +405,164 @@ export class Behavior {
   >(
     entityType: TEntityType,
     rawEntity: GraphileBuild.BehaviorEntities[TEntityType],
-    applyDefaultBehavior = true,
-  ) {
+  ): ResolvedBehavior {
     this.assertEntity(entityType);
-    const { cacheWithDefault, cacheWithoutDefault, listCache } =
-      this.behaviorEntities[entityType];
-    const cache = applyDefaultBehavior ? cacheWithDefault : cacheWithoutDefault;
+    const behaviorEntity = this.behaviorEntities[entityType];
+    const { fullCache: cache } = behaviorEntity;
+
     const entity = Array.isArray(rawEntity)
-      ? getCachedEntity(listCache, rawEntity)
+      ? getCachedEntity(behaviorEntity.listCache, rawEntity)
       : rawEntity;
     const existing = cache.get(entity);
     if (existing !== undefined) {
       return existing;
     }
+    const inferredBehavior = this.getInferredBehaviorForEntity(
+      entityType,
+      rawEntity,
+    );
+    const overrideBehavior = this.getOverrideBehaviorForEntity(
+      entityType,
+      rawEntity,
+    );
+    const behavior = this.getPreferencesAppliedBehaviors(
+      entityType,
+      inferredBehavior,
+      overrideBehavior,
+    );
+    cache.set(entity, behavior);
+    return behavior;
+  }
+
+  public getInferredBehaviorForEntity<
+    TEntityType extends keyof GraphileBuild.BehaviorEntities,
+  >(
+    entityType: TEntityType,
+    rawEntity: GraphileBuild.BehaviorEntities[TEntityType],
+  ): ResolvedBehavior {
+    this.assertEntity(entityType);
     const behaviorEntity = this.behaviorEntities[entityType];
-    const behavior = resolveBehavior(
-      applyDefaultBehavior ? this.globalDefaultBehavior : NULL_BEHAVIOR,
-      behaviorEntity.behaviorCallbacks,
+    const { inferredCache: cache, inferredBehaviorCallbacks: callbacks } =
+      behaviorEntity;
+
+    const entity = Array.isArray(rawEntity)
+      ? getCachedEntity(behaviorEntity.listCache, rawEntity)
+      : rawEntity;
+    const existing = cache.get(entity);
+    if (existing !== undefined) {
+      return existing;
+    }
+    const behavior = this.resolveBehavior(
+      entityType,
+      this.globalDefaultBehavior,
+      callbacks,
       entity,
       this.build,
     );
     cache.set(entity, behavior);
+    return behavior;
+  }
+
+  public getOverrideBehaviorForEntity<
+    TEntityType extends keyof GraphileBuild.BehaviorEntities,
+  >(
+    entityType: TEntityType,
+    rawEntity: GraphileBuild.BehaviorEntities[TEntityType],
+  ): ResolvedBehavior {
+    this.assertEntity(entityType);
+    const behaviorEntity = this.behaviorEntities[entityType];
+    const { overrideCache: cache, overrideBehaviorCallbacks: callbacks } =
+      behaviorEntity;
+
+    const entity = Array.isArray(rawEntity)
+      ? getCachedEntity(behaviorEntity.listCache, rawEntity)
+      : rawEntity;
+    const existing = cache.get(entity);
+    if (existing !== undefined) {
+      return existing;
+    }
+    const behavior = this.resolveBehavior(
+      entityType,
+      NULL_BEHAVIOR,
+      callbacks,
+      entity,
+      this.build,
+    );
+    cache.set(entity, behavior);
+    return behavior;
+  }
+
+  public getCombinedBehaviorForEntities<
+    TEntityType extends keyof GraphileBuild.BehaviorEntities,
+  >(
+    entityType: TEntityType,
+    sources: {
+      [entityType in keyof GraphileBuild.BehaviorEntities]?: GraphileBuild.BehaviorEntities[entityType];
+    },
+  ): ResolvedBehavior {
+    // First; ensure that `entityType` is the last key in sources
+    const keys = Object.keys(sources);
+    if (keys[keys.length - 1] !== entityType || !sources[entityType]) {
+      throw new Error(
+        `The order of keys in 'sources' is significant; you must ensure that '${entityType}' is the last key in 'sources' so that it has highest precedence`,
+      );
+    }
+    const inferredBehaviors = keys.map((key) =>
+      this.getInferredBehaviorForEntity(
+        key as keyof GraphileBuild.BehaviorEntities,
+        sources[
+          key as keyof GraphileBuild.BehaviorEntities
+        ] as GraphileBuild.BehaviorEntities[keyof GraphileBuild.BehaviorEntities],
+      ),
+    );
+    const overrideBehaviors = keys.map((key) =>
+      this.getOverrideBehaviorForEntity(
+        key as keyof GraphileBuild.BehaviorEntities,
+        sources[
+          key as keyof GraphileBuild.BehaviorEntities
+        ] as GraphileBuild.BehaviorEntities[keyof GraphileBuild.BehaviorEntities],
+      ),
+    );
+    const behavior = this.getPreferencesAppliedBehaviors(
+      entityType,
+      joinResolvedBehaviors(inferredBehaviors),
+      joinResolvedBehaviors(overrideBehaviors),
+    );
+    return behavior;
+  }
+
+  getPreferencesAppliedBehaviors<
+    TEntityType extends keyof GraphileBuild.BehaviorEntities,
+  >(
+    entityType: TEntityType,
+    inferredBehavior: ResolvedBehavior,
+    overrideBehavior: ResolvedBehavior,
+  ) {
+    const defaultBehavior = this.getDefaultBehaviorFor(entityType);
+    const inferredBehaviorWithPreferencesApplied = multiplyBehavior(
+      defaultBehavior,
+      inferredBehavior.behaviorString,
+      entityType,
+    );
+    const behaviorString = joinBehaviors([
+      inferredBehaviorWithPreferencesApplied,
+      overrideBehavior.behaviorString,
+    ]);
+    const behavior: ResolvedBehavior = {
+      stack: [
+        ...inferredBehavior.stack,
+        {
+          source: `__ApplyBehaviors_${entityType}__`,
+          prefix: "",
+          suffix: `-* ${inferredBehaviorWithPreferencesApplied}`,
+        },
+        ...overrideBehavior.stack,
+      ],
+      behaviorString,
+      toString() {
+        return behaviorString;
+      },
+    };
     return behavior;
   }
 
@@ -284,6 +600,135 @@ export class Behavior {
 
   parseScope(filter: string) {
     return parseScope(filter);
+  }
+
+  private resolveBehavior<TArgs extends [...any[]]>(
+    entityType: keyof GraphileBuild.BehaviorEntities | null,
+    initialBehavior: ResolvedBehavior,
+    // Misnomer; also allows strings or nothings
+    callbacks: ReadonlyArray<
+      [
+        source: string,
+        callback:
+          | GraphileBuild.BehaviorString
+          | GraphileBuild.BehaviorString[]
+          | null
+          | undefined
+          | ((
+              behavior: GraphileBuild.BehaviorString,
+              ...args: TArgs
+            ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[]),
+      ]
+    >,
+    ...args: TArgs
+  ): ResolvedBehavior {
+    let behaviorString: string = initialBehavior.behaviorString;
+    const stack: Array<StackItem> = [...initialBehavior.stack];
+
+    for (const [source, rawG] of callbacks) {
+      const oldBehavior = behaviorString;
+      const g = typeof rawG === "string" ? [rawG] : rawG;
+      if (Array.isArray(g)) {
+        if (g.length === 0) continue;
+        if (behaviorString === "") {
+          behaviorString = g.join(" ");
+        } else {
+          behaviorString = g.join(" ") + " " + behaviorString;
+        }
+      } else if (typeof g === "function") {
+        const newBehavior: string | string[] = g(
+          oldBehavior as GraphileBuild.BehaviorString,
+          ...args,
+        );
+        if (!newBehavior.includes(oldBehavior)) {
+          throw new Error(
+            `${source} callback must return a list that contains the current (passed in) behavior in addition to any other behaviors you wish to set.`,
+          );
+        }
+        if (Array.isArray(newBehavior)) {
+          behaviorString = joinBehaviors(newBehavior);
+        } else {
+          behaviorString = newBehavior;
+        }
+      }
+      const i = behaviorString.indexOf(oldBehavior);
+      const prefix = behaviorString.substring(0, i);
+      const suffix = behaviorString.substring(i + oldBehavior.length);
+      if (prefix !== "" || suffix !== "") {
+        this.validateBehavior(entityType, source, prefix);
+        this.validateBehavior(entityType, source, suffix);
+        stack.push({ source, prefix, suffix });
+      }
+    }
+    return {
+      stack,
+      behaviorString: behaviorString as GraphileBuild.BehaviorString,
+      toString() {
+        return behaviorString;
+      },
+    };
+  }
+
+  private validateBehavior(
+    entityType: keyof GraphileBuild.BehaviorEntities | null,
+    source: string,
+    behaviorString: string,
+  ): asserts behaviorString is GraphileBuild.BehaviorString {
+    try {
+      this.parseBehaviorString(behaviorString);
+      if (!entityType) {
+        return;
+      }
+    } catch (e) {
+      throw new Error(
+        `Failed parsing behavior string ${JSON.stringify(
+          behaviorString,
+        )} from '${source}': ${e.message}`,
+      );
+    }
+  }
+
+  _defaultBehaviorByEntityTypeCache = new Map<
+    keyof GraphileBuild.BehaviorEntities,
+    string
+  >();
+  getDefaultBehaviorFor(entityType: keyof GraphileBuild.BehaviorEntities) {
+    if (!this._defaultBehaviorByEntityTypeCache.has(entityType)) {
+      const supportedBehaviors = new Set<string>();
+
+      for (const [behaviorString, spec] of Object.entries(
+        this.behaviorRegistry,
+      )) {
+        /*
+         * This is `true` because of inheritance (e.g. unique inherits from
+         * resource inherits from codec); it causes a headache if we factor it
+         * in.
+         */
+        const applyBehaviorsFromAllEntities = true;
+        if (spec.entities[entityType] || applyBehaviorsFromAllEntities) {
+          const parts = behaviorString.split(":");
+          const l = parts.length;
+          for (let i = 0; i < l; i++) {
+            const subparts = parts.slice(i, l);
+            // We need to add all of the parent behaviors, e.g. `foo:bar:baz`
+            // should also add `bar:baz` and `baz`
+            supportedBehaviors.add(subparts.join(":"));
+          }
+        }
+      }
+
+      // TODO: scope this on an entity basis
+      const defaultBehaviors = this.globalDefaultBehavior;
+
+      const behaviorString = (
+        [...supportedBehaviors].sort().join(" ") +
+        " " +
+        defaultBehaviors.behaviorString
+      ).trim();
+      this._defaultBehaviorByEntityTypeCache.set(entityType, behaviorString);
+      return behaviorString;
+    }
+    return this._defaultBehaviorByEntityTypeCache.get(entityType)!;
   }
 }
 
@@ -372,10 +817,13 @@ function scopeMatches(
 
 export function joinBehaviors(
   strings: ReadonlyArray<string | null | undefined>,
-): string {
+): GraphileBuild.BehaviorString {
   let str = "";
   for (const string of strings) {
     if (string != null && string !== "") {
+      if (isDev && !isValidBehaviorString(string)) {
+        throw new Error(`'${string}' is not a valid behavior string`);
+      }
       if (str === "") {
         str = string;
       } else {
@@ -383,7 +831,21 @@ export function joinBehaviors(
       }
     }
   }
-  return str;
+  return str as GraphileBuild.BehaviorString;
+}
+
+export function joinResolvedBehaviors(
+  behaviors: ReadonlyArray<ResolvedBehavior>,
+): ResolvedBehavior {
+  const stack: StackItem[] = behaviors.flatMap((b) => b.stack);
+  const behaviorString = joinBehaviors(
+    behaviors.flatMap((b) => b.behaviorString),
+  );
+  const b: ResolvedBehavior = {
+    behaviorString,
+    stack,
+  };
+  return b;
 }
 
 interface StackItem {
@@ -394,64 +856,8 @@ interface StackItem {
 
 interface ResolvedBehavior {
   stack: ReadonlyArray<StackItem>;
-  behaviorString: string;
-}
-
-function resolveBehavior<TArgs extends [...any[]]>(
-  initialBehavior: ResolvedBehavior,
-  // Misnomer; also allows strings or nothings
-  callbacks: ReadonlyArray<
-    [
-      source: string,
-      callback:
-        | string
-        | null
-        | undefined
-        | ((behavior: string, ...args: TArgs) => string | string[]),
-    ]
-  >,
-  ...args: TArgs
-) {
-  let behaviorString = initialBehavior.behaviorString;
-  const stack: Array<StackItem> = [...initialBehavior.stack];
-
-  for (const [source, g] of callbacks) {
-    const oldBehavior = behaviorString;
-    if (typeof g === "string") {
-      if (g === "") {
-        continue;
-      } else if (behaviorString === "") {
-        behaviorString = g;
-      } else {
-        behaviorString = g + " " + behaviorString;
-      }
-    } else if (typeof g === "function") {
-      const newBehavior = g(oldBehavior, ...args);
-      if (!newBehavior.includes(oldBehavior)) {
-        throw new Error(
-          `${source} callback must return a list that contains the current (passed in) behavior in addition to any other behaviors you wish to set.`,
-        );
-      }
-      if (Array.isArray(newBehavior)) {
-        behaviorString = joinBehaviors(newBehavior);
-      } else {
-        behaviorString = newBehavior;
-      }
-    }
-    const i = behaviorString.indexOf(oldBehavior);
-    const prefix = behaviorString.substring(0, i);
-    const suffix = behaviorString.substring(i + oldBehavior.length);
-    if (prefix !== "" || suffix !== "") {
-      stack.push({ source, prefix, suffix });
-    }
-  }
-  return {
-    stack,
-    behaviorString,
-    toString() {
-      return behaviorString;
-    },
-  };
+  behaviorString: GraphileBuild.BehaviorString;
+  toString(): string;
 }
 
 function getCachedEntity<T extends any[]>(
@@ -494,4 +900,108 @@ function stringMatches(
     }
   }
   return undefined;
+}
+
+/**
+ * We're strict with this because we want to be able to expand this in future.
+ * For example I want to allow `@behavior all some` to operate the same as
+ * `@behavior all\n@behavior some`. I also want to be able to add
+ * `@behavior -all` to remove a previously enabled behavior.
+ */
+export function isValidBehaviorString(
+  behavior: unknown,
+): behavior is GraphileBuild.BehaviorString {
+  return (
+    typeof behavior === "string" &&
+    /^\s*([+-]?([a-zA-Z](_?[a-zA-Z0-9]+)|\*)(:([a-zA-Z](_?[a-zA-Z0-9]+)|\*))*)(\s+([+-]?([a-zA-Z](_?[a-zA-Z0-9]+)|\*)(:([a-zA-Z](_?[a-zA-Z0-9]+)|\*))*))*\s*$/.test(
+      behavior,
+    )
+  );
+}
+
+const warnedBehaviors: string[] = [];
+
+/*
+ * 1. Take each behavior from inferred
+ * 2. Find the matching behaviors from preferences
+ * 3. Output for the behavior a list of behaviors formed by combining the
+ *    matching behaviors. The result needs to remain at least as constrained as
+ *    it already is.
+ *
+ * For example:
+ * - Preferences: "-* +resource:list -resource:connection +query:resource:connection -query:resource:list"
+ *   - AKA: turn everything off, use connections at the root, lists elsewhere
+ * - Inferred: "+connection +list"
+ * - Split to ["+connection", "+list"]
+ * - For "+connection" (which is equivalent to `+*:*:*:connection`, remember):
+ *   - "-*" becomes "-connection" (needs to remain at least as constrained as it already is)
+ *   - "-resource:connection" matches and is kept
+ *   - "+query:resource:connection" matches and is kept
+ *   - all other behaviors ignored (don't match)
+ * - For "+list":
+ *   - "-*" becomes "-list"
+ *   - "+resource:list" kept
+ *   - "-query:resource:list" kept
+ *   - all others don't match
+ * - Result: concatenate these:
+ *   - "-connection -resource:connection +query:resource:connection -list +resource:list -query:resource:list"
+ */
+function multiplyBehavior(
+  preferences: string,
+  inferred: string,
+  entityType: string,
+) {
+  const pref = parseSpecs(preferences);
+  const inf = parseSpecs(inferred);
+  const result = inf.flatMap((infEntry) => {
+    const final: BehaviorSpec[] = [];
+    nextPref: for (const prefEntry of pref) {
+      // If it matches; new scope must be at least as constrainted as old scope
+      const newScope: BehaviorScope = [];
+      const l = Math.max(prefEntry.scope.length, infEntry.scope.length);
+      // Does it match? Loop backwards through scope keys ensuring matches
+      for (let i = 1; i <= l; i++) {
+        const infScope =
+          i <= infEntry.scope.length
+            ? infEntry.scope[infEntry.scope.length - i]
+            : "*";
+        const prefScope =
+          i <= prefEntry.scope.length
+            ? prefEntry.scope[prefEntry.scope.length - i]
+            : "*";
+        const match =
+          infScope === "*" || prefScope === "*" || infScope == prefScope;
+
+        if (!match) {
+          // No match! Skip to next preference
+          continue nextPref;
+        }
+
+        // There was a match; ensure we're suitably constrained
+        const scopeText = infScope == "*" ? prefScope : infScope;
+        newScope.unshift(scopeText);
+      }
+
+      // If we get here, it must match; add our new behavior
+      final.push({
+        scope: newScope,
+        positive: prefEntry.positive && infEntry.positive,
+      });
+    }
+    if (final.length === 0) {
+      const behavior = infEntry.scope.join(":");
+      if (!warnedBehaviors.includes(behavior)) {
+        warnedBehaviors.push(behavior);
+        console.warn(
+          `No matches for behavior '${behavior}' - please ensure that this behavior is registered for entity type '${entityType}'`,
+        );
+      }
+    }
+    return final;
+  });
+
+  const behaviorString = result
+    .map((r) => `${r.positive ? "" : "-"}${r.scope.join(":")}`)
+    .join(" ");
+  return behaviorString as GraphileBuild.BehaviorString;
 }

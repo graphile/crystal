@@ -78,25 +78,24 @@ sideEffect(null, () => console.log(new Date().toISOString()));
 
 ## Multiple dependencies version
 
-If you need to pass multiple steps, you can use the
-[`list()`](/grafast/step-library/standard-steps/list) step to do so:
-`sideEffect(list([$a, $b, $c]), ([a, b, c]) => doSomethingWith(a, b, c))`.
-
-If you'd prefer to save a few characters you can pass the array of steps
-directly and we'll automatically wrap it in `list()` for you:
+If you need to pass multiple steps, you can pass a list:
 
 ```ts
-function sideEffect<Tuple extends [...any[]], R>(
-  // i.e. $input: ExecutableStep[],
-  $input: { [Index in keyof Tuple]: ExecutableStep<Tuple[Index]> },
-  callback: (input: Tuple) => R | Promise<R>,
-): ExecutableStep<R>;
+sideEffect(
+  // Tuple of dependencies
+  [$login, $username, $password],
+  // becomes a tuple in callback:
+  ([login, username, password]) => login(username, password),
+);
 ```
 
-### Example
+or an object:
 
 ```ts
-sideEffect([$login, $username, $password], ([login, username, password]) =>
-  login(username, password),
+sideEffect(
+  // Object of dependencies
+  { login: $login, username: $username, password: $password },
+  // becomes an object in callback:
+  ({ login, username, password }) => login(username, password),
 );
 ```

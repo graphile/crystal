@@ -157,6 +157,9 @@ const pgResource_employeePgResource = makeRegistry({
           schemaName: "index_expressions",
           name: "employee"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     }

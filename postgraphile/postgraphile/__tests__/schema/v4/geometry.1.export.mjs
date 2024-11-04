@@ -218,6 +218,9 @@ const pgResource_geomPgResource = makeRegistry({
           schemaName: "geometry",
           name: "geom"
         },
+        isInsertable: true,
+        isUpdatable: true,
+        isDeletable: true,
         tags: {}
       }
     }

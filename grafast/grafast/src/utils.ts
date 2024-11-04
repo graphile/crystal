@@ -1084,6 +1084,7 @@ export function stepsAreInSamePhase(
 // ENHANCE: implement this!
 export const canonicalJSONStringify = (o: object) => JSON.stringify(o);
 
+// PERF: only do this if isDev; otherwise replace with NOOP?
 export function assertNotAsync(fn: any, name: string): void {
   if (fn?.constructor?.name === "AsyncFunction") {
     throw new Error(
@@ -1091,6 +1092,21 @@ export function assertNotAsync(fn: any, name: string): void {
     );
   }
 }
+
+// PERF: only do this if isDev; otherwise replace with NOOP?
+export function assertNotPromise<TVal>(
+  value: TVal,
+  fn: any,
+  name: string,
+): TVal {
+  if (isPromiseLike(value)) {
+    throw new Error(
+      `Plans must be synchronous, but this schema has an function at '${name}' that returned a promise-like object: ${fn.toString()}`,
+    );
+  }
+  return value;
+}
+
 export function hasItemPlan(
   step: ExecutableStep & {
     itemPlan?: ($item: ExecutableStep) => ExecutableStep;
@@ -1112,4 +1128,10 @@ export function exportNameHint(obj: any, nameHint: string): void {
       obj.$exporter$name = nameHint;
     }
   }
+}
+
+export function isTuple<T extends readonly [...(readonly any[])]>(
+  t: any | T,
+): t is T {
+  return Array.isArray(t);
 }

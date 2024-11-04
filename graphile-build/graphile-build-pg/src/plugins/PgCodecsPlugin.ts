@@ -21,7 +21,7 @@ import {
 import { EXPORTABLE, gatherConfig } from "graphile-build";
 import type { PgAttribute, PgClass, PgType } from "pg-introspection";
 
-import { addBehaviorToTags, exportNameHint } from "../utils.js";
+import { exportNameHint } from "../utils.js";
 import { version } from "../version.js";
 
 interface State {
@@ -159,6 +159,12 @@ declare global {
   namespace DataplanPg {
     interface PgCodecRelationExtensions {
       originalName?: string;
+    }
+    interface PgCodecAttributeExtensions {
+      /** Checks capabilities of this attribute to see if INSERT is even possible */
+      isInsertable?: boolean;
+      /** Checks capabilities of this attribute to see if UPDATE is even possible */
+      isUpdatable?: boolean;
     }
   }
 }
@@ -349,13 +355,13 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
 
               // Mutate at will!
               const tags = JSON.parse(JSON.stringify(rawTags));
+              const extensions: DataplanPg.PgCodecAttributeExtensions = {
+                tags,
+              };
               if (attributeAttribute.attidentity === "a") {
                 // Generated ALWAYS so no insert/update
-                addBehaviorToTags(
-                  tags,
-                  "-attribute:insert -attribute:update",
-                  true,
-                );
+                extensions.isInsertable = false;
+                extensions.isUpdatable = false;
               }
 
               attributes[attributeAttribute.attname] = {
@@ -372,9 +378,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                     attributeAttribute.attidentity !== "") ||
                   attributeAttribute.getType()?.typdefault != null,
                 // PERF: identicalVia,
-                extensions: {
-                  tags,
-                },
+                extensions,
               };
               await info.process("pgCodecs_attribute", {
                 serviceName,
@@ -1192,6 +1196,7 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
                 typeName,
                 {},
                 () => ({
+                  description: build.wrapDescription(codec.description, "type"),
                   values,
                 }),
                 "PgCodecsPlugin",
@@ -1507,6 +1512,22 @@ export const PgCodecsPlugin: GraphileConfig.Plugin = {
           }
 
           return _;
+        },
+      },
+    },
+
+    entityBehavior: {
+      pgCodecAttribute: {
+        inferred(behavior, [codec, attributeName]) {
+          const newBehavior = [behavior];
+          const attr = codec.attributes[attributeName];
+          if (attr.extensions?.isInsertable === false) {
+            newBehavior.push("-attribute:insert");
+          }
+          if (attr.extensions?.isUpdatable === false) {
+            newBehavior.push("-attribute:update");
+          }
+          return newBehavior;
         },
       },
     },

@@ -32,6 +32,21 @@ declare global {
       "graphile-build-pg": string;
       "@dataplan/pg": string;
     }
+    interface BehaviorStrings {
+      select: true;
+      insert: true;
+      update: true;
+      delete: true;
+      base: true;
+      filter: true;
+      filterBy: true;
+      order: true;
+      orderBy: true;
+      "resource:connection": true;
+      "resource:list": true;
+      "resource:array": true;
+      "resource:single": true;
+    }
     type HasGraphQLTypeForPgCodec = (
       codec: PgCodec<any, any, any, any, any, any, any>,
       situation?: string,
@@ -138,6 +153,11 @@ declare global {
   }
 }
 
+const FILTER_DEF = {
+  description: "can we filter this resource/codec",
+  entities: ["pgCodec", "pgResource"],
+} as const;
+
 export const PgBasicsPlugin: GraphileConfig.Plugin = {
   name: "PgBasicsPlugin",
   description:
@@ -176,19 +196,116 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
   }),
 
   schema: {
-    globalBehavior: "connection -list",
+    globalBehavior: ["connection", "-list"],
+    behaviorRegistry: {
+      add: {
+        select: {
+          description:
+            "can select this resource/column/etc. Note this does not necessarily mean you can do `select * from users` but it might mean that it's possible to see details about a `users` when it's returned by a function or similar. (In this case the `codec` has `select` but the `resource` has `-select`.)",
+          entities: [
+            "pgCodec",
+            "pgCodecAttribute",
+            "pgCodecRelation",
+            "pgResource",
+          ],
+        },
+        insert: {
+          description: "can insert into this resource/column/etc",
+          entities: [],
+        },
+        update: {
+          description: "can update a record in a resource/a column/etc",
+          entities: [],
+        },
+        delete: {
+          description: "can delete a record in a resource",
+          entities: [],
+        },
+        base: {
+          description: 'should we add this attribute to the "base" input type?',
+          entities: [],
+        },
+        filter: FILTER_DEF,
+        "query:resource:list:filter": FILTER_DEF,
+        "query:resource:connection:filter": FILTER_DEF,
+        "manyRelation:resource:list:filter": FILTER_DEF,
+        "manyRelation:resource:connection:filter": FILTER_DEF,
+        "singularRelation:resource:list:filter": FILTER_DEF,
+        "singularRelation:resource:connection:filter": FILTER_DEF,
+        "typeField:resource:list:filter": FILTER_DEF,
+        "typeField:resource:connection:filter": FILTER_DEF,
+        "queryField:resource:list:filter": FILTER_DEF,
+        "queryField:resource:connection:filter": FILTER_DEF,
+        filterBy: { description: "can we filter by this thing?", entities: [] },
+        order: {
+          description: "can we order these results?",
+          entities: ["pgCodec", "pgResource"],
+        },
+        orderBy: {
+          description: "can we order by this thing?",
+          entities: ["pgCodecAttribute", "pgResource" /* < computed column */],
+        },
+
+        connection: {
+          description: "should we use a connection field for this?",
+          entities: [
+            "pgCodec",
+            "pgCodecRelation",
+            "pgResource",
+            "pgResourceUnique",
+          ],
+        },
+        list: {
+          description: "should we use a list field for this?",
+          entities: [
+            "pgCodec",
+            "pgCodecRelation",
+            "pgResource",
+            "pgResourceUnique",
+          ],
+        },
+        "resource:connection": {
+          description: "should we use a connection field for this?",
+          entities: [
+            "pgCodec",
+            "pgCodecRelation",
+            "pgResource",
+            "pgResourceUnique",
+          ],
+        },
+        "resource:list": {
+          description: "should we use a list field for this?",
+          entities: [
+            "pgCodec",
+            "pgCodecRelation",
+            "pgResource",
+            "pgResourceUnique",
+          ],
+        },
+        "resource:array": {
+          description:
+            "should we use a list field for this non-connection-capable thing?",
+          entities: ["pgCodec", "pgResource", "pgResourceUnique"],
+        },
+        "resource:single": {
+          description: "can we get one of this thing?",
+          entities: [
+            "pgCodec",
+            "pgCodecRelation",
+            "pgResource",
+            "pgResourceUnique",
+          ],
+        },
+      },
+    },
     entityBehavior: {
       pgCodec: {
-        after: ["default", "inferred"],
-        provides: ["override"],
-        callback(behavior, codec) {
+        override(behavior, codec) {
           return [behavior, getBehavior(codec.extensions)];
         },
       },
       pgCodecAttribute: {
-        after: ["default", "inferred"],
-        provides: ["override"],
-        callback(behavior, [codec, attributeName]) {
+        override(behavior, [codec, attributeName]) {
           if (typeof attributeName !== "string") {
             throw new Error(
               `pgCodecAttribute no longer accepts (codec, attribute) - it now accepts (codec, attributeName). Please update your code. Sorry! (Changed in PostGraphile V5 alpha 13.)`,
@@ -197,24 +314,25 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
           const attribute = codec.attributes[attributeName];
           return [
             behavior,
-            getBehavior([codec.extensions, attribute.extensions]),
+            getBehavior([attribute.codec.extensions, attribute.extensions]),
           ];
         },
       },
       pgResource: {
-        after: ["default", "inferred"],
-        provides: ["override"],
-        callback(behavior, resource) {
+        override(behavior, resource) {
           return [
             behavior,
-            getBehavior([resource.codec.extensions, resource.extensions]),
+            getBehavior(
+              resource.parameters
+                ? // Functions should not inherit from their codec
+                  [resource.extensions]
+                : [resource.codec.extensions, resource.extensions],
+            ),
           ];
         },
       },
       pgResourceUnique: {
-        after: ["default", "inferred"],
-        provides: ["override"],
-        callback(behavior, [resource, unique]) {
+        override(behavior, [resource, unique]) {
           return [
             behavior,
             getBehavior([
@@ -226,9 +344,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         },
       },
       pgCodecRelation: {
-        after: ["default", "inferred"],
-        provides: ["override"],
-        callback(behavior, relationSpec) {
+        override(behavior, relationSpec) {
           return [
             behavior,
             // The behavior is the relation behavior PLUS the remote table
@@ -242,9 +358,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         },
       },
       pgCodecRef: {
-        after: ["default", "inferred"],
-        provides: ["override"],
-        callback(behavior, [codec, refName]) {
+        override(behavior, [codec, refName]) {
           const ref = codec.refs?.[refName];
           if (!ref) {
             throw new Error(`Codec ${codec.name} has no ref '${refName}'`);
@@ -256,9 +370,7 @@ export const PgBasicsPlugin: GraphileConfig.Plugin = {
         },
       },
       pgRefDefinition: {
-        after: ["default", "inferred"],
-        provides: ["override"],
-        callback(behavior, refSpec) {
+        override(behavior, refSpec) {
           return [behavior, getBehavior(refSpec.extensions)];
         },
       },

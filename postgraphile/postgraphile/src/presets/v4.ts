@@ -8,6 +8,7 @@ import { PgV4BehaviorPlugin } from "../plugins/PgV4BehaviorPlugin.js";
 import { PgV4InflectionPlugin } from "../plugins/PgV4InflectionPlugin.js";
 import { PgV4SimpleSubscriptionsPlugin } from "../plugins/PgV4SimpleSubscriptionsPlugin.js";
 import { PgV4SmartTagsPlugin } from "../plugins/PgV4SmartTagsPlugin.js";
+import PostGraphileAmberPreset from "./amber.js";
 
 export {
   PgV4BehaviorPlugin,
@@ -108,19 +109,19 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
       `The 'defaultRole' V4 option is not currently supported in V5; please use the \`preset.grafast.context\` callback instead.`,
     );
   }
-  const simpleCollectionsBehavior = (() => {
+  const simpleCollectionsBehavior = ((): GraphileBuild.BehaviorString[] => {
     switch (options.simpleCollections) {
       case "both": {
-        return "+connection +resource:connection +list +resource:list";
+        return ["connection", "resource:connection", "list", "resource:list"];
       }
       case "only": {
-        return "-connection -resource:connection +list +resource:list";
+        return ["-connection", "-resource:connection", "list", "resource:list"];
       }
       case "omit": {
-        return "+connection +resource:connection -list -resource:list";
+        return ["connection", "resource:connection", "-list", "-resource:list"];
       }
       default: {
-        return "";
+        return [];
       }
     }
   })();
@@ -157,29 +158,39 @@ const makeV4Plugin = (options: V4Options): GraphileConfig.Plugin => {
     schema: {
       // We could base this on the legacy relations setting; but how to set deprecated?
       globalBehavior(behavior) {
-        return `${behavior} ${simpleCollectionsBehavior} -singularRelation:resource:connection -singularRelation:resource:list +condition:attribute:filterBy +attribute:orderBy +resource:connection:backwards`;
+        return [
+          behavior,
+          ...simpleCollectionsBehavior,
+          "-singularRelation:resource:connection",
+          "-singularRelation:resource:list",
+          "condition:attribute:filterBy",
+          "attribute:orderBy",
+          "resource:connection:backwards",
+        ];
       },
       entityBehavior: {
-        pgResource: "+delete:resource:select",
-        pgCodecAttribute(behavior, [codec, attributeName]) {
-          const attribute = codec.attributes[attributeName];
-          const underlyingCodec =
-            attribute.codec.domainOfCodec ?? attribute.codec;
-          const newBehavior = [behavior];
-          if (
-            underlyingCodec.arrayOfCodec ||
-            underlyingCodec.isBinary ||
-            underlyingCodec.rangeOfCodec
-          ) {
-            newBehavior.push("-attribute:orderBy");
-          }
-          if (
-            underlyingCodec.isBinary ||
-            underlyingCodec.arrayOfCodec?.isBinary
-          ) {
-            newBehavior.push("-condition:attribute:filterBy");
-          }
-          return newBehavior;
+        pgResource: "delete:resource:select",
+        pgCodecAttribute: {
+          inferred(behavior, [codec, attributeName]) {
+            const attribute = codec.attributes[attributeName];
+            const underlyingCodec =
+              attribute.codec.domainOfCodec ?? attribute.codec;
+            const newBehavior = [behavior];
+            if (
+              underlyingCodec.arrayOfCodec ||
+              underlyingCodec.isBinary ||
+              underlyingCodec.rangeOfCodec
+            ) {
+              newBehavior.push("-attribute:orderBy");
+            }
+            if (
+              underlyingCodec.isBinary ||
+              underlyingCodec.arrayOfCodec?.isBinary
+            ) {
+              newBehavior.push("-condition:attribute:filterBy");
+            }
+            return newBehavior;
+          },
         },
       },
     },
@@ -204,6 +215,7 @@ export const makeV4Preset = (
   const graphiqlPath = options.graphiqlRoute ?? "/graphiql";
   const eventStreamPath = options.eventStreamRoute ?? `${graphqlPath}/stream`;
   return {
+    extends: [PostGraphileAmberPreset],
     plugins: [
       PgV4InflectionPlugin,
       PgV4SmartTagsPlugin,

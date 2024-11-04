@@ -18,6 +18,10 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      "insert:resource:select": true;
+      record: true;
+    }
     interface ScopeObject {
       isPgCreatePayloadType?: boolean;
     }
@@ -77,22 +81,41 @@ export const PgMutationCreatePlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "insert:resource:select": {
+          description:
+            "can select the row that was inserted (on the mutation payload)",
+          entities: ["pgResource"],
+        },
+        record: {
+          description: "record type used for insert",
+          entities: ["pgResource"],
+        },
+      },
+    },
+
     entityBehavior: {
       pgResource: {
-        provides: ["default"],
-        before: ["inferred", "override"],
-        callback(behavior, resource) {
-          const newBehavior = [behavior, "+insert:resource:select"];
-          if (
-            !resource.parameters &&
-            !!resource.codec.attributes &&
-            !resource.codec.polymorphism &&
-            !resource.codec.isAnonymous
-          ) {
-            newBehavior.unshift("insert");
-            newBehavior.unshift("record");
-          }
-          return newBehavior;
+        inferred: {
+          provides: ["default"],
+          before: ["inferred", "override"],
+          callback(behavior, resource) {
+            const newBehavior: GraphileBuild.BehaviorString[] = [
+              behavior,
+              "insert:resource:select",
+            ];
+            if (
+              !resource.parameters &&
+              !!resource.codec.attributes &&
+              !resource.codec.polymorphism &&
+              !resource.codec.isAnonymous
+            ) {
+              newBehavior.unshift("insert");
+              newBehavior.unshift("record");
+            }
+            return newBehavior;
+          },
         },
       },
     },

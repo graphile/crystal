@@ -22,6 +22,12 @@ declare global {
   }
 
   namespace GraphileBuild {
+    interface BehaviorStrings {
+      "nodeId:insert": true;
+      "nodeId:update": true;
+      "nodeId:base": true;
+      "nodeId:filterBy": true;
+    }
     interface Inflection {
       /**
        * The name of the attribute used as an `ID` input representing a related
@@ -55,10 +61,39 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
   },
 
   schema: {
+    behaviorRegistry: {
+      add: {
+        "nodeId:insert": {
+          description:
+            "can we insert to the columns represented by this nodeId which represents a table related via foreign key constraint?",
+          entities: ["pgCodecRelation"],
+        },
+        "nodeId:update": {
+          description:
+            "can we update the columns represented by this nodeId which represents a table related via foreign key constraint?",
+          entities: ["pgCodecRelation"],
+        },
+        "nodeId:base": {
+          description:
+            'should we add a nodeId input representing this foreign key constraint to the "base" input type?',
+          entities: ["pgCodecRelation"],
+        },
+        "nodeId:filterBy": {
+          description:
+            "can we filter by the columns represented by this nodeId which represents a table related via foreign key constraint?",
+          entities: ["pgCodecRelation"],
+        },
+      },
+    },
+
     entityBehavior: {
       // By default, column attributes will be present, so we don't want this to also be set
-      pgCodecRelation:
-        "-nodeId:insert -nodeId:update -nodeId:base -nodeId:filterBy",
+      pgCodecRelation: [
+        "-nodeId:insert",
+        "-nodeId:update",
+        "-nodeId:base",
+        "-nodeId:filterBy",
+      ],
     },
     hooks: {
       GraphQLInputObjectType_fields(fields, build, context) {
@@ -124,7 +159,7 @@ export const PgNodeIdAttributesPlugin: GraphileConfig.Plugin = {
                 ? "filterBy"
                 : "insert";
 
-              const fieldBehaviorScope = `nodeId:${action}`;
+              const fieldBehaviorScope = `nodeId:${action}` as const;
               if (
                 !build.behavior.pgCodecRelationMatches(
                   relation,

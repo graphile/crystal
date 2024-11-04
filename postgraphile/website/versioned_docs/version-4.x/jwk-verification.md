@@ -145,7 +145,7 @@ app.use(
     pgSettings: (req) => {
       const settings = {};
       if (req.auth) {
-        settings["user.permissions"] = req.auth.scopes;
+        settings["user.permissions"] = req.auth.scope;
       }
       return settings;
     },

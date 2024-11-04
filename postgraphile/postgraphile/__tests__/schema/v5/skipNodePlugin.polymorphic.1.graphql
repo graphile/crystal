@@ -6163,6 +6163,7 @@ type SingleTableChecklist implements SingleTableItem {
   authorId: Int!
   createdAt: Datetime!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
   parentId: Int
 
   """Reads a single `Person` that is related to this `SingleTableItem`."""
@@ -6349,6 +6350,7 @@ type SingleTableChecklistItem implements SingleTableItem {
   createdAt: Datetime!
   description: String
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
   note: String
   parentId: Int
 
@@ -6534,6 +6536,7 @@ type SingleTableDivider implements SingleTableItem {
   color: String
   createdAt: Datetime!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
   parentId: Int
 
   """Reads a single `Person` that is related to this `SingleTableItem`."""
@@ -7113,6 +7116,7 @@ type SingleTablePost implements SingleTableItem {
   createdAt: Datetime!
   description: String
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
   note: String
   parentId: Int
 
@@ -7298,6 +7302,7 @@ type SingleTableTopic implements SingleTableItem {
   authorId: Int!
   createdAt: Datetime!
   isExplicitlyArchived: Boolean!
+  meaningOfLife: Int
   parentId: Int
 
   """Reads a single `Person` that is related to this `SingleTableItem`."""

@@ -1,7 +1,7 @@
 import "graphile-config";
 
 import { gatherConfig } from "graphile-build";
-import { addBehaviorToTags } from "graphile-build-pg";
+import type { PgSmartTagsDict } from "graphile-build-pg/pg-introspection";
 import { inspect } from "util";
 
 declare global {
@@ -199,11 +199,11 @@ function processOmit(
     return;
   }
   const behavior: string[] = [];
-  const processOmit = (omit: true | string): void => {
-    if (omit === true || omit === "*") {
-      behavior.push("-*");
-      return;
-    }
+  const processOmit = (rawOmit: true | string): void => {
+    const omit =
+      rawOmit === true || rawOmit === "*"
+        ? "create,read,update,delete,execute,filter,order,all,many,manyToMany"
+        : rawOmit;
     if (typeof omit !== "string") {
       throw new Error(
         `Issue in smart tags; expected omit to be true/string/string[], but found something unexpected: ${inspect(
@@ -219,7 +219,7 @@ function processOmit(
           break;
         }
         case "read": {
-          behavior.push("-select -node");
+          behavior.push("-select -node -connection -list -array -single");
           break;
         }
         case "update": {
@@ -281,4 +281,28 @@ function processOmit(
   }
 
   addBehaviorToTags(tags, behavior.join(" "), true);
+}
+
+function addBehaviorToTags(
+  tags: Partial<PgSmartTagsDict>,
+  behavior: string,
+  prepend = false,
+): void {
+  if (Array.isArray(tags.behavior)) {
+    if (prepend) {
+      tags.behavior = [behavior, ...tags.behavior];
+    } else {
+      tags.behavior = [...tags.behavior, behavior];
+    }
+  } else if (typeof tags.behavior === "string") {
+    tags.behavior = prepend
+      ? [behavior, tags.behavior]
+      : [tags.behavior, behavior];
+  } else if (!tags.behavior) {
+    tags.behavior = [behavior];
+  } else {
+    throw new Error(
+      `Did not understand tags.behavior - it wasn't an array or a string`,
+    );
+  }
 }

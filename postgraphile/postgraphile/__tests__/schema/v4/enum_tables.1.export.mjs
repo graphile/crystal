@@ -76,7 +76,7 @@ const executor = new PgExecutor({
   }
 });
 const abcdIdentifier = sql.identifier("enum_tables", "abcd");
-const spec_abcd = {
+const abcdCodec = recordCodec({
   name: "abcd",
   identifier: abcdIdentifier,
   attributes: Object.assign(Object.create(null), {
@@ -111,15 +111,13 @@ const spec_abcd = {
     },
     tags: Object.assign(Object.create(null), {
       enum: true,
-      enumName: "LetterAToD",
-      behavior: ["-*"]
+      enumName: "LetterAToD"
     })
   },
   executor: executor
-};
-const abcdCodec = recordCodec(spec_abcd);
+});
 const abcdViewIdentifier = sql.identifier("enum_tables", "abcd_view");
-const spec_abcdView = {
+const abcdViewCodec = recordCodec({
   name: "abcdView",
   identifier: abcdViewIdentifier,
   attributes: Object.assign(Object.create(null), {
@@ -153,15 +151,13 @@ const spec_abcdView = {
     tags: Object.assign(Object.create(null), {
       primaryKey: "letter",
       enum: true,
-      enumName: "LetterAToDViaView",
-      behavior: ["-*"]
+      enumName: "LetterAToDViaView"
     })
   },
   executor: executor
-};
-const abcdViewCodec = recordCodec(spec_abcdView);
+});
 const simpleEnumIdentifier = sql.identifier("enum_tables", "simple_enum");
-const spec_simpleEnum = {
+const simpleEnumCodec = recordCodec({
   name: "simpleEnum",
   identifier: simpleEnumIdentifier,
   attributes: Object.assign(Object.create(null), {
@@ -193,13 +189,11 @@ const spec_simpleEnum = {
       name: "simple_enum"
     },
     tags: Object.assign(Object.create(null), {
-      enum: true,
-      behavior: ["-*"]
+      enum: true
     })
   },
   executor: executor
-};
-const simpleEnumCodec = recordCodec(spec_simpleEnum);
+});
 const letterDescriptionsIdentifier = sql.identifier("enum_tables", "letter_descriptions");
 const spec_letterDescriptions_attributes_letter_codec_LetterAToDEnum = enumCodec({
   name: "LetterAToDEnum",
@@ -529,7 +523,7 @@ const spec_lotsOfEnums = {
     },
     tags: Object.assign(Object.create(null), {
       omit: true,
-      behavior: ["-*"]
+      behavior: ["-insert -select -node -connection -list -array -single -update -delete -queryField -mutationField -typeField -filter -filterBy -order -orderBy -query:resource:list -query:resource:connection -singularRelation:resource:list -singularRelation:resource:connection -manyRelation:resource:list -manyRelation:resource:connection -manyToMany"]
     })
   },
   executor: executor
@@ -558,10 +552,12 @@ const registryConfig_pgResources_abcd_abcd = {
       schemaName: "enum_tables",
       name: "abcd"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       enum: true,
-      enumName: "LetterAToD",
-      behavior: spec_abcd.extensions.tags.behavior
+      enumName: "LetterAToD"
     }
   }
 };
@@ -588,11 +584,13 @@ const registryConfig_pgResources_abcd_view_abcd_view = {
       schemaName: "enum_tables",
       name: "abcd_view"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       primaryKey: "letter",
       enum: true,
-      enumName: "LetterAToDViaView",
-      behavior: spec_abcdView.extensions.tags.behavior
+      enumName: "LetterAToDViaView"
     }
   }
 };
@@ -619,9 +617,11 @@ const registryConfig_pgResources_simple_enum_simple_enum = {
       schemaName: "enum_tables",
       name: "simple_enum"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
-      enum: true,
-      behavior: spec_simpleEnum.extensions.tags.behavior
+      enum: true
     }
   }
 };
@@ -664,6 +664,9 @@ const registryConfig_pgResources_letter_descriptions_letter_descriptions = {
       schemaName: "enum_tables",
       name: "letter_descriptions"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       foreignKey: "(letter_via_view) references enum_tables.abcd_view"
     }
@@ -693,6 +696,9 @@ const registryConfig_pgResources_referencing_table_referencing_table = {
       schemaName: "enum_tables",
       name: "referencing_table"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {}
   }
 };
@@ -757,6 +763,9 @@ const registryConfig_pgResources_lots_of_enums_lots_of_enums = {
       schemaName: "enum_tables",
       name: "lots_of_enums"
     },
+    isInsertable: true,
+    isUpdatable: true,
+    isDeletable: true,
     tags: {
       omit: true,
       behavior: spec_lotsOfEnums.extensions.tags.behavior
@@ -812,9 +821,7 @@ const registry = makeRegistry({
           schemaName: "enum_tables",
           name: "referencing_table_mutation"
         },
-        tags: {
-          behavior: ["-queryField mutationField -typeField", "-filter -order"]
-        }
+        tags: {}
       },
       description: undefined
     },

@@ -655,72 +655,87 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
     },
   }),
   schema: {
+    behaviorRegistry: {
+      add: {
+        "interface:node": {
+          description:
+            "should this codec representing a polymorphic interface implement the Node interface?",
+          entities: ["pgCodec"],
+        },
+      },
+    },
     entityBehavior: {
       pgCodec: {
-        provides: ["default"],
-        before: ["inferred", "override"],
-        callback(behavior, codec) {
-          return [
-            "select",
-            "table",
-            ...(!codec.isAnonymous ? ["insert", "update"] : []),
-            behavior,
-          ];
+        inferred: {
+          provides: ["default"],
+          before: ["inferred", "override"],
+          callback(behavior, codec) {
+            return [
+              "select",
+              "table",
+              ...((!codec.isAnonymous
+                ? ["insert", "update"]
+                : []) as GraphileBuild.BehaviorString[]),
+              behavior,
+            ];
+          },
         },
       },
       pgCodecRelation: {
-        provides: ["inferred"],
-        after: ["default", "PgRelationsPlugin"],
-        before: ["override"],
-        callback(behavior, entity, build) {
-          const {
-            input: {
-              pgRegistry: { pgRelations },
-            },
-            grafast: { arraysMatch },
-          } = build;
-          const { localCodec, remoteResource, isUnique, isReferencee } = entity;
-          const remoteCodec = remoteResource.codec;
+        inferred: {
+          provides: ["inferred"],
+          after: ["default", "PgRelationsPlugin"],
+          callback(behavior, entity, build) {
+            const {
+              input: {
+                pgRegistry: { pgRelations },
+              },
+              grafast: { arraysMatch },
+            } = build;
+            const { localCodec, remoteResource, isUnique, isReferencee } =
+              entity;
+            const remoteCodec = remoteResource.codec;
 
-          // Hide relation from a concrete type back to the abstract root table.
-          if (
-            isUnique &&
-            !isReferencee &&
-            remoteCodec.polymorphism?.mode === "relational"
-          ) {
-            const localTypeName = build.inflection.tableType(localCodec);
-            const polymorphicTypeDefinitionEntry = Object.entries(
-              remoteCodec.polymorphism.types,
-            ).find(([, val]) => val.name === localTypeName);
-            if (polymorphicTypeDefinitionEntry) {
-              const [, { relationName }] = polymorphicTypeDefinitionEntry;
-              const relation = pgRelations[remoteCodec.name]?.[relationName];
-              if (
-                arraysMatch(relation.remoteAttributes, entity.localAttributes)
-              ) {
-                return [behavior, "-connection -list -single"];
+            // Hide relation from a concrete type back to the abstract root table.
+            if (
+              isUnique &&
+              !isReferencee &&
+              remoteCodec.polymorphism?.mode === "relational"
+            ) {
+              const localTypeName = build.inflection.tableType(localCodec);
+              const polymorphicTypeDefinitionEntry = Object.entries(
+                remoteCodec.polymorphism.types,
+              ).find(([, val]) => val.name === localTypeName);
+              if (polymorphicTypeDefinitionEntry) {
+                const [, { relationName }] = polymorphicTypeDefinitionEntry;
+                const relation = pgRelations[remoteCodec.name]?.[relationName];
+                if (
+                  arraysMatch(relation.remoteAttributes, entity.localAttributes)
+                ) {
+                  return [behavior, "-connection", "-list", "-single"];
+                }
               }
             }
-          }
 
-          // Hide relation from abstract root table to related elements
-          if (isReferencee && localCodec.polymorphism?.mode === "relational") {
-            const relations = Object.values(localCodec.polymorphism.types).map(
-              (t) => pgRelations[localCodec.name]?.[t.relationName],
-            );
-            if (relations.includes(entity)) {
-              return [behavior, "-connection -list -single"];
+            // Hide relation from abstract root table to related elements
+            if (
+              isReferencee &&
+              localCodec.polymorphism?.mode === "relational"
+            ) {
+              const relations = Object.values(
+                localCodec.polymorphism.types,
+              ).map((t) => pgRelations[localCodec.name]?.[t.relationName]);
+              if (relations.includes(entity)) {
+                return [behavior, "-connection", "-list", "-single"];
+              }
             }
-          }
 
-          return behavior;
+            return behavior;
+          },
         },
       },
       pgCodecAttribute: {
-        provides: ["inferred"],
-        after: ["default"],
-        before: ["override"],
-        callback(behavior, [codec, attributeName], build) {
+        inferred(behavior, [codec, attributeName], build) {
           // If this is the primary key of a related table of a
           // `@interface mode:relational` table, then omit it from the schema
           const tbl = build.pgTableResource(codec);
@@ -742,7 +757,10 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 ) {
                   return [
                     behavior,
-                    "-attribute:select -attribute:update -attribute:filterBy -attribute:orderBy",
+                    "-attribute:select",
+                    "-attribute:update",
+                    "-attribute:filterBy",
+                    "-attribute:orderBy",
                   ];
                 }
               }
@@ -753,10 +771,7 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
         },
       },
       pgResource: {
-        provides: ["inferred"],
-        after: ["default"],
-        before: ["override"],
-        callback(behavior, resource, build) {
+        inferred(behavior, resource, build) {
           // Disable insert/update/delete on relational tables
           const newBehavior = [behavior];
           if (
@@ -767,7 +782,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
             if ((resource.codec as PgCodec).polymorphism) {
               // This is a polymorphic type
               newBehavior.push(
-                "-resource:insert -resource:update -resource:delete",
+                "-resource:insert",
+                "-resource:update",
+                "-resource:delete",
               );
             } else {
               const resourceTypeName = build.inflection.tableType(
@@ -795,7 +812,9 @@ export const PgPolymorphismPlugin: GraphileConfig.Plugin = {
                 ) {
                   // This is part of a relational polymorphic type
                   newBehavior.push(
-                    "-resource:insert -resource:update -resource:delete",
+                    "-resource:insert",
+                    "-resource:update",
+                    "-resource:delete",
                   );
                 }
               }
@@ -1446,32 +1465,35 @@ return function (access, inhibitOnNull) {
         }
         return interfaces;
       },
-      GraphQLSchema_types(types, build, _context) {
-        for (const type of Object.values(build.getAllTypes())) {
-          if (build.graphql.isInterfaceType(type)) {
-            const scope = build.scopeByType.get(type) as
-              | GraphileBuild.ScopeInterface
-              | undefined;
-            if (scope) {
-              const polymorphism = scope.pgPolymorphism;
-              if (polymorphism) {
-                switch (polymorphism.mode) {
-                  case "relational":
-                  case "single": {
-                    for (const type of Object.values(polymorphism.types)) {
-                      // Force the type to be built
-                      const t = build.getTypeByName(
-                        type.name,
-                      ) as GraphQLNamedType;
-                      types.push(t);
+      GraphQLSchema_types: {
+        before: ["CollectReferencedTypesPlugin"],
+        callback(types, build, _context) {
+          for (const type of Object.values(build.getAllTypes())) {
+            if (build.graphql.isInterfaceType(type)) {
+              const scope = build.scopeByType.get(type) as
+                | GraphileBuild.ScopeInterface
+                | undefined;
+              if (scope) {
+                const polymorphism = scope.pgPolymorphism;
+                if (polymorphism) {
+                  switch (polymorphism.mode) {
+                    case "relational":
+                    case "single": {
+                      for (const type of Object.values(polymorphism.types)) {
+                        // Force the type to be built
+                        const t = build.getTypeByName(
+                          type.name,
+                        ) as GraphQLNamedType;
+                        types.push(t);
+                      }
                     }
                   }
                 }
               }
             }
           }
-        }
-        return types;
+          return types;
+        },
       },
     },
   },

@@ -53,7 +53,7 @@ declare global {
 
     interface Plugin {
       name: keyof GraphileConfig.Plugins;
-      version: string;
+      version?: string;
       experimental?: boolean;
       description?: string;
       provides?: (

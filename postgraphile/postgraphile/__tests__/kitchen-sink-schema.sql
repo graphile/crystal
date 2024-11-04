@@ -181,6 +181,8 @@ create type b.color as enum ('red', 'green', 'blue');
 create type b.enum_caps as enum ('FOO_BAR', 'BAR_FOO', 'BAZ_QUX', '0_BAR');
 create type b.enum_with_empty_string as enum ('', 'one', 'two');
 
+comment on type b.color is E'Represents the colours red, green and blue.';
+
 create type c.compound_type as (
   a int,
   b text,
@@ -346,7 +348,7 @@ create function a.optional_missing_middle_3(a int, int default 2, c int default 
 create function a.optional_missing_middle_4(int, b int default 2, int default 3) returns int as $$ select $1 + $2 + $3 $$ language sql immutable strict;
 create function a.optional_missing_middle_5(a int, int default 2, int default 3) returns int as $$ select $1 + $2 + $3 $$ language sql immutable strict;
 
-comment on function a.add_1_mutation(int, int) is 'lol, add some stuff 1 mutation';
+comment on function a.add_1_mutation(int, int) is E'@notNull\nlol, add some stuff 1 mutation';
 comment on function a.add_2_mutation(int, int) is 'lol, add some stuff 2 mutation';
 comment on function a.add_3_mutation(int, int) is 'lol, add some stuff 3 mutation';
 comment on function a.add_4_mutation(int, int) is 'lol, add some stuff 4 mutation';
@@ -360,10 +362,10 @@ create function b.mult_2(int, int) returns int as $$ select $1 * $2 $$ language 
 create function b.mult_3(int, int) returns int as $$ select $1 * $2 $$ language sql returns null on null input;
 create function b.mult_4(int, int) returns int as $$ select $1 * $2 $$ language sql strict;
 
-create function c.json_identity(json json) returns json as $$ select json $$ language sql immutable;
-create function c.json_identity_mutation(json json) returns json as $$ select json $$ language sql;
-create function c.jsonb_identity(json jsonb) returns jsonb as $$ select json $$ language sql immutable;
-create function c.jsonb_identity_mutation(json jsonb) returns jsonb as $$ select json $$ language sql;
+create function c.json_identity("json" json) returns json as $$ select "json" $$ language sql immutable;
+create function c.json_identity_mutation("json" json) returns json as $$ select "json" $$ language sql;
+create function c.jsonb_identity("json" jsonb) returns jsonb as $$ select "json" $$ language sql immutable;
+create function c.jsonb_identity_mutation("json" jsonb) returns jsonb as $$ select "json" $$ language sql;
 create function c.jsonb_identity_mutation_plpgsql(_the_json jsonb) returns jsonb as $$ declare begin return _the_json; end; $$ language plpgsql strict security definer;
 create function c.jsonb_identity_mutation_plpgsql_with_default(_the_json jsonb default '[]') returns jsonb as $$ declare begin return _the_json; end; $$ language plpgsql strict security definer;
 create function c.types_query(a bigint, b boolean, c varchar, d integer[], e json, f c.floatrange) returns boolean as $$ select false $$ language sql stable strict;
@@ -1379,6 +1381,9 @@ comment on table polymorphic.single_table_items is $$
   @ref rootChecklistTopic from:SingleTableChecklist to:SingleTableTopic singular via:(root_topic_id)->polymorphic.single_table_items(id)
   $$;
 
+create function polymorphic.single_table_items_meaning_of_life(sti polymorphic.single_table_items) returns int as $$
+select 42;
+$$ language sql stable;
 
 create function polymorphic.all_single_tables ()
 returns setof polymorphic.single_table_items as $$
@@ -1470,6 +1475,10 @@ comment on table polymorphic.relational_items is $$
   @type CHECKLIST references:relational_checklists
   @type CHECKLIST_ITEM references:relational_checklist_items
   $$;
+
+create function polymorphic.relational_items_meaning_of_life(ri polymorphic.relational_items) returns int as $$
+select 42;
+$$ language sql stable;
 
 CREATE FUNCTION polymorphic.custom_delete_relational_item("nodeId" polymorphic.relational_items)
 RETURNS boolean

@@ -22,7 +22,7 @@ type Add1MutationPayload {
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  result: Int
+  result: Int!
 }
 
 """All input for the `add2Mutation` mutation."""
@@ -315,6 +315,7 @@ type BAuthenticatePayloadPayload {
   result: BAuthPayload
 }
 
+"""Represents the colours red, green and blue."""
 enum BColor {
   blue
   green
@@ -1960,12 +1961,12 @@ type CLeftArmIdentityPayload {
   unchanged and unused. May be used by a client to track mutations.
   """
   clientMutationId: String
+  leftArm: CLeftArm
 
   """
   Our root query field type. Allows us to run any query from our mutation payload.
   """
   query: Query
-  result: CLeftArm
 }
 
 """An input for mutations affecting `CLeftArm`"""

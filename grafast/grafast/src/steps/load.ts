@@ -1,12 +1,14 @@
 import type { __ItemStep, Deferred, ExecutionDetails } from "../index.js";
-import { defer, isExecutableStep } from "../index.js";
+import { defer } from "../index.js";
 import type {
   GrafastResultsList,
   Maybe,
   PromiseOrDirect,
 } from "../interfaces.js";
+import type { Multistep, UnwrapMultistep } from "../multistep.js";
+import { isMultistep, multistep } from "../multistep.js";
 import { ExecutableStep, isListLikeStep, isObjectLikeStep } from "../step.js";
-import { arrayOfLength, canonicalJSONStringify } from "../utils.js";
+import { arrayOfLength, canonicalJSONStringify, isTuple } from "../utils.js";
 import { access } from "./access.js";
 
 export interface LoadOptions<
@@ -95,7 +97,7 @@ let loadCounter = 0;
  */
 export class LoadedRecordStep<
   TItem,
-  TParams extends Record<string, any>,
+  TParams extends Record<string, any> = Record<string, any>,
 > extends ExecutableStep<TItem> {
   static $$export = {
     moduleName: "grafast",
@@ -173,35 +175,43 @@ export class LoadedRecordStep<
 }
 
 export class LoadStep<
-  TSpec,
+  const TMultistep extends Multistep,
   TItem,
   TData extends TItem | ReadonlyArray<TItem>,
   TParams extends Record<string, any>,
-  TUnarySpec = never,
+  const TUnaryMultistep extends Multistep = never,
 > extends ExecutableStep {
   /* implements ListCapableStep<TItem, LoadedRecordStep<TItem, TParams>> */
   static $$export = { moduleName: "grafast", exportName: "LoadStep" };
 
   public isSyncAndSafe = false;
 
-  loadOptions: Omit<LoadOptions<TItem, TParams, TUnarySpec>, "unary"> | null =
-    null;
+  loadOptions: Omit<
+    LoadOptions<TItem, TParams, UnwrapMultistep<TUnaryMultistep>>,
+    "unary"
+  > | null = null;
   loadOptionsKey = "";
 
   attributes = new Set<keyof TItem>();
   params: Partial<TParams> = Object.create(null);
   unaryDepId: number | null = null;
   constructor(
-    $spec: ExecutableStep<TSpec>,
-    $unarySpec: ExecutableStep<TUnarySpec> | null,
-    private ioEquivalence:
-      | null
-      | string
-      | { [key in keyof TSpec]?: string | null },
-    private load: LoadCallback<TSpec, TItem, TData, TParams, TUnarySpec>,
+    spec: TMultistep,
+    unarySpec: TUnaryMultistep | null,
+    private ioEquivalence: IOEquivalence<TMultistep>,
+    private load: LoadCallback<
+      UnwrapMultistep<TMultistep>,
+      TItem,
+      TData,
+      TParams,
+      UnwrapMultistep<TUnaryMultistep>
+    >,
   ) {
     super();
+    const $spec = multistep(spec, "load");
     this.addDependency($spec);
+    const $unarySpec =
+      unarySpec == null ? null : multistep(unarySpec, "loadUnary");
     if ($unarySpec) {
       this.unaryDepId = this.addUnaryDependency($unarySpec);
     }
@@ -217,7 +227,7 @@ export class LoadStep<
     } else if (typeof this.ioEquivalence === "string") {
       map[this.ioEquivalence] = $spec;
       return map;
-    } else if (Array.isArray(this.ioEquivalence)) {
+    } else if (isTuple(this.ioEquivalence)) {
       for (let i = 0, l = this.ioEquivalence.length; i < l; i++) {
         const key = this.ioEquivalence[i];
         map[key] = isListLikeStep($spec) ? $spec.at(i) : access($spec, [i]);
@@ -225,7 +235,7 @@ export class LoadStep<
       return map;
     } else if (typeof this.ioEquivalence === "object") {
       for (const key of Object.keys(this.ioEquivalence)) {
-        const attr = this.ioEquivalence[key as keyof TSpec];
+        const attr = this.ioEquivalence[key as any];
         if (attr != null) {
           map[attr] = isObjectLikeStep($spec)
             ? $spec.get(key)
@@ -307,16 +317,16 @@ export class LoadStep<
     count,
     values: [values0, values1],
     extra,
-  }: ExecutionDetails<[TSpec, TUnarySpec]>): PromiseOrDirect<
-    GrafastResultsList<Maybe<TData>>
-  > {
+  }: ExecutionDetails<
+    [UnwrapMultistep<TMultistep>, UnwrapMultistep<TUnaryMultistep>]
+  >): PromiseOrDirect<GrafastResultsList<Maybe<TData>>> {
     const meta = extra.meta as LoadMeta;
     let cache = meta.cache;
     if (!cache) {
       cache = new Map();
       meta.cache = cache;
     }
-    const batch = new Map<TSpec, number[]>();
+    const batch = new Map<UnwrapMultistep<TMultistep>, number[]>();
     const unary = values1?.isBatch === false ? values1.value : undefined;
 
     const results: Array<PromiseOrDirect<Maybe<TData>>> = [];
@@ -358,7 +368,7 @@ export class LoadStep<
           meta.loadBatchesByLoad!.delete(this.load);
           executeBatches(loadBatches!, this.load, {
             ...loadOptions,
-            unary: unary as TUnarySpec,
+            unary: unary as UnwrapMultistep<TUnaryMultistep>,
           });
         });
       }
@@ -423,257 +433,381 @@ async function executeBatches(
 }
 
 function load<
-  TSpec,
+  const TMultistep extends Multistep,
   TItem,
   TData extends TItem | ReadonlyArray<TItem>,
   TParams extends Record<string, any>,
-  TUnarySpec = never,
+  const TUnaryMultistep extends Multistep = never,
 >(
-  $spec: ExecutableStep<TSpec>,
-  $unarySpec: ExecutableStep<TUnarySpec> | null,
-  ioEquivalence: null | string | { [key in keyof TSpec]?: string | null },
-  loadCallback: LoadCallback<TSpec, TItem, TData, TParams, TUnarySpec>,
+  spec: TMultistep,
+  unarySpec: TUnaryMultistep | null,
+  ioEquivalence: IOEquivalence<TMultistep>,
+  loadCallback: LoadCallback<
+    UnwrapMultistep<TMultistep>,
+    TItem,
+    TData,
+    TParams,
+    UnwrapMultistep<TUnaryMultistep>
+  >,
 ) {
-  return new LoadStep($spec, $unarySpec, ioEquivalence, loadCallback);
+  return new LoadStep(spec, unarySpec, ioEquivalence, loadCallback);
 }
 
 export function loadMany<
-  TSpec,
+  const TMultistep extends Multistep,
   TItem,
   TParams extends Record<string, any> = Record<string, any>,
-  TUnarySpec = never,
+  const TUnaryMultistep extends Multistep = never,
 >(
-  $spec: ExecutableStep<TSpec>,
-  loadCallback: LoadManyCallback<TSpec, TItem, TParams, TUnarySpec>,
-): LoadStep<TSpec, TItem, ReadonlyArray<TItem>, TParams, TUnarySpec>;
+  spec: TMultistep,
+  loadCallback: LoadManyCallback<
+    UnwrapMultistep<TMultistep>,
+    TItem,
+    TParams,
+    UnwrapMultistep<TUnaryMultistep>
+  >,
+): LoadStep<
+  UnwrapMultistep<TMultistep>,
+  TItem,
+  ReadonlyArray<TItem>,
+  TParams,
+  UnwrapMultistep<TUnaryMultistep>
+>;
 export function loadMany<
-  TSpec,
+  const TMultistep extends Multistep,
   TItem,
   TParams extends Record<string, any> = Record<string, any>,
-  TUnarySpec = never,
+  const TUnaryMultistep extends Multistep = never,
 >(
-  $spec: ExecutableStep<TSpec>,
-  ioEquivalence:
-    | null
-    | string
-    | (TSpec extends [...any[]]
-        ? { [key in keyof TSpec]: string | null }
-        : TSpec extends Record<string, any>
-        ? { [key in keyof TSpec]?: string | null }
-        : never),
-  loadCallback: LoadManyCallback<TSpec, TItem, TParams, TUnarySpec>,
-): LoadStep<TSpec, TItem, ReadonlyArray<TItem>, TParams, TUnarySpec>;
+  spec: TMultistep,
+  ioEquivalence: IOEquivalence<TMultistep>,
+  loadCallback: LoadManyCallback<
+    UnwrapMultistep<TMultistep>,
+    TItem,
+    TParams,
+    UnwrapMultistep<TUnaryMultistep>
+  >,
+): LoadStep<
+  UnwrapMultistep<TMultistep>,
+  TItem,
+  ReadonlyArray<TItem>,
+  TParams,
+  UnwrapMultistep<TUnaryMultistep>
+>;
 export function loadMany<
-  TSpec,
+  const TMultistep extends Multistep,
   TItem,
   TParams extends Record<string, any> = Record<string, any>,
-  TUnarySpec = never,
+  const TUnaryMultistep extends Multistep = never,
 >(
-  $spec: ExecutableStep<TSpec>,
-  $unarySpec: ExecutableStep<TUnarySpec> | null,
-  loadCallback: LoadManyCallback<TSpec, TItem, TParams, TUnarySpec>,
-): LoadStep<TSpec, TItem, ReadonlyArray<TItem>, TParams, TUnarySpec>;
+  spec: TMultistep,
+  unarySpec: TUnaryMultistep | null,
+  loadCallback: LoadManyCallback<
+    UnwrapMultistep<TMultistep>,
+    TItem,
+    TParams,
+    UnwrapMultistep<TUnaryMultistep>
+  >,
+): LoadStep<
+  UnwrapMultistep<TMultistep>,
+  TItem,
+  ReadonlyArray<TItem>,
+  TParams,
+  UnwrapMultistep<TUnaryMultistep>
+>;
 export function loadMany<
-  TSpec,
+  const TMultistep extends Multistep,
   TItem,
   TParams extends Record<string, any> = Record<string, any>,
-  TUnarySpec = never,
+  const TUnaryMultistep extends Multistep = never,
 >(
-  $spec: ExecutableStep<TSpec>,
-  $unarySpec: ExecutableStep<TUnarySpec> | null,
-  ioEquivalence:
-    | null
-    | string
-    | (TSpec extends [...any[]]
-        ? { [key in keyof TSpec]: string | null }
-        : TSpec extends Record<string, any>
-        ? { [key in keyof TSpec]?: string | null }
-        : never),
-  loadCallback: LoadManyCallback<TSpec, TItem, TParams, TUnarySpec>,
-): LoadStep<TSpec, TItem, ReadonlyArray<TItem>, TParams, TUnarySpec>;
+  spec: TMultistep,
+  unarySpec: TUnaryMultistep | null,
+  ioEquivalence: IOEquivalence<TMultistep>,
+  loadCallback: LoadManyCallback<
+    UnwrapMultistep<TMultistep>,
+    TItem,
+    TParams,
+    UnwrapMultistep<TUnaryMultistep>
+  >,
+): LoadStep<
+  UnwrapMultistep<TMultistep>,
+  TItem,
+  ReadonlyArray<TItem>,
+  TParams,
+  UnwrapMultistep<TUnaryMultistep>
+>;
 export function loadMany<
-  TSpec,
+  const TMultistep extends Multistep,
   TItem,
   TParams extends Record<string, any> = Record<string, any>,
-  TUnarySpec = never,
+  const TUnaryMultistep extends Multistep = never,
 >(
-  $spec: ExecutableStep<TSpec>,
+  spec: TMultistep,
   loadCallbackOrIoEquivalenceOrUnarySpec:
-    | LoadManyCallback<TSpec, TItem, TParams, TUnarySpec>
-    | null
-    | string
-    | { [key in keyof TSpec]?: string | null }
-    | ExecutableStep<TUnarySpec>,
+    | LoadManyCallback<
+        UnwrapMultistep<TMultistep>,
+        TItem,
+        TParams,
+        UnwrapMultistep<TUnaryMultistep>
+      >
+    | IOEquivalence<TMultistep>
+    | TUnaryMultistep,
   loadCallbackOrIoEquivalence?:
-    | LoadManyCallback<TSpec, TItem, TParams>
-    | null
-    | string
-    | { [key in keyof TSpec]?: string | null },
-  loadCallbackOnly?: LoadManyCallback<TSpec, TItem, TParams, TUnarySpec>,
-): LoadStep<TSpec, TItem, ReadonlyArray<TItem>, TParams, TUnarySpec> {
+    | LoadManyCallback<UnwrapMultistep<TMultistep>, TItem, TParams>
+    | IOEquivalence<TMultistep>,
+  loadCallbackOnly?: LoadManyCallback<
+    UnwrapMultistep<TMultistep>,
+    TItem,
+    TParams,
+    UnwrapMultistep<TUnaryMultistep>
+  >,
+): LoadStep<
+  UnwrapMultistep<TMultistep>,
+  TItem,
+  ReadonlyArray<TItem>,
+  TParams,
+  UnwrapMultistep<TUnaryMultistep>
+> {
   if (loadCallbackOnly) {
     return load(
-      $spec,
-      loadCallbackOrIoEquivalenceOrUnarySpec as ExecutableStep<TUnarySpec> | null,
-      loadCallbackOrIoEquivalence as
-        | null
-        | string
-        | { [key in keyof TSpec]?: string | null },
-      loadCallbackOnly as LoadManyCallback<TSpec, TItem, TParams, TUnarySpec>,
-    ) as LoadStep<TSpec, TItem, ReadonlyArray<TItem>, TParams, TUnarySpec>;
+      spec,
+      loadCallbackOrIoEquivalenceOrUnarySpec as TUnaryMultistep | null,
+      loadCallbackOrIoEquivalence as IOEquivalence<TMultistep>,
+      loadCallbackOnly as LoadManyCallback<
+        UnwrapMultistep<TMultistep>,
+        TItem,
+        TParams,
+        UnwrapMultistep<TUnaryMultistep>
+      >,
+    ) as LoadStep<
+      UnwrapMultistep<TMultistep>,
+      TItem,
+      ReadonlyArray<TItem>,
+      TParams,
+      UnwrapMultistep<TUnaryMultistep>
+    >;
   }
   // At most 3 arguments
-  else if (isExecutableStep(loadCallbackOrIoEquivalenceOrUnarySpec)) {
+  else if (
+    isMultistep<TUnaryMultistep>(loadCallbackOrIoEquivalenceOrUnarySpec)
+  ) {
     return load(
-      $spec,
+      spec,
       loadCallbackOrIoEquivalenceOrUnarySpec,
       null,
       loadCallbackOrIoEquivalence as LoadManyCallback<
-        TSpec,
+        UnwrapMultistep<TMultistep>,
         TItem,
         TParams,
-        TUnarySpec
+        UnwrapMultistep<TUnaryMultistep>
       >,
-    ) as LoadStep<TSpec, TItem, ReadonlyArray<TItem>, TParams, TUnarySpec>;
+    ) as LoadStep<
+      UnwrapMultistep<TMultistep>,
+      TItem,
+      ReadonlyArray<TItem>,
+      TParams,
+      UnwrapMultistep<TUnaryMultistep>
+    >;
   }
   // Unary step is definitely null; 3 arguments
   else if (loadCallbackOrIoEquivalence) {
     return load(
-      $spec,
+      spec,
       null,
-      loadCallbackOrIoEquivalenceOrUnarySpec,
+      loadCallbackOrIoEquivalenceOrUnarySpec as IOEquivalence<TMultistep>,
       loadCallbackOrIoEquivalence as LoadManyCallback<
-        TSpec,
+        UnwrapMultistep<TMultistep>,
         TItem,
         TParams,
-        TUnarySpec
+        UnwrapMultistep<TUnaryMultistep>
       >,
-    ) as LoadStep<TSpec, TItem, ReadonlyArray<TItem>, TParams, TUnarySpec>;
+    ) as LoadStep<
+      UnwrapMultistep<TMultistep>,
+      TItem,
+      ReadonlyArray<TItem>,
+      TParams,
+      UnwrapMultistep<TUnaryMultistep>
+    >;
   }
   // 2 arguments
   else {
     return load(
-      $spec,
+      spec,
       null,
       null,
       loadCallbackOrIoEquivalenceOrUnarySpec as LoadManyCallback<
-        TSpec,
+        UnwrapMultistep<TMultistep>,
         TItem,
         TParams,
-        TUnarySpec
+        UnwrapMultistep<TUnaryMultistep>
       >,
-    ) as LoadStep<TSpec, TItem, ReadonlyArray<TItem>, TParams, TUnarySpec>;
+    ) as LoadStep<
+      UnwrapMultistep<TMultistep>,
+      TItem,
+      ReadonlyArray<TItem>,
+      TParams,
+      UnwrapMultistep<TUnaryMultistep>
+    >;
   }
 }
 
+type IOEquivalence<TMultistep extends Multistep> =
+  | null
+  | string
+  | (UnwrapMultistep<TMultistep> extends readonly [...(readonly any[])]
+      ? {
+          [key in Exclude<keyof UnwrapMultistep<TMultistep>, keyof any[]>]:
+            | string
+            | null;
+        }
+      : UnwrapMultistep<TMultistep> extends Record<string, any>
+      ? { [key in keyof UnwrapMultistep<TMultistep>]?: string | null }
+      : never);
+
 export function loadOne<
-  const TSpec,
+  const TMultistep extends Multistep,
   TItem,
   TParams extends Record<string, any> = Record<string, any>,
-  TUnarySpec = never,
+  const TUnaryMultistep extends Multistep = never,
 >(
-  $spec: ExecutableStep<TSpec>,
-  loadCallback: LoadOneCallback<TSpec, TItem, TParams, TUnarySpec>,
+  spec: TMultistep,
+  loadCallback: LoadOneCallback<
+    UnwrapMultistep<TMultistep>,
+    TItem,
+    TParams,
+    UnwrapMultistep<TUnaryMultistep>
+  >,
 ): LoadedRecordStep<TItem, TParams>;
 export function loadOne<
-  const TSpec,
+  const TMultistep extends Multistep,
   TItem,
   TParams extends Record<string, any> = Record<string, any>,
-  TUnarySpec = never,
+  const TUnaryMultistep extends Multistep = never,
 >(
-  $spec: ExecutableStep<TSpec>,
-  ioEquivalence: null | string | { [key in keyof TSpec]?: string | null },
-  loadCallback: LoadOneCallback<TSpec, TItem, TParams, TUnarySpec>,
+  spec: TMultistep,
+  ioEquivalence: IOEquivalence<TMultistep>,
+  loadCallback: LoadOneCallback<
+    UnwrapMultistep<TMultistep>,
+    TItem,
+    TParams,
+    UnwrapMultistep<TUnaryMultistep>
+  >,
 ): LoadedRecordStep<TItem, TParams>;
 export function loadOne<
-  const TSpec,
+  const TMultistep extends Multistep,
   TItem,
   TParams extends Record<string, any> = Record<string, any>,
-  const TUnarySpec = never,
+  const TUnaryMultistep extends Multistep = never,
 >(
-  $spec: ExecutableStep<TSpec>,
-  $unarySpec: ExecutableStep<TUnarySpec> | null,
-  loadCallback: LoadOneCallback<TSpec, TItem, TParams, TUnarySpec>,
+  spec: TMultistep,
+  unarySpec: TUnaryMultistep | null,
+  loadCallback: LoadOneCallback<
+    UnwrapMultistep<TMultistep>,
+    TItem,
+    TParams,
+    UnwrapMultistep<TUnaryMultistep>
+  >,
 ): LoadedRecordStep<TItem, TParams>;
 export function loadOne<
-  const TSpec,
+  const TMultistep extends Multistep,
   TItem,
   TParams extends Record<string, any> = Record<string, any>,
-  const TUnarySpec = never,
+  const TUnaryMultistep extends Multistep = never,
 >(
-  $spec: ExecutableStep<TSpec>,
-  $unarySpec: ExecutableStep<TUnarySpec> | null,
-  ioEquivalence: null | string | { [key in keyof TSpec]?: string | null },
-  loadCallback: LoadOneCallback<TSpec, TItem, TParams, TUnarySpec>,
+  spec: TMultistep,
+  unarySpec: TUnaryMultistep | null,
+  ioEquivalence: IOEquivalence<TMultistep>,
+  loadCallback: LoadOneCallback<
+    UnwrapMultistep<TMultistep>,
+    TItem,
+    TParams,
+    UnwrapMultistep<TUnaryMultistep>
+  >,
 ): LoadedRecordStep<TItem, TParams>;
 export function loadOne<
-  TSpec,
+  const TMultistep extends Multistep,
   TItem,
   TParams extends Record<string, any> = Record<string, any>,
-  TUnarySpec = never,
+  const TUnaryMultistep extends Multistep = never,
 >(
-  $spec: ExecutableStep<TSpec>,
+  spec: TMultistep,
   loadCallbackOrIoEquivalenceOrUnarySpec:
-    | LoadOneCallback<TSpec, TItem, TParams, TUnarySpec>
-    | null
-    | string
-    | { [key in keyof TSpec]?: string | null }
-    | ExecutableStep<TUnarySpec>,
+    | LoadOneCallback<
+        UnwrapMultistep<TMultistep>,
+        TItem,
+        TParams,
+        UnwrapMultistep<TUnaryMultistep>
+      >
+    | IOEquivalence<TMultistep>
+    | TUnaryMultistep,
   loadCallbackOrIoEquivalence?:
-    | LoadOneCallback<TSpec, TItem, TParams, TUnarySpec>
-    | null
-    | string
-    | { [key in keyof TSpec]?: string | null },
-  loadCallbackOnly?: LoadOneCallback<TSpec, TItem, TParams, TUnarySpec>,
+    | LoadOneCallback<
+        UnwrapMultistep<TMultistep>,
+        TItem,
+        TParams,
+        UnwrapMultistep<TUnaryMultistep>
+      >
+    | IOEquivalence<TMultistep>,
+  loadCallbackOnly?: LoadOneCallback<
+    UnwrapMultistep<TMultistep>,
+    TItem,
+    TParams,
+    UnwrapMultistep<TUnaryMultistep>
+  >,
 ): LoadedRecordStep<TItem, TParams> {
   if (loadCallbackOnly) {
     return load(
-      $spec,
-      loadCallbackOrIoEquivalenceOrUnarySpec as ExecutableStep<TUnarySpec> | null,
-      loadCallbackOrIoEquivalence as
-        | null
-        | string
-        | { [key in keyof TSpec]?: string | null },
-      loadCallbackOnly as LoadOneCallback<TSpec, TItem, TParams, TUnarySpec>,
+      spec,
+      loadCallbackOrIoEquivalenceOrUnarySpec as TUnaryMultistep | null,
+      loadCallbackOrIoEquivalence as IOEquivalence<TMultistep>,
+      loadCallbackOnly as LoadOneCallback<
+        UnwrapMultistep<TMultistep>,
+        TItem,
+        TParams,
+        UnwrapMultistep<TUnaryMultistep>
+      >,
     ).single();
   }
   // At most 3 arguments
-  else if (isExecutableStep(loadCallbackOrIoEquivalenceOrUnarySpec)) {
+  else if (
+    isMultistep<TUnaryMultistep>(loadCallbackOrIoEquivalenceOrUnarySpec)
+  ) {
     return load(
-      $spec,
+      spec,
       loadCallbackOrIoEquivalenceOrUnarySpec,
       null,
       loadCallbackOrIoEquivalence as LoadOneCallback<
-        TSpec,
+        UnwrapMultistep<TMultistep>,
         TItem,
         TParams,
-        TUnarySpec
+        UnwrapMultistep<TUnaryMultistep>
       >,
     ).single();
   }
   // Unary step is definitely null; 3 arguments
   else if (loadCallbackOrIoEquivalence) {
     return load(
-      $spec,
+      spec,
       null,
-      loadCallbackOrIoEquivalenceOrUnarySpec,
+      loadCallbackOrIoEquivalenceOrUnarySpec as IOEquivalence<TMultistep>,
       loadCallbackOrIoEquivalence as LoadOneCallback<
-        TSpec,
+        UnwrapMultistep<TMultistep>,
         TItem,
         TParams,
-        TUnarySpec
+        UnwrapMultistep<TUnaryMultistep>
       >,
     ).single();
   } else {
     return load(
-      $spec,
+      spec,
       null,
       null,
       loadCallbackOrIoEquivalenceOrUnarySpec as LoadOneCallback<
-        TSpec,
+        UnwrapMultistep<TMultistep>,
         TItem,
         TParams,
-        TUnarySpec
+        UnwrapMultistep<TUnaryMultistep>
       >,
     ).single();
   }

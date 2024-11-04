@@ -10,12 +10,14 @@ import {
 } from "grafast/graphql";
 import { AsyncHooks, orderedApply, resolvePresets } from "graphile-config";
 
+export { isValidBehaviorString } from "./behavior.js";
 import extend from "./extend.js";
 import { makeInitialInflection } from "./inflection.js";
 import {
   AddNodeInterfaceToSuitableTypesPlugin,
   BuiltinScalarConnectionsPlugin,
   ClientMutationIdDescriptionPlugin,
+  CommonBehaviorsPlugin,
   CommonTypesPlugin,
   CursorTypePlugin,
   MutationPayloadQueryPlugin,
@@ -504,6 +506,7 @@ export {
   AddNodeInterfaceToSuitableTypesPlugin,
   BuiltinScalarConnectionsPlugin,
   ClientMutationIdDescriptionPlugin,
+  CommonBehaviorsPlugin,
   CommonTypesPlugin,
   CursorTypePlugin,
   MutationPayloadQueryPlugin,
@@ -700,6 +703,17 @@ export async function watchSchema(
 export { version } from "./version.js";
 
 declare global {
+  namespace GraphileBuild {
+    type EntityBehaviorHook<
+      entityType extends keyof GraphileBuild.BehaviorEntities,
+    > = PluginHook<
+      (
+        behavior: GraphileBuild.BehaviorString,
+        entity: GraphileBuild.BehaviorEntities[entityType],
+        build: GraphileBuild.Build,
+      ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[]
+    >;
+  }
   namespace GraphileConfig {
     interface Provides {
       default: true;
@@ -847,11 +861,24 @@ declare global {
 
       schema?: {
         globalBehavior?:
-          | string
+          | GraphileBuild.BehaviorString
+          | GraphileBuild.BehaviorString[]
           | ((
-              behavior: string,
+              behavior: GraphileBuild.BehaviorString,
               build: GraphileBuild.Build,
-            ) => string | string[]);
+            ) => GraphileBuild.BehaviorString | GraphileBuild.BehaviorString[]);
+
+        behaviorRegistry?: {
+          add?: Partial<
+            Record<
+              keyof GraphileBuild.BehaviorStrings,
+              {
+                description: string;
+                entities: ReadonlyArray<keyof GraphileBuild.BehaviorEntities>;
+              }
+            >
+          >;
+        };
 
         /**
          * You should use `before`, `after` and `provides` to ensure that the entity
@@ -863,14 +890,12 @@ declare global {
          */
         entityBehavior?: {
           [entityType in keyof GraphileBuild.BehaviorEntities]?:
-            | string
-            | PluginHook<
-                (
-                  behavior: string,
-                  entity: GraphileBuild.BehaviorEntities[entityType],
-                  build: GraphileBuild.Build,
-                ) => string | string[]
-              >;
+            | GraphileBuild.BehaviorString
+            | GraphileBuild.BehaviorString[]
+            | {
+                inferred?: GraphileBuild.EntityBehaviorHook<entityType>;
+                override?: GraphileBuild.EntityBehaviorHook<entityType>;
+              };
         };
 
         hooks?: {
@@ -930,7 +955,7 @@ declare global {
           GraphQLSchema_types?: PluginHook<
             GraphileBuild.Hook<
               GraphQLNamedType[],
-              GraphileBuild.ContextSchema,
+              GraphileBuild.ContextSchemaTypes,
               GraphileBuild.Build
             >
           >;
