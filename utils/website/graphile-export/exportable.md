@@ -10,9 +10,9 @@ external libraries.
 
 Generally speaking there are 2 methods of acheiving this, used in unison:
 
-1. All non-pure functions and their scope dependencies must be made exportable
-   by wrapping in an `EXPORTABLE()` call, or be made importable via the special
-   `$$export` property
+1. All non-pure functions and their non-trivial scope dependencies must be made
+   exportable by wrapping in an `EXPORTABLE()` call, or be made importable via
+   the special `$$export` property
 2. If a dependency cannot be made exportable/importable then instead of
    depending on it via the JavaScript scope, it should be passed at runtime via
    the GraphQL `context` and referenced from there (the third argument to a
