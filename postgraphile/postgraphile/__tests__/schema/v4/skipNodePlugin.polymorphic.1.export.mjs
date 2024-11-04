@@ -12514,18 +12514,28 @@ export const plans = {
       }, ...extraSelectArgs];
       if (resource_single_table_items_meaning_of_lifePgResource.isUnique && !resource_single_table_items_meaning_of_lifePgResource.codec.attributes && typeof resource_single_table_items_meaning_of_lifePgResource.from === "function") {
         // This is a scalar computed attribute, let's inline the expression
-        const placeholders = selectArgs.map((arg, i) => {
+        const newSelectArgs = selectArgs.map((arg, i) => {
+          const {
+            name
+          } = arg;
           if (i === 0) {
-            return $row.getClassStep().alias;
+            return {
+              name,
+              placeholder: $row.getClassStep().alias
+            };
           } else if ("pgCodec" in arg && arg.pgCodec) {
-            return $row.placeholder(arg.step, arg.pgCodec);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step, arg.pgCodec)
+            };
           } else {
-            return $row.placeholder(arg.step);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step)
+            };
           }
         });
-        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...placeholders.map(placeholder => ({
-          placeholder
-        })))}`;
+        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
@@ -17155,18 +17165,28 @@ export const plans = {
       }, ...extraSelectArgs];
       if (resource_single_table_items_meaning_of_lifePgResource.isUnique && !resource_single_table_items_meaning_of_lifePgResource.codec.attributes && typeof resource_single_table_items_meaning_of_lifePgResource.from === "function") {
         // This is a scalar computed attribute, let's inline the expression
-        const placeholders = selectArgs.map((arg, i) => {
+        const newSelectArgs = selectArgs.map((arg, i) => {
+          const {
+            name
+          } = arg;
           if (i === 0) {
-            return $row.getClassStep().alias;
+            return {
+              name,
+              placeholder: $row.getClassStep().alias
+            };
           } else if ("pgCodec" in arg && arg.pgCodec) {
-            return $row.placeholder(arg.step, arg.pgCodec);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step, arg.pgCodec)
+            };
           } else {
-            return $row.placeholder(arg.step);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step)
+            };
           }
         });
-        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...placeholders.map(placeholder => ({
-          placeholder
-        })))}`;
+        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
@@ -17599,18 +17619,28 @@ export const plans = {
       }, ...extraSelectArgs];
       if (resource_single_table_items_meaning_of_lifePgResource.isUnique && !resource_single_table_items_meaning_of_lifePgResource.codec.attributes && typeof resource_single_table_items_meaning_of_lifePgResource.from === "function") {
         // This is a scalar computed attribute, let's inline the expression
-        const placeholders = selectArgs.map((arg, i) => {
+        const newSelectArgs = selectArgs.map((arg, i) => {
+          const {
+            name
+          } = arg;
           if (i === 0) {
-            return $row.getClassStep().alias;
+            return {
+              name,
+              placeholder: $row.getClassStep().alias
+            };
           } else if ("pgCodec" in arg && arg.pgCodec) {
-            return $row.placeholder(arg.step, arg.pgCodec);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step, arg.pgCodec)
+            };
           } else {
-            return $row.placeholder(arg.step);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step)
+            };
           }
         });
-        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...placeholders.map(placeholder => ({
-          placeholder
-        })))}`;
+        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
@@ -17967,18 +17997,28 @@ export const plans = {
       }, ...extraSelectArgs];
       if (resource_single_table_items_meaning_of_lifePgResource.isUnique && !resource_single_table_items_meaning_of_lifePgResource.codec.attributes && typeof resource_single_table_items_meaning_of_lifePgResource.from === "function") {
         // This is a scalar computed attribute, let's inline the expression
-        const placeholders = selectArgs.map((arg, i) => {
+        const newSelectArgs = selectArgs.map((arg, i) => {
+          const {
+            name
+          } = arg;
           if (i === 0) {
-            return $row.getClassStep().alias;
+            return {
+              name,
+              placeholder: $row.getClassStep().alias
+            };
           } else if ("pgCodec" in arg && arg.pgCodec) {
-            return $row.placeholder(arg.step, arg.pgCodec);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step, arg.pgCodec)
+            };
           } else {
-            return $row.placeholder(arg.step);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step)
+            };
           }
         });
-        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...placeholders.map(placeholder => ({
-          placeholder
-        })))}`;
+        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);
@@ -18337,18 +18377,28 @@ export const plans = {
       }, ...extraSelectArgs];
       if (resource_single_table_items_meaning_of_lifePgResource.isUnique && !resource_single_table_items_meaning_of_lifePgResource.codec.attributes && typeof resource_single_table_items_meaning_of_lifePgResource.from === "function") {
         // This is a scalar computed attribute, let's inline the expression
-        const placeholders = selectArgs.map((arg, i) => {
+        const newSelectArgs = selectArgs.map((arg, i) => {
+          const {
+            name
+          } = arg;
           if (i === 0) {
-            return $row.getClassStep().alias;
+            return {
+              name,
+              placeholder: $row.getClassStep().alias
+            };
           } else if ("pgCodec" in arg && arg.pgCodec) {
-            return $row.placeholder(arg.step, arg.pgCodec);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step, arg.pgCodec)
+            };
           } else {
-            return $row.placeholder(arg.step);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step)
+            };
           }
         });
-        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...placeholders.map(placeholder => ({
-          placeholder
-        })))}`;
+        return pgClassExpression($row, resource_single_table_items_meaning_of_lifePgResource.codec)`${resource_single_table_items_meaning_of_lifePgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_single_table_items_meaning_of_lifePgResource.execute(selectArgs);

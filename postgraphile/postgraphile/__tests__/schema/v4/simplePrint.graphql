@@ -1415,6 +1415,11 @@ type Person implements Node {
   computedInoutOut(ino: String): PersonComputedInoutOutRecord
   exists(email: Email): Boolean @deprecated(reason: "This is deprecated (comment on function c.person_exists).")
   computedFirstArgInoutOut: PersonComputedFirstArgInoutOutRecord
+  optionalMissingMiddle1(arg0: Int!, b: Int, c: Int): Int
+  optionalMissingMiddle2(a: Int!, b: Int, c: Int): Int
+  optionalMissingMiddle3(a: Int!, arg1: Int, c: Int): Int
+  optionalMissingMiddle4(arg0: Int!, b: Int, arg2: Int): Int
+  optionalMissingMiddle5(a: Int!, arg1: Int, arg2: Int): Int
   computedComplex(a: Int, b: String): PersonComputedComplexRecord
 
   """The first post by the person."""

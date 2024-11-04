@@ -2502,6 +2502,11 @@ const person_computed_inoutFunctionIdentifer = sql.identifier("c", "person_compu
 const person_computed_inout_outFunctionIdentifer = sql.identifier("c", "person_computed_inout_out");
 const person_existsFunctionIdentifer = sql.identifier("c", "person_exists");
 const person_computed_first_arg_inout_outFunctionIdentifer = sql.identifier("c", "person_computed_first_arg_inout_out");
+const person_optional_missing_middle_1FunctionIdentifer = sql.identifier("c", "person_optional_missing_middle_1");
+const person_optional_missing_middle_2FunctionIdentifer = sql.identifier("c", "person_optional_missing_middle_2");
+const person_optional_missing_middle_3FunctionIdentifer = sql.identifier("c", "person_optional_missing_middle_3");
+const person_optional_missing_middle_4FunctionIdentifer = sql.identifier("c", "person_optional_missing_middle_4");
+const person_optional_missing_middle_5FunctionIdentifer = sql.identifier("c", "person_optional_missing_middle_5");
 const func_out_complexFunctionIdentifer = sql.identifier("c", "func_out_complex");
 const func_out_complex_setofFunctionIdentifer = sql.identifier("c", "func_out_complex_setof");
 const mutation_out_complexFunctionIdentifer = sql.identifier("c", "mutation_out_complex");
@@ -4292,6 +4297,216 @@ const registry = makeRegistry({
           serviceName: "main",
           schemaName: "c",
           name: "person_computed_first_arg_inout_out"
+        },
+        tags: {}
+      },
+      description: undefined
+    },
+    person_optional_missing_middle_1: {
+      executor,
+      name: "person_optional_missing_middle_1",
+      identifier: "main.c.person_optional_missing_middle_1(c.person,int4,int4,int4)",
+      from(...args) {
+        return sql`${person_optional_missing_middle_1FunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "p",
+        required: true,
+        notNull: true,
+        codec: personCodec
+      }, {
+        name: "",
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "b",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "c",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "person_optional_missing_middle_1"
+        },
+        tags: {}
+      },
+      description: undefined
+    },
+    person_optional_missing_middle_2: {
+      executor,
+      name: "person_optional_missing_middle_2",
+      identifier: "main.c.person_optional_missing_middle_2(c.person,int4,int4,int4)",
+      from(...args) {
+        return sql`${person_optional_missing_middle_2FunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "p",
+        required: true,
+        notNull: true,
+        codec: personCodec
+      }, {
+        name: "a",
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "b",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "c",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "person_optional_missing_middle_2"
+        },
+        tags: {}
+      },
+      description: undefined
+    },
+    person_optional_missing_middle_3: {
+      executor,
+      name: "person_optional_missing_middle_3",
+      identifier: "main.c.person_optional_missing_middle_3(c.person,int4,int4,int4)",
+      from(...args) {
+        return sql`${person_optional_missing_middle_3FunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "p",
+        required: true,
+        notNull: true,
+        codec: personCodec
+      }, {
+        name: "a",
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "c",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "person_optional_missing_middle_3"
+        },
+        tags: {}
+      },
+      description: undefined
+    },
+    person_optional_missing_middle_4: {
+      executor,
+      name: "person_optional_missing_middle_4",
+      identifier: "main.c.person_optional_missing_middle_4(c.person,int4,int4,int4)",
+      from(...args) {
+        return sql`${person_optional_missing_middle_4FunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "p",
+        required: true,
+        notNull: true,
+        codec: personCodec
+      }, {
+        name: "",
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "b",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "person_optional_missing_middle_4"
+        },
+        tags: {}
+      },
+      description: undefined
+    },
+    person_optional_missing_middle_5: {
+      executor,
+      name: "person_optional_missing_middle_5",
+      identifier: "main.c.person_optional_missing_middle_5(c.person,int4,int4,int4)",
+      from(...args) {
+        return sql`${person_optional_missing_middle_5FunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "p",
+        required: true,
+        notNull: true,
+        codec: personCodec
+      }, {
+        name: "a",
+        required: true,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }, {
+        name: "",
+        required: false,
+        notNull: true,
+        codec: TYPES.int
+      }],
+      isUnique: !false,
+      codec: TYPES.int,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "person_optional_missing_middle_5"
         },
         tags: {}
       },
@@ -7093,22 +7308,28 @@ const makeArgs37 = (args, path = []) => {
 };
 const resource_person_computed_first_arg_inout_outPgResource = registry.pgResources["person_computed_first_arg_inout_out"];
 const argDetailsSimple38 = [{
-  graphqlArgName: "a",
-  postgresArgName: "a",
+  graphqlArgName: "arg0",
+  postgresArgName: "",
   pgCodec: TYPES.int,
   required: true,
   fetcher: null
 }, {
   graphqlArgName: "b",
   postgresArgName: "b",
-  pgCodec: TYPES.text,
-  required: true,
+  pgCodec: TYPES.int,
+  required: false,
+  fetcher: null
+}, {
+  graphqlArgName: "c",
+  postgresArgName: "c",
+  pgCodec: TYPES.int,
+  required: false,
   fetcher: null
 }];
 const makeArgs38 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 3; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -7119,7 +7340,7 @@ const makeArgs38 = (args, path = []) => {
     const $raw = args.getRaw([...path, graphqlArgName]);
     let step;
     if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
+      if (!required && i >= 1 - 1) {
         skipped = true;
         continue;
       } else {
@@ -7149,12 +7370,30 @@ const makeArgs38 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_computed_complexPgResource = registry.pgResources["person_computed_complex"];
-const argDetailsSimple39 = [];
+const resource_person_optional_missing_middle_1PgResource = registry.pgResources["person_optional_missing_middle_1"];
+const argDetailsSimple39 = [{
+  graphqlArgName: "a",
+  postgresArgName: "a",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "b",
+  postgresArgName: "b",
+  pgCodec: TYPES.int,
+  required: false,
+  fetcher: null
+}, {
+  graphqlArgName: "c",
+  postgresArgName: "c",
+  pgCodec: TYPES.int,
+  required: false,
+  fetcher: null
+}];
 const makeArgs39 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 3; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -7195,12 +7434,30 @@ const makeArgs39 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_first_postPgResource = registry.pgResources["person_first_post"];
-const argDetailsSimple40 = [];
+const resource_person_optional_missing_middle_2PgResource = registry.pgResources["person_optional_missing_middle_2"];
+const argDetailsSimple40 = [{
+  graphqlArgName: "a",
+  postgresArgName: "a",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "arg1",
+  postgresArgName: "",
+  pgCodec: TYPES.int,
+  required: false,
+  fetcher: null
+}, {
+  graphqlArgName: "c",
+  postgresArgName: "c",
+  pgCodec: TYPES.int,
+  required: false,
+  fetcher: null
+}];
 const makeArgs40 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 3; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -7211,7 +7468,7 @@ const makeArgs40 = (args, path = []) => {
     const $raw = args.getRaw([...path, graphqlArgName]);
     let step;
     if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
+      if (!required && i >= 2 - 1) {
         skipped = true;
         continue;
       } else {
@@ -7241,12 +7498,30 @@ const makeArgs40 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_computed_first_arg_inoutPgResource = registry.pgResources["person_computed_first_arg_inout"];
-const argDetailsSimple41 = [];
+const resource_person_optional_missing_middle_3PgResource = registry.pgResources["person_optional_missing_middle_3"];
+const argDetailsSimple41 = [{
+  graphqlArgName: "arg0",
+  postgresArgName: "",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "b",
+  postgresArgName: "b",
+  pgCodec: TYPES.int,
+  required: false,
+  fetcher: null
+}, {
+  graphqlArgName: "arg2",
+  postgresArgName: "",
+  pgCodec: TYPES.int,
+  required: false,
+  fetcher: null
+}];
 const makeArgs41 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 3; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -7257,7 +7532,7 @@ const makeArgs41 = (args, path = []) => {
     const $raw = args.getRaw([...path, graphqlArgName]);
     let step;
     if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
+      if (!required && i >= 3 - 1) {
         skipped = true;
         continue;
       } else {
@@ -7287,46 +7562,30 @@ const makeArgs41 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_friendsPgResource = registry.pgResources["person_friends"];
-const getSelectPlanFromParentAndArgs12 = ($in, args, _info) => {
-  if (!hasRecord($in)) {
-    throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
-  }
-  const extraSelectArgs = makeArgs41(args);
-  /**
-   * An optimisation - if all our dependencies are
-   * compatible with the expression's class plan then we
-   * can inline ourselves into that, otherwise we must
-   * issue the query separately.
-   */
-  const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
-  const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
-  const selectArgs = [{
-    step: $row.record()
-  }, ...extraSelectArgs];
-  if (resource_person_friendsPgResource.isUnique && !resource_person_friendsPgResource.codec.attributes && typeof resource_person_friendsPgResource.from === "function") {
-    // This is a scalar computed attribute, let's inline the expression
-    const placeholders = selectArgs.map((arg, i) => {
-      if (i === 0) {
-        return $row.getClassStep().alias;
-      } else if ("pgCodec" in arg && arg.pgCodec) {
-        return $row.placeholder(arg.step, arg.pgCodec);
-      } else {
-        return $row.placeholder(arg.step);
-      }
-    });
-    return pgClassExpression($row, resource_person_friendsPgResource.codec)`${resource_person_friendsPgResource.from(...placeholders.map(placeholder => ({
-      placeholder
-    })))}`;
-  }
-  // PERF: or here, if scalar add select to `$row`?
-  return resource_person_friendsPgResource.execute(selectArgs);
-};
-const argDetailsSimple42 = [];
+const resource_person_optional_missing_middle_4PgResource = registry.pgResources["person_optional_missing_middle_4"];
+const argDetailsSimple42 = [{
+  graphqlArgName: "a",
+  postgresArgName: "a",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "arg1",
+  postgresArgName: "",
+  pgCodec: TYPES.int,
+  required: false,
+  fetcher: null
+}, {
+  graphqlArgName: "arg2",
+  postgresArgName: "",
+  pgCodec: TYPES.int,
+  required: false,
+  fetcher: null
+}];
 const makeArgs42 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 3; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -7337,7 +7596,7 @@ const makeArgs42 = (args, path = []) => {
     const $raw = args.getRaw([...path, graphqlArgName]);
     let step;
     if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
+      if (!required && i >= 3 - 1) {
         skipped = true;
         continue;
       } else {
@@ -7367,52 +7626,24 @@ const makeArgs42 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_type_function_connectionPgResource = registry.pgResources["person_type_function_connection"];
-const getSelectPlanFromParentAndArgs13 = ($in, args, _info) => {
-  if (!hasRecord($in)) {
-    throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
-  }
-  const extraSelectArgs = makeArgs42(args);
-  /**
-   * An optimisation - if all our dependencies are
-   * compatible with the expression's class plan then we
-   * can inline ourselves into that, otherwise we must
-   * issue the query separately.
-   */
-  const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
-  const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
-  const selectArgs = [{
-    step: $row.record()
-  }, ...extraSelectArgs];
-  if (resource_person_type_function_connectionPgResource.isUnique && !resource_person_type_function_connectionPgResource.codec.attributes && typeof resource_person_type_function_connectionPgResource.from === "function") {
-    // This is a scalar computed attribute, let's inline the expression
-    const placeholders = selectArgs.map((arg, i) => {
-      if (i === 0) {
-        return $row.getClassStep().alias;
-      } else if ("pgCodec" in arg && arg.pgCodec) {
-        return $row.placeholder(arg.step, arg.pgCodec);
-      } else {
-        return $row.placeholder(arg.step);
-      }
-    });
-    return pgClassExpression($row, resource_person_type_function_connectionPgResource.codec)`${resource_person_type_function_connectionPgResource.from(...placeholders.map(placeholder => ({
-      placeholder
-    })))}`;
-  }
-  // PERF: or here, if scalar add select to `$row`?
-  return resource_person_type_function_connectionPgResource.execute(selectArgs);
-};
+const resource_person_optional_missing_middle_5PgResource = registry.pgResources["person_optional_missing_middle_5"];
 const argDetailsSimple43 = [{
-  graphqlArgName: "id",
-  postgresArgName: "id",
+  graphqlArgName: "a",
+  postgresArgName: "a",
   pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "b",
+  postgresArgName: "b",
+  pgCodec: TYPES.text,
   required: true,
   fetcher: null
 }];
 const makeArgs43 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 2; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -7453,7 +7684,7 @@ const makeArgs43 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_type_functionPgResource = registry.pgResources["person_type_function"];
+const resource_person_computed_complexPgResource = registry.pgResources["person_computed_complex"];
 const argDetailsSimple44 = [];
 const makeArgs44 = (args, path = []) => {
   const selectArgs = [];
@@ -7499,9 +7730,7 @@ const makeArgs44 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_person_type_function_listPgResource = registry.pgResources["person_type_function_list"];
-const resource_frmcdc_wrappedUrlPgResource = registry.pgResources["frmcdc_wrappedUrl"];
-const resource_frmcdc_compoundTypePgResource = registry.pgResources["frmcdc_compoundType"];
+const resource_person_first_postPgResource = registry.pgResources["person_first_post"];
 const argDetailsSimple45 = [];
 const makeArgs45 = (args, path = []) => {
   const selectArgs = [];
@@ -7514,6 +7743,332 @@ const makeArgs45 = (args, path = []) => {
       required,
       fetcher
     } = argDetailsSimple45[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
+const resource_person_computed_first_arg_inoutPgResource = registry.pgResources["person_computed_first_arg_inout"];
+const argDetailsSimple46 = [];
+const makeArgs46 = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 0; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple46[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
+const resource_person_friendsPgResource = registry.pgResources["person_friends"];
+const getSelectPlanFromParentAndArgs12 = ($in, args, _info) => {
+  if (!hasRecord($in)) {
+    throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
+  }
+  const extraSelectArgs = makeArgs46(args);
+  /**
+   * An optimisation - if all our dependencies are
+   * compatible with the expression's class plan then we
+   * can inline ourselves into that, otherwise we must
+   * issue the query separately.
+   */
+  const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
+  const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
+  const selectArgs = [{
+    step: $row.record()
+  }, ...extraSelectArgs];
+  if (resource_person_friendsPgResource.isUnique && !resource_person_friendsPgResource.codec.attributes && typeof resource_person_friendsPgResource.from === "function") {
+    // This is a scalar computed attribute, let's inline the expression
+    const newSelectArgs = selectArgs.map((arg, i) => {
+      const {
+        name
+      } = arg;
+      if (i === 0) {
+        return {
+          name,
+          placeholder: $row.getClassStep().alias
+        };
+      } else if ("pgCodec" in arg && arg.pgCodec) {
+        return {
+          name,
+          placeholder: $row.placeholder(arg.step, arg.pgCodec)
+        };
+      } else {
+        return {
+          name,
+          placeholder: $row.placeholder(arg.step)
+        };
+      }
+    });
+    return pgClassExpression($row, resource_person_friendsPgResource.codec)`${resource_person_friendsPgResource.from(...newSelectArgs)}`;
+  }
+  // PERF: or here, if scalar add select to `$row`?
+  return resource_person_friendsPgResource.execute(selectArgs);
+};
+const argDetailsSimple47 = [];
+const makeArgs47 = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 0; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple47[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
+const resource_person_type_function_connectionPgResource = registry.pgResources["person_type_function_connection"];
+const getSelectPlanFromParentAndArgs13 = ($in, args, _info) => {
+  if (!hasRecord($in)) {
+    throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
+  }
+  const extraSelectArgs = makeArgs47(args);
+  /**
+   * An optimisation - if all our dependencies are
+   * compatible with the expression's class plan then we
+   * can inline ourselves into that, otherwise we must
+   * issue the query separately.
+   */
+  const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
+  const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
+  const selectArgs = [{
+    step: $row.record()
+  }, ...extraSelectArgs];
+  if (resource_person_type_function_connectionPgResource.isUnique && !resource_person_type_function_connectionPgResource.codec.attributes && typeof resource_person_type_function_connectionPgResource.from === "function") {
+    // This is a scalar computed attribute, let's inline the expression
+    const newSelectArgs = selectArgs.map((arg, i) => {
+      const {
+        name
+      } = arg;
+      if (i === 0) {
+        return {
+          name,
+          placeholder: $row.getClassStep().alias
+        };
+      } else if ("pgCodec" in arg && arg.pgCodec) {
+        return {
+          name,
+          placeholder: $row.placeholder(arg.step, arg.pgCodec)
+        };
+      } else {
+        return {
+          name,
+          placeholder: $row.placeholder(arg.step)
+        };
+      }
+    });
+    return pgClassExpression($row, resource_person_type_function_connectionPgResource.codec)`${resource_person_type_function_connectionPgResource.from(...newSelectArgs)}`;
+  }
+  // PERF: or here, if scalar add select to `$row`?
+  return resource_person_type_function_connectionPgResource.execute(selectArgs);
+};
+const argDetailsSimple48 = [{
+  graphqlArgName: "id",
+  postgresArgName: "id",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}];
+const makeArgs48 = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 1; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple48[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
+const resource_person_type_functionPgResource = registry.pgResources["person_type_function"];
+const argDetailsSimple49 = [];
+const makeArgs49 = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 0; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple49[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
+const resource_person_type_function_listPgResource = registry.pgResources["person_type_function_list"];
+const resource_frmcdc_wrappedUrlPgResource = registry.pgResources["frmcdc_wrappedUrl"];
+const resource_frmcdc_compoundTypePgResource = registry.pgResources["frmcdc_compoundType"];
+const argDetailsSimple50 = [];
+const makeArgs50 = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 0; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple50[i];
     const $raw = args.getRaw([...path, graphqlArgName]);
     let step;
     if ($raw.evalIs(undefined)) {
@@ -7614,247 +8169,11 @@ const parseValueLiteral = (ast, variables) => {
   }
 };
 const resource_frmcdc_postPgResource = registry.pgResources["frmcdc_post"];
-const argDetailsSimple46 = [];
-const makeArgs46 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 0; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple46[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
-    } else {
-      step = args.get([...path, graphqlArgName]);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
-const resource_edge_case_computedPgResource = registry.pgResources["edge_case_computed"];
-const argDetailsSimple47 = [];
-const makeArgs47 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 0; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple47[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
-    } else {
-      step = args.get([...path, graphqlArgName]);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
-const resource_mutation_outPgResource = registry.pgResources["mutation_out"];
-const argDetailsSimple48 = [];
-const makeArgs48 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 0; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple48[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
-    } else {
-      step = args.get([...path, graphqlArgName]);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
-const resource_mutation_out_setofPgResource = registry.pgResources["mutation_out_setof"];
-const argDetailsSimple49 = [];
-const makeArgs49 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 0; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple49[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
-    } else {
-      step = args.get([...path, graphqlArgName]);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
-const resource_mutation_out_unnamedPgResource = registry.pgResources["mutation_out_unnamed"];
-const argDetailsSimple50 = [];
-const makeArgs50 = (args, path = []) => {
-  const selectArgs = [];
-  let skipped = false;
-  for (let i = 0; i < 0; i++) {
-    const {
-      graphqlArgName,
-      postgresArgName,
-      pgCodec,
-      required,
-      fetcher
-    } = argDetailsSimple50[i];
-    const $raw = args.getRaw([...path, graphqlArgName]);
-    let step;
-    if ($raw.evalIs(undefined)) {
-      if (!required && i >= 0 - 1) {
-        skipped = true;
-        continue;
-      } else {
-        step = constant(null);
-      }
-    } else if (fetcher) {
-      step = fetcher(args.get([...path, graphqlArgName])).record();
-    } else {
-      step = args.get([...path, graphqlArgName]);
-    }
-    if (skipped) {
-      const name = postgresArgName;
-      if (!name) {
-        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
-      }
-      selectArgs.push({
-        step,
-        pgCodec,
-        name
-      });
-    } else {
-      selectArgs.push({
-        step,
-        pgCodec
-      });
-    }
-  }
-  return selectArgs;
-};
-const resource_no_args_mutationPgResource = registry.pgResources["no_args_mutation"];
-const argDetailsSimple51 = [{
-  graphqlArgName: "i",
-  postgresArgName: "i",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}];
+const argDetailsSimple51 = [];
 const makeArgs51 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -7895,18 +8214,12 @@ const makeArgs51 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_in_outPgResource = registry.pgResources["mutation_in_out"];
-const argDetailsSimple52 = [{
-  graphqlArgName: "i",
-  postgresArgName: "i",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}];
+const resource_edge_case_computedPgResource = registry.pgResources["edge_case_computed"];
+const argDetailsSimple52 = [];
 const makeArgs52 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -7947,18 +8260,12 @@ const makeArgs52 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_returns_table_one_colPgResource = registry.pgResources["mutation_returns_table_one_col"];
-const argDetailsSimple53 = [{
-  graphqlArgName: "json",
-  postgresArgName: "json",
-  pgCodec: TYPES.json,
-  required: true,
-  fetcher: null
-}];
+const resource_mutation_outPgResource = registry.pgResources["mutation_out"];
+const argDetailsSimple53 = [];
 const makeArgs53 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -7999,18 +8306,12 @@ const makeArgs53 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_json_identity_mutationPgResource = registry.pgResources["json_identity_mutation"];
-const argDetailsSimple54 = [{
-  graphqlArgName: "json",
-  postgresArgName: "json",
-  pgCodec: TYPES.jsonb,
-  required: true,
-  fetcher: null
-}];
+const resource_mutation_out_setofPgResource = registry.pgResources["mutation_out_setof"];
+const argDetailsSimple54 = [];
 const makeArgs54 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -8051,18 +8352,12 @@ const makeArgs54 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_jsonb_identity_mutationPgResource = registry.pgResources["jsonb_identity_mutation"];
-const argDetailsSimple55 = [{
-  graphqlArgName: "_theJson",
-  postgresArgName: "_the_json",
-  pgCodec: TYPES.jsonb,
-  required: true,
-  fetcher: null
-}];
+const resource_mutation_out_unnamedPgResource = registry.pgResources["mutation_out_unnamed"];
+const argDetailsSimple55 = [];
 const makeArgs55 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -8103,12 +8398,12 @@ const makeArgs55 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_jsonb_identity_mutation_plpgsqlPgResource = registry.pgResources["jsonb_identity_mutation_plpgsql"];
+const resource_no_args_mutationPgResource = registry.pgResources["no_args_mutation"];
 const argDetailsSimple56 = [{
-  graphqlArgName: "_theJson",
-  postgresArgName: "_the_json",
-  pgCodec: TYPES.jsonb,
-  required: false,
+  graphqlArgName: "i",
+  postgresArgName: "i",
+  pgCodec: TYPES.int,
+  required: true,
   fetcher: null
 }];
 const makeArgs56 = (args, path = []) => {
@@ -8155,16 +8450,10 @@ const makeArgs56 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_jsonb_identity_mutation_plpgsql_with_defaultPgResource = registry.pgResources["jsonb_identity_mutation_plpgsql_with_default"];
+const resource_mutation_in_outPgResource = registry.pgResources["mutation_in_out"];
 const argDetailsSimple57 = [{
   graphqlArgName: "i",
   postgresArgName: "i",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "ino",
-  postgresArgName: "ino",
   pgCodec: TYPES.int,
   required: true,
   fetcher: null
@@ -8172,7 +8461,7 @@ const argDetailsSimple57 = [{
 const makeArgs57 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 1; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -8213,12 +8502,18 @@ const makeArgs57 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_in_inoutPgResource = registry.pgResources["mutation_in_inout"];
-const argDetailsSimple58 = [];
+const resource_mutation_returns_table_one_colPgResource = registry.pgResources["mutation_returns_table_one_col"];
+const argDetailsSimple58 = [{
+  graphqlArgName: "json",
+  postgresArgName: "json",
+  pgCodec: TYPES.json,
+  required: true,
+  fetcher: null
+}];
 const makeArgs58 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 1; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -8259,12 +8554,18 @@ const makeArgs58 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_outPgResource = registry.pgResources["mutation_out_out"];
-const argDetailsSimple59 = [];
+const resource_json_identity_mutationPgResource = registry.pgResources["json_identity_mutation"];
+const argDetailsSimple59 = [{
+  graphqlArgName: "json",
+  postgresArgName: "json",
+  pgCodec: TYPES.jsonb,
+  required: true,
+  fetcher: null
+}];
 const makeArgs59 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 1; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -8305,12 +8606,18 @@ const makeArgs59 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_out_setofPgResource = registry.pgResources["mutation_out_out_setof"];
-const argDetailsSimple60 = [];
+const resource_jsonb_identity_mutationPgResource = registry.pgResources["jsonb_identity_mutation"];
+const argDetailsSimple60 = [{
+  graphqlArgName: "_theJson",
+  postgresArgName: "_the_json",
+  pgCodec: TYPES.jsonb,
+  required: true,
+  fetcher: null
+}];
 const makeArgs60 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 1; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -8351,30 +8658,18 @@ const makeArgs60 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_out_unnamedPgResource = registry.pgResources["mutation_out_out_unnamed"];
+const resource_jsonb_identity_mutation_plpgsqlPgResource = registry.pgResources["jsonb_identity_mutation_plpgsql"];
 const argDetailsSimple61 = [{
-  graphqlArgName: "x",
-  postgresArgName: "x",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "y",
-  postgresArgName: "y",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "z",
-  postgresArgName: "z",
-  pgCodec: TYPES.int,
-  required: true,
+  graphqlArgName: "_theJson",
+  postgresArgName: "_the_json",
+  pgCodec: TYPES.jsonb,
+  required: false,
   fetcher: null
 }];
 const makeArgs61 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 1; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -8415,12 +8710,24 @@ const makeArgs61 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_int_set_mutationPgResource = registry.pgResources["int_set_mutation"];
-const argDetailsSimple62 = [];
+const resource_jsonb_identity_mutation_plpgsql_with_defaultPgResource = registry.pgResources["jsonb_identity_mutation_plpgsql_with_default"];
+const argDetailsSimple62 = [{
+  graphqlArgName: "i",
+  postgresArgName: "i",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "ino",
+  postgresArgName: "ino",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}];
 const makeArgs62 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 2; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -8461,18 +8768,12 @@ const makeArgs62 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_unnamed_out_out_unnamedPgResource = registry.pgResources["mutation_out_unnamed_out_out_unnamed"];
-const argDetailsSimple63 = [{
-  graphqlArgName: "i",
-  postgresArgName: "i",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}];
+const resource_mutation_in_inoutPgResource = registry.pgResources["mutation_in_inout"];
+const argDetailsSimple63 = [];
 const makeArgs63 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -8513,18 +8814,12 @@ const makeArgs63 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_returns_table_multi_colPgResource = registry.pgResources["mutation_returns_table_multi_col"];
-const argDetailsSimple64 = [{
-  graphqlArgName: "leftArm",
-  postgresArgName: "left_arm",
-  pgCodec: leftArmCodec,
-  required: true,
-  fetcher: null
-}];
+const resource_mutation_out_outPgResource = registry.pgResources["mutation_out_out"];
+const argDetailsSimple64 = [];
 const makeArgs64 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -8565,7 +8860,7 @@ const makeArgs64 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_left_arm_identityPgResource = registry.pgResources["left_arm_identity"];
+const resource_mutation_out_out_setofPgResource = registry.pgResources["mutation_out_out_setof"];
 const argDetailsSimple65 = [];
 const makeArgs65 = (args, path = []) => {
   const selectArgs = [];
@@ -8611,12 +8906,30 @@ const makeArgs65 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_issue756_mutationPgResource = registry.pgResources["issue756_mutation"];
-const argDetailsSimple66 = [];
+const resource_mutation_out_out_unnamedPgResource = registry.pgResources["mutation_out_out_unnamed"];
+const argDetailsSimple66 = [{
+  graphqlArgName: "x",
+  postgresArgName: "x",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "y",
+  postgresArgName: "y",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "z",
+  postgresArgName: "z",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}];
 const makeArgs66 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 3; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -8657,48 +8970,12 @@ const makeArgs66 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_issue756_set_mutationPgResource = registry.pgResources["issue756_set_mutation"];
-const argDetailsSimple67 = [{
-  graphqlArgName: "a",
-  postgresArgName: "a",
-  pgCodec: TYPES.bigint,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "b",
-  postgresArgName: "b",
-  pgCodec: TYPES.boolean,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "c",
-  postgresArgName: "c",
-  pgCodec: TYPES.varchar,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "d",
-  postgresArgName: "d",
-  pgCodec: int4ArrayCodec,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "e",
-  postgresArgName: "e",
-  pgCodec: TYPES.json,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "f",
-  postgresArgName: "f",
-  pgCodec: floatrangeCodec,
-  required: true,
-  fetcher: null
-}];
+const resource_int_set_mutationPgResource = registry.pgResources["int_set_mutation"];
+const argDetailsSimple67 = [];
 const makeArgs67 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -8739,10 +9016,10 @@ const makeArgs67 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_types_mutationPgResource = registry.pgResources["types_mutation"];
+const resource_mutation_out_unnamed_out_out_unnamedPgResource = registry.pgResources["mutation_out_unnamed_out_out_unnamed"];
 const argDetailsSimple68 = [{
-  graphqlArgName: "i1",
-  postgresArgName: "i1",
+  graphqlArgName: "i",
+  postgresArgName: "i",
   pgCodec: TYPES.int,
   required: true,
   fetcher: null
@@ -8791,11 +9068,11 @@ const makeArgs68 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_out_compound_typePgResource = registry.pgResources["mutation_out_out_compound_type"];
+const resource_mutation_returns_table_multi_colPgResource = registry.pgResources["mutation_returns_table_multi_col"];
 const argDetailsSimple69 = [{
-  graphqlArgName: "id",
-  postgresArgName: "id",
-  pgCodec: TYPES.int,
+  graphqlArgName: "leftArm",
+  postgresArgName: "left_arm",
+  pgCodec: leftArmCodec,
   required: true,
   fetcher: null
 }];
@@ -8843,24 +9120,12 @@ const makeArgs69 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_table_mutationPgResource = registry.pgResources["table_mutation"];
-const argDetailsSimple70 = [{
-  graphqlArgName: "a",
-  postgresArgName: "a",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "b",
-  postgresArgName: "b",
-  pgCodec: TYPES.text,
-  required: true,
-  fetcher: null
-}];
+const resource_left_arm_identityPgResource = registry.pgResources["left_arm_identity"];
+const argDetailsSimple70 = [];
 const makeArgs70 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -8901,24 +9166,12 @@ const makeArgs70 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_complexPgResource = registry.pgResources["mutation_out_complex"];
-const argDetailsSimple71 = [{
-  graphqlArgName: "a",
-  postgresArgName: "a",
-  pgCodec: TYPES.int,
-  required: true,
-  fetcher: null
-}, {
-  graphqlArgName: "b",
-  postgresArgName: "b",
-  pgCodec: TYPES.text,
-  required: true,
-  fetcher: null
-}];
+const resource_issue756_mutationPgResource = registry.pgResources["issue756_mutation"];
+const argDetailsSimple71 = [];
 const makeArgs71 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 0; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -8959,12 +9212,48 @@ const makeArgs71 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_complex_setofPgResource = registry.pgResources["mutation_out_complex_setof"];
-const argDetailsSimple72 = [];
+const resource_issue756_set_mutationPgResource = registry.pgResources["issue756_set_mutation"];
+const argDetailsSimple72 = [{
+  graphqlArgName: "a",
+  postgresArgName: "a",
+  pgCodec: TYPES.bigint,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "b",
+  postgresArgName: "b",
+  pgCodec: TYPES.boolean,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "c",
+  postgresArgName: "c",
+  pgCodec: TYPES.varchar,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "d",
+  postgresArgName: "d",
+  pgCodec: int4ArrayCodec,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "e",
+  postgresArgName: "e",
+  pgCodec: TYPES.json,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "f",
+  postgresArgName: "f",
+  pgCodec: floatrangeCodec,
+  required: true,
+  fetcher: null
+}];
 const makeArgs72 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 6; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -9005,12 +9294,18 @@ const makeArgs72 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_tablePgResource = registry.pgResources["mutation_out_table"];
-const argDetailsSimple73 = [];
+const resource_types_mutationPgResource = registry.pgResources["types_mutation"];
+const argDetailsSimple73 = [{
+  graphqlArgName: "i1",
+  postgresArgName: "i1",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}];
 const makeArgs73 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 0; i++) {
+  for (let i = 0; i < 1; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -9051,9 +9346,177 @@ const makeArgs73 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_mutation_out_table_setofPgResource = registry.pgResources["mutation_out_table_setof"];
-const argDetailsSimple74 = [];
+const resource_mutation_out_out_compound_typePgResource = registry.pgResources["mutation_out_out_compound_type"];
+const argDetailsSimple74 = [{
+  graphqlArgName: "id",
+  postgresArgName: "id",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}];
 const makeArgs74 = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 1; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple74[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
+const resource_table_mutationPgResource = registry.pgResources["table_mutation"];
+const argDetailsSimple75 = [{
+  graphqlArgName: "a",
+  postgresArgName: "a",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "b",
+  postgresArgName: "b",
+  pgCodec: TYPES.text,
+  required: true,
+  fetcher: null
+}];
+const makeArgs75 = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 2; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple75[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
+const resource_mutation_out_complexPgResource = registry.pgResources["mutation_out_complex"];
+const argDetailsSimple76 = [{
+  graphqlArgName: "a",
+  postgresArgName: "a",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "b",
+  postgresArgName: "b",
+  pgCodec: TYPES.text,
+  required: true,
+  fetcher: null
+}];
+const makeArgs76 = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 2; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple76[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
+const resource_mutation_out_complex_setofPgResource = registry.pgResources["mutation_out_complex_setof"];
+const argDetailsSimple77 = [];
+const makeArgs77 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
   for (let i = 0; i < 0; i++) {
@@ -9063,7 +9526,99 @@ const makeArgs74 = (args, path = []) => {
       pgCodec,
       required,
       fetcher
-    } = argDetailsSimple74[i];
+    } = argDetailsSimple77[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
+const resource_mutation_out_tablePgResource = registry.pgResources["mutation_out_table"];
+const argDetailsSimple78 = [];
+const makeArgs78 = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 0; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple78[i];
+    const $raw = args.getRaw([...path, graphqlArgName]);
+    let step;
+    if ($raw.evalIs(undefined)) {
+      if (!required && i >= 0 - 1) {
+        skipped = true;
+        continue;
+      } else {
+        step = constant(null);
+      }
+    } else if (fetcher) {
+      step = fetcher(args.get([...path, graphqlArgName])).record();
+    } else {
+      step = args.get([...path, graphqlArgName]);
+    }
+    if (skipped) {
+      const name = postgresArgName;
+      if (!name) {
+        throw new Error("GraphileInternalError<6f9e0fbc-6c73-4811-a7cf-c2bc2b3c0946>: This should not be possible since we asserted that allArgsAreNamed");
+      }
+      selectArgs.push({
+        step,
+        pgCodec,
+        name
+      });
+    } else {
+      selectArgs.push({
+        step,
+        pgCodec
+      });
+    }
+  }
+  return selectArgs;
+};
+const resource_mutation_out_table_setofPgResource = registry.pgResources["mutation_out_table_setof"];
+const argDetailsSimple79 = [];
+const makeArgs79 = (args, path = []) => {
+  const selectArgs = [];
+  let skipped = false;
+  for (let i = 0; i < 0; i++) {
+    const {
+      graphqlArgName,
+      postgresArgName,
+      pgCodec,
+      required,
+      fetcher
+    } = argDetailsSimple79[i];
     const $raw = args.getRaw([...path, graphqlArgName]);
     let step;
     if ($raw.evalIs(undefined)) {
@@ -9756,6 +10311,11 @@ type Person implements Node {
   computedInoutOut(ino: String): PersonComputedInoutOutRecord
   exists(email: Email): Boolean @deprecated(reason: "This is deprecated (comment on function c.person_exists).")
   computedFirstArgInoutOut: PersonComputedFirstArgInoutOutRecord
+  optionalMissingMiddle1(arg0: Int!, b: Int, c: Int): Int
+  optionalMissingMiddle2(a: Int!, b: Int, c: Int): Int
+  optionalMissingMiddle3(a: Int!, arg1: Int, c: Int): Int
+  optionalMissingMiddle4(arg0: Int!, b: Int, arg2: Int): Int
+  optionalMissingMiddle5(a: Int!, arg1: Int, arg2: Int): Int
   computedComplex(a: Int, b: String): PersonComputedComplexRecord
 
   """The first post by the person."""
@@ -13307,18 +13867,28 @@ export const plans = {
       }, ...extraSelectArgs];
       if (resource_person_computed_outPgResource.isUnique && !resource_person_computed_outPgResource.codec.attributes && typeof resource_person_computed_outPgResource.from === "function") {
         // This is a scalar computed attribute, let's inline the expression
-        const placeholders = selectArgs.map((arg, i) => {
+        const newSelectArgs = selectArgs.map((arg, i) => {
+          const {
+            name
+          } = arg;
           if (i === 0) {
-            return $row.getClassStep().alias;
+            return {
+              name,
+              placeholder: $row.getClassStep().alias
+            };
           } else if ("pgCodec" in arg && arg.pgCodec) {
-            return $row.placeholder(arg.step, arg.pgCodec);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step, arg.pgCodec)
+            };
           } else {
-            return $row.placeholder(arg.step);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step)
+            };
           }
         });
-        return pgClassExpression($row, resource_person_computed_outPgResource.codec)`${resource_person_computed_outPgResource.from(...placeholders.map(placeholder => ({
-          placeholder
-        })))}`;
+        return pgClassExpression($row, resource_person_computed_outPgResource.codec)`${resource_person_computed_outPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_person_computed_outPgResource.execute(selectArgs);
@@ -13341,18 +13911,28 @@ export const plans = {
       }, ...extraSelectArgs];
       if (resource_person_first_namePgResource.isUnique && !resource_person_first_namePgResource.codec.attributes && typeof resource_person_first_namePgResource.from === "function") {
         // This is a scalar computed attribute, let's inline the expression
-        const placeholders = selectArgs.map((arg, i) => {
+        const newSelectArgs = selectArgs.map((arg, i) => {
+          const {
+            name
+          } = arg;
           if (i === 0) {
-            return $row.getClassStep().alias;
+            return {
+              name,
+              placeholder: $row.getClassStep().alias
+            };
           } else if ("pgCodec" in arg && arg.pgCodec) {
-            return $row.placeholder(arg.step, arg.pgCodec);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step, arg.pgCodec)
+            };
           } else {
-            return $row.placeholder(arg.step);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step)
+            };
           }
         });
-        return pgClassExpression($row, resource_person_first_namePgResource.codec)`${resource_person_first_namePgResource.from(...placeholders.map(placeholder => ({
-          placeholder
-        })))}`;
+        return pgClassExpression($row, resource_person_first_namePgResource.codec)`${resource_person_first_namePgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_person_first_namePgResource.execute(selectArgs);
@@ -13375,18 +13955,28 @@ export const plans = {
       }, ...extraSelectArgs];
       if (resource_person_computed_out_outPgResource.isUnique && !resource_person_computed_out_outPgResource.codec.attributes && typeof resource_person_computed_out_outPgResource.from === "function") {
         // This is a scalar computed attribute, let's inline the expression
-        const placeholders = selectArgs.map((arg, i) => {
+        const newSelectArgs = selectArgs.map((arg, i) => {
+          const {
+            name
+          } = arg;
           if (i === 0) {
-            return $row.getClassStep().alias;
+            return {
+              name,
+              placeholder: $row.getClassStep().alias
+            };
           } else if ("pgCodec" in arg && arg.pgCodec) {
-            return $row.placeholder(arg.step, arg.pgCodec);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step, arg.pgCodec)
+            };
           } else {
-            return $row.placeholder(arg.step);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step)
+            };
           }
         });
-        return pgClassExpression($row, resource_person_computed_out_outPgResource.codec)`${resource_person_computed_out_outPgResource.from(...placeholders.map(placeholder => ({
-          placeholder
-        })))}`;
+        return pgClassExpression($row, resource_person_computed_out_outPgResource.codec)`${resource_person_computed_out_outPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_person_computed_out_outPgResource.execute(selectArgs);
@@ -13410,18 +14000,28 @@ export const plans = {
         }, ...extraSelectArgs];
         if (resource_person_computed_inoutPgResource.isUnique && !resource_person_computed_inoutPgResource.codec.attributes && typeof resource_person_computed_inoutPgResource.from === "function") {
           // This is a scalar computed attribute, let's inline the expression
-          const placeholders = selectArgs.map((arg, i) => {
+          const newSelectArgs = selectArgs.map((arg, i) => {
+            const {
+              name
+            } = arg;
             if (i === 0) {
-              return $row.getClassStep().alias;
+              return {
+                name,
+                placeholder: $row.getClassStep().alias
+              };
             } else if ("pgCodec" in arg && arg.pgCodec) {
-              return $row.placeholder(arg.step, arg.pgCodec);
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step, arg.pgCodec)
+              };
             } else {
-              return $row.placeholder(arg.step);
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step)
+              };
             }
           });
-          return pgClassExpression($row, resource_person_computed_inoutPgResource.codec)`${resource_person_computed_inoutPgResource.from(...placeholders.map(placeholder => ({
-            placeholder
-          })))}`;
+          return pgClassExpression($row, resource_person_computed_inoutPgResource.codec)`${resource_person_computed_inoutPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_person_computed_inoutPgResource.execute(selectArgs);
@@ -13449,18 +14049,28 @@ export const plans = {
         }, ...extraSelectArgs];
         if (resource_person_computed_inout_outPgResource.isUnique && !resource_person_computed_inout_outPgResource.codec.attributes && typeof resource_person_computed_inout_outPgResource.from === "function") {
           // This is a scalar computed attribute, let's inline the expression
-          const placeholders = selectArgs.map((arg, i) => {
+          const newSelectArgs = selectArgs.map((arg, i) => {
+            const {
+              name
+            } = arg;
             if (i === 0) {
-              return $row.getClassStep().alias;
+              return {
+                name,
+                placeholder: $row.getClassStep().alias
+              };
             } else if ("pgCodec" in arg && arg.pgCodec) {
-              return $row.placeholder(arg.step, arg.pgCodec);
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step, arg.pgCodec)
+              };
             } else {
-              return $row.placeholder(arg.step);
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step)
+              };
             }
           });
-          return pgClassExpression($row, resource_person_computed_inout_outPgResource.codec)`${resource_person_computed_inout_outPgResource.from(...placeholders.map(placeholder => ({
-            placeholder
-          })))}`;
+          return pgClassExpression($row, resource_person_computed_inout_outPgResource.codec)`${resource_person_computed_inout_outPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_person_computed_inout_outPgResource.execute(selectArgs);
@@ -13488,18 +14098,28 @@ export const plans = {
         }, ...extraSelectArgs];
         if (resource_person_existsPgResource.isUnique && !resource_person_existsPgResource.codec.attributes && typeof resource_person_existsPgResource.from === "function") {
           // This is a scalar computed attribute, let's inline the expression
-          const placeholders = selectArgs.map((arg, i) => {
+          const newSelectArgs = selectArgs.map((arg, i) => {
+            const {
+              name
+            } = arg;
             if (i === 0) {
-              return $row.getClassStep().alias;
+              return {
+                name,
+                placeholder: $row.getClassStep().alias
+              };
             } else if ("pgCodec" in arg && arg.pgCodec) {
-              return $row.placeholder(arg.step, arg.pgCodec);
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step, arg.pgCodec)
+              };
             } else {
-              return $row.placeholder(arg.step);
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step)
+              };
             }
           });
-          return pgClassExpression($row, resource_person_existsPgResource.codec)`${resource_person_existsPgResource.from(...placeholders.map(placeholder => ({
-            placeholder
-          })))}`;
+          return pgClassExpression($row, resource_person_existsPgResource.codec)`${resource_person_existsPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_person_existsPgResource.execute(selectArgs);
@@ -13526,23 +14146,33 @@ export const plans = {
       }, ...extraSelectArgs];
       if (resource_person_computed_first_arg_inout_outPgResource.isUnique && !resource_person_computed_first_arg_inout_outPgResource.codec.attributes && typeof resource_person_computed_first_arg_inout_outPgResource.from === "function") {
         // This is a scalar computed attribute, let's inline the expression
-        const placeholders = selectArgs.map((arg, i) => {
+        const newSelectArgs = selectArgs.map((arg, i) => {
+          const {
+            name
+          } = arg;
           if (i === 0) {
-            return $row.getClassStep().alias;
+            return {
+              name,
+              placeholder: $row.getClassStep().alias
+            };
           } else if ("pgCodec" in arg && arg.pgCodec) {
-            return $row.placeholder(arg.step, arg.pgCodec);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step, arg.pgCodec)
+            };
           } else {
-            return $row.placeholder(arg.step);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step)
+            };
           }
         });
-        return pgClassExpression($row, resource_person_computed_first_arg_inout_outPgResource.codec)`${resource_person_computed_first_arg_inout_outPgResource.from(...placeholders.map(placeholder => ({
-          placeholder
-        })))}`;
+        return pgClassExpression($row, resource_person_computed_first_arg_inout_outPgResource.codec)`${resource_person_computed_first_arg_inout_outPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_person_computed_first_arg_inout_outPgResource.execute(selectArgs);
     },
-    computedComplex: {
+    optionalMissingMiddle1: {
       plan($in, args, _info) {
         if (!hasRecord($in)) {
           throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
@@ -13559,20 +14189,285 @@ export const plans = {
         const selectArgs = [{
           step: $row.record()
         }, ...extraSelectArgs];
-        if (resource_person_computed_complexPgResource.isUnique && !resource_person_computed_complexPgResource.codec.attributes && typeof resource_person_computed_complexPgResource.from === "function") {
+        if (resource_person_optional_missing_middle_1PgResource.isUnique && !resource_person_optional_missing_middle_1PgResource.codec.attributes && typeof resource_person_optional_missing_middle_1PgResource.from === "function") {
           // This is a scalar computed attribute, let's inline the expression
-          const placeholders = selectArgs.map((arg, i) => {
+          const newSelectArgs = selectArgs.map((arg, i) => {
+            const {
+              name
+            } = arg;
             if (i === 0) {
-              return $row.getClassStep().alias;
+              return {
+                name,
+                placeholder: $row.getClassStep().alias
+              };
             } else if ("pgCodec" in arg && arg.pgCodec) {
-              return $row.placeholder(arg.step, arg.pgCodec);
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step, arg.pgCodec)
+              };
             } else {
-              return $row.placeholder(arg.step);
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step)
+              };
             }
           });
-          return pgClassExpression($row, resource_person_computed_complexPgResource.codec)`${resource_person_computed_complexPgResource.from(...placeholders.map(placeholder => ({
-            placeholder
-          })))}`;
+          return pgClassExpression($row, resource_person_optional_missing_middle_1PgResource.codec)`${resource_person_optional_missing_middle_1PgResource.from(...newSelectArgs)}`;
+        }
+        // PERF: or here, if scalar add select to `$row`?
+        return resource_person_optional_missing_middle_1PgResource.execute(selectArgs);
+      },
+      args: {
+        arg0: undefined,
+        b: undefined,
+        c: undefined
+      }
+    },
+    optionalMissingMiddle2: {
+      plan($in, args, _info) {
+        if (!hasRecord($in)) {
+          throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
+        }
+        const extraSelectArgs = makeArgs39(args);
+        /**
+         * An optimisation - if all our dependencies are
+         * compatible with the expression's class plan then we
+         * can inline ourselves into that, otherwise we must
+         * issue the query separately.
+         */
+        const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
+        const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
+        const selectArgs = [{
+          step: $row.record()
+        }, ...extraSelectArgs];
+        if (resource_person_optional_missing_middle_2PgResource.isUnique && !resource_person_optional_missing_middle_2PgResource.codec.attributes && typeof resource_person_optional_missing_middle_2PgResource.from === "function") {
+          // This is a scalar computed attribute, let's inline the expression
+          const newSelectArgs = selectArgs.map((arg, i) => {
+            const {
+              name
+            } = arg;
+            if (i === 0) {
+              return {
+                name,
+                placeholder: $row.getClassStep().alias
+              };
+            } else if ("pgCodec" in arg && arg.pgCodec) {
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step, arg.pgCodec)
+              };
+            } else {
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step)
+              };
+            }
+          });
+          return pgClassExpression($row, resource_person_optional_missing_middle_2PgResource.codec)`${resource_person_optional_missing_middle_2PgResource.from(...newSelectArgs)}`;
+        }
+        // PERF: or here, if scalar add select to `$row`?
+        return resource_person_optional_missing_middle_2PgResource.execute(selectArgs);
+      },
+      args: {
+        a: undefined,
+        b: undefined,
+        c: undefined
+      }
+    },
+    optionalMissingMiddle3: {
+      plan($in, args, _info) {
+        if (!hasRecord($in)) {
+          throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
+        }
+        const extraSelectArgs = makeArgs40(args);
+        /**
+         * An optimisation - if all our dependencies are
+         * compatible with the expression's class plan then we
+         * can inline ourselves into that, otherwise we must
+         * issue the query separately.
+         */
+        const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
+        const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
+        const selectArgs = [{
+          step: $row.record()
+        }, ...extraSelectArgs];
+        if (resource_person_optional_missing_middle_3PgResource.isUnique && !resource_person_optional_missing_middle_3PgResource.codec.attributes && typeof resource_person_optional_missing_middle_3PgResource.from === "function") {
+          // This is a scalar computed attribute, let's inline the expression
+          const newSelectArgs = selectArgs.map((arg, i) => {
+            const {
+              name
+            } = arg;
+            if (i === 0) {
+              return {
+                name,
+                placeholder: $row.getClassStep().alias
+              };
+            } else if ("pgCodec" in arg && arg.pgCodec) {
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step, arg.pgCodec)
+              };
+            } else {
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step)
+              };
+            }
+          });
+          return pgClassExpression($row, resource_person_optional_missing_middle_3PgResource.codec)`${resource_person_optional_missing_middle_3PgResource.from(...newSelectArgs)}`;
+        }
+        // PERF: or here, if scalar add select to `$row`?
+        return resource_person_optional_missing_middle_3PgResource.execute(selectArgs);
+      },
+      args: {
+        a: undefined,
+        arg1: undefined,
+        c: undefined
+      }
+    },
+    optionalMissingMiddle4: {
+      plan($in, args, _info) {
+        if (!hasRecord($in)) {
+          throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
+        }
+        const extraSelectArgs = makeArgs41(args);
+        /**
+         * An optimisation - if all our dependencies are
+         * compatible with the expression's class plan then we
+         * can inline ourselves into that, otherwise we must
+         * issue the query separately.
+         */
+        const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
+        const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
+        const selectArgs = [{
+          step: $row.record()
+        }, ...extraSelectArgs];
+        if (resource_person_optional_missing_middle_4PgResource.isUnique && !resource_person_optional_missing_middle_4PgResource.codec.attributes && typeof resource_person_optional_missing_middle_4PgResource.from === "function") {
+          // This is a scalar computed attribute, let's inline the expression
+          const newSelectArgs = selectArgs.map((arg, i) => {
+            const {
+              name
+            } = arg;
+            if (i === 0) {
+              return {
+                name,
+                placeholder: $row.getClassStep().alias
+              };
+            } else if ("pgCodec" in arg && arg.pgCodec) {
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step, arg.pgCodec)
+              };
+            } else {
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step)
+              };
+            }
+          });
+          return pgClassExpression($row, resource_person_optional_missing_middle_4PgResource.codec)`${resource_person_optional_missing_middle_4PgResource.from(...newSelectArgs)}`;
+        }
+        // PERF: or here, if scalar add select to `$row`?
+        return resource_person_optional_missing_middle_4PgResource.execute(selectArgs);
+      },
+      args: {
+        arg0: undefined,
+        b: undefined,
+        arg2: undefined
+      }
+    },
+    optionalMissingMiddle5: {
+      plan($in, args, _info) {
+        if (!hasRecord($in)) {
+          throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
+        }
+        const extraSelectArgs = makeArgs42(args);
+        /**
+         * An optimisation - if all our dependencies are
+         * compatible with the expression's class plan then we
+         * can inline ourselves into that, otherwise we must
+         * issue the query separately.
+         */
+        const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
+        const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
+        const selectArgs = [{
+          step: $row.record()
+        }, ...extraSelectArgs];
+        if (resource_person_optional_missing_middle_5PgResource.isUnique && !resource_person_optional_missing_middle_5PgResource.codec.attributes && typeof resource_person_optional_missing_middle_5PgResource.from === "function") {
+          // This is a scalar computed attribute, let's inline the expression
+          const newSelectArgs = selectArgs.map((arg, i) => {
+            const {
+              name
+            } = arg;
+            if (i === 0) {
+              return {
+                name,
+                placeholder: $row.getClassStep().alias
+              };
+            } else if ("pgCodec" in arg && arg.pgCodec) {
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step, arg.pgCodec)
+              };
+            } else {
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step)
+              };
+            }
+          });
+          return pgClassExpression($row, resource_person_optional_missing_middle_5PgResource.codec)`${resource_person_optional_missing_middle_5PgResource.from(...newSelectArgs)}`;
+        }
+        // PERF: or here, if scalar add select to `$row`?
+        return resource_person_optional_missing_middle_5PgResource.execute(selectArgs);
+      },
+      args: {
+        a: undefined,
+        arg1: undefined,
+        arg2: undefined
+      }
+    },
+    computedComplex: {
+      plan($in, args, _info) {
+        if (!hasRecord($in)) {
+          throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
+        }
+        const extraSelectArgs = makeArgs43(args);
+        /**
+         * An optimisation - if all our dependencies are
+         * compatible with the expression's class plan then we
+         * can inline ourselves into that, otherwise we must
+         * issue the query separately.
+         */
+        const canUseExpressionDirectly = $in instanceof PgSelectSingleStep && extraSelectArgs.every(a => stepAMayDependOnStepB($in.getClassStep(), a.step));
+        const $row = canUseExpressionDirectly ? $in : pgSelectSingleFromRecord($in.resource, $in.record());
+        const selectArgs = [{
+          step: $row.record()
+        }, ...extraSelectArgs];
+        if (resource_person_computed_complexPgResource.isUnique && !resource_person_computed_complexPgResource.codec.attributes && typeof resource_person_computed_complexPgResource.from === "function") {
+          // This is a scalar computed attribute, let's inline the expression
+          const newSelectArgs = selectArgs.map((arg, i) => {
+            const {
+              name
+            } = arg;
+            if (i === 0) {
+              return {
+                name,
+                placeholder: $row.getClassStep().alias
+              };
+            } else if ("pgCodec" in arg && arg.pgCodec) {
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step, arg.pgCodec)
+              };
+            } else {
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step)
+              };
+            }
+          });
+          return pgClassExpression($row, resource_person_computed_complexPgResource.codec)`${resource_person_computed_complexPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_person_computed_complexPgResource.execute(selectArgs);
@@ -13586,7 +14481,7 @@ export const plans = {
       if (!hasRecord($in)) {
         throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
       }
-      const extraSelectArgs = makeArgs39(args);
+      const extraSelectArgs = makeArgs44(args);
       /**
        * An optimisation - if all our dependencies are
        * compatible with the expression's class plan then we
@@ -13600,18 +14495,28 @@ export const plans = {
       }, ...extraSelectArgs];
       if (resource_person_first_postPgResource.isUnique && !resource_person_first_postPgResource.codec.attributes && typeof resource_person_first_postPgResource.from === "function") {
         // This is a scalar computed attribute, let's inline the expression
-        const placeholders = selectArgs.map((arg, i) => {
+        const newSelectArgs = selectArgs.map((arg, i) => {
+          const {
+            name
+          } = arg;
           if (i === 0) {
-            return $row.getClassStep().alias;
+            return {
+              name,
+              placeholder: $row.getClassStep().alias
+            };
           } else if ("pgCodec" in arg && arg.pgCodec) {
-            return $row.placeholder(arg.step, arg.pgCodec);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step, arg.pgCodec)
+            };
           } else {
-            return $row.placeholder(arg.step);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step)
+            };
           }
         });
-        return pgClassExpression($row, resource_person_first_postPgResource.codec)`${resource_person_first_postPgResource.from(...placeholders.map(placeholder => ({
-          placeholder
-        })))}`;
+        return pgClassExpression($row, resource_person_first_postPgResource.codec)`${resource_person_first_postPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_person_first_postPgResource.execute(selectArgs);
@@ -13620,7 +14525,7 @@ export const plans = {
       if (!hasRecord($in)) {
         throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
       }
-      const extraSelectArgs = makeArgs40(args);
+      const extraSelectArgs = makeArgs45(args);
       /**
        * An optimisation - if all our dependencies are
        * compatible with the expression's class plan then we
@@ -13634,18 +14539,28 @@ export const plans = {
       }, ...extraSelectArgs];
       if (resource_person_computed_first_arg_inoutPgResource.isUnique && !resource_person_computed_first_arg_inoutPgResource.codec.attributes && typeof resource_person_computed_first_arg_inoutPgResource.from === "function") {
         // This is a scalar computed attribute, let's inline the expression
-        const placeholders = selectArgs.map((arg, i) => {
+        const newSelectArgs = selectArgs.map((arg, i) => {
+          const {
+            name
+          } = arg;
           if (i === 0) {
-            return $row.getClassStep().alias;
+            return {
+              name,
+              placeholder: $row.getClassStep().alias
+            };
           } else if ("pgCodec" in arg && arg.pgCodec) {
-            return $row.placeholder(arg.step, arg.pgCodec);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step, arg.pgCodec)
+            };
           } else {
-            return $row.placeholder(arg.step);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step)
+            };
           }
         });
-        return pgClassExpression($row, resource_person_computed_first_arg_inoutPgResource.codec)`${resource_person_computed_first_arg_inoutPgResource.from(...placeholders.map(placeholder => ({
-          placeholder
-        })))}`;
+        return pgClassExpression($row, resource_person_computed_first_arg_inoutPgResource.codec)`${resource_person_computed_first_arg_inoutPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_person_computed_first_arg_inoutPgResource.execute(selectArgs);
@@ -13750,7 +14665,7 @@ export const plans = {
         if (!hasRecord($in)) {
           throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
         }
-        const extraSelectArgs = makeArgs43(args);
+        const extraSelectArgs = makeArgs48(args);
         /**
          * An optimisation - if all our dependencies are
          * compatible with the expression's class plan then we
@@ -13764,18 +14679,28 @@ export const plans = {
         }, ...extraSelectArgs];
         if (resource_person_type_functionPgResource.isUnique && !resource_person_type_functionPgResource.codec.attributes && typeof resource_person_type_functionPgResource.from === "function") {
           // This is a scalar computed attribute, let's inline the expression
-          const placeholders = selectArgs.map((arg, i) => {
+          const newSelectArgs = selectArgs.map((arg, i) => {
+            const {
+              name
+            } = arg;
             if (i === 0) {
-              return $row.getClassStep().alias;
+              return {
+                name,
+                placeholder: $row.getClassStep().alias
+              };
             } else if ("pgCodec" in arg && arg.pgCodec) {
-              return $row.placeholder(arg.step, arg.pgCodec);
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step, arg.pgCodec)
+              };
             } else {
-              return $row.placeholder(arg.step);
+              return {
+                name,
+                placeholder: $row.placeholder(arg.step)
+              };
             }
           });
-          return pgClassExpression($row, resource_person_type_functionPgResource.codec)`${resource_person_type_functionPgResource.from(...placeholders.map(placeholder => ({
-            placeholder
-          })))}`;
+          return pgClassExpression($row, resource_person_type_functionPgResource.codec)`${resource_person_type_functionPgResource.from(...newSelectArgs)}`;
         }
         // PERF: or here, if scalar add select to `$row`?
         return resource_person_type_functionPgResource.execute(selectArgs);
@@ -13788,7 +14713,7 @@ export const plans = {
       if (!hasRecord($in)) {
         throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
       }
-      const extraSelectArgs = makeArgs44(args);
+      const extraSelectArgs = makeArgs49(args);
       /**
        * An optimisation - if all our dependencies are
        * compatible with the expression's class plan then we
@@ -13802,18 +14727,28 @@ export const plans = {
       }, ...extraSelectArgs];
       if (resource_person_type_function_listPgResource.isUnique && !resource_person_type_function_listPgResource.codec.attributes && typeof resource_person_type_function_listPgResource.from === "function") {
         // This is a scalar computed attribute, let's inline the expression
-        const placeholders = selectArgs.map((arg, i) => {
+        const newSelectArgs = selectArgs.map((arg, i) => {
+          const {
+            name
+          } = arg;
           if (i === 0) {
-            return $row.getClassStep().alias;
+            return {
+              name,
+              placeholder: $row.getClassStep().alias
+            };
           } else if ("pgCodec" in arg && arg.pgCodec) {
-            return $row.placeholder(arg.step, arg.pgCodec);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step, arg.pgCodec)
+            };
           } else {
-            return $row.placeholder(arg.step);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step)
+            };
           }
         });
-        return pgClassExpression($row, resource_person_type_function_listPgResource.codec)`${resource_person_type_function_listPgResource.from(...placeholders.map(placeholder => ({
-          placeholder
-        })))}`;
+        return pgClassExpression($row, resource_person_type_function_listPgResource.codec)`${resource_person_type_function_listPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_person_type_function_listPgResource.execute(selectArgs);
@@ -14048,7 +14983,7 @@ export const plans = {
       if (!hasRecord($in)) {
         throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
       }
-      const extraSelectArgs = makeArgs45(args);
+      const extraSelectArgs = makeArgs50(args);
       /**
        * An optimisation - if all our dependencies are
        * compatible with the expression's class plan then we
@@ -14062,18 +14997,28 @@ export const plans = {
       }, ...extraSelectArgs];
       if (resource_compound_type_computed_fieldPgResource.isUnique && !resource_compound_type_computed_fieldPgResource.codec.attributes && typeof resource_compound_type_computed_fieldPgResource.from === "function") {
         // This is a scalar computed attribute, let's inline the expression
-        const placeholders = selectArgs.map((arg, i) => {
+        const newSelectArgs = selectArgs.map((arg, i) => {
+          const {
+            name
+          } = arg;
           if (i === 0) {
-            return $row.getClassStep().alias;
+            return {
+              name,
+              placeholder: $row.getClassStep().alias
+            };
           } else if ("pgCodec" in arg && arg.pgCodec) {
-            return $row.placeholder(arg.step, arg.pgCodec);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step, arg.pgCodec)
+            };
           } else {
-            return $row.placeholder(arg.step);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step)
+            };
           }
         });
-        return pgClassExpression($row, resource_compound_type_computed_fieldPgResource.codec)`${resource_compound_type_computed_fieldPgResource.from(...placeholders.map(placeholder => ({
-          placeholder
-        })))}`;
+        return pgClassExpression($row, resource_compound_type_computed_fieldPgResource.codec)`${resource_compound_type_computed_fieldPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_compound_type_computed_fieldPgResource.execute(selectArgs);
@@ -16808,7 +17753,7 @@ export const plans = {
       if (!hasRecord($in)) {
         throw new Error(`Invalid plan, exepcted 'PgSelectSingleStep', 'PgInsertSingleStep', 'PgUpdateSingleStep' or 'PgDeleteSingleStep', but found ${$in}`);
       }
-      const extraSelectArgs = makeArgs46(args);
+      const extraSelectArgs = makeArgs51(args);
       /**
        * An optimisation - if all our dependencies are
        * compatible with the expression's class plan then we
@@ -16822,18 +17767,28 @@ export const plans = {
       }, ...extraSelectArgs];
       if (resource_edge_case_computedPgResource.isUnique && !resource_edge_case_computedPgResource.codec.attributes && typeof resource_edge_case_computedPgResource.from === "function") {
         // This is a scalar computed attribute, let's inline the expression
-        const placeholders = selectArgs.map((arg, i) => {
+        const newSelectArgs = selectArgs.map((arg, i) => {
+          const {
+            name
+          } = arg;
           if (i === 0) {
-            return $row.getClassStep().alias;
+            return {
+              name,
+              placeholder: $row.getClassStep().alias
+            };
           } else if ("pgCodec" in arg && arg.pgCodec) {
-            return $row.placeholder(arg.step, arg.pgCodec);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step, arg.pgCodec)
+            };
           } else {
-            return $row.placeholder(arg.step);
+            return {
+              name,
+              placeholder: $row.placeholder(arg.step)
+            };
           }
         });
-        return pgClassExpression($row, resource_edge_case_computedPgResource.codec)`${resource_edge_case_computedPgResource.from(...placeholders.map(placeholder => ({
-          placeholder
-        })))}`;
+        return pgClassExpression($row, resource_edge_case_computedPgResource.codec)`${resource_edge_case_computedPgResource.from(...newSelectArgs)}`;
       }
       // PERF: or here, if scalar add select to `$row`?
       return resource_edge_case_computedPgResource.execute(selectArgs);
@@ -17509,7 +18464,7 @@ export const plans = {
     __assertStep: __ValueStep,
     mutationOut: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs47(args, ["input"]);
+        const selectArgs = makeArgs52(args, ["input"]);
         const $result = resource_mutation_outPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17526,7 +18481,7 @@ export const plans = {
     },
     mutationOutSetof: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs48(args, ["input"]);
+        const selectArgs = makeArgs53(args, ["input"]);
         const $result = resource_mutation_out_setofPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17543,7 +18498,7 @@ export const plans = {
     },
     mutationOutUnnamed: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs49(args, ["input"]);
+        const selectArgs = makeArgs54(args, ["input"]);
         const $result = resource_mutation_out_unnamedPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17560,7 +18515,7 @@ export const plans = {
     },
     noArgsMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs50(args, ["input"]);
+        const selectArgs = makeArgs55(args, ["input"]);
         const $result = resource_no_args_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17577,7 +18532,7 @@ export const plans = {
     },
     mutationInOut: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs51(args, ["input"]);
+        const selectArgs = makeArgs56(args, ["input"]);
         const $result = resource_mutation_in_outPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17594,7 +18549,7 @@ export const plans = {
     },
     mutationReturnsTableOneCol: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs52(args, ["input"]);
+        const selectArgs = makeArgs57(args, ["input"]);
         const $result = resource_mutation_returns_table_one_colPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17611,7 +18566,7 @@ export const plans = {
     },
     jsonIdentityMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs53(args, ["input"]);
+        const selectArgs = makeArgs58(args, ["input"]);
         const $result = resource_json_identity_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17628,7 +18583,7 @@ export const plans = {
     },
     jsonbIdentityMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs54(args, ["input"]);
+        const selectArgs = makeArgs59(args, ["input"]);
         const $result = resource_jsonb_identity_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17645,7 +18600,7 @@ export const plans = {
     },
     jsonbIdentityMutationPlpgsql: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs55(args, ["input"]);
+        const selectArgs = makeArgs60(args, ["input"]);
         const $result = resource_jsonb_identity_mutation_plpgsqlPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17662,7 +18617,7 @@ export const plans = {
     },
     jsonbIdentityMutationPlpgsqlWithDefault: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs56(args, ["input"]);
+        const selectArgs = makeArgs61(args, ["input"]);
         const $result = resource_jsonb_identity_mutation_plpgsql_with_defaultPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17679,7 +18634,7 @@ export const plans = {
     },
     mutationInInout: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs57(args, ["input"]);
+        const selectArgs = makeArgs62(args, ["input"]);
         const $result = resource_mutation_in_inoutPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17696,7 +18651,7 @@ export const plans = {
     },
     mutationOutOut: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs58(args, ["input"]);
+        const selectArgs = makeArgs63(args, ["input"]);
         const $result = resource_mutation_out_outPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17713,7 +18668,7 @@ export const plans = {
     },
     mutationOutOutSetof: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs59(args, ["input"]);
+        const selectArgs = makeArgs64(args, ["input"]);
         const $result = resource_mutation_out_out_setofPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17730,7 +18685,7 @@ export const plans = {
     },
     mutationOutOutUnnamed: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs60(args, ["input"]);
+        const selectArgs = makeArgs65(args, ["input"]);
         const $result = resource_mutation_out_out_unnamedPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17747,7 +18702,7 @@ export const plans = {
     },
     intSetMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs61(args, ["input"]);
+        const selectArgs = makeArgs66(args, ["input"]);
         const $result = resource_int_set_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17764,7 +18719,7 @@ export const plans = {
     },
     mutationOutUnnamedOutOutUnnamed: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs62(args, ["input"]);
+        const selectArgs = makeArgs67(args, ["input"]);
         const $result = resource_mutation_out_unnamed_out_out_unnamedPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17781,7 +18736,7 @@ export const plans = {
     },
     mutationReturnsTableMultiCol: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs63(args, ["input"]);
+        const selectArgs = makeArgs68(args, ["input"]);
         const $result = resource_mutation_returns_table_multi_colPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17798,7 +18753,7 @@ export const plans = {
     },
     leftArmIdentity: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs64(args, ["input"]);
+        const selectArgs = makeArgs69(args, ["input"]);
         const $result = resource_left_arm_identityPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17815,7 +18770,7 @@ export const plans = {
     },
     issue756Mutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs65(args, ["input"]);
+        const selectArgs = makeArgs70(args, ["input"]);
         const $result = resource_issue756_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17832,7 +18787,7 @@ export const plans = {
     },
     issue756SetMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs66(args, ["input"]);
+        const selectArgs = makeArgs71(args, ["input"]);
         const $result = resource_issue756_set_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17849,7 +18804,7 @@ export const plans = {
     },
     typesMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs67(args, ["input"]);
+        const selectArgs = makeArgs72(args, ["input"]);
         const $result = resource_types_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17866,7 +18821,7 @@ export const plans = {
     },
     mutationOutOutCompoundType: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs68(args, ["input"]);
+        const selectArgs = makeArgs73(args, ["input"]);
         const $result = resource_mutation_out_out_compound_typePgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17883,7 +18838,7 @@ export const plans = {
     },
     tableMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs69(args, ["input"]);
+        const selectArgs = makeArgs74(args, ["input"]);
         const $result = resource_table_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17900,7 +18855,7 @@ export const plans = {
     },
     mutationOutComplex: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs70(args, ["input"]);
+        const selectArgs = makeArgs75(args, ["input"]);
         const $result = resource_mutation_out_complexPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17917,7 +18872,7 @@ export const plans = {
     },
     mutationOutComplexSetof: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs71(args, ["input"]);
+        const selectArgs = makeArgs76(args, ["input"]);
         const $result = resource_mutation_out_complex_setofPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17934,7 +18889,7 @@ export const plans = {
     },
     mutationOutTable: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs72(args, ["input"]);
+        const selectArgs = makeArgs77(args, ["input"]);
         const $result = resource_mutation_out_tablePgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17951,7 +18906,7 @@ export const plans = {
     },
     mutationOutTableSetof: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs73(args, ["input"]);
+        const selectArgs = makeArgs78(args, ["input"]);
         const $result = resource_mutation_out_table_setofPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
@@ -17968,7 +18923,7 @@ export const plans = {
     },
     tableSetMutation: {
       plan($root, args, _info) {
-        const selectArgs = makeArgs74(args, ["input"]);
+        const selectArgs = makeArgs79(args, ["input"]);
         const $result = resource_table_set_mutationPgResource.execute(selectArgs, "mutation");
         return object({
           result: $result
