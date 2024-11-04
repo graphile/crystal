@@ -293,36 +293,6 @@ const registryConfig_pgCodecs_FuncOutUnnamedOutOutUnnamedRecord_FuncOutUnnamedOu
   executor,
   isAnonymous: true
 });
-const registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord = recordCodec({
-  name: "FuncReturnsTableMultiColRecord",
-  identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
-  attributes: Object.assign(Object.create(null), {
-    col1: {
-      notNull: false,
-      codec: TYPES.int,
-      extensions: {
-        argIndex: 1,
-        argName: "col1"
-      }
-    },
-    col2: {
-      notNull: false,
-      codec: TYPES.text,
-      extensions: {
-        argIndex: 2,
-        argName: "col2"
-      }
-    }
-  }),
-  description: undefined,
-  extensions: {
-    /* `The return type of our \`${name}\` ${
-      pgProc.provolatile === "v" ? "mutation" : "query"
-    }.`, */
-  },
-  executor,
-  isAnonymous: true
-});
 const registryConfig_pgCodecs_MutationOutUnnamedOutOutUnnamedRecord_MutationOutUnnamedOutOutUnnamedRecord = recordCodec({
   name: "MutationOutUnnamedOutOutUnnamedRecord",
   identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
@@ -378,6 +348,36 @@ const registryConfig_pgCodecs_MutationReturnsTableMultiColRecord_MutationReturns
       codec: TYPES.text,
       extensions: {
         argIndex: 2,
+        argName: "col2"
+      }
+    }
+  }),
+  description: undefined,
+  extensions: {
+    /* `The return type of our \`${name}\` ${
+      pgProc.provolatile === "v" ? "mutation" : "query"
+    }.`, */
+  },
+  executor,
+  isAnonymous: true
+});
+const registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord = recordCodec({
+  name: "FuncReturnsTableMultiColRecord",
+  identifier: sql`ANONYMOUS_TYPE_DO_NOT_REFERENCE`,
+  attributes: Object.assign(Object.create(null), {
+    col1: {
+      notNull: false,
+      codec: TYPES.int,
+      extensions: {
+        argIndex: 3,
+        argName: "col1"
+      }
+    },
+    col2: {
+      notNull: false,
+      codec: TYPES.text,
+      extensions: {
+        argIndex: 4,
         argName: "col2"
       }
     }
@@ -2330,11 +2330,11 @@ const mutation_out_outFunctionIdentifer = sql.identifier("c", "mutation_out_out"
 const mutation_out_out_setofFunctionIdentifer = sql.identifier("c", "mutation_out_out_setof");
 const mutation_out_out_unnamedFunctionIdentifer = sql.identifier("c", "mutation_out_out_unnamed");
 const func_out_unnamed_out_out_unnamedFunctionIdentifer = sql.identifier("c", "func_out_unnamed_out_out_unnamed");
-const func_returns_table_multi_colFunctionIdentifer = sql.identifier("c", "func_returns_table_multi_col");
 const int_set_mutationFunctionIdentifer = sql.identifier("c", "int_set_mutation");
 const int_set_queryFunctionIdentifer = sql.identifier("c", "int_set_query");
 const mutation_out_unnamed_out_out_unnamedFunctionIdentifer = sql.identifier("c", "mutation_out_unnamed_out_out_unnamed");
 const mutation_returns_table_multi_colFunctionIdentifer = sql.identifier("c", "mutation_returns_table_multi_col");
+const func_returns_table_multi_colFunctionIdentifer = sql.identifier("c", "func_returns_table_multi_col");
 const search_test_summariesFunctionIdentifer = sql.identifier("c", "search_test_summaries");
 const my_tableUniques = [{
   isPrimary: true,
@@ -2579,9 +2579,9 @@ const registry = makeRegistry({
     MutationOutOutSetofRecord: registryConfig_pgCodecs_MutationOutOutSetofRecord_MutationOutOutSetofRecord,
     MutationOutOutUnnamedRecord: registryConfig_pgCodecs_MutationOutOutUnnamedRecord_MutationOutOutUnnamedRecord,
     FuncOutUnnamedOutOutUnnamedRecord: registryConfig_pgCodecs_FuncOutUnnamedOutOutUnnamedRecord_FuncOutUnnamedOutOutUnnamedRecord,
-    FuncReturnsTableMultiColRecord: registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord,
     MutationOutUnnamedOutOutUnnamedRecord: registryConfig_pgCodecs_MutationOutUnnamedOutOutUnnamedRecord_MutationOutUnnamedOutOutUnnamedRecord,
     MutationReturnsTableMultiColRecord: registryConfig_pgCodecs_MutationReturnsTableMultiColRecord_MutationReturnsTableMultiColRecord,
+    FuncReturnsTableMultiColRecord: registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord,
     SearchTestSummariesRecord: registryConfig_pgCodecs_SearchTestSummariesRecord_SearchTestSummariesRecord,
     interval: TYPES.interval,
     myTable: myTableCodec,
@@ -3374,33 +3374,6 @@ const registry = makeRegistry({
       },
       description: undefined
     },
-    func_returns_table_multi_col: {
-      executor,
-      name: "func_returns_table_multi_col",
-      identifier: "main.c.func_returns_table_multi_col(int4,int4,text)",
-      from(...args) {
-        return sql`${func_returns_table_multi_colFunctionIdentifer}(${sqlFromArgDigests(args)})`;
-      },
-      parameters: [{
-        name: "i",
-        required: true,
-        notNull: false,
-        codec: TYPES.int
-      }],
-      isUnique: !true,
-      codec: registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord,
-      uniques: [],
-      isMutation: false,
-      extensions: {
-        pg: {
-          serviceName: "main",
-          schemaName: "c",
-          name: "func_returns_table_multi_col"
-        },
-        tags: {}
-      },
-      description: undefined
-    },
     int_set_mutation: {
       executor,
       name: "int_set_mutation",
@@ -3519,6 +3492,43 @@ const registry = makeRegistry({
           serviceName: "main",
           schemaName: "c",
           name: "mutation_returns_table_multi_col"
+        },
+        tags: {}
+      },
+      description: undefined
+    },
+    func_returns_table_multi_col: {
+      executor,
+      name: "func_returns_table_multi_col",
+      identifier: "main.c.func_returns_table_multi_col(int4,int4,int4,int4,text)",
+      from(...args) {
+        return sql`${func_returns_table_multi_colFunctionIdentifer}(${sqlFromArgDigests(args)})`;
+      },
+      parameters: [{
+        name: "i",
+        required: true,
+        notNull: false,
+        codec: TYPES.int
+      }, {
+        name: "a",
+        required: true,
+        notNull: false,
+        codec: TYPES.int
+      }, {
+        name: "b",
+        required: true,
+        notNull: false,
+        codec: TYPES.int
+      }],
+      isUnique: !true,
+      codec: registryConfig_pgCodecs_FuncReturnsTableMultiColRecord_FuncReturnsTableMultiColRecord,
+      uniques: [],
+      isMutation: false,
+      extensions: {
+        pg: {
+          serviceName: "main",
+          schemaName: "c",
+          name: "func_returns_table_multi_col"
         },
         tags: {}
       },
@@ -5976,8 +5986,20 @@ const makeArgs14 = (args, path = []) => {
 };
 const resource_func_out_unnamed_out_out_unnamedPgResource = registry.pgResources["func_out_unnamed_out_out_unnamed"];
 const argDetailsSimple15 = [{
-  graphqlArgName: "i",
-  postgresArgName: "i",
+  graphqlArgName: "x",
+  postgresArgName: "x",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "y",
+  postgresArgName: "y",
+  pgCodec: TYPES.int,
+  required: true,
+  fetcher: null
+}, {
+  graphqlArgName: "z",
+  postgresArgName: "z",
   pgCodec: TYPES.int,
   required: true,
   fetcher: null
@@ -5985,7 +6007,7 @@ const argDetailsSimple15 = [{
 const makeArgs15 = (args, path = []) => {
   const selectArgs = [];
   let skipped = false;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 3; i++) {
     const {
       graphqlArgName,
       postgresArgName,
@@ -6026,22 +6048,22 @@ const makeArgs15 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_func_returns_table_multi_colPgResource = registry.pgResources["func_returns_table_multi_col"];
+const resource_int_set_queryPgResource = registry.pgResources["int_set_query"];
 const argDetailsSimple16 = [{
-  graphqlArgName: "x",
-  postgresArgName: "x",
+  graphqlArgName: "i",
+  postgresArgName: "i",
   pgCodec: TYPES.int,
   required: true,
   fetcher: null
 }, {
-  graphqlArgName: "y",
-  postgresArgName: "y",
+  graphqlArgName: "a",
+  postgresArgName: "a",
   pgCodec: TYPES.int,
   required: true,
   fetcher: null
 }, {
-  graphqlArgName: "z",
-  postgresArgName: "z",
+  graphqlArgName: "b",
+  postgresArgName: "b",
   pgCodec: TYPES.int,
   required: true,
   fetcher: null
@@ -6090,7 +6112,7 @@ const makeArgs16 = (args, path = []) => {
   }
   return selectArgs;
 };
-const resource_int_set_queryPgResource = registry.pgResources["int_set_query"];
+const resource_func_returns_table_multi_colPgResource = registry.pgResources["func_returns_table_multi_col"];
 const argDetailsSimple17 = [];
 const makeArgs17 = (args, path = []) => {
   const selectArgs = [];
@@ -9656,15 +9678,6 @@ type Query implements Node {
   ): [FuncOutOutSetofRecord!]
   funcOutOutUnnamed: FuncOutOutUnnamedRecord
   funcOutUnnamedOutOutUnnamed: FuncOutUnnamedOutOutUnnamedRecord
-  funcReturnsTableMultiColList(
-    i: Int
-
-    """Only read the first \`n\` values of the set."""
-    first: Int
-
-    """Skip the first \`n\` values."""
-    offset: Int
-  ): [FuncReturnsTableMultiColRecord!]
   intSetQueryList(
     x: Int
     y: Int
@@ -9676,6 +9689,17 @@ type Query implements Node {
     """Skip the first \`n\` values."""
     offset: Int
   ): [Int!]
+  funcReturnsTableMultiColList(
+    i: Int
+    a: Int
+    b: Int
+
+    """Only read the first \`n\` values of the set."""
+    first: Int
+
+    """Skip the first \`n\` values."""
+    offset: Int
+  ): [FuncReturnsTableMultiColRecord!]
   searchTestSummariesList(
     """Only read the first \`n\` values of the set."""
     first: Int
@@ -13397,13 +13421,15 @@ export const plans = {
       const selectArgs = makeArgs14(args);
       return resource_func_out_unnamed_out_out_unnamedPgResource.execute(selectArgs);
     },
-    funcReturnsTableMultiColList: {
+    intSetQueryList: {
       plan($root, args, _info) {
         const selectArgs = makeArgs15(args);
-        return resource_func_returns_table_multi_colPgResource.execute(selectArgs);
+        return resource_int_set_queryPgResource.execute(selectArgs);
       },
       args: {
-        i: undefined,
+        x: undefined,
+        y: undefined,
+        z: undefined,
         first: {
           autoApplyAfterParentPlan: true,
           applyPlan(_, $connection, arg) {
@@ -13418,15 +13444,15 @@ export const plans = {
         }
       }
     },
-    intSetQueryList: {
+    funcReturnsTableMultiColList: {
       plan($root, args, _info) {
         const selectArgs = makeArgs16(args);
-        return resource_int_set_queryPgResource.execute(selectArgs);
+        return resource_func_returns_table_multi_colPgResource.execute(selectArgs);
       },
       args: {
-        x: undefined,
-        y: undefined,
-        z: undefined,
+        i: undefined,
+        a: undefined,
+        b: undefined,
         first: {
           autoApplyAfterParentPlan: true,
           applyPlan(_, $connection, arg) {

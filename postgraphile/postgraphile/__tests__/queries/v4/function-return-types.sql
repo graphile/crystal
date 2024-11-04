@@ -323,23 +323,31 @@ select
 from "c"."func_out_table_setof"() as __func_out_table_setof__;
 
 select __func_returns_table_multi_col_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __func_returns_table_multi_col_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"int4" as "id2") as __func_returns_table_multi_col_identifiers__,
 lateral (
   select
     __func_returns_table_multi_col__."col1"::text as "0",
     __func_returns_table_multi_col__."col2" as "1",
     (not (__func_returns_table_multi_col__ is null))::text as "2",
     __func_returns_table_multi_col_identifiers__.idx as "3"
-  from "c"."func_returns_table_multi_col"(__func_returns_table_multi_col_identifiers__."id0") as __func_returns_table_multi_col__
+  from "c"."func_returns_table_multi_col"(
+    __func_returns_table_multi_col_identifiers__."id0",
+    __func_returns_table_multi_col_identifiers__."id1",
+    __func_returns_table_multi_col_identifiers__."id2"
+  ) as __func_returns_table_multi_col__
 ) as __func_returns_table_multi_col_result__;
 
 select __func_returns_table_multi_col_result__.*
-from (select 0 as idx, $1::"int4" as "id0") as __func_returns_table_multi_col_identifiers__,
+from (select 0 as idx, $1::"int4" as "id0", $2::"int4" as "id1", $3::"int4" as "id2") as __func_returns_table_multi_col_identifiers__,
 lateral (
   select
     (count(*))::text as "0",
     __func_returns_table_multi_col_identifiers__.idx as "1"
-  from "c"."func_returns_table_multi_col"(__func_returns_table_multi_col_identifiers__."id0") as __func_returns_table_multi_col__
+  from "c"."func_returns_table_multi_col"(
+    __func_returns_table_multi_col_identifiers__."id0",
+    __func_returns_table_multi_col_identifiers__."id1",
+    __func_returns_table_multi_col_identifiers__."id2"
+  ) as __func_returns_table_multi_col__
 ) as __func_returns_table_multi_col_result__;
 
 select __func_returns_table_one_col_result__.*
