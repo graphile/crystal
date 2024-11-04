@@ -7,10 +7,22 @@ sidebar_position: 1
 Graphile Export enables you to export a GraphQL schema (or other code) as
 executable JavaScript code. It is primarily intended to be used with GraphQL
 schemas (or code) that have been automatically generated in memory via some
-kind of framework. It can be used with any GraphQL schema that has been written
-in a way so as to be compatible (see [exportable/importable](./exportable.md))
-and is not specific to GraphQL schemas generated via the Graphile suite of open
-source tools.
+kind of framework.
+
+Graphile Export can be used with any JavaScript-based GraphQL schema that has
+been written in a way so as to be compatible (see
+[exportable/importable](./exportable.md)) &mdash; it is **not** specific to
+GraphQL schemas generated via Graphile-produced software such as PostGraphile,
+Graphile Build or Gra*fast*.
+
+:::tip PostGraphile users
+
+The Graphile Export documentation is written in a tooling-agnostic way. Users
+of PostGraphile should also refer to the PostGraphile ["Exporting your
+schema"](https://postgraphile.org/postgraphile/next/exporting-schema) article
+for PostGraphile specific instructions, tips, and warnings.
+
+:::
 
 The key reason to export your schema as executable code is to move intensive
 schema build processes such as introspection, looping, computation,
