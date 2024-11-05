@@ -1,5 +1,13 @@
 # @dataplan/json
 
+## 0.0.1-beta.25
+
+### Patch Changes
+
+- Updated dependencies
+  [[`76c7340b7`](https://github.com/graphile/crystal/commit/76c7340b74d257c454beec883384d19ef078b21e)]:
+  - grafast@0.1.1-beta.16
+
 ## 0.0.1-beta.24
 
 ### Patch Changes

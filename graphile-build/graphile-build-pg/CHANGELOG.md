@@ -1,5 +1,28 @@
 # graphile-build-pg
 
+## 5.0.0-beta.32
+
+### Patch Changes
+
+- [#2229](https://github.com/graphile/crystal/pull/2229)
+  [`87bdf9730`](https://github.com/graphile/crystal/commit/87bdf973036a3801e44b22cfc9f0feb639de4aa9)
+  Thanks [@benjie](https://github.com/benjie)! - Fixes bug handling optional
+  arguments to computed column functions.
+
+- [#2230](https://github.com/graphile/crystal/pull/2230)
+  [`aa480f6a3`](https://github.com/graphile/crystal/commit/aa480f6a3db8b545ff113e7a3a4b479be42a0eab)
+  Thanks [@benjie](https://github.com/benjie)! - Fix bug recognizing the
+  required-ness of arguments to functions using `out` args or `returns table` -
+  this particularly affects people using `pgStrictFunctions` and should result
+  in a couple of required arguments becoming nullable.
+- Updated dependencies
+  [[`5626c7d36`](https://github.com/graphile/crystal/commit/5626c7d3649285e11fe9857dfa319d2883d027eb),
+  [`76c7340b7`](https://github.com/graphile/crystal/commit/76c7340b74d257c454beec883384d19ef078b21e)]:
+  - graphile-config@0.0.1-beta.11
+  - grafast@0.1.1-beta.16
+  - @dataplan/pg@0.0.1-beta.27
+  - graphile-build@5.0.0-beta.28
+
 ## 5.0.0-beta.31
 
 ### Patch Changes

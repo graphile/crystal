@@ -1,6 +1,6 @@
 {
   "name": "ruru",
-  "version": "2.0.0-beta.15",
+  "version": "2.0.0-beta.16",
   "description": "Grafast-flavoured GraphiQL distribution",
   "type": "commonjs",
   "main": "./dist/index.js",

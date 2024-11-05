@@ -1,5 +1,18 @@
 # grafast
 
+## 0.1.1-beta.16
+
+### Patch Changes
+
+- [#2224](https://github.com/graphile/crystal/pull/2224)
+  [`76c7340b7`](https://github.com/graphile/crystal/commit/76c7340b74d257c454beec883384d19ef078b21e)
+  Thanks [@benjie](https://github.com/benjie)! - Fix type in middleware (for
+  plugins) that incorrectly unwrapped promise, resulting in TypeScript
+  incorrectly suggesting `await` was not necessary.
+- Updated dependencies
+  [[`5626c7d36`](https://github.com/graphile/crystal/commit/5626c7d3649285e11fe9857dfa319d2883d027eb)]:
+  - graphile-config@0.0.1-beta.11
+
 ## 0.1.1-beta.15
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # graphile-config
 
+## 0.0.1-beta.11
+
+### Patch Changes
+
+- [#2224](https://github.com/graphile/crystal/pull/2224)
+  [`5626c7d36`](https://github.com/graphile/crystal/commit/5626c7d3649285e11fe9857dfa319d2883d027eb)
+  Thanks [@benjie](https://github.com/benjie)! - Remove requirement that plugins
+  have a version.
+
 ## 0.0.1-beta.10
 
 ### Patch Changes

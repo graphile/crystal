@@ -1,5 +1,22 @@
 # grafserv
 
+## 0.1.1-beta.18
+
+### Patch Changes
+
+- [#2204](https://github.com/graphile/crystal/pull/2204)
+  [`bf2a2e72a`](https://github.com/graphile/crystal/commit/bf2a2e72ab78a01f5aba6cda97b5a125563b1f3d)
+  Thanks [@Dodobibi](https://github.com/Dodobibi)! - Overhaul websocket support
+  in nuxt/h3 server adaptor. Removes experimental methods since they are no
+  longer needed. Docs have been updated - please follow the docs. Any issues,
+  please let us know (or better: open a PR!)
+- Updated dependencies
+  [[`5626c7d36`](https://github.com/graphile/crystal/commit/5626c7d3649285e11fe9857dfa319d2883d027eb),
+  [`76c7340b7`](https://github.com/graphile/crystal/commit/76c7340b74d257c454beec883384d19ef078b21e)]:
+  - graphile-config@0.0.1-beta.11
+  - grafast@0.1.1-beta.16
+  - ruru@2.0.0-beta.16
+
 ## 0.1.1-beta.17
 
 ### Patch Changes

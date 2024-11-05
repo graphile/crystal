@@ -1,5 +1,29 @@
 # pgl
 
+## 5.0.0-beta.33
+
+### Patch Changes
+
+- [#2224](https://github.com/graphile/crystal/pull/2224)
+  [`fba24f91f`](https://github.com/graphile/crystal/commit/fba24f91f321ad20ed0a427da319e46079717b55)
+  Thanks [@benjie](https://github.com/benjie)! - Update README to reference
+  postgres:/// protocol
+
+- Updated dependencies
+  [[`87bdf9730`](https://github.com/graphile/crystal/commit/87bdf973036a3801e44b22cfc9f0feb639de4aa9),
+  [`5626c7d36`](https://github.com/graphile/crystal/commit/5626c7d3649285e11fe9857dfa319d2883d027eb),
+  [`bf2a2e72a`](https://github.com/graphile/crystal/commit/bf2a2e72ab78a01f5aba6cda97b5a125563b1f3d),
+  [`76c7340b7`](https://github.com/graphile/crystal/commit/76c7340b74d257c454beec883384d19ef078b21e),
+  [`aa480f6a3`](https://github.com/graphile/crystal/commit/aa480f6a3db8b545ff113e7a3a4b479be42a0eab)]:
+  - graphile-build-pg@5.0.0-beta.32
+  - postgraphile@5.0.0-beta.33
+  - graphile-config@0.0.1-beta.11
+  - grafserv@0.1.1-beta.18
+  - grafast@0.1.1-beta.16
+  - @dataplan/pg@0.0.1-beta.27
+  - graphile-build@5.0.0-beta.28
+  - @dataplan/json@0.0.1-beta.25
+
 ## 5.0.0-beta.32
 
 ### Patch Changes

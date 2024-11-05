@@ -1,5 +1,13 @@
 # ruru-components
 
+## 2.0.0-beta.24
+
+### Patch Changes
+
+- Updated dependencies
+  [[`76c7340b7`](https://github.com/graphile/crystal/commit/76c7340b74d257c454beec883384d19ef078b21e)]:
+  - grafast@0.1.1-beta.16
+
 ## 2.0.0-beta.23
 
 ### Patch Changes
