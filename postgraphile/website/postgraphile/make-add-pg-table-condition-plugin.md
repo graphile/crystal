@@ -14,7 +14,7 @@ Many GraphQL experts would opine that GraphQL filters should not be overly
 complicated, and should not reveal too much of the underlying data store. This
 is why we don't have advanced filtering built in by default; however, should you
 desire that, please check out the filter plugin
-[documented on our Filtering page](./filtering/).
+[documented on our Filtering page](./filtering).
 
 Here's an example of filtering forums to those created by a particular user:
 

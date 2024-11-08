@@ -81,7 +81,7 @@ idea:
     This provides you with the same freedom and flexibility as you might want
     from a custom API except more performant.
 3.  PostgreSQL gives you automatic relations with the `REFERENCES` constraint
-    and PostGraphile [automatically detects them](./relations/). With a custom
+    and PostGraphile [automatically detects them](./relations). With a custom
     API, you’d need to hardcode these relationships, which can become quite a
     chore!
 4.  For what it’s worth, you can write in your favorite scripting language in

@@ -9,7 +9,7 @@ your GraphQL schema.
 
 For more information about nullability in PostGraphile in general (and to help
 determine if the change that you want to make is wise or misguided), see the
-FAQ question ["Why is it nullable?"](./why-nullable/)
+FAQ question ["Why is it nullable?"](./why-nullable)
 
 ## Function signature
 

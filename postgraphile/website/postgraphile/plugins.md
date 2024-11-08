@@ -7,9 +7,9 @@ title: Server plugins
 _NOTE: This page relates to changing how the PostGraphile HTTP server
 (Grafserv) and other non-schema concerns work. If you're instead looking to
 change the generated GraphQL schema (e.g. to add fields or types), see [Schema
-Plugins](./extending/)._
+Plugins](./extending)._
 
-In addition to the [Graphile Build plugin system](./extending/) which builds
+In addition to the [Graphile Build plugin system](./extending) which builds
 the GraphQL schema in PostGraphile, PostGraphile also has a plugin system for
 the CLI and web layer. Thanks to `graphile-config`, this now uses the same
 plugin system, just different scopes.
@@ -134,7 +134,7 @@ current license
 [in the Graphile Store validator](https://store.graphile.com/validate) and log
 in to generate a new license code.
 
-For more information, see the FAQ at the bottom of the [Go Pro!](/pricing/)
+For more information, see the FAQ at the bottom of the [Go Pro!](/pricing)
 page.
 
 ### Installing

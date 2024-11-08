@@ -35,18 +35,18 @@ PostGraphile ensures your generated schema is secure, performant and extensible.
 
 Some of the features we offer:
 
-- [Incredible performance](./performance/) - no N+1 query issues
-- Extensibility via [schema](./extending/) and [server](./plugins/) plugins
-- [Auto-discovered relations](./relations/) e.g. `userByAuthorId`
-- [Computed columns](./computed-columns/) allowing easy expansion of your API
-- [Custom query procedures](./custom-queries/) enabling arbitrary SQL queries
-- [Automatic CRUD mutations](./crud-mutations/) e.g. `updatePost`
-- [Custom mutation procedures](./custom-mutations/) enabling complex changes to
+- [Incredible performance](./performance) - no N+1 query issues
+- Extensibility via [schema](./extending) and [server](./plugins) plugins
+- [Auto-discovered relations](./relations) e.g. `userByAuthorId`
+- [Computed columns](./computed-columns) allowing easy expansion of your API
+- [Custom query procedures](./custom-queries) enabling arbitrary SQL queries
+- [Automatic CRUD mutations](./crud-mutations) e.g. `updatePost`
+- [Custom mutation procedures](./custom-mutations) enabling complex changes to
   be exposed simply
-- [Real-time](./realtime/) features powered by LISTEN/NOTIFY and/or logical
+- [Real-time](./realtime) features powered by LISTEN/NOTIFY and/or logical
   decoding
 
-The easiest way to get started is with the [CLI interface](./usage-cli/); if you
+The easiest way to get started is with the [CLI interface](./usage-cli); if you
 have `npx` installed you can try it out with:
 
 ```

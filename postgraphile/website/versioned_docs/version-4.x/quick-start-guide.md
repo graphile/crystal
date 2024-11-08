@@ -47,7 +47,7 @@ If you are running on macOS, it is recommended that you install and use
 the [PostgreSQL download page](https://www.postgresql.org/download/) to pick up
 a copy of PostgreSQL. We recommend using a version of PostgreSQL higher than
 `9.6.0`. You can read more about the reasoning behind this requirement
-[in our documentation](./requirements/).
+[in our documentation](./requirements).
 
 After that, make sure your copy of PostgreSQL is running locally by running
 `psql postgres:///` in a terminal (the three slashes is deliberate - we're

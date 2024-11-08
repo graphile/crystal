@@ -13,7 +13,7 @@ your database - both scalar and composite), [resources](./registry/resources) (w
 represent the sources of data inside your database - tables, views, functions,
 etc), and [relations](./registry/relations) (which represent links between codecs and
 the resources they relate to). These three things together combine into the
-[registry](./registry/).
+[registry](./registry).
 
 Once you have your registry, you can utilise it to fetch rows from tables/views
 (via `resource.get()` (one) or `resource.find()` (many)), call database

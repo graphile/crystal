@@ -51,7 +51,7 @@ If you are running on macOS, it is recommended that you install and use
 [PostgreSQL.app](http://postgresapp.com/). If you are on another platform, go to
 the [PostgreSQL download page](https://www.postgresql.org/download/) to pick up
 a copy of PostgreSQL. The latest LTS version is probably a good choice, but please
-refer to [the requirements documentation](./requirements/).
+refer to [the requirements documentation](./requirements).
 
 After that, make sure your copy of PostgreSQL is running locally by running
 `psql postgres:///` in a terminal (the three slashes is deliberate - we're

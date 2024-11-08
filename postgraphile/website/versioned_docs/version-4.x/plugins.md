@@ -11,9 +11,9 @@ Stability: experimental, may change in **semver minor** versions.
 
 _NOTE: This page relates to changing how the PostGraphile HTTP server and CLI
 work. If you're instead looking to change the generated GraphQL schema (e.g. to
-add fields or types), see [Schema Plugins](./extending/)._
+add fields or types), see [Schema Plugins](./extending)._
 
-In addition to the [Graphile Engine plugin system](./extending/) which builds
+In addition to the [Graphile Engine plugin system](./extending) which builds
 the GraphQL schema in PostGraphile, PostGraphile also has a plugin system for
 the CLI and web layer. This plugin system is less mature, help documenting it is
 welcome!
@@ -65,7 +65,7 @@ current license
 [in the Graphile Store validator](https://store.graphile.com/validate) and log
 in to generate a new license code.
 
-For more information, see the FAQ at the bottom of the [Go Pro!](/pricing/)
+For more information, see the FAQ at the bottom of the [Go Pro!](/pricing)
 page.
 
 :::

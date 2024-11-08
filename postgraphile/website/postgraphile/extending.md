@@ -10,7 +10,7 @@ write your own plugins - either using the helpers available in `graphile-utils`,
 or using the raw plugin interface available from Graphile Build.
 
 _If you're looking for an easy way to remove/rename things, check out
-[smart tags](./smart-tags/)._
+[smart tags](./smart-tags)._
 
 ### Inflection example
 
@@ -41,20 +41,20 @@ const FullNameToNamePlugin = {
 We've created a number of plugin helpers for common tasks:
 
 - To add new fields and types,
-  [check out `makeExtendSchemaPlugin`](./make-extend-schema-plugin/)
+  [check out `makeExtendSchemaPlugin`](./make-extend-schema-plugin)
 - To change how fields and types are automatically named,
   [check out "Overriding inflection"](./inflection#overriding-inflection)
 - To change how fields are planned,
-  [check out `makeWrapPlansPlugin`](./make-wrap-plans-plugin/)
+  [check out `makeWrapPlansPlugin`](./make-wrap-plans-plugin)
 - To make certain fields nullable or non-nullable,
-  [check out `makeChangeNullabilityPlugin`](./make-change-nullability-plugin/)
+  [check out `makeChangeNullabilityPlugin`](./make-change-nullability-plugin)
 - To process the generated schema,
-  [check out `makeProcessSchemaPlugin`](./make-process-schema-plugin/)
+  [check out `makeProcessSchemaPlugin`](./make-process-schema-plugin)
 
 For everything else, you can
-[write raw Graphile Build plugins](./extending-raw/).
+[write raw Graphile Build plugins](./extending-raw).
 
-Do check out our [plugin gallery](./plugin-gallery/) for examples of plugins.
+Do check out our [plugin gallery](./plugin-gallery) for examples of plugins.
 These are generally suitable for copying/pasting into your app and then
 customising to your needs.
 

@@ -58,4 +58,4 @@ add the `--subscriptions` flag.
 Now PostGraphile natively supports subscriptions, our built in GraphiQL
 (http://localhost:5000/graphiql by default) now supports subscriptions too, so
 it's easier than ever to try out a subscription. Also note we have experimental
-support for [live queries](./live-queries/).
+support for [live queries](./live-queries).

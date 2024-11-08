@@ -10,28 +10,28 @@ write your own plugins - either using the helpers available in `graphile-utils`,
 or using the raw plugin interface available from Graphile Engine.
 
 _If you're looking for an easy way to remove/rename things, check out
-[smart comments](./smart-comments/)._
+[smart comments](./smart-comments)._
 
 ### Writing Plugins
 
 We've created a number of plugin helpers for common tasks:
 
 - To add new fields and types,
-  [check out `makeExtendSchemaPlugin`](./make-extend-schema-plugin/)
+  [check out `makeExtendSchemaPlugin`](./make-extend-schema-plugin)
 - To change how fields and types are automatically named,
-  [check out `makeAddInflectorsPlugin`](./make-add-inflectors-plugin/)
+  [check out `makeAddInflectorsPlugin`](./make-add-inflectors-plugin)
 - To change how fields are resolved,
-  [check out `makeWrapResolversPlugin`](./make-wrap-resolvers-plugin/)
+  [check out `makeWrapResolversPlugin`](./make-wrap-resolvers-plugin)
 - To make certain fields nullable or non-nullable,
-  [check out `makeChangeNullabilityPlugin`](./make-change-nullability-plugin/)
+  [check out `makeChangeNullabilityPlugin`](./make-change-nullability-plugin)
 - To process the generated schema, for example to run it through a third-party
   tool such as `graphql-shield`,
-  [check out `makeProcessSchemaPlugin`](./make-process-schema-plugin/)
+  [check out `makeProcessSchemaPlugin`](./make-process-schema-plugin)
 
 For everything else, you can
-[write raw Graphile Engine plugins](./extending-raw/).
+[write raw Graphile Engine plugins](./extending-raw).
 
-Do check out our [plugin gallery](./plugin-gallery/) for examples of plugins.
+Do check out our [plugin gallery](./plugin-gallery) for examples of plugins.
 These are generally suitable for copying/pasting into your app and then
 customising to your needs.
 

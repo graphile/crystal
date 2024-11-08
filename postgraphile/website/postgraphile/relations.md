@@ -47,9 +47,9 @@ By default, relations are exposed as GraphQL fields using a camelCase
 combination of the target type and the source fields (inflectors:
 `singleRelationByKeys`, `singleRelationByKeysBackwards`, and
 `manyRelationByKeys`). Unique constraints expose a GraphQL table type directly,
-non-unique constraints expose a [connection](./connections/) or list depending
+non-unique constraints expose a [connection](./connections) or list depending
 on your configuration. The GraphQL connections that these relations expose
-support pagination, [filtering](./filtering/), and ordering (and other features
+support pagination, [filtering](./filtering), and ordering (and other features
 such as aggregation if you add the relevant plugin).
 
 ### Examples

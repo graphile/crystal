@@ -20,7 +20,7 @@ server for smart tag changes to take effect.
 
 We often refer to things like the `@behavior` smart tag or the `@name` smart
 tag; really these tags are just `behavior` and `name` respectively; but in the
-[Smart Comment](./smart-comments/) syntax (the oldest form of smart tags in
+[Smart Comment](./smart-comments) syntax (the oldest form of smart tags in
 PostGraphile) the `@` is required to denote a smart tag, and this pattern has
 stuck when referring to smart tags.
 
@@ -45,10 +45,10 @@ Some tags only support one or two of these types of values.
 
 There's multiple ways of adding tags to entities:
 
-- The [postgraphile.tags.json5](./smart-tags-file/) file
-- [Smart Comments](./smart-comments/) in the database via `COMMENT`
-- A [`makePgSmartTagsPlugin`](./make-pg-smart-tags-plugin/) instance
-- Your own [plugin](./extending-raw/); specifically:
+- The [postgraphile.tags.json5](./smart-tags-file) file
+- [Smart Comments](./smart-comments) in the database via `COMMENT`
+- A [`makePgSmartTagsPlugin`](./make-pg-smart-tags-plugin) instance
+- Your own [plugin](./extending-raw); specifically:
   - implement the `gather.hooks.pgIntrospection_introspection` callback,
   - get the relevant entity,
   - call `entity.getTagsAndDescription()` on it,
@@ -174,8 +174,8 @@ Applies to:
 - Composite types (one direction only)
 - Columns
 - Types
-- [Custom Query](./custom-queries/) functions: the `Query` field name
-- [Custom Mutation](./custom-mutations/) functions: the `Mutation` field name
+- [Custom Query](./custom-queries) functions: the `Query` field name
+- [Custom Mutation](./custom-mutations) functions: the `Mutation` field name
 
 ```json5 title="postgraphile.tags.json5"
 {
@@ -286,7 +286,7 @@ type specified; if you break this then Weird Things may occur.
 
 Applies to:
 
-- [Custom Mutation](./custom-mutations/) functions: the field on the mutation
+- [Custom Mutation](./custom-mutations) functions: the field on the mutation
   payload type
 
 ```json5 title="postgraphile.tags.json5"
@@ -344,7 +344,7 @@ become non-nullable fields. You can let PostGraphile know that you want to
 convert the composite type into another "variant" GraphQL type with a smart
 comment. Variants include `patch` (which is equivalent to the argument to
 `update*` mutations), `nodeId` (which can be used to have a function to accept
-the type's [global object identifier](./node-id/)) and `base` (which
+the type's [global object identifier](./node-id)) and `base` (which
 makes every column both available (ignores permissions) and nullable). For
 example:
 

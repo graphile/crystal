@@ -17,7 +17,7 @@ Under the hood, PostGraphile polymorphism is powered by
 some restrictions may apply to what PostGraphile generates for polymorphic
 types and fields based on what `@dataplan/pg` supports. For example, CRUD
 mutations are not generated for polymorphic types at this time - see instead
-[Custom Mutations](./custom-mutations/).
+[Custom Mutations](./custom-mutations).
 
 :::
 

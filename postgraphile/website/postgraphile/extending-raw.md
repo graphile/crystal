@@ -25,7 +25,7 @@ have familiarity with that before attempting to write your own plugins.
 
 A common request is to add additional root-level fields to your schema, for
 example to integrate external services. The easiest way to do this is to
-[use `makeExtendSchemaPlugin`](./make-extend-schema-plugin/) to generate a
+[use `makeExtendSchemaPlugin`](./make-extend-schema-plugin) to generate a
 plugin that will extend your schema (this can be used to add fields anywhere,
 not just at the root-level):
 
@@ -132,7 +132,7 @@ similar) then the objects referenced cannot be extended via plugins.)
 
 **If you're looking for an easy way to prevent certain tables, fields, functions
 or relations being added to your GraphQL schema, check out
-[smart comments](./smart-comments/).**
+[smart comments](./smart-comments).**
 
 If you want to prevent a class of things from being added to the schema then
 you can disable the plugin that adds them; for example if you didn't want
@@ -161,7 +161,7 @@ return the set of fields less the one you want removed.
 
 Here's an example of a plugin generator you could use to generate plugins to
 remove individual fields. This is just to demonstrate how a plugin to do this
-might work, [smart comments](./smart-comments/) are likely a better approach.
+might work, [smart comments](./smart-comments) are likely a better approach.
 
 ```ts
 function makeRemoveFieldPlugin(

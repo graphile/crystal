@@ -54,7 +54,7 @@ Using this pattern is **not required** and in fact you can just use the default
 `public` schema if you so chose. By default, PostGraphile will automatically
 ignore resources installed by extensions, so you don't need to omit these
 manually. Other tables and functions can be omitted using the
-[smart comments](./smart-comments/) functionality.
+[smart comments](./smart-comments) functionality.
 
 ### Other schemas
 

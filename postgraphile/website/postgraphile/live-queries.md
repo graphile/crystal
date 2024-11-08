@@ -75,7 +75,7 @@ but there’s still more to be done. Currently we feel PostGraphile live queries
 may be suitable in apps with relatively small user bases (such as for internal
 tooling used across a large enterprise), but if you’re targeting an internet
 scale deployment hoping for millions of users you will likely be better off
-using [subscriptions](./subscriptions/), or keeping live queries to a very small
+using [subscriptions](./subscriptions), or keeping live queries to a very small
 area of your application.
 
 One particular problem to be aware of is the "thundering herd" — if thousands of
@@ -276,7 +276,7 @@ Optimisation steps you can take currently:
 
 We do not currently recommend live queries for very large deployments - if
 you're expecting tens of thousands of concurrent users it's going to be
-significantly more efficient to use regular [subscriptions](./subscriptions/)
+significantly more efficient to use regular [subscriptions](./subscriptions)
 
 ### Scaling
 
@@ -293,7 +293,7 @@ configuring it.
 
 By default, live fields use the same names as fields in the `Query` type;
 however these field names are sent through the `live` inflector so you may
-customise these if you wish using [the inflection system](./inflection/).
+customise these if you wish using [the inflection system](./inflection).
 
 ### Limitations
 

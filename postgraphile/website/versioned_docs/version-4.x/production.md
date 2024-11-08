@@ -65,7 +65,7 @@ not directly related to the problem of serving GraphQL from your PostgreSQL
 database, PostGraphile does not include these things by default. We recommend
 that you use something like Express middleware to implement these common
 requirements. This is why we recommend
-[using PostGraphile as a library](./usage-library/) for production usage.
+[using PostGraphile as a library](./usage-library) for production usage.
 
 Picking the Express (or similar) middleware that work for you is beyond the
 scope of this article; below is an example of where to place these middleware.
@@ -219,7 +219,7 @@ GraphQL clients, but it does have a few caveats:
   where possible, even if it means having additional static operations.
 - It does not protect you from writing expensive queries yourself; it may be
   wise to combine this technique with a cost estimation technique such as that
-  provided by the [Graphile Pro plugin](/pricing/) to help guide your developers
+  provided by the [Graphile Pro plugin](/pricing) to help guide your developers
   and avoid accidentally writing expensive queries.
 
 PostGraphile has first-party support for persisted operations via the open
@@ -239,7 +239,7 @@ their knees.
 
 :::info
 
-You are highly encouraged to purchase the [Pro Plugin](/pricing/) <Pro />, which
+You are highly encouraged to purchase the [Pro Plugin](/pricing) <Pro />, which
 implements these protections in a deeply-integrated and PostGraphile-optimized
 way. Sponsors <Spon /> also have access to the Pro Plugin and have the added benefit
 of helping sustain development and maintenance on the project. You can read the
@@ -286,7 +286,7 @@ option: `defaultPaginationCap`) which enables you to enforce a pagination cap on
 all connections. Whatever number you pass will be used as the pagination cap
 (allowing requests smaller or equal to this cap to go through, and blocking
 those above it), but you can override it on a table-by-table basis using
-[smart comments](./smart-comments/) - in this case the `@paginationCap`<Pro />&nbsp;<Spon />
+[smart comments](./smart-comments) - in this case the `@paginationCap`<Pro />&nbsp;<Spon />
 Smart Comment.
 
 ```sql

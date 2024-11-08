@@ -13,7 +13,7 @@ If you have written a PostGraphile plugin (or have found one that is not listed
 here), then please feel free to add it, you can use the "edit this page" link
 to do so.
 
-See [the configuration docs](./config/) for how to load
+See [the configuration docs](./config) for how to load
 plugins.
 
 Schema extension plugins for PostGraphile:

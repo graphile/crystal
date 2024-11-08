@@ -43,7 +43,7 @@ We can leverage PostgreSQL's foreign key relations to enforce that a value is
 contained within a small set, defined by the values in some other table. To use
 this feature, we must have a table in which to contain our enums, and we must
 tell PostGraphile that it is an enum table using the `@enum`
-[smart comment](./smart-comments/). You may also include a column named
+[smart comment](./smart-comments). You may also include a column named
 'description' to provide the description for the enum value.
 
 **IMPORTANT**: this is one of the few places where a smart tag and a smart

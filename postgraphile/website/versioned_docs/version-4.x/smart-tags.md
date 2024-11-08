@@ -20,7 +20,7 @@ to restart the server for smart tag changes to take effect.
 
 We often refer to things like the `@omit` smart tag or the `@name` smart tag;
 really these tags are just `omit` and `name` respectively; but in the
-[Smart Comment](./smart-comments/) syntax (the oldest form of smart tags in
+[Smart Comment](./smart-comments) syntax (the oldest form of smart tags in
 PostGraphile) the `@` is required to denote a smart tag, and this pattern has
 stuck when referring to smart tags.
 
@@ -45,10 +45,10 @@ Some tags only support one or two of these types of values.
 
 There's multiple ways of adding tags to entities:
 
-- The [postgraphile.tags.json5](./smart-tags-file/) file
-- [Smart Comments](./smart-comments/) in the database via `COMMENT`
-- A [`makePgSmartTagsPlugin`](./make-pg-smart-tags-plugin/) instance
-- Your own custom [Graphile Engine plugin](./extending-raw/)
+- The [postgraphile.tags.json5](./smart-tags-file) file
+- [Smart Comments](./smart-comments) in the database via `COMMENT`
+- A [`makePgSmartTagsPlugin`](./make-pg-smart-tags-plugin) instance
+- Your own custom [Graphile Engine plugin](./extending-raw)
 
 ### Example
 
@@ -166,8 +166,8 @@ Applies to:
 - Composite types (one direction only)
 - Columns
 - Types
-- [Custom Query](./custom-queries/) functions: the `Query` field name
-- [Custom Mutation](./custom-mutations/) functions: the `Mutation` field name
+- [Custom Query](./custom-queries) functions: the `Query` field name
+- [Custom Mutation](./custom-mutations) functions: the `Mutation` field name
 
 ```json5
 class: {
@@ -220,7 +220,7 @@ See also: `@fieldName`
 
 Applies to:
 
-- [Custom Mutation](./custom-mutations/) functions: the field on the mutation
+- [Custom Mutation](./custom-mutations) functions: the field on the mutation
   payload type
 
 ```json5

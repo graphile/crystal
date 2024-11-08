@@ -7,12 +7,12 @@ title: Database Functions
 One of the easiest ways to add more capabilities to your PostGraphile schema is
 with PostgreSQL functions. The three main methods are:
 
-- [Computed Columns](./computed-columns/) enable you to add a computed field to
+- [Computed Columns](./computed-columns) enable you to add a computed field to
   a table type
-- [Custom Queries](./custom-queries/) enable you to add a root level Query field
+- [Custom Queries](./custom-queries) enable you to add a root level Query field
   which can return a scalar, list, custom type, table row or even a table
   connection
-- [Custom Mutations](./custom-mutations/) enable you to add a root level
+- [Custom Mutations](./custom-mutations) enable you to add a root level
   Mutation field which can cause modifications to your database and return
   nothing (`void`), a scalar, list, custom type, table row or list of table rows
   (but not a connection, since you cannot paginate over a mutation)
@@ -214,7 +214,7 @@ Anyone familiar with HTTP could compare a `VOLATILE` function to “unsafe” HT
 methods like `POST`, `PUT`, `PATCH`, and `DELETE`.
 
 Certain VOLATILE functions will be exposed by PostGraphile as
-[custom mutations](./custom-mutations/).
+[custom mutations](./custom-mutations).
 
 ### STABLE/IMMUTABLE (Query) Functions
 
@@ -263,13 +263,13 @@ To use the HTTP analogy again, `IMMUTABLE` and `STABLE` are comparable to “saf
 HTTP methods like `GET` and `HEAD`.
 
 Certain STABLE/IMMUTABLE functions will be exposed by PostGraphile as
-[custom queries](./custom-queries/) or [computed columns](./computed-columns/).
+[custom queries](./custom-queries) or [computed columns](./computed-columns).
 
 ### SETOF Functions - Connections
 
 As well as scalars, compound types, and arrays of these, PostgreSQL functions
 can also return sets. Sets emulate tables, and so it's natural for PostGraphile
-to expose these to GraphQL using [connections](./connections/).
+to expose these to GraphQL using [connections](./connections).
 
 SETOF functions can be a powerful way of exposing data to the user that may be
 too much for them to handle all at once and require pagination.
@@ -281,7 +281,7 @@ To create a function that returns a connection, you could use SQL such as this:
 CREATE FUNCTION my_function(a int, b int) RETURNS SETOF person AS $$ … $$ LANGUAGE sql STABLE;
 ```
 
-This function would be recognised as a [custom query](./custom-queries/), and
+This function would be recognised as a [custom query](./custom-queries), and
 could be queried like this:
 
 ```graphql {2}
@@ -302,7 +302,7 @@ could be queried like this:
 ```
 
 More information on constructing advanced queries can be found
-[here](./custom-queries/).
+[here](./custom-queries).
 
 [forum example sql schema]: https://github.com/graphile/postgraphile/blob/v4/examples/forum/schema.sql
 

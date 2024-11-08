@@ -20,10 +20,10 @@ The enhancements that we apply on top of Relay's connection spec include:
   use `nodes { ... }` rather than `edges { cursor, node { ... } }`
 
 Many connections (specifically those coming from tables, views and relations)
-support [filtering](./filtering/) the return results with a conditon.
+support [filtering](./filtering) the return results with a conditon.
 
 ### Advice
 
 If you prefer a simpler list interface over GraphQL connections then you can
 enable that either along-side our connections (`both`) or exclusively (`only`)
-using our [`--simple-collections [omit|both|only]` option](./usage-cli/).
+using our [`--simple-collections [omit|both|only]` option](./usage-cli).

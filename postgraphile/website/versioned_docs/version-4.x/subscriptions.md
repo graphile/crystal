@@ -32,7 +32,7 @@ If you just use the `--subscriptions` flag alone, you'll notice that your schema
 still only has `query` and `mutation` operation types. To add subscriptions to
 your GraphQL schema you'll need a plugin to provide the relevant `subscription`
 fields (by extending the `Subscription` type) - or you can write your own
-[with `makeExtendSchemaPlugin`](./make-extend-schema-plugin/).
+[with `makeExtendSchemaPlugin`](./make-extend-schema-plugin).
 
 The easiest way to get started is with Simple Subscriptions (see below) but we
 recommend that you take the Custom Subscriptions approach as it allows you to be
