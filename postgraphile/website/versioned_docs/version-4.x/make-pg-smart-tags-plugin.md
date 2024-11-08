@@ -6,7 +6,7 @@ title: makePgSmartTagsPlugin (graphile-utils v4.5.0+)
 
 Smart Tags enable you to customize how (or if) your PostgreSQL resources are
 represented in your PostGraphile GraphQL schema. Before reading this page, you
-should familiarize yourself with [Smart Tags](./smart-tags/) so that you know
+should familiarize yourself with [Smart Tags](./smart-tags) so that you know
 when and why you would use them.
 
 `makePgSmartTagsPlugin` and `makeJSONPgSmartTagsPlugin` are plugin generators
@@ -20,7 +20,7 @@ that allows you to easily apply smart tags to various PostgreSQL entities.
 - `makePgSmartTagsPlugin` is the lowest level plugin, it allows you to apply
   smart tags to PostgreSQL entities that match your specified rules.
 
-We recommend the [postgraphile.tags.json5 file](./smart-tags-file/) to most
+We recommend the [postgraphile.tags.json5 file](./smart-tags-file) to most
 users; but the below plugin generators can be helpful if you have more advanced
 needs.
 
@@ -53,7 +53,7 @@ app.use(
 ```
 
 This plugin powers the automatic
-[postgraphile.tags.json5 file](./smart-tags-file/) support in PostGraphile CLI,
+[postgraphile.tags.json5 file](./smart-tags-file) support in PostGraphile CLI,
 and can be used as above for library users. You can even use it multiple times
 to merge smart tags from multiple files should you wish.
 
@@ -118,7 +118,7 @@ An example of an empty `JSONPgSmartTags` object would be:
 ```
 
 A more in-depth example of this configuration file, with comments, is available
-in [the postgraphile.tags.json5 file documentation](./smart-tags-file/).
+in [the postgraphile.tags.json5 file documentation](./smart-tags-file).
 
 Within the config object, we can add entries for each supported "kind" of
 PostgreSQL entity. The supported entities include:

@@ -25,7 +25,7 @@ _This article was originally written by
 ### Advice - Foreign Key Indexes
 
 Many people don't realise that when you create a [foreign key
-relation](./relations/), PostgreSQL does NOT automatically create an index on
+relation](./relations), PostgreSQL does NOT automatically create an index on
 the referencing column(s). That can mean that when you query based on that
 relation, which PostGraphile does a lot when traversing relationships, it can
 involve a full table scan which is very expensive. By default, PostGraphile

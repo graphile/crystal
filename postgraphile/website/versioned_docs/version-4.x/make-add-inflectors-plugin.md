@@ -10,7 +10,7 @@ If you're not happy with the default naming conventions in PostGraphile (or if
 you want to extend PostGraphile's functionality and use the inflection system to
 do so), you can use `makeAddInflectorsPlugin` from `graphile-utils`.
 
-Please see the [inflection article](./inflection/) for more information on
+Please see the [inflection article](./inflection) for more information on
 inflection in PostGraphile.
 
 ### Syntax

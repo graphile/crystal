@@ -90,7 +90,7 @@ query After {
 }
 ```
 
-**_NOTE: you can use [smart comments](./smart-comments/) to change the GraphQL
+**_NOTE: you can use [smart comments](./smart-comments) to change the GraphQL
 field name_**
 
 ### Authorization

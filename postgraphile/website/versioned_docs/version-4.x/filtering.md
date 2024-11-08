@@ -5,26 +5,26 @@ title: Filtering
 ---
 
 Out of the box, PostGraphile supports rudimentary filtering on
-[connections](./connections/) using a `condition` argument. This allows you to
+[connections](./connections) using a `condition` argument. This allows you to
 filter for specific values (e.g. `username: "Alice"` or `category: ARTICLE`).
 
 [See an example using the `connection` argument.](./examples/#Collections__Relation_condition)
 
 It's important when implementing filters to keep performance in mind, so
 PostGraphile gives you the ability to omit certain fields from the list of
-filters using the `@omit filter` [smart comment](./smart-comments/). You may
+filters using the `@omit filter` [smart comment](./smart-comments). You may
 also use the `--no-ignore-indexes` option to try and automatically omit fields
 that don't appear to be indexed.
 
 ### Advanced filtering
 
 You can extend PostGraphile's schema with more advance filtering capabilities by
-adding fields using [custom queries](./custom-queries/),
-[computed columns](./computed-columns/) or by using
-[makeExtendSchemaPlugin](./make-extend-schema-plugin/).
+adding fields using [custom queries](./custom-queries),
+[computed columns](./computed-columns) or by using
+[makeExtendSchemaPlugin](./make-extend-schema-plugin).
 
 You can also augment PostGraphile's existing connections using custom
-[Graphile Engine plugins](./extending-raw/), such as the following:
+[Graphile Engine plugins](./extending-raw), such as the following:
 
 #### Filter Plugin
 
@@ -51,7 +51,7 @@ prevent malicious parties issuing complex requests) then I recommend you check
 it out!
 
 Be aware that the connection-filter plugin has no live-query specific handling.
-This means while [live queries](./live-queries/) will work, the filters are not
+This means while [live queries](./live-queries) will work, the filters are not
 taken into account when checking if the query result changed. This means that
 you may get a subscription update every time something in the collection
 changes, even if the result with the applied filter is still the same.
@@ -62,4 +62,4 @@ start using `makeAddPgConditionPlugin` to add your own conditions.
 #### Other plugins
 
 Some more of the community plugins relate to filtering, you can read more about
-them on the [community plugins page](./community-plugins/)
+them on the [community plugins page](./community-plugins)

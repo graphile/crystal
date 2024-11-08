@@ -160,4 +160,4 @@ app.use(
 ### Going further
 
 For greater flexibility, you might choose to check out
-[makePgSmartTagsPlugin](./make-pg-smart-tags-plugin/).
+[makePgSmartTagsPlugin](./make-pg-smart-tags-plugin).

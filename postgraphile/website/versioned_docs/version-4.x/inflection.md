@@ -19,7 +19,7 @@ in GraphQL whilst attempting to avoid naming conflicts. For example:
 ### Overriding Naming - One-off
 
 If you want to rename just one field or type, your best bet is to use a
-[smart comment](./smart-comments/); e.g. for a table you might do:
+[smart comment](./smart-comments); e.g. for a table you might do:
 
 ```sql
 COMMENT ON TABLE post IS E'@name message';
@@ -32,7 +32,7 @@ different, so the input to the inflectors differs.
 
 It's possible to override individual inflectors with a plugin. Doing so is
 documented in the
-[`makeAddInflectorsPlugin` article](./make-add-inflectors-plugin/).
+[`makeAddInflectorsPlugin` article](./make-add-inflectors-plugin).
 
 An example plugin looks something like this:
 

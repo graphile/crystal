@@ -11,7 +11,7 @@ automatically be exposed to the resultant GraphQL schema as a field on the type;
 it can accept arguments that influence its result, and may return either a
 scalar, record, [enum](./enums/#functions-returning-table-enums),
 list or a set. Sets (denoted by `RETURNS SETOF ...`) are exposed
-as [connections](./connections/).
+as [connections](./connections).
 
 _Performance note: we inline these function calls into the original `SELECT`
 statement, so there's no N+1 issues - it's very efficient._
@@ -20,7 +20,7 @@ To create a function that PostGraphile will recognise as a computed column, it
 must obey the following rules:
 
 - adhere to
-  [common PostGraphile function restrictions](./function-restrictions/)
+  [common PostGraphile function restrictions](./function-restrictions)
 - name must begin with the name of the table it applies to, followed by an
   underscore (`_`)
 - first parameter must be the table type

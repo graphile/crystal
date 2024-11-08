@@ -5,7 +5,7 @@ title: Adding and replacing inflectors
 ---
 
 Inflection relates to naming things; please see the [inflection
-article](./inflection/) for more information on inflection in PostGraphile.
+article](./inflection) for more information on inflection in PostGraphile.
 
 In V4 of PostGraphile we had `makeAddInflectorsPlugin`, but in V5 this is no
 longer needed since inflection is now a first class feature of the plugin

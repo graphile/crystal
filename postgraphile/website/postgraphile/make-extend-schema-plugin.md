@@ -108,7 +108,7 @@ The `gql` helper is responsible for turning the human-readable GraphQL schema
 language you write into an abstract syntax tree (AST) that the application can
 understand. Our `gql` help differs slightly from the one you may be familiar
 with in the `graphql-tag` npm module, namely in how the placeholders work. Ours
-is designed to work with PostGraphile's [inflection system](./inflection/), so
+is designed to work with PostGraphile's [inflection system](./inflection), so
 you can embed strings directly. You may also embed other gql tags directly. For
 example:
 
@@ -968,4 +968,4 @@ perform the action your plugin is attempting to achieve then you may need to
 create a companion database function that is marked as `SECURITY DEFINER` in
 order to perform the action with elevated privileges; alternatively you could
 use this database function directly - see [Custom
-Mutations](./custom-mutations/) for more details.
+Mutations](./custom-mutations) for more details.

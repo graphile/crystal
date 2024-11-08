@@ -13,4 +13,4 @@ This documentation is copied from Version 4 and has not been updated to Version
 
 PostGraphile does not currently have support for the new procedures introduced
 in PostgreSQL 11; however we have solid support for functions, which you can
-read more about [here](./functions/)
+read more about [here](./functions)

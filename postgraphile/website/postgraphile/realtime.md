@@ -53,7 +53,7 @@ Use subscriptions when:
 - You know which events should trigger an update
 - Performance and scalability is important to you
 
-[Find out more about subscriptions in PostGraphile](./subscriptions/).
+[Find out more about subscriptions in PostGraphile](./subscriptions).
 
 <!--
 
@@ -97,6 +97,6 @@ When to use live queries:
   every time a change occurs - this is quite the opposite of normal GraphQL)
 - When you want to fawn over the power of GraphQL 🤤
 
-[Find out more about live queries in PostGraphile](./live-queries/).
+[Find out more about live queries in PostGraphile](./live-queries).
 
 -->

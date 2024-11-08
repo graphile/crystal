@@ -10,7 +10,7 @@ of calling a function defined in the PostgreSQL schema. This function will
 automatically be exposed to the resultant GraphQL schema as a field on the type;
 it can accept arguments that influence its result, and may return either a
 scalar, record, list or a set. Sets (denoted by `RETURNS SETOF ...`) are exposed
-as [connections](./connections/) or lists, depending on the behavior configuration.
+as [connections](./connections) or lists, depending on the behavior configuration.
 
 :::tip
 
@@ -29,7 +29,7 @@ To create a function that PostGraphile will recognize as a computed column, it
 must obey the following rules:
 
 - adhere to
-  [common PostGraphile function restrictions](./function-restrictions/)
+  [common PostGraphile function restrictions](./function-restrictions)
 - name must begin with the name of the table it applies to, followed by an
   underscore (`_`)
 - first parameter must be the table type

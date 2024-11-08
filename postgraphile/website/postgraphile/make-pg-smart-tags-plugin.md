@@ -6,12 +6,12 @@ title: makePgSmartTagsPlugin
 
 Smart Tags enable you to customize how (or if) your PostgreSQL resources are
 represented in your PostGraphile GraphQL schema. Before reading this page, you
-should familiarize yourself with [Smart Tags](./smart-tags/) so that you know
+should familiarize yourself with [Smart Tags](./smart-tags) so that you know
 when and why you would use them.
 
 ## Recommended: TagsFilePlugin
 
-We recommend the [postgraphile.tags.json5 file](./smart-tags-file/) to most
+We recommend the [postgraphile.tags.json5 file](./smart-tags-file) to most
 users; you can enable it by adding the `TagsFilePlugin` to your preset:
 
 ```js title="graphile.config.mjs"
@@ -64,7 +64,7 @@ const preset: GraphileConfig.Preset = {
 };
 ```
 
-This plugin powers the [postgraphile.tags.json5 file](./smart-tags-file/)
+This plugin powers the [postgraphile.tags.json5 file](./smart-tags-file)
 enabled by `TagsFilePlugin`. You can use it multiple times to merge smart tags
 from multiple files should you wish.
 
@@ -136,7 +136,7 @@ An example of an empty `JSONPgSmartTags` object would be:
 ```
 
 A more in-depth example of this configuration file, with comments, is available
-in [the postgraphile.tags.json5 file documentation](./smart-tags-file/).
+in [the postgraphile.tags.json5 file documentation](./smart-tags-file).
 
 ### Details
 

@@ -4,7 +4,7 @@ path: /postgraphile/custom-mutations/
 title: Custom Mutations
 ---
 
-PostGraphile automatically generates [CRUD Mutations](./crud-mutations/) for
+PostGraphile automatically generates [CRUD Mutations](./crud-mutations) for
 you; but it's rare that these will cover all your needs - and many people just
 disable them outright. Custom mutations enable you to write exactly the business
 logic you need with access to all of your data all wrapped up in a PostgreSQL
@@ -18,7 +18,7 @@ To create a function that PostGraphile will recognise as a custom mutation, it
 must obey the following rules:
 
 - adhere to
-  [common PostGraphile function restrictions](./function-restrictions/)
+  [common PostGraphile function restrictions](./function-restrictions)
 - must be marked as `VOLATILE` (which is the default for PostgreSQL functions)
 - must be defined in one of the introspected schemas
 
@@ -122,7 +122,7 @@ $$ LANGUAGE sql STRICT VOLATILE;
 
 If you prefer adding mutations on the JavaScript side, you can use
 `ExtendSchemaPlugin` from `graphile-utils`; see [Schema
-Plugins](./extending/) for more information.
+Plugins](./extending) for more information.
 
 ### GraphQL Schema Stitching
 

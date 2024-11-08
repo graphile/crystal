@@ -7,7 +7,7 @@ title: Community contributions
 The community contributes to PostGraphile development in many ways.
 
 One of the common ways of contributing is to write a plugin, see
-[Community Plugins](./community-plugins/) for a list of some of the plugins that
+[Community Plugins](./community-plugins) for a list of some of the plugins that
 have been made open source by the community.
 
 Community members also help each other on our

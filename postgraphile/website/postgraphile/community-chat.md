@@ -14,5 +14,5 @@ features in PostGraphile.
 <div class='graphile-logo-bg'></div>
 
 Chat, like everything else in Graphile, is governed by our
-[code of conduct](./code-of-conduct/), so please be careful to ensure your
+[code of conduct](./code-of-conduct), so please be careful to ensure your
 language always contributes to creating a positive environment.

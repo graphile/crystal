@@ -24,7 +24,7 @@ export default {
 ```
 
 You might do this if you prefer to define all of your mutations yourself (e.g.
-with [custom mutations](./custom-mutations/)).
+with [custom mutations](./custom-mutations)).
 
 It's a common misconception for people unfamiliar with PostGraphile that its
 main feature is the CRUD mutations. In actuality, a very significant portion of
@@ -36,8 +36,8 @@ Mutations](https://xuorig.medium.com/graphql-mutation-design-anemic-mutations-dd
 article.
 
 PostGraphile gives you a lot of ways to define your own mutations (from
-[database functions](./custom-mutations/), to [schema
-extensions](./make-extend-schema-plugin/), to [custom plugins](./extending)),
+[database functions](./custom-mutations), to [schema
+extensions](./make-extend-schema-plugin), to [custom plugins](./extending)),
 so you can pick whichever pattern you and your team are most comfortable with.
 
 :::note
@@ -55,7 +55,7 @@ and behavior systems. These are just some of the well-known key features of Post
 
 ### CRUD mutation fields
 
-Using the `users` table from the [parent article](./tables/), depending on the
+Using the `users` table from the [parent article](./tables), depending on the
 PostGraphile settings you use (and the permissions you've granted), you might
 get the following mutations:
 
@@ -78,7 +78,7 @@ You also get the following query fields ("Read"):
 - user - Returns a single `User` using its globally unique `ID`.
 - userById - Reads a single `User` using its globally unique `ID`.
 - userByUsername - Reads a single `User` using its unique `username`.
-- allUsers - Returns a [connection](./connections/) enabling pagination through
+- allUsers - Returns a [connection](./connections) enabling pagination through
   a set of (visible) `User`.
 
 ### Examples

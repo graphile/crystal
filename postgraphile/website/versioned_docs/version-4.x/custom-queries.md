@@ -6,9 +6,9 @@ title: Custom Queries
 
 You can add root-level `Query` fields to your GraphQL schema using "Custom
 Queries". These are PostgreSQL functions, similar to
-[computed columns](./computed-columns/), that can return scalars, records, [enums](./computed-columns/), lists
+[computed columns](./computed-columns), that can return scalars, records, [enums](./computed-columns), lists
 or sets. Sets (denoted by `RETURNS SETOF ...`) are exposed as
-[connections](./connections/). The arguments to these functions will be exposed
+[connections](./connections). The arguments to these functions will be exposed
 via GraphQL - named arguments are preferred, if your arguments are not named we
 will assign them an auto-generated name such as `arg1`.
 
@@ -16,9 +16,9 @@ To create a function that PostGraphile will recognise as a custom query, it must
 obey the following rules:
 
 - adhere to
-  [common PostGraphile function restrictions](./function-restrictions/)
+  [common PostGraphile function restrictions](./function-restrictions)
 - if the function accepts arguments, the first argument must NOT be a table type
-  (see [computed columns](./computed-columns/))
+  (see [computed columns](./computed-columns))
 - must NOT return `VOID`
 - must be marked as `STABLE` (or `IMMUTABLE`, though that tends to be less
   common)
@@ -116,7 +116,7 @@ as part of this.
 
 If you prefer adding to your schema on the JavaScript side, you can use
 `ExtendSchemaPlugin` from `graphile-utils`; see [Schema
-Plugins](./extending/) for more information.
+Plugins](./extending) for more information.
 
 ### GraphQL Schema Stitching
 

@@ -87,7 +87,7 @@ practice.
 
 ### Protect Your API
 
-See [Production Considerations](./production/).
+See [Production Considerations](./production).
 
 ### Use `LANGUAGE sql` Over `LANGUAGE plpgsql` Where Possible
 

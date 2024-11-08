@@ -9,9 +9,9 @@ manipulation APIs; "CRUD Mutations" refer to all but the "R". PostGraphile will
 automatically add CRUD mutations to the schema for each table; this behaviour
 can be disabled via the `--disable-default-mutations` CLI setting (or the
 `disableDefaultMutations: true` library setting) if you prefer to define all of
-your mutations yourself (e.g. with [custom mutations](./custom-mutations/)).
+your mutations yourself (e.g. with [custom mutations](./custom-mutations)).
 
-Using the `users` table from the [parent article](./tables/), depending on the
+Using the `users` table from the [parent article](./tables), depending on the
 PostGraphile settings you use (and the permissions you've granted), you might
 get the following mutations:
 
@@ -34,7 +34,7 @@ You also get the following query fields ("Read"):
 - user - Returns a single `User` using its globally unique `ID`.
 - userById - Reads a single `User` using its globally unique `ID`.
 - userByUsername - Reads a single `User` using its unique `username`.
-- allUsers - Returns a [connection](./connections/) enabling pagination through
+- allUsers - Returns a [connection](./connections) enabling pagination through
   a set of (visible) `User`.
 
 ### Examples

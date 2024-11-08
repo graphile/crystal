@@ -9,8 +9,8 @@ import Pro from "@site/src/components/Pro";
 import Spon from "@site/src/components/Spon";
 
 Library mode is the most popular way of running PostGraphile; it gives more
-power than using the CLI (see [CLI usage](./usage-cli/)), but is much easier to
-setup and more fully featured than [Schema-only Usage](./usage-schema/).
+power than using the CLI (see [CLI usage](./usage-cli)), but is much easier to
+setup and more fully featured than [Schema-only Usage](./usage-schema).
 
 Details of
 [the configuration options can be found below](#api-postgraphilepgconfig-schemaname-options).
@@ -528,7 +528,7 @@ for <tt>postgraphile@4.12.3</tt>.
     not accurate at all). Default `50000000` (~50MB). Set to 0 to disable.
 
 The following options are not part of PostGraphile core, but are available from
-the `@graphile/pg-pubsub` [subscriptions plugin](./subscriptions/) (formerly the
+the `@graphile/pg-pubsub` [subscriptions plugin](./subscriptions) (formerly the
 paid "supporter" plugin, but now fully free and open source - please consider
 [sponsoring us](https://graphile.org/sponsor/)!):
 
@@ -538,7 +538,7 @@ paid "supporter" plugin, but now fully free and open source - please consider
   subscribe
 
 The following options are not part of PostGraphile core, but are available from
-the Pro plugin - see [Go Pro!](/pricing/) for more information.
+the Pro plugin - see [Go Pro!](/pricing) for more information.
 
 - **`options`**:
   - `readOnlyConnection` <Pro /> <Spon /> ⚡️[experimental] set this to a PostgreSQL

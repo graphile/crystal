@@ -22,7 +22,7 @@ is updated) which creates your PostGraphile GraphQL schema by introspecting your
 database.
 
 The function takes very similar arguments to
-[the `postgraphile` middleware](./usage-library/).
+[the `postgraphile` middleware](./usage-library).
 
 ```js
 createPostGraphileSchema(
@@ -258,7 +258,7 @@ resolver. To do so you need the following:
     `await postgraphileMiddleware.getGqlSchema()`
   - if you don't need the PostGraphile middleware, you can use
     `await createPostGraphileSchema(...)` - see
-    [schema only usage](./usage-schema/) - do this once and cache it because
+    [schema only usage](./usage-schema) - do this once and cache it because
     it's expensive to compute
 - A GraphQL operation (aka query, but includes mutations, subscriptions) to
   execute; this can be a string or an AST
@@ -266,7 +266,7 @@ resolver. To do so you need the following:
 - A valid GraphQL context for PostGraphile
   - inside a resolver, you can just pass the resolver's context straight through
   - in other situations, have a look at `withPostGraphileContext` in the
-    [schema only usage](./usage-schema/)
+    [schema only usage](./usage-schema)
 
 Issuing a GraphQL operation from inside a resolver example:
 

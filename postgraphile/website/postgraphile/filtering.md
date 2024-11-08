@@ -5,7 +5,7 @@ title: Filtering
 ---
 
 Out of the box, PostGraphile supports rudimentary filtering on
-[connections](./connections/) using a `condition` argument. This allows you to
+[connections](./connections) using a `condition` argument. This allows you to
 filter using equality with specific values (e.g. `username: "Alice"` or
 `category: ARTICLE`).
 
@@ -15,20 +15,20 @@ It's important when implementing filters to keep performance in mind. By
 default (unless you're using the V4 preset), PostGraphile will not allow you to
 filter by a column that isn't indexed. To force a column to appear in the
 filtering options you can applying the `@behavior filterBy` [smart
-tag](./smart-tags/) to the relevant column, or you can use `@behavior -filterBy`
+tag](./smart-tags) to the relevant column, or you can use `@behavior -filterBy`
 to force it remove it.
 
 ### Advanced filtering
 
 You can extend PostGraphile's schema with more advance filtering capabilities by
-adding fields using [custom queries](./custom-queries/),
-[computed columns](./computed-columns/) or by using
-[makeExtendSchemaPlugin](./make-extend-schema-plugin/).
+adding fields using [custom queries](./custom-queries),
+[computed columns](./computed-columns) or by using
+[makeExtendSchemaPlugin](./make-extend-schema-plugin).
 
 To add a condition to an existing condition another option is the
 [`makeAddPgTableConditionPlugin`](./make-add-pg-table-condition-plugin). You
 can also augment PostGraphile's existing connections using custom [Graphile
-Engine plugins](./extending-raw/), such as the following:
+Engine plugins](./extending-raw), such as the following:
 
 #### Filter Plugin
 
@@ -57,4 +57,4 @@ it out! (But do keep the caveats above in mind.)
 #### Other plugins
 
 Some more of the community plugins relate to filtering, you can read more about
-them on the [community plugins page](./community-plugins/)
+them on the [community plugins page](./community-plugins)

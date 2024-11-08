@@ -81,7 +81,7 @@ not directly related to the problem of serving GraphQL from your PostgreSQL
 database, PostGraphile does not include these things by default. We recommend
 that you use something like Express middleware to implement these common
 requirements. This is why we recommend
-[using PostGraphile as a library](./usage-library/) for production usage.
+[using PostGraphile as a library](./usage-library) for production usage.
 
 Picking the Express (or similar) middleware that work for you is beyond the
 scope of this article; but you should ensure that they're installed before you
@@ -245,7 +245,7 @@ GraphQL clients, but it does have a few caveats:
   where possible, even if it means having additional static operations.
 - It does not protect you from writing expensive queries yourself; it may be
   wise to combine this technique with a cost estimation technique <!-- TODO: such as that
-  provided by the [Graphile Pro plugin](/pricing/) --> to help guide your developers
+  provided by the [Graphile Pro plugin](/pricing) --> to help guide your developers
   and avoid accidentally writing expensive queries.
 
 PostGraphile has first-party support for persisted operations via the open
@@ -264,7 +264,7 @@ you wish arbitrary third parties to be able to send queries to your API without
 the queries being pre-approved and without the risk of bringing your servers to
 their knees.
 
-**You are highly encouraged to purchase the [Pro Plugin [PRO]](/pricing/), which
+**You are highly encouraged to purchase the [Pro Plugin [PRO]](/pricing), which
 implements these protections in a deeply integrated and PostGraphile optimised
 way, and has the added benefit of helping sustain development and maintenance on
 the project.** You can read the
@@ -309,7 +309,7 @@ option: `defaultPaginationCap`) which enables you to enforce a pagination cap on
 all connections. Whatever number you pass will be used as the pagination cap
 (allowing requests smaller or equal to this cap to go through, and blocking
 those above it), but you can override it on a table-by-table basis using
-[smart comments](./smart-comments/) - in this case the `@paginationCap`[PRO]
+[smart comments](./smart-comments) - in this case the `@paginationCap`[PRO]
 smart comment.
 
 ```sql

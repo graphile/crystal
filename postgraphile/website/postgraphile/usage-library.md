@@ -5,10 +5,10 @@ title: Library/middleware
 # Using PostGraphile as a Library
 
 Library mode is the most popular way of running PostGraphile; it gives more
-power than using the CLI (see [CLI usage](./usage-cli/)) because you can
+power than using the CLI (see [CLI usage](./usage-cli)) because you can
 leverage the capabilities and ecosystems of your chosen Node.js webserver
 (Express, Koa, Fastify, etc), but is more fully featured than [Schema-only
-Usage](./usage-schema/).
+Usage](./usage-schema).
 
 ## PostGraphile instance
 

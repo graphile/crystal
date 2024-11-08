@@ -7,7 +7,7 @@ title: Reserved Keywords / Table Names
 Some table, column, function and argument names can cause issues with
 PostGraphile due to conflicts with auto-generated type and field names. In these
 cases you can generally change the GraphQL type and field names for your
-PostgreSQL schema to avoid conflicts using [smart comments](./smart-comments/).
+PostgreSQL schema to avoid conflicts using [smart comments](./smart-comments).
 
 Note that in many cases the **singular** or the **plural** of the words below
 may also cause issues, so assume the list below includes singulars and plurals

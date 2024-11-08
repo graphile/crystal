@@ -43,7 +43,7 @@ experience.
   [`@omit` smart comment](./smart-comments/#omitting).
 - **Function restrictions**: we have pretty good support for PostgreSQL
   functions, but there's some
-  [common function restrictions](./function-restrictions/) you should check out.
+  [common function restrictions](./function-restrictions) you should check out.
 - **Use unique constraints** rather than unique indexes when appropriate: we use
   unique constraints to create mutations such as `updateUserByUsername`; note
   that "PostgreSQL automatically creates a unique index when a unique constraint

@@ -92,7 +92,7 @@ query After {
 
 :::note
 
-You can use [smart tags](./smart-tags/) to change the GraphQL
+You can use [smart tags](./smart-tags) to change the GraphQL
 field name.
 
 :::
