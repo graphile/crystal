@@ -159,10 +159,15 @@ console.log("$a = " + $a.toString());
 You may override this to add additional data to the `toString` method (the data
 that would occur between the triangular brackets).
 
-## Access methods
+## Conventions
 
-When writing a step class, you should implement either `.at()` or `.get()` depending on
-if the step represents a list, array, or an objet.
+Your step may implement any additional methods that it needs; however certain methods 
+have special meaning. For example, if your step represents an object then it should
+implement the `.get(key)` method; and if the step represents an array/list then it
+should implement the `.at(index)` method.
+
+These conventions are still evolving, and more may be added as common usage patterns are
+detected. Functions that have special meanings/expectations can be found below:
 
 ### at
 
