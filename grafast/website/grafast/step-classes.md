@@ -161,7 +161,7 @@ that would occur between the triangular brackets).
 
 ## Conventions
 
-Your step may implement any additional methods that it needs; however certain methods 
+Your step may implement any additional methods that it needs; however certain methods
 have special meaning. For example, if your step represents an object then it should
 implement the `.get(key)` method; and if the step represents an array/list then it
 should implement the `.at(index)` method.
@@ -177,7 +177,7 @@ integer, which represents the index within the list-like value which should be a
 Usage:
 
 ```ts
-import { access } from 'grafast';
+import { access } from "grafast";
 
 class MyListStep extends ExecutableStep {
   // ...
@@ -189,13 +189,22 @@ class MyListStep extends ExecutableStep {
 }
 ```
 
+:::caution
+
+If your step implements `.at()`, make sure it meets the expectations:
+ie it correctly accepts a single argument an integer.
+&ZeroWidthSpace;<grafast /> relies on this assumption; unanticipated behaviours may result
+from steps which don't adhere to these expectations.
+
+:::
+
 ### get
 
 Implement `.get()` if your step represents an object. It should accept a single argument, a
 string, which represents an attribute to access an object-like value.
 
 ```ts
-import { access } from 'grafast';
+import { access } from "grafast";
 
 class MyObjectStep extends ExecutableStep {
   // ...
@@ -207,12 +216,11 @@ class MyObjectStep extends ExecutableStep {
 }
 ```
 
-
 :::caution
 
-If your step implements `.at()` or `.get()`, make sure it conforms to the expectations of
-those methods: ie it correctly accepts a single argument of either an integer or string.
-&ZeroWidthSpace;<grafast /> relies on these assumptions; unanticipated behaviours may result
+If your step implements `.get()`, make sure it meets the expectations:
+ie it correctly accepts a single argument of a string.
+&ZeroWidthSpace;<grafast /> relies on this assumption; unanticipated behaviours may result
 from steps which don't adhere to these expectations.
 
 :::
