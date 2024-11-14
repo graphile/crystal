@@ -172,9 +172,16 @@ integer, which represents the index within the list-like value which should be a
 Usage:
 
 ```ts
-const $abTuple = list([$a, $b]);
+import { access } from 'grafast';
 
-// abTuple.at(0) returns $a
+class MyListStep extends ExecutableStep {
+  // ...
+
+  at(index) {
+    // Your step may implement a more optimized solution here.
+    return access(this, index);
+  }
+}
 ```
 
 ### get
@@ -182,21 +189,19 @@ const $abTuple = list([$a, $b]);
 Implement `.get()` if your step represents an object. It should accept a single argument, a
 string, which represents an attribute to access an object-like value.
 
-### access
-
-If optimization isn't a concern, you can defer to `access` while implementing `get` or `at`. This
-means you can refactor and optimize at a later stage without affecting code using that step class.
-
 ```ts
-class MyStep extends ExecutableStep {
+import { access } from 'grafast';
+
+class MyObjectStep extends ExecutableStep {
   // ...
 
-  // For steps representing objects:
-  get(key) { return access(this, key); }
-
-  // For steps representing lists:
-  at(index) { return access(this, index); }
+  get(key) {
+    // Your step may implement a more optimized solution here.
+    return access(this, key);
+  }
+}
 ```
+
 
 :::caution
 

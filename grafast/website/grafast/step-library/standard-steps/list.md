@@ -6,11 +6,11 @@ of their values.
 Usage:
 
 ```ts
-const $abTuple = list([$a, $b]);
+const $abTuple = list([$a, $b, $c]);
 ```
 
 A ListStep has the following methods:
 
-- `.at(index)` - gets the value at `index` (`abTuple.at(0)` returns `$a`).
-- `.first()` - returns the first value in the list (`abTuple.first` returns `$a`).
-- `.last()` - returns the last value in the list (`abTuple.last()` returns `$b`).
+- `.at(index)` - gets the value at `index` (`$abTuple.at(1)` returns `$b`).
+- `.first()` - returns the first value in the list (`$abTuple.first()` returns `$a`).
+- `.last()` - returns the last value in the list (`$abTuple.last()` returns `$c`).
