@@ -5,9 +5,9 @@ A step class is a JavaScript class that extends `ExecutableStep` with an
 methods, and add other accessors and similar that child field plans may call.
 For more information see [step classes](../step-classes).
 
-A number of builtin standard step classes are provided for schemas to
+A number of built-in standard step classes are provided for schemas to
 accomplish common tasks, these are documented in [Standard
-steps](./standard-steps). Often these builtin steps are enough for your schemas
+steps](./standard-steps). Often these built-in steps are enough for your schemas
 needs, especially when integrating with an existing business logic layer via
 steps such as [loadOne][] and [loadMany][].
 
