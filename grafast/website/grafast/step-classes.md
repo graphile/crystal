@@ -50,6 +50,72 @@ inherit directly from `ExecutableStep`.
 
 :::
 
+## Conventions
+
+Your step may implement any additional methods that it needs; however certain methods
+have special meaning. For example, if your step represents an object then it should
+implement the `.get(key)` method; and if the step represents an array/list then it
+should implement the `.at(index)` method.
+
+These conventions are still evolving, and more may be added as common usage patterns are
+detected. Functions that have special meanings/expectations can be found below:
+
+### at
+
+Implement `.at()` if your step represents a list or an array. It should accept a single argument, an
+integer, which represents the index within the list-like value which should be accessed.
+
+Usage:
+
+```ts
+import { access } from "grafast";
+
+class MyListStep extends ExecutableStep {
+  // ...
+
+  at(index) {
+    // Your step may implement a more optimized solution here.
+    return access(this, index);
+  }
+}
+```
+
+:::caution
+
+If your step implements `.at()`, make sure it meets the expectations:
+ie it correctly accepts a single argument an integer.
+&ZeroWidthSpace;<grafast /> relies on this assumption; unanticipated behaviours may result
+from steps which don't adhere to these expectations.
+
+:::
+
+### get
+
+Implement `.get()` if your step represents an object. It should accept a single argument, a
+string, which represents an attribute to access an object-like value.
+
+```ts
+import { access } from "grafast";
+
+class MyObjectStep extends ExecutableStep {
+  // ...
+
+  get(key) {
+    // Your step may implement a more optimized solution here.
+    return access(this, key);
+  }
+}
+```
+
+:::caution
+
+If your step implements `.get()`, make sure it meets the expectations:
+ie it correctly accepts a single argument of a string.
+&ZeroWidthSpace;<grafast /> relies on this assumption; unanticipated behaviours may result
+from steps which don't adhere to these expectations.
+
+:::
+
 ## Built in methods
 
 Your custom step class will have access to all the built-in methods that come
@@ -158,72 +224,6 @@ console.log("$a = " + $a.toString());
 
 You may override this to add additional data to the `toString` method (the data
 that would occur between the triangular brackets).
-
-## Conventions
-
-Your step may implement any additional methods that it needs; however certain methods
-have special meaning. For example, if your step represents an object then it should
-implement the `.get(key)` method; and if the step represents an array/list then it
-should implement the `.at(index)` method.
-
-These conventions are still evolving, and more may be added as common usage patterns are
-detected. Functions that have special meanings/expectations can be found below:
-
-### at
-
-Implement `.at()` if your step represents a list or an array. It should accept a single argument, an
-integer, which represents the index within the list-like value which should be accessed.
-
-Usage:
-
-```ts
-import { access } from "grafast";
-
-class MyListStep extends ExecutableStep {
-  // ...
-
-  at(index) {
-    // Your step may implement a more optimized solution here.
-    return access(this, index);
-  }
-}
-```
-
-:::caution
-
-If your step implements `.at()`, make sure it meets the expectations:
-ie it correctly accepts a single argument an integer.
-&ZeroWidthSpace;<grafast /> relies on this assumption; unanticipated behaviours may result
-from steps which don't adhere to these expectations.
-
-:::
-
-### get
-
-Implement `.get()` if your step represents an object. It should accept a single argument, a
-string, which represents an attribute to access an object-like value.
-
-```ts
-import { access } from "grafast";
-
-class MyObjectStep extends ExecutableStep {
-  // ...
-
-  get(key) {
-    // Your step may implement a more optimized solution here.
-    return access(this, key);
-  }
-}
-```
-
-:::caution
-
-If your step implements `.get()`, make sure it meets the expectations:
-ie it correctly accepts a single argument of a string.
-&ZeroWidthSpace;<grafast /> relies on this assumption; unanticipated behaviours may result
-from steps which don't adhere to these expectations.
-
-:::
 
 ## Lifecycle methods
 
